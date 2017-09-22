@@ -25,7 +25,6 @@ import java.util.Collections;
 
 import org.eclipse.core.resources.IFile;
 
-
 /**
  * Describes the configuration for the FSTModel, to determine whether a feature is selected.
  * 
@@ -35,7 +34,8 @@ public class FSTConfiguration extends FSTFeature {
 
 	private final IFile file;
 	private boolean selected;
-	private Collection<String> selectedFeatures = Collections.emptySet();
+	private Collection<String> selectedFeatures =
+		Collections.emptySet();
 
 	/**
 	 * 
@@ -45,28 +45,30 @@ public class FSTConfiguration extends FSTFeature {
 	 */
 	public FSTConfiguration(final String name, final IFile file, final boolean selected) {
 		super(name, null);
-		this.file = file;
-		this.selected = selected;
+		this.file =
+			file;
+		this.selected =
+			selected;
 	}
-	
+
 	public IFile getFile() {
 		return file;
 	}
-	
+
 	public boolean isSelected() {
 		return selected;
 	}
-	
+
 	public void setSelectedFeatures(final Collection<String> selectedFeatures) {
-		this.selectedFeatures = Collections.unmodifiableCollection(selectedFeatures);
+		this.selectedFeatures =
+			Collections.unmodifiableCollection(selectedFeatures);
 	}
-	
+
 	/**
 	 * @return the selectedFeatures
 	 */
 	public Collection<String> getSelectedFeatures() {
 		return selectedFeatures;
 	}
-	
 
 }

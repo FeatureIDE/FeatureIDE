@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
  * @author Christopher Kruczek
  */
 public class ExportAsImageImpl extends AbstractExportAsAction {
-	
+
 	public ExportAsImageImpl(String text, GraphicalViewerImpl view) {
 		super(text, view);
 	}

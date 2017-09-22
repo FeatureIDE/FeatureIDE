@@ -33,15 +33,16 @@ public class UniqueId {
 	 * The id generator.
 	 */
 	private AtomicInteger idGenerator;
-	
+
 	/**
-	 * Creates an unique id generator instance and initializes internal state. 
+	 * Creates an unique id generator instance and initializes internal state.
 	 */
 	public UniqueId() {
-		idGenerator = new AtomicInteger();
+		idGenerator =
+			new AtomicInteger();
 		idGenerator.set(0);
 	}
-	
+
 	/**
 	 * Yields the next free natural number.
 	 * 

@@ -39,91 +39,128 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  */
 @Deprecated
 public class FAMAWriter extends AbstractFeatureModelWriter {
+
 	/**
 	 * 
 	 * @param feature
 	 * @return
 	 */
 	private String processFeature(IFeature feature) {
-		String prefix = "", suffix = "";
-		boolean isAnd = feature.getStructure().isAnd();
+		String prefix =
+			"", suffix =
+				"";
+		boolean isAnd =
+			feature.getStructure().isAnd();
 
-		if(!isAnd) {
-			if(feature.getStructure().isOr()) {
-				prefix += "[1,"+feature.getStructure().getChildren().size()+"]{";
-			} else if(feature.getStructure().isAlternative()) {
-				prefix += "[1,1]{";
+		if (!isAnd) {
+			if (feature.getStructure().isOr()) {
+				prefix +=
+					"[1,"
+						+ feature.getStructure().getChildren().size()
+						+ "]{";
+			} else if (feature.getStructure().isAlternative()) {
+				prefix +=
+					"[1,1]{";
 			}
-			if(!feature.getStructure().getChildren().isEmpty()) suffix = "}";
+			if (!feature.getStructure().getChildren().isEmpty()) suffix =
+				"}";
 		}
-		
-		StringBuilder out = new StringBuilder();
+
+		StringBuilder out =
+			new StringBuilder();
 		out.append(prefix);
-		
-		for(IFeatureStructure child : feature.getStructure().getChildren()){
-			if(isAnd && !child.isMandatory())
-				out.append("["+child.getFeature().getName()+"]");
+
+		for (IFeatureStructure child : feature.getStructure().getChildren()) {
+			if (isAnd
+				&& !child.isMandatory())
+				out.append("["
+					+ child.getFeature().getName()
+					+ "]");
 			else
 				out.append(child.getFeature().getName());
 			out.append(" ");
 		}
-		out.delete(out.length()-1, out.length());
-		out.append(suffix+";");
+		out.delete(out.length()
+			- 1, out.length());
+		out.append(suffix
+			+ ";");
 		return out.toString();
 	}
-	
+
 	/**
 	 * 
 	 * @param constraint
 	 * @return
 	 */
 	private String processConstraint(IConstraint constraint) {
-		org.prop4j.Node node = constraint.getNode().toCNF();
-		
-		if(node instanceof And) {
-			node = node.getChildren()[0];
+		org.prop4j.Node node =
+			constraint.getNode().toCNF();
+
+		if (node instanceof And) {
+			node =
+				node.getChildren()[0];
 		}
-		
-		org.prop4j.Node[] features = node.getChildren();
-		String f1 = features[0].getContainedFeatures().get(0);
-		String f2 = features[1].getContainedFeatures().get(0);
-		
-		if(features[0] instanceof Not || (features[0] instanceof Literal && !((Literal)features[0]).positive)) {
-			if(features[1] instanceof Not || (features[1] instanceof Literal && !((Literal)features[1]).positive)) {
-				return f1 + " EXCLUDES " + f2 + ";"; 
+
+		org.prop4j.Node[] features =
+			node.getChildren();
+		String f1 =
+			features[0].getContainedFeatures().get(0);
+		String f2 =
+			features[1].getContainedFeatures().get(0);
+
+		if (features[0] instanceof Not
+			|| (features[0] instanceof Literal
+				&& !((Literal) features[0]).positive)) {
+			if (features[1] instanceof Not
+				|| (features[1] instanceof Literal
+					&& !((Literal) features[1]).positive)) {
+				return f1
+					+ " EXCLUDES "
+					+ f2
+					+ ";";
 			} else {
-				return f1 + " REQUIRES " + f2 + ";"; 
+				return f1
+					+ " REQUIRES "
+					+ f2
+					+ ";";
 			}
 		} else {
-			return f2 + " REQUIRES " + f1 + ";";
+			return f2
+				+ " REQUIRES "
+				+ f1
+				+ ";";
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.io.AbstractObjectWriter#writeToString()
 	 */
 	@Override
 	public String writeToString() {
 		// TODO Auto-generated method stub
-		StringBuilder out = new StringBuilder();
-		
+		StringBuilder out =
+			new StringBuilder();
+
 		out.append("%Relationships\n");
-		for(IFeature f : object.getFeatures()) {
-			if(f.getStructure().hasChildren()) {
-				out.append(f.getName() + ": ");
-				out.append(processFeature(f) + "\n");
+		for (IFeature f : object.getFeatures()) {
+			if (f.getStructure().hasChildren()) {
+				out.append(f.getName()
+					+ ": ");
+				out.append(processFeature(f)
+					+ "\n");
 			}
 		}
-		
+
 		out.append("\n%Constraints\n");
-		
-		for(IConstraint c : object.getConstraints()) {
-			if(ComplexConstraintConverter.isSimple(c.getNode()))
-				out.append(processConstraint(c)+"\n");
+
+		for (IConstraint c : object.getConstraints()) {
+			if (ComplexConstraintConverter.isSimple(c.getNode()))
+				out.append(processConstraint(c)
+					+ "\n");
 		}
-		
+
 		return out.toString();
 	}
 
-	
 }

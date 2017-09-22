@@ -7,7 +7,8 @@ public class ProjectExplorerException extends PluginException {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID =
+		1L;
 
 	public ProjectExplorerException(String message) {
 		super(message);

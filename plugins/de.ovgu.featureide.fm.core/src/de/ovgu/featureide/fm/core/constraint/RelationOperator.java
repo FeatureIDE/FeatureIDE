@@ -21,25 +21,20 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * Different relation operators.<br>
- * {EQUAL, NOT_EQUAL, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL}
+ * Different relation operators.<br> {EQUAL, NOT_EQUAL, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL}
  * 
  * @author Sebastian Henneberg
  */
 public enum RelationOperator {
-	EQUAL("=="),
-	NOT_EQUAL("!="),
-	GREATER(">"),
-	LESS("<"),
-	GREATER_EQUAL(">="),
-	LESS_EQUAL("<=");
-	
+	EQUAL("=="), NOT_EQUAL("!="), GREATER(">"), LESS("<"), GREATER_EQUAL(">="), LESS_EQUAL("<=");
+
 	private String symbol;
-	
+
 	private RelationOperator(String symbol) {
-		this.symbol = symbol;
+		this.symbol =
+			symbol;
 	}
-	
+
 	@Override
 	public String toString() {
 		return symbol;

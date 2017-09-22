@@ -25,7 +25,6 @@ package de.ovgu.featureide.fm.core;
  * 
  * @author Cyrill Meyer
  */
-public enum FeatureStatus 
-{
+public enum FeatureStatus {
 	NORMAL, DEAD, FALSE_OPTIONAL, INDETERMINATE_HIDDEN
 }

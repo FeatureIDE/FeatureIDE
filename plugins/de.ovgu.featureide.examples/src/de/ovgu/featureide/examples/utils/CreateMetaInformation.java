@@ -52,33 +52,42 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public class CreateMetaInformation {
 
-	private static final String TEMPLATE_PROJECT_INFORMATION_XML = "template_" + ProjectRecord.PROJECT_INFORMATION_XML;
-	private static final String SPACE_REPLACEMENT = "%20";
+	private static final String TEMPLATE_PROJECT_INFORMATION_XML =
+		"template_"
+			+ ProjectRecord.PROJECT_INFORMATION_XML;
+	private static final String SPACE_REPLACEMENT =
+		"%20";
 
 	private static final class FileWalker implements FileVisitor<Path> {
+
 		private final static Pattern names;
 		static {
-			List<String> lines = new ArrayList<>(
-					Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
+			List<String> lines =
+				new ArrayList<>(
+						Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
 			try {
 				lines.addAll(Files.readAllLines(Paths.get(".gitignore"), Charset.forName("UTF-8")));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			final StringBuilder sb = new StringBuilder();
+			final StringBuilder sb =
+				new StringBuilder();
 			if (!lines.isEmpty()) {
 				for (String line : lines) {
 					sb.append("|");
-					//TODO implement full support for .gitignore syntax
+					// TODO implement full support for .gitignore syntax
 					if (line.startsWith("*")) {
-						sb.append(".*" + Pattern.quote(line.substring(1)));
+						sb.append(".*"
+							+ Pattern.quote(line.substring(1)));
 					} else {
 						sb.append(Pattern.quote(line));
 					}
 				}
-				names = Pattern.compile(sb.toString().substring(1));
+				names =
+					Pattern.compile(sb.toString().substring(1));
 			} else {
-				names = Pattern.compile("");
+				names =
+					Pattern.compile("");
 			}
 		}
 
@@ -86,20 +95,28 @@ public class CreateMetaInformation {
 		private final Path projectDir;
 
 		private FileWalker(List<String> listOfFiles, Path projectDir) {
-			this.listOfFiles = listOfFiles;
-			this.projectDir = projectDir;
+			this.listOfFiles =
+				listOfFiles;
+			this.projectDir =
+				projectDir;
 		}
 
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			final Path dirName = dir.getFileName();
-			return dirName != null && names.matcher(dirName.toString()).matches() ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
+			final Path dirName =
+				dir.getFileName();
+			return dirName != null
+				&& names.matcher(dirName.toString()).matches()
+					? FileVisitResult.SKIP_SUBTREE
+					: FileVisitResult.CONTINUE;
 		}
 
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-			final Path fileName = file.getFileName();
-			if (fileName != null && !names.matcher(fileName.toString()).matches()) {
+			final Path fileName =
+				file.getFileName();
+			if (fileName != null
+				&& !names.matcher(fileName.toString()).matches()) {
 				listOfFiles.add(projectDir.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "));
 			}
 			return FileVisitResult.CONTINUE;
@@ -118,20 +135,25 @@ public class CreateMetaInformation {
 
 	private static final class ProjectWalker implements FileVisitor<Path> {
 
-		private final static Set<String> names = new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
+		private final static Set<String> names =
+			new HashSet<>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
 
 		private final List<ProjectRecord> projects;
 
-		private LinkedList<ProjectRecord> lastProjects = new LinkedList<>();
+		private LinkedList<ProjectRecord> lastProjects =
+			new LinkedList<>();
 
 		private ProjectWalker(List<ProjectRecord> projects) {
-			this.projects = projects;
+			this.projects =
+				projects;
 		}
 
 		@Override
 		public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			final Path dirName = dir.getFileName();
-			if (dirName != null && names.contains(dirName.toString())) {
+			final Path dirName =
+				dir.getFileName();
+			if (dirName != null
+				&& names.contains(dirName.toString())) {
 				return FileVisitResult.SKIP_SUBTREE;
 			} else {
 				lastProjects.add(null);
@@ -141,14 +163,19 @@ public class CreateMetaInformation {
 
 		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-			final Path fileName = file.getFileName();
-			if (fileName != null && IProjectDescription.DESCRIPTION_FILE_NAME.equals(fileName.toString())) {
-				final Path parent = file.getParent();
+			final Path fileName =
+				file.getFileName();
+			if (fileName != null
+				&& IProjectDescription.DESCRIPTION_FILE_NAME.equals(fileName.toString())) {
+				final Path parent =
+					file.getParent();
 				if (parent != null) {
-					final Path parentName = parent.getFileName();
+					final Path parentName =
+						parent.getFileName();
 					if (parentName != null) {
-						final ProjectRecord newProject = new ProjectRecord(
-								pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parentName.toString());
+						final ProjectRecord newProject =
+							new ProjectRecord(
+									pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parentName.toString());
 						newProject.setUpdated(createIndex(parent));
 						projects.add(newProject);
 						lastProjects.removeLast();
@@ -166,13 +193,18 @@ public class CreateMetaInformation {
 
 		@Override
 		public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-			final ProjectRecord lastProject = lastProjects.removeLast();
+			final ProjectRecord lastProject =
+				lastProjects.removeLast();
 			if (lastProject != null) {
-				final ListIterator<ProjectRecord> listIterator = projects.listIterator(projects.size());
+				final ListIterator<ProjectRecord> listIterator =
+					projects.listIterator(projects.size());
 				while (listIterator.hasPrevious()) {
-					final ProjectRecord previousProject = listIterator.previous();
-					final String ppPath = previousProject.getRelativePath();
-					final String lpPath = lastProject.getRelativePath();
+					final ProjectRecord previousProject =
+						listIterator.previous();
+					final String ppPath =
+						previousProject.getRelativePath();
+					final String lpPath =
+						lastProject.getRelativePath();
 					if (ppPath.startsWith(lpPath)) {
 						if (ppPath.length() > lpPath.length()) {
 							lastProject.addSubProject(previousProject);
@@ -189,20 +221,26 @@ public class CreateMetaInformation {
 
 	private static Path pluginRoot;
 
-	private static boolean force = false;
+	private static boolean force =
+		false;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 0) {
 			if ("-force".equals(args[0])) {
-				force = true;
+				force =
+					true;
 			}
 		}
-		pluginRoot = Paths.get(".");
-		final Path exampleDir = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
-		final Path indexFile = pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+		pluginRoot =
+			Paths.get(".");
+		final Path exampleDir =
+			pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		final Path indexFile =
+			pluginRoot.resolve(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
 
 		System.out.println("Examining Files...");
-		final ProjectRecordCollection projectFiles = new ProjectRecordCollection();
+		final ProjectRecordCollection projectFiles =
+			new ProjectRecordCollection();
 		Files.walkFileTree(exampleDir, new ProjectWalker(projectFiles));
 		Collections.sort(projectFiles);
 
@@ -213,9 +251,11 @@ public class CreateMetaInformation {
 			}
 		}
 
-		final ProjectRecordFormat format = new ProjectRecordFormat();
+		final ProjectRecordFormat format =
+			new ProjectRecordFormat();
 
-		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
+		final ProjectRecordCollection oldProjectFiles =
+			new ProjectRecordCollection();
 		if (Files.exists(indexFile)) {
 			FileHandler.load(indexFile, oldProjectFiles, format);
 			Collections.sort(oldProjectFiles);
@@ -232,9 +272,10 @@ public class CreateMetaInformation {
 					System.out.printf("\tAdded Project: %s \n", projectRecord.getProjectName());
 					try {
 						Files.copy(pluginRoot.resolve(TEMPLATE_PROJECT_INFORMATION_XML), Paths.get(projectRecord.getInformationDocumentPath()));
-					} catch (FileAlreadyExistsException e) {
-					} catch (IOException | UnsupportedOperationException e) {
-						System.err.println("\t\tWARNING: Could not create " + ProjectRecord.PROJECT_INFORMATION_XML + " file.");
+					} catch (FileAlreadyExistsException e) {} catch (IOException | UnsupportedOperationException e) {
+						System.err.println("\t\tWARNING: Could not create "
+							+ ProjectRecord.PROJECT_INFORMATION_XML
+							+ " file.");
 						e.printStackTrace();
 					}
 				}
@@ -251,12 +292,20 @@ public class CreateMetaInformation {
 
 	private static boolean createIndex(final Path projectDir) {
 		try {
-			final List<String> listOfFiles = new ArrayList<>();
+			final List<String> listOfFiles =
+				new ArrayList<>();
 			Files.walkFileTree(projectDir, new FileWalker(listOfFiles, projectDir));
-			final Path indexFile = projectDir.resolve(ProjectRecord.INDEX_FILENAME);
-			final List<String> listOfFilesOld = force ? null : readFile(indexFile);
-			if (listOfFilesOld == null || listOfFilesOld.hashCode() != listOfFiles.hashCode() || !listOfFiles.equals(listOfFilesOld)) {
-				StringBuilder sb = new StringBuilder();
+			final Path indexFile =
+				projectDir.resolve(ProjectRecord.INDEX_FILENAME);
+			final List<String> listOfFilesOld =
+				force
+					? null
+					: readFile(indexFile);
+			if (listOfFilesOld == null
+				|| listOfFilesOld.hashCode() != listOfFiles.hashCode()
+				|| !listOfFiles.equals(listOfFilesOld)) {
+				StringBuilder sb =
+					new StringBuilder();
 				for (String filePath : listOfFiles) {
 					sb.append(filePath);
 					sb.append("\n"); // always use Unix file separator to keep file lists line endings uniform across different platforms

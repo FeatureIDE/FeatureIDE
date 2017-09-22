@@ -28,26 +28,32 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform
 	 */
 	public DeadFeatureExplanationWriter(DeadFeatureExplanation explanation) {
 		super(explanation);
 	}
-	
+
 	@Override
 	protected DeadFeatureExplanation getExplanation() {
 		return (DeadFeatureExplanation) super.getExplanation();
 	}
-	
+
 	@Override
 	protected String getSubjectString() {
-		return getExplanation().isVoid() ? "feature model" : getSubjectString(getExplanation().getSubject());
+		return getExplanation().isVoid()
+			? "feature model"
+			: getSubjectString(getExplanation().getSubject());
 	}
-	
+
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isVoid() ? "void" : "dead";
+		return getExplanation().isVoid()
+			? "void"
+			: "dead";
 	}
 }

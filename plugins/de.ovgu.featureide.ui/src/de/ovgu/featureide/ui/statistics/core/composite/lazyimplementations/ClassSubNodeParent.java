@@ -31,14 +31,15 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 public class ClassSubNodeParent extends Parent {
 
 	private final FSTClassFragment frag;
-	
+
 	public ClassSubNodeParent(String descString, FSTClassFragment fstClassFrag) {
 		super(descString.replace(":", ""));
-		frag = fstClassFrag;
+		frag =
+			fstClassFrag;
 	}
 
-	public FSTClassFragment getFragment(){
+	public FSTClassFragment getFragment() {
 		return frag;
 	}
-	
+
 }

@@ -38,18 +38,21 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGro
  */
 public class OrAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.or";
+	public static final String ID =
+		"de.ovgu.featureide.or";
 
 	private final IFeatureModel featureModel;
 
 	public OrAction(Object viewer, IFeatureModel featureModel) {
 		super(OR, viewer);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
-		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.OR, feature, featureModel);
+		ChangeFeatureGroupTypeOperation op =
+			new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.OR, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -62,9 +65,12 @@ public class OrAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		boolean or = feature.getStructure().isOr();
+		boolean or =
+			feature.getStructure().isOr();
 		// setEnabled(connectionSelected && !feature.isRoot() && !or)
-		setEnabled(!or && feature.getStructure().hasChildren() && feature.getStructure().getChildrenCount() > 1);
+		setEnabled(!or
+			&& feature.getStructure().hasChildren()
+			&& feature.getStructure().getChildrenCount() > 1);
 		setChecked(or);
 	}
 

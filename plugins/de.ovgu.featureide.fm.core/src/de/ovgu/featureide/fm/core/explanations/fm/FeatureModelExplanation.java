@@ -35,26 +35,30 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  * @author Timo G&uuml;nther
  */
 public abstract class FeatureModelExplanation extends Explanation {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	protected FeatureModelExplanation(IFeatureModelElement subject) {
 		super(subject);
 	}
-	
+
 	@Override
 	public IFeatureModelElement getSubject() {
 		return (IFeatureModelElement) super.getSubject();
 	}
-	
+
 	/**
-	 * Returns all feature model elements affected by this explanation.
-	 * An element is considered affected if it is the defect element, the source element of any reason or part of any such constraint.
+	 * Returns all feature model elements affected by this explanation. An element is considered affected if it is the defect element, the source element of any
+	 * reason or part of any such constraint.
+	 * 
 	 * @return all feature model elements affected by this explanation
 	 */
 	public Set<IFeatureModelElement> getAffectedElements() {
-		final Set<IFeatureModelElement> affectedElements = new LinkedHashSet<>();
+		final Set<IFeatureModelElement> affectedElements =
+			new LinkedHashSet<>();
 		for (final Reason reason : getReasons()) {
 			if (!(reason instanceof FeatureModelReason)) {
 				continue;
@@ -62,24 +66,28 @@ public abstract class FeatureModelExplanation extends Explanation {
 			affectedElements.addAll(((FeatureModelReason) reason).getTrace().getElements());
 		}
 		affectedElements.add(getSubject());
-		final Set<IFeatureModelElement> constraintElements = new LinkedHashSet<>();
+		final Set<IFeatureModelElement> constraintElements =
+			new LinkedHashSet<>();
 		for (final IFeatureModelElement affectedElement : affectedElements) {
 			if (!(affectedElement instanceof IConstraint)) {
 				continue;
 			}
-			final IConstraint constraint = (IConstraint) affectedElement;
+			final IConstraint constraint =
+				(IConstraint) affectedElement;
 			constraintElements.addAll(constraint.getContainedFeatures());
 		}
 		affectedElements.addAll(constraintElements);
 		return affectedElements;
 	}
-	
+
 	/**
 	 * Returns all features affected by this explanation.
+	 * 
 	 * @return all features affected by this explanation
 	 */
 	public Set<IFeature> getAffectedFeatures() {
-		final Set<IFeature> affectedFeatures = new LinkedHashSet<>();
+		final Set<IFeature> affectedFeatures =
+			new LinkedHashSet<>();
 		for (final IFeatureModelElement affectedElement : getAffectedElements()) {
 			if (affectedElement instanceof IFeature) {
 				affectedFeatures.add((IFeature) affectedElement);
@@ -87,13 +95,15 @@ public abstract class FeatureModelExplanation extends Explanation {
 		}
 		return affectedFeatures;
 	}
-	
+
 	/**
 	 * Returns all constraints affected by this explanation.
+	 * 
 	 * @return all constraints affected by this explanation
 	 */
 	public Set<IConstraint> getAffectedConstraints() {
-		final Set<IConstraint> affectedConstraints = new LinkedHashSet<>();
+		final Set<IConstraint> affectedConstraints =
+			new LinkedHashSet<>();
 		for (final IFeatureModelElement affectedElement : getAffectedElements()) {
 			if (affectedElement instanceof IConstraint) {
 				affectedConstraints.add((IConstraint) affectedElement);

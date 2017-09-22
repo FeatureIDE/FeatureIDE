@@ -38,51 +38,63 @@ public class XMLMandatoryOmitTest {
 
 	@Test
 	public void testOmmitingMandatoryAttribute() {
-		XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+		XmlFeatureModelFormat format =
+			new XmlFeatureModelFormat();
 
-		//Create new Feature Model
-		IFeatureModel fm = new FeatureModel("OmitTest");
+		// Create new Feature Model
+		IFeatureModel fm =
+			new FeatureModel("OmitTest");
 
-		//Create root
-		IFeature root = new Feature(fm, "Root");
+		// Create root
+		IFeature root =
+			new Feature(fm, "Root");
 		fm.getStructure().setRoot(root.getStructure());
 
-		//Create Or Group
-		IFeature or = new Feature(fm, "OrGroup");
+		// Create Or Group
+		IFeature or =
+			new Feature(fm, "OrGroup");
 		root.getStructure().addChild(or.getStructure());
-		
-		IFeature orOne = new Feature(fm, "OrChild");
+
+		IFeature orOne =
+			new Feature(fm, "OrChild");
 		orOne.getStructure().setMandatory(true);
 		or.getStructure().addChild(orOne.getStructure());
-		IFeature orTwo = new Feature(fm, "OrChild2");
+		IFeature orTwo =
+			new Feature(fm, "OrChild2");
 		orTwo.getStructure().setMandatory(true);
 		or.getStructure().addChild(orTwo.getStructure());
-		
-		//Change or feature to group mode OR
+
+		// Change or feature to group mode OR
 		or.getStructure().changeToOr();
-		
-		//Create Alternative Group
-		IFeature alt = new Feature(fm, "AlternativeGroup");
+
+		// Create Alternative Group
+		IFeature alt =
+			new Feature(fm, "AlternativeGroup");
 		root.getStructure().addChild(alt.getStructure());
-		
-		IFeature altOne = new Feature(fm, "AlternativeChild");
+
+		IFeature altOne =
+			new Feature(fm, "AlternativeChild");
 		altOne.getStructure().setMandatory(true);
 		alt.getStructure().addChild(altOne.getStructure());
-		IFeature altTwo = new Feature(fm, "AlternativeChild2");
+		IFeature altTwo =
+			new Feature(fm, "AlternativeChild2");
 		altTwo.getStructure().setMandatory(true);
 		alt.getStructure().addChild(altTwo.getStructure());
-		
-		//Change alternative feature to group mode ALTERNATIVE
+
+		// Change alternative feature to group mode ALTERNATIVE
 		alt.getStructure().changeToAlternative();
-		
-		//Create XML from feature model
-		String ausgabe = format.write(fm);
-		
-		//Replace roots mandatory
-        ausgabe = ausgabe.replaceFirst("mandatory=\"true\"", "");
-        
-        //Check if mandatory = true is present in current xml
-		boolean isMandantoryPresent = ausgabe.contains("mandatory=\"true\"");
+
+		// Create XML from feature model
+		String ausgabe =
+			format.write(fm);
+
+		// Replace roots mandatory
+		ausgabe =
+			ausgabe.replaceFirst("mandatory=\"true\"", "");
+
+		// Check if mandatory = true is present in current xml
+		boolean isMandantoryPresent =
+			ausgabe.contains("mandatory=\"true\"");
 
 		assertEquals(isMandantoryPresent, false);
 	}

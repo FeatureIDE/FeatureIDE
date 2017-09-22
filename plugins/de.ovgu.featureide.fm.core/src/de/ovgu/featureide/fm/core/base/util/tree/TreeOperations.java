@@ -30,8 +30,7 @@ import java.util.Collections;
  */
 public final class TreeOperations {
 
-	private TreeOperations() {
-	}
+	private TreeOperations() {}
 
 	public static void reverse(ModelTree<?, ?> tree) {
 		for (ModelTree<?, ?> child : tree.children) {

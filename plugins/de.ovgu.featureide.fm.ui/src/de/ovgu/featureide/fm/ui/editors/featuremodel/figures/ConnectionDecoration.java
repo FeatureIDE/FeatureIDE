@@ -26,28 +26,31 @@ import org.eclipse.draw2d.Shape;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 
 /**
- * A decoration for a connection figure.
- * Can be either {@link CircleDecoration} or {@link RelationDecoration}.
+ * A decoration for a connection figure. Can be either {@link CircleDecoration} or {@link RelationDecoration}.
  * 
  * @author Timo G&uuml;nther
  */
 public abstract class ConnectionDecoration extends Shape implements RotatableDecoration {
+
 	/** the currently active reason */
 	private FeatureModelReason activeReason;
-	
+
 	/**
 	 * Returns the currently active reason.
+	 * 
 	 * @return the currently active reason
 	 */
 	public FeatureModelReason getActiveReason() {
 		return activeReason;
 	}
-	
+
 	/**
 	 * Sets the currently active reason.
+	 * 
 	 * @param activeReason new active reason
 	 */
 	public void setActiveReason(FeatureModelReason activeReason) {
-		this.activeReason = activeReason;
+		this.activeReason =
+			activeReason;
 	}
 }

@@ -32,11 +32,26 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class InternalFeatureModelFormat implements IFeatureModelFormat {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + InternalFeatureModelFormat.class.getSimpleName();
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ InternalFeatureModelFormat.class.getSimpleName();
 
-	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private final StringBuilder sb = new StringBuilder();
+	private static final String[] SYMBOLS =
+		{
+			"!",
+			"&&",
+			"||",
+			"->",
+			"<->",
+			", ",
+			"choose",
+			"atleast",
+			"atmost" };
+	private static final String NEWLINE =
+		System.getProperty("line.separator", "\n");
+	private final StringBuilder sb =
+		new StringBuilder();
 
 	@Override
 	public boolean supportsRead() {
@@ -50,7 +65,8 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel object) {
-		IFeatureStructure root = object.getStructure().getRoot();
+		IFeatureStructure root =
+			object.getStructure().getRoot();
 		if (root == null) {
 			return "";
 		}
@@ -100,14 +116,20 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 		if (feature.isAbstract()) {
 			sb.append("a ");
 		}
-		if (feature.isMandatory() && (feature.getParent() == null || feature.getParent().isAnd())) {
+		if (feature.isMandatory()
+			&& (feature.getParent() == null
+				|| feature.getParent().isAnd())) {
 			sb.append("m ");
 		}
 		sb.append(feature.getFeature().getName());
-		final String description = feature.getFeature().getProperty().getDescription();
-		final boolean hasDescription = description != null && !description.isEmpty();
+		final String description =
+			feature.getFeature().getProperty().getDescription();
+		final boolean hasDescription =
+			description != null
+				&& !description.isEmpty();
 
-		if (feature.getChildrenCount() != 0 || hasDescription) {
+		if (feature.getChildrenCount() != 0
+			|| hasDescription) {
 			sb.append(" {");
 			sb.append(NEWLINE);
 			if (hasDescription) {

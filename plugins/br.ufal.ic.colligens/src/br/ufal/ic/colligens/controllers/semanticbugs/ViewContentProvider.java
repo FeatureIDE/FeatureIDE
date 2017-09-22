@@ -20,12 +20,10 @@ import br.ufal.ic.colligens.models.cppchecker.CppCheckerLog;
 class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public Object[] getElements(Object files) {
@@ -37,8 +35,9 @@ class ViewContentProvider implements ITreeContentProvider {
 		if (parentElement instanceof List)
 			return ((List<?>) parentElement).toArray();
 		if (parentElement instanceof CppCheckerFileLogs) {
-			Collection<CppCheckerLog> logs = ((CppCheckerFileLogs) parentElement)
-					.getLogs();
+			Collection<CppCheckerLog> logs =
+				((CppCheckerFileLogs) parentElement)
+						.getLogs();
 
 			return logs.toArray();
 		}

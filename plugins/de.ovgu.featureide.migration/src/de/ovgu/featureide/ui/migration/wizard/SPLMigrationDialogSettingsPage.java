@@ -28,56 +28,51 @@ import org.eclipse.swt.widgets.Composite;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
 /**
- * Second Page of the {@link SPLMigrationWizard}. Enables the user to choose the
- * new projects composer, and the pathes for source, feature and config folders.
+ * Second Page of the {@link SPLMigrationWizard}. Enables the user to choose the new projects composer, and the pathes for source, feature and config folders.
  * 
  * 
  * @author Konstantin Tonscheidt
  * 
  */
-public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage
-{
+public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage {
 
-	public SPLMigrationDialogSettingsPage()
-	{
+	public SPLMigrationDialogSettingsPage() {
 		super();
 		setDescription(IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE);
 	}
 
 	@Override
-	public boolean canFlipToNextPage()
-	{
+	public boolean canFlipToNextPage() {
 		return false;
 	}
-	
+
 	@Override
-	public void createControl(Composite parent)
-	{
+	public void createControl(Composite parent) {
 		super.createControl(parent);
-		
+
 		validateComposerMigrationSupport();
 	}
-	
+
 	@Override
-	protected void dialogChanged()
-	{
+	protected void dialogChanged() {
 		super.dialogChanged();
-		
+
 		validateComposerMigrationSupport();
 	}
 
 	/**
 	 * Only allow finishing, when the composer is supported by the MigrationPlugin
 	 */
-	private void validateComposerMigrationSupport()
-	{
-		final boolean composerSupported = getCompositionTool().supportsMigration();
-		
-		if(!composerSupported)
+	private void validateComposerMigrationSupport() {
+		final boolean composerSupported =
+			getCompositionTool().supportsMigration();
+
+		if (!composerSupported)
 			updateStatus(MIGRATION_IS_CURRENTLY_NOT_SUPPORTED_FOR_THE_SELECTED_COMPOSER__PLEASE_CHOOSE_ANOTHER_ONE);
 		else
 			setErrorMessage(null);
-		
-		setPageComplete(isPageComplete() && composerSupported);
+
+		setPageComplete(isPageComplete()
+			&& composerSupported);
 	}
 }

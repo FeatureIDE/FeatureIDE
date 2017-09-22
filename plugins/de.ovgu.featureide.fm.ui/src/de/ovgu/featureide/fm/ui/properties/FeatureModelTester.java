@@ -33,9 +33,11 @@ public class FeatureModelTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IFile res = (IFile) SelectionWrapper.checkClass(receiver, IFile.class);
+		final IFile res =
+			(IFile) SelectionWrapper.checkClass(receiver, IFile.class);
 		if (res != null) {
-			IFeatureModel featureModel = FeatureModelManager.load(Paths.get(res.getLocationURI())).getObject();
+			IFeatureModel featureModel =
+				FeatureModelManager.load(Paths.get(res.getLocationURI())).getObject();
 			if (featureModel != null)
 				return true;
 			return false;

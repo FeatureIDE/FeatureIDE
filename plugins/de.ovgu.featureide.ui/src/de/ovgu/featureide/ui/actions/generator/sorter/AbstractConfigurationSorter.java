@@ -29,33 +29,36 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
- * Sorts configurations.<br>
- * Default implementation, does nothing.
+ * Sorts configurations.<br> Default implementation, does nothing.
  * 
  * @author Jens Meinicke
  */
 public class AbstractConfigurationSorter {
-	
+
 	/**
-	 * This list contains all found configurations to built.<br>
-	 * Use <code>getConfiguration()</code> and <code>setConfiguration(c)</code> for synchronizing.
+	 * This list contains all found configurations to built.<br> Use <code>getConfiguration()</code> and <code>setConfiguration(c)</code> for synchronizing.
 	 */
-	protected LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>(); 
+	protected LinkedList<BuilderConfiguration> configurations =
+		new LinkedList<BuilderConfiguration>();
 
 	protected final Collection<String> concreteFeatures;
 
-	protected boolean sorted = true;
+	protected boolean sorted =
+		true;
 
 	public AbstractConfigurationSorter(final IFeatureModel featureModel) {
-		concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
+		concreteFeatures =
+			FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
 	}
-	
+
 	public int sortConfigurations(final IMonitor monitor) {
-		int numberOfConfigurations = sort(monitor);
-		sorted = true;
+		int numberOfConfigurations =
+			sort(monitor);
+		sorted =
+			true;
 		return numberOfConfigurations;
 	}
-	
+
 	protected int sort(final IMonitor monitor) {
 		return configurations.size();
 	}
@@ -65,16 +68,17 @@ public class AbstractConfigurationSorter {
 	}
 
 	public synchronized BuilderConfiguration getConfiguration() {
-		if (!sorted  || configurations.isEmpty()) {
+		if (!sorted
+			|| configurations.isEmpty()) {
 			return null;
 		}
 		return configurations.pop();
 	}
-	
+
 	public int getBufferSize() {
 		return configurations.size();
 	}
-	
+
 	public boolean isSorted() {
 		return sorted;
 	}

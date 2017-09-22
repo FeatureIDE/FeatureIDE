@@ -30,5 +30,5 @@ public class AddInterfaceNatureHandler extends AFeatureProjectHandler {
 	protected void singleAction(IFeatureProject project) {
 		MPLPlugin.getDefault().addInterfaceNature(project);
 	}
-	
+
 }

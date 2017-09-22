@@ -29,6 +29,7 @@ import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommen
  */
 public class VariantMerger extends ADocumentationCommentMerger {
 
-	private static final long serialVersionUID = -7675621880088603487L;
+	private static final long serialVersionUID =
+		-7675621880088603487L;
 
 }

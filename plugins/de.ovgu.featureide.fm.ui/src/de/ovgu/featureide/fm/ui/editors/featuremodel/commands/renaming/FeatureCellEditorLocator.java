@@ -38,23 +38,37 @@ public class FeatureCellEditorLocator implements CellEditorLocator, GUIDefaults 
 	private FeatureFigure figure;
 
 	public FeatureCellEditorLocator(FeatureFigure figure) {
-		this.figure = figure;
+		this.figure =
+			figure;
 	}
 
 	public void relocate(CellEditor celleditor) {
-		Control control = celleditor.getControl();
+		Control control =
+			celleditor.getControl();
 
-		Rectangle labelBounds = figure.getLabelBounds();
-		Rectangle bounds = labelBounds.getCopy();
+		Rectangle labelBounds =
+			figure.getLabelBounds();
+		Rectangle bounds =
+			labelBounds.getCopy();
 		figure.translateToAbsolute(bounds);
 
-		bounds.width = Math.max(bounds.width, CELL_EDITOR_MINSIZE.width);
-		bounds.width += CELL_EDITOR_INSETS.getWidth();
-		bounds.x += (labelBounds.width - bounds.width) / 2;
+		bounds.width =
+			Math.max(bounds.width, CELL_EDITOR_MINSIZE.width);
+		bounds.width +=
+			CELL_EDITOR_INSETS.getWidth();
+		bounds.x +=
+			(labelBounds.width
+				- bounds.width)
+				/ 2;
 
-		bounds.height = Math.max(bounds.height, CELL_EDITOR_MINSIZE.height);
-		bounds.height += CELL_EDITOR_INSETS.getHeight();
-		bounds.y += (labelBounds.height - bounds.height) / 2;
+		bounds.height =
+			Math.max(bounds.height, CELL_EDITOR_MINSIZE.height);
+		bounds.height +=
+			CELL_EDITOR_INSETS.getHeight();
+		bounds.y +=
+			(labelBounds.height
+				- bounds.height)
+				/ 2;
 
 		control.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
 	}

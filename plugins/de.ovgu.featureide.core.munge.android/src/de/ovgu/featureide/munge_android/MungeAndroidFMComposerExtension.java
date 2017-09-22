@@ -29,5 +29,5 @@ import de.ovgu.featureide.munge.MungeFMComposerExtension;
  * @author Eric Guimatsia
  */
 public class MungeAndroidFMComposerExtension extends MungeFMComposerExtension {
-	
+
 }

@@ -38,7 +38,7 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 			int modifiers, Type returnType) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString());
 	}
-	
+
 	public MungeFieldSignature(AbstractClassSignature parent, String name,
 			int modifiers, Type returnType, int line) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString(), line);
@@ -46,7 +46,8 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 
 	@Override
 	public String toString() {
-		StringBuilder fieldString = new StringBuilder();
+		StringBuilder fieldString =
+			new StringBuilder();
 
 //		fieldString.append(super.toString());
 //		if (fieldString.length() > 0) {
@@ -73,17 +74,22 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		hashCode = hashCodePrime * hashCode + type.hashCode();
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ type.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
 
-		MungeFieldSignature otherSig = (MungeFieldSignature) obj;
+		MungeFieldSignature otherSig =
+			(MungeFieldSignature) obj;
 
 		return super.sigEquals(otherSig);
 	}

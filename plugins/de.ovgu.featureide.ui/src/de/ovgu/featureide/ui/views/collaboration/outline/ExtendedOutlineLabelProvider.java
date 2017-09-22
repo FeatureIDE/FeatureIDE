@@ -30,13 +30,13 @@ import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLab
  */
 public class ExtendedOutlineLabelProvider extends CollaborationOutlineLabelProvider {
 
-
 	@Override
 	public String getText(Object element) {
 		if (element instanceof FSTClass) {
-			FSTClass fstclass = (FSTClass) element;
+			FSTClass fstclass =
+				(FSTClass) element;
 			return fstclass.getName();
-		}else{
+		} else {
 			return super.getText(element);
 		}
 	}
@@ -44,5 +44,5 @@ public class ExtendedOutlineLabelProvider extends CollaborationOutlineLabelProvi
 	public String getLabelProvName() {
 		return "Extended Outline";
 	}
-	
+
 }

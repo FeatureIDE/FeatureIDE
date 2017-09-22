@@ -33,7 +33,7 @@ public interface IRunner<T> extends IJob<T> {
 	void setCancelingTimeout(int cancelingTimeout);
 
 	void setStoppable(boolean stoppable);
-	
+
 	LongRunningMethod<T> getMethod();
 
 }

@@ -33,14 +33,17 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
  * @author Timo G&uuml;nther
  */
 public interface PreprocessorExplanationCreator extends FeatureModelExplanationCreator {
+
 	/**
 	 * Returns the expression stack.
+	 * 
 	 * @return the expression stack
 	 */
 	public Deque<Node> getExpressionStack();
-	
+
 	/**
 	 * Sets the expression stack.
+	 * 
 	 * @param expressionStack the expression stack
 	 */
 	public void setExpressionStack(Collection<Node> expressionStack);

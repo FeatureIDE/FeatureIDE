@@ -75,11 +75,19 @@ import de.ovgu.featureide.examples.utils.SimpleStructureProvider;
  */
 public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQuery {
 
-	public static final String ID = ExamplePlugin.PLUGIN_ID;
+	public static final String ID =
+		ExamplePlugin.PLUGIN_ID;
 
-	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
+	private static final String[] response =
+		new String[] {
+			YES,
+			ALL,
+			NO,
+			NO_ALL,
+			CANCEL };
 
-	private ExampleNewWizardPage mainPage = null;
+	private ExampleNewWizardPage mainPage =
+		null;
 
 	/**
 	 * Constructor for SampleNewWizard.
@@ -93,7 +101,8 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		mainPage = new ExampleNewWizardPage();
+		mainPage =
+			new ExampleNewWizardPage();
 		addPage(mainPage);
 	}
 
@@ -112,31 +121,34 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	/**
 	 * Create the selected projects
 	 * 
-	 * @return boolean <code>true</code> if all project creations were
-	 *         successful.
+	 * @return boolean <code>true</code> if all project creations were successful.
 	 */
 	public boolean createProjects() {
-		final Object[] selected = mainPage.getCheckedProjects();
-		final WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				try {
-					monitor.beginTask("", selected.length); //$NON-NLS-1$
-					if (monitor.isCanceled()) {
-						throw new OperationCanceledException();
-					}
-					for (Object selectedObject : selected) {
-						if (selectedObject instanceof ProjectRecord) {
-							ProjectRecord projectRecord = (ProjectRecord) selectedObject;
-							createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
-						} else if (selectedObject instanceof String) {
-							// do nothing
+		final Object[] selected =
+			mainPage.getCheckedProjects();
+		final WorkspaceModifyOperation op =
+			new WorkspaceModifyOperation() {
+
+				protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					try {
+						monitor.beginTask("", selected.length); //$NON-NLS-1$
+						if (monitor.isCanceled()) {
+							throw new OperationCanceledException();
 						}
+						for (Object selectedObject : selected) {
+							if (selectedObject instanceof ProjectRecord) {
+								ProjectRecord projectRecord =
+									(ProjectRecord) selectedObject;
+								createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
+							} else if (selectedObject instanceof String) {
+								// do nothing
+							}
+						}
+					} finally {
+						monitor.done();
 					}
-				} finally {
-					monitor.done();
 				}
-			}
-		};
+			};
 		// run the new project creation operation
 		try {
 			getContainer().run(true, true, op);
@@ -144,13 +156,17 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 			return false;
 		} catch (InvocationTargetException e) {
 			// one of the steps resulted in a core exception
-			Throwable t = e.getTargetException();
-			String message = CREATION_PROBLEMS;
+			Throwable t =
+				e.getTargetException();
+			String message =
+				CREATION_PROBLEMS;
 			IStatus status;
 			if (t instanceof CoreException) {
-				status = ((CoreException) t).getStatus();
+				status =
+					((CoreException) t).getStatus();
 			} else {
-				status = new Status(IStatus.ERROR, "org.eclipse.ui.ide", 1, message, t);
+				status =
+					new Status(IStatus.ERROR, "org.eclipse.ui.ide", 1, message, t);
 			}
 			ErrorDialog.openError(getShell(), message, null, status);
 			ExamplePlugin.getDefault().logError(e);
@@ -170,23 +186,32 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * @throws IOException
 	 */
 	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-		String projectName = record.getProjectName();
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(projectName);
+		String projectName =
+			record.getProjectName();
+		final IWorkspace workspace =
+			ResourcesPlugin.getWorkspace();
+		final IProject project =
+			workspace.getRoot().getProject(projectName);
 
 		final InputStream inputStream;
 		try {
-			URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + record.getIndexDocumentPath());
-			inputStream = url.openConnection().getInputStream();
+			URL url =
+				new URL("platform:/plugin/de.ovgu.featureide.examples/"
+					+ record.getIndexDocumentPath());
+			inputStream =
+				url.openConnection().getInputStream();
 		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
 
-		List<String> res = new ArrayList<>();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
+		List<String> res =
+			new ArrayList<>();
+		try (BufferedReader br =
+			new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
 			String line;
-			while ((line = br.readLine()) != null) {
+			while ((line =
+				br.readLine()) != null) {
 				res.add(line);
 			}
 			new ImportOperation(project.getFullPath(), null, new SimpleStructureProvider(record.getRelativePath()), this, res).run(monitor);
@@ -211,23 +236,31 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	 * @throws InvocationTargetException
 	 */
 	private void importSubProjects(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException {
-		String projectName = record.getProjectName();
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final IProject project = workspace.getRoot().getProject(projectName);
+		String projectName =
+			record.getProjectName();
+		final IWorkspace workspace =
+			ResourcesPlugin.getWorkspace();
+		final IProject project =
+			workspace.getRoot().getProject(projectName);
 
-		IProjectDescription desc = workspace.newProjectDescription(projectName);
+		IProjectDescription desc =
+			workspace.newProjectDescription(projectName);
 		desc.setBuildSpec(record.getProjectDescription().getBuildSpec());
 		desc.setComment(record.getProjectDescription().getComment());
 		desc.setDynamicReferences(record.getProjectDescription().getDynamicReferences());
 		desc.setNatureIds(record.getProjectDescription().getNatureIds());
 		desc.setReferencedProjects(record.getProjectDescription().getReferencedProjects());
 
-		final String projectPath = record.getRelativePath();
-		IPath location = workspace.getRoot().getLocation();
-		location = location.append(projectPath);
+		final String projectPath =
+			record.getRelativePath();
+		IPath location =
+			workspace.getRoot().getLocation();
+		location =
+			location.append(projectPath);
 		desc.setLocation(location);
 
-		SubMonitor subMonitor = SubMonitor.convert(monitor);
+		SubMonitor subMonitor =
+			SubMonitor.convert(monitor);
 		try {
 			subMonitor.beginTask(CREATING_PROJECTS, 100);
 			project.create(desc, subMonitor.newChild(30));
@@ -245,37 +278,54 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 	}
 
 	/**
-	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing
-	 * resource at the given path should be overwritten.
+	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing resource at the given
+	 * path should be overwritten.
 	 * 
 	 * @param pathString
 	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, or <code>"CANCEL"</code>
 	 */
 	public String queryOverwrite(String pathString) {
-		Path path = new Path(pathString);
+		Path path =
+			new Path(pathString);
 
 		String messageString;
 		// Break the message up if there is a file name and a directory
 		// and there are at least 2 segments.
-		if (path.getFileExtension() == null || path.segmentCount() < 2) {
-			messageString = pathString + " already exists. Would you like to overwrite it?";
+		if (path.getFileExtension() == null
+			|| path.segmentCount() < 2) {
+			messageString =
+				pathString
+					+ " already exists. Would you like to overwrite it?";
 		} else {
-			messageString = OVERWRITE + path.lastSegment() + IN_FOLDER + path.removeLastSegments(1).toOSString() + " ?";
+			messageString =
+				OVERWRITE
+					+ path.lastSegment()
+					+ IN_FOLDER
+					+ path.removeLastSegments(1).toOSString()
+					+ " ?";
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION,
-				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
+		final MessageDialog dialog =
+			new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION,
+					new String[] {
+						IDialogConstants.YES_LABEL,
+						IDialogConstants.YES_TO_ALL_LABEL,
+						IDialogConstants.NO_LABEL,
+						IDialogConstants.NO_TO_ALL_LABEL,
 						IDialogConstants.CANCEL_LABEL },
-				0);
+					0);
 
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
 		mainPage.getControl().getDisplay().syncExec(new Runnable() {
+
 			public void run() {
 				dialog.open();
 			}
 		});
-		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog.getReturnCode()];
+		return dialog.getReturnCode() < 0
+			? CANCEL
+			: response[dialog.getReturnCode()];
 	}
 
 }

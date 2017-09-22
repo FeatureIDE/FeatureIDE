@@ -32,20 +32,27 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * @author Jens Meinicke
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
-	
-	public final static String DEFAULT_PACKAGE = "(default package).";
 
-	private static final String STATIC = "static";
-	private static final String PUBLIC = "public";
-	private static final String PROTECTED = "protected";
-	private static final String PRIVATE = "private";
-	private static final String FINAL = "final";
+	public final static String DEFAULT_PACKAGE =
+		"(default package).";
+
+	private static final String STATIC =
+		"static";
+	private static final String PUBLIC =
+		"public";
+	private static final String PROTECTED =
+		"protected";
+	private static final String PRIVATE =
+		"private";
+	private static final String FINAL =
+		"final";
 
 	protected String name;
 	protected String type;
 	protected String modifiers;
 	protected String body;
-	protected String javaDocComment = null;
+	protected String javaDocComment =
+		null;
 	protected int beginLine;
 	protected int endLine;
 	protected int composedLine;
@@ -54,28 +61,35 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 	protected IRoleElement parent;
 
-	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
-	
+	private final TreeSet<FSTDirective> directives =
+		new TreeSet<FSTDirective>();
+
 	public void add(FSTDirective directive) {
 		directives.add(directive);
 		directive.setRole(role);
 	}
-	
+
 	public TreeSet<FSTDirective> getFSTDirectives() {
 		return directives;
 	}
-	
+
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
 	}
 
 	public RoleElement(String name, String type, String modifiers, String body, int beginLine, int endLine) {
-		this.name = name;
-		this.type = type;
-		this.modifiers = modifiers;
-		this.body = body;
-		this.beginLine = beginLine;
-		this.endLine = endLine;
+		this.name =
+			name;
+		this.type =
+			type;
+		this.modifiers =
+			modifiers;
+		this.body =
+			body;
+		this.beginLine =
+			beginLine;
+		this.endLine =
+			endLine;
 	}
 
 	public FSTRole getRole() {
@@ -83,39 +97,56 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 	public void setRole(FSTRole parent) {
-		this.role = parent;
+		this.role =
+			parent;
 	}
 
 	public IRoleElement getParent() {
 		return parent;
 	}
-	
+
 	private static String removeExtension(String name) {
-		final int extIndex = name.lastIndexOf('.');
-		return (extIndex > -1) ? name.substring(0, extIndex) : name;		
+		final int extIndex =
+			name.lastIndexOf('.');
+		return (extIndex > -1)
+			? name.substring(0, extIndex)
+			: name;
 	}
 
 	public String getFullIdentifier() {
-		final StringBuilder sb = new StringBuilder(removeExtension(name));
-		String packageName = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
-		IRoleElement nextParent = parent;
+		final StringBuilder sb =
+			new StringBuilder(removeExtension(name));
+		String packageName =
+			(this instanceof FSTClassFragment)
+				? ((FSTClassFragment) this).getPackage()
+				: null;
+		IRoleElement nextParent =
+			parent;
 		while (nextParent != null) {
 			sb.insert(0, '.');
 			if (nextParent.getParent() == null) {
-				packageName = ((FSTClassFragment) nextParent).getPackage();
+				packageName =
+					((FSTClassFragment) nextParent).getPackage();
 				sb.insert(0, removeExtension(nextParent.getName()));
 			} else {
 				sb.insert(0, nextParent.getName());
 			}
-			nextParent = nextParent.getParent();
+			nextParent =
+				nextParent.getParent();
 		}
-		final String className = sb.toString();
-		return ((packageName == null) ? DEFAULT_PACKAGE : packageName + ".") 
-				+ className.substring(className.lastIndexOf('/') + 1);
+		final String className =
+			sb.toString();
+		return ((packageName == null)
+			? DEFAULT_PACKAGE
+			: packageName
+				+ ".")
+			+ className.substring(className.lastIndexOf('/')
+				+ 1);
 	}
 
 	public void setParent(IRoleElement parent) {
-		this.parent = parent;
+		this.parent =
+			parent;
 	}
 
 	public IFile getFile() {
@@ -127,11 +158,13 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 	public void setLine(int lineNumber) {
-		this.beginLine = lineNumber;
+		this.beginLine =
+			lineNumber;
 	}
-	
+
 	public void setEndLine(int lineNumber) {
-		this.endLine = lineNumber;
+		this.endLine =
+			lineNumber;
 	}
 
 	public int getEndLine() {
@@ -139,7 +172,8 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 	public int getMethodLength() {
-		return endLine - beginLine;
+		return endLine
+			- beginLine;
 	}
 
 	public int getComposedLine() {
@@ -147,7 +181,8 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 	public void setComposedLine(int line) {
-		composedLine = line;
+		composedLine =
+			line;
 	}
 
 	public String getBody() {
@@ -192,15 +227,20 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 	/**
-	 * @return
-	 *         <code>true</code> if the given element is equivalent
-	 *         in its structure and it has the same class as this element
+	 * @return <code>true</code> if the given element is equivalent in its structure and it has the same class as this element
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((getFullName() == null) ? 0 : getFullName().hashCode());
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			prime
+				* result
+				+ ((getFullName() == null)
+					? 0
+					: getFullName().hashCode());
 		return result;
 	}
 
@@ -208,9 +248,11 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || !obj.getClass().equals(this.getClass()))
+		if (obj == null
+			|| !obj.getClass().equals(this.getClass()))
 			return false;
-		final IRoleElement other = (IRoleElement) obj;
+		final IRoleElement other =
+			(IRoleElement) obj;
 		if (!other.getFullName().equals(this.getFullName()))
 			return false;
 
@@ -223,7 +265,8 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 	@Override
 	public void setJavaDocComment(String javaDocComment) {
-		this.javaDocComment = javaDocComment;
+		this.javaDocComment =
+			javaDocComment;
 	}
 
 	@Override
@@ -235,4 +278,3 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 }
-

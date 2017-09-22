@@ -64,6 +64,7 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 //	}
 
 	public static final class SignatureMethodAccess {
+
 		private final int featureID;
 		private final AbstractSignature absSig;
 
@@ -83,8 +84,10 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 			if (!(arg0 instanceof SignatureMethodAccess)) {
 				return false;
 			}
-			SignatureMethodAccess comp = (SignatureMethodAccess) arg0;
-			if (this.featureID != comp.featureID || !this.absSig.equals(comp.absSig)) {
+			SignatureMethodAccess comp =
+				(SignatureMethodAccess) arg0;
+			if (this.featureID != comp.featureID
+				|| !this.absSig.equals(comp.absSig)) {
 				return false;
 			}
 			return true;
@@ -92,19 +95,27 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 
 		@Override
 		public int hashCode() {
-			int hashCode = this.featureID;
-			hashCode = 37 * hashCode + this.absSig.hashCode();
+			int hashCode =
+				this.featureID;
+			hashCode =
+				37
+					* hashCode
+					+ this.absSig.hashCode();
 			return hashCode;
 		}
 
 		@Override
 		public String toString() {
-			return this.featureID + "; " + this.absSig.toString();
+			return this.featureID
+				+ "; "
+				+ this.absSig.toString();
 		}
 
 		public SignatureMethodAccess(int featureID, AbstractSignature absSig) {
-			this.featureID = featureID;
-			this.absSig = absSig;
+			this.featureID =
+				featureID;
+			this.absSig =
+				absSig;
 		}
 	}
 
@@ -157,14 +168,16 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 //	private final HashMap<BodyDecl, java.util.List<ExtendedSignature>> bodyMap = new HashMap<BodyDecl, java.util.List<ExtendedSignature>>();
 //	private final ArrayList<ExtendedSignature> originalList = new ArrayList<ExtendedSignature>();
 //	private final Hashtable<ExtendedSignature, ClassDecl> nonPrimitveTypesTable = new Hashtable<ExtendedSignature, ClassDecl>();
-	
+
 	public ProjectSignatures getProjectSignatures() {
 		return projectSignatures;
 	}
-	
+
 	public ExtendedFujiSignaturesJob(IFeatureProject featureProject) {
-		this.featureProject = featureProject;
-		this.projectSignatures = new ProjectSignatures(this.featureProject.getFeatureModel());
+		this.featureProject =
+			featureProject;
+		this.projectSignatures =
+			new ProjectSignatures(this.featureProject.getFeatureModel());
 //		this.featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
 	}
 
@@ -226,7 +239,7 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 //		SPLStructure spl = null;
 //		Program ast;
 //		try {
-			throw new UnsupportedOperationException("Fuji is currently not supported.");
+		throw new UnsupportedOperationException("Fuji is currently not supported.");
 //			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(fm), FeatureUtils.CHARSQUENCE_TO_STRING);
 //			
 //			Composition composition = fuji.getComposition(fuji);

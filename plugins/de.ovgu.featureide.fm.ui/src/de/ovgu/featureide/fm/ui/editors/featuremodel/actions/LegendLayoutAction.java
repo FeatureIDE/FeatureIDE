@@ -41,16 +41,20 @@ public class LegendLayoutAction extends Action {
 
 	private IGraphicalFeatureModel featureModel;
 
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-		}
-	};
+	private ISelectionChangedListener listener =
+		new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection =
+					(IStructuredSelection) event.getSelection();
+				setEnabled(isValidSelection(selection));
+			}
+		};
 
 	public LegendLayoutAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
-		this.featureModel = featuremodel;
+		this.featureModel =
+			featuremodel;
 		this.setEnabled(false);
 		this.setChecked(true);
 		viewer.addSelectionChangedListener(listener);

@@ -38,10 +38,12 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 
 	private FMFormatManager() {
-		setExtensionLoaderInternal(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
+		setExtensionLoaderInternal(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(),
+				new SXFMFormat(), new GuidslFormat()));
 	}
 
-	private static FMFormatManager instance = new FMFormatManager();
+	private static FMFormatManager instance =
+		new FMFormatManager();
 
 	public static FMFormatManager getInstance() {
 		return instance;

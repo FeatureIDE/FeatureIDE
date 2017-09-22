@@ -35,8 +35,7 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.fm.core.Logger;
 
 /**
- * Responsible to load and save all information from / to a file.</br>
- * To get an instance use the {@link FileManagerMap}.
+ * Responsible to load and save all information from / to a file.</br> To get an instance use the {@link FileManagerMap}.
  * 
  * @author Sebastian Krieter
  */
@@ -48,42 +47,56 @@ public abstract class FileListener<T> implements IResourceChangeListener {
 	private final IPath eclipseFile;
 
 	protected FileListener(AFileManager<T> fileManager) {
-		this.fileManager = fileManager;
-		IPath absolutePath2 = new org.eclipse.core.runtime.Path(fileManager.getAbsolutePath());
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath rootLocation = root.getLocation();
+		this.fileManager =
+			fileManager;
+		IPath absolutePath2 =
+			new org.eclipse.core.runtime.Path(fileManager.getAbsolutePath());
+		final IWorkspaceRoot root =
+			ResourcesPlugin.getWorkspace().getRoot();
+		final IPath rootLocation =
+			root.getLocation();
 		if (absolutePath2.matchingFirstSegments(rootLocation) != rootLocation.segmentCount()) {
 			try {
-				IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString().replace(" ", "%20")));
-				absolutePath2 = filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
+				IFile[] filesOfLocation =
+					root.findFilesForLocationURI(URI.create("file:/"
+						+ absolutePath2.toString().replace(" ", "%20")));
+				absolutePath2 =
+					filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
 			} catch (IndexOutOfBoundsException e) {
 				Logger.logError(e);
-				eclipseFile = null;
+				eclipseFile =
+					null;
 				return;
 			}
 		}
-		this.eclipseFile = absolutePath2.makeRelativeTo(rootLocation);
+		this.eclipseFile =
+			absolutePath2.makeRelativeTo(rootLocation);
 	}
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-			final IResourceDelta delta = event.getDelta();
+			final IResourceDelta delta =
+				event.getDelta();
 			if (delta != null) {
-				final IResourceDelta deltaMember = delta.findMember(eclipseFile);
+				final IResourceDelta deltaMember =
+					delta.findMember(eclipseFile);
 				if (deltaMember != null) {
-					final IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
-						public boolean visit(IResourceDelta delta) {
-							if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-								fileManager.read();
+					final IResourceDeltaVisitor visitor =
+						new IResourceDeltaVisitor() {
+
+							public boolean visit(IResourceDelta delta) {
+								if (delta.getKind() == IResourceDelta.CHANGED
+									&& (delta.getFlags()
+										& IResourceDelta.CONTENT) != 0) {
+									fileManager.read();
+								}
+								return true;
 							}
-							return true;
-						}
-					};
+						};
 					try {
 						deltaMember.accept(visitor);
-					} catch (CoreException e) {
-					}
+					} catch (CoreException e) {}
 				}
 			}
 		}
@@ -91,7 +104,8 @@ public abstract class FileListener<T> implements IResourceChangeListener {
 
 	@Override
 	public String toString() {
-		return "Resource change listener for " + fileManager.getAbsolutePath();
+		return "Resource change listener for "
+			+ fileManager.getAbsolutePath();
 	}
 
 }

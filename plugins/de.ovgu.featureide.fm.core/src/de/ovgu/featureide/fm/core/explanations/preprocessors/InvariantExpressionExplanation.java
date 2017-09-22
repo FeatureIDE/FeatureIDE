@@ -28,38 +28,43 @@ import org.prop4j.Node;
  * @author Timo G&uuml;nther
  */
 public class InvariantExpressionExplanation extends PreprocessorExplanation {
+
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	public InvariantExpressionExplanation(Node subject) {
 		super(subject);
 	}
-	
+
 	/**
 	 * Returns true if the expression is a tautology or false if it is a contradiction.
+	 * 
 	 * @return true if the expression is a tautology or false if it is a contradiction
 	 */
 	public boolean isTautology() {
 		return tautology;
 	}
-	
+
 	/**
 	 * Sets the tautology flag.
+	 * 
 	 * @param tautology true if the expression is a tautology or false if it is a contradiction
 	 */
 	public void setTautology(boolean tautology) {
-		this.tautology = tautology;
+		this.tautology =
+			tautology;
 	}
-	
+
 	@Override
 	public Node getSubject() {
 		return (Node) super.getSubject();
 	}
-	
+
 	@Override
 	public InvariantExpressionExplanationWriter getWriter() {
 		return new InvariantExpressionExplanationWriter(this);

@@ -22,8 +22,8 @@ package de.ovgu.featureide.migration.impl;
 
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
-public class MigrationConfigurationData
-{
+public class MigrationConfigurationData {
+
 	public String projectName;
 	public IComposerExtensionBase composer;
 	public String sourcePath;
@@ -31,12 +31,16 @@ public class MigrationConfigurationData
 	public String buildPath;
 
 	public MigrationConfigurationData(String projectName, IComposerExtensionBase composer,
-			String sourcePath, String configPath, String buildPath)
-	{
-		this.projectName = projectName;
-		this.composer = composer;
-		this.sourcePath = sourcePath;
-		this.configPath = configPath;
-		this.buildPath = buildPath;
+			String sourcePath, String configPath, String buildPath) {
+		this.projectName =
+			projectName;
+		this.composer =
+			composer;
+		this.sourcePath =
+			sourcePath;
+		this.configPath =
+			configPath;
+		this.buildPath =
+			buildPath;
 	}
 }

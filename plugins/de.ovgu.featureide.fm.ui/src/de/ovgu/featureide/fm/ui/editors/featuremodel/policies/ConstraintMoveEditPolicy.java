@@ -46,8 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 
 	/**
-	 * Allows constraints to be moved at the feature diagram and provides a
-	 * feedback figure.
+	 * Allows constraints to be moved at the feature diagram and provides a feedback figure.
 	 * 
 	 */
 	private ConstraintEditPart editPart;
@@ -55,8 +54,10 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	private ModelLayoutEditPolicy superPolicy;
 
 	public ConstraintMoveEditPolicy(ConstraintEditPart child, ModelLayoutEditPolicy superPolicy) {
-		this.editPart = child;
-		this.superPolicy = superPolicy;
+		this.editPart =
+			child;
+		this.superPolicy =
+			superPolicy;
 	}
 
 	private RectangleFigure r;
@@ -66,19 +67,23 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
 
-		r = new RectangleFigure();
+		r =
+			new RectangleFigure();
 		FigureUtilities.makeGhostShape(r);
 		r.setLineStyle(Graphics.LINE_DOT);
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = editPart.getModel().getLocation().getCopy();
+		Point s =
+			editPart.getModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
-		c = new PolylineConnection();
+		c =
+			new PolylineConnection();
 		c.setForegroundColor(ColorConstants.white);
 		c.setLineWidth(3);
-		FreeformLayer l = new FreeformLayer();
+		FreeformLayer l =
+			new FreeformLayer();
 		// l.add(r);
 		l.add(c);
 
@@ -92,7 +97,8 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
+		PrecisionRectangle rect =
+			new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
@@ -100,12 +106,17 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setBounds(rect);
 
 		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
-			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
-			boolean isAutoLayout = editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
-			if (cmd.canExecute() && isAutoLayout) {
+			ConstraintDragAndDropCommand cmd =
+				(ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
+			boolean isAutoLayout =
+				editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
+			if (cmd.canExecute()
+				&& isAutoLayout) {
 				c.setForegroundColor(ColorConstants.black);
-				Point l = cmd.getLeftPoint();
-				Point r = cmd.getRightPoint();
+				Point l =
+					cmd.getLeftPoint();
+				Point r =
+					cmd.getRightPoint();
 				getHostFigure().translateToAbsolute(l);
 				getHostFigure().translateToAbsolute(r);
 				c.setSourceAnchor(new XYAnchor(l));
@@ -118,8 +129,10 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	@Override
 	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
 		super.eraseChangeBoundsFeedback(request);
-		r = null;
-		c = null;
+		r =
+			null;
+		c =
+			null;
 	}
 
 }

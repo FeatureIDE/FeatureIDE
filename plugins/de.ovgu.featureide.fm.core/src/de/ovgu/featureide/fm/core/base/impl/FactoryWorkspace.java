@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * A factory workspace maps feature model {@link IFeatureModelFormat formats} to a feature model {@link IFeatureModelFactory factory}.
- * This way it can be ensured that a specific factory is used when reading from a certain file type.
+ * A factory workspace maps feature model {@link IFeatureModelFormat formats} to a feature model {@link IFeatureModelFactory factory}. This way it can be
+ * ensured that a specific factory is used when reading from a certain file type.
  * 
  * @author Sebastian Krieter
  */
@@ -42,13 +42,17 @@ public class FactoryWorkspace {
 	private String defaultFactoryID;
 
 	public FactoryWorkspace(FactoryWorkspace oldWorkspace) {
-		this.defaultFactoryID = oldWorkspace.defaultFactoryID;
-		this.map = new HashMap<>(oldWorkspace.map);
+		this.defaultFactoryID =
+			oldWorkspace.defaultFactoryID;
+		this.map =
+			new HashMap<>(oldWorkspace.map);
 	}
 
 	public FactoryWorkspace() {
-		this.defaultFactoryID = DefaultFeatureModelFactory.ID;
-		this.map = new HashMap<>();
+		this.defaultFactoryID =
+			DefaultFeatureModelFactory.ID;
+		this.map =
+			new HashMap<>();
 	}
 
 	public String getID(IPersistentFormat<IFeatureModel> format) {
@@ -56,8 +60,11 @@ public class FactoryWorkspace {
 	}
 
 	public String getID(String formatID) {
-		final String factoryID = map.get(formatID);
-		return factoryID == null ? defaultFactoryID : factoryID;
+		final String factoryID =
+			map.get(formatID);
+		return factoryID == null
+			? defaultFactoryID
+			: factoryID;
 	}
 
 	public String getDefaultFactoryID() {
@@ -65,7 +72,8 @@ public class FactoryWorkspace {
 	}
 
 	public void setDefaultFactoryID(String defaultFactoryID) {
-		this.defaultFactoryID = defaultFactoryID;
+		this.defaultFactoryID =
+			defaultFactoryID;
 	}
 
 	public void assignID(IFeatureModelFormat format, String factoryID) {

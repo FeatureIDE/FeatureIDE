@@ -43,96 +43,112 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Alexander Knueppel
  */
 public class TComplexConstraintConverter {
-	
-	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+
+	private static final IFeatureModelFactory factory =
+		FMFactoryManager.getDefaultFactory();
 	private static IFeatureModel fm;
-	
+
 	static {
 		// setup a test model
-        fm = factory.createFeatureModel(); 
-        final IFeature root = factory.createFeature(fm, "root");
-        
+		fm =
+			factory.createFeatureModel();
+		final IFeature root =
+			factory.createFeature(fm, "root");
+
 		fm.addFeature(root);
 		fm.getStructure().setRoot(root.getStructure());
-		
-		IFeature A = factory.createFeature(fm, "A");
-		IFeature B = factory.createFeature(fm, "B");
-		IFeature C = factory.createFeature(fm, "C");
-		//IFeature D = factory.createFeature(fm, "D");
-		
+
+		IFeature A =
+			factory.createFeature(fm, "A");
+		IFeature B =
+			factory.createFeature(fm, "B");
+		IFeature C =
+			factory.createFeature(fm, "C");
+		// IFeature D = factory.createFeature(fm, "D");
+
 		A.getStructure().setMandatory(false);
 		B.getStructure().setMandatory(false);
 		C.getStructure().setMandatory(false);
-		
+
 		A.getStructure().setAbstract(false);
 		B.getStructure().setAbstract(false);
 		C.getStructure().setAbstract(false);
-		//D.getStructure().setMandatory(false);
-		
+		// D.getStructure().setMandatory(false);
+
 		fm.getStructure().getRoot().addChild(A.getStructure());
 		fm.getStructure().getRoot().addChild(B.getStructure());
 		fm.getStructure().getRoot().addChild(C.getStructure());
-		//fm.getStructure().getRoot().addChild(D.getStructure());
+		// fm.getStructure().getRoot().addChild(D.getStructure());
 		fm.getStructure().getRoot().setAnd();
-		
-		Node n1 = new Or(A, B);
-		Node n2 = new Or(B, C);
-		//Node n3 = new Implies(new And(new Or(A,B), D), new Not(C));
-		
-		IConstraint c1 = factory.createConstraint(fm, n1);
-		IConstraint c2 = factory.createConstraint(fm, n2);
-		//IConstraint c3 = factory.createConstraint(fm, n3);
-	    fm.addConstraint(c1);
+
+		Node n1 =
+			new Or(A, B);
+		Node n2 =
+			new Or(B, C);
+		// Node n3 = new Implies(new And(new Or(A,B), D), new Not(C));
+
+		IConstraint c1 =
+			factory.createConstraint(fm, n1);
+		IConstraint c2 =
+			factory.createConstraint(fm, n2);
+		// IConstraint c3 = factory.createConstraint(fm, n3);
+		fm.addConstraint(c1);
 		fm.addConstraint(c2);
-		//fm.addConstraint(c3);
+		// fm.addConstraint(c3);
 	}
-	
+
 	/*
 	 * Check whether our converter recognizes simple constraints.
 	 */
 	@Test
 	public void testIsSimpleConstraint() throws UnsupportedModelException {
-		Node[] simpleNodes = new Node[] {
-				 				new Implies("f", "g"),
-				 				new Or("f",new Not("g")), 
-				 				new Or(new Not("f"),"g"), 
-				 				new Or(new Not("f"),new Not("g")), 
-				 				new Implies("f", new Not(new Not("g"))),
-				 				new Implies("f", new Not("g")),
-				 				new Implies("f", new Literal("g")),
-				 				new Implies("f", new Not(new Literal("g"))),
-				 				new Implies(new Literal("f"), new Not("g")),
-				 				new Implies(new Literal("f"), new Literal("g")),
-				 				new Implies(new Literal("f"), new Not(new Literal("g")))};
+		Node[] simpleNodes =
+			new Node[] {
+				new Implies("f", "g"),
+				new Or("f", new Not("g")),
+				new Or(new Not("f"), "g"),
+				new Or(new Not("f"), new Not("g")),
+				new Implies("f", new Not(new Not("g"))),
+				new Implies("f", new Not("g")),
+				new Implies("f", new Literal("g")),
+				new Implies("f", new Not(new Literal("g"))),
+				new Implies(new Literal("f"), new Not("g")),
+				new Implies(new Literal("f"), new Literal("g")),
+				new Implies(new Literal("f"), new Not(new Literal("g"))) };
 
-		boolean result = true;
+		boolean result =
+			true;
 		for (Node node : simpleNodes) {
-			result &= ComplexConstraintConverter.isSimple(node);
- 		}	
+			result &=
+				ComplexConstraintConverter.isSimple(node);
+		}
 
 		assertTrue(result);
 	}
-	
+
 	/*
 	 * Check whether our converter recognizes simple constraints.
 	 */
 	@Test
 	public void testIsComplexConstraint() throws UnsupportedModelException {
-		Node[] complexNodes = new Node[] {
- 				new Implies(new Not("f"), "g"),
- 				new Implies("f", new And("g", "h")),
- 				new Implies("f", new Or("g", "h")),
- 				new Or("f", "g"),
- 				new And("f", "g")};
+		Node[] complexNodes =
+			new Node[] {
+				new Implies(new Not("f"), "g"),
+				new Implies("f", new And("g", "h")),
+				new Implies("f", new Or("g", "h")),
+				new Or("f", "g"),
+				new And("f", "g") };
 
-		boolean result = true;
+		boolean result =
+			true;
 		for (Node node : complexNodes) {
-			result &= ComplexConstraintConverter.isComplex(node);
- 		}	
+			result &=
+				ComplexConstraintConverter.isComplex(node);
+		}
 
 		assertTrue(result);
 	}
-	
+
 	/*
 	 * Conversion should preserve semantics.
 	 */
@@ -143,7 +159,7 @@ public class TComplexConstraintConverter {
 //		
 //		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));	
 //	}
-	
+
 	/*
 	 * Conversion should preserve semantics.
 	 */
@@ -159,5 +175,5 @@ public class TComplexConstraintConverter {
 //		System.out.println(comparator.getDeletedFeatures());
 //		assertEquals(Comparison.REFACTORING, comparator.getResult());
 //	}
-	
+
 }

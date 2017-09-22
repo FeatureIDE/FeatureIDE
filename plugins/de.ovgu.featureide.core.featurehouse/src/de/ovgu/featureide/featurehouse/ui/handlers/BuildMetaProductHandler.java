@@ -32,31 +32,36 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 /**
- * Builds the meta product via FeatureHouse. 
+ * Builds the meta product via FeatureHouse.
  *
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
 public class BuildMetaProductHandler extends AFeatureProjectHandler {
-	
+
 	@Override
 	protected void singleAction(final IFeatureProject featureProject) {
 		if (FeatureHouseComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
-			final FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) featureProject.getComposer();
+			final FeatureHouseComposer featureHouseComposer =
+				(FeatureHouseComposer) featureProject.getComposer();
 			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.buildMetaProduct());
-			
-			LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
-				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
-					try {
-						featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-					} catch (CoreException e) {
-						FeatureHouseCorePlugin.getDefault().logError(e);
+
+			LongRunningMethod<Boolean> job =
+				new LongRunningMethod<Boolean>() {
+
+					@Override
+					public Boolean execute(IMonitor workMonitor) throws Exception {
+						try {
+							featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+						} catch (CoreException e) {
+							FeatureHouseCorePlugin.getDefault().logError(e);
+						}
+						return true;
 					}
-					return true;
-				}
-			};
-			LongRunningWrapper.getRunner(job, "Build meta product for project \"" + featureProject.getProjectName() + "\".").schedule();
+				};
+			LongRunningWrapper.getRunner(job, "Build meta product for project \""
+				+ featureProject.getProjectName()
+				+ "\".").schedule();
 		}
 	}
 

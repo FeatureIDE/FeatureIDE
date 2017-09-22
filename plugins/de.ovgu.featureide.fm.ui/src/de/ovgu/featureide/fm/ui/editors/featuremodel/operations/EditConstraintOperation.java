@@ -30,8 +30,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Operation with functionality to edit a constraint. Enables undo/redo
- * functionality.
+ * Operation with functionality to edit a constraint. Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
@@ -41,12 +40,15 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
-	
+
 	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
 		super(featureModel, EDIT_CONSTRAINT);
-		this.newNode = propNode;
-		this.oldNode = constraint.getNode();
-		this.constraint = constraint;
+		this.newNode =
+			propNode;
+		this.oldNode =
+			constraint.getNode();
+		this.constraint =
+			constraint;
 	}
 
 	@Override

@@ -30,25 +30,28 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  */
 public class FilterOutlineAction extends Action {
 
-		private IOutlineFilter filter;
+	private IOutlineFilter filter;
 
-		/**
-		 * Constructor for FilterOutlineAction
-		 * @param viewer
-		 */
-		public FilterOutlineAction(IOutlineFilter filter) {
-			super("", AS_CHECK_BOX);
-			this.filter = filter;
-			this.setText(filter.getName());
-			this.setImageDescriptor(filter.getImage());
-		}
+	/**
+	 * Constructor for FilterOutlineAction
+	 * 
+	 * @param viewer
+	 */
+	public FilterOutlineAction(IOutlineFilter filter) {
+		super("", AS_CHECK_BOX);
+		this.filter =
+			filter;
+		this.setText(filter.getName());
+		this.setImageDescriptor(filter.getImage());
+	}
 
-		/**
-		 * Returns the outline provider
-		 * @return
-		 */
-		public IOutlineFilter getFilter() {
-			return filter;
-		}
+	/**
+	 * Returns the outline provider
+	 * 
+	 * @return
+	 */
+	public IOutlineFilter getFilter() {
+		return filter;
+	}
 
 }

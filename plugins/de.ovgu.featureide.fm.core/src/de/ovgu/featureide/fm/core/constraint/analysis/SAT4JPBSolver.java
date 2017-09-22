@@ -43,38 +43,43 @@ import de.ovgu.featureide.fm.core.constraint.analysis.Restriction.Op;
 public class SAT4JPBSolver implements PBSolver {
 
 	IPBSolver solver;
-	
+
 	boolean alreadyContradiction;
-	
+
 	public SAT4JPBSolver() {
-		solver = SolverFactory.newDefault();
-		alreadyContradiction = false;
+		solver =
+			SolverFactory.newDefault();
+		alreadyContradiction =
+			false;
 	}
-	
+
 	@Override
 	public <T extends Restriction> void addRestriction(T restriction) {
-		IVecInt ids = new VecInt(restriction.getIds());
-		Vec<BigInteger> coefficients = 
+		IVecInt ids =
+			new VecInt(restriction.getIds());
+		Vec<BigInteger> coefficients =
 			new Vec<BigInteger>(restriction.getCoefficients());
-		BigInteger degree = BigInteger.valueOf(restriction.getDegree());
-		
+		BigInteger degree =
+			BigInteger.valueOf(restriction.getDegree());
+
 		try {
 			// add the inequality "terms >= degree"
 			solver.addPseudoBoolean(ids, coefficients, true, degree);
-			
+
 			// add the inequality "terms <= degree" if the operator is EQ
 			if (restriction.getOp() == Op.EQ) {
 				solver.addPseudoBoolean(ids, coefficients, false, degree);
 			}
 		} catch (ContradictionException e) {
-			alreadyContradiction = true;
+			alreadyContradiction =
+				true;
 		}
 	}
-	
+
 	@Override
 	public <T extends Restriction> void addRestrictions(
 			Collection<T> restrictions) {
-		
+
 		for (Restriction restriction : restrictions) {
 			addRestriction(restriction);
 		}
@@ -84,7 +89,7 @@ public class SAT4JPBSolver implements PBSolver {
 	public boolean isSatisfiable() {
 		if (alreadyContradiction)
 			return false;
-		
+
 		try {
 			return solver.isSatisfiable();
 		} catch (TimeoutException e) {
@@ -96,25 +101,28 @@ public class SAT4JPBSolver implements PBSolver {
 	public boolean isSatisfiable(int[] assumptions) {
 		if (alreadyContradiction)
 			return false;
-		
+
 		try {
 			return solver.isSatisfiable(new VecInt(assumptions));
 		} catch (TimeoutException e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	}
-	
+
 	public Set<Integer> backbone(Set<Integer> varibales) {
-		Set<Integer> backbone = new HashSet<Integer>();
-		
+		Set<Integer> backbone =
+			new HashSet<Integer>();
+
 		for (Integer variable : varibales) {
-			if (!isSatisfiable(new int[] {variable})) {
+			if (!isSatisfiable(new int[] {
+				variable })) {
 				backbone.add(-variable);
-			} else if (!isSatisfiable(new int[] {-variable})) {
+			} else if (!isSatisfiable(new int[] {
+				-variable })) {
 				backbone.add(variable);
 			}
 		}
-		
+
 		return backbone;
 	}
 }

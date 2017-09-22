@@ -39,87 +39,98 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
  * @author Timo G&uuml;nther
  */
 public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator implements AutomaticSelectionExplanationCreator {
+
 	/**
-	 * The features that have been added to the oracle.
-	 * Stored for performance reasons.
+	 * The features that have been added to the oracle. Stored for performance reasons.
 	 */
-	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
-	
+	private final List<SelectableFeature> selectedFeatures =
+		new LinkedList<>();
+
 	@Override
 	public SelectableFeature getSubject() {
 		return (SelectableFeature) super.getSubject();
 	}
-	
+
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null && !(subject instanceof SelectableFeature)) {
+		if (subject != null
+			&& !(subject instanceof SelectableFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
 	}
-	
+
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle = getOracle();
+		final MusExtractor oracle =
+			getOracle();
 		final AutomaticSelectionExplanation explanation;
 		oracle.push();
 		try {
 			selectedFeatures.clear();
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
-				final Object var = featureSelection.getFeature().getName();
+				final Object var =
+					featureSelection.getFeature().getName();
 				final boolean value;
 				if (featureSelection == getSubject()) {
 					switch (featureSelection.getAutomatic()) {
-						case SELECTED:
-							value = false;
-							break;
-						case UNSELECTED:
-							value = true;
-							break;
-						case UNDEFINED:
-							throw new IllegalStateException("Feature not automatically selected or unselected");
-						default:
-							throw new IllegalStateException("Unknown feature selection state");
+					case SELECTED:
+						value =
+							false;
+						break;
+					case UNSELECTED:
+						value =
+							true;
+						break;
+					case UNDEFINED:
+						throw new IllegalStateException("Feature not automatically selected or unselected");
+					default:
+						throw new IllegalStateException("Unknown feature selection state");
 					}
-					oracle.addAssumption(var, value); //Assumptions do not show up in the explanation.
+					oracle.addAssumption(var, value); // Assumptions do not show up in the explanation.
 				} else {
 					switch (featureSelection.getManual()) {
-						case SELECTED:
-							value = true;
-							break;
-						case UNSELECTED:
-							value = false;
-							break;
-						case UNDEFINED:
-							continue;
-						default:
-							throw new IllegalStateException("Unknown feature selection state");
+					case SELECTED:
+						value =
+							true;
+						break;
+					case UNSELECTED:
+						value =
+							false;
+						break;
+					case UNDEFINED:
+						continue;
+					default:
+						throw new IllegalStateException("Unknown feature selection state");
 					}
 					oracle.addFormula(new Literal(var, value));
 					selectedFeatures.add(featureSelection);
 				}
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation =
+				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
 		return explanation;
 	}
-	
+
 	@Override
 	protected AutomaticSelectionExplanation getExplanation(Set<Integer> clauseIndexes) {
 		return (AutomaticSelectionExplanation) super.getExplanation(clauseIndexes);
 	}
-	
+
 	@Override
 	protected Reason getReason(int clauseIndex) {
-		int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
+		int selectionIndex =
+			clauseIndex
+				- getTraceModel().getTraceCount();
 		if (selectionIndex >= 0) {
 			return new ConfigurationReason(selectedFeatures.get(selectionIndex));
 		}
 		return super.getReason(clauseIndex);
 	}
-	
+
 	@Override
 	protected AutomaticSelectionExplanation getConcreteExplanation() {
 		return new AutomaticSelectionExplanation(getSubject());

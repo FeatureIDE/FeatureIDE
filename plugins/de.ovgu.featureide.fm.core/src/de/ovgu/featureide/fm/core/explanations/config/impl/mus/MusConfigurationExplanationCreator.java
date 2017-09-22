@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfiguration
  * @author Timo G&uuml;nther
  */
 public abstract class MusConfigurationExplanationCreator extends AbstractConfigurationExplanationCreator {
+
 	@Override
 	protected MusExtractor getOracle() {
 		return (MusExtractor) super.getOracle();
@@ -39,7 +40,8 @@ public abstract class MusConfigurationExplanationCreator extends AbstractConfigu
 
 	@Override
 	protected Object createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle =
+			SatSolverFactory.getDefault().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}

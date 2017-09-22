@@ -28,8 +28,10 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public class RedundantConstraintExplanationWriter extends FeatureModelExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform; not null
 	 */
 	public RedundantConstraintExplanationWriter(RedundantConstraintExplanation explanation) {
@@ -40,14 +42,16 @@ public class RedundantConstraintExplanationWriter extends FeatureModelExplanatio
 	protected RedundantConstraintExplanation getExplanation() {
 		return (RedundantConstraintExplanation) super.getExplanation();
 	}
-	
+
 	@Override
 	protected String getSubjectString() {
 		return getSubjectString(getExplanation().getSubject());
 	}
-	
+
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isImplicit() ? "transitive" : "redundant";
+		return getExplanation().isImplicit()
+			? "transitive"
+			: "redundant";
 	}
 }

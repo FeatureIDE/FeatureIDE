@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * @author Sebastian Krieter
  */
 public class ConfigurationLoader {
+
 	private IConfigurationLoaderCallback callback;
 	private boolean propagateConfigs;
 
@@ -55,10 +56,12 @@ public class ConfigurationLoader {
 	}
 
 	public ConfigurationLoader(IConfigurationLoaderCallback callback, boolean propagateConfigs) {
-		this.callback = callback;
-		this.propagateConfigs = propagateConfigs;
+		this.callback =
+			callback;
+		this.propagateConfigs =
+			propagateConfigs;
 	}
-	
+
 	/**
 	 * @return If the configfs should be propagated. The default value is false.
 	 */
@@ -67,7 +70,8 @@ public class ConfigurationLoader {
 	}
 
 	public void setPropagateConfigs(boolean propagateConfigs) {
-		this.propagateConfigs = propagateConfigs;
+		this.propagateConfigs =
+			propagateConfigs;
 	}
 
 	public List<Configuration> loadConfigurations(IFeatureModel featureModel, String path) {
@@ -87,15 +91,18 @@ public class ConfigurationLoader {
 	}
 
 	private List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path, Filter<? super Path> filter) {
-		final List<Configuration> configs = new ArrayList<>();
+		final List<Configuration> configs =
+			new ArrayList<>();
 
 		if (callback != null)
 			callback.onLoadingStarted();
 
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
+		try (DirectoryStream<Path> directoryStream =
+			Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				Configuration currentConfiguration = new Configuration(featureModel, propagateConfigs);
-				
+				Configuration currentConfiguration =
+					new Configuration(featureModel, propagateConfigs);
+
 				FileHandler.load(configPath, currentConfiguration, ConfigFormatManager.getInstance());
 				configs.add(currentConfiguration);
 				if (callback != null)
@@ -106,14 +113,15 @@ public class ConfigurationLoader {
 			if (callback != null)
 				callback.onLoadingError(e);
 		}
-		
+
 		if (callback != null)
 			callback.onLoadingFinished();
-		
+
 		return configs;
 	}
 
 	private static final class ConfigFileFilter implements Filter<Path> {
+
 		private final String excludeFile;
 
 		public ConfigFileFilter() {
@@ -121,17 +129,23 @@ public class ConfigurationLoader {
 		}
 
 		public ConfigFileFilter(String excludeFile) {
-			this.excludeFile = excludeFile;
+			this.excludeFile =
+				excludeFile;
 		}
 
 		@Override
 		public boolean accept(Path configPath) throws IOException {
-			final Path fileName = configPath.getFileName();
+			final Path fileName =
+				configPath.getFileName();
 			if (fileName == null) {
 				return false;
 			}
-			final String fileNameString = fileName.toString();
-			return fileNameString.endsWith(".config") && !fileNameString.equals(excludeFile) && Files.isReadable(configPath) && Files.isRegularFile(configPath);
+			final String fileNameString =
+				fileName.toString();
+			return fileNameString.endsWith(".config")
+				&& !fileNameString.equals(excludeFile)
+				&& Files.isReadable(configPath)
+				&& Files.isRegularFile(configPath);
 		}
 	}
 }

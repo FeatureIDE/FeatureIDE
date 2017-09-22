@@ -30,6 +30,7 @@ import org.eclipse.draw2d.MarginBorder;
  * @author Timo G&uuml;nther
  */
 public class ModelFigure extends FreeformLayer {
+
 	/**
 	 * Constructs a new instance of this class.
 	 */

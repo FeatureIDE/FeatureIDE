@@ -23,7 +23,7 @@ package de.ovgu.featureide.ui.statistics.core.composite;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 
 /**
- * Interface to explicitly make nodes have tool tips. 
+ * Interface to explicitly make nodes have tool tips.
  * 
  * @see TreeLabelProvider
  * 
@@ -31,6 +31,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
  * @author Patrick Haese
  */
 public interface IToolTip {
+
 	/**
 	 * @return tool-tip text to be displayed.
 	 */

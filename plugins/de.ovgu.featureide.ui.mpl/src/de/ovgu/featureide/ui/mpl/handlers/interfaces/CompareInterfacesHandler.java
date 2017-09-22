@@ -39,13 +39,13 @@ public class CompareInterfacesHandler extends AProjectJobHandler {
 	protected AbstractWizard instantiateWizard() {
 		return new FeatureInterfaceWizard(COMPARE_CONFIGURATION_INTERFACES);
 	}
-	
+
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().compareConfigurationInterfaces(
-				projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				projects,
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME),
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL),
 				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 	}
 

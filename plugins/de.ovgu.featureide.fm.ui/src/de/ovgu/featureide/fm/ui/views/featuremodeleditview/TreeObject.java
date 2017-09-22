@@ -40,8 +40,10 @@ public class TreeObject extends TreeElement {
 	}
 
 	public TreeObject(String name, Image image) {
-		this.name = name;
-		this.image = image;
+		this.name =
+			name;
+		this.image =
+			image;
 	}
 
 	public String getName() {
@@ -49,12 +51,15 @@ public class TreeObject extends TreeElement {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
 
 	public void setContents(String name, Image image) {
-		this.name = name;
-		this.image = image;
+		this.name =
+			name;
+		this.image =
+			image;
 	}
 
 	public Image getImage() {
@@ -62,8 +67,10 @@ public class TreeObject extends TreeElement {
 	}
 
 	public void set(TreeParent parent) {
-		this.name = parent.getName();
-		this.image = parent.getImage();
+		this.name =
+			parent.getName();
+		this.image =
+			parent.getImage();
 		this.removeChildren();
 		for (TreeElement child : parent.getChildren()) {
 			this.addChild(child);

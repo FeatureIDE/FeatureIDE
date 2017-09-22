@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Marcus Pinnecke
  */
 public class ImportVelvetHandler extends AbstractImportHandler {
+
 	@Override
 	protected IFeatureModelFormat setModelReader() {
 		return new VelvetFeatureModelFormat();
@@ -42,7 +43,9 @@ public class ImportVelvetHandler extends AbstractImportHandler {
 
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.velvet" });
-		fileDialog.setFilterNames(new String[] { VELVET });
+		fileDialog.setFilterExtensions(new String[] {
+			"*.velvet" });
+		fileDialog.setFilterNames(new String[] {
+			VELVET });
 	}
 }

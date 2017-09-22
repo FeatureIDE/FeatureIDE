@@ -28,26 +28,30 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public class InvariantExpressionExplanationWriter extends PreprocessorExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform
 	 */
 	public InvariantExpressionExplanationWriter(InvariantExpressionExplanation explanation) {
 		super(explanation);
 	}
-	
+
 	@Override
 	protected InvariantExpressionExplanation getExplanation() {
 		return (InvariantExpressionExplanation) super.getExplanation();
 	}
-	
+
 	@Override
 	protected String getSubjectString() {
 		return String.format("expression %s", getExplanation().getSubject().toString(getSymbols()));
 	}
-	
+
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
+		return getExplanation().isTautology()
+			? "a tautology"
+			: "a contradiction";
 	}
 }

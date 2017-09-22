@@ -21,5 +21,6 @@
 package de.ovgu.featureide.core.signature.base;
 
 public abstract class AClassCreator {
+
 	public abstract AbstractClass create(AbstractClassSignature sig);
 }

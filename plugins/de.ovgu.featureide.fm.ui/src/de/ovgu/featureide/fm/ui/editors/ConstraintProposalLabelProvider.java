@@ -35,15 +35,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class ConstraintProposalLabelProvider extends LabelProvider implements GUIDefaults {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 	 */
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof ContentProposal) {
-			String content = ((ContentProposal) element).getContent();
-			if (NOT.equals(content) || "or".equals(content) || "and".equals(content) || "iff".equals(content) || "implies".equals(content)
-					|| "(".equals(content) || ")".equals(content)) {
+			String content =
+				((ContentProposal) element).getContent();
+			if (NOT.equals(content)
+				|| "or".equals(content)
+				|| "and".equals(content)
+				|| "iff".equals(content)
+				|| "implies".equals(content)
+				|| "(".equals(content)
+				|| ")".equals(content)) {
 				return OPERATOR_SYMBOL;
 			}
 		}

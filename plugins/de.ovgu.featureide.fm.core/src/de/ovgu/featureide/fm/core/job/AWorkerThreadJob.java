@@ -28,8 +28,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
- * Abstract eclipse job with support for {@link JobFinishListener}.
- * This class offers convenience constructors and hides the {@link #run2(IProgressMonitor)}-method.
+ * Abstract eclipse job with support for {@link JobFinishListener}. This class offers convenience constructors and hides the
+ * {@link #run2(IProgressMonitor)}-method.
  * 
  * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead.
  * 
@@ -50,7 +50,8 @@ public class AWorkerThreadJob extends AbstractJob<Void> {
 		super(name, Job.LONG);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.job.AbstractJob#work(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
 	 */
 	@Override

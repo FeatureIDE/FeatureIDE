@@ -26,7 +26,7 @@ package de.ovgu.featureide.fm.core;
  * @author Tom Brosch
  */
 public interface IExtension {
-	
+
 	public abstract String getId();
-	
+
 }

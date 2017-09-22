@@ -63,12 +63,14 @@ import de.ovgu.featureide.ui.UIPlugin;
 @SuppressWarnings(RESTRICTION)
 public class Generator extends Thread implements IConfigurationBuilderBasics {
 
-	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	protected static final String JAVA_NATURE =
+		"org.eclipse.jdt.core.javanature";
 
 	/**
 	 * A counter that shows how many configurations are built by this job
 	 */
-	int generated = 0;
+	int generated =
+		0;
 
 	/**
 	 * The builder containing this job
@@ -87,7 +89,8 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 
 	private BuilderConfiguration configuration;
 
-	private static boolean JUNIT_INSTALLED = Platform.getBundle("org.junit") != null;
+	private static boolean JUNIT_INSTALLED =
+		Platform.getBundle("org.junit") != null;
 
 	/**
 	 * 
@@ -95,14 +98,18 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
 	 */
 	public Generator(int nr, ConfigurationBuilder builder) {
-		this.nr = nr;
-		this.builder = builder;
+		this.nr =
+			nr;
+		this.builder =
+			builder;
 		if (!builder.createNewProjects) {
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
-					compiler = new JavaCompiler(nr, this);
+					compiler =
+						new JavaCompiler(nr, this);
 					if (JUNIT_INSTALLED) {
-						testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+						testRunner =
+							new TestRunner(compiler.tmp, builder.testResults, builder);
 					}
 				}
 			} catch (CoreException e) {
@@ -114,7 +121,7 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 			}
 		}
 	}
-	
+
 	/**
 	 * Generates the configurations of CongfigurationBuilder.configurations
 	 */
@@ -128,11 +135,14 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 						return;
 					}
 					if (builder.sorter.getBufferSize() == 0) {
-						while (builder.sorter.getBufferSize() == 0 || !builder.sorter.isSorted()) {
+						while (builder.sorter.getBufferSize() == 0
+							|| !builder.sorter.isSorted()) {
 							/** the job waits for a new configuration to build **/
 							try {
 								Thread.sleep(1000);
-								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || builder.cancelGeneratorJobs) {
+								if ((builder.sorter.getBufferSize() == 0
+									&& builder.finish)
+									|| builder.cancelGeneratorJobs) {
 									return;
 								}
 							} catch (InterruptedException e) {
@@ -141,37 +151,47 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 						}
 					}
 				}
-				configuration = builder.getConfiguration();
+				configuration =
+					builder.getConfiguration();
 				if (configuration == null) {
 					continue;
 				}
-				String name = configuration.getName();
+				String name =
+					configuration.getName();
 				if (builder.createNewProjects) {
 					final String separator;
 					switch (builder.buildType) {
 					case ALL_CURRENT:
-						separator = SEPARATOR_CONFIGURATION;
+						separator =
+							SEPARATOR_CONFIGURATION;
 						break;
 					case ALL_VALID:
-						separator = SEPARATOR_VARIANT;
+						separator =
+							SEPARATOR_VARIANT;
 						break;
 					case INTEGRATION:
-						separator = SEPARATOR_INTEGRATION;
+						separator =
+							SEPARATOR_INTEGRATION;
 						break;
 					case RANDOM:
-						separator = SEPARATOR_RANDOM;
+						separator =
+							SEPARATOR_RANDOM;
 						break;
 					case T_WISE:
-						separator = SEPARATOR_T_WISE;
+						separator =
+							SEPARATOR_T_WISE;
 						break;
 					default:
-						throw new RuntimeException(builder.buildType + " not supported");
+						throw new RuntimeException(builder.buildType
+							+ " not supported");
 					}
-					buildConfiguration(builder.featureProject.getProjectName() + separator + name, configuration);
+					buildConfiguration(builder.featureProject.getProjectName()
+						+ separator
+						+ name, configuration);
 				} else {
 					builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 				}
-				
+
 				if (compiler != null) {
 					compiler.compile(configuration);
 					if (builder.runTests) {
@@ -184,12 +204,14 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 				builder.builtConfiguration();
 			}
 		} catch (Exception e) {
-			UIPlugin.getDefault().logError(ERROR_IN_CONFIGURATION + configuration, e);
+			UIPlugin.getDefault().logError(ERROR_IN_CONFIGURATION
+				+ configuration, e);
 			/**
-			 * If there is any build error the configuration will be built again.
-			 * And because this job is terminated a new one will be created.
+			 * If there is any build error the configuration will be built again. And because this job is terminated a new one will be created.
 			 */
-			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_ + nr + WILL_BE_RESTARTED_);
+			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_
+				+ nr
+				+ WILL_BE_RESTARTED_);
 			builder.createNewGenerator(nr);
 		} finally {
 			builder.generatorJobs.remove(this);
@@ -203,8 +225,11 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 * @param name The name of the new project
 	 */
 	void buildConfiguration(String name, Configuration configuration) {
-		IPath p2 = new Path("/" + name);
-		ConfigurationProject project = new ConfigurationProject(p2, (Workspace) builder.featureProject.getProject().getWorkspace());
+		IPath p2 =
+			new Path("/"
+				+ name);
+		ConfigurationProject project =
+			new ConfigurationProject(p2, (Workspace) builder.featureProject.getProject().getWorkspace());
 		try {
 			if (!project.exists()) {
 				project.create(null);
@@ -214,41 +239,50 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		List<String> srcPaths = new ArrayList<>(1);
+		List<String> srcPaths =
+			new ArrayList<>(1);
 		srcPaths.add(builder.featureProject.getBuildPath());
 		try {
 			if (project.hasNature(JAVA_NATURE)) {
-				srcPaths = setClassPath(project);
+				srcPaths =
+					setClassPath(project);
 			}
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 
-		final IComposerExtensionClass composer = builder.featureProject.getComposer();
+		final IComposerExtensionClass composer =
+			builder.featureProject.getComposer();
 		for (String src : srcPaths) {
-			IFolder buildFolder = builder.featureProject.getBuildFolder();
-			IPath buildFolderPath = buildFolder.getFullPath().makeRelativeTo(builder.featureProject.getProject().getFullPath());
+			IFolder buildFolder =
+				builder.featureProject.getBuildFolder();
+			IPath buildFolderPath =
+				buildFolder.getFullPath().makeRelativeTo(builder.featureProject.getProject().getFullPath());
 			if (src.equals(buildFolderPath.toString())) {
 				// build files
-				final IFolder sourceFolder = project.getFolder(src);
+				final IFolder sourceFolder =
+					project.getFolder(src);
 				composer.buildConfiguration(sourceFolder, configuration, name);
 				if (composer instanceof PPComposerExtensionClass) {
 					((PPComposerExtensionClass) composer).postProcess(sourceFolder);
 				}
 			} else {
 				// copy files of further source folder
-				final IFolder srcFolder = builder.featureProject.getProject().getFolder(src);
-				final IFolder dstFolder = project.getFolder(src);
+				final IFolder srcFolder =
+					builder.featureProject.getProject().getFolder(src);
+				final IFolder dstFolder =
+					project.getFolder(src);
 				try {
 					srcFolder.copy(dstFolder.getFullPath(), true, null);
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
-				
+
 			}
 		}
 		try {
-			IFile modelFile = builder.featureProject.getModelFile();
+			IFile modelFile =
+				builder.featureProject.getModelFile();
 			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
@@ -260,46 +294,62 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 * Sets the classpath entries for the newly created project
 	 * 
 	 * @param p The new project
-	 * @return 
+	 * @return
 	 */
 	// TODO remove redundant calculations for each configuration
 	// TODO copy settings
 	private List<String> setClassPath(IProject p) {
-		List<String> sourcePaths = new ArrayList<>();
-		JavaProject baseProject = new JavaProject(builder.featureProject.getProject(), null);
-		JavaProject newProject = new JavaProject(p, null);
+		List<String> sourcePaths =
+			new ArrayList<>();
+		JavaProject baseProject =
+			new JavaProject(builder.featureProject.getProject(), null);
+		JavaProject newProject =
+			new JavaProject(p, null);
 		try {
-			IClasspathEntry[] entries = baseProject.getRawClasspath().clone();
-			for (int i = 0; i < entries.length; i++) {
+			IClasspathEntry[] entries =
+				baseProject.getRawClasspath().clone();
+			for (int i =
+				0; i < entries.length; i++) {
 				// set source entry
-				IClasspathEntry e = entries[i];
+				IClasspathEntry e =
+					entries[i];
 				if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					String srcPath = e.getPath().removeFirstSegments(1).toOSString();
+					String srcPath =
+						e.getPath().removeFirstSegments(1).toOSString();
 					sourcePaths.add(srcPath);
-					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path(srcPath), e.getInclusionPatterns(), e.getExclusionPatterns(),
-							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(),
-							e.getExtraAttributes());
+					entries[i] =
+						new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path(srcPath), e.getInclusionPatterns(), e.getExclusionPatterns(),
+								e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(),
+								e.getExtraAttributes());
 				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-					// set the library entries and copy the libraries 
-					// which are direct at the old projects folder  
-					IPath path = e.getPath().removeFirstSegments(1);
-					IProject project = builder.featureProject.getProject();
-					IFile file = project.getFile(path);
+					// set the library entries and copy the libraries
+					// which are direct at the old projects folder
+					IPath path =
+						e.getPath().removeFirstSegments(1);
+					IProject project =
+						builder.featureProject.getProject();
+					IFile file =
+						project.getFile(path);
 					if (!file.exists()) {
-						path = e.getPath();
-						file = project.getFile(path);
+						path =
+							e.getPath();
+						file =
+							project.getFile(path);
 						if (!file.exists()) {
 							continue;
 						}
 					}
 					createLibFolder(p.getFile(path).getParent());
-					IFile destination = p.getFile(e.getPath().removeFirstSegments(1));
+					IFile destination =
+						p.getFile(e.getPath().removeFirstSegments(1));
 					if (!destination.exists()) {
 						file.copy(destination.getFullPath(), true, null);
 					}
-					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), e.getPath().removeFirstSegments(1), e.getInclusionPatterns(),
-							e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(),
-							e.combineAccessRules(), e.getExtraAttributes());
+					entries[i] =
+						new ClasspathEntry(e.getContentKind(), e.getEntryKind(), e.getPath().removeFirstSegments(1), e.getInclusionPatterns(),
+								e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(),
+								e.getAccessRules(),
+								e.combineAccessRules(), e.getExtraAttributes());
 				}
 			}
 			newProject.setRawClasspath(entries, null);
@@ -317,7 +367,8 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 * @param parent The folder containing the library
 	 */
 	private void createLibFolder(IContainer parent) {
-		if (!parent.exists() && parent instanceof IFolder) {
+		if (!parent.exists()
+			&& parent instanceof IFolder) {
 			createLibFolder(parent.getParent());
 			try {
 				((IFolder) parent).create(true, true, null);
@@ -334,32 +385,45 @@ public class Generator extends Thread implements IConfigurationBuilderBasics {
 	 * @throws CoreException
 	 */
 	private void setDescription(IProject newProject) throws CoreException {
-		IProject project = builder.featureProject.getProject();
-		IProjectDescription newDescription = newProject.getDescription();
-		IProjectDescription oldDescription = project.getDescription();
+		IProject project =
+			builder.featureProject.getProject();
+		IProjectDescription newDescription =
+			newProject.getDescription();
+		IProjectDescription oldDescription =
+			project.getDescription();
 
 		// remove FeatureIDE build commands
-		ICommand[] buildSpec = oldDescription.getBuildSpec();
-		ICommand[] commands = new ICommand[buildSpec.length - 1];
-		int i = 0;
+		ICommand[] buildSpec =
+			oldDescription.getBuildSpec();
+		ICommand[] commands =
+			new ICommand[buildSpec.length
+				- 1];
+		int i =
+			0;
 		for (ICommand c : buildSpec) {
 			if (ExtensibleFeatureProjectBuilder.BUILDER_ID.equals(c.getBuilderName())) {
 				continue;
 			}
-			commands[i] = c;
+			commands[i] =
+				c;
 			i++;
 		}
 		newDescription.setBuildSpec(commands);
 
 		// remove the FeatureIDE nature
-		String[] natureIDs = oldDescription.getNatureIds();
-		String[] natures = new String[natureIDs.length - 1];
-		int j = 0;
+		String[] natureIDs =
+			oldDescription.getNatureIds();
+		String[] natures =
+			new String[natureIDs.length
+				- 1];
+		int j =
+			0;
 		for (String id : natureIDs) {
 			if (FeatureProjectNature.NATURE_ID.equals(id)) {
 				continue;
 			}
-			natures[j] = id;
+			natures[j] =
+				id;
 			j++;
 		}
 		newDescription.setNatureIds(natures);

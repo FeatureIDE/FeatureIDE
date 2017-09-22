@@ -59,41 +59,48 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  */
 @SuppressWarnings(RESTRICTION)
 public class FeatureHouseToAHEADConversion extends ComposerConversion {
+
 	private FSTModel model;
 
 	/**
 	 * Changes the composer of the given feature project to <code>AHEAD</code>.
+	 * 
 	 * @param featureProject
 	 */
 	public FeatureHouseToAHEADConversion(final IFeatureProject featureProject) {
 		if (featureProject == null) {
 			return;
 		}
-		this.featureProject = featureProject; 
-		ConversionPlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT 
-				+ featureProject.getProjectName() + 
-				FROM_FEATUREHOUSE_TO_AHEAD_);
-		Job job = new Job(CHANGE_COMPOSER_) {
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					setJavaBuildPath(featureProject);
-					monitor.beginTask(CHANGE_COMPOSER_, 2);
-					monitor.subTask("Build full FSTModel.");
-					buildFullFSTModel();
-					model = featureProject.getFSTModel();
-					monitor.worked(1);
-					monitor.subTask(REPLACE_KEYWORDS_);
-					startProjectConversion(featureProject);
-					monitor.worked(1);
-				} finally {
-					monitor.done();
+		this.featureProject =
+			featureProject;
+		ConversionPlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT
+			+ featureProject.getProjectName()
+			+
+			FROM_FEATUREHOUSE_TO_AHEAD_);
+		Job job =
+			new Job(CHANGE_COMPOSER_) {
+
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						setJavaBuildPath(featureProject);
+						monitor.beginTask(CHANGE_COMPOSER_, 2);
+						monitor.subTask("Build full FSTModel.");
+						buildFullFSTModel();
+						model =
+							featureProject.getFSTModel();
+						monitor.worked(1);
+						monitor.subTask(REPLACE_KEYWORDS_);
+						startProjectConversion(featureProject);
+						monitor.worked(1);
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
 				}
-				return Status.OK_STATUS;
-			}
-		};
+			};
 		job.setPriority(Job.BUILD);
 		job.schedule();
-		
+
 	}
 
 	/**
@@ -105,40 +112,50 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Sets the java build path to the build folder of the given feature project.
+	 * 
 	 * @param featureProject
 	 */
 	private void setJavaBuildPath(IFeatureProject featureProject) {
-		try {	
-			JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
-			IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
-			for (int i = 0; i < classpathEntries.length; i++) {
+		try {
+			JavaProject javaProject =
+				new JavaProject(featureProject.getProject(), null);
+			IClasspathEntry[] classpathEntries =
+				javaProject.getRawClasspath();
+			for (int i =
+				0; i < classpathEntries.length; i++) {
 				/** change the actual source entry **/
 				if (classpathEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					classpathEntries[i] = setSourceEntry(classpathEntries[i]);
+					classpathEntries[i] =
+						setSourceEntry(classpathEntries[i]);
 					javaProject.setRawClasspath(classpathEntries, null);
 					return;
 				}
 			}
-			
+
 			/** case: no source entry **/
-			IClasspathEntry[] newEntries = new IClasspathEntry[classpathEntries.length + 1];
+			IClasspathEntry[] newEntries =
+				new IClasspathEntry[classpathEntries.length
+					+ 1];
 			System.arraycopy(classpathEntries, 0, newEntries, 0, classpathEntries.length);
-			newEntries[newEntries.length - 1] = getSourceEntry();
+			newEntries[newEntries.length
+				- 1] =
+					getSourceEntry();
 			javaProject.setRawClasspath(classpathEntries, null);
 		} catch (JavaModelException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Set the source path of given <code>ClasspathEntry</code> to the current build path
+	 * 
 	 * @param e The entry to set
 	 * @return The entry with the new source path
 	 */
 	public IClasspathEntry setSourceEntry(IClasspathEntry e) {
-		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
-				featureProject.getBuildFolder().getFullPath(), e.getInclusionPatterns(), e.getExclusionPatterns(), 
-				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(),
+				featureProject.getBuildFolder().getFullPath(), e.getInclusionPatterns(), e.getExclusionPatterns(),
+				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null,
 				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 	}
 
@@ -146,14 +163,15 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * @return A default source entry
 	 */
 	public IClasspathEntry getSourceEntry() {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE,
 				IClasspathEntry.CPE_SOURCE, featureProject.getBuildFolder().getFullPath(), new IPath[0],
 				new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	/**
 	 * Replaces the composer of the given feature project by <code>AHEAD</code>.
-	 * @param project 
+	 * 
+	 * @param project
 	 */
 	@Override
 	void changeComposer(IFeatureProject project) {
@@ -161,36 +179,43 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	}
 
 	/**
-	 * Replaces <code>original()</code> by <code>Super().methodName()</code>.<br>
-	 * Inserts <code>refines</code> to classes that refine.
+	 * Replaces <code>original()</code> by <code>Super().methodName()</code>.<br> Inserts <code>refines</code> to classes that refine.
 	 */
 	@Override
 	public String changeFile(String fileText, IFile file) {
 		return changeFile(fileText, file, null);
 	}
-	
-	// XXX private fields used in refining classes need to be set package private  
+
+	// XXX private fields used in refining classes need to be set package private
 	private String changeFile(String fileText, IFile file, AbstractList<String> methodNames) {
-		fileText = fileText.replaceFirst("package\\s[\\w,\\s,.]*;", ""); 
-		
+		fileText =
+			fileText.replaceFirst("package\\s[\\w,\\s,.]*;", "");
+
 		if (fileText.contains("original(")) {
 			// XXX also set refines if the file exists in a feature before
-			fileText = fileText.replaceFirst(" class ",	" refines class ");
+			fileText =
+				fileText.replaceFirst(" class ", " refines class ");
 		}
-		int i = 0;
+		int i =
+			0;
 		while (fileText.contains("original(")) {
-			fileText = fileText.replaceFirst("original\\(", "Super()." + 
-					(file != null ? getMethodName(getLine(fileText), file) : methodNames.get(i++)) + "(");
+			fileText =
+				fileText.replaceFirst("original\\(", "Super()."
+					+
+					(file != null
+						? getMethodName(getLine(fileText), file)
+						: methodNames.get(i++))
+					+ "(");
 		}
 		return fileText;
 	}
-	
+
 	public String TChangeFile(String fileText, LinkedList<String> methodNames) {
 		return changeFile(fileText, null, methodNames);
 	}
 
 	/**
-	 * @param fileText 
+	 * @param fileText
 	 * @return The lines of the given text
 	 */
 	private int getLine(String fileText) {
@@ -202,14 +227,17 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 */
 	private String getMethodName(int line, IFile file) {
 		if (model != null) {
-			final String name = model.getAbsoluteClassName(file);
+			final String name =
+				model.getAbsoluteClassName(file);
 			if (model.getClass(name) != null) {
-				LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
+				LinkedList<FSTMethod> methods =
+					new LinkedList<FSTMethod>();
 				for (FSTRole role : model.getClass(name).getRoles()) {
 					methods.addAll(role.getClassFragment().getMethods());
 				}
 				for (FSTMethod method : methods) {
-					if (method.getLine() <= line && method.getEndLine() >= line) {
+					if (method.getLine() <= line
+						&& method.getEndLine() >= line) {
 						return method.getName();
 					}
 				}
@@ -220,12 +248,13 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	/**
 	 * Replaces the file extension <code>.java</code> by <code>.jak</code> of the given file
+	 * 
 	 * @param file
 	 */
 	@Override
 	void replaceFileExtension(IFile file) {
 		try {
-			file.move(((IFolder)file.getParent()).getFile(file.getName().replace(".java", ".jak")).getFullPath(), true, null);
+			file.move(((IFolder) file.getParent()).getFile(file.getName().replace(".java", ".jak")).getFullPath(), true, null);
 		} catch (CoreException e) {
 			ConversionPlugin.getDefault().logError(e);
 		}

@@ -31,30 +31,37 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
  * @author Sebastian Krieter
  */
 public class SignatureSetter {
-	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
-	
-	private FSTModel fstModel = null;
-	private ProjectSignatures signatures = null;
-	
+
+	private final FujiSignaturesCreator sigCreator =
+		new FujiSignaturesCreator();
+
+	private FSTModel fstModel =
+		null;
+	private ProjectSignatures signatures =
+		null;
+
 	public void setFstModel(FSTModel fstModel) {
 		synchronized (this) {
-			this.fstModel = fstModel;
+			this.fstModel =
+				fstModel;
 			if (signatures != null) {
 				assignSignatures();
 			}
 		}
 	}
-	
+
 	public void setFujiParameters(IFeatureProject fp, Program ast) {
-		final ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
+		final ProjectSignatures sigs =
+			sigCreator.createSignatures(fp, ast);
 		synchronized (this) {
-			this.signatures = sigs;
+			this.signatures =
+				sigs;
 			if (fstModel != null) {
 				assignSignatures();
 			}
 		}
 	}
-	
+
 	private void assignSignatures() {
 		sigCreator.attachJavadocComments(signatures, fstModel);
 		fstModel.setProjectSignatures(signatures);

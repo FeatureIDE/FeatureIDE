@@ -25,8 +25,7 @@ import java.nio.file.Path;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * Based on {@link SimpleFileHandler}.
- * Provides convenient methods for reading / writing files with a certain {@link IPersistentFormat format}.
+ * Based on {@link SimpleFileHandler}. Provides convenient methods for reading / writing files with a certain {@link IPersistentFormat format}.
  * 
  * @see AFileManager
  * 

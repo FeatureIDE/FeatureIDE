@@ -57,7 +57,6 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * The parent folder of the generated variants
 	 */
 	final IFolder tmp;
-	
 
 	/**
 	 * 
@@ -65,9 +64,12 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @param generator The generator holding this compiler
 	 */
 	public JavaCompiler(int nr, Generator generator) {
-		this.generator = generator;
+		this.generator =
+			generator;
 
-		tmp = generator.builder.tmp.getFolder(COMPILER + nr);
+		tmp =
+			generator.builder.tmp.getFolder(COMPILER
+				+ nr);
 		if (!tmp.exists()) {
 			try {
 				tmp.create(true, true, null);
@@ -75,14 +77,14 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
-		
+
 	}
 
 	/**
 	 * Compiles the given configuration.
 	 * 
 	 * @param configuration The configuration to build
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	protected void compile(BuilderConfiguration configuration) throws CoreException {
 		try {
@@ -97,14 +99,15 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	}
 
 	/**
-	 * Compiles the built configuration to create error markers.
-	 * The binary files will be placed into an temporary folder.
+	 * Compiles the built configuration to create error markers. The binary files will be placed into an temporary folder.
 	 * 
 	 * @param confName
 	 */
 	private void compile(String confName) {
-		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
-		final LinkedList<String> options = new LinkedList<>();
+		LinkedList<IFile> files =
+			getJavaFiles(generator.builder.folder.getFolder(confName));
+		final LinkedList<String> options =
+			new LinkedList<>();
 		for (IFile file : files) {
 			options.add(setupPath(file));
 		}
@@ -117,8 +120,10 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
 
-		String output = process(options);
-		LinkedList<IFile> errorFiles = parseJavacOutput(output, files, confName);
+		String output =
+			process(options);
+		LinkedList<IFile> errorFiles =
+			parseJavacOutput(output, files, confName);
 		for (IFile file : errorFiles) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
@@ -130,27 +135,36 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	private String setupPath(IFile file) {
 		return setupPath(file.getRawLocation().toOSString());
 	}
-	
+
 	/**
 	 * Adds quotation marks to the path name if it contains white spaces.
 	 */
 	private String setupPath(String location) {
-		return location.contains(" ") ? "\"" + location + "\"" : location;
+		return location.contains(" ")
+			? "\""
+				+ location
+				+ "\""
+			: location;
 	}
 
 	private String process(AbstractList<String> command) {
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb =
+			new StringBuilder();
 		for (String string : command) {
 			sb.append(string);
 			sb.append(' ');
 		}
 
-		String output = null;
-		try (StringWriter writer = new StringWriter()) {
-			final String params = sb.toString();
-			
+		String output =
+			null;
+		try (StringWriter writer =
+			new StringWriter()) {
+			final String params =
+				sb.toString();
+
 			BatchCompiler.compile(params, new PrintWriter(System.out), new PrintWriter(writer), null);
-			output = writer.toString();
+			output =
+				writer.toString();
 		} catch (IOException e) {
 			UIPlugin.getDefault().logError(e);
 		}
@@ -166,26 +180,33 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @return
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
-		LinkedList<IFile> errorFiles = new LinkedList<IFile>();
+		LinkedList<IFile> errorFiles =
+			new LinkedList<IFile>();
 		if (output.isEmpty()) {
 			return errorFiles;
 		}
-		TreeMap<String, IFile> sourcePaths = new TreeMap<>();
+		TreeMap<String, IFile> sourcePaths =
+			new TreeMap<>();
 		for (IFile file : files)
 			sourcePaths.put(file.getLocation().toOSString(), file);
 
-		try (Scanner scanner = new Scanner(output)) {
+		try (Scanner scanner =
+			new Scanner(output)) {
 			String currentLine;
 			while (scanner.hasNextLine()) {
-				currentLine = scanner.nextLine();
+				currentLine =
+					scanner.nextLine();
 				// \S*\s(\w+)\sin\s(\w:[\w,\\,.,\s]*.java)\s[(]at line (\d+)[)]
-				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
-				Matcher matcher = pattern.matcher(currentLine);
+				Pattern pattern =
+					Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
+				Matcher matcher =
+					pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;
 				}
 				try {
-					boolean contains = sourcePaths.containsKey(matcher.group(2));
+					boolean contains =
+						sourcePaths.containsKey(matcher.group(2));
 					if (!contains) {
 						continue;
 					}
@@ -193,37 +214,54 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 					UIPlugin.getDefault().logError(e);
 					continue;
 				}
-				final boolean warning = "WARNING".equals(matcher.group(1));
-				IFile currentFile = sourcePaths.get(matcher.group(2));
-				int line = Integer.parseInt(matcher.group(3));
+				final boolean warning =
+					"WARNING".equals(matcher.group(1));
+				IFile currentFile =
+					sourcePaths.get(matcher.group(2));
+				int line =
+					Integer.parseInt(matcher.group(3));
 				// get error message in from the next lines
 				while (scanner.hasNextLine()) {
-					currentLine = scanner.nextLine();
-					Pattern messagePattern = Pattern.compile("\\w.*");
-					Matcher m = messagePattern.matcher(currentLine);
-					boolean found = m.matches();
+					currentLine =
+						scanner.nextLine();
+					Pattern messagePattern =
+						Pattern.compile("\\w.*");
+					Matcher m =
+						messagePattern.matcher(currentLine);
+					boolean found =
+						m.matches();
 					if (found) {
 						break;
 					}
 				}
 
-				String errorMessage = currentLine;
-				//			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
-				//				errorMessage = parseCannotFindSymbolMessage(scanner);
-				//			}
-				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) || errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
-						|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) && !errorMessage.contains("cannot be resolved")) || errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+				String errorMessage =
+					currentLine;
+				// if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
+				// errorMessage = parseCannotFindSymbolMessage(scanner);
+				// }
+				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE)
+					|| errorMessage.contains(ERROR_IGNOR_CAST)
+					|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
+					|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT)
+						&& !errorMessage.contains("cannot be resolved"))
+					|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
 					continue;
 				}
 				if (!errorFiles.contains(currentFile)) {
 					errorFiles.add(currentFile);
 				}
 				IMarker newMarker;
-				newMarker = currentFile.createMarker(PROBLEM_MARKER);
+				newMarker =
+					currentFile.createMarker(PROBLEM_MARKER);
 				if (newMarker.exists()) {
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
-					newMarker.setAttribute(IMarker.MESSAGE, configurationName + " " + errorMessage);
-					newMarker.setAttribute(IMarker.SEVERITY, warning ? IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR);
+					newMarker.setAttribute(IMarker.MESSAGE, configurationName
+						+ " "
+						+ errorMessage);
+					newMarker.setAttribute(IMarker.SEVERITY, warning
+						? IMarker.SEVERITY_WARNING
+						: IMarker.SEVERITY_ERROR);
 				}
 			}
 		} catch (CoreException e) {
@@ -236,11 +274,15 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	@SuppressWarnings("unused")
 	private String parseCannotFindSymbolMessage(Scanner scanner) {
 		while (scanner.hasNextLine()) {
-			String currentLine = scanner.nextLine();
+			String currentLine =
+				scanner.nextLine();
 			if (currentLine.startsWith(SYMBOL)) {
-				String[] tokens = currentLine.split(": ");
+				String[] tokens =
+					currentLine.split(": ");
 				if (tokens.length == 2)
-					return CANNOT_FIND_SYMBOL + ": " + tokens[1];
+					return CANNOT_FIND_SYMBOL
+						+ ": "
+						+ tokens[1];
 				break;
 			}
 		}
@@ -254,7 +296,8 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @return A list with all java files at the folder
 	 */
 	private LinkedList<IFile> getJavaFiles(IFolder folder) {
-		LinkedList<IFile> files = new LinkedList<IFile>();
+		LinkedList<IFile> files =
+			new LinkedList<IFile>();
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFolder) {

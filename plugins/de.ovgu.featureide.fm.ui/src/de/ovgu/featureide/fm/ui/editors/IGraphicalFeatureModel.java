@@ -44,8 +44,11 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	FeatureModelLayout getLayout();
 
 	boolean isLegendHidden();
+
 	void setLegendHidden(boolean hidden);
+
 	void setLegend(Legend legend);
+
 	Legend getLegend();
 
 	void handleLegendLayoutChanged();
@@ -57,27 +60,26 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void refreshContextMenu();
 
 	Collection<IGraphicalFeature> getFeatures();
-	
+
 	Collection<IGraphicalFeature> getAllFeatures();
 
 	void setActiveExplanation(Explanation exp);
+
 	Explanation getActiveExplanation();
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 
 	List<IGraphicalConstraint> getConstraints();
-	
+
 	IGraphicalConstraint getGraphicalConstraint(IConstraint newFeature);
-		
+
 	IGraphicalFeatureModel clone();
-	
+
 	void init();
 
 	/**
-	 * Returns the list of not collapsed constraints stored in this feature model.
-	 * <br/>
-	 * <br/>
-	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * Returns the list of not collapsed constraints stored in this feature model. <br/> <br/> <b>Note</b>: The returned list should be <b>unmodifiable</b> to
+	 * avoid external access to internal data
 	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -96,10 +98,8 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	List<IGraphicalConstraint> getVisibleConstraints();
 
 	/**
-	 * Returns the list of not collapsed features stored in this feature model.
-	 * <br/>
-	 * <br/>
-	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * Returns the list of not collapsed features stored in this feature model. <br/> <br/> <b>Note</b>: The returned list should be <b>unmodifiable</b> to
+	 * avoid external access to internal data
 	 * 
 	 * @since 3.3
 	 * 
@@ -109,10 +109,10 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	/**
 	 * return the current index of the constraint. It will olny count constaints that are currently visible.
+	 * 
 	 * @param constraint
 	 * @return
 	 */
 	int getConstraintIndex(Constraint constraint);
-
 
 }

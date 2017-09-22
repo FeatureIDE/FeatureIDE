@@ -32,9 +32,8 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
- * Abstract class that can be used for tests on configurations.
- * Each set of configuration tests that is performed on the same model is defined
- * in its own subclass.
+ * Abstract class that can be used for tests on configurations. Each set of configuration tests that is performed on the same model is defined in its own
+ * subclass.
  * 
  * @author Fabian Benduhn
  */
@@ -44,14 +43,13 @@ public abstract class AbstractConfigurationTest {
 
 	@Before
 	public void setModel() {
-		fm = loadModel();
+		fm =
+			loadModel();
 	}
 
 	/**
-	 * This method is used by setModel() to initialize
-	 * the feature model before each test case.
-	 * For basic string input use methods loadGUIDSL or loadXML.
-	 * For file input use any FeatureModelReader.
+	 * This method is used by setModel() to initialize the feature model before each test case. For basic string input use methods loadGUIDSL or loadXML. For
+	 * file input use any FeatureModelReader.
 	 * 
 	 * @return the FeatureModel used in this test class
 	 */
@@ -71,20 +69,28 @@ public abstract class AbstractConfigurationTest {
 	 * @return
 	 */
 	protected static IFeatureModel loadXML(String fmXml, String constraintsXml) {
-		String xml = "<featureModel><struct>" + fmXml;
-		xml += "</struct>";
+		String xml =
+			"<featureModel><struct>"
+				+ fmXml;
+		xml +=
+			"</struct>";
 		if (constraintsXml != null) {
-			xml += "<constraints>";
-			xml += constraintsXml + "</constraints>";
+			xml +=
+				"<constraints>";
+			xml +=
+				constraintsXml
+					+ "</constraints>";
 		}
-		xml += "</featureModel>";
+		xml +=
+			"</featureModel>";
 
 		return load(new XmlFeatureModelFormat(), xml);
 	}
 
 	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
 		try {
-			final IFeatureModel fm = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			final IFeatureModel fm =
+				FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(fm, xml).containsError()) {
 				fail();
 			}

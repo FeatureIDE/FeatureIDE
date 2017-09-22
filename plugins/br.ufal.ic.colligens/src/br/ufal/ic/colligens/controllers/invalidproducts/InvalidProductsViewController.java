@@ -32,12 +32,14 @@ public class InvalidProductsViewController extends ViewController {
 
 	private InvalidProductsViewController() {
 		super(InvalidProductView.ID);
-		viewContentProvider = new ViewContentProvider();
+		viewContentProvider =
+			new ViewContentProvider();
 	}
 
 	public static InvalidProductsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new InvalidProductsViewController();
+			INSTANCE =
+				new InvalidProductsViewController();
 		}
 		return INSTANCE;
 	}
@@ -56,12 +58,16 @@ public class InvalidProductsViewController extends ViewController {
 	}
 
 	public void createPartControl(Composite parent) {
-		Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.FULL_SELECTION | SWT.LEFT);
+		Tree tree =
+			new Tree(parent, SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.FULL_SELECTION
+				| SWT.LEFT);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 
-		treeViewer = new TreeViewer(tree);
+		treeViewer =
+			new TreeViewer(tree);
 
 		this.createColumns(tree);
 
@@ -73,11 +79,15 @@ public class InvalidProductsViewController extends ViewController {
 
 			@Override
 			public void handleEvent(Event event) {
-				Point point = new Point(event.x, event.y);
-				TreeItem clickedItem = treeViewer.getTree().getItem(point);
+				Point point =
+					new Point(event.x, event.y);
+				TreeItem clickedItem =
+					treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
-					if (event.button == MouseEvent.BUTTON1 && event.count == 2) {
-						Object data = clickedItem.getData();
+					if (event.button == MouseEvent.BUTTON1
+						&& event.count == 2) {
+						Object data =
+							clickedItem.getData();
 						if (data instanceof InvalidProductViewLog) {
 
 						}
@@ -87,7 +97,8 @@ public class InvalidProductsViewController extends ViewController {
 		});
 
 		// Set the sorter for the table
-		comparator = new ViewSorter();
+		comparator =
+			new ViewSorter();
 		treeViewer.setComparator(comparator);
 
 		// PlatformUI.getWorkbench().getHelpSystem()
@@ -96,10 +107,17 @@ public class InvalidProductsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles = { VARIANT_NAME, PATH };
-		int[] bounds = { 400, 400 };
+		String[] titles =
+			{
+				VARIANT_NAME,
+				PATH };
+		int[] bounds =
+			{
+				400,
+				400 };
 
-		for (int i = 0; i < bounds.length; i++) {
+		for (int i =
+			0; i < bounds.length; i++) {
 			this.createTreeViewerColumn(tree, titles[i], bounds[i], i);
 		}
 	}
@@ -107,9 +125,13 @@ public class InvalidProductsViewController extends ViewController {
 	private void createTreeViewerColumn(Tree tree, String title, int bound,
 			final int ColumnNumber) {
 
-		int style = (ColumnNumber == 0) ? SWT.RIGHT : SWT.LEFT;
+		int style =
+			(ColumnNumber == 0)
+				? SWT.RIGHT
+				: SWT.LEFT;
 
-		final TreeColumn treeColumn = new TreeColumn(tree, style);
+		final TreeColumn treeColumn =
+			new TreeColumn(tree, style);
 
 		treeColumn.setText(title);
 		treeColumn.setWidth(bound);
@@ -121,16 +143,19 @@ public class InvalidProductsViewController extends ViewController {
 
 	private SelectionAdapter getSelectionAdapter(final TreeColumn column,
 			final int index) {
-		SelectionAdapter selectionAdapter = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				comparator.setColumn(index);
-				int direction = comparator.getDirection();
-				treeViewer.getTree().setSortDirection(direction);
-				treeViewer.getTree().setSortColumn(column);
-				treeViewer.refresh();
-			}
-		};
+		SelectionAdapter selectionAdapter =
+			new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					comparator.setColumn(index);
+					int direction =
+						comparator.getDirection();
+					treeViewer.getTree().setSortDirection(direction);
+					treeViewer.getTree().setSortColumn(column);
+					treeViewer.refresh();
+				}
+			};
 		return selectionAdapter;
 	}
 

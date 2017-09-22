@@ -30,21 +30,21 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
 
 /**
- * Action in the editor's context menu to toggle 
- * the editor highlighting of the directives
+ * Action in the editor's context menu to toggle the editor highlighting of the directives
  * 
  * @author Sebastian Krieter
  */
 public class EditorHighlightingHandler extends AbstractHandler {
-	
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IEditorPart targetEditor = HandlerUtil.getActiveEditor(event);
+		final IEditorPart targetEditor =
+			HandlerUtil.getActiveEditor(event);
 		if (targetEditor instanceof ITextEditor) {
-		    boolean oldValue = HandlerUtil.toggleCommandState(event.getCommand());
+			boolean oldValue =
+				HandlerUtil.toggleCommandState(event.getCommand());
 			ColorAnnotationModel.setHighlighting(!oldValue, (ITextEditor) targetEditor);
 		}
 		return null;
 	}
 }
-

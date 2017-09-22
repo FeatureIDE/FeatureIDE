@@ -45,17 +45,31 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 @Deprecated
 public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
-	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->",
-			", ", "choose", "atleast", "atmost" };
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private final StringBuilder sb = new StringBuilder();
+	private static final String[] SYMBOLS =
+		{
+			"!",
+			"&&",
+			"||",
+			"->",
+			"<->",
+			", ",
+			"choose",
+			"atleast",
+			"atmost" };
+	private static final String NEWLINE =
+		System.getProperty("line.separator", "\n");
+	private final StringBuilder sb =
+		new StringBuilder();
 
 	/**
 	 * If true an interface will be created. Otherwise it is named CONCEPT
 	 */
-	private boolean isInterface = false;
-	private ExtendedFeatureModel extFeatureModel = null;
-	private final HashSet<String> usedVariables = new HashSet<String>();
+	private boolean isInterface =
+		false;
+	private ExtendedFeatureModel extFeatureModel =
+		null;
+	private final HashSet<String> usedVariables =
+		new HashSet<String>();
 
 	public VelvetFeatureModelWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
@@ -64,16 +78,21 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 	public VelvetFeatureModelWriter(IFeatureModel featureModel,
 			boolean isInterface) {
 		this(featureModel);
-		this.isInterface = true;
+		this.isInterface =
+			true;
 	}
 
 	@Override
 	public String writeToString() {
 		if (object instanceof ExtendedFeatureModel) {
-			extFeatureModel = (ExtendedFeatureModel) object;
-			isInterface = isInterface || extFeatureModel.isInterface();
+			extFeatureModel =
+				(ExtendedFeatureModel) object;
+			isInterface =
+				isInterface
+					|| extFeatureModel.isInterface();
 		}
-		IFeatureStructure root = object.getStructure().getRoot();
+		IFeatureStructure root =
+			object.getStructure().getRoot();
 		sb.delete(0, sb.length());
 
 		if (isInterface) {
@@ -84,9 +103,12 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(root.getFeature().getName());
 		if (extFeatureModel != null) {
 			usedVariables.clear();
-			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
-			LinkedList<ExtendedFeatureModel.UsedModel> instanceModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
-			LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
+			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels =
+				new LinkedList<ExtendedFeatureModel.UsedModel>();
+			LinkedList<ExtendedFeatureModel.UsedModel> instanceModels =
+				new LinkedList<ExtendedFeatureModel.UsedModel>();
+			LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels =
+				new LinkedList<ExtendedFeatureModel.UsedModel>();
 			for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 				switch (usedModel.getType()) {
 				case ExtendedFeature.TYPE_INHERITED:
@@ -100,7 +122,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 					break;
 				}
 			}
-			
+
 			if (!inheritedModels.isEmpty()) {
 				sb.append(" : ");
 				sb.append(inheritedModels.removeFirst().getModelName());
@@ -109,7 +131,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 					sb.append(usedModel.getModelName());
 				}
 			}
-			
+
 			if (!instanceModels.isEmpty()) {
 				sb.append(NEWLINE);
 				sb.append("\tinstance ");
@@ -119,7 +141,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 					sb.append(usedModel);
 				}
 			}
-			
+
 			if (!interfaceModels.isEmpty()) {
 				sb.append(NEWLINE);
 				sb.append("\tinterface ");
@@ -133,11 +155,12 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(" {");
 		sb.append(NEWLINE);
 
-		if (extFeatureModel != null && !isInterface) {
+		if (extFeatureModel != null
+			&& !isInterface) {
 			for (IFeatureStructure child : root.getChildren()) {
 				writeNewDefined(child, 1);
 			}
-			
+
 			for (IConstraint constraint : object.getConstraints()) {
 				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
 					sb.append("\tconstraint ");
@@ -148,7 +171,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 			}
 		} else {
 			writeFeatureGroup(root, 1);
-			
+
 			for (IConstraint constraint : object.getConstraints()) {
 				sb.append("\tconstraint ");
 				sb.append(constraint.getNode().toString(SYMBOLS));
@@ -156,35 +179,42 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 				sb.append(NEWLINE);
 			}
 		}
-		
+
 		sb.append("}");
 
 		return sb.toString();
 	}
-	
+
 	private void writeFeatureGroup(IFeatureStructure root, int depth) {
 		if (root.isAnd()) {
 			for (IFeatureStructure feature : root.getChildren()) {
-				writeFeature(feature, depth + 1);
+				writeFeature(feature, depth
+					+ 1);
 			}
 		} else if (root.isOr()) {
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("someOf {");
 			sb.append(NEWLINE);
 			for (IFeatureStructure feature : root.getChildren()) {
-				writeFeature(feature, depth + 2);
+				writeFeature(feature, depth
+					+ 2);
 			}
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("}");
 			sb.append(NEWLINE);
 		} else if (root.isAlternative()) {
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("oneOf {");
 			sb.append(NEWLINE);
 			for (IFeatureStructure f : root.getChildren()) {
-				writeFeature(f, depth + 2);
+				writeFeature(f, depth
+					+ 2);
 			}
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("}");
 			sb.append(NEWLINE);
 		}
@@ -195,49 +225,60 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		if (feature.isAbstract()) {
 			sb.append("abstract ");
 		}
-		if (feature.isMandatory() && (feature.getParent() == null || feature.getParent().isAnd())) {
+		if (feature.isMandatory()
+			&& (feature.getParent() == null
+				|| feature.getParent().isAnd())) {
 			sb.append("mandatory ");
 		}
 		sb.append("feature ");
 		sb.append(feature.getFeature().getName());
-		final String description = feature.getFeature().getProperty().getDescription();
-		final boolean hasDescription = description != null && !description.isEmpty();
+		final String description =
+			feature.getFeature().getProperty().getDescription();
+		final boolean hasDescription =
+			description != null
+				&& !description.isEmpty();
 
-		if (feature.getChildrenCount() == 0 && !hasDescription) {
+		if (feature.getChildrenCount() == 0
+			&& !hasDescription) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
 			sb.append(NEWLINE);
 			if (hasDescription) {
-				writeTab(depth + 1);
+				writeTab(depth
+					+ 1);
 				sb.append("description \"");
 				sb.append(description.replace("\"", "\\\""));
 				sb.append("\";");
 				sb.append(NEWLINE);
 			}
-			
+
 			writeFeatureGroup(feature, depth);
-			
+
 			writeTab(depth);
 			sb.append("}");
 		}
 		sb.append(NEWLINE);
 	}
-	
+
 	private void writeNewDefined(IFeatureStructure child2, int depth) {
 		if (child2 instanceof ExtendedFeature) {
-			final ExtendedFeature extFeature = (ExtendedFeature) child2;
-			
-			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
+			final ExtendedFeature extFeature =
+				(ExtendedFeature) child2;
+
+			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE
+				|| extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
-					IFeatureStructure parent = child2.getParent();
+					IFeatureStructure parent =
+						child2.getParent();
 					writeTab(depth);
 					if (!parent.isRoot()) {
 						sb.append("feature ");
 						sb.append(parent.getFeature().getName());
 						sb.append(" {");
 						sb.append(NEWLINE);
-						writeTab(depth + 1);
+						writeTab(depth
+							+ 1);
 					}
 					sb.append(USE);
 					sb.append(extFeature.getExternalModelName());
@@ -257,7 +298,8 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 	}
 
 	private void writeTab(int times) {
-		for (int i = 0; i < times; i++) {
+		for (int i =
+			0; i < times; i++) {
 			sb.append('\t');
 		}
 	}

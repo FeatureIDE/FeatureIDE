@@ -24,8 +24,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features in in-order according to the feature tree.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features in in-order according to the feature tree.
  * 
  * @author Sebastian Krieter
  */

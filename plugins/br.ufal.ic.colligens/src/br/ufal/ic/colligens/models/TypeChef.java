@@ -49,33 +49,45 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class TypeChef {
 
 	private IProject project;
-	private boolean isFinish = false;
+	private boolean isFinish =
+		false;
 	private List<FileProxy> fileProxies;
 
 	private final AbstractHeader header;
-	private IProgressMonitor monitor = null;
+	private IProgressMonitor monitor =
+		null;
 
 	public TypeChef() {
-		header = AbstractHeader.getInstance();
+		header =
+			AbstractHeader.getInstance();
 	}
 
 	/**
 	 * 
 	 */
 	private void prepareFeatureModel() {
-		File inputFile = new File(project.getLocation().toOSString()
-				+ System.getProperty("file.separator") + "model.xml");
-		File outputFile = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator") + "cnf.fm");
-		BufferedWriter print = null;
+		File inputFile =
+			new File(project.getLocation().toOSString()
+				+ System.getProperty("file.separator")
+				+ "model.xml");
+		File outputFile =
+			new File(Colligens.getDefault().getConfigDir()
+					.getAbsolutePath()
+				+ System.getProperty("file.separator")
+				+ "cnf.fm");
+		BufferedWriter print =
+			null;
 		try {
-			print = new BufferedWriter(new FileWriter(outputFile));
-			
-			final IFeatureModel fm = FeatureModelManager.load(inputFile.toPath()).getObject();
-			
-			Node nodes = AdvancedNodeCreator.createCNF(fm);
-			StringBuilder cnf = new StringBuilder();
+			print =
+				new BufferedWriter(new FileWriter(outputFile));
+
+			final IFeatureModel fm =
+				FeatureModelManager.load(inputFile.toPath()).getObject();
+
+			Node nodes =
+				AdvancedNodeCreator.createCNF(fm);
+			StringBuilder cnf =
+				new StringBuilder();
 			cnf.append(nodes.toString(NodeWriter.javaSymbols));
 			print.write(cnf.toString());
 		} catch (FileNotFoundException e) {
@@ -99,7 +111,8 @@ public class TypeChef {
 	 */
 	private FrontendOptions getOptions(FileProxy fileProxy) throws OptionException {
 
-		ArrayList<String> paramters = new ArrayList<String>();
+		ArrayList<String> paramters =
+			new ArrayList<String>();
 
 		// paramters.add("--parserstatistics");
 
@@ -107,7 +120,8 @@ public class TypeChef {
 		paramters.add("--lexNoStdout");
 		paramters.add("--lexOutput");
 		paramters.add(Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "lexOutput.c");
+			+ System.getProperty("file.separator")
+			+ "lexOutput.c");
 
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("FEATURE_MODEL")) {
@@ -115,27 +129,32 @@ public class TypeChef {
 			paramters.add("--featureModelFExpr");
 			paramters.add(Colligens.getDefault().getConfigDir()
 					.getAbsolutePath()
-					+ System.getProperty("file.separator") + "cnf.fm");
+				+ System.getProperty("file.separator")
+				+ "cnf.fm");
 		}
 
-		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
-				.getString("TypeChefPreference");
+		String typeChefPreference =
+			Colligens.getDefault().getPreferenceStore()
+					.getString("TypeChefPreference");
 
 		paramters.add(typeChefPreference);
 
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			// Project C includes
-			ICProject project = CoreModel
-					.getDefault()
-					.getCModel()
-					.getCProject(
-							PlatformHeader.getFile(fileProxy.getFileReal())
-									.getProject().getName());
+			ICProject project =
+				CoreModel
+						.getDefault()
+						.getCModel()
+						.getCProject(
+								PlatformHeader.getFile(fileProxy.getFileReal())
+										.getProject().getName());
 
 			try {
-				IIncludeReference includes[] = project.getIncludeReferences();
-				for (int i = 0; i < includes.length; i++) {
+				IIncludeReference includes[] =
+					project.getIncludeReferences();
+				for (int i =
+					0; i < includes.length; i++) {
 					paramters.add("-I");
 					paramters.add(includes[i].getElementName());
 				}
@@ -146,28 +165,33 @@ public class TypeChef {
 
 		}
 
-		Collection<String> headersPath = header.getIncludes();
+		Collection<String> headersPath =
+			header.getIncludes();
 
-		for (Iterator<String> iterator = headersPath.iterator(); iterator
-				.hasNext();) {
+		for (Iterator<String> iterator =
+			headersPath.iterator(); iterator
+					.hasNext();) {
 			paramters.add("-h");
 			paramters.add(iterator.next());
 		}
 
 		paramters.add(fileProxy.getFileToAnalyse());
-		
-		//this static variable was changed, private to public, the jar typechef. 
-		Options.maxOptionId = 0;
-		
-		FrontendOptionsWithConfigFiles	frontendOptions = new FrontendOptionsWithConfigFiles();
 
-		String[] paramterArray = paramters
-				.toArray(new String[paramters.size()]);
+		// this static variable was changed, private to public, the jar typechef.
+		Options.maxOptionId =
+			0;
+
+		FrontendOptionsWithConfigFiles frontendOptions =
+			new FrontendOptionsWithConfigFiles();
+
+		String[] paramterArray =
+			paramters
+					.toArray(new String[paramters.size()]);
 
 		frontendOptions.parseOptions(paramterArray);
 
 		frontendOptions.setPrintToStdOutput(false);
-		
+
 		return frontendOptions;
 
 	}
@@ -184,13 +208,16 @@ public class TypeChef {
 	 * @throws TypeChefException
 	 */
 	public void run(List<IResource> resourceList) throws TypeChefException {
-		this.isFinish = false;
+		this.isFinish =
+			false;
 
-		fileProxies = resourceToFileProxy(resourceList);
+		fileProxies =
+			resourceToFileProxy(resourceList);
 
 		try {
 			if (fileProxies.isEmpty()) {
-				monitor = null;
+				monitor =
+					null;
 				throw new TypeChefException(NOT_A_VALID_FILE_FOUND_C);
 			}
 
@@ -209,41 +236,47 @@ public class TypeChef {
 				monitorSubTask(fileProxy.getFullPath());
 				// end Monitor
 				if (monitorIsCanceled()) {
-					this.isFinish = true;
+					this.isFinish =
+						true;
 					break;
 				}
 
 				try {
 
-					TypeChefFrontend typeChefFrontend = new TypeChefFrontend();
+					TypeChefFrontend typeChefFrontend =
+						new TypeChefFrontend();
 
 					typeChefFrontend.processFile(this.getOptions(fileProxy), fileProxy);
-					
-					this.isFinish = true;
+
+					this.isFinish =
+						true;
 				} catch (OptionException e) {
 					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line
 					this.startCommandLineMode(fileProxy);
 
-					this.isFinish = true;
-				}
-				catch (Exception e) {
+					this.isFinish =
+						true;
+				} catch (Exception e) {
 					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line
 					this.startCommandLineMode(fileProxy);
 
-					this.isFinish = true;
+					this.isFinish =
+						true;
 				}
 
 			}
 		} catch (PlatformException e1) {
-			monitor = null;
+			monitor =
+				null;
 			e1.printStackTrace();
 			Colligens.getDefault().logError(e1);
 		}
-		monitor = null;
+		monitor =
+			null;
 	}
 
 	/**
@@ -251,15 +284,19 @@ public class TypeChef {
 	 * @return
 	 */
 	private List<FileProxy> resourceToFileProxy(List<IResource> list) {
-		List<FileProxy> fileProxies = new LinkedList<FileProxy>();
+		List<FileProxy> fileProxies =
+			new LinkedList<FileProxy>();
 		// pega um dos arquivos para descobrir qual projeto esta sendo
 		// verificado...
-		if (project == null && !list.isEmpty()) {
-			project = list.get(0).getProject();
+		if (project == null
+			&& !list.isEmpty()) {
+			project =
+				list.get(0).getProject();
 			// System.err.println(project.toString());
 		}
 		for (IResource resouce : list) {
-			FileProxy fileProxy = new FileProxy(resouce);
+			FileProxy fileProxy =
+				new FileProxy(resouce);
 			fileProxies.add(fileProxy);
 		}
 
@@ -270,7 +307,8 @@ public class TypeChef {
 	 * @return
 	 */
 	public List<FileProxy> getFilesLog() {
-		List<FileProxy> list = new LinkedList<FileProxy>();
+		List<FileProxy> list =
+			new LinkedList<FileProxy>();
 
 		for (FileProxy fileProxy : fileProxies) {
 			if (!fileProxy.getLogs().isEmpty()) {
@@ -287,44 +325,54 @@ public class TypeChef {
 	 */
 	private void startCommandLineMode(FileProxy fileProxy)
 			throws TypeChefException {
-		XMLParserTypeChef xmlParser = new XMLParserTypeChef();
+		XMLParserTypeChef xmlParser =
+			new XMLParserTypeChef();
 
-		ArrayList<String> args = new ArrayList<String>();
+		ArrayList<String> args =
+			new ArrayList<String>();
 		args.add(fileProxy.getFileToAnalyse());
 
-		String typeChefPreference = Colligens.getDefault().getPreferenceStore()
-				.getString("TypeChefPreference");
+		String typeChefPreference =
+			Colligens.getDefault().getPreferenceStore()
+					.getString("TypeChefPreference");
 
-		URL url = BundleUtility.find(Colligens.getDefault().getBundle(), "lib/"
+		URL url =
+			BundleUtility.find(Colligens.getDefault().getBundle(), "lib/"
 				+ "TypeChef-0.3.5.jar");
 		try {
-			url = FileLocator.toFileURL(url);
+			url =
+				FileLocator.toFileURL(url);
 		} catch (IOException e) {
 			Colligens.getDefault().logError(e);
 		}
-		Path pathToTypeChef = new Path(url.getFile());
+		Path pathToTypeChef =
+			new Path(url.getFile());
 
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("FEATURE_MODEL")) {
 			prepareFeatureModel(); // General processing options String
 			args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
-					+ System.getProperty("file.separator") + "cnf.fm");
+				+ System.getProperty("file.separator")
+				+ "cnf.fm");
 			args.add(0, "--featureModelFExpr");
 		}
 
 		if (Colligens.getDefault().getPreferenceStore()
 				.getBoolean("USE_INCLUDES")) {
 			// // Project C includes
-			ICProject project = CoreModel
-					.getDefault()
-					.getCModel()
-					.getCProject(
-							PlatformHeader.getFile(fileProxy.getFileReal())
-									.getProject().getName());
+			ICProject project =
+				CoreModel
+						.getDefault()
+						.getCModel()
+						.getCProject(
+								PlatformHeader.getFile(fileProxy.getFileReal())
+										.getProject().getName());
 
 			try {
-				IIncludeReference includes[] = project.getIncludeReferences();
-				for (int i = 0; i < includes.length; i++) {
+				IIncludeReference includes[] =
+					project.getIncludeReferences();
+				for (int i =
+					0; i < includes.length; i++) {
 					args.add(0, includes[i].getElementName());
 					args.add(0, "-I");
 				}
@@ -335,10 +383,12 @@ public class TypeChef {
 
 		}
 
-		Collection<String> headersPath = header.getIncludes();
+		Collection<String> headersPath =
+			header.getIncludes();
 
-		for (Iterator<String> iterator = headersPath.iterator(); iterator
-				.hasNext();) {
+		for (Iterator<String> iterator =
+			headersPath.iterator(); iterator
+					.hasNext();) {
 
 			args.add(0, iterator.next());
 			args.add(0, "-h");
@@ -347,23 +397,31 @@ public class TypeChef {
 		args.add(0, typeChefPreference);
 
 		// saved in the' temp directory
-		String outputFilePath = Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator") + "output";
+		String outputFilePath =
+			Colligens.getDefault().getConfigDir()
+					.getAbsolutePath()
+				+ System.getProperty("file.separator")
+				+ "output";
 
 		try {
-			RandomAccessFile arq = new RandomAccessFile(outputFilePath, "rw");
+			RandomAccessFile arq =
+				new RandomAccessFile(outputFilePath, "rw");
 			arq.close();
-			arq = new RandomAccessFile(outputFilePath + ".xml", "rw");
+			arq =
+				new RandomAccessFile(outputFilePath
+					+ ".xml", "rw");
 			arq.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		args.add(0, "--errorXML=" + outputFilePath + ".xml");
+		args.add(0, "--errorXML="
+			+ outputFilePath
+			+ ".xml");
 
 		args.add(0, Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "lexOutput.c");
+			+ System.getProperty("file.separator")
+			+ "lexOutput.c");
 		args.add(0, "--lexOutput");
 		args.add(0, "--lexNoStdout");
 		args.add(0, "-w");
@@ -372,26 +430,35 @@ public class TypeChef {
 		args.add(0, "java");
 
 		for (String s : args) {
-			System.err.print(s + " ");
+			System.err.print(s
+				+ " ");
 		}
 
-		ProcessBuilder processBuilder = new ProcessBuilder(args);
+		ProcessBuilder processBuilder =
+			new ProcessBuilder(args);
 
-		BufferedReader input = null;
-		BufferedReader error = null;
+		BufferedReader input =
+			null;
+		BufferedReader error =
+			null;
 		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			boolean x = true;
+			Process process =
+				processBuilder.start();
+			input =
+				new BufferedReader(new InputStreamReader(
+						process.getInputStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			error =
+				new BufferedReader(new InputStreamReader(
+						process.getErrorStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			boolean x =
+				true;
 			while (x) {
 				try {
 					String line;
-					while ((line = input.readLine()) != null) {
+					while ((line =
+						input.readLine()) != null) {
 						System.out.println(line);
 						Colligens.getDefault().logWarning(line);
 					}
@@ -401,12 +468,14 @@ public class TypeChef {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue = process.exitValue();
+					int exitValue =
+						process.exitValue();
 					if (exitValue != 0) {
 						throw new TypeChefException(
 								TYPECHEF_DID_NOT_RUN_CORRECTLY_);
 					}
-					x = false;
+					x =
+						false;
 				} catch (IllegalThreadStateException e) {
 					System.out.println(e.toString());
 					Colligens.getDefault().logError(e);
@@ -425,9 +494,9 @@ public class TypeChef {
 			} finally {
 				if (error != null)
 					try {
-						error.close();
+					error.close();
 					} catch (IOException e) {
-						Colligens.getDefault().logError(e);
+					Colligens.getDefault().logError(e);
 					}
 			}
 		}
@@ -436,11 +505,14 @@ public class TypeChef {
 	}
 
 	public void setMonitor(IProgressMonitor monitor) {
-		this.monitor = monitor;
+		this.monitor =
+			monitor;
 	}
 
 	private boolean monitorIsCanceled() {
-		return monitor != null ? monitor.isCanceled() : false;
+		return monitor != null
+			? monitor.isCanceled()
+			: false;
 	}
 
 	private void monitorWorked(int value) {

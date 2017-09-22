@@ -45,11 +45,14 @@ public abstract class ASelectionHandler extends AbstractHandler {
 
 	@Override
 	public final Object execute(ExecutionEvent event) throws ExecutionException {
-		final ISelection selection = HandlerUtil.getCurrentSelection(event);
+		final ISelection selection =
+			HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection strSelection = (IStructuredSelection) selection;
+			IStructuredSelection strSelection =
+				(IStructuredSelection) selection;
 			if (startAction(strSelection)) {
-				for (Iterator<?> it = strSelection.iterator(); it.hasNext();) {
+				for (Iterator<?> it =
+					strSelection.iterator(); it.hasNext();) {
 					singleAction(it.next());
 				}
 				endAction();
@@ -59,8 +62,7 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	}
 
 	/**
-	 * This method is called before iterating through the current selection.</br>
-	 * Default implementation returns {@code true}.
+	 * This method is called before iterating through the current selection.</br> Default implementation returns {@code true}.
 	 * 
 	 * @param selection the current selection
 	 * 
@@ -71,8 +73,7 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	}
 
 	/**
-	 * This method is called after the last object in the selection was handled.</br>
-	 * Default implementation does nothing.
+	 * This method is called after the last object in the selection was handled.</br> Default implementation does nothing.
 	 */
 	protected void endAction() {
 		// do nothing.

@@ -21,10 +21,8 @@
 package de.ovgu.featureide.ahead.wrapper;
 
 /**
- * There are three types of errors that are all managed by the
- * AheadBuildError. The ahead build error type is used to 
- * distinguish between errors that occur during the compose,
- * reduce or compile step.
+ * There are three types of errors that are all managed by the AheadBuildError. The ahead build error type is used to distinguish between errors that occur
+ * during the compose, reduce or compile step.
  * 
  * @author Tom Brosch
  *

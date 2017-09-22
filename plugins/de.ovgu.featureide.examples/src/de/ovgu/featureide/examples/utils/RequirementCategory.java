@@ -25,18 +25,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class holds information about categrory and requirements.
- * Is required for CommentParser.
+ * This class holds information about categrory and requirements. Is required for CommentParser.
  * 
  * @author Alexander Dreiling
  */
 public class RequirementCategory {
+
 	String catName;
-	Map<String, String> requirements = new HashMap<String, String>();
+	Map<String, String> requirements =
+		new HashMap<String, String>();
 
 	public RequirementCategory(String categoryName, Map<String, String> requirements) {
-		this.catName = categoryName;
-		this.requirements = requirements;
+		this.catName =
+			categoryName;
+		this.requirements =
+			requirements;
 	}
 
 	public String getCategory() {

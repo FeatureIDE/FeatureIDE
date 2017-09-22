@@ -50,21 +50,25 @@ public class CheckBoxListener implements ICheckStateListener {
 
 	public CheckBoxListener(final CheckboxTreeViewer viewer) {
 		super();
-		this.viewer = viewer;
+		this.viewer =
+			viewer;
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				Object[] sources = ((TreeSelection) event.getSelection())
-						.toArray();
+				Object[] sources =
+					((TreeSelection) event.getSelection())
+							.toArray();
 				for (Object source : sources) {
 					if (source instanceof Parent) {
-						Parent selected = (Parent) source;
+						Parent selected =
+							(Parent) source;
 						if (selected.hasChildren()) {
 							if (selected instanceof LazyParent) {
 								((LazyParent) selected).getChildren();
 							}
-							boolean allChecked = allChildrenChecked(selected);
+							boolean allChecked =
+								allChildrenChecked(selected);
 							viewer.setChecked(selected, !allChecked);
 							for (Parent child : selected.getChildren()) {
 								viewer.setChecked(child, !allChecked);
@@ -94,18 +98,20 @@ public class CheckBoxListener implements ICheckStateListener {
 
 	@Override
 	public void checkStateChanged(CheckStateChangedEvent event) {
-		
+
 	}
-	
+
 	/**
 	 * @param element
 	 * @return
 	 */
 	private boolean allChildrenChecked(Object element) {
-		boolean allChildrenChecked = true;
+		boolean allChildrenChecked =
+			true;
 		for (Object o : ((Parent) element).getChildren()) {
 			if (!viewer.getChecked(o)) {
-				allChildrenChecked = false;
+				allChildrenChecked =
+					false;
 				break;
 			}
 		}
@@ -113,14 +119,15 @@ public class CheckBoxListener implements ICheckStateListener {
 	}
 
 	private void refreshViewer() {
-		UIJob job = new UIJob(REFRESH_EXPORT_DIALOG) {
+		UIJob job =
+			new UIJob(REFRESH_EXPORT_DIALOG) {
 
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.refresh();
-				return Status.OK_STATUS;
-			}
-		};
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					viewer.refresh();
+					return Status.OK_STATUS;
+				}
+			};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}

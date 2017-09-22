@@ -28,15 +28,18 @@ package de.ovgu.featureide.fm.core.constraint;
 public class WeightedTerm {
 
 	private int weight;
-	
+
 	private boolean positive;
-	
+
 	private Reference reference;
 
 	public WeightedTerm(int weight, boolean positive, Reference reference) {
-		this.weight = weight;
-		this.positive = positive;
-		this.reference = reference;
+		this.weight =
+			weight;
+		this.positive =
+			positive;
+		this.reference =
+			reference;
 	}
 
 	public int getWeight() {
@@ -50,14 +53,15 @@ public class WeightedTerm {
 	public Reference getReference() {
 		return reference;
 	}
-	
+
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb =
+			new StringBuilder();
 		sb.append("(");
 		sb.append(weight);
 		sb.append(" ");
-		if (!positive) 
+		if (!positive)
 			sb.append("~");
 		sb.append(reference.toString());
 		sb.append(")");

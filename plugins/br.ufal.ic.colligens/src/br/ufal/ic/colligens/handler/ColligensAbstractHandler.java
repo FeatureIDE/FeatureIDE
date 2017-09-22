@@ -25,80 +25,110 @@ import org.eclipse.ui.part.FileEditorInput;
 
 @SuppressWarnings(RESTRICTION)
 public abstract class ColligensAbstractHandler extends AbstractHandler {
-	private static ISelection selection = null;
-	private static boolean enabled = false;
+
+	private static ISelection selection =
+		null;
+	private static boolean enabled =
+		false;
 
 	@Override
 	public boolean isEnabled() {
-		ISelection selection = null;
+		ISelection selection =
+			null;
 		try {
-			selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().getSelection();
+			selection =
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+						.getActivePage().getSelection();
 
 			if (ColligensAbstractHandler.selection != null
-					&& ColligensAbstractHandler.selection.equals(selection)) {
+				&& ColligensAbstractHandler.selection.equals(selection)) {
 				return enabled;
 			}
 			if (selection instanceof TextSelection) {
-				ColligensAbstractHandler.selection = selection;
-				FileEditorInput fileEditorInput = (FileEditorInput) PlatformUI
-						.getWorkbench().getActiveWorkbenchWindow()
-						.getActivePage().getActiveEditor().getEditorInput();
+				ColligensAbstractHandler.selection =
+					selection;
+				FileEditorInput fileEditorInput =
+					(FileEditorInput) PlatformUI
+							.getWorkbench().getActiveWorkbenchWindow()
+							.getActivePage().getActiveEditor().getEditorInput();
 
-				enabled = (fileEditorInput != null
+				enabled =
+					(fileEditorInput != null
 						&& (fileEditorInput.getFile().getFileExtension()
-								.equals("h") || fileEditorInput.getFile()
-								.getFileExtension().equals("c")) && fileEditorInput
-						.getFile()
-						.getProject()
-						.hasNature(
-								"de.ovgu.featureide.core.featureProjectNature"));
+								.equals("h")
+							|| fileEditorInput.getFile()
+									.getFileExtension().equals("c"))
+						&& fileEditorInput
+								.getFile()
+								.getProject()
+								.hasNature(
+										"de.ovgu.featureide.core.featureProjectNature"));
 
 				return enabled;
 
 			} else if (selection instanceof IStructuredSelection) {
-				ColligensAbstractHandler.selection = selection;
-				IStructuredSelection extended = (IStructuredSelection) selection;
-				for (Iterator<?> iterator = extended.iterator(); iterator
-						.hasNext();) {
-					Object object = iterator.next();
+				ColligensAbstractHandler.selection =
+					selection;
+				IStructuredSelection extended =
+					(IStructuredSelection) selection;
+				for (Iterator<?> iterator =
+					extended.iterator(); iterator
+							.hasNext();) {
+					Object object =
+						iterator.next();
 					if (isValid(object)) {
-						enabled = true;
+						enabled =
+							true;
 						return enabled;
 					}
 				}
 
 			}
 		} catch (Exception e) {
-			enabled = false;
+			enabled =
+				false;
 			return enabled;
 		}
-		enabled = false;
+		enabled =
+			false;
 		return enabled;
 	}
 
 	private boolean isValid(Object object) throws CoreException {
-		IProject project = null;
-		boolean isvalid = false;
+		IProject project =
+			null;
+		boolean isvalid =
+			false;
 		if (object instanceof Project) {
-			project = (Project) object;
-			isvalid = project.isOpen();
+			project =
+				(Project) object;
+			isvalid =
+				project.isOpen();
 		} else if (object instanceof SourceRoot) {
-			project = ((SourceRoot) object).getCProject().getProject();
-			isvalid = true;
+			project =
+				((SourceRoot) object).getCProject().getProject();
+			isvalid =
+				true;
 		} else if (object instanceof CContainer) {
-			project = ((CContainer) object).getCProject().getProject();
-			IResource resource = ((CContainer) object).getResource();
-			isvalid = isResource(resource);
+			project =
+				((CContainer) object).getCProject().getProject();
+			IResource resource =
+				((CContainer) object).getResource();
+			isvalid =
+				isResource(resource);
 		} else if (object instanceof ITranslationUnit) {
-			ITranslationUnit iTranslationUnit = (ITranslationUnit) object;
-			project = iTranslationUnit.getCProject().getProject();
-			isvalid = isResource(iTranslationUnit.getResource());
+			ITranslationUnit iTranslationUnit =
+				(ITranslationUnit) object;
+			project =
+				iTranslationUnit.getCProject().getProject();
+			isvalid =
+				isResource(iTranslationUnit.getResource());
 		}
 
 		if (project != null) {
 			return (project
-					.hasNature("de.ovgu.featureide.core.featureProjectNature") && isvalid);
+					.hasNature("de.ovgu.featureide.core.featureProjectNature")
+				&& isvalid);
 		}
 		return false;
 	}
@@ -107,7 +137,7 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 		if (iResource instanceof IFile) {
 			// adds .c and .h files only
 			if (iResource.getLocation().toString().trim().endsWith(".c")
-					|| iResource.getLocation().toString().trim().endsWith(".h")) {
+				|| iResource.getLocation().toString().trim().endsWith(".h")) {
 				return true;
 			}
 		} else if (iResource instanceof IFolder) {
@@ -124,7 +154,9 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 	}
 
 	protected static final boolean saveAll() {
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		return IDE.saveAllEditors(new IResource[] { workspaceRoot }, true);
+		IWorkspaceRoot workspaceRoot =
+			ResourcesPlugin.getWorkspace().getRoot();
+		return IDE.saveAllEditors(new IResource[] {
+			workspaceRoot }, true);
 	}
 }

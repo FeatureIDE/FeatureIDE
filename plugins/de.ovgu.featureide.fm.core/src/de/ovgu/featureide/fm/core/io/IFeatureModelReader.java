@@ -37,14 +37,14 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 @Deprecated
 public interface IFeatureModelReader {
-	
+
 	/**
 	 * Returns the feature model where the read data is stored.
 	 * 
 	 * @return the model to fill
 	 */
 	public IFeatureModel getFeatureModel();
-	
+
 	/**
 	 * Sets the feature model where the read data is stored.
 	 * 
@@ -55,7 +55,7 @@ public interface IFeatureModelReader {
 	/**
 	 * Parses a specific feature model file.
 	 * 
-	 * @param  file  the feature model file
+	 * @param file the feature model file
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
@@ -64,7 +64,7 @@ public interface IFeatureModelReader {
 	/**
 	 * Parses a specific feature model file.
 	 * 
-	 * @param  file  the feature model file
+	 * @param file the feature model file
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
@@ -90,8 +90,7 @@ public interface IFeatureModelReader {
 	/**
 	 * Set the source file of the textual representation of the feature model.
 	 * 
-	 * @param featureModelFile
-	 *            the source file
+	 * @param featureModelFile the source file
 	 */
 	public void setFile(File featureModelFile);
 

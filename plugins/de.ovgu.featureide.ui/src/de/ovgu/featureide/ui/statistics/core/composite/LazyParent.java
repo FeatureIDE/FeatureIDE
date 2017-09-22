@@ -33,9 +33,8 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
- * Provides functionality for lazy calculating its children for the
- * {@link TreeViewer}. {@link LazyParent#initChildren()} has to be overridden
- * using the LazyParent#addChild(Parent)-method to initialize.
+ * Provides functionality for lazy calculating its children for the {@link TreeViewer}. {@link LazyParent#initChildren()} has to be overridden using the
+ * LazyParent#addChild(Parent)-method to initialize.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
@@ -43,12 +42,13 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 public abstract class LazyParent extends Parent {
 
 	public final class StatisticTreeJob extends TreeJob {
-		
+
 		private final boolean expand;
 
 		private StatisticTreeJob(Parent calculated, boolean expand) {
 			super(calculated);
-			this.expand = expand;
+			this.expand =
+				expand;
 		}
 
 		public boolean isExpand() {
@@ -72,7 +72,8 @@ public abstract class LazyParent extends Parent {
 
 	}
 
-	protected boolean lazy = true;
+	protected boolean lazy =
+		true;
 
 	@Override
 	public Parent[] getChildren() {
@@ -80,66 +81,72 @@ public abstract class LazyParent extends Parent {
 	}
 
 	/**
-	 * Starts a job, that calculates the children of this instance, and
-	 * registers it to the listener.
+	 * Starts a job, that calculates the children of this instance, and registers it to the listener.
 	 */
 	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
-			final TreeJob job = new StatisticTreeJob(this, expand);
-			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
+			final TreeJob job =
+				new StatisticTreeJob(this, expand);
+			LongRunningJob<Boolean> runner =
+				new LongRunningJob<>(CALCULATE
+					+ this.getClass().getName(), job);
 			runner.setPriority(Job.SHORT);
-			final JobDoneListener listener = JobDoneListener.getInstance();
+			final JobDoneListener listener =
+				JobDoneListener.getInstance();
 			if (listener != null) {
 				runner.addJobChangeListener(listener);
 			}
 			runner.schedule();
 		}
-		lazy = false;
+		lazy =
+			false;
 		return super.getChildren();
 	}
-	
+
 	/**
-	 * May be overridden in order to change the priority. Should be used
-	 * especially for lengthy calculations.
+	 * May be overridden in order to change the priority. Should be used especially for lengthy calculations.
 	 * 
 	 * @param job
 	 */
 	protected void setPriority(Job job) {
 		job.setPriority(Job.SHORT);
 	}
-	
+
 	public boolean isLazy() {
 		return lazy;
 	}
-	
+
 	public void setLazy(boolean lazy) {
-		this.lazy = lazy;
+		this.lazy =
+			lazy;
 	}
-	
+
 	@Override
 	public Boolean hasChildren() {
-		return lazy || super.hasChildren();
+		return lazy
+			|| super.hasChildren();
 	}
-	
+
 	/**
 	 * Must be implemented to initialize this node lazily. Therefore this method must use {@link Parent#addChild(Parent)}.
 	 */
 	protected abstract void initChildren();
-	
+
 	public LazyParent(String description, Object value) {
 		super(description, value);
 	}
-	
+
 	protected LazyParent() {
 		super();
 	}
-	
+
 	public LazyParent(String description) {
 		super(description);
 	}
-	
+
 	public void recalculate() {
-		this.children = new LinkedList<Parent>();
+		this.children =
+			new LinkedList<Parent>();
 		initChildren();
 	}
 }

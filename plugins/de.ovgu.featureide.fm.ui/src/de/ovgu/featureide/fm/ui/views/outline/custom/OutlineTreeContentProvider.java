@@ -34,61 +34,67 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  */
 public abstract class OutlineTreeContentProvider implements ITreeContentProvider {
 
-	private final Set<IOutlineFilter> filters = new HashSet<>();
-	
-	/* (non-Javadoc)
+	private final Set<IOutlineFilter> filters =
+		new HashSet<>();
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang.Object)
 	 */
 	@Override
 	public abstract Object[] getElements(Object inputElement);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 	 */
 	@Override
 	public abstract Object[] getChildren(Object parentElement);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 	 */
 	@Override
 	public abstract Object getParent(Object element);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 	 */
 	@Override
 	public abstract boolean hasChildren(Object element);
 
-	//add filter to filter set
+	// add filter to filter set
 	public void addFilter(IOutlineFilter filter) {
 		filters.add(filter);
 	}
 
-	//remove filter from filter set
+	// remove filter from filter set
 	public void removeFilter(IOutlineFilter filter) {
 		for (IOutlineFilter f : filters) {
 			if (f.getName().equals(filter.getName())) filters.remove(f);
 		}
 	}
-	
+
 	public void removeAllFilters() {
 		filters.clear();
 	}
-	
+
 	public boolean hasFilter(IOutlineFilter filter) {
 		for (IOutlineFilter f : filters) {
 			if (f.getName().equals(filter.getName())) return true;
 		}
 		return false;
-	} 
+	}
 
-	//apply all filters from filter set
+	// apply all filters from filter set
 	protected Object[] filter(Object[] obj) {
 		for (IOutlineFilter filter : filters) {
-			obj = filter.filter(obj);
+			obj =
+				filter.filter(obj);
 		}
 		return obj;
 	}
-	
+
 }

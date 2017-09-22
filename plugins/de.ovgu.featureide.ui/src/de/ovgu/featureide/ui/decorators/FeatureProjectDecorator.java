@@ -36,28 +36,26 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class FeatureProjectDecorator implements ILightweightLabelDecorator {
 
-	private static final ImageDescriptor OVERLAY = UIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
+	private static final ImageDescriptor OVERLAY =
+		UIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
 
-	public FeatureProjectDecorator() {
-	}
-	
-	public void dispose() {
-	}
+	public FeatureProjectDecorator() {}
+
+	public void dispose() {}
 
 	public void decorate(Object element, IDecoration decoration) {
-		IProject project = (IProject) element;
+		IProject project =
+			(IProject) element;
 
-		//decorate feature projects
+		// decorate feature projects
 		if (CorePlugin.hasProjectData(project)) {
 			decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
 		}
 	}
 
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	public boolean isLabelProperty(Object element, String property) {
 		return false;

@@ -43,7 +43,9 @@ public class ImportGUIDSLHandler extends AbstractImportHandler {
 
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL" });
+		fileDialog.setFilterExtensions(new String[] {
+			"*.m" });
+		fileDialog.setFilterNames(new String[] {
+			"GUIDSL" });
 	}
 }

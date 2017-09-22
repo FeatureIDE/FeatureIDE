@@ -30,37 +30,37 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 
 /**
- * Starts the configuration file wizard for the selected configuration file
- * at the context menu. 
+ * Starts the configuration file wizard for the selected configuration file at the context menu.
  */
 public class StartConfigurationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	public void init(IWorkbenchWindow window) {
-		this.window=window;
+		this.window =
+			window;
 	}
 
 	public void run(IAction action) {
-		
-		NewConfigurationFileWizard wizard=new NewConfigurationFileWizard();
-		ISelection selection = window.getSelectionService().getSelection();
-		
-		if(selection instanceof IStructuredSelection){
-			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);	
-		}
-		else{
+
+		NewConfigurationFileWizard wizard =
+			new NewConfigurationFileWizard();
+		ISelection selection =
+			window.getSelectionService().getSelection();
+
+		if (selection instanceof IStructuredSelection) {
+			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);
+		} else {
 			wizard.init(window.getWorkbench(), null);
 		}
-		
-		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+
+		WizardDialog dialog =
+			new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
-	}
+	public void selectionChanged(IAction action, ISelection selection) {}
 
 }

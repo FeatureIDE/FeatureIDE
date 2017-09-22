@@ -24,15 +24,15 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * Extends the abstract {@link AFeatureData} class.
- * Stores additional information for signatures in a preprocessor project.
+ * Extends the abstract {@link AFeatureData} class. Stores additional information for signatures in a preprocessor project.
  * 
  * @author Sebastian Krieter
  */
 public class PreprocessorFeatureData extends AFeatureData {
 
-	private final HashSet<Integer> involvedFeatures = new HashSet<>();
-	
+	private final HashSet<Integer> involvedFeatures =
+		new HashSet<>();
+
 	PreprocessorFeatureData(int startLineNumber, int endLineNumber) {
 		super(-1, startLineNumber, endLineNumber);
 	}
@@ -40,9 +40,9 @@ public class PreprocessorFeatureData extends AFeatureData {
 	public Collection<Integer> getInvolvedFeature() {
 		return involvedFeatures;
 	}
-	
+
 	public void addFeature(Integer featureID) {
 		involvedFeatures.add(featureID);
 	}
-	
+
 }

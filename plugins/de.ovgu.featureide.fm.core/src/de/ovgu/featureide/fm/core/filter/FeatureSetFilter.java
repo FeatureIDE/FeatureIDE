@@ -38,7 +38,8 @@ public class FeatureSetFilter implements IFilter<IFeature> {
 	private final Collection<IFeature> features;
 
 	public FeatureSetFilter(Collection<IFeature> features) {
-		this.features = features;
+		this.features =
+			features;
 	}
 
 	@Override

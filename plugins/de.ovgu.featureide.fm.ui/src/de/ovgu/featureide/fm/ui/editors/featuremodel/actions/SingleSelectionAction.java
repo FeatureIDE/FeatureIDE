@@ -37,20 +37,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
- * A default implementation for actions that only allow one feature to be
- * selected.
+ * A default implementation for actions that only allow one feature to be selected.
  * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
 public abstract class SingleSelectionAction extends Action implements IEventListener {
 
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			selectionElementChanged(isValidSelection(selection));
-		}
-	};
+	private ISelectionChangedListener listener =
+		new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection =
+					(IStructuredSelection) event.getSelection();
+				selectionElementChanged(isValidSelection(selection));
+			}
+		};
 
 	Object viewer;
 
@@ -60,7 +62,8 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 
 	public SingleSelectionAction(String text, Object viewer2) {
 		super(text);
-		this.viewer = viewer2;
+		this.viewer =
+			viewer2;
 		setEnabled(false);
 		if (viewer2 instanceof GraphicalViewerImpl)
 			((GraphicalViewerImpl) viewer2).addSelectionChangedListener(listener);
@@ -70,21 +73,28 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 
 	private boolean isOneFeatureSelected(IStructuredSelection selection) {
 		return selection.size() == 1
-				&& (selection.getFirstElement() instanceof FeatureEditPart || selection.getFirstElement() instanceof ConnectionEditPart
-						|| selection.getFirstElement() instanceof FmOutlineGroupStateStorage || selection.getFirstElement() instanceof IFeature);
+			&& (selection.getFirstElement() instanceof FeatureEditPart
+				|| selection.getFirstElement() instanceof ConnectionEditPart
+				|| selection.getFirstElement() instanceof FmOutlineGroupStateStorage
+				|| selection.getFirstElement() instanceof IFeature);
 	}
 
 	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {
 		Object part;
 		if (diagramEditor == null) {
-			IStructuredSelection selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
-			part = selection.getFirstElement();
+			IStructuredSelection selection =
+				(IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
+			part =
+				selection.getFirstElement();
 		} else {
-			IFeature selection = (IFeature) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
-			part = ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(selection);
+			IFeature selection =
+				(IFeature) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			part =
+				((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(selection);
 		}
 
-		connectionSelected = part instanceof ConnectionEditPart;
+		connectionSelected =
+			part instanceof ConnectionEditPart;
 
 		if (connectionSelected)
 			return (FeatureEditPart) ((ConnectionEditPart) part).getTarget();
@@ -95,17 +105,21 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	public IFeature getSelectedFeature() {
 		IStructuredSelection selection;
 		if (viewer instanceof TreeViewer) {
-			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+			selection =
+				(IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage)
 				return ((FmOutlineGroupStateStorage) selection.getFirstElement()).getFeature();
 			else
 				return (IFeature) selection.getFirstElement();
 		} else {
-			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
+			selection =
+				(IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
 		}
 
-		Object part = selection.getFirstElement();
-		connectionSelected = part instanceof ConnectionEditPart;
+		Object part =
+			selection.getFirstElement();
+		connectionSelected =
+			part instanceof ConnectionEditPart;
 		if (connectionSelected)
 			return ((ConnectionEditPart) part).getModel().getTarget().getObject();
 		return ((FeatureEditPart) part).getModel().getObject();
@@ -115,11 +129,13 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 		if (feature != null)
 			feature.removeListener(this);
 		if (oneSelected) {
-			feature = getSelectedFeature();
+			feature =
+				getSelectedFeature();
 			feature.addListener(this);
 			updateProperties();
 		} else {
-			feature = null;
+			feature =
+				null;
 			setEnabled(false);
 			setChecked(false);
 		}
@@ -132,9 +148,14 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	protected abstract void updateProperties();
 
 	public void propertyChange(FeatureIDEEvent event) {
-		EventType prop = event.getEventType();
-		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop) || EventType.HIDDEN_CHANGED.equals(prop)
-				|| EventType.COLOR_CHANGED.equals(prop) || EventType.COLLAPSED_CHANGED.equals(prop)) {
+		EventType prop =
+			event.getEventType();
+		if (EventType.GROUP_TYPE_CHANGED.equals(prop)
+			|| EventType.MANDATORY_CHANGED.equals(prop)
+			|| EventType.PARENT_CHANGED.equals(prop)
+			|| EventType.HIDDEN_CHANGED.equals(prop)
+			|| EventType.COLOR_CHANGED.equals(prop)
+			|| EventType.COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

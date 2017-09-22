@@ -34,18 +34,21 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * @author Marcus Pinnecke
  */
 public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
+
 	private IConstraint constraint;
 
 	private int index;
 
 	public DeleteConstraintOperation(IConstraint constraint, IFeatureModel featureModel) {
 		super(featureModel, DELETE_CONSTRAINT);
-		this.constraint = constraint;
+		this.constraint =
+			constraint;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		index = featureModel.getConstraintIndex(constraint);
+		index =
+			featureModel.getConstraintIndex(constraint);
 		featureModel.removeConstraint(constraint);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
 	}

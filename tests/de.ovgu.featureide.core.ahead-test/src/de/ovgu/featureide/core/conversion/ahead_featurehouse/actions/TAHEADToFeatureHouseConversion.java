@@ -30,28 +30,43 @@ import org.junit.Test;
  * @author Jens Meinicke
  */
 public class TAHEADToFeatureHouseConversion {
-	
-	private AHEADToFeatureHouseConversion converter = new AHEADToFeatureHouseConversion(null);
-	
-	private String TEXT_1 = 
-			"layer testLayer;/r/n" +
-			"/r/n" +
-			"public refines class testClass {/r/n" +
-			"/r/n" +
-			" public void method() {/r/n" +
-			"  Super().method();/r/n" +
-			" }/r/n" +
+
+	private AHEADToFeatureHouseConversion converter =
+		new AHEADToFeatureHouseConversion(null);
+
+	private String TEXT_1 =
+		"layer testLayer;/r/n"
+			+
+			"/r/n"
+			+
+			"public refines class testClass {/r/n"
+			+
+			"/r/n"
+			+
+			" public void method() {/r/n"
+			+
+			"  Super().method();/r/n"
+			+
+			" }/r/n"
+			+
 			"}";
-	private String CHANGED_TEXT_1 = 
-			"/r/n" +
-			"/r/n" +
-			"public class testClass {/r/n" +
-			"/r/n" +
-			" public void method() {/r/n" +
-			"  original();/r/n" +
-			" }/r/n" +
+	private String CHANGED_TEXT_1 =
+		"/r/n"
+			+
+			"/r/n"
+			+
+			"public class testClass {/r/n"
+			+
+			"/r/n"
+			+
+			" public void method() {/r/n"
+			+
+			"  original();/r/n"
+			+
+			" }/r/n"
+			+
 			"}";
-	
+
 	@Test
 	public void changeFile_1() {
 		assertEquals(CHANGED_TEXT_1, converter.changeFile(TEXT_1, null));

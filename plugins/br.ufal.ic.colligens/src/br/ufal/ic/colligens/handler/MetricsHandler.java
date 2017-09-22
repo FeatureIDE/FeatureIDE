@@ -23,23 +23,24 @@ import br.ufal.ic.colligens.views.MetricsView;
  * 
  */
 public class MetricsHandler extends ColligensAbstractHandler {
+
 	private MetricsController controller;
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands. ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		IWorkbenchWindow window =
+			HandlerUtil.getActiveWorkbenchWindow(event);
 
-		ISelection selection = window.getActivePage().getSelection();
+		ISelection selection =
+			window.getActivePage().getSelection();
 
 		if (controller == null) {
-			controller = new MetricsController();
+			controller =
+				new MetricsController();
 		}
 
 		controller.setWindow(window);
@@ -47,11 +48,12 @@ public class MetricsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			IWorkbenchPage page = window.getActivePage();
+			IWorkbenchPage page =
+				window.getActivePage();
 			try {
 				page.showView(MetricsView.ID);
 			} catch (PartInitException e) {
-				
+
 				e.printStackTrace();
 			}
 			controller.run();

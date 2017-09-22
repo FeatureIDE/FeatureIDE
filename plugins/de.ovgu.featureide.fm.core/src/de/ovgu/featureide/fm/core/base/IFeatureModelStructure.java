@@ -23,8 +23,7 @@ package de.ovgu.featureide.fm.core.base;
 import java.util.Collection;
 
 /**
- * Manages all structural information of a feature model.
- * Intended for tree structures (features are represented by tree nodes).
+ * Manages all structural information of a feature model. Intended for tree structures (features are represented by tree nodes).
  * 
  * @author Sebastian Krieter
  */

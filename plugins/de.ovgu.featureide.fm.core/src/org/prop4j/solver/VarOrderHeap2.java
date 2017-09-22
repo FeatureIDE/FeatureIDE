@@ -26,35 +26,45 @@ import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ISolver;
 
 /**
- * Modified variable order for {@link ISolver}.</br>
- * Initializes the used heap in a certain order.
+ * Modified variable order for {@link ISolver}.</br> Initializes the used heap in a certain order.
  * 
  * @author Sebastian Krieter
  */
 public class VarOrderHeap2 extends VarOrderHeap {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID =
+		1L;
 	private int[] order;
 
 	public VarOrderHeap2(IPhaseSelectionStrategy strategy, int[] order) {
 		super(strategy);
-		this.order = order;
+		this.order =
+			order;
 	}
 
 	@Override
 	public void init() {
-		int nlength = this.lits.nVars() + 1;
-		if (this.activity == null || this.activity.length < nlength) {
-			this.activity = new double[nlength];
+		int nlength =
+			this.lits.nVars()
+				+ 1;
+		if (this.activity == null
+			|| this.activity.length < nlength) {
+			this.activity =
+				new double[nlength];
 		}
 		this.phaseStrategy.init(nlength);
-		this.activity[0] = -1;
-		this.heap = new Heap(this.activity);
+		this.activity[0] =
+			-1;
+		this.heap =
+			new Heap(this.activity);
 		this.heap.setBounds(nlength);
 		nlength--;
-		for (int i = 0; i < nlength; i++) {
-			final int x = order[i];
-			this.activity[x] = 0.0;
+		for (int i =
+			0; i < nlength; i++) {
+			final int x =
+				order[i];
+			this.activity[x] =
+				0.0;
 			if (this.lits.belongsToPool(x)) {
 				this.heap.insert(x);
 			}
@@ -66,7 +76,8 @@ public class VarOrderHeap2 extends VarOrderHeap {
 	}
 
 	public void setOrder(int[] order) {
-		this.order = order;
+		this.order =
+			order;
 	}
 
 }

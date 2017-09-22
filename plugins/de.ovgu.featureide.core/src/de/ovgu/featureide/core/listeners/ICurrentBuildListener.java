@@ -29,5 +29,6 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @author Constanze Adler
  */
 public interface ICurrentBuildListener {
+
 	void updateGuiAfterBuild(IFeatureProject project, IFile configurationFile);
 }

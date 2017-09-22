@@ -31,42 +31,49 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public abstract class ConfigurationExplanationWriter extends FeatureModelExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform
 	 */
 	public ConfigurationExplanationWriter(ConfigurationExplanation explanation) {
 		super(explanation);
 	}
-	
+
 	@Override
 	protected String getConcreteReasonString(Reason reason) {
 		if (!(reason instanceof ConfigurationReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final SelectableFeature selection = ((ConfigurationReason) reason).getFeatureSelection();
+		final SelectableFeature selection =
+			((ConfigurationReason) reason).getFeatureSelection();
 		String selectionString;
 		switch (selection.getSelection()) {
-			case SELECTED:
-				selectionString = "selected";
-				break;
-			case UNSELECTED:
-				selectionString = "unselected";
-				break;
-			case UNDEFINED:
-				selectionString = "neither selected nor unselected";
-			default:
-				throw new IllegalStateException("Unknown feature selection state");
+		case SELECTED:
+			selectionString =
+				"selected";
+			break;
+		case UNSELECTED:
+			selectionString =
+				"unselected";
+			break;
+		case UNDEFINED:
+			selectionString =
+				"neither selected nor unselected";
+		default:
+			throw new IllegalStateException("Unknown feature selection state");
 		}
 		switch (selection.getManual()) {
-			case SELECTED:
-			case UNSELECTED:
-				selectionString = String.format("manually %s", selectionString);
-				break;
-			case UNDEFINED:
-				break;
-			default:
-				throw new IllegalStateException("Unknown feature selection state");
+		case SELECTED:
+		case UNSELECTED:
+			selectionString =
+				String.format("manually %s", selectionString);
+			break;
+		case UNDEFINED:
+			break;
+		default:
+			throw new IllegalStateException("Unknown feature selection state");
 		}
 		return String.format("%s is %s.", selection.getFeature().getName(), selectionString);
 	}

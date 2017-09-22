@@ -39,16 +39,19 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  * @author Timo G&uuml;nther
  */
 public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to be transformed; not null
 	 */
 	public FeatureModelExplanationWriter(Explanation explanation) {
 		super(explanation);
 	}
-	
+
 	/**
 	 * Returns the given feature as a string.
+	 * 
 	 * @param feature feature to transform; not null
 	 * @return the given feature as a string
 	 */
@@ -59,68 +62,87 @@ public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
 			return String.format("concrete feature %s", feature.getName());
 		}
 	}
-	
+
 	/**
 	 * Returns the given constraint as a string.
+	 * 
 	 * @param constraint constraint to transform; not null
 	 * @return the given constraint as a string
 	 */
 	protected String getSubjectString(IConstraint constraint) {
 		return String.format("constraint %s", constraint.getNode().toString(getSymbols()));
 	}
-	
+
 	@Override
 	protected String getConcreteReasonString(Reason reason) throws IllegalArgumentException {
 		if (!(reason instanceof FeatureModelReason)) {
 			return null;
 		}
-		final FeatureModelElementTrace trace = ((FeatureModelReason) reason).getTrace();
-		final Set<IFeatureModelElement> sourceElements = trace.getElements();
-		final String joinedSourceElements = joinElements(sourceElements);
+		final FeatureModelElementTrace trace =
+			((FeatureModelReason) reason).getTrace();
+		final Set<IFeatureModelElement> sourceElements =
+			trace.getElements();
+		final String joinedSourceElements =
+			joinElements(sourceElements);
 		final IFeature parent;
 		switch (trace.getOrigin()) {
-			case CHILD_UP:
-				parent = (IFeature) trace.getElement();
-				return String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-			case CHILD_DOWN:
-				parent = (IFeature) trace.getElement();
-				if (parent.getStructure().isAlternative()) {
-					return String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else if (parent.getStructure().isOr()) {
-					return String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else {
-					return String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				}
-			case CHILD_HORIZONTAL:
-				return String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
-			case CONSTRAINT:
-				return String.format("%s is a constraint.", joinedSourceElements);
-			case ROOT:
-				return String.format("%s is the root.", joinedSourceElements);
-			default:
-				throw new IllegalStateException("Reason has unexpected source attribute");
+		case CHILD_UP:
+			parent =
+				(IFeature) trace.getElement();
+			return String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+		case CHILD_DOWN:
+			parent =
+				(IFeature) trace.getElement();
+			if (parent.getStructure().isAlternative()) {
+				return String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			} else if (parent.getStructure().isOr()) {
+				return String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			} else {
+				return String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			}
+		case CHILD_HORIZONTAL:
+			return String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
+		case CONSTRAINT:
+			return String.format("%s is a constraint.", joinedSourceElements);
+		case ROOT:
+			return String.format("%s is the root.", joinedSourceElements);
+		default:
+			throw new IllegalStateException("Reason has unexpected source attribute");
 		}
 	}
-	
+
 	/**
 	 * Joins the given elements.
+	 * 
 	 * @param elements elements to join
 	 * @return joined elements
 	 */
 	private String joinElements(Set<IFeatureModelElement> elements) {
-		String s = "";
-		int i = 0;
-		for (final Iterator<IFeatureModelElement> it = elements.iterator(); it.hasNext();) {
-			final IFeatureModelElement element = it.next();
+		String s =
+			"";
+		int i =
+			0;
+		for (final Iterator<IFeatureModelElement> it =
+			elements.iterator(); it.hasNext();) {
+			final IFeatureModelElement element =
+				it.next();
 			if (i++ > 0) {
-				s += it.hasNext() ? ", " : i > 2 ? ", and " : " and ";
+				s +=
+					it.hasNext()
+						? ", "
+						: i > 2
+							? ", and "
+							: " and ";
 			}
 			if (element instanceof IConstraint) {
-				final NodeWriter w = new NodeWriter(((IConstraint) element).getNode());
+				final NodeWriter w =
+					new NodeWriter(((IConstraint) element).getNode());
 				w.setSymbols(getSymbols());
-				s += w.nodeToString();
+				s +=
+					w.nodeToString();
 			} else {
-				s += element.getName();
+				s +=
+					element.getName();
 			}
 		}
 		return s;

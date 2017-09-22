@@ -30,5 +30,5 @@ public class RefreshHandler extends AFeatureProjectHandler {
 	protected void singleAction(IFeatureProject project) {
 		MPLPlugin.getDefault().refresh(project.getProject());
 	}
-	
+
 }

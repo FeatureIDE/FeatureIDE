@@ -39,11 +39,13 @@ public class TargetAnchor extends AbstractConnectionAnchor {
 
 	public TargetAnchor(IFigure owner, IGraphicalFeature model) {
 		super(owner);
-		this.model = model;
+		this.model =
+			model;
 	}
 
 	public Point getLocation(Point reference) {
-		Point ref = FeatureUIHelper.getTargetLocation(model);
+		Point ref =
+			FeatureUIHelper.getTargetLocation(model);
 		getOwner().translateToAbsolute(ref);
 		return ref;
 

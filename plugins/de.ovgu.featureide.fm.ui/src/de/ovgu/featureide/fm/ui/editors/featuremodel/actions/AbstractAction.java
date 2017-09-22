@@ -35,20 +35,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbst
  */
 public class AbstractAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.abstract";
+	public static final String ID =
+		"de.ovgu.featureide.abstract";
 
 	private IFeatureModel featureModel;
 
 	public AbstractAction(Object viewer, IFeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
 
 		setChecked(feature.getStructure().isAbstract());
-		SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(feature, featureModel);
+		SetFeatureToAbstractOperation op =
+			new SetFeatureToAbstractOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

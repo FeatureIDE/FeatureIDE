@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to set all features to collapsed. Enables
- * undo/redo functionality.
+ * Operation with functionality to set all features to collapsed. Enables undo/redo functionality.
  * 
  * @author Joshua Sprey
  * @author Enis Belli
@@ -45,21 +44,28 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	Iterable<IGraphicalFeature> features;
 	boolean collapse;
 
-	private LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
+	private LinkedList<IGraphicalFeature> affectedFeatureList =
+		new LinkedList<IGraphicalFeature>();
 
 	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
 		super(graphicalFeatureModel.getFeatureModel(), COLLAPSE_ALL);
-		this.features = graphicalFeatureModel.getFeatures();
-		this.collapse = collapse;
+		this.features =
+			graphicalFeatureModel.getFeatures();
+		this.collapse =
+			collapse;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
+		Iterator<IGraphicalFeature> feautureModelIterator =
+			features.iterator();
 		while (feautureModelIterator.hasNext()) {
-			IGraphicalFeature gFeature = feautureModelIterator.next();
-			IFeature feature = gFeature.getObject();
-			if (!feature.getStructure().isRoot() || !collapse) {
+			IGraphicalFeature gFeature =
+				feautureModelIterator.next();
+			IFeature feature =
+				gFeature.getObject();
+			if (!feature.getStructure().isRoot()
+				|| !collapse) {
 				if (feature.getStructure().hasChildren()) {
 					if (gFeature.isCollapsed() != collapse) {
 						affectedFeatureList.add(gFeature);
@@ -73,7 +79,8 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
+		Iterator<IGraphicalFeature> feautureModelIterator =
+			features.iterator();
 		for (IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
 		}

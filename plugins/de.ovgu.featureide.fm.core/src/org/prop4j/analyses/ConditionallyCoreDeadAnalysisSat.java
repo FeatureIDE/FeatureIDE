@@ -42,31 +42,42 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 	}
 
 	public int[] analyze(IMonitor monitor) throws Exception {
-		satCount = 0;
+		satCount =
+			0;
 		solver.getAssignment().ensure(fixedVariables.length);
-		for (int i = 0; i < fixedVariables.length; i++) {
+		for (int i =
+			0; i < fixedVariables.length; i++) {
 			solver.assignmentPush(fixedVariables[i]);
 		}
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 = solver.findModel();
+		int[] model1 =
+			solver.findModel();
 		satCount++;
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 = solver.findModel();
+			int[] model2 =
+				solver.findModel();
 			satCount++;
 
 			// if there are more negative than positive literals
-			solver.setSelectionStrategy((model1.length < countNegative(model2) + countNegative(model1)
-					? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE));
+			solver.setSelectionStrategy((model1.length < countNegative(model2)
+				+ countNegative(model1)
+					? SelectionStrategy.POSITIVE
+					: SelectionStrategy.NEGATIVE));
 
-			for (int i = 0; i < fixedVariables.length; i++) {
-				model1[Math.abs(fixedVariables[i]) - 1] = 0;
+			for (int i =
+				0; i < fixedVariables.length; i++) {
+				model1[Math.abs(fixedVariables[i])
+					- 1] =
+						0;
 			}
 
 			SatInstance.updateModel(model1, model2);
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
+			for (int i =
+				0; i < model1.length; i++) {
+				final int varX =
+					model1[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					satCount++;

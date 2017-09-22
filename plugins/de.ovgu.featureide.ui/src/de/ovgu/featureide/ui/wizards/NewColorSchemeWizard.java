@@ -36,27 +36,33 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
  */
 public class NewColorSchemeWizard extends Wizard {
 
-	public static final String ID = UIPlugin.PLUGIN_ID
+	public static final String ID =
+		UIPlugin.PLUGIN_ID
 			+ ".wizards.NewColorSchemeWizard";
 
 	public NewColorSchemePage page;
-	
+
 	private IFeatureModel featureModel;
-	
+
 	public NewColorSchemeWizard(IFeatureModel featureModel, CollaborationView collaborationView) {
 		super();
 		setWindowTitle(NEW_COLORSCHEME);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
 
 	public void addPages() {
-		page = new NewColorSchemePage();
+		page =
+			new NewColorSchemePage();
 		addPage(page);
 	}
 
 	public boolean performFinish() {
-		final String csName = page.getColorSchemeName();
-		if (csName != null && !csName.isEmpty() && !FeatureColorManager.hasColorScheme(featureModel, csName)) {
+		final String csName =
+			page.getColorSchemeName();
+		if (csName != null
+			&& !csName.isEmpty()
+			&& !FeatureColorManager.hasColorScheme(featureModel, csName)) {
 			FeatureColorManager.newColorScheme(featureModel, csName);
 			if (page.isCurColorScheme()) {
 				FeatureColorManager.setActive(featureModel, csName);

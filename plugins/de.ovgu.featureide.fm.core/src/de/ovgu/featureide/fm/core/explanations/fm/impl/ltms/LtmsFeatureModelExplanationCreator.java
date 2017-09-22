@@ -37,40 +37,46 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Sofia Ananieva
  */
 public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
+
 	@Override
 	protected Ltms getOracle() {
 		return (Ltms) super.getOracle();
 	}
-	
+
 	@Override
 	protected Ltms createOracle() {
 		return new Ltms(getCnf());
 	}
-	
+
 	/**
-	 * Returns the shortest explanation among the given ones.
-	 * Note that this may not be the shortest one possible.
+	 * Returns the shortest explanation among the given ones. Note that this may not be the shortest one possible.
+	 * 
 	 * @param clauseIndexes indexes of clauses of explanations to roll into one
 	 * @return the shortest explanation among the given ones
 	 */
 	protected Explanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		final List<Explanation> explanations = new LinkedList<>();
+		final List<Explanation> explanations =
+			new LinkedList<>();
 		for (final Set<Integer> c : clauseIndexes) {
 			explanations.add(getExplanation(c));
 		}
-		final Explanation cumulatedExplanation = getConcreteExplanation();
+		final Explanation cumulatedExplanation =
+			getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		Explanation shortestExplanation = null;
+		Explanation shortestExplanation =
+			null;
 		for (final Explanation explanation : explanations) {
-			cumulatedExplanation.addExplanation(explanation); //Remember that this explanation was generated.
-			if (shortestExplanation == null || explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
-				shortestExplanation = explanation; //Remember the shortest explanation.
+			cumulatedExplanation.addExplanation(explanation); // Remember that this explanation was generated.
+			if (shortestExplanation == null
+				|| explanation.getReasonCount() < shortestExplanation.getReasonCount()) {
+				shortestExplanation =
+					explanation; // Remember the shortest explanation.
 			}
 		}
 		if (shortestExplanation == null) {
 			return null;
 		}
-		shortestExplanation.setCounts(cumulatedExplanation); //Remember the reason and explanations that were generated before.
+		shortestExplanation.setCounts(cumulatedExplanation); // Remember the reason and explanations that were generated before.
 		return shortestExplanation;
 	}
 }

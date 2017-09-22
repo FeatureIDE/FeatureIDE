@@ -43,7 +43,8 @@ public class AutomatedCalculationsAction extends Action {
 
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(AUTOMATED_CALCULATIONS);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 		setChecked(featureModel.getAnalyser().runCalculationAutomatically);
 	}
 
@@ -56,9 +57,11 @@ public class AutomatedCalculationsAction extends Action {
 			for (IConstraint c : featureModel.getConstraints()) {
 				c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			}
-			featureModel.getAnalyser().runCalculationAutomatically = false;
+			featureModel.getAnalyser().runCalculationAutomatically =
+				false;
 		} else {
-			featureModel.getAnalyser().runCalculationAutomatically = true;
+			featureModel.getAnalyser().runCalculationAutomatically =
+				true;
 		}
 		featureModel.handleModelDataChanged();
 	}

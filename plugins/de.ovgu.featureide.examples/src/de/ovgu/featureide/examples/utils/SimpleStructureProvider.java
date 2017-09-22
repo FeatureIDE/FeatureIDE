@@ -34,7 +34,7 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
- * Simple StructureProvider used by the class {@link ImportOperation} 
+ * Simple StructureProvider used by the class {@link ImportOperation}
  * 
  * @author Reimar Schroeter
  */
@@ -44,7 +44,8 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	public SimpleStructureProvider(String project) {
 		super();
-		this.project = project;
+		this.project =
+			project;
 	}
 
 	@Override
@@ -54,10 +55,14 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public InputStream getContents(Object element) {
-		IPath p = new Path((String) element);
+		IPath p =
+			new Path((String) element);
 		try {
-			return new URL("platform:/plugin/de.ovgu.featureide.examples/featureide_examples/" + project + "/" + p.toString()).openConnection()
-					.getInputStream();
+			return new URL("platform:/plugin/de.ovgu.featureide.examples/featureide_examples/"
+				+ project
+				+ "/"
+				+ p.toString()).openConnection()
+						.getInputStream();
 		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 		}
@@ -71,7 +76,8 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public String getLabel(Object element) {
-		IPath path = new Path((String) element);
+		IPath path =
+			new Path((String) element);
 		return path.lastSegment();
 	}
 

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -48,174 +47,238 @@ import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard.ConversionMet
  */
 public class EliminateConstraintsPage extends AbstractWizardPage {
 
-	private static final String METHOD_LABEL = "Refactoring Method:";
-	private static final String METHOD_TOOLTIP = "Which method to use when refactoring to a product-equivalent model without complex constraints.";
-	
-	private static final String COMBO_CNF_LABEL = "Conjunctive Normal Form (CNF)";
-	private static final String COMBO_NNF_LABEL = "Negation Normal Form (NNF)";
-	private static final String COMBO_COMB_LABEL = "Combined Method";
-	
-	private static final String PRESERVE_CONFIGS_LABEL = "Preserve configurations:";
-	private static final String PRESERVE_CONFIGS_TOOLTIP = "Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
-	
-	private static final String REDUNDANT_LABEL = "Remove redundant constraints:";
-	private static final String REDUNDANT_TOOLTIP = "Whether to remove redundant and tautological constraints. Requires SAT-analysis and "
-												  + "and can therefore be time consuming.";
-	
+	private static final String METHOD_LABEL =
+		"Refactoring Method:";
+	private static final String METHOD_TOOLTIP =
+		"Which method to use when refactoring to a product-equivalent model without complex constraints.";
+
+	private static final String COMBO_CNF_LABEL =
+		"Conjunctive Normal Form (CNF)";
+	private static final String COMBO_NNF_LABEL =
+		"Negation Normal Form (NNF)";
+	private static final String COMBO_COMB_LABEL =
+		"Combined Method";
+
+	private static final String PRESERVE_CONFIGS_LABEL =
+		"Preserve configurations:";
+	private static final String PRESERVE_CONFIGS_TOOLTIP =
+		"Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
+
+	private static final String REDUNDANT_LABEL =
+		"Remove redundant constraints:";
+	private static final String REDUNDANT_TOOLTIP =
+		"Whether to remove redundant and tautological constraints. Requires SAT-analysis and "
+			+ "and can therefore be time consuming.";
+
 	private IFile inputModelFile;
 	private Combo methodCombo;
-	
+
 	private boolean trivial;
 	private String fileExtension;
-	
+
 	protected Text fileName;
 	protected String path;
 	protected ConversionMethod selectedMethod;
-	protected boolean preserveConfigurations = false;
-	protected boolean removeRedundancy = false;
+	protected boolean preserveConfigurations =
+		false;
+	protected boolean removeRedundancy =
+		false;
 	protected Combo fromFormatCombo;
 	protected Combo toFormatCombo;
+
 	/**
 	 * @param name
 	 */
 	protected EliminateConstraintsPage(IFile file, String name, boolean trivial, String fileExtension) {
 		super(name);
 		// TODO Auto-generated constructor stub
-		inputModelFile = file;
-		this.trivial = trivial;
-		this.fileExtension = fileExtension;
+		inputModelFile =
+			file;
+		this.trivial =
+			trivial;
+		this.fileExtension =
+			fileExtension;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout(2, false);
-		layout.verticalSpacing = 9;
+		Composite composite =
+			new Composite(parent, SWT.NULL);
+		GridLayout layout =
+			new GridLayout(2, false);
+		layout.verticalSpacing =
+			9;
 		composite.setLayout(layout);
 
-		Label labelGenerate = new Label(composite, SWT.NULL);
+		Label labelGenerate =
+			new Label(composite, SWT.NULL);
 		labelGenerate.setText(METHOD_LABEL);
 		labelGenerate.setToolTipText(METHOD_TOOLTIP);
-		
-		methodCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+
+		methodCombo =
+			new Combo(composite, SWT.BORDER
+				| SWT.SINGLE
+				| SWT.READ_ONLY);
 		methodCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		methodCombo.add(COMBO_COMB_LABEL);
 		methodCombo.add(COMBO_NNF_LABEL);
 		methodCombo.add(COMBO_CNF_LABEL);
 		methodCombo.setText(COMBO_COMB_LABEL);
-		selectedMethod = ConversionMethod.COMBINED;
-		
-		if(trivial)
+		selectedMethod =
+			ConversionMethod.COMBINED;
+
+		if (trivial)
 			methodCombo.setEnabled(false);
 
-		Label fileNameLabel = new Label(composite, SWT.NULL);
+		Label fileNameLabel =
+			new Label(composite, SWT.NULL);
 		fileNameLabel.setText("File name:");
-		
-		Composite fileComposite = new Composite(composite, SWT.NULL);
+
+		Composite fileComposite =
+			new Composite(composite, SWT.NULL);
 		fileComposite.setLayout(new GridLayout(2, false));
 		fileComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		
-		if(inputModelFile != null) {
-			fileName = new Text(fileComposite, SWT.BORDER | SWT.SINGLE);
-			String modelName = inputModelFile.getLocation().removeFileExtension().toOSString();
-			fileName.setText(modelName + "-simple-constraints."+fileExtension);	
-			path = fileName.getText();
+
+		if (inputModelFile != null) {
+			fileName =
+				new Text(fileComposite, SWT.BORDER
+					| SWT.SINGLE);
+			String modelName =
+				inputModelFile.getLocation().removeFileExtension().toOSString();
+			fileName.setText(modelName
+				+ "-simple-constraints."
+				+ fileExtension);
+			path =
+				fileName.getText();
 			fileName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-			Button browseButton = new Button(fileComposite, SWT.NONE);
+			Button browseButton =
+				new Button(fileComposite, SWT.NONE);
 			browseButton.setText("Browse...");
-			
+
 			browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-					String selectedPath = openFileDialog();
+					String selectedPath =
+						openFileDialog();
 					if (selectedPath != null) {
 						fileName.setText(selectedPath);
-						IPath path = new Path(selectedPath);
+						IPath path =
+							new Path(selectedPath);
 						if (path.getFileExtension() == null) {
-							fileName.setText(selectedPath + "." + fileExtension);
+							fileName.setText(selectedPath
+								+ "."
+								+ fileExtension);
 						}
 					}
 				}
 			});
 		}
-		
-		final Label preserveConfigsLabel = new Label(composite, SWT.NULL);
+
+		final Label preserveConfigsLabel =
+			new Label(composite, SWT.NULL);
 		preserveConfigsLabel.setText(PRESERVE_CONFIGS_LABEL);
 		preserveConfigsLabel.setToolTipText(PRESERVE_CONFIGS_TOOLTIP);
-		final Button preserveConfigsButton = new Button(composite, SWT.CHECK);
+		final Button preserveConfigsButton =
+			new Button(composite, SWT.CHECK);
 		preserveConfigsButton.setToolTipText(PRESERVE_CONFIGS_TOOLTIP);
 		preserveConfigsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		final Label redundantLabel = new Label(composite, SWT.NULL);
+
+		final Label redundantLabel =
+			new Label(composite, SWT.NULL);
 		redundantLabel.setText(REDUNDANT_LABEL);
 		redundantLabel.setToolTipText(REDUNDANT_TOOLTIP);
-		final Button redundantButton = new Button(composite, SWT.CHECK);
+		final Button redundantButton =
+			new Button(composite, SWT.CHECK);
 		redundantButton.setToolTipText(REDUNDANT_TOOLTIP);
 		redundantButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		if(trivial)
+
+		if (trivial)
 			preserveConfigsButton.setEnabled(false);
-		
+
 		// Add listeners
 		methodCombo.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
-				ConversionMethod[] methods = new ConversionMethod[]{ConversionMethod.COMBINED, ConversionMethod.NNF, ConversionMethod.CNF};
-				int selection = methodCombo.getSelectionIndex();
-				selectedMethod = methods[selection];
-				boolean useCNF = selection < 2;
+				ConversionMethod[] methods =
+					new ConversionMethod[] {
+						ConversionMethod.COMBINED,
+						ConversionMethod.NNF,
+						ConversionMethod.CNF };
+				int selection =
+					methodCombo.getSelectionIndex();
+				selectedMethod =
+					methods[selection];
+				boolean useCNF =
+					selection < 2;
 				preserveConfigsButton.setEnabled(true);
 				preserveConfigsLabel.setEnabled(true);
 			}
 		});
-		
+
 		fileName.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
-				if(checkFileName())
-					path = fileName.getText();
+				if (checkFileName())
+					path =
+						fileName.getText();
 			}
 		});
-		
+
 		preserveConfigsButton.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				preserveConfigurations = preserveConfigsButton.getSelection();
-				removeRedundancy = redundantButton.getSelection();
+				preserveConfigurations =
+					preserveConfigsButton.getSelection();
+				removeRedundancy =
+					redundantButton.getSelection();
 			}
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
-		
+
 		redundantButton.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeRedundancy = redundantButton.getSelection();
+				removeRedundancy =
+					redundantButton.getSelection();
 			}
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
-		
+
 		setControl(composite);
 		checkFileName();
 	}
-	
+
 	protected boolean checkFileName() {
-		String text = fileName.getText();
-		IPath path = new Path(text);
+		String text =
+			fileName.getText();
+		IPath path =
+			new Path(text);
 		if (path.isEmpty()) {
 			updateErrorMessage("File name must be specified.");
 			return false;
 		}
 		if (!path.isValidPath(text)) {
-			updateErrorMessage(text + " is no valid path.");
+			updateErrorMessage(text
+				+ " is no valid path.");
 			return false;
 		}
-		String fileExtension = path.getFileExtension();
-		if (fileExtension == null || !fileExtension.equals(fileExtension)) {
-			updateErrorMessage("Exported model file must have "+fileExtension+" as file extension.");
+		String fileExtension =
+			path.getFileExtension();
+		if (fileExtension == null
+			|| !fileExtension.equals(fileExtension)) {
+			updateErrorMessage("Exported model file must have "
+				+ fileExtension
+				+ " as file extension.");
 			return false;
 		}
 //		if (path.toFile().exists()) {
@@ -223,39 +286,43 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 //			return false;
 //		}
 		updateErrorMessage(null);
-		//updateStatusMessage(null);
-		
+		// updateStatusMessage(null);
+
 		return true;
 	}
-	
+
 	private void updateErrorMessage(String message) {
 		setErrorMessage(message);
 		setPageComplete(message == null);
 	}
-	
+
 //	private void updateStatusMessage(String message) {
 //		setMessage(message);
 //		setPageComplete(true);
 //	}
-	
+
 	private String openFileDialog() {
-		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell(), SWT.MULTI);
+		FileDialog fileDialog =
+			new FileDialog(PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getShell(), SWT.MULTI);
 
 		fileDialog.setFileName("simple-constraints.xml");
-		fileDialog.setFilterExtensions(new String[] { "*."+fileExtension });
+		fileDialog.setFilterExtensions(new String[] {
+			"*."
+				+ fileExtension });
 		fileDialog.setOverwrite(true);
 		fileDialog.setFilterPath(inputModelFile.getProject().getLocation().toOSString());
 		return fileDialog.open();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage#putData()
 	 */
 	@Override
 	protected void putData() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

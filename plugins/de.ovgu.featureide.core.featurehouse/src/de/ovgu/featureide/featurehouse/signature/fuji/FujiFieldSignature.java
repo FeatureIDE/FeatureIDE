@@ -36,12 +36,14 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 	public FujiFieldSignature(AbstractClassSignature parent, String name,
 			String modifiers, TypeDecl returnType) {
 		super(parent, name, modifiers, returnType.name());
-		this.returnType = returnType;
+		this.returnType =
+			returnType;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder fieldString = new StringBuilder();
+		StringBuilder fieldString =
+			new StringBuilder();
 
 //		fieldString.append(super.toString());
 //		if (fieldString.length() > 0) {
@@ -68,21 +70,25 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		hashCode = hashCodePrime * hashCode + type.hashCode();
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ type.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
 
-		FujiFieldSignature otherSig = (FujiFieldSignature) obj;
+		FujiFieldSignature otherSig =
+			(FujiFieldSignature) obj;
 
 		if (!super.sigEquals(otherSig)
-				|| returnType != otherSig.returnType
-		) {
+			|| returnType != otherSig.returnType) {
 			return false;
 		}
 		return true;

@@ -35,20 +35,25 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectio
  * @author Reimar Schroeter
  */
 public class NameTypeSelectionAction extends Action {
+
 	private int newNameType;
 	private int oldNameType;
 	private final IGraphicalFeatureModel featureModel;
 
 	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
 		super(FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
-		this.featureModel = featureModel;
+		this.newNameType =
+			newNameType;
+		this.oldNameType =
+			oldNameType;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
-		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
+		final NameTypeSelectionOperation op =
+			new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

@@ -31,14 +31,16 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
  * @author Sebastian Krieter
  */
 public class EnableFujiHandler extends AFeatureProjectHandler {
-	
+
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final IComposerExtensionClass composer = featureProject.getComposer();
+		final IComposerExtensionClass composer =
+			featureProject.getComposer();
 		if (FeatureHouseComposer.COMPOSER_ID.equals(composer.getId())) {
-			FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) composer;
+			FeatureHouseComposer featureHouseComposer =
+				(FeatureHouseComposer) composer;
 			featureHouseComposer.setUseFuji(!featureHouseComposer.usesFuji());
 		}
 	}
-	
+
 }

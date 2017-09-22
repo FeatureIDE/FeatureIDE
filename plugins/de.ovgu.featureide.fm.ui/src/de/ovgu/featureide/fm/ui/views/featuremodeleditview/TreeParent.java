@@ -31,7 +31,8 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
  */
 public class TreeParent extends TreeObject {
 
-	boolean lazy = false;
+	boolean lazy =
+		false;
 
 	public TreeParent(String name) {
 		super(name);
@@ -43,7 +44,8 @@ public class TreeParent extends TreeObject {
 
 	public TreeParent(String name, Image image, boolean lazy) {
 		super(name, image);
-		this.lazy = lazy;
+		this.lazy =
+			lazy;
 	}
 
 	public void addChild(String name) {
@@ -53,13 +55,15 @@ public class TreeParent extends TreeObject {
 	public TreeElement[] getChildren() {
 		if (lazy) {
 			initChildren();
-			lazy = false;
+			lazy =
+				false;
 		}
 		return super.getChildren();
 	}
 
 	public boolean hasChildren() {
-		return lazy || super.hasChildren();
+		return lazy
+			|| super.hasChildren();
 	}
 
 	public void initChildren() {

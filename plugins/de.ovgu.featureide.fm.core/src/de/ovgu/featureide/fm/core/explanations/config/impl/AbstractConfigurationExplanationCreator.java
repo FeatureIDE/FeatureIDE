@@ -30,24 +30,28 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractConfigurationExplanationCreator extends AbstractFeatureModelExplanationCreator implements ConfigurationExplanationCreator {
+
 	/** The configuration containing an issue that needs explaining. */
 	private Configuration config;
-	
+
 	@Override
 	public Configuration getConfiguration() {
 		return config;
 	}
-	
+
 	@Override
 	public void setConfiguration(Configuration config) {
-		this.config = config;
+		this.config =
+			config;
 		setFeatureModel();
 	}
-	
+
 	/**
 	 * Sets the feature model context.
 	 */
 	protected void setFeatureModel() {
-		setFeatureModel(getConfiguration() == null ? null : getConfiguration().getFeatureModel());
+		setFeatureModel(getConfiguration() == null
+			? null
+			: getConfiguration().getFeatureModel());
 	}
 }

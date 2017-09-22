@@ -25,10 +25,10 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 public class RemoveInterfaceNatureHandler extends AFeatureProjectHandler {
-	
+
 	@Override
 	protected void singleAction(IFeatureProject project) {
 		MPLPlugin.getDefault().removeInterfaceNature(project.getProject());
 	}
-	
+
 }

@@ -33,8 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to expand only features of this constraint. Enables undo/redo
- * functionality. Enables undo/redo functionality.
+ * Operation with functionality to expand only features of this constraint. Enables undo/redo functionality. Enables undo/redo functionality.
  * 
  * @author Maximilian K�hl
  * @author Christopher Sontag
@@ -43,7 +42,8 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	private IConstraint iConstraint;
 	private IGraphicalFeatureModel graphicalFeatureModel;
-	private LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
+	private LinkedList<IGraphicalFeature> affectedFeatureList =
+		new LinkedList<IGraphicalFeature>();
 
 	/**
 	 * @param featureModel
@@ -51,8 +51,10 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
 		super(graphicalFeatureModel.getFeatureModel(), EXPAND_CONSTRAINT);
-		this.iConstraint = iConstraint;
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.iConstraint =
+			iConstraint;
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
 	}
 
 	public void expandParents(IFeature feature) {
@@ -60,17 +62,20 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 			return;
 		}
 
-		IFeatureStructure p = feature.getStructure().getParent();
-		IGraphicalFeature g = null;
+		IFeatureStructure p =
+			feature.getStructure().getParent();
+		IGraphicalFeature g =
+			null;
 		while (!p.isRoot()) {
-			g = graphicalFeatureModel.getGraphicalFeature(p.getFeature());
+			g =
+				graphicalFeatureModel.getGraphicalFeature(p.getFeature());
 			if (g.isCollapsed()) {
 				expandFeature(g);
 			}
-			p = p.getParent();
+			p =
+				p.getParent();
 		}
-		if(g != null)
-		{
+		if (g != null) {
 			g.setCollapsed(false);
 		}
 	}
@@ -78,13 +83,12 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		getCollapsedFeatures();
-		CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
+		CollapseAllOperation collapseAll =
+			new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();
 
-		
-		
 		for (IFeature feature : iConstraint.getContainedFeatures()) {
 			expandParents(feature);
 		}
@@ -94,7 +98,8 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
+		CollapseAllOperation collapseAll =
+			new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();

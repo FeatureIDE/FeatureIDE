@@ -33,6 +33,7 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
  * @author Antje Moench
  */
 public class CoreFeatureFilter extends ConfigurationMapFilter {
+
 	private List<IFeature> coreFeatures;
 	private IFeatureModel featureModelFilterIsInitializedFor;
 
@@ -46,16 +47,22 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		IFeatureModel featureModel = configurationMap.getFeatureProject().getFeatureModel();
+		IFeatureModel featureModel =
+			configurationMap.getFeatureProject().getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			FeatureModelAnalyzer analyser = featureModel.getAnalyser();
-			this.coreFeatures = analyser.getCoreFeatures();
-			featureModelFilterIsInitializedFor = featureModel;
+			FeatureModelAnalyzer analyser =
+				featureModel.getAnalyser();
+			this.coreFeatures =
+				analyser.getCoreFeatures();
+			featureModelFilterIsInitializedFor =
+				featureModel;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {

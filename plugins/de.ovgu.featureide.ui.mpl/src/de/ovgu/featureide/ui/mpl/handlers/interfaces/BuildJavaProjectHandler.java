@@ -32,17 +32,19 @@ import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
  * 
  * @author Sebastian Krieter
  */
-public class BuildJavaProjectHandler extends AFolderHandler  {
+public class BuildJavaProjectHandler extends AFolderHandler {
 
 	@Override
 	protected void singleAction(IFolder folder) {
-		IResource[] members = null;
+		IResource[] members =
+			null;
 		try {
-			members = folder.members();
+			members =
+				folder.members();
 		} catch (CoreException e) {
 			MPLUIPlugin.getDefault().logError(e);
 		}
-		
+
 		// TODO Build java projects
 //		if (members != null) {
 //			for (IResource resource : members) {
@@ -53,5 +55,5 @@ public class BuildJavaProjectHandler extends AFolderHandler  {
 //			}
 //		}		
 	}
-	
+
 }

@@ -24,14 +24,15 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * CPP specific feature model extensions.
- * @author Francisco Dalton
- * thanks to:
+ * 
+ * @author Francisco Dalton thanks to:
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
 public class CPPFMComposerExtension extends FMComposerExtension {
 
-	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on preprocessors such as CPPs do not\n"
+	private static String ORDER_PAGE_MESSAGE =
+		"FeatureIDE projects based on preprocessors such as CPPs do not\n"
 			+ NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 
 	@Override
@@ -47,8 +48,10 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-		IFolder sourceFolder = featureProject.getSourceFolder();
+		IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(project);
+		IFolder sourceFolder =
+			featureProject.getSourceFolder();
 		System.out.println(sourceFolder.getFullPath().toOSString());
 		if (!sourceFolder.exists())
 			return true;
@@ -68,7 +71,8 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file = (IFile) res;
+				IFile file =
+					(IFile) res;
 				performRenamings(oldName, newName, file);
 			}
 
@@ -76,26 +80,33 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	}
 
 	private void performRenamings(String oldName, String newName, IFile iFile) {
-		Scanner scanner = null;
-		FileWriter fw = null;
+		Scanner scanner =
+			null;
+		FileWriter fw =
+			null;
 		try {
-			File file = iFile.getRawLocation().toFile();
+			File file =
+				iFile.getRawLocation().toFile();
 
-			StringBuilder fileText = new StringBuilder();
-			scanner = new Scanner(file, "UTF-8");
+			StringBuilder fileText =
+				new StringBuilder();
+			scanner =
+				new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append(System.getProperty("line.separator"));
 			}
 
-			String newText = replaceFeatureInText(fileText.toString(), oldName,
-					newName);
+			String newText =
+				replaceFeatureInText(fileText.toString(), oldName,
+						newName);
 
 			if (fileText.toString().equals(newText)) {
 				return;
 			}
 
-			fw = new FileWriter(file);
+			fw =
+				new FileWriter(file);
 			fw.write(newText);
 
 		} catch (FileNotFoundException e) {
@@ -107,22 +118,28 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 				scanner.close();
 			if (fw != null)
 				try {
-					fw.close();
+				fw.close();
 				} catch (IOException e) {
-					Colligens.getDefault().logError(e);
+				Colligens.getDefault().logError(e);
 				}
 		}
 	}
 
 	private String replaceFeatureInText(String text, String oldName,
 			String newName) {
-		Pattern pattern = Pattern.compile(String.format(CPPModelBuilder.REGEX,
-				oldName));
-		Matcher matcher = pattern.matcher(text);
+		Pattern pattern =
+			Pattern.compile(String.format(CPPModelBuilder.REGEX,
+					oldName));
+		Matcher matcher =
+			pattern.matcher(text);
 
 		while (matcher.find()) {
-			String newText = matcher.group(1) + newName + matcher.group(3);
-			text = text.replace(matcher.group(0), newText);
+			String newText =
+				matcher.group(1)
+					+ newName
+					+ matcher.group(3);
+			text =
+				text.replace(matcher.group(0), newText);
 			matcher.reset(text);
 		}
 

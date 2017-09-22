@@ -34,42 +34,48 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
+public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer {
 
 	private ExtendedFeatureModel efm;
 	private HashMap<String, Integer> map;
 	private List<DeRestriction> deFm;
-	
+
 	private UniqueId idGen;
 	private RestrictionFactory<DeRestriction> deFactory;
 
 	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm) {
 		super(fm);
 
-		this.efm = fm;
-		this.idGen = new UniqueId();
-		this.map = Translator.buildFeatureNameMap(efm, idGen);
-		this.deFactory = new DeRestrictionFactory();
+		this.efm =
+			fm;
+		this.idGen =
+			new UniqueId();
+		this.map =
+			Translator.buildFeatureNameMap(efm, idGen);
+		this.deFactory =
+			new DeRestrictionFactory();
 	}
-	
-	public boolean isValid_PBSolver() throws TimeoutException {		
+
+	public boolean isValid_PBSolver() throws TimeoutException {
 		if (deFm == null)
 			setUpDeRestrictions();
-		
-		PBSolver solver = new SAT4JPBSolver();
+
+		PBSolver solver =
+			new SAT4JPBSolver();
 		solver.addRestrictions(deFm);
-		
+
 		if (!solver.isSatisfiable()) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private void setUpDeRestrictions() {
-		this.deFm = Translator.translateFmTree(map, efm, deFactory);
+		this.deFm =
+			Translator.translateFmTree(map, efm, deFactory);
 		this.deFm.addAll(Translator.translateFmConstraints(map, efm, deFactory));
-		this.deFm.addAll(Translator.translateEquations(map, efm, 
+		this.deFm.addAll(Translator.translateEquations(map, efm,
 				efm.getIntegerAttributes(), efm.getAttributConstraints(), deFactory));
 	}
 }

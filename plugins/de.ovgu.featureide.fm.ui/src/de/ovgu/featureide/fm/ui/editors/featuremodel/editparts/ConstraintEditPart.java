@@ -51,17 +51,17 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	public IGraphicalConstraint getConstraintModel() {
 		return (IGraphicalConstraint) getModel();
 	}
-	
+
 	@Override
 	public ModelEditPart getParent() {
 		return (ModelEditPart) super.getParent();
 	}
-	
+
 	@Override
 	public IGraphicalConstraint getModel() {
 		return (IGraphicalConstraint) super.getModel();
 	}
-	
+
 	@Override
 	public ConstraintFigure getFigure() {
 		return (ConstraintFigure) super.getFigure();
@@ -78,7 +78,8 @@ public class ConstraintEditPart extends ModelElementEditPart {
 	}
 
 	public void performRequest(Request request) {
-		final IGraphicalConstraint constraintModel = getModel();
+		final IGraphicalConstraint constraintModel =
+			getModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
 			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
@@ -105,7 +106,8 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		final EventType prop = event.getEventType();
+		final EventType prop =
+			event.getEventType();
 		switch (prop) {
 		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
@@ -120,26 +122,25 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			getFigure().setConstraintProperties();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
-			setActiveReason(null); //reset
+			setActiveReason(null); // reset
 			break;
 		case ACTIVE_REASON_CHANGED:
 			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
-			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
+			FMUIPlugin.getDefault().logWarning(event
+				+ " @ "
+				+ getModel()
+				+ " not handled.");
 			break;
 		}
 	}
 
 	/**
-	 * <p>
-	 * Sets the currently active reason.
-	 * </p>
+	 * <p> Sets the currently active reason. </p>
 	 * 
-	 * <p>
-	 * Propagates into the figure.
-	 * Refreshes accordingly.
-	 * </p>
+	 * <p> Propagates into the figure. Refreshes accordingly. </p>
+	 * 
 	 * @param activeReason the new active reason; null to reset
 	 */
 	protected void setActiveReason(FeatureModelReason activeReason) {

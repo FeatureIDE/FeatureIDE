@@ -40,90 +40,106 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorReason;
  * @author Timo G&uuml;nther
  */
 public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExplanationCreator implements InvariantExpressionExplanationCreator {
+
 	/** Keeps track of the clause indexes of the expressions added to the solver. */
-	private final List<Node> addedExpressions = new LinkedList<>();
+	private final List<Node> addedExpressions =
+		new LinkedList<>();
 	/** The amount of clauses added to the solver for the invariant expression. */
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
-	
+
 	@Override
 	public boolean isTautology() {
 		return tautology;
 	}
-	
+
 	@Override
 	public void setTautology(boolean tautology) {
-		this.tautology = tautology;
+		this.tautology =
+			tautology;
 	}
-	
+
 	@Override
 	public void setExpressionStack(Collection<Node> expressionStack) {
 		super.setExpressionStack(expressionStack);
 		setSubject(getExpressionStack().peek());
 	}
-	
+
 	@Override
 	public Node getSubject() {
 		return (Node) super.getSubject();
 	}
-	
+
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null && !(subject instanceof Node)) {
+		if (subject != null
+			&& !(subject instanceof Node)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
 	}
-	
+
 	@Override
 	public InvariantExpressionExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle = getOracle();
+		final MusExtractor oracle =
+			getOracle();
 		final InvariantExpressionExplanation explanation;
 		oracle.push();
 		try {
 			addedExpressions.clear();
-			boolean first = true; //The first expression on the stack is the subject, i.e., the invariant expression.
+			boolean first =
+				true; // The first expression on the stack is the subject, i.e., the invariant expression.
 			for (Node expression : getExpressionStack()) {
-				if (first && isTautology()) {
-					expression = new Not(expression);
+				if (first
+					&& isTautology()) {
+					expression =
+						new Not(expression);
 				}
-				final int expressionClauseCount = oracle.addFormula(expression);
-				for (int i = 0; i < expressionClauseCount; i++) {
+				final int expressionClauseCount =
+					oracle.addFormula(expression);
+				for (int i =
+					0; i < expressionClauseCount; i++) {
 					addedExpressions.add(expression);
 				}
 				if (first) {
-					invariantExpressionClauseCount = expressionClauseCount;
+					invariantExpressionClauseCount =
+						expressionClauseCount;
 				}
-				first = false;
+				first =
+					false;
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation =
+				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
 		return explanation;
 	}
-	
+
 	@Override
 	protected InvariantExpressionExplanation getExplanation(Set<Integer> clauseIndexes) {
 		return (InvariantExpressionExplanation) super.getExplanation(clauseIndexes);
 	}
-	
+
 	@Override
 	protected Reason getReason(int clauseIndex) {
-		int expressionIndex = clauseIndex - getTraceModel().getTraceCount();
+		int expressionIndex =
+			clauseIndex
+				- getTraceModel().getTraceCount();
 		if (expressionIndex >= 0) {
 			if (expressionIndex < invariantExpressionClauseCount) {
-				return null; //Ignore clauses from the subject itself.
+				return null; // Ignore clauses from the subject itself.
 			}
 			return new PreprocessorReason(addedExpressions.get(expressionIndex));
 		}
 		return super.getReason(clauseIndex);
 	}
-	
+
 	@Override
 	protected InvariantExpressionExplanation getConcreteExplanation() {
-		final InvariantExpressionExplanation explanation = new InvariantExpressionExplanation(getSubject());
+		final InvariantExpressionExplanation explanation =
+			new InvariantExpressionExplanation(getSubject());
 		explanation.setTautology(isTautology());
 		return explanation;
 	}

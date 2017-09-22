@@ -28,8 +28,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Operation with functionality to move Constraints. Provides undo/redo
- * functionality.
+ * Operation with functionality to move Constraints. Provides undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
@@ -43,9 +42,12 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 
 	public MoveConstraintOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
 		super(featureModel, MOVE_CONSTRAINT);
-		this.constraint = constraint;
-		this.index = newIndex;
-		this.oldIndex = oldIndex;
+		this.constraint =
+			constraint;
+		this.index =
+			newIndex;
+		this.oldIndex =
+			oldIndex;
 	}
 
 	@Override

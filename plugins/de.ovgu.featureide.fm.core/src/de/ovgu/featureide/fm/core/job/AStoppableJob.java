@@ -27,8 +27,8 @@ import de.ovgu.featureide.fm.core.Logger;
 /**
  * Abstract eclipse job which can be stopped.
  * 
- * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/>
- * A {@link IRunner} from the wrapper can be made stoppable via {@link IRunner#setStoppable(boolean)}.
+ * @deprecated Use {@link LongRunningMethod} and {@link LongRunningWrapper} instead. <br/> A {@link IRunner} from the wrapper can be made stoppable via
+ *             {@link IRunner#setStoppable(boolean)}.
  * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
@@ -36,13 +36,17 @@ import de.ovgu.featureide.fm.core.Logger;
 @SuppressWarnings("rawtypes")
 @Deprecated
 public abstract class AStoppableJob extends AbstractJob implements IStoppableJob {
-	
+
 	private class InnerThread extends Thread {
+
 		public InnerThread() {
-			super("Thread-" + AStoppableJob.this.getName());
-			
-			final int prio = AStoppableJob.this.getPriority();
-			if (prio == SHORT || prio == INTERACTIVE) {		
+			super("Thread-"
+				+ AStoppableJob.this.getName());
+
+			final int prio =
+				AStoppableJob.this.getPriority();
+			if (prio == SHORT
+				|| prio == INTERACTIVE) {
 				this.setPriority(Thread.MAX_PRIORITY);
 			} else if (prio == LONG) {
 				this.setPriority(Thread.NORM_PRIORITY);
@@ -50,7 +54,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 				this.setPriority(Thread.MIN_PRIORITY);
 			}
 		}
-		
+
 		@Override
 		public void run() {
 			try {
@@ -60,19 +64,21 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 			}
 		}
 	}
-	
-	private int cancelingTimeout = 300;
-	
-	private InnerThread innerThread = new InnerThread();;
-	
+
+	private int cancelingTimeout =
+		300;
+
+	private InnerThread innerThread =
+		new InnerThread();;
+
 	protected AStoppableJob(String name, int priority) {
 		super(name, priority);
 	}
-	
+
 	protected AStoppableJob(String name) {
 		this(name, Job.SHORT);
 	}
-	
+
 	@Override
 	public final void canceling() {
 		synchronized (this) {
@@ -80,9 +86,10 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 				return;
 			}
 		}
-		
+
 		if (cancelingTimeout > 0) {
 			new Thread(new Runnable() {
+
 				@Override
 				public void run() {
 					try {
@@ -105,20 +112,20 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 
 	@Override
 	public final void setCancelingTimeout(int cancelingTimeout) {
-		this.cancelingTimeout = cancelingTimeout;
+		this.cancelingTimeout =
+			cancelingTimeout;
 	}
-	
+
 	/**
-	 * {@inheritDoc}</br></br>
-	 * Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
+	 * {@inheritDoc}</br></br> Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
 	 */
 	protected abstract boolean work() throws Exception;
 
 	private void stopInnerThread() {
 		try {
-		if (innerThread.isAlive()) {
-			innerThread.stop();
-		}
+			if (innerThread.isAlive()) {
+				innerThread.stop();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

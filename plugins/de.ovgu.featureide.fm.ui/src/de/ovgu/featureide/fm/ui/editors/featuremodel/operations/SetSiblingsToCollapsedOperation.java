@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to set all siblings to collapsed. Enables
- * undo/redo functionality.
+ * Operation with functionality to set all siblings to collapsed. Enables undo/redo functionality.
  * 
  * @author Maximilian Kühl
  */
@@ -41,19 +40,20 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 
 	private IFeature feature;
 	private IGraphicalFeatureModel graphicalFeatureModel;
-	private LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
+	private LinkedList<Boolean> collapseStates =
+		new LinkedList<Boolean>();
 
 	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
+	 * @param label Description of this operation to be used in the menu
+	 * @param feature feature on which this operation will be executed
 	 * 
 	 */
 	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
-		this.feature = feature;
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.feature =
+			feature;
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
 	}
 
 	/**
@@ -65,32 +65,32 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {		
+	protected FeatureIDEEvent operation() {
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				IGraphicalFeature graphicalFeature =
+					graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				collapseStates.add(graphicalFeature.isCollapsed());
 				if (!f.equals(feature.getStructure())) {
 					graphicalFeature.setCollapsed(true);
 				}
 			}
 		}
-		if(feature.getStructure().getParent() != null)
-		{
+		if (feature.getStructure().getParent() != null) {
 			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
-		}
-		else
-		{
+		} else {
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
 		}
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		int i = 0;
+		int i =
+			0;
 		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				IGraphicalFeature graphicalFeature =
+					graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}

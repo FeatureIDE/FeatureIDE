@@ -26,55 +26,60 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * This class implements a {@link Job}, that is executed only once, even if it 
- * is scheduled twice.
+ * This class implements a {@link Job}, that is executed only once, even if it is scheduled twice.
  * 
  * @author Jens Meinicke
  */
 public abstract class SingleJob extends Job {
 
-	private boolean running = false;
-	
+	private boolean running =
+		false;
+
 	public SingleJob(String name) {
 		super(name);
 	}
 
 	@Override
 	protected IStatus run(final IProgressMonitor monitor) {
-		Thread thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					execute(monitor);
-				} catch (Exception e){
-					Logger.logError(e);
+		Thread thread =
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						execute(monitor);
+					} catch (Exception e) {
+						Logger.logError(e);
+					}
 				}
-			}
-			
-		}, "Thread-" + getName());
-		if (getPriority() == SHORT || getPriority() == INTERACTIVE) {		
+
+			}, "Thread-"
+				+ getName());
+		if (getPriority() == SHORT
+			|| getPriority() == INTERACTIVE) {
 			thread.setPriority(Thread.MAX_PRIORITY);
 		} else if (getPriority() == LONG) {
 			thread.setPriority(Thread.NORM_PRIORITY);
 		} else {
 			thread.setPriority(Thread.MIN_PRIORITY);
 		}
-		
+
 		try {
 			synchronized (this) {
 				if (running) {
 					thread.join();
 					return Status.OK_STATUS;
 				}
-				running = true;
+				running =
+					true;
 			}
 			thread.start();
 			thread.join();
 		} catch (InterruptedException e) {
 			Logger.logError(e);
 		} finally {
-			running = false;
+			running =
+				false;
 		}
 		return Status.OK_STATUS;
 	}

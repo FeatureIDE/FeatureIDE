@@ -36,7 +36,8 @@ public class ExportGUIDSLHandler extends AbstractExportHandler {
 
 	@Override
 	protected IFeatureModelFormat getFormat() {
-		final GuidslFormat fmWriter = new GuidslFormat();
+		final GuidslFormat fmWriter =
+			new GuidslFormat();
 		// TODO Guidsl
 //		if (fmWriter.hasConcreteCompounds()
 //				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
@@ -50,8 +51,10 @@ public class ExportGUIDSLHandler extends AbstractExportHandler {
 	protected void configureFileDialog(FileDialog fileDialog) {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("model.m");
-		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL format *.m" });
+		fileDialog.setFilterExtensions(new String[] {
+			"*.m" });
+		fileDialog.setFilterNames(new String[] {
+			"GUIDSL format *.m" });
 	}
 
 }

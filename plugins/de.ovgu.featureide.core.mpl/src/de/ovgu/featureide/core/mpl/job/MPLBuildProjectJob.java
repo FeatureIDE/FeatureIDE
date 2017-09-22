@@ -228,8 +228,9 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
-			final IFile configFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
-				+ mappingFileName);
+			final IFile configFile =
+				arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
+					+ mappingFileName);
 			FileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigFormatManager.getInstance());
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);

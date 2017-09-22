@@ -32,6 +32,7 @@ public class AntennaLogger implements ILogger {
 
 	/**
 	 * Logging
+	 * 
 	 * @see antenna.preprocessor.v3.ILogger#log(java.lang.String)
 	 */
 	@Override

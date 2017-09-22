@@ -42,22 +42,27 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Marcus Leich
  */
 public class ActiveConfigurationDecorator implements ILightweightLabelDecorator, ICurrentConfigurationListener {
-	
+
 	private ImageDescriptor icon;
 	private LinkedList<ILabelProviderListener> listeners;
-	
+
 	public ActiveConfigurationDecorator() {
-		URL url = de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
-		icon = ImageDescriptor.createFromURL(url);
-	    listeners = new LinkedList<ILabelProviderListener> ();
-	    
-	    // add Listener to Activator
-	    de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentConfigurationListener(this); 
+		URL url =
+			de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
+		icon =
+			ImageDescriptor.createFromURL(url);
+		listeners =
+			new LinkedList<ILabelProviderListener>();
+
+		// add Listener to Activator
+		de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentConfigurationListener(this);
 	}
 
 	public void decorate(Object element, IDecoration decoration) {
-		IFeatureProject pd = CorePlugin.getFeatureProject ((IResource)element);
-		if (pd != null && ((IResource)element).equals(pd.getCurrentConfiguration())) {
+		IFeatureProject pd =
+			CorePlugin.getFeatureProject((IResource) element);
+		if (pd != null
+			&& ((IResource) element).equals(pd.getCurrentConfiguration())) {
 			decoration.addOverlay(icon, IDecoration.TOP_LEFT);
 		}
 	}
@@ -71,9 +76,10 @@ public class ActiveConfigurationDecorator implements ILightweightLabelDecorator,
 	public void dispose() {
 		de.ovgu.featureide.core.CorePlugin.getDefault().removeCurrentConfigurationListener(this);
 	}
-	
-	private void refresh (IResource[] res) {
-		LabelProviderChangedEvent e = new LabelProviderChangedEvent (this, res);
+
+	private void refresh(IResource[] res) {
+		LabelProviderChangedEvent e =
+			new LabelProviderChangedEvent(this, res);
 		for (ILabelProviderListener l : listeners) {
 			l.labelProviderChanged(e);
 		}

@@ -29,21 +29,23 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Operation with functionality to set a Feature hidden. Enables undo/redo
- * functionality.
+ * Operation with functionality to set a Feature hidden. Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
-	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
+	private static final String LABEL_NOT_HIDDEN =
+		SET_FEATURE_NOT_HIDDEN;
+	private static final String LABEL_HIDDEN =
+		SET_FEATURE_HIDDEN;
 	private IFeature feature;
 
 	public SetFeatureToHiddenOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
-		this.feature = feature;
+		this.feature =
+			feature;
 	}
 
 	private static String getLabel(IFeature feature) {

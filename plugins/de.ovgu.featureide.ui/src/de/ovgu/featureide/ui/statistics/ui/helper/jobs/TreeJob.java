@@ -26,10 +26,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * Job for the {@code FeatureStatisticsView}.
- * <p>
- * Behaves like a normal {@link Job} but stores a {@link Parent} for the
- * calculation.
+ * Job for the {@code FeatureStatisticsView}. <p> Behaves like a normal {@link Job} but stores a {@link Parent} for the calculation.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
@@ -39,7 +36,8 @@ public abstract class TreeJob implements LongRunningMethod<Boolean>, ITreeJob {
 	protected Parent calculated;
 
 	public TreeJob(Parent calculated) {
-		this.calculated = calculated;
+		this.calculated =
+			calculated;
 	}
 
 	public Parent getCalculated() {
@@ -47,7 +45,8 @@ public abstract class TreeJob implements LongRunningMethod<Boolean>, ITreeJob {
 	}
 
 	public void setCalculated(Parent calculated) {
-		this.calculated = calculated;
+		this.calculated =
+			calculated;
 	}
 
 }

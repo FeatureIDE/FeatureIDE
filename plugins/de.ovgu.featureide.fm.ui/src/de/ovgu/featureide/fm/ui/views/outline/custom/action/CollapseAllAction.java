@@ -31,22 +31,24 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class CollapseAllAction extends Action {
 
-		private TreeViewer viewer;
+	private TreeViewer viewer;
 
-		/**
-		 * Constructor for CollapseAllAction
-		 * @param viewer
-		 */
-		public CollapseAllAction(TreeViewer viewer) {
-			super();
-			this.viewer = viewer;
-			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
-		}
+	/**
+	 * Constructor for CollapseAllAction
+	 * 
+	 * @param viewer
+	 */
+	public CollapseAllAction(TreeViewer viewer) {
+		super();
+		this.viewer =
+			viewer;
+		this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
+	}
 
-		public void run() {
-			viewer.collapseAll();
-			viewer.expandToLevel(2);
-			this.firePropertyChange("COLLAPSE", null, null);
-		}
-	
+	public void run() {
+		viewer.collapseAll();
+		viewer.expandToLevel(2);
+		this.firePropertyChange("COLLAPSE", null, null);
+	}
+
 }

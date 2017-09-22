@@ -28,6 +28,7 @@ import org.eclipse.swt.graphics.Color;
  * @author Antje Moench
  */
 public class CustomColumnStyle {
+
 	private String title;
 	private int width;
 	private Color backgroundColor, foregroundColor;
@@ -36,14 +37,23 @@ public class CustomColumnStyle {
 	private boolean drawLine;
 
 	public CustomColumnStyle(String title, int width) {
-		this.title = title;
-		this.width = width;
-		this.backgroundColor = this.foregroundColor = null;
-		this.verticalAlignment = SWT.TOP;
-		this.horizontalAlignment = SWT.CENTER;
-		this.isRotated = true;
-		this.isSelectable = true;
-		this.drawLine = true;
+		this.title =
+			title;
+		this.width =
+			width;
+		this.backgroundColor =
+			this.foregroundColor =
+				null;
+		this.verticalAlignment =
+			SWT.TOP;
+		this.horizontalAlignment =
+			SWT.CENTER;
+		this.isRotated =
+			true;
+		this.isSelectable =
+			true;
+		this.drawLine =
+			true;
 	}
 
 	public int getWidth() {
@@ -51,11 +61,13 @@ public class CustomColumnStyle {
 	}
 
 	public void setWidth(int width) {
-		this.width = width;
+		this.width =
+			width;
 	}
 
 	public void setVerticalAlignment(int alignment) {
-		this.verticalAlignment = alignment;
+		this.verticalAlignment =
+			alignment;
 	}
 
 	public int getVerticalAlignment() {
@@ -63,7 +75,8 @@ public class CustomColumnStyle {
 	}
 
 	public void setHorizontalAlignment(int alignment) {
-		this.horizontalAlignment = alignment;
+		this.horizontalAlignment =
+			alignment;
 	}
 
 	public int getHorizontalAlignment() {
@@ -71,7 +84,8 @@ public class CustomColumnStyle {
 	}
 
 	public void setRotated(boolean isRotated) {
-		this.isRotated = isRotated;
+		this.isRotated =
+			isRotated;
 	}
 
 	public boolean isRotated() {
@@ -79,17 +93,19 @@ public class CustomColumnStyle {
 	}
 
 	public void setSelectable(boolean isSelectable) {
-		this.isSelectable = isSelectable;
+		this.isSelectable =
+			isSelectable;
 	}
 
 	public boolean isSelectable() {
 		return isSelectable;
 	}
-	
+
 	public void setDrawingLine(boolean drawLine) {
-		this.drawLine = drawLine;
+		this.drawLine =
+			drawLine;
 	}
-	
+
 	public boolean isDrawingLine() {
 		return drawLine;
 	}
@@ -99,7 +115,8 @@ public class CustomColumnStyle {
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		this.title =
+			title;
 	}
 
 	public Color getForeground() {
@@ -107,7 +124,8 @@ public class CustomColumnStyle {
 	}
 
 	public void setForeground(Color foregroundColor) {
-		this.foregroundColor = foregroundColor;
+		this.foregroundColor =
+			foregroundColor;
 	}
 
 	public Color getBackground() {
@@ -115,6 +133,7 @@ public class CustomColumnStyle {
 	}
 
 	public void setBackground(Color backgroundColor) {
-		this.backgroundColor = backgroundColor;
+		this.backgroundColor =
+			backgroundColor;
 	}
 }

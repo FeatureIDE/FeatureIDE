@@ -68,28 +68,35 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
 public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments, Boolean> {
 
 	public static class Arguments extends JobArguments {
+
 		private final IProject externalProject;
 		private final String prefix;
 		private final IPath srcPath;
 
 		public Arguments(IProject externalProject, String prefix, IPath srcPath) {
 			super(Arguments.class);
-			this.externalProject = externalProject;
-			this.prefix = prefix;
-			this.srcPath = srcPath;
+			this.externalProject =
+				externalProject;
+			this.prefix =
+				prefix;
+			this.srcPath =
+				srcPath;
 		}
 	}
 
 	protected MPLRenameExternalJob(Arguments arguments) {
 		super(RENAMING_PACKAGES, arguments);
-		javaProject = new JavaProject(arguments.externalProject, null);
+		javaProject =
+			new JavaProject(arguments.externalProject, null);
 	}
-	
+
 	private static int getJavaBuildPathEntry(JavaProject javaProject) {
 		try {
-			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
-			
-			for (int i = 0; i < classpathEntrys.length; ++i) {
+			final IClasspathEntry[] classpathEntrys =
+				javaProject.getRawClasspath();
+
+			for (int i =
+				0; i < classpathEntrys.length; ++i) {
 				if (classpathEntrys[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					return i;
 				}
@@ -99,27 +106,35 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 		return -1;
 	}
-	
+
 	private static IPath setJavaBuildPath(JavaProject javaProject, IPath path, int index) {
 		try {
-			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
-			
+			final IClasspathEntry[] classpathEntrys =
+				javaProject.getRawClasspath();
+
 			if (index >= 0) {
-				final IClasspathEntry e = classpathEntrys[index];
+				final IClasspathEntry e =
+					classpathEntrys[index];
 				if (!e.getPath().equals(path)) {
-					final IPath formerSourcePath = e.getPath();
-					classpathEntrys[index] = new ClasspathEntry(
-						e.getContentKind(), e.getEntryKind(), path, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(),
-						e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+					final IPath formerSourcePath =
+						e.getPath();
+					classpathEntrys[index] =
+						new ClasspathEntry(
+								e.getContentKind(), e.getEntryKind(), path, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(),
+								e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 					javaProject.setRawClasspath(classpathEntrys, null);
 					return formerSourcePath;
 				}
 			} else {
-				final IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length + 1];
+				final IClasspathEntry[] newEntrys =
+					new IClasspathEntry[classpathEntrys.length
+						+ 1];
 				System.arraycopy(classpathEntrys, 0, newEntrys, 0, classpathEntrys.length);
-				newEntrys[newEntrys.length - 1] = new ClasspathEntry(
-						IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, path, new IPath[0], new IPath[0], null,
-						null, null, false, null, false, new IClasspathAttribute[0]);
+				newEntrys[newEntrys.length
+					- 1] =
+						new ClasspathEntry(
+								IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, path, new IPath[0], new IPath[0], null,
+								null, null, false, null, false, new IClasspathAttribute[0]);
 				javaProject.setRawClasspath(newEntrys, null);
 			}
 		} catch (JavaModelException e) {
@@ -130,22 +145,29 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 	}
 
 	public static void setJavaBuildPath(IProject project, IPath path) {
-		final JavaProject javaProject = new JavaProject(project, null);
+		final JavaProject javaProject =
+			new JavaProject(project, null);
 		setJavaBuildPath(javaProject, path, getJavaBuildPathEntry(javaProject));
 	}
-	
+
 	private static void resetJavaBuildPath(JavaProject javaProject, IPath formerSourcePath, int formerSourcePathIndex) {
 		try {
-			final IClasspathEntry[] classpathEntrys = javaProject.getRawClasspath();
-			
+			final IClasspathEntry[] classpathEntrys =
+				javaProject.getRawClasspath();
+
 			if (formerSourcePath != null) {
-				final IClasspathEntry e = classpathEntrys[formerSourcePathIndex];
-				classpathEntrys[formerSourcePathIndex] = new ClasspathEntry(
-					e.getContentKind(), e.getEntryKind(), formerSourcePath, e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(),
-					e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+				final IClasspathEntry e =
+					classpathEntrys[formerSourcePathIndex];
+				classpathEntrys[formerSourcePathIndex] =
+					new ClasspathEntry(
+							e.getContentKind(), e.getEntryKind(), formerSourcePath, e.getInclusionPatterns(), e.getExclusionPatterns(),
+							e.getSourceAttachmentPath(),
+							e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 				javaProject.setRawClasspath(classpathEntrys, null);
 			} else if (formerSourcePathIndex == -1) {
-				final IClasspathEntry[] newEntrys = new IClasspathEntry[classpathEntrys.length - 1];
+				final IClasspathEntry[] newEntrys =
+					new IClasspathEntry[classpathEntrys.length
+						- 1];
 				System.arraycopy(classpathEntrys, 0, newEntrys, 0, newEntrys.length);
 				javaProject.setRawClasspath(newEntrys, null);
 			}
@@ -153,17 +175,22 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 			MPLPlugin.getDefault().logError(e);
 		}
 	}
-	
-	private int formerSourcePathIndex = -1;
-	private IPath formerSourcePath = null;
+
+	private int formerSourcePathIndex =
+		-1;
+	private IPath formerSourcePath =
+		null;
 	private final JavaProject javaProject;
-	
+
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
 		try {
-			this.workMonitor = workMonitor;
-			formerSourcePathIndex = getJavaBuildPathEntry(javaProject);
-			formerSourcePath = setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
+			this.workMonitor =
+				workMonitor;
+			formerSourcePathIndex =
+				getJavaBuildPathEntry(javaProject);
+			formerSourcePath =
+				setJavaBuildPath(javaProject, arguments.srcPath, formerSourcePathIndex);
 		} finally {
 			resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
 		}
@@ -172,31 +199,43 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 
 	private boolean renameProject() {
 		final IPackageFragmentRoot packageFragmentRoot;
-		
-		List<IPackageFragment> packages = new LinkedList<IPackageFragment>();
+
+		List<IPackageFragment> packages =
+			new LinkedList<IPackageFragment>();
 		try {
-			IPackageFragmentRoot[] packageFragmentRoots = javaProject.getPackageFragmentRoots();
-			packageFragmentRoot = packageFragmentRoots[0];
-			IJavaElement[] fragments = packageFragmentRoot.getChildren();
-			for (int j = 0; j < fragments.length; j++) {
-				IPackageFragment fragment = (IPackageFragment) fragments[j];
+			IPackageFragmentRoot[] packageFragmentRoots =
+				javaProject.getPackageFragmentRoots();
+			packageFragmentRoot =
+				packageFragmentRoots[0];
+			IJavaElement[] fragments =
+				packageFragmentRoot.getChildren();
+			for (int j =
+				0; j < fragments.length; j++) {
+				IPackageFragment fragment =
+					(IPackageFragment) fragments[j];
 				packages.add(fragment);
 			}
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-		
-		ICompilationUnit[] defaultCompilationUnits = null;
-		final Pattern p = Pattern.compile(arguments.prefix.replace(".", "\\.") + "(\\..*)?");
-		
-		Iterator<IPackageFragment> it = packages.iterator();
+
+		ICompilationUnit[] defaultCompilationUnits =
+			null;
+		final Pattern p =
+			Pattern.compile(arguments.prefix.replace(".", "\\.")
+				+ "(\\..*)?");
+
+		Iterator<IPackageFragment> it =
+			packages.iterator();
 		while (it.hasNext()) {
-			IPackageFragment pckg = it.next();
+			IPackageFragment pckg =
+				it.next();
 			if (pckg.isDefaultPackage()) {
 				if (pckg.exists()) {
 					try {
-						defaultCompilationUnits = pckg.getCompilationUnits();
+						defaultCompilationUnits =
+							pckg.getCompilationUnits();
 					} catch (JavaModelException e) {
 						MPLPlugin.getDefault().logError(e);
 						return false;
@@ -210,11 +249,11 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 				it.remove();
 			}
 		}
-		
+
 		if (!renameDefaultPackage(packageFragmentRoot, defaultCompilationUnits)) {
 			return false;
 		}
-		
+
 		for (IPackageFragment pckg : packages) {
 			if (!renamePackage(pckg)) {
 				return false;
@@ -239,17 +278,24 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-		RefactoringContribution contribution = RefactoringCore.getRefactoringContribution(IJavaRefactorings.RENAME_PACKAGE);
-		RenameJavaElementDescriptor descriptor = (RenameJavaElementDescriptor) contribution.createDescriptor();
+		RefactoringContribution contribution =
+			RefactoringCore.getRefactoringContribution(IJavaRefactorings.RENAME_PACKAGE);
+		RenameJavaElementDescriptor descriptor =
+			(RenameJavaElementDescriptor) contribution.createDescriptor();
 		descriptor.setProject(arguments.externalProject.getName());
 		descriptor.setUpdateReferences(true);
 		descriptor.setJavaElement(pckg);
-		descriptor.setNewName(arguments.prefix + "." + pckg.getElementName());
+		descriptor.setNewName(arguments.prefix
+			+ "."
+			+ pckg.getElementName());
 
-		RefactoringStatus status = new RefactoringStatus();
+		RefactoringStatus status =
+			new RefactoringStatus();
 		try {
-			final NullProgressMonitor monitor = new NullProgressMonitor();
-			Refactoring refactoring = descriptor.createRefactoring(status);
+			final NullProgressMonitor monitor =
+				new NullProgressMonitor();
+			Refactoring refactoring =
+				descriptor.createRefactoring(status);
 			new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS).run(monitor);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
@@ -257,21 +303,27 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		}
 		return true;
 	}
-	
+
 	private boolean renameDefaultPackage(IPackageFragmentRoot packageFragmentRoot, ICompilationUnit[] compilationUnits) {
-		if (compilationUnits != null && compilationUnits.length > 0) {
-			RefactoringContribution contribution = RefactoringCore.getRefactoringContribution(IJavaRefactorings.MOVE);
-			MoveDescriptor descriptor = (MoveDescriptor) contribution.createDescriptor();
+		if (compilationUnits != null
+			&& compilationUnits.length > 0) {
+			RefactoringContribution contribution =
+				RefactoringCore.getRefactoringContribution(IJavaRefactorings.MOVE);
+			MoveDescriptor descriptor =
+				(MoveDescriptor) contribution.createDescriptor();
 
 			descriptor.setProject(arguments.externalProject.getName());
-			descriptor.setDestination(packageFragmentRoot.getPackageFragment(arguments.prefix));			
+			descriptor.setDestination(packageFragmentRoot.getPackageFragment(arguments.prefix));
 			descriptor.setMoveResources(new IFile[0], new IFolder[0], compilationUnits);
 			descriptor.setUpdateReferences(true);
-			
-			RefactoringStatus status = new RefactoringStatus();
+
+			RefactoringStatus status =
+				new RefactoringStatus();
 			try {
-				final NullProgressMonitor monitor = new NullProgressMonitor();
-				Refactoring refactoring = descriptor.createRefactoring(status);
+				final NullProgressMonitor monitor =
+					new NullProgressMonitor();
+				Refactoring refactoring =
+					descriptor.createRefactoring(status);
 				new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS).run(monitor);
 			} catch (CoreException e) {
 				MPLPlugin.getDefault().logError(e);

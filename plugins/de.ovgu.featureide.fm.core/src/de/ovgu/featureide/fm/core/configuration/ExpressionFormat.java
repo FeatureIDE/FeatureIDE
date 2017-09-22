@@ -24,8 +24,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Simple configuration format.</br>
- * Lists all selected features in the user-defined order (if specified).
+ * Simple configuration format.</br> Lists all selected features in the user-defined order (if specified).
  * 
  * @author Sebastian Krieter
  * 
@@ -33,7 +32,10 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ExpressionFormat extends DefaultFormat {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + ExpressionFormat.class.getSimpleName();
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.config."
+			+ ExpressionFormat.class.getSimpleName();
 
 	@Override
 	public String getSuffix() {

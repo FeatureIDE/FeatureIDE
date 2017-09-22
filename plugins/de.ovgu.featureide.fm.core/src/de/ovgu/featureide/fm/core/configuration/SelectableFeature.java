@@ -39,25 +39,33 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class SelectableFeature extends TreeElement {
 
-	private Selection manual = Selection.UNDEFINED;
+	private Selection manual =
+		Selection.UNDEFINED;
 
-	private Selection automatic = Selection.UNDEFINED;
+	private Selection automatic =
+		Selection.UNDEFINED;
 
-	private Selection recommended = Selection.UNDEFINED;
+	private Selection recommended =
+		Selection.UNDEFINED;
 
 	private final IFeature feature;
 
-	private int recommendationValue = -1;
-	private Map<Integer, Node> openClauses = null;
+	private int recommendationValue =
+		-1;
+	private Map<Integer, Node> openClauses =
+		null;
 
 	private String name;
 
 	public SelectableFeature(IFeature feature) {
-		this.feature = feature;
+		this.feature =
+			feature;
 	}
 
 	public Selection getSelection() {
-		return automatic == Selection.UNDEFINED ? manual : automatic;
+		return automatic == Selection.UNDEFINED
+			? manual
+			: automatic;
 	}
 
 	public Selection getManual() {
@@ -65,8 +73,10 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setManual(Selection manual) {
-		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED) {
-			this.manual = manual;
+		if (manual == Selection.UNDEFINED
+			|| automatic == Selection.UNDEFINED) {
+			this.manual =
+				manual;
 		} else if (manual != automatic) {
 			throw new SelectionNotPossibleException(getName(), manual);
 		}
@@ -77,8 +87,11 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setAutomatic(Selection automatic) {
-		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
-			this.automatic = automatic;
+		if (automatic == Selection.UNDEFINED
+			|| manual == Selection.UNDEFINED
+			|| manual == automatic) {
+			this.automatic =
+				automatic;
 		} else {
 			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
 		}
@@ -88,7 +101,9 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? "" : feature.getName();
+		return feature == null
+			? ""
+			: feature.getName();
 	}
 
 	public IFeature getFeature() {
@@ -100,7 +115,8 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
 
 	public Selection getRecommended() {
@@ -108,7 +124,8 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setRecommended(Selection recommended) {
-		this.recommended = recommended;
+		this.recommended =
+			recommended;
 	}
 
 	public int getRecommendationValue() {
@@ -116,7 +133,8 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setRecommendationValue(int recommendationValue) {
-		this.recommendationValue = recommendationValue;
+		this.recommendationValue =
+			recommendationValue;
 	}
 
 	@Nonnull
@@ -129,13 +147,15 @@ public class SelectableFeature extends TreeElement {
 
 	public void addOpenClause(int index, Node openClause) {
 		if (openClauses == null) {
-			openClauses = new TreeMap<>();
+			openClauses =
+				new TreeMap<>();
 		}
 		openClauses.put(index, openClause);
 	}
 
 	public void clearOpenClauses() {
-		openClauses = null;
+		openClauses =
+			null;
 	}
 
 	@Nonnull

@@ -32,6 +32,7 @@ import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
  * This Class contains one of the three actions, which is added to the menu
  * 
  * The other related classes are:
+ * 
  * @see de.ovgu.featureide.ui.actions.AddProfileColorScheme.java
  * @see de.ovgu.featureide.ui.actions.DeleteProfileColorScheme.java
  * 
@@ -42,22 +43,26 @@ import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 public class RenameProfileColorSchemeAction extends Action {
 
 	private IFeatureModel model;
+
 	/*
 	 * Constructor
 	 */
 	public RenameProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
-		this.model = model;
+		this.model =
+			model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
 	/**
-	 *  Call the rename wizard and saves the configuration
+	 * Call the rename wizard and saves the configuration
 	 */
 	public void run() {
-		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(model);
+		RenameColorSchemeWizard wizard =
+			new RenameColorSchemeWizard(model);
 
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		WizardDialog dialog =
+			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 

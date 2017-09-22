@@ -28,7 +28,7 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @author Tom Brosch
  */
 public interface IConfigurationChangedListener {
-	
+
 	void configurationChanged(IFeatureProject featureProject);
-	
+
 }

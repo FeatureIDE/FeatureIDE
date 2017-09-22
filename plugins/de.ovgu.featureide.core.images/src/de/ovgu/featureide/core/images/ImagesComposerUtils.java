@@ -42,9 +42,12 @@ public class ImagesComposerUtils {
 	 * @return null if it is not an image file or the file format
 	 */
 	public static String getImageFormat(String name) {
-		int i = name.lastIndexOf('.');
+		int i =
+			name.lastIndexOf('.');
 		if (i > 0) {
-			name = name.substring(i + 1);
+			name =
+				name.substring(i
+					+ 1);
 		} else {
 			return null;
 		}
@@ -71,33 +74,43 @@ public class ImagesComposerUtils {
 	 */
 	public static void overlapImages(List<File> imageFiles, File outputImageFile) throws Exception {
 		// Get the images and calculate final size
-		List<BufferedImage> images = new ArrayList<BufferedImage>();
-		int maxWidth = 0;
-		int maxHeight = 0;
+		List<BufferedImage> images =
+			new ArrayList<BufferedImage>();
+		int maxWidth =
+			0;
+		int maxHeight =
+			0;
 		for (File imageFile : imageFiles) {
-			BufferedImage image = ImageIO.read(imageFile);
+			BufferedImage image =
+				ImageIO.read(imageFile);
 			if (image == null) {
-				throw new Exception("Error reading image: " + imageFile.getAbsolutePath());
+				throw new Exception("Error reading image: "
+					+ imageFile.getAbsolutePath());
 			}
 			if (image.getWidth() > maxWidth) {
-				maxWidth = image.getWidth();
+				maxWidth =
+					image.getWidth();
 			}
 			if (image.getHeight() > maxHeight) {
-				maxHeight = image.getHeight();
+				maxHeight =
+					image.getHeight();
 			}
 			images.add(image);
 		}
 
 		// Overlap the images
 		if (!images.isEmpty()) {
-			BufferedImage combined = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
-			Graphics g = combined.getGraphics();
+			BufferedImage combined =
+				new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+			Graphics g =
+				combined.getGraphics();
 			for (BufferedImage i : images) {
 				g.drawImage(i, 0, 0, null);
 			}
 			g.dispose();
 			outputImageFile.getParentFile().mkdirs();
-			String imageFormat = getImageFormat(outputImageFile.getName());
+			String imageFormat =
+				getImageFormat(outputImageFile.getName());
 			ImageIO.write(combined, imageFormat, outputImageFile);
 		}
 	}
@@ -121,7 +134,8 @@ public class ImagesComposerUtils {
 	 */
 	private static List<File> getAllFiles(List<File> files, File dir) {
 		if (files == null) {
-			files = new ArrayList<File>();
+			files =
+				new ArrayList<File>();
 		}
 
 		if (!dir.isDirectory()) {

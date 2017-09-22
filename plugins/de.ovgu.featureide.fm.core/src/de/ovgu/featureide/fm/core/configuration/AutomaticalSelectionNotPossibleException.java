@@ -21,17 +21,22 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 /**
- * This exception identifies an error in the propagation of feature selections.
- * If this occurs there might be an error in updating automatically selections.
+ * This exception identifies an error in the propagation of feature selections. If this occurs there might be an error in updating automatically selections.
  * 
  * @author Thomas Thuem
  */
 public class AutomaticalSelectionNotPossibleException extends RuntimeException {
 
-	private static final long serialVersionUID = 1793844229871267311L;
+	private static final long serialVersionUID =
+		1793844229871267311L;
 
 	public AutomaticalSelectionNotPossibleException(String feature, Selection selection) {
-		super("The feature \"" + feature + "\" cannot be automatically " + (selection == Selection.SELECTED ? "selected" : "deselected"));
+		super("The feature \""
+			+ feature
+			+ "\" cannot be automatically "
+			+ (selection == Selection.SELECTED
+				? "selected"
+				: "deselected"));
 	}
 
 }

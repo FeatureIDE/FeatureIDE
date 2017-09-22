@@ -38,12 +38,16 @@ public class SignatureToggleTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final State state = ((ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
-		IProject curProject = SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
+		final State state =
+			((ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
+		IProject curProject =
+			SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
 		if (curProject != null) {
-			final IFeatureProject featureProject = CorePlugin.getFeatureProject(curProject);
+			final IFeatureProject featureProject =
+				CorePlugin.getFeatureProject(curProject);
 			if (featureProject != null) {
-				final IComposerExtensionClass composer = featureProject.getComposer();
+				final IComposerExtensionClass composer =
+					featureProject.getComposer();
 				if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
 					state.setValue(((MungePreprocessor) composer).getCreateSignature());
 					return true;

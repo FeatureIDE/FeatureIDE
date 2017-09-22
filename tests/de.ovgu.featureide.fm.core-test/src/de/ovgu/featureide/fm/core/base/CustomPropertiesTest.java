@@ -35,19 +35,28 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 public class CustomPropertiesTest {
 
-	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
-	static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+	static final File modelFile =
+		new File("feature_model_tmp_"
+			+ System.currentTimeMillis()
+			+ ".xml");
+	static final IFeatureModelFactory factory =
+		FMFactoryManager.getDefaultFactory();
 
 	@Before
 	public void setup() {
 		CustomFeaturesCustomPropertiesTest.setFileSystem();
-		
-		final IFeatureModel model = factory.createFeatureModel();
 
-		final IFeature f1 = factory.createFeature(model, "A");
-		final IFeature f2 = factory.createFeature(model, "B");
-		final IFeature f3 = factory.createFeature(model, "C");
-		final IFeature f4 = factory.createFeature(model, "D");
+		final IFeatureModel model =
+			factory.createFeatureModel();
+
+		final IFeature f1 =
+			factory.createFeature(model, "A");
+		final IFeature f2 =
+			factory.createFeature(model, "B");
+		final IFeature f3 =
+			factory.createFeature(model, "C");
+		final IFeature f4 =
+			factory.createFeature(model, "D");
 
 		f1.getStructure().addChild(f2.getStructure());
 		f1.getStructure().addChild(f3.getStructure());
@@ -71,8 +80,10 @@ public class CustomPropertiesTest {
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model = factory.createFeatureModel();
-		ProblemList problems = FileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		final IFeatureModel model =
+			factory.createFeatureModel();
+		ProblemList problems =
+			FileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.containsError());
 
 		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1"));
@@ -99,13 +110,15 @@ public class CustomPropertiesTest {
 
 		modelFile.delete();
 		FileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
-		
-		final IFeatureModel model2 = factory.createFeatureModel();
-		ProblemList problems2 = FileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
-		
+
+		final IFeatureModel model2 =
+			factory.createFeatureModel();
+		ProblemList problems2 =
+			FileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
+
 		for (Problem p : problems2.getErrors())
 			System.out.println(p.message);
-		
+
 		Assert.assertFalse(problems2.containsError());
 
 		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1"));

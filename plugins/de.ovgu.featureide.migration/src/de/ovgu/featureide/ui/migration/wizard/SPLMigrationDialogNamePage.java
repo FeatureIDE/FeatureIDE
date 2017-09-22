@@ -39,64 +39,70 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.migration.impl.DefaultSPLMigrator;
 
-public class SPLMigrationDialogNamePage extends WizardPage
-{	
-	protected GridData gridDataFill = new GridData(GridData.FILL_HORIZONTAL);
+public class SPLMigrationDialogNamePage extends WizardPage {
+
+	protected GridData gridDataFill =
+		new GridData(GridData.FILL_HORIZONTAL);
 
 	private Text newProjectName;
-	
-	public SPLMigrationDialogNamePage()
-	{
+
+	public SPLMigrationDialogNamePage() {
 		super(GIVE_A_NAME_FOR_THE_SOFTWARE_PRODUCT_LINE);
 		setTitle(PROJECT_NAME);
 		setDescription(GIVE_A_NAME_FOR_THE_SOFTWARE_PRODUCT_LINE);
 	}
 
 	@Override
-	public void createControl(Composite parent)
-	{
-		Composite container = new Composite(parent, SWT.NONE);
-		final GridLayout gridLayout = new GridLayout();
-		
-	    gridLayout.numColumns = 1;
-	    container.setLayout(gridLayout);
-	    setControl(container);
-	    
-	    gridLayout.numColumns = 2;
-	    
-	    Group nameGroup = new Group(container, SWT.NONE);
-	    nameGroup.setLayout(gridLayout);
-	    nameGroup.setLayoutData(gridDataFill);
-	    
-	    String tooltip = GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
-		
-	    Label newProductNameLabel = new Label(nameGroup, SWT.NULL);
+	public void createControl(Composite parent) {
+		Composite container =
+			new Composite(parent, SWT.NONE);
+		final GridLayout gridLayout =
+			new GridLayout();
+
+		gridLayout.numColumns =
+			1;
+		container.setLayout(gridLayout);
+		setControl(container);
+
+		gridLayout.numColumns =
+			2;
+
+		Group nameGroup =
+			new Group(container, SWT.NONE);
+		nameGroup.setLayout(gridLayout);
+		nameGroup.setLayoutData(gridDataFill);
+
+		String tooltip =
+			GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
+
+		Label newProductNameLabel =
+			new Label(nameGroup, SWT.NULL);
 		newProductNameLabel.setText("&Project Name:");
 		newProductNameLabel.setToolTipText(tooltip);
-		
-		newProjectName = new Text(nameGroup, SWT.BORDER | SWT.SINGLE);
+
+		newProjectName =
+			new Text(nameGroup, SWT.BORDER
+				| SWT.SINGLE);
 		newProjectName.setLayoutData(gridDataFill);
 		newProjectName.setText(DefaultSPLMigrator.DEFAULT_PROJECT_NAME);
 		newProjectName.setToolTipText(tooltip);
-		
+
 		addNameChangeListener();
 	}
-	
-	private void addNameChangeListener()
-	{
+
+	private void addNameChangeListener() {
 		newProjectName.addModifyListener(new ModifyListener() {
-			
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				onNameChange();
 			}
 		});
-			
+
 	}
 
-	protected void onNameChange()
-	{
-		if(ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName()).exists())
+	protected void onNameChange() {
+		if (ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName()).exists())
 			setErrorMessage(A_PROJECT_WITH_THIS_NAME_ALREADY_EXISTS_IN_THE_WORKSPACE__PLEASE_CHANGE_THE_NAME_);
 		else
 			setErrorMessage(null);
@@ -105,20 +111,20 @@ public class SPLMigrationDialogNamePage extends WizardPage
 	public String getProjectName() {
 		return newProjectName.getText();
 	}
-	
+
 	@Override
-	public boolean isPageComplete()
-	{
-		if(isCurrentPage())
+	public boolean isPageComplete() {
+		if (isCurrentPage())
 			return getErrorMessage() == null;
-		else 
+		else
 			return true;
 	}
-	
+
 	@Override
-	public boolean canFlipToNextPage()
-	{
-		return !(getProjectName() == null || getProjectName().isEmpty()) && isPageComplete();
+	public boolean canFlipToNextPage() {
+		return !(getProjectName() == null
+			|| getProjectName().isEmpty())
+			&& isPageComplete();
 	}
-	
+
 }

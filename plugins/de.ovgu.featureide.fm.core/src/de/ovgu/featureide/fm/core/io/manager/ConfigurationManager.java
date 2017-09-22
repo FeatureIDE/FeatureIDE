@@ -39,11 +39,13 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 public class ConfigurationManager extends AFileManager<Configuration> {
 
 	private static class ObjectCreator extends AFileManager.ObjectCreator<Configuration> {
+
 		private final Configuration configuration;
 
 		public ObjectCreator(Configuration configuration) {
 			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
-			this.configuration = configuration;
+			this.configuration =
+				configuration;
 		}
 
 		@Override
@@ -81,9 +83,11 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	}
 
 	public void setConfiguration(Configuration configuration) {
-		variableObject = configuration;
+		variableObject =
+			configuration;
 		synchronized (syncObject) {
-			persistentObject = copyObject(variableObject);
+			persistentObject =
+				copyObject(variableObject);
 		}
 	}
 

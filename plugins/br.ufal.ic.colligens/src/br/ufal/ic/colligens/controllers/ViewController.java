@@ -15,11 +15,13 @@ public abstract class ViewController {
 
 	private String ID;
 	private ViewPart view;
+
 	/**
 	 * @param ID
 	 */
 	public ViewController(String ID) {
-		this.ID = ID;
+		this.ID =
+			ID;
 	}
 
 	public ViewPart getView() {
@@ -27,7 +29,8 @@ public abstract class ViewController {
 	}
 
 	public void setView(ViewPart view) {
-		this.view = view;
+		this.view =
+			view;
 	}
 
 	/**
@@ -35,13 +38,16 @@ public abstract class ViewController {
 	 */
 	public void showView() {
 		Display.getDefault().syncExec(new Runnable() {
+
 			public void run() {
 				IWorkbenchWindow activeWindow;
 				IWorkbenchPage activePage;
-				activeWindow = PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow();
+				activeWindow =
+					PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow();
 				if (activeWindow != null) {
-					activePage = activeWindow.getActivePage();
+					activePage =
+						activeWindow.getActivePage();
 					if (activePage != null) {
 						try {
 							activePage.showView(ID);
@@ -53,5 +59,5 @@ public abstract class ViewController {
 			}
 		});
 	}
-	
+
 }

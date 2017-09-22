@@ -33,15 +33,17 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
  * @author Sebastian Krieter
  */
 public class SetColorSchemeAction extends AbstractColorAction {
-	
+
 	String newColorSchemeName;
-	
+
 	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index, String newColorSchemeName) {
 		super(text, view, collaborationView, index, Action.AS_CHECK_BOX);
-		this.newColorSchemeName = newColorSchemeName;
+		this.newColorSchemeName =
+			newColorSchemeName;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
 	 */
 	@Override
@@ -49,5 +51,5 @@ public class SetColorSchemeAction extends AbstractColorAction {
 		FeatureColorManager.setActive(fm, collName);
 		return true;
 	}
-	
+
 }

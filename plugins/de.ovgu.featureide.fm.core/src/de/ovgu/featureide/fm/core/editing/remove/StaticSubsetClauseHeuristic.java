@@ -25,36 +25,46 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features dependent on the current clauses in the formula.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features dependent on the current clauses in the formula.
  * 
  * @author Sebastian Krieter
  */
 public class StaticSubsetClauseHeuristic extends AFeatureOrderHeuristic {
 
-	private LinkedList<Integer> order = new LinkedList<>();
+	private LinkedList<Integer> order =
+		new LinkedList<>();
 
 	public StaticSubsetClauseHeuristic(final DeprecatedFeature[] map, int length) {
 		super(map, length);
-		for (int i = 0; i < map.length; i++) {
+		for (int i =
+			0; i < map.length; i++) {
 			if (map[i] != null) {
 				order.add(i);
 			}
 		}
 		Collections.sort(order, new Comparator<Integer>() {
+
 			@Override
 			public int compare(Integer o1, Integer o2) {
-				final DeprecatedFeature f1 = map[o1];
-				final DeprecatedFeature f2 = map[o2];
-				final long cc1 = f1.getClauseCount();
-				final long cc2 = f2.getClauseCount();
-				final long mc1 = f1.getMixedCount();
-				final long mc2 = f2.getMixedCount();
+				final DeprecatedFeature f1 =
+					map[o1];
+				final DeprecatedFeature f2 =
+					map[o2];
+				final long cc1 =
+					f1.getClauseCount();
+				final long cc2 =
+					f2.getClauseCount();
+				final long mc1 =
+					f1.getMixedCount();
+				final long mc2 =
+					f2.getMixedCount();
 				if (Math.min(cc1, cc2) <= 0) {
-					return (int) Math.signum(cc1 - cc2);
+					return (int) Math.signum(cc1
+						- cc2);
 				} else if (Math.min(mc1, mc2) == 0) {
 					if (Math.max(mc1, mc2) == 0) {
-						return (int) Math.signum(cc1 - cc2);
+						return (int) Math.signum(cc1
+							- cc2);
 					} else {
 						if (mc1 == 0) {
 							return -1;
@@ -63,7 +73,8 @@ public class StaticSubsetClauseHeuristic extends AFeatureOrderHeuristic {
 						}
 					}
 				} else {
-					return (int) Math.signum(cc1 - cc2);
+					return (int) Math.signum(cc1
+						- cc2);
 				}
 			}
 		});

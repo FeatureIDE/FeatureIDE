@@ -41,45 +41,52 @@ import org.prop4j.Or;
  * @author Timo G&uuml;nther
  */
 public abstract class SatSolverTests extends SatProblemTests {
+
 	@Test
 	public void testSatisfiable() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Implies("A", "B")));
 		assertTrue(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableContradiction() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Not("A")));
 		assertFalse(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableUnsatisfiable() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Implies("A", "B"), new Not("B")));
 		assertFalse(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableEmpty() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		assertTrue(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableMultiple() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Implies("A", "B")));
 		assertTrue(solver.isSatisfiable());
 		assertTrue(solver.isSatisfiable());
 		assertTrue(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableIncremental() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new Or("A", "B"));
 		assertTrue(solver.isSatisfiable());
 		solver.addFormula(new Or("A", new Not("A")));
@@ -91,10 +98,11 @@ public abstract class SatSolverTests extends SatProblemTests {
 		solver.addFormula(new Or("B", new Not("B")));
 		assertFalse(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testSatisfiableAssumptions() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Implies("A", "B")));
 		assertTrue(solver.isSatisfiable());
 		solver.addAssumption("B", true);
@@ -108,60 +116,72 @@ public abstract class SatSolverTests extends SatProblemTests {
 		solver.addAssumption("A", false);
 		assertFalse(solver.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testModel() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Not("B")));
-		final Map<Object, Boolean> expected = new LinkedHashMap<>();
+		final Map<Object, Boolean> expected =
+			new LinkedHashMap<>();
 		expected.put("A", true);
 		expected.put("B", false);
-		final Map<Object, Boolean> actual = solver.getModel();
+		final Map<Object, Boolean> actual =
+			solver.getModel();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testModelContradiction() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Not("A")));
 		exception.expect(IllegalStateException.class);
 		solver.getModel();
 	}
-	
+
 	@Test
 	public void testModelUnsatisfiable() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Implies("A", "B"), new Not("B")));
 		exception.expect(IllegalStateException.class);
 		solver.getModel();
 	}
-	
+
 	@Test
 	public void testModelEmpty() {
-		final SatSolver solver = getInstance();
-		final Map<Object, Boolean> expected = Collections.emptyMap();
-		final Map<Object, Boolean> actual = solver.getModel();
+		final SatSolver solver =
+			getInstance();
+		final Map<Object, Boolean> expected =
+			Collections.emptyMap();
+		final Map<Object, Boolean> actual =
+			solver.getModel();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testModelMultiple() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new And("A", new Not("B")));
-		final Map<Object, Boolean> expected = new LinkedHashMap<>();
+		final Map<Object, Boolean> expected =
+			new LinkedHashMap<>();
 		expected.put("A", true);
 		expected.put("B", false);
 		assertEquals(expected, solver.getModel());
 		assertEquals(expected, solver.getModel());
 		assertEquals(expected, solver.getModel());
 	}
-	
+
 	@Test
 	public void testModelAssumptions() {
-		final SatSolver solver = getInstance();
+		final SatSolver solver =
+			getInstance();
 		solver.addFormula(new Implies("A", "B"));
 		solver.addAssumption("B", false);
-		final Map<Object, Boolean> expected = new LinkedHashMap<>();
+		final Map<Object, Boolean> expected =
+			new LinkedHashMap<>();
 		expected.put("A", false);
 		expected.put("B", false);
 		assertEquals(expected, solver.getModel());
@@ -169,7 +189,7 @@ public abstract class SatSolverTests extends SatProblemTests {
 		expected.put("C", true);
 		assertEquals(expected, solver.getModel());
 	}
-	
+
 	@Override
 	protected abstract SatSolver getInstance();
 }

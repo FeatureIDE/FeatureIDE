@@ -31,8 +31,7 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 
 /**
- * Read the .order file from the project directory. The constructor need the
- * location of the project as parameter
+ * Read the .order file from the project directory. The constructor need the location of the project as parameter
  * 
  * @deprecated Use {@link FeatureOrderFormat} instead.
  * 
@@ -44,7 +43,10 @@ public class FeatureOrderReader {
 	private File file;
 
 	public FeatureOrderReader(File file) {
-		this.file = new File(file.toString() + System.getProperty("file.separator") + ".order");
+		this.file =
+			new File(file.toString()
+				+ System.getProperty("file.separator")
+				+ ".order");
 	}
 
 	/**
@@ -53,9 +55,11 @@ public class FeatureOrderReader {
 	 */
 
 	public LinkedList<String> featureOrderRead() {
-		LinkedList<String> list = new LinkedList<String>();
+		LinkedList<String> list =
+			new LinkedList<String>();
 		try {
-			Scanner scanner = new Scanner(file, "UTF-8");
+			Scanner scanner =
+				new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}

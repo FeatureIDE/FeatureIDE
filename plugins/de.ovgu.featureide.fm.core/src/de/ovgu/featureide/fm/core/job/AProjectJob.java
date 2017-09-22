@@ -20,29 +20,29 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
- * This class implements support for Eclipse jobs.
- * The {@link JobArguments} object should be extended to add constructor 
- * parameters, and can be used to conveniently start several {@link AProjectJob}s.
+ * This class implements support for Eclipse jobs. The {@link JobArguments} object should be extended to add constructor parameters, and can be used to
+ * conveniently start several {@link AProjectJob}s.
  * 
  * @author Sebastian Krieter
  */
 public abstract class AProjectJob<T extends JobArguments, R> implements LongRunningMethod<R> {
 
 	protected final T arguments;
-	
+
 	protected IMonitor workMonitor;
-	
+
 	protected AProjectJob(T arguments) {
-		this.arguments = arguments;
+		this.arguments =
+			arguments;
 	}
-	
+
 	protected AProjectJob(String name, T arguments) {
-		this.arguments = arguments;
+		this.arguments =
+			arguments;
 	}
 
 }

@@ -43,15 +43,19 @@ public class ClassNodeParent extends AbstractSortModeNode {
 
 	public ClassNodeParent(String descString, FSTClass fstClass, FSTModel fstMod) {
 		super(descString, fstClass.getRoles().size());
-		this.fstClass = fstClass;
-		this.fstModel = fstMod;
+		this.fstClass =
+			fstClass;
+		this.fstModel =
+			fstMod;
 
 	}
 
 	public ClassNodeParent(String descString, FSTClassFragment fstClassFrag, FSTModel fstMod) {
 		super(descString);
-		this.fstClassFrag = fstClassFrag;
-		this.fstModel = fstMod;
+		this.fstClassFrag =
+			fstClassFrag;
+		this.fstModel =
+			fstMod;
 	}
 
 	@Override

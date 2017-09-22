@@ -48,42 +48,63 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		yoffset = 0;
-		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
+		yoffset =
+			0;
+		IGraphicalFeature root =
+			FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
 		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private void layout(IGraphicalFeature root) {
-		if (root == null || root.getObject().getStructure().isHidden()) {
+		if (root == null
+			|| root.getObject().getStructure().isHidden()) {
 			return;
 		}
-		LinkedList<IGraphicalFeature> list = new LinkedList<>();
+		LinkedList<IGraphicalFeature> list =
+			new LinkedList<>();
 		list.add(root);
 
-		yoffset += FMPropertyManager.getLayoutMarginY();
-		
+		yoffset +=
+			FMPropertyManager.getLayoutMarginY();
+
 		while (!list.isEmpty()) {
-			//center the features of the level
-			int width = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
+			// center the features of the level
+			int width =
+				2
+					* FMPropertyManager.getLayoutMarginX()
+					- FMPropertyManager.getFeatureSpaceX();
 			for (IGraphicalFeature feature : list) {
-				width += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
+				width +=
+					feature.getSize().width
+						+ FMPropertyManager.getFeatureSpaceX();
 			}
 
-			int xoffset = controlWidth / 2 - width / 2;
+			int xoffset =
+				controlWidth
+					/ 2
+					- width
+						/ 2;
 
-			//set location of each feature at this level
-			int levelSize = list.size();
-			for (int i = 0; i < levelSize; i++) {
-				IGraphicalFeature feature = list.removeFirst();
+			// set location of each feature at this level
+			int levelSize =
+				list.size();
+			for (int i =
+				0; i < levelSize; i++) {
+				IGraphicalFeature feature =
+					list.removeFirst();
 				setLocation(feature, new Point(xoffset, yoffset));
-				xoffset += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
-				//add the features children
+				xoffset +=
+					feature.getSize().width
+						+ FMPropertyManager.getFeatureSpaceX();
+				// add the features children
 				list.addAll(getChildren(feature));
 			}
-			yoffset += FMPropertyManager.getFeatureSpaceY();
+			yoffset +=
+				FMPropertyManager.getFeatureSpaceY();
 		}
-		yoffset -= FMPropertyManager.getFeatureSpaceY();
+		yoffset -=
+			FMPropertyManager.getFeatureSpaceY();
 	}
 
 }

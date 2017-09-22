@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.AbstractPrepro
  * @author Timo G&uuml;nther
  */
 public abstract class MusPreprocessorExplanationCreator extends AbstractPreprocessorExplanationCreator {
+
 	@Override
 	protected MusExtractor getOracle() {
 		return (MusExtractor) super.getOracle();
@@ -39,7 +40,8 @@ public abstract class MusPreprocessorExplanationCreator extends AbstractPreproce
 
 	@Override
 	protected Object createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle =
+			SatSolverFactory.getDefault().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}

@@ -46,7 +46,8 @@ public abstract class AbstractObjectWriter<T> {
 	protected T object;
 
 	public void setObject(T object) {
-		this.object = object;
+		this.object =
+			object;
 	}
 
 	public T getObject() {
@@ -54,7 +55,8 @@ public abstract class AbstractObjectWriter<T> {
 	}
 
 	public void writeToFile(File file) {
-		try (FileOutputStream output = new FileOutputStream(file)) {
+		try (FileOutputStream output =
+			new FileOutputStream(file)) {
 			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 			output.flush();
 		} catch (IOException e) {

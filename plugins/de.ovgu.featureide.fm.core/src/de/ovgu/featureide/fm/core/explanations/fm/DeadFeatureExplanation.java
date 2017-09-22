@@ -24,33 +24,36 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * An explanation for dead features in feature models.
- * Can also be an explanation for {@link #isVoid() void feature models} in case the dead feature is the root feature.
+ * An explanation for dead features in feature models. Can also be an explanation for {@link #isVoid() void feature models} in case the dead feature is the root
+ * feature.
  * 
  * @author Timo G&uuml;nther
  */
 public class DeadFeatureExplanation extends FeatureModelExplanation {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	public DeadFeatureExplanation(IFeature subject) {
 		super(subject);
 	}
-	
+
 	@Override
 	public IFeature getSubject() {
 		return (IFeature) super.getSubject();
 	}
-	
+
 	/**
 	 * Returns true iff this explanation is for a void feature model.
+	 * 
 	 * @return true iff this explanation is for a void feature model
 	 */
 	public boolean isVoid() {
 		return FeatureUtils.isRoot(getSubject());
 	}
-	
+
 	@Override
 	public DeadFeatureExplanationWriter getWriter() {
 		return new DeadFeatureExplanationWriter(this);

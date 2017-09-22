@@ -47,32 +47,47 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 	}
 
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
+		Composite container =
+			new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout =
+			new GridLayout();
+		gridLayout.numColumns =
+			1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout = new GridLayout();
-		projGridLayout.numColumns = 2;
+		GridLayout projGridLayout =
+			new GridLayout();
+		projGridLayout.numColumns =
+			2;
 
-		Group configGroup = new Group(container, SWT.NONE);
+		Group configGroup =
+			new Group(container, SWT.NONE);
 		configGroup.setText("");
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 1;
+		GridData gridData =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan =
+			2;
+		gridData.verticalSpan =
+			1;
 
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
-		gridData2.horizontalSpan = 1;
-		gridData2.verticalSpan = 1;
+		GridData gridData2 =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData2.horizontalSpan =
+			1;
+		gridData2.verticalSpan =
+			1;
 
-		Label featureLabel = new Label(configGroup, 0);
+		Label featureLabel =
+			new Label(configGroup, 0);
 		featureLabel.setText("Name of Feature: ");
-		featureName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
-		//		featureName.setText(featureNameString);
+		featureName =
+			new Text(configGroup, SWT.BORDER
+				| SWT.SINGLE);
+		// featureName.setText(featureNameString);
 		featureName.setLayoutData(gridData2);
 		featureName.addKeyListener(new KeyPressedListener());
 	}

@@ -26,9 +26,17 @@ package de.ovgu.featureide.fm.core;
  * @author Fabian Benduhn
  */
 public class Operator {
-	public static final String[] NAMES = { "Not", "And", "Or",
-		"Implies", "Iff", "(", ")"};
-	
+
+	public static final String[] NAMES =
+		{
+			"Not",
+			"And",
+			"Or",
+			"Implies",
+			"Iff",
+			"(",
+			")" };
+
 	/**
 	 * @param name
 	 * @return true if name is operator name
@@ -40,6 +48,6 @@ public class Operator {
 				return true;
 		}
 		return false;
-	}	
-	
+	}
+
 }

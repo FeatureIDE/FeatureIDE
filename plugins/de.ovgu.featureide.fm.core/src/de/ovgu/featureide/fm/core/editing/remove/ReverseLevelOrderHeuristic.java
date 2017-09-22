@@ -26,8 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features in reverse-level-order according to the feature tree.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features in reverse-level-order according to the feature tree.
  * 
  * @author Sebastian Krieter
  */
@@ -39,11 +38,15 @@ public class ReverseLevelOrderHeuristic extends ATreeHeuristic {
 
 	@Override
 	protected void order(IFeatureStructure root) {
-		indexArrayIndex = indexArray.length - 1;
-		LinkedList<IFeatureStructure> list = new LinkedList<>();
+		indexArrayIndex =
+			indexArray.length
+				- 1;
+		LinkedList<IFeatureStructure> list =
+			new LinkedList<>();
 		list.add(root);
 		while (!list.isEmpty()) {
-			final IFeatureStructure nextFeature = list.removeFirst();
+			final IFeatureStructure nextFeature =
+				list.removeFirst();
 			list.addAll(nextFeature.getChildren());
 			find(nextFeature.getFeature());
 		}

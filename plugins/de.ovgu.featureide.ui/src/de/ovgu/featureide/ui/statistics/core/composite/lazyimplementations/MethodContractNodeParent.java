@@ -36,14 +36,17 @@ public class MethodContractNodeParent extends AbstractSortModeNode {
 
 	public MethodContractNodeParent(String discription, FSTMethod nameMethod, LinkedList<FSTMethod> allMethodsList) {
 		super(discription);
-		fstMethod = nameMethod;
-		int numberOfMethods = countMethodsWithSameName(allMethodsList);
+		fstMethod =
+			nameMethod;
+		int numberOfMethods =
+			countMethodsWithSameName(allMethodsList);
 		super.setValue(numberOfMethods);
 
 	}
 
 	private int countMethodsWithSameName(LinkedList<FSTMethod> methods) {
-		int c = 0;
+		int c =
+			0;
 		for (FSTMethod tempMethod : methods) {
 			if (tempMethod.getFullIdentifier().equals(fstMethod.getFullIdentifier())) {
 				c++;
@@ -55,7 +58,6 @@ public class MethodContractNodeParent extends AbstractSortModeNode {
 	}
 
 	@Override
-	protected void initChildren() {
-	}
+	protected void initChildren() {}
 
 }

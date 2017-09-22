@@ -34,22 +34,31 @@ import java.util.TreeSet;
  */
 public class TestResults {
 
-	final Set<String> modulTests = new HashSet<>();
-	
-	int ignored = 0;
-	int errors = 0;
-	int failures = 0;
-	int started = 0;
-	int tests = 0;
+	final Set<String> modulTests =
+		new HashSet<>();
+
+	int ignored =
+		0;
+	int errors =
+		0;
+	int failures =
+		0;
+	int started =
+		0;
+	int tests =
+		0;
 
 	final String project;
 	final String name;
 
-	Map<String, Map<String, Set<Test>>> testResults = Collections.synchronizedMap(new TreeMap<String,Map<String, Set<Test>>>());
+	Map<String, Map<String, Set<Test>>> testResults =
+		Collections.synchronizedMap(new TreeMap<String, Map<String, Set<Test>>>());
 
 	public TestResults(String project, String name) {
-		this.project = project;
-		this.name = name;
+		this.project =
+			project;
+		this.name =
+			name;
 	}
 
 	public void addTest(String klass, String configuration, Test test) {
@@ -60,16 +69,16 @@ public class TestResults {
 		if (!testResults.containsKey(klass)) {
 			testResults.put(klass, new TreeMap<String, Set<Test>>());
 		}
-		
-		Map<String, Set<Test>> klassTest = testResults.get(klass);
+
+		Map<String, Set<Test>> klassTest =
+			testResults.get(klass);
 		if (!klassTest.containsKey(configuration)) {
 			klassTest.put(configuration, new TreeSet<Test>());
 		}
-		
-		Set<Test> configurationTests = klassTest.get(configuration);
+
+		Set<Test> configurationTests =
+			klassTest.get(configuration);
 		configurationTests.add(test);
 	}
-	
+
 }
-
-

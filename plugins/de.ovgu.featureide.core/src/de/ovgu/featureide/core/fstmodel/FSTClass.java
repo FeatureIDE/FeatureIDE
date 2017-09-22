@@ -29,21 +29,24 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 /**
- * Represents a class at the {@link FSTModel}.<br>
- * Contains {@link FSTRole}s with their corresponding {@link FSTFeature}.
+ * Represents a class at the {@link FSTModel}.<br> Contains {@link FSTRole}s with their corresponding {@link FSTFeature}.
  * 
  * @author Jens Meinicke
  */
 public class FSTClass {
 
-	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
+	private final HashMap<String, FSTRole> roles =
+		new HashMap<String, FSTRole>();
 	private final String name;
 	private LinkedList<String> invariants;
-	public boolean hasComposedLines = false;
+	public boolean hasComposedLines =
+		false;
 
 	public FSTClass(String name) {
-		this.name = name;
-		invariants = new LinkedList<String>();
+		this.name =
+			name;
+		invariants =
+			new LinkedList<String>();
 	}
 
 	public String getName() {
@@ -77,9 +80,12 @@ public class FSTClass {
 	}
 
 	public List<List<FSTClassFragment>> getAllFSTFragments() {
-		final List<List<FSTClassFragment>> allFrags = new ArrayList<>();
-		final HashSet<FSTClassFragment> helper = new HashSet<>();
-		final List<FSTClassFragment> fragmentsOfThisClass = new LinkedList<>();
+		final List<List<FSTClassFragment>> allFrags =
+			new ArrayList<>();
+		final HashSet<FSTClassFragment> helper =
+			new HashSet<>();
+		final List<FSTClassFragment> fragmentsOfThisClass =
+			new LinkedList<>();
 
 		for (FSTRole currRole : getRoles()) {
 			fragmentsOfThisClass.add(currRole.getClassFragment());
@@ -93,6 +99,5 @@ public class FSTClass {
 
 		return allFrags;
 	}
-	
-}
 
+}

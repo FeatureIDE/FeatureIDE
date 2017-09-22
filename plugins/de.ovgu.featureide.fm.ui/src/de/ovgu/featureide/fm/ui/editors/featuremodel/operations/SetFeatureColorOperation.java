@@ -34,46 +34,56 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * 
  * @author Joshua Sprey
  */
-public class SetFeatureColorOperation extends AbstractFeatureModelOperation{
+public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 
 	ArrayList<FeatureColor> oldColor;
 	FeatureColor newColor;
 	ArrayList<IFeature> features;
-	
+
 	/**
 	 * @param featureModel
 	 * @param label
 	 */
 	public SetFeatureColorOperation(IFeatureModel featureModel, ArrayList<IFeature> featureListBuffer, FeatureColor newColor) {
 		super(featureModel, "Change feature color");
-		this.features = featureListBuffer;
-		this.newColor = newColor;
-		oldColor = new ArrayList<>();
-		for (int i = 0; i < featureListBuffer.size(); i++) {
+		this.features =
+			featureListBuffer;
+		this.newColor =
+			newColor;
+		oldColor =
+			new ArrayList<>();
+		for (int i =
+			0; i < featureListBuffer.size(); i++) {
 			oldColor.add(FeatureColorManager.getColor(featureListBuffer.get(i)));
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#operation()
 	 */
 	@Override
 	protected FeatureIDEEvent operation() {
-		for (int i = 0; i < features.size(); i++) {
-			final IFeature feature = features.get(i);
+		for (int i =
+			0; i < features.size(); i++) {
+			final IFeature feature =
+				features.get(i);
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		FeatureColorManager.notifyColorChange(features);
 		return new FeatureIDEEvent(features, EventType.COLOR_CHANGED);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation#inverseOperation()
 	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		for (int i = 0; i < features.size(); i++) {
-			final IFeature feature = features.get(i);
+		for (int i =
+			0; i < features.size(); i++) {
+			final IFeature feature =
+				features.get(i);
 			FeatureColorManager.setColor(feature, oldColor.get(i));
 		}
 		FeatureColorManager.notifyColorChange(features);

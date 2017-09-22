@@ -31,12 +31,15 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Fabian Benduhn
  */
 public class Legend implements IGraphicItem {
+
 	private final IGraphicalFeatureModel model;
 	private Point pos;
 
 	public Legend(IGraphicalFeatureModel model) {
-		this.model = model;
-		this.pos = model.getLayout().getLegendPos().getCopy();
+		this.model =
+			model;
+		this.pos =
+			model.getLayout().getLegendPos().getCopy();
 	}
 
 	public IGraphicalFeatureModel getModel() {
@@ -52,7 +55,8 @@ public class Legend implements IGraphicItem {
 	}
 
 	public void setPos(Point pos) {
-		this.pos = pos;
+		this.pos =
+			pos;
 		model.getLayout().setLegendPos(pos.x, pos.y);
 	}
 

@@ -42,22 +42,27 @@ public class FilterAction extends Action {
 
 	private final GraphicalViewerImpl viewer;
 	private final CollaborationView collaborationView;
-	
-	private final Set<String> classFilter = new HashSet<String>(); 
-	private final Set<String> featureFilter = new HashSet<String>();
-	
+
+	private final Set<String> classFilter =
+		new HashSet<String>();
+	private final Set<String> featureFilter =
+		new HashSet<String>();
+
 	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
-		this.collaborationView = collaborationView;
-		viewer = view;
+		this.collaborationView =
+			collaborationView;
+		viewer =
+			view;
 	}
 
 	public void setEnabled(boolean enabled) {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		IStructuredSelection selection =
+			(IStructuredSelection) viewer.getSelection();
 		super.setEnabled(false);
-		
+
 		for (Object part : selection.toList()) {
-			if (part instanceof RoleEditPart) { 
+			if (part instanceof RoleEditPart) {
 				classFilter.add(((RoleEditPart) part).getRoleModel().getClassFragment().getName());
 				super.setEnabled(true);
 			} else if (part instanceof ClassEditPart) {
@@ -68,16 +73,19 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		boolean filterDefined = CollaborationModelBuilder.isFilterDefined();
+		boolean filterDefined =
+			CollaborationModelBuilder.isFilterDefined();
 		setChecked(filterDefined);
 		if (filterDefined) {
 			super.setEnabled(true);
 		}
 	}
-	
+
 	public void run() {
-		if ((!classFilter.isEmpty() || !featureFilter.isEmpty()) &&
-				!CollaborationModelBuilder.isFilterDefined()) {
+		if ((!classFilter.isEmpty()
+			|| !featureFilter.isEmpty())
+			&&
+			!CollaborationModelBuilder.isFilterDefined()) {
 			setChecked(true);
 			CollaborationModelBuilder.setClassFilter(new HashSet<String>(classFilter));
 			CollaborationModelBuilder.setFeatureFilter(new HashSet<String>(featureFilter));

@@ -39,11 +39,11 @@ public class BuildExtendedModulesHandler extends AProjectJobHandler {
 	protected AbstractWizard instantiateWizard() {
 		return new BuildExtendedModulesWizard(FOLDER_OF_EXTENDED_MODULES, "ExtendedModules");
 	}
-	
+
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildExtendedModules(projects, 
+		MPLPlugin.getDefault().buildExtendedModules(projects,
 				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
-	
+
 }

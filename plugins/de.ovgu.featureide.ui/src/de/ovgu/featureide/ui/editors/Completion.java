@@ -74,98 +74,141 @@ public class Completion implements IJavaCompletionProposalComputer {
 	}
 
 	@Override
-	public void sessionStarted() {
-	}
+	public void sessionStarted() {}
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
 
-		JavaContentAssistInvocationContext context = null;
+		JavaContentAssistInvocationContext context =
+			null;
 		if (arg0 instanceof JavaContentAssistInvocationContext) {
-			context = (JavaContentAssistInvocationContext) arg0;
+			context =
+				(JavaContentAssistInvocationContext) arg0;
 		}
 
-		final IFile file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		final IFile file =
+			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+		final IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(file);
 
-		if (context == null || featureProject == null || featureProject.getProjectSignatures() == null) {
+		if (context == null
+			|| featureProject == null
+			|| featureProject.getProjectSignatures() == null) {
 			return Collections.emptyList();
 		}
 
-		String featureName = featureProject.getFeatureName(file);
+		String featureName =
+			featureProject.getFeatureName(file);
 
-		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
-		String prefix = "";
+		final ArrayList<ICompletionProposal> list =
+			new ArrayList<ICompletionProposal>();
+		String prefix =
+			"";
 		try {
-			prefix = ((JavaContentAssistInvocationContext) arg0).computeIdentifierPrefix().toString();
+			prefix =
+				((JavaContentAssistInvocationContext) arg0).computeIdentifierPrefix().toString();
 		} catch (BadLocationException e1) {
 			e1.printStackTrace();
 		}
 
-		List<CompletionProposal> completionProp = CorePlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
+		List<CompletionProposal> completionProp =
+			CorePlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
 
 		for (CompletionProposal curProp : completionProp) {
-			curProp.setReplaceRange(context.getInvocationOffset() - context.getCoreContext().getToken().length, context.getInvocationOffset());
+			curProp.setReplaceRange(context.getInvocationOffset()
+				- context.getCoreContext().getToken().length, context.getInvocationOffset());
 
 			if (curProp.getKind() == CompletionProposal.TYPE_REF) {
-				LazyJavaCompletionProposal prsss = new LazyJavaCompletionProposal(curProp, context);
+				LazyJavaCompletionProposal prsss =
+					new LazyJavaCompletionProposal(curProp, context);
 
 				prsss.setStyledDisplayString(new StyledString(new String(curProp.getCompletion())));
 				prsss.setReplacementString(new String(curProp.getCompletion()));
-				if (prefix.length() >= 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if (prefix.length() >= 0
+					&& new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(prsss);
 				}
 			} else if (curProp.getKind() == CompletionProposal.METHOD_REF) {
-				LazyJavaCompletionProposal meth = new LazyJavaCompletionProposal(curProp, context);
+				LazyJavaCompletionProposal meth =
+					new LazyJavaCompletionProposal(curProp, context);
 
-				String displayString = new String(curProp.getCompletion());
-				displayString = displayString.concat("(");
-				int paramNr = 0;
+				String displayString =
+					new String(curProp.getCompletion());
+				displayString =
+					displayString.concat("(");
+				int paramNr =
+					0;
 				try {
-					paramNr = Signature.getParameterCount(curProp.getSignature());
+					paramNr =
+						Signature.getParameterCount(curProp.getSignature());
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				}
 
-				for (int i = 0; i < paramNr; i++) {
-					String paramName = new String(Signature.getParameterTypes(curProp.getSignature())[i]);
-					paramName = normalize(paramName);
-					displayString = displayString.concat(paramName + " arg" + i);
-					if (i + 1 < paramNr) {
-						displayString = displayString.concat(", ");
+				for (int i =
+					0; i < paramNr; i++) {
+					String paramName =
+						new String(Signature.getParameterTypes(curProp.getSignature())[i]);
+					paramName =
+						normalize(paramName);
+					displayString =
+						displayString.concat(paramName
+							+ " arg"
+							+ i);
+					if (i
+						+ 1 < paramNr) {
+						displayString =
+							displayString.concat(", ");
 					}
 				}
-				displayString = displayString.concat(") : ");
+				displayString =
+					displayString.concat(") : ");
 
-				displayString = displayString.concat(normalize(new String(Signature.getReturnType(curProp.getSignature()))));
+				displayString =
+					displayString.concat(normalize(new String(Signature.getReturnType(curProp.getSignature()))));
 
-				StyledString methString = new StyledString(displayString);
-				Styler styler = StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+				StyledString methString =
+					new StyledString(displayString);
+				Styler styler =
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
 				// TextStyle style = new
 				// TextStyle(JFaceResources.getDefaultFont(),JFaceResources.getResources().createColor(new
 				// RGB(10, 10,
 				// 10)),JFaceResources.getResources().createColor(new
 				// RGB(0,0,0)));
 				// styler.applyStyles(style);
-				StyledString infoString = new StyledString(new String(" - " + normalize(new String(curProp.getDeclarationSignature())) + " " + featureName), styler);
+				StyledString infoString =
+					new StyledString(new String(" - "
+						+ normalize(new String(curProp.getDeclarationSignature()))
+						+ " "
+						+ featureName), styler);
 				methString.append(infoString);
 				meth.setStyledDisplayString(methString);
 
 				meth.setReplacementString(new String(curProp.getCompletion()));
 
-				if (prefix.length() >= 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if (prefix.length() >= 0
+					&& new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(meth);
 				}
 			} else if (curProp.getKind() == CompletionProposal.FIELD_REF) {
-				LazyJavaCompletionProposal field = new LazyJavaCompletionProposal(curProp, context);
-				StyledString fieldString = new StyledString(new String(curProp.getCompletion()));
-				Styler styler = StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
-				StyledString infoString = new StyledString(new String(" - " + new String(curProp.getName()) + " " + featureName), styler);
+				LazyJavaCompletionProposal field =
+					new LazyJavaCompletionProposal(curProp, context);
+				StyledString fieldString =
+					new StyledString(new String(curProp.getCompletion()));
+				Styler styler =
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+				StyledString infoString =
+					new StyledString(new String(" - "
+						+ new String(curProp.getName())
+						+ " "
+						+ featureName), styler);
 				fieldString.append(infoString);
 				field.setStyledDisplayString(fieldString);
 
 				field.setReplacementString(new String(curProp.getCompletion()));
-				if (prefix.length() > 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if (prefix.length() > 0
+					&& new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(field);
 				}
 			}
@@ -174,11 +217,15 @@ public class Completion implements IJavaCompletionProposalComputer {
 	}
 
 	private String normalize(String paramName) {
-		int firstIDX = paramName.lastIndexOf('.');
+		int firstIDX =
+			paramName.lastIndexOf('.');
 		if (firstIDX <= 0) {
-			firstIDX = 1;
+			firstIDX =
+				1;
 		}
-		paramName = paramName.substring(firstIDX, paramName.length() - 1);
+		paramName =
+			paramName.substring(firstIDX, paramName.length()
+				- 1);
 		return paramName;
 	}
 }

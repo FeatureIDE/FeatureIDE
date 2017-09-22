@@ -24,21 +24,28 @@ import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionProcessor {
+
 	private String sourceOutRefactor;
-	private TextSelection textSelection = null;
-	private IFile file = null;
+	private TextSelection textSelection =
+		null;
+	private IFile file =
+		null;
 	private StubsHeader stubsHeader;
 	// List of change perform on the code
-	protected List<Change> changes = new LinkedList<Change>();
+	protected List<Change> changes =
+		new LinkedList<Change>();
 
 	public void selectToFile(IFile file, TextSelection textSelection,
 			RefactoringType refactoringType) throws IOException,
 			LexerException, OptionException, RefactorException {
 
-		this.textSelection = textSelection;
-		this.file = file;
+		this.textSelection =
+			textSelection;
+		this.file =
+			file;
 
-		stubsHeader = new StubsHeader();
+		stubsHeader =
+			new StubsHeader();
 
 		try {
 			stubsHeader.setProject(file.getProject().getName());
@@ -48,11 +55,13 @@ public class RefactorSelectionProcessor {
 			throw new RefactorException();
 		}
 
-		RefactoringFrontend refactoring = new RefactoringFrontend();
+		RefactoringFrontend refactoring =
+			new RefactoringFrontend();
 
-		this.sourceOutRefactor = refactoring.refactorCode(
-				textSelection.getText(), stubsHeader.getIncludePath(),
-				refactoringType);
+		this.sourceOutRefactor =
+			refactoring.refactorCode(
+					textSelection.getText(), stubsHeader.getIncludePath(),
+					refactoringType);
 
 		this.removeStubs();
 
@@ -64,12 +73,14 @@ public class RefactorSelectionProcessor {
 
 	public List<Change> process(IProgressMonitor monitor) throws IOException {
 
-		MultiTextEdit edit = new MultiTextEdit();
+		MultiTextEdit edit =
+			new MultiTextEdit();
 
 		edit.addChild(new ReplaceEdit(textSelection.getOffset(), textSelection
 				.getLength(), sourceOutRefactor));
 
-		TextFileChange change = new TextFileChange(file.getName(), file);
+		TextFileChange change =
+			new TextFileChange(file.getName(), file);
 
 		change.setTextType("c");
 		change.setEdit(edit);
@@ -80,18 +91,26 @@ public class RefactorSelectionProcessor {
 
 	public void removeStubs() throws IOException {
 
-		Collection<String> collection = stubsHeader.getIncludes();
+		Collection<String> collection =
+			stubsHeader.getIncludes();
 
-		for (Iterator<String> iterator = collection.iterator(); iterator
-				.hasNext();) {
-			BufferedReader br = new BufferedReader(new FileReader(
-					iterator.next()));
+		for (Iterator<String> iterator =
+			collection.iterator(); iterator
+					.hasNext();) {
+			BufferedReader br =
+				new BufferedReader(new FileReader(
+						iterator.next()));
 			try {
-				String line = br.readLine();
-				while (line != null && line.contains("typedef")) {
-					sourceOutRefactor = sourceOutRefactor.replace(line + "\n",
-							"");
-					line = br.readLine();
+				String line =
+					br.readLine();
+				while (line != null
+					&& line.contains("typedef")) {
+					sourceOutRefactor =
+						sourceOutRefactor.replace(line
+							+ "\n",
+								"");
+					line =
+						br.readLine();
 				}
 			} finally {
 				br.close();

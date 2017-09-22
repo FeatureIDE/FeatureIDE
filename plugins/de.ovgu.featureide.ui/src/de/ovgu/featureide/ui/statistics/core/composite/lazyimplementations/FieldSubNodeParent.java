@@ -34,7 +34,8 @@ public class FieldSubNodeParent extends Parent {
 
 	public FieldSubNodeParent(String descString, FSTField field) {
 		super(descString.replace(":", ""));
-		this.field = field;
+		this.field =
+			field;
 	}
 
 	public FSTField getField() {

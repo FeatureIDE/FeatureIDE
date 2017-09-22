@@ -32,49 +32,85 @@ import de.ovgu.featureide.munge.MungeFMComposerExtension;
  * @author Jens Meinicke
  */
 public class TMungeFMComposerExtension {
-	private MungeFMComposerExtension fmComposerExtension = new MungeFMComposerExtension();
-	
-	private static final String OLD_NAME = "Hello"; 
-	private static final String NEW_NAME = "NewFeature";
-	
-	private static final String OLD_FILE_CONTENT = 
-		"public class Main {\r\n" +
-		"\r\n" +
-		"public static void main(String[] args){\r\n" +
-		"	/*if[Hello]*/\r\n" +
-		"	System.out.print(\"Hello\");\r\n" +
-		"	/*end[Hello]*/\r\n" +
-		"	/*if[Beautiful]*/	\r\n" +
-		"	System.out.print(\" beautiful\");\r\n" +
-		"	/*end[Beautiful]*/\r\n" +
-		"	/*if[Wonderful]*/	\r\n" +
-		"	System.out.print(\" wonderful\");\r\n" +	
-		"	/*end[Wonderful]*/\r\n" +
-		"	/*if[World]*/		\r\n" +
-		"	System.out.print(\" world!\");\r\n" +
-		"	/*end[World]*/\r\n" +
-		"	}\r\n" +
-		"}";
-	
-	private static final String NEW_FILE_CONTENT = 
-		"public class Main {\r\n" +
-		"\r\n" +
-		"public static void main(String[] args){\r\n" +
-		"	/*if[NewFeature]*/\r\n" +
-		"	System.out.print(\"Hello\");\r\n" +
-		"	/*end[NewFeature]*/\r\n" +
-		"	/*if[Beautiful]*/	\r\n" +
-		"	System.out.print(\" beautiful\");\r\n" +
-		"	/*end[Beautiful]*/\r\n" +
-		"	/*if[Wonderful]*/	\r\n" +
-		"	System.out.print(\" wonderful\");\r\n" +	
-		"	/*end[Wonderful]*/\r\n" +
-		"	/*if[World]*/		\r\n" +
-		"	System.out.print(\" world!\");\r\n" +
-		"	/*end[World]*/\r\n" +
-		"	}\r\n" +
-		"}";
-	
+
+	private MungeFMComposerExtension fmComposerExtension =
+		new MungeFMComposerExtension();
+
+	private static final String OLD_NAME =
+		"Hello";
+	private static final String NEW_NAME =
+		"NewFeature";
+
+	private static final String OLD_FILE_CONTENT =
+		"public class Main {\r\n"
+			+
+			"\r\n"
+			+
+			"public static void main(String[] args){\r\n"
+			+
+			"	/*if[Hello]*/\r\n"
+			+
+			"	System.out.print(\"Hello\");\r\n"
+			+
+			"	/*end[Hello]*/\r\n"
+			+
+			"	/*if[Beautiful]*/	\r\n"
+			+
+			"	System.out.print(\" beautiful\");\r\n"
+			+
+			"	/*end[Beautiful]*/\r\n"
+			+
+			"	/*if[Wonderful]*/	\r\n"
+			+
+			"	System.out.print(\" wonderful\");\r\n"
+			+
+			"	/*end[Wonderful]*/\r\n"
+			+
+			"	/*if[World]*/		\r\n"
+			+
+			"	System.out.print(\" world!\");\r\n"
+			+
+			"	/*end[World]*/\r\n"
+			+
+			"	}\r\n"
+			+
+			"}";
+
+	private static final String NEW_FILE_CONTENT =
+		"public class Main {\r\n"
+			+
+			"\r\n"
+			+
+			"public static void main(String[] args){\r\n"
+			+
+			"	/*if[NewFeature]*/\r\n"
+			+
+			"	System.out.print(\"Hello\");\r\n"
+			+
+			"	/*end[NewFeature]*/\r\n"
+			+
+			"	/*if[Beautiful]*/	\r\n"
+			+
+			"	System.out.print(\" beautiful\");\r\n"
+			+
+			"	/*end[Beautiful]*/\r\n"
+			+
+			"	/*if[Wonderful]*/	\r\n"
+			+
+			"	System.out.print(\" wonderful\");\r\n"
+			+
+			"	/*end[Wonderful]*/\r\n"
+			+
+			"	/*if[World]*/		\r\n"
+			+
+			"	System.out.print(\" world!\");\r\n"
+			+
+			"	/*end[World]*/\r\n"
+			+
+			"	}\r\n"
+			+
+			"}";
+
 	@Test
 	public void performRenamingsTest_1() {
 		assertEquals(fmComposerExtension.performRenamings(OLD_NAME, NEW_NAME, OLD_FILE_CONTENT), NEW_FILE_CONTENT);

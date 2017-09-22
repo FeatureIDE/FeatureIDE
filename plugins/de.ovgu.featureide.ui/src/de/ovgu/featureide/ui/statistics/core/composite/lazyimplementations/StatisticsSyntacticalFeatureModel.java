@@ -40,27 +40,35 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 
-	private static final double precision = 1000.0;
+	private static final double precision =
+		1000.0;
 
 	private final IFeatureModel model;
 
 	public StatisticsSyntacticalFeatureModel(String description, IFeatureModel model) {
 		super(description, null);
-		this.model = model;
+		this.model =
+			model;
 	}
 
 	@Override
 	protected void initChildren() {
 		if (model != null) {
 
-			final int constraints = model.getConstraintCount();
+			final int constraints =
+				model.getConstraintCount();
 
-			final Collection<IFeature> listOfFeatures = Functional.toList(model.getFeatures());
+			final Collection<IFeature> listOfFeatures =
+				Functional.toList(model.getFeatures());
 
-			final List<IFeature> listOfCompoundFeatures = new ArrayList<IFeature>();
-			final List<IFeature> listOfPrimitiveFeatures = new ArrayList<IFeature>();
-			final List<IFeature> listOfAbstractFeatures = new ArrayList<IFeature>();
-			final List<IFeature> listOfConcreteFeatures = new ArrayList<IFeature>();
+			final List<IFeature> listOfCompoundFeatures =
+				new ArrayList<IFeature>();
+			final List<IFeature> listOfPrimitiveFeatures =
+				new ArrayList<IFeature>();
+			final List<IFeature> listOfAbstractFeatures =
+				new ArrayList<IFeature>();
+			final List<IFeature> listOfConcreteFeatures =
+				new ArrayList<IFeature>();
 
 			for (IFeature f : listOfFeatures) {
 				if (f.getStructure().getChildren().isEmpty()) {
@@ -75,7 +83,8 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 				}
 			}
 
-			final HashSet<IFeature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
+			final HashSet<IFeature> constraintFeatures =
+				new HashSet<>(model.getNumberOfFeatures() << 1);
 			for (IConstraint constraint : model.getConstraints()) {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
@@ -96,7 +105,10 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 
 			addChild(new Parent(NUMBER_CONSTRAINT_FEATURES, constraintFeatures.size()));
 
-			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision * constraintFeatures.size()) / model.getNumberOfFeatures()) / precision));
+			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision
+				* constraintFeatures.size())
+				/ model.getNumberOfFeatures())
+				/ precision));
 
 		}
 	}

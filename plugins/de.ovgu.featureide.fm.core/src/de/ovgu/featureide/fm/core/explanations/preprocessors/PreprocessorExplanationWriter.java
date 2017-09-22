@@ -32,20 +32,23 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public abstract class PreprocessorExplanationWriter extends FeatureModelExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform
 	 */
 	public PreprocessorExplanationWriter(PreprocessorExplanation explanation) {
 		super(explanation);
 	}
-	
+
 	@Override
 	protected String getConcreteReasonString(Reason reason) {
 		if (!(reason instanceof PreprocessorReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final Node expression = ((PreprocessorReason) reason).getExpression();
+		final Node expression =
+			((PreprocessorReason) reason).getExpression();
 		return String.format("%s is an expression.", expression.toString(getSymbols()));
 	}
 }

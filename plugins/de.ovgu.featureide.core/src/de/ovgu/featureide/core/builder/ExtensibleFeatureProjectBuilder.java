@@ -44,9 +44,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
- * A general builder used to build every <code>FeatureProject</code>. Using an
- * extension point the real composition algorithm is given, that builds the
- * compiled files.
+ * A general builder used to build every <code>FeatureProject</code>. Using an extension point the real composition algorithm is given, that builds the compiled
+ * files.
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
@@ -54,29 +53,37 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
-	public static final String COMPOSER_KEY = "composer";
+	public static final String BUILDER_ID =
+		CorePlugin.PLUGIN_ID
+			+ ".extensibleFeatureProjectBuilder";
+	public static final String COMPOSER_KEY =
+		"composer";
 
 	private IFeatureProject featureProject;
 	private IComposerExtensionClass composerExtension;
 
 	private boolean featureProjectLoaded() {
-		if (featureProject != null && composerExtension != null)
+		if (featureProject != null
+			&& composerExtension != null)
 			return true;
 
 		if (getProject() == null) {
 			CorePlugin.getDefault().logWarning(UNABLE_TO_GET_PROJECT_);
 			return false;
 		}
-		featureProject = CorePlugin.getFeatureProject(getProject());
+		featureProject =
+			CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
 
 			return false;
 		}
 
-		final IStatus status = CorePlugin.getDefault().isComposable(getProject());
-		
-		if (!status.isOK() || (composerExtension = featureProject.getComposer()) == null) {
+		final IStatus status =
+			CorePlugin.getDefault().isComposable(getProject());
+
+		if (!status.isOK()
+			|| (composerExtension =
+				featureProject.getComposer()) == null) {
 			CorePlugin.getDefault().logWarning(NO_COMPOSITION_TOOL_FOUND_);
 			featureProject.createBuilderMarker(featureProject.getProject(), status.getMessage(), 0, IMarker.SEVERITY_ERROR);
 			return false;
@@ -84,50 +91,63 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		return true;
 	}
 
-	private boolean cleanBuild = false;
+	private boolean cleanBuild =
+		false;
 
-	private boolean cleaned = false;
+	private boolean cleaned =
+		false;
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		if (!featureProjectLoaded())
 			return;
 
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(), IResource.DEPTH_INFINITE);
-		IProject project = featureProject.getProject();
+		IProject project =
+			featureProject.getProject();
 		if (!composerExtension.clean()) {
-			cleaned = false;
+			cleaned =
+				false;
 
 			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			return;
 		}
-		boolean hasOtherNature = true;
-		if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
-			hasOtherNature = false;
+		boolean hasOtherNature =
+			true;
+		if (project.getDescription().getNatureIds().length == 1
+			&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
+			hasOtherNature =
+				false;
 		}
 
-		IFolder buildFolder = featureProject.getBuildFolder();
+		IFolder buildFolder =
+			featureProject.getBuildFolder();
 		if (buildFolder != null) {
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
-		IFolder binFolder = featureProject.getBinFolder();
+		IFolder binFolder =
+			featureProject.getBinFolder();
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists()) {
+			if (binFolder != null
+				&& binFolder.exists()) {
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 		}
 
 		if (cleanBuild) {
-			IFile configFile = featureProject.getCurrentConfiguration();
+			IFile configFile =
+				featureProject.getCurrentConfiguration();
 			if (configFile == null) {
 				return;
 			}
 		} else {
-			cleaned = true;
+			cleaned =
+				true;
 		}
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists())
+			if (binFolder != null
+				&& binFolder.exists())
 				for (IResource member : binFolder.members())
-					member.delete(true, monitor);
+				member.delete(true, monitor);
 		}
 		for (IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
@@ -135,10 +155,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists())
+			if (binFolder != null
+				&& binFolder.exists())
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
-		cleanBuild = false;
+		cleanBuild =
+			false;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -147,18 +169,23 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (!featureProjectLoaded())
 			return null;
 
-		if (!featureProject.buildRelevantChanges() && !cleaned && kind == AUTO_BUILD)
+		if (!featureProject.buildRelevantChanges()
+			&& !cleaned
+			&& kind == AUTO_BUILD)
 			return null;
 
-		cleaned = false;
-		IFile configFile = featureProject.getCurrentConfiguration();
+		cleaned =
+			false;
+		IFile configFile =
+			featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
 
 		try {
 			for (IResource res : featureProject.getConfigFolder().members())
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
-			cleanBuild = true;
+			cleanBuild =
+				true;
 			clean(monitor);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -167,8 +194,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (configFile == null) {
 			return null;
 		}
-		IFeatureModel featureModel = featureProject.getFeatureModel();
-		if (featureModel == null || featureModel.getStructure().getRoot() == null) {
+		IFeatureModel featureModel =
+			featureProject.getFeatureModel();
+		if (featureModel == null
+			|| featureModel.getStructure().getRoot() == null) {
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
@@ -180,7 +209,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		Configuration c = new Configuration(featureModel);
+		Configuration c =
+			new Configuration(featureModel);
 		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
 		composerExtension.copyNotComposedFiles(c, null);
 		try {

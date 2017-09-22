@@ -45,8 +45,7 @@ public interface IFeatureModelEditorPage extends IEventListener {
 	int getIndex();
 
 	/**
-	 * @param the
-	 *            index of this page.
+	 * @param the index of this page.
 	 */
 	void setIndex(int index);
 
@@ -61,8 +60,7 @@ public interface IFeatureModelEditorPage extends IEventListener {
 	void initEditor();
 
 	/**
-	 * @param the
-	 *            feature model editor containing the page.
+	 * @param the feature model editor containing the page.
 	 */
 	void setFeatureModelEditor(FeatureModelEditor featureModelEditor);
 

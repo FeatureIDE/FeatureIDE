@@ -25,23 +25,27 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
- * This simple rule is used to prevent a concurrent write and read access of different jobs.
- * In our case, we use the rule to prevent a read access to the model file while the model file is written.
+ * This simple rule is used to prevent a concurrent write and read access of different jobs. In our case, we use the rule to prevent a read access to the model
+ * file while the model file is written.
  * 
  * @author Reimar Schroeter
  */
 public class ModelScheduleRule implements ISchedulingRule {
-	public static ModelScheduleRule RULE = new ModelScheduleRule();
+
+	public static ModelScheduleRule RULE =
+		new ModelScheduleRule();
 
 	public boolean isConflicting(ISchedulingRule rule) {
-		if (rule instanceof IProject || rule instanceof IFolder) {
+		if (rule instanceof IProject
+			|| rule instanceof IFolder) {
 			return true;
 		}
 		return rule == this;
 	}
 
 	public boolean contains(ISchedulingRule rule) {
-		if (rule instanceof IProject || rule instanceof IFolder) {
+		if (rule instanceof IProject
+			|| rule instanceof IFolder) {
 			return true;
 		}
 		return rule == this;

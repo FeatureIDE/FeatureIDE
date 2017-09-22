@@ -35,20 +35,39 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
-		result = prime * result + ((comments == null) ? 0 : comments.hashCode());
-		result = prime * result + (featureOrderInXML ? 1231 : 1237);
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			prime
+				* result
+				+ ((annotations == null)
+					? 0
+					: annotations.hashCode());
+		result =
+			prime
+				* result
+				+ ((comments == null)
+					? 0
+					: comments.hashCode());
+		result =
+			prime
+				* result
+				+ (featureOrderInXML
+					? 1231
+					: 1237);
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -59,7 +78,8 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FeatureModelProperty other = (FeatureModelProperty) obj;
+		FeatureModelProperty other =
+			(FeatureModelProperty) obj;
 		if (annotations == null) {
 			if (other.annotations != null)
 				return false;
@@ -73,7 +93,7 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 		if (correspondingFeatureModel == null) {
 			if (other.correspondingFeatureModel != null)
 				return false;
-		} 
+		}
 //		else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
 //			return false;
 		if (featureOrderInXML != other.featureOrderInXML)
@@ -82,14 +102,12 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	/**
-	 * Saves the annotations from the model file as they were read,
-	 * because they were not yet used.
+	 * Saves the annotations from the model file as they were read, because they were not yet used.
 	 */
 	protected final List<String> annotations;
 
 	/**
-	 * All comment lines from the model file without line number at which they
-	 * occur
+	 * All comment lines from the model file without line number at which they occur
 	 */
 	protected final List<String> comments;
 
@@ -98,21 +116,31 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	protected boolean featureOrderInXML;
 
 	protected FeatureModelProperty(FeatureModelProperty oldProperty, IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldProperty.correspondingFeatureModel;
+		this.correspondingFeatureModel =
+			correspondingFeatureModel != null
+				? correspondingFeatureModel
+				: oldProperty.correspondingFeatureModel;
 
-		featureOrderInXML = oldProperty.featureOrderInXML;
+		featureOrderInXML =
+			oldProperty.featureOrderInXML;
 
-		comments = new LinkedList<>(oldProperty.comments);
-		annotations = new LinkedList<>(oldProperty.annotations);
+		comments =
+			new LinkedList<>(oldProperty.comments);
+		annotations =
+			new LinkedList<>(oldProperty.annotations);
 	}
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel;
+		this.correspondingFeatureModel =
+			correspondingFeatureModel;
 
-		featureOrderInXML = false;
+		featureOrderInXML =
+			false;
 
-		comments = new LinkedList<>();
-		annotations = new LinkedList<>();
+		comments =
+			new LinkedList<>();
+		annotations =
+			new LinkedList<>();
 	}
 
 	@Override
@@ -153,14 +181,16 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 
 	@Override
 	public void reset() {
-		featureOrderInXML = false;
+		featureOrderInXML =
+			false;
 		comments.clear();
 		annotations.clear();
 	}
 
 	@Override
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		this.featureOrderInXML = featureOrderInXML;
+		this.featureOrderInXML =
+			featureOrderInXML;
 	}
 
 }

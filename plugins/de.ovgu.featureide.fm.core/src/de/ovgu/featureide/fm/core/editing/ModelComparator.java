@@ -40,8 +40,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
- * Compares two feature models based on a satisfiability solver. The result is a
- * classification of the edit that transforms one model into the second model.
+ * Compares two feature models based on a satisfiability solver. The result is a classification of the edit that transforms one model into the second model.
  * 
  * @author Thomas Thuem
  */
@@ -53,7 +52,8 @@ public class ModelComparator {
 		WithoutIdenticalRules, SingleTesting, SingleTestingAborted
 	};
 
-	private Set<Strategy> strategy = new HashSet<Strategy>();
+	private Set<Strategy> strategy =
+		new HashSet<Strategy>();
 
 	private IFeatureModel oldModel;
 
@@ -86,7 +86,8 @@ public class ModelComparator {
 	}
 
 	public ModelComparator(long timeout, int strategyIndex) {
-		this.timeout = timeout;
+		this.timeout =
+			timeout;
 		if (strategyIndex > 0)
 			strategy.add(Strategy.WithoutIdenticalRules);
 		if (strategyIndex > 1)
@@ -96,77 +97,109 @@ public class ModelComparator {
 	}
 
 	public Comparison compare(IFeatureModel oldModel, IFeatureModel newModel) {
-		this.oldModel = oldModel;
-		this.newModel = newModel;
+		this.oldModel =
+			oldModel;
+		this.newModel =
+			newModel;
 		try {
-			addedFeatures = calculateAddedFeatures(oldModel, newModel);
-			deletedFeatures = calculateAddedFeatures(newModel, oldModel);
-			
-			Map<Object, Node> oldMap = NodeCreator
-					.calculateReplacingMap(oldModel);
-			Map<Object, Node> newMap = NodeCreator
-					.calculateReplacingMap(newModel);
+			addedFeatures =
+				calculateAddedFeatures(oldModel, newModel);
+			deletedFeatures =
+				calculateAddedFeatures(newModel, oldModel);
+
+			Map<Object, Node> oldMap =
+				NodeCreator
+						.calculateReplacingMap(oldModel);
+			Map<Object, Node> newMap =
+				NodeCreator
+						.calculateReplacingMap(newModel);
 			optimizeReplacingMaps(oldMap, newMap);
 
-			oldRoot = NodeCreator.createNodes(oldModel, oldMap);
-			newRoot = NodeCreator.createNodes(newModel, newMap);
+			oldRoot =
+				NodeCreator.createNodes(oldModel, oldMap);
+			newRoot =
+				NodeCreator.createNodes(newModel, newMap);
 
-			oldRoot = createFalseStatementForConcreteVariables(addedFeatures,
-					oldRoot);
-			newRoot = createFalseStatementForConcreteVariables(deletedFeatures,
-					newRoot);
+			oldRoot =
+				createFalseStatementForConcreteVariables(addedFeatures,
+						oldRoot);
+			newRoot =
+				createFalseStatementForConcreteVariables(deletedFeatures,
+						newRoot);
 
-			oldRootUpdated = removeIdenticalNodes(oldRoot, newRoot);
-			newRootUpdated = removeIdenticalNodes(newRoot, oldRoot);
+			oldRootUpdated =
+				removeIdenticalNodes(oldRoot, newRoot);
+			newRootUpdated =
+				removeIdenticalNodes(newRoot, oldRoot);
 
-			removedProducts = new ExampleCalculator(oldModel, timeout);
-			implies = implies(oldRoot, newRootUpdated, removedProducts);
+			removedProducts =
+				new ExampleCalculator(oldModel, timeout);
+			implies =
+				implies(oldRoot, newRootUpdated, removedProducts);
 
-			addedProducts = new ExampleCalculator(newModel, timeout);
-			isImplied = implies(newRoot, oldRootUpdated, addedProducts);
+			addedProducts =
+				new ExampleCalculator(newModel, timeout);
+			isImplied =
+				implies(newRoot, oldRootUpdated, addedProducts);
 
 			if (implies)
 				if (isImplied)
-					result = Comparison.REFACTORING;
+					result =
+						Comparison.REFACTORING;
 				else
-					result = Comparison.GENERALIZATION;
+					result =
+						Comparison.GENERALIZATION;
 			else if (isImplied)
-				result = Comparison.SPECIALIZATION;
+				result =
+					Comparison.SPECIALIZATION;
 			else
-				result = Comparison.ARBITRARY;
+				result =
+					Comparison.ARBITRARY;
 		} catch (OutOfMemoryError e) {
-			result = Comparison.OUTOFMEMORY;
+			result =
+				Comparison.OUTOFMEMORY;
 		} catch (TimeoutException e) {
-			result = Comparison.TIMEOUT;
+			result =
+				Comparison.TIMEOUT;
 		} catch (Exception e) {
 			Logger.logError(e);
-			result = Comparison.ERROR;
+			result =
+				Comparison.ERROR;
 		}
 		return result;
 	}
 
 	private Set<String> calculateAddedFeatures(IFeatureModel oldModel,
 			IFeatureModel newModel) {
-		Set<String> addedFeatures = new HashSet<String>();
+		Set<String> addedFeatures =
+			new HashSet<String>();
 		for (IFeature feature : newModel.getFeatures())
 			if (feature.getStructure().isConcrete()) {
-				String name = newModel.getRenamingsManager().getOldName(feature.getName());
-				IFeature associatedFeature = oldModel.getFeature(oldModel
-						.getRenamingsManager().getNewName(name));
-				if (associatedFeature == null || associatedFeature.getStructure().isAbstract())
+				String name =
+					newModel.getRenamingsManager().getOldName(feature.getName());
+				IFeature associatedFeature =
+					oldModel.getFeature(oldModel
+							.getRenamingsManager().getNewName(name));
+				if (associatedFeature == null
+					|| associatedFeature.getStructure().isAbstract())
 					addedFeatures.add(name);
 			}
 		return addedFeatures;
 	}
 
 	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
-		List<Object> toBeRemoved = new LinkedList<Object>();
+		List<Object> toBeRemoved =
+			new LinkedList<Object>();
 		for (Entry<Object, Node> entry : oldMap.entrySet()) {
-			Object var = entry.getKey();
+			Object var =
+				entry.getKey();
 			if (newMap.containsKey(var)) {
-				Node oldRepl = entry.getValue();
-				Node newRepl = newMap.get(var);
-				if (oldRepl != null && oldRepl.equals(newRepl))
+				Node oldRepl =
+					entry.getValue();
+				Node newRepl =
+					newMap.get(var);
+				if (oldRepl != null
+					&& oldRepl.equals(newRepl))
 					toBeRemoved.add(var);
 			}
 		}
@@ -180,7 +213,8 @@ public class ModelComparator {
 			Set<String> addedFeatures, Node node) {
 		if (addedFeatures.isEmpty())
 			return node;
-		LinkedList<Node> children = new LinkedList<Node>();
+		LinkedList<Node> children =
+			new LinkedList<Node>();
 		for (Object var : addedFeatures)
 			children.add(new Literal(var, false));
 		return new And(node, new And(children));
@@ -189,20 +223,21 @@ public class ModelComparator {
 	/**
 	 * Removes all child nodes that are contained in the reference node.
 	 * 
-	 * @param node
-	 *            the node to copy and remove from
-	 * @param referenceNode
-	 *            node that specifies what do remove
+	 * @param node the node to copy and remove from
+	 * @param referenceNode node that specifies what do remove
 	 * @return a copy of the node where some child nodes are not existent
 	 */
 	private Node removeIdenticalNodes(Node node, Node referenceNode) {
 		if (!strategy.contains(Strategy.WithoutIdenticalRules))
 			return node;
-		LinkedList<Node> updatedNodes = new LinkedList<Node>();
+		LinkedList<Node> updatedNodes =
+			new LinkedList<Node>();
 		for (Node child : node.getChildren())
 			if (!containedIn(child, referenceNode.getChildren()))
 				updatedNodes.add(child);
-		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
+		return updatedNodes.isEmpty()
+			? null
+			: new And(updatedNodes);
 	}
 
 	public boolean implies(Node a, Node b, ExampleCalculator example)
@@ -211,8 +246,10 @@ public class ModelComparator {
 			return true;
 
 		if (!strategy.contains(Strategy.SingleTesting)) {
-			Node node = new And(a.clone(), new Not(b.clone()));
-			SatSolver solver = new SatSolver(node, timeout);
+			Node node =
+				new And(a.clone(), new Not(b.clone()));
+			SatSolver solver =
+				new SatSolver(node, timeout);
 			return !solver.isSatisfiable();
 		}
 
@@ -231,8 +268,10 @@ public class ModelComparator {
 
 	public Configuration calculateExample(boolean added)
 			throws TimeoutException {
-		return added ? addedProducts.nextExample() : removedProducts
-				.nextExample();
+		return added
+			? addedProducts.nextExample()
+			: removedProducts
+					.nextExample();
 	}
 
 	public Set<Strategy> getStrategy() {
@@ -275,7 +314,7 @@ public class ModelComparator {
 		return implies;
 	}
 
-	public boolean isImplied() {		
+	public boolean isImplied() {
 		if (isImplied == null) {
 			Logger.reportBug(278);
 			return false;

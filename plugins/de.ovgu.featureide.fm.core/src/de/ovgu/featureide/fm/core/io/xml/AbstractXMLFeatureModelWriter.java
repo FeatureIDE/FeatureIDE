@@ -81,37 +81,46 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 	 * @return
 	 */
 	private static String prettyPrint(String text) {
-		StringBuilder result = new StringBuilder();
+		StringBuilder result =
+			new StringBuilder();
 		String line;
-		int indentLevel = 0;
-		BufferedReader reader = new BufferedReader(new StringReader(text));
+		int indentLevel =
+			0;
+		BufferedReader reader =
+			new BufferedReader(new StringReader(text));
 		try {
-			line = reader.readLine();
+			line =
+				reader.readLine();
 			while (line != null) {
 				if (line.startsWith("</")) {
 					indentLevel--;
-					for (int i = 0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
 
 				else if (line.startsWith("<")) {
-					for (int i = 0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 					if (!line.contains("</")) {
 						indentLevel++;
 					}
 				} else {
-					for (int i = 0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
-				result.append(line + "\n");
+				result.append(line
+					+ "\n");
 				if (line.contains("/>")) {
 					indentLevel--;
 				}
-				line = reader.readLine();
+				line =
+					reader.readLine();
 			}
 		} catch (IOException e) {
 			Logger.logError(e);
@@ -120,27 +129,33 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 	}
 
 	public String writeToString() {
-		//Create Empty DOM Document
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		// Create Empty DOM Document
+		DocumentBuilderFactory dbf =
+			DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(true);
 		dbf.setExpandEntityReferences(true);
-		DocumentBuilder db = null;
+		DocumentBuilder db =
+			null;
 		try {
-			db = dbf.newDocumentBuilder();
+			db =
+				dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		Document doc = db.newDocument();
-		//Create the Xml Representation
+		Document doc =
+			db.newDocument();
+		// Create the Xml Representation
 		createXmlDoc(doc);
 
-		//Transform the Xml Representation into a String
-		Transformer transfo = null;
+		// Transform the Xml Representation into a String
+		Transformer transfo =
+			null;
 		try {
-			transfo = TransformerFactory.newInstance().newTransformer();
+			transfo =
+				TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
 			Logger.logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
@@ -149,8 +164,10 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
+		StreamResult result =
+			new StreamResult(new StringWriter());
+		DOMSource source =
+			new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {

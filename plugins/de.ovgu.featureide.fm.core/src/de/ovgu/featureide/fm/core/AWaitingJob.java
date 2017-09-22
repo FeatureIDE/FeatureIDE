@@ -26,22 +26,23 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * If the job is scheduled twice, the second call waits until the first has finished.<br>
- * If it is scheduled more than twice, but one instance is still waiting, it is not 
- * scheduled again. 
+ * If the job is scheduled twice, the second call waits until the first has finished.<br> If it is scheduled more than twice, but one instance is still waiting,
+ * it is not scheduled again.
  * 
  * @author Jens Meinicke
  */
 public abstract class AWaitingJob extends Job {
 
-	private boolean waiting = false;
-	private final Job job = new Job(this.getName()) {
-		
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			return execute(monitor);
-		}
-	};
+	private boolean waiting =
+		false;
+	private final Job job =
+		new Job(this.getName()) {
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				return execute(monitor);
+			}
+		};
 
 	public AWaitingJob(String name) {
 		super(name);
@@ -53,7 +54,8 @@ public abstract class AWaitingJob extends Job {
 			if (waiting) {
 				return Status.OK_STATUS;
 			}
-			waiting = true;
+			waiting =
+				true;
 		}
 		try {
 			job.cancel();
@@ -62,11 +64,12 @@ public abstract class AWaitingJob extends Job {
 		} catch (InterruptedException e) {
 			Logger.logError(e);
 		} finally {
-			waiting = false;
+			waiting =
+				false;
 		}
 		return Status.OK_STATUS;
 	}
 
 	protected abstract IStatus execute(IProgressMonitor monitor);
-	
+
 }

@@ -48,74 +48,75 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Listens for an editorpart to attach the color annotation model and renaming
- * of titel for java editor
+ * Listens for an editorpart to attach the color annotation model and renaming of titel for java editor
  * 
  * @author Sebastian Krieter
  */
 public class EditorTracker {
-	private static final Image TITLE_IMAGE = UIPlugin.getImage("JakFileIcon.png");
+
+	private static final Image TITLE_IMAGE =
+		UIPlugin.getImage("JakFileIcon.png");
 	private final IWorkbench workbench;
-	private HashSet<IWorkbenchPartReference> annotatedPartrefSet = new HashSet<IWorkbenchPartReference>();
+	private HashSet<IWorkbenchPartReference> annotatedPartrefSet =
+		new HashSet<IWorkbenchPartReference>();
 
-	private IWindowListener windowListener = new IWindowListener() {
-		public void windowOpened(IWorkbenchWindow window) {
-			window.getPartService().addPartListener(partListener);
-		}
+	private IWindowListener windowListener =
+		new IWindowListener() {
 
-		public void windowClosed(IWorkbenchWindow window) {
-			window.getPartService().removePartListener(partListener);
-		}
-
-		public void windowActivated(IWorkbenchWindow window) {
-		}
-
-		public void windowDeactivated(IWorkbenchWindow window) {
-		}
-	};
-
-	private IPartListener2 partListener = new IPartListener2() {
-		public void partOpened(IWorkbenchPartReference partref) {
-			//System.out.println(OPENED+partref.getTitle());
-
-		}
-
-		public void partActivated(IWorkbenchPartReference partref) {
-			//	System.out.println(ACTIVATED  +partref.getTitle());
-			annotateEditor(partref);
-		}
-
-		public void partBroughtToTop(IWorkbenchPartReference partref) {
-			//	System.out.println(TOTOP  +partref.getTitle());
-		}
-
-		public void partVisible(IWorkbenchPartReference partref) {
-			//System.out.println(VISIBLE  +partref.getTitle());
-			try {
-				if (annotatedPartrefSet.contains(partref)) {
-					updateEditor(partref);
-				}
-				renameEditor(partref);
-			} catch (Exception e) {
-				UIPlugin.getDefault().logError(e);
+			public void windowOpened(IWorkbenchWindow window) {
+				window.getPartService().addPartListener(partListener);
 			}
-		}
 
-		public void partInputChanged(IWorkbenchPartReference partref) {
-		}
+			public void windowClosed(IWorkbenchWindow window) {
+				window.getPartService().removePartListener(partListener);
+			}
 
-		public void partClosed(IWorkbenchPartReference partref) {
-		}
+			public void windowActivated(IWorkbenchWindow window) {}
 
-		public void partDeactivated(IWorkbenchPartReference partref) {
-		}
+			public void windowDeactivated(IWorkbenchWindow window) {}
+		};
 
-		public void partHidden(IWorkbenchPartReference partref) {
-		}
-	};
+	private IPartListener2 partListener =
+		new IPartListener2() {
+
+			public void partOpened(IWorkbenchPartReference partref) {
+				// System.out.println(OPENED+partref.getTitle());
+
+			}
+
+			public void partActivated(IWorkbenchPartReference partref) {
+				// System.out.println(ACTIVATED +partref.getTitle());
+				annotateEditor(partref);
+			}
+
+			public void partBroughtToTop(IWorkbenchPartReference partref) {
+				// System.out.println(TOTOP +partref.getTitle());
+			}
+
+			public void partVisible(IWorkbenchPartReference partref) {
+				// System.out.println(VISIBLE +partref.getTitle());
+				try {
+					if (annotatedPartrefSet.contains(partref)) {
+						updateEditor(partref);
+					}
+					renameEditor(partref);
+				} catch (Exception e) {
+					UIPlugin.getDefault().logError(e);
+				}
+			}
+
+			public void partInputChanged(IWorkbenchPartReference partref) {}
+
+			public void partClosed(IWorkbenchPartReference partref) {}
+
+			public void partDeactivated(IWorkbenchPartReference partref) {}
+
+			public void partHidden(IWorkbenchPartReference partref) {}
+		};
 
 	public EditorTracker(IWorkbench workbench) {
-		this.workbench = workbench;
+		this.workbench =
+			workbench;
 		for (final IWorkbenchWindow w : workbench.getWorkbenchWindows()) {
 			w.getPartService().addPartListener(partListener);
 		}
@@ -131,7 +132,8 @@ public class EditorTracker {
 	}
 
 	private void annotateEditor(IWorkbenchPartReference partref) {
-		IWorkbenchPart part = partref.getPart(false);
+		IWorkbenchPart part =
+			partref.getPart(false);
 		if (part instanceof ITextEditor) {
 			if (ColorAnnotationModel.attach((ITextEditor) part)) {
 				annotatedPartrefSet.add(partref);
@@ -141,9 +143,11 @@ public class EditorTracker {
 
 	private void updateEditor(IWorkbenchPartReference partref) {
 
-		IWorkbenchPart part = partref.getPart(false);
+		IWorkbenchPart part =
+			partref.getPart(false);
 		if (part != null) {
-			ITextEditor editor = (ITextEditor) part;
+			ITextEditor editor =
+				(ITextEditor) part;
 			ColorAnnotationModel.attach(editor);
 		}
 	}
@@ -152,21 +156,29 @@ public class EditorTracker {
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (!(partref.getPart(true) instanceof IEditorPart))
 			return;
-		IEditorPart editorPart = (IEditorPart) partref.getPart(true);
-		IEditorInput input = editorPart.getEditorInput();
+		IEditorPart editorPart =
+			(IEditorPart) partref.getPart(true);
+		IEditorInput input =
+			editorPart.getEditorInput();
 		if (!(input instanceof IFileEditorInput))
 			return;
-		IFile file = ((IFileEditorInput) input).getFile();
+		IFile file =
+			((IFileEditorInput) input).getFile();
 		if (file == null)
 			return;
-		String fileExt = file.getFileExtension();
-		if (fileExt == null || !fileExt.equals("java"))
+		String fileExt =
+			file.getFileExtension();
+		if (fileExt == null
+			|| !fileExt.equals("java"))
 			return;
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(file);
 		if (featureProject == null)
 			return;
-		String title = getTitle(partref, file);
-		WorkbenchPart workBenchpart = (WorkbenchPart) partref.getPart(false);
+		String title =
+			getTitle(partref, file);
+		WorkbenchPart workBenchpart =
+			(WorkbenchPart) partref.getPart(false);
 		invokeMethod(workBenchpart, "setPartName", String.class, title);
 		invokeMethod(workBenchpart, "setTitleImage", Image.class, TITLE_IMAGE);
 	}
@@ -174,14 +186,10 @@ public class EditorTracker {
 	/**
 	 * Invokes a method using reflection
 	 * 
-	 * @param obj
-	 *            object that is used to call the method
-	 * @param methodname
-	 *            name of the method
-	 * @param paramtype
-	 *            type of parameter
-	 * @param parameter
-	 *            object of parameter
+	 * @param obj object that is used to call the method
+	 * @param methodname name of the method
+	 * @param paramtype type of parameter
+	 * @param parameter object of parameter
 	 * @throws NoSuchMethodException
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
@@ -189,7 +197,8 @@ public class EditorTracker {
 	@SuppressWarnings("rawtypes")
 	private void invokeMethod(WorkbenchPart obj, String methodname, Class paramtype, Object parameter)
 			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		Method method = WorkbenchPart.class.getDeclaredMethod(methodname, paramtype);
+		Method method =
+			WorkbenchPart.class.getDeclaredMethod(methodname, paramtype);
 		method.setAccessible(true);
 		method.invoke(obj, (paramtype.cast(parameter)));
 	}
@@ -197,33 +206,48 @@ public class EditorTracker {
 	private IComposerExtensionClass composer;
 
 	private String getTitle(IWorkbenchPartReference partRef, IFile file) {
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(file);
 		if (featureProject != null) {
 			if (partRef.getPart(true) instanceof IEditorPart) {
 
-				composer = featureProject.getComposer();
+				composer =
+					featureProject.getComposer();
 				if (composer.hasFeatureFolder()) {
-					String feature = featureProject.getFeatureName(file);
+					String feature =
+						featureProject.getFeatureName(file);
 					if (feature != null) {
 						// case: a source file
 						if (composer.hasFeatureFolder()) {
-							return file.getName() + "[" + feature + "]";
+							return file.getName()
+								+ "["
+								+ feature
+								+ "]";
 						}
 					} else {
 						if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
 							// case: a composed file
-							IFile configuration = featureProject.getCurrentConfiguration();
+							IFile configuration =
+								featureProject.getCurrentConfiguration();
 							if (configuration != null) {
-								String config = configuration.getName().split("[.]")[0];
+								String config =
+									configuration.getName().split("[.]")[0];
 								if (config != null) {
-									return file.getName() + "<" + config + ">";
+									return file.getName()
+										+ "<"
+										+ config
+										+ ">";
 								}
 							}
 						} else {
-							String configuration = getConfiguration(file.getParent());
+							String configuration =
+								getConfiguration(file.getParent());
 							if (configuration != null) {
 								// case: a generated products file
-								return file.getName() + "<" + configuration + ">";
+								return file.getName()
+									+ "<"
+									+ configuration
+									+ ">";
 							}
 						}
 					}
@@ -236,12 +260,10 @@ public class EditorTracker {
 	}
 
 	/**
-	 * Looks for the corresponding configuration file<br>
-	 * Necessary for generated products
+	 * Looks for the corresponding configuration file<br> Necessary for generated products
 	 * 
 	 * @param parent
-	 * @return The name of the configuration or <code>null</code> if there is
-	 *         none
+	 * @return The name of the configuration or <code>null</code> if there is none
 	 */
 	private String getConfiguration(IContainer parent) {
 		try {
@@ -255,7 +277,8 @@ public class EditorTracker {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		IContainer p = parent.getParent();
+		IContainer p =
+			parent.getParent();
 		if (p != null) {
 			return getConfiguration(p);
 		}
@@ -265,8 +288,7 @@ public class EditorTracker {
 	/**
 	 * @param parent
 	 * @param buildFolder
-	 * @return <code>true</code> if the build folder is a parent of the given
-	 *         file
+	 * @return <code>true</code> if the build folder is a parent of the given file
 	 */
 	private boolean isComposedFile(IContainer parent, IFolder buildFolder) {
 		if (parent != null) {

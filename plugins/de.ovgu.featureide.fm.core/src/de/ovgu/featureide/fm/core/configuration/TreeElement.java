@@ -27,17 +27,20 @@ import java.util.ArrayList;
  */
 public class TreeElement {
 
-	ArrayList<TreeElement> children = new ArrayList<TreeElement>();
-	
-	TreeElement parent = null;
-	
+	ArrayList<TreeElement> children =
+		new ArrayList<TreeElement>();
+
+	TreeElement parent =
+		null;
+
 	public void addChild(TreeElement child) {
 		children.add(child);
 		child.setParent(this);
 	}
-	
+
 	public void setParent(TreeElement parent) {
-		this.parent = parent;
+		this.parent =
+			parent;
 	}
 
 	public TreeElement getParent() {

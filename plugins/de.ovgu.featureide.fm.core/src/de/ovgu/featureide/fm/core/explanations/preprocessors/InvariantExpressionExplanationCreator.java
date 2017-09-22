@@ -28,33 +28,38 @@ import org.prop4j.Node;
  * @author Timo G&uuml;nther
  */
 public interface InvariantExpressionExplanationCreator extends PreprocessorExplanationCreator {
+
 	/**
 	 * Returns true if the expression is a tautology or false if it is a contradiction.
+	 * 
 	 * @return true if the expression is a tautology or false if it is a contradiction
 	 */
 	public boolean isTautology();
-	
+
 	/**
 	 * Sets the tautology flag.
+	 * 
 	 * @param tautology true if the expression is a tautology or false if it is a contradiction
 	 */
 	public void setTautology(boolean tautology);
-	
+
 	/**
 	 * Returns the invariant expression to explain.
+	 * 
 	 * @return the invariant expression to explain
 	 */
 	@Override
 	public Node getSubject();
-	
+
 	/**
 	 * Sets the invariant expression to explain
+	 * 
 	 * @param subject the invariant expression to explain
 	 * @throws IllegalArgumentException if the subject is not an instance of {@link Node}
 	 */
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException;
-	
+
 	/**
 	 * Returns an explanation why the expression is a contradiction or a tautology.
 	 */

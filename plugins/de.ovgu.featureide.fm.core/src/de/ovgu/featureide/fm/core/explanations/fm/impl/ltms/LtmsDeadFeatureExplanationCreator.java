@@ -35,40 +35,40 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
+
 	@Override
 	public IFeature getSubject() {
 		return (IFeature) super.getSubject();
 	}
-	
+
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null && !(subject instanceof IFeature)) {
+		if (subject != null
+			&& !(subject instanceof IFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p>
-	 * Sets initial truth value assumptions of the dead feature to true.
-	 * Then propagates the values until a violation in a clause occurs.
-	 * </p>
+	 * <p> Sets initial truth value assumptions of the dead feature to true. Then propagates the values until a violation in a clause occurs. </p>
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getOracle();
+		final Ltms ltms =
+			getOracle();
 		ltms.clearPremises();
 		ltms.addPremise(getSubject().getName(), true);
 		return getExplanation(ltms.getExplanations());
 	}
-	
+
 	@Override
 	protected DeadFeatureExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
 		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
-	
+
 	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
 		return new DeadFeatureExplanation(getSubject());

@@ -29,47 +29,60 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  * @author Timo G&uuml;nther
  */
 public class ConfigurationReason extends Reason {
+
 	/** The feature that has been selected or unselected. */
 	private final SelectableFeature featureSelection;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param featureSelection the feature that has been selected or unselected; not null
 	 */
 	public ConfigurationReason(SelectableFeature featureSelection) {
-		this.featureSelection = featureSelection;
+		this.featureSelection =
+			featureSelection;
 	}
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param reason the reason to clone; not null
 	 */
 	protected ConfigurationReason(ConfigurationReason reason) {
 		super(reason);
-		this.featureSelection = reason.featureSelection;
+		this.featureSelection =
+			reason.featureSelection;
 	}
-	
+
 	/**
 	 * Returns the feature that has been selected or unselected.
+	 * 
 	 * @return the feature that has been selected or unselected; not null
 	 */
 	public SelectableFeature getFeatureSelection() {
 		return featureSelection;
 	}
-	
+
 	@Override
 	protected ConfigurationReason clone() {
 		return new ConfigurationReason(featureSelection);
 	}
-	
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((featureSelection == null) ? 0 : featureSelection.hashCode());
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			prime
+				* result
+				+ ((featureSelection == null)
+					? 0
+					: featureSelection.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -78,7 +91,8 @@ public class ConfigurationReason extends Reason {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ConfigurationReason other = (ConfigurationReason) obj;
+		ConfigurationReason other =
+			(ConfigurationReason) obj;
 		if (featureSelection == null) {
 			if (other.featureSelection != null)
 				return false;

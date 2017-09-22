@@ -55,8 +55,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Additional editor page for the feature model editor. In this editor the order
- * of the features can be changed.
+ * Additional editor page for the feature model editor. In this editor the order of the features can be changed.
  * 
  * @author Christian Becker
  * @author Jens Meinicke
@@ -64,22 +63,35 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
+	private static final String ID =
+		FMUIPlugin.PLUGIN_ID
+			+ ".editors.FeatureOrderEditor";
 
-	private static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
-	private static final String CONFIGS_ARGUMENT = "equations";
-	private static final String DEFAULT_CONFIGS_PATH = "equations";
+	private static final QualifiedName configFolderConfigID =
+		new QualifiedName("featureproject.configs", "equations");
+	private static final String CONFIGS_ARGUMENT =
+		"equations";
+	private static final String DEFAULT_CONFIGS_PATH =
+		"equations";
 
-	private static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
+	private static final String BUILDER_ID =
+		"de.ovgu.featureide.core"
+			+ ".extensibleFeatureProjectBuilder";
 
-	private static final String PAGE_TEXT = FEATURE_ORDER;
+	private static final String PAGE_TEXT =
+		FEATURE_ORDER;
 
-	private org.eclipse.swt.widgets.List featurelist = null;
+	private org.eclipse.swt.widgets.List featurelist =
+		null;
 
-	private Button up = null;
-	private Button down = null;
-	private Button defaultButton = null;
-	private Button activate = null;
+	private Button up =
+		null;
+	private Button down =
+		null;
+	private Button defaultButton =
+		null;
+	private Button activate =
+		null;
 
 	// TODO _interfaces: unnecessary with new configuration file format
 //	private IFolder configFolder;
@@ -87,7 +99,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * This flags is <code>true</code> if the composer supports a feature order
 	 */
-	private boolean hasFeatureOrder = true;
+	private boolean hasFeatureOrder =
+		true;
 
 	private Composite comp;
 
@@ -97,23 +110,23 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @param featureModelEditor
 	 */
 	public FeatureOrderEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+		this.featureModelEditor =
+			featureModelEditor;
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (dirty) {
 			updateOrderEditor();
-			
+
 			if (hasFeatureOrder) {
 				writeToOrderFile(); // save the feature order also in .order if file
-									// exists
+									 // exists
 			}
 
 			if (featureModelEditor.getFeatureModel().getFeatureOrderList().isEmpty()) {
 				defaultFeatureList();
 			}
-
 
 			// TODO _interfaces: unnecessary with new configuration file format
 //			if (hasFeatureOrder && configFolder.exists()) {
@@ -162,9 +175,10 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	public void updateOrderEditor() {
 		if (hasFeatureOrder) {
 			// This flag is true if a concrete feature was added or removed
-			boolean changed = updateFeatureList();
+			boolean changed =
+				updateFeatureList();
 			updateFeatureOrderList();
-	
+
 			if (changed) {
 				setDirty();
 			}
@@ -172,25 +186,37 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	private void setDirty() {
-		dirty = true;
+		dirty =
+			true;
 		firePropertyChange(PROP_DIRTY);
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
-		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-		hasFeatureOrder = FMComposerManager.getFMComposerExtension(project).hasFeatureOrder();
-		comp = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
+		IProject project =
+			((IFile) input.getAdapter(IFile.class)).getProject();
+		hasFeatureOrder =
+			FMComposerManager.getFMComposerExtension(project).hasFeatureOrder();
+		comp =
+			new Composite(parent, SWT.NONE);
+		GridLayout layout =
+			new GridLayout();
 		comp.setLayout(layout);
-		Label label = new Label(comp, SWT.NONE);
+		Label label =
+			new Label(comp, SWT.NONE);
 		if (!hasFeatureOrder) {
-			layout.numColumns = 1;
+			layout.numColumns =
+				1;
 			label.setText(FMComposerManager.getFMComposerExtension(project).getOrderPageMessage());
-			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+			featurelist =
+				new org.eclipse.swt.widgets.List(comp, SWT.NONE
+					| SWT.BORDER
+					| SWT.V_SCROLL
+					| SWT.MULTI);
 			featurelist.setVisible(false);
 		} else {
-			layout.numColumns = 3;
+			layout.numColumns =
+				3;
 			label.setText(USER_DEFINED_FEATURE_ORDER);
 			createButtons();
 		}
@@ -205,10 +231,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	private void createActivateButton() {
-		activate = new Button(comp, SWT.CHECK);
+		activate =
+			new Button(comp, SWT.CHECK);
 		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				boolean selection = activate.getSelection();
+				boolean selection =
+					activate.getSelection();
 				enableUI(selection);
 
 				updateFeatureOrderList();
@@ -217,38 +246,57 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			}
 		});
 
-		featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+		featurelist =
+			new org.eclipse.swt.widgets.List(comp, SWT.NONE
+				| SWT.BORDER
+				| SWT.V_SCROLL
+				| SWT.MULTI);
 	}
 
 	private void createGridData() {
-		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 2;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalSpan = 4;
-		gridData.grabExcessVerticalSpace = true;
+		gridData =
+			new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan =
+			2;
+		gridData.grabExcessHorizontalSpace =
+			true;
+		gridData.verticalSpan =
+			4;
+		gridData.grabExcessVerticalSpace =
+			true;
 		featurelist.setLayoutData(gridData);
 		featurelist.setEnabled(false);
 
-		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-		gridData.widthHint = 70;
+		gridData =
+			new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gridData.widthHint =
+			70;
 	}
 
 	private void createUpButton() {
-		up = new Button(comp, SWT.NONE);
+		up =
+			new Button(comp, SWT.NONE);
 		up.setText(UP);
 		up.setLayoutData(gridData);
 		up.setEnabled(false);
 		up.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				LinkedList<String> items = getSelectedItems();
 
-				for (int i = 0; i < items.size(); i++) {
-					int focus = featurelist.indexOf(items.get(i));
+			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+				LinkedList<String> items =
+					getSelectedItems();
+
+				for (int i =
+					0; i < items.size(); i++) {
+					int focus =
+						featurelist.indexOf(items.get(i));
 
 					if (focus != 0) { // First Element is selected, no change
-						String temp = featurelist.getItem(focus - 1);
+						String temp =
+							featurelist.getItem(focus
+								- 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus - 1, featurelist.getItem(focus));
+							featurelist.setItem(focus
+								- 1, featurelist.getItem(focus));
 							featurelist.setItem(focus, temp);
 
 							updateFeatureOrderList();
@@ -264,21 +312,31 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	private void createDownButton() {
-		down = new Button(comp, SWT.NONE);
+		down =
+			new Button(comp, SWT.NONE);
 		down.setText(DOWN);
 		down.setLayoutData(gridData);
 		down.setEnabled(false);
 		down.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				LinkedList<String> items = getSelectedItems();
+				LinkedList<String> items =
+					getSelectedItems();
 
-				for (int i = items.size() - 1; i >= 0; i--) {
-					int focus = featurelist.indexOf(items.get(i));
+				for (int i =
+					items.size()
+						- 1; i >= 0; i--) {
+					int focus =
+						featurelist.indexOf(items.get(i));
 
-					if (focus != featurelist.getItemCount() - 1) {
-						String temp = featurelist.getItem(focus + 1);
+					if (focus != featurelist.getItemCount()
+						- 1) {
+						String temp =
+							featurelist.getItem(focus
+								+ 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus + 1, featurelist.getItem(focus));
+							featurelist.setItem(focus
+								+ 1, featurelist.getItem(focus));
 							featurelist.setItem(focus, temp);
 
 							updateFeatureOrderList();
@@ -299,9 +357,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @return selected items
 	 */
 	private LinkedList<String> getSelectedItems() {
-		int[] focuses = featurelist.getSelectionIndices();
+		int[] focuses =
+			featurelist.getSelectionIndices();
 		Arrays.sort(focuses);
-		LinkedList<String> items = new LinkedList<String>();
+		LinkedList<String> items =
+			new LinkedList<String>();
 		for (int focus : focuses) {
 			items.add(featurelist.getItem(focus));
 		}
@@ -312,14 +372,16 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * Select items in feature order list.
 	 * 
-	 * @param items
-	 *            to be selected
+	 * @param items to be selected
 	 */
 	private void selectItems(LinkedList<String> items) {
-		int[] newindizies = new int[items.size()];
+		int[] newindizies =
+			new int[items.size()];
 
-		for (int i = 0; i < items.size(); i++) {
-			newindizies[i] = featurelist.indexOf(items.get(i));
+		for (int i =
+			0; i < items.size(); i++) {
+			newindizies[i] =
+				featurelist.indexOf(items.get(i));
 		}
 
 		featurelist.setSelection(newindizies);
@@ -329,11 +391,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * 
 	 */
 	private void createDeafaultButton() {
-		defaultButton = new Button(comp, SWT.NONE);
+		defaultButton =
+			new Button(comp, SWT.NONE);
 		defaultButton.setText(DEFAULT);
 		defaultButton.setLayoutData(gridData);
 		defaultButton.setEnabled(false);
 		defaultButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				defaultFeatureList();
 
@@ -348,7 +412,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		featurelist.removeAll();
 
 		if (featureModelEditor.getFeatureModel().getStructure().getRoot() != null) {
-			featureModelEditor.getFeatureModel().setFeatureOrderList(Collections.<String>emptyList());
+			featureModelEditor.getFeatureModel().setFeatureOrderList(Collections.<String> emptyList());
 			for (String featureName : featureModelEditor.getFeatureModel().getFeatureOrderList()) {
 				featurelist.add(featureName);
 			}
@@ -361,14 +425,19 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @return true if feature order list has changed and was not empty before
 	 */
 	private boolean updateFeatureList() {
-		boolean changed = false;
+		boolean changed =
+			false;
 		if (featureModelEditor.getFeatureModel().getStructure().getRoot() != null) {
-			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.getFeatureModel().getFeatureOrderList());
+			HashSet<String> featureSet =
+				new HashSet<String>(featureModelEditor.getFeatureModel().getFeatureOrderList());
 
-			int itemcount = featurelist.getItemCount();
-			for (int i = 0; i < itemcount; i++) {
+			int itemcount =
+				featurelist.getItemCount();
+			for (int i =
+				0; i < itemcount; i++) {
 				if (!featureSet.remove(featurelist.getItem(i))) {
-					changed = true;
+					changed =
+						true;
 					if (featureSet.remove(featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)))) {
 						featurelist.setItem(i, featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)));
 					} else {
@@ -396,29 +465,41 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * Write the order of the features in the .order file in the feature project
-	 * directory, it will be supported for old versions
+	 * Write the order of the features in the .order file in the feature project directory, it will be supported for old versions
 	 * 
 	 */
 	// TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile() {
-		File file = ((IFile) input.getAdapter(IFile.class)).getProject().getLocation().toFile();
-		final String fileSep = System.getProperty("file.separator");
-		file = new File(file.toString() + fileSep + ".order");
+		File file =
+			((IFile) input.getAdapter(IFile.class)).getProject().getLocation().toFile();
+		final String fileSep =
+			System.getProperty("file.separator");
+		file =
+			new File(file.toString()
+				+ fileSep
+				+ ".order");
 		if (!file.exists()) {
 			return;
 		}
-		final String newLine = System.getProperty("line.separator");
-		FileWriter fw = null;
+		final String newLine =
+			System.getProperty("line.separator");
+		FileWriter fw =
+			null;
 		try {
-			fw = new FileWriter(file.toString());
-			fw.write(((featureModelEditor.getFeatureModel().isFeatureOrderUserDefined()) ? "true" : "false") + newLine);
+			fw =
+				new FileWriter(file.toString());
+			fw.write(((featureModelEditor.getFeatureModel().isFeatureOrderUserDefined())
+				? "true"
+				: "false")
+				+ newLine);
 
-			Collection<String> list = featureModelEditor.getFeatureModel().getFeatureOrderList();
+			Collection<String> list =
+				featureModelEditor.getFeatureModel().getFeatureOrderList();
 			if (list.isEmpty()) {
-				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set
-																					// default
-																					// values
+				list =
+					FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set
+				// default
+				// values
 			}
 
 			for (String featureName : list) {
@@ -447,8 +528,10 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			featureModelEditor.getFeatureModel().setFeatureOrderUserDefined(activate.getSelection());
 
 			if (featureModelEditor.getFeatureModel().isFeatureOrderUserDefined()) {
-				LinkedList<String> newFeatureOrderlist = new LinkedList<String>();
-				for (int i = 0; i < featurelist.getItemCount(); i++) {
+				LinkedList<String> newFeatureOrderlist =
+					new LinkedList<String>();
+				for (int i =
+					0; i < featurelist.getItemCount(); i++) {
 					newFeatureOrderlist.add(featurelist.getItem(i));
 				}
 				FeatureUtils.setFeatureOrderList(featureModelEditor.getFeatureModel(), newFeatureOrderlist);
@@ -458,8 +541,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	/**
 	 * 
-	 * @return Return the FeatureOrder as an ArrayList. Return null if the
-	 *         USERDEFINED_ORDER is deactivate or if no order file exists.
+	 * @return Return the FeatureOrder as an ArrayList. Return null if the USERDEFINED_ORDER is deactivate or if no order file exists.
 	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()} instead
 	 */
 	@Deprecated
@@ -470,8 +552,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * sets buttons and featurelist according to feature model if {@link #hasFeatureOrder} is true
 	 * 
-	 * @return returns the featureOrderList from feature model or an empty list
-	 *         if {@link #hasFeatureOrder} is false
+	 * @return returns the featureOrderList from feature model or an empty list if {@link #hasFeatureOrder} is false
 	 */
 	public List<String> readFeatureOrderList() {
 		if (hasFeatureOrder) {
@@ -481,7 +562,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 		return new LinkedList<String>();
 	}
-
 
 	// TODO _interfaces: unnecessary with new configuration file format
 //	/**
@@ -515,12 +595,16 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	public String getProjectConfigurationPath(IProject project) {
 		try {
-			String path = project.getPersistentProperty(configFolderConfigID);
+			String path =
+				project.getPersistentProperty(configFolderConfigID);
 			if (path != null) {
 				return path;
 			} else {
-				path = getPath(project, CONFIGS_ARGUMENT);
-				return (path == null) ? DEFAULT_CONFIGS_PATH : path;
+				path =
+					getPath(project, CONFIGS_ARGUMENT);
+				return (path == null)
+					? DEFAULT_CONFIGS_PATH
+					: path;
 			}
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);

@@ -29,11 +29,11 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  * @author Sebastian Krieter
  */
 public class JavaClass extends AbstractClass {
-	
+
 	public JavaClass(AbstractClassSignature signature) {
 		super(signature);
 	}
-	
+
 	@Override
 	public String toString() {
 		return JavaStringBuilder.getClassString(this, false);

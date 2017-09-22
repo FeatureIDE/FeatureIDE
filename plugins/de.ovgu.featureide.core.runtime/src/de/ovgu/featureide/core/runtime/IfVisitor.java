@@ -25,8 +25,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
- * Visitor for AST, currently only responding to the if statement whose begin
- * line number matches the passed line number.
+ * Visitor for AST, currently only responding to the if statement whose begin line number matches the passed line number.
  * 
  * @author Matthias Quaas
  * 
@@ -39,17 +38,22 @@ class IfVisitor extends ASTVisitor {
 
 	public IfVisitor(final int startLine, final CompilationUnit compilationUnit) {
 		super();
-		endPosition = 0;
-		this.startLine = startLine;
-		this.compilationUnit = compilationUnit;
+		endPosition =
+			0;
+		this.startLine =
+			startLine;
+		this.compilationUnit =
+			compilationUnit;
 	}
 
 	@Override
 	public void endVisit(final IfStatement node) {
 
 		if (compilationUnit.getLineNumber(node.getStartPosition()) == startLine) {
-			endPosition = node.getThenStatement().getStartPosition();
-			endPosition += node.getThenStatement().getLength();
+			endPosition =
+				node.getThenStatement().getStartPosition();
+			endPosition +=
+				node.getThenStatement().getLength();
 		}
 		super.endVisit(node);
 

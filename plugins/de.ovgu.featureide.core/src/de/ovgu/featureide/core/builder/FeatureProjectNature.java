@@ -28,13 +28,11 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
 
-
 /**
  * @brief The nature for feature projects
  * 
- * @remarks
- * - Every feature project has the same nature and builder independent from the used composition tool.
- * - The composition tool in use depends on the project settings and not on the nature or builder
+ * @remarks - Every feature project has the same nature and builder independent from the used composition tool. - The composition tool in use depends on the
+ *          project settings and not on the nature or builder
  * 
  * @author Tom Brosch
  */
@@ -43,54 +41,72 @@ public class FeatureProjectNature implements IProjectNature {
 	/**
 	 * ID of this project nature
 	 */
-	public static final String NATURE_ID = CorePlugin.PLUGIN_ID + ".featureProjectNature";
-	
+	public static final String NATURE_ID =
+		CorePlugin.PLUGIN_ID
+			+ ".featureProjectNature";
+
 	private IProject project;
-	
+
 	public void configure() throws CoreException {
 		if (project == null) {
 			return;
 		}
-		IProjectDescription desc = project.getDescription();
-		ICommand[] commands = desc.getBuildSpec();
+		IProjectDescription desc =
+			project.getDescription();
+		ICommand[] commands =
+			desc.getBuildSpec();
 
-		for (int i = 0; i < commands.length; ++i) {
+		for (int i =
+			0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 				return;
 			}
 		}
 
-		ICommand[] newCommands = new ICommand[commands.length + 1];
+		ICommand[] newCommands =
+			new ICommand[commands.length
+				+ 1];
 		System.arraycopy(commands, 0, newCommands, 1, commands.length);
-		ICommand command = desc.newCommand();
+		ICommand command =
+			desc.newCommand();
 		command.setBuilderName(ExtensibleFeatureProjectBuilder.BUILDER_ID);
-		newCommands[0] = command;
+		newCommands[0] =
+			command;
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
 	}
 
 	public void deconfigure() throws CoreException {
-		IProjectDescription description = getProject().getDescription();
-		ICommand[] commands = description.getBuildSpec();
-		for (int i = 0; i < commands.length; ++i) {
+		IProjectDescription description =
+			getProject().getDescription();
+		ICommand[] commands =
+			description.getBuildSpec();
+		for (int i =
+			0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-				ICommand[] newCommands = new ICommand[commands.length - 1];
+				ICommand[] newCommands =
+					new ICommand[commands.length
+						- 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
-				System.arraycopy(commands, i + 1, newCommands, i,
-						commands.length - i - 1);
+				System.arraycopy(commands, i
+					+ 1, newCommands, i,
+						commands.length
+							- i
+							- 1);
 				description.setBuildSpec(newCommands);
 				getProject().setDescription(description, null);
 				return;
 			}
 		}
 	}
-	
+
 	public IProject getProject() {
 		return project;
 	}
-	
+
 	public void setProject(IProject project) {
-		this.project = project;
+		this.project =
+			project;
 	}
 
 }

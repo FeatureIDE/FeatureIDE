@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class Equals extends Node implements Cloneable {
-	
+
 	public Equals(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
 	}
@@ -60,7 +60,7 @@ public class Equals extends Node implements Cloneable {
 					new Or(new Not(children[1].clone()), children[0]));
 		return this;
 	}
-	
+
 	@Override
 	public Node clone() {
 		return new Equals(children[0].clone(), children[1].clone());
@@ -70,5 +70,5 @@ public class Equals extends Node implements Cloneable {
 	public boolean getValue(Map<Object, Boolean> map) {
 		return children[0].getValue(map) == children[1].getValue(map);
 	}
-	
+
 }

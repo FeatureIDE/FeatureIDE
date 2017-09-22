@@ -28,20 +28,26 @@ package de.ovgu.featureide.fm.core.constraint;
 public class Reference {
 
 	private String featureName;
-	
+
 	private ReferenceType type;
-	
-	private String attributeName = null;
+
+	private String attributeName =
+		null;
 
 	public Reference(String featureName, ReferenceType type, String attributeName) {
-		this.featureName = featureName;
-		this.type = type;
-		this.attributeName = attributeName;
+		this.featureName =
+			featureName;
+		this.type =
+			type;
+		this.attributeName =
+			attributeName;
 	}
-	
+
 	public Reference(String featureName) {
-		this.featureName = featureName;
-		this.type = ReferenceType.FEATURE;
+		this.featureName =
+			featureName;
+		this.type =
+			ReferenceType.FEATURE;
 	}
 
 	public String getFeatureName() {
@@ -55,12 +61,13 @@ public class Reference {
 	public String getAttributeName() {
 		return attributeName;
 	}
-	
+
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb =
+			new StringBuilder();
 		sb.append(featureName);
-		
+
 		switch (type) {
 		case ATTRIBUTE:
 			sb.append(".");
@@ -75,7 +82,7 @@ public class Reference {
 		default:
 			break;
 		}
-		
+
 		return sb.toString();
 	}
 }

@@ -36,15 +36,18 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 
-	private final IEventManager eventManager = new DefaultEventManager();
+	private final IEventManager eventManager =
+		new DefaultEventManager();
 
 	protected T variableObject;
 
 	protected final IPersistentFormat<T> format;
 
 	public VirtualFileManager(T object, IPersistentFormat<T> format) {
-		this.format = format;
-		variableObject = object;
+		this.format =
+			format;
+		variableObject =
+			object;
 	}
 
 	public IPersistentFormat<T> getFormat() {
@@ -67,8 +70,7 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 		return true;
 	}
 
-	public void override() {
-	}
+	public void override() {}
 
 	public boolean save() {
 		return true;
@@ -96,7 +98,8 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 
 	@Override
 	public void dispose() {
-		variableObject = null;
+		variableObject =
+			null;
 	}
 
 	@Override
@@ -110,7 +113,8 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 
 	@Override
 	public String toString() {
-		return "Virtual File manager for " + variableObject;
+		return "Virtual File manager for "
+			+ variableObject;
 	}
 
 }

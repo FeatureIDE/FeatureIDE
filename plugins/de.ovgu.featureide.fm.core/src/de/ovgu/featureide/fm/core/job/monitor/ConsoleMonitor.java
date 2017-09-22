@@ -24,17 +24,19 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
 public class ConsoleMonitor extends ATaskMonitor {
 
-	private boolean output = true;
+	private boolean output =
+		true;
 
-	private boolean canceled = false;
-	private int work = 0;
+	private boolean canceled =
+		false;
+	private int work =
+		0;
 
 	public ConsoleMonitor() {
 		super();
@@ -42,24 +44,27 @@ public class ConsoleMonitor extends ATaskMonitor {
 
 	public ConsoleMonitor(boolean output) {
 		super();
-		this.output = output;
+		this.output =
+			output;
 	}
 
 	private ConsoleMonitor(boolean output, boolean canceled, IConsumer<Object> intermediateFunction, AMonitor parent) {
 		super(parent);
-		this.output = output;
-		this.canceled = canceled;
+		this.output =
+			output;
+		this.canceled =
+			canceled;
 		setIntermediateFunction(intermediateFunction);
 	}
 
 	@Override
 	public void cancel() {
-		canceled = true;
+		canceled =
+			true;
 	}
 
 	@Override
-	public void done() {
-	}
+	public void done() {}
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
@@ -70,13 +75,15 @@ public class ConsoleMonitor extends ATaskMonitor {
 
 	@Override
 	public final void setRemainingWork(int work) {
-		this.work = work;
+		this.work =
+			work;
 	}
 
 	@Override
 	public void worked() {
 		work--;
-		print("\t" + work);
+		print("\t"
+			+ work);
 	}
 
 	public boolean isOutput() {
@@ -84,7 +91,8 @@ public class ConsoleMonitor extends ATaskMonitor {
 	}
 
 	public void setOutput(boolean output) {
-		this.output = output;
+		this.output =
+			output;
 	}
 
 	@Override
@@ -101,9 +109,11 @@ public class ConsoleMonitor extends ATaskMonitor {
 
 	@Override
 	public IMonitor subTask(int size) {
-		final ConsoleMonitor consoleMonitor = new ConsoleMonitor(output, canceled, intermediateFunction, this);
+		final ConsoleMonitor consoleMonitor =
+			new ConsoleMonitor(output, canceled, intermediateFunction, this);
 		consoleMonitor.setRemainingWork(size);
-		work -= size;
+		work -=
+			size;
 		return consoleMonitor;
 	}
 

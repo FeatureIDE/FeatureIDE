@@ -39,42 +39,48 @@ import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
  * @author Antje Moench
  */
 public class ConfigurationMatrix {
+
 	private final List<Config> configurationMatrix;
 	private ConfigurationLoader loader;
 	private IFeatureModel featureModel;
 	private Path path;
 
-	private double[] rec = null;
+	private double[] rec =
+		null;
 
 	public ConfigurationMatrix(IFeatureModel featureModel, String path) {
 		this(featureModel, Paths.get(path));
 	}
 
 	public ConfigurationMatrix(IFeatureModel featureModel, Path path) {
-		this.featureModel = featureModel;
-		this.path = path;
-		this.configurationMatrix = new ArrayList<>();
-		loader = new ConfigurationLoader(new IConfigurationLoaderCallback() {
+		this.featureModel =
+			featureModel;
+		this.path =
+			path;
+		this.configurationMatrix =
+			new ArrayList<>();
+		loader =
+			new ConfigurationLoader(new IConfigurationLoaderCallback() {
 
-			@Override
-			public void onLoadingStarted() {
-				configurationMatrix.clear();
-			}
+				@Override
+				public void onLoadingStarted() {
+					configurationMatrix.clear();
+				}
 
-			@Override
-			public void onLoadingError(IOException exception) {}
+				@Override
+				public void onLoadingError(IOException exception) {}
 
-			@Override
-			public void onConfigurationLoaded(Configuration configuration, Path path) {
-				configurationMatrix.add(createConfig(configuration));
-			}
+				@Override
+				public void onConfigurationLoaded(Configuration configuration, Path path) {
+					configurationMatrix.add(createConfig(configuration));
+				}
 
-			@Override
-			public void onLoadingFinished() {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+				@Override
+				public void onLoadingFinished() {
+					// TODO Auto-generated method stub
+
+				}
+			});
 	}
 
 	public void readConfigurations() {
@@ -86,18 +92,23 @@ public class ConfigurationMatrix {
 	}
 
 	private Config createConfig(Configuration configuration) {
-		final List<SelectableFeature> features = configuration.getFeatures();
-		byte[] configArray = new byte[features.size()];
-		int i = 0;
+		final List<SelectableFeature> features =
+			configuration.getFeatures();
+		byte[] configArray =
+			new byte[features.size()];
+		int i =
+			0;
 		for (SelectableFeature feature : features) {
 			switch (feature.getSelection()) {
 			case SELECTED:
-				configArray[i++] = 1;
+				configArray[i++] =
+					1;
 				break;
 			case UNDEFINED:
 			case UNSELECTED:
 			default:
-				configArray[i++] = 0;
+				configArray[i++] =
+					0;
 				break;
 			}
 		}
@@ -113,45 +124,67 @@ public class ConfigurationMatrix {
 			return;
 		}
 
-		final Config curConfig = createConfig(configuration);
+		final Config curConfig =
+			createConfig(configuration);
 
-		rec = new double[configurationMatrix.get(0).configArray.length];
+		rec =
+			new double[configurationMatrix.get(0).configArray.length];
 		Arrays.fill(rec, 0);
 
-		int[] w = new int[configurationMatrix.size()];
-		int wSum = 0;
+		int[] w =
+			new int[configurationMatrix.size()];
+		int wSum =
+			0;
 		{
-			int j = 0;
+			int j =
+				0;
 			for (Config config : configurationMatrix) {
-				final int delta = curConfig.getDelta(config);
-				w[j++] = delta;
-				wSum += delta;
+				final int delta =
+					curConfig.getDelta(config);
+				w[j++] =
+					delta;
+				wSum +=
+					delta;
 			}
 		}
 
-		for (int i = 0; i < rec.length; i++) {
-			int fSum = 0;
-			for (int j = 0; j < w.length; j++) {
-				fSum += configurationMatrix.get(j).configArray[i] * w[j];
+		for (int i =
+			0; i < rec.length; i++) {
+			int fSum =
+				0;
+			for (int j =
+				0; j < w.length; j++) {
+				fSum +=
+					configurationMatrix.get(j).configArray[i]
+						* w[j];
 			}
-			double recValue = ((double) fSum) / wSum;
+			double recValue =
+				((double) fSum)
+					/ wSum;
 			if (curConfig.configArray[i] == 1) {
-				recValue = 1 - recValue;
+				recValue =
+					1
+						- recValue;
 			}
-			rec[i] = recValue;
+			rec[i] =
+				recValue;
 		}
 	}
 
 	private static class Config {
+
 		private final byte[] configArray;
 
 		public Config(byte[] configArray) {
-			this.configArray = configArray;
+			this.configArray =
+				configArray;
 		}
 
 		public int getDelta(Config otherConfig) {
-			int count = 0;
-			for (int i = 0; i < configArray.length; i++) {
+			int count =
+				0;
+			for (int i =
+				0; i < configArray.length; i++) {
 				if (configArray[i] == otherConfig.configArray[i]) {
 					count++;
 				}

@@ -34,27 +34,34 @@ public class FeatureAttributeMap<T> {
 
 	private final Map<String, Map<String, FeatureAttribute<T>>> attrs;
 
-	public FeatureAttributeMap() {	
-		 attrs = new HashMap<>();
+	public FeatureAttributeMap() {
+		attrs =
+			new HashMap<>();
 	}
-	
-	public FeatureAttributeMap(FeatureAttributeMap<T> oldMap) {	
-		this.attrs = new HashMap<>((int) (1.5 * oldMap.attrs.size()));
-		
+
+	public FeatureAttributeMap(FeatureAttributeMap<T> oldMap) {
+		this.attrs =
+			new HashMap<>((int) (1.5
+				* oldMap.attrs.size()));
+
 		for (Entry<String, Map<String, FeatureAttribute<T>>> mapEntry : oldMap.attrs.entrySet()) {
-			final Map<String, FeatureAttribute<T>> value = mapEntry.getValue();
-			final Map<String, FeatureAttribute<T>> newFeatureMap = new HashMap<>((int) (1.5 * value.size()));
+			final Map<String, FeatureAttribute<T>> value =
+				mapEntry.getValue();
+			final Map<String, FeatureAttribute<T>> newFeatureMap =
+				new HashMap<>((int) (1.5
+					* value.size()));
 			for (Entry<String, FeatureAttribute<T>> attributeEntry : value.entrySet()) {
-				final FeatureAttribute<T> v = attributeEntry.getValue();
+				final FeatureAttribute<T> v =
+					attributeEntry.getValue();
 				newFeatureMap.put(attributeEntry.getKey(), new FeatureAttribute<>(v.getAttributeName(), v.getFeatureName(), v.getValue()));
 			}
 			this.attrs.put(mapEntry.getKey(), newFeatureMap);
 		}
 	}
 
-
 	public boolean hasAttribute(String featureName, String attributeName) {
-		return attrs.containsKey(attributeName) && attrs.get(attributeName).containsKey(featureName);
+		return attrs.containsKey(attributeName)
+			&& attrs.get(attributeName).containsKey(featureName);
 	}
 
 	public boolean hasAttribute(FeatureAttribute<T> fa) {
@@ -62,21 +69,23 @@ public class FeatureAttributeMap<T> {
 	}
 
 	public FeatureAttribute<T> getAttribute(String featureName, String attributeName) {
-		return hasAttribute(featureName, attributeName) ? attrs.get(attributeName).get(featureName) : null;
+		return hasAttribute(featureName, attributeName)
+			? attrs.get(attributeName).get(featureName)
+			: null;
 	}
 
 	public void setAttribute(String featureName, String attributeName, T value) {
 		if (!attrs.containsKey(attributeName))
 			attrs.put(attributeName, new HashMap<String, FeatureAttribute<T>>());
-		
+
 		attrs.get(attributeName).put(featureName, new FeatureAttribute<T>(attributeName, featureName, value));
 	}
 
 	public void setAttribute(FeatureAttribute<T> fa) {
 		if (!attrs.containsKey(fa.getAttributeName()))
 			attrs.put(fa.getAttributeName(), new HashMap<String, FeatureAttribute<T>>());
-		
-		attrs.get(fa.getAttributeName()).put(fa.getFeatureName(),fa);
+
+		attrs.get(fa.getAttributeName()).put(fa.getFeatureName(), fa);
 	}
 
 	public Collection<FeatureAttribute<T>> getAttributes(String attributeName) {

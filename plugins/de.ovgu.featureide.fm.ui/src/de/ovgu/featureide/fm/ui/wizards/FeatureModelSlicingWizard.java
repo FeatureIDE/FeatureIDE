@@ -24,7 +24,9 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 public class FeatureModelSlicingWizard extends AbstractWizard {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizards.FeatureModelSlicingWizard";
+	public static final String ID =
+		FMUIPlugin.PLUGIN_ID
+			+ ".wizards.FeatureModelSlicingWizard";
 
 	public FeatureModelSlicingWizard(String title) {
 		super(title);

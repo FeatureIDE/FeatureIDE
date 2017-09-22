@@ -36,31 +36,35 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * @author Alexander Knueppel
  */
 public class CNFConverter extends NNFConverter {
+
 	/**
 	 * Constructor
 	 */
 	public CNFConverter() {
 		super();
-		//continues number + level
+		// continues number + level
 		naming.put(Or.class, "Clause%d");
-		topName = "SubtreeCNF";
+		topName =
+			"SubtreeCNF";
 	}
-	
+
 	/**
 	 * Creates cnf and returns a list of clauses
 	 */
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		List<Node> clauses = new LinkedList<Node>();
-		
-		Node cnf = constraint.getNode().toCNF();
-		
-		if(cnf instanceof And) {
+		List<Node> clauses =
+			new LinkedList<Node>();
+
+		Node cnf =
+			constraint.getNode().toCNF();
+
+		if (cnf instanceof And) {
 			clauses.addAll(Arrays.asList(cnf.getChildren()));
 		} else {
 			clauses.add(cnf);
 		}
-		
+
 		return clauses;
 	}
 }

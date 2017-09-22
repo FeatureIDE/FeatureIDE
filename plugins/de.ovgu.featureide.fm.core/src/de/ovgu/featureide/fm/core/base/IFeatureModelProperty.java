@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-
 /**
  * Manages all additional properties of a feature model.
  * 

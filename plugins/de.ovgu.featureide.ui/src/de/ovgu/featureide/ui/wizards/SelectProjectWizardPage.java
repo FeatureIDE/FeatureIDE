@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
- * A wizard page to select the project the user wants to import from. Shows all
- * project in workbench.
+ * A wizard page to select the project the user wants to import from. Shows all project in workbench.
  * 
  * @author Christoph Giesel
  * @author Sebastian Krieter
@@ -47,7 +46,8 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	private Composite container;
 	private Tree projectTree;
 
-	private IFeatureProject selectedProject = null;
+	private IFeatureProject selectedProject =
+		null;
 
 	public SelectProjectWizardPage() {
 		super("Select Project");
@@ -57,34 +57,44 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 
 	@Override
 	public void createControl(Composite parent) {
-		container = new Composite(parent, SWT.NONE);
+		container =
+			new Composite(parent, SWT.NONE);
 
-		FillLayout layout = new FillLayout();
+		FillLayout layout =
+			new FillLayout();
 		container.setLayout(layout);
 		setControl(container);
 
-		projectTree = new Tree(container, SWT.NORMAL);
+		projectTree =
+			new Tree(container, SWT.NORMAL);
 		projectTree.addSelectionListener(this);
 
 		for (IFeatureProject project : CorePlugin.getFeatureProjects()) {
-			//			try {
-			IProject projectHandle = project.getProject();
-			if (projectHandle != null && projectHandle.isAccessible()) { //&& !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
-				TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
+			// try {
+			IProject projectHandle =
+				project.getProject();
+			if (projectHandle != null
+				&& projectHandle.isAccessible()) { // && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
+				TreeItem item =
+					new TreeItem(projectTree, SWT.NORMAL);
 				item.setImage(GUIDefaults.FEATURE_SYMBOL);
 				item.setText(project.getProjectName());
 				item.setData(project);
 			}
-			//			} catch (CoreException e) {
-			//				CorePlugin.getDefault().logError(e);
-			//			}
+			// } catch (CoreException e) {
+			// CorePlugin.getDefault().logError(e);
+			// }
 		}
 	}
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		final TreeItem[] items = projectTree.getSelection();
-		selectedProject = (items.length == 0) ? null : (IFeatureProject) items[0].getData();
+		final TreeItem[] items =
+			projectTree.getSelection();
+		selectedProject =
+			(items.length == 0)
+				? null
+				: (IFeatureProject) items[0].getData();
 		updatePage();
 	}
 

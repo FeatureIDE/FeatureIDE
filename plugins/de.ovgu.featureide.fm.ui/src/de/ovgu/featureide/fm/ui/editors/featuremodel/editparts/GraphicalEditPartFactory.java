@@ -42,13 +42,14 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 		} else if (model instanceof IGraphicalFeatureModel) {
 			return new ModelEditPart((IGraphicalFeatureModel) model);
 		} else if (model instanceof FeatureConnection) {
-			return new ConnectionEditPart((FeatureConnection) model); 
+			return new ConnectionEditPart((FeatureConnection) model);
 		} else if (model instanceof IGraphicalConstraint) {
 			return new ConstraintEditPart((IGraphicalConstraint) model);
 		} else if (model instanceof Legend) {
 			return new LegendEditPart((Legend) model);
 		} else {
-			throw new UnsupportedOperationException("Not implememented for " + model.getClass());
+			throw new UnsupportedOperationException("Not implememented for "
+				+ model.getClass());
 		}
 
 	}

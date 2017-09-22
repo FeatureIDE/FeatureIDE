@@ -38,7 +38,6 @@ public class ExtendedFeatureProperty extends FeatureProperty {
 		super(oldProperty, correspondingFeature);
 	}
 
-	
 	@Override
 	public String getDisplayName() {
 		return super.getDisplayName();

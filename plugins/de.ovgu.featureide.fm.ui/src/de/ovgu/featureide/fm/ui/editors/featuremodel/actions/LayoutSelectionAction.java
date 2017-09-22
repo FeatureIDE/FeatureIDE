@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionO
 
 /**
  * Action to select the layout for the feature model.
+ * 
  * @author Marcus Pinnecke (Feature interface)
  */
 public class LayoutSelectionAction extends Action {
@@ -41,18 +42,23 @@ public class LayoutSelectionAction extends Action {
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+	public LayoutSelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm,
+			int oldSelectedLayoutAlgorithm) {
 		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
-		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
-		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
-		this.featureModel = featureModel;
+		this.newSelectedLayoutAlgorithm =
+			newSelectedLayoutAlgorithm;
+		this.oldSelectedLayoutAlgorithm =
+			oldSelectedLayoutAlgorithm;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
-		LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
-		//TODO _interfaces Removed Code
-				op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
+		LayoutSelectionOperation op =
+			new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
+		// TODO _interfaces Removed Code
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

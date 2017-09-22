@@ -30,7 +30,7 @@ package de.ovgu.featureide.fm.core.editing.evaluation;
  */
 @Deprecated
 public class Evaluation {
-	
+
 ////	final static int[] sizes = new int[] {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000};
 ////	final static int[] edites = new int[] {10};
 ////	final static int[] edites2 = new int[] {0, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};

@@ -25,7 +25,8 @@ package de.ovgu.featureide.ui.views.configMap.header;
  * @author Antje Moench
  */
 public interface ICustomTableHeaderSelectionListener {
+
 	public void onColumnSelectionChanged(int columnIndex);
-	
+
 	public void onColumnDoubleClicked();
 }

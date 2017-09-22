@@ -24,21 +24,26 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+
 /**
  * Operation to select the layout for the feature model editor.
  */
 public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOperation {
+
 	private final int newNameType;
 	private int oldNameType;
 	private final IGraphicalFeatureModel featureModel;
 
 	public NameTypeSelectionOperation(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
 		super(featureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
-		this.featureModel = featureModel;
+		this.newNameType =
+			newNameType;
+		this.oldNameType =
+			oldNameType;
+		this.featureModel =
+			featureModel;
 	}
-	
+
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModel.getLayout().setShowShortNames(newNameType == 1);

@@ -30,8 +30,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * This class handles the event that is triggered when you select a
- * configuration file with the context menu.
+ * This class handles the event that is triggered when you select a configuration file with the context menu.
  * 
  * @author Tom Brosch
  * @author Sebastian Krieter
@@ -40,7 +39,8 @@ public class SetConfigurationHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureProject project = CorePlugin.getFeatureProject(file);
+		final IFeatureProject project =
+			CorePlugin.getFeatureProject(file);
 		if (project == null) {
 			UIPlugin.getDefault().logWarning(CANT_SET_CONFIGURATION_AS_CURRENT_CONFIGURATION_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT);
 		} else {

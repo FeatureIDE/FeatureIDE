@@ -31,7 +31,8 @@ import java.util.ArrayList;
  */
 public class AndFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID =
+		1L;
 
 	@Override
 	public boolean isValid(T object) {

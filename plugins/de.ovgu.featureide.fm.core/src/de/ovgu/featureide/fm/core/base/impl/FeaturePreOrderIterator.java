@@ -35,10 +35,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class FeaturePreOrderIterator implements Iterator<IFeature> {
 
-	private final LinkedList<IFeatureStructure> featureStructureList = new LinkedList<>();
+	private final LinkedList<IFeatureStructure> featureStructureList =
+		new LinkedList<>();
 
 	public FeaturePreOrderIterator(IFeatureModel featureModel) {
-		final IFeatureStructure root = featureModel.getStructure().getRoot();
+		final IFeatureStructure root =
+			featureModel.getStructure().getRoot();
 		if (root != null) {
 			featureStructureList.add(root);
 		}
@@ -54,7 +56,8 @@ public class FeaturePreOrderIterator implements Iterator<IFeature> {
 		if (!hasNext()) {
 			throw new NoSuchElementException();
 		}
-		final IFeatureStructure removeFirst = featureStructureList.removeFirst();
+		final IFeatureStructure removeFirst =
+			featureStructureList.removeFirst();
 		if (removeFirst.hasChildren()) {
 			featureStructureList.addAll(0, removeFirst.getChildren());
 		}

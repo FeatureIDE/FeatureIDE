@@ -36,10 +36,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 
 /**
- * The main editpart that has all <code>FeatureEditPart</code>s as children.
- * Notice that Draw2D calls a figure child of another when its drawn within the
- * parent figure. Therefore, all features need to by direct children of this
- * editpart.
+ * The main editpart that has all <code>FeatureEditPart</code>s as children. Notice that Draw2D calls a figure child of another when its drawn within the parent
+ * figure. Therefore, all features need to by direct children of this editpart.
  * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke
@@ -55,12 +53,14 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 	public void setLegend(Legend legend) {
 		if (legend == null)
 			return;
-		this.legend = legend;
+		this.legend =
+			legend;
 	}
 
 	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
-		this.legend = new Legend(featureModel);
+		this.legend =
+			new Legend(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
@@ -93,19 +93,26 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final IGraphicalFeatureModel fm = getModel();
+		final IGraphicalFeatureModel fm =
+			getModel();
 
-		final List<IGraphicalConstraint> constraints = fm.getVisibleConstraints();
-		final Collection<IGraphicalFeature> features = fm.getVisibleFeatures();
+		final List<IGraphicalConstraint> constraints =
+			fm.getVisibleConstraints();
+		final Collection<IGraphicalFeature> features =
+			fm.getVisibleFeatures();
 
-		final ArrayList<Object> list = new ArrayList<>(constraints.size() + features.size() + 1);
+		final ArrayList<Object> list =
+			new ArrayList<>(constraints.size()
+				+ features.size()
+				+ 1);
 
 		list.addAll(features);
 		list.addAll(constraints);
 
 		if (!fm.isLegendHidden()) {
 			if (legend == null)
-				legend = new Legend(fm);
+				legend =
+					new Legend(fm);
 			list.add(legend);
 			fm.setLegend(legend);
 		}

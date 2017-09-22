@@ -16,15 +16,13 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands. ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
-				.getInstance();
+		InvalidConfigurationsViewController analyzerViewController =
+			InvalidConfigurationsViewController
+					.getInstance();
 
 		analyzerViewController.clear();
 		return null;
@@ -32,8 +30,9 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 
 	@Override
 	public boolean isEnabled() {
-		InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
-				.getInstance();
+		InvalidConfigurationsViewController analyzerViewController =
+			InvalidConfigurationsViewController
+					.getInstance();
 
 		return !analyzerViewController.isEmpty();
 	}

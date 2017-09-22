@@ -28,6 +28,7 @@ import org.prop4j.explain.solvers.MusExtractorTests;
  * @author Timo G&uuml;nther
  */
 public class Sat4jMusExtractorTests extends MusExtractorTests {
+
 	@Override
 	protected Sat4jMusExtractor getInstance() {
 		return new Sat4jSatSolverFactory().getMusExtractor();

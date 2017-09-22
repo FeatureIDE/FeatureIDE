@@ -30,16 +30,16 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 public class SPLMigrationPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "de.ovgu.featureide.core.variantimport"; //$NON-NLS-1$
+	public static final String PLUGIN_ID =
+		"de.ovgu.featureide.core.variantimport"; //$NON-NLS-1$
 
 	// The shared instance
 	private static SPLMigrationPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public SPLMigrationPlugin() {
-	}
+	public SPLMigrationPlugin() {}
 
 	/*
 	 * (non-Javadoc)
@@ -47,7 +47,8 @@ public class SPLMigrationPlugin extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		plugin =
+			this;
 	}
 
 	/*
@@ -55,7 +56,8 @@ public class SPLMigrationPlugin extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		plugin =
+			null;
 		super.stop(context);
 	}
 

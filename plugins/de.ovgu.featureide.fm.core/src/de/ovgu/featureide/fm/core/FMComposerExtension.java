@@ -23,15 +23,17 @@ package de.ovgu.featureide.fm.core;
 import org.eclipse.core.resources.IProject;
 
 /**
- * Default feature model extension. 
+ * Default feature model extension.
  * 
  * @author Jens Meinicke
  */
 public class FMComposerExtension implements IFMComposerExtension {
 
-	private boolean hasComposer = false;
-	
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]+\\w*$";
+	private boolean hasComposer =
+		false;
+
+	public static final String FEATURE_NAME_PATTERN =
+		"^[a-zA-Z]+\\w*$";
 
 	@Override
 	public String getOrderPageMessage() {
@@ -48,13 +50,18 @@ public class FMComposerExtension implements IFMComposerExtension {
 			IProject project) {
 		return false;
 	}
-	
+
 	public final boolean isValidFeatureName(String s) {
-		if (s == null || s.trim().isEmpty() || s.contains("\"") || s.contains("(") || s.contains(")"))
+		if (s == null
+			|| s.trim().isEmpty()
+			|| s.contains("\"")
+			|| s.contains("(")
+			|| s.contains(")"))
 			return false;
 		else {
 			if (hasComposer) {
-				boolean valid = isValidFeatureNameComposerSpecific(s);
+				boolean valid =
+					isValidFeatureNameComposerSpecific(s);
 				return valid;
 			} else return true;
 		}
@@ -66,11 +73,14 @@ public class FMComposerExtension implements IFMComposerExtension {
 
 	@Override
 	public final void hasComposer(boolean hasComposer) {
-		this.hasComposer  = hasComposer;
+		this.hasComposer =
+			hasComposer;
 	}
 
 	@Override
 	public String getErrorMessage() {
-		return hasComposer ? ERROR_MESSAGE_COMPOSER : ERROR_MESSAGE_NO_COMPOSER;
+		return hasComposer
+			? ERROR_MESSAGE_COMPOSER
+			: ERROR_MESSAGE_NO_COMPOSER;
 	}
 }

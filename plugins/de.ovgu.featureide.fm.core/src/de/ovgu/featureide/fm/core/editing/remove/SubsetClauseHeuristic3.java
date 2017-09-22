@@ -21,8 +21,7 @@
 package de.ovgu.featureide.fm.core.editing.remove;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features dependent on the current clauses in the formula.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features dependent on the current clauses in the formula.
  * 
  * @author Sebastian Krieter
  */
@@ -34,40 +33,59 @@ public class SubsetClauseHeuristic3 extends AFeatureOrderHeuristic {
 
 	@Override
 	protected int getNextIndex() {
-		DeprecatedFeature smallestFeature = null;
-		int minIndex = 0;
-		for (int i = 1; i < map.length; i++) {
-			final DeprecatedFeature next = map[i];
-			if (next != null && next.getClauseCount() <= 0) {
-				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
-					smallestFeature = next;
-					minIndex = i;
+		DeprecatedFeature smallestFeature =
+			null;
+		int minIndex =
+			0;
+		for (int i =
+			1; i < map.length; i++) {
+			final DeprecatedFeature next =
+				map[i];
+			if (next != null
+				&& next.getClauseCount() <= 0) {
+				if (smallestFeature == null
+					|| smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature =
+						next;
+					minIndex =
+						i;
 				}
 			}
 		}
 		if (minIndex > 0) {
 			return minIndex;
 		}
-		
-		for (int i = 1; i < map.length; i++) {
-			final DeprecatedFeature next = map[i];
-			if (next != null && next.getMixedCount() == 0) {
-				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
-					smallestFeature = next;
-					minIndex = i;
+
+		for (int i =
+			1; i < map.length; i++) {
+			final DeprecatedFeature next =
+				map[i];
+			if (next != null
+				&& next.getMixedCount() == 0) {
+				if (smallestFeature == null
+					|| smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature =
+						next;
+					minIndex =
+						i;
 				}
 			}
 		}
 		if (minIndex > 0) {
 			return minIndex;
 		}
-		
-		for (int i = 1; i < map.length; i++) {
-			final DeprecatedFeature next = map[i];
+
+		for (int i =
+			1; i < map.length; i++) {
+			final DeprecatedFeature next =
+				map[i];
 			if (next != null) {
-				if (smallestFeature == null || smallestFeature.getClauseCount() > next.getClauseCount()) {
-					smallestFeature = next;
-					minIndex = i;
+				if (smallestFeature == null
+					|| smallestFeature.getClauseCount() > next.getClauseCount()) {
+					smallestFeature =
+						next;
+					minIndex =
+						i;
 				}
 			}
 		}

@@ -15,10 +15,12 @@ import br.ufal.ic.colligens.models.cppchecker.CppCheckerFileLogs;
 import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class SemanticBugsController {
+
 	private final ProjectExplorerController projectExplorer;
 
 	public SemanticBugsController() {
-		projectExplorer = new ProjectExplorerController();
+		projectExplorer =
+			new ProjectExplorerController();
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
@@ -37,17 +39,22 @@ public class SemanticBugsController {
 
 			projectExplorer.run();
 
-			final List<IResource> resources = projectExplorer.getList();
+			final List<IResource> resources =
+				projectExplorer.getList();
 
 			Display.getDefault().asyncExec(new Runnable() {
+
 				@Override
 				public void run() {
-					CppCheckAnalyzer analyser = new CppCheckAnalyzer();
+					CppCheckAnalyzer analyser =
+						new CppCheckAnalyzer();
 
-					for (Iterator<IResource> iterator = resources.iterator(); iterator
-							.hasNext();) {
+					for (Iterator<IResource> iterator =
+						resources.iterator(); iterator
+								.hasNext();) {
 
-						IResource iResource = iterator.next();
+						IResource iResource =
+							iterator.next();
 
 						// System.out.println(iResource);
 
@@ -55,11 +62,13 @@ public class SemanticBugsController {
 
 					}
 
-					List<CppCheckerFileLogs> fileLogs = analyser.getFiles();
+					List<CppCheckerFileLogs> fileLogs =
+						analyser.getFiles();
 
 					// returns the list to view
-					SemanticBugsViewController statisticsViewController = SemanticBugsViewController
-							.getInstance();
+					SemanticBugsViewController statisticsViewController =
+						SemanticBugsViewController
+								.getInstance();
 
 					statisticsViewController.setInput(fileLogs);
 

@@ -35,16 +35,18 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractPreprocessorExplanationCreator extends AbstractFeatureModelExplanationCreator implements PreprocessorExplanationCreator {
+
 	/** The expression stack. */
 	private Deque<Node> expressionStack;
-	
+
 	@Override
 	public Deque<Node> getExpressionStack() {
 		return expressionStack;
 	}
-	
+
 	@Override
 	public void setExpressionStack(Collection<Node> expressionStack) {
-		this.expressionStack = new ArrayDeque<>(expressionStack);
+		this.expressionStack =
+			new ArrayDeque<>(expressionStack);
 	}
 }

@@ -16,25 +16,32 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 public class CppCheckAnalyzer {
+
 	private final HashMap<String, CppCheckerFileLogs> hashMap;
 
 	public CppCheckAnalyzer() {
-		hashMap = new HashMap<String, CppCheckerFileLogs>();
+		hashMap =
+			new HashMap<String, CppCheckerFileLogs>();
 	}
 
 	public void processFile(IFile iFile) {
-		CppChecker checker = new CppChecker();
+		CppChecker checker =
+			new CppChecker();
 
 		checker.checkFile(iFile.getLocation().toFile(), iFile.getProject()
 				.getName());
 
-		String xml = checker.getXmlFile();
+		String xml =
+			checker.getXmlFile();
 
 		// System.err.println(xml);
 
-		SAXBuilder builder = new SAXBuilder();
-		Reader in = new StringReader(xml);
-		Document doc = null;
+		SAXBuilder builder =
+			new SAXBuilder();
+		Reader in =
+			new StringReader(xml);
+		Document doc =
+			null;
 		// Element root = null;
 		// Element meta = null;
 		// Element _code = null;
@@ -46,7 +53,8 @@ public class CppCheckAnalyzer {
 		// String description = "";
 
 		try {
-			doc = builder.build(in);
+			doc =
+				builder.build(in);
 			// TODO xml não contem "commResponse"
 			//
 			// root = doc.getRootElement();
@@ -64,33 +72,43 @@ public class CppCheckAnalyzer {
 			e.printStackTrace();
 		}
 
-		Element rootNode = doc.getRootElement();
+		Element rootNode =
+			doc.getRootElement();
 
-		List<Element> list = rootNode.getChildren();
+		List<Element> list =
+			rootNode.getChildren();
 
-		for (Iterator<Element> i = list.iterator(); i.hasNext();) {
+		for (Iterator<Element> i =
+			list.iterator(); i.hasNext();) {
 
-			Element element = i.next();
+			Element element =
+				i.next();
 
-			String file = element.getAttributeValue("file");
-			file = file.substring(iFile.getProject().getLocation().toOSString()
-					.length(), file.length());
+			String file =
+				element.getAttributeValue("file");
+			file =
+				file.substring(iFile.getProject().getLocation().toOSString()
+						.length(), file.length());
 
-			CppCheckerFileLogs fileLogs = null;
+			CppCheckerFileLogs fileLogs =
+				null;
 			if (hashMap.containsKey(file)) {
-				fileLogs = hashMap.get(file);
+				fileLogs =
+					hashMap.get(file);
 			} else {
-				fileLogs = new CppCheckerFileLogs(iFile.getProject().getFile(
-						file));
+				fileLogs =
+					new CppCheckerFileLogs(iFile.getProject().getFile(
+							file));
 				hashMap.put(file, fileLogs);
 			}
 
-			CppCheckerLog log = new CppCheckerLog(fileLogs,
-					element.getAttributeValue("line"),
-					element.getAttributeValue("id"),
-					element.getAttributeValue("severity"),
-					element.getAttributeValue("msg"),
-					element.getAttributeValue("config"));
+			CppCheckerLog log =
+				new CppCheckerLog(fileLogs,
+						element.getAttributeValue("line"),
+						element.getAttributeValue("id"),
+						element.getAttributeValue("severity"),
+						element.getAttributeValue("msg"),
+						element.getAttributeValue("config"));
 
 			fileLogs.addLog(log);
 
@@ -99,13 +117,17 @@ public class CppCheckAnalyzer {
 	}
 
 	public List<CppCheckerFileLogs> getFiles() {
-		List<CppCheckerFileLogs> list = new LinkedList<CppCheckerFileLogs>();
+		List<CppCheckerFileLogs> list =
+			new LinkedList<CppCheckerFileLogs>();
 
-		Collection<CppCheckerFileLogs> collection = hashMap.values();
+		Collection<CppCheckerFileLogs> collection =
+			hashMap.values();
 
-		for (Iterator<CppCheckerFileLogs> iterator = collection.iterator(); iterator
-				.hasNext();) {
-			CppCheckerFileLogs fileLogs = iterator.next();
+		for (Iterator<CppCheckerFileLogs> iterator =
+			collection.iterator(); iterator
+					.hasNext();) {
+			CppCheckerFileLogs fileLogs =
+				iterator.next();
 			list.add(fileLogs);
 		}
 

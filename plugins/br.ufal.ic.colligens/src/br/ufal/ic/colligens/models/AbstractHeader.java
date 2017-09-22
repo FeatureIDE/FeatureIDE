@@ -27,24 +27,32 @@ import br.ufal.ic.colligens.controllers.ProjectExplorerController;
 import br.ufal.ic.colligens.util.metrics.CountDirectives;
 
 public abstract class AbstractHeader {
-	private List<String> listAllFiles = null;
 
-	protected CountDirectives countDirectives = null;
+	private List<String> listAllFiles =
+		null;
+
+	protected CountDirectives countDirectives =
+		null;
 
 	private ICProject project;
 
-	protected IProgressMonitor monitor = null;
+	protected IProgressMonitor monitor =
+		null;
 
 	public AbstractHeader() {
-		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
-		if (!store.getBoolean("USE_INCLUDES") && !store.getBoolean("USE_STUBS")) {
+		IPreferenceStore store =
+			Colligens.getDefault().getPreferenceStore();
+		if (!store.getBoolean("USE_INCLUDES")
+			&& !store.getBoolean("USE_STUBS")) {
 			store.setValue("USE_STUBS", true);
 		}
 	}
 
 	public static AbstractHeader getInstance() {
-		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
-		if (!store.getBoolean("USE_INCLUDES") && !store.getBoolean("USE_STUBS")) {
+		IPreferenceStore store =
+			Colligens.getDefault().getPreferenceStore();
+		if (!store.getBoolean("USE_INCLUDES")
+			&& !store.getBoolean("USE_STUBS")) {
 			store.setValue("USE_STUBS", true);
 		}
 
@@ -70,27 +78,34 @@ public abstract class AbstractHeader {
 	}
 
 	public void setProject(String projectName) throws PlatformException {
-		project = CoreModel.getDefault().getCModel().getCProject(projectName);
+		project =
+			CoreModel.getDefault().getCModel().getCProject(projectName);
 
 		if (project == null) {
-			throw new PlatformException(NOT_A_VALID_FILE_C_IN + projectName);
+			throw new PlatformException(NOT_A_VALID_FILE_C_IN
+				+ projectName);
 		}
 	}
 
 	protected List<String> filesAllProject() throws PlatformException {
-		if (listAllFiles != null && listAllFiles.size() > 0) {
+		if (listAllFiles != null
+			&& listAllFiles.size() > 0) {
 			return listAllFiles;
 		}
 
-		listAllFiles = new ArrayList<String>();
+		listAllFiles =
+			new ArrayList<String>();
 
 		try {
 
-			ISourceRoot sourceRoots[] = project.getSourceRoots();
-			for (int i = 0; i < sourceRoots.length; i++) {
+			ISourceRoot sourceRoots[] =
+				project.getSourceRoots();
+			for (int i =
+				0; i < sourceRoots.length; i++) {
 				if (!sourceRoots[i].getPath().toOSString()
 						.equals(project.getProject().getName())) {
-					ProjectExplorerController explorerController = new ProjectExplorerController();
+					ProjectExplorerController explorerController =
+						new ProjectExplorerController();
 					explorerController
 							.addResource(sourceRoots[i].getResource());
 
@@ -106,13 +121,16 @@ public abstract class AbstractHeader {
 					"Your project does not have a source folder (ex.: /src).");
 		}
 
-		countDirectives = new CountDirectives();
+		countDirectives =
+			new CountDirectives();
 
 		countDirectives.directives.add("COLLIGENS");
 
-		for (Iterator<String> iterator = listAllFiles.iterator(); iterator
-				.hasNext();) {
-			String file = iterator.next();
+		for (Iterator<String> iterator =
+			listAllFiles.iterator(); iterator
+					.hasNext();) {
+			String file =
+				iterator.next();
 			try {
 				countDirectives.count(file);
 			} catch (Exception e) {
@@ -126,17 +144,22 @@ public abstract class AbstractHeader {
 	}
 
 	public static IFile getFile(String fileName) {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(fileName);
+		IWorkspace workspace =
+			ResourcesPlugin.getWorkspace();
+		IPath location =
+			Path.fromOSString(fileName);
 		return workspace.getRoot().getFileForLocation(location);
 	}
 
 	public void setMonitor(IProgressMonitor monitor) {
-		this.monitor = monitor;
+		this.monitor =
+			monitor;
 	}
 
 	protected boolean monitorIsCanceled() {
-		return monitor != null ? monitor.isCanceled() : false;
+		return monitor != null
+			? monitor.isCanceled()
+			: false;
 	}
 
 	protected void monitorWorked(int value) {

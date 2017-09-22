@@ -27,8 +27,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Operation with functionality to rename features. Provides undo/redo
- * functionality.
+ * Operation with functionality to rename features. Provides undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
@@ -40,8 +39,10 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 
 	public RenameFeatureOperation(IFeatureModel featureModel, String oldName, String newName) {
 		super(featureModel, RENAME_FEATURE);
-		this.oldName = oldName;
-		this.newName = newName;
+		this.oldName =
+			oldName;
+		this.newName =
+			newName;
 	}
 
 	@Override

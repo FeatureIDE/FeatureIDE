@@ -30,15 +30,22 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Reimar Schroeter
  */
 public class BuildDocWizard extends AbstractWizard {
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
+
+	public static final String ID =
+		UIPlugin.PLUGIN_ID
+			+ ".wizards.BuildExtendedModulesWizard";
 
 	private final String defaultFolderString;
 	private final boolean featureSelection;
-	
+
 	public BuildDocWizard(String title, String defaultFolderString, boolean featureSelection) {
 		super(title);
-		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
-		this.featureSelection = featureSelection;
+		this.defaultFolderString =
+			(defaultFolderString != null)
+				? defaultFolderString
+				: "";
+		this.featureSelection =
+			featureSelection;
 	}
 
 	@Override
@@ -49,7 +56,7 @@ public class BuildDocWizard extends AbstractWizard {
 //		addPage(new ChooseFolderPage(defaultFolderString));
 		addPage(new DocArgumentsPage());
 	}
-	
+
 	public String getDefaultFolderString() {
 		return defaultFolderString;
 	}

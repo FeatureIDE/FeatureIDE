@@ -33,71 +33,85 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
- * An instance of this class represents the graphical representation of the 
- * Class with in the Collaboration Diagram.
+ * An instance of this class represents the graphical representation of the Class with in the Collaboration Diagram.
  * 
  * @author Constanze Adler
  */
 public class ClassFigure extends Figure implements GUIDefaults {
-	
-	private final Label label = new Label();
+
+	private final Label label =
+		new Label();
 	private int height;
 
-	
 	public ClassFigure(FSTClass c, int height) {
-		
+
 		super();
-		
+
 		this.setLayoutManager(new FreeformLayout());
 
-		IFile editorFile = CollaborationModelBuilder.editorFile;
-		
-		if (editorFile != null && c.getName().equals(editorFile.getName())) {
+		IFile editorFile =
+			CollaborationModelBuilder.editorFile;
+
+		if (editorFile != null
+			&& c.getName().equals(editorFile.getName())) {
 			setBackgroundColor(OPEN_CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER_SELECTED);
 		} else {
 			setBackgroundColor(CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER);
-	
+
 		}
-		
+
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
-		this.height = height;
+		this.height =
+			height;
 
-		String name = c.getName();
+		String name =
+			c.getName();
 		if (name.contains("/")) {
-			name = name.substring(name.lastIndexOf("/")+1,name.length());
+			name =
+				name.substring(name.lastIndexOf("/")
+					+ 1, name.length());
 		}
 		this.setName(name);
-		
+
 		this.add(label);
 		this.setOpaque(false);
-			
+
 	}
-	
-	private void setName(String name){
+
+	private void setName(String name) {
 		label.setText(name);
-		Dimension labelSize = label.getPreferredSize();
-		
+		Dimension labelSize =
+			label.getPreferredSize();
+
 		if (labelSize.width < DEFAULT_CLASS_WIDTH)
-			labelSize.width = DEFAULT_CLASS_WIDTH;
-		
+			labelSize.width =
+				DEFAULT_CLASS_WIDTH;
+
 		if (labelSize.equals(label.getSize()))
 			return;
-		
+
 		label.setSize(labelSize);
 
-		Rectangle bounds = getBounds();
-		int w = CLASS_INSETS.getWidth();
-		
+		Rectangle bounds =
+			getBounds();
+		int w =
+			CLASS_INSETS.getWidth();
+
 		bounds.setSize(labelSize.expand(w, height));
 
-		Dimension oldSize = getSize();
+		Dimension oldSize =
+			getSize();
 		if (!oldSize.equals(0, 0)) {
-			int dx = (oldSize.width - bounds.width) / 2;
-			bounds.x += dx;
+			int dx =
+				(oldSize.width
+					- bounds.width)
+					/ 2;
+			bounds.x +=
+				dx;
 		}
 		setBounds(bounds);
 	}

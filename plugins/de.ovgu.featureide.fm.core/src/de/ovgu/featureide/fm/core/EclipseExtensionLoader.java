@@ -32,26 +32,33 @@ import org.eclipse.core.runtime.Platform;
  * @author Tom Brosch
  */
 public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
-	
+
 	protected final Class<T> classObject;
 	protected final String pluginID;
 	protected final String extensionID;
 	protected final String extensionPointID;
 
 	public EclipseExtensionLoader(String pluginID, String extensionPointID, String extensionID, Class<T> classObject) {
-		this.pluginID = pluginID;
-		this.extensionPointID = extensionPointID;
-		this.extensionID = extensionID;
-		this.classObject = classObject;
+		this.pluginID =
+			pluginID;
+		this.extensionPointID =
+			extensionPointID;
+		this.extensionID =
+			extensionID;
+		this.classObject =
+			classObject;
 	}
 
 	@Override
 	public void loadProviders(ExtensionManager<T> extensionManager) {
-		final IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
+		final IExtension[] extensions =
+			Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
 		for (IExtension extension : extensions) {
-			final IConfigurationElement[] configurationElements = extension.getConfigurationElements();
+			final IConfigurationElement[] configurationElements =
+				extension.getConfigurationElements();
 			for (IConfigurationElement configurationElement : configurationElements) {
-				final T extensionInstance = parseExtension(configurationElement);
+				final T extensionInstance =
+					parseExtension(configurationElement);
 				if (extensionInstance != null) {
 					extensionManager.addExtension(extensionInstance);
 				}

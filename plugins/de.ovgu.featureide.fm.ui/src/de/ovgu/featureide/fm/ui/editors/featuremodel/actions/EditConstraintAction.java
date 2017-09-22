@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
 /**
- * An action to edit a selected propositional constraint below the feature
- * diagram.
+ * An action to edit a selected propositional constraint below the feature diagram.
  * 
  * @author Christian Becker
  * @author Thomas Thuem
@@ -56,18 +55,23 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart)
+		if (selection.size() == 1
+			&& selection.getFirstElement() instanceof ModelEditPart)
 			return false;
 
-		Iterator<?> iter = selection.iterator();
+		Iterator<?> iter =
+			selection.iterator();
 		while (iter.hasNext()) {
-			Object editPart = iter.next();
+			Object editPart =
+				iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint = ((ConstraintEditPart) editPart).getModel().getObject();
+				constraint =
+					((ConstraintEditPart) editPart).getModel().getObject();
 				return true;
 			}
 			if (editPart instanceof IConstraint) {
-				constraint = (IConstraint) editPart;
+				constraint =
+					(IConstraint) editPart;
 				return true;
 			}
 		}

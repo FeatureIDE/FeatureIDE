@@ -42,6 +42,7 @@ public interface IJob<T> {
 		RUNNING(0x01),
 		/**
 		 * Job has finished successfully .
+		 * 
 		 * @see #FAILED
 		 */
 		OK(0x02),
@@ -55,7 +56,8 @@ public interface IJob<T> {
 		private int value;
 
 		private JobStatus(int value) {
-			this.value = value;
+			this.value =
+				value;
 		}
 
 		public int getValue() {

@@ -33,30 +33,33 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * Filter to hide fields in the collaboration outline.
  * 
- * @author Dominic Labsch	
+ * @author Dominic Labsch
  * @author Daniel P�sche
  */
 public class HideAllFields implements IOutlineFilter {
 
-
 	@Override
 	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
+		LinkedList<Object> resultList =
+			new LinkedList<Object>();
 
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
+		if (obj.length > 0
+			&& obj[0] instanceof RoleElement) {
+			for (int i =
+				0; i < obj.length; i++) {
 				if (!(obj[i] instanceof FSTField)) {
 					resultList.add(obj[i]);
 				}
 			}
-		}else{
+		} else {
 			return obj;
 		}
 		return resultList.toArray();
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getName()
 	 */
 	@Override
@@ -64,7 +67,8 @@ public class HideAllFields implements IOutlineFilter {
 		return "Hide All Fields";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getImage()
 	 */
 	@Override

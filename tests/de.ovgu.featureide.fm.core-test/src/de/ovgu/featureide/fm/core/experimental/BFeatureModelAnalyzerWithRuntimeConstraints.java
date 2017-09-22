@@ -27,19 +27,18 @@ import de.ovgu.runtimetest.RuntimeTest.Annotations.Constraint;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.WarmUp;
 
 /**
- * This is a benchmark for analyzes at the {@link IFeatureModel}.
- * The test cases do not analyze the validity of the analyses.
+ * This is a benchmark for analyzes at the {@link IFeatureModel}. The test cases do not analyze the validity of the analyses.
  * 
- * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
- * to avoid that the tests fail for slower computers.
+ * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz) to avoid that the tests fail for slower computers.
  * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
 public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
-	
+
 	static {
-		disableThisTest = false;	// set this flag to true, if this test class should be skipped
+		disableThisTest =
+			false;	// set this flag to true, if this test class should be skipped
 	}
 
 	/**
@@ -47,7 +46,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 */
 	@WarmUp
 	public void warmup() {
-		for (int i = 0; i < 10; i++) {
+		for (int i =
+			0; i < 10; i++) {
 			analyze(10);
 			analyze(20);
 			analyze(21);
@@ -238,30 +238,42 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	private static IFeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
-			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 2:
-			return Commons.loadFeatureModelFromFile("berkeley_db_model2.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("berkeley_db_model2.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 1000:
-			return Commons.loadFeatureModelFromFile("1000-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("1000-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 500:
-			return Commons.loadFeatureModelFromFile("500-101.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("500-101.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 200:
-			return Commons.loadFeatureModelFromFile("200-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("200-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 201:
-			return Commons.loadFeatureModelFromFile("200-100-hidden.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("200-100-hidden.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 100:
-			return Commons.loadFeatureModelFromFile("100-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("100-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 50:
-			return Commons.loadFeatureModelFromFile("50-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("50-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 20:
-			return Commons.loadFeatureModelFromFile("20-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("20-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 21:
-			return Commons.loadFeatureModelFromFile("20-100-hidden.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("20-100-hidden.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		case 10:
-			return Commons.loadFeatureModelFromFile("10-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("10-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		default:
 			System.err.println("NO FM");
-			return Commons.loadFeatureModelFromFile("10-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+			return Commons.loadFeatureModelFromFile("10-100.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 		}
 	}
 

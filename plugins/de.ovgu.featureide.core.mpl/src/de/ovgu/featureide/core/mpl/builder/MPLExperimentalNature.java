@@ -33,14 +33,15 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
  */
 public class MPLExperimentalNature implements IProjectNature {
 
-	public static final String NATURE_ID = MPLPlugin.PLUGIN_ID
+	public static final String NATURE_ID =
+		MPLPlugin.PLUGIN_ID
 			+ ".MPLExperimentalNature";
 
 	private IProject project;
 
 	@Override
 	public void configure() throws CoreException {}
-	
+
 	@Override
 	public void deconfigure() throws CoreException {}
 
@@ -51,7 +52,8 @@ public class MPLExperimentalNature implements IProjectNature {
 
 	@Override
 	public void setProject(IProject project) {
-		this.project = project;
+		this.project =
+			project;
 	}
 
 }

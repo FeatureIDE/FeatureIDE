@@ -45,37 +45,41 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class SelectionAction extends Action {
 
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+	private ISelectionChangedListener listener =
+		new ISelectionChangedListener() {
 
-			if (isSelectionValid(selection)) {
-				for (IGraphicalFeature feature : model.getFeatures()) {
-					if (feature.isConstraintSelected()) {
-						feature.setConstraintSelected(false);
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection =
+					(IStructuredSelection) event.getSelection();
+
+				if (isSelectionValid(selection)) {
+					for (IGraphicalFeature feature : model.getFeatures()) {
+						if (feature.isConstraintSelected()) {
+							feature.setConstraintSelected(false);
+						}
 					}
-				}
 
-				for (IGraphicalConstraint constraint : model.getConstraints()) {
-					if (constraint.isFeatureSelected()) {
-						constraint.setFeatureSelected(false);
+					for (IGraphicalConstraint constraint : model.getConstraints()) {
+						if (constraint.isFeatureSelected()) {
+							constraint.setFeatureSelected(false);
+						}
 					}
-				}
 
-				if (selection.getFirstElement() instanceof ConstraintEditPart) {
-					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-				} else if (selection.getFirstElement() instanceof FeatureEditPart) {
-					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+					if (selection.getFirstElement() instanceof ConstraintEditPart) {
+						((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+					} else if (selection.getFirstElement() instanceof FeatureEditPart) {
+						((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+					}
 				}
 			}
-		}
-	};
+		};
 
 	private IGraphicalFeatureModel model;
 
 	public SelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(SELECTION);
-		this.model = graphicalFeatureModel;
+		this.model =
+			graphicalFeatureModel;
 
 		viewer.addSelectionChangedListener(listener);
 	}

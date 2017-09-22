@@ -25,41 +25,41 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 public class Colligens extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "br.ufal.ic.colligens"; //$NON-NLS-1$
-	public static final String PLUGIN_NAME = "Colligens";
+	public static final String PLUGIN_ID =
+		"br.ufal.ic.colligens"; //$NON-NLS-1$
+	public static final String PLUGIN_NAME =
+		"Colligens";
 
 	// The shared instance
 	private static Colligens plugin;
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		plugin =
+			this;
 
-		Start inicialize = new Start();
+		Start inicialize =
+			new Start();
 		inicialize.SystemClear();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		Start inicialize = new Start();
+		Start inicialize =
+			new Start();
 		inicialize.SystemClear();
 
-		plugin = null;
+		plugin =
+			null;
 		super.stop(context);
 	}
 
@@ -73,11 +73,9 @@ public class Colligens extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
+	 * Returns an image descriptor for the image file at the given plug-in relative path
 	 * 
-	 * @param path
-	 *            the path
+	 * @param path the path
 	 * @return the image descriptor
 	 */
 	@Override
@@ -97,17 +95,23 @@ public class Colligens extends AbstractUIPlugin {
 	 * @return directory configuration
 	 */
 	public File getConfigDir() {
-		Location location = Platform.getConfigurationLocation();
-		File file = null;
+		Location location =
+			Platform.getConfigurationLocation();
+		File file =
+			null;
 		if (location != null) {
-			URL configURL = location.getURL();
-			if (configURL != null && configURL.getProtocol().startsWith("file")) {
-				file = new File(configURL.getFile(), PLUGIN_ID);
+			URL configURL =
+				location.getURL();
+			if (configURL != null
+				&& configURL.getProtocol().startsWith("file")) {
+				file =
+					new File(configURL.getFile(), PLUGIN_ID);
 				file.mkdirs();
 				return file;
 			}
 		}
-		file = getStateLocation().toFile();
+		file =
+			getStateLocation().toFile();
 		file.mkdirs();
 		return file;
 	}

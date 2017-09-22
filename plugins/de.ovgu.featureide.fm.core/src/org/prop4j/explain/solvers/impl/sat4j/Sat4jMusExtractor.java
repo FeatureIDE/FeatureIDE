@@ -35,32 +35,35 @@ import org.sat4j.tools.xplain.Xplain;
  * @author Timo G&uuml;nther
  */
 public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
+
 	/**
 	 * Constructs a new instance of this class.
 	 */
 	protected Sat4jMusExtractor() {}
-	
+
 	@Override
 	protected Xplain<ISolver> createOracle() {
 		return new Xplain<ISolver>(super.createOracle());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Xplain<ISolver> getOracle() {
 		return (Xplain<ISolver>) super.getOracle();
 	}
-	
+
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		final Set<Integer> indexes = getMinimalUnsatisfiableSubsetIndexes();
-		final Set<Node> mus = new LinkedHashSet<>(indexes.size());
+		final Set<Integer> indexes =
+			getMinimalUnsatisfiableSubsetIndexes();
+		final Set<Node> mus =
+			new LinkedHashSet<>(indexes.size());
 		for (final int index : indexes) {
 			mus.add(getClause(index));
 		}
 		return mus;
 	}
-	
+
 	@Override
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		if (isSatisfiable()) {
@@ -68,11 +71,13 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		}
 		final int[] indexes;
 		try {
-			indexes = getOracle().minimalExplanation();
+			indexes =
+				getOracle().minimalExplanation();
 		} catch (TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set =
+			new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}

@@ -45,92 +45,100 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Timo G&uuml;nther
  */
 public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
+
 	/** The CNF with all constraints but the redundant one. */
 	private Node cnfWithoutRedundantConstraint;
 	/** The amount of clauses added to the CNF that originate from a constraint. */
-	private int constraintClauseCount = 0;
-	
+	private int constraintClauseCount =
+		0;
+
 	@Override
 	public IConstraint getSubject() {
 		return (IConstraint) super.getSubject();
 	}
-	
+
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if (subject != null && !(subject instanceof IConstraint)) {
+		if (subject != null
+			&& !(subject instanceof IConstraint)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
 		resetOracle();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p>
-	 * Does not include any of the constraints.
-	 * The constraints are only added later during explaining.
-	 * This is faster than creating the complete CNF and repeatedly removing the redundant constraints from it.
-	 * </p>
+	 * <p> Does not include any of the constraints. The constraints are only added later during explaining. This is faster than creating the complete CNF and
+	 * repeatedly removing the redundant constraints from it. </p>
 	 */
 	@Override
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc = super.createNodeCreator();
+		final AdvancedNodeCreator nc =
+			super.createNodeCreator();
 		nc.setModelType(ModelType.OnlyStructure);
 		return nc;
 	}
-	
+
 	protected Node getCnfWithoutRedundantConstraint() {
-		if (cnfWithoutRedundantConstraint == null && getFeatureModel() != null) {
-			cnfWithoutRedundantConstraint = createCnfWithoutRedundantConstraint();
+		if (cnfWithoutRedundantConstraint == null
+			&& getFeatureModel() != null) {
+			cnfWithoutRedundantConstraint =
+				createCnfWithoutRedundantConstraint();
 		}
 		return cnfWithoutRedundantConstraint;
 	}
-	
+
 	protected Node createCnfWithoutRedundantConstraint() {
 		getTraceModel().removeTraces(constraintClauseCount);
-		this.constraintClauseCount = 0;
-		
-		final List<Node> clauses = new LinkedList<>();
+		this.constraintClauseCount =
+			0;
+
+		final List<Node> clauses =
+			new LinkedList<>();
 		Collections.addAll(clauses, getCnf().getChildren());
-		final AdvancedNodeCreator nc = getNodeCreator();
+		final AdvancedNodeCreator nc =
+			getNodeCreator();
 		for (final IConstraint constraint : getFeatureModel().getConstraints()) {
 			if (constraint == getSubject()) {
 				continue;
 			}
-			final Node constraintNode = nc.createConstraintNode(constraint);
-			final Node[] constraintClauses = constraintNode.getChildren();
-			constraintClauseCount += constraintClauses.length;
+			final Node constraintNode =
+				nc.createConstraintNode(constraint);
+			final Node[] constraintClauses =
+				constraintNode.getChildren();
+			constraintClauseCount +=
+				constraintClauses.length;
 			Collections.addAll(clauses, constraintClauses);
 		}
 		return new And(clauses.toArray(new Node[clauses.size()]));
 	}
-	
+
 	@Override
 	protected Ltms createOracle() {
 		return new Ltms(getCnfWithoutRedundantConstraint());
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p>
-	 * Uses a representation of the feature model without the redundant constraint.
-	 * Sets several initial truth value assumptions that lead to a violation of the redundant constraint.
-	 * Then propagates each set of values until a violation in a clause occurs.
-	 * Since a representation of the feature model without the redundant constraint is used,
-	 * the information of the constraint must already be stored differently in the feature model, making it redundant.
-	 * Finally combines all generated explanations into one.
-	 * </p>
+	 * <p> Uses a representation of the feature model without the redundant constraint. Sets several initial truth value assumptions that lead to a violation of
+	 * the redundant constraint. Then propagates each set of values until a violation in a clause occurs. Since a representation of the feature model without
+	 * the redundant constraint is used, the information of the constraint must already be stored differently in the feature model, making it redundant. Finally
+	 * combines all generated explanations into one. </p>
 	 */
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
-		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
+		final RedundantConstraintExplanation cumulatedExplanation =
+			getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms = getOracle();
+		final Ltms ltms =
+			getOracle();
 		for (final Map<Object, Boolean> assignment : getSubject().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
-			final Explanation explanation = getExplanation(ltms.getExplanations());
+			final Explanation explanation =
+				getExplanation(ltms.getExplanations());
 			if (explanation == null) {
 				continue;
 			}
@@ -141,12 +149,12 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		}
 		return cumulatedExplanation;
 	}
-	
+
 	@Override
 	protected RedundantConstraintExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
 		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
 	}
-	
+
 	@Override
 	protected RedundantConstraintExplanation getConcreteExplanation() {
 		return new RedundantConstraintExplanation(getSubject());

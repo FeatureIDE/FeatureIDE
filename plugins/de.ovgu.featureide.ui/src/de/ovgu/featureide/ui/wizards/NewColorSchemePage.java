@@ -42,8 +42,9 @@ public class NewColorSchemePage extends WizardPage {
 
 	private Text textColorSchemeName;
 	private Button buttonCurColorScheme;
-	
-	private boolean curColorScheme = true;
+
+	private boolean curColorScheme =
+		true;
 
 	public NewColorSchemePage() {
 		super("wizardPage");
@@ -55,33 +56,42 @@ public class NewColorSchemePage extends WizardPage {
 	 * @see IDialogPage#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		composite.setLayout(layout);
-		
-		Label label = new Label(composite, SWT.NULL);
-		label.setText("&New Colorscheme: ");
-		textColorSchemeName = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		textColorSchemeName.setLayoutData(gd);
-		new Label(composite,SWT.NULL);
+		GridData gd =
+			new GridData(GridData.FILL_HORIZONTAL);
 
-		label = new Label(composite, SWT.NULL);
+		Composite composite =
+			new Composite(parent, SWT.NULL);
+		GridLayout layout =
+			new GridLayout();
+		layout.numColumns =
+			3;
+		composite.setLayout(layout);
+
+		Label label =
+			new Label(composite, SWT.NULL);
+		label.setText("&New Colorscheme: ");
+		textColorSchemeName =
+			new Text(composite, SWT.BORDER
+				| SWT.SINGLE);
+		textColorSchemeName.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
+
+		label =
+			new Label(composite, SWT.NULL);
 		label.setText("&Set as current Colorscheme: ");
-		
-		buttonCurColorScheme = new Button(composite, SWT.CHECK);
+
+		buttonCurColorScheme =
+			new Button(composite, SWT.CHECK);
 		buttonCurColorScheme.setSelection(curColorScheme);
 		buttonCurColorScheme.setLayoutData(gd);
-		
+
 		setControl(composite);
 	}
-	
+
 	public boolean isCurColorScheme() {
 		return buttonCurColorScheme.getSelection();
 	}
-	
+
 	public String getColorSchemeName() {
 		return textColorSchemeName.getText();
 	}

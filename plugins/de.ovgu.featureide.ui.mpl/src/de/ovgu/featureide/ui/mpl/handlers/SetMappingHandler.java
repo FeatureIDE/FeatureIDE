@@ -37,5 +37,5 @@ public class SetMappingHandler extends AFileHandler {
 			MPLPlugin.getDefault().setCurrentMapping(file.getProject(), file.getName());
 		}
 	}
-	
+
 }

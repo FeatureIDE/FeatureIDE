@@ -36,7 +36,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
  */
 public class CErrorPropagation extends ErrorPropagation {
 
-	private static final String TASK = "org.eclipse.cdt.core.task";
+	private static final String TASK =
+		"org.eclipse.cdt.core.task";
 
 	protected CErrorPropagation(IFeatureProject featureProject) {
 		super(featureProject);
@@ -51,65 +52,94 @@ public class CErrorPropagation extends ErrorPropagation {
 			if (f.getBody() == null) {
 				continue;
 			}
-			int i = content.indexOf(f.getBody());
+			int i =
+				content.indexOf(f.getBody());
 			if (i == -1) {
 				continue;
 			}
-			int line = countLines(content.substring(0, i));
+			int line =
+				countLines(content.substring(0, i));
 			f.setComposedLine(line);
 		}
 
-		content = content.replaceAll("__wrappee__\\w*\\s*", "");
+		content =
+			content.replaceAll("__wrappee__\\w*\\s*", "");
 		while (content.contains("  ")) {
-			content = content.replaceAll("  ", " ");
+			content =
+				content.replaceAll("  ", " ");
 		}
-		content = content.replaceAll("\t", "");
+		content =
+			content.replaceAll("\t", "");
 		while (content.contains(" (")) {
-			content = content.replaceAll(" \\(", "(");
+			content =
+				content.replaceAll(" \\(", "(");
 		}
 		while (content.contains(" \n")) {
-			content = content.replaceAll(" \n", "\n");
+			content =
+				content.replaceAll(" \n", "\n");
 		}
 
 		for (FSTMethod m : methods) {
 			if (m.getBody() == null) {
 				continue;
 			}
-			int i = -1;
+			int i =
+				-1;
 			if (m.isConstructor()) {
-				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
+				String body =
+					m.getBody().substring(m.getBody().indexOf('{')
+						+ 1);
 				while (body.contains("  ")) {
-					body = body.replaceAll("  ", " ");
+					body =
+						body.replaceAll("  ", " ");
 				}
-				body = body.replaceAll("\t", "");
+				body =
+					body.replaceAll("\t", "");
 				while (body.contains(" (")) {
-					body = body.replaceAll(" \\(", "(");
+					body =
+						body.replaceAll(" \\(", "(");
 				}
-				body = body.replaceAll("\r\n", "\n");
+				body =
+					body.replaceAll("\r\n", "\n");
 				while (body.contains(" \n")) {
-					body = body.replaceAll(" \n", "\n");
+					body =
+						body.replaceAll(" \n", "\n");
 				}
-				body = body.substring(0, body.lastIndexOf('}'));
-				i = content.indexOf(body);
+				body =
+					body.substring(0, body.lastIndexOf('}'));
+				i =
+					content.indexOf(body);
 			} else {
-				String body = m.getBody();
+				String body =
+					m.getBody();
 				while (body.contains("  ")) {
-					body = body.replaceAll("  ", " ");
+					body =
+						body.replaceAll("  ", " ");
 				}
-				body = body.replaceAll("\t", "");
+				body =
+					body.replaceAll("\t", "");
 				while (body.contains(" (")) {
-					body = body.replaceAll(" \\(", "(");
+					body =
+						body.replaceAll(" \\(", "(");
 				}
-				body = body.replaceAll("\r\n", "\n");
+				body =
+					body.replaceAll("\r\n", "\n");
 				while (body.contains(" \n")) {
-					body = body.replaceAll(" \n", "\n");
+					body =
+						body.replaceAll(" \n", "\n");
 				}
-				body = body.replaceAll("original\\(", m.getName() + "(");
-				body = body.replaceAll("original\\s*\\(", m.getName() + " (");
-				i = content.indexOf(body);
+				body =
+					body.replaceAll("original\\(", m.getName()
+						+ "(");
+				body =
+					body.replaceAll("original\\s*\\(", m.getName()
+						+ " (");
+				i =
+					content.indexOf(body);
 			}
 			if (i != -1) {
-				int line = countLines(content.substring(0, i));
+				int line =
+					countLines(content.substring(0, i));
 				m.setComposedLine(line);
 			}
 		}
@@ -119,8 +149,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	protected boolean propagateMarker(IMarker m) {
 		try {
 			return !(TASK.equals(m.getType()));
-		} catch (CoreException e) {
-		}
+		} catch (CoreException e) {}
 		return super.propagateMarker(m);
 	}
 

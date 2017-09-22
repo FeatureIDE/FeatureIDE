@@ -30,8 +30,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Action to specify feature model analysis.<br>
- * A manual call of the feature model analysis.
+ * Action to specify feature model analysis.<br> A manual call of the feature model analysis.
  * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
@@ -42,15 +41,19 @@ public class RunManualCalculationsAction extends Action {
 
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
-		boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
-		featureModel.getAnalyser().runCalculationAutomatically = true;
+		boolean oldValue =
+			featureModel.getAnalyser().runCalculationAutomatically;
+		featureModel.getAnalyser().runCalculationAutomatically =
+			true;
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
+		featureModel.getAnalyser().runCalculationAutomatically =
+			oldValue;
 	}
 
 }

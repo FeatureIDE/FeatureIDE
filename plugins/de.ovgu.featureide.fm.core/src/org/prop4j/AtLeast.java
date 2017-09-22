@@ -24,22 +24,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A constraint that is true iff at least a specified number of children is
- * true.
+ * A constraint that is true iff at least a specified number of children is true.
  * 
  * @author Thomas Thuem
  */
 public class AtLeast extends Node {
-	
+
 	public int min;
 
-	public AtLeast(int min, Object ...children) {
-		this.min = min;
+	public AtLeast(int min, Object... children) {
+		this.min =
+			min;
 		setChildren(children);
 	}
 
 	public AtLeast(int min, Node[] children) {
-		this.min = min;
+		this.min =
+			min;
 		setChildren(children);
 	}
 
@@ -55,7 +56,9 @@ public class AtLeast extends Node {
 
 	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
-		return new And(chooseKofN(newChildren, newChildren.length - min + 1, false));
+		return new And(chooseKofN(newChildren, newChildren.length
+			- min
+			+ 1, false));
 	}
 
 	@Override
@@ -63,8 +66,11 @@ public class AtLeast extends Node {
 		super.eliminate(list);
 		if (!list.contains(getClass()))
 			return this;
-		
-		Node[] newNodes = chooseKofN(children, children.length - min + 1, false);
+
+		Node[] newNodes =
+			chooseKofN(children, children.length
+				- min
+				+ 1, false);
 		return new And(newNodes);
 	}
 
@@ -75,7 +81,8 @@ public class AtLeast extends Node {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		int trueCount = 0;
+		int trueCount =
+			0;
 		for (final Node child : children) {
 			if (child.getValue(map)) {
 				trueCount++;

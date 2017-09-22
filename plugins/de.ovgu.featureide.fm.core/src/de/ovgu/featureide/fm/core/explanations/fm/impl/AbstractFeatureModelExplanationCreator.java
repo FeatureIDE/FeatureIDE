@@ -39,154 +39,174 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
+
 	/** The subject with an attribute to be explained. */
 	private Object subject;
 	/** The feature model context. */
 	private IFeatureModel fm;
 	/**
-	 * Creates the CNF from the feature model.
-	 * Created and reset together with the feature model.
+	 * Creates the CNF from the feature model. Created and reset together with the feature model.
 	 */
 	private AdvancedNodeCreator nodeCreator;
 	/**
-	 * A formula representation of the feature model in CNF (conjunctive normal form).
-	 * The CNF is created lazily when needed and reset when the feature model changes.
-	 * This makes it possible to reuse the CNF for different defects of the same type in the same feature model.
+	 * A formula representation of the feature model in CNF (conjunctive normal form). The CNF is created lazily when needed and reset when the feature model
+	 * changes. This makes it possible to reuse the CNF for different defects of the same type in the same feature model.
 	 */
 	private Node cnf;
 	/**
-	 * The trace model.
-	 * Created and reset together with the CNF.
+	 * The trace model. Created and reset together with the CNF.
 	 */
 	private FeatureModelToNodeTraceModel traceModel;
 	/**
-	 * The oracle used to reason over the circumstance to explain.
-	 * Uses the CNF as input.
-	 * Created lazily when needed and reset when the CNF changes.
+	 * The oracle used to reason over the circumstance to explain. Uses the CNF as input. Created lazily when needed and reset when the CNF changes.
 	 */
 	private Object oracle;
-	
+
 	@Override
 	public Object getSubject() {
 		return subject;
 	}
-	
+
 	@Override
 	public void setSubject(Object subject) {
-		this.subject = subject;
+		this.subject =
+			subject;
 	}
-	
+
 	@Override
 	public IFeatureModel getFeatureModel() {
 		return fm;
 	}
-	
+
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
-		this.fm = fm;
-		this.nodeCreator = null;
-		this.cnf = null;
-		this.traceModel = null;
-		this.oracle = null;
+		this.fm =
+			fm;
+		this.nodeCreator =
+			null;
+		this.cnf =
+			null;
+		this.traceModel =
+			null;
+		this.oracle =
+			null;
 	}
-	
+
 	/**
-	 * Returns the node creator.
-	 * Creates it first if necessary.
+	 * Returns the node creator. Creates it first if necessary.
+	 * 
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
-		if (nodeCreator == null && getFeatureModel() != null) {
-			nodeCreator = createNodeCreator();
+		if (nodeCreator == null
+			&& getFeatureModel() != null) {
+			nodeCreator =
+				createNodeCreator();
 		}
 		return nodeCreator;
 	}
-	
+
 	/**
 	 * Creates a new node creator.
+	 * 
 	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
+		final AdvancedNodeCreator nc =
+			new AdvancedNodeCreator(getFeatureModel());
 		nc.setIncludeBooleanValues(false);
 		nc.setCnfType(CNFType.Regular);
 		nc.setRecordTraceModel(true);
 		return nc;
 	}
-	
+
 	/**
-	 * Returns a formula representation of the feature model in CNF (conjunctive normal form).
-	 * Creates it first if necessary.
+	 * Returns a formula representation of the feature model in CNF (conjunctive normal form). Creates it first if necessary.
+	 * 
 	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if (cnf == null && getFeatureModel() != null) {
-			cnf = createCnf();
+		if (cnf == null
+			&& getFeatureModel() != null) {
+			cnf =
+				createCnf();
 		}
 		return cnf;
 	}
-	
+
 	/**
 	 * Creates the formula representation of the feature model in CNF (conjunctive normal form).
+	 * 
 	 * @return the CNF; not null
 	 */
 	protected Node createCnf() {
 		return getNodeCreator().createNodes();
 	}
-	
+
 	/**
 	 * Returns the trace model.
+	 * 
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
-		if (traceModel == null && getFeatureModel() != null) {
-			traceModel = createTraceModel();
+		if (traceModel == null
+			&& getFeatureModel() != null) {
+			traceModel =
+				createTraceModel();
 		}
 		return traceModel;
 	}
-	
+
 	/**
 	 * Creates the trace model.
+	 * 
 	 * @return the trace model; not null
 	 */
 	protected FeatureModelToNodeTraceModel createTraceModel() {
 		return getNodeCreator().getTraceModel();
 	}
-	
+
 	/**
-	 * Returns the oracle.
-	 * Creates it first if necessary.
+	 * Returns the oracle. Creates it first if necessary.
+	 * 
 	 * @return the oracle; not null
 	 */
 	protected Object getOracle() {
-		if (oracle == null && getFeatureModel() != null) {
-			oracle = createOracle();
+		if (oracle == null
+			&& getFeatureModel() != null) {
+			oracle =
+				createOracle();
 		}
 		return oracle;
 	}
-	
+
 	/**
 	 * Sets the oracle to null.
 	 */
 	protected void resetOracle() {
-		this.oracle = null;
+		this.oracle =
+			null;
 	}
-	
+
 	/**
 	 * Returns a new oracle.
+	 * 
 	 * @return a new oracle; not null
 	 */
 	protected abstract Object createOracle();
-	
+
 	/**
 	 * Returns an explanation for the given clauses.
+	 * 
 	 * @param clauseIndexes indexes of clauses that serve as an explanation
 	 * @return an explanation
 	 */
 	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final Explanation explanation = getConcreteExplanation();
+		final Explanation explanation =
+			getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			final Reason reason = getReason(clauseIndex);
+			final Reason reason =
+				getReason(clauseIndex);
 			if (reason == null) {
 				continue;
 			}
@@ -194,18 +214,20 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 		}
 		return explanation;
 	}
-	
+
 	/**
 	 * Returns the reason for the given clause index.
+	 * 
 	 * @param clauseIndex index of the clause
 	 * @return the reason for the given clause index
 	 */
 	protected Reason getReason(int clauseIndex) {
 		return new FeatureModelReason(getTraceModel().getTrace(clauseIndex));
 	}
-	
+
 	/**
 	 * Returns a new concrete explanation.
+	 * 
 	 * @return a new concrete explanation; not null
 	 */
 	protected abstract Explanation getConcreteExplanation();

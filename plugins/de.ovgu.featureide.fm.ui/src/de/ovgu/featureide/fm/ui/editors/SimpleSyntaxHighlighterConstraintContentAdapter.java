@@ -45,12 +45,15 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	public static class InsertionResult {
+
 		Point selection;
 		String text;
 
 		public InsertionResult(Point selection, String text) {
-			this.selection = selection;
-			this.text = text;
+			this.selection =
+				selection;
+			this.text =
+				text;
 		}
 
 		public Point getSelection() {
@@ -65,11 +68,15 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	public void insertControlContents(Control control, String text, int cursorPosition) {
 
-		final SimpleSyntaxHighlightEditor editor = (SimpleSyntaxHighlightEditor) control;
-		final Point selection = editor.getSelection();
-		final String currentText = editor.getText();
+		final SimpleSyntaxHighlightEditor editor =
+			(SimpleSyntaxHighlightEditor) control;
+		final Point selection =
+			editor.getSelection();
+		final String currentText =
+			editor.getText();
 
-		InsertionResult result = performInsertion(currentText, selection, text);
+		InsertionResult result =
+			performInsertion(currentText, selection, text);
 
 		editor.setText(result.text);
 		editor.setSelection(result.selection);
@@ -82,13 +89,22 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	 * @return
 	 */
 	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert) {
-		String before = "", after = "";
-		String text = textToInsert;
+		String before =
+			"", after =
+				"";
+		String text =
+			textToInsert;
 
 		if (text.contains(Features.FEATURE_SUFFIX)) {
-			text = "\"" + text.replace(Features.FEATURE_SUFFIX, "").trim() + "\"";
+			text =
+				"\""
+					+ text.replace(Features.FEATURE_SUFFIX, "").trim()
+					+ "\"";
 		} else if (text.contains(" ")) {
-			text = "\"" + text + "\"";
+			text =
+				"\""
+					+ text
+					+ "\"";
 		}
 
 		switch (getMode(selection)) {
@@ -99,14 +115,19 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 				if (currentText.isEmpty()) {
 					return new InsertionResult(new Point(text.length(), text.length()), text);
 				} else {
-					before = currentText.substring(0, selection.x);
-					after = currentText.substring(selection.x, currentText.length());
+					before =
+						currentText.substring(0, selection.x);
+					after =
+						currentText.substring(selection.x, currentText.length());
 				}
 				break;
 			case SUBSTRING_PRESENT:
-				int substringStartIndex = getSubStringStartIndex(currentText, selection.x);
-				before = currentText.substring(0, substringStartIndex);
-				after = currentText.substring(selection.x, currentText.length());
+				int substringStartIndex =
+					getSubStringStartIndex(currentText, selection.x);
+				before =
+					currentText.substring(0, substringStartIndex);
+				after =
+					currentText.substring(selection.x, currentText.length());
 				break;
 			default:
 				throw new UnsupportedOperationException();
@@ -114,52 +135,79 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		}
 			break;
 		case REPLACE_TEXT:
-			before = currentText.substring(0, Math.min(selection.x, getSubStringStartIndex(currentText, selection.x)));
-			after = currentText.substring(selection.y, currentText.length());
+			before =
+				currentText.substring(0, Math.min(selection.x, getSubStringStartIndex(currentText, selection.x)));
+			after =
+				currentText.substring(selection.y, currentText.length());
 			break;
 		default:
 			throw new UnsupportedOperationException();
 		}
 
-		if (!before.isEmpty() && !before.endsWith(" "))
-			before += " ";
+		if (!before.isEmpty()
+			&& !before.endsWith(" "))
+			before +=
+				" ";
 
-		if (!after.isEmpty() && !after.startsWith(" "))
-			after = " " + after;
+		if (!after.isEmpty()
+			&& !after.startsWith(" "))
+			after =
+				" "
+					+ after;
 
-		final String newText = before + text + after;
-		final int pos = (before + text).length();
+		final String newText =
+			before
+				+ text
+				+ after;
+		final int pos =
+			(before
+				+ text).length();
 		return new InsertionResult(new Point(pos, pos), newText);
 	}
 
 	private static int getSubStringStartIndex(final String currentText, final int x) {
-		int substringStartIndex = Math.max(0, x - 1);
+		int substringStartIndex =
+			Math.max(0, x
+				- 1);
 		for (; substringStartIndex > 0; substringStartIndex--) {
-			final char ch = currentText.charAt(substringStartIndex);
-			if (ch == ' ' || ch == '(' || ch == ')')
+			final char ch =
+				currentText.charAt(substringStartIndex);
+			if (ch == ' '
+				|| ch == '('
+				|| ch == ')')
 				break;
 		}
 		return substringStartIndex;
 	}
 
 	private static InsertionMode getMode(final String text, final int selectionIndex) {
-		if (text.isEmpty() || selectionIndex - 1 < 0 || text.charAt(selectionIndex - 1) == ' ')
+		if (text.isEmpty()
+			|| selectionIndex
+				- 1 < 0
+			|| text.charAt(selectionIndex
+				- 1) == ' ')
 			return InsertionMode.JUST_INSERT;
-		else if (!text.isEmpty() || selectionIndex - 1 >= 0 && text.charAt(selectionIndex - 1) != ' ')
+		else if (!text.isEmpty()
+			|| selectionIndex
+				- 1 >= 0
+				&& text.charAt(selectionIndex
+					- 1) != ' ')
 			return InsertionMode.SUBSTRING_PRESENT;
 		else
 			return InsertionMode.UNKNOWN;
 	}
 
 	private static TextChangeMode getMode(final Point selection) {
-		return selection.x == selection.y ? TextChangeMode.INSERT_TEXT : selection.x < selection.y ? TextChangeMode.REPLACE_TEXT : TextChangeMode.UNKNOWN;
+		return selection.x == selection.y
+			? TextChangeMode.INSERT_TEXT
+			: selection.x < selection.y
+				? TextChangeMode.REPLACE_TEXT
+				: TextChangeMode.UNKNOWN;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter#
-	 * getControlContents(org.eclipse.swt.widgets.Control)
+	 * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter# getControlContents(org.eclipse.swt.widgets.Control)
 	 */
 	public String getControlContents(Control control) {
 		return ((SimpleSyntaxHighlightEditor) control).getText();
@@ -167,10 +215,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents
-	 * (org.eclipse.swt.widgets.Control, java.lang.String, int)
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents (org.eclipse.swt.widgets.Control, java.lang.String, int)
 	 */
 	public void setControlContents(Control control, String text, int cursorPosition) {
 		((SimpleSyntaxHighlightEditor) control).setText(text);
@@ -179,10 +224,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition
-	 * (org.eclipse.swt.widgets.Control)
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition (org.eclipse.swt.widgets.Control)
 	 */
 	public int getCursorPosition(Control control) {
 		return ((SimpleSyntaxHighlightEditor) control).getSelectionRanges()[0];
@@ -190,25 +232,26 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds
-	 * (org.eclipse.swt.widgets.Control)
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds (org.eclipse.swt.widgets.Control)
 	 */
 	public Rectangle getInsertionBounds(Control control) {
-		SimpleSyntaxHighlightEditor text = (SimpleSyntaxHighlightEditor) control;
-		Point caretOrigin = text.getSelection();
+		SimpleSyntaxHighlightEditor text =
+			(SimpleSyntaxHighlightEditor) control;
+		Point caretOrigin =
+			text.getSelection();
 		// We fudge the y pixels due to problems with getCaretLocation
 		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=52520
-		return new Rectangle(caretOrigin.x + text.getClientArea().x, caretOrigin.y + text.getClientArea().y + 3, 1, text.getLineHeight());
+		return new Rectangle(caretOrigin.x
+			+ text.getClientArea().x,
+				caretOrigin.y
+					+ text.getClientArea().y
+					+ 3,
+				1, text.getLineHeight());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition
-	 * (org.eclipse.swt.widgets.Control, int)
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition (org.eclipse.swt.widgets.Control, int)
 	 */
 	public void setCursorPosition(Control control, int position) {
 		((SimpleSyntaxHighlightEditor) control).setSelection(new Point(position, position));

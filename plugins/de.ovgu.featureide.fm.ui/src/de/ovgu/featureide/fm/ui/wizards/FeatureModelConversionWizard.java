@@ -33,7 +33,9 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class FeatureModelConversionWizard extends AbstractWizard implements INewWizard {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizzard.FeatureModelConversionWizzard";
+	public static final String ID =
+		FMUIPlugin.PLUGIN_ID
+			+ ".wizzard.FeatureModelConversionWizzard";
 
 	public FeatureModelConversionWizard() {
 		super("Convert Feature Models");
@@ -49,7 +51,8 @@ public class FeatureModelConversionWizard extends AbstractWizard implements INew
 	}
 
 	public IFeatureModelFormat getInputFormat() {
-		final Object data = getData(WizardConstants.KEY_OUT_INPUTFORMAT);
+		final Object data =
+			getData(WizardConstants.KEY_OUT_INPUTFORMAT);
 		if (data != null) {
 			try {
 				return FMFormatManager.getInstance().getExtension((String) data);
@@ -61,7 +64,8 @@ public class FeatureModelConversionWizard extends AbstractWizard implements INew
 	}
 
 	public IFeatureModelFormat getOutputFormat() {
-		final Object data = getData(WizardConstants.KEY_OUT_OUTPUTFORMAT);
+		final Object data =
+			getData(WizardConstants.KEY_OUT_OUTPUTFORMAT);
 		if (data != null) {
 			try {
 				return FMFormatManager.getInstance().getExtension((String) data);

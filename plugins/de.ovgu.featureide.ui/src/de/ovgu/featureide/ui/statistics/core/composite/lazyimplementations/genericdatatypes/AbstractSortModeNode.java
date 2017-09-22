@@ -32,16 +32,16 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
 
 /**
- * Implements a second sorting-order. If {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are
- * sorted by their value instead of being sorted alphabetically. In this
- * implementation the {@link TreeClickListener} is responsible for changing
- * this.
+ * Implements a second sorting-order. If {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are sorted by their value instead of being
+ * sorted alphabetically. In this implementation the {@link TreeClickListener} is responsible for changing this.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public abstract class AbstractSortModeNode extends LazyParent implements IToolTip {
-	protected boolean sortByValue = false;
+
+	protected boolean sortByValue =
+		false;
 
 	public AbstractSortModeNode(String description, Object value) {
 		super(description, value);
@@ -58,31 +58,39 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 	}
 
 	public void setSortByValue(boolean sortByValue) {
-		this.sortByValue = sortByValue;
+		this.sortByValue =
+			sortByValue;
 	}
 
 	@Override
 	protected void sortChildren() {
 		if (sortByValue) {
 			Collections.sort(children, new Comparator<Parent>() {
+
 				@Override
 				public int compare(Parent o1, Parent o2) {
 					if (o1.getValue() == null) {
-						if (o1.getDescription() != null && o2.getDescription() != null) {
-							final int i1 = o1.getDescription().lastIndexOf(": ");
-							final int i2 = o2.getDescription().lastIndexOf(": ");
-							if (i1 > -1 && i2 > -1) {
+						if (o1.getDescription() != null
+							&& o2.getDescription() != null) {
+							final int i1 =
+								o1.getDescription().lastIndexOf(": ");
+							final int i2 =
+								o2.getDescription().lastIndexOf(": ");
+							if (i1 > -1
+								&& i2 > -1) {
 								return o2.getDescription().substring(i2).compareTo(o1.getDescription().substring(i1));
 							}
 						}
 					} else {
-						return ((Integer) o2.getValue()) - ((Integer) o1.getValue());
+						return ((Integer) o2.getValue())
+							- ((Integer) o1.getValue());
 					}
 					return 0;
 				}
 			});
 		} else {
 			Collections.sort(children, new Comparator<Parent>() {
+
 				@Override
 				public int compare(Parent o1, Parent o2) {
 					return o1.getDescription().compareTo(o2.getDescription());

@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCr
  * @author Timo G&uuml;nther
  */
 public class MusConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
+
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
 		return new MusAutomaticSelectionExplanationCreator();

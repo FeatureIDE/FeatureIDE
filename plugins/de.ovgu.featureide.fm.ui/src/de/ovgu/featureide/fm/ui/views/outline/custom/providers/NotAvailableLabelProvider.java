@@ -52,12 +52,10 @@ public class NotAvailableLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -65,8 +63,7 @@ public class NotAvailableLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	@Override
 	public int getOutlineType() {
@@ -74,12 +71,10 @@ public class NotAvailableLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-	}
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {}
 
 	@Override
-	public void setForeground(TreeItem item, IFile file) {
-	}
+	public void setForeground(TreeItem item, IFile file) {}
 
 	@Override
 	public String getLabelProvName() {

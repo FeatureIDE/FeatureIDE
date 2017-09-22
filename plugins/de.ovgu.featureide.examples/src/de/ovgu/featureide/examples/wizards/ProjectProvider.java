@@ -45,20 +45,25 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public final class ProjectProvider {
 
-	private static final Collection<ProjectRecord> projects = getProjects();
-	private static final Set<String> viewerNames = getViewersNamesForProjects();
+	private static final Collection<ProjectRecord> projects =
+		getProjects();
+	private static final Set<String> viewerNames =
+		getViewersNamesForProjects();
 
-	private ProjectProvider() {
-	}
+	private ProjectProvider() {}
 
 	public static Collection<ProjectRecord> getProjects() {
 		if (projects != null) {
 			return projects;
 		}
-		InputStream inputStream = null;
+		InputStream inputStream =
+			null;
 		try {
-			final URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
-			inputStream = url.openConnection().getInputStream();
+			final URL url =
+				new URL("platform:/plugin/de.ovgu.featureide.examples/"
+					+ ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+			inputStream =
+				url.openConnection().getInputStream();
 		} catch (IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 		}
@@ -67,11 +72,13 @@ public final class ProjectProvider {
 	}
 
 	private static Collection<ProjectRecord> getProjects(InputStream inputStream) {
-		ProjectRecordCollection projects = new ProjectRecordCollection();
+		ProjectRecordCollection projects =
+			new ProjectRecordCollection();
 
 		FileHandler.load(inputStream, projects, new ProjectRecordFormat());
 
-		for (Iterator<ProjectRecord> iterator = projects.iterator(); iterator.hasNext();) {
+		for (Iterator<ProjectRecord> iterator =
+			projects.iterator(); iterator.hasNext();) {
 			if (!iterator.next().init()) {
 				iterator.remove();
 			}
@@ -84,14 +91,19 @@ public final class ProjectProvider {
 		if (viewerNames != null) {
 			return viewerNames;
 		}
-		Set<String> viewerNames = new HashSet<>();
+		Set<String> viewerNames =
+			new HashSet<>();
 		for (ProjectRecord projectRecord : ProjectProvider.getProjects()) {
-			final Document doc = projectRecord.getInformationDocument();
+			final Document doc =
+				projectRecord.getInformationDocument();
 
 			if (doc != null) {
-				final NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
-				for (int i = 0; i < nlInterfaces.getLength(); i++) {
-					final Node item = nlInterfaces.item(i);
+				final NodeList nlInterfaces =
+					doc.getElementsByTagName("contentProvider");
+				for (int i =
+					0; i < nlInterfaces.getLength(); i++) {
+					final Node item =
+						nlInterfaces.item(i);
 					if (item.getNodeType() == Node.ELEMENT_NODE) {
 						viewerNames.add(((Element) item).getAttribute("name"));
 					}

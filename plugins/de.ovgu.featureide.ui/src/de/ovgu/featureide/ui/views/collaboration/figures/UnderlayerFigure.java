@@ -35,30 +35,32 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 public class UnderlayerFigure extends Figure implements GUIDefaults {
 
 	private CollaborationFigure collaborationFigure;
-	
+
 	public UnderlayerFigure(FSTFeature coll) {
 		super();
-		collaborationFigure = new CollaborationFigure(coll);
+		collaborationFigure =
+			new CollaborationFigure(coll);
 		this.add(collaborationFigure);
-		
+
 		collaborationFigure.setLocation(COLLFIGURE_LOCATION);
 		this.setSize(0, DEFAULT_UNDERLAYER_HEIGHT);
 
 		if (coll.getColor() != -1) {
 			this.setBackgroundColor(ColorPalette.getColor(coll.getColor(), 0.4f));
 		}
-		
+
 		this.setOpaque(true);
 	}
-	
+
 	public void setCollaborationFigureWidth(int width) {
-		collaborationFigure.getBounds().width=width;
+		collaborationFigure.getBounds().width =
+			width;
 	}
 
 	public int getCollaborationFigureWidth() {
 		return collaborationFigure.getBounds().width;
-	}	
-	
+	}
+
 	/**
 	 * @return the collaborationFigure
 	 */

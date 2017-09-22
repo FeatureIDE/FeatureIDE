@@ -28,14 +28,15 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 
-/** 
+/**
  * A decorator for MPL projects.
  * 
  * @author Sebastian Krieter
  */
 public class InterfaceProjectDecorator implements ILightweightLabelDecorator {
-	
-	private static final ImageDescriptor OVERLAY = MPLUIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
+
+	private static final ImageDescriptor OVERLAY =
+		MPLUIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
@@ -48,16 +49,13 @@ public class InterfaceProjectDecorator implements ILightweightLabelDecorator {
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
-	
+
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
-	
+	public void addListener(ILabelProviderListener listener) {}
+
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
-	
+	public void removeListener(ILabelProviderListener listener) {}
+
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 }

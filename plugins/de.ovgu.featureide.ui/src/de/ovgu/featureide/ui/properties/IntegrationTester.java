@@ -40,10 +40,14 @@ public class IntegrationTester extends PropertyTester {
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		if (receiver instanceof IFolder) {
-			IFolder selectedFolder = (IFolder)receiver;
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
-			if (featureProject != null && featureProject.getComposer().hasFeatureFolder()) {
-				IFolder sourceFolder = featureProject.getSourceFolder();
+			IFolder selectedFolder =
+				(IFolder) receiver;
+			IFeatureProject featureProject =
+				CorePlugin.getFeatureProject(selectedFolder);
+			if (featureProject != null
+				&& featureProject.getComposer().hasFeatureFolder()) {
+				IFolder sourceFolder =
+					featureProject.getSourceFolder();
 				try {
 					for (IResource featureFolder : sourceFolder.members()) {
 						if (selectedFolder.equals(featureFolder)) {

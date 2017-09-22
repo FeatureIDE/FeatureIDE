@@ -59,15 +59,18 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
  */
 public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
-	private static final Parent DEFAULT_TEXT = new Parent(OPEN_FILE, null);
+	private static final Parent DEFAULT_TEXT =
+		new Parent(OPEN_FILE, null);
 	private TreeViewer viewer;
-	public Parent godfather = new Parent("godfather", null);
+	public Parent godfather =
+		new Parent("godfather", null);
 	private IFeatureProject project;
 	private boolean canceled;
-	
+
 	public ContentProvider(TreeViewer viewer) {
 		super();
-		this.viewer = viewer;
+		this.viewer =
+			viewer;
 	}
 
 	public boolean isCanceled() {
@@ -75,17 +78,18 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	public void setCanceled(boolean canceled) {
-		this.canceled = canceled;
+		this.canceled =
+			canceled;
 	}
 
 	@Override
 	public void dispose() {
-		this.godfather = null;
+		this.godfather =
+			null;
 	}
 
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	@Override
 	public Object[] getElements(Object inputElement) {
@@ -120,47 +124,59 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	/**
-	 * Calculates content to be shown. If the current editor is not editing a
-	 * file out of a feature project a default message is being displayed. Every
-	 * node is responsible for its own content. So for further information see
-	 * the classes in "lazyimplementations"-package.
+	 * Calculates content to be shown. If the current editor is not editing a file out of a feature project a default message is being displayed. Every node is
+	 * responsible for its own content. So for further information see the classes in "lazyimplementations"-package.
 	 * 
 	 * @see Parent
 	 * @see LazyParent
-	 * @param res
-	 *            Any file out of the current feature-project.
+	 * @param res Any file out of the current feature-project.
 	 */
 	public void calculateContent(IResource res) {
-		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-		boolean hasChanged = newProject != null && project != null && !newProject.equals(project);
+		IFeatureProject newProject =
+			CorePlugin.getFeatureProject(res);
+		boolean hasChanged =
+			newProject != null
+				&& project != null
+				&& !newProject.equals(project);
 		calculateContent(res, hasChanged);
 	}
 
 	public void calculateContent(IResource res, boolean hasChanged) {
-		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
+		final IFeatureProject newProject =
+			CorePlugin.getFeatureProject(res);
 
 		if (newProject == null) {
-			this.project = newProject;
+			this.project =
+				newProject;
 			defaultContent();
-		} else if (hasChanged || project == null) {
-			this.project = newProject;
+		} else if (hasChanged
+			|| project == null) {
+			this.project =
+				newProject;
 			addNodes();
 		}
 	}
 
 	private synchronized void addNodes() {
-		IComposerExtensionClass composer = project.getComposer();
-		FSTModel fstModel = getFSTModel(composer);
-		IFeatureModel featModel = project.getFeatureModel();
+		IComposerExtensionClass composer =
+			project.getComposer();
+		FSTModel fstModel =
+			getFSTModel(composer);
+		IFeatureModel featModel =
+			project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
 
-		godfather = new Parent("GODFATHER", null);
-		String composerName = composer.getName();
-		Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
+		godfather =
+			new Parent("GODFATHER", null);
+		String composerName =
+			composer.getName();
+		Parent composerParent =
+			new Parent(DESC_COMPOSER_NAME, composerName);
 
 		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 		godfather.addChild(composerParent);
-		Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
+		Parent featureModelStatistics =
+			new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
 		featureModelStatistics.addChild(new StatisticsSyntacticalFeatureModel(SYNTACTICAL_STATISTICS, featModel));
 		featureModelStatistics.addChild(new StatisticsSemanticalFeatureModel(SEMANTICAL_STATISTICS, featModel));
 		godfather.addChild(featureModelStatistics);
@@ -176,38 +192,43 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	private FSTModel getFSTModel(IComposerExtensionClass composer) {
-		FSTModel fstModel = project.getFSTModel();
-		if (fstModel == null || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
+		FSTModel fstModel =
+			project.getFSTModel();
+		if (fstModel == null
+			|| fstModel.getClasses().isEmpty()
+			|| fstModel.getFeatures().isEmpty()) {
 			composer.buildFSTModel();
-			fstModel = project.getFSTModel();
+			fstModel =
+				project.getFSTModel();
 		}
 		return fstModel;
 	}
 
 	/**
-	 * Prints a default message when the plug-in can't find necessary
-	 * information.
+	 * Prints a default message when the plug-in can't find necessary information.
 	 */
 	public void defaultContent() {
-		godfather = new Parent("GODFATHER");
+		godfather =
+			new Parent("GODFATHER");
 		godfather.addChild(DEFAULT_TEXT);
 		refresh();
 	}
 
 	/**
-	 * Refreshes the {@link ContentProvider#view} using a UI-Job with highest
-	 * priority.
+	 * Refreshes the {@link ContentProvider#view} using a UI-Job with highest priority.
 	 */
 	protected void refresh() {
-		UIJob job_setColor = new UIJob(REFRESH_STATISTICS_VIEW) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (!viewer.getControl().isDisposed()) {
-					viewer.refresh();
+		UIJob job_setColor =
+			new UIJob(REFRESH_STATISTICS_VIEW) {
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (!viewer.getControl().isDisposed()) {
+						viewer.refresh();
+					}
+					return Status.OK_STATUS;
 				}
-				return Status.OK_STATUS;
-			}
-		};
+			};
 		job_setColor.setPriority(Job.INTERACTIVE);
 		job_setColor.schedule();
 	}

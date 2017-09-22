@@ -25,14 +25,16 @@ import java.util.List;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * Convenience-class. Node which is sorted by default which lazily initializes it's children. A children has it's String-representation as description. The default value of this node is the list's size.
+ * Convenience-class. Node which is sorted by default which lazily initializes it's children. A children has it's String-representation as description. The
+ * default value of this node is the list's size.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class GenericListNode<T> extends AbstractSortModeNode {
+
 	private List<T> list;
-	
+
 	/**
 	 * @param description
 	 * @param value
@@ -40,7 +42,8 @@ public class GenericListNode<T> extends AbstractSortModeNode {
 	 */
 	public GenericListNode(String description, List<T> list) {
 		super(description, list.size());
-		this.list = list;
+		this.list =
+			list;
 		setSorted(true);
 	}
 
@@ -49,6 +52,7 @@ public class GenericListNode<T> extends AbstractSortModeNode {
 		for (T element : list) {
 			addChild(new Parent(element.toString()));
 		}
-		this.value = list.size();
+		this.value =
+			list.size();
 	}
 }

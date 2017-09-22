@@ -23,49 +23,50 @@ package de.ovgu.featureide.ui.views.configMap.header;
 /**
  * A Parallelogram Hitbox.
  * 
- * <pre>
- *                    skew
- *           ________|___
- *          /        |  /
- * height  /         | /
- *        /__________|/
- *     x/y    width
- *    
+ * <pre> skew ________|___ / | / height / | / /__________|/ x/y width
+ * 
  * </pre>
+ * 
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 public class Parallelogram {
+
 	private float width, height, skew, x, y;
-	
+
 	public Parallelogram() {
 		this(1, 1, 0);
 	}
-	
+
 	public Parallelogram(float width, float height, float skew) {
-		this.width = width;
-		this.height = height;
+		this.width =
+			width;
+		this.height =
+			height;
 	}
-	
+
 	public float getX() {
 		return x;
 	}
-	
+
 	public float getY() {
 		return y;
 	}
-	
+
 	public void setLocation(float x, float y) {
-		this.x = x;
-		this.y = y;
+		this.x =
+			x;
+		this.y =
+			y;
 	}
-	
+
 	public float getWidth() {
 		return width;
 	}
 
 	public void setWidth(float width) {
-		this.width = width;
+		this.width =
+			width;
 	}
 
 	public float getHeight() {
@@ -73,7 +74,8 @@ public class Parallelogram {
 	}
 
 	public void setHeight(float height) {
-		this.height = height;
+		this.height =
+			height;
 	}
 
 	public float getSkew() {
@@ -81,25 +83,43 @@ public class Parallelogram {
 	}
 
 	public void setSkew(float skew) {
-		this.skew = skew;
+		this.skew =
+			skew;
 	}
-	
+
 	public boolean containsPoint(float px, float py) {
-		float totalWidth = width + skew;
+		float totalWidth =
+			width
+				+ skew;
 		// check if point is in bounding rectangular
-		boolean inXAxis = x <= px && px <= x + totalWidth;
-		boolean inYAxis = y <= py && py <= y + height;
-		
-		if (inXAxis && inYAxis) {
+		boolean inXAxis =
+			x <= px
+				&& px <= x
+					+ totalWidth;
+		boolean inYAxis =
+			y <= py
+				&& py <= y
+					+ height;
+
+		if (inXAxis
+			&& inYAxis) {
 			// skew = 0 <=> parallelogram is rectangle
 			if (skew == 0) return true;
-			
+
 			// check if the point is not in one of the triangles at the left and right of the parallelogram
-			float gradient = height / skew;
-			float dx = px - x;
-			return py <= gradient * dx && gradient * (dx - width) <= py;
+			float gradient =
+				height
+					/ skew;
+			float dx =
+				px
+					- x;
+			return py <= gradient
+				* dx
+				&& gradient
+					* (dx
+						- width) <= py;
 		}
-		
+
 		return false;
 	}
 

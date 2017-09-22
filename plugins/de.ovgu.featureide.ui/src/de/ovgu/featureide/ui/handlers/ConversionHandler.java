@@ -29,26 +29,26 @@ import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.ui.wizards.ConversionWizard;
 
 /**
- * Starts the conversion wizard for the selected project with the context menu
- * to add the FeatureIDE nature.
+ * Starts the conversion wizard for the selected project with the context menu to add the FeatureIDE nature.
  * 
  * @author Jens Meinicke
  */
 public class ConversionHandler extends ASelectionHandler {
-	
+
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
-		final ConversionWizard wizard = new ConversionWizard();
+		final ConversionWizard wizard =
+			new ConversionWizard();
 		wizard.init(null, selection);
-		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+		final WizardDialog dialog =
+			new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
 			// ...
 		}
 		return false;
 	}
-	
+
 	@Override
-	protected void singleAction(Object element) {
-	}
-	
+	protected void singleAction(Object element) {}
+
 }

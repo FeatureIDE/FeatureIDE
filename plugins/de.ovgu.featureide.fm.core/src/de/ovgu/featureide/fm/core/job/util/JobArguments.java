@@ -26,9 +26,8 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
- * This class is implemented by callers as an anonymous class to encapsulate
- * parameters for the job constructor, so multiple {@code Job}s can be called
- * with low effort.
+ * This class is implemented by callers as an anonymous class to encapsulate parameters for the job constructor, so multiple {@code Job}s can be called with low
+ * effort.
  * 
  * @author Sebastian Krieter
  */
@@ -40,13 +39,16 @@ public abstract class JobArguments {
 	protected JobArguments(Class<? extends JobArguments> cl) {
 		Constructor<? extends LongRunningMethod<?>> tempConstructor;
 		try {
-			tempConstructor = (Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
+			tempConstructor =
+				(Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
 			tempConstructor.setAccessible(true);
 		} catch (Exception e) {
 			Logger.logError(e);
-			tempConstructor = null;
+			tempConstructor =
+				null;
 		}
-		constructor = tempConstructor;
+		constructor =
+			tempConstructor;
 	}
 
 	public LongRunningMethod<?> createJob() {

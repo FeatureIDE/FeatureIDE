@@ -32,21 +32,26 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * @author Sebastian Krieter
  */
 public class AtomicParentNode extends LazyParent {
+
 	private final IFeatureModel model;
 
 	public AtomicParentNode(String description, IFeatureModel model) {
 		super(description, "(expand to calculate)");
-		this.model = model;
+		this.model =
+			model;
 	}
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
+		final List<List<IFeature>> atomicSets =
+			model.getAnalyser().getAtomicSets();
 
-		int i = 0;
+		int i =
+			0;
 		for (List<IFeature> list : atomicSets) {
 			if (list.size() > 1) {
-				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
+				addChild(new FeatureListNode("Atomic Set #"
+					+ ++i, list, list.size(), false));
 			}
 		}
 		setValue(i);

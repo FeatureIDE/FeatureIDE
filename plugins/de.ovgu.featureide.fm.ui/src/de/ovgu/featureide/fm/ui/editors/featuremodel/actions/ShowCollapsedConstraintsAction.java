@@ -44,14 +44,16 @@ public class ShowCollapsedConstraintsAction extends Action {
 
 	public ShowCollapsedConstraintsAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_COLLAPSED_CONSTRAINTS);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 
 	}
 
 	@Override
 	public void run() {
-		ShowCollapsedConstraintsOperation op = new ShowCollapsedConstraintsOperation(featureModel);
-		//TODO _interfaces Removed Code
+		ShowCollapsedConstraintsOperation op =
+			new ShowCollapsedConstraintsOperation(featureModel);
+		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {

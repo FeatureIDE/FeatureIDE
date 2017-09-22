@@ -32,7 +32,8 @@ import org.eclipse.gef.requests.CreateRequest;
  */
 public class ClassXYLayoutPolicy extends XYLayoutEditPolicy {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editpolicies.ConstrainedLayoutEditPolicy#createChangeConstraintCommand(org.eclipse.gef.EditPart, java.lang.Object)
 	 */
 	@Override
@@ -40,7 +41,8 @@ public class ClassXYLayoutPolicy extends XYLayoutEditPolicy {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editpolicies.LayoutEditPolicy#getCreateCommand(org.eclipse.gef.requests.CreateRequest)
 	 */
 	@Override

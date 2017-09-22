@@ -23,30 +23,31 @@ package de.ovgu.featureide.fm.core.explanations.fm;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * Generates explanations for dead features in feature models.
- * Also supports explanations for void feature models by explaining why the root feature is dead.
+ * Generates explanations for dead features in feature models. Also supports explanations for void feature models by explaining why the root feature is dead.
  * 
  * @author Timo G&uuml;nther
  */
 public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
+
 	/**
 	 * Returns the dead feature in the feature model.
+	 * 
 	 * @return the dead feature in the feature model
 	 */
 	@Override
 	public IFeature getSubject();
-	
+
 	/**
 	 * Sets the dead feature in the feature model.
+	 * 
 	 * @param subject the dead feature in the feature model
 	 * @throws IllegalArgumentException if the subject is not an instance of {@link IFeature}
 	 */
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException;
-	
+
 	/**
-	 * Returns an explanation why the specified feature of the specified feature model is dead.
-	 * A dead root feature also means a void feature model.
+	 * Returns an explanation why the specified feature of the specified feature model is dead. A dead root feature also means a void feature model.
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException;

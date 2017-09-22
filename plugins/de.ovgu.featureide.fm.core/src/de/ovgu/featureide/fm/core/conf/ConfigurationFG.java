@@ -51,26 +51,33 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class ConfigurationFG extends Configuration {
 
-	
 	private final class ToIFeature implements Functional.IFunction<IFeatureStructure, IFeature> {
+
 		@Override
 		public IFeature invoke(IFeatureStructure t) {
 			return t.getFeature();
 		}
 	}
 
-	public final static int PARAM_NONE = 0x00;
-	public final static int PARAM_IGNOREABSTRACT = 0x02;
-	public final static int PARAM_PROPAGATE = 0x04;
-	public final static int PARAM_LAZY = 0x08;
+	public final static int PARAM_NONE =
+		0x00;
+	public final static int PARAM_IGNOREABSTRACT =
+		0x02;
+	public final static int PARAM_PROPAGATE =
+		0x04;
+	public final static int PARAM_LAZY =
+		0x08;
 
-	final ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
-	final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
+	final ArrayList<SelectableFeature> features =
+		new ArrayList<SelectableFeature>();
+	final Hashtable<String, SelectableFeature> table =
+		new Hashtable<String, SelectableFeature>();
 
 	private final SelectableFeature root;
 	private final String[] featureNames;
-	
-	private boolean propagate = true;
+
+	private boolean propagate =
+		true;
 
 	private IFeatureGraph featureGraph;
 	private VariableConfiguration variableConfiguration;
@@ -80,22 +87,25 @@ public class ConfigurationFG extends Configuration {
 	 * Creates a new configuration object.
 	 * 
 	 * @param featureModel the corresponding feature model.
-	 * @param options one or more of:</br>
-	 *            &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},</br>
-	 *            &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
-	 *            &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
+	 * @param options one or more of:</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_IGNOREABSTRACT},</br> &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
+	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
 	public ConfigurationFG(IFeatureModel featureModel, IFeatureGraph featureGraph, int options) {
 		super(featureModel);
 
-		this.featureGraph = featureGraph;
+		this.featureGraph =
+			featureGraph;
 
-		this.variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		this.propagator = new ConfigurationChanger(featureGraph, featureModel, variableConfiguration, this);
+		this.variableConfiguration =
+			new VariableConfiguration(featureGraph.getSize());
+		this.propagator =
+			new ConfigurationChanger(featureGraph, featureModel, variableConfiguration, this);
 
-		this.root = initRoot();
-		
-		this.featureNames = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
+		this.root =
+			initRoot();
+
+		this.featureNames =
+			FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 
 		for (String featureName : FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph)) {
 			setAutomatic(featureName, Selection.SELECTED);
@@ -105,19 +115,25 @@ public class ConfigurationFG extends Configuration {
 			setAutomatic(featureName, Selection.UNSELECTED);
 		}
 
-		if ((options & PARAM_LAZY) != 0) {
-			this.propagate = (options & PARAM_PROPAGATE) != 0;
+		if ((options
+			& PARAM_LAZY) != 0) {
+			this.propagate =
+				(options
+					& PARAM_PROPAGATE) != 0;
 		} else {
-			loadPropagator((options & PARAM_PROPAGATE) != 0);
+			loadPropagator((options
+				& PARAM_PROPAGATE) != 0);
 		}
 	}
 
 	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
-		if (sFeature != null && sFeature.getName() != null) {
+		if (sFeature != null
+			&& sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
 			for (IFeature child : Functional.map(feature.getStructure().getChildren(), new ToIFeature())) {
-				SelectableFeature sChild = new SelectableFeature(child);
+				SelectableFeature sChild =
+					new SelectableFeature(child);
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child);
 			}
@@ -125,8 +141,10 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	private SelectableFeature initRoot() {
-		final IFeature featureRoot = featureModel.getStructure().getRoot().getFeature();
-		final SelectableFeature root = new SelectableFeature(featureRoot);
+		final IFeature featureRoot =
+			featureModel.getStructure().getRoot().getFeature();
+		final SelectableFeature root =
+			new SelectableFeature(featureRoot);
 
 		if (featureRoot != null) {
 			initFeatures(root, featureRoot);
@@ -140,7 +158,8 @@ public class ConfigurationFG extends Configuration {
 
 	private void loadPropagator(boolean propagate) {
 		LongRunningWrapper.runMethod(propagator.load());
-		this.propagate = propagate;
+		this.propagate =
+			propagate;
 		update(false, null);
 	}
 
@@ -150,14 +169,16 @@ public class ConfigurationFG extends Configuration {
 
 	public void setAutomatic(SelectableFeature feature, Selection selection) {
 		feature.setAutomatic(selection);
-		final int featureIndex = featureGraph.getFeatureIndex(feature.getName());
+		final int featureIndex =
+			featureGraph.getFeatureIndex(feature.getName());
 		if (featureIndex >= 0) {
 			variableConfiguration.setVariable(featureIndex, selection.getValue(), false);
 		}
 	}
 
 	public void setAutomatic(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
+		SelectableFeature feature =
+			table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
@@ -177,9 +198,11 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	public List<SelectableFeature> getManualFeatures() {
-		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
+		final List<SelectableFeature> featureList =
+			new LinkedList<SelectableFeature>();
 		for (SelectableFeature selectableFeature : features) {
-			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
+			if (selectableFeature.getAutomatic() == Selection.UNDEFINED
+				&& !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
 			}
 		}
@@ -195,7 +218,8 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	public Set<String> getSelectedFeatureNames() {
-		final Set<String> result = new HashSet<String>();
+		final Set<String> result =
+			new HashSet<String>();
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getName());
@@ -209,8 +233,11 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	public List<IFeature> getSelectedFeatures() {
-		final String[] coreFeatures = FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph);
-		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + coreFeatures.length);
+		final String[] coreFeatures =
+			FeatureUtils.getCoreFeaturesFromFeatureGraph(featureGraph);
+		final List<IFeature> featureList =
+			new ArrayList<>(variableConfiguration.size(true)
+				+ coreFeatures.length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.TRUE) {
 				featureList.add(getFeature(var.getId()));
@@ -227,8 +254,11 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	public List<IFeature> getUnSelectedFeatures() {
-		final String[] deadFeatures = FeatureUtils.getDeadFeaturesFromFeatureGraph(featureGraph);
-		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + deadFeatures.length);
+		final String[] deadFeatures =
+			FeatureUtils.getDeadFeaturesFromFeatureGraph(featureGraph);
+		final List<IFeature> featureList =
+			new ArrayList<>(variableConfiguration.size(true)
+				+ deadFeatures.length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.FALSE) {
 				featureList.add(getFeature(var.getId()));
@@ -245,8 +275,7 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	/**
-	 * Checks that all manual and automatic selections are valid.<br>
-	 * Abstract features will <b>not</b> be ignored.
+	 * Checks that all manual and automatic selections are valid.<br> Abstract features will <b>not</b> be ignored.
 	 * 
 	 * @return {@code true} if the current selection is a valid configuration
 	 */
@@ -258,18 +287,15 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	/**
-	 * Ignores hidden features.
-	 * Use this, when propgate is disabled (hidden features are not updated).
+	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
 	 */
 	public boolean isValidNoHidden() {
 		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {
-	}
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, IMonitor workMonitor) {}
 
-	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {
-	}
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, IMonitor workMonitor) {}
 
 	/**
 	 * Turns all automatic into manual values
@@ -278,10 +304,12 @@ public class ConfigurationFG extends Configuration {
 	 */
 	public void makeManual(boolean discardDeselected) {
 		for (SelectableFeature feature : features) {
-			final Selection autoSelection = feature.getAutomatic();
+			final Selection autoSelection =
+				feature.getAutomatic();
 			if (autoSelection != Selection.UNDEFINED) {
 				feature.setAutomatic(Selection.UNDEFINED);
-				if (!discardDeselected || autoSelection == Selection.SELECTED) {
+				if (!discardDeselected
+					|| autoSelection == Selection.SELECTED) {
 					feature.setManual(autoSelection);
 				}
 			}
@@ -301,8 +329,8 @@ public class ConfigurationFG extends Configuration {
 	/**
 	 * Counts the number of possible solutions.
 	 * 
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br>
-	 *         or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occured) that
+	 *         indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout) {
 		return LongRunningWrapper.runMethod(propagator.number(timeout));
@@ -319,14 +347,16 @@ public class ConfigurationFG extends Configuration {
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		final int featureIndex = featureGraph.getFeatureIndex(feature.getName());
+		final int featureIndex =
+			featureGraph.getFeatureIndex(feature.getName());
 		if (featureIndex >= 0) {
 			variableConfiguration.setVariable(featureIndex, selection.getValue(), true);
 		}
 	}
 
 	public void setManual(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
+		SelectableFeature feature =
+			table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
@@ -334,14 +364,17 @@ public class ConfigurationFG extends Configuration {
 	}
 
 	public void setPropagate(boolean propagate) {
-		this.propagate = propagate;
+		this.propagate =
+			propagate;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		StringBuilder builder =
+			new StringBuilder();
 		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().getStructure().isConcrete()) {
+			if (feature.getSelection() == Selection.SELECTED
+				&& feature.getFeature().getStructure().isConcrete()) {
 				builder.append(feature.getFeature().getName());
 				builder.append("\n");
 			}

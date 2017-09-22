@@ -37,58 +37,71 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-/** 
+/**
  * Holds the signature information for a whole java project.
  * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ProjectSignatures implements Iterable<AbstractSignature> {
-	
+
 	public static final class SignatureIterator implements Iterator<AbstractSignature> {
+
 		private final AbstractSignature[] signatureArray;
-		
-		private final LinkedList<IFilter<?>> filter = new LinkedList<>();
-		private int count = 0;
-		private boolean nextAvailable = false;
-		
+
+		private final LinkedList<IFilter<?>> filter =
+			new LinkedList<>();
+		private int count =
+			0;
+		private boolean nextAvailable =
+			false;
+
 		public SignatureIterator() {
-			signatureArray = new AbstractSignature[0];
+			signatureArray =
+				new AbstractSignature[0];
 		}
-		
+
 		private SignatureIterator(AbstractSignature[] signatureArray) {
-			this.signatureArray = signatureArray;
+			this.signatureArray =
+				signatureArray;
 		}
-		
+
 		public void addFilter(IFilter<?> filter) {
 			this.filter.add(filter);
 		}
-		
+
 		public void clearFilter() {
 			this.filter.clear();
 		}
-		
+
 		public void reset() {
-			count = 0;
-			nextAvailable = false;
+			count =
+				0;
+			nextAvailable =
+				false;
 		}
-		
+
 		private boolean findNext() {
-			if (filter == null && count < signatureArray.length) {
-				nextAvailable = true;
+			if (filter == null
+				&& count < signatureArray.length) {
+				nextAvailable =
+					true;
 				return true;
 			} else {
 				for (; count < signatureArray.length; ++count) {
 					if (isValid(signatureArray[count])) {
-						nextAvailable = true;
+						nextAvailable =
+							true;
 						return true;
 					}
 				}
 			}
 			return false;
 		}
-		
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+
+		@SuppressWarnings({
+			"unchecked",
+			"rawtypes" })
 		private boolean isValid(AbstractSignature sig) {
 			for (IFilter curFilter : filter) {
 				if (!curFilter.isValid(sig)) {
@@ -100,15 +113,18 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 
 		@Override
 		public boolean hasNext() {
-			return nextAvailable || findNext();
+			return nextAvailable
+				|| findNext();
 		}
-		
+
 		@Override
 		public AbstractSignature next() {
-			if (!nextAvailable && !findNext()) {
+			if (!nextAvailable
+				&& !findNext()) {
 				return null;
 			} else {
-				nextAvailable = false;
+				nextAvailable =
+					false;
 				return signatureArray[count++];
 			}
 		}
@@ -116,81 +132,97 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		@Override
 		public void remove() {}
 	}
-	
+
 	private final String[] featureNames;
-	private AbstractSignature[] signatureArray = null;
-	
+	private AbstractSignature[] signatureArray =
+		null;
+
 	private final IFeatureModel featureModel;
-	
-	private int hashCode = 0;
-	private boolean hasHashCode = false;
-	
+
+	private int hashCode =
+		0;
+	private boolean hasHashCode =
+		false;
+
 	public ProjectSignatures(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-		final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
-		int countConcreteFeatures = 0;
-		
+		this.featureModel =
+			featureModel;
+		final String[] tempFeatureNames =
+			new String[featureModel.getNumberOfFeatures()];
+		int countConcreteFeatures =
+			0;
+
 		for (IFeature feature : featureModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
-				tempFeatureNames[countConcreteFeatures++] = feature.getName();
+				tempFeatureNames[countConcreteFeatures++] =
+					feature.getName();
 			}
 		}
-		featureNames = new String[countConcreteFeatures];
+		featureNames =
+			new String[countConcreteFeatures];
 		System.arraycopy(tempFeatureNames, 0, featureNames, 0, countConcreteFeatures);
 	}
-	
+
 	@Override
 	public SignatureIterator iterator() {
 		return new SignatureIterator(signatureArray);
 	}
-	
+
 	public SignatureIterator iterator(Collection<IFilter<?>> filters) {
-		final SignatureIterator it = new SignatureIterator(signatureArray);
+		final SignatureIterator it =
+			new SignatureIterator(signatureArray);
 		for (IFilter<?> filter : filters) {
 			it.addFilter(filter);
 		}
 		return it;
 	}
-	
+
 	public void sort(Comparator<AbstractSignature> comparator) {
 		Arrays.sort(signatureArray, comparator);
 	}
-	
+
 	public int[] getFeatureIDs(Collection<String> featureNames) {
-		int[] ids = new int[featureNames.size()];
-		int i = 0;
+		int[] ids =
+			new int[featureNames.size()];
+		int i =
+			0;
 		for (String featureName : featureNames) {
-			ids[i++] = getFeatureID(featureName);
+			ids[i++] =
+				getFeatureID(featureName);
 		}
 		return ids;
 	}
-	
+
 	public int[] getFeatureIDs() {
-		int[] featureIDs = new int[featureNames.length];
-		int i = 0;
+		int[] featureIDs =
+			new int[featureNames.length];
+		int i =
+			0;
 		for (String string : featureModel.getFeatureOrderList()) {
-			featureIDs[i++] = getFeatureID(string);
+			featureIDs[i++] =
+				getFeatureID(string);
 		}
 		return featureIDs;
 	}
-	
+
 	public int getFeatureID(String featureName) {
-		for (int i = 0; i < featureNames.length; ++i) {
+		for (int i =
+			0; i < featureNames.length; ++i) {
 			if (featureNames[i].equals(featureName)) {
 				return i;
 			}
 		}
 		return -1;
 	}
-	
+
 	public String getFeatureName(int id) {
 		return featureNames[id];
 	}
-	
+
 	public int getFeatureCount() {
 		return featureNames.length;
 	}
-	
+
 	public String[] getFeatureNames() {
 		return featureNames;
 	}
@@ -198,40 +230,50 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	public int getSize() {
 		return signatureArray.length;
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
-	
+
 	public void setSignatureArray(AbstractSignature[] signatureArray) {
-		this.signatureArray = signatureArray;
+		this.signatureArray =
+			signatureArray;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		return (this == obj) || ((obj instanceof ProjectSignatures) && Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray));
+		return (this == obj)
+			|| ((obj instanceof ProjectSignatures)
+				&& Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray));
 	}
 
 	@Override
 	public int hashCode() {
 		if (!hasHashCode) {
-			hashCode = 1;
-			hashCode += Arrays.hashCode(signatureArray);
-			hasHashCode = true;
+			hashCode =
+				1;
+			hashCode +=
+				Arrays.hashCode(signatureArray);
+			hasHashCode =
+				true;
 		}
 		return hashCode;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Arrays.toString(signatureArray);
 	}
 
 	public HashMap<Integer, int[]> getStatisticNumbers() {
-		final int[][] allCounters = new int[4][4];
-		HashMap<Integer, int[]> fs = new HashMap<Integer, int[]>();
-		for (int i = 0; i < signatureArray.length; ++i) {
-			AbstractSignature signature = signatureArray[i];
+		final int[][] allCounters =
+			new int[4][4];
+		HashMap<Integer, int[]> fs =
+			new HashMap<Integer, int[]>();
+		for (int i =
+			0; i < signatureArray.length; ++i) {
+			AbstractSignature signature =
+				signatureArray[i];
 			if (signature instanceof AbstractFieldSignature) {
 				count(signature, allCounters[2], fs, 2);
 			} else if (signature instanceof AbstractMethodSignature) {
@@ -244,46 +286,67 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 				}
 			}
 		}
-		
-		int[] spl = new int[3];
-		int[] iface = new int[3];
-		spl[0] = allCounters[0][1];
-		spl[1] = allCounters[2][1];
-		spl[2] = allCounters[3][1];
-		iface[0] = allCounters[0][0];
-		iface[1] = allCounters[2][0];
-		iface[2] = allCounters[3][0];
+
+		int[] spl =
+			new int[3];
+		int[] iface =
+			new int[3];
+		spl[0] =
+			allCounters[0][1];
+		spl[1] =
+			allCounters[2][1];
+		spl[2] =
+			allCounters[3][1];
+		iface[0] =
+			allCounters[0][0];
+		iface[1] =
+			allCounters[2][0];
+		iface[2] =
+			allCounters[3][0];
 		fs.put(-2, spl);
 		fs.put(-3, iface);
 
 		return fs;
 	}
-	
+
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
-		final AFeatureData[] featureData = signature.getFeatureData();
+		final AFeatureData[] featureData =
+			signature.getFeatureData();
 		for (AFeatureData feature : featureData) {
-			int[] x = fs.get(feature.getID());
+			int[] x =
+				fs.get(feature.getID());
 			if (x == null) {
-				x = new int[]{0,0,0,0};
+				x =
+					new int[] {
+						0,
+						0,
+						0,
+						0 };
 				fs.put(feature.getID(), x);
 			}
 			x[i]++;
 		}
 
 		curCounter[0]++;
-		curCounter[1] += signature.getFeatureData().length;
+		curCounter[1] +=
+			signature.getFeatureData().length;
 		if (signature.isPrivate()) {
 			curCounter[2]++;
-			curCounter[3] += signature.getFeatureData().length;
+			curCounter[3] +=
+				signature.getFeatureData().length;
 		}
 	}
-	
-	public String getStatisticsString() {
-		final int[][] allCounters = new int[4][4];
-		HashMap<Integer, int[]> fs = new HashMap<Integer, int[]>();
 
-		for (int i = 0; i < signatureArray.length; ++i) {
-			AbstractSignature signature = signatureArray[i];
+	public String getStatisticsString() {
+		final int[][] allCounters =
+			new int[4][4];
+		HashMap<Integer, int[]> fs =
+			new HashMap<Integer, int[]>();
+
+		for (int i =
+			0; i < signatureArray.length; ++i) {
+			AbstractSignature signature =
+				signatureArray[i];
 			if (signature instanceof AbstractFieldSignature) {
 				count(signature, allCounters[2], fs, 2);
 			} else if (signature instanceof AbstractMethodSignature) {
@@ -298,15 +361,27 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			}
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < allCounters.length; i++) {
-			int[] curCounter = allCounters[i];
+		StringBuilder sb =
+			new StringBuilder();
+		for (int i =
+			0; i < allCounters.length; i++) {
+			int[] curCounter =
+				allCounters[i];
 			switch (i) {
-			case 0: sb.append("#Classes: "); break;
-			case 1: sb.append("#InnerClasses: "); break;
-			case 2: sb.append("#Fields: "); break;
-			case 3: sb.append("#Methods: "); break;
-			default: break;
+			case 0:
+				sb.append("#Classes: ");
+				break;
+			case 1:
+				sb.append("#InnerClasses: ");
+				break;
+			case 2:
+				sb.append("#Fields: ");
+				break;
+			case 3:
+				sb.append("#Methods: ");
+				break;
+			default:
+				break;
 			}
 			sb.append(curCounter[0]);
 			sb.append("\n\t#Private: ");
@@ -322,14 +397,25 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			sb.append("\n\t");
 			sb.append(entry.getKey());
 			sb.append("\n");
-			int[] x = entry.getValue();
-			for (int i = 0; i < x.length; i++) {
+			int[] x =
+				entry.getValue();
+			for (int i =
+				0; i < x.length; i++) {
 				switch (i) {
-				case 0: sb.append("\t\t#Classes: "); break;
-				case 1: sb.append("\t\t#InnerClasses: "); break;
-				case 2: sb.append("\t\t#Fields: "); break;
-				case 3: sb.append("\t\t#Methods: "); break;
-				default: break;
+				case 0:
+					sb.append("\t\t#Classes: ");
+					break;
+				case 1:
+					sb.append("\t\t#InnerClasses: ");
+					break;
+				case 2:
+					sb.append("\t\t#Fields: ");
+					break;
+				case 3:
+					sb.append("\t\t#Methods: ");
+					break;
+				default:
+					break;
 				}
 				sb.append(x[i]);
 				sb.append("\n");

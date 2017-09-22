@@ -39,15 +39,17 @@ import de.ovgu.featureide.core.IFeatureProject;
  * @author Jens Meinicke
  */
 public abstract class ComposerConversion {
-	
+
 	IFeatureProject featureProject;
-	
+
 	/**
 	 * Starts the conversion.
+	 * 
 	 * @param project
 	 */
 	void startProjectConversion(IFeatureProject project) {
-		featureProject = project;
+		featureProject =
+			project;
 		changeComposer(project);
 		changeFiles(project.getSourceFolder());
 		try {
@@ -57,21 +59,22 @@ public abstract class ComposerConversion {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Iterates through all files of the feature folders.
-	 * @param folder 
+	 * 
+	 * @param folder
 	 * 
 	 */
 	private void changeFiles(IFolder folder) {
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFolder) {
-					changeFiles((IFolder)res);
+					changeFiles((IFolder) res);
 				} else {
 					if (canConvert(res.getFileExtension())) {
-						setFileText(changeFile(getFileText((IFile)res), (IFile)res), (IFile)res);
-						replaceFileExtension((IFile)res);
+						setFileText(changeFile(getFileText((IFile) res), (IFile) res), (IFile) res);
+						replaceFileExtension((IFile) res);
 					}
 				}
 			}
@@ -79,9 +82,10 @@ public abstract class ComposerConversion {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Sets the context of the given file.
+	 * 
 	 * @param newFileText The new context
 	 * @param file
 	 */
@@ -89,9 +93,11 @@ public abstract class ComposerConversion {
 		if (newFileText == null) {
 			return;
 		}
-		FileWriter fw = null;
+		FileWriter fw =
+			null;
 		try {
-			fw = new FileWriter(file.getRawLocation().toFile());
+			fw =
+				new FileWriter(file.getRawLocation().toFile());
 			fw.write(newFileText);
 		} catch (IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -111,10 +117,13 @@ public abstract class ComposerConversion {
 	 * @return The context of the given file
 	 */
 	private String getFileText(IFile res) {
-		Scanner scanner = null;
+		Scanner scanner =
+			null;
 		try {
-			 scanner = new Scanner(res.getRawLocation().toFile(), "UTF-8");
-			StringBuffer buffer = new StringBuffer();
+			scanner =
+				new Scanner(res.getRawLocation().toFile(), "UTF-8");
+			StringBuffer buffer =
+				new StringBuffer();
 			while (scanner.hasNext()) {
 				buffer.append(scanner.nextLine());
 				buffer.append("\r\n");
@@ -132,13 +141,15 @@ public abstract class ComposerConversion {
 
 	/**
 	 * Changes the composer of the given project.
-	 * @param project 
+	 * 
+	 * @param project
 	 * 
 	 */
 	abstract void changeComposer(IFeatureProject project);
 
 	/**
 	 * Changes the context of the given file.
+	 * 
 	 * @param fileText the context
 	 * @param file The file
 	 * @return The replaced context
@@ -147,6 +158,7 @@ public abstract class ComposerConversion {
 
 	/**
 	 * Replaces the file extension of the given file.
+	 * 
 	 * @param file
 	 */
 	abstract void replaceFileExtension(IFile file);

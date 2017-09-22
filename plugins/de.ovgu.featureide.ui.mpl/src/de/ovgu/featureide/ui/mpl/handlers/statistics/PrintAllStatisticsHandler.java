@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.mpl.wizards.BuildExtendedModulesWizard;
  * @author Sebastian Krieter
  */
 public class PrintAllStatisticsHandler extends AProjectJobHandler {
-	
+
 	@Override
 	protected AbstractWizard instantiateWizard() {
 		return new BuildExtendedModulesWizard(FOLDER_OF_STATISTICS, STATISTICS);
@@ -43,7 +43,7 @@ public class PrintAllStatisticsHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().printStatistics(projects, 
+		MPLPlugin.getDefault().printStatistics(projects,
 				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 }

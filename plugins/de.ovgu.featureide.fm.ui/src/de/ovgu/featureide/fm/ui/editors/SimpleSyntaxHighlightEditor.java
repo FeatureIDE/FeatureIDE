@@ -45,8 +45,10 @@ import org.eclipse.swt.widgets.Display;
 public class SimpleSyntaxHighlightEditor extends StyledText {
 
 	private String[] keywords;
-	private Set<String> possibleWords = new HashSet<String>();
-	private Set<String> unknownWords = new HashSet<String>();
+	private Set<String> possibleWords =
+		new HashSet<String>();
+	private Set<String> unknownWords =
+		new HashSet<String>();
 
 	/**
 	 * @param parent
@@ -54,11 +56,15 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	 */
 	public SimpleSyntaxHighlightEditor(Composite parent, int style, final String[] keywords) {
 		super(parent, style);
-		this.keywords = keywords;
+		this.keywords =
+			keywords;
 
-		this.keywordColor = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
-		this.wrongWordColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-		this.normalColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+		this.keywordColor =
+			Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+		this.wrongWordColor =
+			Display.getDefault().getSystemColor(SWT.COLOR_RED);
+		this.normalColor =
+			Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
 		this.setFont(JFaceResources.getTextFont());
 
 		super.addModifyListener(new ModifyListener() {
@@ -84,24 +90,34 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 		for (String word : words) {
 			possibleWords.add(word);
-			possibleWords.add("\"" + word + "\"");
+			possibleWords.add("\""
+				+ word
+				+ "\"");
 		}
 
-		for (int i = 0; i < keywords.length; i++) {
-			final String keyword = keywords[i].toLowerCase();
+		for (int i =
+			0; i < keywords.length; i++) {
+			final String keyword =
+				keywords[i].toLowerCase();
 			possibleWords.add(keyword);
 		}
 	}
 
 	private void updateHighlight() {
 		if (!underlineEverything) {
-			final String text = super.getText();
+			final String text =
+				super.getText();
 
-			StyleRange resetStyleRange = new StyleRange();
-			resetStyleRange.start = 0;
-			resetStyleRange.length = text.length();
-			resetStyleRange.fontStyle = SWT.NORMAL;
-			resetStyleRange.foreground = normalColor;
+			StyleRange resetStyleRange =
+				new StyleRange();
+			resetStyleRange.start =
+				0;
+			resetStyleRange.length =
+				text.length();
+			resetStyleRange.fontStyle =
+				SWT.NORMAL;
+			resetStyleRange.foreground =
+				normalColor;
 			setStyleRange(resetStyleRange);
 
 			hightlightKeywords(text);
@@ -116,139 +132,221 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 		unknownWords.clear();
 
-		for (int i = 0; i < keywords.length; i++) {
+		for (int i =
+			0; i < keywords.length; i++) {
 			possibleWords.add(keywords[i]);
 		}
 
-		String safeCopy = new String(text);
-		safeCopy = safeCopy.replace("(", " ").replace(")", " ");
+		String safeCopy =
+			new String(text);
+		safeCopy =
+			safeCopy.replace("(", " ").replace(")", " ");
 
-		StringBuilder safeCopySb = new StringBuilder(safeCopy);
+		StringBuilder safeCopySb =
+			new StringBuilder(safeCopy);
 
-		final char ILLEGAL_FEATURE_NAME_CHAR = '\u0000';
+		final char ILLEGAL_FEATURE_NAME_CHAR =
+			'\u0000';
 		// avoid splitting feature names with containing spaces by replace spaces inside brackets with a char
 		// that could never be inside a feature name and recode this later
-		boolean insideFeatureNameWithWhitespace = false;
-		for (int i = 0; i < safeCopy.length(); i++) {
+		boolean insideFeatureNameWithWhitespace =
+			false;
+		for (int i =
+			0; i < safeCopy.length(); i++) {
 			if (safeCopy.charAt(i) == '\"')
-				insideFeatureNameWithWhitespace = !insideFeatureNameWithWhitespace;
-			if (insideFeatureNameWithWhitespace && safeCopy.charAt(i) == ' ') {
-				safeCopySb.replace(i, i + 1, String.valueOf(ILLEGAL_FEATURE_NAME_CHAR));
+				insideFeatureNameWithWhitespace =
+					!insideFeatureNameWithWhitespace;
+			if (insideFeatureNameWithWhitespace
+				&& safeCopy.charAt(i) == ' ') {
+				safeCopySb.replace(i, i
+					+ 1, String.valueOf(ILLEGAL_FEATURE_NAME_CHAR));
 			}
 		}
 
-		String[] tokens = safeCopySb.toString().split(" ");
-		int start = 0;
-		for (int i = 0; i < tokens.length; i++) {
-			String token = tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
+		String[] tokens =
+			safeCopySb.toString().split(" ");
+		int start =
+			0;
+		for (int i =
+			0; i < tokens.length; i++) {
+			String token =
+				tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
 
-			if (!token.isEmpty() && !possibleWords.contains(token) && !possibleWords.contains(token.toLowerCase())) {
+			if (!token.isEmpty()
+				&& !possibleWords.contains(token)
+				&& !possibleWords.contains(token.toLowerCase())) {
 				unknownWords.add(token);
 
-				StyleRange styleRange = new StyleRange();
-				styleRange.start = start;
-				styleRange.length = token.length();
-				styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-				styleRange.underline = true;
-				styleRange.underlineColor = wrongWordColor;
-				styleRange.foreground = normalColor;
+				StyleRange styleRange =
+					new StyleRange();
+				styleRange.start =
+					start;
+				styleRange.length =
+					token.length();
+				styleRange.underlineStyle =
+					SWT.UNDERLINE_ERROR;
+				styleRange.underline =
+					true;
+				styleRange.underlineColor =
+					wrongWordColor;
+				styleRange.foreground =
+					normalColor;
 
 				setStyleRange(styleRange);
 			}
-			start += tokens[i].length() + 1;
+			start +=
+				tokens[i].length()
+					+ 1;
 		}
 	}
 
 	private static class Match {
+
 		private int start, end;
 
 		public Match(int start, int end) {
-			this.start = start;
-			this.end = end;
+			this.start =
+				start;
+			this.end =
+				end;
 		}
 	}
 
-	private static final Pattern nonOperators = Pattern.compile("\"[^\"]*\"");
+	private static final Pattern nonOperators =
+		Pattern.compile("\"[^\"]*\"");
 
 	private void hightlightKeywords(String text) {
-		final List<Match> keywordPositions = new ArrayList<>();
+		final List<Match> keywordPositions =
+			new ArrayList<>();
 
-		final StringBuilder sb = new StringBuilder("(");
+		final StringBuilder sb =
+			new StringBuilder("(");
 		for (String keyword : keywords) {
 			sb.append(Pattern.quote(keyword.toLowerCase()));
 			sb.append('|');
 		}
-		sb.setCharAt(sb.length() - 1, ')');
+		sb.setCharAt(sb.length()
+			- 1, ')');
 
-		final Matcher operatorMatcher = Pattern.compile(sb.toString()).matcher(text);
-		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
+		final Matcher operatorMatcher =
+			Pattern.compile(sb.toString()).matcher(text);
+		final Matcher nonOperatorMatcher =
+			nonOperators.matcher(text);
 
-		Match nonOperatorMatch = null;
+		Match nonOperatorMatch =
+			null;
 		if (nonOperatorMatcher.find()) {
-			nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
+			nonOperatorMatch =
+				new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
 		}
 		while (operatorMatcher.find()) {
-			int start = operatorMatcher.start();
-			int end = operatorMatcher.end();
+			int start =
+				operatorMatcher.start();
+			int end =
+				operatorMatcher.end();
 
-			while (nonOperatorMatch != null && start > nonOperatorMatch.end) {
+			while (nonOperatorMatch != null
+				&& start > nonOperatorMatch.end) {
 				if (nonOperatorMatcher.find()) {
-					nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
+					nonOperatorMatch =
+						new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
 				} else {
-					nonOperatorMatch = null;
+					nonOperatorMatch =
+						null;
 				}
 			}
-			if (nonOperatorMatch == null || !(start < nonOperatorMatch.end && end > nonOperatorMatch.start)) {
+			if (nonOperatorMatch == null
+				|| !(start < nonOperatorMatch.end
+					&& end > nonOperatorMatch.start)) {
 				keywordPositions.add(new Match(start, end));
 			}
 		}
 
 		// highlight keywords in text
 		for (Match match : keywordPositions) {
-			StyleRange styleRange = new StyleRange();
-			styleRange.start = match.start;
-			styleRange.length = match.end - match.start;
-			styleRange.fontStyle = SWT.BOLD;
-			styleRange.foreground = keywordColor;
+			StyleRange styleRange =
+				new StyleRange();
+			styleRange.start =
+				match.start;
+			styleRange.length =
+				match.end
+					- match.start;
+			styleRange.fontStyle =
+				SWT.BOLD;
+			styleRange.foreground =
+				keywordColor;
 
 			setStyleRange(styleRange);
 		}
 	}
 
 	public void copyIn(final String textToInsert) {
-		StringBuilder temp = new StringBuilder(super.getText());
+		StringBuilder temp =
+			new StringBuilder(super.getText());
 
-		int selStart = super.getSelectionRanges()[0];
-		int selLen = super.getSelectionRanges()[1];
+		int selStart =
+			super.getSelectionRanges()[0];
+		int selLen =
+			super.getSelectionRanges()[1];
 
 		if (selLen != 0) {
-			temp.delete(selStart, selStart + selLen);
+			temp.delete(selStart, selStart
+				+ selLen);
 		}
 
-		String prefix = "";
-		if (selStart - 1 > 0)
-			prefix += temp.charAt(selStart - 1) == ' ' ? "" : " ";
-		String suffix = "";
-		int lastIndex = selStart + prefix.length() + textToInsert.length();
-		suffix += lastIndex >= temp.length() ? " " : (temp.charAt(lastIndex) == ' ' ? "" : " ");
+		String prefix =
+			"";
+		if (selStart
+			- 1 > 0)
+			prefix +=
+				temp.charAt(selStart
+					- 1) == ' '
+						? ""
+						: " ";
+		String suffix =
+			"";
+		int lastIndex =
+			selStart
+				+ prefix.length()
+				+ textToInsert.length();
+		suffix +=
+			lastIndex >= temp.length()
+				? " "
+				: (temp.charAt(lastIndex) == ' '
+					? ""
+					: " ");
 
-		temp.insert(selStart, prefix + textToInsert + suffix);
+		temp.insert(selStart, prefix
+			+ textToInsert
+			+ suffix);
 		super.setText(temp.toString());
 		super.setFocus();
-		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
+		super.setSelection(selStart
+			+ prefix.length()
+			+ textToInsert.length()
+			+ suffix.length());
 	}
 
 	public void underlineEverything(boolean b) {
-		underlineEverything = b;
+		underlineEverything =
+			b;
 		if (underlineEverything) {
-			StyleRange styleRange = new StyleRange();
-			styleRange.start = 0;
-			styleRange.length = this.getText().length();
-			styleRange.fontStyle = SWT.NORMAL;
-			styleRange.foreground = normalColor;
-			styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-			styleRange.underline = true;
-			styleRange.underlineColor = wrongWordColor;
+			StyleRange styleRange =
+				new StyleRange();
+			styleRange.start =
+				0;
+			styleRange.length =
+				this.getText().length();
+			styleRange.fontStyle =
+				SWT.NORMAL;
+			styleRange.foreground =
+				normalColor;
+			styleRange.underlineStyle =
+				SWT.UNDERLINE_ERROR;
+			styleRange.underline =
+				true;
+			styleRange.underlineColor =
+				wrongWordColor;
 			setStyleRange(styleRange);
 		} else {
 			updateHighlight();

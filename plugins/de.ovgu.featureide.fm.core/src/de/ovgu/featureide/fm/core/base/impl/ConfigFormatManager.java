@@ -37,10 +37,12 @@ import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 public final class ConfigFormatManager extends FormatManager<IConfigurationFormat> {
 
 	private ConfigFormatManager() {
-		setExtensionLoaderInternal(new CoreExtensionLoader<>(new XMLConfFormat(), new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
+		setExtensionLoaderInternal(
+				new CoreExtensionLoader<>(new XMLConfFormat(), new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
 	}
 
-	private static ConfigFormatManager instance = new ConfigFormatManager();
+	private static ConfigFormatManager instance =
+		new ConfigFormatManager();
 
 	public static ConfigFormatManager getInstance() {
 		return instance;

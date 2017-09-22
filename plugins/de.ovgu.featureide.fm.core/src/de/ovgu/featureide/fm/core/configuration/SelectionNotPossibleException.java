@@ -21,18 +21,22 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 /**
- * Identifies that the user has selected or deselected a feature which is not
- * possible according the underlying feature model with current manual
- * selections.
+ * Identifies that the user has selected or deselected a feature which is not possible according the underlying feature model with current manual selections.
  * 
  * @author Thomas Thuem
  */
 public class SelectionNotPossibleException extends RuntimeException {
 
-	private static final long serialVersionUID = 1793844229871267311L;
-	
+	private static final long serialVersionUID =
+		1793844229871267311L;
+
 	public SelectionNotPossibleException(String feature, Selection selection) {
-		super("The feature \"" + feature + "\" cannot be " + (selection == Selection.SELECTED ? "selected" : "deselected"));
+		super("The feature \""
+			+ feature
+			+ "\" cannot be "
+			+ (selection == Selection.SELECTED
+				? "selected"
+				: "deselected"));
 	}
 
 }

@@ -26,23 +26,25 @@ package de.ovgu.featureide.fm.core.explanations;
  * @author Timo G&uuml;nther
  */
 public interface ExplanationCreator {
+
 	/**
-	 * Returns the subject with an attribute to be explained.
-	 * Subclasses should override this to provide a subject of a more specific type.
+	 * Returns the subject with an attribute to be explained. Subclasses should override this to provide a subject of a more specific type.
+	 * 
 	 * @return the subject with an attribute to be explained
 	 */
 	public Object getSubject();
-	
+
 	/**
-	 * Sets the subject with an attribute to be explained.
-	 * Subclasses should override this to only allow subjects of a more specific type.
+	 * Sets the subject with an attribute to be explained. Subclasses should override this to only allow subjects of a more specific type.
+	 * 
 	 * @param subject the subject with an attribute to be explained
 	 * @throws IllegalArgumentException if the subject is not of the type expected by the subclass
 	 */
 	public void setSubject(Object subject) throws IllegalArgumentException;
-	
+
 	/**
 	 * Returns an explanation for the specified circumstance.
+	 * 
 	 * @return an explanation; null if none could be generated
 	 * @throws IllegalStateException if the subject or its context is not set
 	 */

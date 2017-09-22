@@ -33,10 +33,12 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
  */
 public class InterfaceProjectNature implements IProjectNature {
 
-	public static final String NATURE_ID = MPLPlugin.PLUGIN_ID + ".interfaceProjectNature";
-	
+	public static final String NATURE_ID =
+		MPLPlugin.PLUGIN_ID
+			+ ".interfaceProjectNature";
+
 	private IProject project;
-	
+
 	@Override
 	public void configure() throws CoreException {
 //		IProjectDescription desc = project.getDescription();
@@ -58,8 +60,7 @@ public class InterfaceProjectNature implements IProjectNature {
 	}
 
 	@Override
-	public void deconfigure() throws CoreException {
-	}
+	public void deconfigure() throws CoreException {}
 
 	@Override
 	public IProject getProject() {
@@ -68,7 +69,8 @@ public class InterfaceProjectNature implements IProjectNature {
 
 	@Override
 	public void setProject(IProject project) {
-		this.project = project;
+		this.project =
+			project;
 	}
 
 }

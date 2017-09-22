@@ -31,18 +31,23 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Sebastian Krieter
  */
 public class JobSynchronizer {
+
 	private class JobEntry {
+
 		private final IRunner<?> currentJob;
 		private Thread starterThread;
 
 		public JobEntry(IRunner<?> currentJob, Thread starterThread) {
-			this.currentJob = currentJob;
-			this.starterThread = starterThread;
+			this.currentJob =
+				currentJob;
+			this.starterThread =
+				starterThread;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getImplementationClass().equals(this.currentJob.getImplementationClass());
+			return (obj instanceof JobEntry)
+				&& ((JobEntry) obj).currentJob.getImplementationClass().equals(this.currentJob.getImplementationClass());
 		}
 
 		@Override
@@ -51,31 +56,37 @@ public class JobSynchronizer {
 		}
 	}
 
-	private final HashMap<JobEntry, JobEntry> jobMap = new HashMap<>();
+	private final HashMap<JobEntry, JobEntry> jobMap =
+		new HashMap<>();
 
 	public synchronized void startJob(final IRunner<?> job, final boolean cancelPreviousJob) {
 		if (job == null) {
 			return;
 		}
-		final JobEntry newEntry = new JobEntry(job, null);
-		final JobEntry currentEntry = jobMap.get(newEntry);
+		final JobEntry newEntry =
+			new JobEntry(job, null);
+		final JobEntry currentEntry =
+			jobMap.get(newEntry);
 		if (currentEntry != null) {
 			if (currentEntry.starterThread == null) {
-				newEntry.starterThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						if (cancelPreviousJob) {
-							currentEntry.currentJob.cancel();
+				newEntry.starterThread =
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							if (cancelPreviousJob) {
+								currentEntry.currentJob.cancel();
+							}
+							try {
+								currentEntry.currentJob.join();
+							} catch (InterruptedException e) {
+								FMUIPlugin.getDefault().logError(e);
+							}
+							job.schedule();
+							newEntry.starterThread =
+								null;
 						}
-						try {
-							currentEntry.currentJob.join();
-						} catch (InterruptedException e) {
-							FMUIPlugin.getDefault().logError(e);
-						}
-						job.schedule();
-						newEntry.starterThread = null;
-					}
-				});
+					});
 				jobMap.put(newEntry, newEntry);
 				newEntry.starterThread.start();
 			}

@@ -17,7 +17,8 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		switch (index) {
 		case 0:
 			if (obj instanceof CppCheckerFileLogs) {
-				IFile iFile = ((CppCheckerFileLogs) obj).getFile();
+				IFile iFile =
+					((CppCheckerFileLogs) obj).getFile();
 				return iFile
 						.getLocation()
 						.toOSString()
@@ -25,11 +26,13 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 								iFile.getProject().getLocation().toOSString()
 										.length(),
 								iFile.getLocation().toOSString().length())
-						+ " ("
-						+ ((CppCheckerFileLogs) obj).getLogs().size()
-						+ ERROR
-						+ ((((CppCheckerFileLogs) obj).getLogs().size() == 1) ? ""
-								: "s") + ")";
+					+ " ("
+					+ ((CppCheckerFileLogs) obj).getLogs().size()
+					+ ERROR
+					+ ((((CppCheckerFileLogs) obj).getLogs().size() == 1)
+						? ""
+						: "s")
+					+ ")";
 			}
 			if (obj instanceof CppCheckerLog)
 				return ((CppCheckerLog) obj).getMsg();

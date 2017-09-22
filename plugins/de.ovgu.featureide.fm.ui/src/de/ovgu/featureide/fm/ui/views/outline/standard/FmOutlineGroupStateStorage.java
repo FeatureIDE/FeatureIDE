@@ -29,12 +29,15 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Marcus Pinnecke
  */
 public class FmOutlineGroupStateStorage {
+
 	private IFeature feature;
 	private boolean isOrGroup;
 
 	public FmOutlineGroupStateStorage(IFeature parentFeature, boolean isOr) {
-		feature = parentFeature;
-		isOrGroup = isOr;
+		feature =
+			parentFeature;
+		isOrGroup =
+			isOr;
 	}
 
 	public boolean isOrGroup() {
@@ -47,20 +50,29 @@ public class FmOutlineGroupStateStorage {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((feature == null) ? 0 : feature.hashCode());
-		return prime * result + (isOrGroup ? 1231 : 1237);
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			prime
+				* result
+				+ ((feature == null)
+					? 0
+					: feature.hashCode());
+		return prime
+			* result
+			+ (isOrGroup
+				? 1231
+				: 1237);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -71,7 +83,8 @@ public class FmOutlineGroupStateStorage {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FmOutlineGroupStateStorage other = (FmOutlineGroupStateStorage) obj;
+		FmOutlineGroupStateStorage other =
+			(FmOutlineGroupStateStorage) obj;
 		if (feature == null) {
 			if (other.feature != null)
 				return false;

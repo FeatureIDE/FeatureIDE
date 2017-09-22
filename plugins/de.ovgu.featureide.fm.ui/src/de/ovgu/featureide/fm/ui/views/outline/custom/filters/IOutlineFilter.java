@@ -25,16 +25,16 @@ import org.eclipse.jface.resource.ImageDescriptor;
 /**
  * Interface to filter the content of the CollaborationOutline.
  * 
- * @author Dominic Labsch	
+ * @author Dominic Labsch
  * @author Daniel P�sche
  * @author Christopher Sontag
  */
 public interface IOutlineFilter {
 
 	public String getName();
-	
+
 	public ImageDescriptor getImage();
-	
+
 	public Object[] filter(Object[] obj);
-		
+
 }

@@ -31,19 +31,21 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Schleicher Miro
  */
 public class InvariantNodeParent extends Parent {
-	
+
 	private final FSTInvariant fstInvariant;
-	
+
 	public InvariantNodeParent(String discription, FSTInvariant fstInvariant, LinkedList<FSTInvariant> allInvariants) {
 		super(discription);
-		this.fstInvariant = fstInvariant;
-		int numberOfInvariants = countInvariantsWithSameName(allInvariants);
+		this.fstInvariant =
+			fstInvariant;
+		int numberOfInvariants =
+			countInvariantsWithSameName(allInvariants);
 		setValue(new Integer(numberOfInvariants));
 	}
-	
-	
+
 	private int countInvariantsWithSameName(LinkedList<FSTInvariant> invariants) {
-		int c = 0;
+		int c =
+			0;
 		for (FSTInvariant tempInvariant : invariants) {
 			if (tempInvariant.getRole().getClassFragment().getFullIdentifier().equals(fstInvariant.getRole().getClassFragment().getFullIdentifier())) {
 				c++;
@@ -53,7 +55,7 @@ public class InvariantNodeParent extends Parent {
 		}
 		return c;
 	}
-	
+
 	public FSTInvariant getInvariant() {
 		return fstInvariant;
 	}

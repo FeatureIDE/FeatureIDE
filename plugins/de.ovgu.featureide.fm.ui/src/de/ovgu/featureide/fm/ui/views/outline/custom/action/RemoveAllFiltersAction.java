@@ -30,24 +30,27 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
  */
 public class RemoveAllFiltersAction extends Action {
 
-		private OutlineProvider provider;
+	private OutlineProvider provider;
 
-		/**
-		 * Constructor for ChangeOutlineProviderAction
-		 * @param viewer
-		 */
-		public RemoveAllFiltersAction(OutlineProvider provider) {
-			super();
-			this.provider = provider;
-			this.setText("Remove Filters");
-		}
+	/**
+	 * Constructor for ChangeOutlineProviderAction
+	 * 
+	 * @param viewer
+	 */
+	public RemoveAllFiltersAction(OutlineProvider provider) {
+		super();
+		this.provider =
+			provider;
+		this.setText("Remove Filters");
+	}
 
-		/**
-		 * Returns the outline provider
-		 * @return
-		 */
-		public OutlineProvider getProvider() {
-			return provider;
-		}
+	/**
+	 * Returns the outline provider
+	 * 
+	 * @return
+	 */
+	public OutlineProvider getProvider() {
+		return provider;
+	}
 
 }

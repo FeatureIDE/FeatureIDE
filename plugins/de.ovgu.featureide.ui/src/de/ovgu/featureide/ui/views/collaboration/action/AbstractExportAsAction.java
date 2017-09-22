@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -32,10 +31,11 @@ import org.eclipse.jface.action.Action;
 public abstract class AbstractExportAsAction extends Action {
 
 	protected final GraphicalViewerImpl viewer;
-	
+
 	public AbstractExportAsAction(String text, GraphicalViewerImpl view) {
 		super(text);
-		viewer = view;
+		viewer =
+			view;
 		setEnabled(true);
 	}
 

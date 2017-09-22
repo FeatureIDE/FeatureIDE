@@ -47,26 +47,35 @@ public class FeatureModelConversionHandler extends ASelectionHandler {
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
-		final IContainer next = SelectionWrapper.init(selection, IContainer.class).getNext();
+		final IContainer next =
+			SelectionWrapper.init(selection, IContainer.class).getNext();
 		if (next != null) {
-			final FeatureModelConversionWizard wizard = new FeatureModelConversionWizard();
+			final FeatureModelConversionWizard wizard =
+				new FeatureModelConversionWizard();
 			wizard.init(null, selection);
-			final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+			final WizardDialog dialog =
+				new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 			if (dialog.open() == Dialog.OK) {
-				final IFeatureModelFormat inputFormat = wizard.getInputFormat();
-				final IFeatureModelFormat outputFormat = wizard.getOutputFormat();
-				if (inputFormat == null || outputFormat == null) {
+				final IFeatureModelFormat inputFormat =
+					wizard.getInputFormat();
+				final IFeatureModelFormat outputFormat =
+					wizard.getOutputFormat();
+				if (inputFormat == null
+					|| outputFormat == null) {
 					return false;
 				}
-				final Path projectPath = Paths.get(next.getProject().getLocationURI());
-				final Path inPath = Paths.get(next.getLocationURI());
+				final Path projectPath =
+					Paths.get(next.getProject().getLocationURI());
+				final Path inPath =
+					Paths.get(next.getLocationURI());
 				try {
-					IFeatureModel fm = FMFactoryManager.getFactory(inPath.toString(), inputFormat).createFeatureModel();
+					IFeatureModel fm =
+						FMFactoryManager.getFactory(inPath.toString(), inputFormat).createFeatureModel();
 					FileHandler.convert(inPath, projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
 				} catch (NoSuchExtensionException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
-				
+
 			}
 		}
 		return true;

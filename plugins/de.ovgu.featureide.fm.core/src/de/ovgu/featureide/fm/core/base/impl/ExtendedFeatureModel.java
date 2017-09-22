@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
 public class ExtendedFeatureModel extends FeatureModel {
 
 	public static class UsedModel {
+
 		private final String modelName;
 		private final String varName;
 		private final int type;
@@ -59,15 +60,22 @@ public class ExtendedFeatureModel extends FeatureModel {
 		private String prefix;
 
 		public UsedModel(UsedModel usedModel, String parentName) {
-			this.modelName = usedModel.modelName;
-			this.varName = parentName + usedModel.varName;
-			this.type = usedModel.type;
+			this.modelName =
+				usedModel.modelName;
+			this.varName =
+				parentName
+					+ usedModel.varName;
+			this.type =
+				usedModel.type;
 		}
 
 		public UsedModel(String modelName, String varName, int type) {
-			this.modelName = modelName;
-			this.varName = varName;
-			this.type = type;
+			this.modelName =
+				modelName;
+			this.varName =
+				varName;
+			this.type =
+				type;
 		}
 
 		public String getModelName() {
@@ -87,12 +95,15 @@ public class ExtendedFeatureModel extends FeatureModel {
 		}
 
 		public void setPrefix(String prefix) {
-			this.prefix = prefix;
+			this.prefix =
+				prefix;
 		}
 
 		@Override
 		public String toString() {
-			return modelName + " " + varName;
+			return modelName
+				+ " "
+				+ varName;
 		}
 	}
 
@@ -113,36 +124,54 @@ public class ExtendedFeatureModel extends FeatureModel {
 	public ExtendedFeatureModel(String factoryID) {
 		super(factoryID);
 
-		this.integerAttributes = new FeatureAttributeMap<>();
-		this.booleanAttributes = new FeatureAttributeMap<>();
-		this.stringAttributes = new FeatureAttributeMap<>();
+		this.integerAttributes =
+			new FeatureAttributeMap<>();
+		this.booleanAttributes =
+			new FeatureAttributeMap<>();
+		this.stringAttributes =
+			new FeatureAttributeMap<>();
 
-		this.usedModels = new HashMap<>();
+		this.usedModels =
+			new HashMap<>();
 
-		this.attributeConstraints = new LinkedList<>();
-		this.imports = new LinkedList<>();
-		this.ownConstraints = new LinkedList<>();
+		this.attributeConstraints =
+			new LinkedList<>();
+		this.imports =
+			new LinkedList<>();
+		this.ownConstraints =
+			new LinkedList<>();
 
-		this.mappingModel = null;
-		this.isInterface = false;
+		this.mappingModel =
+			null;
+		this.isInterface =
+			false;
 	}
 
 	protected ExtendedFeatureModel(ExtendedFeatureModel extendedFeatureModel, IFeature newRoot) {
 		super(extendedFeatureModel, newRoot);
 
-		this.integerAttributes = new FeatureAttributeMap<>(extendedFeatureModel.integerAttributes);
-		this.booleanAttributes = new FeatureAttributeMap<>(extendedFeatureModel.booleanAttributes);
-		this.stringAttributes = new FeatureAttributeMap<>(extendedFeatureModel.stringAttributes);
+		this.integerAttributes =
+			new FeatureAttributeMap<>(extendedFeatureModel.integerAttributes);
+		this.booleanAttributes =
+			new FeatureAttributeMap<>(extendedFeatureModel.booleanAttributes);
+		this.stringAttributes =
+			new FeatureAttributeMap<>(extendedFeatureModel.stringAttributes);
 
-		this.usedModels = new HashMap<>(extendedFeatureModel.usedModels);
+		this.usedModels =
+			new HashMap<>(extendedFeatureModel.usedModels);
 
-		this.attributeConstraints = new LinkedList<>(extendedFeatureModel.attributeConstraints);
-		this.imports = new LinkedList<>(extendedFeatureModel.imports);
-		this.ownConstraints = new LinkedList<>(extendedFeatureModel.ownConstraints);
+		this.attributeConstraints =
+			new LinkedList<>(extendedFeatureModel.attributeConstraints);
+		this.imports =
+			new LinkedList<>(extendedFeatureModel.imports);
+		this.ownConstraints =
+			new LinkedList<>(extendedFeatureModel.ownConstraints);
 
-		this.mappingModel = extendedFeatureModel.mappingModel;
+		this.mappingModel =
+			extendedFeatureModel.mappingModel;
 
-		this.isInterface = extendedFeatureModel.isInterface;
+		this.isInterface =
+			extendedFeatureModel.isInterface;
 	}
 
 	public List<String> getImports() {
@@ -177,12 +206,9 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * Adds a parameter to the available parameters of the model
 	 * 
-	 * @param varType
-	 *            the name of the interface that shall be bound to the variable
-	 * @param varName
-	 *            the name of the variable an interface shall be bound to
-	 * @return true if the parameter could be added to the parameters. False if
-	 *         the variable name was already bound to another interface.
+	 * @param varType the name of the interface that shall be bound to the variable
+	 * @param varName the name of the variable an interface shall be bound to
+	 * @return true if the parameter could be added to the parameters. False if the variable name was already bound to another interface.
 	 */
 	public boolean addInterface(final String varType, final String varName) {
 		return addModel(varType, varName, ExtendedFeature.TYPE_INTERFACE);
@@ -245,7 +271,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInstance() {
 		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInstance()) {
+			if (feature instanceof ExtendedFeature
+				&& ((ExtendedFeature) feature).isInstance()) {
 				return true;
 			}
 		}
@@ -259,7 +286,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInherited() {
 		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInherited()) {
+			if (feature instanceof ExtendedFeature
+				&& ((ExtendedFeature) feature).isInherited()) {
 				return true;
 			}
 		}
@@ -268,7 +296,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public boolean hasInterface() {
 		for (IFeature feature : featureTable.values()) {
-			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInterface()) {
+			if (feature instanceof ExtendedFeature
+				&& ((ExtendedFeature) feature).isInterface()) {
 				return true;
 			}
 		}
@@ -297,24 +326,31 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @param mappingModel the mappingModel to set
 	 */
 	public void setMappingModel(IFeatureModel mappingModel) {
-		this.mappingModel = mappingModel;
+		this.mappingModel =
+			mappingModel;
 	}
 
 	public void runTests() {
-		final ExtendedFeatureModelAnalyzer analyzer = new ExtendedFeatureModelAnalyzer(this);
+		final ExtendedFeatureModelAnalyzer analyzer =
+			new ExtendedFeatureModelAnalyzer(this);
 		Logger.logInfo(VELVET_FEATUREMODEL_IMPORTED);
 
 		try {
-			Logger.logInfo(analyzer.isValid() ? VALID : INVALID);
-			StringBuilder sb = new StringBuilder("Dead Features: ");
+			Logger.logInfo(analyzer.isValid()
+				? VALID
+				: INVALID);
+			StringBuilder sb =
+				new StringBuilder("Dead Features: ");
 			for (IFeature deadFeature : analyzer.getDeadFeatures()) {
-				sb.append(deadFeature.getName() + ", ");
+				sb.append(deadFeature.getName()
+					+ ", ");
 			}
 			Logger.logInfo(sb.toString());
 			sb.delete(0, sb.length());
 			sb.append("FO Features: ");
 			for (IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
-				sb.append(deadFeature.getName() + ", ");
+				sb.append(deadFeature.getName()
+					+ ", ");
 			}
 			Logger.logInfo(sb.toString());
 		} catch (final TimeoutException e) {
@@ -325,13 +361,16 @@ public class ExtendedFeatureModel extends FeatureModel {
 	@Override
 	@CheckForNull
 	public IFeature getFeature(CharSequence name) {
-		IFeature feature = super.getFeature(name);
+		IFeature feature =
+			super.getFeature(name);
 		if (feature != null) {
 			return feature;
 		}
 
 		if (name.toString().contains(".")) {
-			return super.getFeature(this.getStructure().getRoot().getFeature().getName() + "." + name);
+			return super.getFeature(this.getStructure().getRoot().getFeature().getName()
+				+ "."
+				+ name);
 		} else {
 			return null;
 		}
@@ -342,7 +381,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	public void setInterface(boolean isInterface) {
-		this.isInterface = isInterface;
+		this.isInterface =
+			isInterface;
 	}
 
 	public FeatureModel clone() {

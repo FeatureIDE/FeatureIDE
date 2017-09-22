@@ -35,44 +35,57 @@ import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
  * @author Antje Moench
  */
 public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
-	private Menu filterMenu = null;
+
+	private Menu filterMenu =
+		null;
 	private IConfigurationMapFilterable filterable;
 	private ConfigMapFilterAction[] filterActions;
 
 	public ConfigMapFilterMenuAction(IConfigurationMapFilterable filterable, final IConfigurationMapFilter... filters) {
 		super("Filters", Action.AS_DROP_DOWN_MENU);
-		this.filterable = filterable;
+		this.filterable =
+			filterable;
 		setToolTipText("Filter Features");
 		setMenuCreator(this);
 
-		filterActions = new ConfigMapFilterAction[filters.length];
-		for (int i = 0; i < filters.length; i++) {
-			IConfigurationMapFilter filter = filters[i];
-			filterActions[i] = new ConfigMapFilterAction(filter, this.filterable);
+		filterActions =
+			new ConfigMapFilterAction[filters.length];
+		for (int i =
+			0; i < filters.length; i++) {
+			IConfigurationMapFilter filter =
+				filters[i];
+			filterActions[i] =
+				new ConfigMapFilterAction(filter, this.filterable);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
 	 */
 	@Override
 	public Menu getMenu(Control parent) {
 		if (filterMenu == null) {
-			filterMenu = new Menu(parent);
-			for (int i = 0; i < this.filterActions.length; i++) {
-				ConfigMapFilterAction filterAction = filterActions[i];
+			filterMenu =
+				new Menu(parent);
+			for (int i =
+				0; i < this.filterActions.length; i++) {
+				ConfigMapFilterAction filterAction =
+					filterActions[i];
 				filterAction.initializeImage(FMUIPlugin.getImage(filterAction.getFilter().getImagePath()));
-				
-				ActionContributionItem contributionItem = new ActionContributionItem(filterAction);
-				//contributionItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
-				contributionItem.fill(filterMenu, -1 /* means insert at end*/);
+
+				ActionContributionItem contributionItem =
+					new ActionContributionItem(filterAction);
+				// contributionItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
+				contributionItem.fill(filterMenu, -1 /* means insert at end */);
 			}
 		}
-		
+
 		return filterMenu;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
 	 */
 	@Override
@@ -81,6 +94,5 @@ public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
 	}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 }

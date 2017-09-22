@@ -37,17 +37,16 @@ public interface ISearchable<T> {
 	 * 
 	 * @return {@code true} if the element matches the search string, {@code false} otherwise.
 	 */
-	
+
 	boolean matches(T element, String searchString);
-	
+
 	/**
 	 * @return {@link Iterator} for the elements' class.
 	 */
 	Iterator<T> createIterator();
 
 	/**
-	 * Handles the search result.
-	 * Dependent on the actual implementation reveals, selects, or highlights the matching element in the view.
+	 * Handles the search result. Dependent on the actual implementation reveals, selects, or highlights the matching element in the view.
 	 * 
 	 * @param searchResult The found element.
 	 */

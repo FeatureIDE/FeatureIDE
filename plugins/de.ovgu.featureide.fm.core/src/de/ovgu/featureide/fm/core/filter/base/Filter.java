@@ -43,8 +43,10 @@ public abstract class Filter {
 	 * @param predicate the filter
 	 */
 	public static <U, T extends U, V extends Iterable<T>> V remove(V source, IFilter<U> predicate) {
-		if (source != null && predicate != null) {
-			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+		if (source != null
+			&& predicate != null) {
+			for (Iterator<T> iterator =
+				source.iterator(); iterator.hasNext();) {
 				if (predicate.isValid(iterator.next())) {
 					iterator.remove();
 				}
@@ -60,8 +62,10 @@ public abstract class Filter {
 	 * @param predicate the filter
 	 */
 	public static <U, T extends U, V extends Iterable<T>> V retain(V source, IFilter<U> predicate) {
-		if (source != null && predicate != null) {
-			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+		if (source != null
+			&& predicate != null) {
+			for (Iterator<T> iterator =
+				source.iterator(); iterator.hasNext();) {
 				if (!predicate.isValid(iterator.next())) {
 					iterator.remove();
 				}
@@ -70,11 +74,15 @@ public abstract class Filter {
 		return source;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({
+		"rawtypes",
+		"unchecked" })
 	private static <T> Collection<T> internalFilter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
-		if (collection != null && filterList != null) {
+		if (collection != null
+			&& filterList != null) {
 			for (IFilter filter : filterList) {
-				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
+				for (Iterator<T> iterator =
+					collection.iterator(); iterator.hasNext();) {
 					if (!filter.isValid(iterator.next())) {
 						iterator.remove();
 					}
@@ -94,8 +102,10 @@ public abstract class Filter {
 
 	public static Collection<String> toString(Collection<?> collection) {
 		if (collection != null) {
-			final ArrayList<String> result = new ArrayList<>(collection.size());
-			for (Iterator<?> iterator = collection.iterator(); iterator.hasNext();) {
+			final ArrayList<String> result =
+				new ArrayList<>(collection.size());
+			for (Iterator<?> iterator =
+				collection.iterator(); iterator.hasNext();) {
 				result.add(iterator.next().toString());
 			}
 			return result;

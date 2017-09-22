@@ -48,10 +48,14 @@ public class FeatureRenamingCommand extends Command {
 	private final String newName;
 
 	public FeatureRenamingCommand(IFeatureModel featureModel, String oldName, String newName) {
-		super(RENAMING_FEATURE + oldName);
-		this.featureModel = featureModel;
-		this.oldName = oldName;
-		this.newName = newName;
+		super(RENAMING_FEATURE
+			+ oldName);
+		this.featureModel =
+			featureModel;
+		this.oldName =
+			oldName;
+		this.newName =
+			newName;
 	}
 
 	@Override
@@ -65,7 +69,8 @@ public class FeatureRenamingCommand extends Command {
 
 	@Override
 	public void execute() {
-		RenameFeatureOperation op = new RenameFeatureOperation(featureModel, oldName, newName);
+		RenameFeatureOperation op =
+			new RenameFeatureOperation(featureModel, oldName, newName);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

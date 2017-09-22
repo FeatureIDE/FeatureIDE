@@ -33,9 +33,10 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
  * @author Antje Moench
  */
 public class DeadFeatureFilter extends ConfigurationMapFilter {
+
 	private List<IFeature> deadFeatures;
 	private IFeatureModel featureModelFilterIsInitializedFor;
-	
+
 	/**
 	 * @param name
 	 */
@@ -43,19 +44,25 @@ public class DeadFeatureFilter extends ConfigurationMapFilter {
 		super("dead features", isDefault);
 		setImagePath(Image_Minus);
 	}
-	
+
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		IFeatureModel featureModel = configurationMap.getFeatureProject().getFeatureModel();
+		IFeatureModel featureModel =
+			configurationMap.getFeatureProject().getFeatureModel();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			FeatureModelAnalyzer analyser = featureModel.getAnalyser();
-			this.deadFeatures = analyser.getDeadFeatures();
-			featureModelFilterIsInitializedFor = featureModel;
+			FeatureModelAnalyzer analyser =
+				featureModel.getAnalyser();
+			this.deadFeatures =
+				analyser.getDeadFeatures();
+			featureModelFilterIsInitializedFor =
+				featureModel;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {

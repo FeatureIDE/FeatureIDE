@@ -24,6 +24,7 @@ import antenna.preprocessor.v3.ILineFilter;
 
 /**
  * Implementation of ILineFilter
+ * 
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */

@@ -23,27 +23,30 @@ package de.ovgu.featureide.fm.core.explanations.config;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
- * Generates explanations for automatic selections in configurations.
- * These detail why a given feature must be selected or unselected given the other feature selections.
+ * Generates explanations for automatic selections in configurations. These detail why a given feature must be selected or unselected given the other feature
+ * selections.
  * 
  * @author Timo G&uuml;nther
  */
 public interface AutomaticSelectionExplanationCreator extends ConfigurationExplanationCreator {
+
 	/**
 	 * Returns the automatic selection to explain.
+	 * 
 	 * @return the automatic selection to explain
 	 */
 	@Override
 	public SelectableFeature getSubject();
-	
+
 	/**
 	 * Sets the automatic selection to explain
+	 * 
 	 * @param subject the automatic selection to explain
 	 * @throws IllegalArgumentException if the subject is not an instance of {@link SelectableFeature}
 	 */
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException;
-	
+
 	/**
 	 * Returns an explanation why the specified automatic selection is necessary.
 	 */

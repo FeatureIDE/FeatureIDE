@@ -45,7 +45,8 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 
 	private String message;
 
-	private String value = "";
+	private String value =
+		"";
 
 	private Button okButton;
 
@@ -57,28 +58,36 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 
 	public ChangeFeatureDescriptionDialog(Shell parentShell, String dialogTitle, String dialogMessage, String initialValue) {
 		super(parentShell);
-		this.title = dialogTitle;
-		message = dialogMessage;
-		initmessage = message;
+		this.title =
+			dialogTitle;
+		message =
+			dialogMessage;
+		initmessage =
+			message;
 		if (initialValue == null) {
-			value = "";
+			value =
+				"";
 		} else {
-			value = initialValue;
+			value =
+				initialValue;
 		}
 	}
 
 	protected void validate() {
-		if (text.getText().contains(">") || (text.getText().contains("<"))) {
+		if (text.getText().contains(">")
+			|| (text.getText().contains("<"))) {
 
 			if (text.getText().contains(">")) {
-				this.message = "Description contains invalid char '>'";
+				this.message =
+					"Description contains invalid char '>'";
 				label.setText(message);
 				label.setImage(ERROR_IMAGE);
 				okButton.setEnabled(false);
 			}
 
 			if (text.getText().contains("<")) {
-				this.message = "Description contains invalid char '<'";
+				this.message =
+					"Description contains invalid char '<'";
 				label.setText(message);
 				label.setImage(ERROR_IMAGE);
 				okButton.setEnabled(false);
@@ -92,9 +101,11 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
-			value = text.getText();
+			value =
+				text.getText();
 		} else {
-			value = null;
+			value =
+				null;
 		}
 		super.buttonPressed(buttonId);
 	}
@@ -107,7 +118,8 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 	}
 
 	protected void createButtonsForButtonBar(Composite parent) {
-		okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+		okButton =
+			createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
 		text.setFocus();
 		if (value != null) {
 			text.setText(value);
@@ -116,16 +128,24 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 	}
 
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite) super.createDialogArea(parent);
+		Composite composite =
+			(Composite) super.createDialogArea(parent);
 		if (message != null) {
-			label = new CLabel(composite, SWT.WRAP);
+			label =
+				new CLabel(composite, SWT.WRAP);
 			label.setText(message);
-			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
-			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
+			GridData data =
+				new GridData(GridData.GRAB_HORIZONTAL
+					| GridData.GRAB_VERTICAL
+					| GridData.HORIZONTAL_ALIGN_FILL
+					| GridData.VERTICAL_ALIGN_CENTER);
+			data.widthHint =
+				convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
 			label.setFont(parent.getFont());
 		}
-		text = new Text(composite, getInputTextStyle());
+		text =
+			new Text(composite, getInputTextStyle());
 		text.setLayoutData(new GridData(350, 100));
 
 		text.addModifyListener(new ModifyListener() {
@@ -149,11 +169,14 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 	}
 
 	protected int getInputTextStyle() {
-		return SWT.MULTI | SWT.BORDER | SWT.V_SCROLL;
+		return SWT.MULTI
+			| SWT.BORDER
+			| SWT.V_SCROLL;
 	}
 
 	public String getValue() {
-		if (value == null || value.equals(""))
+		if (value == null
+			|| value.equals(""))
 			return " ";
 		return value;
 	}

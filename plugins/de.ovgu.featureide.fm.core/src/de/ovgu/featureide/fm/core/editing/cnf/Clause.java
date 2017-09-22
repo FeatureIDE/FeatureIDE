@@ -29,7 +29,8 @@ import java.util.Arrays;
  */
 public class Clause {
 
-	private static final int HASHSIZE = 64;
+	private static final int HASHSIZE =
+		64;
 
 	protected final int[] literals;
 
@@ -37,15 +38,21 @@ public class Clause {
 	private final int hashCode;
 
 	public Clause(int... literals) {
-		this.literals = literals;
+		this.literals =
+			literals;
 		Arrays.sort(this.literals);
 
-		int literalHash = 0;
+		int literalHash =
+			0;
 		for (int literal : literals) {
-			literalHash |= (1 << (Math.abs(literal) % HASHSIZE));
+			literalHash |=
+				(1 << (Math.abs(literal)
+					% HASHSIZE));
 		}
-		hashValue = literalHash;
-		hashCode = Arrays.hashCode(literals);
+		hashValue =
+			literalHash;
+		hashCode =
+			Arrays.hashCode(literals);
 	}
 
 	public int[] getLiterals() {
@@ -70,14 +77,17 @@ public class Clause {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
 		return Arrays.equals(literals, ((Clause) obj).literals);
 	}
 
 	@Override
 	public String toString() {
-		return "Clause [literals=" + Arrays.toString(literals) + "]";
+		return "Clause [literals="
+			+ Arrays.toString(literals)
+			+ "]";
 	}
 
 	/**
@@ -89,25 +99,35 @@ public class Clause {
 	 * @return the larger clause (can then be removed from formula)
 	 */
 	public static Clause contained2(Clause clause1, Clause clause2) {
-		final int[] literals1 = clause1.literals;
-		final int[] literals2 = clause2.literals;
-		int index1 = 0;
-		int index2 = 0;
-		int bigger = 0;
+		final int[] literals1 =
+			clause1.literals;
+		final int[] literals2 =
+			clause2.literals;
+		int index1 =
+			0;
+		int index2 =
+			0;
+		int bigger =
+			0;
 
-		while (index1 < literals1.length && index2 < literals2.length) {
-			final int diff = literals1[index1] - literals2[index2];
+		while (index1 < literals1.length
+			&& index2 < literals2.length) {
+			final int diff =
+				literals1[index1]
+					- literals2[index2];
 			if (diff < 0) {
 				if (bigger == 2) {
 					return null;
 				}
-				bigger = 1;
+				bigger =
+					1;
 				index1++;
 			} else if (diff > 0) {
 				if (bigger == 1) {
 					return null;
 				}
-				bigger = 2;
+				bigger =
+					2;
 				index2++;
 			} else {
 				index1++;
@@ -117,11 +137,18 @@ public class Clause {
 
 		switch (bigger) {
 		case 0:
-			return literals1.length - literals2.length > 0 ? clause1 : clause2;
+			return literals1.length
+				- literals2.length > 0
+					? clause1
+					: clause2;
 		case 1:
-			return index2 < literals2.length ? null : clause1;
+			return index2 < literals2.length
+				? null
+				: clause1;
 		case 2:
-			return index1 < literals1.length ? null : clause2;
+			return index1 < literals1.length
+				? null
+				: clause2;
 		default:
 			return null;
 		}
@@ -133,23 +160,34 @@ public class Clause {
 	 * @param clause1 first clause
 	 * @param clause2 second clause
 	 * 
-	 * @return The larger clause (can then be removed from formula). <br/>
-	 * 	If both clauses are equal, the first clause is returned.
+	 * @return The larger clause (can then be removed from formula). <br/> If both clauses are equal, the first clause is returned.
 	 */
 	public static Clause contained(Clause clause1, Clause clause2) {
-		final int[] literals1 = clause1.literals;
-		final int[] literals2 = clause2.literals;
+		final int[] literals1 =
+			clause1.literals;
+		final int[] literals2 =
+			clause2.literals;
 
 		if (literals1.length == literals2.length) {
-			return (clause1.hashValue == clause2.hashValue && Arrays.equals(literals1, literals2)) ? clause1 : null;
+			return (clause1.hashValue == clause2.hashValue
+				&& Arrays.equals(literals1, literals2))
+					? clause1
+					: null;
 		} else {
-			final long combinedHash = clause1.hashValue & clause2.hashValue;
+			final long combinedHash =
+				clause1.hashValue
+					& clause2.hashValue;
 			if (literals1.length < literals2.length) {
 				if (combinedHash == clause1.hashValue) {
-					int index1 = 0;
-					int index2 = 0;
-					while (index1 < literals1.length && index2 < literals2.length) {
-						final int diff = literals1[index1] - literals2[index2];
+					int index1 =
+						0;
+					int index2 =
+						0;
+					while (index1 < literals1.length
+						&& index2 < literals2.length) {
+						final int diff =
+							literals1[index1]
+								- literals2[index2];
 						if (diff < 0) {
 							return null;
 						} else if (diff > 0) {
@@ -160,14 +198,21 @@ public class Clause {
 						}
 					}
 
-					return index1 < literals1.length ? null : clause2;
+					return index1 < literals1.length
+						? null
+						: clause2;
 				}
 			} else {
 				if (combinedHash == clause2.hashValue) {
-					int index1 = 0;
-					int index2 = 0;
-					while (index1 < literals1.length && index2 < literals2.length) {
-						final int diff = literals1[index1] - literals2[index2];
+					int index1 =
+						0;
+					int index2 =
+						0;
+					while (index1 < literals1.length
+						&& index2 < literals2.length) {
+						final int diff =
+							literals1[index1]
+								- literals2[index2];
 						if (diff < 0) {
 							index1++;
 						} else if (diff > 0) {
@@ -178,7 +223,9 @@ public class Clause {
 						}
 					}
 
-					return index2 < literals2.length ? null : clause1;
+					return index2 < literals2.length
+						? null
+						: clause1;
 				}
 			}
 

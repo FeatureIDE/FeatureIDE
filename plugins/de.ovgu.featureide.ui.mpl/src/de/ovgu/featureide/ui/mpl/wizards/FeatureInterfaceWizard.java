@@ -31,17 +31,21 @@ import de.ovgu.featureide.ui.mpl.wizards.page.InterfacePage;
  * @author Reimar Schroeter
  */
 public class FeatureInterfaceWizard extends AbstractWizard {
-	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.InterfaceWizard";
-	
+
+	public static final String ID =
+		MPLUIPlugin.PLUGIN_ID
+			+ ".wizards.InterfaceWizard";
+
 	private final String defaultFolderString;
-	
+
 	public FeatureInterfaceWizard(String title) {
 		this(title, null);
 	}
-	
+
 	public FeatureInterfaceWizard(String title, String defaultFolderString) {
 		super(title);
-		this.defaultFolderString = defaultFolderString;
+		this.defaultFolderString =
+			defaultFolderString;
 	}
 
 	@Override

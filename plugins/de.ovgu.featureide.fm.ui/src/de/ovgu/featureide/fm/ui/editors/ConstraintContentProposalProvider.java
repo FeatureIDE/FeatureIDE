@@ -44,31 +44,33 @@ import de.ovgu.featureide.fm.core.Features;
  * @author Stefan Krueger
  */
 public class ConstraintContentProposalProvider implements IContentProposalProvider {
-	static final int CURRENT = 0;
-	static final int LAST = 1;
+
+	static final int CURRENT =
+		0;
+	static final int LAST =
+		1;
 	private Set<String> features;
 
 	public ConstraintContentProposalProvider(Set<String> featureNames) {
 		super();
-		features = featureNames;
+		features =
+			featureNames;
 	}
 
 	/**
-	 * Return an array of Objects s representing the valid content proposals for
-	 * a field.
+	 * Return an array of Objects s representing the valid content proposals for a field.
 	 * 
-	 * @param contents
-	 *            the current contents of the field
-	 * @param position
-	 *            the current cursor position within the field
-	 * @return the array of Objects that represent valid proposals for the field
-	 *         given its current content.
+	 * @param contents the current contents of the field
+	 * @param position the current cursor position within the field
+	 * @return the array of Objects that represent valid proposals for the field given its current content.
 	 */
 	public IContentProposal[] getProposals(String contents, int position) {
 
-		String[] words = getWords(contents, position);
+		String[] words =
+			getWords(contents, position);
 
-		List<ContentProposal> proposalList = getProposalList(words, contents);
+		List<ContentProposal> proposalList =
+			getProposalList(words, contents);
 
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
@@ -76,21 +78,23 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 	/**
 	 * @return all possible feature names or junctors.
-	 * @param words
-	 *            current and previous word of edited string
-	 * @param contents
-	 *            complete string being edited
+	 * @param words current and previous word of edited string
+	 * @param contents complete string being edited
 	 * 
 	 */
 	private List<ContentProposal> getProposalList(String[] words, String contents) {
-		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
+		List<ContentProposal> proposalList =
+			new ArrayList<ContentProposal>();
 
-		if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
-			proposalList = getProposalList(words[LAST], features);
+		if ("(".equals(words[CURRENT])
+			|| " ".equals(words[CURRENT])
+			|| "".equals(words[CURRENT])) {
+			proposalList =
+				getProposalList(words[LAST], features);
 		} else {
 			for (ContentProposal proposal : getProposalList(words[LAST], features)) {
 				if (proposal.getContent().length() > words[CURRENT].trim().length()
-						&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
+					&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
 					proposalList.add(proposal);
 				}
 			}
@@ -99,66 +103,86 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	}
 
 	/**
-	 * Returns the word that is being written and the word before it, given the
-	 * current content and cursor position
+	 * Returns the word that is being written and the word before it, given the current content and cursor position
 	 * 
-	 * @param contents
-	 *            the content,i.e. the string which contains the text
-	 * @param position
-	 *            current position of the cursor, first position is 0
-	 * @return Array with two elements: current word and the word before, words
-	 *         can be empty String, index: CURRENT, LAST
+	 * @param contents the content,i.e. the string which contains the text
+	 * @param position current position of the cursor, first position is 0
+	 * @return Array with two elements: current word and the word before, words can be empty String, index: CURRENT, LAST
 	 */
 	static String[] getWords(String contents, int position) {
 
-		String[] words = new String[2];
+		String[] words =
+			new String[2];
 
-		int posMarker = position - 1;
+		int posMarker =
+			position
+				- 1;
 		if (position == 0) {
-			words[CURRENT] = "";
-			words[LAST] = "";
+			words[CURRENT] =
+				"";
+			words[LAST] =
+				"";
 		} else {
-			while (posMarker > 0 && contents.charAt(posMarker) != ' ') {
+			while (posMarker > 0
+				&& contents.charAt(posMarker) != ' ') {
 				posMarker--;
 			}
-			words[CURRENT] = contents.substring(posMarker, position);
+			words[CURRENT] =
+				contents.substring(posMarker, position);
 
-			while (posMarker > 0 && contents.charAt(posMarker) == ' ') {
+			while (posMarker > 0
+				&& contents.charAt(posMarker) == ' ') {
 				posMarker--;
 			}
-			int startBefore = posMarker;
-			while (startBefore > 0 && contents.charAt(startBefore) != ' ') {
+			int startBefore =
+				posMarker;
+			while (startBefore > 0
+				&& contents.charAt(startBefore) != ' ') {
 				startBefore--;
 			}
 			if (posMarker == 0) {
 				if (contents.charAt(0) == '(')
-					words[LAST] = "(";
+					words[LAST] =
+						"(";
 				else
-					words[LAST] = "";
+					words[LAST] =
+						"";
 			} else
-				words[LAST] = contents.substring(startBefore, posMarker + 1);
+				words[LAST] =
+					contents.substring(startBefore, posMarker
+						+ 1);
 
 		}
 
-		if (words[LAST].trim().startsWith("(") && words[LAST].length() > 1) {
-			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
+		if (words[LAST].trim().startsWith("(")
+			&& words[LAST].length() > 1) {
+			words[LAST] =
+				words[LAST].substring(words[LAST].indexOf('(')
+					+ 1);
 
 		}
 		if (words[CURRENT].trim().startsWith("(")) {
-			words[CURRENT] = words[CURRENT].trim();
-			words[CURRENT] = words[CURRENT].substring(1);
-			words[LAST] = "(";
+			words[CURRENT] =
+				words[CURRENT].trim();
+			words[CURRENT] =
+				words[CURRENT].substring(1);
+			words[LAST] =
+				"(";
 		}
 		if (words[LAST].endsWith(")")) {
-			words[LAST] = ")";
+			words[LAST] =
+				")";
 			if (contents.charAt(posMarker) == ')') {
-				words[LAST] = ") ";
+				words[LAST] =
+					") ";
 			}
 
 		}
 		if (words[CURRENT].endsWith(")")) {
-			words[LAST] = ")";
-			words[CURRENT] = "";
+			words[LAST] =
+				")";
+			words[CURRENT] =
+				"";
 
 		}
 
@@ -169,22 +193,24 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 * 
 	 * @param wordBefore
 	 * 
-	 * @param features
-	 *            set of features
+	 * @param features set of features
 	 * @return List of proposals, either operators or feature names
 	 */
 	private static List<ContentProposal> getProposalList(String wordBefore, Set<String> features) {
 
-		ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
-		ArrayList<String> featureList = new ArrayList<String>(features);
+		ArrayList<ContentProposal> proposals =
+			new ArrayList<ContentProposal>();
+		ArrayList<String> featureList =
+			new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 
-		Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
+		Collection<String> operatorNamesInFeatures =
+			Features.extractOperatorNamesFromFeatuers(features);
 
 		// TODO: Add binary operators only iff their appearance makes sense in content proposal
 		// Example:
-		//		Show "and" for "A |"
-		//		Hide "and" for "A and |"
+		// Show "and" for "A |"
+		// Hide "and" for "A and |"
 		proposals.add(new ContentProposal("and"));
 		proposals.add(new ContentProposal(IFF));
 		proposals.add(new ContentProposal(IMPLIES));
@@ -192,16 +218,20 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 
 		// TODO: Add binary operators only iff their appearance makes sense in content proposal
 		// Example:
-		//		Show NOT for "A implies |"
-		//		Hide NOT for "A |"
+		// Show NOT for "A implies |"
+		// Hide NOT for "A |"
 		proposals.add(new ContentProposal(NOT));
 
 		// TODO: Add features only iff a feature name is valid in context
-		// Example: 
-		//		Show feature for "A implies |"
-		//		Hide features for "A |"
+		// Example:
+		// Show feature for "A implies |"
+		// Hide features for "A |"
 		for (String s : featureList)
-			proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
+			proposals.add(new ContentProposal(s
+				+ (operatorNamesInFeatures.contains(s.trim())
+					? " "
+						+ Features.FEATURE_SUFFIX
+					: "")));
 
 		return proposals;
 	}

@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
  * @author Timo G&uuml;nther
  */
 public class MusPreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
+
 	@Override
 	public InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator() {
 		return new MusInvariantExpressionExplanationCreator();

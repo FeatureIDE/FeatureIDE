@@ -36,45 +36,56 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart
  * @author Sebastian Krieter
  */
 public abstract class AbstractColorAction extends Action {
+
 	private GraphicalViewerImpl viewer;
 	protected CollaborationView collaborationView;
 	protected int index;
-	
-	public AbstractColorAction(String text){
+
+	public AbstractColorAction(String text) {
 		this.setText(text);
 	}
 
 	public AbstractColorAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
 		super(text);
-		this.viewer = view;
-		this.index = index;
-		this.collaborationView = collaborationView;
+		this.viewer =
+			view;
+		this.index =
+			index;
+		this.collaborationView =
+			collaborationView;
 	}
-	
+
 	public AbstractColorAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index, int style) {
 		super(text, style);
-		this.viewer = view;
-		this.index = index;
-		this.collaborationView = collaborationView;
+		this.viewer =
+			view;
+		this.index =
+			index;
+		this.collaborationView =
+			collaborationView;
 	}
 
 	@Override
 	public void run() {
-		Object selectedItem = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+		Object selectedItem =
+			((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 		if (selectedItem instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) selectedItem).getCollaborationModel();
+			FSTFeature coll =
+				((CollaborationEditPart) selectedItem).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
-				IFeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
-				
-				boolean refresh = action(fm, coll.getName());
-				
-				if (refresh) {	
+				IFeatureModel fm =
+					collaborationView.getFeatureProject().getFeatureModel();
+
+				boolean refresh =
+					action(fm, coll.getName());
+
+				if (refresh) {
 					collaborationView.refreshAll();
 				}
 			}
 		}
 	}
-	
+
 	protected abstract boolean action(IFeatureModel fm, String collName);
 }

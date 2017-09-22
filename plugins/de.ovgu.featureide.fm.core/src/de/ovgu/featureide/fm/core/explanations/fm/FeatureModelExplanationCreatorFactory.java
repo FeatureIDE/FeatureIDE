@@ -29,28 +29,33 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplan
  * @author Timo G&uuml;nther
  */
 public abstract class FeatureModelExplanationCreatorFactory implements ExplanationCreatorFactory {
+
 	/**
 	 * Returns a default instance of this class.
+	 * 
 	 * @return a default instance of this class
 	 */
 	public static FeatureModelExplanationCreatorFactory getDefault() {
 		return new MusFeatureModelExplanationCreatorFactory();
 	}
-	
+
 	/**
 	 * Returns an instance of {@link DeadFeatureExplanationCreator}.
+	 * 
 	 * @return an instance of {@link DeadFeatureExplanationCreator}
 	 */
 	public abstract DeadFeatureExplanationCreator getDeadFeatureExplanationCreator();
-	
+
 	/**
 	 * Returns an instance of {@link FalseOptionalFeatureExplanationCreator}.
+	 * 
 	 * @return an instance of {@link FalseOptionalFeatureExplanationCreator}
 	 */
 	public abstract FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator();
-	
+
 	/**
 	 * Returns an instance of {@link RedundantConstraintExplanationCreator}.
+	 * 
 	 * @return an instance of {@link RedundantConstraintExplanationCreator}
 	 */
 	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator();

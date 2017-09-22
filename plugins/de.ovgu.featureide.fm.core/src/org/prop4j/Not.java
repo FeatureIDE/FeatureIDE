@@ -32,9 +32,11 @@ import java.util.Map;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class Not extends Node implements Cloneable {
-	
+
 	public Not(Object child) {
-		children = new Node[] { getNode(child) };
+		children =
+			new Node[] {
+				getNode(child) };
 	}
 
 	@Override
@@ -49,44 +51,49 @@ public class Not extends Node implements Cloneable {
 
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
-		Node node = children[0];
+		Node node =
+			children[0];
 		if (!list.contains(getClass())) {
-			children[0] = node.eliminate(list);
+			children[0] =
+				node.eliminate(list);
 			return this;
 		}
-		
-		//reduce Not(Literal) to Literal
+
+		// reduce Not(Literal) to Literal
 		if (node instanceof Literal) {
 			((Literal) node).flip();
 			return node;
 		}
-		//reduce Not(Not(Node)) to Node
+		// reduce Not(Not(Node)) to Node
 		if (node instanceof Not) {
 			return ((Not) node).children[0].eliminate(list);
 		}
-		//transform Not(And(a,b)) to Or(Not(a),Not(b))
+		// transform Not(And(a,b)) to Or(Not(a),Not(b))
 		if (node instanceof And) {
 			negateNodes(node.children);
 			node.eliminate(list);
 			return new Or((Object[]) node.children);
 		}
-		//transform Not(Or(a,b)) to And(Not(a),Not(b))
+		// transform Not(Or(a,b)) to And(Not(a),Not(b))
 		if (node instanceof Or) {
 			negateNodes(node.children);
 			node.eliminate(list);
 			return new And((Object[]) node.children);
 		}
-		//transform Not(AtMostx(a,b)) to AtLeastx+1(a,b)
+		// transform Not(AtMostx(a,b)) to AtLeastx+1(a,b)
 		if (node instanceof AtMost) {
 			node.eliminate(list);
-			return new AtLeast(((AtMost) node).max + 1, (Object[]) node.children);
+			return new AtLeast(((AtMost) node).max
+				+ 1, (Object[]) node.children);
 		}
-		//transform Not(AtLeastx(a,b)) to AtMostx-1(a,b)
+		// transform Not(AtLeastx(a,b)) to AtMostx-1(a,b)
 		if (node instanceof AtLeast) {
 			node.eliminate(list);
-			return new AtMost(((AtLeast) node).min - 1, (Object[]) node.children);
+			return new AtMost(((AtLeast) node).min
+				- 1, (Object[]) node.children);
 		}
-		throw new RuntimeException(node.getClass().getName() + IS_NOT_SUPPORTED);
+		throw new RuntimeException(node.getClass().getName()
+			+ IS_NOT_SUPPORTED);
 	}
 
 	@Override

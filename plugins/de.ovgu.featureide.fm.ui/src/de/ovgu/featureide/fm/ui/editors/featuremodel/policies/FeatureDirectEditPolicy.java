@@ -41,18 +41,20 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	private final IGraphicalFeature feature;
 
 	public FeatureDirectEditPolicy(IGraphicalFeatureModel featureModel, IGraphicalFeature feature) {
-		this.featureModel = featureModel;
-		this.feature = feature;
+		this.featureModel =
+			featureModel;
+		this.feature =
+			feature;
 	}
 
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
-		String newName = (String) request.getCellEditor().getValue();
+		String newName =
+			(String) request.getCellEditor().getValue();
 		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName(), newName);
 	}
 
 	@Override
-	protected void showCurrentEditValue(DirectEditRequest request) {
-	}
+	protected void showCurrentEditValue(DirectEditRequest request) {}
 
 }

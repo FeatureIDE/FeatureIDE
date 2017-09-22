@@ -26,8 +26,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * Convenience-class to evaluate constraints which is just extracting their
- * names.
+ * Convenience-class to evaluate constraints which is just extracting their names.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
@@ -38,11 +37,12 @@ public class ConstraintNode extends LazyParent {
 
 	public ConstraintNode(IConstraint constr) {
 		super(CONSTRAINT, constr.toString());
-		this.constr = constr;
-		lazy = false;
+		this.constr =
+			constr;
+		lazy =
+			false;
 	}
 
 	@Override
-	protected void initChildren() {
-	}
+	protected void initChildren() {}
 }

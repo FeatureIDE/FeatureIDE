@@ -33,15 +33,15 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to reverse the feature model layout order.
- * Enables undo/redo functionality.
+ * Operation with functionality to reverse the feature model layout order. Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private static final String LABEL = REVERSE_LAYOUT_ORDER;
+	private static final String LABEL =
+		REVERSE_LAYOUT_ORDER;
 
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
@@ -49,8 +49,10 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
-		final IFeatureStructure rootStructure = root.getObject().getStructure();
+		final IGraphicalFeature root =
+			FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
+		final IFeatureStructure rootStructure =
+			root.getObject().getStructure();
 		for (final IFeatureStructure feature : Features.getCompoundFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
 			Collections.reverse(feature.getChildren());
 		}

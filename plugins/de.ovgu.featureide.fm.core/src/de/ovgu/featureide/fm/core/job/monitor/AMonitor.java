@@ -24,8 +24,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
@@ -33,14 +32,17 @@ public abstract class AMonitor implements IMonitor {
 
 	protected final AMonitor parent;
 
-	protected IConsumer<Object> intermediateFunction = null;
+	protected IConsumer<Object> intermediateFunction =
+		null;
 
 	public AMonitor(AMonitor parent) {
-		this.parent = parent;
+		this.parent =
+			parent;
 	}
 
 	public AMonitor() {
-		this.parent = null;
+		this.parent =
+			null;
 	}
 
 	@Override
@@ -64,7 +66,8 @@ public abstract class AMonitor implements IMonitor {
 
 	@Override
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = intermediateFunction;
+		this.intermediateFunction =
+			intermediateFunction;
 	}
 
 }

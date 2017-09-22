@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-
 /**
  * Interface for the {@link RoleElement} class.
  * 
@@ -33,17 +32,17 @@ public interface IRoleElement {
 	void setJavaDocComment(String javaDocComment);
 
 	FSTRole getRole();
-	
+
 	String getFullName();
-	
+
 	String getName();
-	
+
 	String getFullIdentifier();
 
 	void setRole(FSTRole role);
-	
+
 	IRoleElement getParent();
-	
+
 	void setParent(IRoleElement parent);
 
 }

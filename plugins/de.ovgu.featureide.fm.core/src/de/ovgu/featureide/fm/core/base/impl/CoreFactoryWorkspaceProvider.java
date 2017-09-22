@@ -40,7 +40,7 @@ public final class CoreFactoryWorkspaceProvider extends AFactoryWorkspaceProvide
 
 	@Override
 	public void save() {
-		
+
 	}
 
 	@Override

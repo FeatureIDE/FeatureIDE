@@ -29,11 +29,11 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  * @author Sebastian Krieter
  */
 public class FujiClass extends AbstractClass {
-	
+
 	public FujiClass(AbstractClassSignature signature) {
 		super(signature);
 	}
-	
+
 	@Override
 	public String toString() {
 		return FujiStringBuilder.getClassString(this, false);

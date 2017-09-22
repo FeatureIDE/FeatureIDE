@@ -37,18 +37,21 @@ public class FeatureInAllConfigsFilter extends ConfigurationMapFilter {
 		super("= n", isDefault);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		List<Configuration> configs = configurationMap.getConfigurations();
-		
+		List<Configuration> configs =
+			configurationMap.getConfigurations();
+
 		for (Configuration config : configs) {
 			if (!config.getSelectedFeatures().contains(feature))
 				return false;
 		}
-		
+
 		return true;
 	}
 

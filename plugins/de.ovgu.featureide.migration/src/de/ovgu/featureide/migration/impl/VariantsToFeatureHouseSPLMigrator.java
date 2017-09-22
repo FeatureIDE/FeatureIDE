@@ -28,13 +28,13 @@ import org.eclipse.jface.wizard.WizardDialog;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationWizard;
 
 /**
- * Handles the migration of products into a FeatureIDE project using the
- * FeatureHouse composer.
+ * Handles the migration of products into a FeatureIDE project using the FeatureHouse composer.
  * 
  * @author Konstantin Tonscheidt
  * 
  */
 public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator {
+
 	private WizardDialog dialog;
 
 	public VariantsToFeatureHouseSPLMigrator(IStructuredSelection projectSelection) {
@@ -52,7 +52,8 @@ public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator {
 	}
 
 	private void initWizard(IStructuredSelection projectSelection) {
-		dialog = new WizardDialog(null, new SPLMigrationWizard(this));
+		dialog =
+			new WizardDialog(null, new SPLMigrationWizard(this));
 		dialog.open();
 	}
 

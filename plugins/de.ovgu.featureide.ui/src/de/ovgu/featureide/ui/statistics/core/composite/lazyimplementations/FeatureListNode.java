@@ -30,32 +30,35 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * Parent node which evaluates if it has children before actually displaying
- * them. All features are sorted in an alphabetical order ignoring the case.
+ * Parent node which evaluates if it has children before actually displaying them. All features are sorted in an alphabetical order ignoring the case.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public final class FeatureListNode extends LazyParent {
-	
+
 	private final Collection<IFeature> list;
-	
+
 	private final boolean expand;
-	
+
 	public FeatureListNode(String description, Collection<IFeature> collection) {
 		this(description, collection, collection.size(), true);
 	}
 
 	public FeatureListNode(String description, Collection<IFeature> collection, Object value, boolean expand) {
 		super(description, value);
-		
-		this.expand = expand;
-		
-		List<IFeature> list = new LinkedList<IFeature>(collection);
+
+		this.expand =
+			expand;
+
+		List<IFeature> list =
+			new LinkedList<IFeature>(collection);
 		Collections.sort(list, new FeatureComparator(false));
-		
-		this.list = list;
-		lazy = (list.size() != 0);
+
+		this.list =
+			list;
+		lazy =
+			(list.size() != 0);
 	}
 
 	@Override

@@ -37,41 +37,48 @@ import org.prop4j.explain.solvers.SatProblem;
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractSatProblem implements SatProblem {
+
 	/** The clauses added to this problem. */
-	private final List<Node> clauses = new ArrayList<>();
+	private final List<Node> clauses =
+		new ArrayList<>();
 	/** The assumptions added to this problem. */
-	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
-	
+	private final Map<Object, Boolean> assumptions =
+		new LinkedHashMap<>();
+
 	@Override
 	public int addFormulas(Node... formulas) {
 		return addFormulas(Arrays.asList(formulas));
 	}
-	
+
 	@Override
 	public int addFormulas(Collection<Node> formulas) {
-		int added = 0;
+		int added =
+			0;
 		for (final Node formula : formulas) {
-			added += addFormula(formula);
+			added +=
+				addFormula(formula);
 		}
 		return added;
 	}
-	
+
 	@Override
 	public int addFormula(Node formula) {
-		formula = formula.toRegularCNF();
-		final List<Node> clauses = Arrays.asList(formula.getChildren());
+		formula =
+			formula.toRegularCNF();
+		final List<Node> clauses =
+			Arrays.asList(formula.getChildren());
 		return addClauses(clauses);
 	}
-	
+
 	/**
-	 * Adds all given CNF clauses to the problem.
-	 * Each one must be a non-empty disjunction of literals.
-	 * Ignores clauses already added.
+	 * Adds all given CNF clauses to the problem. Each one must be a non-empty disjunction of literals. Ignores clauses already added.
+	 * 
 	 * @param clauses clauses to add; not null
 	 * @return whether the problem changed as a result of this operation
 	 */
 	protected int addClauses(List<Node> clauses) {
-		int added = 0;
+		int added =
+			0;
 		for (final Node clause : clauses) {
 			if (addClause(clause)) {
 				added++;
@@ -79,11 +86,10 @@ public abstract class AbstractSatProblem implements SatProblem {
 		}
 		return added;
 	}
-	
+
 	/**
-	 * Adds the given CNF clause to the problem.
-	 * It must be a non-empty disjunction of literals.
-	 * Ignores the clause if it is already added.
+	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals. Ignores the clause if it is already added.
+	 * 
 	 * @param clause clause to add; not null
 	 * @return whether the problem changed as a result of this operation
 	 * @throws IllegalArgumentException if the clause is empty
@@ -95,44 +101,44 @@ public abstract class AbstractSatProblem implements SatProblem {
 		clauses.add(clause);
 		return true;
 	}
-	
+
 	@Override
 	public List<Node> getClauses() {
 		return clauses;
 	}
-	
+
 	@Override
 	public Node getClause(int index) throws IndexOutOfBoundsException {
 		return clauses.get(index);
 	}
-	
+
 	@Override
 	public int getClauseCount() {
 		return clauses.size();
 	}
-	
+
 	@Override
 	public boolean containsClause(Node clause) {
 		return clauses.contains(clause);
 	}
-	
+
 	@Override
 	public void addAssumptions(Map<Object, Boolean> assumptions) {
 		for (final Entry<Object, Boolean> assumption : assumptions.entrySet()) {
 			addAssumption(assumption.getKey(), assumption.getValue());
 		}
 	}
-	
+
 	@Override
 	public void addAssumption(Object variable, boolean value) {
 		assumptions.put(variable, value);
 	}
-	
+
 	@Override
 	public Map<Object, Boolean> getAssumptions() {
 		return assumptions;
 	}
-	
+
 	@Override
 	public Boolean getAssumption(Object variable) {
 		return assumptions.get(variable);

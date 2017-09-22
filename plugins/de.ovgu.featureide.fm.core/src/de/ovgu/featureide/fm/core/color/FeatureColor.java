@@ -31,7 +31,8 @@ public enum FeatureColor {
 	final int value;
 
 	FeatureColor(int i) {
-		this.value = i;
+		this.value =
+			i;
 	}
 
 	public String getColorName() {
@@ -48,7 +49,9 @@ public enum FeatureColor {
 				return c;
 			}
 		}
-		throw new RuntimeException("Color " + index + " not found");
+		throw new RuntimeException("Color "
+			+ index
+			+ " not found");
 	}
 
 	public static FeatureColor getColor(String colorName) {

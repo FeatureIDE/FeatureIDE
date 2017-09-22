@@ -33,24 +33,24 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Class for starting jobs. {@link IRunner}s in a specific {@link JobSequence} are executed consecutively. {@link IRunner}s in different {@link JobSequence}s
- * are
- * executed independent of each other.
- * </br>
- * It is possible to wait for a sequence to finish.
+ * are executed independent of each other. </br> It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
  */
 public final class JobSequence implements LongRunningMethod<Boolean> {
 
-	private static final ConcurrentHashMap<LongRunningMethod<?>, JobSequence> sequenceMap = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<LongRunningMethod<?>, JobSequence> sequenceMap =
+		new ConcurrentHashMap<>();
 
 	public static JobSequence getSequenceForJob(LongRunningMethod<?> method) {
 		return sequenceMap.get(method);
 	}
 
-	private final LinkedList<LongRunningMethod<?>> jobs = new LinkedList<>();
+	private final LinkedList<LongRunningMethod<?>> jobs =
+		new LinkedList<>();
 
-	private boolean ignorePreviousJobFail = true;
+	private boolean ignorePreviousJobFail =
+		true;
 
 	/**
 	 * Adds a new job to the sequence if it has not already finished
@@ -70,7 +70,8 @@ public final class JobSequence implements LongRunningMethod<Boolean> {
 
 	public void insertJobs(LongRunningMethod<?> lastJob, Collection<LongRunningMethod<?>> newJobs) {
 		synchronized (jobs) {
-			for (ListIterator<LongRunningMethod<?>> it = jobs.listIterator(); it.hasNext();) {
+			for (ListIterator<LongRunningMethod<?>> it =
+				jobs.listIterator(); it.hasNext();) {
 				if (it.next().equals(lastJob)) {
 					for (LongRunningMethod<?> newJob : newJobs) {
 						it.add(newJob);
@@ -88,12 +89,14 @@ public final class JobSequence implements LongRunningMethod<Boolean> {
 	 * @param ignorePreviousJobFail
 	 */
 	public void setIgnorePreviousJobFail(boolean ignorePreviousJobFail) {
-		this.ignorePreviousJobFail = ignorePreviousJobFail;
+		this.ignorePreviousJobFail =
+			ignorePreviousJobFail;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("JobSequence:");
+		StringBuilder sb =
+			new StringBuilder("JobSequence:");
 		for (LongRunningMethod<?> job : jobs) {
 			sb.append("\n\t");
 			sb.append(job.toString());
@@ -111,15 +114,18 @@ public final class JobSequence implements LongRunningMethod<Boolean> {
 				if (jobs.isEmpty()) {
 					break;
 				}
-				curJob = jobs.poll();
+				curJob =
+					jobs.poll();
 			}
-			final IRunner<?> thread = LongRunningWrapper.getThread(curJob, monitor.subTask(1));
+			final IRunner<?> thread =
+				LongRunningWrapper.getThread(curJob, monitor.subTask(1));
 			thread.schedule();
 			thread.join();
 
 			sequenceMap.remove(curJob);
 
-			if (!ignorePreviousJobFail && thread.getStatus() != JobStatus.OK) {
+			if (!ignorePreviousJobFail
+				&& thread.getStatus() != JobStatus.OK) {
 				return false;
 			}
 		}

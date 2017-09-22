@@ -47,35 +47,51 @@ public class ChooseFolderPage extends AbstractWizardPage {
 	public ChooseFolderPage(String defaultFolderName) {
 		super(CHOOSE_FOLDER);
 		setDescription(CHOOSE_A_FOLDER_FOR_EXTENDED_MODULES);
-		this.folderNameString = defaultFolderName;
+		this.folderNameString =
+			defaultFolderName;
 	}
 
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
+		Composite container =
+			new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout =
+			new GridLayout();
+		gridLayout.numColumns =
+			1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout = new GridLayout();
-		projGridLayout.numColumns = 2;
+		GridLayout projGridLayout =
+			new GridLayout();
+		projGridLayout.numColumns =
+			2;
 
-		Group configGroup = new Group(container, SWT.NONE);
+		Group configGroup =
+			new Group(container, SWT.NONE);
 		configGroup.setText("");
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 1;
+		GridData gridData =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan =
+			2;
+		gridData.verticalSpan =
+			1;
 
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
-		gridData2.horizontalSpan = 1;
-		gridData2.verticalSpan = 1;
+		GridData gridData2 =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData2.horizontalSpan =
+			1;
+		gridData2.verticalSpan =
+			1;
 
-		folderLabel = new Label(configGroup, 0);
+		folderLabel =
+			new Label(configGroup, 0);
 		folderLabel.setText("Name of Folder: ");
-		folderName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
+		folderName =
+			new Text(configGroup, SWT.BORDER
+				| SWT.SINGLE);
 		folderName.setText(folderNameString);
 		folderName.setLayoutData(gridData2);
 		folderName.addKeyListener(new KeyPressedListener());
@@ -84,7 +100,8 @@ public class ChooseFolderPage extends AbstractWizardPage {
 
 	@Override
 	protected String checkPage() {
-		folderNameString = folderName.getText();
+		folderNameString =
+			folderName.getText();
 		if (folderNameString.isEmpty()) {
 			return ENTER_A_FOLDER_NAME;
 		}

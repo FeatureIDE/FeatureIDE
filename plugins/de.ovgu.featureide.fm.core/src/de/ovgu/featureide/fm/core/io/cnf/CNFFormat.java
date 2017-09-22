@@ -36,8 +36,11 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  */
 public class CNFFormat implements IFeatureModelFormat {
-	
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + CNFFormat.class.getSimpleName();
+
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ CNFFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -46,8 +49,10 @@ public class CNFFormat implements IFeatureModelFormat {
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
-		final StringBuilder cnf = new StringBuilder();
+		final Node nodes =
+			AdvancedNodeCreator.createCNF(featureModel);
+		final StringBuilder cnf =
+			new StringBuilder();
 		cnf.append("Logical Symbols:\r\n");
 		cnf.append(nodes.toString(NodeWriter.logicalSymbols));
 		cnf.append("\r\n\r\nTextual Symbols:\r\n");

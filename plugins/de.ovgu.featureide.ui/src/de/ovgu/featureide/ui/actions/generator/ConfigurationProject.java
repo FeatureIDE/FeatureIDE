@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * This is a workaround to create a new project
+ * 
  * @author Jens Meinicke
  */
 @SuppressWarnings(RESTRICTION)
@@ -35,13 +36,13 @@ public class ConfigurationProject extends Project {
 
 	/**
 	 * This is a workaround to have a access to the invisible constructor of the super class {@link Project}
+	 * 
 	 * @param path The path of the project
 	 * @param workspace The workspace of the new project
 	 */
 	protected ConfigurationProject(IPath path, Workspace workspace) {
 		super(path, workspace);
-		
-	}
 
+	}
 
 }

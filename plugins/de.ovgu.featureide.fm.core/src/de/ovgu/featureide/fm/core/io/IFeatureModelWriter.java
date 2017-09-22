@@ -42,7 +42,7 @@ public interface IFeatureModelWriter {
 	 * @return the model to write
 	 */
 	public IFeatureModel getFeatureModel();
-	
+
 	/**
 	 * Sets the feature model to be saved in a textual representation.
 	 * 
@@ -57,7 +57,7 @@ public interface IFeatureModelWriter {
 	 * @throws org.eclipse.core.runtime.CoreException
 	 */
 	public abstract void writeToFile(File file);
-	
+
 	/**
 	 * Converts a feature model to a textual representation.
 	 * 

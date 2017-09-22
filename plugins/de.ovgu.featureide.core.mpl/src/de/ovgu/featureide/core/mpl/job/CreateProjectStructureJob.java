@@ -41,17 +41,21 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  */
 public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments, Boolean> {
-	
+
 	public static class Arguments extends JobArguments {
+
 		private final IFilter<AbstractSignature> filter;
 		private final ProjectStructure projectSig;
 		private final IProject project;
-		
+
 		public Arguments(ProjectStructure projectSig, IFilter<AbstractSignature> filter, IProject project) {
 			super(Arguments.class);
-			this.filter = filter;
-			this.projectSig = projectSig;
-			this.project = project;
+			this.filter =
+				filter;
+			this.projectSig =
+				projectSig;
+			this.project =
+				project;
 		}
 	}
 
@@ -61,17 +65,21 @@ public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjec
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
+		this.workMonitor =
+			workMonitor;
+		InterfaceProject interfaceProject =
+			MPLPlugin.getDefault().getInterfaceProject(arguments.project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(arguments.project.getName()
+				+ " is no Interface Project!");
 			return false;
 		}
-		SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
+		SignatureIterator it =
+			interfaceProject.getProjectSignatures().iterator();
 		it.addFilter(arguments.filter);
 		arguments.projectSig.construct(it, getClassCreator());
 		return true;
 	}
-	
+
 	protected abstract AClassCreator getClassCreator();
 }

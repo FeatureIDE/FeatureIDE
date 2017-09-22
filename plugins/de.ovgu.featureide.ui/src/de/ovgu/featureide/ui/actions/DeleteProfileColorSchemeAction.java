@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * This Class contains one of the three actions, which is added to the menu
  * 
  * The other related classes are:
+ * 
  * @see de.ovgu.featureide.ui.actions.AddProfileColorScheme.java
  * @see de.ovgu.featureide.ui.actions.RenameProfileColorScheme.java
  * 
@@ -41,25 +42,23 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 public class DeleteProfileColorSchemeAction extends Action {
 
 	private IFeatureModel model;
-	
 
 	/*
 	 * Constructor
 	 */
 	public DeleteProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
-		this.model = model;
+		this.model =
+			model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 * 
-	 * this method removes the profile and saves the configuration
+	 * @see org.eclipse.jface.action.Action#run() this method removes the profile and saves the configuration
 	 */
-	public void run() {	
+	public void run() {
 		FeatureColorManager.removeCurrentColorScheme(model);
 	}
 

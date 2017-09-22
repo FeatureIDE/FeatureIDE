@@ -33,18 +33,20 @@ import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
  * @author Sebastian Krieter
  */
 public abstract class AFeatureProjectHandler extends ASelectionHandler {
-	
+
 	/**
 	 * This method is called for every project in the current selection.
 	 * 
 	 * @param project the current project handle.
 	 */
 	protected abstract void singleAction(IFeatureProject project);
-	
+
 	@Override
 	protected void singleAction(Object element) {
-		final IResource res = (IResource) SelectionWrapper.checkClass(element, IResource.class);
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
+		final IResource res =
+			(IResource) SelectionWrapper.checkClass(element, IResource.class);
+		final IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(res);
 		if (featureProject != null) {
 			singleAction(featureProject);
 		}

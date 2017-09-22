@@ -45,54 +45,71 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	private IFeature oldParent;
 	private int oldIndex;
 	private LinkedList<IFeature> oldChildren;
-	private boolean deleted = false;
-	private boolean or = false;
-	private boolean alternative = false;
+	private boolean deleted =
+		false;
+	private boolean or =
+		false;
+	private boolean alternative =
+		false;
 	private IFeature replacement;
 
 	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature) {
 		super(featureModel, DELETE);
-		this.feature = feature;
-		this.replacement = null;
+		this.feature =
+			feature;
+		this.replacement =
+			null;
 	}
 
 	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature, IFeature replacement) {
 		super(featureModel, DELETE);
-		this.feature = feature;
-		this.replacement = replacement;
+		this.feature =
+			feature;
+		this.replacement =
+			replacement;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		feature = featureModel.getFeature(feature.getName());
-		oldParent = FeatureUtils.getParent(feature);
+		feature =
+			featureModel.getFeature(feature.getName());
+		oldParent =
+			FeatureUtils.getParent(feature);
 		if (oldParent != null) {
-			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
+			oldIndex =
+				oldParent.getStructure().getChildIndex(feature.getStructure());
 		}
-		oldChildren = new LinkedList<IFeature>();
+		oldChildren =
+			new LinkedList<IFeature>();
 		oldChildren.addAll(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
 
 		if (oldParent != null) {
-			oldParent = featureModel.getFeature(oldParent.getName());
+			oldParent =
+				featureModel.getFeature(oldParent.getName());
 		}
-		LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
+		LinkedList<IFeature> oldChildrenCopy =
+			new LinkedList<IFeature>();
 
 		for (IFeature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				IFeature oldChild = featureModel.getFeature(f.getName());
+				IFeature oldChild =
+					featureModel.getFeature(f.getName());
 				oldChildrenCopy.add(oldChild);
 			}
 		}
 
-		oldChildren = oldChildrenCopy;
+		oldChildren =
+			oldChildrenCopy;
 		if (feature.getStructure().isRoot()) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
-			deleted = true;
+			deleted =
+				true;
 		} else {
-			deleted = featureModel.deleteFeature(feature);
+			deleted =
+				featureModel.deleteFeature(feature);
 		}
 
-		//Replace feature name in constraints
+		// Replace feature name in constraints
 		if (replacement != null) {
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c.getContainedFeatures().contains(feature)) {
@@ -100,12 +117,14 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		
-		//make sure after delete the group type of the parent is set to and if there is only one child left
-		if(oldParent != null){
-			or = oldParent.getStructure().isOr();
-			alternative = oldParent.getStructure().isAlternative();
-			if(oldParent.getStructure().getChildrenCount() == 1){
+
+		// make sure after delete the group type of the parent is set to and if there is only one child left
+		if (oldParent != null) {
+			or =
+				oldParent.getStructure().isOr();
+			alternative =
+				oldParent.getStructure().isAlternative();
+			if (oldParent.getStructure().getChildrenCount() == 1) {
 				oldParent.getStructure().changeToAnd();
 			}
 		}
@@ -120,21 +139,26 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 
 			if (oldParent != null) {
-				oldParent = featureModel.getFeature(oldParent.getName());
+				oldParent =
+					featureModel.getFeature(oldParent.getName());
 			}
-			LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
+			LinkedList<IFeature> oldChildrenCopy =
+				new LinkedList<IFeature>();
 
 			for (IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
-					IFeature child = featureModel.getFeature(f.getName());
-					if (child != null && child.getStructure().getParent() != null) {
+					IFeature child =
+						featureModel.getFeature(f.getName());
+					if (child != null
+						&& child.getStructure().getParent() != null) {
 						child.getStructure().getParent().removeChild(child.getStructure());
 					}
 					oldChildrenCopy.add(child);
 				}
 			}
 
-			oldChildren = oldChildrenCopy;
+			oldChildren =
+				oldChildrenCopy;
 
 			feature.getStructure().setChildren(Functional.toList(FeatureUtils.convertToFeatureStructureList(oldChildren)));
 			if (oldParent != null) {
@@ -144,7 +168,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 			featureModel.addFeature(feature);
 
-			//Replace feature name in Constraints
+			// Replace feature name in Constraints
 			if (replacement != null) {
 				for (IConstraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
@@ -152,15 +176,16 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 					}
 				}
 			}
-			
-			//When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
-			if(oldParent != null && or){
+
+			// When deleting a child and leaving one child behind the group type will be changed to and. reverse to old group type
+			if (oldParent != null
+				&& or) {
 				oldParent.getStructure().changeToOr();
-			} else if (oldParent != null && alternative){
+			} else if (oldParent != null
+				&& alternative) {
 				oldParent.getStructure().changeToAlternative();
 			}
-			
-			
+
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -169,6 +194,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public boolean canUndo() {
-		return oldParent == null || featureModel.getFeature(oldParent.getName()) != null;
+		return oldParent == null
+			|| featureModel.getFeature(oldParent.getName()) != null;
 	}
 }

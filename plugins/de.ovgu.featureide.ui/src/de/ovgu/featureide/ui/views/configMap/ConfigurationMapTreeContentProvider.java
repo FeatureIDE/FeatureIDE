@@ -39,15 +39,19 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ConfigurationMapTreeContentProvider implements ITreeContentProvider, IConfigurationMapFilterable {
 
-	private static final Object[] emptyRoot = new Object[] { StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
+	private static final Object[] emptyRoot =
+		new Object[] {
+			StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
 
 	private IFeatureProject featureProject;
-	private Object[] featureRoots = emptyRoot;
+	private Object[] featureRoots =
+		emptyRoot;
 
 	private ConfigurationMap configurationMap;
 
 	public ConfigurationMapTreeContentProvider(ConfigurationMap configurationMap) {
-		this.configurationMap = configurationMap;
+		this.configurationMap =
+			configurationMap;
 	}
 
 	@Override
@@ -81,7 +85,8 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	public void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
-			this.featureProject = featureProject;
+			this.featureProject =
+				featureProject;
 			if (featureProject != null) {
 				for (IConfigurationMapFilter filter : configurationMap.getFilters()) {
 					filter.initialize(this.configurationMap);
@@ -93,31 +98,31 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	public void updateElements() {
 		if (featureProject == null) {
-			featureRoots = emptyRoot;
+			featureRoots =
+				emptyRoot;
 			return;
 		}
 
-		List<Object> featureRootList = new ArrayList<>();
+		List<Object> featureRootList =
+			new ArrayList<>();
 
-		//add Features
+		// add Features
 		for (IFeature feature : featureProject.getFeatureModel().getFeatures())
 			// getParent(feature) == null <=> With the used filter, this feature is a root (although originally it may be not).
-			if (filter(feature) && (feature.getStructure().isRoot() || getParent(feature) == null))
+			if (filter(feature)
+				&& (feature.getStructure().isRoot()
+					|| getParent(feature) == null))
 				featureRootList.add(feature);
 
-		featureRoots = featureRootList.toArray();
+		featureRoots =
+			featureRootList.toArray();
 
 		this.configurationMap.updateTree();
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * <b>NOTE:</b> The returned array must not contain the given
-	 * <code>inputElement</code>, since this leads to recursion issues in
-	 * {@link AbstractTreeViewer} (see
-	 * <a href="https://bugs.eclipse.org/9262">bug 9262</a>).
-	 * </p>
+	 * {@inheritDoc} <p> <b>NOTE:</b> The returned array must not contain the given <code>inputElement</code>, since this leads to recursion issues in
+	 * {@link AbstractTreeViewer} (see <a href="https://bugs.eclipse.org/9262">bug 9262</a>). </p>
 	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
@@ -125,26 +130,25 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	}
 
 	/**
-	 * Returns the child elements of the given parent element.
-	 * <p>
-	 * The difference between this method and <code>IStructuredContentProvider.getElements</code>
-	 * is that <code>getElements</code> is called to obtain the
-	 * tree viewer's root elements, whereas <code>getChildren</code> is used
-	 * to obtain the children of a given parent element in the tree (including a root).
-	 * </p>
-	 * The result is not modified by the viewer.
+	 * Returns the child elements of the given parent element. <p> The difference between this method and <code>IStructuredContentProvider.getElements</code> is
+	 * that <code>getElements</code> is called to obtain the tree viewer's root elements, whereas <code>getChildren</code> is used to obtain the children of a
+	 * given parent element in the tree (including a root). </p> The result is not modified by the viewer.
 	 *
 	 * @param parentElement the parent element
 	 * @return an array of child elements
 	 */
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFeature) {
-			IFeature f = (IFeature) parentElement;
-			List<IFeatureStructure> childStructures = f.getStructure().getChildren();
+			IFeature f =
+				(IFeature) parentElement;
+			List<IFeatureStructure> childStructures =
+				f.getStructure().getChildren();
 
-			List<Object> children = new ArrayList<>();
+			List<Object> children =
+				new ArrayList<>();
 			for (IFeatureStructure struct : childStructures) {
-				IFeature child = struct.getFeature();
+				IFeature child =
+					struct.getFeature();
 				if (filter(child))
 					children.add(child);
 			}
@@ -156,19 +160,18 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	}
 
 	/**
-	 * Returns the parent for the given element, or <code>null</code>
-	 * indicating that the parent can't be computed.
-	 * In this case the tree-structured viewer can't expand
-	 * a given node correctly if requested.
+	 * Returns the parent for the given element, or <code>null</code> indicating that the parent can't be computed. In this case the tree-structured viewer
+	 * can't expand a given node correctly if requested.
 	 *
 	 * @param element the element
-	 * @return the parent element, or <code>null</code> if it
-	 *         has none or if the parent cannot be computed
+	 * @return the parent element, or <code>null</code> if it has none or if the parent cannot be computed
 	 */
 	public Object getParent(Object element) {
 		if (element instanceof IFeature) {
-			IFeature feature = (IFeature) element;
-			IFeatureStructure parentStructure = feature.getStructure().getParent();
+			IFeature feature =
+				(IFeature) element;
+			IFeatureStructure parentStructure =
+				feature.getStructure().getParent();
 			if (parentStructure != null) {
 				return filter(parentStructure.getFeature());
 			}
@@ -177,20 +180,16 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	}
 
 	/**
-	 * Returns whether the given element has children.
-	 * <p>
-	 * Intended as an optimization for when the viewer does not
-	 * need the actual children. Clients may be able to implement
-	 * this more efficiently than <code>getChildren</code>.
-	 * </p>
+	 * Returns whether the given element has children. <p> Intended as an optimization for when the viewer does not need the actual children. Clients may be
+	 * able to implement this more efficiently than <code>getChildren</code>. </p>
 	 *
 	 * @param element the element
-	 * @return <code>true</code> if the given element has children,
-	 *         and <code>false</code> if it has no children
+	 * @return <code>true</code> if the given element has children, and <code>false</code> if it has no children
 	 */
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature) {
-			IFeature f = (IFeature) element;
+			IFeature f =
+				(IFeature) element;
 
 			for (IFeatureStructure childStruct : f.getStructure().getChildren()) {
 				// If at least one child is valid, the feature has children.
@@ -212,11 +211,9 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	}
 
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 }

@@ -33,8 +33,9 @@ import org.eclipse.core.resources.IFile;
  */
 public class FSTArbitraryRole extends FSTRole {
 
-	private final List<IFile> files = new LinkedList<IFile>();  
-	
+	private final List<IFile> files =
+		new LinkedList<IFile>();
+
 	/**
 	 * @param file
 	 * @param feature
@@ -43,13 +44,13 @@ public class FSTArbitraryRole extends FSTRole {
 	public FSTArbitraryRole(FSTFeature feature, FSTClass fstClass) {
 		super(null, feature, fstClass);
 	}
-	
+
 	void addFile(final IFile file) {
 		if (!files.contains(file)) {
 			files.add(file);
 		}
 	}
-	
+
 	/**
 	 * @return the files
 	 */

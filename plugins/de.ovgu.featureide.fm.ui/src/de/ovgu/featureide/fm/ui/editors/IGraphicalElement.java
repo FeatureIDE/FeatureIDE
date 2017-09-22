@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 public interface IGraphicalElement extends IGraphicItem {
 
 	IFeatureModelElement getObject();
-	
+
 	IGraphicalFeatureModel getGraphicalModel();
 
 	Point getLocation();
@@ -50,7 +50,7 @@ public interface IGraphicalElement extends IGraphicItem {
 	String getGraphicType();
 
 	void update(FeatureIDEEvent event);
-	
+
 	void registerUIObject(IEventListener listener);
 
 }

@@ -30,25 +30,28 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
  */
 public class ChangeOutlineProviderAction extends Action {
 
-		private OutlineProvider provider;
+	private OutlineProvider provider;
 
-		/**
-		 * Constructor for ChangeOutlineProviderAction
-		 * @param viewer
-		 */
-		public ChangeOutlineProviderAction(OutlineProvider provider, boolean checked) {
-			super();
-			this.provider = provider;
-			this.setText(provider.getProviderName());
-			this.setChecked(checked);
-		}
+	/**
+	 * Constructor for ChangeOutlineProviderAction
+	 * 
+	 * @param viewer
+	 */
+	public ChangeOutlineProviderAction(OutlineProvider provider, boolean checked) {
+		super();
+		this.provider =
+			provider;
+		this.setText(provider.getProviderName());
+		this.setChecked(checked);
+	}
 
-		/**
-		 * Returns the outline provider
-		 * @return
-		 */
-		public OutlineProvider getProvider() {
-			return provider;
-		}
+	/**
+	 * Returns the outline provider
+	 * 
+	 * @return
+	 */
+	public OutlineProvider getProvider() {
+		return provider;
+	}
 
 }

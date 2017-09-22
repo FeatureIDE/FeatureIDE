@@ -60,11 +60,14 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
  */
 public class FeatureColorManager implements IEventListener {
 
-	private static final FeatureColorManager INSTANCE = new FeatureColorManager();
+	private static final FeatureColorManager INSTANCE =
+		new FeatureColorManager();
 
-	private static final Map<IProject, Map<String, ColorScheme>> colorSchemes = new HashMap<>();
+	private static final Map<IProject, Map<String, ColorScheme>> colorSchemes =
+		new HashMap<>();
 
-	protected static final List<IEventListener> colorListener = new LinkedList<>();
+	protected static final List<IEventListener> colorListener =
+		new LinkedList<>();
 
 	/**
 	 * Returns the current color of the given feature.
@@ -103,18 +106,24 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	public static void removeColorScheme(final IFeatureModel featureModel, final String currentName) {
-		final IProject project = getProject(featureModel);
-		final IFolder profileFolder = project.getFolder(".profiles");
+		final IProject project =
+			getProject(featureModel);
+		final IFolder profileFolder =
+			project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
 			return;
 		}
 		if (DefaultColorScheme.defaultName.equals(currentName)) {
 			throw new RuntimeException("Default color scheme cannot be removed!");
 		}
-		final ColorScheme removedColorScheme = colorSchemes.get(project).remove(currentName);
-		final IFile file = profileFolder.getFile(currentName + ".profile");
+		final ColorScheme removedColorScheme =
+			colorSchemes.get(project).remove(currentName);
+		final IFile file =
+			profileFolder.getFile(currentName
+				+ ".profile");
 		if (!file.exists()) {
-			Logger.logWarning(file + " does not exist");
+			Logger.logWarning(file
+				+ " does not exist");
 			return;
 		}
 		try {
@@ -134,8 +143,10 @@ public class FeatureColorManager implements IEventListener {
 	 * @return
 	 */
 	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
-		IProject project = getProject(featureModel);
-		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		IProject project =
+			getProject(featureModel);
+		Map<String, ColorScheme> currentSchemes =
+			colorSchemes.get(project);
 		return currentSchemes.get(schmeName).isCurrent();
 	}
 
@@ -156,7 +167,8 @@ public class FeatureColorManager implements IEventListener {
 		IProject project;
 		// Fix for #398
 		try {
-			project = getProject(featureModel);
+			project =
+				getProject(featureModel);
 		} catch (NullPointerException e) {
 			return new DefaultColorScheme();
 		}
@@ -164,10 +176,12 @@ public class FeatureColorManager implements IEventListener {
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project, featureModel);
 		}
-		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		Map<String, ColorScheme> currentSchemes =
+			colorSchemes.get(project);
 		if (currentSchemes.isEmpty()) {
 			initColorSchemes(project, featureModel);
-			currentSchemes = colorSchemes.get(project);
+			currentSchemes =
+				colorSchemes.get(project);
 		}
 
 		for (ColorScheme cs : currentSchemes.values()) {
@@ -194,22 +208,26 @@ public class FeatureColorManager implements IEventListener {
 	 * Initializes and loads all color schemes for the given project.
 	 */
 	private static void initColorSchemes(IProject project, IFeatureModel featureModel) {
-		Map<String, ColorScheme> newEntry = new HashMap<>();
+		Map<String, ColorScheme> newEntry =
+			new HashMap<>();
 		newEntry.put(DefaultColorScheme.defaultName, new DefaultColorScheme());
 		colorSchemes.put(project, newEntry);
 		featureModel.getRenamingsManager().addListener(INSTANCE);
 
-		IFolder profileFolder = project.getFolder(".profiles");
+		IFolder profileFolder =
+			project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
 			return;
 		}
 		try {
 			for (IResource res : profileFolder.members()) {
-				final String ext = res.getFileExtension();
+				final String ext =
+					res.getFileExtension();
 				if (ext == null)
 					throw new RuntimeException("Unexpected null reference");
 
-				if (res instanceof IFile && ext.equals("profile")) {
+				if (res instanceof IFile
+					&& ext.equals("profile")) {
 					readColors(newEntry, res);
 				}
 			}
@@ -222,19 +240,25 @@ public class FeatureColorManager implements IEventListener {
 	 * Reads the colors from the given file.
 	 */
 	private static void readColors(Map<String, ColorScheme> newEntry, IResource res) {
-		try (BufferedReader in = new BufferedReader(new FileReader(new File(res.getLocationURI())))) {
-			final String name = res.getName().substring(0, res.getName().lastIndexOf('.'));
-			ColorScheme newCs = new ColorScheme(name);
+		try (BufferedReader in =
+			new BufferedReader(new FileReader(new File(res.getLocationURI())))) {
+			final String name =
+				res.getName().substring(0, res.getName().lastIndexOf('.'));
+			ColorScheme newCs =
+				new ColorScheme(name);
 			newEntry.put(newCs.getName(), newCs);
-			String line = in.readLine();
+			String line =
+				in.readLine();
 			if (line == null)
 				throw new RuntimeException("Unexpected null reference");
 			if (line.equals("true")) {
 				setActive(res.getProject(), name, false);
 			}
 
-			while ((line = in.readLine()) != null) {
-				String[] split = line.split("=");
+			while ((line =
+				in.readLine()) != null) {
+				String[] split =
+					line.split("=");
 				try {
 					if (split.length != 2) {
 						continue;
@@ -256,7 +280,8 @@ public class FeatureColorManager implements IEventListener {
 		if (colorScheme.isDefault()) {
 			return;
 		}
-		IFolder profileFolder = project.getFolder(".profiles");
+		IFolder profileFolder =
+			project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
 			try {
 				profileFolder.create(true, true, new NullProgressMonitor());
@@ -264,7 +289,9 @@ public class FeatureColorManager implements IEventListener {
 				Logger.logError(e);
 			}
 		}
-		IFile file = profileFolder.getFile(colorScheme.getName() + ".profile");
+		IFile file =
+			profileFolder.getFile(colorScheme.getName()
+				+ ".profile");
 		if (!file.exists()) {
 			try {
 				new File(file.getLocationURI()).createNewFile();
@@ -273,7 +300,8 @@ public class FeatureColorManager implements IEventListener {
 			}
 		}
 
-		try (PrintWriter out = new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
+		try (PrintWriter out =
+			new PrintWriter(new FileWriter(new File(file.getLocationURI()), false), true)) {
 			out.println(colorScheme.isCurrent());
 			for (Entry<String, FeatureColor> entry : colorScheme.getColors().entrySet()) {
 				out.print(entry.getKey());
@@ -291,7 +319,8 @@ public class FeatureColorManager implements IEventListener {
 	 * Returns all profiles for the given model.
 	 */
 	public static Collection<ColorScheme> getColorSchemes(IFeatureModel featureModel) {
-		IProject project = getProject(featureModel);
+		IProject project =
+			getProject(featureModel);
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project, featureModel);
 		}
@@ -306,10 +335,14 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	private static IProject getProject(IFeatureModel featureModel) {
-		java.nio.file.Path file = featureModel.getSourceFile();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPath location = Path.fromOSString(file.toAbsolutePath().toString());
-		IFile iFile = workspace.getRoot().getFileForLocation(location);
+		java.nio.file.Path file =
+			featureModel.getSourceFile();
+		IWorkspace workspace =
+			ResourcesPlugin.getWorkspace();
+		IPath location =
+			Path.fromOSString(file.toAbsolutePath().toString());
+		IFile iFile =
+			workspace.getRoot().getFileForLocation(location);
 		try {
 			return iFile.getProject();
 		} catch (NullPointerException e) {
@@ -322,13 +355,18 @@ public class FeatureColorManager implements IEventListener {
 	 * Creates a new color scheme for with the given name.
 	 */
 	public static void newColorScheme(IFeatureModel featureModel, String csName) {
-		IProject project = getProject(featureModel);
-		ColorScheme newColorScheme = new ColorScheme(csName);
-		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		IProject project =
+			getProject(featureModel);
+		ColorScheme newColorScheme =
+			new ColorScheme(csName);
+		Map<String, ColorScheme> currentSchemes =
+			colorSchemes.get(project);
 		if (currentSchemes.containsKey(csName)) {
-			throw new RuntimeException("scheme " + csName + " already exists");
+			throw new RuntimeException("scheme "
+				+ csName
+				+ " already exists");
 		}
-		//		featureModel.getRenamingsManager().addListener(INSTANCE);
+		// featureModel.getRenamingsManager().addListener(INSTANCE);
 		currentSchemes.put(csName, newColorScheme);
 	}
 
@@ -336,7 +374,8 @@ public class FeatureColorManager implements IEventListener {
 	 * Checks whether there is a color scheme with the given name.
 	 */
 	public static boolean hasColorScheme(IFeatureModel featureModel, String csName) {
-		IProject project = getProject(featureModel);
+		IProject project =
+			getProject(featureModel);
 		return colorSchemes.get(project).containsKey(csName);
 	}
 
@@ -348,9 +387,12 @@ public class FeatureColorManager implements IEventListener {
 	}
 
 	public static void renameColorScheme(IFeatureModel featureModel, String oldName, String newName) {
-		IProject project = getProject(featureModel);
-		Map<String, ColorScheme> currentColorSchemes = colorSchemes.get(project);
-		ColorScheme scheme = currentColorSchemes.get(oldName);
+		IProject project =
+			getProject(featureModel);
+		Map<String, ColorScheme> currentColorSchemes =
+			colorSchemes.get(project);
+		ColorScheme scheme =
+			currentColorSchemes.get(oldName);
 		removeColorScheme(featureModel, oldName);
 		scheme.setName(newName);
 		currentColorSchemes.put(newName, scheme);
@@ -361,7 +403,8 @@ public class FeatureColorManager implements IEventListener {
 	 * Activates the color scheme with the given name.
 	 */
 	public static void setActive(IFeatureModel fm, String collName) {
-		IProject project = getProject(fm);
+		IProject project =
+			getProject(fm);
 		setActive(project, collName, true);
 		fm.handleModelDataChanged();
 	}
@@ -370,12 +413,15 @@ public class FeatureColorManager implements IEventListener {
 	 * Activates the color scheme with the given name.
 	 */
 	public static void setActive(IProject project, String collName, boolean write) {
-		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		Map<String, ColorScheme> currentSchemes =
+			colorSchemes.get(project);
 		if (!currentSchemes.containsKey(collName)) {
-			throw new RuntimeException("tried to activate scheme " + collName);
+			throw new RuntimeException("tried to activate scheme "
+				+ collName);
 		}
 		for (Entry<String, ColorScheme> cs : currentSchemes.entrySet()) {
-			ColorScheme scheme = cs.getValue();
+			ColorScheme scheme =
+				cs.getValue();
 			if (cs.getKey().equals(collName)) {
 				if (!scheme.isCurrent()) {
 					scheme.setCurrent(true);
@@ -399,7 +445,8 @@ public class FeatureColorManager implements IEventListener {
 	 * Performs the feature renaming.
 	 */
 	public static void renameFeature(IFeatureModel model, String oldName, String newName) {
-		Collection<ColorScheme> currentColorSchemes = getColorSchemes(model);
+		Collection<ColorScheme> currentColorSchemes =
+			getColorSchemes(model);
 		for (ColorScheme colorScheme : currentColorSchemes) {
 			colorScheme.renameFeature(oldName, newName);
 			writeColors(getProject(model), colorScheme);

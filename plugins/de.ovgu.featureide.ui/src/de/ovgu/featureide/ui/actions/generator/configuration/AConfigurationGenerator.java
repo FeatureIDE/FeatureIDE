@@ -32,35 +32,40 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
  * 
  * @author Jens Meinicke
  */
-public abstract class AConfigurationGenerator implements LongRunningMethod<Void>{
+public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
+
 	protected IFeatureModel featureModel;
-	
+
 	protected ConfigurationBuilder builder;
-	
+
 	/**
-	 * This is the configuration where the {@link ConfigurationReader} saves the
-	 * read configuration.
+	 * This is the configuration where the {@link ConfigurationReader} saves the read configuration.
 	 */
 	protected Configuration configuration;
-	
+
 	/**
 	 * The count of found configurations.
 	 */
-	protected long confs = 0;
+	protected long confs =
+		0;
 
 	protected final IFeatureProject featureProject;
-	
+
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		this.builder = builder;
-		this.featureModel = featureModel;
-		this.featureProject = featureProject;
-		configuration = new Configuration(featureModel, Configuration.PARAM_NONE);
+		this.builder =
+			builder;
+		this.featureModel =
+			featureModel;
+		this.featureProject =
+			featureProject;
+		configuration =
+			new Configuration(featureModel, Configuration.PARAM_NONE);
 	}
-	
+
 	protected void cancelGenerationJobs() {
 		builder.cancelGenerationJobs();
 	}
-	
+
 	protected int maxConfigs() {
 		return (int) builder.configurationNumber;
 	}

@@ -30,7 +30,6 @@ import org.eclipse.ui.texteditor.IAnnotationImageProvider;
 
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 
-
 /**
  * Image for the annotations shown in the vertical ruler
  * 
@@ -39,13 +38,16 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 public class ColorAnnotationImageProvider implements IAnnotationImageProvider {
 
 	private static final class ColorAnnotationDescriptor extends ImageDescriptor {
+
 		private final ImageData imgdata;
 
 		public ColorAnnotationDescriptor(int color) {
-			imgdata = new ImageData(10, 15, 1, new PaletteData(
-					new RGB[] { ColorPalette.getRGB(color, 0.6f) }));
+			imgdata =
+				new ImageData(10, 15, 1, new PaletteData(
+						new RGB[] {
+							ColorPalette.getRGB(color, 0.6f) }));
 		}
-		
+
 		@Override
 		public ImageData getImageData() {
 			return imgdata;
@@ -60,7 +62,8 @@ public class ColorAnnotationImageProvider implements IAnnotationImageProvider {
 	@Override
 	public String getImageDescriptorId(Annotation annotation) {
 		if (annotation instanceof ColorAnnotation) {
-			ColorAnnotation ca = (ColorAnnotation) annotation;
+			ColorAnnotation ca =
+				(ColorAnnotation) annotation;
 			if (ca.isImageAnnotation()) {
 				return ca.getId();
 			}

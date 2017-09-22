@@ -40,20 +40,22 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * This Editor extends the standard Java editor {@link CompilationUnitEditor} It
- * only sets the part name to differ a source from a composed file.
+ * This Editor extends the standard Java editor {@link CompilationUnitEditor} It only sets the part name to differ a source from a composed file.
  * 
  * @author Jens Meinicke
  */
 /*
- * TODO maybe the BasicJavaEditorActionContributor should used at plugin.xml
- * TODO the images for composed and source files should differ(?)
+ * TODO maybe the BasicJavaEditorActionContributor should used at plugin.xml TODO the images for composed and source files should differ(?)
  */
 @SuppressWarnings(RESTRICTION)
 public class JavaEditor extends CompilationUnitEditor {
-	public static final String ID = UIPlugin.PLUGIN_ID + ".editors.JavaEditor";
-	private static final Image TITLE_IMAGE = UIPlugin
-			.getImage("JakFileIcon.png");
+
+	public static final String ID =
+		UIPlugin.PLUGIN_ID
+			+ ".editors.JavaEditor";
+	private static final Image TITLE_IMAGE =
+		UIPlugin
+				.getImage("JakFileIcon.png");
 	private IComposerExtensionClass composer;
 
 	@Override
@@ -61,39 +63,54 @@ public class JavaEditor extends CompilationUnitEditor {
 			throws PartInitException {
 		super.init(site, input);
 		if (input instanceof IFileEditorInput) {
-			IFile file = ((IFileEditorInput) input).getFile();
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+			IFile file =
+				((IFileEditorInput) input).getFile();
+			IFeatureProject featureProject =
+				CorePlugin.getFeatureProject(file);
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null)
 				return;
-			composer = featureProject.getComposer();
+			composer =
+				featureProject.getComposer();
 			if (composer.hasFeatureFolder()) {
-				String feature = featureProject.getFeatureName(file);
+				String feature =
+					featureProject.getFeatureName(file);
 				if (feature != null) {
 					// case: a source file
 					if (composer.hasFeatureFolder()) {
-						setPartName(file.getName() + "[" + feature + "]");
+						setPartName(file.getName()
+							+ "["
+							+ feature
+							+ "]");
 					}
 				} else {
 					if (isComposedFile(file.getParent(),
 							featureProject.getBuildFolder())) {
 						// case: a composed file
-						IFile configuration = featureProject
-								.getCurrentConfiguration();
+						IFile configuration =
+							featureProject
+									.getCurrentConfiguration();
 						if (configuration != null) {
-							String config = configuration.getName()
-									.split("[.]")[0];
+							String config =
+								configuration.getName()
+										.split("[.]")[0];
 							if (config != null) {
-								setPartName(file.getName() + "<" + config + ">");
+								setPartName(file.getName()
+									+ "<"
+									+ config
+									+ ">");
 							}
 						}
 					} else {
-						String configuration = getConfiguration(file
-								.getParent());
+						String configuration =
+							getConfiguration(file
+									.getParent());
 						if (configuration != null) {
 							// case: a generated products file
-							setPartName(file.getName() + "<" + configuration
-									+ ">");
+							setPartName(file.getName()
+								+ "<"
+								+ configuration
+								+ ">");
 						}
 					}
 				}
@@ -103,12 +120,10 @@ public class JavaEditor extends CompilationUnitEditor {
 	}
 
 	/**
-	 * Looks for the corresponding configuration file<br>
-	 * Necessary for generated products
+	 * Looks for the corresponding configuration file<br> Necessary for generated products
 	 * 
 	 * @param parent
-	 * @return The name of the configuration or <code>null</code> if there is
-	 *         none
+	 * @return The name of the configuration or <code>null</code> if there is none
 	 */
 	private String getConfiguration(IContainer parent) {
 		try {
@@ -123,7 +138,8 @@ public class JavaEditor extends CompilationUnitEditor {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		IContainer p = parent.getParent();
+		IContainer p =
+			parent.getParent();
 		if (p != null) {
 			return getConfiguration(p);
 		}
@@ -133,8 +149,7 @@ public class JavaEditor extends CompilationUnitEditor {
 	/**
 	 * @param parent
 	 * @param buildFolder
-	 * @return <code>true</code> if the build folder is a parent of the given
-	 *         file
+	 * @return <code>true</code> if the build folder is a parent of the given file
 	 */
 	private boolean isComposedFile(IContainer parent, IFolder buildFolder) {
 		if (parent != null) {

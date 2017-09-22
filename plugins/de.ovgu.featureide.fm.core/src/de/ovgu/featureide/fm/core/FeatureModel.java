@@ -44,8 +44,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * The model representation of the feature tree that notifies listeners of
- * changes in the tree.
+ * The model representation of the feature tree that notifies listeners of changes in the tree.
  * 
  * @author Thomas Thuem
  * @author Florian Proksch
@@ -62,11 +61,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public FeatureModel(IFeatureModel model) {
-		this.model = model;
+		this.model =
+			model;
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-		this.model = oldFeatureModel.model.clone();
+		this.model =
+			oldFeatureModel.model.clone();
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
@@ -74,8 +75,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation
-	 * on the {@link FeatureModel}.
+	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation on the {@link FeatureModel}.
 	 */
 	public FeatureModelAnalyzer getAnalyser() {
 		return model.getAnalyser();
@@ -83,12 +83,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 
 	@Override
 	public IFeatureModelLayout getLayout() {
-		//		return model.getLayout();
+		// return model.getLayout();
 		return null;
 	}
 
 	public ColorschemeTable getColorschemeTable() {
-		//		return model.getGraphicRepresenation().getColorschemeTable();
+		// return model.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
@@ -115,8 +115,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * Creates a default {@link FeatureModel} with a root feature named as the project and a
-	 * child feature named base.
+	 * Creates a default {@link FeatureModel} with a root feature named as the project and a child feature named base.
 	 * 
 	 * @param projectName The name of the project
 	 */
@@ -133,7 +132,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-		Hashtable<String, IFeature> iFeatureTable = new Hashtable<>();
+		Hashtable<String, IFeature> iFeatureTable =
+			new Hashtable<>();
 		for (String key : Functional.toIterator(featureTable.keys()))
 			iFeatureTable.put(key, convert(featureTable.get(key)));
 		FeatureUtils.setFeatureTable(model, iFeatureTable);
@@ -194,8 +194,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 * @return the featureTable
 	 */
 	protected Map<String, Feature> getFeatureTable() {
-		Map<String, Feature> result = new HashMap<>();
-		final Map<String, IFeature> map = FeatureUtils.getFeatureTable(model);
+		Map<String, Feature> result =
+			new HashMap<>();
+		final Map<String, IFeature> map =
+			FeatureUtils.getFeatureTable(model);
 		for (String key : map.keySet())
 			result.put(key, convert(map.get(key)));
 		return result;
@@ -236,7 +238,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	public void addPropositionalNode(Node node, int index) {
 		FeatureUtils.addPropositionalNode(model, node, index);
 	}
-	
+
 	public void addConstraint(Constraint constraint, int index) {
 		FeatureUtils.addConstraint(model, convert(constraint), index);
 	}
@@ -345,12 +347,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	/**
-	 * Clones the feature model.
-	 * Makes a deep copy from all fields in the model.</br>
-	 * Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)} are {@code false} in every case.
+	 * Clones the feature model. Makes a deep copy from all fields in the model.</br> Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)}
+	 * are {@code false} in every case.
 	 * 
-	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout
-	 *            are set to {@code null} for a faster cloning process.
+	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout are set to {@code null} for a faster cloning process.
 	 * @return a deep copy from the feature model
 	 * 
 	 * @see #clone()
@@ -438,11 +438,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setUndoContext(Object undoContext) {
-		//		FeatureUtils.setUndoContext(model, undoContext);
+		// FeatureUtils.setUndoContext(model, undoContext);
 	}
 
 	public Object getUndoContext() {
-		//		return FeatureUtils.getUndoContext(model);
+		// return FeatureUtils.getUndoContext(model);
 		return null;
 	}
 
@@ -463,12 +463,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public boolean isFeatureOrderInXML() {
-		//		return FeatureUtils.isFeatureOrderInXML(model);
+		// return FeatureUtils.isFeatureOrderInXML(model);
 		return false;
 	}
 
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
+		// FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
 	}
 
 	@Override

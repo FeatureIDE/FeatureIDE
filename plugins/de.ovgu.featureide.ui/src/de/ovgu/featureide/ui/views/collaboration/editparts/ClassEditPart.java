@@ -78,7 +78,8 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<?> getModelChildren() {
-		List<FSTRole> roles = new LinkedList<FSTRole>();
+		List<FSTRole> roles =
+			new LinkedList<FSTRole>();
 		for (FSTRole role : getClassModel().getRoles()) {
 			if (addFeature(role.getFeature())) {
 				roles.add(role);
@@ -86,7 +87,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		}
 		return roles;
 	}
-	
+
 	private boolean addFeature(final FSTFeature feature) {
 		return CollaborationModelBuilder.showFeature(feature);
 	}
@@ -96,7 +97,9 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void refreshVisuals() {
-		this.getFigure().getBounds().y=GUIDefaults.DEFAULT_INSET_TO_EDGE - 5;
+		this.getFigure().getBounds().y =
+			GUIDefaults.DEFAULT_INSET_TO_EDGE
+				- 5;
 	}
 
 	/**
@@ -104,21 +107,29 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			FSTClass classModel = getClassModel();
-			String fileName = classModel.getName();
+			FSTClass classModel =
+				getClassModel();
+			String fileName =
+				classModel.getName();
 			if (fileName.contains("*"))
 				return;
 
-			final LinkedList<FSTRole> roles = classModel.getRoles();
-			
-			IFile roleFile = roles.getFirst().getFile();
-			IFeatureProject project = CorePlugin.getFeatureProject(roleFile);
+			final LinkedList<FSTRole> roles =
+				classModel.getRoles();
+
+			IFile roleFile =
+				roles.getFirst().getFile();
+			IFeatureProject project =
+				CorePlugin.getFeatureProject(roleFile);
 			if (project == null) return;
-			IFolder buildFolder = project.getBuildFolder();
-			IFile file = buildFolder.getFile(fileName);
+			IFolder buildFolder =
+				project.getBuildFolder();
+			IFile file =
+				buildFolder.getFile(fileName);
 			try {
 				if (!file.exists())
-					file = getBuildFile(fileName, buildFolder);
+					file =
+						getBuildFile(fileName, buildFolder);
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
@@ -129,24 +140,32 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
-			IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench()
-					.getActiveWorkbenchWindow();
-			IWorkbenchPage page = dw.getActivePage();
+			IWorkbenchWindow dw =
+				UIPlugin.getDefault().getWorkbench()
+						.getActiveWorkbenchWindow();
+			IWorkbenchPage page =
+				dw.getActivePage();
 			if (page != null) {
-				IContentType contentType = null;
+				IContentType contentType =
+					null;
 				try {
-					IContentDescription description = file
-							.getContentDescription();
+					IContentDescription description =
+						file
+								.getContentDescription();
 					if (description != null) {
-						contentType = description.getContentType();
+						contentType =
+							description.getContentType();
 					}
-					IEditorDescriptor desc = null;
+					IEditorDescriptor desc =
+						null;
 					if (contentType != null) {
-						desc = PlatformUI.getWorkbench().getEditorRegistry()
-								.getDefaultEditor(file.getName(), contentType);
+						desc =
+							PlatformUI.getWorkbench().getEditorRegistry()
+									.getDefaultEditor(file.getName(), contentType);
 					} else {
-						desc = PlatformUI.getWorkbench().getEditorRegistry()
-								.getDefaultEditor(file.getName());
+						desc =
+							PlatformUI.getWorkbench().getEditorRegistry()
+									.getDefaultEditor(file.getName());
 					}
 
 					if (desc != null) {
@@ -170,7 +189,8 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		IFile file;
 		for (IResource res : buildFoloder.members()) {
 			if (res instanceof IFolder) {
-				file = getBuildFile(fileName, (IFolder) res);
+				file =
+					getBuildFile(fileName, (IFolder) res);
 				if (file != null)
 					return file;
 			}

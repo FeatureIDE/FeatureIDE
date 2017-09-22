@@ -38,7 +38,8 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
  */
 public interface ISatSolver extends Cloneable {
 
-	public static final int MAX_SOLUTION_BUFFER = 1000;
+	public static final int MAX_SOLUTION_BUFFER =
+		1000;
 
 	public static enum SatResult {
 		FALSE, TIMEOUT, TRUE
@@ -85,7 +86,7 @@ public interface ISatSolver extends Cloneable {
 	void setSelectionStrategy(SelectionStrategy strategy);
 
 	void shuffleOrder();
-	
+
 	int[] getOrder();
 
 	List<IConstr> addClauses(Node constraint) throws ContradictionException;

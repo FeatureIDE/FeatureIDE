@@ -24,14 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A constraint that is true iff the left child is false or the right child is
- * true.
+ * A constraint that is true iff the left child is false or the right child is true.
  * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class Implies extends Node implements Cloneable {
-	
+
 	public Implies(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
 	}
@@ -58,22 +57,24 @@ public class Implies extends Node implements Cloneable {
 			return new Or(new Not(children[0]), children[1]);
 		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		// TODO: This is equivalent not to implement hashCode() at all, and was added for legacy code reasons. 
+		// TODO: This is equivalent not to implement hashCode() at all, and was added for legacy code reasons.
 		// Please note: implementing "equals" without custom hashCode should be avoided
-		return super.hashCode();	
+		return super.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object object) {
 		if (!getClass().isInstance(object))
 			return false;
-		Implies implies = (Implies) object;
-		return children[0].equals(implies.children[0]) && children[1].equals(implies.children[1]);
+		Implies implies =
+			(Implies) object;
+		return children[0].equals(implies.children[0])
+			&& children[1].equals(implies.children[1]);
 	}
-	
+
 	@Override
 	public Node clone() {
 		return new Implies(children[0].clone(), children[1].clone());
@@ -81,7 +82,8 @@ public class Implies extends Node implements Cloneable {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		return !children[0].getValue(map) || children[1].getValue(map);
+		return !children[0].getValue(map)
+			|| children[1].getValue(map);
 	}
 
 }

@@ -54,42 +54,43 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Class which contains several tests for {@link ConstraintDialog} text field,
- * which contains user written constraints.
+ * Class which contains several tests for {@link ConstraintDialog} text field, which contains user written constraints.
  * 
  * @author Marcus Pinnecke
  */
 public final class ConstraintTextValidator {
 
 	/**
-	 * returns a List of all features that are caused to be dead by the
-	 * constraint input
+	 * returns a List of all features that are caused to be dead by the constraint input
 	 * 
-	 * @param input
-	 *            constraint to be evaluated
-	 * @param model
-	 *            the feature model
-	 * @return List of all dead Features, empty if no feature is caused to be
-	 *         dead
+	 * @param input constraint to be evaluated
+	 * @param model the feature model
+	 * @return List of all dead Features, empty if no feature is caused to be dead
 	 */
 	private SortedSet<IFeature> getDeadFeatures(IConstraint constraint, String input, IFeatureModel model) {
-		Collection<IFeature> deadFeaturesBefore = null;
-		IFeatureModel clonedModel = model.clone(null);
+		Collection<IFeature> deadFeaturesBefore =
+			null;
+		IFeatureModel clonedModel =
+			model.clone(null);
 
-		NodeReader nodeReader = new NodeReader();
+		NodeReader nodeReader =
+			new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+		Node propNode =
+			nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
-			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
+			deadFeaturesBefore =
+				clonedModel.getAnalyser().getDeadFeatures();
 			clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 
-		final SortedSet<IFeature> deadFeaturesAfter = new TreeSet<IFeature>(new FeatureComparator(true));
+		final SortedSet<IFeature> deadFeaturesAfter =
+			new TreeSet<IFeature>(new FeatureComparator(true));
 
 		for (IFeature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
@@ -101,28 +102,36 @@ public final class ConstraintTextValidator {
 	}
 
 	/**
-	 * returns a String to be displayed in the dialog header contains the list
-	 * of dead features
+	 * returns a String to be displayed in the dialog header contains the list of dead features
 	 * 
-	 * @param deadFeatures
-	 *            List of dead Features
+	 * @param deadFeatures List of dead Features
 	 **/
 	private String getDeadFeatureString(Set<IFeature> deadFeatures) {
-		StringBuilder featureString = new StringBuilder();
+		StringBuilder featureString =
+			new StringBuilder();
 		featureString.append("Constraint causes the following features to be dead: ");
-		int count = 0;
-		int featureCount = 0;
-		boolean isNewLine = false;
+		int count =
+			0;
+		int featureCount =
+			0;
+		boolean isNewLine =
+			false;
 		for (IFeature l : deadFeatures) {
-			count = count + l.toString().length() + 2;
+			count =
+				count
+					+ l.toString().length()
+					+ 2;
 
-			if (isNewLine == false && count > 35) {
+			if (isNewLine == false
+				&& count > 35) {
 				featureString.append('\n');
-				isNewLine = true;
+				isNewLine =
+					true;
 			}
 			if (count < 90) {
 				featureString.append(l.getName());
-				if (featureCount < deadFeatures.size() - 1)
+				if (featureCount < deadFeatures.size()
+					- 1)
 					featureString.append(", ");
 				featureCount++;
 
@@ -136,29 +145,34 @@ public final class ConstraintTextValidator {
 	}
 
 	private List<IFeature> getFalseOptional(IConstraint constraint, String input, IFeatureModel model) {
-		List<IFeature> list = new ArrayList<IFeature>();
-		IFeatureModel clonedModel = model.clone(null);
+		List<IFeature> list =
+			new ArrayList<IFeature>();
+		IFeatureModel clonedModel =
+			model.clone(null);
 
-		NodeReader nodeReader = new NodeReader();
+		NodeReader nodeReader =
+			new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+		Node propNode =
+			nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
-		// The following code fixes issue #406; should be enhanced in further development 
+		// The following code fixes issue #406; should be enhanced in further development
 		// to not always clone the whole feature model for every performed analysis
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
 		}
-		
+
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
-				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
+				// if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
 				clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 				clonedModel.getAnalyser().analyzeFeatureModel(null);
-				if (clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature))
+				if (clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL
+					&& !list.contains(feature))
 					list.add(feature);
-				//}
+				// }
 			}
 		}
 
@@ -166,37 +180,45 @@ public final class ConstraintTextValidator {
 	}
 
 	private String getFalseOptionalString(List<IFeature> list) {
-		String listString = Functional.join(list, ",", FeatureUtils.GET_FEATURE_NAME);
-		String featureString = "Constraint causes the following features to be false optional: " + '\n';
-		return featureString + listString;
+		String listString =
+			Functional.join(list, ",", FeatureUtils.GET_FEATURE_NAME);
+		String featureString =
+			"Constraint causes the following features to be false optional: "
+				+ '\n';
+		return featureString
+			+ listString;
 	}
 
 	/**
 	 * Tests if the {@link IConstraint} will change the product line.
 	 * 
-	 * @param constraint
-	 *            The actual {@link IConstraint}
+	 * @param constraint The actual {@link IConstraint}
 	 * @return <code>true</code> if the {@link IConstraint} is redundant
 	 */
 	private boolean isRedundant(IConstraint constraint, final IFeatureModel featureModel, String input, final int timeOut) {
 		if (input.length() == 0) {
 			return false;
 		}
-		IFeatureModel clonedModel = featureModel.clone(null);
-		Node propNode = new NodeReader().stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
-		
-		// The following code fixes issue #406; should be enhanced in further development 
+		IFeatureModel clonedModel =
+			featureModel.clone(null);
+		Node propNode =
+			new NodeReader().stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+
+		// The following code fixes issue #406; should be enhanced in further development
 		// to not always clone the whole feature model for every performed analysis
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
 		}
-		
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(clonedModel);
-		Node check = new Implies(nodeCreator.createNodes(), propNode);
-		
-		SatSolver satsolver = new SatSolver(new Not(check), timeOut);
+
+		AdvancedNodeCreator nodeCreator =
+			new AdvancedNodeCreator(clonedModel);
+		Node check =
+			new Implies(nodeCreator.createNodes(), propNode);
+
+		SatSolver satsolver =
+			new SatSolver(new Not(check), timeOut);
 
 		try {
 			return !satsolver.isSatisfiable();
@@ -208,14 +230,14 @@ public final class ConstraintTextValidator {
 	/**
 	 * returns true if constraint is satisfiable otherwise false
 	 * 
-	 * @param constraint
-	 *            the constraint to be evaluated
-	 * @param timeout
-	 *            timeout in ms
+	 * @param constraint the constraint to be evaluated
+	 * @param timeout timeout in ms
 	 */
 	public static boolean isSatisfiable(String constraint, int timeout) {
-		NodeReader nodeReader = new NodeReader();
-		SatSolver satsolver = new SatSolver(nodeReader.stringToNode(constraint).clone(), timeout);
+		NodeReader nodeReader =
+			new NodeReader();
+		SatSolver satsolver =
+			new SatSolver(nodeReader.stringToNode(constraint).clone(), timeout);
 		try {
 			return satsolver.isSatisfiable();
 		} catch (TimeoutException e) {
@@ -228,17 +250,18 @@ public final class ConstraintTextValidator {
 	/**
 	 * returns true if the constraint is always true
 	 * 
-	 * @param constraint
-	 *            the constraint to be evaluated
-	 * @param timeout
-	 *            timeout in ms
+	 * @param constraint the constraint to be evaluated
+	 * @param timeout timeout in ms
 	 * 
 	 */
 	private boolean isTautology(String constraint, int timeout) {
-		NodeReader nodeReader = new NodeReader();
-		Node node = nodeReader.stringToNode(constraint);
+		NodeReader nodeReader =
+			new NodeReader();
+		Node node =
+			nodeReader.stringToNode(constraint);
 
-		SatSolver satsolver = new SatSolver(new Not(node.clone()), timeout);
+		SatSolver satsolver =
+			new SatSolver(new Not(node.clone()), timeout);
 
 		try {
 			return !satsolver.isSatisfiable();
@@ -255,6 +278,7 @@ public final class ConstraintTextValidator {
 	 * @author Marcus Pinnecke
 	 */
 	public static class ValidationMessage {
+
 		final ValidationResult validationResult;
 		final String details;
 
@@ -267,8 +291,10 @@ public final class ConstraintTextValidator {
 		}
 
 		public ValidationMessage(ValidationResult result, String message) {
-			this.validationResult = result;
-			this.details = message;
+			this.validationResult =
+				result;
+			this.details =
+				message;
 		}
 	}
 
@@ -281,31 +307,36 @@ public final class ConstraintTextValidator {
 		OK, NOT_WELLFORMED, IS_TAUTOLOGY, IS_NOT_SATISFIABLE, VOIDS_MODEL, FALSE_OPTIONAL_FEATURE, DEAD_FEATURE, REDUNDANT
 	}
 
-	private ValidationJob asyncCheckJob = null;
+	private ValidationJob asyncCheckJob =
+		null;
 
 	public void cancelValidation() {
 		if (asyncCheckJob != null) {
 			asyncCheckJob.cancel();
-			asyncCheckJob = null;
+			asyncCheckJob =
+				null;
 		}
 	}
 
 	public abstract class ValidationJob extends Job {
+
 		public ValidationJob(String name) {
 			super(name);
 		}
 
-		protected volatile boolean canceled = false;
+		protected volatile boolean canceled =
+			false;
 
 		@Override
 		protected void canceling() {
-			this.canceled = true;
+			this.canceled =
+				true;
 		}
 	}
 
 	/**
-	 * Runs tests not blocking the current GUI thread. The result will be returned each test's result and a separate notification
-	 * before the first tests starts and (in case of all test has passed) when the entire series has ended.
+	 * Runs tests not blocking the current GUI thread. The result will be returned each test's result and a separate notification before the first tests starts
+	 * and (in case of all test has passed) when the entire series has ended.
 	 * 
 	 * @param constraint Constraint
 	 * @param timeOut Timeout
@@ -326,93 +357,102 @@ public final class ConstraintTextValidator {
 			final IConsumer<ValidationMessage> onIsRedundantCheckComplete, final IConsumer<ValidationMessage> onCheckEnded,
 			final IConsumer<ValidationMessage> onIsTautology, final IConsumer<ValidationMessage> onIsNotSatisfiable) {
 
-		final String con = constraintText.trim();
+		final String con =
+			constraintText.trim();
 
 		this.cancelValidation();
 
-		asyncCheckJob = new ValidationJob(RUNNING_ADDITIONAL_CHECKS___) {
+		asyncCheckJob =
+			new ValidationJob(RUNNING_ADDITIONAL_CHECKS___) {
 
-			protected IStatus run(IProgressMonitor monitor) {
+				protected IStatus run(IProgressMonitor monitor) {
 
-				updateUI(onCheckStarted, "");
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final boolean problemFoundTautology = isTautology(con, timeOut);
+					updateUI(onCheckStarted, "");
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final boolean problemFoundTautology =
+							isTautology(con, timeOut);
 
-					if (problemFoundTautology) {
-						updateUI(onIsTautology, "");
-						return Status.OK_STATUS;
-					}
-				}
-				
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final boolean problemFoundNotSatisfiable = !isSatisfiable(con, timeOut);
-
-					if (problemFoundNotSatisfiable) {
-						updateUI(onIsNotSatisfiable, "");
-						return Status.OK_STATUS;
-					}
-				}
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final boolean problemFoundVoidsModel = isVoidsModel(featureModel, con, constraint);
-
-					if (problemFoundVoidsModel) {
-						updateUI(onVoidsModelCheckComplete, "");
-						return Status.OK_STATUS;
-					}
-				}
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final List<IFeature> falseOptionalFeatures = getFalseOptional(constraint, con, featureModel);
-
-					if (!falseOptionalFeatures.isEmpty()) {
-						updateUI(onFalseOptionalCheckComplete, getFalseOptionalString(falseOptionalFeatures));
-						return Status.OK_STATUS;
-					}
-				}
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final Set<IFeature> deadFeatuers = getDeadFeatures(constraint, con, featureModel);
-
-					if (!deadFeatuers.isEmpty()) {
-						updateUI(onDeadFeatureCheckComplete, getDeadFeatureString(deadFeatuers));
-						return Status.OK_STATUS;
-					}
-				}
-				// ---------------------------------------------------------
-				if (!canceled) {
-					final boolean problemFoundRedundant = isRedundant(constraint, featureModel, con, timeOut);
-
-					if (problemFoundRedundant) {
-						updateUI(onIsRedundantCheckComplete, "");
-						return Status.OK_STATUS;
-					}
-				}
-				// ---------------------------------------------------------
-				if (!canceled) {
-					updateUI(onCheckEnded, "");
-				}
-
-				return Status.OK_STATUS;
-			}
-
-			private void updateUI(final IConsumer<ValidationMessage> consumer, final String message) {
-				if (!canceled) {
-					new UIJob("Updating ConstraintDialog Message") {
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (!canceled) {
-								consumer.invoke(new ValidationMessage(null, message));
-							}
+						if (problemFoundTautology) {
+							updateUI(onIsTautology, "");
 							return Status.OK_STATUS;
 						}
-					}.schedule();
-				}
-			}
+					}
 
-		};
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final boolean problemFoundNotSatisfiable =
+							!isSatisfiable(con, timeOut);
+
+						if (problemFoundNotSatisfiable) {
+							updateUI(onIsNotSatisfiable, "");
+							return Status.OK_STATUS;
+						}
+					}
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final boolean problemFoundVoidsModel =
+							isVoidsModel(featureModel, con, constraint);
+
+						if (problemFoundVoidsModel) {
+							updateUI(onVoidsModelCheckComplete, "");
+							return Status.OK_STATUS;
+						}
+					}
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final List<IFeature> falseOptionalFeatures =
+							getFalseOptional(constraint, con, featureModel);
+
+						if (!falseOptionalFeatures.isEmpty()) {
+							updateUI(onFalseOptionalCheckComplete, getFalseOptionalString(falseOptionalFeatures));
+							return Status.OK_STATUS;
+						}
+					}
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final Set<IFeature> deadFeatuers =
+							getDeadFeatures(constraint, con, featureModel);
+
+						if (!deadFeatuers.isEmpty()) {
+							updateUI(onDeadFeatureCheckComplete, getDeadFeatureString(deadFeatuers));
+							return Status.OK_STATUS;
+						}
+					}
+					// ---------------------------------------------------------
+					if (!canceled) {
+						final boolean problemFoundRedundant =
+							isRedundant(constraint, featureModel, con, timeOut);
+
+						if (problemFoundRedundant) {
+							updateUI(onIsRedundantCheckComplete, "");
+							return Status.OK_STATUS;
+						}
+					}
+					// ---------------------------------------------------------
+					if (!canceled) {
+						updateUI(onCheckEnded, "");
+					}
+
+					return Status.OK_STATUS;
+				}
+
+				private void updateUI(final IConsumer<ValidationMessage> consumer, final String message) {
+					if (!canceled) {
+						new UIJob("Updating ConstraintDialog Message") {
+
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) {
+								if (!canceled) {
+									consumer.invoke(new ValidationMessage(null, message));
+								}
+								return Status.OK_STATUS;
+							}
+						}.schedule();
+					}
+				}
+
+			};
 		asyncCheckJob.setPriority(Job.DECORATE);
 		asyncCheckJob.setSystem(true);
 		asyncCheckJob.schedule();
@@ -432,15 +472,12 @@ public final class ConstraintTextValidator {
 	}
 
 	/**
-	 * returns true if the constraint causes the feature model to be void
-	 * otherwise false
+	 * returns true if the constraint causes the feature model to be void otherwise false
 	 * 
-	 * @param input
-	 *            constraint to be evaluated
-	 * @param model
-	 *            the feature model
+	 * @param input constraint to be evaluated
+	 * @param model the feature model
 	 * 
-	 *            * @throws TimeoutException
+	 *        * @throws TimeoutException
 	 */
 	private boolean voidsModel(final IConstraint constraint, String input, IFeatureModel model) throws TimeoutException {
 		if (!model.getAnalyser().isValid()) {
@@ -451,10 +488,13 @@ public final class ConstraintTextValidator {
 
 			return false;
 		}
-		IFeatureModel clonedModel = model.clone(null);
-		NodeReader nodeReader = new NodeReader();
+		IFeatureModel clonedModel =
+			model.clone(null);
+		NodeReader nodeReader =
+			new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+		Node propNode =
+			nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);

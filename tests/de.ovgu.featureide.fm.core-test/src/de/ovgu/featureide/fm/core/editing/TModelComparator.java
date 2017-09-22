@@ -40,8 +40,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 
 /**
- * Checks that the calculation of edit categories works properly. A couple of
- * known refactorings, generalizations and arbitrary edits are performed and the
+ * Checks that the calculation of edit categories works properly. A couple of known refactorings, generalizations and arbitrary edits are performed and the
  * result of the ModelComperator is tested.
  * 
  * @author Thomas Thuem
@@ -50,7 +49,8 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
  */
 public class TModelComparator {
 
-	private static final long TIMEOUT = 1000;
+	private static final long TIMEOUT =
+		1000;
 
 	/**
 	 * Refactoring: OR => OPTIONAL AND (where S is abstract)
@@ -139,10 +139,14 @@ public class TModelComparator {
 	@Test
 	public void testDuplicateConstraintRefactoring2() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader = new NodeReader();
-		Node a = reader.stringToNode("A  and  (not A or B or C)  and D ");
-		Node b = reader.stringToNode("A  and  (not A or B or C)  and D ");
-		ModelComparator comparator = new ModelComparator(TIMEOUT);
+		NodeReader reader =
+			new NodeReader();
+		Node a =
+			reader.stringToNode("A  and  (not A or B or C)  and D ");
+		Node b =
+			reader.stringToNode("A  and  (not A or B or C)  and D ");
+		ModelComparator comparator =
+			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
 	}
@@ -314,10 +318,14 @@ public class TModelComparator {
 	@Test
 	public void testImpliesSameVariable() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader = new NodeReader();
-		Node a = reader.stringToNode("A");
-		Node b = reader.stringToNode("A");
-		ModelComparator comparator = new ModelComparator(TIMEOUT);
+		NodeReader reader =
+			new NodeReader();
+		Node a =
+			reader.stringToNode("A");
+		Node b =
+			reader.stringToNode("A");
+		ModelComparator comparator =
+			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
 	}
@@ -325,21 +333,29 @@ public class TModelComparator {
 	@Test
 	public void testImpliesSameVariable2() throws TimeoutException,
 			UnsupportedModelException {
-		NodeReader reader = new NodeReader();
-		Node a = reader.stringToNode("A and A ");
-		Node b = reader.stringToNode("A and A ");
-		ModelComparator comparator = new ModelComparator(TIMEOUT);
+		NodeReader reader =
+			new NodeReader();
+		Node a =
+			reader.stringToNode("A and A ");
+		Node b =
+			reader.stringToNode("A and A ");
+		ModelComparator comparator =
+			new ModelComparator(TIMEOUT);
 		assertTrue(comparator.implies(a, b, new ExampleCalculator(null, 2500)));
 
 	}
 
 	private Comparison compare(String fm1, String fm2)
 			throws UnsupportedModelException {
-		ModelComparator comperator = new ModelComparator(TIMEOUT);
-		IFeatureModel oldModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
-		GuidslFormat reader = new GuidslFormat();
+		ModelComparator comperator =
+			new ModelComparator(TIMEOUT);
+		IFeatureModel oldModel =
+			FMFactoryManager.getDefaultFactory().createFeatureModel();
+		GuidslFormat reader =
+			new GuidslFormat();
 		reader.read(oldModel, fm1);
-		IFeatureModel newModel = FMFactoryManager.getDefaultFactory().createFeatureModel();
+		IFeatureModel newModel =
+			FMFactoryManager.getDefaultFactory().createFeatureModel();
 		reader.read(newModel, fm2);
 		return comperator.compare(oldModel, newModel);
 	}
@@ -347,24 +363,33 @@ public class TModelComparator {
 	@Test
 	/**
 	 * Based on https://github.com/tthuem/FeatureIDE/issues/264
+	 * 
 	 * @author Marcus Pinnecke
 	 * 
 	 */
 	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
-	    final IFeatureModel fm = Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
-	    final IFeatureModel fmGen = Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
-	    final ModelComparator comparator = new ModelComparator(1000000);
-	    final Comparison comparison = comparator.compare(fm, fmGen);
-	    
-	    assertEquals(Comparison.GENERALIZATION, comparison);
-	    
-	    final Set<String> addedProducts = new HashSet<String>();
-	    
-	    Configuration c;
-	    while((c = comparator.calculateExample(true)) != null) {
-	        System.out.println(c);
-	        addedProducts.add(c.toString());
-	    }
-	    // TODO: assertEquals(12, addedProducts.size());
+		final IFeatureModel fm =
+			Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmGen =
+			Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
+					Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+		final ModelComparator comparator =
+			new ModelComparator(1000000);
+		final Comparison comparison =
+			comparator.compare(fm, fmGen);
+
+		assertEquals(Comparison.GENERALIZATION, comparison);
+
+		final Set<String> addedProducts =
+			new HashSet<String>();
+
+		Configuration c;
+		while ((c =
+			comparator.calculateExample(true)) != null) {
+			System.out.println(c);
+			addedProducts.add(c.toString());
+		}
+		// TODO: assertEquals(12, addedProducts.size());
 	}
 }

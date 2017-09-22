@@ -53,8 +53,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Abstract class with core functionality to import FeatureModels.</br>
- * Implementing classes mainly provide a specific FeatureModelReader.
+ * Abstract class with core functionality to import FeatureModels.</br> Implementing classes mainly provide a specific FeatureModelReader.
  * 
  * @author Fabian Benduhn
  * @author Sebastian Krieter
@@ -64,34 +63,43 @@ public abstract class AbstractImportHandler extends AFileHandler {
 
 	@Override
 	protected final void singleAction(IFile outputFile) {
-		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
+		final FileDialog fileDialog =
+			new FileDialog(new Shell(), SWT.OPEN);
 		fileDialog.setOverwrite(false);
 		setFilter(fileDialog);
 
 		File inputFile;
 		while (true) {
-			final String filepath = fileDialog.open();
+			final String filepath =
+				fileDialog.open();
 			if (filepath == null) {
 				return;
 			}
-			inputFile = new File(filepath);
+			inputFile =
+				new File(filepath);
 			if (inputFile.exists()) {
 				break;
 			}
-			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
+			MessageDialog.openInformation(new Shell(), FILE
+				+ NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 		}
 
-		final IFeatureModelFormat modelFormat = setModelReader();
-		IFeatureModel fm = null;
+		final IFeatureModelFormat modelFormat =
+			setModelReader();
+		IFeatureModel fm =
+			null;
 		try {
-			fm = FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
+			fm =
+				FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
 		} catch (NoSuchExtensionException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		if (fm != null) {
-			final ProblemList errors = FileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
+			final ProblemList errors =
+				FileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
 			if (!errors.isEmpty()) {
-				final StringBuilder sb = new StringBuilder("Error while loading file: \n");
+				final StringBuilder sb =
+					new StringBuilder("Error while loading file: \n");
 				for (Problem problem : errors) {
 					sb.append("Line ");
 					sb.append(problem.getLine());
@@ -112,21 +120,26 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.xml" });
-		fileDialog.setFilterNames(new String[] { XML });
+		fileDialog.setFilterExtensions(new String[] {
+			"*.xml" });
+		fileDialog.setFilterNames(new String[] {
+			XML });
 	}
 
 	/**
-	 * Opens the imported model in a new editor. If it is already open, the
-	 * editor will be closed first.
+	 * Opens the imported model in a new editor. If it is already open, the editor will be closed first.
 	 * 
 	 * @throws PartInitException
 	 */
 	private void openFileInEditor(IFile outputFile) throws PartInitException {
-		final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		final IEditorInput editorInput = new FileEditorInput(outputFile);
-		final IEditorReference[] refs = page.getEditorReferences();
-		for (int i = 0; i < refs.length; i++) {
+		final IWorkbenchPage page =
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		final IEditorInput editorInput =
+			new FileEditorInput(outputFile);
+		final IEditorReference[] refs =
+			page.getEditorReferences();
+		for (int i =
+			0; i < refs.length; i++) {
 			if (refs[i].getEditorInput().equals(editorInput)) {
 				page.closeEditor(refs[i].getEditor(false), false);
 				break;

@@ -32,30 +32,33 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ColorScheme {
-	
+
 	/**
 	 * The unique name of the scheme.
 	 */
 	private String name;
-	
+
 	/**
 	 * Specifies whether the scheme is active-
 	 */
-	private boolean isCurrent = false;
-	
-	private Map<String, FeatureColor> colors = new HashMap<>();
+	private boolean isCurrent =
+		false;
+
+	private Map<String, FeatureColor> colors =
+		new HashMap<>();
 
 	public ColorScheme(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
-	
+
 	/**
 	 * Returns the color scheme.
 	 */
 	public Map<String, FeatureColor> getColors() {
 		return colors;
 	}
-	
+
 	/**
 	 * 
 	 * @return The name of the scheme.
@@ -63,9 +66,10 @@ public class ColorScheme {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
 
 	public boolean isCurrent() {
@@ -85,7 +89,7 @@ public class ColorScheme {
 	public void setColor(IFeature feature, FeatureColor color) {
 		setColor(feature.getName(), color);
 	}
-	
+
 	/**
 	 * Sets the color of the given feature.
 	 */
@@ -107,7 +111,8 @@ public class ColorScheme {
 	 * Activates the scheme.
 	 */
 	public void setCurrent(boolean current) {
-		isCurrent = current;
+		isCurrent =
+			current;
 	}
 
 	public void renameFeature(String oldName, String newName) {
@@ -115,9 +120,15 @@ public class ColorScheme {
 			colors.put(newName, colors.remove(oldName));
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return name + ":" + (isCurrent ? "ACTIVE" : "INACTIV") + "  " + colors;
+		return name
+			+ ":"
+			+ (isCurrent
+				? "ACTIVE"
+				: "INACTIV")
+			+ "  "
+			+ colors;
 	}
 }

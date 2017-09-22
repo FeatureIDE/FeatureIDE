@@ -31,9 +31,11 @@ import de.ovgu.featureide.fm.core.IExtension;
  */
 public interface IFeatureModelFactory extends IExtension {
 
-	public static String extensionPointID = "FMFactory";
+	public static String extensionPointID =
+		"FMFactory";
 
-	public static String extensionID = "fmFactory";
+	public static String extensionID =
+		"fmFactory";
 
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 

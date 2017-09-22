@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Antje Moench
  */
 public class CustomTableHeader extends Canvas implements PaintListener, MouseListener, ISelectionProvider {
+
 	private List<CustomColumnStyle> columnStyles;
 	private Transform transform;
 	private Parallelogram hitbox;
@@ -64,18 +65,20 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 
 	public CustomTableHeader(Composite parent, int style, List<CustomColumnStyle> columnStyles) {
 		super(parent, style);
-		this.hitbox = new Parallelogram(0, 0, 0);
-		this.listeners = new ArrayList<>(1);
+		this.hitbox =
+			new Parallelogram(0, 0, 0);
+		this.listeners =
+			new ArrayList<>(1);
 		this.setSelectedColumn(-1);
 		this.setColumnStyles(columnStyles);
 		addPaintListener(this);
 		addMouseListener(this);
 	}
-	
+
 	public void addColumnSelectionListener(ICustomTableHeaderSelectionListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public void removeColumnSelectionListener(ICustomTableHeaderSelectionListener listener) {
 		listeners.remove(listener);
 	}
@@ -91,7 +94,8 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	 * @param highlightColor the highlightColor to set
 	 */
 	public void setHighlightColor(Color highlightColor) {
-		this.highlightColor = highlightColor;
+		this.highlightColor =
+			highlightColor;
 	}
 
 	public boolean areLinesVisible() {
@@ -102,21 +106,26 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	 * @param drawLines the drawLines to set
 	 */
 	public void setLinesVisible(boolean drawLines) {
-		this.drawLines = drawLines;
+		this.drawLines =
+			drawLines;
 	}
-	
+
 	public void setSelectedColumn(int index) {
-		if (0 <= index && index < columnStyles.size())
+		if (0 <= index
+			&& index < columnStyles.size())
 			if (!columnStyles.get(index).isSelectable())
-				index = -1;
-		this.selectedColumn = index;
+				index =
+					-1;
+		this.selectedColumn =
+			index;
 		redraw();
 		for (ICustomTableHeaderSelectionListener listener : listeners)
 			listener.onColumnSelectionChanged(index);
 	}
 
 	public void setColumnStyles(List<CustomColumnStyle> columnStyles) {
-		this.columnStyles = columnStyles;
+		this.columnStyles =
+			columnStyles;
 		setSelectedColumn(-1);
 		updateHeight();
 		redraw();
@@ -127,12 +136,14 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	}
 
 	public void setGlobalRotation(float rotation) {
-		this.globalRotation = rotation;
+		this.globalRotation =
+			rotation;
 		updateHeight();
 	}
 
 	private void setHeight(int height) {
-		this.height = height;
+		this.height =
+			height;
 		hitbox.setHeight(this.height);
 		hitbox.setSkew(calculateSkew(globalRotation, this.height));
 	}
@@ -142,51 +153,76 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 	}
 
 	private void updateHeight() {
-		int textWidth = 0;
-		int textHeight = 0;
+		int textWidth =
+			0;
+		int textHeight =
+			0;
 
 		if (this.columnStyles != null) {
-			GC gc = new GC(this);
+			GC gc =
+				new GC(this);
 
 			for (CustomColumnStyle style : this.columnStyles) {
-				String text = style.getTitle();
+				String text =
+					style.getTitle();
 
-				Point estimatedSize = gc.stringExtent(text);
+				Point estimatedSize =
+					gc.stringExtent(text);
 				if (estimatedSize.x > textWidth)
-					textWidth = estimatedSize.x;
+					textWidth =
+						estimatedSize.x;
 				if (estimatedSize.y > textHeight)
-					textHeight = estimatedSize.y;
+					textHeight =
+						estimatedSize.y;
 			}
 		}
 
-		setHeight((int) Math.abs(textWidth * Math.sin(globalRotation) + textHeight * Math.tan(Math.PI / 2.0 - globalRotation)));
+		setHeight((int) Math.abs(textWidth
+			* Math.sin(globalRotation)
+			+ textHeight
+				* Math.tan(Math.PI
+					/ 2.0
+					- globalRotation)));
 	}
 
 	private float calculateSkew(float rotation, float height) {
-		return (float) (height / Math.tan(-globalRotation));
+		return (float) (height
+			/ Math.tan(-globalRotation));
 	}
 
 	private double getFloatingHeight(int fontHeight, double rotation) {
-		double sin = Math.sin(0.5 * Math.PI - rotation);
-		return Math.min(fontHeight, fontHeight - fontHeight * sin);
+		double sin =
+			Math.sin(0.5
+				* Math.PI
+				- rotation);
+		return Math.min(fontHeight, fontHeight
+			- fontHeight
+				* sin);
 	}
 
 	private void updateSelection(float ex, float ey) {
-		int offset = 0, index = 0, selectedIndex = -1;
+		int offset =
+			0, index =
+				0,
+				selectedIndex =
+					-1;
 		for (CustomColumnStyle col : columnStyles) {
 			if (col.isSelectable()) {
 				hitbox.setWidth(col.getWidth());
 				hitbox.setLocation(offset, 0);
-				if (hitbox.containsPoint(ex, height - ey)) {
-					selectedIndex = index;
+				if (hitbox.containsPoint(ex, height
+					- ey)) {
+					selectedIndex =
+						index;
 					break;
 				}
 			}
 
-			offset += col.getWidth();
+			offset +=
+				col.getWidth();
 			index++;
 		}
-		
+
 		setSelectedColumn(selectedIndex);
 
 		redraw();
@@ -211,17 +247,22 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
 	 */
 	@Override
 	public void paintControl(PaintEvent e) {
-		if (columnStyles != null && !columnStyles.isEmpty()) {
-			Display display = getDisplay();
-			GC gc = e.gc;
+		if (columnStyles != null
+			&& !columnStyles.isEmpty()) {
+			Display display =
+				getDisplay();
+			GC gc =
+				e.gc;
 
 			if (transform == null)
-				this.transform = new Transform(display);
+				this.transform =
+					new Transform(display);
 
 			gc.setAdvanced(true);
 			if (!gc.getAdvanced()) {
@@ -231,29 +272,47 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 
 			gc.setFont(display.getSystemFont());
 
-			int columnOffset = 0;
-			int[] backgroundCorners = new int[8];
+			int columnOffset =
+				0;
+			int[] backgroundCorners =
+				new int[8];
 
 			// y values
-			backgroundCorners[1] = height;
-			backgroundCorners[3] = 0;
-			backgroundCorners[5] = 0;
-			backgroundCorners[7] = height;
+			backgroundCorners[1] =
+				height;
+			backgroundCorners[3] =
+				0;
+			backgroundCorners[5] =
+				0;
+			backgroundCorners[7] =
+				height;
 
-			int index = 0;
+			int index =
+				0;
 			for (CustomColumnStyle col : columnStyles) {
-				int dx = 0;
-				int dy = 0;
-				int hAlignment = col.getHorizontalAlignment();
-				int vAlignment = col.getVerticalAlignment();
+				int dx =
+					0;
+				int dy =
+					0;
+				int hAlignment =
+					col.getHorizontalAlignment();
+				int vAlignment =
+					col.getVerticalAlignment();
 
-				int fontHeight = gc.getFontMetrics().getHeight();
-				int width = col.getWidth();
-				int skew = (int) hitbox.getSkew();
+				int fontHeight =
+					gc.getFontMetrics().getHeight();
+				int width =
+					col.getWidth();
+				int skew =
+					(int) hitbox.getSkew();
 
 				// BACKGROUND
-				Color fgrnd = col.getForeground();
-				Color bgrnd = index == selectedColumn ? highlightColor : col.getBackground();
+				Color fgrnd =
+					col.getForeground();
+				Color bgrnd =
+					index == selectedColumn
+						? highlightColor
+						: col.getBackground();
 
 				if (fgrnd != null)
 					gc.setForeground(fgrnd);
@@ -263,62 +322,94 @@ public class CustomTableHeader extends Canvas implements PaintListener, MouseLis
 					// draw background
 					this.transform.identity();
 					gc.setTransform(transform);
-					backgroundCorners[0] = columnOffset;
-					backgroundCorners[2] = columnOffset + skew;
-					backgroundCorners[4] = columnOffset + width + skew;
-					backgroundCorners[6] = columnOffset + width;
+					backgroundCorners[0] =
+						columnOffset;
+					backgroundCorners[2] =
+						columnOffset
+							+ skew;
+					backgroundCorners[4] =
+						columnOffset
+							+ width
+							+ skew;
+					backgroundCorners[6] =
+						columnOffset
+							+ width;
 					gc.fillPolygon(backgroundCorners);
 				}
 
 				// ALIGNMENTS
 				if (hAlignment == SWT.CENTER) {
-					float projectedHeight = (float) (fontHeight * Math.cos(0.5 * Math.PI - globalRotation));
-					dx = (int) ((col.getWidth() + projectedHeight) / 2f);
+					float projectedHeight =
+						(float) (fontHeight
+							* Math.cos(0.5
+								* Math.PI
+								- globalRotation));
+					dx =
+						(int) ((col.getWidth()
+							+ projectedHeight)
+							/ 2f);
 				}
 
-				if ((vAlignment & (SWT.CENTER | SWT.BOTTOM)) != 0) {
-					dy = height - fontHeight;
+				if ((vAlignment
+					& (SWT.CENTER
+						| SWT.BOTTOM)) != 0) {
+					dy =
+						height
+							- fontHeight;
 					if (col.isRotated())
-						dy += (int) getFloatingHeight(fontHeight, globalRotation);
+						dy +=
+							(int) getFloatingHeight(fontHeight, globalRotation);
 
 					if (vAlignment == SWT.CENTER)
-						dy /= 2;
+						dy /=
+							2;
 				}
 
 				// ROTATION
-				float cos = 1;
-				float sin = 0;
+				float cos =
+					1;
+				float sin =
+					0;
 
 				if (col.isRotated()) {
-					cos = (float) Math.cos(globalRotation);
-					sin = (float) Math.sin(globalRotation);
+					cos =
+						(float) Math.cos(globalRotation);
+					sin =
+						(float) Math.sin(globalRotation);
 				}
 
-				this.transform.setElements(cos, sin, -sin, cos, columnOffset + dx, dy);
+				this.transform.setElements(cos, sin, -sin, cos, columnOffset
+					+ dx, dy);
 				gc.setTransform(transform);
 
 				// RENDERING
 				gc.drawText(col.getTitle(), 0, 0);
 
-				columnOffset += width;
+				columnOffset +=
+					width;
 
-				//draw line
-				if (drawLines && col.isDrawingLine()) {
+				// draw line
+				if (drawLines
+					&& col.isDrawingLine()) {
 					this.transform.identity();
 					gc.setTransform(transform);
-					gc.drawLine(columnOffset, height, columnOffset + skew, 0);
+					gc.drawLine(columnOffset, height, columnOffset
+						+ skew, 0);
 				}
-				
+
 				index++;
 			}
 		}
 	}
 
 	public static double toRadians(double degrees) {
-		return (Math.PI * degrees) / 180.0;
+		return (Math.PI
+			* degrees)
+			/ 180.0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
 	 */
 	@Override

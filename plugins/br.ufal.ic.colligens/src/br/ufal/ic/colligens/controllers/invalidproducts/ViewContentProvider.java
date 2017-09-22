@@ -8,12 +8,10 @@ import org.eclipse.jface.viewers.Viewer;
 class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public Object[] getElements(Object parent) {

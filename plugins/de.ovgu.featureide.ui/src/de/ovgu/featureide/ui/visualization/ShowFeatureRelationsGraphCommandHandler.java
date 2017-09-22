@@ -52,24 +52,32 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 	@Override
 	protected void singleAction(Object element) {
-		IProject project = null;
+		IProject project =
+			null;
 		if (!(element instanceof IProject)) {
 			if (element instanceof IAdaptable) {
-				project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				project =
+					(IProject) ((IAdaptable) element).getAdapter(IProject.class);
 			}
 		} else {
-			project = (IProject) element;
+			project =
+				(IProject) element;
 		}
 
-		Shell shell = new Shell(Display.getCurrent());
+		Shell shell =
+			new Shell(Display.getCurrent());
 		shell.setText("Select feature");
 		shell.setSize(400, 200);
 		shell.setLayout(new FillLayout(SWT.VERTICAL));
-		final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(shell, SWT.BORDER | SWT.V_SCROLL);
+		final org.eclipse.swt.widgets.List list =
+			new org.eclipse.swt.widgets.List(shell, SWT.BORDER
+				| SWT.V_SCROLL);
 
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(project);
 		if (featureProject != null) {
-			List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+			List<String> featureList =
+				ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
 			for (String f : featureList) {
 				list.add(f);
 			}
@@ -77,7 +85,8 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 			list.addSelectionListener(new SelectionListener() {
 
 				public void widgetSelected(SelectionEvent event) {
-					int[] selections = list.getSelectionIndices();
+					int[] selections =
+						list.getSelectionIndices();
 					showFrog(featureProject, list.getItem(selections[0]));
 				}
 
@@ -92,20 +101,28 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 	// P(i|currentI)
 	public static double getGivenOperation(boolean[][] matrix, int currentI, int i) {
-		double numerator = 0;
-		double denominator = 0;
-		for (int conf = 0; conf < matrix.length; conf++) {
+		double numerator =
+			0;
+		double denominator =
+			0;
+		for (int conf =
+			0; conf < matrix.length; conf++) {
 			if (matrix[conf][currentI]) {
-				denominator = denominator + 1.0;
+				denominator =
+					denominator
+						+ 1.0;
 				if (matrix[conf][i]) {
-					numerator = numerator + 1.0;
+					numerator =
+						numerator
+							+ 1.0;
 				}
 			}
 		}
 		if (denominator == 0) {
 			return 0;
 		}
-		return numerator / denominator;
+		return numerator
+			/ denominator;
 	}
 
 	/**
@@ -117,12 +134,16 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
 
 		// Get feature in the center
-		IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
+		IFeature fc =
+			featureProject.getFeatureModel().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
-		List<String> formalizedRequires = new ArrayList<String>();
-		List<String> formalizedExcludes = new ArrayList<String>();
-		FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
+		List<String> formalizedRequires =
+			new ArrayList<String>();
+		List<String> formalizedExcludes =
+			new ArrayList<String>();
+		FeatureDependencies fd =
+			new FeatureDependencies(featureProject.getFeatureModel());
 		for (IFeature f : fd.always(fc)) {
 			formalizedRequires.add(f.getName());
 		}
@@ -131,11 +152,14 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 
 		// Get all features in order ignoring the mandatory features
-		List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+		List<String> featureList =
+			ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
 		// Create the matrix configurations/features for the calculations
-		boolean[][] matrix = null;
+		boolean[][] matrix =
+			null;
 		try {
-			matrix = ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
+			matrix =
+				ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -148,7 +172,8 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		// var FORMALIZED_REQUIRES = [];
 		// var FORMALIZED_EXCLUDES = [];
 
-		StringBuffer data = new StringBuffer(" CENTRAL_FEATURE = \"");
+		StringBuffer data =
+			new StringBuffer(" CENTRAL_FEATURE = \"");
 		data.append(featureCenter);
 		data.append("\";\n FEATURE_NAMES = [");
 		for (String f : featureList) {
@@ -158,55 +183,72 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 				data.append("\",");
 			}
 		}
-		data.setLength(data.length() - 1); // remove last comma
+		data.setLength(data.length()
+			- 1); // remove last comma
 		data.append("];\n GIVEN = [");
 		for (String f : featureList) {
 			if (!f.equals(featureCenter)) {
-				int i = featureList.indexOf(f);
-				int ic = featureList.indexOf(featureCenter);
+				int i =
+					featureList.indexOf(f);
+				int ic =
+					featureList.indexOf(featureCenter);
 				data.append(getGivenOperation(matrix, ic, i));
 				data.append(",");
 			}
 		}
-		data.setLength(data.length() - 1); // remove last comma
-		boolean atLeastOne = false;
+		data.setLength(data.length()
+			- 1); // remove last comma
+		boolean atLeastOne =
+			false;
 		data.append("];\n FORMALIZED_REQUIRES = [");
 		for (String f : formalizedRequires) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
-			atLeastOne = true;
+			atLeastOne =
+				true;
 		}
 		if (atLeastOne) {
-			data.setLength(data.length() - 1); // remove last comma
+			data.setLength(data.length()
+				- 1); // remove last comma
 		}
-		atLeastOne = false;
+		atLeastOne =
+			false;
 		data.append("];\n FORMALIZED_EXCLUDES = [");
 		for (String f : formalizedExcludes) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
-			atLeastOne = true;
+			atLeastOne =
+				true;
 		}
 		if (atLeastOne) {
-			data.setLength(data.length() - 1); // remove last comma
+			data.setLength(data.length()
+				- 1); // remove last comma
 		}
 		data.append("];\n");
 
-		File fi = Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
-		String html = Utils.getStringOfFile(fi);
-		html = html.replaceFirst("// DATA_HERE", data.toString());
+		File fi =
+			Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
+		String html =
+			Utils.getStringOfFile(fi);
+		html =
+			html.replaceFirst("// DATA_HERE", data.toString());
 
 		// Open the browser
-		Shell shell = new Shell(Display.getCurrent());
+		Shell shell =
+			new Shell(Display.getCurrent());
 		shell.setLayout(new FillLayout());
 		shell.setSize(900, 800);
-		shell.setText("Feature relations graph: " + featureCenter);
+		shell.setText("Feature relations graph: "
+			+ featureCenter);
 		Browser browser;
 		try {
-			browser = new Browser(shell, SWT.NONE);
+			browser =
+				new Browser(shell, SWT.NONE);
 		} catch (SWTError e) {
-			System.out.println("Could not instantiate Browser: " + e.getMessage());
+			System.out.println("Could not instantiate Browser: "
+				+ e.getMessage());
 			return;
 		}
 		browser.setText(html);

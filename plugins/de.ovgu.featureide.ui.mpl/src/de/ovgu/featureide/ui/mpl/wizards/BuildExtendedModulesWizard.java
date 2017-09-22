@@ -31,13 +31,19 @@ import de.ovgu.featureide.ui.mpl.handlers.interfaces.BuildExtendedModulesHandler
  * @author Reimar Schroeter
  */
 public class BuildExtendedModulesWizard extends AbstractWizard {
-	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
-	
+
+	public static final String ID =
+		MPLUIPlugin.PLUGIN_ID
+			+ ".wizards.BuildExtendedModulesWizard";
+
 	private final String defaultFolderString;
-	
+
 	public BuildExtendedModulesWizard(String title, String defaultFolderString) {
 		super(title);
-		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
+		this.defaultFolderString =
+			(defaultFolderString != null)
+				? defaultFolderString
+				: "";
 	}
 
 	@Override

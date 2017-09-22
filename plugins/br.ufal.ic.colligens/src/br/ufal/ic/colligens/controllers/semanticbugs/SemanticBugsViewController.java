@@ -37,12 +37,14 @@ public class SemanticBugsViewController extends ViewController {
 
 	private SemanticBugsViewController() {
 		super(InvalidConfigurationsView.ID);
-		viewContentProvider = new ViewContentProvider();
+		viewContentProvider =
+			new ViewContentProvider();
 	}
 
 	public static SemanticBugsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new SemanticBugsViewController();
+			INSTANCE =
+				new SemanticBugsViewController();
 		}
 		return INSTANCE;
 	}
@@ -86,12 +88,16 @@ public class SemanticBugsViewController extends ViewController {
 
 	public void createPartControl(Composite parent) {
 
-		Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.FULL_SELECTION | SWT.LEFT);
+		Tree tree =
+			new Tree(parent, SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.FULL_SELECTION
+				| SWT.LEFT);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 
-		treeViewer = new TreeViewer(tree);
+		treeViewer =
+			new TreeViewer(tree);
 
 		this.createColumns(tree);
 
@@ -99,23 +105,29 @@ public class SemanticBugsViewController extends ViewController {
 		treeViewer.setInput(getView().getViewSite());
 		treeViewer.setLabelProvider(new ViewLabelProvider());
 
-		final IWorkbenchPage page = getView().getSite().getPage();
+		final IWorkbenchPage page =
+			getView().getSite().getPage();
 		tree.addListener(SWT.MouseDown, new Listener() {
 
 			@Override
 			public void handleEvent(Event event) {
-				Point point = new Point(event.x, event.y);
-				TreeItem clickedItem = treeViewer.getTree().getItem(point);
+				Point point =
+					new Point(event.x, event.y);
+				TreeItem clickedItem =
+					treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
-					Object data = clickedItem.getData();
+					Object data =
+						clickedItem.getData();
 					if (data instanceof CppCheckerLog) {
 						if (event.button == MouseEvent.BUTTON1
-								&& event.count == 2) {
-							final CppCheckerLog log = (CppCheckerLog) data;
+							&& event.count == 2) {
+							final CppCheckerLog log =
+								(CppCheckerLog) data;
 							try {
 
-								IEditorPart editor = IDE.openEditor(page, log
-										.getFileLogs().getFile());
+								IEditorPart editor =
+									IDE.openEditor(page, log
+											.getFileLogs().getFile());
 								editor.getSite().getSelectionProvider()
 										.setSelection(log);
 
@@ -126,9 +138,10 @@ public class SemanticBugsViewController extends ViewController {
 					}
 					if (data instanceof CppCheckerFileLogs) {
 						if (event.button == MouseEvent.BUTTON1
-								&& event.count == 2) {
+							&& event.count == 2) {
 
-							final CppCheckerFileLogs FileLogs = (CppCheckerFileLogs) data;
+							final CppCheckerFileLogs FileLogs =
+								(CppCheckerFileLogs) data;
 							try {
 
 								IDE.openEditor(page, FileLogs.getFile());
@@ -147,10 +160,23 @@ public class SemanticBugsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles = { "Msg", "Line", "Severity", "Config", "Id" };
-		int[] bounds = { 300, 100, 100, 300, 100 };
+		String[] titles =
+			{
+				"Msg",
+				"Line",
+				"Severity",
+				"Config",
+				"Id" };
+		int[] bounds =
+			{
+				300,
+				100,
+				100,
+				300,
+				100 };
 
-		for (int i = 0; i < bounds.length; i++) {
+		for (int i =
+			0; i < bounds.length; i++) {
 			this.createTreeViewerColumn(tree, titles[i], bounds[i], i);
 		}
 	}
@@ -158,9 +184,13 @@ public class SemanticBugsViewController extends ViewController {
 	private void createTreeViewerColumn(Tree tree, String title, int bound,
 			final int ColumnNumber) {
 
-		int style = (ColumnNumber == 0) ? SWT.RIGHT : SWT.LEFT;
+		int style =
+			(ColumnNumber == 0)
+				? SWT.RIGHT
+				: SWT.LEFT;
 
-		final TreeColumn treeColumn = new TreeColumn(tree, style);
+		final TreeColumn treeColumn =
+			new TreeColumn(tree, style);
 
 		treeColumn.setText(title);
 		treeColumn.setWidth(bound);
@@ -172,12 +202,14 @@ public class SemanticBugsViewController extends ViewController {
 
 	private SelectionAdapter getSelectionAdapter(final TreeColumn column,
 			final int index) {
-		SelectionAdapter selectionAdapter = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
+		SelectionAdapter selectionAdapter =
+			new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
 
 			}
-		};
+			};
 		return selectionAdapter;
 	}
 

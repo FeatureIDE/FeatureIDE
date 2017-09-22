@@ -31,17 +31,20 @@ import org.prop4j.solver.SatInstance;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Creates a complete implication graph.</br>
- * This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
+ * Creates a complete implication graph.</br> This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
  * 
  * @author Sebastian Krieter AtomicSetAnalysis
  */
 public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationship, Relationship>> {
 
-	private static final byte BIT_11 = 1 << 3;
-	private static final byte BIT_10 = 1 << 2;
-	private static final byte BIT_01 = 1 << 1;
-	private static final byte BIT_00 = 1 << 0;
+	private static final byte BIT_11 =
+		1 << 3;
+	private static final byte BIT_10 =
+		1 << 2;
+	private static final byte BIT_01 =
+		1 << 1;
+	private static final byte BIT_00 =
+		1 << 0;
 
 	public NaiveImplicationSetsAnalysis(ISatSolver solver) {
 		super(solver);
@@ -53,30 +56,38 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 
 	@Override
 	public HashMap<Relationship, Relationship> analyze(IMonitor monitor) throws Exception {
-		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
+		final HashMap<Relationship, Relationship> relationSet =
+			new HashMap<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 = solver.findModel();
+		int[] model1 =
+			solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 = solver.findModel();
+			int[] model2 =
+				solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
-			final byte[] done = new byte[model1.length];
+			final byte[] done =
+				new byte[model1.length];
 
-			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
+			final int[] model1Copy =
+				Arrays.copyOf(model1, model1.length);
 
 			SatInstance.updateModel(model1Copy, model2);
-			for (int i = 0; i < model1Copy.length; i++) {
-				final int varX = model1Copy[i];
+			for (int i =
+				0; i < model1Copy.length; i++) {
+				final int varX =
+					model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						done[i] = 2;
+						done[i] =
+							2;
 						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
@@ -84,7 +95,8 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						model2 = solver.getModel();
+						model2 =
+							solver.getModel();
 						SatInstance.updateModel(model1Copy, model2);
 						solver.shuffleOrder();
 						break;
@@ -92,11 +104,13 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 				}
 			}
 
-			for (int i = 0; i < model1.length; i++) {
+			for (int i =
+				0; i < model1.length; i++) {
 				if (done[i] != 0) {
 					continue;
 				}
-				final int varX = Math.abs(model1[i]);
+				final int varX =
+					Math.abs(model1[i]);
 				testCombinations(relationSet, model1, done, i, varX);
 				testCombinations(relationSet, model1, done, i, -varX);
 			}
@@ -106,11 +120,14 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 
 	private void testCombinations(final HashMap<Relationship, Relationship> relationSet, int[] model1, final byte[] done, int i, final int varX) {
 		solver.assignmentPush(varX);
-		for (int j = i + 1; j < model1.length; j++) {
+		for (int j =
+			i
+				+ 1; j < model1.length; j++) {
 			if (done[j] != 0) {
 				continue;
 			}
-			final int varY = Math.abs(model1[j]);
+			final int varY =
+				Math.abs(model1[j]);
 			testCombination(relationSet, varX, varY);
 			testCombination(relationSet, varX, -varY);
 		}
@@ -132,13 +149,22 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 	}
 
 	private void addRelation(final HashMap<Relationship, Relationship> relationSet, final int mx0, final int my0) {
-		final Relationship newRelationship = new Relationship(Math.abs(mx0), Math.abs(my0));
-		Relationship curRelationship = relationSet.get(newRelationship);
+		final Relationship newRelationship =
+			new Relationship(Math.abs(mx0), Math.abs(my0));
+		Relationship curRelationship =
+			relationSet.get(newRelationship);
 		if (curRelationship == null) {
 			relationSet.put(newRelationship, newRelationship);
-			curRelationship = newRelationship;
+			curRelationship =
+				newRelationship;
 		}
-		curRelationship.addRelation((byte) (mx0 > 0 ? (my0 > 0 ? BIT_11 : BIT_10) : (my0 > 0 ? BIT_01 : BIT_00)));
+		curRelationship.addRelation((byte) (mx0 > 0
+			? (my0 > 0
+				? BIT_11
+				: BIT_10)
+			: (my0 > 0
+				? BIT_01
+				: BIT_00)));
 	}
 
 }

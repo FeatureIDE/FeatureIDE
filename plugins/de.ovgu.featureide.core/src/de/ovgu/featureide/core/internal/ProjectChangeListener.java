@@ -36,9 +36,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 
 /**
- * Listener for projects owning a FeatureIDE project Nature. Synchronizes the project data
- * map of CorePlugin if projects have been created, opened, closed, deleted or
- * imported.
+ * Listener for projects owning a FeatureIDE project Nature. Synchronizes the project data map of CorePlugin if projects have been created, opened, closed,
+ * deleted or imported.
  * 
  * @author Markus Leich
  * @author Thomas Th�m
@@ -46,35 +45,40 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 public class ProjectChangeListener implements IResourceChangeListener {
 
 	public void resourceChanged(IResourceChangeEvent event) {
-		IResourceDelta delta = event.getDelta();
+		IResourceDelta delta =
+			event.getDelta();
 		if (delta == null) return;
 
 		for (IResourceDelta child : delta.getAffectedChildren()) {
 			if (!(child.getResource() instanceof IProject))
 				return;
 
-			final IProject project = (IProject) child.getResource();
+			final IProject project =
+				(IProject) child.getResource();
 			if (hasNature(project)) {
-				//FeatureIDE project created
-				if ((child.getFlags() & IResourceDelta.DESCRIPTION) != 0) {
+				// FeatureIDE project created
+				if ((child.getFlags()
+					& IResourceDelta.DESCRIPTION) != 0) {
 					addProject(project);
 				}
-				//FeatureIDE project opened or imported
-				else if((child.getFlags() & IResourceDelta.OPEN) != 0) {
+				// FeatureIDE project opened or imported
+				else if ((child.getFlags()
+					& IResourceDelta.OPEN) != 0) {
 					addProject(project);
 				}
 			} else {
-				//FeatureIDE project closed or deleted
+				// FeatureIDE project closed or deleted
 				if (!project.isOpen()) {
 					removeProject(project);
 				}
 			}
 		}
 	}
-	
+
 	private boolean hasNature(IProject project) {
 		try {
-			if (project.isAccessible() && project.hasNature(FeatureProjectNature.NATURE_ID))
+			if (project.isAccessible()
+				&& project.hasNature(FeatureProjectNature.NATURE_ID))
 				return true;
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -87,12 +91,14 @@ public class ProjectChangeListener implements IResourceChangeListener {
 	}
 
 	private void removeProject(final IProject project) {
-		Job job = new Job(REMOVE_PROJECT) {
-			protected IStatus run(IProgressMonitor monitor) {
-				CorePlugin.getDefault().removeProject(project);
-				return Status.OK_STATUS;
-			}
-		};
+		Job job =
+			new Job(REMOVE_PROJECT) {
+
+				protected IStatus run(IProgressMonitor monitor) {
+					CorePlugin.getDefault().removeProject(project);
+					return Status.OK_STATUS;
+				}
+			};
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}

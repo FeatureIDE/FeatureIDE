@@ -26,8 +26,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
@@ -38,14 +37,18 @@ public class ProgressMonitor extends ATaskMonitor {
 
 	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
 		super(parent);
-		this.monitor = SubMonitor.convert(monitor, 1);
-		this.orgMonitor = null;
+		this.monitor =
+			SubMonitor.convert(monitor, 1);
+		this.orgMonitor =
+			null;
 	}
 
 	public ProgressMonitor(String taskName, IProgressMonitor monitor) {
 		super(taskName);
-		this.monitor = SubMonitor.convert(monitor, taskName, 1);
-		this.orgMonitor = monitor;
+		this.monitor =
+			SubMonitor.convert(monitor, taskName, 1);
+		this.orgMonitor =
+			monitor;
 	}
 
 	@Override

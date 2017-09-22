@@ -31,14 +31,20 @@ import java.util.NoSuchElementException;
  * @author Sebastian Krieter
  */
 public class RingList<T> implements Iterable<T> {
+
 	private final List<T> ring;
 	private int firstPointer;
 	private int size;
 
 	public RingList(int size) {
-		this.ring = new ArrayList<>();
-		this.size = size > 0 ? size : 1;
-		this.firstPointer = 0;
+		this.ring =
+			new ArrayList<>();
+		this.size =
+			size > 0
+				? size
+				: 1;
+		this.firstPointer =
+			0;
 	}
 
 	public void add(T element) {
@@ -46,7 +52,10 @@ public class RingList<T> implements Iterable<T> {
 			ring.add(element);
 		} else {
 			ring.set(firstPointer, element);
-			firstPointer = (firstPointer + 1) % size;
+			firstPointer =
+				(firstPointer
+					+ 1)
+					% size;
 		}
 	}
 
@@ -56,8 +65,11 @@ public class RingList<T> implements Iterable<T> {
 			return ring.iterator();
 		}
 		return new Iterator<T>() {
-			int index = firstPointer;
-			int count = 0;
+
+			int index =
+				firstPointer;
+			int count =
+				0;
 
 			@Override
 			public boolean hasNext() {
@@ -69,8 +81,12 @@ public class RingList<T> implements Iterable<T> {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
-				final T t = ring.get(index);
-				index = (index + 1) % size;
+				final T t =
+					ring.get(index);
+				index =
+					(index
+						+ 1)
+						% size;
 				count++;
 				return t;
 			}
@@ -87,11 +103,16 @@ public class RingList<T> implements Iterable<T> {
 	}
 
 	public T get(int k) {
-		return ring.get((firstPointer + k) % size);
+		return ring.get((firstPointer
+			+ k)
+			% size);
 	}
 
 	public T getLast() {
-		return ring.get((firstPointer + (ring.size() - 2)) % size);
+		return ring.get((firstPointer
+			+ (ring.size()
+				- 2))
+			% size);
 	}
 
 	public T getFirst() {

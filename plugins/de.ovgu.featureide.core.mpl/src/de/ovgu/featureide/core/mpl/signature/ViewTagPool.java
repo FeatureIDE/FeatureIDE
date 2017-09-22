@@ -30,19 +30,23 @@ import java.util.TreeSet;
  * @author Sebastian Krieter
  */
 public class ViewTagPool {
-	private final HashMap<ViewTag, ViewTag> map = new HashMap<ViewTag, ViewTag>();
-	private final TreeSet<ViewTag> set = new TreeSet<ViewTag>();
-	
+
+	private final HashMap<ViewTag, ViewTag> map =
+		new HashMap<ViewTag, ViewTag>();
+	private final TreeSet<ViewTag> set =
+		new TreeSet<ViewTag>();
+
 	public ViewTag getViewTag(String name, int level) {
 		return getViewTag(new ViewTag(name, level));
 	}
-	
+
 	public ViewTag getViewTag(String name) {
 		return getViewTag(new ViewTag(name));
 	}
-	
+
 	private synchronized ViewTag getViewTag(ViewTag newVT) {
-		final ViewTag existingVT = map.get(newVT);
+		final ViewTag existingVT =
+			map.get(newVT);
 		if (existingVT == null) {
 			set.add(newVT);
 			map.put(newVT, newVT);
@@ -51,24 +55,27 @@ public class ViewTagPool {
 			return existingVT;
 		}
 	}
-	
+
 	public synchronized void removeViewTag(String name) {
-			final ViewTag 
-				startVt = new ViewTag(name, 0), 
-				endVt = new ViewTag(name);
-			
-			NavigableSet<ViewTag> subSet = set.subSet(startVt, true, endVt, true);
-			for (ViewTag viewTag : subSet) {
-				map.remove(viewTag);
-			}
-			subSet.clear();
+		final ViewTag startVt =
+			new ViewTag(name, 0),
+				endVt =
+					new ViewTag(name);
+
+		NavigableSet<ViewTag> subSet =
+			set.subSet(startVt, true, endVt, true);
+		for (ViewTag viewTag : subSet) {
+			map.remove(viewTag);
+		}
+		subSet.clear();
 	}
-	
+
 	public synchronized void scaleUpViewTags(String name, int minimumLevel) {
-		final ViewTag 
-			startVt = new ViewTag(name, minimumLevel), 
-			endVt = new ViewTag(name);
-		
+		final ViewTag startVt =
+			new ViewTag(name, minimumLevel),
+				endVt =
+					new ViewTag(name);
+
 		for (ViewTag curVt : set.subSet(startVt, true, endVt, true)) {
 			curVt.scaleUp();
 		}

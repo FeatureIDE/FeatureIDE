@@ -33,13 +33,14 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
  * @author Sebastian Krieter
  */
 public class GenerateFeatureStubsHandler extends AFeatureProjectHandler {
-	
+
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		FeatureStubsGenerator fsg = new FeatureStubsGenerator(featureProject);
+		FeatureStubsGenerator fsg =
+			new FeatureStubsGenerator(featureProject);
 		if (fsg.generate()) {
 			FeatureHouseCorePlugin.getDefault().logInfo(FEATURE_STUBS_GENERATION_STARTED_);
 		}
 	}
-	
+
 }

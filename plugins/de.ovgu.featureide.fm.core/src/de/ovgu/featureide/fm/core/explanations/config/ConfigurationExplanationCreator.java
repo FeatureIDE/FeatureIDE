@@ -29,14 +29,17 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
  * @author Timo G&uuml;nther
  */
 public interface ConfigurationExplanationCreator extends ExplanationCreator {
+
 	/**
 	 * Returns the configuration.
+	 * 
 	 * @return the configuration
 	 */
 	public Configuration getConfiguration();
-	
+
 	/**
 	 * Sets the configuration.
+	 * 
 	 * @param config the configuration
 	 */
 	public void setConfiguration(Configuration config);

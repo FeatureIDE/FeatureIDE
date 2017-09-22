@@ -54,7 +54,8 @@ public class Constraint implements IGraphicItem {
 	public IConstraint constraint;
 
 	public Constraint(IConstraint c) {
-		this.constraint = c;
+		this.constraint =
+			c;
 	}
 
 	public void setLocation(FMPoint newLocation) {

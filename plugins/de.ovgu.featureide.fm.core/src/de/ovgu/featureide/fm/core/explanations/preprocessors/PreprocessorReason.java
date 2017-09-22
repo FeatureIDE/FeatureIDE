@@ -30,47 +30,60 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  * @author Timo G&uuml;nther
  */
 public class PreprocessorReason extends Reason {
+
 	/** An expression from the expression stack. */
 	private final Node expression;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param expression an expression from the expression stack; not null
 	 */
 	public PreprocessorReason(Node expression) {
-		this.expression = expression;
+		this.expression =
+			expression;
 	}
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param reason the reason to clone; not null
 	 */
 	protected PreprocessorReason(PreprocessorReason reason) {
 		super(reason);
-		this.expression = reason.expression;
+		this.expression =
+			reason.expression;
 	}
-	
+
 	/**
 	 * Returns the expression of this reason.
+	 * 
 	 * @return the expression of this reason; not null
 	 */
 	public Node getExpression() {
 		return expression;
 	}
-	
+
 	@Override
 	protected PreprocessorReason clone() {
 		return new PreprocessorReason(expression);
 	}
-	
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			prime
+				* result
+				+ ((expression == null)
+					? 0
+					: expression.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -79,7 +92,8 @@ public class PreprocessorReason extends Reason {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PreprocessorReason other = (PreprocessorReason) obj;
+		PreprocessorReason other =
+			(PreprocessorReason) obj;
 		if (expression == null) {
 			if (other.expression != null)
 				return false;

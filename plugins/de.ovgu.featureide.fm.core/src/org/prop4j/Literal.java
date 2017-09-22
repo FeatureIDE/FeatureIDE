@@ -40,6 +40,7 @@ public class Literal extends Node implements Cloneable {
 
 	/**
 	 * Creates a new positive literal.
+	 * 
 	 * @param var contained variable
 	 */
 	public Literal(Object var) {
@@ -48,21 +49,27 @@ public class Literal extends Node implements Cloneable {
 
 	/**
 	 * Creates a new literal.
+	 * 
 	 * @param var contained variable
 	 * @param positive whether the variable is positive or negated
 	 */
 	public Literal(Object var, boolean positive) {
-		this.var = var;
-		this.positive = positive;
+		this.var =
+			var;
+		this.positive =
+			positive;
 	}
 
 	protected Literal(Literal oldLiteral) {
-		this.var = oldLiteral.var;
-		this.positive = oldLiteral.positive;
+		this.var =
+			oldLiteral.var;
+		this.positive =
+			oldLiteral.positive;
 	}
 
 	public void flip() {
-		positive = !positive;
+		positive =
+			!positive;
 	}
 
 	@Override
@@ -82,31 +89,32 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
-		//nothing to do with children
+		// nothing to do with children
 		return this;
 	}
 
 	@Override
 	protected Node clausifyCNF() {
-		//nothing to do
+		// nothing to do
 		return this;
 	}
 
 	@Override
 	protected Node clausifyDNF() {
-		//nothing to do
+		// nothing to do
 		return this;
 	}
 
 	@Override
 	public void simplify() {
-		//nothing to do (recursive calls reached lowest node)
+		// nothing to do (recursive calls reached lowest node)
 	}
 
 	@Override
 	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
 		if (this.var.equals(feature.getName())) {
-			this.var = replaceWithFeature.getName();
+			this.var =
+				replaceWithFeature.getName();
 			list.add(this);
 		}
 		return list;
@@ -119,7 +127,10 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		return var.hashCode() * (positive ? 31 : 37);
+		return var.hashCode()
+			* (positive
+				? 31
+				: 37);
 	}
 
 	@Override
@@ -130,27 +141,29 @@ public class Literal extends Node implements Cloneable {
 		if (!(node instanceof Literal)) {
 			return false;
 		}
-		final Literal other = (Literal) node;
-		return (positive == other.positive) && (var.equals(other.var));
+		final Literal other =
+			(Literal) node;
+		return (positive == other.positive)
+			&& (var.equals(other.var));
 	}
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
 		return this.positive == map.get(this.var);
 	}
-	
+
 	@Override
 	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
 		containedFeatures.add(String.valueOf(this.var));
 		return containedFeatures;
 	}
-	
+
 	@Override
 	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
 		literals.add(this);
 		return literals;
 	}
-	
+
 	@Override
 	protected Collection<Object> getVariables(Collection<Object> variables) {
 		variables.add(this.var);

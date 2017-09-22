@@ -16,7 +16,9 @@ import br.ufal.ic.colligens.activator.Colligens;
 
 public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage {
-	public static final String ID = Colligens.PLUGIN_ID
+
+	public static final String ID =
+		Colligens.PLUGIN_ID
 			+ ".preferences.PreferenceCppChecker";
 	private FileFieldEditor fieldCppChecker;
 
@@ -27,8 +29,9 @@ public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 	@Override
 	public void createFieldEditors() {
 
-		fieldCppChecker = new FileFieldEditor("CppCheck",
-				"&CppCheck location:", getFieldEditorParent());
+		fieldCppChecker =
+			new FileFieldEditor("CppCheck",
+					"&CppCheck location:", getFieldEditorParent());
 		addField(fieldCppChecker);
 
 	}
@@ -47,16 +50,23 @@ public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 			// field for which validation is required
 			if (event.getSource() == fieldCppChecker) {
 				// validation is successful
-				String value = fieldCppChecker.getStringValue();
+				String value =
+					fieldCppChecker.getStringValue();
 				if (value != null) {
 					try {
-						Runtime rt = Runtime.getRuntime();
-						Process pr = rt.exec(value + H);
+						Runtime rt =
+							Runtime.getRuntime();
+						Process pr =
+							rt.exec(value
+								+ H);
 
-						BufferedReader input = new BufferedReader(
-								new InputStreamReader(pr.getInputStream()));
-						String line = null;
-						while ((line = input.readLine()) != null) {
+						BufferedReader input =
+							new BufferedReader(
+									new InputStreamReader(pr.getInputStream()));
+						String line =
+							null;
+						while ((line =
+							input.readLine()) != null) {
 							if (line.contains("Cppcheck")) {
 								setValid(true);
 								setErrorMessage(null);

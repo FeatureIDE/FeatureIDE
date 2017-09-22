@@ -28,28 +28,33 @@ import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
  * @author Timo G&uuml;nther
  */
 public abstract class SatSolverFactory {
+
 	/**
 	 * Returns a default instance of this class.
+	 * 
 	 * @return a default instance of this class
 	 */
 	public static SatSolverFactory getDefault() {
 		return new Sat4jSatSolverFactory();
 	}
-	
+
 	/**
 	 * Returns an instance of {@link SatSolver}.
+	 * 
 	 * @return an instance of {@link SatSolver}
 	 */
 	public abstract SatSolver getSatSolver();
-	
+
 	/**
 	 * Returns an instance of {@link MutableSatSolver}.
+	 * 
 	 * @return an instance of {@link MutableSatSolver}
 	 */
 	public abstract MutableSatSolver getMutableSatSolver();
-	
+
 	/**
 	 * Returns an instance of {@link MusExtractor}.
+	 * 
 	 * @return an instance of {@link MusExtractor}
 	 */
 	public abstract MusExtractor getMusExtractor();

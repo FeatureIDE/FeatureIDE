@@ -44,67 +44,81 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
- * This is the MoveAction for the manual movement of objects in the
- * FeatureModelDiagram
+ * This is the MoveAction for the manual movement of objects in the FeatureModelDiagram
  * 
  * @author Guenter Ulreich
  * @author Andy Koch
  * @author Marcus Pinnecke
  */
 public class MoveAction extends Action {
-	public static final int stepwidth = 2;
-	public static final String ID = "de.ovgu.featureide.move";
-	public static final int UP = 1;
-	public static final int RIGHT = 2;
-	public static final int DOWN = 4;
-	public static final int LEFT = 8;
+
+	public static final int stepwidth =
+		2;
+	public static final String ID =
+		"de.ovgu.featureide.move";
+	public static final int UP =
+		1;
+	public static final int RIGHT =
+		2;
+	public static final int DOWN =
+		4;
+	public static final int LEFT =
+		8;
 	// whole movement has been stopped (needed for undo redo purposes)
-	public static final int STOP = 0;
+	public static final int STOP =
+		0;
 
 	private int dir;
 
-	private final Point deltaPos = new Point(0, 0);
+	private final Point deltaPos =
+		new Point(0, 0);
 	private boolean doStop;
 	private boolean isLegendMoving;
 
 	private final GraphicalViewerImpl viewer;
 	private final IGraphicalFeatureModel featureModel;
 
-	private final HashMap<Object, Point> endPositions = new HashMap<Object, Point>();
+	private final HashMap<Object, Point> endPositions =
+		new HashMap<Object, Point>();
 
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			// action only active when manual layout and feature diagram elements are selected
-			setEnabled(isValidSelection((IStructuredSelection) event.getSelection()) && isMovingAllowed());
+	private final ISelectionChangedListener listener =
+		new ISelectionChangedListener() {
 
-			// TODO: insert check for selection changed (would also end
-			// transaction for moving)
-		}
-	};
+			public void selectionChanged(SelectionChangedEvent event) {
+				// action only active when manual layout and feature diagram elements are selected
+				setEnabled(isValidSelection((IStructuredSelection) event.getSelection())
+					&& isMovingAllowed());
+
+				// TODO: insert check for selection changed (would also end
+				// transaction for moving)
+			}
+		};
 
 	/**
 	 * 
-	 * @param viewer
-	 *            the object which for the MoveAction has been registered
-	 * @param featureModel
-	 *            the according FeatureModel object
-	 * @param graphicalViewer
-	 *            the according GraphicalViewerImpl
+	 * @param viewer the object which for the MoveAction has been registered
+	 * @param featureModel the according FeatureModel object
+	 * @param graphicalViewer the according GraphicalViewerImpl
 	 * @param direction
 	 */
 	public MoveAction(Object viewer, IGraphicalFeatureModel featureModel, Object graphicalViewer, int direction) {
 		super(MOVING);
 		this.setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
-			this.viewer = (GraphicalViewerImpl) viewer;
+			this.viewer =
+				(GraphicalViewerImpl) viewer;
 			this.viewer.addSelectionChangedListener(listener);
 		} else {
-			this.viewer = null;
+			this.viewer =
+				null;
 		}
-		this.featureModel = featureModel;
-		this.dir = direction;
+		this.featureModel =
+			featureModel;
+		this.dir =
+			direction;
 		setEnabled(false);
-		doStop = (dir == STOP);
+		doStop =
+			(dir == STOP);
 
 		if (!doStop) {
 			switch (dir) {
@@ -127,7 +141,8 @@ public class MoveAction extends Action {
 
 	private void init() {
 		this.endPositions.clear();
-		this.isLegendMoving = false;
+		this.isLegendMoving =
+			false;
 	}
 
 	@Override
@@ -144,7 +159,8 @@ public class MoveAction extends Action {
 	 */
 	private void doMove(boolean doStop) {
 		if (this.viewer != null) {
-			for (Iterator<?> it = ((IStructuredSelection) viewer.getSelection()).iterator(); it.hasNext();) {
+			for (Iterator<?> it =
+				((IStructuredSelection) viewer.getSelection()).iterator(); it.hasNext();) {
 				moveFigure(it.next(), doStop);
 			}
 		}
@@ -157,38 +173,55 @@ public class MoveAction extends Action {
 	 * @param doStop states whether new position is final position
 	 */
 	private void moveFigure(Object element, boolean doStop) {
-		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
-			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getModel() : (IGraphicalFeature) element;
-			final Point newPos = feature.getLocation().translate(deltaPos);
+		if ((element instanceof FeatureEditPart)
+			|| (element instanceof IFeature)) {
+			IGraphicalFeature feature =
+				element instanceof FeatureEditPart
+					? ((FeatureEditPart) element).getModel()
+					: (IGraphicalFeature) element;
+			final Point newPos =
+				feature.getLocation().translate(deltaPos);
 
 			if (doStop) {
 				this.endPositions.put(element, newPos);
 			}
 
 			feature.setLocation(newPos);
-		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
-			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
-			final Point newPos = constraint.getLocation().translate(deltaPos);
+		} else if ((element instanceof ConstraintEditPart)
+			|| (element instanceof IConstraint)) {
+			IGraphicalConstraint constraint =
+				element instanceof ConstraintEditPart
+					? ((ConstraintEditPart) element).getModel()
+					: (IGraphicalConstraint) element;
+			final Point newPos =
+				constraint.getLocation().translate(deltaPos);
 			constraint.setLocation(newPos);
-		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure)) {
-			LegendFigure legendFigure = null;
-			if(element instanceof LegendEditPart){
-				legendFigure = ((LegendEditPart) element).getFigure();
-			} else if(element instanceof LegendFigure) {
-				legendFigure = (LegendFigure) element;
+		} else if ((element instanceof LegendEditPart)
+			|| (element instanceof LegendFigure)) {
+			LegendFigure legendFigure =
+				null;
+			if (element instanceof LegendEditPart) {
+				legendFigure =
+					((LegendEditPart) element).getFigure();
+			} else if (element instanceof LegendFigure) {
+				legendFigure =
+					(LegendFigure) element;
 			}
-			final Point newPos = legendFigure.getLocation().translate(deltaPos);
+			final Point newPos =
+				legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
 			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());
 			featureModel.getLayout().setLegendAutoLayout(false);
 			featureModel.handleLegendLayoutChanged();
-			this.isLegendMoving = true;
+			this.isLegendMoving =
+				true;
 		}
 	}
 
 	private void stop() {
 		this.doMove(true);
-		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
+		if (!isLegendMoving
+			&& featureModel.getLayout().hasLegendAutoLayout())
 			featureModel.getFeatureModel().handleModelDataChanged();
 
 		this.init();
@@ -206,13 +239,12 @@ public class MoveAction extends Action {
 	/**
 	 * check if the selection has not only one element who is a ModelEditPart
 	 * 
-	 * @param selection
-	 *            the IStructuredSelection object who contains the selected
-	 *            controls
+	 * @param selection the IStructuredSelection object who contains the selected controls
 	 * @return true if condition is matched
 	 */
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (only ModelEditPart is selected)
-		return !(selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart);
+		return !(selection.size() == 1
+			&& selection.getFirstElement() instanceof ModelEditPart);
 	}
 }

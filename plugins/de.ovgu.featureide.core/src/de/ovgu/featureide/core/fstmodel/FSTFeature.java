@@ -29,40 +29,48 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+
 /**
- * Represents a feature at the {@link FSTModel}.<br>
- * Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
+ * Represents a feature at the {@link FSTModel}.<br> Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
  * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class FSTFeature {
 
-	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
+	private final HashMap<String, FSTRole> roles =
+		new HashMap<String, FSTRole>();
 	protected String name;
 	private final FSTModel model;
-	private static final int hashCodePrime = 37;
-	private boolean hasMethodContracts = false;
+	private static final int hashCodePrime =
+		37;
+	private boolean hasMethodContracts =
+		false;
 
 	public FSTFeature(String name, final FSTModel model) {
-		this.name = name;
-		this.model = model;
+		this.name =
+			name;
+		this.model =
+			model;
 	}
-	
+
 	public boolean isSelected() {
-		FSTConfiguration config = model.getConfiguration();
+		FSTConfiguration config =
+			model.getConfiguration();
 		if (config != null) {
 			return config.getSelectedFeatures().contains(name);
 		}
 		return false;
 	}
-	
+
 	public int getColor() {
 		if (model == null) {
 			return FeatureColor.NO_COLOR.getValue();
 		}
-		final IFeatureModel featureModel = model.getFeatureProject().getFeatureModel();
-		IFeature feature = featureModel.getFeature(name);
+		final IFeatureModel featureModel =
+			model.getFeatureProject().getFeatureModel();
+		IFeature feature =
+			featureModel.getFeature(name);
 		return FeatureColorManager.getColor(feature).getValue();
 	}
 
@@ -72,21 +80,22 @@ public class FSTFeature {
 
 	@Nonnull
 	public LinkedList<FSTRole> getRoles() {
-		 return new LinkedList<FSTRole>(roles.values());
+		return new LinkedList<FSTRole>(roles.values());
 	}
 
 	public FSTRole getRole(String className) {
 		return roles.get(className);
 	}
-	
+
 	public boolean hasMethodContracts() {
 		return hasMethodContracts;
 	}
 
 	public void setMethodContracts(boolean hasMethodContracts) {
-		this.hasMethodContracts = hasMethodContracts;
+		this.hasMethodContracts =
+			hasMethodContracts;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;
@@ -99,7 +108,7 @@ public class FSTFeature {
 	public void addRole(String className, FSTRole role) {
 		roles.put(className, role);
 	}
-	
+
 	@Override
 	public boolean equals(Object feature) {
 		if (feature == this) {
@@ -107,21 +116,29 @@ public class FSTFeature {
 		}
 		if (!(feature instanceof FSTFeature)) {
 			return false;
-		}	
-		FSTFeature comp = (FSTFeature) feature;
-		if (!comp.getName().equals(this.getName()) || 
-				!comp.model.getFeatureProject().getProjectName().equals(this.model.getFeatureProject().getProjectName())) {
+		}
+		FSTFeature comp =
+			(FSTFeature) feature;
+		if (!comp.getName().equals(this.getName())
+			||
+			!comp.model.getFeatureProject().getProjectName().equals(this.model.getFeatureProject().getProjectName())) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		if (model != null) {
-		int hashCode = 1;
-		hashCode = hashCodePrime * hashCode + getName().hashCode();
-		return hashCodePrime * hashCode + model.getFeatureProject().getProjectName().hashCode();
+			int hashCode =
+				1;
+			hashCode =
+				hashCodePrime
+					* hashCode
+					+ getName().hashCode();
+			return hashCodePrime
+				* hashCode
+				+ model.getFeatureProject().getProjectName().hashCode();
 		} else {
 			return super.hashCode();
 		}

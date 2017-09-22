@@ -65,101 +65,148 @@ public class FeatureDiagramLayoutHelper {
 			return "Top-Down (ordered)";
 		}
 	}
-	
+
 	/**
 	 * returns label texts (e.g. for the context menu)
 	 */
-	public static String getNameTypeLabel(int layoutType){		
-		switch(layoutType){
-			case 1: 
-				return SHORT_NAMES;
-			case 0:
-			default:
-				return LONG_NAMES;
-		}	
+	public static String getNameTypeLabel(int layoutType) {
+		switch (layoutType) {
+		case 1:
+			return SHORT_NAMES;
+		case 0:
+		default:
+			return LONG_NAMES;
+		}
 	}
 
 	/**
-	 * sets initial positions for new constraints
-	 * needed for manual layout
+	 * sets initial positions for new constraints needed for manual layout
 	 */
 	public static void initializeConstraintPosition(IGraphicalFeatureModel featureModel, int index) {
-		Point newLocation = new Point(0, 0);
-		IGraphicalConstraint constraint = featureModel.getVisibleConstraints().get(index);
-		int leftX = Integer.MAX_VALUE;
-		int rightX = Integer.MIN_VALUE;
-		final int constraintCount = featureModel.getVisibleConstraints().size();
+		Point newLocation =
+			new Point(0, 0);
+		IGraphicalConstraint constraint =
+			featureModel.getVisibleConstraints().get(index);
+		int leftX =
+			Integer.MAX_VALUE;
+		int rightX =
+			Integer.MIN_VALUE;
+		final int constraintCount =
+			featureModel.getVisibleConstraints().size();
 		if (constraintCount == 1) {
 			for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 				if (feature.getLocation().y > newLocation.y) {
-					newLocation.y = feature.getLocation().y;
+					newLocation.y =
+						feature.getLocation().y;
 				}
 				if (feature.getLocation().x > rightX) {
-					rightX = feature.getLocation().x;
+					rightX =
+						feature.getLocation().x;
 				}
 				if (feature.getLocation().x < leftX) {
-					leftX = feature.getLocation().x;
+					leftX =
+						feature.getLocation().x;
 				}
 			}
-			newLocation.x = (leftX + rightX) / 2;
-			newLocation.y += FMPropertyManager.getFeatureSpaceY();
+			newLocation.x =
+				(leftX
+					+ rightX)
+					/ 2;
+			newLocation.y +=
+				FMPropertyManager.getFeatureSpaceY();
 		} else {
-			IGraphicalConstraint lastConstraint = featureModel.getVisibleConstraints().get(constraintCount - 2);
-			newLocation = lastConstraint.getLocation().getCopy();
-			newLocation.y += FMPropertyManager.getConstraintSpace();
+			IGraphicalConstraint lastConstraint =
+				featureModel.getVisibleConstraints().get(constraintCount
+					- 2);
+			newLocation =
+				lastConstraint.getLocation().getCopy();
+			newLocation.y +=
+				FMPropertyManager.getConstraintSpace();
 		}
 		constraint.setLocation(newLocation);
 	}
 
 	/**
-	 * sets initial positions for new features (above)
-	 * needed for manual layout
+	 * sets initial positions for new features (above) needed for manual layout
 	 */
-	public static void initializeCompoundFeaturePosition(IGraphicalFeatureModel featureModel, LinkedList<IGraphicalFeature> selectedFeatures, IGraphicalFeature newCompound) {
-		Point initPos = new Point(0, 0);
-		int xAcc = 0;
+	public static void initializeCompoundFeaturePosition(IGraphicalFeatureModel featureModel, LinkedList<IGraphicalFeature> selectedFeatures,
+			IGraphicalFeature newCompound) {
+		Point initPos =
+			new Point(0, 0);
+		int xAcc =
+			0;
 		for (IGraphicalFeature feature : selectedFeatures) {
 			if (initPos.y < feature.getLocation().y) {
-				initPos.y = feature.getLocation().y;
+				initPos.y =
+					feature.getLocation().y;
 			}
-			xAcc += feature.getLocation().x;
+			xAcc +=
+				feature.getLocation().x;
 		}
-		initPos.x = (xAcc / selectedFeatures.size());
+		initPos.x =
+			(xAcc
+				/ selectedFeatures.size());
 		if (newCompound.getObject().getStructure().isRoot()) {
-			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
+			initPos.y =
+				(initPos.y
+					- FMPropertyManager.getFeatureSpaceY());
 		} else {
-			final IGraphicalFeature parent = FeatureUIHelper.getGraphicalParent(newCompound);
-			initPos.y = (initPos.y + parent.getLocation().y) / 2;
-			initPos.x = (initPos.x + parent.getLocation().x) / 2;
+			final IGraphicalFeature parent =
+				FeatureUIHelper.getGraphicalParent(newCompound);
+			initPos.y =
+				(initPos.y
+					+ parent.getLocation().y)
+					/ 2;
+			initPos.x =
+				(initPos.x
+					+ parent.getLocation().x)
+					/ 2;
 		}
 		newCompound.setLocation(initPos);
 
 	}
 
 	/**
-	 * sets initial positions for new features (below)
-	 * needed for manual layout
+	 * sets initial positions for new features (below) needed for manual layout
 	 */
 	public static void initializeLayerFeaturePosition(IGraphicalFeatureModel featureModel, IGraphicalFeature newLayer, IGraphicalFeature feature) {
-		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
+		final List<IGraphicalFeature> graphicalChildren =
+			FeatureUIHelper.getGraphicalChildren(feature);
 		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
-			Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
+			Point initPos =
+				FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
 			if (feature.getObject().getStructure().getChildrenCount() > 1) {
-				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
-				initPos.x = lastChild.getLocation().x + lastChild.getSize().width + FMPropertyManager.getFeatureSpaceX();
-				initPos.y = lastChild.getLocation().y;
+				IGraphicalFeature lastChild =
+					graphicalChildren.get(graphicalChildren.indexOf(newLayer)
+						- 1);
+				initPos.x =
+					lastChild.getLocation().x
+						+ lastChild.getSize().width
+						+ FMPropertyManager.getFeatureSpaceX();
+				initPos.y =
+					lastChild.getLocation().y;
 			} else {
-				initPos.y += FMPropertyManager.getFeatureSpaceY();
+				initPos.y +=
+					FMPropertyManager.getFeatureSpaceY();
 			}
 			newLayer.setLocation(initPos);
 		} else {
-			Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
+			Point initPos =
+				FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
 			if (graphicalChildren.size() > 1) {
-				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
-				initPos.y = lastChild.getLocation().y + lastChild.getSize().height + FMPropertyManager.getFeatureSpaceX();
-				initPos.x = lastChild.getLocation().x;
+				IGraphicalFeature lastChild =
+					graphicalChildren.get(graphicalChildren.indexOf(newLayer)
+						- 1);
+				initPos.y =
+					lastChild.getLocation().y
+						+ lastChild.getSize().height
+						+ FMPropertyManager.getFeatureSpaceX();
+				initPos.x =
+					lastChild.getLocation().x;
 			} else {
-				initPos.x += FeatureUIHelper.getGraphicalParent(newLayer).getSize().width + FMPropertyManager.getFeatureSpaceY();
+				initPos.x +=
+					FeatureUIHelper.getGraphicalParent(newLayer).getSize().width
+						+ FMPropertyManager.getFeatureSpaceY();
 			}
 			newLayer.setLocation(initPos);
 		}

@@ -41,7 +41,7 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 	public NotAvailableOutlineProvider() {
 		super(new NotAvailableContentProvider(), new NotAvailableLabelProvider());
 	}
-	
+
 	@Override
 	public boolean isSupported(IFile file) {
 		return true;
@@ -49,7 +49,7 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 
 	@Override
 	public void handleUpdate(TreeViewer viewer, IFile iFile) {
-		
+
 	}
 
 	@Override
@@ -58,28 +58,23 @@ public class NotAvailableOutlineProvider extends OutlineProvider {
 	}
 
 	@Override
-	public void selectionChanged(SelectionChangedEvent event) {
-	}
+	public void selectionChanged(SelectionChangedEvent event) {}
 
 	@Override
-	protected void initContextMenuActions(IMenuManager manager) {
-	}
+	protected void initContextMenuActions(IMenuManager manager) {}
 
 	@Override
-	protected void initToolbarActions(IToolBarManager manager) {
-	}
-	
+	protected void initToolbarActions(IToolBarManager manager) {}
+
 	@Override
 	protected List<IOutlineFilter> getFilters() {
 		return null;
 	}
 
 	@Override
-	public void treeCollapsed(TreeExpansionEvent event) {
-	}
+	public void treeCollapsed(TreeExpansionEvent event) {}
 
 	@Override
-	public void treeExpanded(TreeExpansionEvent event) {
-	}
+	public void treeExpanded(TreeExpansionEvent event) {}
 
 }

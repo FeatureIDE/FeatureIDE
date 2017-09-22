@@ -29,9 +29,11 @@ public class FileTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IFile res = (IFile) SelectionWrapper.checkClass(receiver, IFile.class);
+		final IFile res =
+			(IFile) SelectionWrapper.checkClass(receiver, IFile.class);
 		if (res != null) {
-			for (int i = 0; i < args.length; i++) {
+			for (int i =
+				0; i < args.length; i++) {
 				if (res.getName().endsWith((String) args[i])) {
 					return true;
 				}

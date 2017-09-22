@@ -13,12 +13,13 @@ public class Start {
 	 * Clear the cache files
 	 */
 	public void SystemClear() {
-		File file = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath());
+		File file =
+			new File(Colligens.getDefault().getConfigDir()
+					.getAbsolutePath());
 		try {
 			delete(file);
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -35,11 +36,13 @@ public class Start {
 			} else {
 
 				// list all the directory contents
-				String files[] = file.list();
+				String files[] =
+					file.list();
 
 				for (String temp : files) {
 					// construct the file structure
-					File fileDelete = new File(file, temp);
+					File fileDelete =
+						new File(file, temp);
 
 					// recursive delete
 					delete(fileDelete);

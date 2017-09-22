@@ -38,24 +38,26 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
  */
 public class MungeMethodSignature extends AbstractMethodSignature {
 
-	protected List<SingleVariableDeclaration> p = new LinkedList<>();
-	
+	protected List<SingleVariableDeclaration> p =
+		new LinkedList<>();
 
 	public MungeMethodSignature(AbstractClassSignature parent,
 			String name, int modifiers, Type returnType, List<?> parameters, boolean isConstructor) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString(), new LinkedList<String>(), isConstructor);
 		for (Object parameter : parameters) {
-			final SingleVariableDeclaration parameterDeclaration = (SingleVariableDeclaration) parameter;
+			final SingleVariableDeclaration parameterDeclaration =
+				(SingleVariableDeclaration) parameter;
 			p.add(parameterDeclaration);
 			parameterTypes.add(parameterDeclaration.getType().toString());
 		}
 	}
-	
+
 	public MungeMethodSignature(AbstractClassSignature parent,
 			String name, int modifiers, Type returnType, List<?> parameters, boolean isConstructor, int startLine, int endLine) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString(), new LinkedList<String>(), isConstructor, startLine, endLine);
 		for (Object parameter : parameters) {
-			final SingleVariableDeclaration parameterDeclaration = (SingleVariableDeclaration) parameter;
+			final SingleVariableDeclaration parameterDeclaration =
+				(SingleVariableDeclaration) parameter;
 			p.add(parameterDeclaration);
 			parameterTypes.add(parameterDeclaration.getType().toString());
 		}
@@ -63,12 +65,13 @@ public class MungeMethodSignature extends AbstractMethodSignature {
 
 	@Override
 	public String toString() {
-		final StringBuilder methodString = new StringBuilder();
-		
+		final StringBuilder methodString =
+			new StringBuilder();
+
 		if (mergedjavaDocComment != null) {
 			methodString.append(mergedjavaDocComment);
 		}
-		
+
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
 				methodString.append(modifier);
@@ -83,12 +86,14 @@ public class MungeMethodSignature extends AbstractMethodSignature {
 
 		methodString.append(name);
 		methodString.append('(');
-		boolean notfirst = false;
+		boolean notfirst =
+			false;
 		for (SingleVariableDeclaration parameter : p) {
 			if (notfirst) {
 				methodString.append(", ");
 			} else {
-				notfirst = true;
+				notfirst =
+					true;
 			}
 			methodString.append(parameter.getType().toString());
 			methodString.append(' ');
@@ -102,12 +107,23 @@ public class MungeMethodSignature extends AbstractMethodSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		
-		hashCode = hashCodePrime * hashCode + type.hashCode();
-		
-		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
+
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ type.hashCode();
+
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ (isConstructor
+					? 1231
+					: 1237);
 		for (SingleVariableDeclaration parameter : p) {
-			hashCode = hashCodePrime * hashCode + parameter.getType().toString().hashCode();
+			hashCode =
+				hashCodePrime
+					* hashCode
+					+ parameter.getType().toString().hashCode();
 		}
 	}
 
@@ -115,31 +131,37 @@ public class MungeMethodSignature extends AbstractMethodSignature {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
-		
-		MungeMethodSignature otherSig = (MungeMethodSignature) obj;
-		
-		if (!super.sigEquals(otherSig)) 
+
+		MungeMethodSignature otherSig =
+			(MungeMethodSignature) obj;
+
+		if (!super.sigEquals(otherSig))
 			return false;
 		if (isConstructor != otherSig.isConstructor) {
 			return false;
 		}
-		
+
 		if (p.size() != otherSig.p.size()) {
 			return false;
 		}
-		
-		final Iterator<SingleVariableDeclaration> thisIt = p.iterator();
-		final Iterator<SingleVariableDeclaration> otherIt = otherSig.p.iterator();
+
+		final Iterator<SingleVariableDeclaration> thisIt =
+			p.iterator();
+		final Iterator<SingleVariableDeclaration> otherIt =
+			otherSig.p.iterator();
 		while (thisIt.hasNext()) {
-			final SingleVariableDeclaration tNext = thisIt.next();
-			final SingleVariableDeclaration oNext = otherIt.next();
+			final SingleVariableDeclaration tNext =
+				thisIt.next();
+			final SingleVariableDeclaration oNext =
+				otherIt.next();
 			if (!tNext.getType().equals(oNext.getType())) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 

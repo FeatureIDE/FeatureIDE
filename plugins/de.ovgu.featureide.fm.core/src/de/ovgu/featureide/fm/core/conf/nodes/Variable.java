@@ -25,9 +25,14 @@ import java.util.TreeSet;
 
 public class Variable implements Serializable {
 
-	private static final long serialVersionUID = 2253729345725413110L;
+	private static final long serialVersionUID =
+		2253729345725413110L;
 
-	public static final int TRUE = 2, FALSE = 1, UNDEFINED = 0;
+	public static final int TRUE =
+		2, FALSE =
+			1,
+			UNDEFINED =
+				0;
 
 	protected final int id;
 
@@ -38,24 +43,27 @@ public class Variable implements Serializable {
 	}
 
 	public Variable(int id, int value) {
-		this.id = id;
+		this.id =
+			id;
 		setManualValue(value);
 	}
 
 	public int getId() {
 		return id;
 	}
-	
+
 	public boolean hasValue() {
 		return value > UNDEFINED;
 	}
 
 	public int getValue() {
-		return getManualValue() | getAutomaticValue();
+		return getManualValue()
+			| getAutomaticValue();
 	}
 
 	public int getManualValue() {
-		return value & 3;
+		return value
+			& 3;
 	}
 
 	public int getAutomaticValue() {
@@ -63,17 +71,24 @@ public class Variable implements Serializable {
 	}
 
 	void setManualValue(int value) {
-		this.value = (this.value & 0xfffffffc) | value;
-		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
+		this.value =
+			(this.value
+				& 0xfffffffc)
+				| value;
+		assert getValue() <= TRUE
+			&& getValue() >= UNDEFINED : "Invalid Variable Configuration";
 	}
 
 	void setAutomaticValue(int value) {
-		this.value = (this.value & 0xfffffff3) | value << 2;
-		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
+		this.value =
+			(this.value
+				& 0xfffffff3)
+				| value << 2;
+		assert getValue() <= TRUE
+			&& getValue() >= UNDEFINED : "Invalid Variable Configuration";
 	}
 
-	protected void reset() {
-	}
+	protected void reset() {}
 
 	protected void getVariables(TreeSet<Integer> list) {
 		list.add(id);
@@ -83,13 +98,18 @@ public class Variable implements Serializable {
 	public String toString() {
 		switch (getValue()) {
 		case TRUE:
-			return id + " : true";
+			return id
+				+ " : true";
 		case FALSE:
-			return id + " : false";
+			return id
+				+ " : false";
 		case UNDEFINED:
-			return id + " : undefined";
+			return id
+				+ " : undefined";
 		default:
-			return "! " + id + " : invalid value!";
+			return "! "
+				+ id
+				+ " : invalid value!";
 		}
 	}
 

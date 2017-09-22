@@ -29,6 +29,7 @@ import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommen
  */
 public class FeatureModuleMerger extends ADocumentationCommentMerger {
 
-	private static final long serialVersionUID = 3765234776718850316L;
+	private static final long serialVersionUID =
+		3765234776718850316L;
 
 }

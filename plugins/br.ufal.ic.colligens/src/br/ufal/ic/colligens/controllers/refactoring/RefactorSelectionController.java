@@ -28,26 +28,33 @@ import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionController extends Refactoring {
-	private TextSelection textSelection = null;
-	private IFile file = null;
+
+	private TextSelection textSelection =
+		null;
+	private IFile file =
+		null;
 	private RefactoringType refactoringType;
 	private final RefactorSelectionProcessor processor;
-	protected List<Change> changes = new LinkedList<Change>();
+	protected List<Change> changes =
+		new LinkedList<Change>();
 
 	public RefactorSelectionController() {
-		processor = new RefactorSelectionProcessor();
+		processor =
+			new RefactorSelectionProcessor();
 	}
 
 	@Override
 	public String getName() {
-		return REFACTORING + refactoringType.getLabel();
+		return REFACTORING
+			+ refactoringType.getLabel();
 	}
 
 	@Override
 	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
 			throws CoreException, OperationCanceledException {
-		RefactoringStatus status = new RefactoringStatus();
-		
+		RefactoringStatus status =
+			new RefactoringStatus();
+
 		monitor.beginTask(CHECKING_PRECONDITIONS___, 2);
 
 		try {
@@ -77,12 +84,14 @@ public class RefactorSelectionController extends Refactoring {
 	@Override
 	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
 			throws CoreException, OperationCanceledException {
-		RefactoringStatus status = new RefactoringStatus();
+		RefactoringStatus status =
+			new RefactoringStatus();
 
 		monitor.beginTask(CHECKING_CHECKFINALCONDITIONS___, 2);
 
 		try {
-			changes = processor.process(monitor);
+			changes =
+				processor.process(monitor);
 		} catch (IOException e) {
 
 			status.addFatalError(e.getMessage());
@@ -107,9 +116,12 @@ public class RefactorSelectionController extends Refactoring {
 
 	public void setSelection(IFile file, TextSelection selection,
 			RefactoringType refactoringType) {
-		this.textSelection = selection;
-		this.file = file;
-		this.refactoringType = refactoringType;
+		this.textSelection =
+			selection;
+		this.file =
+			file;
+		this.refactoringType =
+			refactoringType;
 	}
 
 }

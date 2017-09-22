@@ -37,17 +37,17 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	LegendEditPart(Legend legend) {
 		setModel(legend);
 	}
-	
+
 	@Override
 	public ModelEditPart getParent() {
 		return (ModelEditPart) super.getParent();
 	}
-	
+
 	@Override
 	public Legend getModel() {
 		return (Legend) super.getModel();
 	}
-	
+
 	@Override
 	public LegendFigure getFigure() {
 		return (LegendFigure) super.getFigure();

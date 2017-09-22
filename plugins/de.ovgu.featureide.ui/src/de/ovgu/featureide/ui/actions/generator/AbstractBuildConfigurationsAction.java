@@ -35,8 +35,9 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Jens Meinicke
  */
 public abstract class AbstractBuildConfigurationsAction implements IObjectActionDelegate, IConfigurationBuilderBasics {
+
 	protected ISelection selection;
-	
+
 	/**
 	 * Gets the toggle state from persistent properties
 	 */
@@ -54,30 +55,27 @@ public abstract class AbstractBuildConfigurationsAction implements IObjectAction
 	 */
 	protected static void setToggleState(boolean value) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value
+				? TRUE
+				: FALSE);
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection = selection;
+		this.selection =
+			selection;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface. action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
 	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {

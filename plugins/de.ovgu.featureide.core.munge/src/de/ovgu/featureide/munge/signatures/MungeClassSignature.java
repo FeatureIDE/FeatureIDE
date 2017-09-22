@@ -30,23 +30,24 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  * @author Sebastian Krieter
  */
 public class MungeClassSignature extends AbstractClassSignature {
-	
-	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers, 
+
+	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers,
 			String type, String pckg) {
-		super(parent, name,  Modifier.toString(modifiers), type, pckg);
+		super(parent, name, Modifier.toString(modifiers), type, pckg);
 	}
-	
+
 	@Override
-	public String toString() {		
-		StringBuilder sb = new StringBuilder();
-		
+	public String toString() {
+		StringBuilder sb =
+			new StringBuilder();
+
 //		sb.append(super.toString());
 //		sb.append(LINE_SEPARATOR);
-		
+
 		if (mergedjavaDocComment != null) {
 			sb.append(mergedjavaDocComment);
 		}
-		
+
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
 				sb.append(modifier);
@@ -56,7 +57,7 @@ public class MungeClassSignature extends AbstractClassSignature {
 		sb.append(type);
 		sb.append(' ');
 		sb.append(name);
-		
+
 		return sb.toString();
 	}
 
@@ -73,15 +74,17 @@ public class MungeClassSignature extends AbstractClassSignature {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
-		
-		MungeClassSignature otherSig = (MungeClassSignature) obj;
-		
+
+		MungeClassSignature otherSig =
+			(MungeClassSignature) obj;
+
 		if (!super.sigEquals(otherSig)) {
 			return false;
-		}		
-		
+		}
+
 		return true;
 	}
 }

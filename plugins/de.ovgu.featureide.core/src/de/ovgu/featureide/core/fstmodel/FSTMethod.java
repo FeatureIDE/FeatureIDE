@@ -38,13 +38,14 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	private String contract;
 	private String compKey;
 	private int startLineOfContract;
-	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
-	
+	private final TreeSet<FSTDirective> directives =
+		new TreeSet<FSTDirective>();
+
 	public void add(FSTDirective directive) {
 		directives.add(directive);
 		directive.setRole(super.role);
 	}
-	
+
 	public TreeSet<FSTDirective> getFSTDirectives() {
 		return directives;
 	}
@@ -91,26 +92,33 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract,
 			String compKey, int startLineOfContract) {
 		super(name, type, modifiers, body, beginLine, endLine);
-		this.parameterTypes = parameterTypes;
-		this.contract = contract;
-		this.compKey = compKey;
+		this.parameterTypes =
+			parameterTypes;
+		this.contract =
+			contract;
+		this.compKey =
+			compKey;
 		if (startLineOfContract > -1) {
-			this.startLineOfContract = startLineOfContract;
+			this.startLineOfContract =
+				startLineOfContract;
 		}
 	}
 
 	public String getFullName() {
-		StringBuilder fullname = new StringBuilder();
+		StringBuilder fullname =
+			new StringBuilder();
 		fullname.append(name);
 		fullname.append("(");
-		for (int i = 0; i < parameterTypes.size(); i++) {
+		for (int i =
+			0; i < parameterTypes.size(); i++) {
 			if (i > 0)
 				fullname.append(", ");
 			fullname.append(parameterTypes.get(i));
 		}
 		fullname.append(")");
 		if (!"void".equals(type))
-			fullname.append(" : " + type);
+			fullname.append(" : "
+				+ type);
 		return fullname.toString();
 	}
 
@@ -119,7 +127,8 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	}
 
 	public void setConstructor(boolean isConstructor) {
-		this.isConstructor = isConstructor;
+		this.isConstructor =
+			isConstructor;
 	}
 
 	public boolean refines() {
@@ -127,7 +136,8 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	}
 
 	public void setRefines(boolean refines) {
-		this.refines = refines;
+		this.refines =
+			refines;
 	}
 
 	public LinkedList<String> getParameter() {
@@ -147,8 +157,7 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 
 	/**
 	 * 
-	 * @return <code>true</code> if an equivalent method exists in an other role
-	 *         of the same class.
+	 * @return <code>true</code> if an equivalent method exists in an other role of the same class.
 	 */
 	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {
@@ -156,7 +165,8 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 				continue;
 			}
 			for (FSTMethod method : role.getClassFragment().getMethods()) {
-				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter())) {
+				if (method.getName().equals(getName())
+					&& method.getParameter().equals(getParameter())) {
 					return true;
 				}
 			}
@@ -170,7 +180,9 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 				continue;
 			}
 			for (FSTMethod method : role.getClassFragment().getMethods()) {
-				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter()) && method.hasContract()) {
+				if (method.getName().equals(getName())
+					&& method.getParameter().equals(getParameter())
+					&& method.hasContract()) {
 					return true;
 				}
 			}
@@ -179,4 +191,3 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	}
 
 }
-

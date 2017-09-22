@@ -39,42 +39,57 @@ public class TwoColorGradientLine extends Shape implements GUIDefaults {
 	int rDiff;
 	int gDiff;
 	int bDiff;
+
 	/**
 	 * 
 	 */
 	public TwoColorGradientLine(Color left, Color right, int width, int height) {
-		XYLayout layout = new XYLayout();
+		XYLayout layout =
+			new XYLayout();
 		setLayoutManager(layout);
 		setSize(width, height);
 		setBackgroundColor(left);
-		rDiff = right.getRed() - left.getRed();
-		gDiff = right.getGreen() - left.getGreen();
-		bDiff = right.getBlue() - left.getBlue();
-		
-		this.left = left;
-		this.right = right;
-		setOpaque(true);		
+		rDiff =
+			right.getRed()
+				- left.getRed();
+		gDiff =
+			right.getGreen()
+				- left.getGreen();
+		bDiff =
+			right.getBlue()
+				- left.getBlue();
+
+		this.left =
+			left;
+		this.right =
+			right;
+		setOpaque(true);
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.draw2d.Shape#fillShape(org.eclipse.draw2d.Graphics)
 	 */
 	@Override
 	protected void fillShape(Graphics graphics) {
 		// TODO Auto-generated method stub
-		Color oldFore= graphics.getForegroundColor();
-		Color oldBack = graphics.getBackgroundColor();
-		
+		Color oldFore =
+			graphics.getForegroundColor();
+		Color oldBack =
+			graphics.getBackgroundColor();
+
 		graphics.setForegroundColor(left);
 		graphics.setBackgroundColor(right);
 		graphics.fillGradient(getLocation().x, getLocation().y, getSize().width, getSize().height, false);
 		graphics.setForegroundColor(oldFore);
 		graphics.setBackgroundColor(oldBack);
-		
+
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.draw2d.Shape#outlineShape(org.eclipse.draw2d.Graphics)
 	 */
 	@Override
-	protected void outlineShape(Graphics graphics) {
-	}
+	protected void outlineShape(Graphics graphics) {}
 }

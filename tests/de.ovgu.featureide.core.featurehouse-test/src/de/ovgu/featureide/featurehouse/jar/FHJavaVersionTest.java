@@ -37,7 +37,7 @@ public class FHJavaVersionTest {
 	public void testFeatureHouseJavaVersion() throws Exception {
 		JavaVersionTest.testJavaVersion(FSTGenComposer.class);
 	}
-	
+
 	@Test
 	public void testFUJIJavaVersion() throws Exception {
 		JavaVersionTest.testJavaVersion(Main.class);

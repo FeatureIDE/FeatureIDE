@@ -28,8 +28,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
- * This internal job can be canceled.<br>
- * Cancel can cause invalid program states. 
+ * This internal job can be canceled.<br> Cancel can cause invalid program states.
  * 
  * Use {@link AStoppableJob} instead.
  * 
@@ -41,8 +40,7 @@ public abstract class StoppableJob extends Job {
 	private Thread thread;
 
 	/**
-	 * Creates a new job with the specified name.  The job name is a human-readable
-	 * value that is displayed to users.  The name does not need to be unique, but it
+	 * Creates a new job with the specified name. The job name is a human-readable value that is displayed to users. The name does not need to be unique, but it
 	 * must not be <code>null</code>.
 	 * 
 	 * @param name the name of the job.
@@ -50,27 +48,30 @@ public abstract class StoppableJob extends Job {
 	public StoppableJob(String name) {
 		super(name);
 	}
-	
+
 	/**
 	 * The run method executes this method as an internal thread.
 	 */
 	protected abstract IStatus execute(IProgressMonitor monitor);
-	
+
 	@Override
 	protected final IStatus run(final IProgressMonitor monitor) {
-		thread = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					execute(monitor);
-				} catch (Exception e){
-					Logger.logError(e);
+		thread =
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						execute(monitor);
+					} catch (Exception e) {
+						Logger.logError(e);
+					}
 				}
-			}
-			
-		}, "Thread-" + getName());
-		if (getPriority() == SHORT || getPriority() == INTERACTIVE) {		
+
+			}, "Thread-"
+				+ getName());
+		if (getPriority() == SHORT
+			|| getPriority() == INTERACTIVE) {
 			thread.setPriority(Thread.MAX_PRIORITY);
 		} else if (getPriority() == LONG) {
 			thread.setPriority(Thread.NORM_PRIORITY);
@@ -83,9 +84,9 @@ public abstract class StoppableJob extends Job {
 		} catch (InterruptedException e) {
 			Logger.logError(e);
 		}
-		return Status.OK_STATUS; 
+		return Status.OK_STATUS;
 	}
-	
+
 	@Override
 	protected void canceling() {
 		thread.stop();

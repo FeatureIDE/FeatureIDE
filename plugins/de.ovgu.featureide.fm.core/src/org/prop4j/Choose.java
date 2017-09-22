@@ -24,22 +24,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A constraint that is true iff exactly a specified number of children is
- * true.
+ * A constraint that is true iff exactly a specified number of children is true.
  * 
  * @author Thomas Thuem
  */
 public class Choose extends Node {
-	
+
 	public int n;
 
-	public Choose(int n, Object ...children) {
-		this.n = n;
+	public Choose(int n, Object... children) {
+		this.n =
+			n;
 		setChildren(children);
 	}
 
 	public Choose(int n, Node[] children) {
-		this.n = n;
+		this.n =
+			n;
 		setChildren(children);
 	}
 
@@ -74,7 +75,8 @@ public class Choose extends Node {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		int trueCount = 0;
+		int trueCount =
+			0;
 		for (final Node child : children) {
 			if (child.getValue(map)) {
 				trueCount++;

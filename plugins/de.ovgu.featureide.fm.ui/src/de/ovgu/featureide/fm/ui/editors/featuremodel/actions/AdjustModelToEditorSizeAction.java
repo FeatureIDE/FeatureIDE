@@ -35,11 +35,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEdi
 /**
  * TODO description
  * 
- * @author Maximilian Kühl 	
+ * @author Maximilian Kühl
  * @author Joshua Sprey
  */
 public class AdjustModelToEditorSizeAction extends Action {
-	public static final String ID = "de.ovgu.featureide.adjustmodeltoeditor";
+
+	public static final String ID =
+		"de.ovgu.featureide.adjustmodeltoeditor";
 
 	private FeatureDiagramEditor editor;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
@@ -47,29 +49,33 @@ public class AdjustModelToEditorSizeAction extends Action {
 	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
 		super(title);
 		if (viewer instanceof FeatureDiagramEditor) {
-			editor = (FeatureDiagramEditor) viewer;
+			editor =
+				(FeatureDiagramEditor) viewer;
 		}
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
 	}
 
 	@Override
 	public void run() {
-		IFeature root = graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
+		IFeature root =
+			graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
 		if (root == null) {
 			return;
 		}
-		AdjustModelToEditorSizeOperation op = new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
+		AdjustModelToEditorSizeOperation op =
+			new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		if(editor != null && editor instanceof FeatureDiagramEditor)
-		{
-			IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
+		if (editor != null
+			&& editor instanceof FeatureDiagramEditor) {
+			IGraphicalFeature graphicalRoot =
+				FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
 			editor.centerPointOnScreen(graphicalRoot.getObject());
 		}
 	}
 
 }
- 

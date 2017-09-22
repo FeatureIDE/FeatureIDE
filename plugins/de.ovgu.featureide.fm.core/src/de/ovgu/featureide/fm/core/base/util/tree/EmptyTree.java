@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.base.util.tree;
 
 import java.util.Iterator;
 
-
 /**
  * Tree element.
  * 
@@ -50,8 +49,7 @@ public class EmptyTree<E> extends Tree<E> {
 			}
 
 			@Override
-			public void remove() {				
-			}
+			public void remove() {}
 
 			@Override
 			public Iterator<E> iterator() {
@@ -59,8 +57,7 @@ public class EmptyTree<E> extends Tree<E> {
 			}
 
 			@Override
-			public void removeSubtree() {
-			}
+			public void removeSubtree() {}
 
 			@Override
 			public int getCurrentLevel() {

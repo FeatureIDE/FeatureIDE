@@ -39,52 +39,70 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Fabian Benduhn
  */
 public class TGuidslReader {
-	protected static String AND_GROUP_ALL_OPTIONAL = "Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
-	protected static String AND_GROUP_A_MANDATORY = "Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
-	protected static String OR_GROUP = "Root : Base* :: _Root ;Base : A	| B	| C ;";
-	protected static String ALTERNATIVE_GROUP = "Root : Base ;Base : A| B	| C ;";
 
-	protected static String sep = System.getProperty("file.separator");
+	protected static String AND_GROUP_ALL_OPTIONAL =
+		"Root : [Base] :: _Root ; Base : [A] [B] [C] :: _Base ;";
+	protected static String AND_GROUP_A_MANDATORY =
+		"Root : [Base] :: _Root ; Base : A [B] [C] :: _Base ;";
+	protected static String OR_GROUP =
+		"Root : Base* :: _Root ;Base : A	| B	| C ;";
+	protected static String ALTERNATIVE_GROUP =
+		"Root : Base ;Base : A| B	| C ;";
+
+	protected static String sep =
+		System.getProperty("file.separator");
 
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		final IFeatureModel model = load(AND_GROUP_ALL_OPTIONAL);
-		IFeature a = model.getFeature("A");
-		IFeature base = model.getFeature("Base");
+		final IFeatureModel model =
+			load(AND_GROUP_ALL_OPTIONAL);
+		IFeature a =
+			model.getFeature("A");
+		IFeature base =
+			model.getFeature("Base");
 		assertTrue(base.getStructure().isAnd());
 		assertFalse(a.getStructure().isMandatory());
 	}
 
 	@Test
 	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		final IFeatureModel model = load(AND_GROUP_A_MANDATORY);
+		final IFeatureModel model =
+			load(AND_GROUP_A_MANDATORY);
 
-		IFeature a = model.getFeature("A");
-		IFeature base = model.getFeature("Base");
+		IFeature a =
+			model.getFeature("A");
+		IFeature base =
+			model.getFeature("Base");
 		assertTrue(base.getStructure().isAnd());
 		assertTrue(a.getStructure().isMandatory());
 	}
 
 	@Test
 	public void testReaderOrGroup() throws UnsupportedModelException {
-		final IFeatureModel model = load(OR_GROUP);
+		final IFeatureModel model =
+			load(OR_GROUP);
 
-		IFeature base = model.getFeature("Base");
+		IFeature base =
+			model.getFeature("Base");
 		assertTrue(base.getStructure().isOr());
 	}
 
 	@Test
 	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		final IFeatureModel model = load(ALTERNATIVE_GROUP);
+		final IFeatureModel model =
+			load(ALTERNATIVE_GROUP);
 
-		IFeature base = model.getFeature("Base");
+		IFeature base =
+			model.getFeature("Base");
 		assertTrue(base.getStructure().isAlternative());
 	}
 
 	private IFeatureModel load(String input) {
 		try {
-			final IFeatureModelFormat format = new GuidslFormat();
-			IFeatureModel model = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			final IFeatureModelFormat format =
+				new GuidslFormat();
+			IFeatureModel model =
+				FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(model, input).containsError()) {
 				fail();
 			}

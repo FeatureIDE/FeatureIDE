@@ -40,8 +40,8 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
 /**
- * This class is designated for search functionalities inside of the collaborations diagram
- * It takes care of tasks like: creating the searchbox, catching the key events, firing the search and so on.
+ * This class is designated for search functionalities inside of the collaborations diagram It takes care of tasks like: creating the searchbox, catching the
+ * key events, firing the search and so on.
  * 
  * @author Christopher Kruczek
  */
@@ -56,15 +56,21 @@ public class CollaborationViewSearch {
 	private List<Label> matchedLabels;
 
 	private class SearchDialog extends org.eclipse.jface.dialogs.Dialog {
+
 		private Text searchTextBox;
 		private String searchText;
 		private String title;
 
 		public SearchDialog(Shell parent, String title) {
 			super(parent);
-			setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+			setShellStyle(SWT.CLOSE
+				| SWT.TITLE
+				| SWT.BORDER
+				| SWT.DIALOG_TRIM
+				| SWT.APPLICATION_MODAL);
 			setBlockOnOpen(true);
-			this.title = title;
+			this.title =
+				title;
 		}
 
 		@Override
@@ -75,9 +81,13 @@ public class CollaborationViewSearch {
 
 		@Override
 		protected Control createDialogArea(Composite parent) {
-			Composite container = (Composite) super.createDialogArea(parent);
+			Composite container =
+				(Composite) super.createDialogArea(parent);
 			container.setLayout(new FillLayout());
-			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
+			this.searchTextBox =
+				new Text(container, SWT.SEARCH
+					| SWT.SINGLE
+					| SWT.ICON_SEARCH);
 			this.searchTextBox.setBounds(500, 500, 200, 50);
 			this.searchTextBox.setSelection(searchText.length());
 			return container;
@@ -85,7 +95,8 @@ public class CollaborationViewSearch {
 
 		@Override
 		protected void buttonPressed(int buttonId) {
-			searchText = this.searchTextBox.getText();
+			searchText =
+				this.searchTextBox.getText();
 			super.buttonPressed(buttonId);
 		}
 
@@ -96,6 +107,7 @@ public class CollaborationViewSearch {
 	}
 
 	public static class Builder {
+
 		private GraphicalViewerImpl attachedViewerParent;
 		private String searchBoxText;
 		private Color findResultsColor;
@@ -106,7 +118,8 @@ public class CollaborationViewSearch {
 		}
 
 		public Builder setNoSearchResultsColor(Color noSearchResultsColor) {
-			this.noSearchResultsColor = noSearchResultsColor;
+			this.noSearchResultsColor =
+				noSearchResultsColor;
 			return this;
 		}
 
@@ -115,7 +128,8 @@ public class CollaborationViewSearch {
 		}
 
 		public Builder setAttachedViewerParent(GraphicalViewerImpl attachedViewerParent) {
-			this.attachedViewerParent = attachedViewerParent;
+			this.attachedViewerParent =
+				attachedViewerParent;
 			return this;
 		}
 
@@ -124,7 +138,8 @@ public class CollaborationViewSearch {
 		}
 
 		public Builder setSearchBoxText(String searchBoxText) {
-			this.searchBoxText = searchBoxText;
+			this.searchBoxText =
+				searchBoxText;
 			return this;
 		}
 
@@ -133,7 +148,8 @@ public class CollaborationViewSearch {
 		}
 
 		public Builder setFindResultsColor(Color findResultsColor) {
-			this.findResultsColor = findResultsColor;
+			this.findResultsColor =
+				findResultsColor;
 			return this;
 		}
 
@@ -144,12 +160,18 @@ public class CollaborationViewSearch {
 	}
 
 	private CollaborationViewSearch(Builder searchBuilder) {
-		this.extractedLabels = new ArrayList<Label>();
-		this.matchedLabels = new ArrayList<Label>();
-		this.attachedViewerParent = searchBuilder.getAttachedViewerParent();
-		this.searchBoxText = searchBuilder.getSearchBoxText();
-		this.findResultsColor = searchBuilder.getFindResultsColor();
-		this.noSearchResultsColor = searchBuilder.getNoSearchResultsColor();
+		this.extractedLabels =
+			new ArrayList<Label>();
+		this.matchedLabels =
+			new ArrayList<Label>();
+		this.attachedViewerParent =
+			searchBuilder.getAttachedViewerParent();
+		this.searchBoxText =
+			searchBuilder.getSearchBoxText();
+		this.findResultsColor =
+			searchBuilder.getFindResultsColor();
+		this.noSearchResultsColor =
+			searchBuilder.getNoSearchResultsColor();
 		createControls();
 	}
 
@@ -161,18 +183,24 @@ public class CollaborationViewSearch {
 			public boolean keyPressed(KeyEvent event) {
 				if (event.keyCode == SWT.ESC) {
 					uncolorOldLabels();
-				} else if (((event.stateMask & SWT.CTRL) == SWT.CTRL) && (event.keyCode == 'f')) {
+				} else if (((event.stateMask
+					& SWT.CTRL) == SWT.CTRL)
+					&& (event.keyCode == 'f')) {
 					if (searchDialog == null) {
-						searchDialog = new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
+						searchDialog =
+							new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
 					}
-					searchDialog.searchText = Character.toString(event.character);
+					searchDialog.searchText =
+						Character.toString(event.character);
 					searchDialog.open();
-					String searchText = searchDialog.getSearchText();
+					String searchText =
+						searchDialog.getSearchText();
 					if (!searchText.isEmpty()) {
 						uncolorOldLabels();
 						matchedLabels.clear();
 						for (Label label : extractedLabels) {
-							String labelText = label.getText().toLowerCase();
+							String labelText =
+								label.getText().toLowerCase();
 							if (labelText.contains(searchText)) {
 								label.setBackgroundColor(findResultsColor);
 								matchedLabels.add(label);
@@ -187,11 +215,11 @@ public class CollaborationViewSearch {
 	}
 
 	/**
-	 * This function refreshes the labels which are designated for searching.
-	 * It uses the given GraphicalViewerImpl and looks for labels.
+	 * This function refreshes the labels which are designated for searching. It uses the given GraphicalViewerImpl and looks for labels.
 	 */
 	public void refreshSearchContent() {
-		ModelEditPart editPart = (ModelEditPart) attachedViewerParent.getContents();
+		ModelEditPart editPart =
+			(ModelEditPart) attachedViewerParent.getContents();
 		gatherLabels(editPart.getFigure());
 	}
 
@@ -204,16 +232,20 @@ public class CollaborationViewSearch {
 	}
 
 	private void gatherLabels(IFigure rootFigure) {
-		List<Label> labels = new ArrayList<Label>();
+		List<Label> labels =
+			new ArrayList<Label>();
 		gatherLabels(rootFigure, labels);
-		extractedLabels = new ArrayList<Label>(labels);
+		extractedLabels =
+			new ArrayList<Label>(labels);
 	}
 
 	private void gatherLabels(IFigure rootFigure, List<Label> alreadyGatheredLabels) {
 
-		IFigure tempRootFigure = rootFigure;
+		IFigure tempRootFigure =
+			rootFigure;
 		for (Object objFigure : tempRootFigure.getChildren()) {
-			IFigure figure = (IFigure) objFigure;
+			IFigure figure =
+				(IFigure) objFigure;
 			if (!(figure instanceof Label)) {
 				gatherLabels(figure, alreadyGatheredLabels);
 			} else {

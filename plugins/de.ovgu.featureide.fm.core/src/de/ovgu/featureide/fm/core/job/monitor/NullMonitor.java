@@ -23,23 +23,23 @@ package de.ovgu.featureide.fm.core.job.monitor;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
 public final class NullMonitor extends AMonitor {
 
-	private boolean cancel = false;
+	private boolean cancel =
+		false;
 
 	@Override
 	public void cancel() {
-		cancel = true;
+		cancel =
+			true;
 	}
 
 	@Override
-	public void done() {
-	}
+	public void done() {}
 
 	@Override
 	public void checkCancel() throws MethodCancelException {
@@ -54,16 +54,13 @@ public final class NullMonitor extends AMonitor {
 	}
 
 	@Override
-	public void worked() {
-	}
+	public void worked() {}
 
 	@Override
-	public void setRemainingWork(int work) {
-	}
+	public void setRemainingWork(int work) {}
 
 	@Override
-	public void setTaskName(String name) {
-	}
+	public void setTaskName(String name) {}
 
 	public String getTaskName() {
 		return "";

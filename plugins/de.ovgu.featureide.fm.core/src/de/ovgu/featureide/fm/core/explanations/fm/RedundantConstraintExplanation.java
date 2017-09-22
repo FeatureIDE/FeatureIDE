@@ -28,38 +28,43 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * @author Timo G&uuml;nther
  */
 public class RedundantConstraintExplanation extends FeatureModelExplanation {
+
 	/** True if this explanation is for an implicit constraint. */
 	private boolean implicit;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	public RedundantConstraintExplanation(IConstraint subject) {
 		super(subject);
 	}
-	
+
 	@Override
 	public IConstraint getSubject() {
 		return (IConstraint) super.getSubject();
 	}
-	
+
 	/**
 	 * Returns true iff this explanation is for an implicit constraint.
+	 * 
 	 * @return true iff this explanation is for an implicit constraint
 	 */
 	public boolean isImplicit() {
 		return implicit;
 	}
-	
+
 	/**
 	 * Sets whether this explanation is for an implicit constraint.
+	 * 
 	 * @param implicit whether this explanation is for an implicit constraint
 	 */
 	public void setImplicit(boolean implicit) {
-		this.implicit = implicit;
+		this.implicit =
+			implicit;
 	}
-	
+
 	@Override
 	public RedundantConstraintExplanationWriter getWriter() {
 		return new RedundantConstraintExplanationWriter(this);

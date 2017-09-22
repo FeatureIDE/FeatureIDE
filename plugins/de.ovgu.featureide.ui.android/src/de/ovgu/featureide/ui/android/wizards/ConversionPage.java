@@ -63,63 +63,83 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
  * @author Eric Guimatsia
  */
 public class ConversionPage extends NewFeatureProjectPage {
-	
+
 	public ConversionPage() {
 		super();
 		setDescription(ADD_THE_FEATUREIDE_NATURE_TO_ANDROID_PROJECTS_);
 	}
-	
+
 	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-	    final GridLayout gridLayout = new GridLayout();
-	    gridLayout.numColumns = 1;
-	    container.setLayout(gridLayout);
-	    setControl(container);
-	    
-	    Group toolGroup = new Group(container, SWT.NONE);
+		Composite container =
+			new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout =
+			new GridLayout();
+		gridLayout.numColumns =
+			1;
+		container.setLayout(gridLayout);
+		setControl(container);
+
+		Group toolGroup =
+			new Group(container, SWT.NONE);
 		toolGroup.setText("Composer Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout projGridLayout = new GridLayout();
-		projGridLayout.numColumns = 2;
+		GridLayout projGridLayout =
+			new GridLayout();
+		projGridLayout.numColumns =
+			2;
 		toolGroup.setLayout(projGridLayout);
-		
-		final Label helloLabel = new Label(toolGroup, SWT.NONE);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 2;
+
+		final Label helloLabel =
+			new Label(toolGroup, SWT.NONE);
+		GridData gridData =
+			new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan =
+			2;
 		helloLabel.setLayoutData(gridData);
 		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
-		
-	    Label label = new Label(toolGroup, SWT.NONE);
-	    label.setText("Composers:");
-	    toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
-	    
-	    final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
-	    GridData gridData2 = new GridData(GridData.FILL_BOTH);
-		gridData2.horizontalSpan = 2;
-	    descriptionLabel.setLayoutData(gridData2);
-	    
-	    StringBuilder descriptionStringBuilder = new StringBuilder();
-	    descriptionStringBuilder.append("Possible choices are:\n\n");
-	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-	    
-	    // Filter for Android compatible composers
-	    List<IComposerExtension> androidCompatibleComposers = new ArrayList<IComposerExtension>();
-	    for (IComposerExtension composer : composerExtensions) {
-	    	if (composer.supportsAndroid()) {
-	    		androidCompatibleComposers.add(composer);
-	    	}
-	    }
-	    
-	    extensions = new IComposerExtensionBase[androidCompatibleComposers.size()]; 
-	    androidCompatibleComposers.toArray(extensions);
-	    Arrays.sort(extensions, new Comparator<IComposerExtensionBase> () {
+
+		Label label =
+			new Label(toolGroup, SWT.NONE);
+		label.setText("Composers:");
+		toolCB =
+			new Combo(toolGroup, SWT.READ_ONLY
+				| SWT.DROP_DOWN);
+		toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		final Label descriptionLabel =
+			new Label(toolGroup, SWT.NONE);
+		GridData gridData2 =
+			new GridData(GridData.FILL_BOTH);
+		gridData2.horizontalSpan =
+			2;
+		descriptionLabel.setLayoutData(gridData2);
+
+		StringBuilder descriptionStringBuilder =
+			new StringBuilder();
+		descriptionStringBuilder.append("Possible choices are:\n\n");
+		List<IComposerExtension> composerExtensions =
+			ComposerExtensionManager.getInstance().getComposers();
+
+		// Filter for Android compatible composers
+		List<IComposerExtension> androidCompatibleComposers =
+			new ArrayList<IComposerExtension>();
+		for (IComposerExtension composer : composerExtensions) {
+			if (composer.supportsAndroid()) {
+				androidCompatibleComposers.add(composer);
+			}
+		}
+
+		extensions =
+			new IComposerExtensionBase[androidCompatibleComposers.size()];
+		androidCompatibleComposers.toArray(extensions);
+		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
+
 			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
-	    });
-	    
+		});
+
 		for (IComposerExtensionBase composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
@@ -127,92 +147,125 @@ public class ConversionPage extends NewFeatureProjectPage {
 			descriptionStringBuilder.append("\n");
 			toolCB.add(composerExtension.getName());
 		}
-		
-		String descriptionString = descriptionStringBuilder.toString();
+
+		String descriptionString =
+			descriptionStringBuilder.toString();
 		if (composerExtensions.isEmpty()) {
-			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
+			descriptionString =
+				NO_COMPOSITION_ENGINES_INSTALLED_;
 			setDescription(descriptionString);
 			toolCB.setEnabled(false);
 		}
 		descriptionLabel.setText(descriptionString);
 		toolCB.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
-				composerExtension = extensions[toolCB.getSelectionIndex()];
+				composerExtension =
+					extensions[toolCB.getSelectionIndex()];
 			}
 		});
 		toolCB.select(0);
-		
-		//Path Group
-		pathGroup = new Group(container, SWT.NONE);
-		layout.numColumns = 2;
-		layout.verticalSpacing = 9;
+
+		// Path Group
+		pathGroup =
+			new Group(container, SWT.NONE);
+		layout.numColumns =
+			2;
+		layout.verticalSpacing =
+			9;
 		pathGroup.setText("Path Specification:");
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
-		
-		String tooltip = THE_ANDROID_SOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
-		label = new Label(pathGroup, SWT.NULL);
+
+		String tooltip =
+			THE_ANDROID_SOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
+		label =
+			new Label(pathGroup, SWT.NULL);
 		label.setText("Android Source Path:");
 		label.setToolTipText(tooltip);
-		Text androidSrcPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		Text androidSrcPath =
+			new Text(pathGroup, SWT.BORDER
+				| SWT.SINGLE
+				| SWT.READ_ONLY);
 		androidSrcPath.setLayoutData(gd);
 		androidSrcPath.setText("src");
 		androidSrcPath.setToolTipText(tooltip);
-		
-		tooltip = THE_ANDROID_RESOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
-		label = new Label(pathGroup, SWT.NULL);
+
+		tooltip =
+			THE_ANDROID_RESOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
+		label =
+			new Label(pathGroup, SWT.NULL);
 		label.setText("Android Resource Files Path:");
 		label.setToolTipText(tooltip);
-		Text androidResPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		Text androidResPath =
+			new Text(pathGroup, SWT.BORDER
+				| SWT.SINGLE
+				| SWT.READ_ONLY);
 		androidResPath.setLayoutData(gd);
 		androidResPath.setText("res");
 		androidResPath.setToolTipText(tooltip);
-		
-		tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
-		buildLabel = new Label(pathGroup, SWT.NULL);
+
+		tooltip =
+			SETS_THE_PATH_OF_COMPOSED_FILES_;
+		buildLabel =
+			new Label(pathGroup, SWT.NULL);
 		buildLabel.setText("&Composed files Path:");
 		buildLabel.setToolTipText(tooltip);
-		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		buildPath =
+			new Text(pathGroup, SWT.BORDER
+				| SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("composed");
 		buildPath.setToolTipText(tooltip);
-		
-		tooltip = SETS_THE_PATH_OF_SOURCE_FILES_;
-		label = new Label(pathGroup, SWT.NULL);
+
+		tooltip =
+			SETS_THE_PATH_OF_SOURCE_FILES_;
+		label =
+			new Label(pathGroup, SWT.NULL);
 		label.setText("&Source Path:");
 		label.setToolTipText(tooltip);
-		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		sourcePath =
+			new Text(pathGroup, SWT.BORDER
+				| SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText("source");
 		sourcePath.setToolTipText(tooltip);
-		
-		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
-		label = new Label(pathGroup, SWT.NULL);
+
+		tooltip =
+			SETS_THE_PATH_OF_CONFIGURATIONFILES_;
+		label =
+			new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
-		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		configsPath =
+			new Text(pathGroup, SWT.BORDER
+				| SWT.SINGLE);
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
 		configsPath.setToolTipText(tooltip);
-		
+
 		addListeners();
-	}	
-	
+	}
+
 	@Override
 	protected void dialogChanged() {
-		IComposerExtensionBase compositionTool = getCompositionTool();
+		IComposerExtensionBase compositionTool =
+			getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
-		
-		if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
+
+		if (getSourcePath().equals("src")
+			|| getSourcePath().equals("res")) {
 			updateStatus("Source path cannot be \"/src\" or \"/res\".");
 			return;
 		}
-		if (getBuildPath().equals("src") || getBuildPath().equals("res")) {
+		if (getBuildPath().equals("src")
+			|| getBuildPath().equals("res")) {
 			updateStatus("Build path cannot be \"/src\" or \"/res\".");
 			return;
 		}
-		if (getConfigPath().equals("src") || getConfigPath().equals("res")) {
+		if (getConfigPath().equals("src")
+			|| getConfigPath().equals("res")) {
 			updateStatus("Config path cannot be \"/src\" or \"/res\".");
 			return;
 		}
@@ -229,14 +282,14 @@ public class ConversionPage extends NewFeatureProjectPage {
 			return;
 		}
 		if (isPathEmpty(getSourcePath(), SOURCE)
-				|| isPathEmpty(getBuildPath(), BUILD)
-				|| isPathEmpty(getConfigPath(), EQUATIONS)
-				|| isInvalidPath(getSourcePath(), SOURCE)
-				|| isInvalidPath(getBuildPath(), BUILD)
-				|| isInvalidPath(getConfigPath(), EQUATIONS)) {
+			|| isPathEmpty(getBuildPath(), BUILD)
+			|| isPathEmpty(getConfigPath(), EQUATIONS)
+			|| isInvalidPath(getSourcePath(), SOURCE)
+			|| isInvalidPath(getBuildPath(), BUILD)
+			|| isInvalidPath(getConfigPath(), EQUATIONS)) {
 			return;
 		}
-		
+
 		updateStatus(null);
 	}
 }

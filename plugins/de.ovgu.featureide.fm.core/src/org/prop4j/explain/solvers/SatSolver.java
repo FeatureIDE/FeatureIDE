@@ -25,41 +25,37 @@ import java.util.Map;
 import org.prop4j.Node;
 
 /**
- * A solver for the satisfiability problem for propositional formulas.
- * Uses a SAT oracle to do the actual work and only provides a common access point.
+ * A solver for the satisfiability problem for propositional formulas. Uses a SAT oracle to do the actual work and only provides a common access point.
  * 
  * @author Timo G&uuml;nther
  * @see {@link MutableSatSolver} for a solver that supports the removal of clauses
  */
 public interface SatSolver extends SatProblem {
+
 	/**
 	 * Returns the oracle used for the actual solving.
+	 * 
 	 * @return the oracle; not null
 	 */
 	public Object getOracle();
-	
+
 	/**
-	 * <p>
-	 * Returns true iff the problem is satisfiable.
-	 * </p>
+	 * <p> Returns true iff the problem is satisfiable. </p>
 	 * 
-	 * <p>
-	 * More formally, let <i>f</i> denote the current (possibly empty) problem.
-	 * Those are all the clauses that have been {@link #addFormula(Node) added} to the problem.
-	 * <i>f</i> is a conjunction of <i>n</i> &ge; 0 CNF clauses <i>f<sub>i</sub></i>.
-	 * Each clause <i>f<sub>i</sub></i> in turn consists of a positive amount of possibly negated literals <i>f<sub>ij</sub></i>:
-	 * <pre><i>f</i> = <i>f<sub>1</sub></i> &and; &hellip; &and; <i>f<sub>n</sub></i>
-	 *  = (<i>f<sub>11</sub></i> &or; &hellip; &or; <i>f<sub>1m</sub></i>) &and; &hellip; &and; (<i>f<sub>n1</sub></i> &or; &hellip; &or; <i>f<sub>nk</sub></i>)</pre>
-	 * </p>
-	 * Then, <i>f</i> is satisfiable iff there is a variable assignment that satisfies <i>f</i> (i.e. makes it evaluate to true).
-	 * Such an assignment is called {@link #getModel() model}.
-	 * </p>
+	 * <p> More formally, let <i>f</i> denote the current (possibly empty) problem. Those are all the clauses that have been {@link #addFormula(Node) added} to
+	 * the problem. <i>f</i> is a conjunction of <i>n</i> &ge; 0 CNF clauses <i>f<sub>i</sub></i>. Each clause <i>f<sub>i</sub></i> in turn consists of a
+	 * positive amount of possibly negated literals <i>f<sub>ij</sub></i>: <pre><i>f</i> = <i>f<sub>1</sub></i> &and; &hellip; &and; <i>f<sub>n</sub></i> =
+	 * (<i>f<sub>11</sub></i> &or; &hellip; &or; <i>f<sub>1m</sub></i>) &and; &hellip; &and; (<i>f<sub>n1</sub></i> &or; &hellip; &or;
+	 * <i>f<sub>nk</sub></i>)</pre> </p> Then, <i>f</i> is satisfiable iff there is a variable assignment that satisfies <i>f</i> (i.e. makes it evaluate to
+	 * true). Such an assignment is called {@link #getModel() model}. </p>
+	 * 
 	 * @return whether the problem is satisfiable
 	 */
 	public boolean isSatisfiable();
-	
+
 	/**
 	 * Returns any variable assignment that {@link #isSatisfiable() satisfies} the problem.
+	 * 
 	 * @return the model; not null
 	 * @throws IllegalStateException if the problem is unsatisfiable
 	 */

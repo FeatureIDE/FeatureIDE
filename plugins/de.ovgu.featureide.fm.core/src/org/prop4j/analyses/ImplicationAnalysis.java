@@ -42,38 +42,45 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
 	public ImplicationAnalysis(SatInstance satInstance, List<int[]> pairs) {
 		super(satInstance);
-		this.pairs = pairs;
+		this.pairs =
+			pairs;
 	}
 
 	public ImplicationAnalysis(BasicSolver solver, List<int[]> pairs) {
 		super(solver);
-		this.pairs = pairs;
+		this.pairs =
+			pairs;
 	}
 
 	public List<int[]> analyze(IMonitor monitor) throws Exception {
-		final List<int[]> resultList = new ArrayList<>();
+		final List<int[]> resultList =
+			new ArrayList<>();
 
 		if (pairs == null) {
 			return resultList;
 		}
 
-		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
+		final RingList<int[]> solutionList =
+			new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 		monitor.checkCancel();
-		int[] model1 = solver.findModel();
+		int[] model1 =
+			solver.findModel();
 
 		if (model1 != null) {
 			solutionList.add(model1);
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 
 			monitor.checkCancel();
-			int[] model2 = solver.findModel();
+			int[] model2 =
+				solver.findModel();
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
-			if (model1.length - countNegative(model1) < countNegative(model2)) {
+			if (model1.length
+				- countNegative(model1) < countNegative(model2)) {
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			}
 
@@ -81,7 +88,8 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 				monitor.checkCancel();
 				solutionLoop: for (int[] is : solutionList) {
 					for (int i : pair) {
-						if (is[Math.abs(i) - 1] == i) {
+						if (is[Math.abs(i)
+							- 1] == i) {
 							continue solutionLoop;
 						}
 					}
@@ -101,7 +109,8 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 					solver.shuffleOrder();
 					break;
 				}
-				for (int i = 0; i < pair.length; i++) {
+				for (int i =
+					0; i < pair.length; i++) {
 					solver.assignmentPop();
 				}
 			}
@@ -111,9 +120,13 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 	}
 
 	private static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
+		int count =
+			0;
+		for (int i =
+			0; i < model.length; i++) {
+			count +=
+				model[i] >>> (Integer.SIZE
+					- 1);
 		}
 		return count;
 	}

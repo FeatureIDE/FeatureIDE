@@ -34,8 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 
-	public ViewLabelProvider() {
-	}
+	public ViewLabelProvider() {}
 
 	public String getText(Object o) {
 		return o.toString();
@@ -45,16 +44,19 @@ public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 		if (o instanceof TreeObject)
 			return ((TreeObject) o).getImage();
 		if (o instanceof SelectableFeature) {
-			SelectableFeature feature = (SelectableFeature) o;
-			return feature.getManual() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
+			SelectableFeature feature =
+				(SelectableFeature) o;
+			return feature.getManual() == Selection.SELECTED
+				? IMAGE_ASELECTED
+				: IMAGE_ADESELECTED;
 		}
 		return null;
 	}
 
 	@Override
 	public void dispose() {
-		//		IMAGE_ASELECTED.dispose();
-		//		IMAGE_ADESELECTED.dispose();
+		// IMAGE_ASELECTED.dispose();
+		// IMAGE_ADESELECTED.dispose();
 		super.dispose();
 	}
 

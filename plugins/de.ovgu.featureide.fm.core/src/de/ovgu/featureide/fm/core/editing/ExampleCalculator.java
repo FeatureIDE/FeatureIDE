@@ -41,48 +41,61 @@ import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExampleCalculator {
-	
+
 	private IFeatureModel fm;
 
 	private Node a;
 
 	private Node[] bChildren;
-	
+
 	private LinkedList<Integer> bSatisfiable;
 
 	private int bIndex;
-	
+
 	private SatSolver solver;
 
-	private SatSolver exampleSolver = null;
+	private SatSolver exampleSolver =
+		null;
 
-	private String lastSolution = null;
+	private String lastSolution =
+		null;
 
 	private long timeout;
-	
+
 	public ExampleCalculator(IFeatureModel fm, long timeout) {
-		this.fm = fm;
-		this.timeout = timeout;
+		this.fm =
+			fm;
+		this.timeout =
+			timeout;
 	}
 
 	public void setLeft(Node a) {
-		a = a.clone().toCNF();
-		this.a = a;
-		solver = new SatSolver(a, timeout);
+		a =
+			a.clone().toCNF();
+		this.a =
+			a;
+		solver =
+			new SatSolver(a, timeout);
 	}
 
 	public void setRight(Node b) {
-		b = b.clone().toCNF();
+		b =
+			b.clone().toCNF();
 		if (b instanceof Or)
-			b = new And(b);
-		bChildren = b.getChildren();
-		bSatisfiable = new LinkedList<Integer>();
-		bIndex = -1;
+			b =
+				new And(b);
+		bChildren =
+			b.getChildren();
+		bSatisfiable =
+			new LinkedList<Integer>();
+		bIndex =
+			-1;
 	}
 
 	public boolean hasNextChild() {
-		if(bChildren==null)return false;
-		return bIndex + 1 < bChildren.length;
+		if (bChildren == null) return false;
+		return bIndex
+			+ 1 < bChildren.length;
 	}
 
 	public Node nextChild() {
@@ -92,45 +105,59 @@ public class ExampleCalculator {
 	public void childIsSatisfiable() {
 		bSatisfiable.add(bIndex);
 	}
-	
-	//might return some examples multiple times
+
+	// might return some examples multiple times
 	public Configuration nextExample() throws TimeoutException {
 		if (exampleSolver == null) {
-			if (bSatisfiable.isEmpty() && !findSatisfiable(true))
+			if (bSatisfiable.isEmpty()
+				&& !findSatisfiable(true))
 				return null;
-			Node child = bChildren[bSatisfiable.removeFirst()];
-			exampleSolver = new SatSolver(new And(a, new Not(child.clone())), timeout);
+			Node child =
+				bChildren[bSatisfiable.removeFirst()];
+			exampleSolver =
+				new SatSolver(new And(a, new Not(child.clone())), timeout);
 		}
-		String solution = exampleSolver.getSolution();
+		String solution =
+			exampleSolver.getSolution();
 		if (solution == null) {
 			return null;
 		}
 		if (solution.equals(lastSolution)) {
-			exampleSolver = null;
+			exampleSolver =
+				null;
 			return nextExample();
 		}
-		final Configuration configuration = new Configuration(fm, false);
-		final DefaultFormat format = new DefaultFormat();
+		final Configuration configuration =
+			new Configuration(fm, false);
+		final DefaultFormat format =
+			new DefaultFormat();
 
 		format.read(configuration, solution);
-		lastSolution = solution;
+		lastSolution =
+			solution;
 		return configuration;
 	}
 
 	public boolean findSatisfiable(boolean stopEarly) throws TimeoutException {
-		boolean sat = false;
+		boolean sat =
+			false;
 		while (hasNextChild()) {
-			Node child = nextChild();
+			Node child =
+				nextChild();
 			if (!(child instanceof Or))
-				child = new Or(child);
-			Node[] list = Node.clone(child.getChildren());
+				child =
+					new Or(child);
+			Node[] list =
+				Node.clone(child.getChildren());
 			for (Node node : list)
-				((Literal) node).positive ^= true;
+				((Literal) node).positive ^=
+					true;
 			if (solver.isSatisfiable(list)) {
 				childIsSatisfiable();
 				if (stopEarly)
 					return true;
-				sat = true;
+				sat =
+					true;
 			}
 		}
 		return sat;

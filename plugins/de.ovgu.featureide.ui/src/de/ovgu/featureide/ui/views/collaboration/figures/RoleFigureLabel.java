@@ -27,38 +27,41 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Label for RoleFigures
- *  
+ * 
  * @author Steffen Schulze
  * @author Christian Lausberger
  */
-public class RoleFigureLabel extends Label{
-	
+public class RoleFigureLabel extends Label {
+
 	private final String elementName;
 	private RoleElement<?> roleElement;
-	
+
 	public RoleFigureLabel(String text, Image image, String elementName, RoleElement<?> element) {
 		this(text, image, elementName);
-		roleElement = element;
+		roleElement =
+			element;
 	}
-	
+
 	public RoleFigureLabel(String text, Image image, String elementName) {
 		super(text, image);
-		this.elementName = elementName;
+		this.elementName =
+			elementName;
 	}
-	
+
 	public RoleFigureLabel(String text, String elementName) {
 		super(text);
-		this.elementName = elementName;
+		this.elementName =
+			elementName;
 	}
-	
+
 	public String getElementName() {
 		return elementName;
 	}
-	
+
 	public String toString() {
 		return elementName;
 	}
-	
+
 	public RoleElement<?> getRoleElement() {
 		return roleElement;
 	}

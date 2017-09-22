@@ -58,28 +58,38 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
 	public int[] analyze(IMonitor monitor) throws Exception {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 = solver.findModel();
+		int[] model1 =
+			solver.findModel();
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 = solver.findModel();
+			int[] model2 =
+				solver.findModel();
 
 			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
+				final int[] model3 =
+					new int[model1.length];
+				for (int i =
+					0; i < features.length; i++) {
+					final int index =
+						features[i]
+							- 1;
 					if (index >= 0) {
-						model3[index] = model1[index];
+						model3[index] =
+							model1[index];
 					}
 				}
-				model1 = model3;
+				model1 =
+					model3;
 			}
 
 			SatInstance.updateModel(model1, model2);
 			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
+			for (int i =
+				0; i < model1.length; i++) {
+				final int varX =
+					model1[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {
@@ -108,7 +118,8 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 	}
 
 	public void setFeatures(int[] features) {
-		this.features = features;
+		this.features =
+			features;
 	}
 
 }

@@ -33,8 +33,9 @@ import org.eclipse.swt.widgets.TreeItem;
  * @author Sebastian Krieter
  */
 public class UITreeIterator implements Iterator<TreeItem> {
-	
-	private LinkedList<TreeItem> itemQueue = new LinkedList<>();
+
+	private LinkedList<TreeItem> itemQueue =
+		new LinkedList<>();
 
 	public UITreeIterator(Tree tree) {
 		itemQueue.addAll(Arrays.asList(tree.getItems()));
@@ -47,7 +48,8 @@ public class UITreeIterator implements Iterator<TreeItem> {
 
 	@Override
 	public TreeItem next() {
-		final TreeItem next = itemQueue.removeFirst();
+		final TreeItem next =
+			itemQueue.removeFirst();
 		itemQueue.addAll(0, Arrays.asList(next.getItems()));
 		return next;
 	}

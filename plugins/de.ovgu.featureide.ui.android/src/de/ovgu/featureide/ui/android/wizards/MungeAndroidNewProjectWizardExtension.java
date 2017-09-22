@@ -51,8 +51,10 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
 public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProjectWizardExtension {
 
-	private BasicNewResourceWizard wizard = null;
-	private IProject project = null;
+	private BasicNewResourceWizard wizard =
+		null;
+	private IProject project =
+		null;
 
 	@Override
 	public boolean performBeforeFinish(WizardPage page) {
@@ -60,21 +62,26 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 			return false;
 		}
 
-		IWizardDescriptor wizDesc = PlatformUI.getWorkbench().getNewWizardRegistry()
-				.findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
+		IWizardDescriptor wizDesc =
+			PlatformUI.getWorkbench().getNewWizardRegistry()
+					.findWizard("com.android.ide.eclipse.adt.project.NewProjectWizard");
 		if (wizDesc != null) {
 			try {
-				IWizard wizard = wizDesc.createWizard();
+				IWizard wizard =
+					wizDesc.createWizard();
 				if (wizard instanceof INewWizard) {
 					// save all projects before Android project wizard runs
-					Set<IProject> projectsBefore = new HashSet<IProject>();
+					Set<IProject> projectsBefore =
+						new HashSet<IProject>();
 					Collections.addAll(projectsBefore, ResourcesPlugin.getWorkspace().getRoot().getProjects());
 
 					// call Android project wizard
-					INewWizard newWizard = (INewWizard) wizard;
+					INewWizard newWizard =
+						(INewWizard) wizard;
 					newWizard.init(PlatformUI.getWorkbench(), this.wizard.getSelection());
 
-					WizardDialog dialog = new WizardDialog(null, wizard);
+					WizardDialog dialog =
+						new WizardDialog(null, wizard);
 
 					if (dialog.open() != Window.OK) {
 						return false; // Android wizard was canceled
@@ -82,13 +89,16 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 
 					// compare with projects after Android project creation to
 					// find new project
-					Set<IProject> projectsAfter = new HashSet<IProject>();
+					Set<IProject> projectsAfter =
+						new HashSet<IProject>();
 					Collections.addAll(projectsAfter, ResourcesPlugin.getWorkspace().getRoot().getProjects());
 					projectsAfter.removeAll(projectsBefore);
 
-					project = null;
+					project =
+						null;
 					if (projectsAfter.size() == 1) {
-						project = (IProject) projectsAfter.toArray()[0];
+						project =
+							(IProject) projectsAfter.toArray()[0];
 					} else if (projectsAfter.size() > 1) {
 						// The Android wizard automatically creates a support
 						// library project if needed.
@@ -96,14 +106,16 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 						// multiple projects were created.
 						for (Object proj : projectsAfter) {
 							if (!isAndroidSupportLibraryProject((IProject) proj)) {
-								project = (IProject) proj;
+								project =
+									(IProject) proj;
 								break;
 							}
 						}
 					} else {
 						return false;
 					}
-					final NewFeatureProjectPage featurePage = (NewFeatureProjectPage) page;
+					final NewFeatureProjectPage featurePage =
+						(NewFeatureProjectPage) page;
 					AndroidProjectConversion.convertAndroidProject(this.project, featurePage.getCompositionTool().getId(),
 							featurePage.getSourcePath(), featurePage.getConfigPath(), featurePage.getBuildPath());
 				}
@@ -112,8 +124,9 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 				return false;
 			}
 		} else {
-			IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID,
-					THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_);
+			IStatus status =
+				new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID,
+						THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_);
 			StatusManager.getManager().handle(status, StatusManager.SHOW);
 			return false;
 		}
@@ -123,27 +136,33 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 	@Override
 	public void setWizard(BasicNewResourceWizard wizard) {
 		super.setWizard(wizard);
-		this.wizard = wizard;
+		this.wizard =
+			wizard;
 	}
 
 	/**
-	 * Check whether the given newly created Android project is an support
-	 * library project.
+	 * Check whether the given newly created Android project is an support library project.
 	 */
 	private boolean isAndroidSupportLibraryProject(IProject project) {
-		IFile propertiesFile = project.getFile("project.properties");
+		IFile propertiesFile =
+			project.getFile("project.properties");
 		if (propertiesFile.exists()) {
-			Properties properties = new Properties();
+			Properties properties =
+				new Properties();
 			try {
 				properties.load(propertiesFile.getContents());
-				String isLibrary = properties.getProperty("android.library");
-				if (isLibrary == null || isLibrary.equals("false")) {
+				String isLibrary =
+					properties.getProperty("android.library");
+				if (isLibrary == null
+					|| isLibrary.equals("false")) {
 					return false;
 				}
 				for (Object key : properties.keySet()) {
 					if (key instanceof String) {
-						String strKey = (String) key;
-						final String ref = "android.library.reference";
+						String strKey =
+							(String) key;
+						final String ref =
+							"android.library.reference";
 						if (strKey.regionMatches(0, ref, 0, ref.length())) {
 							return false;
 						}

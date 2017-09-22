@@ -21,8 +21,7 @@
 package de.ovgu.featureide.fm.core.editing.remove;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features dependent on the current clauses in the formula.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features dependent on the current clauses in the formula.
  * 
  * @author Sebastian Krieter
  */
@@ -34,13 +33,22 @@ public class MinimumClauseHeuristic extends AFeatureOrderHeuristic {
 
 	@Override
 	protected int getNextIndex() {
-		DeprecatedFeature smallestFeature = map[1];
-		int minIndex = 1;
-		for (int i = 2; i < map.length; i++) {
-			final DeprecatedFeature next = map[i];
-			if (smallestFeature == null || (next != null && (smallestFeature.getClauseCount() - next.getClauseCount()) > 0)) {
-				smallestFeature = next;
-				minIndex = i;
+		DeprecatedFeature smallestFeature =
+			map[1];
+		int minIndex =
+			1;
+		for (int i =
+			2; i < map.length; i++) {
+			final DeprecatedFeature next =
+				map[i];
+			if (smallestFeature == null
+				|| (next != null
+					&& (smallestFeature.getClauseCount()
+						- next.getClauseCount()) > 0)) {
+				smallestFeature =
+					next;
+				minIndex =
+					i;
 			}
 		}
 		return minIndex;

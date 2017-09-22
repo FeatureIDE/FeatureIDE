@@ -32,9 +32,11 @@ import java.util.NoSuchElementException;
  */
 public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 
-	protected LinkedList<ModelTree<M, E>> iteratorList = new LinkedList<>();
+	protected LinkedList<ModelTree<M, E>> iteratorList =
+		new LinkedList<>();
 
-	protected ModelTree<M, E> next = null;
+	protected ModelTree<M, E> next =
+		null;
 
 	protected AbstractTreeIterator(ModelTree<M, E> root) {
 		iteratorList.add(root);
@@ -50,7 +52,8 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 		if (iteratorList.isEmpty()) {
 			throw new NoSuchElementException();
 		}
-		next = getNext();
+		next =
+			getNext();
 		return next.object;
 	}
 
@@ -60,12 +63,16 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 	public void remove() {
 		if (next != null) {
 			if (next.parent == null) {
-				next.object = null;
+				next.object =
+					null;
 			} else {
-				ListIterator<ModelTree<M, E>> listIterator = next.parent.children.listIterator();
-				int i = 0;
+				ListIterator<ModelTree<M, E>> listIterator =
+					next.parent.children.listIterator();
+				int i =
+					0;
 				while (listIterator.hasNext()) {
-					ModelTree<M, E> n = listIterator.next();
+					ModelTree<M, E> n =
+						listIterator.next();
 					if (n == next) {
 						listIterator.remove();
 						break;
@@ -74,7 +81,8 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 				}
 				next.parent.children.addAll(i, next.children);
 			}
-			next = null;
+			next =
+				null;
 		} else {
 			throw new IllegalStateException();
 		}
@@ -84,12 +92,14 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 	public void removeSubtree() {
 		if (next != null) {
 			if (next.parent == null) {
-				next.object = null;
+				next.object =
+					null;
 				next.children.clear();
 			} else {
 				next.parent.children.remove(next);
 			}
-			next = null;
+			next =
+				null;
 		} else {
 			throw new IllegalStateException();
 		}
@@ -101,10 +111,13 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 	}
 
 	public int getCurrentLevel() {
-		int level = -1;
-		ModelTree<M, E> tempParent = next;
+		int level =
+			-1;
+		ModelTree<M, E> tempParent =
+			next;
 		while (tempParent != null) {
-			tempParent = tempParent.getParent();
+			tempParent =
+				tempParent.getParent();
 			level++;
 		}
 		return level;

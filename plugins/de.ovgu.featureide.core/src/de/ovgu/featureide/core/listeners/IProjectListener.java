@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 public interface IProjectListener {
 
 	void projectAdded(IFeatureProject featureProject);
-	
+
 	void projectRemoved(IFeatureProject featureProject);
-	
+
 }

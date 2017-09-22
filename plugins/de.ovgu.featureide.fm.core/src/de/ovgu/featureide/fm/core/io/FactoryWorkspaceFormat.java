@@ -37,16 +37,24 @@ import de.ovgu.featureide.fm.core.base.impl.FactoryWorkspace;
  */
 public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspace> {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FactoryWorkspaceFormat.class.getSimpleName();
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ FactoryWorkspaceFormat.class.getSimpleName();
 
-	private static final String DEFAULT_KEY = "default";
-	private static final String PREFIX = "$";
+	private static final String DEFAULT_KEY =
+		"default";
+	private static final String PREFIX =
+		"$";
 
 	@Override
 	public ProblemList read(FactoryWorkspace workspace, CharSequence source) {
-		final ProblemList list = new ProblemList();
-		final Properties properties = new Properties();
-		try (StringReader reader = new StringReader(source.toString())) {
+		final ProblemList list =
+			new ProblemList();
+		final Properties properties =
+			new Properties();
+		try (StringReader reader =
+			new StringReader(source.toString())) {
 			properties.load(reader);
 		} catch (IOException e) {
 			list.add(new Problem(e));
@@ -54,7 +62,8 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 
 		workspace.setDefaultFactoryID(properties.getProperty(DEFAULT_KEY));
 		for (Entry<Object, Object> entry : properties.entrySet()) {
-			final Object key = entry.getKey();
+			final Object key =
+				entry.getKey();
 			if (!DEFAULT_KEY.equals(key)) {
 				workspace.assignID(key.toString().substring(PREFIX.length()), entry.getValue().toString());
 			}
@@ -65,12 +74,15 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 
 	@Override
 	public String write(FactoryWorkspace workspace) {
-		final Properties properties = new Properties();
+		final Properties properties =
+			new Properties();
 		properties.setProperty(DEFAULT_KEY, workspace.getDefaultFactoryID());
 		for (Entry<String, String> entry : workspace.getMap().entrySet()) {
-			properties.setProperty(PREFIX + entry.getKey(), entry.getValue());
+			properties.setProperty(PREFIX
+				+ entry.getKey(), entry.getValue());
 		}
-		try (StringWriter writer = new StringWriter()) {
+		try (StringWriter writer =
+			new StringWriter()) {
 			properties.store(writer, null);
 			return writer.toString();
 		} catch (IOException e) {

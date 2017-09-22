@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.util.tree;
 
-
 /**
  * Tree element.
  * 

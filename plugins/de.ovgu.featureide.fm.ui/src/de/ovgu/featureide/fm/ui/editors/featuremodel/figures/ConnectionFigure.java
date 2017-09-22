@@ -31,8 +31,10 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Timo G&uuml;nther
  */
 public class ConnectionFigure extends PolylineConnection {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param external whether the connection connects two external features
 	 */
 	public ConnectionFigure(boolean external) {
@@ -41,12 +43,12 @@ public class ConnectionFigure extends PolylineConnection {
 			setLineStyle(SWT.LINE_DASH);
 		}
 	}
-	
+
 	@Override
 	public CircleDecoration getSourceDecoration() {
 		return (CircleDecoration) super.getSourceDecoration();
 	}
-	
+
 	@Override
 	public RelationDecoration getTargetDecoration() {
 		return (RelationDecoration) super.getTargetDecoration();

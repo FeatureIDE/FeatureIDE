@@ -38,13 +38,19 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
  */
 public class FeatureGraphFormat implements IFeatureGraphFormat {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fg."
+			+ FeatureGraphFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureGraph object, CharSequence source) {
-		ProblemList problems = new ProblemList();
-		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
-			final IFeatureGraph featureGraph = (IFeatureGraph) in.readObject();
+		ProblemList problems =
+			new ProblemList();
+		try (final ObjectInputStream in =
+			new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
+			final IFeatureGraph featureGraph =
+				(IFeatureGraph) in.readObject();
 			object.copyValues(featureGraph);
 		} catch (IOException | ClassNotFoundException e) {
 			problems.add(new Problem(e));
@@ -54,11 +60,15 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 
 	@Override
 	public String write(IFeatureGraph object) {
-		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		String ret = null;
-		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {
+		final ByteArrayOutputStream byteArrayOutputStream =
+			new ByteArrayOutputStream();
+		String ret =
+			null;
+		try (final ObjectOutputStream out =
+			new ObjectOutputStream(byteArrayOutputStream)) {
 			out.writeObject(object);
-			ret = byteArrayOutputStream.toString("UTF-8");
+			ret =
+				byteArrayOutputStream.toString("UTF-8");
 		} catch (IOException e) {
 			Logger.logError(e);
 		}

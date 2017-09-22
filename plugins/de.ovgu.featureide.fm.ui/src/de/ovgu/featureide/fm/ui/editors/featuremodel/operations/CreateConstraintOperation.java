@@ -31,25 +31,26 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * Operation with functionality to create a new constraint. Enables undo/redo
- * functionality.
+ * Operation with functionality to create a new constraint. Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
+
 	private IConstraint constraint;
-	private IFeatureModel	featureModel;
+	private IFeatureModel featureModel;
+
 	/**
-	 * @param node
-	 *            the node representing the constraint to be added
-	 * @param featureModel
-	 *            model that will be used to add the constraint
+	 * @param node the node representing the constraint to be added
+	 * @param featureModel model that will be used to add the constraint
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
-		this.featureModel = featureModel;
+		constraint =
+			FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override

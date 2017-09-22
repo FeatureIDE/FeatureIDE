@@ -41,23 +41,25 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	protected FeatureModelEditor featureModelEditor;
 
-	protected boolean dirty = false;
+	protected boolean dirty =
+		false;
 
 	protected IEditorInput input;
 
 	protected IEditorSite site;
 
 	/**
-	 * @param featureModelEditor
-	 *            the featureModelEditor to set
+	 * @param featureModelEditor the featureModelEditor to set
 	 */
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+		this.featureModelEditor =
+			featureModelEditor;
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		dirty = false;
+		dirty =
+			false;
 		firePropertyChange(PROP_DIRTY);
 	}
 
@@ -68,8 +70,10 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		this.input = input;
-		this.site = site;
+		this.input =
+			input;
+		this.site =
+			site;
 	}
 
 	@Override
@@ -99,7 +103,8 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void setIndex(int index) {
-		this.index = index;
+		this.index =
+			index;
 	}
 
 	public IEditorSite getSite() {
@@ -107,8 +112,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void initEditor() {
-	}
+	public void initEditor() {}
 
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {

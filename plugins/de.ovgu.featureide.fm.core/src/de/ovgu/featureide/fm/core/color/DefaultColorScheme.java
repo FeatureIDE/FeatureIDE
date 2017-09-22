@@ -30,28 +30,29 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class DefaultColorScheme extends ColorScheme {
 
-	public static String defaultName = DefaultColorScheme.class.getName(); 
-	
+	public static String defaultName =
+		DefaultColorScheme.class.getName();
+
 	public DefaultColorScheme() {
 		super(defaultName);
 		setCurrent(true);
 	}
-	
+
 	@Override
 	public boolean isDefault() {
 		return true;
 	}
-	
+
 	@Override
 	public void setColor(IFeature feature, FeatureColor color) {
 		throw new RuntimeException("setColor called on default color scheme");
 	}
-	
+
 	@Override
 	public FeatureColor getColor(IFeature feature) {
 		return FeatureColor.NO_COLOR;
 	}
-	
+
 	@Override
 	public void renameFeature(String oldName, String newName) {
 		// nothing here

@@ -23,7 +23,7 @@ package de.ovgu.featureide.core.listeners;
 import org.eclipse.core.resources.IFolder;
 
 public interface IFeatureFolderListener {
-	
+
 	void featureFolderChanged(IFolder folder);
 
 }

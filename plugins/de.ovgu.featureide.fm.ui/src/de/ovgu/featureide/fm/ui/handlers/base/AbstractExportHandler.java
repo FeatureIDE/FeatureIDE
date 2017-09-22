@@ -42,25 +42,33 @@ public abstract class AbstractExportHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile modelFile) {
 		// Ask for file name
-		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		FileDialog fileDialog =
+			new FileDialog(new Shell(), SWT.SAVE);
 		configureFileDialog(fileDialog);
-		final String filepath = fileDialog.open();
+		final String filepath =
+			fileDialog.open();
 		if (filepath == null) {
 			return;
 		}
 
-		final Path path = Paths.get(modelFile.getLocationURI());
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
+		final Path path =
+			Paths.get(modelFile.getLocationURI());
+		final IFeatureModelFormat format =
+			FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
 		IFeatureModelFactory factory;
 		try {
-			factory = FMFactoryManager.getFactory(path.toString(), format);
+			factory =
+				FMFactoryManager.getFactory(path.toString(), format);
 		} catch (NoSuchExtensionException e) {
 			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
+			factory =
+				FMFactoryManager.getDefaultFactory();
 		}
-		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeatureModel fm =
+			factory.createFeatureModel();
 
-		FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
+		FileHandler<IFeatureModel> handler =
+			new FileHandler<>(fm);
 		// Read model
 		handler.read(path, format);
 		handler.write(Paths.get(filepath), getFormat());

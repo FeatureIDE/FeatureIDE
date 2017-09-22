@@ -25,59 +25,69 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Extends the abstract {@link AFeatureData} class.
- * Stores additional information for signatures in an FOP project.
+ * Extends the abstract {@link AFeatureData} class. Stores additional information for signatures in an FOP project.
  * 
  * @author Sebastian Krieter
  */
 public class FOPFeatureData extends AFeatureData {
 
 	private boolean usesExternalMethods, usesOriginal;
-	
+
 	private ArrayList<AbstractSignature> calledSignatures;
 	private ArrayList<String> usedNonPrimitveTypes;
-	
+
 	FOPFeatureData(int id, int startLineNumber, int endLineNumber) {
 		super(id, startLineNumber, endLineNumber);
-		this.calledSignatures = null;
-		this.usesExternalMethods = false;
-		this.usesOriginal = false;
+		this.calledSignatures =
+			null;
+		this.usesExternalMethods =
+			false;
+		this.usesOriginal =
+			false;
 	}
-	
+
 	public boolean usesExternMethods() {
 		return usesExternalMethods;
 	}
-	
+
 	public boolean usesOriginal() {
 		return usesOriginal;
 	}
 
 	public List<String> getUsedNonPrimitveTypes() {
-		return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : Collections.<String>emptyList();
+		return usedNonPrimitveTypes != null
+			? Collections.unmodifiableList(usedNonPrimitveTypes)
+			: Collections.<String> emptyList();
 	}
-	
+
 	public void setUsesExternMethods(boolean usesExternMethods) {
-		this.usesExternalMethods = usesExternMethods;
+		this.usesExternalMethods =
+			usesExternMethods;
 	}
-	
+
 	public void setUsesOriginal(boolean usesOriginal) {
-		this.usesOriginal = usesOriginal;
+		this.usesOriginal =
+			usesOriginal;
 	}
-	
+
 	public List<AbstractSignature> getCalledSignatures() {
-		return calledSignatures != null ? Collections.unmodifiableList(calledSignatures) : Collections.<AbstractSignature>emptyList();
+		return calledSignatures != null
+			? Collections.unmodifiableList(calledSignatures)
+			: Collections.<AbstractSignature> emptyList();
 	}
-	
+
 	public void addCalledSignature(AbstractSignature signature) {
 		if (this.calledSignatures == null) {
-			this.calledSignatures = new ArrayList<AbstractSignature>();
+			this.calledSignatures =
+				new ArrayList<AbstractSignature>();
 		}
 		this.calledSignatures.add(signature);
 	}
-	
+
 	public void addUsedNonPrimitveType(String usedNonPrimitveType) {
 		if (this.usedNonPrimitveTypes == null) {
-			this.usedNonPrimitveTypes = new ArrayList<String>();
+			this.usedNonPrimitveTypes =
+				new ArrayList<String>();
 		}
 		if (!this.usedNonPrimitveTypes.contains(usedNonPrimitveType)) {
 			this.usedNonPrimitveTypes.add(usedNonPrimitveType);

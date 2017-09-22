@@ -31,23 +31,46 @@ import org.junit.Test;
  */
 public class TAheadComposer {
 
-	public static final String SOUCE_1 = 
-			"layer test;" + AheadComposer.NEWLINE + 
-			"import import1;" + AheadComposer.NEWLINE + 
-			"public class test {" + AheadComposer.NEWLINE + 
-			"private Player player;" + 
-			"	private void method1() {" + AheadComposer.NEWLINE + 
-			AheadComposer.NEWLINE + 
-			"	}" + AheadComposer.NEWLINE + 
+	public static final String SOUCE_1 =
+		"layer test;"
+			+ AheadComposer.NEWLINE
+			+
+			"import import1;"
+			+ AheadComposer.NEWLINE
+			+
+			"public class test {"
+			+ AheadComposer.NEWLINE
+			+
+			"private Player player;"
+			+
+			"	private void method1() {"
+			+ AheadComposer.NEWLINE
+			+
+			AheadComposer.NEWLINE
+			+
+			"	}"
+			+ AheadComposer.NEWLINE
+			+
 			"}";
-	private static final String CORRECTED_1 = 
-			AheadComposer.NEWLINE + 
-			"import import1;" + AheadComposer.NEWLINE + 
-			"public class test {" + AheadComposer.NEWLINE + 
-			"private Player player;" + 
-			"	private void method1() {" + AheadComposer.NEWLINE + 
-			AheadComposer.NEWLINE + 
-			"	}" + AheadComposer.NEWLINE + 
+	private static final String CORRECTED_1 =
+		AheadComposer.NEWLINE
+			+
+			"import import1;"
+			+ AheadComposer.NEWLINE
+			+
+			"public class test {"
+			+ AheadComposer.NEWLINE
+			+
+			"private Player player;"
+			+
+			"	private void method1() {"
+			+ AheadComposer.NEWLINE
+			+
+			AheadComposer.NEWLINE
+			+
+			"	}"
+			+ AheadComposer.NEWLINE
+			+
 			"}";
 
 	/**
@@ -58,20 +81,39 @@ public class TAheadComposer {
 		assertEquals(AheadComposer.correctFileText(SOUCE_1), CORRECTED_1);
 	}
 
-	private static final String SOUCE_2 = 
-			"import import1;" + AheadComposer.NEWLINE + 
-			"public class test {" + AheadComposer.NEWLINE + 
-			"	private void method1() {" + AheadComposer.NEWLINE + 
-			AheadComposer.NEWLINE + 
-			"	}" + AheadComposer.NEWLINE + 
+	private static final String SOUCE_2 =
+		"import import1;"
+			+ AheadComposer.NEWLINE
+			+
+			"public class test {"
+			+ AheadComposer.NEWLINE
+			+
+			"	private void method1() {"
+			+ AheadComposer.NEWLINE
+			+
+			AheadComposer.NEWLINE
+			+
+			"	}"
+			+ AheadComposer.NEWLINE
+			+
 			"}";
-	private static final String CORRECTED_2 = 
-			AheadComposer.NEWLINE + 
-			"import import1;" + AheadComposer.NEWLINE + 
-			"public class test {" + AheadComposer.NEWLINE + 
-			"	private void method1() {" + AheadComposer.NEWLINE + 
-			AheadComposer.NEWLINE + 
-			"	}" + AheadComposer.NEWLINE + 
+	private static final String CORRECTED_2 =
+		AheadComposer.NEWLINE
+			+
+			"import import1;"
+			+ AheadComposer.NEWLINE
+			+
+			"public class test {"
+			+ AheadComposer.NEWLINE
+			+
+			"	private void method1() {"
+			+ AheadComposer.NEWLINE
+			+
+			AheadComposer.NEWLINE
+			+
+			"	}"
+			+ AheadComposer.NEWLINE
+			+
 			"}";
 
 	/**
@@ -82,14 +124,26 @@ public class TAheadComposer {
 		assertEquals(AheadComposer.correctFileText(SOUCE_2), CORRECTED_2);
 	}
 
-	private static final String SOUCE_3 = 
-			AheadComposer.NEWLINE + 
-			"import player.*;" + AheadComposer.NEWLINE + 
-			"public class Player {" + AheadComposer.NEWLINE + 
-			"	private void player() {" + AheadComposer.NEWLINE + 
-			AheadComposer.NEWLINE + 
-			"	}" + AheadComposer.NEWLINE + 
-			"private Player player;" + AheadComposer.NEWLINE + 
+	private static final String SOUCE_3 =
+		AheadComposer.NEWLINE
+			+
+			"import player.*;"
+			+ AheadComposer.NEWLINE
+			+
+			"public class Player {"
+			+ AheadComposer.NEWLINE
+			+
+			"	private void player() {"
+			+ AheadComposer.NEWLINE
+			+
+			AheadComposer.NEWLINE
+			+
+			"	}"
+			+ AheadComposer.NEWLINE
+			+
+			"private Player player;"
+			+ AheadComposer.NEWLINE
+			+
 			"}";
 
 	/**

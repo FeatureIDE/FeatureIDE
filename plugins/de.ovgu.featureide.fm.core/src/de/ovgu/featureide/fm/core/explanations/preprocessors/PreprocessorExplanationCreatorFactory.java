@@ -29,16 +29,19 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreproc
  * @author Timo G&uuml;nther
  */
 public abstract class PreprocessorExplanationCreatorFactory implements ExplanationCreatorFactory {
+
 	/**
 	 * Returns a default instance of this class.
+	 * 
 	 * @return a default instance of this class
 	 */
 	public static PreprocessorExplanationCreatorFactory getDefault() {
 		return new MusPreprocessorExplanationCreatorFactory();
 	}
-	
+
 	/**
 	 * Returns an instance of {@link InvariantExpressionExplanationCreator}.
+	 * 
 	 * @return an instance of {@link InvariantExpressionExplanationCreator}
 	 */
 	public abstract InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator();

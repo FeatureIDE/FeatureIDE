@@ -23,17 +23,18 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import org.eclipse.draw2d.geometry.Point;
 
 /**
- * Adjusted RelationDecoration that can be used with Coordinates instead of
- * Features
+ * Adjusted RelationDecoration that can be used with Coordinates instead of Features
  * 
  * @author Fabian Benduhn
  */
 public class LegendRelationDecoration extends RelationDecoration {
+
 	private Point point;
 
 	public LegendRelationDecoration(boolean fill, Point point) {
 		super(fill, null);
-		this.point = point;
+		this.point =
+			point;
 	}
 
 	@Override

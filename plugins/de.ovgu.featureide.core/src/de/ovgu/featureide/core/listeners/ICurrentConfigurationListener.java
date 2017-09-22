@@ -23,7 +23,7 @@ package de.ovgu.featureide.core.listeners;
 import de.ovgu.featureide.core.IFeatureProject;
 
 public interface ICurrentConfigurationListener {
-	
+
 	void currentConfigurationChanged(IFeatureProject featureProject);
 
 }

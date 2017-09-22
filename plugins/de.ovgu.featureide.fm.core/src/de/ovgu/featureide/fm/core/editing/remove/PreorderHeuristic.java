@@ -26,8 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features in pre-order according to the feature tree.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features in pre-order according to the feature tree.
  * 
  * @author Sebastian Krieter
  */
@@ -39,10 +38,12 @@ public class PreorderHeuristic extends ATreeHeuristic {
 
 	@Override
 	protected void order(IFeatureStructure root) {
-		LinkedList<IFeatureStructure> list = new LinkedList<>();
+		LinkedList<IFeatureStructure> list =
+			new LinkedList<>();
 		list.add(root);
 		while (!list.isEmpty()) {
-			final IFeatureStructure nextFeature = list.removeFirst();
+			final IFeatureStructure nextFeature =
+				list.removeFirst();
 			list.addAll(0, nextFeature.getChildren());
 			find(nextFeature.getFeature());
 		}

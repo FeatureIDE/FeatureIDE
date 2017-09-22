@@ -46,7 +46,8 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 
 	public CurrentConfigurationsGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
-		builder.configurationNumber = Math.min(builder.configurationNumber, countConfigurations(featureProject.getConfigFolder()));
+		builder.configurationNumber =
+			Math.min(builder.configurationNumber, countConfigurations(featureProject.getConfigFolder()));
 	}
 
 	@Override
@@ -78,11 +79,9 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * Builds the given configuration file into the folder for current
-	 * configurations.
+	 * Builds the given configuration file into the folder for current configurations.
 	 * 
-	 * @param configuration
-	 *            The configuration file
+	 * @param configuration The configuration file
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IMonitor monitor) {
@@ -91,23 +90,23 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * @param res
-	 *            A file.
+	 * @param res A file.
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return res instanceof IFile && ConfigFormatManager.getInstance().hasFormat(res.getName());
+		return res instanceof IFile
+			&& ConfigFormatManager.getInstance().hasFormat(res.getName());
 	}
 
 	/**
 	 * Counts the configurations at the given folder.
 	 * 
-	 * @param configFolder
-	 *            The folder
+	 * @param configFolder The folder
 	 * @return Number of configuration files
 	 */
 	private int countConfigurations(IFolder configFolder) {
-		int i = 0;
+		int i =
+			0;
 		try {
 			for (IResource res : configFolder.members()) {
 				if (isConfiguration(res)) {

@@ -52,28 +52,33 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
  * @author Christopher Kruczek
  */
 public class ExportAsXmlImpl extends AbstractExportAsAction {
-	
+
 	public ExportAsXmlImpl(String text, GraphicalViewerImpl view) {
 		super(text, view);
 	}
 
 	@Override
 	public void run() {
-		final String file = createXmlSaveDialog().open();
+		final String file =
+			createXmlSaveDialog().open();
 		if (file == null) {
 			return;
 		}
-		
+
 		try {
-			XMLStreamWriter sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
-					new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			XMLStreamWriter sw =
+				XMLOutputFactory.newInstance().createXMLStreamWriter(
+						new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			sw.writeStartDocument("utf-8", "1.0");
 			sw.writeStartElement("configuration");
-			ModelEditPart mep = (ModelEditPart) viewer.getContents();
+			ModelEditPart mep =
+				(ModelEditPart) viewer.getContents();
 			for (Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
-					CollaborationEditPart cep = (CollaborationEditPart) child;
-					FSTFeature feature = cep.getCollaborationModel();
+					CollaborationEditPart cep =
+						(CollaborationEditPart) child;
+					FSTFeature feature =
+						cep.getCollaborationModel();
 					if (!(feature instanceof FSTConfiguration)) {
 						writeElement(sw, feature);
 					} else {
@@ -91,8 +96,10 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 	}
 
 	private FileDialog createXmlSaveDialog() {
-		FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
-		dlg.setFilterExtensions(new String[] { "*.xml" });
+		FileDialog dlg =
+			new FileDialog(new Shell(), SWT.SAVE);
+		dlg.setFilterExtensions(new String[] {
+			"*.xml" });
 		dlg.setOverwrite(true);
 		return dlg;
 	}

@@ -35,5 +35,5 @@ public class FSTAstemaLFunction extends FSTField {
 			String body, int beginLine, int endLine) {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
 	}
-	
+
 }

@@ -36,10 +36,11 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
  */
 public class InterfaceProjectBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID = MPLPlugin.PLUGIN_ID	+ ".builder.interfaceProjectBuilder";
+	public static final String BUILDER_ID =
+		MPLPlugin.PLUGIN_ID
+			+ ".builder.interfaceProjectBuilder";
 
-	protected void clean(IProgressMonitor monitor) throws CoreException {
-	}
+	protected void clean(IProgressMonitor monitor) throws CoreException {}
 
 	@SuppressWarnings("rawtypes")
 	@Override

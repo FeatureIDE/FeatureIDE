@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 
-
 /**
  * Creates configurations for missing configurations.
  * 
@@ -48,36 +47,41 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 	public QuickFixMissingFeatures(final IMarker marker) {
 		super(marker);
 	}
-	
+
 	public void run(final IMarker marker) {
-		Job job = new Job(getLabel()) {
-			
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-				if (project != null) {
-					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
-					final List<Configuration> confs = createConfigurations(unusedFeatures, monitor);
-					writeConfigurations(confs);
+		Job job =
+			new Job(getLabel()) {
+
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					if (project != null) {
+						final Collection<String> unusedFeatures =
+							project.getUnusedConfigurationFeatures();
+						final List<Configuration> confs =
+							createConfigurations(unusedFeatures, monitor);
+						writeConfigurations(confs);
+					}
+					return Status.OK_STATUS;
 				}
-				return Status.OK_STATUS;
-			}
-		};
+			};
 		job.schedule();
 	}
-	
+
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
 		monitor.beginTask(CREATE_CONFIGURATIONS_FOR, unusedFeatures.size());
-		final List<Configuration> confs = new LinkedList<Configuration>();
+		final List<Configuration> confs =
+			new LinkedList<Configuration>();
 		while (!unusedFeatures.isEmpty()) {
 			monitor.subTask(createShortMessage(unusedFeatures));
 			if (monitor.isCanceled()) {
 				break;
 			}
-			final Configuration configuration = new Configuration(featureModel, true);
+			final Configuration configuration =
+				new Configuration(featureModel, true);
 			for (final String feature : unusedFeatures) {
 				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);
-					
+
 				}
 			}
 			if (monitor.isCanceled()) {
@@ -85,12 +89,13 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 			}
 			for (final IFeature feature : configuration.getSelectedFeatures()) {
 				if (unusedFeatures.remove(feature.getName())) {
-					monitor.worked(1);	
+					monitor.worked(1);
 				}
 			}
-			
+
 			// select further features to get a valid configuration
-			final List<SelectableFeature> features = new LinkedList<SelectableFeature>();
+			final List<SelectableFeature> features =
+				new LinkedList<SelectableFeature>();
 			for (final SelectableFeature feature : configuration.getFeatures()) {
 				if (configuration.isValid()) {
 					break;
@@ -100,12 +105,15 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 					features.add(feature);
 				}
 			}
-			
+
 			// deselect unneccessary features
-			boolean unselected = true;
-			final List<SelectableFeature> unselectedFeatures = new LinkedList<SelectableFeature>(); 
+			boolean unselected =
+				true;
+			final List<SelectableFeature> unselectedFeatures =
+				new LinkedList<SelectableFeature>();
 			while (unselected) {
-				unselected = false;
+				unselected =
+					false;
 				unselectedFeatures.clear();
 				for (final SelectableFeature feature : features) {
 					if (feature.getAutomatic() == Selection.UNDEFINED) {
@@ -115,12 +123,13 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 							break;
 						}
 						unselectedFeatures.add(feature);
-						unselected = true;
+						unselected =
+							true;
 					}
 				}
 				features.removeAll(unselectedFeatures);
 			}
-			
+
 			confs.add(configuration);
 		}
 		return confs;

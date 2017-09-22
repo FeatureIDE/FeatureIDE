@@ -48,24 +48,36 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public class FeatureModelJPFCore implements IFeatureModelClass {
 
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private static final String NEWLINE =
+		System.getProperty("line.separator", "\n");
 
-	private final static String HEAD = "/**" + NEWLINE 
-			+ " * Variability encoding of the feature model for JPF." + NEWLINE 
-			+ " * Auto-generated class." + NEWLINE 
-			+ " */" + NEWLINE + "public class FeatureModel {" + NEWLINE + NEWLINE;
-	
-	private final static String FIELD_MODIFIER = "\tpublic static Boolean ";
+	private final static String HEAD =
+		"/**"
+			+ NEWLINE
+			+ " * Variability encoding of the feature model for JPF."
+			+ NEWLINE
+			+ " * Auto-generated class."
+			+ NEWLINE
+			+ " */"
+			+ NEWLINE
+			+ "public class FeatureModel {"
+			+ NEWLINE
+			+ NEWLINE;
+
+	private final static String FIELD_MODIFIER =
+		"\tpublic static Boolean ";
 	private StringBuilder stringBuilder;
-	private Collection<IFeature> deadFeatures = Collections.emptyList();
-	private Collection<IFeature> coreFeatures = Collections.emptyList();
+	private Collection<IFeature> deadFeatures =
+		Collections.emptyList();
+	private Collection<IFeature> coreFeatures =
+		Collections.emptyList();
 	private IFeatureModel featureModel;
 
 	public FeatureModelJPFCore(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
-	
-	
+
 	@Override
 	public String getImports() {
 		return IMPORT_JPF;
@@ -78,30 +90,46 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 
 	@Override
 	public String getFeatureFields() {
-		StringBuffer fields = new StringBuffer();
+		StringBuffer fields =
+			new StringBuffer();
 		for (String f : FeatureUtils.extractConcreteFeaturesAsStringList(featureModel)) {
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toLowerCase(Locale.ENGLISH));
-			fields.append("_;" + NEWLINE);
+			fields.append("_;"
+				+ NEWLINE);
 		}
 
-		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		coreFeatures = deadCoreList.get(0);
-		deadFeatures = deadCoreList.get(1);
-		fields.append(NEWLINE + "\t/**" + NEWLINE 
-				+ "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE 
-				+ "\t * All other features have unknown selection states." + NEWLINE 
-				+ "\t */" + NEWLINE 
-				+ "\tstatic {" + NEWLINE);
+		final ArrayList<IFeature> features =
+			new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
+		final List<List<IFeature>> deadCoreList =
+			featureModel.getAnalyser().analyzeFeatures();
+		coreFeatures =
+			deadCoreList.get(0);
+		deadFeatures =
+			deadCoreList.get(1);
+		fields.append(NEWLINE
+			+ "\t/**"
+			+ NEWLINE
+			+ "\t * Core features are set 'selected' and dead features 'unselected'."
+			+ NEWLINE
+			+ "\t * All other features have unknown selection states."
+			+ NEWLINE
+			+ "\t */"
+			+ NEWLINE
+			+ "\tstatic {"
+			+ NEWLINE);
 		for (IFeature f : features) {
 			if (deadFeatures.contains(f)) {
-				fields.append("\t\t" + f.toString().toLowerCase(Locale.ENGLISH));
-				fields.append("_ = false;" + NEWLINE);
+				fields.append("\t\t"
+					+ f.toString().toLowerCase(Locale.ENGLISH));
+				fields.append("_ = false;"
+					+ NEWLINE);
 			}
 			if (coreFeatures.contains(f)) {
-				fields.append("\t\t" + f.toString().toLowerCase(Locale.ENGLISH));
-				fields.append("_ = true;" + NEWLINE);
+				fields.append("\t\t"
+					+ f.toString().toLowerCase(Locale.ENGLISH));
+				fields.append("_ = true;"
+					+ NEWLINE);
 			}
 		}
 		fields.append("\t}\r\n");
@@ -110,28 +138,34 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		stringBuilder = new StringBuilder();
+		stringBuilder =
+			new StringBuilder();
 		stringBuilder.append(VALID);
 		stringBuilder.append("Verify.resetCounter(0);\r\n");
-		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature root =
+			featureModel.getStructure().getRoot().getFeature();
 		stringBuilder.append("\t\tboolean "
-				+ root.toString().toLowerCase(Locale.ENGLISH) + " = true;\r\n");
+			+ root.toString().toLowerCase(Locale.ENGLISH)
+			+ " = true;\r\n");
 
 		addedFeatures.add(root.toString().toLowerCase(Locale.ENGLISH));
 		addFeature(root, getFormulaJPF(featureModel));
-		stringBuilder.append("\t\tVerify.incrementCounter(0);\r\n\t\treturn true;\r\n\t}\r\n\r\n\tprivate static boolean random() {\r\n\t\treturn Verify.getBoolean(false);\r\n\t}\r\n\r\n");
+		stringBuilder.append(
+				"\t\tVerify.incrementCounter(0);\r\n\t\treturn true;\r\n\t}\r\n\r\n\tprivate static boolean random() {\r\n\t\treturn Verify.getBoolean(false);\r\n\t}\r\n\r\n");
 		return stringBuilder.toString();
 	}
 
-	private LinkedList<String> addedFeatures = new LinkedList<String>();
+	private LinkedList<String> addedFeatures =
+		new LinkedList<String>();
 
 	private Node getFormulaJPF(IFeatureModel model) {
-		final AdvancedNodeCreator c = new AdvancedNodeCreator(model);
+		final AdvancedNodeCreator c =
+			new AdvancedNodeCreator(model);
 		c.setCnfType(CNFType.Compact);
 		c.setOptionalRoot(true);
 		return c.createNodes();
 	}
-	
+
 	/**
 	 * @param root
 	 */
@@ -153,12 +187,14 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private void addAnd(List<IFeature> children, Node formula) {
 		for (IFeature child : children) {
 			stringBuilder.append("\t\tboolean "
-					+ child.toString().toLowerCase(Locale.ENGLISH) + " = ");
+				+ child.toString().toLowerCase(Locale.ENGLISH)
+				+ " = ");
 			if (child.getStructure().isMandatory()) {
-				stringBuilder.append(getFeature(child) + ";\r\n");
+				stringBuilder.append(getFeature(child)
+					+ ";\r\n");
 			} else {
 				stringBuilder.append(getFeature(child)
-						+ " ? random() : false;\r\n");
+					+ " ? random() : false;\r\n");
 			}
 			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(setFormula(formula));
@@ -172,28 +208,37 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	 * @param children
 	 */
 	private void addOr(List<IFeature> children, Node formula) {
-		String set = "false";
-		int i = 0;
+		String set =
+			"false";
+		int i =
+			0;
 		for (IFeature child : children) {
 			stringBuilder.append("\t\tboolean "
-					+ child.toString().toLowerCase(Locale.ENGLISH) + " = ");
-			if (i == children.size() - 1) {
+				+ child.toString().toLowerCase(Locale.ENGLISH)
+				+ " = ");
+			if (i == children.size()
+				- 1) {
 				if (set.isEmpty()) {
 					stringBuilder
 							.append(getFeature(child)
-									+ ";\r\n\t\tVerify.ignoreIf(Verify.getCounter(0) != 0);\r\n");
+								+ ";\r\n\t\tVerify.ignoreIf(Verify.getCounter(0) != 0);\r\n");
 				} else {
-					stringBuilder.append(getFeature(child) + " ? " + set
-							+ " ?  random() : true : false;\r\n");
+					stringBuilder.append(getFeature(child)
+						+ " ? "
+						+ set
+						+ " ?  random() : true : false;\r\n");
 				}
 			} else if (i == 0) {
 				stringBuilder.append(getFeature(child)
-						+ " ? random() : false;\r\n");
-				set = child.toString().toLowerCase(Locale.ENGLISH);
+					+ " ? random() : false;\r\n");
+				set =
+					child.toString().toLowerCase(Locale.ENGLISH);
 			} else {
 				stringBuilder.append(getFeature(child)
-						+ " ? random() : false;\r\n");
-				set += " ||" + child.toString().toLowerCase(Locale.ENGLISH);
+					+ " ? random() : false;\r\n");
+				set +=
+					" ||"
+						+ child.toString().toLowerCase(Locale.ENGLISH);
 			}
 			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(setFormula(formula));
@@ -208,26 +253,38 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	 * @param children
 	 */
 	private void addAlternative(List<IFeature> children, Node formula) {
-		String set = "";
-		int i = 0;
+		String set =
+			"";
+		int i =
+			0;
 		for (IFeature child : children) {
 			stringBuilder.append("\t\tboolean "
-					+ child.toString().toLowerCase(Locale.ENGLISH) + " = ");
-			if (i == children.size() - 1) {
+				+ child.toString().toLowerCase(Locale.ENGLISH)
+				+ " = ");
+			if (i == children.size()
+				- 1) {
 				if (set.isEmpty()) {
-					stringBuilder.append(getFeature(child) + ";\r\n");
+					stringBuilder.append(getFeature(child)
+						+ ";\r\n");
 				} else {
-					stringBuilder.append(getFeature(child) + " ? !(" + set
-							+ ") : false;\r\n");
+					stringBuilder.append(getFeature(child)
+						+ " ? !("
+						+ set
+						+ ") : false;\r\n");
 				}
 			} else if (i == 0) {
 				stringBuilder.append(getFeature(child)
-						+ " ? random() : false;\r\n");
-				set = child.toString().toLowerCase(Locale.ENGLISH);
+					+ " ? random() : false;\r\n");
+				set =
+					child.toString().toLowerCase(Locale.ENGLISH);
 			} else {
-				stringBuilder.append(getFeature(child) + " ? " + set
-						+ "? false : random() : false;\r\n");
-				set = child.toString().toLowerCase(Locale.ENGLISH) + " ||"
+				stringBuilder.append(getFeature(child)
+					+ " ? "
+					+ set
+					+ "? false : random() : false;\r\n");
+				set =
+					child.toString().toLowerCase(Locale.ENGLISH)
+						+ " ||"
 						+ set;
 			}
 			addedFeatures.add(child.toString().toLowerCase(Locale.ENGLISH));
@@ -241,15 +298,23 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	}
 
 	private String getFeature(IFeature f) {
-		String featureName = f.toString().toLowerCase(Locale.ENGLISH);
-		String start = featureName + "_ != null ? " + featureName + "_ : ";
+		String featureName =
+			f.toString().toLowerCase(Locale.ENGLISH);
+		String start =
+			featureName
+				+ "_ != null ? "
+				+ featureName
+				+ "_ : ";
 		if (deadFeatures.contains(f.getStructure().getParent())) {
-			return start + "false";
+			return start
+				+ "false";
 		}
 		if (coreFeatures.contains(f.getStructure().getParent())) {
-			return start + "true";
+			return start
+				+ "true";
 		}
-		return start + f.getStructure().getParent().toString().toLowerCase(Locale.ENGLISH);
+		return start
+			+ f.getStructure().getParent().toString().toLowerCase(Locale.ENGLISH);
 	}
 
 	/**
@@ -257,14 +322,18 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	 * @return
 	 */
 	private String setFormula(Node formula) {
-		ArrayList<Node> actualFormula = new ArrayList<Node>();
-		ArrayList<Node> nextFormula = new ArrayList<Node>();
+		ArrayList<Node> actualFormula =
+			new ArrayList<Node>();
+		ArrayList<Node> nextFormula =
+			new ArrayList<Node>();
 		for (Node child : formula.getChildren()) {
-			boolean allAdded = true;
+			boolean allAdded =
+				true;
 			for (Node feature : child.getChildren()) {
 				if (!addedFeatures.contains(feature.toString()
 						.toLowerCase(Locale.ENGLISH).replaceFirst("-", ""))) {
-					allAdded = false;
+					allAdded =
+						false;
 					break;
 				}
 			}
@@ -279,22 +348,32 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			return "";
 		}
 		return "\t\tVerify.ignoreIf(Verify.getCounter(0) != 0 || !("
-				+ new And(actualFormula.toArray()).toString(
-						NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH)
-				+ "));\r\n";
+			+ new And(actualFormula.toArray()).toString(
+					NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH)
+			+ "));\r\n";
 	}
 
 	@Override
 	public String getGetter() {
-		final StringBuilder stringBuilder = new StringBuilder();
+		final StringBuilder stringBuilder =
+			new StringBuilder();
 		for (IFeature f : FeatureUtils.extractConcreteFeatures(featureModel)) {
-			final String featureName = f.toString().toLowerCase(Locale.ENGLISH);
-			stringBuilder.append("\tpublic static boolean " + featureName + "() {\r\n");
-			stringBuilder.append("\t\tif (" + featureName + "_ == null) {\r\n");
-			stringBuilder.append("\t\t\t" + featureName + "_ = random();\r\n");
+			final String featureName =
+				f.toString().toLowerCase(Locale.ENGLISH);
+			stringBuilder.append("\tpublic static boolean "
+				+ featureName
+				+ "() {\r\n");
+			stringBuilder.append("\t\tif ("
+				+ featureName
+				+ "_ == null) {\r\n");
+			stringBuilder.append("\t\t\t"
+				+ featureName
+				+ "_ = random();\r\n");
 			stringBuilder.append("\t\t\tvalid();\r\n");
 			stringBuilder.append("\t\t}\r\n");
-			stringBuilder.append("\t\treturn " + featureName + "_;\r\n");
+			stringBuilder.append("\t\treturn "
+				+ featureName
+				+ "_;\r\n");
 			stringBuilder.append("\t}\r\n\r\n");
 		}
 		return stringBuilder.toString();
@@ -304,24 +383,37 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	 * @return The current feature selection for Java Pathfinder.
 	 */
 	public String getSelection() {
-		StringBuilder stringBuilder = new StringBuilder();
+		StringBuilder stringBuilder =
+			new StringBuilder();
 		stringBuilder.append("\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection(boolean names) {\r\n\t\t");
-		List<IFeature> features = new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
+		List<IFeature> features =
+			new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
 		stringBuilder.append("if (names) return ");
-		for (int i = 0;i < features.size();i++) {
+		for (int i =
+			0; i < features.size(); i++) {
 			if (i != 0) {
-				stringBuilder.append(" + ");	
+				stringBuilder.append(" + ");
 			}
-			String name = features.get(i).getName();
-			String lowerName = name.toLowerCase(Locale.ENGLISH);
-			stringBuilder.append(" (" + lowerName+"_ != null && " + lowerName + "_ ? \"" + name + "\\r\\n\" : \"\") ");
+			String name =
+				features.get(i).getName();
+			String lowerName =
+				name.toLowerCase(Locale.ENGLISH);
+			stringBuilder.append(" ("
+				+ lowerName
+				+ "_ != null && "
+				+ lowerName
+				+ "_ ? \""
+				+ name
+				+ "\\r\\n\" : \"\") ");
 		}
 		stringBuilder.append(";\r\n\t\treturn \"\" + ");
-		for (int i = 0;i < features.size();i++) {
+		for (int i =
+			0; i < features.size(); i++) {
 			if (i != 0) {
-				stringBuilder.append(" + \"|\" + ");	
+				stringBuilder.append(" + \"|\" + ");
 			}
-			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH) + EMPTY___);
+			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH)
+				+ EMPTY___);
 		}
 		stringBuilder.append(";\r\n\t}\r\n");
 		return stringBuilder.toString();

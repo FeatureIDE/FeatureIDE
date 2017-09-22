@@ -32,20 +32,21 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class SyncCollapsedStateAction extends Action {
 
-		private TreeViewer viewer;
+	private TreeViewer viewer;
 
-		/**
-		 * Constructor for SyncCollapsedStateAction
-		 * @param viewer
-		 */
-		public SyncCollapsedStateAction(TreeViewer viewer, boolean syncState) {
-			super("", AS_CHECK_BOX);
-			this.setChecked(syncState);
-			this.viewer = viewer;
-			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif"));
-		}
+	/**
+	 * Constructor for SyncCollapsedStateAction
+	 * 
+	 * @param viewer
+	 */
+	public SyncCollapsedStateAction(TreeViewer viewer, boolean syncState) {
+		super("", AS_CHECK_BOX);
+		this.setChecked(syncState);
+		this.viewer =
+			viewer;
+		this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif"));
+	}
 
-		public void run() {
-		}
-	
+	public void run() {}
+
 }

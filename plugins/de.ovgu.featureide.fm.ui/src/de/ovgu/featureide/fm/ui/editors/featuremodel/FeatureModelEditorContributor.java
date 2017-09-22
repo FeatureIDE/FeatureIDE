@@ -58,28 +58,51 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID, MandatoryAction.ID, AndAction.ID,
-			OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			//ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
-			//ActionFactory.PASTE.getId(),
+	private static final String[] DIAGRAM_ACTION_IDS =
+		{
+			CreateLayerAction.ID,
+			CreateCompoundAction.ID,
+			CalculateDependencyAction.ID,
+			DeleteAction.ID,
+			MandatoryAction.ID,
+			AndAction.ID,
+			OrAction.ID,
+			AlternativeAction.ID,
+			ActionFactory.UNDO.getId(),
+			ActionFactory.REDO.getId(),
+			// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
+			// ActionFactory.PASTE.getId(),
 			ActionFactory.SELECT_ALL.getId(),
-			//ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
-	//IDEActionFactory.BOOKMARK.getId()
-	};
+			// ActionFactory.FIND.getId(),
+			ActionFactory.PRINT.getId(),
+			GEFActionConstants.ZOOM_IN,
+			GEFActionConstants.ZOOM_OUT,
+		// IDEActionFactory.BOOKMARK.getId()
+		};
 
-	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
+	private static final String[] TEXTEDITOR_ACTION_IDS =
+		{
+			ActionFactory.DELETE.getId(),
+			ActionFactory.UNDO.getId(),
+			ActionFactory.REDO.getId(),
+			ActionFactory.CUT.getId(),
+			ActionFactory.COPY.getId(),
+			ActionFactory.PASTE.getId(),
+			ActionFactory.SELECT_ALL.getId(),
+			ActionFactory.FIND.getId(),
+			ActionFactory.PRINT.getId(),
+			IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
-		FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
+		FeatureModelEditor editor =
+			(FeatureModelEditor) targetEditor;
 		setActivePage(editor, editor.getActivePage());
 	}
 
 	public void setActivePage(FeatureModelEditor editor, int pageIndex) {
-		IActionBars actionBars = getActionBars();
+		IActionBars actionBars =
+			getActionBars();
 		if (actionBars != null) {
 			switch (pageIndex) {
 			case 0:
@@ -94,14 +117,17 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	}
 
 	private void hookGlobalDiagramActions(FeatureModelEditor editor, IActionBars actionBars) {
-		for (int i = 0; i < DIAGRAM_ACTION_IDS.length; i++) {
+		for (int i =
+			0; i < DIAGRAM_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(DIAGRAM_ACTION_IDS[i], editor.getDiagramAction(DIAGRAM_ACTION_IDS[i]));
 		}
 	}
 
 	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {
-		ITextEditor textEditor = editor.getSourceEditor();
-		for (int i = 0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
+		ITextEditor textEditor =
+			editor.getSourceEditor();
+		for (int i =
+			0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(TEXTEDITOR_ACTION_IDS[i], textEditor.getAction(TEXTEDITOR_ACTION_IDS[i]));
 		}
 	}
@@ -110,45 +136,56 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	public void contributeToToolBar(IToolBarManager manager) {
 		super.contributeToToolBar(manager);
 		manager.add(new Separator());
-		
-		//Fix for Issue #363
+
+		// Fix for Issue #363
 		if (org.eclipse.core.runtime.Platform.getOS().equals(org.eclipse.core.runtime.Platform.OS_WIN32)) {
-		manager.add(new ContributionItem() {
-							final Point size = new Point(0,30);
-							private ToolItem widget;
+			manager.add(new ContributionItem() {
 
-							@Override
-							public void fill(ToolBar parent, int index) {
-								if (widget == null && parent != null) {
-									int flags = SWT.PUSH;
-									
-									ToolItem ti = null;
-									if (index >= 0) {
-										ti = new ToolItem(parent, flags, index);
-									} else {
-										ti = new ToolItem(parent, flags);
-									}
-									ti.setData(this);
-									
-									// create an image the height of the text field
-									final Image image = new Image(Display.getCurrent(),1,size.y);
-									GC gc = new GC(image);
-									gc.setBackground(parent.getBackground());
-									gc.fillRectangle(image.getBounds());
-									gc.dispose();
-									ti.addDisposeListener(new DisposeListener() {
-										public void widgetDisposed(DisposeEvent e) {
-											image.dispose();
-										}
-									});
-									ti.setImage(image);
+				final Point size =
+					new Point(0, 30);
+				private ToolItem widget;
 
-									widget = ti;
-								}
+				@Override
+				public void fill(ToolBar parent, int index) {
+					if (widget == null
+						&& parent != null) {
+						int flags =
+							SWT.PUSH;
+
+						ToolItem ti =
+							null;
+						if (index >= 0) {
+							ti =
+								new ToolItem(parent, flags, index);
+						} else {
+							ti =
+								new ToolItem(parent, flags);
+						}
+						ti.setData(this);
+
+						// create an image the height of the text field
+						final Image image =
+							new Image(Display.getCurrent(), 1, size.y);
+						GC gc =
+							new GC(image);
+						gc.setBackground(parent.getBackground());
+						gc.fillRectangle(image.getBounds());
+						gc.dispose();
+						ti.addDisposeListener(new DisposeListener() {
+
+							public void widgetDisposed(DisposeEvent e) {
+								image.dispose();
 							}
 						});
+						ti.setImage(image);
+
+						widget =
+							ti;
+					}
+				}
+			});
 		}
-		
+
 		manager.add(new ZoomComboContributionItem(getPage()));
 	}
 

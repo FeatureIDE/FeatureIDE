@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  */
 
 public class SetProfileColorSchemeAction extends Action {
+
 	private IFeatureModel model;
 	private String newProfileColorSchemeName;
 
@@ -43,18 +44,22 @@ public class SetProfileColorSchemeAction extends Action {
 	 */
 	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
 		super(text, style);
-		this.model = model;
-		this.newProfileColorSchemeName = text;
+		this.model =
+			model;
+		this.newProfileColorSchemeName =
+			text;
 	}
 
 	/**
-	 * Changes selected color scheme and saves the configuration 
+	 * Changes selected color scheme and saves the configuration
 	 */
 	public void run() {
-		String clrSchemeName = newProfileColorSchemeName;
-		
+		String clrSchemeName =
+			newProfileColorSchemeName;
+
 		if (FeatureColorManager.isCurrentColorScheme(model, clrSchemeName))
-			clrSchemeName = DefaultColorScheme.defaultName;
+			clrSchemeName =
+				DefaultColorScheme.defaultName;
 
 		FeatureColorManager.setActive(model, clrSchemeName);
 	}

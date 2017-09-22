@@ -38,14 +38,16 @@ import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
  */
 public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactory> {
 
-	public static IFactoryWorkspaceProvider factoryWorkspaceProvider = new CoreFactoryWorkspaceProvider();
+	public static IFactoryWorkspaceProvider factoryWorkspaceProvider =
+		new CoreFactoryWorkspaceProvider();
 
 	private FMFactoryManager() {
 		setExtensionLoaderInternal(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
 		factoryWorkspaceProvider.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 	}
 
-	private static FMFactoryManager instance = new FMFactoryManager();
+	private static FMFactoryManager instance =
+		new FMFactoryManager();
 
 	public static FMFactoryManager getInstance() {
 		return instance;
@@ -60,12 +62,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns a specific factory associated with the string <b>id</b>. By default, the following
-	 * factories are available:
-	 * <ul>
+	 * Returns a specific factory associated with the string <b>id</b>. By default, the following factories are available: <ul>
 	 * <li><b>de.ovgu.featureide.fm.core.DefaultFeatureModelFactory</b>: An instance of {@link DefaultFeatureModelFactory}</li>
-	 * <li><b>de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory</b>: An instance of {@link ExtendedFeatureModelFactory}</li>
-	 * </ul>
+	 * <li><b>de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory</b>: An instance of {@link ExtendedFeatureModelFactory}</li> </ul>
 	 * 
 	 * @param id the (unique) identifier for an instance of {@link IFeatureModelFactory} to be returned
 	 * @return Returns Instance of feature model factory associated with <b>id</b>, or throws <b<>RuntimeException</b> in case <b>id</b> is not known
@@ -86,10 +85,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	public static FactoryWorkspace getFactoryWorkspace(String path) {
 		return factoryWorkspaceProvider.getFactoryWorkspace(path);
 	}
-	
+
 	/**
-	 * Returns the feature model factory that was used to create the given model.
-	 * (if the factory is not available the default factory is returned).
+	 * Returns the feature model factory that was used to create the given model. (if the factory is not available the default factory is returned).
 	 * 
 	 * @param featureModel the feature model
 	 * 
@@ -104,12 +102,10 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 		}
 	}
 
-
 	/**
-	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/>
-	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
-	 * underlying feature model file.
+	 * Return the currently set default factory (if not changed, it is an instance of the built-in {@link DefaultFeatureModelFactory}).<br/> <br/> <b>Important
+	 * Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct
+	 * factory is used for the underlying feature model file.
 	 * 
 	 * @return Returns the default feature model factory.
 	 */
@@ -123,11 +119,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given path
-	 * (if none is specified an instance of the default factory is returned).<br/>
-	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
-	 * underlying feature model file.
+	 * Returns the currently set default factory for the given path (if none is specified an instance of the default factory is returned).<br/> <br/>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat)} or {@link #getFactory(IFeatureModel)} instead to ensure that the
+	 * correct factory is used for the underlying feature model file.
 	 * 
 	 * @param path
 	 * 
@@ -140,8 +134,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the feature model factory for the given path and format.
-	 * (if none is specified an instance of the default factory is returned).
+	 * Returns the feature model factory for the given path and format. (if none is specified an instance of the default factory is returned).
 	 * 
 	 * @param path
 	 * @param format
@@ -155,11 +148,9 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	}
 
 	/**
-	 * Returns the currently set default factory for the given format
-	 * (if none is specified an instance of the default factory is returned).<br/>
-	 * <br/>
-	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat<IFeatureModel>)} or {@link #getFactory(IFeatureModel)} instead to ensure that the correct factory is used for the
-	 * underlying feature model file.
+	 * Returns the currently set default factory for the given format (if none is specified an instance of the default factory is returned).<br/> <br/>
+	 * <b>Important Note:</b> If possible, use {@link #getFactory(String, IPersistentFormat<IFeatureModel>)} or {@link #getFactory(IFeatureModel)} instead to
+	 * ensure that the correct factory is used for the underlying feature model file.
 	 * 
 	 * @param format
 	 * 

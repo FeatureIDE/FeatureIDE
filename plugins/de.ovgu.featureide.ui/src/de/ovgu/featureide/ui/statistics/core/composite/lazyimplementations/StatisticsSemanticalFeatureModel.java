@@ -48,53 +48,62 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	private final IFeatureModel model;
 
 	public static class ConfigNode extends Parent {
+
 		private IFeatureModel innerModel;
 
 		public ConfigNode(String description, IFeatureModel innerModel) {
 			super(description, "(double-click to calculate)");
-			this.innerModel = innerModel;
+			this.innerModel =
+				innerModel;
 		}
 
 		/**
-		 * calculates the number of configurations/variants depending on
-		 * ignoreAbstract. This method should be called by
-		 * {@link TreeClickListener}.
+		 * calculates the number of configurations/variants depending on ignoreAbstract. This method should be called by {@link TreeClickListener}.
 		 * 
-		 * @param timeout
-		 *            defines how long the SAT-Solver may take to accomplish the
-		 *            task.
-		 * @param priority
-		 *            for the job.
+		 * @param timeout defines how long the SAT-Solver may take to accomplish the task.
+		 * @param priority for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			LongRunningMethod<Boolean> job = new TreeJob(this) {
-				private String calculateConfigs() {
-					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
-						// case: there is no concrete feature so there is only one program variant,
-						// without this the calculation least much to long
-						return "1";
+			LongRunningMethod<Boolean> job =
+				new TreeJob(this) {
+
+					private String calculateConfigs() {
+						boolean ignoreAbstract =
+							description.equals(DESC_CONFIGS);
+						if (!ignoreAbstract
+							&& innerModel.getAnalyser().countConcreteFeatures() == 0) {
+							// case: there is no concrete feature so there is only one program variant,
+							// without this the calculation least much to long
+							return "1";
+						}
+
+						final long number =
+							new Configuration(innerModel, false, ignoreAbstract).number(timeout);
+
+						return ((number < 0)
+							? MORE_THAN
+								+ (-number
+									- 1)
+							: String.valueOf(number));
 					}
 
-					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
+					@Override
+					public Boolean execute(IMonitor workMonitor) throws Exception {
+						setValue(calculateConfigs());
+						return true;
+					}
 
-					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
-				}
-
-				@Override
-				public Boolean execute(IMonitor workMonitor) throws Exception {
-					setValue(calculateConfigs());
-					return true;
-				}
-
-				@Override
-				public boolean cancel() {
-					return false;
-				}
-			};
-			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + this.description, job);
+					@Override
+					public boolean cancel() {
+						return false;
+					}
+				};
+			LongRunningJob<Boolean> runner =
+				new LongRunningJob<>(CALCULATING
+					+ this.description, job);
 			runner.setPriority(priority);
-			JobDoneListener listener = JobDoneListener.getInstance();
+			JobDoneListener listener =
+				JobDoneListener.getInstance();
 			if (listener != null) {
 				runner.addJobChangeListener(listener);
 			}
@@ -104,20 +113,25 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
 		super(description);
-		this.model = model;
+		this.model =
+			model;
 	}
 
 	@Override
 	protected void initChildren() {
-		
-		Boolean isValid = null;
+
+		Boolean isValid =
+			null;
 		try {
-			isValid = model.getAnalyser().isValid();
+			isValid =
+				model.getAnalyser().isValid();
 		} catch (TimeoutException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 
-		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
+		addChild(new Parent(MODEL_VOID, isValid == null
+			? MODEL_TIMEOUT
+			: isValid));
 
 		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
 
@@ -128,7 +142,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 		addChild(new AtomicParentNode(ATOMIC_SETS, model));
 
 		addChild(new ConfigNode(DESC_CONFIGS, model));
-		
+
 		addChild(new ConfigNode(DESC_VARIANTS, model));
 	}
 }

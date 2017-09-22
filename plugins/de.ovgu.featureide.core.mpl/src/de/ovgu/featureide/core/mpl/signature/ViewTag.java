@@ -26,22 +26,27 @@ package de.ovgu.featureide.core.mpl.signature;
  * @author Sebastian Krieter
  */
 public class ViewTag implements Comparable<ViewTag> {
+
 	private final String name;
 	private int level;
-	
+
 	public ViewTag(String name, int level) {
-		this.name = name == null ? "" : name;
-		this.level = level;
+		this.name =
+			name == null
+				? ""
+				: name;
+		this.level =
+			level;
 	}
-	
+
 	public ViewTag(String name) {
 		this(name, Integer.MAX_VALUE);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public int getLevel() {
 		return level;
 	}
@@ -51,35 +56,45 @@ public class ViewTag implements Comparable<ViewTag> {
 			level++;
 		}
 	}
-	
+
 	public boolean matches(ViewTag otherViewTag) {
-		return otherViewTag.level <= level && name.equals(otherViewTag.name);
+		return otherViewTag.level <= level
+			&& name.equals(otherViewTag.name);
 	}
-	
+
 	public boolean matches(String name, int level) {
-		return level <= this.level && this.name.equals(name);
+		return level <= this.level
+			&& this.name.equals(name);
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return 907 * name.hashCode() - 113 * level;
+		return 907
+			* name.hashCode()
+			- 113
+				* level;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		ViewTag otherViewTag = (ViewTag) obj;
-		return otherViewTag.level == level && otherViewTag.name.equals(name);
+		ViewTag otherViewTag =
+			(ViewTag) obj;
+		return otherViewTag.level == level
+			&& otherViewTag.name.equals(name);
 	}
 
 	@Override
 	public String toString() {
-		return name + ":" + level;
+		return name
+			+ ":"
+			+ level;
 	}
 
 	@Override
 	public int compareTo(ViewTag o) {
 		if (o.name.equals(name)) {
-			return level - o.level;
+			return level
+				- o.level;
 		}
 		return name.compareTo(o.name);
 	}

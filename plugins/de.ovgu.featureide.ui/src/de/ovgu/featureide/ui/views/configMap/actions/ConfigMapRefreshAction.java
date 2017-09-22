@@ -31,23 +31,25 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
  * @author Mohammad Mahhouk
  */
 public class ConfigMapRefreshAction extends Action {
-	
+
 	private ConfigurationMap configMap;
 
-	public ConfigMapRefreshAction(ConfigurationMap map){
+	public ConfigMapRefreshAction(ConfigurationMap map) {
 		super("Refresh");
-		setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif"))); 
-			
+		setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
+
 		setToolTipText("Refresh");
-		this.configMap = map;
+		this.configMap =
+			map;
 	}
-		
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	@Override
 	public void run() {
-		super.run();	
+		super.run();
 		configMap.updateElements();
 		configMap.refresh();
 	}

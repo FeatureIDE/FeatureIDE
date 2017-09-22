@@ -44,14 +44,22 @@ import junit.framework.JUnit4TestAdapter;
  */
 public class Prop4JTest {
 
-	private static final long TIMEOUT = 1000;
-	private Literal a = new Literal("a");
-	private Literal b = new Literal("b");
-	private Literal c = new Literal("c");
-	private Literal d = new Literal("d");
-	private Literal e = new Literal("e");
-	private Literal f = new Literal("f");
-	private Literal g = new Literal("g");
+	private static final long TIMEOUT =
+		1000;
+	private Literal a =
+		new Literal("a");
+	private Literal b =
+		new Literal("b");
+	private Literal c =
+		new Literal("c");
+	private Literal d =
+		new Literal("d");
+	private Literal e =
+		new Literal("e");
+	private Literal f =
+		new Literal("f");
+	private Literal g =
+		new Literal("g");
 
 	public static junit.framework.Test suite() {
 		return new JUnit4TestAdapter(Prop4JTest.class);
@@ -147,17 +155,24 @@ public class Prop4JTest {
 	@Test
 	public void testTautologyImplies() throws TimeoutException {
 		taut(new Implies(new And("A", new And(new Or(new Not("A"), new Or("B",
-				"C")), "D")), new And("A", new And(new Or(new Not("A"), new Or(
-				"B", "C")), "D"))));
+				"C")), "D")), new And("A", new And(new Or(new Not("A"),
+						new Or(
+								"B", "C")),
+						"D"))));
 	}
 
 	@Test
 	public void testDelphi() throws TimeoutException {
-		Node delphi1 = new Implies(new Not("M"), new And("L", "R"));
-		Node delphi2 = new Implies(new Not(new And("L", "M")), new Not("R"));
-		Node delphi3 = new Implies(new Or("L", "R"), new Not("M"));
-		Node delphi = new And(delphi1, delphi2, delphi3);
-		Node solution = new And(new Not("L"), "M", new Not("R"));
+		Node delphi1 =
+			new Implies(new Not("M"), new And("L", "R"));
+		Node delphi2 =
+			new Implies(new Not(new And("L", "M")), new Not("R"));
+		Node delphi3 =
+			new Implies(new Or("L", "R"), new Not("M"));
+		Node delphi =
+			new And(delphi1, delphi2, delphi3);
+		Node solution =
+			new And(new Not("L"), "M", new Not("R"));
 		taut(delphi, solution);
 	}
 
@@ -185,7 +200,9 @@ public class Prop4JTest {
 
 	@Test
 	public void testSolutionCounting3() {
-		solutions(3 + 3 + 1, new AtLeast(1, "p1", "p2", "p3"));
+		solutions(3
+			+ 3
+			+ 1, new AtLeast(1, "p1", "p2", "p3"));
 	}
 
 	private void solutions(int count, Node node) {
@@ -194,19 +211,27 @@ public class Prop4JTest {
 
 	@Test
 	public void testArrayIndexOutOfBounds1() throws TimeoutException {
-		Node a = new And(new Literal("A"), new Equals("A", "B"), new Literal(
-				"D", false));
-		Node b = new And(new Literal("C"), new Equals("C", "D"), new Literal(
-				"B", false));
-		a = a.clone().toCNF();
-		b = b.clone().toCNF();
-		SatSolver solver = new SatSolver(a, TIMEOUT);
+		Node a =
+			new And(new Literal("A"), new Equals("A", "B"), new Literal(
+					"D", false));
+		Node b =
+			new And(new Literal("C"), new Equals("C", "D"), new Literal(
+					"B", false));
+		a =
+			a.clone().toCNF();
+		b =
+			b.clone().toCNF();
+		SatSolver solver =
+			new SatSolver(a, TIMEOUT);
 		for (Node child : b.getChildren()) {
 			if (!(child instanceof Or))
-				child = new Or(child);
-			Node[] list = Node.clone(child.getChildren());
+				child =
+					new Or(child);
+			Node[] list =
+				Node.clone(child.getChildren());
 			for (Node node : list)
-				((Literal) node).positive ^= true;
+				((Literal) node).positive ^=
+					true;
 			solver.isSatisfiable(list);
 		}
 	}
@@ -228,29 +253,52 @@ public class Prop4JTest {
 	@Test
 	public void testArrayIndexOutOfBounds3() throws ContradictionException,
 			TimeoutException {
-		ISolver solver = SolverFactory.newDefault();
+		ISolver solver =
+			SolverFactory.newDefault();
 		solver.newVar(3);
-		solver.addClause(new VecInt(new int[] { 1 }));
-		solver.addClause(new VecInt(new int[] { -1, 2 }));
-		solver.addClause(new VecInt(new int[] { 1, -2 }));
-		solver.addClause(new VecInt(new int[] { -3 }));
+		solver.addClause(new VecInt(new int[] {
+			1 }));
+		solver.addClause(new VecInt(new int[] {
+			-1,
+			2 }));
+		solver.addClause(new VecInt(new int[] {
+			1,
+			-2 }));
+		solver.addClause(new VecInt(new int[] {
+			-3 }));
 		solver.newVar(1);
-		solver.addClause(new VecInt(new int[] { 4, -4 }));
-		solver.isSatisfiable(new VecInt(new int[] { -4 }));
+		solver.addClause(new VecInt(new int[] {
+			4,
+			-4 }));
+		solver.isSatisfiable(new VecInt(new int[] {
+			-4 }));
 	}
 
 	@Test
 	public void testBinom() {
-		for (int n = 1; n < 10; n++) {
+		for (int n =
+			1; n < 10; n++) {
 			assertEquals(1, Node.binom(n, 0));
 			assertEquals(n, Node.binom(n, 1));
-			assertEquals(n, Node.binom(n, n - 1));
+			assertEquals(n, Node.binom(n, n
+				- 1));
 			assertEquals(1, Node.binom(n, n));
-			for (int k = 0; k <= n; k++) {
-				assertEquals(k * Node.binom(n, k), n * Node.binom(n - 1, k - 1));
-				assertEquals(Node.binom(n + 1, k + 1),
-						Node.binom(n, k) + Node.binom(n, k + 1));
-				assertEquals(Node.binom(n, k), Node.binom(n, n - k));
+			for (int k =
+				0; k <= n; k++) {
+				assertEquals(k
+					* Node.binom(n, k),
+						n
+							* Node.binom(n
+								- 1, k
+									- 1));
+				assertEquals(Node.binom(n
+					+ 1, k
+						+ 1),
+						Node.binom(n, k)
+							+ Node.binom(n, k
+								+ 1));
+				assertEquals(Node.binom(n, k), Node.binom(n, n
+					- k));
 			}
 		}
 	}
@@ -267,152 +315,184 @@ public class Prop4JTest {
 	}
 
 	private void testReaderByObject(String constraint, Node cNode) {
-		Node node = new NodeReader().stringToNode(constraint);
+		Node node =
+			new NodeReader().stringToNode(constraint);
 
 		assertEquals(cNode, node);
 	}
 
 	@Test
 	public void testReaderLiteral() {
-		String testString = "a";
+		String testString =
+			"a";
 
 		testReaderByObject(testString, a);
 	}
 
 	@Test
 	public void testReaderLiteralWithBrackets() {
-		String testString = "((a))";
+		String testString =
+			"((a))";
 
 		testReaderByObject(testString, a);
 	}
 
 	@Test
 	public void testReaderNot() {
-		String testString = "not a";
+		String testString =
+			"not a";
 
-		Node node = new Not(a);
+		Node node =
+			new Not(a);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderAnd() {
-		String testString = "a and b";
+		String testString =
+			"a and b";
 
-		Node node = new And(a, b);
+		Node node =
+			new And(a, b);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderOr() {
-		String testString = "a or b";
+		String testString =
+			"a or b";
 
-		Node node = new Or(a, b);
+		Node node =
+			new Or(a, b);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderImplies() {
-		String testString = "a implies b";
+		String testString =
+			"a implies b";
 
-		Node node = new Implies(a, b);
+		Node node =
+			new Implies(a, b);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderIff() {
-		String testString = "a iff b";
+		String testString =
+			"a iff b";
 
-		Node node = new Equals(a, b);
+		Node node =
+			new Equals(a, b);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithoutBrackets1() {
-		String testString = "a and b or c implies d";
+		String testString =
+			"a and b or c implies d";
 
-		Node node = new Implies(new Or(new And(a, b), c), d);
+		Node node =
+			new Implies(new Or(new And(a, b), c), d);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithoutBrackets2() {
-		String testString = "a and not b or c implies d";
+		String testString =
+			"a and not b or c implies d";
 
-		Node node = new Implies(new Or(new And(a, new Not(b)), c), d);
+		Node node =
+			new Implies(new Or(new And(a, new Not(b)), c), d);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithoutBrackets3() {
-		String testString = "a iff b or c iff d";
+		String testString =
+			"a iff b or c iff d";
 
-		Node node = new Equals(a, new Equals(new Or(b, c), d));
+		Node node =
+			new Equals(a, new Equals(new Or(b, c), d));
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBrackets1() {
-		String testString = "(a implies b) and d";
+		String testString =
+			"(a implies b) and d";
 
-		Node node = new And(new Implies(a, b), d);
+		Node node =
+			new And(new Implies(a, b), d);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBrackets2() {
-		String testString = "a and not (b or c implies d)";
+		String testString =
+			"a and not (b or c implies d)";
 
-		Node node = new And(a, new Not(new Implies(new Or(b, c), d)));
+		Node node =
+			new And(a, new Not(new Implies(new Or(b, c), d)));
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBrackets3() {
-		String testString = "(a iff b) or (c iff d)";
+		String testString =
+			"(a iff b) or (c iff d)";
 
-		Node node = new Or(new Equals(a, b), new Equals(c, d));
+		Node node =
+			new Or(new Equals(a, b), new Equals(c, d));
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBracketsAndSpaces1() {
-		String testString = "( a and b ) or c";
+		String testString =
+			"( a and b ) or c";
 
-		Node node = new Or(new And(a, b), c);
+		Node node =
+			new Or(new And(a, b), c);
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBracketsAndSpaces2() {
-		String testString = "(    a iff   b ) or (c iff d)  ";
+		String testString =
+			"(    a iff   b ) or (c iff d)  ";
 
-		Node node = new Or(new Equals(a, b), new Equals(c, d));
+		Node node =
+			new Or(new Equals(a, b), new Equals(c, d));
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBrackets5() {
-		String testString = "(a iff b) or (c implies (d) and e or (f iff g))";
+		String testString =
+			"(a iff b) or (c implies (d) and e or (f iff g))";
 
-		Node node = new Or(new Equals(a, b), new Implies(c, new Or(
-				new And(d, e), new Equals(f, g))));
+		Node node =
+			new Or(new Equals(a, b), new Implies(c, new Or(
+					new And(d, e), new Equals(f, g))));
 		testReaderByObject(testString, node);
 	}
 
 	@Test
 	public void testReaderWithBrackets6() {
 		/*
-		 * Node node = NodeReader.stringToNode("(((a or b)))");
-		 * assetEquals(NodeWriter.node.getChildren()[0]) }
+		 * Node node = NodeReader.stringToNode("(((a or b)))"); assetEquals(NodeWriter.node.getChildren()[0]) }
 		 */
 
 	}
 
 	@Test
 	public void testReaderFeatureNameContainsOperator() {
-		String testString = "Handy";
+		String testString =
+			"Handy";
 
-		Node node = new Literal("Handy");
+		Node node =
+			new Literal("Handy");
 		testReaderByObject(testString, node);
 
 	}
@@ -425,24 +505,42 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames1() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"Hello";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames2() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "(Hello)";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"(Hello)";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames3() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "affe";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"affe";
 
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 
@@ -451,48 +549,84 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames4() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "and";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"and";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames5() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello and";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"Hello and";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames6() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "not Hello and World";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"not Hello and World";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames7() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "not Hello and World ()";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"not Hello and World ()";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames8() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "(Hello))";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"(Hello))";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames9() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "((not (Hello) and World";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"((not (Hello) and World";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
@@ -500,8 +634,14 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames10() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello and or";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"Hello and or";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
@@ -509,18 +649,29 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames11() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
 
-
 	@Test
 	public void testValidatorWithFeatureNames12() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = " ";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			" ";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
@@ -528,8 +679,14 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames13() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello) or (";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"Hello) or (";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
@@ -537,109 +694,177 @@ public class Prop4JTest {
 
 	@Test
 	public void testValidatorWithFeatureNames14() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "()()()()";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"()()()()";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 	}
 
 	@Test
 	public void testValidatorWithFeatureNames15() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "Hello Wonderful";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"Hello Wonderful";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
 
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames16() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful" };
-		String constraint = "(World and Beautiful)";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful" };
+		String constraint =
+			"(World and Beautiful)";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames17() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "\"Hello and World\" or Wonderful";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"\"Hello and World\" or Wonderful";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames18() {
-		String[] featureNames = { "Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "\"Hello and World\" or Wonderful";
+		String[] featureNames =
+			{
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"\"Hello and World\" or Wonderful";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
-	
+
 	@Test
 	public void testValidatorWithFeatureNames19() {
-		String[] featureNames = {"Wonderful"};
-		String constraint = "\"Hello and World\" or Wonderful";
+		String[] featureNames =
+			{
+				"Wonderful" };
+		String constraint =
+			"\"Hello and World\" or Wonderful";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
 	}
-		
+
 	@Test
 	public void testValidatorWithFeatureNames21() {
-		String[] featureNames = { "Hello", "World", "Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "(\"Hello and World\" or Wonderful) or \"Hello\"";
+		String[] featureNames =
+			{
+				"Hello",
+				"World",
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"(\"Hello and World\" or Wonderful) or \"Hello\"";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
-	}		
-	
+	}
+
 	@Test
 	public void testValidatorWithFeatureNames22() {
-		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "(Hello \"and World\" or Wonderful)";
+		String[] featureNames =
+			{
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"(Hello \"and World\" or Wonderful)";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
-	}		
-	
+	}
+
 	@Test
 	public void testValidatorWithFeatureNames23() {
-		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "((\"Hello and World\") or Wonderful)";
+		String[] featureNames =
+			{
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"((\"Hello and World\") or Wonderful)";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
-	}		
+	}
 
 	@Test
 	public void testValidatorWithFeatureNames24() {
-		String[] featureNames = {"Beautiful", "Wonderful", "Hello and World" };
-		String constraint = "((\"Hello and World\") \"or\" Wonderful)";
+		String[] featureNames =
+			{
+				"Beautiful",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"((\"Hello and World\") \"or\" Wonderful)";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
-	}		
+	}
 
 	@Test
 	public void testValidatorWithFeatureNames25() {
-		String[] featureNames = {"Beautiful and", "Wonderful", "Hello and World" };
-		String constraint = "((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		String[] featureNames =
+			{
+				"Beautiful and",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
 		assertTrue(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
-	}		
-	
+	}
+
 	@Test
 	public void testValidatorWithFeatureNames26() {
-		String[] featureNames = {"Beautiful and", "Wonderful", "Hello and World" };
-		String constraint = "(((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		String[] featureNames =
+			{
+				"Beautiful and",
+				"Wonderful",
+				"Hello and World" };
+		String constraint =
+			"(((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertFalse(testValidatorWithoutFeatureNames(constraint));
-	}		
-	
+	}
+
 	@Test
 	public void testValidatorWithFeatureNames27() {
-		String[] featureNames = {"Hello and World" };
-		String constraint = "((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
+		String[] featureNames =
+			{
+				"Hello and World" };
+		String constraint =
+			"((((\"Hello and World\" and \"Beautiful and\"))) or Wonderful)";
 		assertFalse(testValidatorWithFeatureNames(constraint, featureNames));
 		assertTrue(testValidatorWithoutFeatureNames(constraint));
-	}		
+	}
 
 	private boolean testValidatorWithFeatureNames(String constraint, String[] featureNames) {
 		return new NodeReader().isWellFormed(constraint, new HashSet<>(Arrays.asList(featureNames)));
@@ -651,7 +876,8 @@ public class Prop4JTest {
 
 	@Test
 	public void testSimplify1() {
-		Node node = new Or(a, new Or(new Or(b, c), new Or(d, e)));
+		Node node =
+			new Or(a, new Or(new Or(b, c), new Or(d, e)));
 		node.simplify();
 
 		assertEquals(a, node.getChildren()[0]);
@@ -663,7 +889,8 @@ public class Prop4JTest {
 
 	@Test
 	public void testSimplify2() {
-		Node node = new And(a, new And(new And(b, c), new And(d, e)));
+		Node node =
+			new And(a, new And(new And(b, c), new And(d, e)));
 		node.simplify();
 
 		assertEquals(a, node.getChildren()[0]);
@@ -675,9 +902,12 @@ public class Prop4JTest {
 
 	@Test
 	public void testSimplify3() {
-		Node x = new And(b, c);
-		Node y = new And(d, e);
-		Node node = new Or(a, new Or(x, y));
+		Node x =
+			new And(b, c);
+		Node y =
+			new And(d, e);
+		Node node =
+			new Or(a, new Or(x, y));
 		node.simplify();
 
 		assertEquals(a, node.getChildren()[0]);
@@ -687,9 +917,12 @@ public class Prop4JTest {
 
 	@Test
 	public void testSimplify4() {
-		Node x = new Or(b, c);
-		Node y = new Or(d, e);
-		Node node = new And(a, new And(x, y));
+		Node x =
+			new Or(b, c);
+		Node y =
+			new Or(d, e);
+		Node node =
+			new And(a, new And(x, y));
 		node.simplify();
 
 		assertEquals(a, node.getChildren()[0]);
@@ -699,28 +932,45 @@ public class Prop4JTest {
 
 	@Test
 	public void testSat4J() throws ContradictionException, TimeoutException {
-		ISolver solver = SolverFactory.newDefault();
+		ISolver solver =
+			SolverFactory.newDefault();
 		solver.setTimeout(15);
-		solver.addClause(new VecInt(new int[] { 1 }));
-		solver.addClause(new VecInt(new int[] { -1, 2, 3 }));
-		solver.addClause(new VecInt(new int[] { 4 }));
-		solver.isSatisfiable(new VecInt(new int[] { 1, -2, -3 }));
-		assertFalse(solver.isSatisfiable(new VecInt(new int[] { -4 })));
+		solver.addClause(new VecInt(new int[] {
+			1 }));
+		solver.addClause(new VecInt(new int[] {
+			-1,
+			2,
+			3 }));
+		solver.addClause(new VecInt(new int[] {
+			4 }));
+		solver.isSatisfiable(new VecInt(new int[] {
+			1,
+			-2,
+			-3 }));
+		assertFalse(solver.isSatisfiable(new VecInt(new int[] {
+			-4 })));
 
 	}
-	
+
 	@Test
 	public void problemAymericHervieu() {
-		String ctr = "(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) & "+
-				"(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E "+
-				"=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) & "+
-				"(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) & "+
-				"(I => E)"; 
+		String ctr =
+			"(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) & "
+				+
+				"(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E "
+				+
+				"=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) & "
+				+
+				"(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) & "
+				+
+				"(I => E)";
 
-		NodeReader nd = new NodeReader();
+		NodeReader nd =
+			new NodeReader();
 		nd.activateShortSymbols();
 		assertTrue(nd.isWellFormed(ctr));
-		Node n = nd.stringToNode(ctr);
+		Node n =
+			nd.stringToNode(ctr);
 		assertNotNull(n.getChildren());
 	}
 }

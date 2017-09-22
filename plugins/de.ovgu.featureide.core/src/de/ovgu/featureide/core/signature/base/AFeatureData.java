@@ -23,12 +23,13 @@ package de.ovgu.featureide.core.signature.base;
 import org.prop4j.Node;
 
 /**
- * Stores information about a {@link AbstractSignature} in a certain feature.</br>
- * An instance of this class is stored in a signature instance for every feature that implements the signature.
+ * Stores information about a {@link AbstractSignature} in a certain feature.</br> An instance of this class is stored in a signature instance for every feature
+ * that implements the signature.
  * 
  * @author Sebastian Krieter
  */
 public abstract class AFeatureData implements IConstrainedObject {
+
 	protected final int startLineNumber, endLineNumber;
 	protected final int id;
 
@@ -37,9 +38,12 @@ public abstract class AFeatureData implements IConstrainedObject {
 	protected String comment;
 
 	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
-		this.startLineNumber = lineNumber;
-		this.endLineNumber = endLineNumber;
-		this.id = id;
+		this.startLineNumber =
+			lineNumber;
+		this.endLineNumber =
+			endLineNumber;
+		this.id =
+			id;
 	}
 
 	public int getStartLineNumber() {
@@ -55,7 +59,8 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public void setConstraint(Node constraint) {
-		this.constraint = constraint;
+		this.constraint =
+			constraint;
 	}
 
 	public String getComment() {
@@ -63,7 +68,8 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public void setComment(String comment) {
-		this.comment = comment;
+		this.comment =
+			comment;
 	}
 
 	public int getID() {
@@ -71,7 +77,8 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public boolean hasID(int id) {
-		return this.id == -1 || this.id == id;
+		return this.id == -1
+			|| this.id == id;
 	}
 
 }

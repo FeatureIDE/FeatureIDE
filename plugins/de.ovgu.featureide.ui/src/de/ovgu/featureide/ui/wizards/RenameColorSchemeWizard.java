@@ -35,11 +35,12 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class RenameColorSchemeWizard extends Wizard {
 
-	public static final String ID = UIPlugin.PLUGIN_ID
+	public static final String ID =
+		UIPlugin.PLUGIN_ID
 			+ ".wizards.RenameColorSchemeWizard";
 
 	public RenameColorSchemePage page;
-	
+
 	private final IFeatureModel featureModel;
 
 	/**
@@ -47,7 +48,8 @@ public class RenameColorSchemeWizard extends Wizard {
 	 */
 	public RenameColorSchemeWizard(IFeatureModel featureModel) {
 		super();
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 		setWindowTitle(RENAME_COLORSCHEME);
 	}
 
@@ -55,17 +57,19 @@ public class RenameColorSchemeWizard extends Wizard {
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		page = new RenameColorSchemePage();
+		page =
+			new RenameColorSchemePage();
 		addPage(page);
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We
-	 * will create an operation and run it using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
-		final String csName = page.getColorSchemeName();
-		if (csName != null && !csName.isEmpty()) {
+		final String csName =
+			page.getColorSchemeName();
+		if (csName != null
+			&& !csName.isEmpty()) {
 			FeatureColorManager.renameColorScheme(featureModel, csName);
 			return true;
 		}

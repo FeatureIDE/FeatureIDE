@@ -37,13 +37,14 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * All structural information of an {@link IFeatureModel}.
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke  
+ * @author Marcus Pinnecke
  */
 public class FeatureStructure implements IFeatureStructure {
 
 	protected boolean and;
 
-	protected final LinkedList<IFeatureStructure> children = new LinkedList<>();
+	protected final LinkedList<IFeatureStructure> children =
+		new LinkedList<>();
 	protected boolean concrete;
 	protected final IFeature correspondingFeature;
 
@@ -52,22 +53,31 @@ public class FeatureStructure implements IFeatureStructure {
 	protected boolean mandatory;
 	protected boolean multiple;
 
-	protected IFeatureStructure parent = null;
-	protected List<IConstraint> partOfConstraints = new LinkedList<>();
-	
+	protected IFeatureStructure parent =
+		null;
+	protected List<IConstraint> partOfConstraints =
+		new LinkedList<>();
+
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
-			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
+			correspondingFeature =
+				oldStructure.correspondingFeature.clone(newFeatureModel, this);
 			newFeatureModel.addFeature(correspondingFeature);
 		} else {
-			correspondingFeature = oldStructure.correspondingFeature;
+			correspondingFeature =
+				oldStructure.correspondingFeature;
 		}
 
-		mandatory = oldStructure.mandatory;
-		concrete = oldStructure.concrete;
-		and = oldStructure.and;
-		multiple = oldStructure.multiple;
-		hidden = oldStructure.hidden;
+		mandatory =
+			oldStructure.mandatory;
+		concrete =
+			oldStructure.concrete;
+		and =
+			oldStructure.and;
+		multiple =
+			oldStructure.multiple;
+		hidden =
+			oldStructure.hidden;
 
 		for (final IFeatureStructure child : oldStructure.children) {
 			addNewChild(child.cloneSubtree(newFeatureModel));
@@ -75,13 +85,19 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	public FeatureStructure(IFeature correspondingFeature) {
-		this.correspondingFeature = correspondingFeature;
+		this.correspondingFeature =
+			correspondingFeature;
 
-		mandatory = false;
-		concrete = true;
-		and = true;
-		multiple = false;
-		hidden = false;
+		mandatory =
+			false;
+		concrete =
+			true;
+		and =
+			true;
+		multiple =
+			false;
+		hidden =
+			false;
 	}
 
 	@Override
@@ -107,28 +123,34 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void changeToAlternative() {
-		if(getChildrenCount() <= 1){
+		if (getChildrenCount() <= 1) {
 			return;
 		}
-		and = false;
-		multiple = false;
+		and =
+			false;
+		multiple =
+			false;
 		fireChildrenChanged();
 	}
 
 	@Override
 	public void changeToAnd() {
-		and = true;
-		multiple = false;
+		and =
+			true;
+		multiple =
+			false;
 		fireChildrenChanged();
 	}
 
 	@Override
 	public void changeToOr() {
-		if(getChildrenCount() <= 1){
+		if (getChildrenCount() <= 1) {
 			return;
 		}
-		and = false;
-		multiple = true;
+		and =
+			false;
+		multiple =
+			true;
 		fireChildrenChanged();
 	}
 
@@ -138,22 +160,26 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	protected void fireAttributeChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED);
+		final FeatureIDEEvent event =
+			new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED);
 		correspondingFeature.fireEvent(event);
 	}
-	
+
 	protected void fireChildrenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.GROUP_TYPE_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event =
+			new FeatureIDEEvent(this, EventType.GROUP_TYPE_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event =
+			new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
-	
+
 	protected void fireMandatoryChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event =
+			new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -166,13 +192,16 @@ public class FeatureStructure implements IFeatureStructure {
 	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		return children;
 	}
-	
+
 	@Override
 	public boolean hasVisibleChildren(boolean showHiddenFeature) {
-		boolean check = false;
-		for (IFeatureStructure child: children) {
-			if ((!child.hasHiddenParent() || showHiddenFeature)) {
-				check = true;
+		boolean check =
+			false;
+		for (IFeatureStructure child : children) {
+			if ((!child.hasHiddenParent()
+				|| showHiddenFeature)) {
+				check =
+					true;
 			}
 		}
 		return check;
@@ -229,27 +258,30 @@ public class FeatureStructure implements IFeatureStructure {
 
 			return false;
 		}
-		IFeatureStructure p = getParent();
+		IFeatureStructure p =
+			getParent();
 
 		while (!p.isRoot()) {
 			if (p.isHidden()) {
 				return true;
 			}
-			p = p.getParent();
+			p =
+				p.getParent();
 
 		}
 
 		return false;
 	}
 
-
 	/**
-	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
-	 * Gh'.
+	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef :: Gh'.
 	 */
 	@Override
 	public boolean hasInlineRule() {
-		return (getChildrenCount() > 1) && and && isMandatory() && !multiple;
+		return (getChildrenCount() > 1)
+			&& and
+			&& isMandatory()
+			&& !multiple;
 	}
 
 	@Override
@@ -259,17 +291,20 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAlternative() {
-		return !and && !multiple;
+		return !and
+			&& !multiple;
 	}
 
 	@Override
 	public boolean isAncestorOf(IFeatureStructure parent) {
-		IFeatureStructure currParent = getParent();
+		IFeatureStructure currParent =
+			getParent();
 		while (currParent != null) {
 			if (parent == currParent) {
 				return true;
 			}
-			currParent = currParent.getParent();
+			currParent =
+				currParent.getParent();
 		}
 		return false;
 	}
@@ -281,7 +316,8 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isANDPossible() {
-		if ((parent == null) || parent.isAnd()) {
+		if ((parent == null)
+			|| parent.isAnd()) {
 			return false;
 		}
 		for (final IFeatureStructure child : children) {
@@ -306,10 +342,12 @@ public class FeatureStructure implements IFeatureStructure {
 	public boolean isHidden() {
 		return hidden;
 	}
-	
+
 	@Override
 	public boolean isMandatory() {
-		return (parent == null) || !parent.isAnd() || mandatory;
+		return (parent == null)
+			|| !parent.isAnd()
+			|| mandatory;
 	}
 
 	@Override
@@ -324,7 +362,8 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isOr() {
-		return !and && multiple;
+		return !and
+			&& multiple;
 	}
 
 	@Override
@@ -334,7 +373,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void removeChild(IFeatureStructure child) {
-		if(!children.remove(child))
+		if (!children.remove(child))
 			throw new NoSuchElementException();
 		child.setParent(null);
 		fireChildrenChanged();
@@ -342,7 +381,8 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public IFeatureStructure removeLastChild() {
-		final IFeatureStructure child = children.removeLast();
+		final IFeatureStructure child =
+			children.removeLast();
 		child.setParent(null);
 		fireChildrenChanged();
 		return child;
@@ -350,7 +390,8 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild) {
-		final int index = children.indexOf(oldChild);
+		final int index =
+			children.indexOf(oldChild);
 		children.set(index, newChild);
 		oldChild.setParent(null);
 		newChild.setParent(this);
@@ -359,24 +400,29 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void setAbstract(boolean value) {
-		concrete = !value;
+		concrete =
+			!value;
 		fireAttributeChanged();
 	}
 
 	@Override
 	public void setAlternative() {
-		and = false;
-		multiple = false;
+		and =
+			false;
+		multiple =
+			false;
 	}
 
 	@Override
 	public void setAnd() {
-		and = true;
+		and =
+			true;
 	}
 
 	@Override
 	public void setAND(boolean and) {
-		this.and = and;
+		this.and =
+			and;
 		fireChildrenChanged();
 	}
 
@@ -391,26 +437,31 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void setHidden(boolean hid) {
-		hidden = hid;
+		hidden =
+			hid;
 		fireHiddenChanged();
 	}
 
 	@Override
 	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
+		this.mandatory =
+			mandatory;
 		fireMandatoryChanged();
 	}
 
 	@Override
 	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
+		this.multiple =
+			multiple;
 		fireChildrenChanged();
 	}
 
 	@Override
 	public void setOr() {
-		and = false;
-		multiple = true;
+		and =
+			false;
+		multiple =
+			true;
 	}
 
 	@Override
@@ -418,12 +469,14 @@ public class FeatureStructure implements IFeatureStructure {
 		if (newParent == parent) {
 			return;
 		}
-		parent = newParent;
+		parent =
+			newParent;
 	}
 
 	@Override
 	public void setRelevantConstraints() {
-		final List<IConstraint> constraintList = new LinkedList<>();
+		final List<IConstraint> constraintList =
+			new LinkedList<>();
 		for (final IConstraint constraint : correspondingFeature.getFeatureModel().getConstraints()) {
 			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(correspondingFeature.getName())) {
@@ -432,21 +485,23 @@ public class FeatureStructure implements IFeatureStructure {
 				}
 			}
 		}
-		partOfConstraints = constraintList;
+		partOfConstraints =
+			constraintList;
 	}
 
 	@Override
 	public void setRelevantConstraints(List<IConstraint> constraints) {
-		partOfConstraints = constraints;
+		partOfConstraints =
+			constraints;
 	}
-	
+
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("FeatureStructure=(");
+		StringBuilder sb =
+			new StringBuilder("FeatureStructure=(");
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
 	}
-
 
 }

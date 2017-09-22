@@ -37,14 +37,17 @@ public class FeatureUnusedFilter extends ConfigurationMapFilter {
 		super("unused features", isDefault);
 		setImagePath(Image_Minus);
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		List<Configuration> configs = configurationMap.getConfigurations();
-		if(configs == null) return false;
+		List<Configuration> configs =
+			configurationMap.getConfigurations();
+		if (configs == null) return false;
 		for (Configuration config : configs) {
 			if (config.getSelectedFeatures().contains(feature))
 				return false;

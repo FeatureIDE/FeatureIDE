@@ -41,17 +41,18 @@ import de.ovgu.featureide.ui.views.collaboration.figures.UnderlayerFigure;
  * @author Constanze Adler
  */
 public class CollaborationEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
-	
-	public CollaborationEditPart(FSTFeature coll){
+
+	public CollaborationEditPart(FSTFeature coll) {
 		super();
 		setModel(coll);
 	}
-	
-	public FSTFeature getCollaborationModel(){
+
+	public FSTFeature getCollaborationModel() {
 		return (FSTFeature) getModel();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#createFigure()
 	 */
 	@Override
@@ -59,45 +60,52 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 		return new UnderlayerFigure(getCollaborationModel());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
 	 */
 	@Override
-	protected void createEditPolicies() {
-	}
-	
+	protected void createEditPolicies() {}
+
 	/**
 	 * {@link ModelEditPart#refreshVisuals()}
 	 */
 	@Override
 	protected void refreshVisuals() {
-		this.getFigure().getBounds().x =GUIDefaults.DEFAULT_INSET_TO_EDGE;
-		this.getFigure().getBounds().y= this.getFigure().getBounds().y + GUIDefaults.DEFAULT_INSET_TO_EDGE;
+		this.getFigure().getBounds().x =
+			GUIDefaults.DEFAULT_INSET_TO_EDGE;
+		this.getFigure().getBounds().y =
+			this.getFigure().getBounds().y
+				+ GUIDefaults.DEFAULT_INSET_TO_EDGE;
 	}
-	
+
 	/**
 	 * Opens the configuration editor if the element is a configuration.
 	 */
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
 			if (getCollaborationModel() instanceof FSTConfiguration) {
-				IFile file = ((FSTConfiguration) getCollaborationModel()).getFile();
-				
-				 if (file == null)
-					 return;
-				 
-				 IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();	 
-				 try {
-					 IWorkbenchPage page = dw.getActivePage();
-					 if (page != null) {
-						 FileEditorInput fileEditorInput = new FileEditorInput(file);
-						 page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
-					 }
-				 } catch (PartInitException e) {
-					 UIPlugin.getDefault().logError(e);
-				 }
+				IFile file =
+					((FSTConfiguration) getCollaborationModel()).getFile();
+
+				if (file == null)
+					return;
+
+				IWorkbenchWindow dw =
+					UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+				try {
+					IWorkbenchPage page =
+						dw.getActivePage();
+					if (page != null) {
+						FileEditorInput fileEditorInput =
+							new FileEditorInput(file);
+						page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
+					}
+				} catch (PartInitException e) {
+					UIPlugin.getDefault().logError(e);
+				}
 			}
-	
+
 		}
 		super.performRequest(request);
 	}

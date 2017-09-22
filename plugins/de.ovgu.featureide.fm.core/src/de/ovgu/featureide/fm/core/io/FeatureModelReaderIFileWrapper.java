@@ -32,26 +32,28 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
- * This Wrapper makes it possible, to read feature models from IFiles, 
- * e.g. if working with Eclipse plugins
- * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
+ * This Wrapper makes it possible, to read feature models from IFiles, e.g. if working with Eclipse plugins Otherwise only the classes extending
+ * {@link AbstractFeatureModelReader} are needed
  * 
- * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/>
- * {@link IFile} can be converted via {@code Paths.getPath(ifile.getLocationURI())}.
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/> {@link IFile} can be converted via
+ *             {@code Paths.getPath(ifile.getLocationURI())}.
  * 
  * @author Sönke Holthusen
  * @author Marcus Pinnecke (Feature Interface)
  */
 @Deprecated
 public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
+
 	private AbstractFeatureModelReader reader;
 
 	public FeatureModelReaderIFileWrapper(AbstractFeatureModelReader reader) {
-		this.reader = reader;
+		this.reader =
+			reader;
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
-		reader.featureModel = featureModel;
+		reader.featureModel =
+			featureModel;
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -61,11 +63,9 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	/**
 	 * Reads a feature model from a string.
 	 * 
-	 * Please use {@link #setFile(IFile)} if you know the source of the feature
-	 * model.
+	 * Please use {@link #setFile(IFile)} if you know the source of the feature model.
 	 * 
-	 * @param text
-	 *            the textual representation of the feature model
+	 * @param text the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
 	public void readFromString(String text) throws UnsupportedModelException {
@@ -77,7 +77,8 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		////
 		FMComposerManager.getFMComposerExtension(ifile.getProject());
 		/////
-		File file = ifile.getRawLocation().makeAbsolute().toFile();
+		File file =
+			ifile.getRawLocation().makeAbsolute().toFile();
 
 		reader.readFromFile(file);
 	}

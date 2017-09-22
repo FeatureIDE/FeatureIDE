@@ -32,15 +32,16 @@ public class Experiment_SPLOTmodels {
 		// www.splot-research.org for details)
 		// If an identifier is not provided for a feature use the feature name
 		// as id
-		splar.core.fm.FeatureModel featureModel = new XMLFeatureModel(
-				featureModelPath, XMLFeatureModel.USE_VARIABLE_NAME_AS_ID);
+		splar.core.fm.FeatureModel featureModel =
+			new XMLFeatureModel(
+					featureModelPath, XMLFeatureModel.USE_VARIABLE_NAME_AS_ID);
 		// load feature model from
 		featureModel.loadModel();
 
 		return featureModel;
 	}
 
-	/** 
+	/**
 	 * 
 	 * @param featureModel
 	 * @return number of valid configurations (using BDD)
@@ -52,30 +53,32 @@ public class Experiment_SPLOTmodels {
 		// create BDD variable order heuristic
 		new FTPreOrderSortedECTraversalHeuristic("Pre-CL-MinSpan",
 				featureModel, FTPreOrderSortedECTraversalHeuristic.FORCE_SORT);
-		VariableOrderingHeuristic heuristic = VariableOrderingHeuristicsManager
-				.createHeuristicsManager().getHeuristic("Pre-CL-MinSpan");
-            
+		VariableOrderingHeuristic heuristic =
+			VariableOrderingHeuristicsManager
+					.createHeuristicsManager().getHeuristic("Pre-CL-MinSpan");
+
 		// Creates the BDD reasoner
-		ReasoningWithBDD reasoner = new FMReasoningWithBDD(featureModel,
-				heuristic, 50000, 50000, 60000, "pre-order");
-   
+		ReasoningWithBDD reasoner =
+			new FMReasoningWithBDD(featureModel,
+					heuristic, 50000, 50000, 60000, "pre-order");
+
 		// Initialize the reasoner (BDD is created at this moment)
 		reasoner.init();
 		// Use the reasoner
-		//System.out.println("BDD has " + reasoner.getBDD().nodeCount()
-				//+ " nodes and was built in " + reasoner.getBDDBuildingTime()
-				//+ " ms "  );
-        
+		// System.out.println("BDD has " + reasoner.getBDD().nodeCount()
+		// + " nodes and was built in " + reasoner.getBDDBuildingTime()
+		// + " ms " );
+
 		// Check if feature model is consistent, i.e., has at least one valid
 		// configuration
 		assert (reasoner.isConsistent());
-		//System.out.println("Feature model is "
-				//+ (reasoner.isConsistent() ? "" : " NOT ") + "consistent!");
+		// System.out.println("Feature model is "
+		// + (reasoner.isConsistent() ? "" : " NOT ") + "consistent!");
 
 		// Count feature model solutions
-		//System.out.println("Feature model has "
+		// System.out.println("Feature model has "
 //				+ reasoner.countValidConfigurations()
-				// + " possible configurations");
+		// + " possible configurations");
 
 		// Important:
 		// - My research focused on heuristics to reduce the size of BDDs as
@@ -89,5 +92,4 @@ public class Experiment_SPLOTmodels {
 		return (long) reasoner.countValidConfigurations();
 	}
 
-	
 }

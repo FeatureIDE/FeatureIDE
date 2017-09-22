@@ -38,32 +38,41 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * @author Sebastian Krieter
  */
 public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments, Boolean> {
-	
+
 	public static class Arguments extends JobArguments {
+
 		private final IFolder srcFolder;
 		private final IFolder destFolder;
-		
+
 		public Arguments(IFolder srcFolder, IFolder destFolder) {
 			super(Arguments.class);
-			this.srcFolder = srcFolder;
-			this.destFolder = destFolder;
+			this.srcFolder =
+				srcFolder;
+			this.destFolder =
+				destFolder;
 		}
 	}
-	
+
 	protected MPLCopyExternalJob(Arguments arguments) {
 		super(COPYING_SOURCE_FILES, arguments);
 	}
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor = workMonitor;
-		IPath destPath = arguments.destFolder.getFullPath();
-		
+		this.workMonitor =
+			workMonitor;
+		IPath destPath =
+			arguments.destFolder.getFullPath();
+
 		try {
-			IResource[] srcMembers = arguments.srcFolder.members();
-			for (int i = 0; i < srcMembers.length; i++) {
-				IResource srcMember = srcMembers[i];
-				IPath px = destPath.append(srcMember.getName());
+			IResource[] srcMembers =
+				arguments.srcFolder.members();
+			for (int i =
+				0; i < srcMembers.length; i++) {
+				IResource srcMember =
+					srcMembers[i];
+				IPath px =
+					destPath.append(srcMember.getName());
 				if (!px.toFile().exists()) {
 					srcMember.move(px, true, null);
 				}

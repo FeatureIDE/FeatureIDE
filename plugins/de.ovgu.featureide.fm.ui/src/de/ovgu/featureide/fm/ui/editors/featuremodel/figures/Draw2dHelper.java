@@ -31,8 +31,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 public class Draw2dHelper {
 
 	/**
-	 * Draws a filled circle inside the rectangle.<br>
-	 * Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
+	 * Draws a filled circle inside the rectangle.<br> Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
 	 * 
 	 * @param graphics The graphics to draw in.
 	 * @param bounds The bounds of the circle.
@@ -40,10 +39,9 @@ public class Draw2dHelper {
 	public static void fillCircle(Graphics graphics, Rectangle bounds) {
 		fillArc(graphics, bounds, 0, 360);
 	}
-	
+
 	/**
-	 * Draws a filled arc inside the rectangle.<br>
-	 * Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
+	 * Draws a filled arc inside the rectangle.<br> Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
 	 * 
 	 * @param graphics The graphics to draw in.
 	 * @param bounds The bounds of the arc.
@@ -53,16 +51,17 @@ public class Draw2dHelper {
 	public static void fillArc(Graphics graphics, Rectangle bounds, int offset, int length) {
 		fillArc(graphics, bounds.x, bounds.y, bounds.width, bounds.height, offset, length);
 	}
-	
+
 	/**
-	 * Draws a filled arc inside the rectangle.<br>
-	 * Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
+	 * Draws a filled arc inside the rectangle.<br> Workaround for the method {@link Graphics#fillArc(Rectangle, int, int)} as it seems to be broken.
 	 * 
 	 * @param graphics The graphics to draw in.
 	 * @param offset The start angle of the arc.
 	 * @param length The length of the arc.
 	 */
 	public static void fillArc(Graphics graphics, int x, int y, int width, int height, int offset, int length) {
-		graphics.fillArc(x, y, width + 1, height + 1, offset, length);
+		graphics.fillArc(x, y, width
+			+ 1, height
+				+ 1, offset, length);
 	}
 }

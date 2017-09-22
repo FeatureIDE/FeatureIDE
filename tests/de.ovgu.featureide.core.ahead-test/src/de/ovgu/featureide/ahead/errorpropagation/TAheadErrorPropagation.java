@@ -33,55 +33,62 @@ import de.ovgu.featureide.core.CorePlugin;
 /**
  * Tests the class {@link AheadBuildErrorEvent}<br><br>
  * 
- * To generate test cases copy the files into "testcases.<code>projectname</code>"<br>
- * java files need to be renamed into <code>filename</code>.javaX<br>
+ * To generate test cases copy the files into "testcases.<code>projectname</code>"<br> java files need to be renamed into <code>filename</code>.javaX<br>
  * feature files need to be renamed into <code>feature</code>_filename.jak
- *  
+ * 
  * @author Jens Meinicke
  */
 /*
- * A full test could be possible checking all lines of a generated file and compares the content
- * of the lines (except for lines whose content needed to be changed or is created at the composition process)  
+ * A full test could be possible checking all lines of a generated file and compares the content of the lines (except for lines whose content needed to be
+ * changed or is created at the composition process)
  */
 public class TAheadErrorPropagation {
 
-	protected static File FILE_FOLDER = new File(
-			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
+	protected static File FILE_FOLDER =
+		new File(
+				"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
 
-	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
+	AheadBuildErrorEvent event =
+		new AheadBuildErrorEvent();
 
 	private String project;
-	
+
 	private void setHelloWorld() {
-		project = "HelloWorld";
+		project =
+			"HelloWorld";
 	}
-	
+
 	private void setDesktopSearcher() {
-		project = "DesktopSearcher";
+		project =
+			"DesktopSearcher";
 	}
-	
+
 	public File getFile(String name) {
 		// first tries the location on build server, if this fails tries to use
 		// local location
 		if (!FILE_FOLDER.canRead()) {
-			FILE_FOLDER = new File(ClassLoader.getSystemResource(
-					"testcases").getPath());
+			FILE_FOLDER =
+				new File(ClassLoader.getSystemResource(
+						"testcases").getPath());
 		}
-		File folder = FILE_FOLDER.listFiles(getFileFilter(project))[0];
+		File folder =
+			FILE_FOLDER.listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
 	}
-	
+
 	private final static FileFilter getFileFilter(final String s) {
 		return new FileFilter() {
+
 			@Override
 			public boolean accept(File pathname) {
 				return pathname.getName().equals(s);
 			}
 		};
 	}
-	
+
 	/**
 	 * Main test function. Calls all necessary methods to generate the markers.
+	 * 
 	 * @param className The name of the class.
 	 * @param feature The feature containing the error
 	 * @param javaLine The line at the generated java file
@@ -89,38 +96,76 @@ public class TAheadErrorPropagation {
 	 * @param jakLine The line at the source file
 	 */
 	private void test(String className, String feature, int javaLine, int composedLine, int jakLine) {
-		int composedJakLine = calculateComposedJakLine(javaLine, className + ".javaX");
+		int composedJakLine =
+			calculateComposedJakLine(javaLine, className
+				+ ".javaX");
 		if (composedLine != composedJakLine) {
-			System.out.println("Wrong composed line @ " + className + ".java (expected: " + composedLine +
-					" but was: " + composedJakLine + ")");
+			System.out.println("Wrong composed line @ "
+				+ className
+				+ ".java (expected: "
+				+ composedLine
+				+
+				" but was: "
+				+ composedJakLine
+				+ ")");
 		}
-		
-		String content = readFile(getFile(className + ".jak"));
-		int line = event.setSourceFile(content, composedJakLine); 
 
-		if (!event.fileName.equals("../features/" + feature + "/" + className + ".jak")) {
-			System.out.println("Wrong source files @ " + className + ".java (expected: " + "../features/" + feature + "/" + className + ".jak" +
-					" but was: " + event.fileName + ")");
+		String content =
+			readFile(getFile(className
+				+ ".jak"));
+		int line =
+			event.setSourceFile(content, composedJakLine);
+
+		if (!event.fileName.equals("../features/"
+			+ feature
+			+ "/"
+			+ className
+			+ ".jak")) {
+			System.out.println("Wrong source files @ "
+				+ className
+				+ ".java (expected: "
+				+ "../features/"
+				+ feature
+				+ "/"
+				+ className
+				+ ".jak"
+				+
+				" but was: "
+				+ event.fileName
+				+ ")");
 		}
-		
-		int sourceLine = event.setSourceLine(composedJakLine, line, readFile(getFile(feature + "_" + className + ".jak")));
+
+		int sourceLine =
+			event.setSourceLine(composedJakLine, line, readFile(getFile(feature
+				+ "_"
+				+ className
+				+ ".jak")));
 		if (jakLine != sourceLine) {
-			System.out.println("Wrong source line @ " + className + ".java (expected: " + jakLine +
-					" but was: " + sourceLine + ")");
+			System.out.println("Wrong source line @ "
+				+ className
+				+ ".java (expected: "
+				+ jakLine
+				+
+				" but was: "
+				+ sourceLine
+				+ ")");
 		}
 		// TODO #457 AHEAD error propagation add this test
-		//assertEquals(jakLine, sourceLine);
+		// assertEquals(jakLine, sourceLine);
 	}
-	
+
 	private int calculateComposedJakLine(int javaLine, String fileName) {
 		return event.calculateComposedJakLine(javaLine, readFile(getFile(fileName)));
 	}
 
 	private String readFile(File file) {
-		Scanner scanner = null;
-		StringBuilder builder = new StringBuilder();
+		Scanner scanner =
+			null;
+		StringBuilder builder =
+			new StringBuilder();
 		try {
-			scanner = new Scanner(file, "UTF-8");
+			scanner =
+				new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				builder.append(scanner.nextLine());
 				builder.append("\r\n");
@@ -128,15 +173,13 @@ public class TAheadErrorPropagation {
 		} catch (FileNotFoundException e) {
 			CorePlugin.getDefault().logError(e);
 		} finally {
-			if(scanner!=null)scanner.close();
+			if (scanner != null) scanner.close();
 		}
 		return builder.toString();
 	}
 
-	/*�**********************************************************************
-	 * project		 : HelloWorld-AHEAD										*
-	 * class  		 : Main													*
-	 * configuration : BeatifulWorld										*
+	/*
+	 * �********************************************************************** project : HelloWorld-AHEAD * class : Main * configuration : BeatifulWorld *
 	 ************************************************************************/
 	@Test
 	public void testMain_1() {
@@ -149,17 +192,15 @@ public class TAheadErrorPropagation {
 		setHelloWorld();
 		test("Main", "Beautiful", 18, 18, 4);
 	}
-	
+
 	@Test
 	public void testMain_3() {
 		setHelloWorld();
 		test("Main", "World", 27, 27, 4);
 	}
-	
-	/*�**********************************************************************
-	 * project		 : DesktopSearcher-AHEAD								*
-	 * class  		 : MainFrame											*
-	 * configuration : config												*
+
+	/*
+	 * �********************************************************************** project : DesktopSearcher-AHEAD * class : MainFrame * configuration : config *
 	 ************************************************************************/
 	@Test
 	public void testMainFrame_1() {
@@ -172,7 +213,7 @@ public class TAheadErrorPropagation {
 		setDesktopSearcher();
 		test("MainFrame", "Single_Directory", 213, 213, 37);
 	}
-	
+
 	@Test
 	public void testMainFrame_3() {
 		setDesktopSearcher();

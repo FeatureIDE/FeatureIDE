@@ -32,29 +32,33 @@ import de.ovgu.featureide.ui.UIPlugin;
 /**
  * Filter to hide methods in the collaboration outline.
  * 
-  * @author Dominic Labsch
-  * @author Daniel P�sche
+ * @author Dominic Labsch
+ * @author Daniel P�sche
  */
 public class HideAllMethods implements IOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
+		LinkedList<Object> resultList =
+			new LinkedList<Object>();
 
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
+		if (obj.length > 0
+			&& obj[0] instanceof RoleElement) {
+			for (int i =
+				0; i < obj.length; i++) {
 				if (!(obj[i] instanceof FSTMethod)) {
 					resultList.add(obj[i]);
 				}
 			}
-		}else{
+		} else {
 			return obj;
 		}
 		return resultList.toArray();
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getName()
 	 */
 	@Override
@@ -62,7 +66,8 @@ public class HideAllMethods implements IOutlineFilter {
 		return "Hide All Methods";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getImage()
 	 */
 	@Override

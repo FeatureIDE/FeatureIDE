@@ -28,5 +28,6 @@ import org.prop4j.Node;
  * @author Sebastian Krieter
  */
 public interface IConstrainedObject {
+
 	Node getConstraint();
 }

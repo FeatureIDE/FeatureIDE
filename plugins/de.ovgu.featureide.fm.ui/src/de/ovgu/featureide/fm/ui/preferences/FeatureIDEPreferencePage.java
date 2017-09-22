@@ -43,19 +43,19 @@ import de.ovgu.featureide.fm.core.Preferences;
 
 public class FeatureIDEPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
-	private static final SelectionListener completionSelectionListener = new SelectionListener() {
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			Preferences.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
-		}
+	private static final SelectionListener completionSelectionListener =
+		new SelectionListener() {
 
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
-	};
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Preferences.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
+			}
 
-	public FeatureIDEPreferencePage() {
-	}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		};
+
+	public FeatureIDEPreferencePage() {}
 
 	public FeatureIDEPreferencePage(String title) {
 		super(title);
@@ -66,22 +66,26 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 	}
 
 	@Override
-	public void init(IWorkbench workbench) {
-	}
+	public void init(IWorkbench workbench) {}
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
+		Composite container =
+			new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 
-		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
+		final Group completionGroup =
+			new Group(container, SWT.SHADOW_IN);
 		completionGroup.setText(CONFIGURATION_COLORING);
 		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		completionGroup
 				.setToolTipText(THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_);
-		final Button noneButton = new Button(completionGroup, SWT.RADIO);
-		final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
-		final Button contradictionButton = new Button(completionGroup, SWT.RADIO);
+		final Button noneButton =
+			new Button(completionGroup, SWT.RADIO);
+		final Button openClauseButton =
+			new Button(completionGroup, SWT.RADIO);
+		final Button contradictionButton =
+			new Button(completionGroup, SWT.RADIO);
 
 		noneButton.setData(Preferences.COMPLETION_NONE);
 		openClauseButton.setData(Preferences.COMPLETION_OPEN_CLAUSES);

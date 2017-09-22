@@ -28,20 +28,27 @@ import org.junit.Test;
 
 /**
  * Test for {@link FeatureHouseModelBuilder} of Haskel files.
+ * 
  * @see HaskellClassBuilder
  * @author Jens Meinicke
  */
 public class THaskellClassBuilder {
-	private HaskellClassBuilder builder = new HaskellClassBuilder(null);
-	
+
+	private HaskellClassBuilder builder =
+		new HaskellClassBuilder(null);
+
 	// METHOD TEST 1
-	private String TEST_METHOD_1 = "mapResult :: (a -> Result b err) -> Result a err -> Result b err"; 
-	private String EXPECTED_NAME_METHOD_1 = "mapResult";
-	private String EXPECTED_PARAMETER_1_METHOD_1 = "(a -> Result b err) -> Result a err -> Result b err";
-	
+	private String TEST_METHOD_1 =
+		"mapResult :: (a -> Result b err) -> Result a err -> Result b err";
+	private String EXPECTED_NAME_METHOD_1 =
+		"mapResult";
+	private String EXPECTED_PARAMETER_1_METHOD_1 =
+		"(a -> Result b err) -> Result a err -> Result b err";
+
 	@Test
 	public void methodTest1() {
-		LinkedList<String> method = builder.getMethod(TEST_METHOD_1);
+		LinkedList<String> method =
+			builder.getMethod(TEST_METHOD_1);
 		assertEquals(EXPECTED_NAME_METHOD_1, method.get(0));
 		assertEquals(EXPECTED_PARAMETER_1_METHOD_1, method.get(1));
 	}

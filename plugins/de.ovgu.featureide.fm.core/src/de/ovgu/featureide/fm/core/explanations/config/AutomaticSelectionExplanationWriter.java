@@ -28,35 +28,37 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  * @author Timo G&uuml;nther
  */
 public class AutomaticSelectionExplanationWriter extends ConfigurationExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param explanation explanation to transform
 	 */
 	public AutomaticSelectionExplanationWriter(AutomaticSelectionExplanation explanation) {
 		super(explanation);
 	}
-	
+
 	@Override
 	protected AutomaticSelectionExplanation getExplanation() {
 		return (AutomaticSelectionExplanation) super.getExplanation();
 	}
-	
+
 	@Override
 	protected String getSubjectString() {
 		return getSubjectString(getExplanation().getSubject().getFeature());
 	}
-	
+
 	@Override
 	protected String getAttributeString() {
 		switch (getExplanation().getSubject().getAutomatic()) {
-			case SELECTED:
-				return "automatically selected";
-			case UNSELECTED:
-				return "automatically unselected";
-			case UNDEFINED:
-				throw new IllegalStateException("Feature is not automatically selected or unselected");
-			default:
-				throw new IllegalStateException("Unknown feature selection state");
+		case SELECTED:
+			return "automatically selected";
+		case UNSELECTED:
+			return "automatically unselected";
+		case UNDEFINED:
+			throw new IllegalStateException("Feature is not automatically selected or unselected");
+		default:
+			throw new IllegalStateException("Unknown feature selection state");
 		}
 	}
 }

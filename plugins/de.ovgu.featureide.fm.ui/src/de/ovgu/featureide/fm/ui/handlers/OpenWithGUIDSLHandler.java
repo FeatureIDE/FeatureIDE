@@ -59,21 +59,40 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile modelfile) {
 		try {
-			String jakarta = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/jakarta.jar");
-			String guidsl = getFileFromPlugin(PluginID.PLUGIN_ID, "lib/guidsl.jar");
-			String command = "java -cp \"" + jakarta + "\"";
-			command += " -jar \"" + guidsl + "\"";
+			String jakarta =
+				getFileFromPlugin(PluginID.PLUGIN_ID, "lib/jakarta.jar");
+			String guidsl =
+				getFileFromPlugin(PluginID.PLUGIN_ID, "lib/guidsl.jar");
+			String command =
+				"java -cp \""
+					+ jakarta
+					+ "\"";
+			command +=
+				" -jar \""
+					+ guidsl
+					+ "\"";
 
-			IFeatureModel fm = FeatureModelManager.load(Paths.get(modelfile.getLocationURI())).getObject();
+			IFeatureModel fm =
+				FeatureModelManager.load(Paths.get(modelfile.getLocationURI())).getObject();
 
 			// Parse XML to GUIDSL and save file as model.m
-			String loc = modelfile.getLocation().toOSString();
-			String dirpath = loc.substring(0, loc.length() - 10);
-			String filepath = loc.substring(0, loc.length() - 4) + ".m";
-			File outputfile = new File(filepath);
+			String loc =
+				modelfile.getLocation().toOSString();
+			String dirpath =
+				loc.substring(0, loc.length()
+					- 10);
+			String filepath =
+				loc.substring(0, loc.length()
+					- 4)
+					+ ".m";
+			File outputfile =
+				new File(filepath);
 			FileHandler.save(outputfile.toPath(), fm, new GuidslFormat());
 
-			command += " \"" + filepath + "\"";
+			command +=
+				" \""
+					+ filepath
+					+ "\"";
 
 			System.out.println(command);
 			System.out.println(dirpath);
@@ -86,64 +105,92 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 	}
 
 	public static String getFileFromPlugin(String pluginId, String localPath) throws IOException {
-		if (pluginId == null || localPath == null) {
+		if (pluginId == null
+			|| localPath == null) {
 			throw new IllegalArgumentException();
 		}
 
 		// if the bundle is not ready then there is no file
-		Bundle bundle = Platform.getBundle(pluginId);
+		Bundle bundle =
+			Platform.getBundle(pluginId);
 		if (!BundleUtility.isReady(bundle)) {
 			return null;
 		}
 
 		// look for the file
-		URL url = BundleUtility.find(bundle, localPath);
-		url = FileLocator.toFileURL(url);
+		URL url =
+			BundleUtility.find(bundle, localPath);
+		url =
+			FileLocator.toFileURL(url);
 		return new Path(url.getPath()).toOSString();
 	}
 
 	private void execProcess(String command, File dir) throws IOException {
-		System.out.println("Starting process: " + command);
-		Process process = Runtime.getRuntime().exec(command, null, dir);
-		String sys = System.getProperty("os.name");
+		System.out.println("Starting process: "
+			+ command);
+		Process process =
+			Runtime.getRuntime().exec(command, null, dir);
+		String sys =
+			System.getProperty("os.name");
 		// #58 ,OS dependent Code for excuting commands, Linux does not execute
 		// without a shell
 		if (LINUX.equals(sys)) {
-			String[] cmd = new String[3];
-			cmd[0] = "/bin/bash";
-			cmd[1] = "-c";
-			cmd[2] = command;
-			process = Runtime.getRuntime().exec(cmd, null, dir);
+			String[] cmd =
+				new String[3];
+			cmd[0] =
+				"/bin/bash";
+			cmd[1] =
+				"-c";
+			cmd[2] =
+				command;
+			process =
+				Runtime.getRuntime().exec(cmd, null, dir);
 		}
-		BufferedReader input = null;
-		BufferedReader error = null;
+		BufferedReader input =
+			null;
+		BufferedReader error =
+			null;
 		try {
-			input = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
-			error = new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
+			input =
+				new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+			error =
+				new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
 
-			long start = System.currentTimeMillis();
-			int diff = 250;
+			long start =
+				System.currentTimeMillis();
+			int diff =
+				250;
 			while (true) {
 				try {
 					String line;
-					while ((line = input.readLine()) != null) {
-						System.out.println(">>>" + line);
+					while ((line =
+						input.readLine()) != null) {
+						System.out.println(">>>"
+							+ line);
 					}
-					while ((line = error.readLine()) != null) {
-						System.err.println(">>>" + line);
+					while ((line =
+						error.readLine()) != null) {
+						System.err.println(">>>"
+							+ line);
 					}
-					if (System.currentTimeMillis() - start > diff) {
-						start += diff;
+					if (System.currentTimeMillis()
+						- start > diff) {
+						start +=
+							diff;
 						System.out.print('.');
 					}
-					int exitValue = process.exitValue();
-					System.out.println("...finished (exit=" + exitValue + ")!");
+					int exitValue =
+						process.exitValue();
+					System.out.println("...finished (exit="
+						+ exitValue
+						+ ")!");
 					if (exitValue != 0) {
-						throw new IOException("The process doesn't finish normally (exit=" + exitValue + ")!");
+						throw new IOException("The process doesn't finish normally (exit="
+							+ exitValue
+							+ ")!");
 					}
 					return;
-				} catch (IllegalThreadStateException e) {
-				}
+				} catch (IllegalThreadStateException e) {}
 			}
 		} finally {
 			try {

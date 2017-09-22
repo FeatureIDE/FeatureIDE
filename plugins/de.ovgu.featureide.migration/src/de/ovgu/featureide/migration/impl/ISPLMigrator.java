@@ -25,16 +25,15 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 
 /**
- * Interface for Migration of multiple projects into a FeatureIDE-project. It is
- * highly recommended to extend the default implementation
+ * Interface for Migration of multiple projects into a FeatureIDE-project. It is highly recommended to extend the default implementation
  * {@link DefaultSPLMigrator}.
  * 
  * 
  * @author Konstantin Tonscheidt
  * 
  */
-public interface ISPLMigrator
-{
+public interface ISPLMigrator {
+
 	/**
 	 * Registers the Projects that should be migrated with the Migrator.
 	 * 
@@ -47,8 +46,7 @@ public interface ISPLMigrator
 	/**
 	 * Migrates previously registered projects into a new FeautureIDE-project.
 	 * 
-	 * @param configurationData
-	 *            should contain metadata for creation of the new project.
+	 * @param configurationData should contain metadata for creation of the new project.
 	 * 
 	 * @see DefaultSPLMigrator#migrate(MigrationConfigurationData)
 	 * @see #registerProjectsForMigration(Set)

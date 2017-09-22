@@ -45,14 +45,16 @@ public class ShowHiddenFeaturesAction extends Action {
 
 	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_HIDDEN_FEATURES);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 
 	}
 
 	@Override
 	public void run() {
-		ShowHiddenFeaturesOperation op = new ShowHiddenFeaturesOperation(featureModel);
-		//TODO _interfaces Removed Code
+		ShowHiddenFeaturesOperation op =
+			new ShowHiddenFeaturesOperation(featureModel);
+		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {

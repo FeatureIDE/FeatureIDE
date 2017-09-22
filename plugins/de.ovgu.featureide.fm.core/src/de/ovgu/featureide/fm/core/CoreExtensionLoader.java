@@ -28,11 +28,13 @@ package de.ovgu.featureide.fm.core;
 public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
 
 	private final T[] extensionArray;
-	
+
 	@SafeVarargs
 	public CoreExtensionLoader(T... extensions) {
-		this.extensionArray = extensions;
+		this.extensionArray =
+			extensions;
 	}
+
 	@Override
 	public void loadProviders(ExtensionManager<T> extensionManager) {
 		for (T extension : extensionArray) {

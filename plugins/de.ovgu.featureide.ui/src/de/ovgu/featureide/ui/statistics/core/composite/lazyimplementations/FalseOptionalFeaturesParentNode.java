@@ -32,17 +32,20 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * @author Sebastian Krieter
  */
 public class FalseOptionalFeaturesParentNode extends LazyParent {
+
 	private final IFeatureModel model;
 
 	public FalseOptionalFeaturesParentNode(String description, IFeatureModel model) {
 		super(description, null);
-		this.model = model;
+		this.model =
+			model;
 		calculateChidren(false);
 	}
 
 	@Override
 	protected void initChildren() {
-		List<IFeature> foFeatures = model.getAnalyser().getFalseOptionalFeatures();
+		List<IFeature> foFeatures =
+			model.getAnalyser().getFalseOptionalFeatures();
 		setValue(foFeatures.size());
 
 		for (IFeature feature : foFeatures) {

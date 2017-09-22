@@ -31,7 +31,7 @@ public interface ILanguage {
 	 * @return The translation for: REDUNDANT_CONSTRAINT
 	 */
 	public String getRedundantConst();
-	
+
 	/**
 	 * @return The translation for: IMPLICIT_CONSTRAINT
 	 */
@@ -101,7 +101,7 @@ public interface ILanguage {
 	 * @return The word for: "Hidden"
 	 */
 	public String getHidden();
-	
+
 	/**
 	 * @return The word for: "Collapsed"
 	 */

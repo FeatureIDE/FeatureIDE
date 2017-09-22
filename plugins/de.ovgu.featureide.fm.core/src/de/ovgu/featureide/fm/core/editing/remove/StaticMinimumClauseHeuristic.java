@@ -25,26 +25,29 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 /**
- * Implementation of {@link AFeatureOrderHeuristic}.
- * Returns features dependent on the current clauses in the formula.
+ * Implementation of {@link AFeatureOrderHeuristic}. Returns features dependent on the current clauses in the formula.
  * 
  * @author Sebastian Krieter
  */
 public class StaticMinimumClauseHeuristic extends AFeatureOrderHeuristic {
-	
-	private LinkedList<Integer> order = new LinkedList<>();
+
+	private LinkedList<Integer> order =
+		new LinkedList<>();
 
 	public StaticMinimumClauseHeuristic(final DeprecatedFeature[] map, int length) {
 		super(map, length);
-		for (int i = 0; i < map.length; i++) {
+		for (int i =
+			0; i < map.length; i++) {
 			if (map[i] != null) {
 				order.add(i);
 			}
 		}
 		Collections.sort(order, new Comparator<Integer>() {
+
 			@Override
 			public int compare(Integer o1, Integer o2) {
-				return (int) Math.signum(map[o1].getClauseCount() - map[o2].getClauseCount());
+				return (int) Math.signum(map[o1].getClauseCount()
+					- map[o2].getClauseCount());
 			}
 		});
 	}

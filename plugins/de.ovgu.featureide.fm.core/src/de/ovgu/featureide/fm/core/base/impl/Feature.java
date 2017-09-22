@@ -28,34 +28,17 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Implementation of {@link AFeature} used as default implementation inside FeatureIDE.
- * <br/>
- * <br/>
- * This class implements the functionality required by {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}.
- * <br/>
- * <br/>
- * This class is intended to be the default implementation for regular use-cases of feature management. Further specialization for other use-cases is available
- * in the sub classes {@link ExtendedFeature} and inside {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}.
- * <br/>
- * <br/>
- * An instance of a <code>Feature</code> is intended to be instantiated by a {@link IFeatureModelFactory}.
- * <br/>
- * <br/>
- * <b>Example</b><br/>
- * The following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>IFeature</code> (
- * <code>AFeature</code>) implementation
- * {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
- * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
- * {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface:
- * <code>
- * <pre>
- * IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
- * IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA");
- * </pre>
- * </code>
- * A unified handling of certain <code>Feature</code> (<code>AFeature</code>, <code>IFeature</code>) implementations (in terms of conviennent methods) can be
- * achieved with the use of
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
+ * Implementation of {@link AFeature} used as default implementation inside FeatureIDE. <br/> <br/> This class implements the functionality required by
+ * {@link IFeature} and a {@link AFeatureModelElement}, specified in {@link AFeature}. <br/> <br/> This class is intended to be the default implementation for
+ * regular use-cases of feature management. Further specialization for other use-cases is available in the sub classes {@link ExtendedFeature} and inside
+ * {@link de.ovgu.featureide.fm.core.io.sxfm.SXFMReader SXFMReader}. <br/> <br/> An instance of a <code>Feature</code> is intended to be instantiated by a
+ * {@link IFeatureModelFactory}. <br/> <br/> <b>Example</b><br/> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using
+ * FeatureIDE's default <code>IFeature</code> ( <code>AFeature</code>) implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the
+ * corresponding default factory {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory
+ * class {@link FMFactoryManager}. The instance is stored against the <code>IFeature</code> interface: <code> <pre> IFeatureModel model =
+ * FMFactoryManager.getFactory().createFeatureModel(); IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A
+ * unified handling of certain <code>Feature</code> (<code>AFeature</code>, <code>IFeature</code>) implementations (in terms of conviennent methods) can be
+ * achieved with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
  *
  * @see de.ovgu.featureide.fm.core.base.AFeature Default implementation of the interface for feature in FeatureIDE (<code>AFeature</code>)
  * 
@@ -79,20 +62,16 @@ public class Feature extends AFeature {
 
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
-	 * <code>featureModel</code>, and a
-	 * feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see {@link IFeature} and
-	 * {@link IFeatureModel}). Moreover, the user-defined properties are copied.
-	 * <br/>
-	 * <br/>
-	 * <b>Note</b>: The parameter <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as
-	 * an subclass of {@link AFeatureModelElement) can be <b>null</b>.
+	 * <code>featureModel</code>, and a feature structure <code>newFeatureStructure</code> (for further information on feature model and structure, see
+	 * {@link IFeature} and {@link IFeatureModel}). Moreover, the user-defined properties are copied. <br/> <br/> <b>Note</b>: The parameter
+	 * <code>oldFeature</code> have to be non-null. The getter {@link AFeatureModelElement#getName()} of <code>oldFeature</code> (as an subclass of
+	 * {@link AFeatureModelElement) can be <b>null</b>.
 	 * 
 	 * @param oldFeature used to copy the original feature's identifier, and the original feature's name (if available)
 	 * @param featureModel is used to set the new feature's feature model if <code>featureModel</code> is non-null. If <code>featureModel</code> is <b>null</b>,
-	 *            a
-	 *            reference to the feature model of <code>oldFeature</code> will be used.
+	 *        a reference to the feature model of <code>oldFeature</code> will be used.
 	 * @param newFeatrureStructure is used to set the new feature's feature structure if <code>newFeatrureStructure</code> is non-null. If
-	 *            <code>newFeatrureStructure</code> is <b>null</b>, a reference to the feature structure <code>oldFeature</code> will be used.
+	 *        <code>newFeatrureStructure</code> is <b>null</b>, a reference to the feature structure <code>oldFeature</code> will be used.
 	 * 
 	 * @since 3.0
 	 */
@@ -102,9 +81,8 @@ public class Feature extends AFeature {
 
 	/**
 	 * <b>Default constructor</b>. Constructs a new instance of <code>AFeature</code> with the name <code>name</code> in a given feature model
-	 * <code>featureModel</code>.
-	 * The parameter <code>featureModel</code> have to be non-null since features are identified by their internal numerical identifier and
-	 * <code>featureModel</code> have to provide the next free identifier.
+	 * <code>featureModel</code>. The parameter <code>featureModel</code> have to be non-null since features are identified by their internal numerical
+	 * identifier and <code>featureModel</code> have to provide the next free identifier.
 	 * 
 	 * @param featureModel in which the new instance feature should be part of
 	 * @param name the name of the feature.

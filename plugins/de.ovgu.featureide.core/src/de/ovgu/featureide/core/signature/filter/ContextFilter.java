@@ -43,47 +43,63 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 	private SatSolver solver;
 
 	public ContextFilter(String featureName, ProjectSignatures projectSignatures) {
-		this(new Node[] { new Literal(featureName, true) }, projectSignatures);
+		this(new Node[] {
+			new Literal(featureName, true) }, projectSignatures);
 	}
 
 	public ContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
-		this.projectSignatures = projectSignatures;
-		fmNode = AdvancedNodeCreator.createNodes(projectSignatures.getFeatureModel());
-		selectedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
+		this.projectSignatures =
+			projectSignatures;
+		fmNode =
+			AdvancedNodeCreator.createNodes(projectSignatures.getFeatureModel());
+		selectedFeatures =
+			new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
 
 		init(constraints);
 	}
 
 	public void init(String featureName) {
-		init(new Node[] { new Literal(featureName, true) });
+		init(new Node[] {
+			new Literal(featureName, true) });
 	}
 
 	public void init(Node[] constraints) {
-		Node[] fixClauses = new Node[constraints.length + 1];
-		fixClauses[0] = fmNode;
+		Node[] fixClauses =
+			new Node[constraints.length
+				+ 1];
+		fixClauses[0] =
+			fmNode;
 		System.arraycopy(constraints, 0, fixClauses, 1, constraints.length);
 		Arrays.fill(selectedFeatures, false);
 
-		solver = new SatSolver(new And(fixClauses), 2000);
+		solver =
+			new SatSolver(new And(fixClauses), 2000);
 
 		for (Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
-			int id = projectSignatures.getFeatureID(literal.var.toString());
+			int id =
+				projectSignatures.getFeatureID(literal.var.toString());
 			if (id > -1) {
-				selectedFeatures[id] = true;
+				selectedFeatures[id] =
+					true;
 			}
 		}
 	}
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
-		AFeatureData[] ids = signature.getFeatureData();
-		Node[] negativeLiterals = new Node[ids.length];
-		for (int i = 0; i < ids.length; ++i) {
-			int id = ids[i].getID();
+		AFeatureData[] ids =
+			signature.getFeatureData();
+		Node[] negativeLiterals =
+			new Node[ids.length];
+		for (int i =
+			0; i < ids.length; ++i) {
+			int id =
+				ids[i].getID();
 			if (selectedFeatures[id]) {
 				return true;
 			}
-			negativeLiterals[i] = new Literal(projectSignatures.getFeatureName(id), false);
+			negativeLiterals[i] =
+				new Literal(projectSignatures.getFeatureName(id), false);
 		}
 		try {
 			return !solver.isSatisfiable(negativeLiterals);

@@ -40,30 +40,35 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButEx
  * @author Timo G&uuml;nther
  */
 public class CollapseAllButExplanationAction extends Action {
+
 	/** The ID of this action. */
-	public static final String ID = "de.ovgu.featureide.collapseallbutexplanation";
-	
+	public static final String ID =
+		"de.ovgu.featureide.collapseallbutexplanation";
+
 	/** The graphical feature model context. */
 	private final IGraphicalFeatureModel fm;
-	
+
 	/** The currently active explanation. */
 	private FeatureModelExplanation explanation;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param fm the graphical feature model context
 	 */
 	public CollapseAllButExplanationAction(IGraphicalFeatureModel fm) {
 		super(COLLAPSE_ALL_BUT_EXPLANATION);
-		this.fm = fm;
+		this.fm =
+			fm;
 		addActiveExplanationListener();
 	}
-	
+
 	/**
 	 * Adds a listener that updates the active explanation.
 	 */
 	private void addActiveExplanationListener() {
 		fm.getFeatureModel().addListener(new IEventListener() {
+
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
 				if (event.getEventType() != EventType.ACTIVE_EXPLANATION_CHANGED) {
@@ -73,35 +78,40 @@ public class CollapseAllButExplanationAction extends Action {
 			}
 		});
 	}
-	
+
 	/**
 	 * Returns the graphical feature model context.
+	 * 
 	 * @return the graphical feature model context
 	 */
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {
 		return fm;
 	}
-	
+
 	/**
 	 * Returns the currently active explanation.
+	 * 
 	 * @return the currently active explanation.
 	 */
 	public FeatureModelExplanation getExplanation() {
 		return explanation;
 	}
-	
+
 	/**
 	 * Sets the currently active explanation.
+	 * 
 	 * @param explanation the new active explanation
 	 */
 	public void setExplanation(FeatureModelExplanation explanation) {
-		this.explanation = explanation;
+		this.explanation =
+			explanation;
 		setEnabled(explanation != null);
 	}
-	
+
 	@Override
 	public void run() {
-		final CollapseAllButExplanationOperation op = new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
+		final CollapseAllButExplanationOperation op =
+			new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

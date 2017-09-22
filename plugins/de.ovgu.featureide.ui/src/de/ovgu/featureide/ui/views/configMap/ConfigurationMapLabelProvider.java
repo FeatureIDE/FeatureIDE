@@ -41,17 +41,22 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Paul Maximilian Bittner
  */
 public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITableColorProvider {
-	private final static String imgSelectedPath = "aselected.ico";
-	private final static String imgUnselectedPath = "adeselected.ico";
+
+	private final static String imgSelectedPath =
+		"aselected.ico";
+	private final static String imgUnselectedPath =
+		"adeselected.ico";
 
 	private ConfigurationMap configurationMap;
-	
+
 	private HashMap<String, Image> cachedImages;
 
 	public ConfigurationMapLabelProvider(ConfigurationMap configurationMap) {
-		this.configurationMap = configurationMap;
-		
-		cachedImages = new HashMap<String, Image>();
+		this.configurationMap =
+			configurationMap;
+
+		cachedImages =
+			new HashMap<String, Image>();
 		cachedImages.put(imgSelectedPath, FMUIPlugin.getDefault().getImage(imgSelectedPath));
 		cachedImages.put(imgUnselectedPath, FMUIPlugin.getDefault().getImage(imgUnselectedPath));
 	}
@@ -71,8 +76,10 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 		if (columnIndex == configurationMap.getSelectedColumnIndex()) {
 			return configurationMap.getColumnHighlightColor();
 		} else if (element instanceof IFeature) {
-			IFeature feature = (IFeature) element;
-			FeatureColor featureColor = FeatureColorManager.getColor(feature);
+			IFeature feature =
+				(IFeature) element;
+			FeatureColor featureColor =
+				FeatureColorManager.getColor(feature);
 			return ColorPalette.toSwtColor(featureColor);
 		}
 		return null;
@@ -81,14 +88,18 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (element instanceof IFeature) {
-			IFeature feature = (IFeature) element;
+			IFeature feature =
+				(IFeature) element;
 			if (configurationMap.isConfigColumn(columnIndex)) {// && columnIndex < configurationMap.end) {
-				Configuration config = configurationMap.getConfigurationOfColumn(columnIndex);
+				Configuration config =
+					configurationMap.getConfigurationOfColumn(columnIndex);
 
 				if (!feature.getStructure().isAbstract()) {
-					String imgPath = imgUnselectedPath;
+					String imgPath =
+						imgUnselectedPath;
 					if (config.getSelectedFeatures().contains(feature))
-						imgPath = imgSelectedPath;
+						imgPath =
+							imgSelectedPath;
 
 					return cachedImages.get(imgPath);
 				}
@@ -101,7 +112,8 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	@Override
 	public String getColumnText(Object element, int columnIndex) {
 		if (configurationMap.getConfigColumnsOffset() > columnIndex) {
-			if (element instanceof IFeature || element instanceof String) {
+			if (element instanceof IFeature
+				|| element instanceof String) {
 				return element.toString();
 			}
 		}
@@ -110,15 +122,12 @@ public class ConfigurationMapLabelProvider implements ITableLabelProvider, ITabl
 	}
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 }

@@ -38,7 +38,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 
 /**
- * Changes the composer of an AHEAD project to FeatureHouse. 
+ * Changes the composer of an AHEAD project to FeatureHouse.
  * 
  * @author Jens Meinicke
  */
@@ -46,6 +46,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 
 	/**
 	 * Changes the composer of the given feature project to <code>FeatureHouse</code>.
+	 * 
 	 * @param featureProject
 	 */
 	public AHEADToFeatureHouseConversion(final IFeatureProject featureProject) {
@@ -53,22 +54,26 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 			return;
 		}
 		AheadCorePlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT
-				+ featureProject.getProjectName() + 
-				FROM_AHEAD_TO_FEATUREHOUSE_);
-		Job job = new Job(CHANGE_COMPOSER_) {
-			protected IStatus run(IProgressMonitor monitor) {
-				startProjectConversion(featureProject);
-				return Status.OK_STATUS;
-			}
-		};
+			+ featureProject.getProjectName()
+			+
+			FROM_AHEAD_TO_FEATUREHOUSE_);
+		Job job =
+			new Job(CHANGE_COMPOSER_) {
+
+				protected IStatus run(IProgressMonitor monitor) {
+					startProjectConversion(featureProject);
+					return Status.OK_STATUS;
+				}
+			};
 		job.setPriority(Job.BUILD);
 		job.schedule();
-		
+
 	}
 
 	/**
 	 * Replaces the composer of the given feature project by <code>FeatureHouse</code>.
-	 * @param project 
+	 * 
+	 * @param project
 	 */
 	@Override
 	void changeComposer(IFeatureProject project) {
@@ -76,25 +81,27 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	}
 
 	/**
-	 * Replaces <code>Super().methodName()</code> by <code>original()</code>.<br>
-	 * Removes <code>refines</code> from classes that refine.<br>
-	 * Removes <code>layer feature;</code> declaration.
+	 * Replaces <code>Super().methodName()</code> by <code>original()</code>.<br> Removes <code>refines</code> from classes that refine.<br> Removes <code>layer
+	 * feature;</code> declaration.
 	 */
 	@Override
 	public String changeFile(String fileText, IFile file) {
-		fileText = fileText.replaceFirst("layer \\w*;", "");
-		fileText = fileText.replaceFirst("refines ", "");
+		fileText =
+			fileText.replaceFirst("layer \\w*;", "");
+		fileText =
+			fileText.replaceFirst("refines ", "");
 		return fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");
 	}
 
 	/**
 	 * Replaces the file extension <code>.jak</code> by <code>.java</code> of the given file
+	 * 
 	 * @param file
 	 */
 	@Override
 	void replaceFileExtension(IFile file) {
 		try {
-			file.move(((IFolder)file.getParent()).getFile(file.getName().replace(JAK, ".java")).getFullPath(), true, null);
+			file.move(((IFolder) file.getParent()).getFile(file.getName().replace(JAK, ".java")).getFullPath(), true, null);
 		} catch (CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}

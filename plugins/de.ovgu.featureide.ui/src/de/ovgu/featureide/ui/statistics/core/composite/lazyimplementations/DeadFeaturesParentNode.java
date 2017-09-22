@@ -32,18 +32,21 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * @author Sebastian Krieter
  */
 public class DeadFeaturesParentNode extends LazyParent {
+
 	private final IFeatureModel model;
 
 	public DeadFeaturesParentNode(String description, IFeatureModel model) {
 		super(description, null);
-		this.model = model;
+		this.model =
+			model;
 		calculateChidren(false);
 	}
 
 	@Override
 	protected void initChildren() {
 		// TODO Performance: Dead and core features should be calculated together.
-		List<IFeature> deadFeatures = model.getAnalyser().getDeadFeatures();
+		List<IFeature> deadFeatures =
+			model.getAnalyser().getDeadFeatures();
 		setValue(deadFeatures.size());
 
 		for (IFeature feature : deadFeatures) {

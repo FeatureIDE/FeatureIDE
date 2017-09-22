@@ -39,12 +39,14 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeatureModel> {
 
 	private static class ObjectCreator extends AFileManager.ObjectCreator<IGraphicalFeatureModel> {
+
 		private final IGraphicalFeatureModel model;
 
 		public ObjectCreator(IGraphicalFeatureModel model) {
 			super(IGraphicalFeatureModel.class, GraphicalFeatureModelManager.class,
 					new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
-			this.model = model;
+			this.model =
+				model;
 		}
 
 		@Override

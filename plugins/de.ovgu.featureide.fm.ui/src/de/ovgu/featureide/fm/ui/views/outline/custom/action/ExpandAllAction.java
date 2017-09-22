@@ -33,21 +33,23 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ExpandAllAction extends Action {
 
-		private TreeViewer viewer;
+	private TreeViewer viewer;
 
-		/**
-		 * Constructor for ExpandAllAction
-		 * @param viewer
-		 */
-		public ExpandAllAction(TreeViewer viewer) {
-			super();
-			this.viewer = viewer;
-			this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif"));
-		}
+	/**
+	 * Constructor for ExpandAllAction
+	 * 
+	 * @param viewer
+	 */
+	public ExpandAllAction(TreeViewer viewer) {
+		super();
+		this.viewer =
+			viewer;
+		this.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif"));
+	}
 
-		public void run() {
-			viewer.expandAll();
-			this.firePropertyChange("EXPAND", null, null);
-		}
-	
+	public void run() {
+		viewer.expandAll();
+		this.firePropertyChange("EXPAND", null, null);
+	}
+
 }

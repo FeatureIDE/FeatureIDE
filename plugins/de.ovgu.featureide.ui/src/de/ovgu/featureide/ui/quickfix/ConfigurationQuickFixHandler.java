@@ -35,14 +35,17 @@ import de.ovgu.featureide.core.IFeatureProject;
 public class ConfigurationQuickFixHandler implements IMarkerResolutionGenerator {
 
 	public final IMarkerResolution[] getResolutions(final IMarker marker) {
-    	if (marker.getResource() instanceof IFolder) {
-			final String message = marker.getAttribute(IMarker.MESSAGE, "");
+		if (marker.getResource() instanceof IFolder) {
+			final String message =
+				marker.getAttribute(IMarker.MESSAGE, "");
 			if (message.startsWith(IFeatureProject.MARKER_UNUSED)) {
-				return new IMarkerResolution[] {new QuickFixUnusedFeatures(marker)};
+				return new IMarkerResolution[] {
+					new QuickFixUnusedFeatures(marker) };
 			} else if (message.startsWith(IFeatureProject.MARKER_FALSE_OPTIONAL)) {
-				return new IMarkerResolution[] {new QuickFixFalseOptionalFeatures(marker)};
+				return new IMarkerResolution[] {
+					new QuickFixFalseOptionalFeatures(marker) };
 			}
-    	}
-    	return new IMarkerResolution[0];
-    }
+		}
+		return new IMarkerResolution[0];
+	}
 }

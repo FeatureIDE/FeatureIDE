@@ -76,7 +76,6 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	public XmlFeatureModelReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-	
 
 	@Override
 	protected synchronized void parseInputStream(final InputStream inputStream)
@@ -85,9 +84,11 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 // TODO _interfaces Removed Code
 //		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
 //		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
-		Document  doc = null;
+		Document doc =
+			null;
 		try {
-			doc = PositionalXMLReader.readXML(inputStream);
+			doc =
+				PositionalXMLReader.readXML(inputStream);
 		} catch (SAXParseException e) {
 			throw new UnsupportedModelException(e.getMessage(), e.getLineNumber());
 		} catch (IOException e) {
@@ -98,9 +99,10 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			Logger.logError(e);
 		}
 		doc.getDocumentElement().normalize();
-		
-		final Collection<PropertiesParser> customProperties = new ArrayList<>();
-		
+
+		final Collection<PropertiesParser> customProperties =
+			new ArrayList<>();
+
 		for (Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
@@ -108,48 +110,56 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			parseCalculations(e.getElementsByTagName(CALCULATIONS));
 			parseComments(e.getElementsByTagName(COMMENTS));
 			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
-			
-			XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
+
+			XmlPropertyLoader propertyLoader =
+				new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
 		if (FeatureUtils.getRoot(featureModel) == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
-		
+
 		importCustomProperties(customProperties, featureModel);
-		
-		//featureModel.handleModelDataLoaded();
+
+		// featureModel.handleModelDataLoaded();
 	}
 
 	private void importCustomProperties(Collection<PropertiesParser> customProperties, IFeatureModel featureModel) {
 		for (PropertiesParser parser : customProperties) {
 			switch (parser.getType()) {
 			case FEATURE_PROPERTIES_PARSER: {
-				for(String featureName : parser.getIdentifier()) {
+				for (String featureName : parser.getIdentifier()) {
 					featureModel.getFeature(featureName).getCustomProperties().setEntrySet(parser.getPropertyEntries(featureName));
 				}
-			} break;
-			default: throw new UnsupportedOperationException("Unkown property container parser type " + parser.getType());
+			}
+				break;
+			default:
+				throw new UnsupportedOperationException("Unkown property container parser type "
+					+ parser.getType());
 			}
 		}
 	}
 
 	/**
 	 * @param nodeList
-	 * @return The child nodes from type Element of the given NodeList. 
+	 * @return The child nodes from type Element of the given NodeList.
 	 */
 	private ArrayList<Element> getElements(NodeList nodeList) {
-		ArrayList<Element> elements = new ArrayList<Element>(nodeList.getLength());
-		for (int temp = 0; temp < nodeList.getLength(); temp++) {
-			org.w3c.dom.Node nNode = nodeList.item(temp);
+		ArrayList<Element> elements =
+			new ArrayList<Element>(nodeList.getLength());
+		for (int temp =
+			0; temp < nodeList.getLength(); temp++) {
+			org.w3c.dom.Node nNode =
+				nodeList.item(temp);
 			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
+				Element eElement =
+					(Element) nNode;
 				elements.add(eElement);
 			}
 		}
 		return elements;
 	}
-	
+
 	/**
 	 * Adds attributes to the feature model
 	 */
@@ -182,40 +192,59 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			parseFeatures(e.getChildNodes(), null);
 		}
 	}
-	
+
 	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+			String nodeName =
+				e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
-				String nodeValue = e.getFirstChild().getNodeValue();
-				if (nodeValue != null) { 
-					nodeValue = nodeValue.replace("\t", ""); 
-					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
-					nodeValue = nodeValue.trim(); 
-				} 
+				String nodeValue =
+					e.getFirstChild().getNodeValue();
+				if (nodeValue != null) {
+					nodeValue =
+						nodeValue.replace("\t", "");
+					nodeValue =
+						nodeValue.substring(1, nodeValue.length()
+							- 1);
+					nodeValue =
+						nodeValue.trim();
+				}
 				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
-			boolean mandatory = false;
-			boolean _abstract = false;
-			boolean hidden = false;
-			String name = "";
+			boolean mandatory =
+				false;
+			boolean _abstract =
+				false;
+			boolean hidden =
+				false;
+			String name =
+				"";
 //			FMPoint featureLocation = null;
 			if (e.hasAttributes()) {
-				NamedNodeMap nodeMap = e.getAttributes();
-				for (int i = 0; i < nodeMap.getLength(); i++) {
-					org.w3c.dom.Node node = nodeMap.item(i);
-					String attributeName = node.getNodeName();
-					String attributeValue = node.getNodeValue();
+				NamedNodeMap nodeMap =
+					e.getAttributes();
+				for (int i =
+					0; i < nodeMap.getLength(); i++) {
+					org.w3c.dom.Node node =
+						nodeMap.item(i);
+					String attributeName =
+						node.getNodeName();
+					String attributeValue =
+						node.getNodeValue();
 					if (attributeName.equals(ABSTRACT)) {
-						_abstract = attributeValue.equals(TRUE);
+						_abstract =
+							attributeValue.equals(TRUE);
 					} else if (attributeName.equals(MANDATORY)) {
-						mandatory = attributeValue.equals(TRUE);
+						mandatory =
+							attributeValue.equals(TRUE);
 					} else if (attributeName.equals(NAME)) {
-						name = attributeValue;
+						name =
+							attributeValue;
 					} else if (attributeName.equals(HIDDEN)) {
-						hidden = attributeValue.equals(TRUE);
+						hidden =
+							attributeValue.equals(TRUE);
 					} else if (attributeName.equals(COORDINATES)) {
 // TODO _interfaces Legacy Code
 //						String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
@@ -227,16 +256,19 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 //							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
 //						}
 					} else {
-						throwError("Unknown feature attribute: " + attributeName, e);
+						throwError("Unknown feature attribute: "
+							+ attributeName, e);
 					}
 
 				}
 			}
-			
+
 			if (featureModel.getFeature(name) != null) {
-				throwError("Duplicate entry for feature: " + name, e);
+				throwError("Duplicate entry for feature: "
+					+ name, e);
 			}
-			IFeature f = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, name);
+			IFeature f =
+				FMFactoryManager.getFactory(featureModel).createFeature(featureModel, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -245,9 +277,10 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			} else if (nodeName.equals(OR)) {
 				f.getStructure().setOr();
 			} else if (nodeName.equals(FEATURE)) {
-				
+
 			} else {
-				throwError("Unknown feature type: " + nodeName, e);
+				throwError("Unknown feature type: "
+					+ nodeName, e);
 			}
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
@@ -264,7 +297,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			}
 			if (e.hasChildNodes()) {
 				parseFeatures(e.getChildNodes(), f);
-			}			
+			}
 		}
 	}
 
@@ -272,16 +305,22 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Parses the constraint section.
 	 */
 	private void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
-		for (Element e: getElements(nodeList)) {
-			for (Element child: getElements(e.getChildNodes())) {
-				String nodeName = child.getNodeName();
+		for (Element e : getElements(nodeList)) {
+			for (Element child : getElements(e.getChildNodes())) {
+				String nodeName =
+					child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					IConstraint c = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c =
+						FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
-						NamedNodeMap nodeMap = child.getAttributes();
-						for (int i = 0; i < nodeMap.getLength(); i++) {
-							org.w3c.dom.Node node = nodeMap.item(i);
-							String attributeName = node.getNodeName();
+						NamedNodeMap nodeMap =
+							child.getAttributes();
+						for (int i =
+							0; i < nodeMap.getLength(); i++) {
+							org.w3c.dom.Node node =
+								nodeMap.item(i);
+							String attributeName =
+								node.getNodeName();
 //							String attributeValue = node.getNodeValue();
 							if (attributeName.equals(COORDINATES)) {
 // TODO _interfaces Legacy Code
@@ -294,45 +333,55 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 //									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 //								}
 							} else {
-								throwError("Unknown constraint attribute: " + attributeName, node);
+								throwError("Unknown constraint attribute: "
+									+ attributeName, node);
 							}
 						}
 					}
 					featureModel.addConstraint(c);
 				} else {
-					throwError("Unknown constraint node: " + nodeName, child);
+					throwError("Unknown constraint node: "
+						+ nodeName, child);
 				}
 			}
 		}
 	}
 
 	private LinkedList<Node> parseConstraints2(NodeList nodeList) throws UnsupportedModelException {
-		LinkedList<Node> nodes = new LinkedList<Node>();
+		LinkedList<Node> nodes =
+			new LinkedList<Node>();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+			String nodeName =
+				e.getNodeName();
 			if (nodeName.equals(DISJ)) {
-				nodes.add( new Or(parseConstraints2(e.getChildNodes())));
+				nodes.add(new Or(parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(CONJ)) {
-				nodes.add( new And(parseConstraints2(e.getChildNodes())));
+				nodes.add(new And(parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(EQ)) {
-				LinkedList<Node> children = parseConstraints2(e.getChildNodes());
-				nodes.add( new Equals(children.get(0), children.get(1)));
+				LinkedList<Node> children =
+					parseConstraints2(e.getChildNodes());
+				nodes.add(new Equals(children.get(0), children.get(1)));
 			} else if (nodeName.equals(IMP)) {
-				LinkedList<Node> children = parseConstraints2(e.getChildNodes());
-				nodes.add( new Implies(children.get(0), children.get(1)));
+				LinkedList<Node> children =
+					parseConstraints2(e.getChildNodes());
+				nodes.add(new Implies(children.get(0), children.get(1)));
 			} else if (nodeName.equals(NOT)) {
-				nodes.add( new Not((parseConstraints2(e.getChildNodes())).getFirst()));
+				nodes.add(new Not((parseConstraints2(e.getChildNodes())).getFirst()));
 			} else if (nodeName.equals(ATMOST1)) {
-				nodes.add( new AtMost(1, parseConstraints2(e.getChildNodes())));
+				nodes.add(new AtMost(1, parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(VAR)) {
-				String featureName = e.getTextContent();
+				String featureName =
+					e.getTextContent();
 				if (featureModel.getFeature(featureName) != null) {
 					nodes.add(new Literal(featureName));
 				} else {
-					throwError("Feature \"" + featureName + "\" does not exists", e);
+					throwError("Feature \""
+						+ featureName
+						+ "\" does not exists", e);
 				}
 			} else {
-				throwError("Unknown constraint type: " + nodeName, e);
+				throwError("Unknown constraint type: "
+					+ nodeName, e);
 			}
 		}
 		return nodes;
@@ -342,7 +391,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Parses the comment section.
 	 */
 	private void parseComments(NodeList nodeList) throws UnsupportedModelException {
-		for (Element e: getElements(nodeList)) {
+		for (Element e : getElements(nodeList)) {
 			if (e.hasChildNodes()) {
 				parseComments2(e.getChildNodes());
 			}
@@ -350,11 +399,12 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	}
 
 	private void parseComments2(NodeList nodeList) throws UnsupportedModelException {
-		for (Element e: getElements(nodeList)) {
+		for (Element e : getElements(nodeList)) {
 			if (e.getNodeName().equals(C)) {
 				featureModel.getProperty().addComment(e.getTextContent());
 			} else {
-				throwError("Unknown comment attribute: " + e.getNodeName(), e);
+				throwError("Unknown comment attribute: "
+					+ e.getNodeName(), e);
 			}
 		}
 	}
@@ -363,24 +413,33 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Parses the feature order section.
 	 */
 	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
-		ArrayList<String> order = new ArrayList<String>(featureModel.getNumberOfFeatures());
-		for (Element e: getElements(nodeList)) {
+		ArrayList<String> order =
+			new ArrayList<String>(featureModel.getNumberOfFeatures());
+		for (Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
-				NamedNodeMap nodeMap = e.getAttributes();
-				for (int i = 0; i < nodeMap.getLength(); i++) {
-					org.w3c.dom.Node node = nodeMap.item(i);
-					String attributeName = node.getNodeName();
-					String attributeValue = node.getNodeValue();
+				NamedNodeMap nodeMap =
+					e.getAttributes();
+				for (int i =
+					0; i < nodeMap.getLength(); i++) {
+					org.w3c.dom.Node node =
+						nodeMap.item(i);
+					String attributeName =
+						node.getNodeName();
+					String attributeValue =
+						node.getNodeValue();
 					if (attributeName.equals(USER_DEFINED)) {
 						featureModel.setFeatureOrderUserDefined(attributeValue.equals(TRUE));
-					} else if (attributeName.equals(NAME)){
+					} else if (attributeName.equals(NAME)) {
 						if (featureModel.getFeature(attributeValue) != null) {
 							order.add(attributeValue);
 						} else {
-							throwError("Feature \"" + attributeValue + "\" does not exists", e);
+							throwError("Feature \""
+								+ attributeValue
+								+ "\" does not exists", e);
 						}
 					} else {
-						throwError("Unknown feature order attribute: " + attributeName, e);
+						throwError("Unknown feature order attribute: "
+							+ attributeName, e);
 					}
 
 				}
@@ -398,39 +457,51 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Parses the calculations.
 	 */
 	private void parseCalculations(NodeList nodeList) throws UnsupportedModelException {
-		for (Element e: getElements(nodeList)) {
+		for (Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
-				NamedNodeMap nodeMap = e.getAttributes();
-				for (int i = 0; i < nodeMap.getLength(); i++) {
-					org.w3c.dom.Node node = nodeMap.item(i);
-					String nodeName = node.getNodeName();
-					boolean value = node.getNodeValue().equals(TRUE);
+				NamedNodeMap nodeMap =
+					e.getAttributes();
+				for (int i =
+					0; i < nodeMap.getLength(); i++) {
+					org.w3c.dom.Node node =
+						nodeMap.item(i);
+					String nodeName =
+						node.getNodeName();
+					boolean value =
+						node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						featureModel.getAnalyser().runCalculationAutomatically = value;
+						featureModel.getAnalyser().runCalculationAutomatically =
+							value;
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						featureModel.getAnalyser().calculateConstraints = value;
+						featureModel.getAnalyser().calculateConstraints =
+							value;
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						featureModel.getAnalyser().calculateRedundantConstraints = value;
+						featureModel.getAnalyser().calculateRedundantConstraints =
+							value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						featureModel.getAnalyser().calculateFeatures = value;
+						featureModel.getAnalyser().calculateFeatures =
+							value;
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						featureModel.getAnalyser().calculateTautologyConstraints = value;
+						featureModel.getAnalyser().calculateTautologyConstraints =
+							value;
 					} else {
-						throwError("Unknown calculations attribute: " + nodeName, e);
+						throwError("Unknown calculations attribute: "
+							+ nodeName, e);
 					}
 
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Throws an error that will be used for error markers
+	 * 
 	 * @param message The error message
-	 * @param tempNode The node that causes the error. this node is used for positioning. 
+	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
-		throw new UnsupportedModelException(message, 
-				Integer.parseInt (node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
+		throw new UnsupportedModelException(message,
+				Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
 	}
 }

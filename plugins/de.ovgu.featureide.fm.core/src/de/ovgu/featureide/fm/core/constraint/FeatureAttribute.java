@@ -31,9 +31,12 @@ public class FeatureAttribute<T> {
 	private final T value;
 
 	public FeatureAttribute(String attributeName, String featureName, T value) {
-		this.attributeName = attributeName;
-		this.featureName = featureName;
-		this.value = value;
+		this.attributeName =
+			attributeName;
+		this.featureName =
+			featureName;
+		this.value =
+			value;
 	}
 
 	public String getAttributeName() {

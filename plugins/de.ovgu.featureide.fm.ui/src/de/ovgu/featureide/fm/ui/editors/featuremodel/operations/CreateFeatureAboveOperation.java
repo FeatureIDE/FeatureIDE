@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
- * Operation with functionality to create a compound feature. Enables undo/redo
- * functionality.
+ * Operation with functionality to create a compound feature. Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
@@ -47,30 +46,43 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private final IFeature newCompound;
 	private final IFeature child;
 	LinkedList<IFeature> selectedFeatures;
-	HashMap<IFeature, Integer> children = new HashMap<>();
+	HashMap<IFeature, Integer> children =
+		new HashMap<>();
 
-	boolean parentOr = false;
-	boolean parentAlternative = false;
-	
+	boolean parentOr =
+		false;
+	boolean parentAlternative =
+		false;
+
 	public CreateFeatureAboveOperation(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel, CREATE_COMPOUND);
-		this.selectedFeatures = selectedFeatures;
-		this.child = selectedFeatures.get(0);
-		int number = 0;
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)){}
-		
-		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		this.selectedFeatures =
+			selectedFeatures;
+		this.child =
+			selectedFeatures.get(0);
+		int number =
+			0;
+		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION
+			+ ++number)) {}
+
+		newCompound =
+			new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION
+				+ number);
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		IFeatureStructure parent = child.getStructure().getParent();
+		IFeatureStructure parent =
+			child.getStructure().getParent();
 		if (parent != null) {
-			parentOr = parent.isOr();
-			parentAlternative = parent.isAlternative();
-			
+			parentOr =
+				parent.isOr();
+			parentAlternative =
+				parent.isAlternative();
+
 			newCompound.getStructure().setMultiple(parent.isMultiple());
-			final int index = parent.getChildIndex(child.getStructure());
+			final int index =
+				parent.getChildIndex(child.getStructure());
 			for (IFeature iFeature : selectedFeatures) {
 				children.put(iFeature, parent.getChildIndex(iFeature.getStructure()));
 			}
@@ -81,10 +93,10 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			for (IFeature iFeature : selectedFeatures) {
 				newCompound.getStructure().addChild(iFeature.getStructure());
 			}
-			
-			if(parentOr){
+
+			if (parentOr) {
 				newCompound.getStructure().changeToOr();
-			} else if (parentAlternative){
+			} else if (parentAlternative) {
 				newCompound.getStructure().changeToAlternative();
 			} else {
 				newCompound.getStructure().changeToAnd();
@@ -96,24 +108,25 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			featureModel.addFeature(newCompound);
 			featureModel.getStructure().setRoot(newCompound.getStructure());
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newCompound);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null
+			? parent.getFeature()
+			: null, newCompound);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		final IFeatureStructure parent = newCompound.getStructure().getParent();
-		if(parent != null)
-		{
-			newCompound.getStructure().setChildren(Collections.<IFeatureStructure>emptyList());
+		final IFeatureStructure parent =
+			newCompound.getStructure().getParent();
+		if (parent != null) {
+			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
 			featureModel.deleteFeature(newCompound);
-			for(IFeature iFeature : children.keySet())
-			{
+			for (IFeature iFeature : children.keySet()) {
 				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());
 			}
 
-			if(parentOr){
+			if (parentOr) {
 				parent.changeToOr();
-			} else if (parentAlternative){
+			} else if (parentAlternative) {
 				parent.changeToAlternative();
 			} else {
 				parent.changeToAnd();

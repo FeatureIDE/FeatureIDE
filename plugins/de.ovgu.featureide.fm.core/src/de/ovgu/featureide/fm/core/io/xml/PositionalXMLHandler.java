@@ -31,17 +31,21 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This is an extension of a default xml reader, which saves the line numbers via user data.
- * Original code by: http://eyalsch.wordpress.com/2010/11/30/xml-dom-2/
+ * This is an extension of a default xml reader, which saves the line numbers via user data. Original code by:
+ * http://eyalsch.wordpress.com/2010/11/30/xml-dom-2/
  * 
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
 public class PositionalXMLHandler extends DefaultHandler {
-	public final static String LINE_NUMBER_KEY_NAME = "lineNumber";
 
-	private final LinkedList<Element> elementStack = new LinkedList<>();
-	private final StringBuilder textBuffer = new StringBuilder();
+	public final static String LINE_NUMBER_KEY_NAME =
+		"lineNumber";
+
+	private final LinkedList<Element> elementStack =
+		new LinkedList<>();
+	private final StringBuilder textBuffer =
+		new StringBuilder();
 
 	private final Document doc;
 
@@ -49,19 +53,23 @@ public class PositionalXMLHandler extends DefaultHandler {
 
 	public PositionalXMLHandler(Document doc) {
 		super();
-		this.doc = doc;
+		this.doc =
+			doc;
 	}
 
 	@Override
 	public void setDocumentLocator(final Locator locator) {
-		this.locator = locator;
+		this.locator =
+			locator;
 	}
 
 	@Override
 	public void startElement(final String uri, final String localName, final String qName, final Attributes attributes) throws SAXException {
 		addTextIfNeeded();
-		final Element el = doc.createElement(qName);
-		for (int i = 0; i < attributes.getLength(); i++) {
+		final Element el =
+			doc.createElement(qName);
+		for (int i =
+			0; i < attributes.getLength(); i++) {
 			el.setAttribute(attributes.getQName(i), attributes.getValue(i));
 		}
 		el.setUserData(LINE_NUMBER_KEY_NAME, this.locator.getLineNumber(), null);
@@ -71,11 +79,13 @@ public class PositionalXMLHandler extends DefaultHandler {
 	@Override
 	public void endElement(final String uri, final String localName, final String qName) {
 		addTextIfNeeded();
-		final Element closedEl = elementStack.pop();
+		final Element closedEl =
+			elementStack.pop();
 		if (elementStack.isEmpty()) {
 			doc.appendChild(closedEl);
 		} else {
-			final Element parentEl = elementStack.peek();
+			final Element parentEl =
+				elementStack.peek();
 			parentEl.appendChild(closedEl);
 		}
 	}
@@ -87,8 +97,10 @@ public class PositionalXMLHandler extends DefaultHandler {
 
 	private void addTextIfNeeded() {
 		if (textBuffer.length() > 0) {
-			final Element el = elementStack.peek();
-			final Node textNode = doc.createTextNode(textBuffer.toString());
+			final Element el =
+				elementStack.peek();
+			final Node textNode =
+				doc.createTextNode(textBuffer.toString());
 			el.appendChild(textNode);
 			textBuffer.delete(0, textBuffer.length());
 		}

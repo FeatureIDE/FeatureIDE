@@ -40,15 +40,18 @@ import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
-	private static final ObjectCreator<IFeatureModel> objectCreator = new ObjectCreator<IFeatureModel>(IFeatureModel.class, FeatureModelManager.class,
-			FMFormatManager.getInstance()) {
-		@Override
-		protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
-			final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
-			featureModel.setSourceFile(path);
-			return featureModel;
-		}
-	};
+	private static final ObjectCreator<IFeatureModel> objectCreator =
+		new ObjectCreator<IFeatureModel>(IFeatureModel.class, FeatureModelManager.class,
+				FMFormatManager.getInstance()) {
+
+			@Override
+			protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
+				final IFeatureModel featureModel =
+					FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
+				featureModel.setSourceFile(path);
+				return featureModel;
+			}
+		};
 
 	/**
 	 * Returns an instance of a {@link IFileManager} for a certain file.
@@ -69,13 +72,16 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	}
 
 	public static boolean save(IFeatureModel featureModel, Path path) {
-		final String pathString = path.toAbsolutePath().toString();
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
+		final String pathString =
+			path.toAbsolutePath().toString();
+		final IFeatureModelFormat format =
+			FMFormatManager.getInstance().getFormatByFileName(pathString);
 		return !FileHandler.save(path, featureModel, format).containsError();
 	}
 
 	public static boolean convert(Path inPath, Path outPath) {
-		IFeatureModel featureModel = load(inPath).getObject();
+		IFeatureModel featureModel =
+			load(inPath).getObject();
 		if (featureModel == null) {
 			return false;
 		}
@@ -93,9 +99,12 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	@Override
 	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
-		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
-		final String s1 = format.getInstance().write(o1);
-		final String s2 = format.getInstance().write(o2);
+		final InternalFeatureModelFormat format =
+			new InternalFeatureModelFormat();
+		final String s1 =
+			format.getInstance().write(o1);
+		final String s2 =
+			format.getInstance().write(o2);
 		return s1.equals(s2);
 	}
 
@@ -112,7 +121,8 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	@Override
 	protected IFeatureModel copyObject(IFeatureModel oldObject) {
-		final IFeatureModel clone = oldObject.clone();
+		final IFeatureModel clone =
+			oldObject.clone();
 		clone.setUndoContext(oldObject.getUndoContext());
 		return clone;
 	}

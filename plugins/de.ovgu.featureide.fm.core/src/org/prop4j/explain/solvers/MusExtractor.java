@@ -30,24 +30,22 @@ import org.prop4j.Node;
  * @author Timo G&uuml;nther
  */
 public interface MusExtractor extends MutableSatSolver {
+
 	/**
-	 * <p>
-	 * Returns any minimal unsatisfiable subset (MUS) of the problem.
-	 * A MUS is any unsatisfiable subset of the formula which cannot be reduced any further without becoming satisfiable.
-	 * </p>
+	 * <p> Returns any minimal unsatisfiable subset (MUS) of the problem. A MUS is any unsatisfiable subset of the formula which cannot be reduced any further
+	 * without becoming satisfiable. </p>
 	 * 
-	 * <p>
-	 * A MUS can act as an explanation for why a formula is unsatisfiable.
-	 * As such, the problem must be {@link #isSatisfiable() unsatisfiable} for a MUS to be found.
-	 * </p>
+	 * <p> A MUS can act as an explanation for why a formula is unsatisfiable. As such, the problem must be {@link #isSatisfiable() unsatisfiable} for a MUS to
+	 * be found. </p>
+	 * 
 	 * @return any minimal unsatisfiable subset; not null
 	 * @throws IllegalStateException if the formula in this solver is satisfiable
 	 */
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException;
-	
+
 	/**
-	 * Returns any minimal unsatisfiable subset (MUS) of the problem.
-	 * Each clause is referenced by its index instead of object.
+	 * Returns any minimal unsatisfiable subset (MUS) of the problem. Each clause is referenced by its index instead of object.
+	 * 
 	 * @return any minimal unsatisfiable subset; not null
 	 * @throws IllegalStateException
 	 */

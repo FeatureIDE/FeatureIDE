@@ -57,7 +57,8 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 */
 	private final IFeatureModel completeFm;
 
-	private static final String LABEL = CALCULATE_DEPENDENCY;
+	private static final String LABEL =
+		CALCULATE_DEPENDENCY;
 
 	/**
 	 * Constructor.
@@ -67,8 +68,10 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 */
 	public CalculateDependencyOperation(IFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel, LABEL);
-		subtreeRoot = selectedFeature;
-		completeFm = featureModel;
+		subtreeRoot =
+			selectedFeature;
+		completeFm =
+			featureModel;
 	}
 
 	/**
@@ -79,11 +82,13 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	 * @return res A list of all features from the sub feature model
 	 */
 	private ArrayList<String> getSubtreeFeatures(IFeature root) {
-		ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res =
+			new ArrayList<String>();
 		if (!res.contains(root.getName())) {
 			res.add(root.getName());
 		}
-		Iterable<IFeature> children = FeatureUtils.getChildren(root);
+		Iterable<IFeature> children =
+			FeatureUtils.getChildren(root);
 		if (children != null) {
 			for (IFeature f : children) {
 				res.addAll(getSubtreeFeatures(f));
@@ -93,31 +98,40 @@ public class CalculateDependencyOperation extends AbstractFeatureModelOperation 
 	}
 
 	/**
-	 * Executes operation by calling feature model slicing and replacing the new root with the selected
-	 * feature. A wizard page presents the sub feature model and implicit constraints.
+	 * Executes operation by calling feature model slicing and replacing the new root with the selected feature. A wizard page presents the sub feature model
+	 * and implicit constraints.
 	 */
 	@Override
 	protected FeatureIDEEvent operation() {
-		ArrayList<String> subtreeFeatures = getSubtreeFeatures(subtreeRoot);
-		boolean isCoreFeature = false;
-		// feature model slicing 
-		final Arguments arguments = new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
-		SliceFeatureModelJob slice = new SliceFeatureModelJob(arguments);
-		IFeatureModel slicedModel = slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
-		
+		ArrayList<String> subtreeFeatures =
+			getSubtreeFeatures(subtreeRoot);
+		boolean isCoreFeature =
+			false;
+		// feature model slicing
+		final Arguments arguments =
+			new SliceFeatureModelJob.Arguments(null, completeFm, subtreeFeatures, true);
+		SliceFeatureModelJob slice =
+			new SliceFeatureModelJob(arguments);
+		IFeatureModel slicedModel =
+			slice.sliceModel(completeFm, subtreeFeatures, new NullMonitor()).clone(); // returns new feature model
+
 		// only replace root with selected feature if feature is core-feature
-		List<IFeature> coreFeatures = completeFm.getAnalyser().getCoreFeatures();
+		List<IFeature> coreFeatures =
+			completeFm.getAnalyser().getCoreFeatures();
 		if (coreFeatures.contains(subtreeRoot)) {
-			isCoreFeature = true;
+			isCoreFeature =
+				true;
 		}
 		if (isCoreFeature) {
 			FeatureUtils.replaceRoot(slicedModel, slicedModel.getFeature(subtreeRoot.getName()));
 		}
 
 		// Instantiating a wizard page, removing the help button and opening a wizard dialog
-		final AbstractWizard wizard = new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, completeFm);
+		final AbstractWizard wizard =
+			new SubtreeDependencyWizard("Submodel Dependencies", slicedModel, completeFm);
 		TrayDialog.setDialogHelpAvailable(false);
-		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+		final WizardDialog dialog =
+			new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		dialog.open();
 		completeFm.getAnalyser().clearExplanations();
 		return new FeatureIDEEvent(completeFm, EventType.DEPENDENCY_CALCULATED, null, subtreeRoot);

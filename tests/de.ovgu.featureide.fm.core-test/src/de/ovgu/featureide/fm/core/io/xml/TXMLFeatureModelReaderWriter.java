@@ -43,53 +43,62 @@ public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		IFeatureModel fmOrig = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		IFeatureModel fmCollapsed = Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		IFeatureModel fmOrig =
+			Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		IFeatureModel fmCollapsed =
+			Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		IFeatureModel fmNotCollapsed =
+			Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
 
-		IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
+		IGraphicalFeatureModel gFM =
+			new GraphicalFeatureModel(fmOrig);
 		gFM.init();
 
-		IGraphicalFeatureModel gfmCollapsed = new GraphicalFeatureModel(fmCollapsed);
+		IGraphicalFeatureModel gfmCollapsed =
+			new GraphicalFeatureModel(fmCollapsed);
 		gfmCollapsed.init();
 		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.getObject().getName().equals("Root")) {
-				feature.setCollapsed(true);				
+				feature.setCollapsed(true);
 			}
 		}
 
-		IGraphicalFeatureModel gfmNotCollapsed = new GraphicalFeatureModel(fmNotCollapsed);
+		IGraphicalFeatureModel gfmNotCollapsed =
+			new GraphicalFeatureModel(fmNotCollapsed);
 		gfmNotCollapsed.init();
 		gfmCollapsed.init();
 		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
-				feature.setCollapsed(false);		
+			feature.setCollapsed(false);
 		}
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getFeatures().size());
-		
-		int notVisible = 0;
+
+		int notVisible =
+			0;
 		for (IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.hasCollapsedParent()) {
 				notVisible++;
 			}
 		}
 
-		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size() + notVisible);
+		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size()
+			+ notVisible);
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmNotCollapsed.getVisibleFeatures().size());
-		//		
-		//		for (IFeature origF : fmOrig.getFeatures()) {
-		//				IFeature newF = fmNotCollapsed.getFeature(origF.getName());
-		//				
-		//				if (newF == null) {
-		//					fail();
-		//				} else {
-		//					assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(), fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
-		//				}
-		//		}
+		//
+		// for (IFeature origF : fmOrig.getFeatures()) {
+		// IFeature newF = fmNotCollapsed.getFeature(origF.getName());
+		//
+		// if (newF == null) {
+		// fail();
+		// } else {
+		// assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(),
+		// fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
+		// }
+		// }
 	}
 
 }

@@ -53,31 +53,40 @@ import org.eclipse.ui.progress.UIJob;
 public class GEFImageWriter {
 
 	public static void writeToFile(final GraphicalViewerImpl graphicalViewer, final File file) {
-		UIJob job = new UIJob(SAVE_IMAGE) {
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				saveEditorContentsAsImage(graphicalViewer, file.toString());
-				return Status.OK_STATUS;
-			}
-		};
+		UIJob job =
+			new UIJob(SAVE_IMAGE) {
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					saveEditorContentsAsImage(graphicalViewer, file.toString());
+					return Status.OK_STATUS;
+				}
+			};
 		job.schedule();
 	}
 
 	private static void saveEditorContentsAsImage(GraphicalViewer viewer, String saveFilePath) {
-		Image image = drawFigureOnImage(viewer);
-		Image croppedImage = cropImage(image);
+		Image image =
+			drawFigureOnImage(viewer);
+		Image croppedImage =
+			cropImage(image);
 		image.dispose();
 		saveImage(croppedImage, saveFilePath);
 		croppedImage.dispose();
 	}
 
 	private static Image drawFigureOnImage(GraphicalViewer viewer) {
-		IFigure figure = getRootFigure(viewer);
-		Rectangle bounds = figure.getBounds();
+		IFigure figure =
+			getRootFigure(viewer);
+		Rectangle bounds =
+			figure.getBounds();
 
-		Image image = new Image(null, bounds.width, bounds.height);
-		GC imageGC = new GC(image);
-		Graphics imgGraphics = new SWTGraphics(imageGC);
+		Image image =
+			new Image(null, bounds.width, bounds.height);
+		GC imageGC =
+			new GC(image);
+		Graphics imgGraphics =
+			new SWTGraphics(imageGC);
 
 		imgGraphics.translate(-bounds.x, -bounds.y);
 		figure.paint(imgGraphics);
@@ -88,70 +97,111 @@ public class GEFImageWriter {
 	}
 
 	private static Image cropImage(Image image) {
-		int border = 5;
-		Rectangle r = calculateUsedRectangle(image);
+		int border =
+			5;
+		Rectangle r =
+			calculateUsedRectangle(image);
 
-		Image img2 = new Image(null, r.width + 2 * border, r.height + 2 * border);
-		GC imageGC2 = new GC(img2);
-		Graphics imgGraphics2 = new SWTGraphics(imageGC2);
+		Image img2 =
+			new Image(null, r.width
+				+ 2
+					* border, r.height
+						+ 2
+							* border);
+		GC imageGC2 =
+			new GC(img2);
+		Graphics imgGraphics2 =
+			new SWTGraphics(imageGC2);
 
 		imgGraphics2.drawImage(image, r, new Rectangle(border, border, r.width, r.height));
 		return img2;
 	}
 
 	private static void saveImage(Image image, String saveFilePath) {
-		int format = readFormatFromFileName(saveFilePath);
+		int format =
+			readFormatFromFileName(saveFilePath);
 
-		ImageData[] data = new ImageData[1];
-		data[0] = image.getImageData();
+		ImageData[] data =
+			new ImageData[1];
+		data[0] =
+			image.getImageData();
 
-		ImageLoader loader = new ImageLoader();
-		loader.data = data;
+		ImageLoader loader =
+			new ImageLoader();
+		loader.data =
+			data;
 		loader.save(saveFilePath, format);
 	}
 
 	private static IFigure getRootFigure(GraphicalViewer viewer) {
-		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
+		ScalableFreeformRootEditPart rootEditPart =
+			(ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 		return ((LayerManager) rootEditPart).getLayer(LayerConstants.PRINTABLE_LAYERS);
 	}
 
 	private static Rectangle calculateUsedRectangle(Image image) {
-		ImageData data = image.getImageData();
-		Rectangle r = new Rectangle();
-		int bg = data.getPixel(0, 0);
-		for (int x = 0; x < data.width; x++)
-			for (int y = 0; y < data.height; y++)
+		ImageData data =
+			image.getImageData();
+		Rectangle r =
+			new Rectangle();
+		int bg =
+			data.getPixel(0, 0);
+		for (int x =
+			0; x < data.width; x++)
+			for (int y =
+				0; y < data.height; y++)
 				if (data.getPixel(x, y) != bg) {
-					r.x = x;
-					x = data.width;
+					r.x =
+						x;
+					x =
+						data.width;
 					break;
 				}
-		for (int x = data.width - 1; x >= 0; x--)
-			for (int y = 0; y < data.height; y++)
+		for (int x =
+			data.width
+				- 1; x >= 0; x--)
+			for (int y =
+				0; y < data.height; y++)
 				if (data.getPixel(x, y) != bg) {
-					r.width = x - r.x + 1;
-					x = 0;
+					r.width =
+						x
+							- r.x
+							+ 1;
+					x =
+						0;
 					break;
 				}
-		for (int y = 0; y < data.height; y++)
-			for (int x = 0; x < data.width; x++)
+		for (int y =
+			0; y < data.height; y++)
+			for (int x =
+				0; x < data.width; x++)
 				if (data.getPixel(x, y) != bg) {
-					r.y = y;
-					y = data.height;
+					r.y =
+						y;
+					y =
+						data.height;
 					break;
 				}
-		for (int y = data.height - 1; y >= 0; y--)
-			for (int x = 0; x < data.width; x++)
+		for (int y =
+			data.height
+				- 1; y >= 0; y--)
+			for (int x =
+				0; x < data.width; x++)
 				if (data.getPixel(x, y) != bg) {
-					r.height = y - r.y + 1;
-					y = 0;
+					r.height =
+						y
+							- r.y
+							+ 1;
+					y =
+						0;
 					break;
 				}
 		return r;
 	}
 
 	private static int readFormatFromFileName(String saveFilePath) {
-		String file = saveFilePath.toLowerCase(Locale.ENGLISH);
+		String file =
+			saveFilePath.toLowerCase(Locale.ENGLISH);
 		if (file.endsWith(".bmp"))
 			return SWT.IMAGE_BMP;
 		if (file.endsWith(".gif"))
@@ -166,7 +216,8 @@ public class GEFImageWriter {
 			return SWT.IMAGE_PNG;
 		if (file.endsWith(".tif"))
 			return SWT.IMAGE_TIFF;
-		throw new RuntimeException(UNKNOWN_IMAGE_FILE_FORMAT + saveFilePath);
+		throw new RuntimeException(UNKNOWN_IMAGE_FILE_FORMAT
+			+ saveFilePath);
 	}
 
 }

@@ -30,9 +30,9 @@ public class FSTAsmetaLInitialization extends FSTField {
 	public FSTAsmetaLInitialization(String name, String type, String modifiers) {
 		super(name, type, modifiers);
 	}
-	
+
 	public FSTAsmetaLInitialization(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
-	}		
+	}
 }

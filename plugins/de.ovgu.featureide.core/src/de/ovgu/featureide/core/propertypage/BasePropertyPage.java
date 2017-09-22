@@ -36,54 +36,66 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
- * First FeatureIDE property page containing all other property 
- * pages at the sub tree
+ * First FeatureIDE property page containing all other property pages at the sub tree
  * 
  * @author Jens Meinicke
  */
 @SuppressWarnings(RESTRICTION)
 public class BasePropertyPage extends PropertyPage {
 
-	private static final String DESCRIPTION = null;
+	private static final String DESCRIPTION =
+		null;
 	private IProject project;
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
-		layout.verticalSpacing = 9;
+		Composite composite =
+			new Composite(parent, SWT.NULL);
+		GridLayout layout =
+			new GridLayout();
+		layout.numColumns =
+			1;
+		layout.verticalSpacing =
+			9;
 		composite.setLayout(layout);
-		
+
 		if (!getProject()) {
-			Label label = new Label(composite, SWT.NULL);
-			label.setText(NO_RESOURCE_SELECTED);	
+			Label label =
+				new Label(composite, SWT.NULL);
+			label.setText(NO_RESOURCE_SELECTED);
 			return null;
 		}
 
-		Label label = new Label(composite, SWT.NULL);
-		label.setText("&Project: " + project.getName());		
-		
+		Label label =
+			new Label(composite, SWT.NULL);
+		label.setText("&Project: "
+			+ project.getName());
+
 		return composite;
 	}
-	
+
 	/**
 	 * Gets the project of the selected resource.
+	 * 
 	 * @return <code>true</code> if successful
 	 */
 	private boolean getProject() {
-		IAdaptable resource = getElement();
+		IAdaptable resource =
+			getElement();
 		if (resource instanceof JavaElement) {
-			IJavaProject javaProject = ((JavaElement)resource).getJavaProject();
-			project  = javaProject.getProject();
+			IJavaProject javaProject =
+				((JavaElement) resource).getJavaProject();
+			project =
+				javaProject.getProject();
 		} else if (resource instanceof IResource) {
-			project = ((IResource) resource).getProject();
+			project =
+				((IResource) resource).getProject();
 		} else {
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
 	public String getDescription() {
 		return DESCRIPTION;

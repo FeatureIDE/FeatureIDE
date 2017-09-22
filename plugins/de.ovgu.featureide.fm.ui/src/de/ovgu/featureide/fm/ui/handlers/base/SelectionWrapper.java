@@ -39,7 +39,7 @@ public class SelectionWrapper<T> {
 		if (element.getClass() == classType) {
 			return classType.cast(element);
 		} else if (element instanceof IAdaptable) {
-			return (R)((IAdaptable) element).getAdapter(classType);
+			return (R) ((IAdaptable) element).getAdapter(classType);
 		}
 		return null;
 	}
@@ -52,14 +52,17 @@ public class SelectionWrapper<T> {
 	private Iterator<?> it;
 
 	private SelectionWrapper(IStructuredSelection selection, Class<T> type) {
-		this.type = type;
-		this.it = ((IStructuredSelection) selection).iterator();
+		this.type =
+			type;
+		this.it =
+			((IStructuredSelection) selection).iterator();
 	}
 
 	@CheckForNull
 	public T getNext() {
 		while (it.hasNext()) {
-			final T element = checkClass(it.next(), type);
+			final T element =
+				checkClass(it.next(), type);
 			if (element != null) {
 				return element;
 			}

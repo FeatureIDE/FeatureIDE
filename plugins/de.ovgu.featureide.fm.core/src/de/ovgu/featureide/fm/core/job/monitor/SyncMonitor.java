@@ -25,13 +25,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 /**
  * Decorator for an {@link IMonitor} object that provides synchronized access to the following methods:
  * 
- * <pre>
- * {@link #invoke(Object)}
- * {@link #setRemainingWork(int)}
- * {@link #step()}
- * {@link #step(Object)}
- * {@link #worked()}
- * </pre>
+ * <pre> {@link #invoke(Object)} {@link #setRemainingWork(int)} {@link #step()} {@link #step(Object)} {@link #worked()} </pre>
  * 
  * @author Sebastian Krieter
  */
@@ -40,7 +34,8 @@ public class SyncMonitor implements IMonitor {
 	private final IMonitor monitor;
 
 	public SyncMonitor(IMonitor monitor) {
-		this.monitor = monitor;
+		this.monitor =
+			monitor;
 	}
 
 	@Override

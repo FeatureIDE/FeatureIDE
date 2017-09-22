@@ -30,16 +30,18 @@ public class FSTField extends RoleElement<FSTField> {
 	public FSTField(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
 	}
-	
+
 	public FSTField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
 	}
 
 	public String getFullName() {
-		return name + " : " + type;
+		return name
+			+ " : "
+			+ type;
 	}
-	
+
 	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {
 			if (role.getFeature().equals(getRole().getFeature())) {

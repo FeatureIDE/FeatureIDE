@@ -67,12 +67,10 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -80,8 +78,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	@Override
 	public Image getImage(Object element) {
@@ -122,8 +119,10 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 			return ((AbstractClassFragment) element).getSignature().getName();
 		} else if (element instanceof AbstractSignature) {
 			if (element instanceof AbstractMethodSignature) {
-				final AbstractMethodSignature method = (AbstractMethodSignature) element;
-				final StringBuilder sb = new StringBuilder();
+				final AbstractMethodSignature method =
+					(AbstractMethodSignature) element;
+				final StringBuilder sb =
+					new StringBuilder();
 				sb.append(method.getName());
 				sb.append('(');
 				for (String parameterType : method.getParameterTypes()) {
@@ -131,7 +130,8 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 					sb.append(", ");
 				}
 				if (method.getParameterTypes().size() > 0) {
-					sb.delete(sb.length() - 2, sb.length());
+					sb.delete(sb.length()
+						- 2, sb.length());
 				}
 				sb.append(')');
 				if (!method.isConstructor()) {
@@ -140,8 +140,11 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				}
 				return sb.toString();
 			} else if (element instanceof AbstractFieldSignature) {
-				final AbstractFieldSignature field = (AbstractFieldSignature) element;
-				return field.getName() + " : " + field.getType();
+				final AbstractFieldSignature field =
+					(AbstractFieldSignature) element;
+				return field.getName()
+					+ " : "
+					+ field.getType();
 			} else if (element instanceof AbstractClassSignature) {
 				return ((AbstractClassSignature) element).getName();
 			}
@@ -152,8 +155,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-	}
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {}
 
 	@Override
 	public void setForeground(TreeItem item, IFile file) {
@@ -177,89 +179,128 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public void init() {
-		//viewer.addSelectionChangedListener(sListner);
+		// viewer.addSelectionChangedListener(sListner);
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
-		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+		if (!(editorPart instanceof ITextEditor)
+			|| lineNumber <= 0) {
 			return;
 		}
-		final ITextEditor editor = (ITextEditor) editorPart;
-		final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		final ITextEditor editor =
+			(ITextEditor) editorPart;
+		final IDocument document =
+			editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
-			IRegion lineInfo = null;
+			IRegion lineInfo =
+				null;
 			try {
-				lineInfo = document.getLineInformation(lineNumber - 1);
-			} catch (BadLocationException e) {
-			}
+				lineInfo =
+					document.getLineInformation(lineNumber
+						- 1);
+			} catch (BadLocationException e) {}
 			if (lineInfo != null) {
 				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
 			}
 		}
 	}
 
-	private ISelectionChangedListener sListner = new ISelectionChangedListener() {
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			if (viewer.getInput() != null) {
-				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-				if (!(viewer.getInput() instanceof IResource)) {
-					return;
-				}
-				final IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());
-				if (featureProject != null) {
-					if (selection instanceof AbstractClassFragment) {
-						final AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
-						final AFeatureData[] featureDataArray = sig.getFeatureData();
-						openEditor(sig, featureProject, featureDataArray[0].getID());
-					} else if (selection instanceof AbstractSignature) {
-						final AbstractSignature sig = (AbstractSignature) selection;
-						final AFeatureData[] featureDataArray = sig.getFeatureData();
-						openEditor(sig, featureProject, featureDataArray[0].getID());
-					} else if (selection instanceof IFeature) {
-						final ProjectSignatures signatures = featureProject.getProjectSignatures();
-						if (signatures != null) {
-							final TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
-							openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((IFeature) selection).getName()));
+	private ISelectionChangedListener sListner =
+		new ISelectionChangedListener() {
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				if (viewer.getInput() != null) {
+					Object selection =
+						((IStructuredSelection) viewer.getSelection()).getFirstElement();
+					if (!(viewer.getInput() instanceof IResource)) {
+						return;
+					}
+					final IFeatureProject featureProject =
+						CorePlugin.getFeatureProject((IResource) viewer.getInput());
+					if (featureProject != null) {
+						if (selection instanceof AbstractClassFragment) {
+							final AbstractSignature sig =
+								((AbstractClassFragment) selection).getSignature();
+							final AFeatureData[] featureDataArray =
+								sig.getFeatureData();
+							openEditor(sig, featureProject, featureDataArray[0].getID());
+						} else if (selection instanceof AbstractSignature) {
+							final AbstractSignature sig =
+								(AbstractSignature) selection;
+							final AFeatureData[] featureDataArray =
+								sig.getFeatureData();
+							openEditor(sig, featureProject, featureDataArray[0].getID());
+						} else if (selection instanceof IFeature) {
+							final ProjectSignatures signatures =
+								featureProject.getProjectSignatures();
+							if (signatures != null) {
+								final TreeItem decl =
+									viewer.getTree().getSelection()[0].getParentItem();
+								openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((IFeature) selection).getName()));
+							}
 						}
 					}
 				}
 			}
-		}
 
-		private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
-			final FSTModel model = featureProject.getFSTModel();
-			final ProjectSignatures signatures = featureProject.getProjectSignatures();
-			if (model != null && signatures != null) {
-				AbstractSignature parent = sig;
-				while (parent.getParent() != null) {
-					parent = parent.getParent();
-				}
+			private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
+				final FSTModel model =
+					featureProject.getFSTModel();
+				final ProjectSignatures signatures =
+					featureProject.getProjectSignatures();
+				if (model != null
+					&& signatures != null) {
+					AbstractSignature parent =
+						sig;
+					while (parent.getParent() != null) {
+						parent =
+							parent.getParent();
+					}
 
-				final String fullName = parent.getFullName();
-				final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
+					final String fullName =
+						parent.getFullName();
+					final String fileName =
+						(fullName.startsWith("."))
+							? fullName.substring(1)
+							: fullName.replace('.', '/');
 
-				final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
+					final IFile iFile =
+						model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName
+							+ ".java").getFile();
 
-				if (iFile.isAccessible()) {
-					final IWorkbench workbench = PlatformUI.getWorkbench();
-					try {
-						final IContentDescription description = iFile.getContentDescription();
-						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-								(description != null) ? description.getContentType() : null);
-						final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-						IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
-						if (editorPart == null) {
-							editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+					if (iFile.isAccessible()) {
+						final IWorkbench workbench =
+							PlatformUI.getWorkbench();
+						try {
+							final IContentDescription description =
+								iFile.getContentDescription();
+							final IEditorDescriptor desc =
+								workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+										(description != null)
+											? description.getContentType()
+											: null);
+							final IWorkbenchPage activePage =
+								workbench.getActiveWorkbenchWindow().getActivePage();
+							IEditorPart editorPart =
+								activePage.findEditor(new FileEditorInput(iFile));
+							if (editorPart == null) {
+								editorPart =
+									activePage.openEditor(new FileEditorInput(iFile), (desc != null)
+										? desc.getId()
+										: "org.eclipse.ui.DefaultTextEditor");
+							}
+							final int dataIndex =
+								sig.hasFeature(featureID);
+							scrollToLine(editorPart, (dataIndex > -1)
+								? sig.getFeatureData()[dataIndex].getStartLineNumber()
+								: 1);
+						} catch (CoreException e) {
+							UIPlugin.getDefault().logError(e);
 						}
-						final int dataIndex = sig.hasFeature(featureID);
-						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getStartLineNumber() : 1);
-					} catch (CoreException e) {
-						UIPlugin.getDefault().logError(e);
 					}
 				}
 			}
-		}
-	};
+		};
 
 }

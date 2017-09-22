@@ -39,26 +39,37 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  * @author Sebastian Krieter
  */
 public abstract class ADocumentationCommentMerger implements Comparator<BlockTag>, Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
-	protected static final int
-		RULE_MERGE = 0,
-		RULE_OVERRIDE = 1,
-		RULE_DISCARD = 2;
-	
-	private final List<IFilter<?>> filterList = new LinkedList<>();
 
-	protected int[] featureIDRanks = null;
-	
+	private static final long serialVersionUID =
+		1L;
+
+	protected static final String LINE_SEPARATOR =
+		System.getProperty("line.separator");
+	protected static final int RULE_MERGE =
+		0,
+			RULE_OVERRIDE =
+				1,
+			RULE_DISCARD =
+				2;
+
+	private final List<IFilter<?>> filterList =
+		new LinkedList<>();
+
+	protected int[] featureIDRanks =
+		null;
+
 	public void setValidFeatureIDs(int numberOfFeatures, int[] validFeatureIDs) {
-		featureIDRanks = new int[numberOfFeatures];
-		for (int i = 0; i < featureIDRanks.length; i++) {
-			featureIDRanks[i] = -1;
-			for (int j = 0; j < validFeatureIDs.length; j++) {
+		featureIDRanks =
+			new int[numberOfFeatures];
+		for (int i =
+			0; i < featureIDRanks.length; i++) {
+			featureIDRanks[i] =
+				-1;
+			for (int j =
+				0; j < validFeatureIDs.length; j++) {
 				if (validFeatureIDs[j] == i) {
-					featureIDRanks[i] = j;
+					featureIDRanks[i] =
+						j;
 					break;
 				}
 			}
@@ -68,29 +79,36 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	public String merge(List<BlockTag> generalTags, List<BlockTag> featureTags) {
 //		Filter.filter(generalTags, filterList);
 		Filter.filter(featureTags, filterList);
-		
+
 		sortFeatureList(featureTags);
-		
-		featureTags = mergeList(featureTags);
-		generalTags = mergeList(generalTags);
+
+		featureTags =
+			mergeList(featureTags);
+		generalTags =
+			mergeList(generalTags);
 
 		return mergeLists(generalTags, featureTags);
 	}
 
 	public String mergeLists(List<BlockTag> generalTags, List<BlockTag> featureTags) {
-		if (generalTags.isEmpty() && featureTags.isEmpty()) {
+		if (generalTags.isEmpty()
+			&& featureTags.isEmpty()) {
 			return "";
 		} else {
 			Collections.sort(generalTags);
 			Collections.sort(featureTags);
 
-			final StringBuilder sb = new StringBuilder();
+			final StringBuilder sb =
+				new StringBuilder();
 			sb.append(ADocumentationCommentParser.COMMENT_START);
 
-			final ListIterator<BlockTag> itg = generalTags.listIterator();
-			final ListIterator<BlockTag> itf = featureTags.listIterator();
+			final ListIterator<BlockTag> itg =
+				generalTags.listIterator();
+			final ListIterator<BlockTag> itf =
+				featureTags.listIterator();
 
-			while (itg.hasNext() || itf.hasNext()) {
+			while (itg.hasNext()
+				|| itf.hasNext()) {
 				sb.append(LINE_SEPARATOR);
 
 				if (!itg.hasNext()) {
@@ -98,9 +116,12 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 				} else if (!itf.hasNext()) {
 					sb.append(itg.next());
 				} else {
-					final BlockTag g = itg.next();
-					final BlockTag f = itf.next();
-					final int comp = g.compareTo(f);
+					final BlockTag g =
+						itg.next();
+					final BlockTag f =
+						itf.next();
+					final int comp =
+						g.compareTo(f);
 					if (comp < 0) {
 						sb.append(g);
 						itf.previous();
@@ -126,9 +147,12 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	public void sortFeatureList(List<BlockTag> tagList) {
 		if (featureIDRanks != null) {
-			for (Iterator<BlockTag> it = tagList.iterator(); it.hasNext();) {
-				final BlockTag tag = it.next();
-				if (tag.getFeatureID() > -1 && featureIDRanks[tag.getFeatureID()] == -1) {
+			for (Iterator<BlockTag> it =
+				tagList.iterator(); it.hasNext();) {
+				final BlockTag tag =
+					it.next();
+				if (tag.getFeatureID() > -1
+					&& featureIDRanks[tag.getFeatureID()] == -1) {
 					it.remove();
 				}
 			}
@@ -137,23 +161,30 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	}
 
 	public List<BlockTag> mergeList(List<BlockTag> tagList) {
-		final HashMap<BlockTag, BlockTag> tagSet = new HashMap<>();
+		final HashMap<BlockTag, BlockTag> tagSet =
+			new HashMap<>();
 
 		for (BlockTag newTag : tagList) {
-			newTag = adaptBlockTag(newTag);
+			newTag =
+				adaptBlockTag(newTag);
 			if (newTag != null) {
-				final BlockTag oldTag = tagSet.get(newTag);
+				final BlockTag oldTag =
+					tagSet.get(newTag);
 				if (oldTag == null) {
 					tagSet.put(newTag, newTag);
 				} else {
-					final int comp = oldTag.getPriority() - newTag.getPriority();
+					final int comp =
+						oldTag.getPriority()
+							- newTag.getPriority();
 					if (comp < 0) {
 						tagSet.put(newTag, newTag);
 					} else if (comp == 0) {
 						switch (getRuleForCommentPart(newTag)) {
 						case RULE_MERGE:
 							if (!oldTag.getDesc().isEmpty()) {
-								oldTag.setDesc(oldTag.getDesc() + ("</br>" + newTag.getDesc()));
+								oldTag.setDesc(oldTag.getDesc()
+									+ ("</br>"
+										+ newTag.getDesc()));
 							} else {
 								oldTag.setDesc(newTag.getDesc());
 							}
@@ -205,10 +236,12 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	@Override
 	public int compare(BlockTag tag1, BlockTag tag2) {
-		if (tag1.getFeatureID() == -1 || tag2.getFeatureID() == -1) {
+		if (tag1.getFeatureID() == -1
+			|| tag2.getFeatureID() == -1) {
 			return 0;
 		}
-		return featureIDRanks[tag1.getFeatureID()] - featureIDRanks[tag2.getFeatureID()];
+		return featureIDRanks[tag1.getFeatureID()]
+			- featureIDRanks[tag2.getFeatureID()];
 	}
 
 	public void addFilter(IFilter<?> filter) {

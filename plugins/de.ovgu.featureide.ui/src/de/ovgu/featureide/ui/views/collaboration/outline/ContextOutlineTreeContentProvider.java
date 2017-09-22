@@ -46,61 +46,84 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
  * @author Sebastian Krieter
  */
 public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvider {
-	ProjectStructure projectStructure = null;
-	IFeatureProject featureProject = null;
+
+	ProjectStructure projectStructure =
+		null;
+	IFeatureProject featureProject =
+		null;
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement == null || !(inputElement instanceof IFile)) {
-			return new String[] { "no file found" };
+		if (inputElement == null
+			|| !(inputElement instanceof IFile)) {
+			return new String[] {
+				"no file found" };
 		}
 
-		IFile inputFile = (IFile) inputElement;
+		IFile inputFile =
+			(IFile) inputElement;
 
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(inputFile);
-		this.featureProject = featureProject;
+		IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(inputFile);
+		this.featureProject =
+			featureProject;
 
 		if (featureProject != null) {
 			if (featureProject.getProjectSignatures() == null) {
-				return new String[] { "No signature found - Use Fuji typecheck" };
+				return new String[] {
+					"No signature found - Use Fuji typecheck" };
 			}
-			String featureName = featureProject.getFeatureName(inputFile);
-			String filename = (inputFile).getName();
+			String featureName =
+				featureProject.getFeatureName(inputFile);
+			String filename =
+				(inputFile).getName();
 			String classname;
 			if (filename.endsWith(".java")) {
-				classname = filename.substring(0, filename.length() - ".java".length());
+				classname =
+					filename.substring(0, filename.length()
+						- ".java".length());
 			} else {
-				classname = "";
+				classname =
+					"";
 			}
 
-			projectStructure = CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
+			projectStructure =
+				CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
 			if (projectStructure != null) {
-				AbstractClassFragment[] ar = new AbstractClassFragment[projectStructure.getClasses().size()];
-				int i = 0;
+				AbstractClassFragment[] ar =
+					new AbstractClassFragment[projectStructure.getClasses().size()];
+				int i =
+					0;
 				for (AbstractClassFragment frag : projectStructure.getClasses()) {
-					ar[i++] = frag;
+					ar[i++] =
+						frag;
 				}
 				Arrays.sort(ar, new ClassFragmentComparator(classname));
 
 				return ar;
 			} else {
-				return new String[] { "Feature Context Outline is not supported" };
+				return new String[] {
+					"Feature Context Outline is not supported" };
 			}
 		} else {
-			return new String[] { "no feature project" };
+			return new String[] {
+				"no feature project" };
 		}
 	}
 
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null && (newInput instanceof IFile)) {
-			IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
+		if (newInput != null
+			&& (newInput instanceof IFile)) {
+			IFeatureProject featureProject =
+				CorePlugin.getFeatureProject((IFile) newInput);
 			if (featureProject != null) {
-				final String featureName = featureProject.getFeatureName((IResource) newInput);
-				projectStructure = CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
+				final String featureName =
+					featureProject.getFeatureName((IResource) newInput);
+				projectStructure =
+					CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
 			}
 		}
 	}
@@ -108,26 +131,35 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof AbstractClassFragment) {
-			final AbstractClassFragment frag = (AbstractClassFragment) parentElement;
-			final Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
-			
+			final AbstractClassFragment frag =
+				(AbstractClassFragment) parentElement;
+			final Object[] ret =
+				new Object[frag.getMembers().size()
+					+ frag.getInnerClasses().size()];
+
 			System.arraycopy(frag.getMembers().toArray(), 0, ret, 0, frag.getMembers().size());
 			System.arraycopy(frag.getInnerClasses().values().toArray(), 0, ret, frag.getMembers().size(), frag.getInnerClasses().values().size());
-			
+
 			Arrays.sort(ret, new SignatureComparator());
 
 			return ret;
 		} else if (parentElement instanceof AbstractSignature) {
-			final AbstractSignature sig = (AbstractSignature) parentElement;
-			final ProjectSignatures signatures = featureProject.getProjectSignatures();
+			final AbstractSignature sig =
+				(AbstractSignature) parentElement;
+			final ProjectSignatures signatures =
+				featureProject.getProjectSignatures();
 
 			if (signatures != null) {
-				final HashMap<String, IFeature> featureMap = new HashMap<String, IFeature>();
+				final HashMap<String, IFeature> featureMap =
+					new HashMap<String, IFeature>();
 
-				final AFeatureData[] featureDataArray = sig.getFeatureData();
+				final AFeatureData[] featureDataArray =
+					sig.getFeatureData();
 				for (AFeatureData featureData : featureDataArray) {
-					final String featureName = signatures.getFeatureName(featureData.getID());
-					final IFeature feature = featureProject.getFeatureModel().getFeature(featureName);
+					final String featureName =
+						signatures.getFeatureName(featureData.getID());
+					final IFeature feature =
+						featureProject.getFeatureModel().getFeature(featureName);
 					if (!featureMap.containsKey(featureName)) {
 						featureMap.put(featureName, feature);
 					}
@@ -135,8 +167,9 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 				return featureMap.values().toArray();
 			}
 		}
-		
-		return new Object[] { "No Children" };
+
+		return new Object[] {
+			"No Children" };
 	}
 
 	@Override
@@ -147,10 +180,12 @@ public class ContextOutlineTreeContentProvider extends OutlineTreeContentProvide
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof AbstractClassFragment) {
-			AbstractClassFragment frag = (AbstractClassFragment) element;
+			AbstractClassFragment frag =
+				(AbstractClassFragment) element;
 			return frag.getMemberCount() > 0;
 		} else if (element instanceof AbstractSignature) {
-			AbstractSignature sig = (AbstractSignature) element;
+			AbstractSignature sig =
+				(AbstractSignature) element;
 			return sig.getFeatureData().length > 0;
 		}
 		return false;

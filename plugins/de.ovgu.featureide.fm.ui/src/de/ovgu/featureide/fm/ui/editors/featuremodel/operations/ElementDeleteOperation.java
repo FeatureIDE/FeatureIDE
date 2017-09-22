@@ -68,7 +68,8 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 	public ElementDeleteOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, DELETE);
-		this.viewer = viewer;
+		this.viewer =
+			viewer;
 	}
 
 	/**
@@ -76,29 +77,41 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 */
 	public void createSingleOperations() {
 		/**
-		 * The key of the Map is the feature which could be replaced by their equivalents given at the
-		 * corresponding List.
+		 * The key of the Map is the feature which could be replaced by their equivalents given at the corresponding List.
 		 */
-		Map<IFeature, List<IFeature>> removalMap = new HashMap<>();
-		List<IFeature> alreadyDeleted = new LinkedList<>();
-		List<IFeature> commonAncestorList = null;
+		Map<IFeature, List<IFeature>> removalMap =
+			new HashMap<>();
+		List<IFeature> alreadyDeleted =
+			new LinkedList<>();
+		List<IFeature> commonAncestorList =
+			null;
 
 		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
-			IFeature parent = removeFeature(element, removalMap, alreadyDeleted);
-			
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
+			IFeature parent =
+				removeFeature(element, removalMap, alreadyDeleted);
+
+			commonAncestorList =
+				Features.getCommonAncestor(commonAncestorList, parent);
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
 
 		if (viewer instanceof GraphicalViewerImpl) {
-			final GraphicalViewerImpl viewer2 = (GraphicalViewerImpl) viewer;
-			final IFeature parent = (commonAncestorList != null && !commonAncestorList.isEmpty()) 
-					? commonAncestorList.get(commonAncestorList.size() - 1) : null;
-			final Object editPart = viewer2.getEditPartRegistry().get(parent != null ? parent : featureModel.getStructure().getRoot());
+			final GraphicalViewerImpl viewer2 =
+				(GraphicalViewerImpl) viewer;
+			final IFeature parent =
+				(commonAncestorList != null
+					&& !commonAncestorList.isEmpty())
+						? commonAncestorList.get(commonAncestorList.size()
+							- 1)
+						: null;
+			final Object editPart =
+				viewer2.getEditPartRegistry().get(parent != null
+					? parent
+					: featureModel.getStructure().getRoot());
 			if (editPart instanceof FeatureEditPart) {
 				viewer2.setSelection(new StructuredSelection(editPart));
 				viewer2.reveal((EditPart) editPart);
@@ -122,11 +135,13 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 */
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
-			IConstraint constraint = ((ConstraintEditPart) element).getModel().getObject();
+			IConstraint constraint =
+				((ConstraintEditPart) element).getModel().getObject();
 			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
-			IConstraint constraint = ((IConstraint) element);
+			IConstraint constraint =
+				((IConstraint) element);
 			operations.add(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		}
@@ -141,22 +156,28 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
 	private IFeature removeFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
-		IFeature feature = null;
+		IFeature feature =
+			null;
 		if (element instanceof IFeature) {
-			feature = ((IFeature) element);
+			feature =
+				((IFeature) element);
 		} else if (element instanceof FeatureEditPart) {
-			feature = ((FeatureEditPart) element).getModel().getObject();
+			feature =
+				((FeatureEditPart) element).getModel().getObject();
 		}
 		if (feature != null) {
-			final IFeature parent = FeatureUtils.getParent(feature);
+			final IFeature parent =
+				FeatureUtils.getParent(feature);
 			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				operations.add(new DeleteFeatureOperation(featureModel, feature));
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features
-				FeatureDependencies featureDependencies = new FeatureDependencies(featureModel, false);
-				List<IFeature> equivalent = new LinkedList<IFeature>();
+				FeatureDependencies featureDependencies =
+					new FeatureDependencies(featureModel, false);
+				List<IFeature> equivalent =
+					new LinkedList<IFeature>();
 				for (IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
 					if (featureDependencies.isAlways(f2, feature)) {
 						equivalent.add(f2);
@@ -170,33 +191,37 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	}
 
 	/**
-	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br>
-	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to
-	 * select the features to replace with.<br>
-	 * If the feature has no equivalent an error message will be displayed.
+	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br> If the feature could be removed a
+	 * {@link DeleteOperationAlternativeDialog} will be opened to select the features to replace with.<br> If the feature has no equivalent an error message
+	 * will be displayed.
 	 * 
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
 	private void removeContainedFeatures(Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
 		if (!removalMap.isEmpty()) {
-			boolean hasDeletableFeature = false;
-			List<IFeature> toBeDeleted = new ArrayList<IFeature>(removalMap.keySet());
+			boolean hasDeletableFeature =
+				false;
+			List<IFeature> toBeDeleted =
+				new ArrayList<IFeature>(removalMap.keySet());
 
-			List<IFeature> notDeletable = new LinkedList<IFeature>();
+			List<IFeature> notDeletable =
+				new LinkedList<IFeature>();
 			for (Entry<IFeature, List<IFeature>> entry : removalMap.entrySet()) {
-				List<IFeature> featureList = entry.getValue();
+				List<IFeature> featureList =
+					entry.getValue();
 				featureList.removeAll(toBeDeleted);
 				featureList.removeAll(alreadyDeleted);
 				if (featureList.isEmpty()) {
 					notDeletable.add(entry.getKey());
 				} else {
-					hasDeletableFeature = true;
+					hasDeletableFeature =
+						true;
 				}
 			}
 
 			if (hasDeletableFeature) {
-				// case: features can be replaced with an equivalent feature 
+				// case: features can be replaced with an equivalent feature
 				new DeleteOperationAlternativeDialog(featureModel, removalMap, this);
 			} else {
 				// case: features can NOT be replaced with an equivalent feature
@@ -211,22 +236,36 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 	 * @param notDeletable The not deletable features
 	 */
 	private void openErrorDialog(List<IFeature> notDeletable) {
-		String notDeletedFeatures = null;
+		String notDeletedFeatures =
+			null;
 		for (IFeature f : notDeletable) {
 			if (notDeletedFeatures == null) {
-				notDeletedFeatures = "\"" + f.getName() + "\"";
+				notDeletedFeatures =
+					"\""
+						+ f.getName()
+						+ "\"";
 			} else {
-				notDeletedFeatures += ", \"" + f.getName() + "\"";
+				notDeletedFeatures +=
+					", \""
+						+ f.getName()
+						+ "\"";
 			}
 		}
 
-		MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
-				((notDeletable.size() != 1) ? "The following features are contained in constraints:" : "The following feature is contained in constraints:")
+		MessageDialog dialog =
+			new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
+					((notDeletable.size() != 1)
+						? "The following features are contained in constraints:"
+						: "The following feature is contained in constraints:")
 						+ "\n"
 						+ notDeletedFeatures
 						+ "\n"
-						+ ((notDeletable.size() != 1) ? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_
-								: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_), MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+						+ ((notDeletable.size() != 1)
+							? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_
+							: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_),
+					MessageDialog.ERROR, new String[] {
+						IDialogConstants.OK_LABEL },
+					0);
 		dialog.open();
 	}
 

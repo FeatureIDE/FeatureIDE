@@ -45,13 +45,19 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	private IComposerExtensionClass defaultComposerExtensionClass;
 
 	public ComposerExtensionProxy(IConfigurationElement configurationElement) throws Exception {
-		this.configElement = configurationElement;
-		name = configElement.getAttribute("name");
-		id = configElement.getAttribute("id");
-		description = configElement.getAttribute("description");
-		projectComposerMap = new WeakHashMap<IFeatureProject, IComposerExtensionClass>();
+		this.configElement =
+			configurationElement;
+		name =
+			configElement.getAttribute("name");
+		id =
+			configElement.getAttribute("id");
+		description =
+			configElement.getAttribute("description");
+		projectComposerMap =
+			new WeakHashMap<IFeatureProject, IComposerExtensionClass>();
 		try {
-			defaultComposerExtensionClass = (IComposerExtensionClass) configElement.createExecutableExtension("class");
+			defaultComposerExtensionClass =
+				(IComposerExtensionClass) configElement.createExecutableExtension("class");
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			throw e;
@@ -70,7 +76,10 @@ public class ComposerExtensionProxy implements IComposerExtension {
 
 	@Override
 	public String toString() {
-		return "Name: " + name + "; ID: " + id;
+		return "Name: "
+			+ name
+			+ "; ID: "
+			+ id;
 	}
 
 	@Override
@@ -80,12 +89,15 @@ public class ComposerExtensionProxy implements IComposerExtension {
 
 	@Override
 	public IComposerExtensionClass getComposerByProject(IFeatureProject featureProject) {
-		IComposerExtensionClass composer = projectComposerMap.get(featureProject);
+		IComposerExtensionClass composer =
+			projectComposerMap.get(featureProject);
 		if (composer == null) {
 			try {
-				ComposerExtensionClass tmpComposer = (ComposerExtensionClass) configElement.createExecutableExtension("class");
+				ComposerExtensionClass tmpComposer =
+					(ComposerExtensionClass) configElement.createExecutableExtension("class");
 				tmpComposer.setComposerExtension(this);
-				composer = tmpComposer;
+				composer =
+					tmpComposer;
 				projectComposerMap.put(featureProject, composer);
 			} catch (CoreException e) {
 				CorePlugin.getDefault().logError(e);

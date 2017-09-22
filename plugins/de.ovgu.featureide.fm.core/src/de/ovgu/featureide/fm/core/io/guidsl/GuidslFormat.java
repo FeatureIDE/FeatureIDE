@@ -34,14 +34,18 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Sebastian Krieter
  */
 public class GuidslFormat implements IFeatureModelFormat {
-	
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
-	
+
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ GuidslFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
-		final ProblemList problemList = new ProblemList();
-		final GuidslReader guidslReader = new GuidslReader();
+		final ProblemList problemList =
+			new ProblemList();
+		final GuidslReader guidslReader =
+			new GuidslReader();
 		try {
 			guidslReader.parseInputStream(featureModel, source.toString());
 		} catch (UnsupportedModelException e) {
@@ -85,5 +89,5 @@ public class GuidslFormat implements IFeatureModelFormat {
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
 	}
-	
+
 }

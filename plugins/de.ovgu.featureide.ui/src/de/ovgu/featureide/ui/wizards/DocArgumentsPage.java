@@ -43,46 +43,62 @@ public class DocArgumentsPage extends AbstractWizardPage {
 
 	private Text optionsText;
 	private Label optionsLabel;
-	
+
 	private String options;
 
 	public DocArgumentsPage() {
 		super(JAVADOC_OPTIONS);
 		setDescription(SPECIFY_OPTIONS_FOR_JAVADOC_TOOL);
-		this.options = "";
+		this.options =
+			"";
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
+		Composite container =
+			new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout =
+			new GridLayout();
+		gridLayout.numColumns =
+			1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		GridLayout projGridLayout = new GridLayout();
-		projGridLayout.numColumns = 1;
+		GridLayout projGridLayout =
+			new GridLayout();
+		projGridLayout.numColumns =
+			1;
 
-		Group configGroup = new Group(container, SWT.NONE);
+		Group configGroup =
+			new Group(container, SWT.NONE);
 		configGroup.setText("");
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 3;
+		GridData gridData =
+			new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan =
+			2;
+		gridData.verticalSpan =
+			3;
 
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		GridData gridData2 = new GridData(GridData.FILL_BOTH);
-		gridData2.horizontalSpan = 1;
-		gridData2.verticalSpan = 3;
+		GridData gridData2 =
+			new GridData(GridData.FILL_BOTH);
+		gridData2.horizontalSpan =
+			1;
+		gridData2.verticalSpan =
+			3;
 
-		optionsLabel = new Label(configGroup, 0);
+		optionsLabel =
+			new Label(configGroup, 0);
 		optionsLabel.setText("Options: ");
-		optionsText = new Text(configGroup, SWT.BORDER | SWT.MULTI);
+		optionsText =
+			new Text(configGroup, SWT.BORDER
+				| SWT.MULTI);
 		optionsText.setText(options);
 		optionsText.setLayoutData(gridData2);
 		optionsText.addKeyListener(new KeyPressedListener());
-		
+
 		updatePage();
 	}
 

@@ -40,7 +40,7 @@ public interface IPersistentFormat<T> extends IExtension {
 	boolean supportsRead();
 
 	boolean supportsWrite();
-	
+
 	boolean supportsContent(CharSequence content);
-	
+
 }

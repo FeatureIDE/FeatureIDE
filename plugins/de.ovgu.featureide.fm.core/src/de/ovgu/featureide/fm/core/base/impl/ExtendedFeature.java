@@ -32,11 +32,20 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class ExtendedFeature extends Feature {
 
-	public static final int TYPE_INTERN = 0, TYPE_INHERITED = 1, TYPE_INTERFACE = 2, TYPE_INSTANCE = 3;
+	public static final int TYPE_INTERN =
+		0, TYPE_INHERITED =
+			1,
+			TYPE_INTERFACE =
+				2,
+			TYPE_INSTANCE =
+				3;
 
-	private int type = TYPE_INTERN;
-	private String externalModelName = null;
-	private boolean newDefined = false;
+	private int type =
+		TYPE_INTERN;
+	private String externalModelName =
+		null;
+	private boolean newDefined =
+		false;
 
 	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
@@ -44,9 +53,12 @@ public class ExtendedFeature extends Feature {
 
 	public ExtendedFeature(ExtendedFeature extendedFeature, IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		super(extendedFeature, newFeatureModel, newStructure);
-		this.type = extendedFeature.type;
-		this.externalModelName = extendedFeature.externalModelName;
-		this.newDefined = extendedFeature.newDefined;
+		this.type =
+			extendedFeature.type;
+		this.externalModelName =
+			extendedFeature.externalModelName;
+		this.newDefined =
+			extendedFeature.newDefined;
 	}
 
 	@Override
@@ -75,7 +87,8 @@ public class ExtendedFeature extends Feature {
 	}
 
 	public void setType(int type) {
-		this.type = type;
+		this.type =
+			type;
 	}
 
 	public String getExternalModelName() {
@@ -83,7 +96,8 @@ public class ExtendedFeature extends Feature {
 	}
 
 	public void setExternalModelName(String externalModelName) {
-		this.externalModelName = externalModelName;
+		this.externalModelName =
+			externalModelName;
 	}
 
 	public boolean isNewDefined() {
@@ -91,7 +105,8 @@ public class ExtendedFeature extends Feature {
 	}
 
 	public void setNewDefined(boolean newDefined) {
-		this.newDefined = newDefined;
+		this.newDefined =
+			newDefined;
 	}
 
 	@Override

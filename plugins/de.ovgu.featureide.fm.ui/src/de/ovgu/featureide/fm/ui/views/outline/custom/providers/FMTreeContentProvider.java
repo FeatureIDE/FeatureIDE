@@ -39,8 +39,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
- * This class is part of the outline. It provides the content that should be
- * displayed. Therefore it maps the information provided by the fmProject to the
+ * This class is part of the outline. It provides the content that should be displayed. Therefore it maps the information provided by the fmProject to the
  * methods of the ITreeContentProvider interface.
  * 
  * @author Jan Wedding
@@ -55,12 +54,15 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
 			if (newInput instanceof IFeatureModel)
-				fModel = ((IFeatureModel) newInput);
+				fModel =
+					((IFeatureModel) newInput);
 			else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
-					FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
+					FeatureModelManager fmm =
+						FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
 					if (fmm != null)
-						fModel = fmm.getObject();
+						fModel =
+							fmm.getObject();
 				}
 			}
 		}
@@ -74,14 +76,19 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if (fModel != null && fModel.getStructure().getRoot() != null) {
-			elements = new Object[2];
-			elements[0] = fModel.getStructure().getRoot().getFeature();
-			elements[1] = CONSTRAINTS;
+		if (fModel != null
+			&& fModel.getStructure().getRoot() != null) {
+			elements =
+				new Object[2];
+			elements[0] =
+				fModel.getStructure().getRoot().getFeature();
+			elements[1] =
+				CONSTRAINTS;
 			return elements;
 		}
 
-		return new String[] { NO_DATA_TO_DISPLAY_AVAILABLE_ };
+		return new String[] {
+			NO_DATA_TO_DISPLAY_AVAILABLE_ };
 	}
 
 	@Override
@@ -90,11 +97,16 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 			return null;
 
 		// we have a String as parent of constraints
-		if (parentElement instanceof String && CONSTRAINTS.equals(parentElement)) {
-			Object[] elements = new Object[fModel.getConstraintCount()];
-			List<IConstraint> cList = fModel.getConstraints();
-			for (int i = 0; i < fModel.getConstraintCount(); i++) {
-				elements[i] = cList.get(i);
+		if (parentElement instanceof String
+			&& CONSTRAINTS.equals(parentElement)) {
+			Object[] elements =
+				new Object[fModel.getConstraintCount()];
+			List<IConstraint> cList =
+				fModel.getConstraints();
+			for (int i =
+				0; i < fModel.getConstraintCount(); i++) {
+				elements[i] =
+					cList.get(i);
 			}
 			return elements;
 		}
@@ -118,14 +130,16 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	/**
 	 * converts a list of Features into an Array
 	 * 
-	 * @param f
-	 *            FeatureList
+	 * @param f FeatureList
 	 * @return Array of Features
 	 */
 	private IFeature[] featureListToArray(List<IFeature> f) {
-		IFeature[] fArray = new IFeature[f.size()];
-		for (int i = 0; i < f.size(); i++) {
-			fArray[i] = f.get(i);
+		IFeature[] fArray =
+			new IFeature[f.size()];
+		for (int i =
+			0; i < f.size(); i++) {
+			fArray[i] =
+				f.get(i);
 		}
 		return fArray;
 	}
@@ -159,7 +173,6 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	 * FIX for Bug #582
 	 */
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 }

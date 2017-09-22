@@ -40,15 +40,15 @@ public class BuildFeatureInterfacesHandler extends AProjectJobHandler {
 	protected AbstractWizard instantiateWizard() {
 		return new FeatureInterfaceWizard(BUILD_FEATURE_INTERFACES, "folder");
 	}
-	
+
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildFeatureInterfaces(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
-				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+		MPLPlugin.getDefault().buildFeatureInterfaces(projects,
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER),
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME),
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL),
 				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
-		
+
 	}
-	
+
 }

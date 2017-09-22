@@ -41,13 +41,16 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	protected List<ParameterDeclaration> parameterList;
 	protected List<Access> exceptionList;
 
-	public FujiMethodSignature(AbstractClassSignature parent, String name, 
+	public FujiMethodSignature(AbstractClassSignature parent, String name,
 			String modifier, TypeDecl returnType, boolean isConstructor,
 			List<ParameterDeclaration> parameterList, List<Access> exceptionList) {
 		super(parent, name, modifier, returnType.name(), new LinkedList<String>(), isConstructor);
-		this.returnType = returnType;
-		this.parameterList = parameterList;
-		this.exceptionList = exceptionList;
+		this.returnType =
+			returnType;
+		this.parameterList =
+			parameterList;
+		this.exceptionList =
+			exceptionList;
 		for (ParameterDeclaration parameter : parameterList) {
 			parameterTypes.add(parameter.type().name());
 		}
@@ -55,17 +58,18 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 
 	@Override
 	public String toString() {
-		final StringBuilder methodString = new StringBuilder();
+		final StringBuilder methodString =
+			new StringBuilder();
 
 //		methodString.append(super.toString());
 //		if (methodString.length() > 0) {
 //			methodString.append(LINE_SEPARATOR);
 //		}
-		
+
 		if (mergedjavaDocComment != null) {
 			methodString.append(mergedjavaDocComment);
 		}
-		
+
 		if (modifiers.length > 0) {
 			for (String modifier : modifiers) {
 				methodString.append(modifier);
@@ -80,44 +84,59 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 
 		methodString.append(name);
 		methodString.append('(');
-		boolean notfirst = false;
+		boolean notfirst =
+			false;
 		for (ParameterDeclaration parameter : parameterList) {
 			if (notfirst) {
 				methodString.append(", ");
 			} else {
-				notfirst = true;
+				notfirst =
+					true;
 			}
 			methodString.append(parameter.type().name());
 			methodString.append(' ');
 			methodString.append(parameter.name());
 		}
 		methodString.append(')');
-		
+
 		if (exceptionList.getNumChild() > 0) {
-			notfirst = false;
+			notfirst =
+				false;
 			methodString.append(" throws ");
 			for (Access exception : exceptionList) {
 				if (notfirst) {
 					methodString.append(", ");
 				} else {
-					notfirst = true;
+					notfirst =
+						true;
 				}
 				methodString.append(exception.type().name());
 			}
 		}
-	
+
 		return methodString.toString();
 	}
 
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		
-		hashCode = hashCodePrime * hashCode + type.hashCode();
-		
-		hashCode = hashCodePrime * hashCode + (isConstructor ? 1231 : 1237);
+
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ type.hashCode();
+
+		hashCode =
+			hashCodePrime
+				* hashCode
+				+ (isConstructor
+					? 1231
+					: 1237);
 		for (ParameterDeclaration parameter : parameterList) {
-			hashCode = hashCodePrime * hashCode + parameter.type().name().hashCode();
+			hashCode =
+				hashCodePrime
+					* hashCode
+					+ parameter.type().name().hashCode();
 		}
 	}
 
@@ -125,33 +144,37 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
-		
-		FujiMethodSignature otherSig = (FujiMethodSignature) obj;
-		
-		if (!super.sigEquals(otherSig)) 
+
+		FujiMethodSignature otherSig =
+			(FujiMethodSignature) obj;
+
+		if (!super.sigEquals(otherSig))
 			return false;
 		if (isConstructor != otherSig.isConstructor) {
 			return false;
 		}
-		
+
 		if (returnType != otherSig.returnType) {
 			return false;
 		}
-		
+
 		if (parameterList.getNumChild() != otherSig.parameterList.getNumChild()) {
 			return false;
 		}
-		
-		Iterator<ParameterDeclaration> thisIt = parameterList.iterator();
-		Iterator<ParameterDeclaration> otherIt = otherSig.parameterList.iterator();
+
+		Iterator<ParameterDeclaration> thisIt =
+			parameterList.iterator();
+		Iterator<ParameterDeclaration> otherIt =
+			otherSig.parameterList.iterator();
 		while (thisIt.hasNext()) {
 			if (thisIt.next().type() != otherIt.next().type()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 

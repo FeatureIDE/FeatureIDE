@@ -28,17 +28,18 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Paul Maximilian Bittner
  */
 public interface IConfigurationMapFilter {
+
 	public void initialize(ConfigurationMap configurationMap);
-	
+
 	/**
 	 * @param configurationMap
 	 * @param feature
 	 * @return True, if the given IFeature is valid, false if it should be filtered out.
 	 */
 	public boolean test(ConfigurationMap configurationMap, IFeature feature);
-	
+
 	public String getName();
-	
+
 	public String getImagePath();
 
 	/**

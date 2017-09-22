@@ -32,12 +32,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
- * This Wrapper makes it possible, to write feature models to IFiles, e.g. if
- * working with Eclipse plugins Otherwise only the classes extending
+ * This Wrapper makes it possible, to write feature models to IFiles, e.g. if working with Eclipse plugins Otherwise only the classes extending
  * {@link AbstractFeatureModelWriter} are needed
  * 
- * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/>
- * {@link IFile} can be converted via {@code Paths.getPath(ifile.getLocationURI())}.
+ * @deprecated Use {@link IFeatureModelFormat} and {@link FileHandler} instead. <br/> {@link IFile} can be converted via
+ *             {@code Paths.getPath(ifile.getLocationURI())}.
  * 
  * @author S�nke Holthusen
  * @author Marcus Pinnecke (Feature Interface)
@@ -48,7 +47,8 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 	private IFeatureModelWriter writer;
 
 	public FeatureModelWriterIFileWrapper(IFeatureModelWriter writer) {
-		this.writer = writer;
+		this.writer =
+			writer;
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
@@ -69,8 +69,9 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 	}
 
 	public void writeToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeToString().getBytes(
-				Charset.availableCharsets().get("UTF-8")));
+		InputStream source =
+			new ByteArrayInputStream(writeToString().getBytes(
+					Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {

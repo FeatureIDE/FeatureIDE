@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
+
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
@@ -41,30 +42,47 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_
  */
 public class English implements ILanguage {
 
-	public static final String NAME = ENGLISH;
+	public static final String NAME =
+		ENGLISH;
 
-	private static final String LEGEND = "Legend:";
-	private static final String MANDATORY = "Mandatory";
-	private static final String ABSTRACT = "Abstract";
-	private static final String INTERFACED = FROM_INTERFACE;
-	private static final String CONCRETE = "Concrete";
-	private static final String HIDDEN = "Hidden";
-	private static final String COLLAPSED = "Collapsed";
-	private static final String DEAD = "Dead feature";
-	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
-	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
-	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
-	private static final String IMPLICIT = "Implicit constraint";
-	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
-	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
-	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String LEGEND =
+		"Legend:";
+	private static final String MANDATORY =
+		"Mandatory";
+	private static final String ABSTRACT =
+		"Abstract";
+	private static final String INTERFACED =
+		FROM_INTERFACE;
+	private static final String CONCRETE =
+		"Concrete";
+	private static final String HIDDEN =
+		"Hidden";
+	private static final String COLLAPSED =
+		"Collapsed";
+	private static final String DEAD =
+		"Dead feature";
+	private static final String FALSE_OPTIONAL =
+		FALSE_OPTIONAL_FEATURE;
+	private static final String OPTIONAL =
+		"Optional";
+	private static final String INDETHIDDEN =
+		INDETERMINATE_HIDDEN;
+	private static final String REDUNDANT =
+		REDUNDANT_CONSTRAINT;
+	private static final String IMPLICIT =
+		"Implicit constraint";
+	private static final String UNSATISFIABLE_CONST =
+		UNSATISFIABLE_CONSTRAINT;
+	private static final String TAUTOLOGY_CONST =
+		CONSTRAINT_IS_TAUTOLOGY;
+	private static final String VOID_MODEL_CONST =
+		CONSTRAINT_MAKES_THE_MODEL_VOID;
 
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
 	}
-	
+
 	@Override
 	public String getImplicitConst() {
 		return IMPLICIT;
@@ -134,7 +152,7 @@ public class English implements ILanguage {
 	public String getHidden() {
 		return HIDDEN;
 	}
-	
+
 	@Override
 	public String getCollapsed() {
 		return COLLAPSED;

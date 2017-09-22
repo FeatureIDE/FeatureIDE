@@ -27,9 +27,8 @@ import de.ovgu.featureide.migration.impl.VariantsToFeatureHouseSPLMigrator;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationWizard;
 
 /**
- * This class handles the {@code SPLMigrationCommand} which is triggered by the
- * context menu on a selection of projects in the eclipse packet manager. Most
- * of the Implementation is handled by the {@link SPLMigrationWizard}.
+ * This class handles the {@code SPLMigrationCommand} which is triggered by the context menu on a selection of projects in the eclipse packet manager. Most of
+ * the Implementation is handled by the {@link SPLMigrationWizard}.
  * 
  * @author Konstantin Tonscheidt
  * 
@@ -43,7 +42,6 @@ public class SPLMigrationCommandHandler extends ASelectionHandler {
 	}
 
 	@Override
-	protected void singleAction(Object element) {		
-	}
+	protected void singleAction(Object element) {}
 
 }

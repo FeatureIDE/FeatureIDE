@@ -30,5 +30,5 @@ public class AddMSPLNatureHandler extends AFeatureProjectHandler {
 	protected void singleAction(IFeatureProject project) {
 		MPLPlugin.getDefault().addMSPLNature(project);
 	}
-	
+
 }

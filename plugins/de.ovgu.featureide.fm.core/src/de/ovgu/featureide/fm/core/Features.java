@@ -38,7 +38,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public final class Features {
 
-	public static final String FEATURE_SUFFIX = "(Feature)";
+	public static final String FEATURE_SUFFIX =
+		"(Feature)";
 
 	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
 		return getAllFeatures(features, root, true);
@@ -52,7 +53,8 @@ public final class Features {
 		return getCompoundFeatures(features, root, true);
 	}
 
-	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
+	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
+			boolean includeRoot) {
 		if (includeRoot) {
 			features.add(root);
 		}
@@ -62,8 +64,10 @@ public final class Features {
 		return features;
 	}
 
-	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
-		if (includeRoot && !root.hasChildren()) {
+	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
+			boolean includeRoot) {
+		if (includeRoot
+			&& !root.hasChildren()) {
 			features.add(root);
 		}
 		for (final IFeatureStructure feature : root.getChildren()) {
@@ -74,7 +78,8 @@ public final class Features {
 
 	public static Collection<IFeatureStructure> getCompoundFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
 			boolean includeRoot) {
-		if (includeRoot && root.hasChildren()) {
+		if (includeRoot
+			&& root.hasChildren()) {
 			features.add(root);
 		}
 		for (final IFeatureStructure feature : root.getChildren()) {
@@ -84,9 +89,11 @@ public final class Features {
 	}
 
 	public static final Collection<String> extractOperatorNamesFromFeatuers(final Set<String> features) {
-		List<String> result = new ArrayList<>();
+		List<String> result =
+			new ArrayList<>();
 		for (String feature : features) {
-			final String str = feature.toLowerCase().trim();
+			final String str =
+				feature.toLowerCase().trim();
 			if (Operator.isOperatorName(str))
 				result.add(str);
 		}
@@ -94,36 +101,48 @@ public final class Features {
 	}
 
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
-		List<IFeature> commonAncestorList = null;
+		List<IFeature> commonAncestorList =
+			null;
 		for (IFeature feature : features) {
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
+			commonAncestorList =
+				Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
-		return commonAncestorList.get(commonAncestorList.size() - 1);
+		return commonAncestorList.get(commonAncestorList.size()
+			- 1);
 	}
 
 	public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
 		if (commonAncestorList == null) {
-			commonAncestorList = new LinkedList<>();
+			commonAncestorList =
+				new LinkedList<>();
 			while (parent != null) {
 				commonAncestorList.add(0, parent);
-				parent = FeatureUtils.getParent(parent);
+				parent =
+					FeatureUtils.getParent(parent);
 			}
 		} else if (parent != null) {
-			LinkedList<IFeature> parentList = new LinkedList<>();
+			LinkedList<IFeature> parentList =
+				new LinkedList<>();
 			while (parent != null) {
 				parentList.addFirst(parent);
-				parent = FeatureUtils.getParent(parent);
+				parent =
+					FeatureUtils.getParent(parent);
 			}
-			final Iterator<IFeature> iterator1 = parentList.iterator();
-			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
-			int i = 0;
-			while (iterator1.hasNext() && iterator2.hasNext()) {
+			final Iterator<IFeature> iterator1 =
+				parentList.iterator();
+			final Iterator<IFeature> iterator2 =
+				commonAncestorList.iterator();
+			int i =
+				0;
+			while (iterator1.hasNext()
+				&& iterator2.hasNext()) {
 				if (!iterator1.next().equals(iterator2.next())) {
 					break;
 				}
 				i++;
 			}
-			commonAncestorList = commonAncestorList.subList(0, i);
+			commonAncestorList =
+				commonAncestorList.subList(0, i);
 		}
 		return commonAncestorList;
 	}

@@ -24,27 +24,33 @@ package de.ovgu.featureide.fm.core.annotation;
  * @author Marcus Pinnecke
  */
 public class LogService {
-	
-	private static LogService INSTANCE = null;
-	
+
+	private static LogService INSTANCE =
+		null;
+
 	private LogService() {
-		
+
 	}
-	
+
 	public static LogService getInstance() {
 		if (INSTANCE == null)
-			INSTANCE = new LogService();
+			INSTANCE =
+				new LogService();
 		return INSTANCE;
 	}
-	
-	public enum LogLevel { DEBUG }
-	
+
+	public enum LogLevel {
+		DEBUG
+	}
+
 	public void log(LogLevel level, String message) {
 		switch (level) {
-		case DEBUG: 
+		case DEBUG:
 			System.out.println(message);
 			break;
-		default: throw new RuntimeException("Unknown log level " + level.toString());
+		default:
+			throw new RuntimeException("Unknown log level "
+				+ level.toString());
 		}
 	}
 

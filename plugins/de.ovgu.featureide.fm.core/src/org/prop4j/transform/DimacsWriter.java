@@ -37,25 +37,32 @@ import org.prop4j.Node;
  * @author Timo G&uuml;nther
  */
 public class DimacsWriter {
+
 	/** Token leading a (single-line) comment. */
-	private static final String COMMENT = "c";
+	private static final String COMMENT =
+		"c";
 	/** Token leading the problem definition. */
-	private static final String PROBLEM = "p";
+	private static final String PROBLEM =
+		"p";
 	/** Token identifying the problem type as CNF. */
-	private static final String CNF = "cnf";
+	private static final String CNF =
+		"cnf";
 	/** Token denoting the end of a clause. */
-	private static final String CLAUSE_END = "0";
-	
+	private static final String CLAUSE_END =
+		"0";
+
 	/** The clauses of the CNF to transform. */
 	private final List<Node> clauses;
 	/** Maps variables to indexes. */
 	private final Map<Object, Integer> variableIndexes;
-	
+
 	/** Whether the writer should write a variable directory listing the names of the variables. */
-	private boolean writingVariableDirectory = false;
-	
+	private boolean writingVariableDirectory =
+		false;
+
 	/**
 	 * Constructs a new instance of this class with the given CNF.
+	 * 
 	 * @param cnf the CNF to transform; not null
 	 * @throws IllegalArgumentException if the input is null or not in CNF
 	 */
@@ -66,71 +73,82 @@ public class DimacsWriter {
 		if (!cnf.isConjunctiveNormalForm()) {
 			throw new IllegalArgumentException("Input is not in CNF");
 		}
-		this.clauses = cnf instanceof And ? Arrays.asList(cnf.getChildren()) : Collections.singletonList(cnf);
-		this.variableIndexes = new LinkedHashMap<>();
+		this.clauses =
+			cnf instanceof And
+				? Arrays.asList(cnf.getChildren())
+				: Collections.singletonList(cnf);
+		this.variableIndexes =
+			new LinkedHashMap<>();
 		for (final Object variable : cnf.getUniqueVariables()) {
 			addVariable(variable);
 		}
 	}
-	
+
 	/**
-	 * Adds the given variable.
-	 * This means assigning an index to it.
+	 * Adds the given variable. This means assigning an index to it.
+	 * 
 	 * @param l variable to add; not null
 	 */
 	private void addVariable(Object variable) {
 		if (variableIndexes.containsKey(variable)) {
 			return;
 		}
-		final int index = variableIndexes.size() + 1;
+		final int index =
+			variableIndexes.size()
+				+ 1;
 		variableIndexes.put(variable, index);
 	}
-	
+
 	/**
-	 * <p>
-	 * Sets the writing variable directory flag.
-	 * If true, the writer will write a variable directory at the start of the output.
-	 * This is a set of comments naming the variables.
-	 * This can later be used during reading so the variables are not just numbers.
-	 * </p>
+	 * <p> Sets the writing variable directory flag. If true, the writer will write a variable directory at the start of the output. This is a set of comments
+	 * naming the variables. This can later be used during reading so the variables are not just numbers. </p>
 	 * 
-	 * <p>
-	 * Defaults to false.
-	 * </p>
+	 * <p> Defaults to false. </p>
+	 * 
 	 * @param writingVariableDirectory whether to write the variable directory
 	 */
 	public void setWritingVariableDirectory(boolean writingVariableDirectory) {
-		this.writingVariableDirectory = writingVariableDirectory;
+		this.writingVariableDirectory =
+			writingVariableDirectory;
 	}
-	
+
 	/**
 	 * Writes the DIMACS CNF file format.
+	 * 
 	 * @return the transformed CNF; not null
 	 */
 	public String write() {
-		String s = "";
+		String s =
+			"";
 		if (writingVariableDirectory) {
-			s += writeVariableDirectory();
+			s +=
+				writeVariableDirectory();
 		}
-		s += writeProblem();
-		s += writeClauses();
+		s +=
+			writeProblem();
+		s +=
+			writeClauses();
 		return s;
 	}
-	
+
 	/**
 	 * Writes the variable directory.
+	 * 
 	 * @return the variable directory; not null
 	 */
 	private String writeVariableDirectory() {
-		String s = "";
+		String s =
+			"";
 		for (final Entry<Object, Integer> e : variableIndexes.entrySet()) {
-			s += writeVariableDirectoryEntry(e.getKey(), e.getValue());
+			s +=
+				writeVariableDirectoryEntry(e.getKey(), e.getValue());
 		}
 		return s;
 	}
-	
+
 	/**
 	 * Writes an entry of the variable directory.
+	 * 
 	 * @param variable variable to list in the entry
 	 * @param index index of the variable
 	 * @return an entry of the variable directory; not null
@@ -141,9 +159,10 @@ public class DimacsWriter {
 				index,
 				String.valueOf(variable));
 	}
-	
+
 	/**
 	 * Writes the problem description.
+	 * 
 	 * @return the problem description; not null
 	 */
 	private String writeProblem() {
@@ -153,43 +172,55 @@ public class DimacsWriter {
 				variableIndexes.size(),
 				clauses.size());
 	}
-	
+
 	/**
 	 * Writes all clauses.
+	 * 
 	 * @return all transformed clauses; not null
 	 */
 	private String writeClauses() {
-		String s = "";
+		String s =
+			"";
 		for (final Node clause : clauses) {
-			s += writeClause(clause);
+			s +=
+				writeClause(clause);
 		}
 		return s;
 	}
-	
+
 	/**
 	 * Writes the given clause.
+	 * 
 	 * @param clause clause to transform; not null
 	 * @return the transformed clause; not null
 	 */
 	private String writeClause(Node clause) {
-		String s = "";
+		String s =
+			"";
 		for (final Literal l : clause.getUniqueLiterals()) {
-			s += writeLiteral(l) + " ";
+			s +=
+				writeLiteral(l)
+					+ " ";
 		}
-		s += CLAUSE_END;
-		s += System.lineSeparator();
+		s +=
+			CLAUSE_END;
+		s +=
+			System.lineSeparator();
 		return s;
 	}
-	
+
 	/**
 	 * Writes the given literal.
+	 * 
 	 * @param l literal to transform; not null
 	 * @return the transformed literal; not null
 	 */
 	private String writeLiteral(Literal l) {
-		int index = variableIndexes.get(l.var);
+		int index =
+			variableIndexes.get(l.var);
 		if (!l.positive) {
-			index = -index;
+			index =
+				-index;
 		}
 		return String.valueOf(index);
 	}

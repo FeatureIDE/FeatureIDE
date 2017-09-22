@@ -34,27 +34,38 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
  * 
  */
 public abstract class AFeatureModelElement implements IFeatureModelElement {
-	
+
 	protected final long id;
 
 	protected String name;
 
 	protected final IFeatureModel featureModel;
-	protected final LinkedList<IEventListener> listenerList = new LinkedList<>();
-	
+	protected final LinkedList<IEventListener> listenerList =
+		new LinkedList<>();
+
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
-		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
-		this.id = oldElement.id;
-		name = (oldElement.name == null) ? null : new String(oldElement.name);
+		this.featureModel =
+			featureModel != null
+				? featureModel
+				: oldElement.featureModel;
+		this.id =
+			oldElement.id;
+		name =
+			(oldElement.name == null)
+				? null
+				: new String(oldElement.name);
 	}
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
 		if (featureModel == null) {
 			throw new RuntimeException();
 		}
-		this.id = featureModel.getNextElementId();
-		this.featureModel = featureModel;
-		this.name = null;
+		this.id =
+			featureModel.getNextElementId();
+		this.featureModel =
+			featureModel;
+		this.name =
+			null;
 	}
 
 	@Override
@@ -66,7 +77,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	public final long getInternalId() {
 		return id;
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;
@@ -74,9 +85,10 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	@Override
 	public void setName(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
-	
+
 	@Override
 	public final void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
@@ -98,16 +110,19 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	@Override
 	public final int hashCode() {
-		return (int) (37 * id);
+		return (int) (37
+			* id);
 	}
 
 	@Override
 	public final boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (obj == null
+			|| getClass() != obj.getClass())
 			return false;
-		AFeatureModelElement other = (AFeatureModelElement) obj;
+		AFeatureModelElement other =
+			(AFeatureModelElement) obj;
 		return id == other.id;
 	}
 

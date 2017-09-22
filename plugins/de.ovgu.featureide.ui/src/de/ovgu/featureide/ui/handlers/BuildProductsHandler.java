@@ -38,17 +38,19 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
  * @author Sebastian Krieter
  */
 public class BuildProductsHandler extends AFeatureProjectHandler implements IConfigurationBuilderBasics {
-	
+
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		BuildProductsWizard wizard = new BuildProductsWizard(featureProject, getToggleState());
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		BuildProductsWizard wizard =
+			new BuildProductsWizard(featureProject, getToggleState());
+		WizardDialog dialog =
+			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-		
+
 		setToggleState(wizard.getToggleState());
 	}
-	
+
 	/**
 	 * Gets the toggle state from persistent properties
 	 */
@@ -66,7 +68,9 @@ public class BuildProductsHandler extends AFeatureProjectHandler implements ICon
 	 */
 	protected static void setToggleState(boolean value) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value
+				? TRUE
+				: FALSE);
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

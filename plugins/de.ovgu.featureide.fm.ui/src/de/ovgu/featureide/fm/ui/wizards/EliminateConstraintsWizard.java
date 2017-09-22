@@ -33,9 +33,10 @@ import de.ovgu.featureide.fm.core.conversion.NNFConverter;
  * 
  * @author Alexander
  */
-public class EliminateConstraintsWizard extends AbstractWizard implements INewWizard {	
+public class EliminateConstraintsWizard extends AbstractWizard implements INewWizard {
+
 	protected static enum ConversionMethod {
-		NNF, CNF, /*TSEITIN,*/ COMBINED;
+		NNF, CNF, /* TSEITIN, */ COMBINED;
 	}
 
 	private EliminateConstraintsPage page;
@@ -46,38 +47,49 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 	private int pseudocomplex;
 	private int strictcomplex;
 	private String fileExtension;
+
 	/**
 	 * @param title
 	 */
 	public EliminateConstraintsWizard(IFile file, String title, boolean trivial, int pseudocomplex, int strictcomplex, String fileExtension) {
 		super(title);
 		// TODO Auto-generated constructor stub
-		inputModelFile = file;
-		this.trivial = trivial;
-		this.pseudocomplex = pseudocomplex;
-		this.strictcomplex = strictcomplex;
-		this.fileExtension = fileExtension;
+		inputModelFile =
+			file;
+		this.trivial =
+			trivial;
+		this.pseudocomplex =
+			pseudocomplex;
+		this.strictcomplex =
+			strictcomplex;
+		this.fileExtension =
+			fileExtension;
 	}
-	
+
 	@Override
 	public void addPages() {
 		setWindowTitle("Export Product-Equivalent Model Without Complex Constraints");
-		page = new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
-		
-		if(strictcomplex == 0) {
+		page =
+			new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
+
+		if (strictcomplex == 0) {
 			page.setTitle("No Strict-Complex Constraints found");
-			page.setDescription("Number of pseudo-complex constraints: " + pseudocomplex);
+			page.setDescription("Number of pseudo-complex constraints: "
+				+ pseudocomplex);
 		} else {
 			page.setTitle("Strict-Complex Constraints found");
-			page.setDescription("Number of strict-complex constraints: " + strictcomplex + "\n"
-					+ "Number of pseudo-complex constraints: " + pseudocomplex);
+			page.setDescription("Number of strict-complex constraints: "
+				+ strictcomplex
+				+ "\n"
+				+ "Number of pseudo-complex constraints: "
+				+ pseudocomplex);
 		}
-		
+
 		addPage(page);
 	}
-	
+
 	public IConverterStrategy getStrategy() {
-		switch(page.selectedMethod) {
+		switch (page.selectedMethod) {
 		case CNF:
 			return new CNFConverter();
 		case NNF:
@@ -86,15 +98,15 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 			return new CombinedConverter();
 		}
 	}
-	
+
 	public String getPath() {
 		return page.path;
 	}
-	
+
 	public boolean preserveConfigurations() {
 		return page.preserveConfigurations;
 	}
-	
+
 	public boolean removeRedundancy() {
 		return page.removeRedundancy;
 	}

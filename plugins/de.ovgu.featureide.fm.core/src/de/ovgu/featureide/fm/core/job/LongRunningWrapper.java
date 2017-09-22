@@ -31,17 +31,20 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  */
 public final class LongRunningWrapper {
 
-	public static LongRunningCore INSTANCE = new LongRunningCore();
+	public static LongRunningCore INSTANCE =
+		new LongRunningCore();
 
-	private LongRunningWrapper() {
-	}
+	private LongRunningWrapper() {}
 
 	public static <T> T runMethod(LongRunningMethod<T> method) {
 		return runMethod(method, null);
 	}
 
 	public static <T> T runMethod(LongRunningMethod<T> method, IMonitor monitor) {
-		monitor = monitor != null ? monitor : new NullMonitor();
+		monitor =
+			monitor != null
+				? monitor
+				: new NullMonitor();
 		try {
 			return method.execute(monitor);
 		} catch (Exception e) {
@@ -52,7 +55,7 @@ public final class LongRunningWrapper {
 			monitor.done();
 		}
 	}
-	
+
 	public static <T> IRunner<T> getRunner(LongRunningMethod<T> method) {
 		return getRunner(method, "");
 	}
@@ -65,7 +68,7 @@ public final class LongRunningWrapper {
 		return getThread(method, "", null);
 	}
 
-	public  static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name) {
+	public static <T> IRunner<T> getThread(LongRunningMethod<T> method, String name) {
 		return getThread(method, name, null);
 	}
 

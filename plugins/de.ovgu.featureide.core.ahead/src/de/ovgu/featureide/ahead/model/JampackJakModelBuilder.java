@@ -44,15 +44,14 @@ import jampack.MethodDcl;
 import jampack.MthDector;
 
 /**
- * This builder builds the JakProjectModel, by extracting features, 
- * methods and fields from classes to build. 
+ * This builder builds the JakProjectModel, by extracting features, methods and fields from classes to build.
  * 
  * @author Tom Brosch
  * @author Constanze Adler
  * @author Jens Meinicke
  * @author Felix Rieger
  */
-public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>{
+public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program> {
 
 	/**
 	 * @param featureProject
@@ -69,19 +68,16 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	/**
 	 * Adds a class to the jak project model
 	 * 
-	 * @param className
-	 *            Name of the class
-	 * @param sources
-	 *            source files that were composed to build this class
-	 * @param composedASTs
-	 *            composed ahead ASTs during the composition step
-	 * @param ownASTs
-	 *            ahead ASTs of each source file without composing
+	 * @param className Name of the class
+	 * @param sources source files that were composed to build this class
+	 * @param composedASTs composed ahead ASTs during the composition step
+	 * @param ownASTs ahead ASTs of each source file without composing
 	 */
 	@Override
-	public void addClass(String className, List<IFile> sources, 
+	public void addClass(String className, List<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
-		sourceFolder = model.getFeatureProject().getSourceFolder();
+		sourceFolder =
+			model.getFeatureProject().getSourceFolder();
 		try {
 			updateAst(className, sources, composedASTs, ownASTs);
 		} catch (Throwable e) {
@@ -90,19 +86,25 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	}
 
 	@Override
-	public void updateAst(String currentClass, List<IFile> sources, 
+	public void updateAst(String currentClass, List<IFile> sources,
 			AST_Program[] composedASTs, AST_Program[] ownASTs) {
-		IFile currentFile = null;
-		AstCursor c = new AstCursor();
-		for (int i = 0; i < sources.size(); i++) {
-			currentFile = sources.get(i);
+		IFile currentFile =
+			null;
+		AstCursor c =
+			new AstCursor();
+		for (int i =
+			0; i < sources.size(); i++) {
+			currentFile =
+				sources.get(i);
 			// The role corresponding to the current source file
-			FSTRole role = model.addRole(getFeature((IFolder)currentFile.getParent()), model.getAbsoluteClassName(currentFile), currentFile);
-		
+			FSTRole role =
+				model.addRole(getFeature((IFolder) currentFile.getParent()), model.getAbsoluteClassName(currentFile), currentFile);
+
 			// Add methods and fields of the FST to the role
 			for (c.First(ownASTs[i]); c.More(); c.PlusPlus()) {
 				if (c.node instanceof MethodDcl) {
-					FSTMethod method = getMethod((MethodDcl) c.node);
+					FSTMethod method =
+						getMethod((MethodDcl) c.node);
 					role.getClassFragment().add(method);
 					c.Sibling();
 				}
@@ -118,10 +120,12 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	}
 
 	private int getLineNumber(AstNode node) {
-		AstCursor cur = new AstCursor();
+		AstCursor cur =
+			new AstCursor();
 		for (cur.First(node); cur.More(); cur.PlusPlus()) {
-			if (cur.node != null && cur.node.tok != null
-					&& cur.node.tok[0] != null) {
+			if (cur.node != null
+				&& cur.node.tok != null
+				&& cur.node.tok[0] != null) {
 				return ((AstToken) cur.node.tok[0]).lineNum();
 			}
 		}
@@ -129,11 +133,16 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	}
 
 	private FSTMethod getMethod(MethodDcl methDcl) {
-		AstCursor cur = new AstCursor();
-		String type = "";
-		String name = "";
-		String modifiers = "";
-		LinkedList<String> paramTypes = new LinkedList<String>();
+		AstCursor cur =
+			new AstCursor();
+		String type =
+			"";
+		String name =
+			"";
+		String modifiers =
+			"";
+		LinkedList<String> paramTypes =
+			new LinkedList<String>();
 
 		// Travers the Subtree and catch the name of the method,
 		// its return type and parameter types;
@@ -142,12 +151,15 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 			if (cur.node instanceof MthDector) {
 
 				// Get the name of the Method
-				name = ((MthDector) cur.node).getQName().GetName();
+				name =
+					((MthDector) cur.node).getQName().GetName();
 
 				// Travers the list of parameters if the method has some
-				AST_ParList list = ((MthDector) cur.node).getAST_ParList();
+				AST_ParList list =
+					((MthDector) cur.node).getAST_ParList();
 				if (list != null) {
-					AstCursor listCur = new AstCursor();
+					AstCursor listCur =
+						new AstCursor();
 					for (listCur.First(list); listCur.More(); listCur
 							.PlusPlus()) {
 						if (listCur.node instanceof AST_TypeName) {
@@ -162,30 +174,36 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 			} else if (cur.node instanceof AST_TypeName) {
 
 				// Get the return type of the method
-				type = ((AST_TypeName) cur.node).GetName();
+				type =
+					((AST_TypeName) cur.node).GetName();
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
-			}
-			else if (cur.node instanceof AST_Modifiers) {
+			} else if (cur.node instanceof AST_Modifiers) {
 
 				// Get the modifiers of the method
-				modifiers = ((AST_Modifiers) cur.node).toString().trim();
+				modifiers =
+					((AST_Modifiers) cur.node).toString().trim();
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
-				
+
 			}
 
 		}
-		int lineNumber = getLineNumber(methDcl);
+		int lineNumber =
+			getLineNumber(methDcl);
 		return new FSTMethod(name, paramTypes, type, modifiers, lineNumber);
 	}
 
 	private LinkedList<FSTField> getFields(FldVarDec fieldDcl) {
-		AstCursor cur = new AstCursor();
-		String type = "";
-		String modifiers = "";
+		AstCursor cur =
+			new AstCursor();
+		String type =
+			"";
+		String modifiers =
+			"";
 
-		LinkedList<FSTField> fields = new LinkedList<FSTField>();
+		LinkedList<FSTField> fields =
+			new LinkedList<FSTField>();
 
 		// Travers the Subtree and get the type and
 		// all variable qualifiers
@@ -195,18 +213,18 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 			if (cur.node instanceof AST_TypeName) {
 
 				// Get the return type of the method
-				type = ((AST_TypeName) cur.node).GetName();
+				type =
+					((AST_TypeName) cur.node).GetName();
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
-			}
-			else if (cur.node instanceof AST_Modifiers) {
+			} else if (cur.node instanceof AST_Modifiers) {
 
 				// Get modifiers of the field
-				modifiers = ((AST_Modifiers) cur.node).toString().trim();
+				modifiers =
+					((AST_Modifiers) cur.node).toString().trim();
 				cur.Sibling(); // This subtree was complete analysed so we can
 				// skip it
-			}
-			else if (cur.node instanceof DecNameDim) {
+			} else if (cur.node instanceof DecNameDim) {
 				// to do: find out the dimension more correctly
 				fields.add(new FSTField(((DecNameDim) cur.node).getQName()
 						.GetName(), type, modifiers));
@@ -218,8 +236,8 @@ public class JampackJakModelBuilder extends AbstractJakModelBuilder<AST_Program>
 	}
 
 	private String getFeature(IFolder folder) {
-		if (((IFolder)folder.getParent()).equals(sourceFolder))
+		if (((IFolder) folder.getParent()).equals(sourceFolder))
 			return folder.getName();
-		return getFeature((IFolder)folder.getParent());
+		return getFeature((IFolder) folder.getParent());
 	}
 }

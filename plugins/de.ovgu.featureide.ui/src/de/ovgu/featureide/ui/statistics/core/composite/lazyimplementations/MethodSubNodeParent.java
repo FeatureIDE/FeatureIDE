@@ -34,11 +34,12 @@ public class MethodSubNodeParent extends Parent {
 
 	public MethodSubNodeParent(String descString, FSTMethod method) {
 		super(descString.replace(":", ""));
-		this.method = method;
+		this.method =
+			method;
 	}
 
 	public FSTMethod getMethod() {
 		return method;
-	}	
+	}
 
 }

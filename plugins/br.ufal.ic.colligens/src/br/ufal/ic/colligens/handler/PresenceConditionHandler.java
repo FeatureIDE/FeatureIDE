@@ -40,48 +40,61 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands. ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-		IWorkbenchPage page = window.getActivePage();
-		IEditorPart editor = page.getActiveEditor();
-		
+		IWorkbenchWindow window =
+			HandlerUtil.getActiveWorkbenchWindow(event);
+		IWorkbenchPage page =
+			window.getActivePage();
+		IEditorPart editor =
+			page.getActiveEditor();
+
 		if (editor instanceof ITextEditor) {
-			
-			ISelectionProvider selectionProvider = ((ITextEditor) editor)
-					.getSelectionProvider();
-			ISelection selection = selectionProvider.getSelection();
-			
+
+			ISelectionProvider selectionProvider =
+				((ITextEditor) editor)
+						.getSelectionProvider();
+			ISelection selection =
+				selectionProvider.getSelection();
+
 			if (selection instanceof ITextSelection) {
-				
-				TextSelection textSelection = (TextSelection) selection;
-				
-				IDocumentProvider provider = ((ITextEditor) editor)
-						.getDocumentProvider();
-				IDocument document = provider.getDocument(editor
-						.getEditorInput());
-				int line = textSelection.getStartLine();
 
-				FileEditorInput fileEditorInput = (FileEditorInput) window
-						.getActivePage().getActiveEditor().getEditorInput();
+				TextSelection textSelection =
+					(TextSelection) selection;
 
-				IFile file = fileEditorInput.getFile();
-				String code = null;
+				IDocumentProvider provider =
+					((ITextEditor) editor)
+							.getDocumentProvider();
+				IDocument document =
+					provider.getDocument(editor
+							.getEditorInput());
+				int line =
+					textSelection.getStartLine();
+
+				FileEditorInput fileEditorInput =
+					(FileEditorInput) window
+							.getActivePage().getActiveEditor().getEditorInput();
+
+				IFile file =
+					fileEditorInput.getFile();
+				String code =
+					null;
 				try {
-					code = document.get(document.getLineOffset(line),
-							document.getLineLength(line));
+					code =
+						document.get(document.getLineOffset(line),
+								document.getLineLength(line));
 				} catch (BadLocationException e1) {
 
 					e1.printStackTrace();
 				}
 
-				PresenceConditionController conditionController = new PresenceConditionController(
-						file, line + 1, code);
+				PresenceConditionController conditionController =
+					new PresenceConditionController(
+							file, line
+								+ 1,
+							code);
 
 				try {
 					conditionController.run();
@@ -89,16 +102,18 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 					// show erros
 
 					if (conditionController.getFileProxy() != null
-							&& !conditionController.getFileProxy().getLogs()
-									.isEmpty()) {
+						&& !conditionController.getFileProxy().getLogs()
+								.isEmpty()) {
 						try {
 							page.showView(InvalidConfigurationsView.ID);
-							InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
-									.getInstance();
+							InvalidConfigurationsViewController analyzerViewController =
+								InvalidConfigurationsViewController
+										.getInstance();
 
 							analyzerViewController.clear();
 
-							List<FileProxy> list = new LinkedList<FileProxy>();
+							List<FileProxy> list =
+								new LinkedList<FileProxy>();
 
 							list.add(conditionController.getFileProxy());
 

@@ -23,8 +23,7 @@ package de.ovgu.featureide.fm.ui.wizards;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only
- * and not persistent.
+ * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only and not persistent.
  * 
  * @author "Ananieva Sofia"
  */
@@ -41,16 +40,18 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	IFeatureModel completeFm;
 
 	/**
-	 * Constructor. 
+	 * Constructor.
 	 * 
 	 * @param title The title of the wizard page
-	 * @param newModel The sub feature model 
+	 * @param newModel The sub feature model
 	 * @param completeModel The origin feature model
 	 */
 	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel completeModel) {
 		super(title);
-		subFm = newModel;
-		completeFm = completeModel;
+		subFm =
+			newModel;
+		completeFm =
+			completeModel;
 	}
 
 	/**
@@ -60,7 +61,6 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	public void addPages() {
 		addPage(new SubtreeDependencyPage(subFm, completeFm));
 	}
-
 
 	/**
 	 * Performs finishing actions when closing the wizard.

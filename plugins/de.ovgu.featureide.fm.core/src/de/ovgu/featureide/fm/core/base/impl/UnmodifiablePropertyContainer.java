@@ -29,11 +29,13 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 public class UnmodifiablePropertyContainer implements IPropertyContainer {
 
 	private IPropertyContainer container;
-	
-	static UnsupportedOperationException exception = new UnsupportedOperationException("Manipulation is not allowed. This is an unmodifiable property container");
+
+	static UnsupportedOperationException exception =
+		new UnsupportedOperationException("Manipulation is not allowed. This is an unmodifiable property container");
 
 	public UnmodifiablePropertyContainer(IPropertyContainer container) {
-		this.container = container;
+		this.container =
+			container;
 	}
 
 	@Override
@@ -58,7 +60,8 @@ public class UnmodifiablePropertyContainer implements IPropertyContainer {
 
 	@Override
 	public Set<String> keySet() {
-		final Set<String> set = new HashSet<>();
+		final Set<String> set =
+			new HashSet<>();
 		for (final String s : container.keySet()) {
 			set.add(new String(s));
 		}

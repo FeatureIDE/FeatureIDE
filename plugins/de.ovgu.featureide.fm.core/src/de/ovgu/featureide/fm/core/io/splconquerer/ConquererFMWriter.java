@@ -83,301 +83,378 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class ConquererFMWriter implements IFeatureModelFormat {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
-	
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ ConquererFMWriter.class.getSimpleName();
+
 	private IFeatureModel featureModel;
-	
-	private Map<String,Set<String>> require, exclude;
-	
+
+	private Map<String, Set<String>> require, exclude;
+
 	/**
 	 * Creates XML-Document
+	 * 
 	 * @param doc document to write
 	 */
 	private void createXmlDoc(Document doc) {
-        Element plm = doc.createElement("plm");
-    	doc.appendChild(plm);
+		Element plm =
+			doc.createElement("plm");
+		doc.appendChild(plm);
 		plm.setAttribute("name", featureModel.getStructure().getRoot().getFeature().getName());
 		plm.setAttribute("canReuseInstance", "true");
-		
-		require = new HashMap<String, Set<String>>();
-		exclude = new HashMap<String, Set<String>>();
-    	final List<Node> furtherNodes = new LinkedList<Node>();
-		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
-    	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
-    	Node node = new And(nodeArray);
-    	if (node.getChildren().length > 0) {
-        	node = node.toCNF();
-        	if (!(node instanceof And))
-        		node = new And(node);
-        	for (Node child : node.getChildren()) {
-        		if (child instanceof Or && child.getChildren().length == 2) {
-        			Literal literalA = (Literal) child.getChildren()[0];
-        			Literal literalB = (Literal) child.getChildren()[1];
-        			if (!literalA.positive || !literalB.positive) {
-        				if (literalA.positive) {
-        					Literal temp = literalA;
-        					literalA = literalB;
-        					literalB = temp;
-        				}
-        				if (literalB.positive) {
-        					Set<String> set = require.get(literalA.var);
-        					if (set == null) {
-        						set = new HashSet<String>();
-        						require.put(literalA.var.toString(), set);
-        					}
-        					set.add(literalB.var.toString());
-        				}
-        				else {
-        					Set<String> set = exclude.get(literalA.var);
-        					if (set == null) {
-        						set = new HashSet<String>();
-        						exclude.put(literalA.var.toString(), set);
-        					}
-        					set.add(literalB.var.toString());
-        				}
-        			}
-            		else
-            			furtherNodes.add(child);
-        		}
-        		else
-        			furtherNodes.add(child);
-        	}
-    	}
 
-    	initializeIDs();
-       	generateSubtree(doc, plm, featureModel.getStructure().getRoot().getFeature());
-    	
-    	plm.appendChild(doc.createElement("properties"));
+		require =
+			new HashMap<String, Set<String>>();
+		exclude =
+			new HashMap<String, Set<String>>();
+		final List<Node> furtherNodes =
+			new LinkedList<Node>();
+		final List<Node> nodes =
+			Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
+		Node[] nodeArray =
+			nodes.toArray(new Node[nodes.size()]);
+		Node node =
+			new And(nodeArray);
+		if (node.getChildren().length > 0) {
+			node =
+				node.toCNF();
+			if (!(node instanceof And))
+				node =
+					new And(node);
+			for (Node child : node.getChildren()) {
+				if (child instanceof Or
+					&& child.getChildren().length == 2) {
+					Literal literalA =
+						(Literal) child.getChildren()[0];
+					Literal literalB =
+						(Literal) child.getChildren()[1];
+					if (!literalA.positive
+						|| !literalB.positive) {
+						if (literalA.positive) {
+							Literal temp =
+								literalA;
+							literalA =
+								literalB;
+							literalB =
+								temp;
+						}
+						if (literalB.positive) {
+							Set<String> set =
+								require.get(literalA.var);
+							if (set == null) {
+								set =
+									new HashSet<String>();
+								require.put(literalA.var.toString(), set);
+							}
+							set.add(literalB.var.toString());
+						} else {
+							Set<String> set =
+								exclude.get(literalA.var);
+							if (set == null) {
+								set =
+									new HashSet<String>();
+								exclude.put(literalA.var.toString(), set);
+							}
+							set.add(literalB.var.toString());
+						}
+					} else
+						furtherNodes.add(child);
+				} else
+					furtherNodes.add(child);
+			}
+		}
 
-    	Element furtherConstraints = doc.createElement("furtherConstraints");
-    	plm.appendChild(furtherConstraints);
-    	for (Node child : furtherNodes) {
-			Element clause = doc.createElement(CLAUSE);
+		initializeIDs();
+		generateSubtree(doc, plm, featureModel.getStructure().getRoot().getFeature());
+
+		plm.appendChild(doc.createElement("properties"));
+
+		Element furtherConstraints =
+			doc.createElement("furtherConstraints");
+		plm.appendChild(furtherConstraints);
+		for (Node child : furtherNodes) {
+			Element clause =
+				doc.createElement(CLAUSE);
 			furtherConstraints.appendChild(clause);
 			clause.appendChild(doc.createTextNode(child.toString()));
 		}
-    }
-    
-    private void generateSubtree(Document doc, Element node, IFeature feature) {
-    	if (!feature.getStructure().isRoot())
-    		generateElement(doc, node, feature);
-    	
-    	for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
-    		generateSubtree(doc, node, child);
-    }
-  
+	}
+
+	private void generateSubtree(Document doc, Element node, IFeature feature) {
+		if (!feature.getStructure().isRoot())
+			generateElement(doc, node, feature);
+
+		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
+			generateSubtree(doc, node, child);
+	}
+
 	private void generateElement(Document doc, Element node, IFeature feature) {
-    	Element element = doc.createElement(ELEMENT);
-    	node.appendChild(element);
+		Element element =
+			doc.createElement(ELEMENT);
+		node.appendChild(element);
 		element.setAttribute("id", getID(feature.getName()));
 		element.setAttribute("name", feature.getName());
 		element.setAttribute(TYPE, "feature");
-		element.setAttribute(OPTIONAL, feature.getStructure().isMandatory() ? "false" : "true");
+		element.setAttribute(OPTIONAL, feature.getStructure().isMandatory()
+			? "false"
+			: "true");
 		element.setAttribute(DYNAMIC, "false");
-    	
-    	element.appendChild(doc.createElement("path_absolut"));
-    	element.appendChild(doc.createElement("path_relativ"));
 
-    	if (!feature.getStructure().getParent().isRoot()) {
-        	Element parentElement = doc.createElement("parentElement");
-        	element.appendChild(parentElement);
-        	Element id = doc.createElement("id");
-        	parentElement.appendChild(id);
-        	id.appendChild(doc.createTextNode(getID(FeatureUtils.getParent(feature).getName())));
-    	}
-    	
-    	Element constraints = doc.createElement("constraints");
-    	element.appendChild(constraints);
-    	
-    	Element alternative = doc.createElement("constraint");
-    	constraints.appendChild(alternative);
-		alternative.setAttribute(TYPE, "alternative");
-    	if (!feature.getStructure().isRoot() && feature.getStructure().getParent().isAlternative()) {
-        	for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
-        		if (childFeature != feature) {
-	            	Element constraint_element = doc.createElement("constraint_element");
-	            	alternative.appendChild(constraint_element);
-	            	Element id = doc.createElement("id");
-	            	constraint_element.appendChild(id);
-	            	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
-	            	Element name = doc.createElement("name");
-	            	constraint_element.appendChild(name);
-	            	name.appendChild(doc.createTextNode(childFeature.getName()));
-	    		}
-    	}
+		element.appendChild(doc.createElement("path_absolut"));
+		element.appendChild(doc.createElement("path_relativ"));
 
-    	Element commulative = doc.createElement("constraint");
-    	constraints.appendChild(commulative);
-    	commulative.setAttribute(TYPE, COMMULATIVE);
-    	if (!feature.getStructure().isRoot() && feature.getStructure().getParent().isOr()) {
-        	for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
-        		if (childFeature != feature) {
-	            	Element constraint_element = doc.createElement("constraint_element");
-	            	commulative.appendChild(constraint_element);
-	            	Element id = doc.createElement("id");
-	            	constraint_element.appendChild(id);
-	            	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
-	            	Element name = doc.createElement("name");
-	            	constraint_element.appendChild(name);
-	            	name.appendChild(doc.createTextNode(childFeature.getName()));
-	    		}
-    	}
-
-    	Element requires = doc.createElement("constraint");
-    	constraints.appendChild(requires);
-    	requires.setAttribute(TYPE, REQUIRES);
-    	Set<String> requireFeature = require.get(feature.getName());
-    	if (requireFeature != null)
-	    	for (String childFeature : requireFeature) {
-	        	Element constraint_element = doc.createElement("constraint_element");
-	        	requires.appendChild(constraint_element);
-	        	Element id = doc.createElement("id");
-	        	constraint_element.appendChild(id);
-	        	id.appendChild(doc.createTextNode(getID(childFeature)));
-	        	Element name = doc.createElement("name");
-	        	constraint_element.appendChild(name);
-	        	name.appendChild(doc.createTextNode(childFeature));
-			}
-
-    	Element excludes = doc.createElement("constraint");
-    	constraints.appendChild(excludes);
-    	excludes.setAttribute(TYPE, EXCLUDES);
-    	Set<String> excludeFeature = exclude.get(feature.getName());
-    	if (excludeFeature != null)
-	    	for (String childFeature : excludeFeature) {
-	        	Element constraint_element = doc.createElement("constraint_element");
-	        	excludes.appendChild(constraint_element);
-	        	Element id = doc.createElement("id");
-	        	constraint_element.appendChild(id);
-	        	id.appendChild(doc.createTextNode(getID(childFeature)));
-	        	Element name = doc.createElement("name");
-	        	constraint_element.appendChild(name);
-	        	name.appendChild(doc.createTextNode(childFeature));
-			}
-    	
-    	Element childElements = doc.createElement("childElements");
-    	element.appendChild(childElements);
-    	for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
-        	Element child = doc.createElement(CHILD);
-        	childElements.appendChild(child);
-    		child.setAttribute(OPTIONAL, childFeature.getStructure().isMandatory() ? "false" : "true");
-        	Element id = doc.createElement("id");
-        	child.appendChild(id);
-        	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
+		if (!feature.getStructure().getParent().isRoot()) {
+			Element parentElement =
+				doc.createElement("parentElement");
+			element.appendChild(parentElement);
+			Element id =
+				doc.createElement("id");
+			parentElement.appendChild(id);
+			id.appendChild(doc.createTextNode(getID(FeatureUtils.getParent(feature).getName())));
 		}
-    	
-    	element.appendChild(doc.createElement(ORDER));
-    	element.appendChild(doc.createElement(CLASSES));
+
+		Element constraints =
+			doc.createElement("constraints");
+		element.appendChild(constraints);
+
+		Element alternative =
+			doc.createElement("constraint");
+		constraints.appendChild(alternative);
+		alternative.setAttribute(TYPE, "alternative");
+		if (!feature.getStructure().isRoot()
+			&& feature.getStructure().getParent().isAlternative()) {
+			for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
+				if (childFeature != feature) {
+					Element constraint_element =
+						doc.createElement("constraint_element");
+					alternative.appendChild(constraint_element);
+					Element id =
+						doc.createElement("id");
+					constraint_element.appendChild(id);
+					id.appendChild(doc.createTextNode(getID(childFeature.getName())));
+					Element name =
+						doc.createElement("name");
+					constraint_element.appendChild(name);
+					name.appendChild(doc.createTextNode(childFeature.getName()));
+				}
+		}
+
+		Element commulative =
+			doc.createElement("constraint");
+		constraints.appendChild(commulative);
+		commulative.setAttribute(TYPE, COMMULATIVE);
+		if (!feature.getStructure().isRoot()
+			&& feature.getStructure().getParent().isOr()) {
+			for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getParent().getChildren()))
+				if (childFeature != feature) {
+					Element constraint_element =
+						doc.createElement("constraint_element");
+					commulative.appendChild(constraint_element);
+					Element id =
+						doc.createElement("id");
+					constraint_element.appendChild(id);
+					id.appendChild(doc.createTextNode(getID(childFeature.getName())));
+					Element name =
+						doc.createElement("name");
+					constraint_element.appendChild(name);
+					name.appendChild(doc.createTextNode(childFeature.getName()));
+				}
+		}
+
+		Element requires =
+			doc.createElement("constraint");
+		constraints.appendChild(requires);
+		requires.setAttribute(TYPE, REQUIRES);
+		Set<String> requireFeature =
+			require.get(feature.getName());
+		if (requireFeature != null)
+			for (String childFeature : requireFeature) {
+			Element constraint_element =
+				doc.createElement("constraint_element");
+			requires.appendChild(constraint_element);
+			Element id =
+				doc.createElement("id");
+			constraint_element.appendChild(id);
+			id.appendChild(doc.createTextNode(getID(childFeature)));
+			Element name =
+				doc.createElement("name");
+			constraint_element.appendChild(name);
+			name.appendChild(doc.createTextNode(childFeature));
+			}
+
+		Element excludes =
+			doc.createElement("constraint");
+		constraints.appendChild(excludes);
+		excludes.setAttribute(TYPE, EXCLUDES);
+		Set<String> excludeFeature =
+			exclude.get(feature.getName());
+		if (excludeFeature != null)
+			for (String childFeature : excludeFeature) {
+			Element constraint_element =
+				doc.createElement("constraint_element");
+			excludes.appendChild(constraint_element);
+			Element id =
+				doc.createElement("id");
+			constraint_element.appendChild(id);
+			id.appendChild(doc.createTextNode(getID(childFeature)));
+			Element name =
+				doc.createElement("name");
+			constraint_element.appendChild(name);
+			name.appendChild(doc.createTextNode(childFeature));
+			}
+
+		Element childElements =
+			doc.createElement("childElements");
+		element.appendChild(childElements);
+		for (IFeature childFeature : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
+			Element child =
+				doc.createElement(CHILD);
+			childElements.appendChild(child);
+			child.setAttribute(OPTIONAL, childFeature.getStructure().isMandatory()
+				? "false"
+				: "true");
+			Element id =
+				doc.createElement("id");
+			child.appendChild(id);
+			id.appendChild(doc.createTextNode(getID(childFeature.getName())));
+		}
+
+		element.appendChild(doc.createElement(ORDER));
+		element.appendChild(doc.createElement(CLASSES));
 	}
 
 	/**
-     * Inserts indentations into the text
-     * @param text
-     * @return
-     */
-    private String prettyPrint (String text) {
-    	StringBuilder result = new StringBuilder();
-    	String line;
-    	int indentLevel = 0;
-    	BufferedReader reader = new BufferedReader(new StringReader(text));
-    	try {
-        	reader.readLine(); //hack to remove first line
-			line = reader.readLine();
-			while (line != null) {	
-				if (line.startsWith("</") ) {
+	 * Inserts indentations into the text
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private String prettyPrint(String text) {
+		StringBuilder result =
+			new StringBuilder();
+		String line;
+		int indentLevel =
+			0;
+		BufferedReader reader =
+			new BufferedReader(new StringReader(text));
+		try {
+			reader.readLine(); // hack to remove first line
+			line =
+				reader.readLine();
+			while (line != null) {
+				if (line.startsWith("</")) {
 					indentLevel--;
-					for (int i=0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append('\t');
 					}
-				} 
+				}
 
 				else if (line.startsWith("<")) {
-					for (int i=0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append('\t');
 					}
-					if (!line.contains("</") ) {
+					if (!line.contains("</")) {
 						indentLevel++;
-					}	
+					}
 				} else {
-					for (int i=0; i < indentLevel; i++) {
+					for (int i =
+						0; i < indentLevel; i++) {
 						result.append('\t');
 					}
 				}
-				result.append(line + "\n");
+				result.append(line
+					+ "\n");
 				if (line.contains("/>")) {
-					indentLevel--;				
+					indentLevel--;
 				}
-				line = reader.readLine();
+				line =
+					reader.readLine();
 			}
-    	} catch (IOException e) {
-    		Logger.logError(e);
+		} catch (IOException e) {
+			Logger.logError(e);
 		}
-    	return result.toString();
-    }
-    
-    public String writeToString(IFeatureModel featureModel) {
-    	this.featureModel = featureModel;
-    	//Create Empty DOM Document
-    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setIgnoringComments(true);
-        dbf.setIgnoringElementContentWhitespace(false);
+		return result.toString();
+	}
+
+	public String writeToString(IFeatureModel featureModel) {
+		this.featureModel =
+			featureModel;
+		// Create Empty DOM Document
+		DocumentBuilderFactory dbf =
+			DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.setIgnoringComments(true);
+		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(true);
 		dbf.setExpandEntityReferences(true);
-		DocumentBuilder db = null;
+		DocumentBuilder db =
+			null;
 		try {
-		    db = dbf.newDocumentBuilder();
+			db =
+				dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		Document doc = db.newDocument();
-		//Create the Xml Representation
+		Document doc =
+			db.newDocument();
+		// Create the Xml Representation
 		createXmlDoc(doc);
-		
-		//Transform the Xml Representation into a String
-		Transformer transfo = null;
+
+		// Transform the Xml Representation into a String
+		Transformer transfo =
+			null;
 		try {
-			transfo = TransformerFactory.newInstance().newTransformer();
+			transfo =
+				TransformerFactory.newInstance().newTransformer();
 		} catch (TransformerConfigurationException e) {
 			Logger.logError(e);
 		} catch (TransformerFactoryConfigurationError e) {
 			Logger.logError(e);
 		}
-		
+
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
+		StreamResult result =
+			new StreamResult(new StringWriter());
+		DOMSource source =
+			new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
 		} catch (TransformerException e) {
 			Logger.logError(e);
 		}
-		
-		return prettyPrint(result.getWriter().toString()); 
+
+		return prettyPrint(result.getWriter().toString());
 	}
-    
-    private HashMap<String,Integer> ids;
-    
-    private void initializeIDs() {
-    	ids = new HashMap<String, Integer>();
-    	initializeIDs(featureModel.getStructure().getRoot().getFeature());
-    }
-    
-    private void initializeIDs(IFeature feature) {
-    	getID(feature.getName());
-    	for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
-    		initializeIDs(child);
-    }
-    
-    private String getID(String feature) {
-    	Integer id = ids.get(feature);
-    	if (id != null)
-    		return id.toString();
-    	id = ids.size() + 1;
-    	ids.put(feature, id);
-    	return id.toString();
-    }
+
+	private HashMap<String, Integer> ids;
+
+	private void initializeIDs() {
+		ids =
+			new HashMap<String, Integer>();
+		initializeIDs(featureModel.getStructure().getRoot().getFeature());
+	}
+
+	private void initializeIDs(IFeature feature) {
+		getID(feature.getName());
+		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
+			initializeIDs(child);
+	}
+
+	private String getID(String feature) {
+		Integer id =
+			ids.get(feature);
+		if (id != null)
+			return id.toString();
+		id =
+			ids.size()
+				+ 1;
+		ids.put(feature, id);
+		return id.toString();
+	}
 
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
@@ -418,5 +495,5 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
 	}
-    
+
 }

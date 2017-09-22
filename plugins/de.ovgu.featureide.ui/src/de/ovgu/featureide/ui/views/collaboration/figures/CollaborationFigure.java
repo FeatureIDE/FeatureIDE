@@ -32,29 +32,37 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**
- * An instance of this class represents the graphical representation of the 
- * Collaboration.
+ * An instance of this class represents the graphical representation of the Collaboration.
  * 
  * @author Constanze Adler
  */
 public class CollaborationFigure extends Figure implements GUIDefaults {
 
-	private final Label label = new Label();
-	public boolean selected = true;
-	public boolean isConfiguration = false;
-	
+	private final Label label =
+		new Label();
+	public boolean selected =
+		true;
+	public boolean isConfiguration =
+		false;
+
 	public CollaborationFigure(FSTFeature coll) {
 		super();
-		
-		selected = coll.isSelected();
-		isConfiguration = coll instanceof FSTConfiguration;
-		GridLayout gridLayout = new GridLayout(1, true);
-		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
-		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT - 1;
+
+		selected =
+			coll.isSelected();
+		isConfiguration =
+			coll instanceof FSTConfiguration;
+		GridLayout gridLayout =
+			new GridLayout(1, true);
+		gridLayout.verticalSpacing =
+			GRIDLAYOUT_VERTICAL_SPACING;
+		gridLayout.marginHeight =
+			GRIDLAYOUT_MARGIN_HEIGHT
+				- 1;
 		this.setLayoutManager(gridLayout);
 
 		this.setBackgroundColor(ROLE_BACKGROUND);
-		
+
 		if (selected) {
 			this.setBorder(COLL_BORDER_SELECTED);
 		} else {
@@ -69,30 +77,39 @@ public class CollaborationFigure extends Figure implements GUIDefaults {
 		}
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(COLLABORATION_INSETS.left, COLLABORATION_INSETS.top));
-		
+
 		this.setName(coll.getName());
 		this.add(label);
-		
+
 		this.setOpaque(true);
 	}
 
-	private void setName(String name){
+	private void setName(String name) {
 		label.setText(name);
-		Dimension labelSize = label.getPreferredSize();
-		
+		Dimension labelSize =
+			label.getPreferredSize();
+
 		if (labelSize.equals(label.getSize()))
 			return;
 		label.setSize(labelSize);
 
-		Rectangle bounds = getBounds();
-		int w = COLLABORATION_INSETS.getWidth();
-		int h = COLLABORATION_INSETS.getHeight();
+		Rectangle bounds =
+			getBounds();
+		int w =
+			COLLABORATION_INSETS.getWidth();
+		int h =
+			COLLABORATION_INSETS.getHeight();
 		bounds.setSize(labelSize.expand(w, h));
-		Dimension oldSize = getSize();
-		
+		Dimension oldSize =
+			getSize();
+
 		if (!oldSize.equals(0, 0)) {
-			int dx = (oldSize.width - bounds.width) / 2;
-			bounds.x += dx;
+			int dx =
+				(oldSize.width
+					- bounds.width)
+					/ 2;
+			bounds.x +=
+				dx;
 		}
 		setBounds(bounds);
 	}

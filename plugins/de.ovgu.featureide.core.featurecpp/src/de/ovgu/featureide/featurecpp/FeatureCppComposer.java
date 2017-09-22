@@ -54,64 +54,83 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * @author Jens Meinicke
  */
 public class FeatureCppComposer extends ComposerExtensionClass {
-	private static final String PLUGIN_ID = "org.eclipse.cdt";
-	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE+PLUGIN_ID+IS_NOT_INSTALLED_;
-	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
-	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
-	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private static final ArrayList<String[]> TEMPLATES = new ArrayList<String[]>(1);
-	
+	private static final String PLUGIN_ID =
+		"org.eclipse.cdt";
+	private static final String PLUGIN_WARNING =
+		THE_REQUIRED_BUNDLE
+			+ PLUGIN_ID
+			+ IS_NOT_INSTALLED_;
+	public static final String COMPOSER_ID =
+		"de.ovgu.featureide.composer.featurecpp";
+	public static final String C_NATURE =
+		"org.eclipse.cdt.core.cnature";
+	public static final String CC_NATURE =
+		"org.eclipse.cdt.core.ccnature";
+
+	private static final String NEWLINE =
+		System.getProperty("line.separator", "\n");
+	private static final ArrayList<String[]> TEMPLATES =
+		new ArrayList<String[]>(1);
+
 	static {
-		 TEMPLATES.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
+		TEMPLATES.add(new String[] {
+			"C++",
+			"h",
+			NEWLINE
+				+ REFINES_PATTERN
+				+ " class "
+				+ CLASS_NAME_PATTERN
+				+ " {"
+				+ NEWLINE
+				+ NEWLINE
+				+ "};" });
 	}
-	
+
 	/**
 	 * This wrapper builds the current configuration into the build folder.
 	 */
-	private final FeatureCppWrapper featureCpp = new FeatureCppWrapper();
-	
+	private final FeatureCppWrapper featureCpp =
+		new FeatureCppWrapper();
+
 	/**
-	 * This wrapper builds a complete configuration into the temp folder to 
-	 * generate a full FST model.
+	 * This wrapper builds a complete configuration into the temp folder to generate a full FST model.
 	 */
-	private final FeatureCppWrapper featureCppModelWrapper = new FeatureCppWrapper();
-	
+	private final FeatureCppWrapper featureCppModelWrapper =
+		new FeatureCppWrapper();
+
 	/**
 	 * This folder called FSTModel is the location where the model wrapper will build the full configuration.
 	 */
 	private IFolder tempFolder;
-	
+
 	/**
 	 * This folder called .tmp contains the full configuration and the temp folder.
 	 */
 	private IFolder parentFolder;
-	
+
 	private FeatureCppModelBuilder featureCppModelBuilder;
-	
 
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
 		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
 		createTempFolder();
-		
+
 		featureCppModelWrapper.initialize(project.getSourceFolder(), tempFolder);
-		
-		featureCppModelBuilder = new FeatureCppModelBuilder(project, tempFolder);
+
+		featureCppModelBuilder =
+			new FeatureCppModelBuilder(project, tempFolder);
 		buildFSTModel();
-		
+
 		return true;
 	}
 
-
 	/**
-	 * Creates the folders for building a full FST model.<br>
-	 * {@link FeatureCppComposer#parentFolder}<br>
-	 * {@link FeatureCppComposer#tempFolder}
+	 * Creates the folders for building a full FST model.<br> {@link FeatureCppComposer#parentFolder}<br> {@link FeatureCppComposer#tempFolder}
 	 */
 	private void createTempFolder() {
-		parentFolder = featureProject.getProject().getFolder(".tmp");
+		parentFolder =
+			featureProject.getProject().getFolder(".tmp");
 		if (!parentFolder.exists()) {
 			try {
 				parentFolder.create(true, true, null);
@@ -120,8 +139,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 		}
-		
-		tempFolder = parentFolder.getFolder("FSTModel");
+
+		tempFolder =
+			parentFolder.getFolder("FSTModel");
 		if (!tempFolder.exists()) {
 			try {
 				tempFolder.create(true, true, null);
@@ -133,11 +153,12 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	public void performFullBuild(IFile config) {
-		if(!isPluginInstalled(PLUGIN_ID)){
+		if (!isPluginInstalled(PLUGIN_ID)) {
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		if (!isInitialized()) {
-			final IFeatureProject configFeatureProject = CorePlugin.getFeatureProject(config);
+			final IFeatureProject configFeatureProject =
+				CorePlugin.getFeatureProject(config);
 			if (configFeatureProject == null) {
 				return;
 			}
@@ -147,13 +168,15 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		buildFSTModel();
 	}
 
-	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
-	
+	private static final LinkedHashSet<String> EXTENSIONS =
+		createExtensions();
+
 	private static LinkedHashSet<String> createExtensions() {
-		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		LinkedHashSet<String> extensions =
+			new LinkedHashSet<String>();
 		extensions.add("h");
 		return extensions;
-	}  
+	}
 
 	@Override
 	public LinkedHashSet<String> extensions() {
@@ -165,13 +188,14 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			String configPath, String buildPath) {
 		addNature(project);
 	}
-	
+
 	private void addNature(IProject project) {
 		try {
 			if (!project.isAccessible())
 				return;
-			
-			int i = 2;
+
+			int i =
+				2;
 			if (project.hasNature(C_NATURE)) {
 				i--;
 			}
@@ -181,17 +205,26 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			if (i == 0) {
 				return;
 			}
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + i];
+			IProjectDescription description =
+				project.getDescription();
+			String[] natures =
+				description.getNatureIds();
+			String[] newNatures =
+				new String[natures.length
+					+ i];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
 			if (project.hasNature(C_NATURE)) {
-				newNatures[natures.length] = CC_NATURE;
+				newNatures[natures.length] =
+					CC_NATURE;
 			} else if (project.hasNature(CC_NATURE)) {
-				newNatures[natures.length] = C_NATURE;
+				newNatures[natures.length] =
+					C_NATURE;
 			} else {
-				newNatures[natures.length] = C_NATURE;
-				newNatures[natures.length + 1] = CC_NATURE;
+				newNatures[natures.length] =
+					C_NATURE;
+				newNatures[natures.length
+					+ 1] =
+						CC_NATURE;
 			}
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
@@ -204,17 +237,21 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public ArrayList<String[]> getTemplates() {
 		return TEMPLATES;
 	}
-	
+
 	@Override
-	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
+	public String replaceSourceContentMarker(String text, boolean refines, String packageName) {
 		if (refines)
-			text = text.replace(REFINES_PATTERN, "refines");
+			text =
+				text.replace(REFINES_PATTERN, "refines");
 		else
-			text = text.replace(REFINES_PATTERN + " ", "");
+			text =
+				text.replace(REFINES_PATTERN
+					+ " ", "");
 		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#refines()
 	 */
 	@Override
@@ -251,23 +288,27 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 				FeatureCppCorePlugin.getDefault().logError(e);
 			}
 		}
-		
-		
-		if (featureProject != null && featureProject.getProject() != null) {
+
+		if (featureProject != null
+			&& featureProject.getProject() != null) {
 			featureCppModelBuilder.resetModel();
-			final StringBuilder stringBuilder = new StringBuilder();
+			final StringBuilder stringBuilder =
+				new StringBuilder();
 			for (final String name : featureProject.getFeatureModel().getFeatureOrderList()) {
 				stringBuilder.append(name);
 				stringBuilder.append("\r\n");
 			}
-			
-			InputStream source = new ByteArrayInputStream(stringBuilder.toString()
-					.getBytes(Charset.availableCharsets().get("UTF-8")));
-			
-			IFile file = parentFolder.getFile("temp." + getConfigurationExtension());
+
+			InputStream source =
+				new ByteArrayInputStream(stringBuilder.toString()
+						.getBytes(Charset.availableCharsets().get("UTF-8")));
+
+			IFile file =
+				parentFolder.getFile("temp."
+					+ getConfigurationExtension());
 			try {
 				if (file.exists()) {
-					file.setContents(source, false, true, null);	
+					file.setContents(source, false, true, null);
 				} else {
 					file.create(source, true, null);
 				}
@@ -290,8 +331,9 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		featureCpp.initialize(null, folder);
 		try {
 			for (IResource res : folder.members()) {
-				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
-					featureCpp.compose(createTemporaryConfigrationFile((IFile)res));
+				if (res instanceof IFile
+					&& getConfigurationExtension().equals(res.getFileExtension())) {
+					featureCpp.compose(createTemporaryConfigrationFile((IFile) res));
 				}
 			}
 		} catch (CoreException e) {
@@ -301,16 +343,15 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 
 	@Override
 	public Mechanism getGenerationMechanism() {
-	    return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
+		return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
 	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
 	}
 

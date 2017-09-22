@@ -27,29 +27,32 @@ import org.eclipse.swt.graphics.Image;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
 
-/** 
+/**
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 public class ConfigMapFilterAction extends Action {
+
 	private IConfigurationMapFilter filter;
 	private IConfigurationMapFilterable filterable;
-	
+
 	public ConfigMapFilterAction(IConfigurationMapFilter filter, IConfigurationMapFilterable filterable) {
 		super(filter.getName(), Action.AS_CHECK_BOX);
-		this.filter = filter;
-		this.filterable = filterable;
+		this.filter =
+			filter;
+		this.filterable =
+			filterable;
 		setChecked(filter.isDefault());
 	}
-	
+
 	public void initializeImage(Image image) {
 		setImageDescriptor(ImageDescriptor.createFromImage(image));
 	}
-	
+
 	public IConfigurationMapFilter getFilter() {
 		return filter;
 	}
-	
+
 	@Override
 	public void setChecked(boolean checked) {
 		super.setChecked(checked);

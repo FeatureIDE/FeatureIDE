@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
-
 /**
  * Graphical representation of a constraint.
  * 
@@ -33,16 +32,15 @@ public interface IGraphicalConstraint extends IGraphicalElement {
 	IConstraint getObject();
 
 	boolean isFeatureSelected();
-	
+
 	boolean isImplicit();
-	
+
 	boolean isCollapsed();
 
 	void setFeatureSelected(boolean selected);
-	
+
 	void setConstraintImplicit(boolean selected);
 
 	IGraphicalConstraint clone();
-	
-	
+
 }

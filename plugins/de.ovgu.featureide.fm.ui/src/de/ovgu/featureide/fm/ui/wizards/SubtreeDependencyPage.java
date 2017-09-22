@@ -41,8 +41,8 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * A wizard page to show implicit constraints of a sub feature model. Enables automated analysis
- * on the sub feature model to explain implicit (redundant) constraints.
+ * A wizard page to show implicit constraints of a sub feature model. Enables automated analysis on the sub feature model to explain implicit (redundant)
+ * constraints.
  * 
  * @author "Ananieva Sofia"
  */
@@ -59,10 +59,10 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	private IFeatureModel completeFm;
 
 	/**
-	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation.
-	 * Used as tool tip for redundant constraint.
+	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation. Used as tool tip for redundant constraint.
 	 */
-	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
+	public static HashMap<Integer, List<String>> redundantExpl =
+		new HashMap<Integer, List<String>>();
 
 	/**
 	 * Constructor.
@@ -74,19 +74,21 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		super("Hidden Dependencies of a Submodel");
 		setTitle("Hidden Dependencies of a Submodel");
 		setDescription("If the selected submodel contains hidden dependencies (implicit constraints), "
-				+ "they are presented below the feature model in a red border.");
-		subtreeModel = fm;
-		completeFm = completeModel;
+			+ "they are presented below the feature model in a red border.");
+		subtreeModel =
+			fm;
+		completeFm =
+			completeModel;
 	}
 
 	/**
-	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to
-	 * fill all available space.
+	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to fill all available space.
 	 * 
 	 * @param parent A composite which contains the feature model
 	 */
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		Composite container =
+			new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 		setControl(container);
 		insertFeatureModel(container);
@@ -94,25 +96,33 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	}
 
 	/**
-	 * Inserts the subtree model into a container within a wizard page.
-	 * Enables automated analysis for the sub feature model and explains implicit constraints
+	 * Inserts the subtree model into a container within a wizard page. Enables automated analysis for the sub feature model and explains implicit constraints
 	 * using the origin feature model.
 	 * 
 	 * @param comp A composite which contains the sub feature model
 	 */
 	private void insertFeatureModel(Composite comp) {
-		FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
+		FeatureModelAnalyzer analyzer =
+			subtreeModel.getAnalyser();
 
-		FeatureModelEditor modeleditor = new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
-		FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
+		FeatureModelEditor modeleditor =
+			new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
+		FeatureDiagramEditor diagramEditor =
+			new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
 		subtreeModel.addListener(diagramEditor);
 
-		analyzer.calculateFeatures = completeFm.getAnalyser().calculateFeatures;
-		analyzer.calculateConstraints = completeFm.getAnalyser().calculateConstraints;
-		analyzer.calculateRedundantConstraints = completeFm.getAnalyser().calculateRedundantConstraints;
-		analyzer.calculateTautologyConstraints = completeFm.getAnalyser().calculateTautologyConstraints;
-		analyzer.calculateDeadConstraints = completeFm.getAnalyser().calculateDeadConstraints;
-		analyzer.calculateFOConstraints = completeFm.getAnalyser().calculateFOConstraints;
+		analyzer.calculateFeatures =
+			completeFm.getAnalyser().calculateFeatures;
+		analyzer.calculateConstraints =
+			completeFm.getAnalyser().calculateConstraints;
+		analyzer.calculateRedundantConstraints =
+			completeFm.getAnalyser().calculateRedundantConstraints;
+		analyzer.calculateTautologyConstraints =
+			completeFm.getAnalyser().calculateTautologyConstraints;
+		analyzer.calculateDeadConstraints =
+			completeFm.getAnalyser().calculateDeadConstraints;
+		analyzer.calculateFOConstraints =
+			completeFm.getAnalyser().calculateFOConstraints;
 
 		analyzer.analyzeFeatureModel(null); // analyze the subtree model
 		explainImplicitConstraints(analyzer, diagramEditor.getGraphicalFeatureModel()); // explain implicit, i.e. redundant, constraints
@@ -123,19 +133,18 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	}
 
 	/**
-	 * Checks if implicit constraints are redundant (must be) and explains them.
-	 * Sets the tool tip with explanations.
+	 * Checks if implicit constraints are redundant (must be) and explains them. Sets the tool tip with explanations.
 	 * 
 	 * @param analyzer The feature model analyzer for the sub feature model
 	 * @param graphicalFeatModel The graphical feature model of the sub feature model
 	 */
 	private void explainImplicitConstraints(FeatureModelAnalyzer analyzer, IGraphicalFeatureModel graphicalFeatModel) {
-		// iterate implicit constraints and generate explanations 
+		// iterate implicit constraints and generate explanations
 		for (IConstraint redundantC : getImplicitConstraints()) {
 			redundantC.setConstraintAttribute(ConstraintAttribute.IMPLICIT, false);
 			subtreeModel.getAnalyser().getRedundantConstraintExplanation(completeFm, redundantC);
-			
-			// remember if an implicit constraint exists to adapt legend 
+
+			// remember if an implicit constraint exists to adapt legend
 			for (IGraphicalConstraint gc : graphicalFeatModel.getConstraints()) {
 				if (gc.getObject().equals(redundantC)) {
 					gc.setConstraintImplicit(true);
@@ -147,21 +156,25 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	}
 
 	/**
-	 * Returns implicit constraints for the sub feature model by iterating constraints of the
-	 * origin model and the sub feature model and collecting constraints which are only present
-	 * in the sub feature model but not in the origin one.
+	 * Returns implicit constraints for the sub feature model by iterating constraints of the origin model and the sub feature model and collecting constraints
+	 * which are only present in the sub feature model but not in the origin one.
 	 * 
 	 * @return result A list which contains implicit constraints for the subtree feature model
 	 */
 	private List<IConstraint> getImplicitConstraints() {
-		List<IConstraint> newConstraints = subtreeModel.getConstraints();
-		List<IConstraint> oldConstraints = completeFm.getConstraints();
-		List<IConstraint> result = new ArrayList<>();
+		List<IConstraint> newConstraints =
+			subtreeModel.getConstraints();
+		List<IConstraint> oldConstraints =
+			completeFm.getConstraints();
+		List<IConstraint> result =
+			new ArrayList<>();
 		result.addAll(newConstraints);
 
-		Iterator<IConstraint> it = result.iterator();
+		Iterator<IConstraint> it =
+			result.iterator();
 		while (it.hasNext()) {
-			IConstraint constrNew = it.next();
+			IConstraint constrNew =
+				it.next();
 			for (IConstraint constrOld : oldConstraints) {
 				if (constrOld.getNode().toRegularCNF().equals(constrNew.getNode().toRegularCNF())) {
 					it.remove();

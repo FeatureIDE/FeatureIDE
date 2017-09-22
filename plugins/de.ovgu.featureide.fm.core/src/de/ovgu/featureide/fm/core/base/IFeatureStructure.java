@@ -24,11 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Manages all structural information of a feature.</br>
- * Intended for tree structures (features are represented by tree nodes).
+ * Manages all structural information of a feature.</br> Intended for tree structures (features are represented by tree nodes).
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke 
+ * @author Marcus Pinnecke
  */
 public interface IFeatureStructure {
 
@@ -59,9 +58,9 @@ public interface IFeatureStructure {
 	IFeatureStructure getParent();
 
 	Collection<IConstraint> getRelevantConstraints();
-	
+
 	boolean hasChildren();
-	
+
 	boolean hasVisibleChildren(boolean showHiddenFeatures);
 
 	boolean hasHiddenParent();

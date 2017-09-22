@@ -33,16 +33,18 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 public class ShowUnselectedAction extends Action {
 
 	private CollaborationView collaborationView;
+
 	public ShowUnselectedAction(String text, CollaborationView collaborationView) {
 		super(text);
-		this.collaborationView = collaborationView;
+		this.collaborationView =
+			collaborationView;
 	}
 
 	public void setEnabled(boolean enabled) {
 		super.setChecked(CollaborationModelBuilder.showUnselectedFeatures());
 		super.setEnabled(true);
 	}
-	
+
 	public void run() {
 		CollaborationModelBuilder.showUnselectedFeatures(!CollaborationModelBuilder.showUnselectedFeatures());
 		collaborationView.refresh();

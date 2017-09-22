@@ -51,23 +51,25 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 * the structure to store the parsed data
 	 */
 	protected IFeatureModel featureModel;
-	
+
 	/**
 	 * warnings occurred while parsing
 	 */
-	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
-	
+	protected LinkedList<Problem> warnings =
+		new LinkedList<Problem>();
+
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
 	 * 
 	 * <strong>Caution:</strong> This field can be null and is maybe not up to date.
 	 */
 	protected File featureModelFile;
-	
+
 	public void setFeatureModel(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
@@ -75,20 +77,22 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * Reads a feature model from a file.
 	 * 
-	 * @param file
-	 *            the file which contains the textual representation of the
-	 *            feature model
+	 * @param file the file which contains the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
 	public void readFromFile(File file) throws UnsupportedModelException,
 			FileNotFoundException {
 		warnings.clear();
-		this.featureModelFile = file;
-		String fileName = file.getPath();
-		InputStream inputStream = null;
+		this.featureModelFile =
+			file;
+		String fileName =
+			file.getPath();
+		InputStream inputStream =
+			null;
 		try {
-			inputStream = new FileInputStream(fileName);
+			inputStream =
+				new FileInputStream(fileName);
 			parseInputStream(inputStream);
 			// TODO: REMOVE THIS, THIS IS A HACK
 			// THIS IS A HACK
@@ -108,20 +112,19 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * Reads a feature model from a string.<br/><br/>
 	 * 
-	 * Please use {@link #setFile(File)} if you know the source of the feature
-	 * model.
+	 * Please use {@link #setFile(File)} if you know the source of the feature model.
 	 * 
-	 * @param text
-	 *            the textual representation of the feature model
+	 * @param text the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
 	public void readFromString(String text) throws UnsupportedModelException {
 		warnings.clear();
-		InputStream inputStream = new ByteArrayInputStream(
-				text.getBytes(Charset.availableCharsets().get("UTF-8")));
+		InputStream inputStream =
+			new ByteArrayInputStream(
+					text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		parseInputStream(inputStream);
 	}
-	
+
 	public List<Problem> getWarnings() {
 		return warnings;
 	}
@@ -129,7 +132,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * Reads a feature model from an input stream.
 	 * 
-	 * @param  inputStream  the textual representation of the feature model
+	 * @param inputStream the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
 	protected abstract void parseInputStream(InputStream inputStream)
@@ -138,11 +141,11 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * Set the source file of the textual representation of the feature model.
 	 * 
-	 * @param featureModelFile
-	 *            the source file
+	 * @param featureModelFile the source file
 	 */
 	public void setFile(File featureModelFile) {
-		this.featureModelFile = featureModelFile;
+		this.featureModelFile =
+			featureModelFile;
 	}
 
 	public File getFile() {

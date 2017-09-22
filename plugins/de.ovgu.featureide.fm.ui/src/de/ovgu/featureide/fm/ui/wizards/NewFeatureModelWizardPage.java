@@ -58,21 +58,30 @@ public class NewFeatureModelWizardPage extends WizardPage {
 
 	public NewFeatureModelWizardPage(String project, IProject projectRes) {
 		super(project);
-		this.project = projectRes;
+		this.project =
+			projectRes;
 		setDescription(CREATE_A_NEW_FEATURE_MODEL_FILE_);
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		layout.verticalSpacing = 9;
+		GridData gd =
+			new GridData(GridData.FILL_HORIZONTAL);
+		Composite composite =
+			new Composite(parent, SWT.NULL);
+		GridLayout layout =
+			new GridLayout();
+		layout.numColumns =
+			3;
+		layout.verticalSpacing =
+			9;
 		composite.setLayout(layout);
-		Label label = new Label(composite, SWT.NULL);
+		Label label =
+			new Label(composite, SWT.NULL);
 		label.setText("&File name:");
-		fileName = new Text(composite, SWT.BORDER | SWT.SINGLE);
+		fileName =
+			new Text(composite, SWT.BORDER
+				| SWT.SINGLE);
 		fileName.setLayoutData(gd);
 		if (project != null) {
 			fileName.setText(project.getFile("model.xml").getLocation().toOSString());
@@ -80,22 +89,28 @@ public class NewFeatureModelWizardPage extends WizardPage {
 			fileName.setText(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
 		}
 
-		Button browseButton = new Button(composite, SWT.NONE);
+		Button browseButton =
+			new Button(composite, SWT.NONE);
 		browseButton.setText(BROWSE___);
 		browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				String selectedPath = openFileDialog();
+				String selectedPath =
+					openFileDialog();
 				if (selectedPath != null) {
 					fileName.setText(selectedPath);
-					IPath path = new Path(selectedPath);
+					IPath path =
+						new Path(selectedPath);
 					if (path.getFileExtension() == null) {
-						fileName.setText(selectedPath + ".xml");
+						fileName.setText(selectedPath
+							+ ".xml");
 					}
 				}
 			}
 		});
 
 		fileName.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
 				checkFileName();
 			}
@@ -106,18 +121,23 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	}
 
 	protected void checkFileName() {
-		String text = fileName.getText();
-		IPath path = new Path(text);
+		String text =
+			fileName.getText();
+		IPath path =
+			new Path(text);
 		if (path.isEmpty()) {
 			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
 			return;
 		}
 		if (!path.isValidPath(text)) {
-			updateStatus(text + " is no valid path.");
+			updateStatus(text
+				+ " is no valid path.");
 			return;
 		}
-		String fileExtension = path.getFileExtension();
-		if (fileExtension == null || !fileExtension.equals("xml")) {
+		String fileExtension =
+			path.getFileExtension();
+		if (fileExtension == null
+			|| !fileExtension.equals("xml")) {
 			updateStatus(NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_);
 			return;
 		}
@@ -134,10 +154,13 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	}
 
 	private String openFileDialog() {
-		FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
+		FileDialog dialog =
+			new FileDialog(getShell(), SWT.MULTI);
 		dialog.setText(NEW_FEATURE_MODEL);
-		dialog.setFilterExtensions(new String[] { "*.xml" });
-		dialog.setFilterNames(new String[] { "XML *.xml" });
+		dialog.setFilterExtensions(new String[] {
+			"*.xml" });
+		dialog.setFilterNames(new String[] {
+			"XML *.xml" });
 		dialog.setFileName("model.xml");
 		if (project != null) {
 			dialog.setFilterPath(project.getLocation().toOSString());

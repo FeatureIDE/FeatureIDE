@@ -34,8 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to set a feature to collapsed. Enables
- * undo/redo functionality.
+ * Operation with functionality to set a feature to collapsed. Enables undo/redo functionality.
  * 
  * @author Joshua Sprey
  * @author Enis Belli
@@ -45,19 +44,20 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 
 	private IFeature feature;
 	private IGraphicalFeatureModel graphicalFeatureModel;
-	private List<FeatureConnection> targetConnections = new ArrayList<>();
+	private List<FeatureConnection> targetConnections =
+		new ArrayList<>();
 
 	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
+	 * @param label Description of this operation to be used in the menu
+	 * @param feature feature on which this operation will be executed
 	 * 
 	 */
 	public SetFeatureToCollapseOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(graphicalFeatureModel.getGraphicalFeature(feature)));
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.feature = feature;
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
+		this.feature =
+			feature;
 	}
 
 	/**
@@ -74,12 +74,14 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	@Override
 	protected FeatureIDEEvent operation() {
 		if (feature.getStructure().hasChildren()) {
-			
-			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+
+			IGraphicalFeature graphicalFeature =
+				graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
-			targetConnections = graphicalFeature.getTargetConnections();
+			targetConnections =
+				graphicalFeature.getTargetConnections();
 			graphicalFeature.getTargetConnections().clear();
-			
+
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
 		}
 		return new FeatureIDEEvent(feature, EventType.DEFAULT);

@@ -65,7 +65,7 @@ public class FeatureModeling extends ComposerExtensionClass {
 	public boolean hasSourceFolder() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasBuildFolder() {
 		return false;
@@ -92,12 +92,17 @@ public class FeatureModeling extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		try {
-			IContainer parent = folder.getParent();
+			IContainer parent =
+				folder.getParent();
 			if (!parent.exists()) {
 				folder.create(true, true, null);
 			}
-			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
-			IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
+			final IPersistentFormat<Configuration> format =
+				ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
+			IFile configurationFile =
+				parent.getFile(new Path(congurationName
+					+ "."
+					+ format.getSuffix()));
 			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {

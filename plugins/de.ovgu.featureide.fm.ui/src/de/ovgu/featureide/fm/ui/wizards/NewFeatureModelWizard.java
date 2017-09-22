@@ -67,31 +67,42 @@ import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 // TOOD add copy of an other model file
 public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewFeatureModelWizard";
+	public static final String ID =
+		FMUIPlugin.PLUGIN_ID
+			+ ".wizard.NewFeatureModelWizard";
 
 	private NewFeatureModelWizardPage page;
-	private IProject project = null;
+	private IProject project =
+		null;
 
 	public boolean performFinish() {
-		final IPath fullFilePath = new Path(page.fileName.getText());
+		final IPath fullFilePath =
+			new Path(page.fileName.getText());
 
-		if (project == null || !createRelativeFile(fullFilePath, project)) {
-			boolean foundParent = false;
+		if (project == null
+			|| !createRelativeFile(fullFilePath, project)) {
+			boolean foundParent =
+				false;
 			for (IProject otherProject : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 				if (createRelativeFile(fullFilePath, otherProject)) {
-					foundParent = true;
+					foundParent =
+						true;
 					break;
 				}
 			}
 			if (!foundParent) {
-				final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+				final XmlFeatureModelFormat format =
+					new XmlFeatureModelFormat();
 				IFeatureModel featureModel;
-				final String filePathString = fullFilePath.toOSString();
+				final String filePathString =
+					fullFilePath.toOSString();
 				try {
-					featureModel = FMFactoryManager.getFactory(filePathString, format).createFeatureModel();
+					featureModel =
+						FMFactoryManager.getFactory(filePathString, format).createFeatureModel();
 				} catch (NoSuchExtensionException e) {
 					Logger.logError(e);
-					featureModel = FMFactoryManager.getEmptyFeatureModel();
+					featureModel =
+						FMFactoryManager.getEmptyFeatureModel();
 				}
 				featureModel.createDefaultValues("");
 				FileHandler.save(Paths.get(filePathString), featureModel, format);
@@ -102,20 +113,28 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 	}
 
 	private void open(IFile file) {
-		IWorkbenchWindow dw = FMUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage page = dw.getActivePage();
+		IWorkbenchWindow dw =
+			FMUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage page =
+			dw.getActivePage();
 		if (page != null) {
-			IContentType contentType = null;
+			IContentType contentType =
+				null;
 			try {
-				IContentDescription description = file.getContentDescription();
+				IContentDescription description =
+					file.getContentDescription();
 				if (description != null) {
-					contentType = description.getContentType();
+					contentType =
+						description.getContentType();
 				}
-				IEditorDescriptor desc = null;
+				IEditorDescriptor desc =
+					null;
 				if (contentType != null) {
-					desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
+					desc =
+						PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 				} else {
-					desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+					desc =
+						PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 				}
 				if (desc != null) {
 					page.openEditor(new FileEditorInput(file), desc.getId());
@@ -128,22 +147,28 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	private boolean createRelativeFile(IPath fullFilePath, IProject parentProject) {
 		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
-			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
+			final IFile file =
+				parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
 
-			final java.nio.file.Path path = Paths.get(file.getLocationURI());
+			final java.nio.file.Path path =
+				Paths.get(file.getLocationURI());
 
-			final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(path.getFileName().toString());
+			final IFeatureModelFormat format =
+				FMFormatManager.getInstance().getFormatByFileName(path.getFileName().toString());
 			IFeatureModelFactory factory;
 			try {
-				factory = FMFactoryManager.getFactory(path.toString(), format);
+				factory =
+					FMFactoryManager.getFactory(path.toString(), format);
 			} catch (NoSuchExtensionException e) {
 				Logger.logError(e);
-				factory = FMFactoryManager.getDefaultFactory();
+				factory =
+					FMFactoryManager.getDefaultFactory();
 			}
-			final IFeatureModel featureModel = factory.createFeatureModel();
+			final IFeatureModel featureModel =
+				factory.createFeatureModel();
 			featureModel.createDefaultValues("");
 			FMComposerManager.getFMComposerExtension(file.getProject());
-			
+
 			FeatureModelManager.save(featureModel, path);
 
 			open(file);
@@ -160,12 +185,16 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+		final IResource res =
+			SelectionWrapper.init(selection, IResource.class).getNext();
 		if (res != null) {
-			project = res.getProject();
-			page = new NewFeatureModelWizardPage("", project);
+			project =
+				res.getProject();
+			page =
+				new NewFeatureModelWizardPage("", project);
 		} else {
-			page = new NewFeatureModelWizardPage("", null);
+			page =
+				new NewFeatureModelWizardPage("", null);
 		}
 	}
 }

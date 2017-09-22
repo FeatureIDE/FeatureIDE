@@ -24,6 +24,7 @@ import de.ovgu.featureide.core.signature.base.AClassCreator;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 public class JavaClassCreator extends AClassCreator {
+
 	@Override
 	public JavaClass create(AbstractClassSignature sig) {
 		return new JavaClass(sig);

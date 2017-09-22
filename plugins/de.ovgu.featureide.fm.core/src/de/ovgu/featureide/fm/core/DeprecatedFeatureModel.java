@@ -40,30 +40,29 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Jens Meinicke
  */
 abstract class DeprecatedFeatureModel {
-	
-    public abstract FeatureModelAnalyzer getAnalyser();
-	
-    public abstract IFeatureModelLayout getLayout();
-    
+
+	public abstract FeatureModelAnalyzer getAnalyser();
+
+	public abstract IFeatureModelLayout getLayout();
+
 	public abstract RenamingsManager getRenamingsManager();
-	
+
 	abstract FMComposerManager getFMComposerManager(final IProject project);
-    
-    /**
-     * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
-     */
+
+	/**
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead.
+	 */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
-	    return getAnalyser().analyzeFeatureModel(null);
+		return getAnalyser().analyzeFeatureModel(null);
 	}
-	
 
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
 	 */
 	@Deprecated
 	public boolean isValid() throws TimeoutException {
-	    return getAnalyser().isValid();
+		return getAnalyser().isValid();
 	}
 
 	/**
@@ -71,7 +70,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<IFeature> a, Set<IFeature> b) throws TimeoutException {
-	    	return getAnalyser().checkImplies(a, b);
+		return getAnalyser().checkImplies(a, b);
 	}
 
 	/**
@@ -79,7 +78,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
-	    	return getAnalyser().checkCondition(condition);
+		return getAnalyser().checkCondition(condition);
 	}
 
 	/**
@@ -88,7 +87,7 @@ abstract class DeprecatedFeatureModel {
 	@Deprecated
 	public boolean areMutualExclusive(Set<IFeature> context,
 			List<Set<IFeature>> featureSets) throws TimeoutException {
-	    	return getAnalyser().areMutualExclusive(context, featureSets);
+		return getAnalyser().areMutualExclusive(context, featureSets);
 	}
 
 	/**
@@ -105,7 +104,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean exists(Set<IFeature> features) throws TimeoutException {
-	    	return getAnalyser().exists(features);
+		return getAnalyser().exists(features);
 	}
 
 	/**
@@ -113,7 +112,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public Node conjunct(Set<IFeature> b) {
-	    	return getAnalyser().conjunct(b);
+		return getAnalyser().conjunct(b);
 	}
 
 	/**
@@ -121,7 +120,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countConcreteFeatures() {
-	    return getAnalyser().countConcreteFeatures();
+		return getAnalyser().countConcreteFeatures();
 	}
 
 	/**
@@ -129,7 +128,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countHiddenFeatures() {
-	    return getAnalyser().countHiddenFeatures();
+		return getAnalyser().countHiddenFeatures();
 	}
 
 	/**
@@ -137,7 +136,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countTerminalFeatures() {
-	    return getAnalyser().countTerminalFeatures();
+		return getAnalyser().countTerminalFeatures();
 	}
 
 	/**
@@ -146,7 +145,7 @@ abstract class DeprecatedFeatureModel {
 	@Deprecated
 	public LinkedList<String> commonFeatures(long timeout,
 			Object... selectedFeatures) {
-	    	return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
+		return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
 	}
 
 	/**
@@ -156,6 +155,7 @@ abstract class DeprecatedFeatureModel {
 	public LinkedList<IFeature> getDeadFeatures() {
 		return new LinkedList<IFeature>(getAnalyser().getDeadFeatures());
 	}
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
 	 */
@@ -232,12 +232,12 @@ abstract class DeprecatedFeatureModel {
 	public void verticalLayout(boolean b) {
 //	    getLayout().verticalLayout(b);
 	}
-	
+
 	@Deprecated
 	public boolean hasDead() {
 		return getDeadFeatures().size() > 0;
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
@@ -254,7 +254,7 @@ abstract class DeprecatedFeatureModel {
 //	    return getLayout().getLayoutAlgorithm();
 		return 0;
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldName(String)} instead.
 	 */
@@ -286,7 +286,7 @@ abstract class DeprecatedFeatureModel {
 	public void performRenamings() {
 		getRenamingsManager().performRenamings();
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#isRenamed()} instead.
 	 */
@@ -294,7 +294,7 @@ abstract class DeprecatedFeatureModel {
 	public boolean isRenamed() {
 		return getRenamingsManager().isRenamed();
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(IFile)} instead.
 	 */
@@ -335,11 +335,9 @@ abstract class DeprecatedFeatureModel {
 		return getAnalyser().valid();
 	}
 
-
 	/**
-	 * @deprecated Will be removed in a future release. 
-	 * Use {@link FeatureModelAnalyzer#getCachedFalseOptionalFeatures()} instead.
-	 * Or use {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedFalseOptionalFeatures()} instead. Or use
+	 *             {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
 	 */
 	@Deprecated
 	public LinkedList<IFeature> getFalseOptionalFeatures() {

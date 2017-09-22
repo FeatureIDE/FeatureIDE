@@ -32,36 +32,34 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * 
  * @author Fabian Benduhn
  */
-public class TConfigurationSelection extends AbstractConfigurationTest{
-	
+public class TConfigurationSelection extends AbstractConfigurationTest {
+
 	@Override
-	IFeatureModel loadModel() 
-	{
+	IFeatureModel loadModel() {
 		return loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 	}
 
-	
 	@Test
-	public void testSelection1() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection1() {
+		Configuration c =
+			new Configuration(fm, true);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
 	}
 
 	@Test
-	public void testSelection2() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection2() {
+		Configuration c =
+			new Configuration(fm, true);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
 	}
 
 	@Test
-	public void testSelection3() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection3() {
+		Configuration c =
+			new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
@@ -69,9 +67,9 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection4() 
-	{
-		Configuration c = new Configuration(fm, true);
+	public void testSelection4() {
+		Configuration c =
+			new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(1, c.number());
@@ -79,12 +77,15 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 
 	@Test
 	public void testSelection5() {
-		Configuration c = new Configuration(fm, true);
-		boolean exception = false;
+		Configuration c =
+			new Configuration(fm, true);
+		boolean exception =
+			false;
 		try {
 			c.setManual("B", Selection.SELECTED);
 		} catch (SelectionNotPossibleException e) {
-			exception = true;
+			exception =
+				true;
 		}
 		assertTrue(exception);
 	}

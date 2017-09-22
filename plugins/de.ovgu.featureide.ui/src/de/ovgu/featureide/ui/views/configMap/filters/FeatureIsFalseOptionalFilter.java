@@ -39,24 +39,28 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 		setImagePath(Image_Plus);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		IFeatureStructure structure = feature.getStructure();
+		IFeatureStructure structure =
+			feature.getStructure();
 
 		if (structure.isMandatory())
 			return false;
 
-		if (structure.isRoot()) 
+		if (structure.isRoot())
 			return false;
-		
+
 		if (!structure.getParent().isAnd())
 			return false;
-		
-		List<Configuration> configs = configurationMap.getConfigurations();
-		if(configs == null) return false;
+
+		List<Configuration> configs =
+			configurationMap.getConfigurations();
+		if (configs == null) return false;
 		for (Configuration config : configs) {
 			if (!config.getSelectedFeatures().contains(feature))
 				return false;

@@ -28,9 +28,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Dominik Hamann
  */
 public interface ITreeJob {
+
 	public Parent getCalculated();
 
 	public void setCalculated(Parent calculated);
-	
+
 	public boolean cancel();
 }

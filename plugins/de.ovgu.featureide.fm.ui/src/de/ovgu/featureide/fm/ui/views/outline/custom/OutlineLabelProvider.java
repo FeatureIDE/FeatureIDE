@@ -31,14 +31,19 @@ import org.eclipse.swt.widgets.TreeItem;
  * @author Reimar Schr�ter
  */
 public abstract class OutlineLabelProvider implements ILabelProvider {
-	public static final int OUTLINE_NOT_AVAILABLE = -1;
-	public static final int OUTLINE_FEATURE_MODEL = 0;
-	public static final int OUTLINE_CODE = 1;
+
+	public static final int OUTLINE_NOT_AVAILABLE =
+		-1;
+	public static final int OUTLINE_FEATURE_MODEL =
+		0;
+	public static final int OUTLINE_CODE =
+		1;
 
 	protected TreeViewer viewer;
 
 	public void initTreeViewer(TreeViewer viewer) {
-		this.viewer = viewer;
+		this.viewer =
+			viewer;
 		init();
 	}
 
@@ -47,13 +52,10 @@ public abstract class OutlineLabelProvider implements ILabelProvider {
 	public abstract int getOutlineType();
 
 	/**
-	 * colors the TreeItems gray in case the method/field is not in the current
-	 * file<br>
-	 * makes the TreeItems bold in case the Feature inside the TreeItem is in
+	 * colors the TreeItems gray in case the method/field is not in the current file<br> makes the TreeItems bold in case the Feature inside the TreeItem is in
 	 * the current file
 	 * 
-	 * @param treeItems
-	 *            the items that should be colored
+	 * @param treeItems the items that should be colored
 	 * @param file
 	 */
 	public abstract void colorizeItems(TreeItem[] treeItems, IFile file);
@@ -63,5 +65,5 @@ public abstract class OutlineLabelProvider implements ILabelProvider {
 	public abstract String getLabelProvName();
 
 	public abstract boolean refreshContent(IFile oldFile, IFile currentFile); // TreeItem[]
-																				// items,
+																				 // items,
 }

@@ -47,7 +47,7 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 
 	private Text viewNameText, viewLevelText;
 	private Label viewNameLabel, viewLevelLabel;
-	
+
 	public ChangeViewTagPage() {
 		super("");
 		setTitle(SELECT_A_COMPOSER);
@@ -55,52 +55,70 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 	}
 
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 1;
+		Composite container =
+			new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout =
+			new GridLayout();
+		gridLayout.numColumns =
+			1;
 		container.setLayout(gridLayout);
 		setControl(container);
-		
-		GridLayout projGridLayout = new GridLayout();
-		projGridLayout.numColumns = 2;
-		
-		Group configGroup = new Group(container, SWT.NONE);
+
+		GridLayout projGridLayout =
+			new GridLayout();
+		projGridLayout.numColumns =
+			2;
+
+		Group configGroup =
+			new Group(container, SWT.NONE);
 		configGroup.setText(SCALE_UP_VIEW_TAG);
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		gridData.verticalSpan = 2;
-		
+		GridData gridData =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan =
+			2;
+		gridData.verticalSpan =
+			2;
+
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
-		
-		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
-		gridData2.horizontalSpan = 1;
-		gridData2.verticalSpan = 1;
-		
-		viewNameLabel = new Label(configGroup, 0);
+
+		GridData gridData2 =
+			new GridData(GridData.FILL_HORIZONTAL);
+		gridData2.horizontalSpan =
+			1;
+		gridData2.verticalSpan =
+			1;
+
+		viewNameLabel =
+			new Label(configGroup, 0);
 		viewNameLabel.setText("View Name: ");
-		viewNameText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
+		viewNameText =
+			new Text(configGroup, SWT.BORDER
+				| SWT.SINGLE);
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
-		
-		viewLevelLabel = new Label(configGroup, 0);
+
+		viewLevelLabel =
+			new Label(configGroup, 0);
 		viewLevelLabel.setText("View Level: ");
-		viewLevelText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
+		viewLevelText =
+			new Text(configGroup, SWT.BORDER
+				| SWT.SINGLE);
 		viewLevelText.setText("1");
 		viewLevelText.setLayoutData(gridData2);
 
 		viewNameText.addKeyListener(new KeyPressedListener());
 		viewLevelText.addKeyListener(new KeyPressedListener());
-		
+
 		updatePage();
 	}
-	
+
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWNAME, viewNameText.getText());
 		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWLEVEL, Integer.valueOf(viewLevelText.getText()));
 	}
-	
+
 	@Override
 	protected String checkPage() {
 		if (viewNameText.getText().isEmpty()) {
@@ -112,5 +130,5 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 			return ENTER_A_NUMBER;
 		}
 		return null;
-	}	
+	}
 }

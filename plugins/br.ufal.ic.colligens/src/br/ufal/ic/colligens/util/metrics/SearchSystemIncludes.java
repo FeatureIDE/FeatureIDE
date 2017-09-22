@@ -11,16 +11,22 @@ import java.util.List;
 
 public class SearchSystemIncludes {
 
-	private List<String> systemIncludes = new ArrayList<String>();
+	private List<String> systemIncludes =
+		new ArrayList<String>();
 
 	public void readFile(File file) throws IOException {
-		FileInputStream fstream = new FileInputStream(file);
-		DataInputStream in = new DataInputStream(fstream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		FileInputStream fstream =
+			new FileInputStream(file);
+		DataInputStream in =
+			new DataInputStream(fstream);
+		BufferedReader br =
+			new BufferedReader(new InputStreamReader(in));
 		String strLine;
-		while ((strLine = br.readLine()) != null) {
-			if (strLine.contains("#include") && strLine.contains("<")
-					&& strLine.contains(">")) {
+		while ((strLine =
+			br.readLine()) != null) {
+			if (strLine.contains("#include")
+				&& strLine.contains("<")
+				&& strLine.contains(">")) {
 				if (!systemIncludes.contains(strLine.trim())) {
 					systemIncludes.add(strLine.trim());
 				}
@@ -35,7 +41,7 @@ public class SearchSystemIncludes {
 				listFilesForFolder(fileEntry);
 			} else {
 				if (fileEntry.getName().endsWith(".h")
-						|| fileEntry.getName().endsWith(".c")) {
+					|| fileEntry.getName().endsWith(".c")) {
 					System.out.println(fileEntry.getName());
 					// this.readFile(fileEntry);
 				}
@@ -44,7 +50,8 @@ public class SearchSystemIncludes {
 	}
 
 	public int count(String path) throws IOException {
-		File file = new File(path);
+		File file =
+			new File(path);
 		if (file.isDirectory()) {
 			listFilesForFolder(file);
 		} else {

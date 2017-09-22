@@ -47,10 +47,14 @@ public class CFeatureRemover extends AFeatureRemover {
 	}
 
 	private void detectRedundantConstraintsComplex() {
-		CNFSolver solver = new CNFSolver(newClauseList, featureNameArray.length - 1);
+		CNFSolver solver =
+			new CNFSolver(newClauseList, featureNameArray.length
+				- 1);
 
-		for (int i = 0; i < relevantPosIndex; i++) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
+		for (int i =
+			0; i < relevantPosIndex; i++) {
+			final DeprecatedClause mainClause =
+				relevantClauseList.get(i);
 			if (isRemovable(solver, mainClause)) {
 				removeRelevant(i--);
 			} else {
@@ -60,11 +64,17 @@ public class CFeatureRemover extends AFeatureRemover {
 	}
 
 	private void detectRedundantConstraintsSimple() {
-		for (int i = 0; i < relevantPosIndex; i++) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
-			for (int j = i + 1; j < relevantPosIndex; j++) {
-				final DeprecatedClause subClause = relevantClauseList.get(j);
-				final Clause contained = Clause.contained(mainClause, subClause);
+		for (int i =
+			0; i < relevantPosIndex; i++) {
+			final DeprecatedClause mainClause =
+				relevantClauseList.get(i);
+			for (int j =
+				i
+					+ 1; j < relevantPosIndex; j++) {
+				final DeprecatedClause subClause =
+					relevantClauseList.get(j);
+				final Clause contained =
+					Clause.contained(mainClause, subClause);
 				if (contained != null) {
 					if (subClause == contained) {
 						removeRelevant(j--);
@@ -76,11 +86,17 @@ public class CFeatureRemover extends AFeatureRemover {
 			}
 		}
 
-		for (int i = 0; i < newRelevantDelIndex; i++) {
-			final DeprecatedClause mainClause = newRelevantClauseList.get(i);
-			for (int j = i + 1; j < newRelevantDelIndex; j++) {
-				final DeprecatedClause subClause = newRelevantClauseList.get(j);
-				final Clause contained = Clause.contained(mainClause, subClause);
+		for (int i =
+			0; i < newRelevantDelIndex; i++) {
+			final DeprecatedClause mainClause =
+				newRelevantClauseList.get(i);
+			for (int j =
+				i
+					+ 1; j < newRelevantDelIndex; j++) {
+				final DeprecatedClause subClause =
+					newRelevantClauseList.get(j);
+				final Clause contained =
+					Clause.contained(mainClause, subClause);
 				if (contained != null) {
 					if (subClause == contained) {
 						removeNewRelevant(j--);
@@ -92,11 +108,16 @@ public class CFeatureRemover extends AFeatureRemover {
 			}
 		}
 
-		for (int i = 0; i < relevantPosIndex; i++) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
-			for (int j = 0; j < newRelevantDelIndex; j++) {
-				final DeprecatedClause subClause = newRelevantClauseList.get(j);
-				final Clause contained = Clause.contained(mainClause, subClause);
+		for (int i =
+			0; i < relevantPosIndex; i++) {
+			final DeprecatedClause mainClause =
+				relevantClauseList.get(i);
+			for (int j =
+				0; j < newRelevantDelIndex; j++) {
+				final DeprecatedClause subClause =
+					newRelevantClauseList.get(j);
+				final Clause contained =
+					Clause.contained(mainClause, subClause);
 				if (contained != null) {
 					if (subClause == contained) {
 						removeNewRelevant(j--);
@@ -112,10 +133,16 @@ public class CFeatureRemover extends AFeatureRemover {
 
 	@Override
 	protected boolean detectRedundancy(DeprecatedFeature next) {
-		final long estimatedClauseCount = next.getClauseCount();
-		final int curClauseCountLimit = (int) Math.floor(localFactor * ((relevantNegIndex - relevantPosIndex) + newRelevantClauseList.size()));
+		final long estimatedClauseCount =
+			next.getClauseCount();
+		final int curClauseCountLimit =
+			(int) Math.floor(localFactor
+				* ((relevantNegIndex
+					- relevantPosIndex)
+					+ newRelevantClauseList.size()));
 
-		if ((estimatedClauseCount > maxClauseCountLimit) || (estimatedClauseCount > curClauseCountLimit)) {
+		if ((estimatedClauseCount > maxClauseCountLimit)
+			|| (estimatedClauseCount > curClauseCountLimit)) {
 			detectRedundantConstraintsSimple();
 			detectRedundantConstraintsComplex();
 			return true;
@@ -123,17 +150,24 @@ public class CFeatureRemover extends AFeatureRemover {
 		return false;
 	}
 
-	protected double localFactor = 1.0;
-	protected double globalFactor = 1.0;
+	protected double localFactor =
+		1.0;
+	protected double globalFactor =
+		1.0;
 	protected int maxClauseCountLimit;
 
 	@Override
 	protected void prepareHeuristics() {
-		localFactor = 1.1;
-		globalFactor = 1.2;
-		maxClauseCountLimit = (int) Math.floor(globalFactor * relevantClauseList.size());
+		localFactor =
+			1.1;
+		globalFactor =
+			1.2;
+		maxClauseCountLimit =
+			(int) Math.floor(globalFactor
+				* relevantClauseList.size());
 
-		heuristic = new StaticMinimumClauseHeuristic(map, features.size());
+		heuristic =
+			new StaticMinimumClauseHeuristic(map, features.size());
 	}
 
 }

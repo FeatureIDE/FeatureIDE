@@ -74,59 +74,79 @@ public class TreeClickListener implements IDoubleClickListener {
 
 	public TreeClickListener(TreeViewer view) {
 		super();
-		this.view = view;
+		this.view =
+			view;
 	}
 
 	/**
-	 * Performs actions depending on the type of the clicked note e.g. opening a
-	 * dialog for {@link ConfigParentNode.ConfigNode} or
-	 * expanding/collapsing nodes(default operation).
+	 * Performs actions depending on the type of the clicked note e.g. opening a dialog for {@link ConfigParentNode.ConfigNode} or expanding/collapsing
+	 * nodes(default operation).
 	 * 
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
+		final Object[] selectedObjects =
+			((TreeSelection) event.getSelection()).toArray();
 
 		for (Object selected : selectedObjects) {
 			if (selected instanceof StatisticsSemanticalFeatureModel.ConfigNode) {
 				handleStatisticsSemanticalNodes(event, selected);
-			} else if (selected instanceof AbstractSortModeNode && view.getExpandedState(selected)) {
-				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
-				sortNode.setSortByValue(!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent || sortNode
-						.isSortByValue()));
+			} else if (selected instanceof AbstractSortModeNode
+				&& view.getExpandedState(selected)) {
+				final AbstractSortModeNode sortNode =
+					((AbstractSortModeNode) selected);
+				sortNode.setSortByValue(!(selected instanceof ClassNodeParent
+					|| selected instanceof FieldNodeParent
+					|| selected instanceof MethodNodeParent
+					|| sortNode
+							.isSortByValue()));
 
-				final UIJob job = new UIJob(RESORT_NODE) {
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						view.refresh(sortNode);
-						return Status.OK_STATUS;
-					}
-				};
+				final UIJob job =
+					new UIJob(RESORT_NODE) {
+
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
+							view.refresh(sortNode);
+							return Status.OK_STATUS;
+						}
+					};
 				job.setPriority(Job.INTERACTIVE);
 				job.schedule();
-			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
+			} else if (selected instanceof Parent
+				&& ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
 			} else if (selected instanceof FieldSubNodeParent) {
-				final IFile iFile = ((FieldSubNodeParent) selected).getField().getRole().getFile();
-				final int line = ((FieldSubNodeParent) selected).getField().getLine();
+				final IFile iFile =
+					((FieldSubNodeParent) selected).getField().getRole().getFile();
+				final int line =
+					((FieldSubNodeParent) selected).getField().getLine();
 				openEditor(iFile, line);
 			} else if (selected instanceof MethodSubNodeParent) {
-				final IFile iFile = ((MethodSubNodeParent) selected).getMethod().getRole().getFile();
-				final int line = ((MethodSubNodeParent) selected).getMethod().getLine();
+				final IFile iFile =
+					((MethodSubNodeParent) selected).getMethod().getRole().getFile();
+				final int line =
+					((MethodSubNodeParent) selected).getMethod().getLine();
 				openEditor(iFile, line);
 			} else if (selected instanceof ClassSubNodeParent) {
-				final IFile iFile = ((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
+				final IFile iFile =
+					((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
 				if (iFile != null) {
 					openEditor(iFile, 1);
 				}
-			} else if (selected instanceof Parent && ((Parent) selected).getParent() instanceof InvariantNodeParent) {
-				IFile iFile = ((FSTInvariant) (((Parent) selected).getValue())).getFile();
-				int line = ((FSTInvariant) (((Parent) selected).getValue())).getLine();
+			} else if (selected instanceof Parent
+				&& ((Parent) selected).getParent() instanceof InvariantNodeParent) {
+				IFile iFile =
+					((FSTInvariant) (((Parent) selected).getValue())).getFile();
+				int line =
+					((FSTInvariant) (((Parent) selected).getValue())).getLine();
 				openEditor(iFile, line);
 			} else if (selected instanceof Parent
-					&& (((Parent) selected).getParent() instanceof MethodContractNodeParent || ((Parent) selected).getParent() instanceof ContractCountNodeParent)) {
-				IFile iFile = ((FSTMethod) (((Parent) selected).getValue())).getFile();
-				int line = ((FSTMethod) (((Parent) selected).getValue())).getLine();
+				&& (((Parent) selected).getParent() instanceof MethodContractNodeParent
+					|| ((Parent) selected).getParent() instanceof ContractCountNodeParent)) {
+				IFile iFile =
+					((FSTMethod) (((Parent) selected).getValue())).getFile();
+				int line =
+					((FSTMethod) (((Parent) selected).getValue())).getLine();
 				openEditor(iFile, line);
 			}
 
@@ -134,14 +154,15 @@ public class TreeClickListener implements IDoubleClickListener {
 	}
 
 	/**
-	 * Opens a dialog to start the calculation corresponding to the clicked
-	 * config-node - but only if their isn't already a calculation in progress.
+	 * Opens a dialog to start the calculation corresponding to the clicked config-node - but only if their isn't already a calculation in progress.
 	 * 
 	 */
 	private void handleStatisticsSemanticalNodes(DoubleClickEvent event, Object selected) {
-		final StatisticsSemanticalFeatureModel.ConfigNode clickedNode = (StatisticsSemanticalFeatureModel.ConfigNode) selected;
+		final StatisticsSemanticalFeatureModel.ConfigNode clickedNode =
+			(StatisticsSemanticalFeatureModel.ConfigNode) selected;
 		if (!clickedNode.isCalculating()) {
-			ConfigDialog dial = new ConfigDialog(event.getViewer().getControl().getShell(), clickedNode.getDescription());
+			ConfigDialog dial =
+				new ConfigDialog(event.getViewer().getControl().getShell(), clickedNode.getDescription());
 			if (dial.open() == ConfigDialog.OK) {
 				clickedNode.calculate(dial.getTimeout(), dial.getPriority());
 			}
@@ -149,17 +170,22 @@ public class TreeClickListener implements IDoubleClickListener {
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
-		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+		if (!(editorPart instanceof ITextEditor)
+			|| lineNumber <= 0) {
 			return;
 		}
-		final ITextEditor editor = (ITextEditor) editorPart;
-		final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		final ITextEditor editor =
+			(ITextEditor) editorPart;
+		final IDocument document =
+			editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
-			IRegion lineInfo = null;
+			IRegion lineInfo =
+				null;
 			try {
-				lineInfo = document.getLineInformation(lineNumber - 1);
-			} catch (BadLocationException e) {
-			}
+				lineInfo =
+					document.getLineInformation(lineNumber
+						- 1);
+			} catch (BadLocationException e) {}
 			if (lineInfo != null) {
 				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
 			}
@@ -167,15 +193,25 @@ public class TreeClickListener implements IDoubleClickListener {
 	}
 
 	public void openEditor(IFile iFile, int line) {
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-		IEditorPart editorPart = null;
+		final IWorkbench workbench =
+			PlatformUI.getWorkbench();
+		final IWorkbenchPage activePage =
+			workbench.getActiveWorkbenchWindow().getActivePage();
+		IEditorPart editorPart =
+			null;
 		IContentDescription description;
 		try {
-			description = iFile.getContentDescription();
-			final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-					(description != null) ? description.getContentType() : null);
-			editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+			description =
+				iFile.getContentDescription();
+			final IEditorDescriptor desc =
+				workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+						(description != null)
+							? description.getContentType()
+							: null);
+			editorPart =
+				activePage.openEditor(new FileEditorInput(iFile), (desc != null)
+					? desc.getId()
+					: "org.eclipse.ui.DefaultTextEditor");
 			scrollToLine(editorPart, line);
 		} catch (CoreException e) {
 			e.printStackTrace();

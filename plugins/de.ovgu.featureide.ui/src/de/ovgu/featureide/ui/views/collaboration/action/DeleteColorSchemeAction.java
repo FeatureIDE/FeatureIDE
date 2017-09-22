@@ -34,14 +34,15 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
  * @author Sebastian Krieter
  */
 public class DeleteColorSchemeAction extends AbstractColorAction {
-	
+
 	public DeleteColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
 	 */
 	@Override
@@ -49,5 +50,5 @@ public class DeleteColorSchemeAction extends AbstractColorAction {
 		FeatureColorManager.removeCurrentColorScheme(fm);
 		return true;
 	}
-	
+
 }

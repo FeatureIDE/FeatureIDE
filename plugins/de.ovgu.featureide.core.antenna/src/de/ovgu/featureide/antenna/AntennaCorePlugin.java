@@ -33,11 +33,12 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 public class AntennaCorePlugin extends AbstractCorePlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "de.ovgu.featureide.core.antenna"; //$NON-NLS-1$
+	public static final String PLUGIN_ID =
+		"de.ovgu.featureide.core.antenna"; //$NON-NLS-1$
 
 	// The shared instance
 	private static AntennaCorePlugin plugin;
-	
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
@@ -49,7 +50,8 @@ public class AntennaCorePlugin extends AbstractCorePlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		plugin =
+			this;
 	}
 
 	/*
@@ -57,7 +59,8 @@ public class AntennaCorePlugin extends AbstractCorePlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		plugin =
+			null;
 		super.stop(context);
 	}
 

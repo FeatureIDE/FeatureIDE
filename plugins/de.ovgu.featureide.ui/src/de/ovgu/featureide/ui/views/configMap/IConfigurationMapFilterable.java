@@ -26,9 +26,10 @@ package de.ovgu.featureide.ui.views.configMap;
  * @author Paul Maximilian Bittner
  */
 public interface IConfigurationMapFilterable {
+
 	public boolean addFilter(IConfigurationMapFilter filter);
-	
+
 	public boolean removeFilter(IConfigurationMapFilter filter);
-	
+
 	public boolean hasFilter(IConfigurationMapFilter filter);
 }

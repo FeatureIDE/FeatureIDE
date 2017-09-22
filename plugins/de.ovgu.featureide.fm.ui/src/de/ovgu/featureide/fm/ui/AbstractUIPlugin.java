@@ -57,7 +57,9 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		logInfo(STARTING_FEATUREIDE_PLUG_IN_ + getID() + "'");
+		logInfo(STARTING_FEATUREIDE_PLUG_IN_
+			+ getID()
+			+ "'");
 	}
 
 	/*
@@ -65,16 +67,16 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		logInfo(STOPPING_FEATUREIDE_PLUG_IN_ + getID() + "'");
+		logInfo(STOPPING_FEATUREIDE_PLUG_IN_
+			+ getID()
+			+ "'");
 		super.stop(context);
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path.
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
 	 * 
-	 * @param path
-	 *            the path
+	 * @param path the path
 	 * @return the image descriptor
 	 */
 	public ImageDescriptor getImageDescriptor(String path) {
@@ -88,63 +90,59 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 * @param file file to open
 	 */
 	public void openEditor(String editorID, IFile file) {
-		IFileEditorInput editorInput = new FileEditorInput(file);
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
+		IFileEditorInput editorInput =
+			new FileEditorInput(file);
+		IWorkbenchWindow window =
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchPage page =
+			window.getActivePage();
 
 		try {
 			page.openEditor(editorInput, editorID);
 		} catch (PartInitException e) {
-			logError(UNABLE_TO_OPEN_FILE + file + IN_EDITOR + editorID, e);
+			logError(UNABLE_TO_OPEN_FILE
+				+ file
+				+ IN_EDITOR
+				+ editorID, e);
 		}
 	}
 
 	/**
-	 * Convenience method for easy and clean logging. All messages collected by
-	 * this method will be written to the eclipse log file.
+	 * Convenience method for easy and clean logging. All messages collected by this method will be written to the eclipse log file.
 	 * 
-	 * Messages are only written to the error log, if the debug option is set
-	 * for this plug-in
+	 * Messages are only written to the error log, if the debug option is set for this plug-in
 	 * 
-	 * @param message
-	 *            A message that should be written to the eclipse log file
+	 * @param message A message that should be written to the eclipse log file
 	 */
 	public void logInfo(String message) {
 		log(IStatus.INFO, message, new Exception());
 	}
 
 	/**
-	 * Convenience method for easy and clean logging of warnings. All messages
-	 * collected by this method will be written to the eclipse log file.
+	 * Convenience method for easy and clean logging of warnings. All messages collected by this method will be written to the eclipse log file.
 	 * 
-	 * @param message
-	 *            A message that should be written to the eclipse log file
+	 * @param message A message that should be written to the eclipse log file
 	 */
 	public void logWarning(String message) {
 		log(IStatus.WARNING, message, new Exception());
 	}
 
 	/**
-	 * Convenience method for easy and clean logging of exceptions. All messages
-	 * collected by this method will be written to the eclipse log file. The
+	 * Convenience method for easy and clean logging of exceptions. All messages collected by this method will be written to the eclipse log file. The
 	 * exception's stack trace is added to the log as well.
 	 * 
-	 * @param message
-	 *            A message that should be written to the eclipse log file
-	 * @param exception
-	 *            Exception containing the stack trace
+	 * @param message A message that should be written to the eclipse log file
+	 * @param exception Exception containing the stack trace
 	 */
 	public void logError(String message, Throwable exception) {
 		log(IStatus.ERROR, message, exception);
 	}
 
 	/**
-	 * Convenience method for easy and clean logging of exceptions. All messages
-	 * collected by this method will be written to the eclipse log file. The
+	 * Convenience method for easy and clean logging of exceptions. All messages collected by this method will be written to the eclipse log file. The
 	 * exception's stack trace is added to the log as well.
 	 * 
-	 * @param exception
-	 *            Exception containing the stack trace
+	 * @param exception Exception containing the stack trace
 	 */
 	public void logError(Throwable exception) {
 		if (exception != null)
@@ -164,7 +162,9 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	}
 
 	public void reportBug(int ticket) {
-		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
+		logWarning("This is a bug. Please report it. See Ticket #"
+			+ ticket
+			+ ".");
 	}
 
 }

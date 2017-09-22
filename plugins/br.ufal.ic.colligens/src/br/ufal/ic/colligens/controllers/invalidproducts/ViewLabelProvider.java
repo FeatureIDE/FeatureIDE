@@ -8,7 +8,7 @@ import org.eclipse.ui.PlatformUI;
 
 import br.ufal.ic.colligens.util.InvalidProductViewLog;
 
-class ViewLabelProvider extends LabelProvider implements ITableLabelProvider{
+class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 	@Override
 	public String getColumnText(Object obj, int index) {

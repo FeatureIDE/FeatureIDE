@@ -32,6 +32,7 @@ import de.ovgu.featureide.core.CorePlugin;
  * @author Eric Guimatsia
  */
 public class AndroidProjectConversion {
+
 	/**
 	 * Adds the FeatureIDE nature to an Android project and transforms the folder structure.
 	 * 
@@ -39,10 +40,13 @@ public class AndroidProjectConversion {
 	public static void convertAndroidProject(IProject project, String compositionTool,
 			String sourcePath, String configPath, String buildPath) {
 		// Move Android src and res folders to feature source path
-		IFolder folderSrc = project.getFolder("src");
-		IFolder folderRes = project.getFolder("res");
-		IFolder newSourceFolder = project.getFolder(sourcePath);
-		
+		IFolder folderSrc =
+			project.getFolder("src");
+		IFolder folderRes =
+			project.getFolder("res");
+		IFolder newSourceFolder =
+			project.getFolder(sourcePath);
+
 		try {
 			if (!newSourceFolder.exists()) {
 				newSourceFolder.create(false, true, null);
@@ -55,18 +59,19 @@ public class AndroidProjectConversion {
 			if (folderRes.exists()) {
 				folderRes.move(newSourceFolder.getFullPath().append("/res"), false, null);
 			} else {
-				newSourceFolder.getFolder("res").create(false, true,  null);
+				newSourceFolder.getFolder("res").create(false, true, null);
 			}
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
-		
+
 		CorePlugin.setupProject(project, compositionTool, sourcePath, configPath, buildPath, true, false);
-		
+
 		// Hide build folder
 		try {
-			IFolder buildFolder = project.getFolder(buildPath);
+			IFolder buildFolder =
+				project.getFolder(buildPath);
 			if (buildFolder.exists()) {
 				buildFolder.setHidden(true);
 			}

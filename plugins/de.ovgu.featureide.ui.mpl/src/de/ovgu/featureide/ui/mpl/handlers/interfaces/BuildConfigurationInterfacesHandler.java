@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
 
-/** 
+/**
  * Action to build interfaces for the current configuration.
  * 
  * @author Sebastian Krieter
@@ -43,10 +43,10 @@ public class BuildConfigurationInterfacesHandler extends AProjectJobHandler {
 	@Override
 	protected void endAction() {
 		MPLPlugin.getDefault().buildConfigurationInterfaces(
-				projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				projects,
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME),
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL),
 				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 	}
-	
+
 }

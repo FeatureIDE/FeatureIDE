@@ -61,23 +61,32 @@ public class DeleteAction extends Action {
 	private String text;
 
 	public DeleteAction(String text, GraphicalViewerImpl view) {
-		this.text = text;
-		viewer = view;
+		this.text =
+			text;
+		viewer =
+			view;
 	}
 
 	public void setEnabled(boolean enable) {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-		part = selection.getFirstElement();
-		if (!(part instanceof RoleEditPart || part instanceof ClassEditPart || part instanceof CollaborationEditPart)) {
+		IStructuredSelection selection =
+			(IStructuredSelection) viewer.getSelection();
+		part =
+			selection.getFirstElement();
+		if (!(part instanceof RoleEditPart
+			|| part instanceof ClassEditPart
+			|| part instanceof CollaborationEditPart)) {
 			super.setText(text);
 			super.setEnabled(false);
 		} else {
 			if (part instanceof RoleEditPart)
-				super.setText(text + ROLE);
+				super.setText(text
+					+ ROLE);
 			if (part instanceof ClassEditPart)
-				super.setText(text + " Class");
+				super.setText(text
+					+ " Class");
 			if (part instanceof CollaborationEditPart)
-				super.setText(text + " Feature");
+				super.setText(text
+					+ " Feature");
 			super.setEnabled(true);
 		}
 
@@ -86,21 +95,29 @@ public class DeleteAction extends Action {
 	}
 
 	public void run() {
-		MessageDialog messageDialog = new MessageDialog(null, DELETE_RESOURCES, null, ARE_YOU_SURE_YOU_WANT_TO_REMOVE
-				+ getDialogText(), MessageDialog.INFORMATION, new String[] { OK, CANCEL }, 0);
+		MessageDialog messageDialog =
+			new MessageDialog(null, DELETE_RESOURCES, null, ARE_YOU_SURE_YOU_WANT_TO_REMOVE
+				+ getDialogText(), MessageDialog.INFORMATION,
+					new String[] {
+						OK,
+						CANCEL },
+					0);
 		if (messageDialog.open() != 0) {
 			return;
 		}
 		if (part instanceof RoleEditPart) {
-			FSTRole role = ((RoleEditPart) part).getRoleModel();
+			FSTRole role =
+				((RoleEditPart) part).getRoleModel();
 			try {
 				role.getFile().delete(true, null);
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		} else if (part instanceof ClassEditPart) {
-			FSTClass c = ((ClassEditPart) part).getClassModel();
-			List<FSTRole> roles = c.getRoles();
+			FSTClass c =
+				((ClassEditPart) part).getClassModel();
+			List<FSTRole> roles =
+				c.getRoles();
 			for (FSTRole role : roles) {
 				try {
 					role.getFile().delete(true, null);
@@ -110,7 +127,8 @@ public class DeleteAction extends Action {
 			}
 
 		} else if (part instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
+			FSTFeature coll =
+				((CollaborationEditPart) part).getCollaborationModel();
 			for (FSTRole role : coll.getRoles()) {
 				try {
 					role.getFile().delete(true, null);
@@ -127,14 +145,25 @@ public class DeleteAction extends Action {
 	 */
 	private String getDialogText() {
 		if (part instanceof RoleEditPart) {
-			FSTRole role = ((RoleEditPart) part).getRoleModel();
-			return THE_ROLE_OF_CLASS_ + role.getClassFragment().getName() + AT_FEATURE_ + role.getFeature().getName() + "'";
+			FSTRole role =
+				((RoleEditPart) part).getRoleModel();
+			return THE_ROLE_OF_CLASS_
+				+ role.getClassFragment().getName()
+				+ AT_FEATURE_
+				+ role.getFeature().getName()
+				+ "'";
 		} else if (part instanceof ClassEditPart) {
-			FSTClass c = ((ClassEditPart) part).getClassModel();
-			return ALL_FILES_OF_CLASS_ + c.getName() + "'?";
+			FSTClass c =
+				((ClassEditPart) part).getClassModel();
+			return ALL_FILES_OF_CLASS_
+				+ c.getName()
+				+ "'?";
 		} else if (part instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
-			return ALL_FILES_OF_FEATURE_ + coll.getName() + "'?";
+			FSTFeature coll =
+				((CollaborationEditPart) part).getCollaborationModel();
+			return ALL_FILES_OF_FEATURE_
+				+ coll.getName()
+				+ "'?";
 		}
 		return null;
 	}

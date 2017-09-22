@@ -37,8 +37,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
- * This class is part of the outline. It maps the items provided by the
- * ContentProvider to visible items that can be displayed inside a TreeView.
+ * This class is part of the outline. It maps the items provided by the ContentProvider to visible items that can be displayed inside a TreeView.
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
@@ -50,12 +49,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -63,8 +60,7 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 
@@ -105,23 +101,26 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 	}
 
 	public Color getBackground(Object element) {
-		Color col = null;
+		Color col =
+			null;
 
 		if (element instanceof IFeature) {
-			IFeature feature = (IFeature) element;
-			FeatureColor color = FeatureColorManager.getColor(feature);
+			IFeature feature =
+				(IFeature) element;
+			FeatureColor color =
+				FeatureColorManager.getColor(feature);
 			if (color != FeatureColor.NO_COLOR) {
-				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
+				col =
+					new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
 			}
 		}
 		return col;
 	}
 
-
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -132,7 +131,7 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 	@Override
 	public void setForeground(TreeItem item, IFile file) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -145,6 +144,5 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 }

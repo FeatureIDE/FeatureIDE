@@ -30,8 +30,11 @@ import de.ovgu.featureide.ui.mpl.wizards.page.NewViewTagPage;
  * @author Sebastian Krieter
  */
 public class NewViewTagWizard extends AbstractWizard {
-	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.NewViewTagWizard";
-	
+
+	public static final String ID =
+		MPLUIPlugin.PLUGIN_ID
+			+ ".wizards.NewViewTagWizard";
+
 	public NewViewTagWizard(String title) {
 		super(title);
 	}

@@ -34,10 +34,14 @@ import de.ovgu.featureide.examples.utils.ProjectRecord;
  */
 class ExampleLabelProvider extends LabelProvider implements IColorProvider {
 
-	private static final Color YELLOW = new Color(null, 183, 187, 11);
-	private static final Color RED = new Color(null, 240, 0, 0);
-	private static final Color BLACK = new Color(null, 0, 0, 0);
-	private static final Color WHITE = new Color(null, 255, 255, 255);
+	private static final Color YELLOW =
+		new Color(null, 183, 187, 11);
+	private static final Color RED =
+		new Color(null, 240, 0, 0);
+	private static final Color BLACK =
+		new Color(null, 0, 0, 0);
+	private static final Color WHITE =
+		new Color(null, 255, 255, 255);
 
 	public String getText(Object element) {
 		if (element instanceof ProjectRecord.TreeItem) {
@@ -52,7 +56,8 @@ class ExampleLabelProvider extends LabelProvider implements IColorProvider {
 	@Override
 	public Color getForeground(Object element) {
 		if (element instanceof ProjectRecord.TreeItem) {
-			ProjectRecord tmpRecord = ((ProjectRecord.TreeItem) element).getRecord();
+			ProjectRecord tmpRecord =
+				((ProjectRecord.TreeItem) element).getRecord();
 			if (tmpRecord.hasErrors()) {
 				return RED;
 			} else if (tmpRecord.hasWarnings()) {

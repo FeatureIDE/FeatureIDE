@@ -28,19 +28,21 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
  * @author Timo G&uuml;nther
  */
 public class AutomaticSelectionExplanation extends ConfigurationExplanation {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	public AutomaticSelectionExplanation(SelectableFeature subject) {
 		super(subject);
 	}
-	
+
 	@Override
 	public SelectableFeature getSubject() {
 		return (SelectableFeature) super.getSubject();
 	}
-	
+
 	@Override
 	public AutomaticSelectionExplanationWriter getWriter() {
 		return new AutomaticSelectionExplanationWriter(this);

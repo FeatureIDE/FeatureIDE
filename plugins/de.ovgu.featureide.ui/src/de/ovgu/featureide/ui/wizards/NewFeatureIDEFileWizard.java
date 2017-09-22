@@ -58,19 +58,21 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Dariusz Krolikowski
  */
 public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
-	
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard"; 
+
+	public static final String ID =
+		UIPlugin.PLUGIN_ID
+			+ ".wizards.NewFeatureIDEFileWizard";
 
 	public NewFeatureIDEFilePage page;
-	
+
 	private ISelection selection;
-	
+
 	private String feature;
-	
+
 	private String clss;
-	
+
 	private String pack;
-	
+
 	/**
 	 * Constructor for NewFeatureIDEFileWizard.
 	 */
@@ -79,12 +81,13 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 		setWindowTitle(NEW_FEATUREIDE_SOURCE_FILE);
 	}
-	
+
 	/**
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		page = new NewFeatureIDEFilePage(selection, feature, clss, pack);
+		page =
+			new NewFeatureIDEFilePage(selection, feature, clss, pack);
 		if (clss == null) {
 			this.page.setRefines(false);
 		} else {
@@ -94,54 +97,66 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in
-	 * the wizard. We will create an operation and run it
-	 * using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
-		final IContainer container = page.getContainerObject();
-		final String fileName = page.getFileName();
-		final String fileExtension = page.getExtension();
-		final String fileTemplate = page.getTemplate();
-		final IComposerExtensionClass composer = page.getComposer();
-		final String featureName = page.getFeatureName();
-		final String className = page.getClassName();
-		final String packageName = page.getPackage();
-		IFolder sourceFolder = page.getSourceFolder();
+		final IContainer container =
+			page.getContainerObject();
+		final String fileName =
+			page.getFileName();
+		final String fileExtension =
+			page.getExtension();
+		final String fileTemplate =
+			page.getTemplate();
+		final IComposerExtensionClass composer =
+			page.getComposer();
+		final String featureName =
+			page.getFeatureName();
+		final String className =
+			page.getClassName();
+		final String packageName =
+			page.getPackage();
+		IFolder sourceFolder =
+			page.getSourceFolder();
 		if (composer.createFolderForFeatures()) {
-			sourceFolder = sourceFolder.getFolder(featureName);
+			sourceFolder =
+				sourceFolder.getFolder(featureName);
 		}
 		createFolder(page.getPackage(), sourceFolder);
-		IRunnableWithProgress op = new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-				try {
-					doFinish(featureName, container, fileName, className, fileExtension, fileTemplate, composer, page.isRefinement(), packageName, monitor);
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
-				} finally {
-					monitor.done();
+		IRunnableWithProgress op =
+			new IRunnableWithProgress() {
+
+				public void run(IProgressMonitor monitor) throws InvocationTargetException {
+					try {
+						doFinish(featureName, container, fileName, className, fileExtension, fileTemplate, composer, page.isRefinement(), packageName, monitor);
+					} catch (CoreException e) {
+						throw new InvocationTargetException(e);
+					} finally {
+						monitor.done();
+					}
 				}
-			}
-		};
+			};
 		try {
 			getContainer().run(true, false, op);
 		} catch (InterruptedException e) {
 			return false;
 		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
+			Throwable realException =
+				e.getTargetException();
 			MessageDialog.openError(getShell(), "Error", realException.getMessage());
 			return false;
 		}
 		return true;
 	}
-	
+
 	/**
-	 * @param packageName 
+	 * @param packageName
 	 * @param sourceFolder
 	 */
 	private void createFolder(String packageName, IFolder folder) {
 		for (String p : packageName.split("[.]")) {
-			folder = folder.getFolder(p);
+			folder =
+				folder.getFolder(p);
 			if (!folder.exists()) {
 				try {
 					folder.create(true, true, null);
@@ -153,68 +168,82 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
-	 * @param packageName 
+	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
+	 * 
+	 * @param packageName
 	 */
-	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template, 
+	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template,
 			IComposerExtensionClass composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
-		monitor.beginTask(CREATING + fileName, 2);
-		final IFile file = container.getFile(new Path(fileName + "." + extension));
-	
+		monitor.beginTask(CREATING
+			+ fileName, 2);
+		final IFile file =
+			container.getFile(new Path(fileName
+				+ "."
+				+ extension));
+
 		try {
-			InputStream stream = openContentStream(featureName, container, classname, template, composer, refines, packageName);
+			InputStream stream =
+				openContentStream(featureName, container, classname, template, composer, refines, packageName);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
 				file.create(stream, true, monitor);
 			}
 			stream.close();
-		} catch (IOException e) {
-		}
+		} catch (IOException e) {}
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
 		getShell().getDisplay().asyncExec(new Runnable() {
+
 			public void run() {
 				IWorkbenchPage page =
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
-				} catch (PartInitException e) {
-				}
+				} catch (PartInitException e) {}
 			}
 		});
 		monitor.worked(1);
 	}
-	
+
 	// TODO Rename, method name does not describe the functionality
-	private InputStream openContentStream(String featurename, IContainer container, String classname, String template, IComposerExtensionClass composer, boolean refines, String packageName) {
-		String contents = template;
-		contents = composer.replaceSourceContentMarker(contents, refines, packageName);
-		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);
-		contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featurename);
+	private InputStream openContentStream(String featurename, IContainer container, String classname, String template, IComposerExtensionClass composer,
+			boolean refines, String packageName) {
+		String contents =
+			template;
+		contents =
+			composer.replaceSourceContentMarker(contents, refines, packageName);
+		contents =
+			contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);
+		contents =
+			contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featurename);
 		return new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
+	 * We will accept the selection in the workbench to see if we can initialize from it.
+	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
+		this.selection =
+			selection;
 	}
-	
+
 	/**
 	 * Extended for passing selected feature.
+	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection, String feature, String clss, String pack) {
-		this.selection = selection;
-		this.feature = feature;
-		this.clss = clss;
-		this.pack = pack;
+		this.selection =
+			selection;
+		this.feature =
+			feature;
+		this.clss =
+			clss;
+		this.pack =
+			pack;
 	}
 }

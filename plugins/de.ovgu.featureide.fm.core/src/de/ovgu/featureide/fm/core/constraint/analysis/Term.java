@@ -21,10 +21,8 @@
 package de.ovgu.featureide.fm.core.constraint.analysis;
 
 /**
- * Term represents a mathematical term in a (linear) pseudo-boolean restriction.
- * The class describes terms like <code>a*x_id<code> where a is an integer 
- * unequal 0, and id an integer greater 0. Additionally, the value of the 
- * boolean variable <code>x_id<code> can be inverted.
+ * Term represents a mathematical term in a (linear) pseudo-boolean restriction. The class describes terms like <code>a*x_id<code> where a is an integer unequal
+ * 0, and id an integer greater 0. Additionally, the value of the boolean variable <code>x_id<code> can be inverted.
  * 
  * @author Sebastian Henneberg
  */
@@ -52,9 +50,12 @@ public final class Term implements Cloneable {
 	 */
 	public Term(Term term) {
 		super();
-		this.id = term.getId();
-		this.positive = term.isPositive();
-		this.coefficient = term.getCoefficient();
+		this.id =
+			term.getId();
+		this.positive =
+			term.isPositive();
+		this.coefficient =
+			term.getCoefficient();
 	}
 
 	/**
@@ -66,9 +67,12 @@ public final class Term implements Cloneable {
 	 */
 	public Term(int id, int coefficient, boolean positive) {
 		super();
-		this.id = id;
-		this.positive = positive;
-		this.coefficient = coefficient;
+		this.id =
+			id;
+		this.positive =
+			positive;
+		this.coefficient =
+			coefficient;
 	}
 
 	/**
@@ -93,8 +97,7 @@ public final class Term implements Cloneable {
 	}
 
 	/**
-	 * Flips a positive coefficient to a negative and vice versa preserving the
-	 * absolute value.
+	 * Flips a positive coefficient to a negative and vice versa preserving the absolute value.
 	 */
 	Term flipCoefficientSign() {
 		return new Term(id, -coefficient, positive);
@@ -108,12 +111,10 @@ public final class Term implements Cloneable {
 	}
 
 	/**
-	 * Converts the term to equivalent term with a positive coefficient. The
-	 * return value has to be added to the other side of the restriction. This
-	 * method helps to achieve a normal form.
+	 * Converts the term to equivalent term with a positive coefficient. The return value has to be added to the other side of the restriction. This method
+	 * helps to achieve a normal form.
 	 * 
-	 * @return The value that has to be added to the other side of the
-	 *         restriction (equation or inequality).
+	 * @return The value that has to be added to the other side of the restriction (equation or inequality).
 	 */
 	Term flipBoth() {
 		return new Term(id, -coefficient, !positive);
@@ -121,8 +122,14 @@ public final class Term implements Cloneable {
 
 	@Override
 	public String toString() {
-		String sign = coefficient >= 0 ? "+" : "";
-		String pos = !positive ? "~" : "";
+		String sign =
+			coefficient >= 0
+				? "+"
+				: "";
+		String pos =
+			!positive
+				? "~"
+				: "";
 		return String.format("%s%s%sx%s", sign, coefficient, pos, id);
 	}
 
@@ -135,23 +142,35 @@ public final class Term implements Cloneable {
 		if (!(object instanceof Term))
 			return false;
 		// depth equality check
-		Term term = (Term) object;
-		return term.getId() == id && term.getCoefficient() == coefficient
-				&& (term.isPositive() == positive);
+		Term term =
+			(Term) object;
+		return term.getId() == id
+			&& term.getCoefficient() == coefficient
+			&& (term.isPositive() == positive);
 	}
 
 	@Override
 	public int hashCode() {
-		int hashCode = (id * 17) ^ coefficient;
-		return positive ? hashCode + 1 : hashCode;
+		int hashCode =
+			(id
+				* 17)
+				^ coefficient;
+		return positive
+			? hashCode
+				+ 1
+			: hashCode;
 	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		Term clone = (Term) super.clone();
-		clone.id = id;
-		clone.positive = positive;
-		clone.coefficient = coefficient;
+		Term clone =
+			(Term) super.clone();
+		clone.id =
+			id;
+		clone.positive =
+			positive;
+		clone.coefficient =
+			coefficient;
 		return clone;
 	}
 }

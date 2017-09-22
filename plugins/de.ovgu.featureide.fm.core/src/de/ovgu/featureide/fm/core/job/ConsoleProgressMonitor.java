@@ -28,13 +28,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
  * @author Sebastian Krieter
  */
 public class ConsoleProgressMonitor extends NullProgressMonitor {
-	
+
 	private int worked;
-	
+
 	@Override
 	public void beginTask(String name, int totalWork) {
 		super.beginTask(name, totalWork);
-		worked = totalWork;
+		worked =
+			totalWork;
 		System.out.println(worked);
 	}
 
@@ -42,11 +43,12 @@ public class ConsoleProgressMonitor extends NullProgressMonitor {
 	public void worked(int work) {
 		super.worked(work);
 		if (work > 0) {
-			worked -= work;
+			worked -=
+				work;
 			synchronized (System.out) {
 				System.out.println(worked);
 			}
 		}
 	}
-	
+
 }

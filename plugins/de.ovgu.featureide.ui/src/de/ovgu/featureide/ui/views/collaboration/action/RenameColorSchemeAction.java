@@ -35,25 +35,28 @@ import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
  * @author Sebastian Krieter
  */
 public class RenameColorSchemeAction extends AbstractColorAction {
-	
+
 	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
 	 */
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
+		RenameColorSchemeWizard wizard =
+			new RenameColorSchemeWizard(fm);
 
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		WizardDialog dialog =
+			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		if (dialog.open() == WizardDialog.OK)
 			collaborationView.refresh();
-		
+
 		return false;
 	}
 }

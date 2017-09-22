@@ -31,9 +31,11 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  */
 public class SPLMerger extends ADocumentationCommentMerger {
 
-	private static final long serialVersionUID = -7089505215805435500L;
+	private static final long serialVersionUID =
+		-7089505215805435500L;
 
 	private static final class BlockTagFilter implements IFilter<BlockTag> {
+
 		@Override
 		public boolean isValid(BlockTag blockTag) {
 			return blockTag.isFeatureIndependent(); // || blockTag.getPriority() > 0; // ???
@@ -46,8 +48,12 @@ public class SPLMerger extends ADocumentationCommentMerger {
 
 	@Override
 	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
+		if (tag.isFeatureSpecific()
+			&& tag.getTagtype() != BlockTag.TAG_SEE) {
+			tag.setDesc("<b>["
+				+ tag.getConstraint()
+				+ "]</b> "
+				+ tag.getDesc());
 		}
 		return tag;
 	}

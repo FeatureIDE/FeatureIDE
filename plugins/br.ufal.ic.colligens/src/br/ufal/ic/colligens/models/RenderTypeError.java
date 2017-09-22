@@ -15,7 +15,8 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 	 * @param fileProxie
 	 */
 	public void setFile(FileProxy fileProxy) {
-		this.fileProxy = fileProxy;
+		this.fileProxy =
+			fileProxy;
 	}
 
 	@Override
@@ -23,29 +24,37 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 
 		if (typeError.where().getPositionFrom().getFile()
 				.contains(fileProxy.getFileToAnalyse())) {
-			boolean isNew = true;
+			boolean isNew =
+				true;
 			if (fileProxy.getLogs().size() > 0) {
 				for (Log log : fileProxy.getLogs()) {
 					if (log.getFeature().equals(
 							typeError.condition().toString())
-							&& log.getMessage().equals(typeError.msg())
-							&& log.getSeverity().equals(
-									typeError.severity().toString())) {
+						&& log.getMessage().equals(typeError.msg())
+						&& log.getSeverity().equals(
+								typeError.severity().toString())) {
 
-						isNew = false;
+						isNew =
+							false;
 					}
 				}
 			}
 
-			if (isNew || fileProxy.getLogs().size() == 0) {
-				Log newlog = new Log(fileProxy, typeError.where()
-						.getPositionFrom().getLine(),typeError.where()
-						.getPositionFrom().getColumn(), typeError.condition()
-						.toString(), typeError.severity().toString(),
-						typeError.msg());
+			if (isNew
+				|| fileProxy.getLogs().size() == 0) {
+				Log newlog =
+					new Log(fileProxy, typeError.where()
+							.getPositionFrom().getLine(),
+							typeError.where()
+									.getPositionFrom().getColumn(),
+							typeError.condition()
+									.toString(),
+							typeError.severity().toString(),
+							typeError.msg());
 
 				fileProxy.getLogs().add(newlog);
-				System.out.println(TYPE_ERROR + fileProxy.getLogs().size());
+				System.out.println(TYPE_ERROR
+					+ fileProxy.getLogs().size());
 			}
 
 		}

@@ -28,8 +28,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.monitor.AMonitor;
 
 /**
- * Control object for {@link IJob}s.
- * Can be used to check for cancel request, display job progress, and calling intermediate functions.
+ * Control object for {@link IJob}s. Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @deprecated Use {@link AMonitor} instead.
  * 
@@ -38,11 +37,17 @@ import de.ovgu.featureide.fm.core.job.monitor.AMonitor;
 @Deprecated
 public abstract class AWorkMonitor {
 
-	private static final int maxRelativeWork = 100;
+	private static final int maxRelativeWork =
+		100;
 
 	private IProgressMonitor monitor;
-	private IConsumer<Object> intermediateFunction = null;
-	private int relativeWorkDone = 0, absoluteWorkDone = 0, maxAbsoluteWork = 1;
+	private IConsumer<Object> intermediateFunction =
+		null;
+	private int relativeWorkDone =
+		0, absoluteWorkDone =
+			0,
+			maxAbsoluteWork =
+				1;
 
 	public AWorkMonitor() {
 		setIntermediateFunction(null);
@@ -53,11 +58,16 @@ public abstract class AWorkMonitor {
 	 * Copy constructor.
 	 */
 	public AWorkMonitor(AWorkMonitor oldMonitor) {
-		this.monitor = oldMonitor.monitor;
-		this.intermediateFunction = oldMonitor.intermediateFunction;
-		this.relativeWorkDone = oldMonitor.relativeWorkDone;
-		this.absoluteWorkDone = oldMonitor.absoluteWorkDone;
-		this.maxAbsoluteWork = oldMonitor.maxAbsoluteWork;
+		this.monitor =
+			oldMonitor.monitor;
+		this.intermediateFunction =
+			oldMonitor.intermediateFunction;
+		this.relativeWorkDone =
+			oldMonitor.relativeWorkDone;
+		this.absoluteWorkDone =
+			oldMonitor.absoluteWorkDone;
+		this.maxAbsoluteWork =
+			oldMonitor.maxAbsoluteWork;
 	}
 
 	public final void begin(String taskName) {
@@ -85,9 +95,14 @@ public abstract class AWorkMonitor {
 	 * Increases the monitor's progress.
 	 */
 	protected final void internalWorked() {
-		final int nworked = (maxRelativeWork * ++absoluteWorkDone) / maxAbsoluteWork;
-		monitor.worked(nworked - relativeWorkDone);
-		relativeWorkDone = nworked;
+		final int nworked =
+			(maxRelativeWork
+				* ++absoluteWorkDone)
+				/ maxAbsoluteWork;
+		monitor.worked(nworked
+			- relativeWorkDone);
+		relativeWorkDone =
+			nworked;
 	}
 
 	/**
@@ -109,7 +124,10 @@ public abstract class AWorkMonitor {
 	public abstract void invoke(Object t);
 
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullConsumer<>();
+		this.intermediateFunction =
+			(intermediateFunction != null)
+				? intermediateFunction
+				: new Functional.NullConsumer<>();
 	}
 
 	/**
@@ -118,11 +136,17 @@ public abstract class AWorkMonitor {
 	 * @param maxAbsoluteWork the absolute amount of work this job has to do
 	 */
 	public final void setMaxAbsoluteWork(int maxAbsoluteWork) {
-		this.maxAbsoluteWork = maxAbsoluteWork > 0 ? maxAbsoluteWork : 1;
+		this.maxAbsoluteWork =
+			maxAbsoluteWork > 0
+				? maxAbsoluteWork
+				: 1;
 	}
 
 	public final void setMonitor(IProgressMonitor monitor) {
-		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
+		this.monitor =
+			(monitor != null)
+				? monitor
+				: new NullProgressMonitor();
 	}
 
 	/**

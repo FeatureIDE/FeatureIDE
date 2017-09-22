@@ -27,8 +27,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * Convenience class for simply displaying {@link HashMap}s in a
- * {@link TreeViewer}. Autosorted with two different sorting-types.
+ * Convenience class for simply displaying {@link HashMap}s in a {@link TreeViewer}. Autosorted with two different sorting-types.
  * 
  * @see AbstractSortModeNode
  * 
@@ -36,9 +35,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Patrick Haese
  */
 public class HashMapNode extends AbstractSortModeNode {
-	
+
 	private HashMap<String, Integer> countMap;
-	
+
 	/**
 	 * @param description
 	 * @param value
@@ -46,19 +45,18 @@ public class HashMapNode extends AbstractSortModeNode {
 	 */
 	public HashMapNode(String description, Object value, HashMap<String, Integer> countMap) {
 		super(description, value);
-		this.countMap = countMap;
+		this.countMap =
+			countMap;
 		setSorted(true);
 	}
 
 	@Override
-	public void initChildren() {		
-		if (this.children.isEmpty())
-		{
-			for (String name : countMap.keySet()) 
-			{
+	public void initChildren() {
+		if (this.children.isEmpty()) {
+			for (String name : countMap.keySet()) {
 				addChild(new Parent(name, countMap.get(name)));
 			}
 		}
 	}
-	
+
 }

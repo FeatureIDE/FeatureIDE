@@ -99,28 +99,48 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  * @author Reimar Schroeter
  */
 public class VelvetFeatureModelFormat implements IFeatureModelFormat {
-	public static boolean IS_USED_AS_API = false;
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
+
+	public static boolean IS_USED_AS_API =
+		false;
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".format.fm."
+			+ VelvetFeatureModelFormat.class.getSimpleName();
 
 	protected File featureModelFile;
 
-	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private final StringBuilder sb = new StringBuilder();
+	private static final String[] SYMBOLS =
+		{
+			"!",
+			"&&",
+			"||",
+			"->",
+			"<->",
+			", ",
+			"choose",
+			"atleast",
+			"atmost" };
+	private static final String NEWLINE =
+		System.getProperty("line.separator", "\n");
+	private final StringBuilder sb =
+		new StringBuilder();
 
 	/**
 	 * If true an interface will be created. Otherwise it is named CONCEPT
 	 */
-	private boolean isInterface = false;
+	private boolean isInterface =
+		false;
 
 	private boolean useLongNames;
 
 	public VelvetFeatureModelFormat() {
-		useLongNames = false;
+		useLongNames =
+			false;
 	}
 
 	public VelvetFeatureModelFormat(boolean useLongNames) {
-		this.useLongNames = useLongNames;
+		this.useLongNames =
+			useLongNames;
 	}
 
 	@Override
@@ -136,10 +156,14 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String write(IFeatureModel object) {
 		if (object instanceof ExtendedFeatureModel) {
-			extFeatureModel = (ExtendedFeatureModel) object;
-			isInterface = isInterface || extFeatureModel.isInterface();
+			extFeatureModel =
+				(ExtendedFeatureModel) object;
+			isInterface =
+				isInterface
+					|| extFeatureModel.isInterface();
 		}
-		IFeatureStructure root = object.getStructure().getRoot();
+		IFeatureStructure root =
+			object.getStructure().getRoot();
 		sb.delete(0, sb.length());
 
 		if (isInterface) {
@@ -150,9 +174,12 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		sb.append(root.getFeature().getName());
 		if (extFeatureModel != null) {
 			usedVariables.clear();
-			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels = new LinkedList<>();
-			LinkedList<ExtendedFeatureModel.UsedModel> instanceModels = new LinkedList<>();
-			LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels = new LinkedList<>();
+			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels =
+				new LinkedList<>();
+			LinkedList<ExtendedFeatureModel.UsedModel> instanceModels =
+				new LinkedList<>();
+			LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels =
+				new LinkedList<>();
 			for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 				switch (usedModel.getType()) {
 				case ExtendedFeature.TYPE_INHERITED:
@@ -168,7 +195,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 
 			if (!inheritedModels.isEmpty()) {
-				useLongNames = true;
+				useLongNames =
+					true;
 				sb.append(" : ");
 				sb.append(inheritedModels.removeFirst().getModelName());
 				for (UsedModel usedModel : inheritedModels) {
@@ -178,7 +206,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 
 			if (!instanceModels.isEmpty()) {
-				useLongNames = true;
+				useLongNames =
+					true;
 				sb.append(NEWLINE);
 				sb.append("\tinstance ");
 				sb.append(instanceModels.removeFirst());
@@ -189,7 +218,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 
 			if (!interfaceModels.isEmpty()) {
-				useLongNames = true;
+				useLongNames =
+					true;
 				sb.append(NEWLINE);
 				sb.append("\tinterface ");
 				sb.append(interfaceModels.removeFirst());
@@ -202,7 +232,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		sb.append(" {");
 		sb.append(NEWLINE);
 
-		if (extFeatureModel != null && !isInterface) {
+		if (extFeatureModel != null
+			&& !isInterface) {
 			for (IFeatureStructure child : root.getChildren()) {
 				writeNewDefined(child, 1);
 			}
@@ -234,26 +265,33 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	private void writeFeatureGroup(IFeatureStructure root, int depth) {
 		if (root.isAnd()) {
 			for (IFeatureStructure feature : root.getChildren()) {
-				writeNewDefined(feature, depth + 1);
+				writeNewDefined(feature, depth
+					+ 1);
 			}
 		} else if (root.isOr()) {
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("someOf {");
 			sb.append(NEWLINE);
 			for (IFeatureStructure feature : root.getChildren()) {
-				writeFeature(feature, depth + 2);
+				writeFeature(feature, depth
+					+ 2);
 			}
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("}");
 			sb.append(NEWLINE);
 		} else if (root.isAlternative()) {
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("oneOf {");
 			sb.append(NEWLINE);
 			for (IFeatureStructure f : root.getChildren()) {
-				writeFeature(f, depth + 2);
+				writeFeature(f, depth
+					+ 2);
 			}
-			writeTab(depth + 1);
+			writeTab(depth
+				+ 1);
 			sb.append("}");
 			sb.append(NEWLINE);
 		}
@@ -264,21 +302,28 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (feature.isAbstract()) {
 			sb.append("abstract ");
 		}
-		if (feature.isMandatory() && (feature.getParent() == null || feature.getParent().isAnd())) {
+		if (feature.isMandatory()
+			&& (feature.getParent() == null
+				|| feature.getParent().isAnd())) {
 			sb.append("mandatory ");
 		}
 		sb.append("feature ");
 		sb.append(feature.getFeature().getName());
-		final String description = feature.getFeature().getProperty().getDescription();
-		final boolean hasDescription = description != null && !description.isEmpty();
+		final String description =
+			feature.getFeature().getProperty().getDescription();
+		final boolean hasDescription =
+			description != null
+				&& !description.isEmpty();
 
-		if (feature.getChildrenCount() == 0 && !hasDescription) {
+		if (feature.getChildrenCount() == 0
+			&& !hasDescription) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
 			sb.append(NEWLINE);
 			if (hasDescription) {
-				writeTab(depth + 1);
+				writeTab(depth
+					+ 1);
 				sb.append("description \"");
 				sb.append(description.replace("\"", "\\\""));
 				sb.append("\";");
@@ -295,11 +340,14 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	// TODO fix write for inherited feature models
 	private void writeNewDefined(IFeatureStructure child2, int depth) {
-		final IFeature feature = child2.getFeature();
+		final IFeature feature =
+			child2.getFeature();
 		if (feature instanceof ExtendedFeature) {
-			final ExtendedFeature extFeature = (ExtendedFeature) feature;
+			final ExtendedFeature extFeature =
+				(ExtendedFeature) feature;
 
-			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
+			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE
+				|| extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
 					writeTab(depth);
 					sb.append(USE);
@@ -317,20 +365,25 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void writeTab(int times) {
-		for (int i = 0; i < times; i++) {
+		for (int i =
+			0; i < times; i++) {
 			sb.append('\t');
 		}
 	}
 
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
-		final ProblemList problemList = new ProblemList();
-		extFeatureModel = (ExtendedFeatureModel) object;
+		final ProblemList problemList =
+			new ProblemList();
+		extFeatureModel =
+			(ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
-			featureModelFile = extFeatureModel.getSourceFile().toFile();
+			featureModelFile =
+				extFeatureModel.getSourceFile().toFile();
 		}
 
-		ByteArrayInputStream inputstr = new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		ByteArrayInputStream inputstr =
+			new ByteArrayInputStream(source.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		try {
 			parseInputStream(inputstr);
 		} catch (UnsupportedModelException e) {
@@ -340,39 +393,58 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private static class ConstraintNode {
+
 		private final Node computedNode;
 		private final Tree rawNode;
 
 		public ConstraintNode(Node computedNode, Tree rawNode) {
-			this.computedNode = computedNode;
-			this.rawNode = rawNode;
+			this.computedNode =
+				computedNode;
+			this.rawNode =
+				rawNode;
 		}
 	}
 
-	private static final ExtendedFeatureModelFactory factory = ExtendedFeatureModelFactory.getInstance();
+	private static final ExtendedFeatureModelFactory factory =
+		ExtendedFeatureModelFactory.getInstance();
 
-	private static final int[] binaryOperators = { VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES,
+	private static final int[] binaryOperators =
+		{
+			VelvetParser.OP_OR,
+			VelvetParser.OP_AND,
+			VelvetParser.OP_XOR,
+			VelvetParser.OP_IMPLIES,
 			VelvetParser.OP_EQUIVALENT };
-	private static final String[] paths = { "%s.velvet", "%s.xml", "MPL/%s.velvet", "MPL/%s.xml" };
+	private static final String[] paths =
+		{
+			"%s.velvet",
+			"%s.xml",
+			"MPL/%s.velvet",
+			"MPL/%s.xml" };
 
-	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<Tree>();
-	private final LinkedList<IFeature> parentStack = new LinkedList<IFeature>();
-	private final LinkedList<ConstraintNode> constraintNodeList = new LinkedList<ConstraintNode>();
-	private final HashSet<String> usedVariables = new HashSet<String>();
+	private final LinkedList<Tree> atrributeConstraintNodes =
+		new LinkedList<Tree>();
+	private final LinkedList<IFeature> parentStack =
+		new LinkedList<IFeature>();
+	private final LinkedList<ConstraintNode> constraintNodeList =
+		new LinkedList<ConstraintNode>();
+	private final HashSet<String> usedVariables =
+		new HashSet<String>();
 
-	//TODO
-	private final boolean velvetImport = false;
+	// TODO
+	private final boolean velvetImport =
+		false;
 
 	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
-	private boolean localSearch = false;
+	private boolean localSearch =
+		false;
 
 	/**
 	 * Reads external model with the right FeatureModelReader.
 	 * 
-	 * @param file
-	 *            file of feature model
+	 * @param file file of feature model
 	 * @return the feature model or null if error occurred
 	 */
 	private IFeatureModel readExternalModelFile(File file) {
@@ -414,12 +486,19 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		for (final IFeatureStructure sourceChildStructure : sourceParentNode.getChildren()) {
 			final ExtendedFeature feature;
 			if (velvetImport) {
-				feature = factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
+				feature =
+					factory.createFeature(targetModel, sourceChildStructure.getFeature().getName());
 			} else {
-				String shortName = sourceChildStructure.getFeature().getName().replace(sourceParentNode.getFeature().getName() + ".", "");
-				feature = factory.createFeature(targetModel, targetParentName + "." + shortName);
+				String shortName =
+					sourceChildStructure.getFeature().getName().replace(sourceParentNode.getFeature().getName()
+						+ ".", "");
+				feature =
+					factory.createFeature(targetModel, targetParentName
+						+ "."
+						+ shortName);
 			}
-			IFeatureStructure targetChildStructure = feature.getStructure();
+			IFeatureStructure targetChildStructure =
+				feature.getStructure();
 			targetChildStructure.setMandatory(sourceChildStructure.isMandatory());
 			targetChildStructure.setAbstract(sourceChildStructure.isAbstract());
 			targetChildStructure.setHidden(sourceChildStructure.isHidden());
@@ -442,18 +521,24 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private static WeightedTerm createTerm(final int weight, final boolean rightSide, final boolean minus, final Reference reference) {
-		boolean positive = weight >= 0;
-		if (rightSide ^ minus) {
-			positive = !positive;
+		boolean positive =
+			weight >= 0;
+		if (rightSide
+			^ minus) {
+			positive =
+				!positive;
 		}
 		return new WeightedTerm(Math.abs(weight), positive, reference);
 	}
 
 	private static LinkedList<Tree> getChildren(final Tree root) {
-		final LinkedList<Tree> children = new LinkedList<Tree>();
+		final LinkedList<Tree> children =
+			new LinkedList<Tree>();
 
-		final int childCount = root.getChildCount();
-		for (int i = 0; i < childCount; i++) {
+		final int childCount =
+			root.getChildCount();
+		for (int i =
+			0; i < childCount; i++) {
 			children.add(root.getChild(i));
 		}
 		return children;
@@ -461,18 +546,25 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private static void updateConstraintNode(Node curNode, String parentModelname, String rootName, IFeatureModel targetModel) {
 		if (curNode instanceof Literal) {
-			Literal literal = (Literal) curNode;
+			Literal literal =
+				(Literal) curNode;
 			if (literal.var.equals(rootName)) {
-				literal.var = parentModelname;
+				literal.var =
+					parentModelname;
 			} else {
-				//if fully qualified name
+				// if fully qualified name
 
-				IFeature feature = targetModel.getFeature(literal.var.toString().replace(rootName, parentModelname));
+				IFeature feature =
+					targetModel.getFeature(literal.var.toString().replace(rootName, parentModelname));
 				if (feature == null) {
-					//else
-					feature = targetModel.getFeature(parentModelname + "." + literal.var.toString());
+					// else
+					feature =
+						targetModel.getFeature(parentModelname
+							+ "."
+							+ literal.var.toString());
 				}
-				literal.var = feature.getName();
+				literal.var =
+					feature.getName();
 			}
 		} else {
 			for (Node child : curNode.getChildren()) {
@@ -482,18 +574,23 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	protected synchronized void parseInputStream(final InputStream inputStream) throws UnsupportedModelException {
-		ANTLRInputStream antlrInputStream = null;
+		ANTLRInputStream antlrInputStream =
+			null;
 		try {
-			antlrInputStream = new ANTLRInputStream(inputStream);
+			antlrInputStream =
+				new ANTLRInputStream(inputStream);
 		} catch (final IOException e) {
 			Logger.logError(e);
 			throw new UnsupportedModelException("Error while reading model!", 0);
 		}
-		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
-		Tree root = null;
+		final VelvetParser parser =
+			new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
+		Tree root =
+			null;
 		try {
 			init();
-			root = (Tree) parser.velvetModel().getTree();
+			root =
+				(Tree) parser.velvetModel().getTree();
 			if (root == null) {
 				throw new UnsupportedModelException("Error while parsing model!", 0);
 			}
@@ -504,14 +601,25 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		} catch (RecognitionException | VelvetParser.InternalSyntaxException e) {
 			RecognitionException re;
 			if (e instanceof VelvetParser.InternalSyntaxException) {
-				re = ((VelvetParser.InternalSyntaxException) e).getException();
+				re =
+					((VelvetParser.InternalSyntaxException) e).getException();
 			} else {
-				re = (RecognitionException) e;
+				re =
+					(RecognitionException) e;
 			}
 			Logger.logError(re);
-			String internalMessage = parser.getErrorMessage(re, parser.getTokenNames());
-			String errorMessage = ILLEGAL_SYNTAX_IN_LINE + re.line + ":" + re.charPositionInLine + " (" + internalMessage + ")";
-			UnsupportedModelException unsupportedModelException = new UnsupportedModelException(errorMessage, re.line);
+			String internalMessage =
+				parser.getErrorMessage(re, parser.getTokenNames());
+			String errorMessage =
+				ILLEGAL_SYNTAX_IN_LINE
+					+ re.line
+					+ ":"
+					+ re.charPositionInLine
+					+ " ("
+					+ internalMessage
+					+ ")";
+			UnsupportedModelException unsupportedModelException =
+				new UnsupportedModelException(errorMessage, re.line);
 			unsupportedModelException.addSuppressed(re);
 			throw unsupportedModelException;
 		}
@@ -519,13 +627,16 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
 			final boolean isHidden) {
-		final ExtendedFeature newFeature = factory.createFeature(extFeatureModel, featureName);
+		final ExtendedFeature newFeature =
+			factory.createFeature(extFeatureModel, featureName);
 		newFeature.getStructure().setMandatory(isMandatory);
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
 
-		IFeature orgFeature = extFeatureModel.getFeature(featureName);
-		if (orgFeature != null && orgFeature instanceof ExtendedFeature) {
+		IFeature orgFeature =
+			extFeatureModel.getFeature(featureName);
+		if (orgFeature != null
+			&& orgFeature instanceof ExtendedFeature) {
 			return (ExtendedFeature) orgFeature;
 		} else {
 			extFeatureModel.addFeature(newFeature);
@@ -537,14 +648,17 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private String checkNode(Node curNode) {
 		if (curNode instanceof Literal) {
-			Literal literal = (Literal) curNode;
-			String varString = literal.var.toString();
+			Literal literal =
+				(Literal) curNode;
+			String varString =
+				literal.var.toString();
 			if (extFeatureModel.getFeature(varString) == null) {
 				return literal.var.toString();
 			}
 		} else {
 			for (Node child : curNode.getChildren()) {
-				String childRet = checkNode(child);
+				String childRet =
+					checkNode(child);
 				if (childRet != null) {
 					return childRet;
 				}
@@ -554,7 +668,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel getExternalFeatureModel(Tree curNode) {
-		final File modelFile = getExternalModelFile(curNode.getText());
+		final File modelFile =
+			getExternalModelFile(curNode.getText());
 		if (modelFile == null) {
 			reportWarning(curNode, format("No model for %s could be found.", curNode.getText()));
 			return null;
@@ -563,7 +678,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel getExternalFeatureModel(String modelName, Tree curNode) {
-		final File modelFile = getExternalModelFile(modelName);
+		final File modelFile =
+			getExternalModelFile(modelName);
 		if (modelFile == null) {
 			return null;
 		}
@@ -571,7 +687,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel getInterfaceFeatureModel(String modelName, Tree curNode) {
-		final File modelFile = getInterfaceModelFile(modelName);
+		final File modelFile =
+			getInterfaceModelFile(modelName);
 		if (modelFile == null) {
 			return null;
 		}
@@ -579,11 +696,14 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel readModel(File modelFile, Tree curNode) {
-		IFeatureModel fm = null;
+		IFeatureModel fm =
+			null;
 		if (IS_USED_AS_API) {
-			fm = readExternalModelFileAPI(modelFile);
+			fm =
+				readExternalModelFileAPI(modelFile);
 		} else {
-			fm = readExternalModelFile(modelFile);
+			fm =
+				readExternalModelFile(modelFile);
 		}
 		if (fm == null) {
 			reportWarning(curNode, format("External model for %s could not be read.", curNode.getText()));
@@ -593,58 +713,68 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private IFeatureModel readExternalModelFileAPI(File file) {
-		final IFeatureModel fm = new ExtendedFeatureModelFactory().createFeatureModel();
+		final IFeatureModel fm =
+			new ExtendedFeatureModelFactory().createFeatureModel();
 		fm.setSourceFile(file.toPath());
 		FileHandler.load(file.toPath(), fm, FMFormatManager.getInstance());
 		return fm;
 	}
 
 	/**
-	 * Search for the right File to include etc. The following search path is
-	 * used:
-	 * <ol>
-	 * <li>./NAME.velvet</li>
-	 * <li>./NAME.xml</li>
-	 * <li>./MPL/NAME.velvet</li>
-	 * <li>/NAME_AS_PROJECT/model.xml</li>
-	 * </ol>
+	 * Search for the right File to include etc. The following search path is used: <ol> <li>./NAME.velvet</li> <li>./NAME.xml</li> <li>./MPL/NAME.velvet</li>
+	 * <li>/NAME_AS_PROJECT/model.xml</li> </ol>
 	 * 
 	 * @param name the name of file or project
 	 * @return File object if found else null
 	 */
 	private File getExternalModelFile(String name) {
-		if (!extFeatureModel.getImports().isEmpty() && !IS_USED_AS_API) {
+		if (!extFeatureModel.getImports().isEmpty()
+			&& !IS_USED_AS_API) {
 			for (String path : extFeatureModel.getImports()) {
-				IProject project = getProject();
+				IProject project =
+					getProject();
 				if (!path.endsWith(name))
 					continue;
 				if (project != null) {
-					IResource res = project.getFile(path + ".xml");
-					if (res != null && res.exists()) {
+					IResource res =
+						project.getFile(path
+							+ ".xml");
+					if (res != null
+						&& res.exists()) {
 						return res.getLocation().toFile();
 					}
-					res = project.getFile(path + ".velvet");
-					if (res != null && res.exists()) {
+					res =
+						project.getFile(path
+							+ ".velvet");
+					if (res != null
+						&& res.exists()) {
 						return res.getLocation().toFile();
 					}
 				}
 			}
 		}
 
-		if (localSearch || IS_USED_AS_API) {
+		if (localSearch
+			|| IS_USED_AS_API) {
 			return localSearch(name);
 		}
-		File returnFile = null;
+		File returnFile =
+			null;
 
 		// local search
-		IProject project = getProject();
+		IProject project =
+			getProject();
 		if (project != null) {
-			for (int i = 0; i < paths.length; i++) {
-				final IResource res = project.findMember(format(paths[i], name));
+			for (int i =
+				0; i < paths.length; i++) {
+				final IResource res =
+					project.findMember(format(paths[i], name));
 				if (res != null) {
-					returnFile = res.getLocation().toFile();
+					returnFile =
+						res.getLocation().toFile();
 					if (returnFile.equals(featureModelFile)) {
-						returnFile = null;
+						returnFile =
+							null;
 					} else {
 						break;
 					}
@@ -656,10 +786,12 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (returnFile == null) {
 			// if could not get current project or could not find file in current
 			// project assume the name is the project name
-			project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+			project =
+				ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 
 			if (project.isAccessible()) {
-				returnFile = project.getFile("model.xml").getLocation().toFile();
+				returnFile =
+					project.getFile("model.xml").getLocation().toFile();
 				if (returnFile.equals(featureModelFile)) {
 					return null;
 				}
@@ -668,7 +800,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 
-		if (returnFile == null || !returnFile.exists() || !returnFile.canRead()) {
+		if (returnFile == null
+			|| !returnFile.exists()
+			|| !returnFile.canRead()) {
 			return null;
 		}
 		return returnFile;
@@ -678,12 +812,16 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (localSearch) {
 			return localSearch(name);
 		}
-		File returnFile = null;
-		IProject project = getProject();
+		File returnFile =
+			null;
+		IProject project =
+			getProject();
 		if (project != null) {
-			final IResource res = project.findMember(format("Interfaces/%s.velvet", name));
+			final IResource res =
+				project.findMember(format("Interfaces/%s.velvet", name));
 			if (res != null) {
-				returnFile = res.getLocation().toFile();
+				returnFile =
+					res.getLocation().toFile();
 			}
 		}
 		return returnFile;
@@ -691,16 +829,24 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private File localSearch(final String name) {
 		if (featureModelFile != null) {
-			final File searchDir = new File(featureModelFile.getParentFile(), "MPL");
+			final File searchDir =
+				new File(featureModelFile.getParentFile(), "MPL");
 			if (searchDir != null) {
-				File[] files = searchDir.listFiles(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String fileName) {
-						int index = fileName.lastIndexOf('.');
-						return index > 0 && fileName.substring(0, index).equals(name) && fileName.substring(index + 1).matches("xml|velvet");
-					}
-				});
-				if (files != null && files.length > 0) {
+				File[] files =
+					searchDir.listFiles(new FilenameFilter() {
+
+						@Override
+						public boolean accept(File dir, String fileName) {
+							int index =
+								fileName.lastIndexOf('.');
+							return index > 0
+								&& fileName.substring(0, index).equals(name)
+								&& fileName.substring(index
+									+ 1).matches("xml|velvet");
+						}
+					});
+				if (files != null
+					&& files.length > 0) {
 					return files[0];
 				}
 			}
@@ -709,22 +855,26 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	/**
-	 * Returns the eclipse project of the file with the textual representation
-	 * of the feature model
+	 * Returns the eclipse project of the file with the textual representation of the feature model
 	 * 
 	 * @return the project of the file or null if not known
 	 */
 	private IProject getProject() {
-		if (featureModelFile == null || IS_USED_AS_API) {
+		if (featureModelFile == null
+			|| IS_USED_AS_API) {
 			return null;
 		}
 
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspace workspace =
+			ResourcesPlugin.getWorkspace();
 		IPath filePath;
 		try {
-			filePath = Path.fromOSString(featureModelFile.getCanonicalPath());
-			IFile file = workspace.getRoot().getFileForLocation(filePath);
-			if (null == file || !file.exists()) {
+			filePath =
+				Path.fromOSString(featureModelFile.getCanonicalPath());
+			IFile file =
+				workspace.getRoot().getFileForLocation(filePath);
+			if (null == file
+				|| !file.exists()) {
 				return workspace.getRoot().getFile(filePath).getProject();
 			}
 			return file.getProject();
@@ -744,26 +894,34 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		usedVariables.clear();
 
 		extFeatureModel.reset();
-		//TODO Layout
-		//		extFeatureModel.getLayout().showHiddenFeatures(true);
-		//		extFeatureModel.getLayout().verticalLayout(false);
+		// TODO Layout
+		// extFeatureModel.getLayout().showHiddenFeatures(true);
+		// extFeatureModel.getLayout().verticalLayout(false);
 		if (getProject() != null) {
-			modelMarkerHandler = new ModelMarkerHandler<IResource>(getProject().getFile(featureModelFile.getName()));
+			modelMarkerHandler =
+				new ModelMarkerHandler<IResource>(getProject().getFile(featureModelFile.getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
 		}
 
-		extFeatureModelName = null;
+		extFeatureModelName =
+			null;
 		extFeatureModel.setInterface(false);
 
 		// TODO MPL: Hack for local search
-		localSearch = featureModelFile != null && featureModelFile.getParentFile() != null && featureModelFile.getParentFile().getName().equals("velvet");
+		localSearch =
+			featureModelFile != null
+				&& featureModelFile.getParentFile() != null
+				&& featureModelFile.getParentFile().getName().equals("velvet");
 	}
 
 	private void parseAttribute(final Tree root, final IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
-		final String name = checkTree(nodeList.poll()).getText();
-		final Tree valueNode = nodeList.poll();
+		final String name =
+			checkTree(nodeList.poll()).getText();
+		final Tree valueNode =
+			nodeList.poll();
 
 		switch (valueNode.getType()) {
 		case VelvetParser.FLOAT:
@@ -775,8 +933,10 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			this.extFeatureModel.addAttribute(parent.getName(), name, Boolean.parseBoolean(valueNode.getText()));
 			break;
 		case VelvetParser.STRING:
-			final String valueNodeText = valueNode.getText();
-			this.extFeatureModel.addAttribute(parent.getName(), name, valueNodeText.substring(1, valueNodeText.length() - 1));
+			final String valueNodeText =
+				valueNode.getText();
+			this.extFeatureModel.addAttribute(parent.getName(), name, valueNodeText.substring(1, valueNodeText.length()
+				- 1));
 			break;
 		default:
 			reportSyntaxError(valueNode);
@@ -785,25 +945,36 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void parseAttributeConstraints() throws UnsupportedModelException, RecognitionException {
 		while (!this.atrributeConstraintNodes.isEmpty()) {
-			final LinkedList<Tree> nodeList = getChildren(this.atrributeConstraintNodes.poll());
+			final LinkedList<Tree> nodeList =
+				getChildren(this.atrributeConstraintNodes.poll());
 
-			final LinkedList<WeightedTerm> weightedTerms = new LinkedList<WeightedTerm>();
-			RelationOperator relationOperator = null;
-			boolean minus = false;
-			int degree = 0;
+			final LinkedList<WeightedTerm> weightedTerms =
+				new LinkedList<WeightedTerm>();
+			RelationOperator relationOperator =
+				null;
+			boolean minus =
+				false;
+			int degree =
+				0;
 
 			while (!nodeList.isEmpty()) {
-				final Tree curNode = nodeList.poll();
+				final Tree curNode =
+					nodeList.poll();
 
 				switch (curNode.getType()) {
 				case VelvetParser.ID:
 				case VelvetParser.IDPath:
-					final String attributeName = curNode.getText();
+					final String attributeName =
+						curNode.getText();
 
-					final Collection<FeatureAttribute<Integer>> attributes = this.extFeatureModel.getIntegerAttributes().getAttributes(attributeName);
+					final Collection<FeatureAttribute<Integer>> attributes =
+						this.extFeatureModel.getIntegerAttributes().getAttributes(attributeName);
 
 					if (attributes == null) {
-						throw new UnsupportedModelException(curNode.getLine() + ":" + curNode.getCharPositionInLine() + NO_SUCH_ATTRIBUTE_DEFINED_,
+						throw new UnsupportedModelException(curNode.getLine()
+							+ ":"
+							+ curNode.getCharPositionInLine()
+							+ NO_SUCH_ATTRIBUTE_DEFINED_,
 								curNode.getLine());
 					}
 
@@ -816,57 +987,74 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				// case VelvetParser.FLOAT:
 				// break;
 				case VelvetParser.INT:
-					final int value = Integer.parseInt(curNode.getText());
-					if (relationOperator == null ^ minus) {
-						degree -= value;
+					final int value =
+						Integer.parseInt(curNode.getText());
+					if (relationOperator == null
+						^ minus) {
+						degree -=
+							value;
 					} else {
-						degree += value;
+						degree +=
+							value;
 					}
 					break;
 				case VelvetParser.PLUS:
-					minus = false;
+					minus =
+						false;
 					break;
 				case VelvetParser.MINUS:
-					minus = true;
+					minus =
+						true;
 					break;
 				case VelvetParser.ATTR_OP_EQUALS:
-					relationOperator = RelationOperator.EQUAL;
+					relationOperator =
+						RelationOperator.EQUAL;
 					break;
 				case VelvetParser.ATTR_OP_NOT_EQUALS:
-					relationOperator = RelationOperator.NOT_EQUAL;
+					relationOperator =
+						RelationOperator.NOT_EQUAL;
 					break;
 				case VelvetParser.ATTR_OP_GREATER:
-					relationOperator = RelationOperator.GREATER;
+					relationOperator =
+						RelationOperator.GREATER;
 					break;
 				case VelvetParser.ATTR_OP_GREATER_EQ:
-					relationOperator = RelationOperator.GREATER_EQUAL;
+					relationOperator =
+						RelationOperator.GREATER_EQUAL;
 					break;
 				case VelvetParser.ATTR_OP_LESS:
-					relationOperator = RelationOperator.LESS;
+					relationOperator =
+						RelationOperator.LESS;
 					break;
 				case VelvetParser.ATTR_OP_LESS_EQ:
-					relationOperator = RelationOperator.LESS_EQUAL;
+					relationOperator =
+						RelationOperator.LESS_EQUAL;
 					break;
 				default:
 					reportSyntaxError(curNode);
 				}
 			}
-			final Equation equation = new Equation(weightedTerms, relationOperator, degree);
+			final Equation equation =
+				new Equation(weightedTerms, relationOperator, degree);
 			extFeatureModel.addAttributeConstraint(equation);
 		}
 	}
 
 	private void parseConcept(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 
 			switch (curNode.getType()) {
 			case VelvetParser.ID:
-				extFeatureModelName = checkTree(curNode).getText();
+				extFeatureModelName =
+					checkTree(curNode).getText();
 
-				final ExtendedFeature rootFeature = factory.createFeature(extFeatureModel, extFeatureModelName);
+				final ExtendedFeature rootFeature =
+					factory.createFeature(extFeatureModel, extFeatureModelName);
 				rootFeature.getStructure().setAbstract(true);
 				rootFeature.getStructure().setMandatory(true);
 
@@ -876,15 +1064,18 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 				break;
 			case VelvetParser.BASEEXT:
-				useLongNames = true;
+				useLongNames =
+					true;
 				parseInheritance(curNode);
 				break;
 			case VelvetParser.IMPORTINSTANCE:
-				useLongNames = true;
+				useLongNames =
+					true;
 				parseInstanceImport(curNode);
 				break;
 			case VelvetParser.IMPORTINTERFACE:
-				useLongNames = true;
+				useLongNames =
+					true;
 				parseInterfaceImport(curNode);
 				break;
 			case VelvetParser.DEF:
@@ -897,7 +1088,8 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 		for (ConstraintNode constraintNode : constraintNodeList) {
 			if (!IS_USED_AS_API) {
-				String nameError = checkNode(constraintNode.computedNode);
+				String nameError =
+					checkNode(constraintNode.computedNode);
 				if (nameError == null) {
 					extFeatureModel.addConstraint(factory.createConstraint(extFeatureModel, constraintNode.computedNode));
 				} else {
@@ -910,19 +1102,23 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseConstraint(final Tree root, final IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 
 			switch (curNode.getType()) {
 			case VelvetParser.ID:
 				// name = curNode.getText();
 				break;
 			case VelvetParser.CONSTR:
-				Node newNode = parseConstraint_rec(curNode);
+				Node newNode =
+					parseConstraint_rec(curNode);
 				if (useLongNames) {
-					newNode = new Implies(new Literal(parent.getName()), newNode);
+					newNode =
+						new Implies(new Literal(parent.getName()), newNode);
 				}
 				constraintNodeList.add(new ConstraintNode(newNode, curNode));
 				break;
@@ -936,24 +1132,32 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private Node parseConstraint_rec(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
-		final LinkedList<Node> nodes = new LinkedList<Node>();
-		final LinkedList<Integer> operators = new LinkedList<Integer>();
-		final LinkedList<Integer> unaryOp = new LinkedList<Integer>();
-		Node n = null;
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
+		final LinkedList<Node> nodes =
+			new LinkedList<Node>();
+		final LinkedList<Integer> operators =
+			new LinkedList<Integer>();
+		final LinkedList<Integer> unaryOp =
+			new LinkedList<Integer>();
+		Node n =
+			null;
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 
 			switch (curNode.getType()) {
 			case VelvetParser.UNARYOP:
 				unaryOp.push(curNode.getChild(0).getType());
 				break;
 			case VelvetParser.CONSTR:
-				n = parseConstraint_rec(curNode);
+				n =
+					parseConstraint_rec(curNode);
 				break;
 			case VelvetParser.OPERAND:
-				n = new Literal(curNode.getChild(0).getText());
+				n =
+					new Literal(curNode.getChild(0).getText());
 				break;
 			default:
 				operators.add(curNode.getType());
@@ -963,22 +1167,28 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 				while (!unaryOp.isEmpty()) {
 					switch (unaryOp.pop()) {
 					case VelvetParser.OP_NOT:
-						n = new Not(n);
+						n =
+							new Not(n);
 					}
 				}
 				nodes.add(n);
-				n = null;
+				n =
+					null;
 			}
 		}
 		if (!operators.isEmpty()) {
 			for (final int operator : binaryOperators) {
-				final ListIterator<Node> nodesIt = nodes.listIterator();
-				for (final ListIterator<Integer> opIt = operators.listIterator(); opIt.hasNext();) {
-					final Node operand1 = nodesIt.next();
+				final ListIterator<Node> nodesIt =
+					nodes.listIterator();
+				for (final ListIterator<Integer> opIt =
+					operators.listIterator(); opIt.hasNext();) {
+					final Node operand1 =
+						nodesIt.next();
 					if (opIt.next() == operator) {
 						opIt.remove();
 						nodesIt.remove();
-						final Node operand2 = nodesIt.next();
+						final Node operand2 =
+							nodesIt.next();
 						switch (operator) {
 						case VelvetParser.OP_AND:
 							nodesIt.set(new And(operand1, operand2));
@@ -1009,13 +1219,16 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseDefinitions(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
-		final IFeature parentFeature = parentStack.pop();
-		//		parentFeature.getStructure().setAnd();
+		final IFeature parentFeature =
+			parentStack.pop();
+		// parentFeature.getStructure().setAnd();
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 
 			switch (curNode.getType()) {
 			// Feature
@@ -1051,13 +1264,17 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseDescription(Tree root, IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
-		final Tree valueNode = nodeList.poll();
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
+		final Tree valueNode =
+			nodeList.poll();
 
 		switch (valueNode.getType()) {
 		case VelvetParser.STRING:
-			final String valueNodeText = valueNode.getText();
-			parent.getProperty().setDescription(valueNodeText.substring(1, valueNodeText.length() - 1).replace("\\\"", "\""));
+			final String valueNodeText =
+				valueNode.getText();
+			parent.getProperty().setDescription(valueNodeText.substring(1, valueNodeText.length()
+				- 1).replace("\\\"", "\""));
 			break;
 		default:
 			reportSyntaxError(valueNode);
@@ -1066,40 +1283,60 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	// XXX Quickfix for issue #383, useLongNames should only be active for MPL models
 	private void parseFeature(final Tree root, IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> childList = getChildren(root);
+		final LinkedList<Tree> childList =
+			getChildren(root);
 		final String featureName;
 		if (extFeatureModel.isInterface()) {
-			featureName = checkTree(childList.poll()).getText();
+			featureName =
+				checkTree(childList.poll()).getText();
 		} else {
-			String childName = checkTree(childList.poll()).getText();
-			if (useLongNames && !childName.startsWith(parent.getName())) {
-				featureName = parent.getName() + "." + childName;
+			String childName =
+				checkTree(childList.poll()).getText();
+			if (useLongNames
+				&& !childName.startsWith(parent.getName())) {
+				featureName =
+					parent.getName()
+						+ "."
+						+ childName;
 			} else {
-				featureName = childName;
+				featureName =
+					childName;
 			}
 		}
-		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
+		boolean isMandatory =
+			false,
+				isAbstract =
+					false,
+				moreDefinitions =
+					false;
 
-		Tree childNode = null;
-		while (!childList.isEmpty() && !moreDefinitions) {
-			childNode = childList.poll();
+		Tree childNode =
+			null;
+		while (!childList.isEmpty()
+			&& !moreDefinitions) {
+			childNode =
+				childList.poll();
 
 			switch (childNode.getType()) {
 			case VelvetParser.MANDATORY:
-				isMandatory = true;
+				isMandatory =
+					true;
 				break;
 			case VelvetParser.ABSTRACT:
-				isAbstract = true;
+				isAbstract =
+					true;
 				break;
 			case VelvetParser.DEF:
-				moreDefinitions = true;
+				moreDefinitions =
+					true;
 				break;
 			default:
 				reportSyntaxError(childNode);
 			}
 		}
 
-		final ExtendedFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
+		final ExtendedFeature newFeature =
+			addFeature(parent, featureName, isMandatory, isAbstract, false);
 		if (moreDefinitions) {
 			parentStack.push(newFeature);
 			parseDefinitions(childNode);
@@ -1107,10 +1344,12 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseFeatureGroup(final Tree root, final IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 
 			switch (curNode.getType()) {
 			case VelvetParser.SOMEOF:
@@ -1129,19 +1368,25 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseInheritance(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
-			final String parentModelName = checkTree(curNode).getText();
+			final Tree curNode =
+				nodeList.poll();
+			final String parentModelName =
+				checkTree(curNode).getText();
 
-			final IFeatureModel fm = getExternalFeatureModel(curNode);
+			final IFeatureModel fm =
+				getExternalFeatureModel(curNode);
 			if (fm == null) {
 				return;
 			}
 
 			if (!extFeatureModel.addInheritance(parentModelName, parentModelName)) {
-				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
+				reportWarning(curNode, THE_PARENT_MODEL
+					+ parentModelName
+					+ IS_ALREADY_USED_);
 				return;
 			}
 			addExternalFeatures(fm, parentModelName, extFeatureModel.getStructure().getRoot(), ExtendedFeature.TYPE_INHERITED);
@@ -1155,21 +1400,33 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 
-		UsedModel usedModel = extFeatureModel.getExternalModel(sourceModelName);
+		UsedModel usedModel =
+			extFeatureModel.getExternalModel(sourceModelName);
 		if (usedModel != null) {
-			usedModel.setPrefix(targetParentFeature.getFeature().getName() + "." + sourceModelName);
+			usedModel.setPrefix(targetParentFeature.getFeature().getName()
+				+ "."
+				+ sourceModelName);
 		}
 
-		final IFeatureStructure instanceRoot = sourceModel.getStructure().getRoot();
+		final IFeatureStructure instanceRoot =
+			sourceModel.getStructure().getRoot();
 
-		String connectorName = "";
+		String connectorName =
+			"";
 		if (type == ExtendedFeature.TYPE_INHERITED) {
-			connectorName = targetParentFeature.getFeature().getName();
+			connectorName =
+				targetParentFeature.getFeature().getName();
 		} else {
-			connectorName = (targetParentFeature.isRoot() && targetParentFeature.getFeature().getName().equals(sourceModelName))
-					? targetParentFeature.getFeature().getName() : targetParentFeature.getFeature().getName() + "." + sourceModelName;
+			connectorName =
+				(targetParentFeature.isRoot()
+					&& targetParentFeature.getFeature().getName().equals(sourceModelName))
+						? targetParentFeature.getFeature().getName()
+						: targetParentFeature.getFeature().getName()
+							+ "."
+							+ sourceModelName;
 		}
-		final ExtendedFeature connector = addFeature(targetParentFeature.getFeature(), connectorName, true, true, instanceRoot.isHidden());
+		final ExtendedFeature connector =
+			addFeature(targetParentFeature.getFeature(), connectorName, true, true, instanceRoot.isHidden());
 		connector.setType(type);
 		connector.setExternalModelName(sourceModelName);
 		if (instanceRoot.isAlternative()) {
@@ -1181,9 +1438,11 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		copyChildnodes(extFeatureModel, connector.getStructure(), instanceRoot, sourceModelName, connectorName, type);
 
 		for (final IConstraint constraint : sourceModel.getConstraints()) {
-			Node constraintNode = constraint.getNode();
+			Node constraintNode =
+				constraint.getNode();
 			updateConstraintNode(constraintNode, connectorName, instanceRoot.getFeature().getName(), extFeatureModel);
-			ExtendedConstraint newConstraint = factory.createConstraint(extFeatureModel, constraintNode);
+			ExtendedConstraint newConstraint =
+				factory.createConstraint(extFeatureModel, constraintNode);
 			newConstraint.setType(type);
 			newConstraint.setContainedFeatures();
 			extFeatureModel.addConstraint(newConstraint);
@@ -1191,46 +1450,63 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseInterfaceImport(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree idNode = checkTree(nodeList.poll());
-			final String interfaceName = idNode.getText();
-			final Tree nameNode = checkTree(nodeList.poll());
-			final String varName = nameNode.getText();
+			final Tree idNode =
+				checkTree(nodeList.poll());
+			final String interfaceName =
+				idNode.getText();
+			final Tree nameNode =
+				checkTree(nodeList.poll());
+			final String varName =
+				nameNode.getText();
 
 			if (checkInterfaceModelFile(idNode)) {
 				if (!extFeatureModel.addInterface(interfaceName, varName)) {
-					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
+					reportWarning(idNode, THE_VARIABLE_NAME
+						+ varName
+						+ IS_ALREADY_IN_USE_);
 				}
 			}
 		}
 	}
 
 	private void parseInstanceImport(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree idNode = checkTree(nodeList.poll());
-			final String interfaceName = idNode.getText();
-			final Tree nameNode = checkTree(nodeList.poll());
-			final String varName = nameNode.getText();
+			final Tree idNode =
+				checkTree(nodeList.poll());
+			final String interfaceName =
+				idNode.getText();
+			final Tree nameNode =
+				checkTree(nodeList.poll());
+			final String varName =
+				nameNode.getText();
 
 			if (checkExternalModelFile(idNode)) {
 				if (!extFeatureModel.addInstance(interfaceName, varName)) {
-					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
+					reportWarning(idNode, THE_VARIABLE_NAME
+						+ varName
+						+ IS_ALREADY_IN_USE_);
 				}
 			}
 		}
 	}
 
 	private void parseModel(final Tree root) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(root);
+		final LinkedList<Tree> nodeList =
+			getChildren(root);
 		while (!nodeList.isEmpty()) {
-			final Tree curNode = nodeList.poll();
+			final Tree curNode =
+				nodeList.poll();
 			switch (curNode.getType()) {
 			case VelvetParser.IMPORT:
-				useLongNames = true;
+				useLongNames =
+					true;
 				parseImport(curNode);
 				break;
 			case VelvetParser.CONCEPT:
@@ -1249,17 +1525,24 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			}
 		}
 		if (!IS_USED_AS_API) {
-			final IFeatureModelFactory mappingModelFactory = FMFactoryManager.getDefaultFactory();
-			IFeatureModel mappingModel = mappingModelFactory.createFeatureModel();
-			IFeatureStructure rootFeature = mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
+			final IFeatureModelFactory mappingModelFactory =
+				FMFactoryManager.getDefaultFactory();
+			IFeatureModel mappingModel =
+				mappingModelFactory.createFeatureModel();
+			IFeatureStructure rootFeature =
+				mappingModelFactory.createFeature(mappingModel, "MPL").getStructure();
 			rootFeature.setAnd();
 			rootFeature.setAbstract(true);
 			rootFeature.setMandatory(true);
 
-			LinkedList<String> possibleProjects = new LinkedList<String>();
-			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-			for (int i = 0; i < projects.length; i++) {
-				IProject project = projects[i];
+			LinkedList<String> possibleProjects =
+				new LinkedList<String>();
+			IProject[] projects =
+				ResourcesPlugin.getWorkspace().getRoot().getProjects();
+			for (int i =
+				0; i < projects.length; i++) {
+				IProject project =
+					projects[i];
 				if (project.isAccessible()) {
 					possibleProjects.add(project.getName());
 				}
@@ -1267,15 +1550,20 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 			for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 				if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-					IFeatureStructure parameterFeature = mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
+					IFeatureStructure parameterFeature =
+						mappingModelFactory.createFeature(mappingModel, parameter.getKey()).getStructure();
 					parameterFeature.setOr();
 					parameterFeature.setAbstract(true);
 					parameterFeature.setMandatory(true);
 					rootFeature.addChild(parameterFeature);
 
 					for (String projectName : possibleProjects) {
-						IFeatureStructure projectFeature = mappingModelFactory
-								.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
+						IFeatureStructure projectFeature =
+							mappingModelFactory
+									.createFeature(mappingModel, parameterFeature.getFeature().getName()
+										+ "."
+										+ projectName)
+									.getStructure();
 						projectFeature.setAbstract(false);
 						projectFeature.setMandatory(false);
 						parameterFeature.addChild(projectFeature);
@@ -1289,25 +1577,32 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	private void parseImport(Tree curNode) throws RecognitionException {
-		final LinkedList<Tree> nodeList = getChildren(curNode);
+		final LinkedList<Tree> nodeList =
+			getChildren(curNode);
 		while (!nodeList.isEmpty()) {
-			final Tree node = nodeList.poll();
-			String text = node.getText();
+			final Tree node =
+				nodeList.poll();
+			String text =
+				node.getText();
 			extFeatureModel.addImport(text);
 		}
 	}
 
 	private void parseUse(Tree root, IFeature parent) throws RecognitionException {
-		final LinkedList<Tree> childList = getChildren(root);
-		final Tree useNameNode = checkTree(childList.poll());
-		final String varName = useNameNode.getText();
+		final LinkedList<Tree> childList =
+			getChildren(root);
+		final Tree useNameNode =
+			checkTree(childList.poll());
+		final String varName =
+			useNameNode.getText();
 
 		if (!usedVariables.add(varName)) {
 			reportWarning(useNameNode, format("The Variable with the name %s was already used in this model.", varName));
 			return;
 		}
 
-		UsedModel usedModel = extFeatureModel.getExternalModel(varName);
+		UsedModel usedModel =
+			extFeatureModel.getExternalModel(varName);
 		if (usedModel == null) {
 			reportWarning(useNameNode, format("No variable with the name %s found.", varName));
 			return;
@@ -1315,14 +1610,16 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 		switch (usedModel.getType()) {
 		case ExtendedFeature.TYPE_INTERFACE:
-			final IFeatureModel interfaceModel = getInterfaceFeatureModel(usedModel.getModelName(), useNameNode);
+			final IFeatureModel interfaceModel =
+				getInterfaceFeatureModel(usedModel.getModelName(), useNameNode);
 			if (interfaceModel == null) {
 				return;
 			}
 			addExternalFeatures(interfaceModel, varName, parent.getStructure(), ExtendedFeature.TYPE_INTERFACE);
 			break;
 		case ExtendedFeature.TYPE_INSTANCE:
-			final IFeatureModel instanceModel = getExternalFeatureModel(usedModel.getModelName(), useNameNode);
+			final IFeatureModel instanceModel =
+				getExternalFeatureModel(usedModel.getModelName(), useNameNode);
 			if (instanceModel == null) {
 				return;
 			}
@@ -1337,8 +1634,16 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		Logger.logWarning(message + " (at line " + curNode.getLine()
-				+ ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \"" + curNode.getText() + "\")");
+		Logger.logWarning(message
+			+ " (at line "
+			+ curNode.getLine()
+			+ ((featureModelFile != null)
+				? IN_FILE
+					+ featureModelFile.getName()
+				: "")
+			+ ": \""
+			+ curNode.getText()
+			+ "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -1350,20 +1655,30 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void reportSyntaxError(Tree curNode) throws RecognitionException {
 		checkTree(curNode);
-		final RecognitionException ex = new RecognitionException();
-		ex.line = 1;
-		ex.charPositionInLine = 1;
+		final RecognitionException ex =
+			new RecognitionException();
+		ex.line =
+			1;
+		ex.charPositionInLine =
+			1;
 		throwException(ex, curNode);
 	}
 
 	private void throwException(RecognitionException e, Tree curNode) throws RecognitionException {
 		if (modelMarkerHandler != null) {
-			String text = "";
+			String text =
+				"";
 
 			if (curNode != null) {
 				curNode.getText();
 			}
-			final String message = ILLEGAL_SYNTAX_IN_LINE + e.line + ":" + e.charPositionInLine + ". " + text;
+			final String message =
+				ILLEGAL_SYNTAX_IN_LINE
+					+ e.line
+					+ ":"
+					+ e.charPositionInLine
+					+ ". "
+					+ text;
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, e.line);
 		}
 		throw e;

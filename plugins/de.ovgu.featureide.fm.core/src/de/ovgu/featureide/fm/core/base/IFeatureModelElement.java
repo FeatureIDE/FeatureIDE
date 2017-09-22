@@ -30,9 +30,9 @@ public interface IFeatureModelElement extends IEventManager {
 	IFeatureModel getFeatureModel();
 
 	long getInternalId();
-	
+
 	String getName();
-	
+
 	void setName(String name);
-	
+
 }

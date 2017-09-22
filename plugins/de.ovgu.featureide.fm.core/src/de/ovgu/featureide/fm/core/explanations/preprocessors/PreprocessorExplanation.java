@@ -28,8 +28,10 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  * @author Timo G&uuml;nther
  */
 public abstract class PreprocessorExplanation extends Explanation {
+
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param subject the subject to be explained
 	 */
 	protected PreprocessorExplanation(Object subject) {

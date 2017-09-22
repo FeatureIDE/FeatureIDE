@@ -33,14 +33,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".ExtendedFeatureModelFactory";
+	public static final String ID =
+		PluginID.PLUGIN_ID
+			+ ".ExtendedFeatureModelFactory";
 
 	public static ExtendedFeatureModelFactory getInstance() {
 		return new ExtendedFeatureModelFactory();
 	}
 
-	public ExtendedFeatureModelFactory() {
-	}
+	public ExtendedFeatureModelFactory() {}
 
 	@Override
 	public String getId() {

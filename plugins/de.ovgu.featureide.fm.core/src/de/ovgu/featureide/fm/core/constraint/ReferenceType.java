@@ -21,13 +21,10 @@
 package de.ovgu.featureide.fm.core.constraint;
 
 /**
- * Different reference types.<br>
- * {FEATURE, ATTRIBUTE, ATTRIBUTE_SUM}
+ * Different reference types.<br> {FEATURE, ATTRIBUTE, ATTRIBUTE_SUM}
  * 
  * @author Sebastian Henneberg
  */
 public enum ReferenceType {
-	FEATURE,
-	ATTRIBUTE,
-	ATTRIBUTE_SUM;
+	FEATURE, ATTRIBUTE, ATTRIBUTE_SUM;
 }

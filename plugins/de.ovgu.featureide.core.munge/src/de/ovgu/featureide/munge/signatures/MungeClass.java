@@ -29,11 +29,11 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  * @author Sebastian Krieter
  */
 public class MungeClass extends AbstractClass {
-	
+
 	public MungeClass(AbstractClassSignature signature) {
 		super(signature);
 	}
-	
+
 	@Override
 	public String toString() {
 		return MungeStringBuilder.getClassString(this, false);

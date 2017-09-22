@@ -26,7 +26,8 @@ package de.ovgu.featureide.fm.core.job.monitor;
  */
 abstract class ATaskMonitor extends AMonitor {
 
-	protected String name = null;
+	protected String name =
+		null;
 
 	public ATaskMonitor() {
 		super();
@@ -34,7 +35,8 @@ abstract class ATaskMonitor extends AMonitor {
 
 	public ATaskMonitor(String name) {
 		super();
-		this.name = name;
+		this.name =
+			name;
 	}
 
 	protected ATaskMonitor(AMonitor parent) {
@@ -43,7 +45,8 @@ abstract class ATaskMonitor extends AMonitor {
 
 	@Override
 	public void setTaskName(String name) {
-		this.name = name;
+		this.name =
+			name;
 	}
 
 	@Override
@@ -52,14 +55,19 @@ abstract class ATaskMonitor extends AMonitor {
 	}
 
 	protected String constructTaskName() {
-		StringBuilder sb = new StringBuilder();
-		AMonitor p = parent;
+		StringBuilder sb =
+			new StringBuilder();
+		AMonitor p =
+			parent;
 		while (p != null) {
 			sb.append(p.getTaskName());
 			sb.append(" - ");
-			p = p.parent;
+			p =
+				p.parent;
 		}
-		sb.append(name != null ? name : "...");
+		sb.append(name != null
+			? name
+			: "...");
 		return sb.toString();
 	}
 

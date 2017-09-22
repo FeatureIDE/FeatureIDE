@@ -43,92 +43,127 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
- * TreeNode who stores the number of used preprocessor directives, directives
- * per class and features per directives.<br>
- * This node should only be used for a preprocessor project.
+ * TreeNode who stores the number of used preprocessor directives, directives per class and features per directives.<br> This node should only be used for a
+ * preprocessor project.
  * 
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class DirectivesNode extends LazyParent {
-	
+
 	private final FSTModel fstModel;
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
 	 * 
-	 * @param description
-	 *            description of the node shown in the view
-	 * @param fstModel
-	 *            FSTModel for the calculation
+	 * @param description description of the node shown in the view
+	 * @param fstModel FSTModel for the calculation
 	 */
 	public DirectivesNode(String description, FSTModel fstModel) {
 		super(description);
-		this.fstModel = fstModel;
+		this.fstModel =
+			fstModel;
 	}
 
 	@Override
 	protected void initChildren() {
-		
-		Parent project = new Parent(PROJECT_STATISTICS);
-		final Aggregator aggProject = new Aggregator();
+
+		Parent project =
+			new Parent(PROJECT_STATISTICS);
+		final Aggregator aggProject =
+			new Aggregator();
 		aggProject.processAll(fstModel);
-		
+
 		// 1.1 Project statistics
 		// 1.1.1 Number of Directives Node
-		Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
+		Parent directives =
+			new Parent(NUMBER_OF_DIRECTIVES);
 		directives.setValue(aggProject.getDirectiveCount());
 		project.addChild(directives);
-		
-		// 1.1.2 Directives per class
-		final Map.Entry<String,Integer> maximumSum = aggProject.getMaximumNumberOfDirectives();
-		final Map.Entry<String,Integer> minimumSum = aggProject.getMinimumNumberOfDirectives();
-		final Double averageSum = aggProject.getAverageNumberOfDirectives();
 
-		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
+		// 1.1.2 Directives per class
+		final Map.Entry<String, Integer> maximumSum =
+			aggProject.getMaximumNumberOfDirectives();
+		final Map.Entry<String, Integer> minimumSum =
+			aggProject.getMinimumNumberOfDirectives();
+		final Double averageSum =
+			aggProject.getAverageNumberOfDirectives();
+
+		final Parent directivesPerClass =
+			new Parent(DIRECTIVES_PER_CLASS);
 		// 1.1.2.1 Maximum number of directives:
-		directivesPerClass.addChild(new Parent(MAXIMUM_NUMBER_OF_DIRECTIVES + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
+		directivesPerClass.addChild(new Parent(MAXIMUM_NUMBER_OF_DIRECTIVES
+			+ maximumSum.getValue()
+			+ IN_CLASS
+			+ maximumSum.getKey()));
 		// 1.1.2.2 Minimum number of directives:
-		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
+		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES
+			+ minimumSum.getValue()
+			+ IN_CLASS
+			+ minimumSum.getKey()));
 		// 1.1.2.3 Average number of directives per class:
 		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, averageSum));
 		project.addChild(directivesPerClass);
 
 		// 1.1.3 Directives per class
-		final Parent featuresPerDirectives = new Parent(FEATURES_PER_DIRECTIVE);
+		final Parent featuresPerDirectives =
+			new Parent(FEATURES_PER_DIRECTIVE);
 		project.addChild(featuresPerDirectives);
-		
-		final Map.Entry<String,Integer> maximumNumberOfFeatures = aggProject.getMaxNumberOfFeatures();
-		final Map.Entry<String,Integer> minimumNumberOfFeatures = aggProject.getMinNumberOfFeatures();
-		final Double averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
-		
+
+		final Map.Entry<String, Integer> maximumNumberOfFeatures =
+			aggProject.getMaxNumberOfFeatures();
+		final Map.Entry<String, Integer> minimumNumberOfFeatures =
+			aggProject.getMinNumberOfFeatures();
+		final Double averageNumberOfFeatures =
+			aggProject.getAverageNumberOfFeatures();
+
 		// 1.1.3.1 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey()));
+		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue()
+			+ IN_CLASS
+			+ maximumNumberOfFeatures.getKey()));
 		// 1.1.3.2 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey()));
+		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue()
+			+ IN_CLASS
+			+ minimumNumberOfFeatures.getKey()));
 		// 1.1.3.3 Average number of features per directives:
 		featuresPerDirectives.addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, averageNumberOfFeatures));
 
-		final Map.Entry<String,Integer> maxNesting = aggProject.getMaxNesting();
-		// 1.1.4 Maximum nesting of directives: 
-		project.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES + ": " + maxNesting.getValue() + IN_CLASS + maxNesting.getKey()));
+		final Map.Entry<String, Integer> maxNesting =
+			aggProject.getMaxNesting();
+		// 1.1.4 Maximum nesting of directives:
+		project.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES
+			+ ": "
+			+ maxNesting.getValue()
+			+ IN_CLASS
+			+ maxNesting.getKey()));
 
 		addChild(project);
-		
+
 		// 1.2 Class Statistics Node
-		Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
-			@Override
-			protected void initChildren() {
-				for(FSTClass c : fstModel.getClasses()){
-					String className = c.getName();
-					final int pIndex = className.lastIndexOf('/');
-					className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
-					Parent p = new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
-					p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
-					addChild(p);
+		Parent classes =
+			new AbstractSortModeNode(CLASS_STATISTICS) {
+
+				@Override
+				protected void initChildren() {
+					for (FSTClass c : fstModel.getClasses()) {
+						String className =
+							c.getName();
+						final int pIndex =
+							className.lastIndexOf('/');
+						className =
+							((pIndex > 0)
+								? className.substring(0, pIndex
+									+ 1).replace('/', '.')
+								: "(default package).")
+								+ className.substring(pIndex
+									+ 1);
+						Parent p =
+							new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
+						p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
+						addChild(p);
+					}
 				}
-			}
-		};
+			};
 		addChild(classes);
 	}
 }

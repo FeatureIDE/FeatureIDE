@@ -46,40 +46,53 @@ public class SimpleFileHandler<T> {
 
 	private static final Charset DEFAULT_CHARSET;
 	static {
-		final Charset utf8 = Charset.forName("UTF-8");
-		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
+		final Charset utf8 =
+			Charset.forName("UTF-8");
+		DEFAULT_CHARSET =
+			utf8 != null
+				? utf8
+				: Charset.defaultCharset();
 	}
 
 	private IPersistentFormat<T> format;
 
-	private final ProblemList problemList = new ProblemList();
+	private final ProblemList problemList =
+		new ProblemList();
 
 	private T object;
 
 	private Path path;
 
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
+		final SimpleFileHandler<T> fileHandler =
+			new SimpleFileHandler<>(path, object, format);
 		fileHandler.read();
 		return fileHandler.getLastProblems();
 	}
 
 	public static <T> ProblemList load(InputStream inputStream, T object, IPersistentFormat<T> format) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(null, object, format);
+		final SimpleFileHandler<T> fileHandler =
+			new SimpleFileHandler<>(null, object, format);
 		fileHandler.read(inputStream);
 		return fileHandler.getLastProblems();
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
-		final String content = fileHandler.getContent();
+		final SimpleFileHandler<T> fileHandler =
+			new SimpleFileHandler<>(path, object, null);
+		final String content =
+			fileHandler.getContent();
 
 		if (content != null) {
-			final String fileName = path.getFileName().toString();
-			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
+			final String fileName =
+				path.getFileName().toString();
+			final IPersistentFormat<T> format =
+				formatManager.getFormatByContent(content, fileName);
 			if (format == null) {
 				fileHandler.getLastProblems()
-						.add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
+						.add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \""
+							+ fileName
+							+ "\"!")));
 			} else {
 				fileHandler.setFormat(format);
 				fileHandler.parse(content);
@@ -89,14 +102,17 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
+		final SimpleFileHandler<T> fileHandler =
+			new SimpleFileHandler<>(path, object, format);
 		fileHandler.write();
 		return fileHandler.getLastProblems();
 	}
 
 	public static <T> ProblemList convert(Path inPath, Path outPath, T object, IPersistentFormat<T> inFormat, IPersistentFormat<T> outFormat) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(inPath, object, inFormat);
-		ProblemList pl = new ProblemList();
+		final SimpleFileHandler<T> fileHandler =
+			new SimpleFileHandler<>(inPath, object, inFormat);
+		ProblemList pl =
+			new ProblemList();
 		fileHandler.read();
 		pl.addAll(fileHandler.getLastProblems());
 		fileHandler.setPath(outPath);
@@ -115,9 +131,12 @@ public class SimpleFileHandler<T> {
 	}
 
 	public SimpleFileHandler(Path path, T object, IPersistentFormat<T> format) {
-		this.format = format;
-		this.path = path;
-		this.object = object;
+		this.format =
+			format;
+		this.path =
+			path;
+		this.object =
+			object;
 	}
 
 	public IPersistentFormat<T> getFormat() {
@@ -137,15 +156,18 @@ public class SimpleFileHandler<T> {
 	}
 
 	public void setFormat(IPersistentFormat<T> format) {
-		this.format = format;
+		this.format =
+			format;
 	}
 
 	public void setObject(T object) {
-		this.object = object;
+		this.object =
+			object;
 	}
 
 	public void setPath(Path path) {
-		this.path = path;
+		this.path =
+			path;
 	}
 
 	public boolean read() {
@@ -174,9 +196,12 @@ public class SimpleFileHandler<T> {
 
 	private String getContent(InputStream inputStream) {
 		try {
-			final StringBuilder sb = new StringBuilder();
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, DEFAULT_CHARSET))) {
-				for (String line; (line = br.readLine()) != null;) {
+			final StringBuilder sb =
+				new StringBuilder();
+			try (BufferedReader br =
+				new BufferedReader(new InputStreamReader(inputStream, DEFAULT_CHARSET))) {
+				for (String line; (line =
+					br.readLine()) != null;) {
 					sb.append(line);
 					sb.append(System.lineSeparator());
 				}
@@ -191,7 +216,8 @@ public class SimpleFileHandler<T> {
 	boolean parse(String content) {
 		if (content != null) {
 			try {
-				final List<Problem> parsingProblemList = format.getInstance().read(object, content);
+				final List<Problem> parsingProblemList =
+					format.getInstance().read(object, content);
 				if (problemList != null) {
 					problemList.addAll(parsingProblemList);
 				}
@@ -206,7 +232,8 @@ public class SimpleFileHandler<T> {
 	public boolean write() {
 		problemList.clear();
 		try {
-			final byte[] content = format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
+			final byte[] content =
+				format.getInstance().write(object).getBytes(DEFAULT_CHARSET);
 			FileSystem.write(path, content);
 		} catch (final Exception e) {
 			problemList.add(new Problem(e));

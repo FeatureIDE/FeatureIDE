@@ -41,21 +41,24 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class OpenFileAction extends Action {
 
 	private IFile file;
-	
-	public OpenFileAction(String text, IFile file){
+
+	public OpenFileAction(String text, IFile file) {
 		super(text);
-		this.file = file;
-	}	
-	
-	public OpenFileAction(String text){
+		this.file =
+			file;
+	}
+
+	public OpenFileAction(String text) {
 		this(text, null);
 	}
-	
-	public void setFile(IFile file){
-		this.file = file;
+
+	public void setFile(IFile file) {
+		this.file =
+			file;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	@Override
@@ -67,30 +70,35 @@ public class OpenFileAction extends Action {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page =
+			UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (page == null) return;
 
-		String editorId = "org.eclipse.ui.DefaultTextEditor";
+		String editorId =
+			"org.eclipse.ui.DefaultTextEditor";
 
-		IEditorDescriptor desc = getDescriptor(file);
+		IEditorDescriptor desc =
+			getDescriptor(file);
 		if (desc != null)
-			editorId = desc.getId();
-		
+			editorId =
+				desc.getId();
+
 		page.openEditor(new FileEditorInput(file), editorId);
 	}
-	
 
-	
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
-		IContentType contentType = null;
-		
-		IContentDescription description = file.getContentDescription();
+		IContentType contentType =
+			null;
+
+		IContentDescription description =
+			file.getContentDescription();
 		if (description != null)
-			contentType = description.getContentType();
-			
+			contentType =
+				description.getContentType();
+
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 	}
-	
+
 }

@@ -33,9 +33,11 @@ import de.ovgu.featureide.fm.core.IExtension;
  */
 public interface IComposerExtensionBase extends IExtension {
 
-	public static String extensionPointID = "composers";
+	public static String extensionPointID =
+		"composers";
 
-	public static String extensionID = "composer";
+	public static String extensionID =
+		"composer";
 
 	String getName();
 
@@ -50,7 +52,7 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return <code>false</code> if a source folder should not be created. Default: <code>true</code>
 	 */
 	boolean hasSourceFolder();
-	
+
 	/**
 	 * @return <code>false</code> if a build folder should not be created. Default: <code>true</code>
 	 */

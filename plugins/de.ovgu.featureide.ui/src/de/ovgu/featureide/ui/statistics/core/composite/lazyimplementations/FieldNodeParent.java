@@ -36,13 +36,16 @@ public class FieldNodeParent extends AbstractSortModeNode {
 
 	public FieldNodeParent(String descString, FSTField fstField, LinkedList<FSTField> allFields) {
 		super(descString);
-		this.fstField = fstField;
-		int numberOfRoles = countFieldsWithSameName(allFields);
+		this.fstField =
+			fstField;
+		int numberOfRoles =
+			countFieldsWithSameName(allFields);
 		setValue(new Integer(numberOfRoles));
 	}
 
 	private int countFieldsWithSameName(LinkedList<FSTField> fields) {
-		int c = 0;
+		int c =
+			0;
 		for (FSTField tempField : fields) {
 			if (tempField.getFullIdentifier().equals(fstField.getFullIdentifier())) {
 				c++;
@@ -55,7 +58,7 @@ public class FieldNodeParent extends AbstractSortModeNode {
 
 	@Override
 	protected void initChildren() {
-		
+
 	}
 
 }

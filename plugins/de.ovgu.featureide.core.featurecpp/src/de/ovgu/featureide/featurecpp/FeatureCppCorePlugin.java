@@ -32,10 +32,11 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
  */
 public class FeatureCppCorePlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID = "de.ovgu.featureide.core.featurecpp";
+	public static final String PLUGIN_ID =
+		"de.ovgu.featureide.core.featurecpp";
 
 	private static FeatureCppCorePlugin plugin;
-	
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
@@ -47,7 +48,8 @@ public class FeatureCppCorePlugin extends AbstractCorePlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		plugin =
+			this;
 	}
 
 	/*
@@ -55,7 +57,8 @@ public class FeatureCppCorePlugin extends AbstractCorePlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		plugin =
+			null;
 		super.stop(context);
 	}
 

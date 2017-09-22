@@ -34,19 +34,22 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {
 
-		private static final long serialVersionUID = -8143277745205866068L;
+		private static final long serialVersionUID =
+			-8143277745205866068L;
 
 		public NoSuchExtensionException(String message) {
 			super(message);
 		}
 	}
 
-	private final List<T> extensions = new ArrayList<>();
+	private final List<T> extensions =
+		new ArrayList<>();
 
 	private IExtensionLoader<T> extensionLoader;
 
 	protected void setExtensionLoaderInternal(IExtensionLoader<T> extensionLoader) {
-		this.extensionLoader = extensionLoader;
+		this.extensionLoader =
+			extensionLoader;
 	}
 
 	public boolean addExtension(T extension) {
@@ -64,13 +67,14 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 			synchronized (extensions) {
 				if (extensionLoader != null) {
 					extensionLoader.loadProviders(this);
-					extensionLoader = null;
+					extensionLoader =
+						null;
 				}
 			}
 		}
 		return Collections.unmodifiableList(extensions);
 	}
-	
+
 	public T getExtension(String id) throws NoSuchExtensionException {
 		java.util.Objects.requireNonNull(id, "ID must not be null!");
 
@@ -79,7 +83,8 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 				return factory;
 			}
 		}
-		throw new NoSuchExtensionException("No extension found for ID " + id);
+		throw new NoSuchExtensionException("No extension found for ID "
+			+ id);
 	}
 
 }

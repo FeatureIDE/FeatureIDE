@@ -34,11 +34,12 @@ public class Problem {
 
 	public static enum Severity {
 		INFO(0), WARNING(1), ERROR(2);
-		
+
 		private final int level;
 
 		private Severity(int level) {
-			this.level = level;
+			this.level =
+				level;
 		}
 
 		public int getLevel() {
@@ -51,7 +52,7 @@ public class Problem {
 	public final String message;
 
 	public final int line;
-	
+
 	public final Throwable error;
 
 	public Problem(Throwable throwable) {
@@ -73,12 +74,16 @@ public class Problem {
 	public Problem(String message, int line, Severity severity) {
 		this(message, line, severity, null);
 	}
-	
+
 	protected Problem(String message, int line, Severity severity, Throwable error) {
-		this.message = message;
-		this.line = line;
-		this.severity = severity;
-		this.error = error;
+		this.message =
+			message;
+		this.line =
+			line;
+		this.severity =
+			severity;
+		this.error =
+			error;
 		if (error != null) {
 			Logger.logError(message, error);
 		} else {
@@ -100,7 +105,10 @@ public class Problem {
 
 	@Override
 	public String toString() {
-		return "Problem(" + severity + ") " + message;
+		return "Problem("
+			+ severity
+			+ ") "
+			+ message;
 	}
 
 	public Severity getSeverity() {

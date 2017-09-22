@@ -49,35 +49,44 @@ public class Commons {
 		 * @param fileExtension file extension that should be accepted (e.g., "xml")
 		 */
 		public FileFilterByExtension(final String fileExtension) {
-			assert (fileExtension != null && !fileExtension.isEmpty());
+			assert (fileExtension != null
+				&& !fileExtension.isEmpty());
 
-			this.fileExtension = fileExtension;
+			this.fileExtension =
+				fileExtension;
 		}
 
 		@Override
 		public boolean accept(final File pathname) {
-			return pathname.getName().endsWith("." + fileExtension);
+			return pathname.getName().endsWith("."
+				+ fileExtension);
 		}
 	};
 
-	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
-	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH = "benchmarkFeatureModels";
-	
-	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
-	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH = "testFeatureModels";
+	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE =
+		"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
+	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH =
+		"benchmarkFeatureModels";
+
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE =
+		"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
+	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH =
+		"testFeatureModels";
 
 	/**
-	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or
-	 * the file reference to <code>localClassPath</code> which should be inside the class path. The return
-	 * value could be <code>null</code> if no such file exists on both places.
+	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or the file reference to <code>localClassPath</code>
+	 * which should be inside the class path. The return value could be <code>null</code> if no such file exists on both places.
 	 * 
 	 * @param remotePath Path to desired file on TeamCity
 	 * @param localClassPath Path to desired file on class path
 	 * @return File instance to that file
 	 */
 	public static final File getFile(final String remotePath, final String localClassPath) {
-		final File folder = new File(remotePath);
-		return folder.canRead() ? folder : new File(ClassLoader.getSystemResource(localClassPath).getPath());
+		final File folder =
+			new File(remotePath);
+		return folder.canRead()
+			? folder
+			: new File(ClassLoader.getSystemResource(localClassPath).getPath());
 	}
 
 	/**
@@ -88,7 +97,7 @@ public class Commons {
 	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
 	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
 	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
-	 *            instance).
+	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
@@ -97,16 +106,18 @@ public class Commons {
 	}
 
 	/**
-	 * Extracts the file extension of the given file <b>filename</b> or empty string, if no file extension is available. 
-	 * The extension does not include the leading ".".
+	 * Extracts the file extension of the given file <b>filename</b> or empty string, if no file extension is available. The extension does not include the
+	 * leading ".".
 	 * 
 	 * @param filename file name
 	 * @return File extension or empty string
 	 */
 	public static String extractFileExtension(String filename) {
-		final int position = filename.lastIndexOf('.');
+		final int position =
+			filename.lastIndexOf('.');
 		if (position > 0) {
-			return filename.substring(position + 1);
+			return filename.substring(position
+				+ 1);
 		} else
 			return "";
 	}
@@ -120,17 +131,19 @@ public class Commons {
 	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
 	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
 	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
-	 *            instance).
+	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
 	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
 			final String localClassPath) {
-		final File modelFileFolder = getFile(remotePath, localClassPath);
+		final File modelFileFolder =
+			getFile(remotePath, localClassPath);
 		assert modelFileFolder != null;
-		
-		final File[] files = modelFileFolder.listFiles(filter);
+
+		final File[] files =
+			modelFileFolder.listFiles(filter);
 		assert files != null;
-		
+
 		for (File f : files) {
 			if (f.getName().equals(featureModelXmlFilename)) {
 				return FeatureModelManager.load(f.toPath()).getObject();
@@ -140,11 +153,15 @@ public class Commons {
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {
-		StringBuilder sb = new StringBuilder();
-		if (list != null && !list.isEmpty()) {
-			for (int i = 0; i < list.size(); i++) {
+		StringBuilder sb =
+			new StringBuilder();
+		if (list != null
+			&& !list.isEmpty()) {
+			for (int i =
+				0; i < list.size(); i++) {
 				sb.append(list.get(i));
-				if (i <= list.size() - 1)
+				if (i <= list.size()
+					- 1)
 					sb.append(delimiter);
 			}
 		}

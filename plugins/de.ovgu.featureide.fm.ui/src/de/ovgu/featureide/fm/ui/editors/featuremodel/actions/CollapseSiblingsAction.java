@@ -42,39 +42,43 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetSiblingsToCol
  */
 public class CollapseSiblingsAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.collapsefeatures";
+	public static final String ID =
+		"de.ovgu.featureide.collapsefeatures";
 
 	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	/**
-	 *  Collapse siblings should not be accessible for root.
+	 * Collapse siblings should not be accessible for root.
 	 */
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-			if (isValidSelection(selection)) {
-				if (selection.getFirstElement() instanceof FeatureEditPart) {
-					if (getSelectedFeature().getStructure().isRoot() || getSelectedFeature().getStructure().getParent().getChildrenCount() == 1) {
-						setEnabled(false);
-					} else {
-						setEnabled(true);
+	private ISelectionChangedListener listener =
+		new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				IStructuredSelection selection =
+					(IStructuredSelection) event.getSelection();
+				setEnabled(isValidSelection(selection));
+				if (isValidSelection(selection)) {
+					if (selection.getFirstElement() instanceof FeatureEditPart) {
+						if (getSelectedFeature().getStructure().isRoot()
+							|| getSelectedFeature().getStructure().getParent().getChildrenCount() == 1) {
+							setEnabled(false);
+						} else {
+							setEnabled(true);
+						}
 					}
 				}
 			}
-		}
-	};
+		};
 
 	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
+	 * @param label Description of this operation to be used in the menu
+	 * @param feature feature on which this operation will be executed
 	 * 
 	 */
 	public CollapseSiblingsAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_SIBLINGS, viewer);
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -86,7 +90,8 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		SetSiblingsToCollapsedOperation op = new SetSiblingsToCollapsedOperation(feature, graphicalFeatureModel);
+		SetSiblingsToCollapsedOperation op =
+			new SetSiblingsToCollapsedOperation(feature, graphicalFeatureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -98,6 +103,5 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	}
 
 	@Override
-	protected void updateProperties() {
-	}
+	protected void updateProperties() {}
 }
