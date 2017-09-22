@@ -34,8 +34,7 @@ public class AutomaticSelectionExplanation extends ConfigurationExplanation {
 	 * @param subject the subject to be explained
 	 */
 	public AutomaticSelectionExplanation(SelectableFeature subject, Configuration config) {
-		super(subject);
-		setConfiguration(config);
+		super(subject, config);
 	}
 	
 	@Override
