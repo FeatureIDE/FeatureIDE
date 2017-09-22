@@ -122,6 +122,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	
 	@Override
 	protected AutomaticSelectionExplanation getConcreteExplanation() {
-		return new AutomaticSelectionExplanation(getSubject());
+		return new AutomaticSelectionExplanation(getSubject(), getConfiguration());
 	}
 }

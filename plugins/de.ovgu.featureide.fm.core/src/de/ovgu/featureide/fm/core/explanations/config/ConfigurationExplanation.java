@@ -29,11 +29,29 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  * @author Timo G&uuml;nther
  */
 public abstract class ConfigurationExplanation extends Explanation {
+	/** The configuration. */
+	private Configuration config;
+	
 	/**
 	 * Constructs a new instance of this class.
 	 * @param subject the subject to be explained
 	 */
 	protected ConfigurationExplanation(Object subject) {
 		super(subject);
+	}
+	/**
+	 * Returns the configuration.
+	 * @return the configuration
+	 */
+	public Configuration getConfiguration() {
+		return config;
+	}
+	
+	/**
+	 * Sets the configuration.
+	 * @param config the configuration
+	 */
+	protected void setConfiguration(Configuration config) {
+		this.config = config;
 	}
 }
