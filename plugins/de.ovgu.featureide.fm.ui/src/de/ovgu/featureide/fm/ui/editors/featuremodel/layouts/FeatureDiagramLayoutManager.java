@@ -27,11 +27,15 @@ import java.util.Map.Entry;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.PrecisionPoint;
+import org.eclipse.draw2d.geometry.Ray;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.draw2d.geometry.Vector;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -83,9 +87,12 @@ abstract public class FeatureDiagramLayoutManager {
 			}
 		}
 
-		if (!featureModel.isLegendHidden()
-			&& featureModel.getLayout().hasLegendAutoLayout()) {
-			layoutLegend(featureModel, showHidden);
+		if (!featureModel.isLegendHidden()) {
+			if (featureModel.getLayout().hasLegendAutoLayout()) {
+				layoutLegend(featureModel, showHidden);
+			} else {
+				layoutLegendManual(featureModel, showHidden);
+			}
 		}
 		newLocations.clear();
 	}
@@ -176,7 +183,87 @@ abstract public class FeatureDiagramLayoutManager {
 				size.height;
 		}
 	}
+	
+	public void layoutLegendManual(IGraphicalFeatureModel featureModel, boolean showHidden) {
+		/*
+		 * check if the edges between features would intersect with the legend
+		 * ONLY FOR TOP-DOWN-LAYOUT
+		 */
+		
+		final Iterable<IGraphicalFeature> nonHidden =
+				featureModel.getVisibleFeatures();
 
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		// Find Legend Figure
+		for (final Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
+		}
+		
+		if ((legendSize == null) && (legendFigure == null)) {
+			return;
+		}
+		
+		for (final IGraphicalFeature feature : nonHidden) {
+			final Point parentLocation = feature.getLocation();
+			Dimension parentSize = feature.getSize(); 
+			final Point source = new Point(
+					parentSize.width()/2 + parentLocation.x, 
+					parentSize.height()  + parentLocation.y);
+			
+			List<IGraphicalFeature> children = feature.getGraphicalChildren(true);
+			for (int i = 0; i < children.size(); i++) {
+				//Only check the outer edges
+				if (i > 0 && i < children.size() - 1)
+					continue;
+				
+				Point childLocation = children.get(i).getLocation();
+				Dimension childSize = children.get(i).getSize();
+				/*
+				 * TODO: Calculation of source and target is dependent on the feature-layout.
+				 */
+				
+				final Point target = new Point(
+						childSize.width()/2 + childLocation.x, 
+						childLocation.y);
+				
+				//Line segment
+				final Point legend = featureModel.getLayout().getLegendPos();
+				int legendMaxX = legend.x + legendSize.width;
+				int legendMaxY = legend.y + legendSize.height;
+				
+				
+				
+				if ((source.x <= legend.x && target.x <= legend.x) ||
+				    (source.y <= legend.y && target.y <= legend.y) ||
+				    (source.x >= legendMaxX && target.x >= legendMaxX) ||
+				    (source.y >= legendMaxY && target.y >= legendMaxY))
+					continue;
+				
+				float m = (float)(target.y - source.y) / (float)(target.x - source.x);
+				float y = m * (float)(legend.x - source.x) + (float)source.y;
+				
+			    if (y > legend.y && y < legendMaxY)
+			    	layoutLegend(featureModel, showHidden);
+
+			    y = m * (float)(legendMaxX - source.x) + (float)source.y;
+			    if (y > legend.y && y < legendMaxY)
+			    	layoutLegend(featureModel, showHidden);
+
+			    float x = (float)(legend.y - source.y) / m + (float)source.x;
+			    if (x > legend.x && x < legendMaxX)
+			    	layoutLegend(featureModel, showHidden);
+
+			    x = (float)(legendMaxY - source.y) / m + (float)source.x;
+			    if (x > legend.x && x < legendMaxX)
+			    	layoutLegend(featureModel, showHidden);
+			}
+		}
+	}
+	
 	/**
 	 * sets the position of the legend
 	 */
@@ -260,24 +347,19 @@ abstract public class FeatureDiagramLayoutManager {
 			return;
 		}
 
-		boolean topRight =
-			true;
-		boolean topLeft =
-			true;
-		boolean botLeft =
-			true;
-		boolean botRight =
-			true;
-
+		boolean topRight = true;
+		boolean topLeft = true;
+		boolean botLeft = true;
+		boolean botRight = true;
+		
+		
 		/*
 		 * check if features would intersect with the legend on the edges
 		 */
 		for (final IGraphicalFeature feature : nonHidden) {
-			final Point tempLocation =
-				feature.getLocation();
+			final Point tempLocation = feature.getLocation();
 			if (null != tempLocation) {
-				final Dimension tempSize =
-					feature.getSize();
+				final Dimension tempSize = feature.getSize();
 				if (tempSize != null) {
 					if (((tempLocation.x
 						+ tempSize.width) > (max.x
@@ -287,8 +369,7 @@ abstract public class FeatureDiagramLayoutManager {
 							+ legendSize.height
 							+ (FMPropertyManager.getFeatureSpaceY()
 								/ 2)))) {
-						topRight =
-							false;
+						topRight = false;
 					}
 					if (((tempLocation.x) < (min.x
 						+ legendSize.width
@@ -297,8 +378,7 @@ abstract public class FeatureDiagramLayoutManager {
 							+ legendSize.height
 							+ (FMPropertyManager.getFeatureSpaceY()
 								/ 2)))) {
-						topLeft =
-							false;
+						topLeft = false;
 					}
 					if (((tempLocation.x) < (min.x
 						+ legendSize.width
@@ -308,8 +388,7 @@ abstract public class FeatureDiagramLayoutManager {
 								- legendSize.height
 								- (FMPropertyManager.getFeatureSpaceY()
 									/ 2)))) {
-						botLeft =
-							false;
+						botLeft = false;
 					}
 					if (((tempLocation.x
 						+ tempSize.width) > (max.x
@@ -320,8 +399,7 @@ abstract public class FeatureDiagramLayoutManager {
 								- legendSize.height
 								- (FMPropertyManager.getFeatureSpaceY()
 									/ 2)))) {
-						botRight =
-							false;
+						botRight = false;
 					}
 				}
 			}
@@ -387,6 +465,7 @@ abstract public class FeatureDiagramLayoutManager {
 				}
 			}
 		}
+		
 
 		/*
 		 * set the legend position
