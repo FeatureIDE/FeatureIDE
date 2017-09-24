@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,14 +27,16 @@ import java.util.NoSuchElementException;
 
 /**
  * Abstract implementation of the {@link TreeIterator} interface.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 
-	protected LinkedList<ModelTree<M, E>> iteratorList = new LinkedList<>();
+	protected LinkedList<ModelTree<M, E>> iteratorList =
+		new LinkedList<>();
 
-	protected ModelTree<M, E> next = null;
+	protected ModelTree<M, E> next =
+		null;
 
 	protected AbstractTreeIterator(ModelTree<M, E> root) {
 		iteratorList.add(root);
@@ -50,7 +52,8 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 		if (iteratorList.isEmpty()) {
 			throw new NoSuchElementException();
 		}
-		next = getNext();
+		next =
+			getNext();
 		return next.object;
 	}
 
@@ -60,12 +63,16 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 	public void remove() {
 		if (next != null) {
 			if (next.parent == null) {
-				next.object = null;
+				next.object =
+					null;
 			} else {
-				ListIterator<ModelTree<M, E>> listIterator = next.parent.children.listIterator();
-				int i = 0;
+				final ListIterator<ModelTree<M, E>> listIterator =
+					next.parent.children.listIterator();
+				int i =
+					0;
 				while (listIterator.hasNext()) {
-					ModelTree<M, E> n = listIterator.next();
+					final ModelTree<M, E> n =
+						listIterator.next();
 					if (n == next) {
 						listIterator.remove();
 						break;
@@ -74,7 +81,8 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 				}
 				next.parent.children.addAll(i, next.children);
 			}
-			next = null;
+			next =
+				null;
 		} else {
 			throw new IllegalStateException();
 		}
@@ -84,12 +92,14 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 	public void removeSubtree() {
 		if (next != null) {
 			if (next.parent == null) {
-				next.object = null;
+				next.object =
+					null;
 				next.children.clear();
 			} else {
 				next.parent.children.remove(next);
 			}
-			next = null;
+			next =
+				null;
 		} else {
 			throw new IllegalStateException();
 		}
@@ -100,11 +110,15 @@ public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 		return this;
 	}
 
+	@Override
 	public int getCurrentLevel() {
-		int level = -1;
-		ModelTree<M, E> tempParent = next;
+		int level =
+			-1;
+		ModelTree<M, E> tempParent =
+			next;
 		while (tempParent != null) {
-			tempParent = tempParent.getParent();
+			tempParent =
+				tempParent.getParent();
 			level++;
 		}
 		return level;

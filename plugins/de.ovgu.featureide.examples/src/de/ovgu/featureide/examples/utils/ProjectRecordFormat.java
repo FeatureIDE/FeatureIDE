@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,17 +34,24 @@ import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 
 /**
  * Reads / Writes the XML structure that holds the paths for all example projects.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
-	public static final String ID = ExamplePlugin.PLUGIN_ID + ".format." + ProjectRecordFormat.class.getSimpleName();
+	public static final String ID =
+		ExamplePlugin.PLUGIN_ID
+			+ ".format."
+			+ ProjectRecordFormat.class.getSimpleName();
 
-	private static final String ATTRIBUTE_PATH = "path";
-	private static final String ATTRIBUTE_NAME = "name";
-	private static final String PROJECT = "project";
-	private static final String PROJECT_RECORDS = "projectRecords";
+	private static final String ATTRIBUTE_PATH =
+		"path";
+	private static final String ATTRIBUTE_NAME =
+		"name";
+	private static final String PROJECT =
+		"project";
+	private static final String PROJECT_RECORDS =
+		"projectRecords";
 
 	@Override
 	public String getId() {
@@ -74,11 +81,14 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	private void parseProjects(List<Element> elements, Collection<ProjectRecord> projectRecords) {
-		for (Element element : elements) {
+		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
-				final String name = element.getAttribute(ATTRIBUTE_NAME);
-				final String path = element.getAttribute(ATTRIBUTE_PATH);
-				final ProjectRecord projectRecord = new ProjectRecord(path, name);
+				final String name =
+					element.getAttribute(ATTRIBUTE_NAME);
+				final String path =
+					element.getAttribute(ATTRIBUTE_PATH);
+				final ProjectRecord projectRecord =
+					new ProjectRecord(path, name);
 				object.add(projectRecord);
 				parseSubProjects(getElements(element.getChildNodes()), projectRecord);
 			}
@@ -86,11 +96,14 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	private void parseSubProjects(List<Element> elements, ProjectRecord parentRecord) {
-		for (Element element : elements) {
+		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
-				final String name = element.getAttribute(ATTRIBUTE_NAME);
-				final String path = element.getAttribute(ATTRIBUTE_PATH);
-				final ProjectRecord projectRecord = new ProjectRecord(path, name);
+				final String name =
+					element.getAttribute(ATTRIBUTE_NAME);
+				final String path =
+					element.getAttribute(ATTRIBUTE_PATH);
+				final ProjectRecord projectRecord =
+					new ProjectRecord(path, name);
 				parentRecord.addSubProject(projectRecord);
 				parseSubProjects(getElements(element.getChildNodes()), projectRecord);
 			}
@@ -99,14 +112,16 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root = doc.createElement(PROJECT_RECORDS);
+		final Element root =
+			doc.createElement(PROJECT_RECORDS);
 		doc.appendChild(root);
 		addProjectRecords(doc, root, object);
 	}
 
 	private void addProjectRecords(Document doc, final Element root, Collection<ProjectRecord> projects) {
-		for (ProjectRecord projectRecord : projects) {
-			final Element projectElement = doc.createElement(PROJECT);
+		for (final ProjectRecord projectRecord : projects) {
+			final Element projectElement =
+				doc.createElement(PROJECT);
 			root.appendChild(projectElement);
 			projectElement.setAttribute(ATTRIBUTE_NAME, projectRecord.getProjectName());
 			projectElement.setAttribute(ATTRIBUTE_PATH, projectRecord.getProjectDescriptionRelativePath());

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,51 +28,55 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
  * @deprecated For legacy purposes only.
- * 
+ *
  * @author Marcus Pinnecke
  */
 @Deprecated
 public final class FeatureUtilsLegacy {
 
-	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<Constraint, IConstraint>() {
+	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT =
+		new IFunction<Constraint, IConstraint>() {
 
-		@Override
-		public IConstraint invoke(Constraint t) {
-			FeatureUtils.requireNonNull(t);
+			@Override
+			public IConstraint invoke(Constraint t) {
+				FeatureUtils.requireNonNull(t);
 
-			return convert(t);
+				return convert(t);
+			};
 		};
-	};
 
-	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<Feature, IFeature>() {
+	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE =
+		new IFunction<Feature, IFeature>() {
 
-		@Override
-		public IFeature invoke(Feature t) {
-			FeatureUtils.requireNonNull(t);
+			@Override
+			public IFeature invoke(Feature t) {
+				FeatureUtils.requireNonNull(t);
 
-			return convert(t);
+				return convert(t);
+			};
 		};
-	};
 
-	public static final IFunction<IConstraint, Constraint> ICONSTRAINT_TO_CONSTRANT = new IFunction<IConstraint, Constraint>() {
+	public static final IFunction<IConstraint, Constraint> ICONSTRAINT_TO_CONSTRANT =
+		new IFunction<IConstraint, Constraint>() {
 
-		@Override
-		public Constraint invoke(IConstraint t) {
-			FeatureUtils.requireNonNull(t);
+			@Override
+			public Constraint invoke(IConstraint t) {
+				FeatureUtils.requireNonNull(t);
 
-			return convert(t);
+				return convert(t);
+			};
 		};
-	};
 
-	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, Feature>() {
+	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE =
+		new IFunction<IFeature, Feature>() {
 
-		@Override
-		public Feature invoke(IFeature t) {
-			FeatureUtils.requireNonNull(t);
+			@Override
+			public Feature invoke(IFeature t) {
+				FeatureUtils.requireNonNull(t);
 
-			return convert(t);
+				return convert(t);
+			};
 		};
-	};
 
 	public static final IConstraint convert(Constraint c) {
 		FeatureUtils.requireNonNull(c);
@@ -118,13 +122,10 @@ public final class FeatureUtilsLegacy {
 		return null;
 	}
 
-	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {
-	}
+	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {}
 
-	public static final void setNewLocation(IFeature feature, FMPoint newLocation) {
-	}
+	public static final void setNewLocation(IFeature feature, FMPoint newLocation) {}
 
-	private FeatureUtilsLegacy() {
-	}
+	private FeatureUtilsLegacy() {}
 
 }

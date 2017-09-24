@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,14 +34,17 @@ import org.prop4j.Or;
 
 /**
  * Tests for {@link DimacsWriter}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class DimacsWriterTests {
-	private static final String LN = System.lineSeparator();
+
+	private static final String LN =
+		System.lineSeparator();
 
 	@Rule
-	public final ExpectedException exception = ExpectedException.none();
+	public final ExpectedException exception =
+		ExpectedException.none();
 
 	@Test
 	public void testSimple() {
@@ -65,47 +68,71 @@ public class DimacsWriterTests {
 
 	@Test
 	public void testAnd() {
-		testEquals(new And("A", new Literal("B", false)), "p cnf 2 2" + LN + "1 0" + LN + "-2 0" + LN);
+		testEquals(new And("A", new Literal("B", false)), "p cnf 2 2"
+			+ LN
+			+ "1 0"
+			+ LN
+			+ "-2 0"
+			+ LN);
 	}
 
 	@Test
 	public void testOr() {
-		testEquals(new Or(new Literal("A", false), "B"), "p cnf 2 1" + LN + "-1 2 0" + LN);
+		testEquals(new Or(new Literal("A", false), "B"), "p cnf 2 1"
+			+ LN
+			+ "-1 2 0"
+			+ LN);
 	}
 
 	@Test
 	public void testNotLiteral() {
-		testEquals(new Literal("A", false), "p cnf 1 1" + LN + "-1 0" + LN);
+		testEquals(new Literal("A", false), "p cnf 1 1"
+			+ LN
+			+ "-1 0"
+			+ LN);
 	}
 
 	@Test
 	public void testNotNode() {
-		final Node in = new Not("A");
+		final Node in =
+			new Not("A");
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
 
 	@Test
 	public void testImplies() {
-		final Node in = new Implies("A", "B");
+		final Node in =
+			new Implies("A", "B");
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
 
 	@Test
 	public void testNull() {
-		final Node in = null;
+		final Node in =
+			null;
 		exception.expect(IllegalArgumentException.class);
 		new DimacsWriter(in);
 	}
-	
+
 	@Test
 	public void testVariableDirectory() {
-		final Node in = new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
-		final DimacsWriter w = new DimacsWriter(in);
+		final Node in =
+			new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
+		final DimacsWriter w =
+			new DimacsWriter(in);
 		w.setWritingVariableDirectory(true);
-		final String actual = w.write();
-		final String expected = "c 1 A" + LN + "c 2 B" + LN + "c 3 C" + LN + getDefaultExpected();
+		final String actual =
+			w.write();
+		final String expected =
+			"c 1 A"
+				+ LN
+				+ "c 2 B"
+				+ LN
+				+ "c 3 C"
+				+ LN
+				+ getDefaultExpected();
 		assertEquals(expected, actual);
 	}
 
@@ -114,12 +141,19 @@ public class DimacsWriterTests {
 	}
 
 	private void testEquals(Node in, String expected) {
-		final DimacsWriter w = new DimacsWriter(in);
-		final String actual = w.write();
+		final DimacsWriter w =
+			new DimacsWriter(in);
+		final String actual =
+			w.write();
 		assertEquals(expected, actual);
 	}
 
 	private String getDefaultExpected() {
-		return "p cnf 3 2" + LN + "1 -2 0" + LN + "3 2 -1 0" + LN;
+		return "p cnf 3 2"
+			+ LN
+			+ "1 -2 0"
+			+ LN
+			+ "3 2 -1 0"
+			+ LN;
 	}
 }

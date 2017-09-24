@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,101 +48,116 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.UIPlugin;
 
-/** 
+/**
  * The builder does some modifucations on the FSTModel for presentation at the CollaborationView.
- * 
+ *
  * @author Constanze Adler
  * @author Jens Meinicke
  * @author Stephan Besecke
  */
 public class CollaborationModelBuilder {
+
 	/**
 	 * Every feature project has its own filter
 	 */
-	private final static Map<IFeatureProject, Set<String>> classFilter = new HashMap<IFeatureProject, Set<String>>();
-	private final static Map<IFeatureProject, Set<String>> featureFilter = new HashMap<IFeatureProject, Set<String>>();
-	
-	public IFile configuration = null;
+	private final static Map<IFeatureProject, Set<String>> classFilter =
+		new HashMap<IFeatureProject, Set<String>>();
+	private final static Map<IFeatureProject, Set<String>> featureFilter =
+		new HashMap<IFeatureProject, Set<String>>();
+
+	public IFile configuration =
+		null;
 	private static FSTModel fSTModel;
 	public static IFeatureProject project;
 
 	public static IFile editorFile;
-	
-	private static final QualifiedName SHOW_UNSELECTED_FEATURES = 
-			new QualifiedName(CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures", 
-						      CollaborationModelBuilder.class.getName() +"#ShowUnselectedFeatures");
-	
-	private static final String TRUE = "true";
-	private static final String FALSE = "false";
-	
+
+	private static final QualifiedName SHOW_UNSELECTED_FEATURES =
+		new QualifiedName(CollaborationModelBuilder.class.getName()
+			+ "#ShowUnselectedFeatures",
+				CollaborationModelBuilder.class.getName()
+					+ "#ShowUnselectedFeatures");
+
+	private static final String TRUE =
+		"true";
+	private static final String FALSE =
+		"false";
+
 	/**
-	 * Sets the persistent property of <i>showUnselectedFeatures 
+	 * Sets the persistent property of <i>showUnselectedFeatures
+	 *
 	 * @param value The value to set
 	 */
 	public static void showUnselectedFeatures(boolean value) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(SHOW_UNSELECTED_FEATURES, value ? TRUE : FALSE);
-		} catch (CoreException e) {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(SHOW_UNSELECTED_FEATURES, value
+				? TRUE
+				: FALSE);
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Gets the the persistent property of <i>showUnselectedFeatures</i>
+	 *
 	 * @return The persistent property
 	 */
 	public static final boolean showUnselectedFeatures() {
 		try {
 			return TRUE.equals(ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(SHOW_UNSELECTED_FEATURES));
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @return The class filter for the current project
 	 */
 	public static Set<String> getClassFilter() {
-		Set<String> filter = classFilter.get(project);
+		final Set<String> filter =
+			classFilter.get(project);
 		if (filter == null) {
 			return new LinkedHashSet<String>();
 		}
 		return filter;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param filter The class filter for the current project
 	 */
-	public static  void setClassFilter(Set<String> filter) {
+	public static void setClassFilter(Set<String> filter) {
 		classFilter.put(project, filter);
 	}
-	
+
 	/**
 	 * @return The feature filter for the current project
 	 */
 	public static Set<String> getFeatureFilter() {
-		Set<String> filter = featureFilter.get(project);
+		final Set<String> filter =
+			featureFilter.get(project);
 		if (filter == null) {
 			return Collections.emptySet();
 		}
 		return filter;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param filter The feature filter for the current project
 	 */
 	public static void setFeatureFilter(Set<String> filter) {
 		featureFilter.put(project, filter);
 	}
-	
+
 	/**
 	 * Returns whether the given class should be diplayed.
 	 */
 	public static boolean showClass(FSTClass c) {
-		if (getClassFilter().isEmpty() || getClassFilter().contains(c.getName())) {
+		if (getClassFilter().isEmpty()
+			|| getClassFilter().contains(c.getName())) {
 			return showClassForFilteredFeatures(c);
 		}
 		return false;
@@ -195,14 +210,15 @@ public class CollaborationModelBuilder {
 			}
 		}
 	}
-	
+
 	private static boolean showFeatureForFilteredClass(FSTFeature feature) {
 		if (getClassFilter().isEmpty()) {
 			return true;
 		}
-		
+
 		for (final String classFilter : getClassFilter()) {
-			final FSTClass fstClass = fSTModel.getClass(classFilter);
+			final FSTClass fstClass =
+				fSTModel.getClass(classFilter);
 			if (fstClass != null) {
 				for (final FSTRole role : fstClass.getRoles()) {
 					if (role.getFeature().equals(feature)) {
@@ -211,17 +227,18 @@ public class CollaborationModelBuilder {
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if a filter is defined for the current project.
 	 */
 	public static boolean isFilterDefined() {
-		return !(getClassFilter().isEmpty() && getFeatureFilter().isEmpty());
+		return !(getClassFilter().isEmpty()
+			&& getFeatureFilter().isEmpty());
 	}
-	
+
 	public synchronized FSTModel buildCollaborationModel(final IFeatureProject featureProject) {
 		if (!initialize(featureProject)) {
 			return null;
@@ -229,22 +246,24 @@ public class CollaborationModelBuilder {
 		return fSTModel;
 	}
 
-	private boolean initialize(IFeatureProject featureProject) {		
+	private boolean initialize(IFeatureProject featureProject) {
 		// set the featureProject
 		if (featureProject == null) {
 			return false;
 		}
-		project = featureProject;
-		
+		project =
+			featureProject;
+
 		// set the composer
-		IComposerExtensionClass composer = project.getComposer();
+		final IComposerExtensionClass composer =
+			project.getComposer();
 		if (composer == null) {
-			return false; 	
+			return false;
 		}
-			
+
 		// set the FSTmodel
 		getFstModel(composer);
-		
+
 		// add the symbol for the configuration to the model
 		if (fSTModel != null) {
 			addConfigurationToModel();
@@ -252,17 +271,19 @@ public class CollaborationModelBuilder {
 		return true;
 	}
 
-
-
 	/**
 	 * sets the FSTModel
+	 *
 	 * @param composer
 	 */
 	private void getFstModel(IComposerExtensionClass composer) {
-		fSTModel = project.getFSTModel();
-		if (fSTModel == null || fSTModel.getClasses().isEmpty()) {
+		fSTModel =
+			project.getFSTModel();
+		if ((fSTModel == null)
+			|| fSTModel.getClasses().isEmpty()) {
 			composer.buildFSTModel();
-			fSTModel = project.getFSTModel();
+			fSTModel =
+				project.getFSTModel();
 		}
 	}
 
@@ -270,53 +291,69 @@ public class CollaborationModelBuilder {
 	 * Adds the configuration to the model.
 	 */
 	private void addConfigurationToModel() {
-		IFile config = project.getCurrentConfiguration(); 
+		final IFile config =
+			project.getCurrentConfiguration();
 		final FSTConfiguration c;
 		if (config == null) {
-			c = new FSTConfiguration(NO_CONFIGURATION, configuration, false);
-		} else if (configuration == null || configuration.equals(config)) {
-			c = new FSTConfiguration(config.getName().split("[.]")[0] + " ", configuration, true);
+			c =
+				new FSTConfiguration(NO_CONFIGURATION, configuration, false);
+		} else if ((configuration == null)
+			|| configuration.equals(config)) {
+			c =
+				new FSTConfiguration(config.getName().split("[.]")[0]
+					+ " ", configuration, true);
 		} else {
-			c = new FSTConfiguration(configuration.getName().split("[.]")[0] + " ", configuration, false);
+			c =
+				new FSTConfiguration(configuration.getName().split("[.]")[0]
+					+ " ", configuration, false);
 		}
 		c.setSelectedFeatures(getSelectedFeatures(project));
 		fSTModel.setConfiguration(c);
 	}
 
 	private Collection<String> getSelectedFeatures(final IFeatureProject featureProject) {
-		if (featureProject == null)
+		if (featureProject == null) {
 			return Collections.emptySet();
+		}
 
 		final IFile iFile;
 		if (configuration == null) {
-			iFile = featureProject.getCurrentConfiguration();
-		} else { 
-			iFile = configuration;
+			iFile =
+				featureProject.getCurrentConfiguration();
+		} else {
+			iFile =
+				configuration;
 		}
-		
-		if (iFile == null || !iFile.exists()) {
+
+		if ((iFile == null)
+			|| !iFile.exists()) {
 			return Collections.emptySet();
 		}
-		
-		final File file = iFile.getRawLocation().toFile();
-		return readFeaturesfromConfigurationFile(file);		
+
+		final File file =
+			iFile.getRawLocation().toFile();
+		return readFeaturesfromConfigurationFile(file);
 	}
 
 	// TODO move to configuration reader
 	private Collection<String> readFeaturesfromConfigurationFile(File file) {
 		Set<String> list;
-		Scanner scanner = null;
-		if (!file.exists())
+		Scanner scanner =
+			null;
+		if (!file.exists()) {
 			return Collections.emptySet();
-		
+		}
+
 		try {
-			scanner = new Scanner(file, "UTF-8");
-		} catch (FileNotFoundException e) {
+			scanner =
+				new Scanner(file, "UTF-8");
+		} catch (final FileNotFoundException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 
 		if (scanner.hasNext()) {
-			list = new HashSet<String>();
+			list =
+				new HashSet<String>();
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}

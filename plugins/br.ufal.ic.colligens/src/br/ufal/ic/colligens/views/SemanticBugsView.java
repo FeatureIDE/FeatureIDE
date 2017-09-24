@@ -13,15 +13,17 @@ import br.ufal.ic.colligens.models.cppchecker.CppCheckerFileLogs;
 
 public class SemanticBugsView extends ViewPart {
 
-	public static final String ID = Colligens.PLUGIN_ID
+	public static final String ID =
+		Colligens.PLUGIN_ID
 			+ ".views.SemanticBugsView";
 
 	private final SemanticBugsViewController viewController;
 
 	public SemanticBugsView() {
-		viewController = SemanticBugsViewController.getInstance();
+		viewController =
+			SemanticBugsViewController.getInstance();
 		viewController.setView(this);
-		this.setTitleToolTip(SEMANTIC_BUGS___COLLIGENS);
+		setTitleToolTip(SEMANTIC_BUGS___COLLIGENS);
 	}
 
 	@Override

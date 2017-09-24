@@ -33,12 +33,14 @@ import br.ufal.ic.colligens.activator.Colligens;
  */
 @SuppressWarnings(RESTRICTION)
 public class ProjectExplorerController {
+
 	private ISelection iSelection;
-	private Set<IResource> iResources;
+	private final Set<IResource> iResources;
 	private IWorkbenchWindow window;
 
 	public ProjectExplorerController() {
-		iResources = new HashSet<IResource>();
+		iResources =
+			new HashSet<IResource>();
 	}
 
 	/**
@@ -48,29 +50,34 @@ public class ProjectExplorerController {
 	public List<IResource> start() throws ProjectExplorerException {
 		iResources.clear();
 
-		List<IResource> iResources = new LinkedList<IResource>();
+		final List<IResource> iResources =
+			new LinkedList<IResource>();
 
 		if (iSelection instanceof IStructuredSelection) {
 
-			IStructuredSelection selection = (IStructuredSelection) iSelection;
+			final IStructuredSelection selection =
+				(IStructuredSelection) iSelection;
 
 			@SuppressWarnings("unchecked")
-			List<Object> list = selection.toList();
+			final List<Object> list =
+				selection.toList();
 
-			for (Object object : list) {
+			for (final Object object : list) {
 				if (object instanceof Project) {
-					ICProject project = CoreModel.getDefault().getCModel()
-							.getCProject(((Project) object).getName());
+					final ICProject project =
+						CoreModel.getDefault().getCModel()
+								.getCProject(((Project) object).getName());
 					if (project != null) {
 						try {
-							ISourceRoot iSourceRoots[] = project
-									.getSourceRoots();
+							final ISourceRoot iSourceRoots[] =
+								project
+										.getSourceRoots();
 
-							for (ISourceRoot iSourceRoot : iSourceRoots) {
+							for (final ISourceRoot iSourceRoot : iSourceRoots) {
 								iResources.add(iSourceRoot.getResource());
 							}
 
-						} catch (CModelException e) {
+						} catch (final CModelException e) {
 
 						}
 					}
@@ -88,10 +95,11 @@ public class ProjectExplorerController {
 			}
 
 		} else if (iSelection instanceof TextSelection) {
-			FileEditorInput fileEditorInput = (FileEditorInput) window
-					.getActivePage().getActiveEditor().getEditorInput();
+			final FileEditorInput fileEditorInput =
+				(FileEditorInput) window
+						.getActivePage().getActiveEditor().getEditorInput();
 			if (fileEditorInput != null) {
-				iResources.add((IResource) fileEditorInput.getFile());
+				iResources.add(fileEditorInput.getFile());
 			}
 		}
 
@@ -99,7 +107,7 @@ public class ProjectExplorerController {
 			throw new ProjectExplorerException(
 					SELECT_A_VALID_FILE_OR_DIRECTORY_);
 		}
-		
+
 		return iResources;
 	}
 
@@ -107,9 +115,10 @@ public class ProjectExplorerController {
 	 * @throws ProjectExplorerException
 	 */
 	public void run() throws ProjectExplorerException {
-		List<IResource> list = start();
+		final List<IResource> list =
+			start();
 
-		for (IResource iResource : list) {
+		for (final IResource iResource : list) {
 			addResource(iResource);
 		}
 	}
@@ -118,8 +127,9 @@ public class ProjectExplorerController {
 	 * @return list containing the file paths
 	 */
 	public List<String> getListToString() {
-		List<String> resourcesAsString = new LinkedList<String>();
-		for (IResource resource : iResources) {
+		final List<String> resourcesAsString =
+			new LinkedList<String>();
+		for (final IResource resource : iResources) {
 			// adds .c and .h files only
 			resourcesAsString.add(resource.getLocation().toString());
 		}
@@ -127,12 +137,15 @@ public class ProjectExplorerController {
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
-		this.window = window;
-		this.iSelection = window.getSelectionService().getSelection();
+		this.window =
+			window;
+		iSelection =
+			window.getSelectionService().getSelection();
 	}
 
 	public void setSelection(ISelection selection) {
-		this.iSelection = selection;
+		iSelection =
+			selection;
 	}
 
 	public List<IResource> getList() {
@@ -143,15 +156,15 @@ public class ProjectExplorerController {
 		if (iResource instanceof IFile) {
 			// adds .c and .h files only
 			if (iResource.getLocation().toString().trim().endsWith(".c")
-					|| iResource.getLocation().toString().trim().endsWith(".h")) {
+				|| iResource.getLocation().toString().trim().endsWith(".h")) {
 				iResources.add(iResource);
 			}
 		} else if (iResource instanceof IFolder) {
 			try {
-				for (IResource res : ((IFolder) iResource).members()) {
+				for (final IResource res : ((IFolder) iResource).members()) {
 					addResource(res);
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				Colligens.getDefault().logError(e);
 				e.printStackTrace();
 			}

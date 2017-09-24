@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,48 +48,55 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 
 /**
- * The purpose of this dialog is to display the content of a 'normal'
- * {@link TreeViewer} in a {@link CheckboxTreeViewer} to select some of it's
- * content and then export it to *.csv.
- * 
+ * The purpose of this dialog is to display the content of a 'normal' {@link TreeViewer} in a {@link CheckboxTreeViewer} to select some of it's content and then
+ * export it to *.csv.
+ *
  * @see CsvExporter
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class CheckBoxTreeViewDialog extends Dialog {
 
-	private static final String TOOLTIP = DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
-	private static final String TITLE = CHOOSE_WHAT_TO_EXPORT;
-	private Parent invisibleRoot;
+	private static final String TOOLTIP =
+		DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
+	private static final String TITLE =
+		CHOOSE_WHAT_TO_EXPORT;
+	private final Parent invisibleRoot;
 	private CheckboxTreeViewer viewer;
-	private TreeViewer oldTree;
+	private final TreeViewer oldTree;
 
 	/**
 	 * Create the dialog.
-	 * 
+	 *
 	 * @param parentShell
 	 */
 	public CheckBoxTreeViewDialog(Shell parentShell, Parent godfather,
 			TreeViewer oldTree) {
 		super(parentShell);
-		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
-		this.oldTree = oldTree;
-		this.invisibleRoot = godfather;
+		setShellStyle(SWT.DIALOG_TRIM
+			| SWT.MIN
+			| SWT.RESIZE);
+		this.oldTree =
+			oldTree;
+		invisibleRoot =
+			godfather;
 	}
 
 	/**
 	 * Create contents of the dialog.
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite container = (Composite) super.createDialogArea(parent);
+		final Composite container =
+			(Composite) super.createDialogArea(parent);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		viewer = new CheckboxTreeViewer(container, SWT.BORDER);
-		
+		viewer =
+			new CheckboxTreeViewer(container, SWT.BORDER);
+
 		viewer.setContentProvider(new ContentProvider(viewer) {
 
 			@Override
@@ -100,7 +107,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 				return getChildren(inputElement);
 			}
 		});
-		
+
 		viewer.setLabelProvider(new TreeLabelProvider() {
 
 			@Override
@@ -108,7 +115,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 				return TOOLTIP;
 			}
 		});
-		
+
 		viewer.setInput(invisibleRoot);
 		JobDoneListener.getInstance().init(viewer);
 		viewer.addCheckStateListener(new CheckBoxListener(viewer));
@@ -118,18 +125,19 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initViewer() {
-		UIJob job = new UIJob(INIT_DIALOG___TREEVIEWER) {
+		final UIJob job =
+			new UIJob(INIT_DIALOG___TREEVIEWER) {
 
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				viewer.setExpandedElements(oldTree.getVisibleExpandedElements());
-				viewer.refresh();
-				return Status.OK_STATUS;
-			}
-		};
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					viewer.setExpandedElements(oldTree.getVisibleExpandedElements());
+					viewer.refresh();
+					return Status.OK_STATUS;
+				}
+			};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
@@ -144,7 +152,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 
 	/**
 	 * Create contents of the button bar.
-	 * 
+	 *
 	 * @param parent
 	 */
 	@Override
@@ -166,7 +174,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		new CsvExporter(this.getShell().getParent().getShell()).export(viewer
+		new CsvExporter(getShell().getParent().getShell()).export(viewer
 				.getCheckedElements());
 		super.okPressed();
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Finds certain solutions of propositional formulas.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class BasicSolver implements ISatSolver {
@@ -56,41 +56,57 @@ public class BasicSolver implements ISatSolver {
 	protected final Solver<?> solver;
 	protected final int[] order;
 	protected final VecInt assignment;
-	protected RingList<int[]> solutionList = null;
+	protected RingList<int[]> solutionList =
+		null;
 
 	public BasicSolver(SatInstance satInstance) throws ContradictionException {
-		this.satInstance = satInstance;
-		final int numberOfVariables = satInstance.getNumberOfVariables();
-		this.order = new int[numberOfVariables];
-		this.assignment = new VecInt(numberOfVariables);
+		this.satInstance =
+			satInstance;
+		final int numberOfVariables =
+			satInstance.getNumberOfVariables();
+		order =
+			new int[numberOfVariables];
+		assignment =
+			new VecInt(numberOfVariables);
 
-		solver = initSolver();
+		solver =
+			initSolver();
 		addVariables();
 	}
 
 	protected BasicSolver(BasicSolver oldSolver) {
-		this.satInstance = oldSolver.satInstance;
-		this.order = new int[satInstance.intToVar.length - 1];
-		this.assignment = new VecInt(0);
-		oldSolver.assignment.copyTo(this.assignment);
+		satInstance =
+			oldSolver.satInstance;
+		order =
+			new int[satInstance.intToVar.length
+				- 1];
+		assignment =
+			new VecInt(0);
+		oldSolver.assignment.copyTo(assignment);
 
-		solver = initSolver();
+		solver =
+			initSolver();
 		try {
 			addVariables();
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			Logger.logError(e);
 			throw new RuntimeException();
 		}
 	}
 
 	private void addVariables() throws ContradictionException {
-		final int size = satInstance.getNumberOfVariables();
+		final int size =
+			satInstance.getNumberOfVariables();
 		if (size > 0) {
 			solver.newVar(size);
-			solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length + 1);
+			solver.setExpectedNumberOfClauses(satInstance.getCnf().getChildren().length
+				+ 1);
 			addCNF(satInstance.getCnf().getChildren());
-			final VecInt pseudoClause = new VecInt(size + 1);
-			for (int i = 1; i <= size; i++) {
+			final VecInt pseudoClause =
+				new VecInt(size
+					+ 1);
+			for (int i =
+				1; i <= size; i++) {
 				pseudoClause.push(i);
 			}
 			pseudoClause.push(-1);
@@ -101,7 +117,8 @@ public class BasicSolver implements ISatSolver {
 	}
 
 	protected Solver<?> initSolver() {
-		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
+		final Solver<?> solver =
+			(Solver<?>) SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
@@ -114,26 +131,34 @@ public class BasicSolver implements ISatSolver {
 	}
 
 	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
-		final List<IConstr> result = new ArrayList<>(cnfChildren.length);
-		for (Node node : cnfChildren) {
+		final List<IConstr> result =
+			new ArrayList<>(cnfChildren.length);
+		for (final Node node : cnfChildren) {
 			result.add(addClause(node));
 		}
 		return result;
 	}
 
 	protected IConstr addClause(final Node node) throws ContradictionException {
-		final Node[] children = node.getChildren();
-		final int[] clause = new int[children.length];
-		for (int i = 0; i < children.length; i++) {
-			final Literal literal = (Literal) children[i];
-			clause[i] = satInstance.getSignedVariable(literal);
+		final Node[] children =
+			node.getChildren();
+		final int[] clause =
+			new int[children.length];
+		for (int i =
+			0; i < children.length; i++) {
+			final Literal literal =
+				(Literal) children[i];
+			clause[i] =
+				satInstance.getSignedVariable(literal);
 		}
 		return solver.addClause(new VecInt(clause));
 	}
 
 	@Override
 	public int[] findModel() {
-		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
+		return isSatisfiable() == SatResult.TRUE
+			? solver.model()
+			: null;
 	}
 
 	@Override
@@ -177,7 +202,7 @@ public class BasicSolver implements ISatSolver {
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
@@ -185,12 +210,15 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public void setOrder(List<IFeature> orderList) {
-		int i = -1;
-		for (IFeature feature : orderList) {
-			order[++i] = satInstance.varToInt.get(feature.getName());
+		int i =
+			-1;
+		for (final IFeature feature : orderList) {
+			order[++i] =
+				satInstance.varToInt.get(feature.getName());
 		}
 	}
 
+	@Override
 	public int[] getOrder() {
 		return order;
 	}
@@ -217,19 +245,30 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public void shuffleOrder() {
-		final Random rnd = new Random();
-		for (int i = order.length - 1; i >= 0; i--) {
-			final int index = rnd.nextInt(i + 1);
-			final int a = order[index];
-			order[index] = order[i];
-			order[i] = a;
+		final Random rnd =
+			new Random();
+		for (int i =
+			order.length
+				- 1; i >= 0; i--) {
+			final int index =
+				rnd.nextInt(i
+					+ 1);
+			final int a =
+				order[index];
+			order[index] =
+				order[i];
+			order[i] =
+				a;
 		}
 	}
 
 	@Override
 	public void fixOrder() {
-		for (int i = 0; i < order.length; i++) {
-			order[i] = i + 1;
+		for (int i =
+			0; i < order.length; i++) {
+			order[i] =
+				i
+					+ 1;
 		}
 	}
 
@@ -268,7 +307,8 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public void initSolutionList(int size) {
-		solutionList = new RingList<>(size);
+		solutionList =
+			new RingList<>(size);
 	}
 
 }

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,11 +30,11 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Tree element.
- * 
+ *
  * TODO remove this class as it seems to be redundant to the feature structure and needs to be updated all the time.S
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public class ModelTree<M, E> implements Iterable<E> {
 
@@ -44,8 +44,10 @@ public class ModelTree<M, E> implements Iterable<E> {
 			super(root);
 		}
 
+		@Override
 		public ModelTree<M, E> getNext() {
-			final ModelTree<M, E> next = iteratorList.removeFirst();
+			final ModelTree<M, E> next =
+				iteratorList.removeFirst();
 			iteratorList.addAll(0, next.children);
 			return next;
 		}
@@ -58,8 +60,10 @@ public class ModelTree<M, E> implements Iterable<E> {
 			super(root);
 		}
 
+		@Override
 		public ModelTree<M, E> getNext() {
-			final ModelTree<M, E> next = iteratorList.removeFirst();
+			final ModelTree<M, E> next =
+				iteratorList.removeFirst();
 			iteratorList.addAll(next.children);
 			return next;
 		}
@@ -67,6 +71,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	private static final class Converter<M, E> implements Functional.IFunction<ModelTree<M, E>, E> {
+
 		@Override
 		public E invoke(ModelTree<M, E> tree) {
 			return tree.object;
@@ -75,19 +80,23 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	protected final M treeModel;
 
-	protected final List<ModelTree<M, E>> children = new ArrayList<>();
+	protected final List<ModelTree<M, E>> children =
+		new ArrayList<>();
 
 	protected E object;
 
-	protected ModelTree<M, E> parent = null;
+	protected ModelTree<M, E> parent =
+		null;
 
 	public ModelTree(E object) {
 		this(object, null);
 	}
 
 	public ModelTree(E object, M treeModel) {
-		this.object = object;
-		this.treeModel = treeModel;
+		this.object =
+			object;
+		this.treeModel =
+			treeModel;
 	}
 
 	public List<ModelTree<M, E>> getChildren() {
@@ -109,6 +118,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 		return parent.object;
 	}
 
+	@Override
 	public TreeIterator<E> iterator() {
 		return new PreOrderIterator<M, E>(this);
 	}
@@ -122,30 +132,38 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void addNode(E newChildObject) {
-		ModelTree<M, E> newChild = new ModelTree<>(newChildObject, this.treeModel);
-		newChild.parent = this;
+		final ModelTree<M, E> newChild =
+			new ModelTree<>(newChildObject, this.treeModel);
+		newChild.parent =
+			this;
 		children.add(newChild);
 	}
-	
+
 	public void addNodeAtIndex(E newChildObject, int index) {
-		ModelTree<M, E> newChild = new ModelTree<>(newChildObject, this.treeModel);
-		newChild.parent = this;
+		final ModelTree<M, E> newChild =
+			new ModelTree<>(newChildObject, this.treeModel);
+		newChild.parent =
+			this;
 		children.add(index, newChild);
 	}
 
 	public void addSubTree(ModelTree<M, E> newChild) {
-		newChild.parent = this;
+		newChild.parent =
+			this;
 		children.add(newChild);
 	}
-	
+
 	public void addSubTreeAtIndex(int index, ModelTree<M, E> newChild) {
-		newChild.parent = this;
+		newChild.parent =
+			this;
 		children.add(index, newChild);
 	}
 
 	public void removeSubTree(ModelTree<M, E> child) {
-		for (Iterator<ModelTree<M, E>> it = children.iterator(); it.hasNext();) {
-			final ModelTree<M, E> next = it.next();
+		for (final Iterator<ModelTree<M, E>> it =
+			children.iterator(); it.hasNext();) {
+			final ModelTree<M, E> next =
+				it.next();
 			if (next.equals(child)) {
 				it.remove();
 				return;
@@ -154,7 +172,8 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void removeNode(E child) {
-		for (TreeIterator<E> it = iterator(); it.hasNext();) {
+		for (final TreeIterator<E> it =
+			iterator(); it.hasNext();) {
 			if (it.next().equals(child)) {
 				it.remove();
 				break;
@@ -179,14 +198,17 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public int getNumberOfNodes() {
-		int count = 0;
-		final LinkedList<ModelTree<M, E>> countList = new LinkedList<>();
+		int count =
+			0;
+		final LinkedList<ModelTree<M, E>> countList =
+			new LinkedList<>();
 		countList.add(this);
 		do {
-			final ModelTree<M, E> next = countList.removeFirst();
+			final ModelTree<M, E> next =
+				countList.removeFirst();
 			countList.addAll(0, next.children);
 			count++;
-		} while(!countList.isEmpty());
+		} while (!countList.isEmpty());
 		return count;
 	}
 
@@ -198,22 +220,28 @@ public class ModelTree<M, E> implements Iterable<E> {
 		if (this == tree) {
 			return true;
 		}
-		ModelTree<M, E> curParent = parent;
+		ModelTree<M, E> curParent =
+			parent;
 		while (curParent != null) {
 			if (tree == curParent) {
 				return true;
 			}
-			curParent = curParent.parent;
+			curParent =
+				curParent.parent;
 		}
 		return false;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		for (TreeIterator<E> it = this.iterator(); it.hasNext();) {
-			final E element = it.next();
-			for (int i = 0; i < it.getCurrentLevel(); i++) {
+		final StringBuilder sb =
+			new StringBuilder();
+		for (final TreeIterator<E> it =
+			this.iterator(); it.hasNext();) {
+			final E element =
+				it.next();
+			for (int i =
+				0; i < it.getCurrentLevel(); i++) {
 				sb.append('\t');
 			}
 			sb.append(element.toString());

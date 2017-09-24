@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,13 +35,16 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Displays the source.
- * 
+ *
  * @author Jens Meinicke
  */
 public class TextEditorPage extends TextEditor implements IConfigurationEditorPage {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
-	private static final String PAGE_TEXT = SOURCE;
+	public static final String ID =
+		FMUIPlugin.PLUGIN_ID
+			+ "TextEditorPage";
+	private static final String PAGE_TEXT =
+		SOURCE;
 
 	private int index;
 
@@ -59,12 +62,14 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public void setIndex(int index) {
-		this.index = index;
+		this.index =
+			index;
 	}
 
 	@Override
 	public void setConfigurationEditor(IConfigurationEditor configurationEditor) {
-		this.configurationEditor = (ConfigurationEditor) configurationEditor;
+		this.configurationEditor =
+			(ConfigurationEditor) configurationEditor;
 	}
 
 	@Override
@@ -79,7 +84,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 			case MODEL_DATA_SAVED:
 				try {
 					getDocumentProvider().resetDocument(getEditorInput());
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					e.printStackTrace();
 				}
 				break;
@@ -92,10 +97,15 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	protected final void refresh() {
-		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
-		if (configurationManager != null && configurationEditor.getConfiguration() != null && !configurationEditor.containsError()) {
-			final String source = configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
+		final ConfigurationManager configurationManager =
+			configurationEditor.getConfigurationManager();
+		if ((configurationManager != null)
+			&& (configurationEditor.getConfiguration() != null)
+			&& !configurationEditor.containsError()) {
+			final String source =
+				configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+			final IDocument document =
+				getDocumentProvider().getDocument(getEditorInput());
 			if (!source.equals(document.get())) {
 				document.set(source);
 			}
@@ -108,8 +118,10 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	public void updateConfiguration() {
-		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
-		final IPersistentFormat<Configuration> confFormat = configurationEditor.getConfigurationManager().getFormat();
+		final String text =
+			getDocumentProvider().getDocument(getEditorInput()).get();
+		final IPersistentFormat<Configuration> confFormat =
+			configurationEditor.getConfigurationManager().getFormat();
 		if (!confFormat.getInstance().write(configurationEditor.getConfiguration()).equals(text)) {
 			confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
 		}
@@ -134,17 +146,24 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public boolean allowPageChange(int newPageIndex) {
-		final ProblemList problems = checkSource();
-		return !(problems.containsError() || (isDirty() && problems.containsWarning()));
+		final ProblemList problems =
+			checkSource();
+		return !(problems.containsError()
+			|| (isDirty()
+				&& problems.containsWarning()));
 	}
 
 	protected ProblemList checkSource() {
-		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		final ConfigurationManager configurationManager =
+			configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			final Configuration configuration = configurationEditor.getConfiguration();
-			final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
+			final Configuration configuration =
+				configurationEditor.getConfiguration();
+			final IPersistentFormat<Configuration> confFormat =
+				configurationManager.getFormat();
 
-			final ProblemList problems = confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
+			final ProblemList problems =
+				confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
 			configurationEditor.createModelFileMarkers(problems);
 			configurationEditor.setContainsError(problems.containsError());
 

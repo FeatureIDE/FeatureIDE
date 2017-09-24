@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,12 +31,13 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> C files.
- * 
+ *
  * @author Jens Meinicke
  */
 public class CErrorPropagation extends ErrorPropagation {
 
-	private static final String TASK = "org.eclipse.cdt.core.task";
+	private static final String TASK =
+		"org.eclipse.cdt.core.task";
 
 	protected CErrorPropagation(IFeatureProject featureProject) {
 		super(featureProject);
@@ -47,69 +48,98 @@ public class CErrorPropagation extends ErrorPropagation {
 	 */
 	@Override
 	protected void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
-		for (FSTField f : fields) {
+		for (final FSTField f : fields) {
 			if (f.getBody() == null) {
 				continue;
 			}
-			int i = content.indexOf(f.getBody());
+			final int i =
+				content.indexOf(f.getBody());
 			if (i == -1) {
 				continue;
 			}
-			int line = countLines(content.substring(0, i));
+			final int line =
+				countLines(content.substring(0, i));
 			f.setComposedLine(line);
 		}
 
-		content = content.replaceAll("__wrappee__\\w*\\s*", "");
+		content =
+			content.replaceAll("__wrappee__\\w*\\s*", "");
 		while (content.contains("  ")) {
-			content = content.replaceAll("  ", " ");
+			content =
+				content.replaceAll("  ", " ");
 		}
-		content = content.replaceAll("\t", "");
+		content =
+			content.replaceAll("\t", "");
 		while (content.contains(" (")) {
-			content = content.replaceAll(" \\(", "(");
+			content =
+				content.replaceAll(" \\(", "(");
 		}
 		while (content.contains(" \n")) {
-			content = content.replaceAll(" \n", "\n");
+			content =
+				content.replaceAll(" \n", "\n");
 		}
 
-		for (FSTMethod m : methods) {
+		for (final FSTMethod m : methods) {
 			if (m.getBody() == null) {
 				continue;
 			}
-			int i = -1;
+			int i =
+				-1;
 			if (m.isConstructor()) {
-				String body = m.getBody().substring(m.getBody().indexOf('{') + 1);
+				String body =
+					m.getBody().substring(m.getBody().indexOf('{')
+						+ 1);
 				while (body.contains("  ")) {
-					body = body.replaceAll("  ", " ");
+					body =
+						body.replaceAll("  ", " ");
 				}
-				body = body.replaceAll("\t", "");
+				body =
+					body.replaceAll("\t", "");
 				while (body.contains(" (")) {
-					body = body.replaceAll(" \\(", "(");
+					body =
+						body.replaceAll(" \\(", "(");
 				}
-				body = body.replaceAll("\r\n", "\n");
+				body =
+					body.replaceAll("\r\n", "\n");
 				while (body.contains(" \n")) {
-					body = body.replaceAll(" \n", "\n");
+					body =
+						body.replaceAll(" \n", "\n");
 				}
-				body = body.substring(0, body.lastIndexOf('}'));
-				i = content.indexOf(body);
+				body =
+					body.substring(0, body.lastIndexOf('}'));
+				i =
+					content.indexOf(body);
 			} else {
-				String body = m.getBody();
+				String body =
+					m.getBody();
 				while (body.contains("  ")) {
-					body = body.replaceAll("  ", " ");
+					body =
+						body.replaceAll("  ", " ");
 				}
-				body = body.replaceAll("\t", "");
+				body =
+					body.replaceAll("\t", "");
 				while (body.contains(" (")) {
-					body = body.replaceAll(" \\(", "(");
+					body =
+						body.replaceAll(" \\(", "(");
 				}
-				body = body.replaceAll("\r\n", "\n");
+				body =
+					body.replaceAll("\r\n", "\n");
 				while (body.contains(" \n")) {
-					body = body.replaceAll(" \n", "\n");
+					body =
+						body.replaceAll(" \n", "\n");
 				}
-				body = body.replaceAll("original\\(", m.getName() + "(");
-				body = body.replaceAll("original\\s*\\(", m.getName() + " (");
-				i = content.indexOf(body);
+				body =
+					body.replaceAll("original\\(", m.getName()
+						+ "(");
+				body =
+					body.replaceAll("original\\s*\\(", m.getName()
+						+ " (");
+				i =
+					content.indexOf(body);
 			}
 			if (i != -1) {
-				int line = countLines(content.substring(0, i));
+				final int line =
+					countLines(content.substring(0, i));
 				m.setComposedLine(line);
 			}
 		}
@@ -119,8 +149,7 @@ public class CErrorPropagation extends ErrorPropagation {
 	protected boolean propagateMarker(IMarker m) {
 		try {
 			return !(TASK.equals(m.getType()));
-		} catch (CoreException e) {
-		}
+		} catch (final CoreException e) {}
 		return super.propagateMarker(m);
 	}
 

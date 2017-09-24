@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,18 +27,24 @@ import java.util.NoSuchElementException;
 
 /**
  * List with a fixed size that wraps around if more elements are added (overwriting previously added elements).
- * 
+ *
  * @author Sebastian Krieter
  */
 public class RingList<T> implements Iterable<T> {
+
 	private final List<T> ring;
 	private int firstPointer;
-	private int size;
+	private final int size;
 
 	public RingList(int size) {
-		this.ring = new ArrayList<>();
-		this.size = size > 0 ? size : 1;
-		this.firstPointer = 0;
+		this.ring =
+			new ArrayList<>();
+		this.size =
+			size > 0
+				? size
+				: 1;
+		this.firstPointer =
+			0;
 	}
 
 	public void add(T element) {
@@ -46,7 +52,10 @@ public class RingList<T> implements Iterable<T> {
 			ring.add(element);
 		} else {
 			ring.set(firstPointer, element);
-			firstPointer = (firstPointer + 1) % size;
+			firstPointer =
+				(firstPointer
+					+ 1)
+					% size;
 		}
 	}
 
@@ -56,8 +65,11 @@ public class RingList<T> implements Iterable<T> {
 			return ring.iterator();
 		}
 		return new Iterator<T>() {
-			int index = firstPointer;
-			int count = 0;
+
+			int index =
+				firstPointer;
+			int count =
+				0;
 
 			@Override
 			public boolean hasNext() {
@@ -69,8 +81,12 @@ public class RingList<T> implements Iterable<T> {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
 				}
-				final T t = ring.get(index);
-				index = (index + 1) % size;
+				final T t =
+					ring.get(index);
+				index =
+					(index
+						+ 1)
+						% size;
 				count++;
 				return t;
 			}
@@ -87,11 +103,16 @@ public class RingList<T> implements Iterable<T> {
 	}
 
 	public T get(int k) {
-		return ring.get((firstPointer + k) % size);
+		return ring.get((firstPointer
+			+ k)
+			% size);
 	}
 
 	public T getLast() {
-		return ring.get((firstPointer + (ring.size() - 2)) % size);
+		return ring.get((firstPointer
+			+ (ring.size()
+				- 2))
+			% size);
 	}
 
 	public T getFirst() {

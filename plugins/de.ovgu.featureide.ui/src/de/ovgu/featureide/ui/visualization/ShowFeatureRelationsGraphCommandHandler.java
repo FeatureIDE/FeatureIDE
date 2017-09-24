@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,42 +45,53 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Show Feature Relations Graph
- * 
+ *
  * @author Jabier Martinez
  */
 public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 	@Override
 	protected void singleAction(Object element) {
-		IProject project = null;
+		IProject project =
+			null;
 		if (!(element instanceof IProject)) {
 			if (element instanceof IAdaptable) {
-				project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+				project =
+					((IAdaptable) element).getAdapter(IProject.class);
 			}
 		} else {
-			project = (IProject) element;
+			project =
+				(IProject) element;
 		}
 
-		Shell shell = new Shell(Display.getCurrent());
+		final Shell shell =
+			new Shell(Display.getCurrent());
 		shell.setText("Select feature");
 		shell.setSize(400, 200);
 		shell.setLayout(new FillLayout(SWT.VERTICAL));
-		final org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(shell, SWT.BORDER | SWT.V_SCROLL);
+		final org.eclipse.swt.widgets.List list =
+			new org.eclipse.swt.widgets.List(shell, SWT.BORDER
+				| SWT.V_SCROLL);
 
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject =
+			CorePlugin.getFeatureProject(project);
 		if (featureProject != null) {
-			List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
-			for (String f : featureList) {
+			final List<String> featureList =
+				ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+			for (final String f : featureList) {
 				list.add(f);
 			}
 
 			list.addSelectionListener(new SelectionListener() {
 
+				@Override
 				public void widgetSelected(SelectionEvent event) {
-					int[] selections = list.getSelectionIndices();
+					final int[] selections =
+						list.getSelectionIndices();
 					showFrog(featureProject, list.getItem(selections[0]));
 				}
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent event) {
 
 				}
@@ -92,51 +103,66 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 	// P(i|currentI)
 	public static double getGivenOperation(boolean[][] matrix, int currentI, int i) {
-		double numerator = 0;
-		double denominator = 0;
-		for (int conf = 0; conf < matrix.length; conf++) {
+		double numerator =
+			0;
+		double denominator =
+			0;
+		for (int conf =
+			0; conf < matrix.length; conf++) {
 			if (matrix[conf][currentI]) {
-				denominator = denominator + 1.0;
+				denominator =
+					denominator
+						+ 1.0;
 				if (matrix[conf][i]) {
-					numerator = numerator + 1.0;
+					numerator =
+						numerator
+							+ 1.0;
 				}
 			}
 		}
 		if (denominator == 0) {
 			return 0;
 		}
-		return numerator / denominator;
+		return numerator
+			/ denominator;
 	}
 
 	/**
 	 * Show frog
-	 * 
+	 *
 	 * @param featureProject
 	 * @param featureCenter
 	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
 
 		// Get feature in the center
-		IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
+		final IFeature fc =
+			featureProject.getFeatureModel().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
-		List<String> formalizedRequires = new ArrayList<String>();
-		List<String> formalizedExcludes = new ArrayList<String>();
-		FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
-		for (IFeature f : fd.always(fc)) {
+		final List<String> formalizedRequires =
+			new ArrayList<String>();
+		final List<String> formalizedExcludes =
+			new ArrayList<String>();
+		final FeatureDependencies fd =
+			new FeatureDependencies(featureProject.getFeatureModel());
+		for (final IFeature f : fd.always(fc)) {
 			formalizedRequires.add(f.getName());
 		}
-		for (IFeature f : fd.never(fc)) {
+		for (final IFeature f : fd.never(fc)) {
 			formalizedExcludes.add(f.getName());
 		}
 
 		// Get all features in order ignoring the mandatory features
-		List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+		final List<String> featureList =
+			ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
 		// Create the matrix configurations/features for the calculations
-		boolean[][] matrix = null;
+		boolean[][] matrix =
+			null;
 		try {
-			matrix = ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
-		} catch (CoreException e) {
+			matrix =
+				ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 
@@ -148,65 +174,83 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		// var FORMALIZED_REQUIRES = [];
 		// var FORMALIZED_EXCLUDES = [];
 
-		StringBuffer data = new StringBuffer(" CENTRAL_FEATURE = \"");
+		final StringBuffer data =
+			new StringBuffer(" CENTRAL_FEATURE = \"");
 		data.append(featureCenter);
 		data.append("\";\n FEATURE_NAMES = [");
-		for (String f : featureList) {
+		for (final String f : featureList) {
 			if (!f.equals(featureCenter)) {
 				data.append("\"");
 				data.append(f);
 				data.append("\",");
 			}
 		}
-		data.setLength(data.length() - 1); // remove last comma
+		data.setLength(data.length()
+			- 1); // remove last comma
 		data.append("];\n GIVEN = [");
-		for (String f : featureList) {
+		for (final String f : featureList) {
 			if (!f.equals(featureCenter)) {
-				int i = featureList.indexOf(f);
-				int ic = featureList.indexOf(featureCenter);
+				final int i =
+					featureList.indexOf(f);
+				final int ic =
+					featureList.indexOf(featureCenter);
 				data.append(getGivenOperation(matrix, ic, i));
 				data.append(",");
 			}
 		}
-		data.setLength(data.length() - 1); // remove last comma
-		boolean atLeastOne = false;
+		data.setLength(data.length()
+			- 1); // remove last comma
+		boolean atLeastOne =
+			false;
 		data.append("];\n FORMALIZED_REQUIRES = [");
-		for (String f : formalizedRequires) {
+		for (final String f : formalizedRequires) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
-			atLeastOne = true;
+			atLeastOne =
+				true;
 		}
 		if (atLeastOne) {
-			data.setLength(data.length() - 1); // remove last comma
+			data.setLength(data.length()
+				- 1); // remove last comma
 		}
-		atLeastOne = false;
+		atLeastOne =
+			false;
 		data.append("];\n FORMALIZED_EXCLUDES = [");
-		for (String f : formalizedExcludes) {
+		for (final String f : formalizedExcludes) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
-			atLeastOne = true;
+			atLeastOne =
+				true;
 		}
 		if (atLeastOne) {
-			data.setLength(data.length() - 1); // remove last comma
+			data.setLength(data.length()
+				- 1); // remove last comma
 		}
 		data.append("];\n");
 
-		File fi = Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
-		String html = Utils.getStringOfFile(fi);
-		html = html.replaceFirst("// DATA_HERE", data.toString());
+		final File fi =
+			Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
+		String html =
+			Utils.getStringOfFile(fi);
+		html =
+			html.replaceFirst("// DATA_HERE", data.toString());
 
 		// Open the browser
-		Shell shell = new Shell(Display.getCurrent());
+		final Shell shell =
+			new Shell(Display.getCurrent());
 		shell.setLayout(new FillLayout());
 		shell.setSize(900, 800);
-		shell.setText("Feature relations graph: " + featureCenter);
+		shell.setText("Feature relations graph: "
+			+ featureCenter);
 		Browser browser;
 		try {
-			browser = new Browser(shell, SWT.NONE);
-		} catch (SWTError e) {
-			System.out.println("Could not instantiate Browser: " + e.getMessage());
+			browser =
+				new Browser(shell, SWT.NONE);
+		} catch (final SWTError e) {
+			System.out.println("Could not instantiate Browser: "
+				+ e.getMessage());
 			return;
 		}
 		browser.setText(html);

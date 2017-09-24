@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AFeatureRemover implements LongRunningMethod<List<? extends Clause>> {
@@ -55,24 +55,32 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	 * For sorting clauses by length. Starting with the longest.
 	 */
 	private static final class LengthComparator implements Comparator<Clause> {
+
 		@Override
 		public int compare(Clause o1, Clause o2) {
-			return o2.getLiterals().length - o1.getLiterals().length;
+			return o2.getLiterals().length
+				- o1.getLiterals().length;
 		}
 	}
 
-	protected static final Comparator<Clause> lengthComparator = new LengthComparator();
+	protected static final Comparator<Clause> lengthComparator =
+		new LengthComparator();
 
 	protected final Node fmNode;
 
 	protected final boolean includeBooleanValues;
 	protected final boolean regularCNF;
 
-	protected final List<DeprecatedClause> newRelevantClauseList = new ArrayList<>();
-	protected final List<DeprecatedClause> newNewClauseList = new ArrayList<>();
-	protected final Set<DeprecatedClause> relevantClauseSet = new HashSet<>();
-	protected final Set<DeprecatedClause> newClauseSet = new HashSet<>();
-	protected final Set<String> retainedFeatures = new HashSet<>();
+	protected final List<DeprecatedClause> newRelevantClauseList =
+		new ArrayList<>();
+	protected final List<DeprecatedClause> newNewClauseList =
+		new ArrayList<>();
+	protected final Set<DeprecatedClause> relevantClauseSet =
+		new HashSet<>();
+	protected final Set<DeprecatedClause> newClauseSet =
+		new HashSet<>();
+	protected final Set<String> retainedFeatures =
+		new HashSet<>();
 
 	protected List<DeprecatedClause> relevantClauseList;
 	protected List<DeprecatedClause> newClauseList;
@@ -85,11 +93,15 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	protected DeprecatedFeature[] map;
 	protected AFeatureOrderHeuristic heuristic;
 
-	protected int globalMixedClauseCount = 0;
+	protected int globalMixedClauseCount =
+		0;
 
-	protected int relevantPosIndex = 0;
-	protected int relevantNegIndex = 0;
-	protected int newRelevantDelIndex = 0;
+	protected int relevantPosIndex =
+		0;
+	protected int relevantNegIndex =
+		0;
+	protected int newRelevantDelIndex =
+		0;
 
 	public AFeatureRemover(Node cnf, Collection<String> features) {
 		this(cnf, features, true, false);
@@ -100,51 +112,82 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	public AFeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues, boolean regularCNF) {
-		this.fmNode = cnf;
-		this.features = features;
-		this.includeBooleanValues = includeBooleanValues;
-		this.regularCNF = regularCNF;
+		fmNode =
+			cnf;
+		this.features =
+			features;
+		this.includeBooleanValues =
+			includeBooleanValues;
+		this.regularCNF =
+			regularCNF;
 	}
 
 	public final Node createNewClauseList(Collection<? extends Clause> clauses) {
-		final int newClauseSize = clauses.size();
+		final int newClauseSize =
+			clauses.size();
 		final Node[] newClauses;
 		if (includeBooleanValues) {
-			newClauses = new Node[newClauseSize + 3];
+			newClauses =
+				new Node[newClauseSize
+					+ 3];
 
 			// create clause that contains all retained features
-			final Node[] allLiterals = new Node[retainedFeatures.size() + 1];
-			int i = 0;
-			for (String featureName : retainedFeatures) {
-				allLiterals[i++] = new Literal(featureName);
+			final Node[] allLiterals =
+				new Node[retainedFeatures.size()
+					+ 1];
+			int i =
+				0;
+			for (final String featureName : retainedFeatures) {
+				allLiterals[i++] =
+					new Literal(featureName);
 			}
-			allLiterals[i] = new Literal(NodeCreator.varTrue);
+			allLiterals[i] =
+				new Literal(NodeCreator.varTrue);
 
-			newClauses[newClauseSize] = new Or(allLiterals);
+			newClauses[newClauseSize] =
+				new Or(allLiterals);
 			if (regularCNF) {
-				newClauses[newClauseSize + 1] = new Or(new Literal(NodeCreator.varTrue, true));
-				newClauses[newClauseSize + 2] = new Or(new Literal(NodeCreator.varFalse, false));
+				newClauses[newClauseSize
+					+ 1] =
+						new Or(new Literal(NodeCreator.varTrue, true));
+				newClauses[newClauseSize
+					+ 2] =
+						new Or(new Literal(NodeCreator.varFalse, false));
 			} else {
-				newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue, true);
-				newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
+				newClauses[newClauseSize
+					+ 1] =
+						new Literal(NodeCreator.varTrue, true);
+				newClauses[newClauseSize
+					+ 2] =
+						new Literal(NodeCreator.varFalse, false);
 			}
 		} else {
-			newClauses = new Node[newClauseSize];
+			newClauses =
+				new Node[newClauseSize];
 		}
-		int j = 0;
-		for (Clause newClause : clauses) {
-			final int[] newClauseLiterals = newClause.getLiterals();
-			final Literal[] literals = new Literal[newClauseLiterals.length];
-			int i = literals.length;
-			for (int k = 0; k < literals.length; k++) {
-				final int child = newClauseLiterals[k];
-				literals[--i] = new Literal(featureNameArray[Math.abs(child)], child > 0);
+		int j =
+			0;
+		for (final Clause newClause : clauses) {
+			final int[] newClauseLiterals =
+				newClause.getLiterals();
+			final Literal[] literals =
+				new Literal[newClauseLiterals.length];
+			int i =
+				literals.length;
+			for (int k =
+				0; k < literals.length; k++) {
+				final int child =
+					newClauseLiterals[k];
+				literals[--i] =
+					new Literal(featureNameArray[Math.abs(child)], child > 0);
 			}
-			newClauses[j++] = new Or(literals);
+			newClauses[j++] =
+				new Or(literals);
 		}
 		return new And(newClauses);
 	}
 
+	@Override
 	public final List<? extends Clause> execute(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
@@ -160,7 +203,8 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	private void addLiteral(Set<String> retainedFeatures, Node orChild) {
-		final Literal literal = (Literal) orChild;
+		final Literal literal =
+			(Literal) orChild;
 		if (literal.var instanceof String) {
 			retainedFeatures.add((String) literal.var);
 		}
@@ -189,9 +233,9 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	private void collectFeatures() {
 		if (fmNode instanceof And) {
-			for (Node andChild : fmNode.getChildren()) {
+			for (final Node andChild : fmNode.getChildren()) {
 				if (andChild instanceof Or) {
-					for (Node orChild : andChild.getChildren()) {
+					for (final Node orChild : andChild.getChildren()) {
 						addLiteral(retainedFeatures, orChild);
 					}
 				} else {
@@ -199,7 +243,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 				}
 			}
 		} else if (fmNode instanceof Or) {
-			for (Node orChild : fmNode.getChildren()) {
+			for (final Node orChild : fmNode.getChildren()) {
 				addLiteral(retainedFeatures, orChild);
 			}
 		} else {
@@ -210,26 +254,37 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	private int[] convert(Literal[] newChildren) {
-		final int[] literals = new int[newChildren.length];
-		for (int j = 0; j < newChildren.length; j++) {
-			final Literal child = newChildren[j];
-			literals[j] = child.positive ? idMap.get(child.var) : -idMap.get(child.var);
+		final int[] literals =
+			new int[newChildren.length];
+		for (int j =
+			0; j < newChildren.length; j++) {
+			final Literal child =
+				newChildren[j];
+			literals[j] =
+				child.positive
+					? idMap.get(child.var)
+					: -idMap.get(child.var);
 		}
 		return literals;
 	}
 
 	private void createClauseLists(final Node[] andChildren) {
-		for (int i = 0; i < andChildren.length; i++) {
+		for (int i =
+			0; i < andChildren.length; i++) {
 			addNewClause(getClause(andChildren[i]));
 		}
 
-		newClauseList = new ArrayList<>(newNewClauseList);
-		relevantClauseList = new ArrayList<>(newRelevantClauseList);
+		newClauseList =
+			new ArrayList<>(newNewClauseList);
+		relevantClauseList =
+			new ArrayList<>(newRelevantClauseList);
 		newRelevantClauseList.clear();
 		newNewClauseList.clear();
 
-		relevantPosIndex = relevantClauseList.size();
-		relevantNegIndex = relevantClauseList.size();
+		relevantPosIndex =
+			relevantClauseList.size();
+		relevantNegIndex =
+			relevantClauseList.size();
 	}
 
 	protected final void deleteClause(final DeprecatedClause curClause) {
@@ -240,9 +295,10 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	protected final void deleteOldRelevantClauses() {
 		if (relevantPosIndex < relevantClauseList.size()) {
-			final List<DeprecatedClause> subList = relevantClauseList.subList(relevantPosIndex, relevantClauseList.size());
+			final List<DeprecatedClause> subList =
+				relevantClauseList.subList(relevantPosIndex, relevantClauseList.size());
 			relevantClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 			subList.clear();
@@ -251,9 +307,10 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	protected final void deleteNewRelevantClauses() {
 		if (newRelevantDelIndex < newRelevantClauseList.size()) {
-			final List<DeprecatedClause> subList = newRelevantClauseList.subList(newRelevantDelIndex, newRelevantClauseList.size());
+			final List<DeprecatedClause> subList =
+				newRelevantClauseList.subList(newRelevantDelIndex, newRelevantClauseList.size());
 			relevantClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 		}
@@ -261,27 +318,36 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	private DeprecatedClause getClause(Node andChild) {
 		if (andChild instanceof Or) {
-			int absoluteValueCount = 0;
-			boolean valid = true;
+			int absoluteValueCount =
+				0;
+			boolean valid =
+				true;
 
-			final Literal[] children = Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class);
-			for (int j = 0; j < children.length; j++) {
-				final Literal literal = children[j];
+			final Literal[] children =
+				Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class);
+			for (int j =
+				0; j < children.length; j++) {
+				final Literal literal =
+					children[j];
 
 				// sort out obvious tautologies
 				if (literal.var.equals(NodeCreator.varTrue)) {
 					if (literal.positive) {
-						valid = false;
+						valid =
+							false;
 					} else {
 						absoluteValueCount++;
-						children[j] = null;
+						children[j] =
+							null;
 					}
 				} else if (literal.var.equals(NodeCreator.varFalse)) {
 					if (literal.positive) {
 						absoluteValueCount++;
-						children[j] = null;
+						children[j] =
+							null;
 					} else {
-						valid = false;
+						valid =
+							false;
 					}
 				}
 			}
@@ -291,12 +357,18 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 					if (children.length == absoluteValueCount) {
 						throw new RuntimeException("Model is void!");
 					}
-					Literal[] newChildren = new Literal[children.length - absoluteValueCount];
-					int k = 0;
-					for (int j = 0; j < children.length; j++) {
-						final Literal literal = children[j];
+					final Literal[] newChildren =
+						new Literal[children.length
+							- absoluteValueCount];
+					int k =
+						0;
+					for (int j =
+						0; j < children.length; j++) {
+						final Literal literal =
+							children[j];
 						if (literal != null) {
-							newChildren[k++] = literal;
+							newChildren[k++] =
+								literal;
 						}
 					}
 					return DeprecatedClause.createClause(convert(newChildren));
@@ -307,7 +379,8 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 				return null;
 			}
 		} else {
-			final Literal literal = (Literal) andChild;
+			final Literal literal =
+				(Literal) andChild;
 			if (literal.var.equals(NodeCreator.varTrue)) {
 				if (!literal.positive) {
 					throw new RuntimeException("Model is void!");
@@ -319,18 +392,24 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 				}
 				return null;
 			} else {
-				return DeprecatedClause.createClause(convert(new Literal[] { literal }));
+				return DeprecatedClause.createClause(convert(new Literal[] {
+					literal }));
 			}
 		}
 	}
 
 	private List<? extends Clause> handleComplexFormula(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		map = new DeprecatedFeature[idMap.size() + 1];
-		for (String curFeature : features) {
-			final Integer id = idMap.get(curFeature);
-			map[id] = new DeprecatedFeature(curFeature, id);
+		map =
+			new DeprecatedFeature[idMap.size()
+				+ 1];
+		for (final String curFeature : features) {
+			final Integer id =
+				idMap.get(curFeature);
+			map[id] =
+				new DeprecatedFeature(curFeature, id);
 		}
-		helper = new int[featureNameArray.length];
+		helper =
+			new int[featureNameArray.length];
 
 		// fill sets
 		createClauseLists(fmNode.getChildren());
@@ -339,17 +418,31 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 		while (heuristic.hasNext()) {
 			workMonitor.checkCancel();
-			final DeprecatedFeature nextFeature = heuristic.next();
+			final DeprecatedFeature nextFeature =
+				heuristic.next();
 			if (nextFeature == null) {
 				break;
 			}
 
 			preRedundancyCheck(nextFeature);
 
-			final boolean outputSwitch = heuristic.size() < 20 || nextFeature.getClauseCount() > 0;
+			final boolean outputSwitch =
+				(heuristic.size() < 20)
+					|| (nextFeature.getClauseCount() > 0);
 			if (outputSwitch) {
-				final String s = heuristic.size() + ": " + nextFeature.getFeature() + " | #Res: " + nextFeature.getClauseCount() + " | #Rel: "
-						+ relevantClauseList.size() + " (-" + nextFeature.getNegativeCount() + ", " + nextFeature.getPositiveCount() + ")";
+				final String s =
+					heuristic.size()
+						+ ": "
+						+ nextFeature.getFeature()
+						+ " | #Res: "
+						+ nextFeature.getClauseCount()
+						+ " | #Rel: "
+						+ relevantClauseList.size()
+						+ " (-"
+						+ nextFeature.getNegativeCount()
+						+ ", "
+						+ nextFeature.getPositiveCount()
+						+ ")";
 				System.err.print(s);
 			}
 
@@ -360,24 +453,36 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 			resolution(nextFeature);
 
 			if (outputSwitch) {
-				final String s = " -> New: " + newNewClauseList.size();
+				final String s =
+					" -> New: "
+						+ newNewClauseList.size();
 				System.err.print(s);
 			}
-			int newCount = newClauseList.size();
+			final int newCount =
+				newClauseList.size();
 
-			if (newNewClauseList.size() > 0 || heuristic.size() == 0) {
+			if ((newNewClauseList.size() > 0)
+				|| (heuristic.size() == 0)) {
 				addNewClauses(nextFeature);
 			}
 
 			if (outputSwitch) {
-				final String s = "(" + (newClauseList.size() - newCount) + ") -> Rel: " + newRelevantClauseList.size();
+				final String s =
+					"("
+						+ (newClauseList.size()
+							- newCount)
+						+ ") -> Rel: "
+						+ newRelevantClauseList.size();
 				System.err.print(s);
 			}
 
 			detectRedundancy(nextFeature);
 
 			if (outputSwitch) {
-				final String s = "(" + (newRelevantDelIndex) + ")\n";
+				final String s =
+					"("
+						+ (newRelevantDelIndex)
+						+ ")\n";
 				System.err.print(s);
 			}
 
@@ -399,8 +504,9 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	}
 
 	private List<? extends Clause> handleSingleClause(IMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		for (Node clauseChildren : fmNode.getChildren()) {
-			final Literal literal = (Literal) clauseChildren;
+		for (final Node clauseChildren : fmNode.getChildren()) {
+			final Literal literal =
+				(Literal) clauseChildren;
 			if (features.contains(literal.var)) {
 				return Arrays.asList(new Clause());
 			}
@@ -420,32 +526,45 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 		collectFeatures();
 
-		featureNameArray = new String[retainedFeatures.size() + 1];
-		idMap = new HashMap<>(retainedFeatures.size() << 1);
+		featureNameArray =
+			new String[retainedFeatures.size()
+				+ 1];
+		idMap =
+			new HashMap<>(retainedFeatures.size() << 1);
 
-		int id = 1;
-		for (String name : features) {
+		int id =
+			1;
+		for (final String name : features) {
 			idMap.put(name, id);
-			featureNameArray[id] = name;
+			featureNameArray[id] =
+				name;
 			id++;
 		}
 
 		retainedFeatures.removeAll(features);
 
-		for (String name : retainedFeatures) {
+		for (final String name : retainedFeatures) {
 			idMap.put(name, id);
-			featureNameArray[id] = name;
+			featureNameArray[id] =
+				name;
 			id++;
 		}
 	}
 
 	private void resolution(DeprecatedFeature nextFeature) {
-		final int curFeatureID = nextFeature.getId();
-		for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
-			final int[] posOrChildren = relevantClauseList.get(i).getLiterals();
-			for (int j = relevantNegIndex; j < relevantClauseList.size(); j++) {
-				final int[] negOrChildren = relevantClauseList.get(j).getLiterals();
-				final int[] newChildren = new int[posOrChildren.length + negOrChildren.length];
+		final int curFeatureID =
+			nextFeature.getId();
+		for (int i =
+			relevantPosIndex; i < relevantNegIndex; i++) {
+			final int[] posOrChildren =
+				relevantClauseList.get(i).getLiterals();
+			for (int j =
+				relevantNegIndex; j < relevantClauseList.size(); j++) {
+				final int[] negOrChildren =
+					relevantClauseList.get(j).getLiterals();
+				final int[] newChildren =
+					new int[posOrChildren.length
+						+ negOrChildren.length];
 
 				System.arraycopy(posOrChildren, 0, newChildren, 0, posOrChildren.length);
 				System.arraycopy(negOrChildren, 0, newChildren, posOrChildren.length, negOrChildren.length);
@@ -453,24 +572,31 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 				addNewClause(DeprecatedClause.createClause(newChildren, curFeatureID, helper));
 			}
 		}
-		newRelevantDelIndex = newRelevantClauseList.size();
+		newRelevantDelIndex =
+			newRelevantClauseList.size();
 	}
 
 	private void sortRelevantList(DeprecatedFeature nextFeature) {
-		final int curFeatureID = nextFeature.getId();
-		for (int i = 0; i < relevantNegIndex; i++) {
-			final Clause clause = relevantClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+		final int curFeatureID =
+			nextFeature.getId();
+		for (int i =
+			0; i < relevantNegIndex; i++) {
+			final Clause clause =
+				relevantClauseList.get(i);
+			for (final int literal : clause.getLiterals()) {
 				if (literal == -curFeatureID) {
 					Collections.swap(relevantClauseList, i--, --relevantNegIndex);
 					break;
 				}
 			}
 		}
-		relevantPosIndex = relevantNegIndex;
-		for (int i = 0; i < relevantPosIndex; i++) {
-			final Clause clause = relevantClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+		relevantPosIndex =
+			relevantNegIndex;
+		for (int i =
+			0; i < relevantPosIndex; i++) {
+			final Clause clause =
+				relevantClauseList.get(i);
+			for (final int literal : clause.getLiterals()) {
 				if (literal == curFeatureID) {
 					Collections.swap(relevantClauseList, i--, --relevantPosIndex);
 					break;
@@ -490,9 +616,12 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 		newRelevantClauseList.clear();
 
-		relevantPosIndex = relevantClauseList.size();
-		relevantNegIndex = relevantClauseList.size();
-		newRelevantDelIndex = 0;
+		relevantPosIndex =
+			relevantClauseList.size();
+		relevantNegIndex =
+			relevantClauseList.size();
+		newRelevantDelIndex =
+			0;
 	}
 
 	protected void addNewClauses(DeprecatedFeature nextFeature) {
@@ -503,15 +632,21 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 	protected abstract boolean detectRedundancy(DeprecatedFeature next);
 
 	protected final boolean isRemovable(ICNFSolver solver, Clause curClause) {
-		final int[] literals = curClause.getLiterals();
-		final int[] literals2 = new int[literals.length];
-		for (int i = 0; i < literals.length; i++) {
-			literals2[i] = -literals[i];
+		final int[] literals =
+			curClause.getLiterals();
+		final int[] literals2 =
+			new int[literals.length];
+		for (int i =
+			0; i < literals.length; i++) {
+			literals2[i] =
+				-literals[i];
 		}
-		boolean remove = false;
+		boolean remove =
+			false;
 		try {
-			remove = !solver.isSatisfiable(literals2);
-		} catch (TimeoutException e) {
+			remove =
+				!solver.isSatisfiable(literals2);
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 		}
 		return remove;
@@ -519,8 +654,7 @@ public abstract class AFeatureRemover implements LongRunningMethod<List<? extend
 
 	protected abstract void prepareHeuristics();
 
-	protected void preRedundancyCheck(final DeprecatedFeature nextFeature) {
-	}
+	protected void preRedundancyCheck(final DeprecatedFeature nextFeature) {}
 
 	protected void release() {
 		retainedFeatures.clear();

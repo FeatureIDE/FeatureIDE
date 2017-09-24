@@ -25,14 +25,15 @@ import java.util.List;
 
 /**
  * Handler to properly write / read objects.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FormatHandler<T> {
 
 	private final IPersistentFormat<T> format;
 
-	private List<Problem> lastWarnings = null;
+	private List<Problem> lastWarnings =
+		null;
 
 	private T object;
 
@@ -41,12 +42,16 @@ public class FormatHandler<T> {
 	}
 
 	public FormatHandler(IPersistentFormat<T> format, T object) {
-		this.format = format;
-		this.object = object;
+		this.format =
+			format;
+		this.object =
+			object;
 	}
 
 	public List<Problem> getLastWarnings() {
-		return lastWarnings != null ? lastWarnings : Collections.<Problem> emptyList();
+		return lastWarnings != null
+			? lastWarnings
+			: Collections.<Problem> emptyList();
 	}
 
 	public T getObject() {
@@ -54,11 +59,13 @@ public class FormatHandler<T> {
 	}
 
 	public List<Problem> read(CharSequence source) {
-		return lastWarnings = createFormat().read(object, source);
+		return lastWarnings =
+			createFormat().read(object, source);
 	}
 
 	public void setObject(T object) {
-		this.object = object;
+		this.object =
+			object;
 	}
 
 	public String write() {
@@ -68,7 +75,7 @@ public class FormatHandler<T> {
 	protected IPersistentFormat<T> createFormat() {
 		return format.getInstance();
 	}
-	
+
 	public IPersistentFormat<T> getFormat() {
 		return format;
 	}

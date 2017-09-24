@@ -8,17 +8,19 @@ import org.eclipse.ui.PlatformUI;
 
 import br.ufal.ic.colligens.util.InvalidProductViewLog;
 
-class ViewLabelProvider extends LabelProvider implements ITableLabelProvider{
+class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 	@Override
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getProductName();
+			}
 		case 1:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getRelativePath();
+			}
 		default:
 			return "";
 		}

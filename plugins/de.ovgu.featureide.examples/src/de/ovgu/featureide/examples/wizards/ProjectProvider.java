@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,29 +37,34 @@ import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.ProjectRecord;
 import de.ovgu.featureide.examples.utils.ProjectRecordCollection;
 import de.ovgu.featureide.examples.utils.ProjectRecordFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * 
+ *
  * @author Reimar Schroeter
  */
 public final class ProjectProvider {
 
-	private static final Collection<ProjectRecord> projects = getProjects();
-	private static final Set<String> viewerNames = getViewersNamesForProjects();
+	private static final Collection<ProjectRecord> projects =
+		getProjects();
+	private static final Set<String> viewerNames =
+		getViewersNamesForProjects();
 
-	private ProjectProvider() {
-	}
+	private ProjectProvider() {}
 
 	public static Collection<ProjectRecord> getProjects() {
 		if (projects != null) {
 			return projects;
 		}
-		InputStream inputStream = null;
+		InputStream inputStream =
+			null;
 		try {
-			final URL url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
-			inputStream = url.openConnection().getInputStream();
-		} catch (IOException e) {
+			final URL url =
+				new URL("platform:/plugin/de.ovgu.featureide.examples/"
+					+ ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+			inputStream =
+				url.openConnection().getInputStream();
+		} catch (final IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 		}
 
@@ -67,11 +72,13 @@ public final class ProjectProvider {
 	}
 
 	private static Collection<ProjectRecord> getProjects(InputStream inputStream) {
-		ProjectRecordCollection projects = new ProjectRecordCollection();
+		final ProjectRecordCollection projects =
+			new ProjectRecordCollection();
 
-		FileHandler.load(inputStream, projects, new ProjectRecordFormat());
+		SimpleFileHandler.load(inputStream, projects, new ProjectRecordFormat());
 
-		for (Iterator<ProjectRecord> iterator = projects.iterator(); iterator.hasNext();) {
+		for (final Iterator<ProjectRecord> iterator =
+			projects.iterator(); iterator.hasNext();) {
 			if (!iterator.next().init()) {
 				iterator.remove();
 			}
@@ -84,14 +91,19 @@ public final class ProjectProvider {
 		if (viewerNames != null) {
 			return viewerNames;
 		}
-		Set<String> viewerNames = new HashSet<>();
-		for (ProjectRecord projectRecord : ProjectProvider.getProjects()) {
-			final Document doc = projectRecord.getInformationDocument();
+		final Set<String> viewerNames =
+			new HashSet<>();
+		for (final ProjectRecord projectRecord : ProjectProvider.getProjects()) {
+			final Document doc =
+				projectRecord.getInformationDocument();
 
 			if (doc != null) {
-				final NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
-				for (int i = 0; i < nlInterfaces.getLength(); i++) {
-					final Node item = nlInterfaces.item(i);
+				final NodeList nlInterfaces =
+					doc.getElementsByTagName("contentProvider");
+				for (int i =
+					0; i < nlInterfaces.getLength(); i++) {
+					final Node item =
+						nlInterfaces.item(i);
 					if (item.getNodeType() == Node.ELEMENT_NODE) {
 						viewerNames.add(((Element) item).getAttribute("name"));
 					}
@@ -102,7 +114,7 @@ public final class ProjectProvider {
 	}
 
 	public static void resetProjectItems() {
-		for (ProjectRecord projectRecord : getProjects()) {
+		for (final ProjectRecord projectRecord : getProjects()) {
 			projectRecord.resetItems();
 		}
 	}

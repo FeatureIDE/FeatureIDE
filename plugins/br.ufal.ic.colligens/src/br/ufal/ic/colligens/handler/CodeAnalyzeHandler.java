@@ -17,34 +17,40 @@ import br.ufal.ic.colligens.controllers.invalidconfigurations.InvalidConfigurati
 import br.ufal.ic.colligens.views.InvalidConfigurationsView;
 
 public class CodeAnalyzeHandler extends ColligensAbstractHandler {
+
 	private CoreController controller;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window =
+			HandlerUtil.getActiveWorkbenchWindow(event);
 
-		ISelection selection = window.getActivePage().getSelection();
+		final ISelection selection =
+			window.getActivePage().getSelection();
 
 		if (selection != null) {
 			if (controller == null) {
-				controller = new CoreController();
+				controller =
+					new CoreController();
 			}
 
 			controller.setWindow(HandlerUtil.getActiveWorkbenchWindow(event));
 			controller.setSelection(selection);
 
 			if (super.saveAll()) {
-				IWorkbenchPage page = window.getActivePage();
+				final IWorkbenchPage page =
+					window.getActivePage();
 				try {
 
 					page.showView(InvalidConfigurationsView.ID);
-					InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
-							.getInstance();
+					final InvalidConfigurationsViewController analyzerViewController =
+						InvalidConfigurationsViewController
+								.getInstance();
 
 					analyzerViewController.clear();
 
-				} catch (PartInitException e) {
+				} catch (final PartInitException e) {
 					e.printStackTrace();
 				}
 

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,14 +39,17 @@ import org.prop4j.Or;
 
 /**
  * Tests for {@link MutableSatSolver}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public abstract class MutableSatSolverTests extends SatSolverTests {
+
 	@Test
 	public void testPush() {
-		final MutableSatSolver instance = getInstance();
-		final List<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final List<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new Or("A", new Literal("B", false)));
 		expected.add(new Or("A", new Literal("B", false)));
 		assertEquals(expected, instance.getClauses());
@@ -59,22 +62,26 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testPushEmpty() {
-		final MutableSatSolver instance = getInstance();
-		final List<Node> expected = Collections.emptyList();
+		final MutableSatSolver instance =
+			getInstance();
+		final List<Node> expected =
+			Collections.emptyList();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 		instance.push();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testPushMultiple() {
-		final MutableSatSolver instance = getInstance();
-		final List<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final List<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new Or("A", "B"));
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
@@ -99,11 +106,13 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testPop() {
-		final MutableSatSolver instance = getInstance();
-		final Deque<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final Deque<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new Or("A", new Literal("B", false)));
 		expected.add(new Or("A", new Literal("B", false)));
 		assertEquals(expected, instance.getClauses());
@@ -120,18 +129,21 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testPopEmpty() {
-		final MutableSatSolver instance = getInstance();
+		final MutableSatSolver instance =
+			getInstance();
 		exception.expect(NoSuchElementException.class);
 		instance.pop();
 	}
-	
+
 	@Test
 	public void testPopMultiple() {
-		final MutableSatSolver instance = getInstance();
-		final Deque<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final Deque<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new Or("A", "B"));
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
@@ -168,11 +180,13 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		exception.expect(NoSuchElementException.class);
 		instance.pop();
 	}
-	
+
 	@Test
 	public void testPopUnit() {
-		final MutableSatSolver instance = getInstance();
-		final Deque<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final Deque<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new Or("A"));
 		expected.add(new Or("A"));
 		assertEquals(expected, instance.getClauses());
@@ -189,11 +203,13 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
 	@Test
 	public void testPopAssumptions() {
-		final MutableSatSolver instance = getInstance();
-		final Deque<Node> expected = new LinkedList<>();
+		final MutableSatSolver instance =
+			getInstance();
+		final Deque<Node> expected =
+			new LinkedList<>();
 		instance.addFormula(new And("A", "B"));
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
@@ -209,6 +225,7 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 	}
-	
+
+	@Override
 	protected abstract MutableSatSolver getInstance();
 }

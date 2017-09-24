@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,28 +29,31 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHidd
 
 /**
  * Action to mark a feature as hidden.
- * 
+ *
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class HiddenAction extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.hidden";
+	public static final String ID =
+		"de.ovgu.featureide.hidden";
 
 	private final IFeatureModel featureModel;
 
 	public HiddenAction(Object viewer, IFeatureModel featureModel) {
 		super("Hidden", viewer);
-		this.featureModel = featureModel;
+		this.featureModel =
+			featureModel;
 	}
 
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isHidden());
-		SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
+		final SetFeatureToHiddenOperation op =
+			new SetFeatureToHiddenOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}

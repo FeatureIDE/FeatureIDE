@@ -25,16 +25,19 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
  * @author Thiago Emmanuel
  */
 public class CoreController {
+
 	private final ProjectExplorerController projectExplorerController;
 	private TypeChef typeChef;
 	private static IWorkbenchWindow window;
 
 	public CoreController() {
-		projectExplorerController = new ProjectExplorerController();
+		projectExplorerController =
+			new ProjectExplorerController();
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
-		CoreController.window = window;
+		CoreController.window =
+			window;
 		projectExplorerController.setWindow(window);
 	}
 
@@ -47,57 +50,61 @@ public class CoreController {
 	 */
 	public void run() {
 
-		typeChef = new TypeChef();
+		typeChef =
+			new TypeChef();
 
-		Job job = new Job(ANALYZING_FILES) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime
-			 * .IProgressMonitor)
-			 */
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+		final Job job =
+			new Job(ANALYZING_FILES) {
 
-				typeChef.setMonitor(monitor);
+				/*
+				 * (non-Javadoc)
+				 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime .IProgressMonitor)
+				 */
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
 
-				if (monitor.isCanceled())
-					return Status.CANCEL_STATUS;
+					typeChef.setMonitor(monitor);
 
-				try {
-					// checks files in ProjectExplorer or PackageExplorer
-					projectExplorerController.run();
-
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
+					}
 
-					List<IResource> list = projectExplorerController.getList();
+					try {
+						// checks files in ProjectExplorer or PackageExplorer
+						projectExplorerController.run();
 
-					// get files to analyze e run;
-					typeChef.run(list);
+						if (monitor.isCanceled()) {
+							return Status.CANCEL_STATUS;
+						}
 
-					// returns the result to view
-					syncWithPluginView();
+						final List<IResource> list =
+							projectExplorerController.getList();
 
-					if (monitor.isCanceled())
+						// get files to analyze e run;
+						typeChef.run(list);
+
+						// returns the result to view
+						syncWithPluginView();
+
+						if (monitor.isCanceled()) {
+							return Status.CANCEL_STATUS;
+						}
+
+					} catch (final TypeChefException e) {
+						e.printStackTrace();
 						return Status.CANCEL_STATUS;
+					} catch (final ProjectExplorerException e) {
+						e.printStackTrace();
+						return Status.CANCEL_STATUS;
+					} finally {
 
-				} catch (TypeChefException e) {
-					e.printStackTrace();
-					return Status.CANCEL_STATUS;
-				} catch (ProjectExplorerException e) {
-					e.printStackTrace();
-					return Status.CANCEL_STATUS;
-				} finally {
+						monitor.done();
 
-					monitor.done();
+					}
 
+					return Status.OK_STATUS;
 				}
-
-				return Status.OK_STATUS;
-			}
-		};
+			};
 
 		job.setUser(true);
 		job.schedule();
@@ -109,19 +116,23 @@ public class CoreController {
 	 */
 	private void syncWithPluginView() {
 		Display.getDefault().asyncExec(new Runnable() {
+
 			@Override
 			public void run() {
 
-				IViewPart view = window.getActivePage().findView(
-						InvalidConfigurationsView.ID);
+				final IViewPart view =
+					window.getActivePage().findView(
+							InvalidConfigurationsView.ID);
 				if (view instanceof InvalidConfigurationsView) {
-					final InvalidConfigurationsView analyzerView = (InvalidConfigurationsView) view;
+					final InvalidConfigurationsView analyzerView =
+						(InvalidConfigurationsView) view;
 
 					// Typechef checks performed at least one analysis
 					if (typeChef.isFinish()) {
 						// get list of error logs
 						List<FileProxy> logs;
-						logs = typeChef.getFilesLog();
+						logs =
+							typeChef.getFilesLog();
 						// returns the list to view
 						analyzerView.setInput(logs);
 						//

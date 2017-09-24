@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Represents a propositional constraint below the feature diagram.
- * 
+ *
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -48,12 +48,16 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 
-	protected ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+	protected ConstraintAttribute attribute =
+		ConstraintAttribute.NORMAL;
 
-	protected final Collection<IFeature> containedFeatureList = new LinkedList<>();
-	protected final Collection<IFeature> deadFeatures = new LinkedList<>();
+	protected final Collection<IFeature> containedFeatureList =
+		new LinkedList<>();
+	protected final Collection<IFeature> deadFeatures =
+		new LinkedList<>();
 
-	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+	protected final Collection<IFeature> falseOptionalFeatures =
+		new LinkedList<>();
 
 	protected Node propNode;
 	boolean featureSelected;
@@ -61,16 +65,22 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
-		this.propNode = oldConstraint.propNode;
-		this.featureSelected = oldConstraint.featureSelected;
-		this.isImplicit = oldConstraint.isImplicit;
+		propNode =
+			oldConstraint.propNode;
+		featureSelected =
+			oldConstraint.featureSelected;
+		isImplicit =
+			oldConstraint.isImplicit;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
-		this.propNode = propNode;
-		this.featureSelected = false;
-		this.isImplicit = false;
+		this.propNode =
+			propNode;
+		featureSelected =
+			false;
+		isImplicit =
+			false;
 	}
 
 	@Override
@@ -79,7 +89,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	/**
-	 * 
+	 *
 	 * @return All {@link Feature}s contained at this {@link AConstraint}.
 	 */
 	@Override
@@ -101,14 +111,19 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
 
 		final Collection<IFeature> deadFeatures;
-		final Node propNode = getNode();
-		final Comparator<IFeature> featComp = new FeatureComparator(true);
+		final Node propNode =
+			getNode();
+		final Comparator<IFeature> featComp =
+			new FeatureComparator(true);
 		if (propNode != null) {
-			deadFeatures = featureModel.getAnalyser().getDeadFeatures(solver, propNode);
+			deadFeatures =
+				featureModel.getAnalyser().getDeadFeatures(solver, propNode);
 		} else {
-			deadFeatures = new TreeSet<IFeature>(featComp);
+			deadFeatures =
+				new TreeSet<IFeature>(featComp);
 		}
-		final Collection<IFeature> deadFeaturesAfter = new TreeSet<>(featComp);
+		final Collection<IFeature> deadFeaturesAfter =
+			new TreeSet<>(featComp);
 
 		deadFeaturesAfter.addAll(exlcudeFeatuers);
 		deadFeaturesAfter.retainAll(deadFeatures);
@@ -133,7 +148,8 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public boolean hasHiddenFeatures() {
 		for (final IFeature f : getContainedFeatures()) {
-			if (f.getStructure().isHidden() || f.getStructure().hasHiddenParent()) {
+			if (f.getStructure().isHidden()
+				|| f.getStructure().hasHiddenParent()) {
 				return true;
 			}
 		}
@@ -142,7 +158,8 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	@Override
 	public void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners) {
-		this.attribute = attribute;
+		this.attribute =
+			attribute;
 		if (notifyListeners) {
 			fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
@@ -178,16 +195,20 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public void setFalseOptionalFeatures(Iterable<IFeature> foFeatures) {
 		falseOptionalFeatures.clear();
-		this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
+		falseOptionalFeatures.addAll(Functional.toList(foFeatures));
 	}
 
+	@Override
 	public void setNode(Node node) {
-		this.propNode = node;
+		propNode =
+			node;
 	}
 
 	@Override
 	public String toString() {
-		return "AConstraint [propNode=" + propNode + "]";
+		return "AConstraint [propNode="
+			+ propNode
+			+ "]";
 	}
 
 }

@@ -13,7 +13,9 @@ import br.ufal.ic.colligens.activator.Colligens;
 
 public class PreferencePage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage {
-	public static final String ID = Colligens.PLUGIN_ID
+
+	public static final String ID =
+		Colligens.PLUGIN_ID
 			+ ".preferences.PreferencePage";
 
 	public PreferencePage() {
@@ -35,8 +37,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 
 		addField(new RadioGroupFieldEditor("TypeChefPreference",
 				GENERAL_PROCESSING_TYPECHEF_OPTIONS, 1, new String[][] {
-						{ "&Typecheck", "--typecheck" },
-						{ "P&arse", "--parse" } }, getFieldEditorParent()));
+					{
+						"&Typecheck",
+						"--typecheck" },
+					{
+						"P&arse",
+						"--parse" } },
+				getFieldEditorParent()));
 
 	}
 

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
  * Generates a configuration containing the given feature and a configuration without it.
- * 
+ *
  * @author Jens Meinicke
  */
 public class ModuleConfigurationGenerator extends AConfigurationGenerator {
@@ -44,7 +44,8 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 
 	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject, String featureName) {
 		super(builder, featureModel, featureProject);
-		this.featureName = featureName;
+		this.featureName =
+			featureName;
 	}
 
 	@Override
@@ -55,72 +56,84 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 
 	/**
 	 * Creates a configuration containing the given feature.
+	 *
 	 * @param featureProject The feature project
 	 * @param featureName The feature to build
 	 */
 	private void buildModule(IFeatureProject featureProject, IMonitor monitor, String featureName) {
 		// create a configuration where the feature is selected
-		Configuration configuration = new Configuration(featureModel, true);
-		boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);
+		Configuration configuration =
+			new Configuration(featureModel, true);
+		final boolean success =
+			createValidConfiguration(configuration, featureName, Selection.SELECTED);
 		if (success) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, featureName));
 		}
-		
 
-		for (IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
+		for (final IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
 			if (coreFeature.getName().equals(featureName)) {
-				builder.configurationNumber = 1;
+				builder.configurationNumber =
+					1;
 				return;
 			}
 		}
 		// create a configuration without the feature
-		configuration = new Configuration(featureModel, true);
+		configuration =
+			new Configuration(featureModel, true);
 		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
 			return;
 		}
 		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
 		if (success) {
-			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
+			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_
+				+ featureName));
 		}
 	}
-	
+
 	/**
 	 * Selects features to create a valid configuration.
-	 * @param featureName 
-	 * @param selection 
+	 *
+	 * @param featureName
+	 * @param selection
 	 */
 	private boolean createValidConfiguration(Configuration configuration, String featureName, Selection selection) {
 		configuration.setManual(featureName, selection);
-		for (SelectableFeature feature : configuration.getFeatures()) {
+		for (final SelectableFeature feature : configuration.getFeatures()) {
 			if (feature.getName().equals(featureName)) {
 				continue;
 			}
 			if (configuration.isValid()) {
 				break;
 			}
-			SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+			final SelectableFeature selectableFeature =
+				configuration.getSelectablefeature(feature.getName());
 			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
 				configuration.setManual(selectableFeature, Selection.SELECTED);
 			}
 		}
-		boolean canDeselect = true;
+		boolean canDeselect =
+			true;
 		while (canDeselect) {
-			canDeselect = false;
-			for (IFeature feature : configuration.getSelectedFeatures()) {
+			canDeselect =
+				false;
+			for (final IFeature feature : configuration.getSelectedFeatures()) {
 				if (feature.getName().equals(featureName)) {
 					continue;
 				}
-				SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+				final SelectableFeature selectableFeature =
+					configuration.getSelectablefeature(feature.getName());
 				try {
-					if (selectableFeature.getAutomatic() == Selection.UNDEFINED && selectableFeature.getManual() == Selection.SELECTED) {
+					if ((selectableFeature.getAutomatic() == Selection.UNDEFINED)
+						&& (selectableFeature.getManual() == Selection.SELECTED)) {
 						configuration.setManual(selectableFeature, Selection.UNDEFINED);
 						if (!configuration.isValid()) {
 							configuration.setManual(selectableFeature, Selection.SELECTED);
 						} else {
-							canDeselect = true;
+							canDeselect =
+								true;
 						}
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}

@@ -16,14 +16,16 @@ public class RenderParserError implements
 	 * @param fileProxie
 	 */
 	public void setFile(FileProxy fileProxie) {
-		this.fileProxie = fileProxie;
+		this.fileProxie =
+			fileProxie;
 	}
 
 	@Override
 	public Object apply(FeatureExpr featureExpr, String msg, Position position) {
 		if (position.getFile().contains(fileProxie.getFileToAnalyse())) {
-			Log log = new Log(fileProxie, position.getLine(),position.getColumn(),
-					featureExpr.toString(), "", msg);
+			final Log log =
+				new Log(fileProxie, position.getLine(), position.getColumn(),
+						featureExpr.toString(), "", msg);
 			fileProxie.getLogs().add(log);
 		}
 		// System.out.println(PARSER_ERROR + fileProxie.getLogs().size());

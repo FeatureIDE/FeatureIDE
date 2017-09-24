@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.FontData;
 
 /**
  * Implements some basic graphical methods.
- * 
+ *
  * @author Thomas Thuem
  */
 @CheckReturnValue
@@ -40,13 +40,24 @@ public class GUIBasics {
 	}
 
 	public static Color createColor(double r, double g, double b) {
-		return new Color(null, (int) (r * 255), (int) (g * 255), (int) (b * 255));
+		return new Color(null, (int) (r
+			* 255),
+				(int) (g
+					* 255),
+				(int) (b
+					* 255));
 	}
 
 	public static Color createBorderColor(Color color) {
-		int r = (int) (color.getRed() * 0.75);
-		int g = (int) (color.getGreen() * 0.75);
-		int b = (int) (color.getBlue() * 0.75);
+		final int r =
+			(int) (color.getRed()
+				* 0.75);
+		final int g =
+			(int) (color.getGreen()
+				* 0.75);
+		final int b =
+			(int) (color.getBlue()
+				* 0.75);
 		return new Color(null, r, g, b);
 	}
 
@@ -59,11 +70,16 @@ public class GUIBasics {
 	}
 
 	public static boolean unicodeStringTest(Font swtFont, String s) {
-		FontData fd = swtFont.getFontData()[0];
-		java.awt.Font awtFont = new java.awt.Font(fd.getName(), 0, fd.getHeight());
-		for (int i = 0; i < s.length(); i++)
-			if (!awtFont.canDisplay(s.charAt(i)))
+		final FontData fd =
+			swtFont.getFontData()[0];
+		final java.awt.Font awtFont =
+			new java.awt.Font(fd.getName(), 0, fd.getHeight());
+		for (int i =
+			0; i < s.length(); i++) {
+			if (!awtFont.canDisplay(s.charAt(i))) {
 				return false;
+			}
+		}
 		return true;
 	}
 

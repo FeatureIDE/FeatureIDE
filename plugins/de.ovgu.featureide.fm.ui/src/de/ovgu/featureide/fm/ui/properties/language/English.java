@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,39 +32,57 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
+
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
- * 
+ *
  * @author Jens Meinicke
  * @author Florian Proksch
  * @author Stefan Krueger
  */
 public class English implements ILanguage {
 
-	public static final String NAME = ENGLISH;
+	public static final String NAME =
+		ENGLISH;
 
-	private static final String LEGEND = "Legend:";
-	private static final String MANDATORY = "Mandatory";
-	private static final String ABSTRACT = "Abstract";
-	private static final String INTERFACED = FROM_INTERFACE;
-	private static final String CONCRETE = "Concrete";
-	private static final String HIDDEN = "Hidden";
-	private static final String COLLAPSED = "Collapsed";
-	private static final String DEAD = "Dead feature";
-	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
-	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
-	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
-	private static final String IMPLICIT = "Implicit constraint";
-	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
-	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
-	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String LEGEND =
+		"Legend:";
+	private static final String MANDATORY =
+		"Mandatory";
+	private static final String ABSTRACT =
+		"Abstract";
+	private static final String INTERFACED =
+		FROM_INTERFACE;
+	private static final String CONCRETE =
+		"Concrete";
+	private static final String HIDDEN =
+		"Hidden";
+	private static final String COLLAPSED =
+		"Collapsed";
+	private static final String DEAD =
+		"Dead feature";
+	private static final String FALSE_OPTIONAL =
+		FALSE_OPTIONAL_FEATURE;
+	private static final String OPTIONAL =
+		"Optional";
+	private static final String INDETHIDDEN =
+		INDETERMINATE_HIDDEN;
+	private static final String REDUNDANT =
+		REDUNDANT_CONSTRAINT;
+	private static final String IMPLICIT =
+		"Implicit constraint";
+	private static final String UNSATISFIABLE_CONST =
+		UNSATISFIABLE_CONSTRAINT;
+	private static final String TAUTOLOGY_CONST =
+		CONSTRAINT_IS_TAUTOLOGY;
+	private static final String VOID_MODEL_CONST =
+		CONSTRAINT_MAKES_THE_MODEL_VOID;
 
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
 	}
-	
+
 	@Override
 	public String getImplicitConst() {
 		return IMPLICIT;
@@ -134,7 +152,7 @@ public class English implements ILanguage {
 	public String getHidden() {
 		return HIDDEN;
 	}
-	
+
 	@Override
 	public String getCollapsed() {
 		return COLLAPSED;

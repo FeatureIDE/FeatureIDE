@@ -21,18 +21,20 @@ public class MetricsViewController extends ViewController {
 
 	private TableViewer tableViewer;
 	private MetricsView view;
-	private ViewContentProvider viewContentProvider;
+	private final ViewContentProvider viewContentProvider;
 
 	private static MetricsViewController INSTANCE;
 
 	private MetricsViewController() {
 		super(MetricsView.ID);
-		viewContentProvider = new ViewContentProvider();
+		viewContentProvider =
+			new ViewContentProvider();
 	}
 
 	public static MetricsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new MetricsViewController();
+			INSTANCE =
+				new MetricsViewController();
 		}
 		return INSTANCE;
 	}
@@ -42,15 +44,18 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void setViewer(TableViewer tableViewer) {
-		this.tableViewer = tableViewer;
+		this.tableViewer =
+			tableViewer;
 	}
 
+	@Override
 	public MetricsView getView() {
 		return view;
 	}
 
 	public void setView(MetricsView view) {
-		this.view = view;
+		this.view =
+			view;
 	}
 
 	public void setInput(List<Metrics> list) {
@@ -64,13 +69,17 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void createPartControl(Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.FULL_SELECTION | SWT.LEFT);
+		tableViewer =
+			new TableViewer(parent, SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.FULL_SELECTION
+				| SWT.LEFT);
 		createColumns(parent);
-		final Table table = tableViewer.getTable();
+		final Table table =
+			tableViewer.getTable();
 
-		tableViewer.setContentProvider(this.viewContentProvider);
-		tableViewer.setInput(this.view.getViewSite());
+		tableViewer.setContentProvider(viewContentProvider);
+		tableViewer.setInput(view.getViewSite());
 		tableViewer.setLabelProvider(new ViewLabelProvider());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -81,19 +90,28 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void createColumns(Composite parent) {
-		String[] titles = { METRICS, VALUE };
-		int[] bounds = { 300, 400 };
+		final String[] titles =
+			{
+				METRICS,
+				VALUE };
+		final int[] bounds =
+			{
+				300,
+				400 };
 
-		for (int i = 0; i < bounds.length; i++) {
+		for (int i =
+			0; i < bounds.length; i++) {
 			createTableViewerColumn(titles[i], bounds[i], i);
 		}
 	}
 
 	public TableViewerColumn createTableViewerColumn(String title, int bound,
 			final int colNumber) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(
-				tableViewer, SWT.LEFT);
-		final TableColumn column = viewerColumn.getColumn();
+		final TableViewerColumn viewerColumn =
+			new TableViewerColumn(
+					tableViewer, SWT.LEFT);
+		final TableColumn column =
+			viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);
 		column.setResizable(true);

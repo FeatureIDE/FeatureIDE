@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,15 +37,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * A simple editor to change description of a particular feature diagram.
- * 
+ *
  */
 public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefaults {
 
-	private String title;
+	private final String title;
 
 	private String message;
 
-	private String value = "";
+	private String value =
+		"";
 
 	private Button okButton;
 
@@ -53,32 +54,40 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 
 	private CLabel label;
 
-	private String initmessage;
+	private final String initmessage;
 
 	public ChangeFeatureDescriptionDialog(Shell parentShell, String dialogTitle, String dialogMessage, String initialValue) {
 		super(parentShell);
-		this.title = dialogTitle;
-		message = dialogMessage;
-		initmessage = message;
+		title =
+			dialogTitle;
+		message =
+			dialogMessage;
+		initmessage =
+			message;
 		if (initialValue == null) {
-			value = "";
+			value =
+				"";
 		} else {
-			value = initialValue;
+			value =
+				initialValue;
 		}
 	}
 
 	protected void validate() {
-		if (text.getText().contains(">") || (text.getText().contains("<"))) {
+		if (text.getText().contains(">")
+			|| (text.getText().contains("<"))) {
 
 			if (text.getText().contains(">")) {
-				this.message = "Description contains invalid char '>'";
+				message =
+					"Description contains invalid char '>'";
 				label.setText(message);
 				label.setImage(ERROR_IMAGE);
 				okButton.setEnabled(false);
 			}
 
 			if (text.getText().contains("<")) {
-				this.message = "Description contains invalid char '<'";
+				message =
+					"Description contains invalid char '<'";
 				label.setText(message);
 				label.setImage(ERROR_IMAGE);
 				okButton.setEnabled(false);
@@ -90,15 +99,19 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 		}
 	}
 
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
-			value = text.getText();
+			value =
+				text.getText();
 		} else {
-			value = null;
+			value =
+				null;
 		}
 		super.buttonPressed(buttonId);
 	}
 
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		if (title != null) {
@@ -106,8 +119,10 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 		}
 	}
 
+	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+		okButton =
+			createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
 		text.setFocus();
 		if (value != null) {
 			text.setText(value);
@@ -115,17 +130,26 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 		}
 	}
 
+	@Override
 	protected Control createDialogArea(Composite parent) {
-		Composite composite = (Composite) super.createDialogArea(parent);
+		final Composite composite =
+			(Composite) super.createDialogArea(parent);
 		if (message != null) {
-			label = new CLabel(composite, SWT.WRAP);
+			label =
+				new CLabel(composite, SWT.WRAP);
 			label.setText(message);
-			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
-			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
+			final GridData data =
+				new GridData(GridData.GRAB_HORIZONTAL
+					| GridData.GRAB_VERTICAL
+					| GridData.HORIZONTAL_ALIGN_FILL
+					| GridData.VERTICAL_ALIGN_CENTER);
+			data.widthHint =
+				convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
 			label.setFont(parent.getFont());
 		}
-		text = new Text(composite, getInputTextStyle());
+		text =
+			new Text(composite, getInputTextStyle());
 		text.setLayoutData(new GridData(350, 100));
 
 		text.addModifyListener(new ModifyListener() {
@@ -149,12 +173,16 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 	}
 
 	protected int getInputTextStyle() {
-		return SWT.MULTI | SWT.BORDER | SWT.V_SCROLL;
+		return SWT.MULTI
+			| SWT.BORDER
+			| SWT.V_SCROLL;
 	}
 
 	public String getValue() {
-		if (value == null || value.equals(""))
+		if ((value == null)
+			|| value.equals("")) {
 			return " ";
+		}
 		return value;
 	}
 }

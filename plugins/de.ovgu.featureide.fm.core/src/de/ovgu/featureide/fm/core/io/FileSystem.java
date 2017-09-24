@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class FileSystem {
@@ -45,7 +45,8 @@ public final class FileSystem {
 		boolean exists(Path path);
 	}
 
-	public static IFileSystem INSTANCE = new JavaFileSystem();
+	public static IFileSystem INSTANCE =
+		new JavaFileSystem();
 
 	public static void append(Path path, byte[] content) throws IOException {
 		INSTANCE.append(path, content);
@@ -79,7 +80,6 @@ public final class FileSystem {
 		return new String(INSTANCE.read(path), Charset.forName("UTF-8"));
 	}
 
-	private FileSystem() {
-	}
+	private FileSystem() {}
 
 }

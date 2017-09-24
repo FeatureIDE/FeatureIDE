@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,9 +40,9 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Graphical representation of an {@link IFeature} instance.
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public class GraphicalFeature implements IGraphicalFeature {
 
@@ -55,26 +55,37 @@ public class GraphicalFeature implements IGraphicalFeature {
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
 	protected boolean collapsed;
-	
-	protected Point location = new Point(0, 0);
 
-	protected Dimension dimension = new Dimension(10, 10);
+	protected Point location =
+		new Point(0, 0);
+
+	protected Dimension dimension =
+		new Dimension(10, 10);
 
 	private IEventListener uiObject;
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.feature = correspondingFeature;
-		sourceConnection = new FeatureConnection(this);
+		this.graphicalFeatureModel =
+			graphicalFeatureModel;
+		feature =
+			correspondingFeature;
+		sourceConnection =
+			new FeatureConnection(this);
 	}
 
 	public GraphicalFeature(GraphicalFeature graphicalFeature) {
-		constraintSelected = graphicalFeature.constraintSelected;
-		location = graphicalFeature.location;
-		dimension = graphicalFeature.dimension;
-		feature = graphicalFeature.feature;
-		graphicalFeatureModel = graphicalFeature.graphicalFeatureModel;
-		sourceConnection = graphicalFeature.sourceConnection;
+		constraintSelected =
+			graphicalFeature.constraintSelected;
+		location =
+			graphicalFeature.location;
+		dimension =
+			graphicalFeature.dimension;
+		feature =
+			graphicalFeature.feature;
+		graphicalFeatureModel =
+			graphicalFeature.graphicalFeatureModel;
+		sourceConnection =
+			graphicalFeature.sourceConnection;
 	}
 
 	@Override
@@ -95,7 +106,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setConstraintSelected(boolean selection) {
 		if (constraintSelected != selection) {
-			constraintSelected = selection;
+			constraintSelected =
+				selection;
 			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 		}
 	}
@@ -108,7 +120,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!location.equals(newLocation)) {
-			location = newLocation;
+			location =
+				newLocation;
 			update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
 		}
 	}
@@ -120,7 +133,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void setSize(Dimension size) {
-		this.dimension = size;
+		dimension =
+			size;
 	}
 
 	@Override
@@ -142,11 +156,12 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public List<FeatureConnection> getSourceConnectionAsList() {
 		final List<FeatureConnection> list;
-		list = new LinkedList<>();
+		list =
+			new LinkedList<>();
 		list.add(getSourceConnection());
-		if(isCollapsed())
-		{
-			FeatureConnection collapsedConnection = new FeatureConnection(this);
+		if (isCollapsed()) {
+			final FeatureConnection collapsedConnection =
+				new FeatureConnection(this);
 			collapsedConnection.setTarget(this);
 			list.add(collapsedConnection);
 		}
@@ -155,11 +170,16 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
-		final List<FeatureConnection> targetConnections = new LinkedList<>();
-		for (IFeatureStructure child : feature.getStructure().getChildren()) {
-			IGraphicalFeature graphicalChild = graphicalFeatureModel.getGraphicalFeature(child.getFeature());
-			if (!(child.hasHiddenParent() && !graphicalFeatureModel.getLayout().showHiddenFeatures()) && !graphicalChild.hasCollapsedParent())
+		final List<FeatureConnection> targetConnections =
+			new LinkedList<>();
+		for (final IFeatureStructure child : feature.getStructure().getChildren()) {
+			final IGraphicalFeature graphicalChild =
+				graphicalFeatureModel.getGraphicalFeature(child.getFeature());
+			if (!(child.hasHiddenParent()
+				&& !graphicalFeatureModel.getLayout().showHiddenFeatures())
+				&& !graphicalChild.hasCollapsedParent()) {
 				targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
+			}
 		}
 		return targetConnections;
 	}
@@ -174,15 +194,23 @@ public class GraphicalFeature implements IGraphicalFeature {
 		return "";
 	}
 
+	@Override
 	public GraphicalFeature clone() {
 		return new GraphicalFeature(this);
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((feature == null) ? 0 : feature.hashCode());
+		final int prime =
+			31;
+		int result =
+			1;
+		result =
+			(prime
+				* result)
+				+ ((feature == null)
+					? 0
+					: feature.hashCode());
 		return result;
 	}
 
@@ -197,7 +225,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 		if (!(obj instanceof GraphicalFeature)) {
 			return false;
 		}
-		GraphicalFeature other = (GraphicalFeature) obj;
+		final GraphicalFeature other =
+			(GraphicalFeature) obj;
 		if (feature == null) {
 			if (other.feature != null) {
 				return false;
@@ -217,13 +246,13 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void registerUIObject(IEventListener listener) {
-		this.uiObject = listener;
+		uiObject =
+			listener;
 	}
 
 	@Override
 	public boolean isCollapsed() {
-		if(!getObject().getStructure().hasChildren())
-		{
+		if (!getObject().getStructure().hasChildren()) {
 			return false;
 		}
 		return collapsed;
@@ -231,32 +260,42 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void setCollapsed(boolean collapse) {
-		collapsed = collapse;		
+		collapsed =
+			collapse;
 	}
 
+	@Override
 	public boolean hasCollapsedParent() {
-		IFeatureStructure parent = getObject().getStructure().getParent();
-		if (parent == null)
+		IFeatureStructure parent =
+			getObject().getStructure().getParent();
+		if (parent == null) {
 			return false;
+		}
 
 		while (parent != null) {
-			IGraphicalFeature graphicParent = getGraphicalModel().getGraphicalFeature(parent.getFeature());
+			final IGraphicalFeature graphicParent =
+				getGraphicalModel().getGraphicalFeature(parent.getFeature());
 
-			if (graphicParent.isCollapsed())
+			if (graphicParent.isCollapsed()) {
 				return true;
+			}
 
-			parent = parent.getFeature().getStructure().getParent();
+			parent =
+				parent.getFeature().getStructure().getParent();
 		}
 		return false;
 	}
 
-
 	@Override
 	public List<IGraphicalFeature> getGraphicalChildren(boolean showHidden) {
-		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
-		for (IFeatureStructure f : getObject().getStructure().getChildren()) {
-			IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
-			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
+		final List<IGraphicalFeature> features =
+			new ArrayList<IGraphicalFeature>();
+		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
+			final IGraphicalFeature gf =
+				getGraphicalModel().getGraphicalFeature(f.getFeature());
+			if (!gf.hasCollapsedParent()
+				&& (showHidden
+					|| !gf.getObject().getStructure().hasHiddenParent())) {
 				features.add(gf);
 			}
 		}

@@ -9,19 +9,24 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import br.ufal.ic.colligens.controllers.ProjectExplorerController;
+
 @SuppressWarnings("rawtypes")
 public class FilesToSelection implements IStructuredSelection {
+
 	private final List<IResource> list;
 
 	public FilesToSelection(ICProject project, String filePath) {
 
-		IFolder folder = project.getProject().getFolder(filePath);
+		final IFolder folder =
+			project.getProject().getFolder(filePath);
 
-		ProjectExplorerController explorerController = new ProjectExplorerController();
+		final ProjectExplorerController explorerController =
+			new ProjectExplorerController();
 
 		explorerController.addResource(folder);
 
-		list = explorerController.getList();
+		list =
+			explorerController.getList();
 
 	}
 

@@ -6,12 +6,15 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
 public class CppCheckerFileLogs {
+
 	private final IFile file;
 	private final Collection<CppCheckerLog> logs;
 
 	public CppCheckerFileLogs(IFile file) {
-		this.file = file;
-		logs = new LinkedList<CppCheckerLog>();
+		this.file =
+			file;
+		logs =
+			new LinkedList<CppCheckerLog>();
 	}
 
 	public IFile getFile() {

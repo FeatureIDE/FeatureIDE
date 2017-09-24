@@ -4,19 +4,22 @@ import org.eclipse.jface.text.ITextSelection;
 
 public class LogSelection implements ITextSelection {
 
-	private int line;
-	private int length;
-	private int offset;
+	private final int line;
+	private final int length;
+	private final int offset;
 
 	public LogSelection(int line, int length, int offset) {
-		this.line = line;
-		this.length = length;
-		this.offset = offset;
+		this.line =
+			line;
+		this.length =
+			length;
+		this.offset =
+			offset;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		
+
 		return false;
 	}
 
@@ -32,19 +35,19 @@ public class LogSelection implements ITextSelection {
 
 	@Override
 	public int getStartLine() {
-		
+
 		return line;
 	}
 
 	@Override
 	public int getEndLine() {
-		
+
 		return line;
 	}
 
 	@Override
 	public String getText() {
-		
+
 		return null;
 	}
 

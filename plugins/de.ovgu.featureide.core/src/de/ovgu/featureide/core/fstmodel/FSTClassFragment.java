@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,29 +27,44 @@ import javax.annotation.Nonnull;
 
 /**
  * Collection of the members and characteristics of a class representing by one {@link FSTRole}
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FSTClassFragment extends RoleElement<FSTClassFragment> {
-	protected final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
-	protected final TreeSet<FSTField> fields = new TreeSet<FSTField>();
-	protected final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
-	protected final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 
-	protected String pckg = null;
+	protected final TreeSet<FSTMethod> methods =
+		new TreeSet<FSTMethod>();
+	protected final TreeSet<FSTField> fields =
+		new TreeSet<FSTField>();
+	protected final TreeSet<FSTClassFragment> innerClasses =
+		new TreeSet<FSTClassFragment>();
+	protected final TreeSet<FSTInvariant> invariants =
+		new TreeSet<FSTInvariant>();
 
-	protected boolean innerClass = false;
+	protected String pckg =
+		null;
 
-	protected final HashSet<String> importList = new HashSet<String>(), extendList = new HashSet<String>(), implementList = new HashSet<String>();
+	protected boolean innerClass =
+		false;
+
+	protected final HashSet<String> importList =
+		new HashSet<String>(),
+			extendList =
+				new HashSet<String>(),
+			implementList =
+				new HashSet<String>();
 
 	public FSTClassFragment(String name) {
 		super(name, null, null, "", -1, -1);
 	}
 
+	@Override
 	public String getFullName() {
-		StringBuilder fullname = new StringBuilder();
+		final StringBuilder fullname =
+			new StringBuilder();
 		fullname.append(name);
-		fullname.append(" : " + type);
+		fullname.append(" : "
+			+ type);
 		return fullname.toString();
 	}
 
@@ -134,15 +149,18 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	}
 
 	public void setPackage(String pckg) {
-		this.pckg = pckg;
+		this.pckg =
+			pckg;
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		this.type =
+			type;
 	}
 
 	public void setModifiers(String modifiers) {
-		this.modifiers = modifiers;
+		this.modifiers =
+			modifiers;
 	}
 
 	public boolean isInnerClass() {
@@ -150,8 +168,8 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	}
 
 	public void setInnerClass(boolean innerClass) {
-		this.innerClass = innerClass;
+		this.innerClass =
+			innerClass;
 	}
-	
-}
 
+}

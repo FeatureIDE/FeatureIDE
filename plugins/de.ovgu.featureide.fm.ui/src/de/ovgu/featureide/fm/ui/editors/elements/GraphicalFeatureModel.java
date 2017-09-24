@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,9 +44,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Graphical representation of an {@link IFeatureModel} instance.
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
@@ -63,26 +63,35 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	/**
 	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
 	 */
-	public Explanation currentlyActiveExplanation = null;
+	public Explanation currentlyActiveExplanation =
+		null;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel;
-		layout = new FeatureModelLayout();
+		this.correspondingFeatureModel =
+			correspondingFeatureModel;
+		layout =
+			new FeatureModelLayout();
 	}
 
 	/**
 	 * Copy constructor
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
-		this.correspondingFeatureModel = oldModel.correspondingFeatureModel;
+		correspondingFeatureModel =
+			oldModel.correspondingFeatureModel;
 
-		layout = oldModel.layout;
-		features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
-		for (IGraphicalFeature feature : oldModel.features.values()) {
+		layout =
+			oldModel.layout;
+		features =
+			new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
+				* 1.5));
+		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
-		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
-		for (Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
+		constraints =
+			new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
+				* 1.5));
+		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());
 		}
 	}
@@ -111,7 +120,8 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		fireEvent(EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegendHidden()
 	 */
 	@Override
@@ -119,29 +129,35 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return hiddenLegend;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegendHidden(boolean)
 	 */
 	@Override
 	public void setLegendHidden(boolean hidden) {
-		hiddenLegend = hidden;
+		hiddenLegend =
+			hidden;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getLegend()
 	 */
 	@Override
 	public Legend getLegend() {
 		return legend;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setLegend(de.ovgu.featureide.fm.ui.editors.featuremodel.Legend)
 	 */
 	@Override
 	public void setLegend(Legend legend) {
-		this.legend = legend;
+		this.legend =
+			legend;
 	}
-	
+
 	@Override
 	public void handleModelLayoutChanged() {
 		fireEvent(EventType.MODEL_LAYOUT_CHANGED);
@@ -159,8 +175,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
-		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+		final ArrayList<IGraphicalFeature> featureList =
+			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -168,8 +185,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getAllFeatures() {
-		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
-		for (IFeature f : correspondingFeatureModel.getFeatures()) {
+		final ArrayList<IGraphicalFeature> featureList =
+			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
 		return Collections.unmodifiableCollection(featureList);
@@ -177,9 +195,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public IGraphicalFeature getGraphicalFeature(IFeature newFeature) {
-		IGraphicalFeature graphicalFeature = features.get(newFeature);
+		IGraphicalFeature graphicalFeature =
+			features.get(newFeature);
 		if (graphicalFeature == null) {
-			graphicalFeature = new GraphicalFeature(newFeature, this);
+			graphicalFeature =
+				new GraphicalFeature(newFeature, this);
 			features.put(newFeature, graphicalFeature);
 		}
 		return graphicalFeature;
@@ -187,8 +207,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getConstraints() {
-		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraintCount());
-		for (IConstraint c : correspondingFeatureModel.getConstraints()) {
+		final ArrayList<IGraphicalConstraint> constraintList =
+			new ArrayList<>(correspondingFeatureModel.getConstraintCount());
+		for (final IConstraint c : correspondingFeatureModel.getConstraints()) {
 			constraintList.add(getGraphicalConstraint(c));
 		}
 		return constraintList;
@@ -196,10 +217,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getVisibleConstraints() {
-		if (getLayout().showCollapsedConstraints())
+		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
-		List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
-		for (IGraphicalConstraint c : getConstraints()) {
+		}
+		final List<IGraphicalConstraint> constraints =
+			new ArrayList<IGraphicalConstraint>();
+		for (final IGraphicalConstraint c : getConstraints()) {
 			if (!c.isCollapsed()) {
 				constraints.add(c);
 			}
@@ -209,9 +232,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
-		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);
+		IGraphicalConstraint graphicalConstraint =
+			constraints.get(constraint);
 		if (graphicalConstraint == null) {
-			graphicalConstraint = new GraphicalConstraint(constraint, this);
+			graphicalConstraint =
+				new GraphicalConstraint(constraint, this);
 			constraints.put(constraint, graphicalConstraint);
 		}
 		return graphicalConstraint;
@@ -220,40 +245,50 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public String toString() {
 		if (features != null) {
-			return "Graphical feature-model tree:\n" + features.toString();
+			return "Graphical feature-model tree:\n"
+				+ features.toString();
 		}
 		return super.toString();
 	}
 
 	@Override
 	public GraphicalFeatureModel clone() {
-		final GraphicalFeatureModel copy = new GraphicalFeatureModel(this);
+		final GraphicalFeatureModel copy =
+			new GraphicalFeatureModel(this);
 		return copy;
 	}
 
 	@Override
 	public void init() {
-		final IFeatureStructure root = correspondingFeatureModel.getStructure().getRoot();
+		final IFeatureStructure root =
+			correspondingFeatureModel.getStructure().getRoot();
 		if (root != null) {
-			constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
-			for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
+			constraints =
+				new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
+					* 1.5));
+			for (final IConstraint constraint : correspondingFeatureModel.getConstraints()) {
 				constraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
 
-			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
-			for (IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
+			features =
+				new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
+					* 1.5));
+			for (final IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
-			constraints = new HashMap<>();
-			features = new HashMap<>();
+			constraints =
+				new HashMap<>();
+			features =
+				new HashMap<>();
 		}
 	}
 
 	@Override
 	public List<IGraphicalFeature> getVisibleFeatures() {
-		List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
-		for (IGraphicalFeature f : getFeatures()) {
+		final List<IGraphicalFeature> features =
+			new ArrayList<IGraphicalFeature>();
+		for (final IGraphicalFeature f : getFeatures()) {
 			if (!f.hasCollapsedParent()) {
 				features.add(f);
 			}
@@ -261,16 +296,21 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return Collections.unmodifiableList(features);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getConstraintIndex(de.ovgu.featureide.fm.core.base.impl.Constraint)
 	 */
 	@Override
 	public int getConstraintIndex(Constraint constraint) {
-		IGraphicalConstraint gConstarint = getGraphicalConstraint(constraint);
+		final IGraphicalConstraint gConstarint =
+			getGraphicalConstraint(constraint);
 
-		int index = 0;
-		for (int i = 0; i < constraints.size(); i++) {
-			IGraphicalConstraint gTemp = getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
+		int index =
+			0;
+		for (int i =
+			0; i < constraints.size(); i++) {
+			final IGraphicalConstraint gTemp =
+				getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
 			if (gTemp == gConstarint) {
 				return index;
 			}
@@ -282,16 +322,19 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return index;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
 	 */
 	@Override
 	public void setActiveExplanation(Explanation exp) {
-		currentlyActiveExplanation = exp;
+		currentlyActiveExplanation =
+			exp;
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
 	 */
 	@Override

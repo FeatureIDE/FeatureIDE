@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,17 +44,24 @@ public class EclipseFileSystem implements IFileSystem {
 	}
 
 	public static IResource getResource(Path path) {
-		final IPath iPath = getIPath(path);
-		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
+		final IPath iPath =
+			getIPath(path);
+		final IWorkspaceRoot root =
+			ResourcesPlugin.getWorkspace().getRoot();
+		final IResource res =
+			Files.isDirectory(path)
+				? root.getContainerForLocation(iPath)
+				: root.getFileForLocation(iPath);
 		return res;
 	}
 
-	private JavaFileSystem JAVA = new JavaFileSystem();
+	private final JavaFileSystem JAVA =
+		new JavaFileSystem();
 
 	@Override
 	public void write(Path path, byte[] content) throws IOException {
-		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
+		final IFile file =
+			ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.write(path, content);
 		}
@@ -64,20 +71,21 @@ public class EclipseFileSystem implements IFileSystem {
 			} else {
 				file.create(new ByteArrayInputStream(content), true, null);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			throw new IOException(e);
 		}
 	}
 
 	@Override
 	public void append(Path path, byte[] content) throws IOException {
-		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
+		final IFile file =
+			ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.append(path, content);
 		}
 		try {
 			file.appendContents(new ByteArrayInputStream(content), true, true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			throw new IOException(e);
 		}
 	}
@@ -89,18 +97,21 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void mkDir(Path path) throws IOException {
-		IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
+		IContainer container =
+			ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
 		if (container == null) {
 			JAVA.mkDir(path);
 		}
 		try {
 			if (container instanceof IFolder) {
-				final LinkedList<IFolder> folders = new LinkedList<>();
+				final LinkedList<IFolder> folders =
+					new LinkedList<>();
 				while (!container.exists()) {
 					folders.addFirst((IFolder) container);
-					container = container.getParent();
+					container =
+						container.getParent();
 				}
-				for (IFolder folder : folders) {
+				for (final IFolder folder : folders) {
 					folder.create(true, true, null);
 				}
 			}
@@ -111,21 +122,23 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void delete(Path path) throws IOException {
-		final IResource res = getResource(path);
+		final IResource res =
+			getResource(path);
 		try {
 			if (res == null) {
 				JAVA.exists(path);
 			} else if (res.exists()) {
 				res.delete(true, null);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			throw new IOException(e);
 		}
 	}
 
 	@Override
 	public boolean exists(Path path) {
-		final IResource res = getResource(path);
+		final IResource res =
+			getResource(path);
 		if (res == null) {
 			return JAVA.exists(path);
 		}

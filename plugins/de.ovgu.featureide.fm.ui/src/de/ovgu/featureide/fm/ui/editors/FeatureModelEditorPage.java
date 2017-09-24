@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * Basic class with some default methods for feature model editor pages.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
@@ -41,23 +41,26 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	protected FeatureModelEditor featureModelEditor;
 
-	protected boolean dirty = false;
+	protected boolean dirty =
+		false;
 
 	protected IEditorInput input;
 
 	protected IEditorSite site;
 
 	/**
-	 * @param featureModelEditor
-	 *            the featureModelEditor to set
+	 * @param featureModelEditor the featureModelEditor to set
 	 */
+	@Override
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+		this.featureModelEditor =
+			featureModelEditor;
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		dirty = false;
+		dirty =
+			false;
 		firePropertyChange(PROP_DIRTY);
 	}
 
@@ -68,8 +71,10 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		this.input = input;
-		this.site = site;
+		this.input =
+			input;
+		this.site =
+			site;
 	}
 
 	@Override
@@ -99,16 +104,17 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void setIndex(int index) {
-		this.index = index;
+		this.index =
+			index;
 	}
 
+	@Override
 	public IEditorSite getSite() {
 		return site;
 	}
 
 	@Override
-	public void initEditor() {
-	}
+	public void initEditor() {}
 
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {

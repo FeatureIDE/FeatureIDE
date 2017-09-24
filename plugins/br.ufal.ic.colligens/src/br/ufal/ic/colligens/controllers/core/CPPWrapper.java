@@ -21,15 +21,17 @@ import br.ufal.ic.colligens.util.ProjectConfigurationErrorLogger;
 
 /**
  * provisional class until we change to the CDT internal builder
- * 
+ *
  * @author Francisco Dalton
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class CPPWrapper {
-	private String GCC_PATH = Colligens.getDefault()
-			.getPreferenceStore().getString("GCC");
-	private MessageConsole console;
+
+	private final String GCC_PATH =
+		Colligens.getDefault()
+				.getPreferenceStore().getString("GCC");
+	private final MessageConsole console;
 
 	public CPPWrapper() {
 		// ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -37,103 +39,134 @@ public class CPPWrapper {
 		// console = new MessageConsole("TypeChefConsole", null);
 		// conMan.addConsoles(new IConsole[] { console });
 
-		console = findConsole("TypeChefConsole");
+		console =
+			findConsole("TypeChefConsole");
 
 	}
 
 	private MessageConsole findConsole(String name) {
-		ConsolePlugin plugin = ConsolePlugin.getDefault();
-		IConsoleManager conMan = plugin.getConsoleManager();
-		IConsole[] existing = conMan.getConsoles();
-		for (int i = 0; i < existing.length; i++)
-			if (name.equals(existing[i].getName()))
+		final ConsolePlugin plugin =
+			ConsolePlugin.getDefault();
+		final IConsoleManager conMan =
+			plugin.getConsoleManager();
+		final IConsole[] existing =
+			conMan.getConsoles();
+		for (int i =
+			0; i < existing.length; i++) {
+			if (name.equals(existing[i].getName())) {
 				return (MessageConsole) existing[i];
+			}
+		}
 		// no console found, so create a new one
-		MessageConsole myConsole = new MessageConsole(name, null);
-		conMan.addConsoles(new IConsole[] { myConsole });
+		final MessageConsole myConsole =
+			new MessageConsole(name, null);
+		conMan.addConsoles(new IConsole[] {
+			myConsole });
 		return myConsole;
 	}
 
 	public void runCompiler(List<String> packageArgs) {
 		packageArgs.add(0, GCC_PATH);
-		ProcessBuilder processBuilder = new ProcessBuilder(packageArgs);
+		final ProcessBuilder processBuilder =
+			new ProcessBuilder(packageArgs);
 
-		BufferedReader input = null;
-		BufferedReader error = null;
-		MessageConsoleStream consoleOut = console.newMessageStream();
+		BufferedReader input =
+			null;
+		BufferedReader error =
+			null;
+		final MessageConsoleStream consoleOut =
+			console.newMessageStream();
 
 		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			boolean x = true;
+			final Process process =
+				processBuilder.start();
+			input =
+				new BufferedReader(new InputStreamReader(
+						process.getInputStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			error =
+				new BufferedReader(new InputStreamReader(
+						process.getErrorStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			boolean x =
+				true;
 			while (x) {
 				try {
 					String line;
-					if ((line = error.readLine()) != null) {
-						ProjectConfigurationErrorLogger prjConfi = ProjectConfigurationErrorLogger
-								.getInstance();
+					if ((line =
+						error.readLine()) != null) {
+						final ProjectConfigurationErrorLogger prjConfi =
+							ProjectConfigurationErrorLogger
+									.getInstance();
 						// the string that comes here, have
 						// /variant00x/variant00x/
 						// that will be used by the compiler to generate the
 						// executable
-						String s = packageArgs.get(packageArgs.size() - 1);
+						final String s =
+							packageArgs.get(packageArgs.size()
+								- 1);
 						// let's "clean" it...
-						int lastFileSeparator = s.lastIndexOf(System
-								.getProperty("file.separator"));
-						String variantPath = s.substring(0, lastFileSeparator);
+						final int lastFileSeparator =
+							s.lastIndexOf(System
+									.getProperty("file.separator"));
+						final String variantPath =
+							s.substring(0, lastFileSeparator);
 						prjConfi.addConfigurationWithError(variantPath);
 						consoleOut.println("Variant Name: "
-								+ s.substring(lastFileSeparator));
+							+ s.substring(lastFileSeparator));
 
 						do {
 							// use pattern to avoid errors in Windows OS
-							String pattern = Pattern.quote(System
-									.getProperty("file.separator"));
-							String[] errorLine = line.split(pattern);
-							consoleOut.println(errorLine[errorLine.length - 1]);
+							final String pattern =
+								Pattern.quote(System
+										.getProperty("file.separator"));
+							final String[] errorLine =
+								line.split(pattern);
+							consoleOut.println(errorLine[errorLine.length
+								- 1]);
 							Colligens.getDefault().logWarning(line);
-						} while ((line = error.readLine()) != null);
+						} while ((line =
+							error.readLine()) != null);
 						consoleOut.println();
 					}
 
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						consoleOut.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue = process.exitValue();
+					final int exitValue =
+						process.exitValue();
 					if (exitValue != 0) {
 						throw new IOException(
 								"The process doesn't finish normally (exit="
-										+ exitValue + ")!");
+									+ exitValue
+									+ ")!");
 					}
-					x = false;
-				} catch (IllegalThreadStateException e) {
+					x =
+						false;
+				} catch (final IllegalThreadStateException e) {
 					consoleOut.println(e.toString());
 					Colligens.getDefault().logError(e);
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// consoleOut.println("The Project contains errors! " +
 			// e.getMessage());
 			Colligens.getDefault().logError(e);
 		} finally {
 			try {
-				if (input != null)
+				if (input != null) {
 					input.close();
-			} catch (IOException e) {
+				}
+			} catch (final IOException e) {
 				Colligens.getDefault().logError(e);
 			} finally {
 				if (error != null) {
 					try {
 						error.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Colligens.getDefault().logError(e);
 					}
 				}
@@ -150,69 +183,88 @@ public class CPPWrapper {
 		packageArgs.add(0, "-nostdinc");
 		packageArgs.add(0, "-E");
 		packageArgs.add(0, GCC_PATH);
-		ProcessBuilder processBuilder = new ProcessBuilder(packageArgs);
+		final ProcessBuilder processBuilder =
+			new ProcessBuilder(packageArgs);
 
-		BufferedReader input = null;
-		BufferedReader error = null;
-		String errorLog = "";
+		BufferedReader input =
+			null;
+		BufferedReader error =
+			null;
+		String errorLog =
+			"";
 
 		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			boolean x = true;
+			final Process process =
+				processBuilder.start();
+			input =
+				new BufferedReader(new InputStreamReader(
+						process.getInputStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			error =
+				new BufferedReader(new InputStreamReader(
+						process.getErrorStream(), Charset.availableCharsets().get(
+								"UTF-8")));
+			boolean x =
+				true;
 
-			File outputFile = new File(preProcessorOutput);
+			final File outputFile =
+				new File(preProcessorOutput);
 			while (x) {
 				try {
 					String line;
 					try {
 
-						FileWriter fileW = new FileWriter(outputFile);
-						BufferedWriter buffW = new BufferedWriter(fileW);
+						final FileWriter fileW =
+							new FileWriter(outputFile);
+						final BufferedWriter buffW =
+							new BufferedWriter(fileW);
 
-						while ((line = input.readLine()) != null) {
-							buffW.write(line + "\n");
+						while ((line =
+							input.readLine()) != null) {
+							buffW.write(line
+								+ "\n");
 						}
 
-						while ((line = error.readLine()) != null) {
-							errorLog += line + "\n";
+						while ((line =
+							error.readLine()) != null) {
+							errorLog +=
+								line
+									+ "\n";
 						}
 						buffW.close();
 						fileW.close();
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						Colligens.getDefault().logError(e);
 					}
 
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue = process.exitValue();
+					final int exitValue =
+						process.exitValue();
 					if (exitValue != 0) {
 						if (!errorLog
 								.contains("error: no include path in which to search for")) {
 							outputFile.deleteOnExit();
 							throw new IOException(
 									"The process doesn't finish normally (exit="
-											+ exitValue + ")!");
+										+ exitValue
+										+ ")!");
 						}
 					}
 
-					x = false;
-				} catch (IllegalThreadStateException e) {
+					x =
+						false;
+				} catch (final IllegalThreadStateException e) {
 					Colligens.getDefault().logError(e);
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			System.out.println(e.toString());
 			Colligens.getDefault().logError(e);
 		} finally {
@@ -221,15 +273,16 @@ public class CPPWrapper {
 					input.close();
 				}
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				Colligens.getDefault().logError(e);
 			} finally {
-				if (error != null)
+				if (error != null) {
 					try {
 						error.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Colligens.getDefault().logError(e);
 					}
+				}
 			}
 		}
 

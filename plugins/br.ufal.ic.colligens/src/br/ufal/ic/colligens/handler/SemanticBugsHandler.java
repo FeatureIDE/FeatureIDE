@@ -18,30 +18,36 @@ import br.ufal.ic.colligens.controllers.SemanticBugsController;
 import br.ufal.ic.colligens.views.SemanticBugsView;
 
 public class SemanticBugsHandler extends ColligensAbstractHandler {
+
 	private SemanticBugsController controller;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IWorkbenchWindow window = HandlerUtil
-				.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window =
+			HandlerUtil
+					.getActiveWorkbenchWindow(event);
 
-		ISelection selection = window.getActivePage().getSelection();
+		final ISelection selection =
+			window.getActivePage().getSelection();
 
-		String cppCheckerPath = Colligens.getDefault().getPreferenceStore()
-				.getString("CppCheck");
+		final String cppCheckerPath =
+			Colligens.getDefault().getPreferenceStore()
+					.getString("CppCheck");
 
-		if (cppCheckerPath != null && !(new File(cppCheckerPath).isFile())) {
+		if ((cppCheckerPath != null)
+			&& !(new File(cppCheckerPath).isFile())) {
 			MessageDialog
 					.openError(
 							window.getShell(),
 							Colligens.PLUGIN_NAME,
 							"Go to the Colligens preferences, and set where you installed the CppChecker. \n"
-									+ "Window > Preferences > Colligens > CppCheck Settings");
+								+ "Window > Preferences > Colligens > CppCheck Settings");
 			return null;
 		}
 
 		if (controller == null) {
-			controller = new SemanticBugsController();
+			controller =
+				new SemanticBugsController();
 		}
 
 		controller.setWindow(window);
@@ -49,10 +55,11 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			IWorkbenchPage page = window.getActivePage();
+			final IWorkbenchPage page =
+				window.getActivePage();
 			try {
 				page.showView(SemanticBugsView.ID);
-			} catch (PartInitException e) {
+			} catch (final PartInitException e) {
 
 				e.printStackTrace();
 			}

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -25,21 +25,26 @@ import core.RefactoringType;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class RefactorSelectionHandler extends ColligensAbstractHandler {
-	public static String PARM_ID = "br.ufal.ic.colligens.RefactorParameter";
-	public static String COMMAND_ID = "br.ufal.ic.colligens.commands.RefactorCommand";
-	private final String WIZARD_NAME = REFACTORING___COLLIGENS;
+
+	public static String PARM_ID =
+		"br.ufal.ic.colligens.RefactorParameter";
+	public static String COMMAND_ID =
+		"br.ufal.ic.colligens.commands.RefactorCommand";
+	private final String WIZARD_NAME =
+		REFACTORING___COLLIGENS;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		if (event.getParameter(RefactorSelectionHandler.PARM_ID) != null) {
-			IWorkbenchWindow window = HandlerUtil
-					.getActiveWorkbenchWindow(event);
+			final IWorkbenchWindow window =
+				HandlerUtil
+						.getActiveWorkbenchWindow(event);
 
-			this.run(window,
+			run(window,
 					event.getParameter(RefactorSelectionHandler.PARM_ID));
 
 		}
@@ -49,36 +54,46 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
 	private void run(IWorkbenchWindow window, String type) {
 
-		RefactoringType refactoringType = RefactoringType.valueOf(type);
+		final RefactoringType refactoringType =
+			RefactoringType.valueOf(type);
 
-		ISelection selection = null;
-		selection = window.getActivePage().getSelection();
+		ISelection selection =
+			null;
+		selection =
+			window.getActivePage().getSelection();
 
 		if (selection instanceof TextSelection) {
 
-			TextSelection textSelection = (TextSelection) selection;
+			final TextSelection textSelection =
+				(TextSelection) selection;
 
-			Shell shell = window.getShell();
+			final Shell shell =
+				window.getShell();
 
-			RefactorSelectionController refactoringController = new RefactorSelectionController();
+			final RefactorSelectionController refactoringController =
+				new RefactorSelectionController();
 
-			FileEditorInput fileEditorInput = (FileEditorInput) window
-					.getActivePage().getActiveEditor().getEditorInput();
+			final FileEditorInput fileEditorInput =
+				(FileEditorInput) window
+						.getActivePage().getActiveEditor().getEditorInput();
 
-			IFile file = fileEditorInput.getFile();
+			final IFile file =
+				fileEditorInput.getFile();
 
 			refactoringController.setSelection(file, textSelection,
 					refactoringType);
 
-			RefactorDataWizard wizard = new RefactorDataWizard(
-					refactoringController, WIZARD_NAME);
+			final RefactorDataWizard wizard =
+				new RefactorDataWizard(
+						refactoringController, WIZARD_NAME);
 			try {
-				RefactoringWizardOpenOperation operation = new RefactoringWizardOpenOperation(
-						wizard);
+				final RefactoringWizardOpenOperation operation =
+					new RefactoringWizardOpenOperation(
+							wizard);
 				operation.run(shell, WIZARD_NAME);
-			} catch (InterruptedException exception) {
+			} catch (final InterruptedException exception) {
 				// Do nothing
-			} catch (NullPointerException exception) {
+			} catch (final NullPointerException exception) {
 				// Do nothing
 			}
 		}
@@ -86,28 +101,35 @@ public class RefactorSelectionHandler extends ColligensAbstractHandler {
 
 	@Override
 	public boolean isEnabled() {
-		TextSelection textSelection = null;
-		IEditorPart editorPart = null;
+		TextSelection textSelection =
+			null;
+		IEditorPart editorPart =
+			null;
 		try {
-			editorPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().getActiveEditor();
-		} catch (NullPointerException e) {
+			editorPart =
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+						.getActivePage().getActiveEditor();
+		} catch (final NullPointerException e) {
 			return false;
 		}
 
 		if (editorPart instanceof ITextEditor) {
 			if (super.isEnabled()) {
 
-				ITextEditor editor = (ITextEditor) editorPart;
-				textSelection = (TextSelection) editor.getSelectionProvider()
-						.getSelection();
+				final ITextEditor editor =
+					(ITextEditor) editorPart;
+				textSelection =
+					(TextSelection) editor.getSelectionProvider()
+							.getSelection();
 
-				String line = textSelection.getText();
+				final String line =
+					textSelection.getText();
 				if (line.contains("#")) {
-					if (line.contains("#if ") || line.contains("#elif ")
-							|| line.contains("#ifdef ")
-							|| line.contains("#ifndef ")
-							|| line.contains("#else")) {
+					if (line.contains("#if ")
+						|| line.contains("#elif ")
+						|| line.contains("#ifdef ")
+						|| line.contains("#ifndef ")
+						|| line.contains("#else")) {
 
 						return true;
 					}

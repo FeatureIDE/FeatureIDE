@@ -14,10 +14,12 @@ import core.RefactoringType;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class RefactorContributionItems extends CompoundContributionItem {
-	public static String ID = "br.ufal.ic.colligens.RefactorContributionItems";
+
+	public static String ID =
+		"br.ufal.ic.colligens.RefactorContributionItems";
 
 	public RefactorContributionItems() {
 		super();
@@ -29,27 +31,33 @@ public class RefactorContributionItems extends CompoundContributionItem {
 
 	@Override
 	protected IContributionItem[] getContributionItems() {
-		ArrayList<IContributionItem> citems = new ArrayList<IContributionItem>();
+		final ArrayList<IContributionItem> citems =
+			new ArrayList<IContributionItem>();
 
-		for (RefactoringType type : RefactoringType.values()) {
+		for (final RefactoringType type : RefactoringType.values()) {
 
-			CommandContributionItemParameter parameters = new CommandContributionItemParameter(
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
-					RefactorContributionItems.ID,
-					RefactorSelectionHandler.COMMAND_ID,
-					CommandContributionItem.STYLE_PUSH);
+			final CommandContributionItemParameter parameters =
+				new CommandContributionItemParameter(
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
+						RefactorContributionItems.ID,
+						RefactorSelectionHandler.COMMAND_ID,
+						CommandContributionItem.STYLE_PUSH);
 
-			Map<String, String> params = new HashMap<String, String>();
+			final Map<String, String> params =
+				new HashMap<String, String>();
 
 			params.put(RefactorSelectionHandler.PARM_ID,
 					String.valueOf(type.name()));
 
-			parameters.parameters = params;
+			parameters.parameters =
+				params;
 
-			parameters.label = type.getLabel();
+			parameters.label =
+				type.getLabel();
 
-			CommandContributionItem item = new CommandContributionItem(
-					parameters);
+			final CommandContributionItem item =
+				new CommandContributionItem(
+						parameters);
 
 			citems.add(item);
 		}
