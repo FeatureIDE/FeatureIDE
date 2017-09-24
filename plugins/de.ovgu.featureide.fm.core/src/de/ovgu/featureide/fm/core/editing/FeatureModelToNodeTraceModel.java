@@ -258,11 +258,11 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 *
 		 * @return literals for the multiple source elements; not null
 		 */
-		private Literal[] getLiterals() {
+		private Node[] getLiterals() {
 			final Set<IFeatureModelElement> elements =
 				getElements();
-			final Literal[] literals =
-				new Literal[elements.size()];
+			final Node[] literals =
+				new Node[elements.size()];
 			int i =
 				0;
 			for (final IFeatureModelElement element : elements) {
