@@ -62,8 +62,9 @@ public class ColorSchemeHandler extends AbstractHandler {
 
 		editorPart =
 			HandlerUtil.getActiveEditor(event);
+		// Cast is necessary, don't remove
 		editor =
-			editorPart.getAdapter(ITextEditor.class);
+			(ITextEditor) editorPart.getAdapter(ITextEditor.class);
 		provider =
 			editor.getDocumentProvider();
 

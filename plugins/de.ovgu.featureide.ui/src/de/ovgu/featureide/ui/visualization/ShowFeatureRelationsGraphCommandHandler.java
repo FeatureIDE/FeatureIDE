@@ -56,8 +56,9 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 			null;
 		if (!(element instanceof IProject)) {
 			if (element instanceof IAdaptable) {
+				// Cast is necessary, don't remove
 				project =
-					((IAdaptable) element).getAdapter(IProject.class);
+					(IProject) ((IAdaptable) element).getAdapter(IProject.class);
 			}
 		} else {
 			project =

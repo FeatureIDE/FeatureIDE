@@ -201,8 +201,9 @@ public class DynamicProfileMenu extends ContributionItem {
 			} else if (element instanceof IJavaElement) {
 				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
 			} else if (element instanceof IAdaptable) {
+				// Cast is necessary, don't remove
 				final IProject project =
-					((IAdaptable) element).getAdapter(IProject.class);
+					(IProject) ((IAdaptable) element).getAdapter(IProject.class);
 				if (project != null) {
 					return CorePlugin.getFeatureProject(project);
 				}
