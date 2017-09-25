@@ -48,14 +48,12 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 	private InvalidConfigurationsViewController() {
 		super(InvalidConfigurationsView.ID);
-		viewContentProvider =
-			new ViewContentProvider();
+		viewContentProvider = new ViewContentProvider();
 	}
 
 	public static InvalidConfigurationsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE =
-				new InvalidConfigurationsViewController();
+			INSTANCE = new InvalidConfigurationsViewController();
 		}
 		return INSTANCE;
 	}
@@ -75,13 +73,10 @@ public class InvalidConfigurationsViewController extends ViewController {
 			return;
 		}
 
-		final Object object =
-			treeViewer.getInput();
-		if ((object != null)
-			&& (object instanceof List)) {
+		final Object object = treeViewer.getInput();
+		if ((object != null) && (object instanceof List)) {
 			@SuppressWarnings("unchecked")
-			final List<FileProxy> fileProxies =
-				(List<FileProxy>) object;
+			final List<FileProxy> fileProxies = (List<FileProxy>) object;
 			for (final FileProxy fileProxy : fileProxies) {
 				fileProxy.deleteMarkers();
 			}
@@ -116,16 +111,11 @@ public class InvalidConfigurationsViewController extends ViewController {
 	 */
 	public void createPartControl(Composite parent) {
 
-		final Tree tree =
-			new Tree(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.FULL_SELECTION
-				| SWT.LEFT);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.LEFT);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 
-		treeViewer =
-			new TreeViewer(tree);
+		treeViewer = new TreeViewer(tree);
 
 		createColumns(tree);
 
@@ -137,25 +127,17 @@ public class InvalidConfigurationsViewController extends ViewController {
 
 			@Override
 			public void handleEvent(Event event) {
-				final Point point =
-					new Point(event.x, event.y);
-				final TreeItem clickedItem =
-					treeViewer.getTree().getItem(point);
+				final Point point = new Point(event.x, event.y);
+				final TreeItem clickedItem = treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
-					final Object data =
-						clickedItem.getData();
+					final Object data = clickedItem.getData();
 					if (data instanceof Log) {
-						if ((event.button == MouseEvent.BUTTON1)
-							&& (event.count == 2)) {
-							final Log log =
-								(Log) data;
+						if ((event.button == MouseEvent.BUTTON1) && (event.count == 2)) {
+							final Log log = (Log) data;
 							try {
 
-								final IEditorPart editor =
-									IDE.openEditor(getView()
-											.getSite().getPage(), log.getFile());
-								editor.getSite().getSelectionProvider()
-										.setSelection(log.selection());
+								final IEditorPart editor = IDE.openEditor(getView().getSite().getPage(), log.getFile());
+								editor.getSite().getSelectionProvider().setSelection(log.selection());
 
 							} catch (final PartInitException e) {
 
@@ -171,41 +153,23 @@ public class InvalidConfigurationsViewController extends ViewController {
 								e.printStackTrace();
 							}
 						}
-						if ((event.button == MouseEvent.BUTTON3)
-							&& (event.count == 2)) {
-							final Log log =
-								(Log) data;
-							final String textData =
-								log.getFullPath()
-									+ "\n"
-									+ log.getMessage()
-									+ "\n"
-									+ log.getFeature();
-							final TextTransfer textTransfer =
-								TextTransfer
-										.getInstance();
+						if ((event.button == MouseEvent.BUTTON3) && (event.count == 2)) {
+							final Log log = (Log) data;
+							final String textData = log.getFullPath() + "\n" + log.getMessage() + "\n" + log.getFeature();
+							final TextTransfer textTransfer = TextTransfer.getInstance();
 
-							final Display display =
-								getView().getSite().getShell()
-										.getDisplay();
-							final Clipboard cb =
-								new Clipboard(display);
-							cb.setContents(new Object[] {
-								textData },
-									new Transfer[] {
-										textTransfer });
+							final Display display = getView().getSite().getShell().getDisplay();
+							final Clipboard cb = new Clipboard(display);
+							cb.setContents(new Object[] { textData }, new Transfer[] { textTransfer });
 						}
 					}
 					if (data instanceof FileProxy) {
-						if ((event.button == MouseEvent.BUTTON1)
-							&& (event.count == 2)) {
+						if ((event.button == MouseEvent.BUTTON1) && (event.count == 2)) {
 
-							final FileProxy fileProxy =
-								(FileProxy) data;
+							final FileProxy fileProxy = (FileProxy) data;
 							try {
 
-								IDE.openEditor(getView().getSite().getPage(),
-										(IFile) fileProxy.getResource());
+								IDE.openEditor(getView().getSite().getPage(), (IFile) fileProxy.getResource());
 
 							} catch (final PartInitException e) {
 
@@ -219,8 +183,7 @@ public class InvalidConfigurationsViewController extends ViewController {
 		});
 
 		// // Set the sorter for the table
-		comparator =
-			new ViewSorter();
+		comparator = new ViewSorter();
 		treeViewer.setComparator(comparator);
 
 		// PlatformUI.getWorkbench().getHelpSystem()
@@ -228,61 +191,39 @@ public class InvalidConfigurationsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		final String[] titles =
-			{
-				DESCRIPTION,
-				"Resource",
-				"Path",
-				FEATURE_CONFIGURATION,
-				SEVERITY };
-		final int[] bounds =
-			{
-				300,
-				100,
-				100,
-				300,
-				100 };
+		final String[] titles = { DESCRIPTION, "Resource", "Path", FEATURE_CONFIGURATION, SEVERITY };
+		final int[] bounds = { 300, 100, 100, 300, 100 };
 
-		for (int i =
-			0; i < bounds.length; i++) {
+		for (int i = 0; i < bounds.length; i++) {
 			createTreeViewerColumn(tree, titles[i], bounds[i], i);
 		}
 	}
 
-	private void createTreeViewerColumn(Tree tree, String title, int bound,
-			final int ColumnNumber) {
+	private void createTreeViewerColumn(Tree tree, String title, int bound, final int ColumnNumber) {
 
-		final int style =
-			(ColumnNumber == 0)
-				? SWT.RIGHT
-				: SWT.LEFT;
+		final int style = (ColumnNumber == 0) ? SWT.RIGHT : SWT.LEFT;
 
-		final TreeColumn treeColumn =
-			new TreeColumn(tree, style);
+		final TreeColumn treeColumn = new TreeColumn(tree, style);
 
 		treeColumn.setText(title);
 		treeColumn.setWidth(bound);
 		treeColumn.setResizable(true);
 		treeColumn.setMoveable(false);
-		treeColumn.addSelectionListener(getSelectionAdapter(treeColumn,
-				ColumnNumber));
+		treeColumn.addSelectionListener(getSelectionAdapter(treeColumn, ColumnNumber));
 	}
 
-	private SelectionAdapter getSelectionAdapter(final TreeColumn column,
-			final int index) {
-		final SelectionAdapter selectionAdapter =
-			new SelectionAdapter() {
+	private SelectionAdapter getSelectionAdapter(final TreeColumn column, final int index) {
+		final SelectionAdapter selectionAdapter = new SelectionAdapter() {
 
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					comparator.setColumn(index);
-					final int direction =
-						comparator.getDirection();
-					treeViewer.getTree().setSortDirection(direction);
-					treeViewer.getTree().setSortColumn(column);
-					treeViewer.refresh();
-				}
-			};
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				comparator.setColumn(index);
+				final int direction = comparator.getDirection();
+				treeViewer.getTree().setSortDirection(direction);
+				treeViewer.getTree().setSortColumn(column);
+				treeViewer.refresh();
+			}
+		};
 		return selectionAdapter;
 	}
 

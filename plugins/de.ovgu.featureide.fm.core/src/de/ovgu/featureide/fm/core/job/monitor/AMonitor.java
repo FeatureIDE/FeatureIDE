@@ -32,17 +32,14 @@ public abstract class AMonitor implements IMonitor {
 
 	protected final AMonitor parent;
 
-	protected IConsumer<Object> intermediateFunction =
-		null;
+	protected IConsumer<Object> intermediateFunction = null;
 
 	public AMonitor(AMonitor parent) {
-		this.parent =
-			parent;
+		this.parent = parent;
 	}
 
 	public AMonitor() {
-		parent =
-			null;
+		parent = null;
 	}
 
 	@Override
@@ -66,8 +63,7 @@ public abstract class AMonitor implements IMonitor {
 
 	@Override
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction =
-			intermediateFunction;
+		this.intermediateFunction = intermediateFunction;
 	}
 
 }

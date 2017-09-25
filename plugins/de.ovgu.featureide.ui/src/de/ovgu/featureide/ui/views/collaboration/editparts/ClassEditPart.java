@@ -78,8 +78,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<?> getModelChildren() {
-		final List<FSTRole> roles =
-			new LinkedList<FSTRole>();
+		final List<FSTRole> roles = new LinkedList<FSTRole>();
 		for (final FSTRole role : getClassModel().getRoles()) {
 			if (addFeature(role.getFeature())) {
 				roles.add(role);
@@ -97,9 +96,7 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void refreshVisuals() {
-		getFigure().getBounds().y =
-			GUIDefaults.DEFAULT_INSET_TO_EDGE
-				- 5;
+		getFigure().getBounds().y = GUIDefaults.DEFAULT_INSET_TO_EDGE - 5;
 	}
 
 	/**
@@ -108,32 +105,24 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 	@Override
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			final FSTClass classModel =
-				getClassModel();
-			final String fileName =
-				classModel.getName();
+			final FSTClass classModel = getClassModel();
+			final String fileName = classModel.getName();
 			if (fileName.contains("*")) {
 				return;
 			}
 
-			final LinkedList<FSTRole> roles =
-				classModel.getRoles();
+			final LinkedList<FSTRole> roles = classModel.getRoles();
 
-			final IFile roleFile =
-				roles.getFirst().getFile();
-			final IFeatureProject project =
-				CorePlugin.getFeatureProject(roleFile);
+			final IFile roleFile = roles.getFirst().getFile();
+			final IFeatureProject project = CorePlugin.getFeatureProject(roleFile);
 			if (project == null) {
 				return;
 			}
-			final IFolder buildFolder =
-				project.getBuildFolder();
-			IFile file =
-				buildFolder.getFile(fileName);
+			final IFolder buildFolder = project.getBuildFolder();
+			IFile file = buildFolder.getFile(fileName);
 			try {
 				if (!file.exists()) {
-					file =
-						getBuildFile(fileName, buildFolder);
+					file = getBuildFile(fileName, buildFolder);
 				}
 			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
@@ -146,40 +135,27 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
-			final IWorkbenchWindow dw =
-				UIPlugin.getDefault().getWorkbench()
-						.getActiveWorkbenchWindow();
-			final IWorkbenchPage page =
-				dw.getActivePage();
+			final IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+			final IWorkbenchPage page = dw.getActivePage();
 			if (page != null) {
-				IContentType contentType =
-					null;
+				IContentType contentType = null;
 				try {
-					final IContentDescription description =
-						file
-								.getContentDescription();
+					final IContentDescription description = file.getContentDescription();
 					if (description != null) {
-						contentType =
-							description.getContentType();
+						contentType = description.getContentType();
 					}
-					IEditorDescriptor desc =
-						null;
+					IEditorDescriptor desc = null;
 					if (contentType != null) {
-						desc =
-							PlatformUI.getWorkbench().getEditorRegistry()
-									.getDefaultEditor(file.getName(), contentType);
+						desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 					} else {
-						desc =
-							PlatformUI.getWorkbench().getEditorRegistry()
-									.getDefaultEditor(file.getName());
+						desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 					}
 
 					if (desc != null) {
 						page.openEditor(new FileEditorInput(file), desc.getId());
 					} else {
 						// case: there is no default editor for the file
-						page.openEditor(new FileEditorInput(file),
-								"org.eclipse.ui.DefaultTextEditor");
+						page.openEditor(new FileEditorInput(file), "org.eclipse.ui.DefaultTextEditor");
 					}
 				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
@@ -190,13 +166,11 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		super.performRequest(request);
 	}
 
-	public IFile getBuildFile(String fileName, IFolder buildFoloder)
-			throws CoreException {
+	public IFile getBuildFile(String fileName, IFolder buildFoloder) throws CoreException {
 		IFile file;
 		for (final IResource res : buildFoloder.members()) {
 			if (res instanceof IFolder) {
-				file =
-					getBuildFile(fileName, (IFolder) res);
+				file = getBuildFile(fileName, (IFolder) res);
 				if (file != null) {
 					return file;
 				}

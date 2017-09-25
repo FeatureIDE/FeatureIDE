@@ -46,14 +46,10 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 	 */
 	public SetFeatureColorOperation(IFeatureModel featureModel, ArrayList<IFeature> featureListBuffer, FeatureColor newColor) {
 		super(featureModel, "Change feature color");
-		features =
-			featureListBuffer;
-		this.newColor =
-			newColor;
-		oldColor =
-			new ArrayList<>();
-		for (int i =
-			0; i < featureListBuffer.size(); i++) {
+		features = featureListBuffer;
+		this.newColor = newColor;
+		oldColor = new ArrayList<>();
+		for (int i = 0; i < featureListBuffer.size(); i++) {
 			oldColor.add(FeatureColorManager.getColor(featureListBuffer.get(i)));
 		}
 	}
@@ -64,10 +60,8 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 	 */
 	@Override
 	protected FeatureIDEEvent operation() {
-		for (int i =
-			0; i < features.size(); i++) {
-			final IFeature feature =
-				features.get(i);
+		for (int i = 0; i < features.size(); i++) {
+			final IFeature feature = features.get(i);
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		FeatureColorManager.notifyColorChange(features);
@@ -80,10 +74,8 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 	 */
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		for (int i =
-			0; i < features.size(); i++) {
-			final IFeature feature =
-				features.get(i);
+		for (int i = 0; i < features.size(); i++) {
+			final IFeature feature = features.get(i);
 			FeatureColorManager.setColor(feature, oldColor.get(i));
 		}
 		FeatureColorManager.notifyColorChange(features);

@@ -42,11 +42,8 @@ public class CompareInterfacesHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().compareConfigurationInterfaces(
-				projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME),
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL),
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
+		MPLPlugin.getDefault().compareConfigurationInterfaces(projects, (String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME),
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), (Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 	}
 
 }

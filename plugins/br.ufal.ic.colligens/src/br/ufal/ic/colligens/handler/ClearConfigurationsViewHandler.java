@@ -20,9 +20,7 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final InvalidConfigurationsViewController analyzerViewController =
-			InvalidConfigurationsViewController
-					.getInstance();
+		final InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController.getInstance();
 
 		analyzerViewController.clear();
 		return null;
@@ -30,9 +28,7 @@ public class ClearConfigurationsViewHandler extends ColligensAbstractHandler {
 
 	@Override
 	public boolean isEnabled() {
-		final InvalidConfigurationsViewController analyzerViewController =
-			InvalidConfigurationsViewController
-					.getInstance();
+		final InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController.getInstance();
 
 		return !analyzerViewController.isEmpty();
 	}

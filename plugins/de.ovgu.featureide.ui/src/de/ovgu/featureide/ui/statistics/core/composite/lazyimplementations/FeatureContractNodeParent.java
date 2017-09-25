@@ -36,10 +36,8 @@ public class FeatureContractNodeParent extends AbstractSortModeNode {
 
 	public FeatureContractNodeParent(String description, FSTMethod method, LinkedList<FSTMethod> allContractsFeature) {
 		super(description);
-		fstMethod =
-			method;
-		final int numberOfContractsInFeature =
-			countFeature(allContractsFeature);
+		fstMethod = method;
+		final int numberOfContractsInFeature = countFeature(allContractsFeature);
 		super.setValue(numberOfContractsInFeature);
 	}
 
@@ -48,8 +46,7 @@ public class FeatureContractNodeParent extends AbstractSortModeNode {
 
 	public int countFeature(LinkedList<FSTMethod> methods) {
 
-		int c =
-			0;
+		int c = 0;
 		for (final FSTMethod tempMethod : methods) {
 			if (tempMethod.getRole().getFeature().equals(fstMethod.getRole().getFeature())) {
 				c++;

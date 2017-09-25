@@ -48,13 +48,10 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 
 	@Test
 	public void testMandatoryHidden() {
-		final IFeatureModel fm =
-			loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
-		final Configuration c =
-			new Configuration(fm);
+		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
+		final Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		final List<IFeature> list =
-			new ArrayList<IFeature>();
+		final List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		list.add(fm.getFeature("B"));
 		assertEquals(c.getSelectedFeatures(), list);
@@ -62,27 +59,22 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 
 	@Test
 	public void testOptionalHidden() {
-		final IFeatureModel fm =
-			loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c =
-			new Configuration(fm);
+		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
+		final Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		final List<IFeature> list =
-			new ArrayList<IFeature>();
+		final List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		assertEquals(list, c.getSelectedFeatures());
 	}
 
 	@Test
 	public void testAlternativeHidden() {
-		final IFeatureModel fm =
-			loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
-		final Configuration c =
-			new Configuration(fm);
+		final IFeatureModel fm = loadXML(
+				"<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
+		final Configuration c = new Configuration(fm);
 		assertEquals(2, c.number());
 		c.setManual("A", Selection.UNSELECTED);
-		final List<IFeature> list =
-			new ArrayList<IFeature>();
+		final List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		list.add(fm.getFeature("B"));
 		// set={S,B}
@@ -97,13 +89,10 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 
 	@Test
 	public void testHidden() {
-		final IFeatureModel fm =
-			loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
-		final Configuration c =
-			new Configuration(fm);
+		final IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
+		final Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		final List<IFeature> list =
-			new ArrayList<IFeature>();
+		final List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		assertEquals(list, c.getSelectedFeatures());
 	}

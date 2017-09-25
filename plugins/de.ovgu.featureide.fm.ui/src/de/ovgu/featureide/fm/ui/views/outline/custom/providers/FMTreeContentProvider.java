@@ -53,15 +53,12 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput != null) {
 			if (newInput instanceof IFeatureModel) {
-				fModel =
-					((IFeatureModel) newInput);
+				fModel = ((IFeatureModel) newInput);
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
-					final FeatureModelManager fmm =
-						FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
+					final FeatureModelManager fmm = FeatureModelManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
 					if (fmm != null) {
-						fModel =
-							fmm.getObject();
+						fModel = fmm.getObject();
 					}
 				}
 			}
@@ -76,19 +73,14 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if ((fModel != null)
-			&& (fModel.getStructure().getRoot() != null)) {
-			elements =
-				new Object[2];
-			elements[0] =
-				fModel.getStructure().getRoot().getFeature();
-			elements[1] =
-				CONSTRAINTS;
+		if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
+			elements = new Object[2];
+			elements[0] = fModel.getStructure().getRoot().getFeature();
+			elements[1] = CONSTRAINTS;
 			return elements;
 		}
 
-		return new String[] {
-			NO_DATA_TO_DISPLAY_AVAILABLE_ };
+		return new String[] { NO_DATA_TO_DISPLAY_AVAILABLE_ };
 	}
 
 	@Override
@@ -98,16 +90,11 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 		}
 
 		// we have a String as parent of constraints
-		if ((parentElement instanceof String)
-			&& CONSTRAINTS.equals(parentElement)) {
-			final Object[] elements =
-				new Object[fModel.getConstraintCount()];
-			final List<IConstraint> cList =
-				fModel.getConstraints();
-			for (int i =
-				0; i < fModel.getConstraintCount(); i++) {
-				elements[i] =
-					cList.get(i);
+		if ((parentElement instanceof String) && CONSTRAINTS.equals(parentElement)) {
+			final Object[] elements = new Object[fModel.getConstraintCount()];
+			final List<IConstraint> cList = fModel.getConstraints();
+			for (int i = 0; i < fModel.getConstraintCount(); i++) {
+				elements[i] = cList.get(i);
 			}
 			return elements;
 		}
@@ -137,12 +124,9 @@ public class FMTreeContentProvider extends OutlineTreeContentProvider {
 	 * @return Array of Features
 	 */
 	private IFeature[] featureListToArray(List<IFeature> f) {
-		final IFeature[] fArray =
-			new IFeature[f.size()];
-		for (int i =
-			0; i < f.size(); i++) {
-			fArray[i] =
-				f.get(i);
+		final IFeature[] fArray = new IFeature[f.size()];
+		for (int i = 0; i < f.size(); i++) {
+			fArray[i] = f.get(i);
 		}
 		return fArray;
 	}

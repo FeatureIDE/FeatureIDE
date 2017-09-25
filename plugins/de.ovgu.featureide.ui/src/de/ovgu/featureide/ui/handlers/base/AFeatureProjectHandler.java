@@ -43,10 +43,8 @@ public abstract class AFeatureProjectHandler extends ASelectionHandler {
 
 	@Override
 	protected void singleAction(Object element) {
-		final IResource res =
-			SelectionWrapper.checkClass(element, IResource.class);
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(res);
+		final IResource res = SelectionWrapper.checkClass(element, IResource.class);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
 		if (featureProject != null) {
 			singleAction(featureProject);
 		}

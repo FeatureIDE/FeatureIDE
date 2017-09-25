@@ -37,26 +37,20 @@ import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilterable;
  */
 public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
 
-	private Menu filterMenu =
-		null;
+	private Menu filterMenu = null;
 	private final IConfigurationMapFilterable filterable;
 	private final ConfigMapFilterAction[] filterActions;
 
 	public ConfigMapFilterMenuAction(IConfigurationMapFilterable filterable, final IConfigurationMapFilter... filters) {
 		super("Filters", IAction.AS_DROP_DOWN_MENU);
-		this.filterable =
-			filterable;
+		this.filterable = filterable;
 		setToolTipText("Filter Features");
 		setMenuCreator(this);
 
-		filterActions =
-			new ConfigMapFilterAction[filters.length];
-		for (int i =
-			0; i < filters.length; i++) {
-			final IConfigurationMapFilter filter =
-				filters[i];
-			filterActions[i] =
-				new ConfigMapFilterAction(filter, this.filterable);
+		filterActions = new ConfigMapFilterAction[filters.length];
+		for (int i = 0; i < filters.length; i++) {
+			final IConfigurationMapFilter filter = filters[i];
+			filterActions[i] = new ConfigMapFilterAction(filter, this.filterable);
 		}
 	}
 
@@ -67,16 +61,12 @@ public class ConfigMapFilterMenuAction extends Action implements IMenuCreator {
 	@Override
 	public Menu getMenu(Control parent) {
 		if (filterMenu == null) {
-			filterMenu =
-				new Menu(parent);
-			for (int i =
-				0; i < filterActions.length; i++) {
-				final ConfigMapFilterAction filterAction =
-					filterActions[i];
+			filterMenu = new Menu(parent);
+			for (int i = 0; i < filterActions.length; i++) {
+				final ConfigMapFilterAction filterAction = filterActions[i];
 				filterAction.initializeImage(FMUIPlugin.getImage(filterAction.getFilter().getImagePath()));
 
-				final ActionContributionItem contributionItem =
-					new ActionContributionItem(filterAction);
+				final ActionContributionItem contributionItem = new ActionContributionItem(filterAction);
 				// contributionItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 				contributionItem.fill(filterMenu, -1 /* means insert at end */);
 			}

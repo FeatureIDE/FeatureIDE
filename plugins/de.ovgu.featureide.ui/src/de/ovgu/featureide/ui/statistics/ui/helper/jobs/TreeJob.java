@@ -36,8 +36,7 @@ public abstract class TreeJob implements LongRunningMethod<Boolean>, ITreeJob {
 	protected Parent calculated;
 
 	public TreeJob(Parent calculated) {
-		this.calculated =
-			calculated;
+		this.calculated = calculated;
 	}
 
 	@Override
@@ -47,8 +46,7 @@ public abstract class TreeJob implements LongRunningMethod<Boolean>, ITreeJob {
 
 	@Override
 	public void setCalculated(Parent calculated) {
-		this.calculated =
-			calculated;
+		this.calculated = calculated;
 	}
 
 }

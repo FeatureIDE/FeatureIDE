@@ -32,8 +32,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 //TODO MPL: better implementation
 public class SignatureComparator implements Comparator<Object>, Serializable {
 
-	private static final long serialVersionUID =
-		7263887114849068283L;
+	private static final long serialVersionUID = 7263887114849068283L;
 
 	@Override
 	public int compare(Object sig0, Object sig1) {
@@ -41,8 +40,7 @@ public class SignatureComparator implements Comparator<Object>, Serializable {
 	}
 
 	private String buildCompareString(Object obj) {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		if (obj instanceof AbstractSignature) {
 			sb.append('b');
 			if (obj instanceof AbstractMethodSignature) {

@@ -31,15 +31,13 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  */
 public class MungeClassSignature extends AbstractClassSignature {
 
-	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers,
-			String type, String pckg) {
+	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers, String type, String pckg) {
 		super(parent, name, Modifier.toString(modifiers), type, pckg);
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 //		sb.append(super.toString());
 //		sb.append(LINE_SEPARATOR);
@@ -75,13 +73,11 @@ public class MungeClassSignature extends AbstractClassSignature {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 
-		final MungeClassSignature otherSig =
-			(MungeClassSignature) obj;
+		final MungeClassSignature otherSig = (MungeClassSignature) obj;
 
 		if (!super.sigEquals(otherSig)) {
 			return false;

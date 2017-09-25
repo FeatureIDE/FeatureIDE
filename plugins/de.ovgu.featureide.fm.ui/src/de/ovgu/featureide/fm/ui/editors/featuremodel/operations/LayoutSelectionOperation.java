@@ -38,12 +38,9 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	private final int oldSelectedLayoutAlgorithm;
 
 	public LayoutSelectionOperation(IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super(featureModel, SET
-			+ FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
-		this.newSelectedLayoutAlgorithm =
-			newSelectedLayoutAlgorithm;
-		this.oldSelectedLayoutAlgorithm =
-			oldSelectedLayoutAlgorithm;
+		super(featureModel, SET + FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
+		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
+		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 	}
 
 	@Override

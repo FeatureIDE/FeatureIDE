@@ -56,8 +56,7 @@ public class ModifiableSolver extends BasicSolver {
 
 	@Override
 	protected Solver<?> initSolver() {
-		final Solver<?> solver =
-			(Solver<?>) SolverFactory.newDefault();
+		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
 		solver.setDBSimplificationAllowed(false);
 		solver.setVerbose(false);
@@ -66,18 +65,15 @@ public class ModifiableSolver extends BasicSolver {
 
 	public List<IConstr> addCNF(final Collection<? extends Clause> cnfChildren) throws ContradictionException {
 		if (constrList == null) {
-			constrList =
-				new ArrayList<>();
+			constrList = new ArrayList<>();
 		}
-		final int oldSize =
-			constrList.size();
+		final int oldSize = constrList.size();
 		try {
 			for (final Clause clause : cnfChildren) {
 				constrList.add(solver.addClause(new VecInt(clause.getLiterals())));
 			}
 		} catch (final ContradictionException e) {
-			removeLastClauses(constrList.size()
-				- oldSize);
+			removeLastClauses(constrList.size() - oldSize);
 			throw e;
 		}
 		return new ArrayList<>(constrList.subList(oldSize, constrList.size()));
@@ -86,29 +82,21 @@ public class ModifiableSolver extends BasicSolver {
 	@Override
 	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
 		if (constrList == null) {
-			constrList =
-				new ArrayList<>();
+			constrList = new ArrayList<>();
 		}
-		final int oldSize =
-			constrList.size();
+		final int oldSize = constrList.size();
 		try {
 			for (final Node node : cnfChildren) {
-				final Node[] children =
-					node.getChildren();
-				final int[] clause =
-					new int[children.length];
-				for (int i =
-					0; i < children.length; i++) {
-					final Literal literal =
-						(Literal) children[i];
-					clause[i] =
-						satInstance.getSignedVariable(literal);
+				final Node[] children = node.getChildren();
+				final int[] clause = new int[children.length];
+				for (int i = 0; i < children.length; i++) {
+					final Literal literal = (Literal) children[i];
+					clause[i] = satInstance.getSignedVariable(literal);
 				}
 				constrList.add(solver.addClause(new VecInt(clause)));
 			}
 		} catch (final ContradictionException e) {
-			removeLastClauses(constrList.size()
-				- oldSize);
+			removeLastClauses(constrList.size() - oldSize);
 			throw e;
 		}
 		return new ArrayList<>(constrList.subList(oldSize, constrList.size()));
@@ -121,12 +109,9 @@ public class ModifiableSolver extends BasicSolver {
 	}
 
 	public boolean isImplied(Node... or) {
-		final IVecInt backbone =
-			new VecInt();
-		for (int i =
-			0; i < or.length; i++) {
-			final Literal node =
-				(Literal) or[i];
+		final IVecInt backbone = new VecInt();
+		for (int i = 0; i < or.length; i++) {
+			final Literal node = (Literal) or[i];
 			backbone.push(-satInstance.getSignedVariable(node));
 		}
 		try {
@@ -138,11 +123,8 @@ public class ModifiableSolver extends BasicSolver {
 	}
 
 	public void removeLastClauses(int numberOfClauses) {
-		for (int i =
-			0; i < numberOfClauses; i++) {
-			final IConstr removeLast =
-				constrList.remove(constrList.size()
-					- 1);
+		for (int i = 0; i < numberOfClauses; i++) {
+			final IConstr removeLast = constrList.remove(constrList.size() - 1);
 			if (removeLast != null) {
 				solver.removeSubsumedConstr(removeLast);
 			}
@@ -155,8 +137,7 @@ public class ModifiableSolver extends BasicSolver {
 		if (this.getClass() == ModifiableSolver.class) {
 			return new ModifiableSolver(this);
 		} else {
-			throw new RuntimeException("Cloning not supported for "
-				+ this.getClass().toString());
+			throw new RuntimeException("Cloning not supported for " + this.getClass().toString());
 		}
 	}
 

@@ -44,10 +44,8 @@ public class SetProfileColorSchemeAction extends Action {
 	 */
 	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
 		super(text, style);
-		this.model =
-			model;
-		newProfileColorSchemeName =
-			text;
+		this.model = model;
+		newProfileColorSchemeName = text;
 	}
 
 	/**
@@ -55,12 +53,10 @@ public class SetProfileColorSchemeAction extends Action {
 	 */
 	@Override
 	public void run() {
-		String clrSchemeName =
-			newProfileColorSchemeName;
+		String clrSchemeName = newProfileColorSchemeName;
 
 		if (FeatureColorManager.isCurrentColorScheme(model, clrSchemeName)) {
-			clrSchemeName =
-				DefaultColorScheme.defaultName;
+			clrSchemeName = DefaultColorScheme.defaultName;
 		}
 
 		FeatureColorManager.setActive(model, clrSchemeName);

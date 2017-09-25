@@ -59,8 +59,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public class FeatureModel implements IFeatureModel {
 
-	private static long NEXT_ID =
-		0;
+	private static long NEXT_ID = 0;
 
 	protected static final synchronized long getNextId() {
 		return NEXT_ID++;
@@ -68,8 +67,7 @@ public class FeatureModel implements IFeatureModel {
 
 	private long id;
 
-	private long nextElementId =
-		0;
+	private long nextElementId = 0;
 
 	@Override
 	public final synchronized long getNextElementId() {
@@ -79,8 +77,7 @@ public class FeatureModel implements IFeatureModel {
 	protected final String factoryID;
 
 	protected final FeatureModelAnalyzer analyser;
-	protected final List<IConstraint> constraints =
-		new ArrayList<>();
+	protected final List<IConstraint> constraints = new ArrayList<>();
 
 	/**
 	 * A list containing the feature names in their specified order will be initialized in XmlFeatureModelReader.
@@ -90,64 +87,45 @@ public class FeatureModel implements IFeatureModel {
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	protected final Map<String, IFeature> featureTable =
-		new ConcurrentHashMap<>();
+	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
-	protected final ArrayList<IEventListener> listenerList =
-		new ArrayList<>();
+	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
 
 	protected final IFeatureModelProperty property;
 
-	protected final RenamingsManager renamingsManager =
-		new RenamingsManager(this);
+	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
 
 	protected final IFeatureModelStructure structure;
 
-	protected Object undoContext =
-		null;
+	protected Object undoContext = null;
 	private Path sourceFile;
 
 	public FeatureModel(String factoryID) {
-		this.factoryID =
-			factoryID;
+		this.factoryID = factoryID;
 
-		id =
-			getNextId();
-		featureOrderList =
-			new LinkedList<>();
-		featureOrderUserDefined =
-			false;
+		id = getNextId();
+		featureOrderList = new LinkedList<>();
+		featureOrderUserDefined = false;
 
-		property =
-			createProperty();
-		structure =
-			createStructure();
+		property = createProperty();
+		structure = createStructure();
 
-		analyser =
-			createAnalyser();
+		analyser = createAnalyser();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		factoryID =
-			oldFeatureModel.factoryID;
-		id =
-			oldFeatureModel.id;
-		featureOrderList =
-			new LinkedList<>(oldFeatureModel.featureOrderList);
-		featureOrderUserDefined =
-			oldFeatureModel.featureOrderUserDefined;
+		factoryID = oldFeatureModel.factoryID;
+		id = oldFeatureModel.id;
+		featureOrderList = new LinkedList<>(oldFeatureModel.featureOrderList);
+		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
-		property =
-			oldFeatureModel.getProperty().clone(this);
-		structure =
-			createStructure();
+		property = oldFeatureModel.getProperty().clone(this);
+		structure = createStructure();
 
-		sourceFile =
-			oldFeatureModel.sourceFile;
+		sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
-			final IFeatureStructure root =
-				oldFeatureModel.getStructure().getRoot();
+			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
 			if (root != null) {
 				structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
 				for (final IConstraint constraint : oldFeatureModel.constraints) {
@@ -162,10 +140,7 @@ public class FeatureModel implements IFeatureModel {
 				}
 			}
 		}
-		analyser =
-			oldFeatureModel.getAnalyser() == null
-				? createAnalyser()
-				: oldFeatureModel.getAnalyser();
+		analyser = oldFeatureModel.getAnalyser() == null ? createAnalyser() : oldFeatureModel.getAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -188,8 +163,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public boolean addFeature(IFeature feature) {
-		final CharSequence name =
-			feature.getName();
+		final CharSequence name = feature.getName();
 		if (featureTable.containsKey(name)) {
 			return false;
 		}
@@ -215,20 +189,16 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void createDefaultValues(CharSequence projectName) {
-		String rootName =
-			getValidJavaIdentifier(projectName);
+		String rootName = getValidJavaIdentifier(projectName);
 		if (rootName.isEmpty()) {
-			rootName =
-				"Root";
+			rootName = "Root";
 		}
 		if (featureTable.isEmpty()) {
-			final IFeature root =
-				new Feature(this, rootName);
+			final IFeature root = new Feature(this, rootName);
 			structure.setRoot(root.getStructure());
 			addFeature(root);
 		}
-		final IFeature feature =
-			new Feature(this, "Base");
+		final IFeature feature = new Feature(this, "Base");
 		addFeature(feature);
 
 		structure.getRoot().addChild(feature.getStructure());
@@ -243,15 +213,13 @@ public class FeatureModel implements IFeatureModel {
 		}
 
 		// check if it exists
-		final CharSequence name =
-			feature.getName();
+		final CharSequence name = feature.getName();
 		if (!featureTable.containsKey(name)) {
 			return false;
 		}
 
 		// use the group type of the feature to delete
-		final IFeatureStructure parent =
-			feature.getStructure().getParent();
+		final IFeatureStructure parent = feature.getStructure().getParent();
 
 		if (parent.getChildrenCount() == 1) {
 			if (feature.getStructure().isAnd()) {
@@ -264,8 +232,7 @@ public class FeatureModel implements IFeatureModel {
 		}
 
 		// add children to parent
-		final int index =
-			parent.getChildIndex(feature.getStructure());
+		final int index = parent.getChildIndex(feature.getStructure());
 		while (feature.getStructure().hasChildren()) {
 			parent.addChildAtPosition(index, feature.getStructure().removeLastChild());
 		}
@@ -342,11 +309,9 @@ public class FeatureModel implements IFeatureModel {
 	 */
 	@Override
 	public Collection<IFeature> getVisibleFeatures(boolean showHiddenFeatures) {
-		final Collection<IFeature> features =
-			new ArrayList<IFeature>();
+		final Collection<IFeature> features = new ArrayList<IFeature>();
 		for (final IFeature f : getFeatures()) {
-			if (!(f.getStructure().hasHiddenParent()
-				&& !showHiddenFeatures)) {
+			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures)) {
 				features.add(f);
 			}
 		}
@@ -382,10 +347,8 @@ public class FeatureModel implements IFeatureModel {
 	 * Removes all invalid java identifiers form a given string.
 	 */
 	protected String getValidJavaIdentifier(CharSequence s) {
-		final StringBuilder stringBuilder =
-			new StringBuilder();
-		int i =
-			0;
+		final StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
 		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierStart(s.charAt(i))) {
 				stringBuilder.append(s.charAt(i));
@@ -451,8 +414,7 @@ public class FeatureModel implements IFeatureModel {
 		featureOrderList.clear();
 
 		property.reset();
-		nextElementId =
-			0;
+		nextElementId = 0;
 	}
 
 	@Override
@@ -463,8 +425,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		final List<String> basicSet =
-			Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
 		// TODO optimize performance
 		basicSet.removeAll(featureOrderList);
 		this.featureOrderList.clear();
@@ -474,8 +435,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-		this.featureOrderUserDefined =
-			featureOrderUserDefined;
+		this.featureOrderUserDefined = featureOrderUserDefined;
 	}
 
 	@Override
@@ -486,8 +446,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setUndoContext(Object undoContext) {
-		this.undoContext =
-			undoContext;
+		this.undoContext = undoContext;
 	}
 
 	@Override
@@ -504,8 +463,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder("FeatureModel(");
+		final StringBuilder sb = new StringBuilder("FeatureModel(");
 		if (getStructure().getRoot() != null) {
 			sb.append("Structure=[");
 			FeatureUtils.print(getStructure().getRoot().getFeature(), sb);
@@ -515,34 +473,25 @@ public class FeatureModel implements IFeatureModel {
 		} else {
 			sb.append("Feature model without root feature.");
 		}
-		final StringBuilder features =
-			new StringBuilder();
-		final String[] feat =
-			featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
-		for (int i =
-			0; i < feat.length; i++) {
+		final StringBuilder features = new StringBuilder();
+		final String[] feat = featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
+		for (int i = 0; i < feat.length; i++) {
 			features.append(feat[i]);
-			if ((i
-				+ 1) < feat.length) {
+			if ((i + 1) < feat.length) {
 				features.append(", ");
 			}
 		}
-		sb.append("Features=["
-			+ (features.length() > 0
-				? features.toString()
-				: ""));
+		sb.append("Features=[" + (features.length() > 0 ? features.toString() : ""));
 		sb.append("])");
 		return sb.toString();
 	}
 
 	private void print(List<IConstraint> constraints, StringBuilder sb) {
-		for (int i =
-			0; i < constraints.size(); i++) {
+		for (int i = 0; i < constraints.size(); i++) {
 			sb.append("[");
 			sb.append(new NodeWriter(constraints.get(i).getNode()).nodeToString());
 			sb.append("]");
-			if ((i
-				+ 1) < constraints.size()) {
+			if ((i + 1) < constraints.size()) {
 				sb.append(", ");
 			}
 		}
@@ -550,11 +499,9 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setSourceFile(Path file) {
-		sourceFile =
-			file;
+		sourceFile = file;
 		if (file != null) {
-			id =
-				ModelFileIdMap.getModelId(this, file);
+			id = ModelFileIdMap.getModelId(this, file);
 		}
 	}
 
@@ -570,8 +517,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public int hashCode() {
-		return (int) (37
-			* id);
+		return (int) (37 * id);
 	}
 
 	@Override
@@ -579,12 +525,10 @@ public class FeatureModel implements IFeatureModel {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
-		final FeatureModel other =
-			(FeatureModel) obj;
+		final FeatureModel other = (FeatureModel) obj;
 		return id == other.id;
 	}
 

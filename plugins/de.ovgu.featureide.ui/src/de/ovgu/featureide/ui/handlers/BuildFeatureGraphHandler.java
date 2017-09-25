@@ -43,8 +43,7 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 
-	private final LinkedList<IFeatureProject> projectList =
-		new LinkedList<>();
+	private final LinkedList<IFeatureProject> projectList = new LinkedList<>();
 
 	@Override
 	protected void singleAction(IFeatureProject project) {
@@ -54,16 +53,11 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	@Override
 	protected void endAction() {
 		for (final IFeatureProject project : projectList) {
-			final Path path =
-				Paths.get(project.getProject().getFile("model.fg").getLocationURI());
-			final IFeatureModel fm =
-				project.getFeatureModel();
+			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
+			final IFeatureModel fm = project.getFeatureModel();
 			final SatInstance sat =
-				new SatInstance(
-						AdvancedNodeCreator.createRegularCNF(fm),
-						Functional.mapToList(fm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
-			final IRunner<IFeatureGraph> runner =
-				LongRunningWrapper.getRunner(new FGBuilder(sat));
+				new SatInstance(AdvancedNodeCreator.createRegularCNF(fm), Functional.mapToList(fm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
+			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(sat));
 			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
 
 				@Override

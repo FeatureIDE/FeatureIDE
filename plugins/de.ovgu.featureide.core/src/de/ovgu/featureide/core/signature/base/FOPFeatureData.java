@@ -38,12 +38,9 @@ public class FOPFeatureData extends AFeatureData {
 
 	FOPFeatureData(int id, int startLineNumber, int endLineNumber) {
 		super(id, startLineNumber, endLineNumber);
-		calledSignatures =
-			null;
-		usesExternalMethods =
-			false;
-		usesOriginal =
-			false;
+		calledSignatures = null;
+		usesExternalMethods = false;
+		usesOriginal = false;
 	}
 
 	public boolean usesExternMethods() {
@@ -55,39 +52,31 @@ public class FOPFeatureData extends AFeatureData {
 	}
 
 	public List<String> getUsedNonPrimitveTypes() {
-		return usedNonPrimitveTypes != null
-			? Collections.unmodifiableList(usedNonPrimitveTypes)
-			: Collections.<String> emptyList();
+		return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : Collections.<String> emptyList();
 	}
 
 	public void setUsesExternMethods(boolean usesExternMethods) {
-		usesExternalMethods =
-			usesExternMethods;
+		usesExternalMethods = usesExternMethods;
 	}
 
 	public void setUsesOriginal(boolean usesOriginal) {
-		this.usesOriginal =
-			usesOriginal;
+		this.usesOriginal = usesOriginal;
 	}
 
 	public List<AbstractSignature> getCalledSignatures() {
-		return calledSignatures != null
-			? Collections.unmodifiableList(calledSignatures)
-			: Collections.<AbstractSignature> emptyList();
+		return calledSignatures != null ? Collections.unmodifiableList(calledSignatures) : Collections.<AbstractSignature> emptyList();
 	}
 
 	public void addCalledSignature(AbstractSignature signature) {
 		if (calledSignatures == null) {
-			calledSignatures =
-				new ArrayList<AbstractSignature>();
+			calledSignatures = new ArrayList<AbstractSignature>();
 		}
 		calledSignatures.add(signature);
 	}
 
 	public void addUsedNonPrimitveType(String usedNonPrimitveType) {
 		if (usedNonPrimitveTypes == null) {
-			usedNonPrimitveTypes =
-				new ArrayList<String>();
+			usedNonPrimitveTypes = new ArrayList<String>();
 		}
 		if (!usedNonPrimitveTypes.contains(usedNonPrimitveType)) {
 			usedNonPrimitveTypes.add(usedNonPrimitveType);

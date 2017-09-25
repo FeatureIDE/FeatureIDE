@@ -26,15 +26,12 @@ import splar.plugins.reasoners.bdd.javabdd.ReasoningWithBDD;
  */
 public class Experiment_SPLOTmodels {
 
-	protected splar.core.fm.FeatureModel getSplotModel(String featureModelPath)
-			throws Exception {
+	protected splar.core.fm.FeatureModel getSplotModel(String featureModelPath) throws Exception {
 		// Create feature model object from an XML file (SXFM format - see
 		// www.splot-research.org for details)
 		// If an identifier is not provided for a feature use the feature name
 		// as id
-		final splar.core.fm.FeatureModel featureModel =
-			new XMLFeatureModel(
-					featureModelPath, XMLFeatureModel.USE_VARIABLE_NAME_AS_ID);
+		final splar.core.fm.FeatureModel featureModel = new XMLFeatureModel(featureModelPath, XMLFeatureModel.USE_VARIABLE_NAME_AS_ID);
 		// load feature model from
 		featureModel.loadModel();
 
@@ -48,19 +45,13 @@ public class Experiment_SPLOTmodels {
 	 * @throws Exception
 	 * @throws OperationNotSupportedException
 	 */
-	protected long getNumberOfValidProducts(splar.core.fm.FeatureModel featureModel) throws Exception,
-			OperationNotSupportedException {
+	protected long getNumberOfValidProducts(splar.core.fm.FeatureModel featureModel) throws Exception, OperationNotSupportedException {
 		// create BDD variable order heuristic
-		new FTPreOrderSortedECTraversalHeuristic("Pre-CL-MinSpan",
-				featureModel, FTPreOrderSortedECTraversalHeuristic.FORCE_SORT);
-		final VariableOrderingHeuristic heuristic =
-			VariableOrderingHeuristicsManager
-					.createHeuristicsManager().getHeuristic("Pre-CL-MinSpan");
+		new FTPreOrderSortedECTraversalHeuristic("Pre-CL-MinSpan", featureModel, FTPreOrderSortedECTraversalHeuristic.FORCE_SORT);
+		final VariableOrderingHeuristic heuristic = VariableOrderingHeuristicsManager.createHeuristicsManager().getHeuristic("Pre-CL-MinSpan");
 
 		// Creates the BDD reasoner
-		final ReasoningWithBDD reasoner =
-			new FMReasoningWithBDD(featureModel,
-					heuristic, 50000, 50000, 60000, "pre-order");
+		final ReasoningWithBDD reasoner = new FMReasoningWithBDD(featureModel, heuristic, 50000, 50000, 60000, "pre-order");
 
 		// Initialize the reasoner (BDD is created at this moment)
 		reasoner.init();

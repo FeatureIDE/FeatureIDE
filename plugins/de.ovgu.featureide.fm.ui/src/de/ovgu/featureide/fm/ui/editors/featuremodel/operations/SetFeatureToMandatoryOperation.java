@@ -36,18 +36,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_MANDATORY =
-		SET_FEATURE_MANDATORY;
-	private static final String LABEL_OPTIONAL =
-		SET_FEATURE_OPTIONAL;
+	private static final String LABEL_MANDATORY = SET_FEATURE_MANDATORY;
+	private static final String LABEL_OPTIONAL = SET_FEATURE_OPTIONAL;
 	private final IFeature feature;
 
 	/**
 	 */
 	public SetFeatureToMandatoryOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
-		this.feature =
-			feature;
+		this.feature = feature;
 	}
 
 	/**
@@ -64,8 +61,7 @@ public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperatio
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		final boolean isMandatory =
-			feature.getStructure().isMandatory();
+		final boolean isMandatory = feature.getStructure().isMandatory();
 		feature.getStructure().setMandatory(!isMandatory);
 		return new FeatureIDEEvent(feature, EventType.MANDATORY_CHANGED, isMandatory, !isMandatory);
 	}

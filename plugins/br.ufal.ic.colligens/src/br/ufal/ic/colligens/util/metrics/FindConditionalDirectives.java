@@ -13,12 +13,9 @@ import java.util.regex.Pattern;
 
 public class FindConditionalDirectives {
 
-	private final List<String> directives =
-		new ArrayList<String>();
-	private int files =
-		0;
-	private int fileNoDirectives =
-		0;
+	private final List<String> directives = new ArrayList<String>();
+	private int files = 0;
+	private int fileNoDirectives = 0;
 
 	public void getFiles(final File folder) throws IOException {
 		for (final File fileEntry : folder.listFiles()) {
@@ -33,36 +30,25 @@ public class FindConditionalDirectives {
 	}
 
 	public void readFile(File file) throws IOException {
-		boolean directives =
-			false;
+		boolean directives = false;
 		files++;
 
-		final FileInputStream fstream =
-			new FileInputStream(file);
-		final DataInputStream in =
-			new DataInputStream(fstream);
-		final BufferedReader br =
-			new BufferedReader(new InputStreamReader(in));
+		final FileInputStream fstream = new FileInputStream(file);
+		final DataInputStream in = new DataInputStream(fstream);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		String strLine;
-		while ((strLine =
-			br.readLine()) != null) {
-			if (strLine.contains("#if")
-				|| strLine.contains("#elif")) {
+		while ((strLine = br.readLine()) != null) {
+			if (strLine.contains("#if") || strLine.contains("#elif")) {
 
-				directives =
-					true;
+				directives = true;
 
-				final String pattern =
-					"(?://.*)|(/\\*(?:.|[\\n\\r])*?\\*/)";
-				final Pattern r =
-					Pattern.compile(pattern);
+				final String pattern = "(?://.*)|(/\\*(?:.|[\\n\\r])*?\\*/)";
+				final Pattern r = Pattern.compile(pattern);
 
 				// Now create matcher object.
-				final Matcher m =
-					r.matcher(strLine);
+				final Matcher m = r.matcher(strLine);
 				if (m.find()) {
-					strLine =
-						strLine.replace(m.group(), "");
+					strLine = strLine.replace(m.group(), "");
 				}
 
 				if (!this.directives.contains(strLine.trim())) {
@@ -79,23 +65,17 @@ public class FindConditionalDirectives {
 	}
 
 	public static void main(String[] args) throws IOException {
-		final FindConditionalDirectives findConditionalDirectives =
-			new FindConditionalDirectives();
+		final FindConditionalDirectives findConditionalDirectives = new FindConditionalDirectives();
 		findConditionalDirectives.getFiles(new File("projects/lighttpd/src"));
-		final List<String> directives =
-			findConditionalDirectives.directives;
+		final List<String> directives = findConditionalDirectives.directives;
 
-		for (int i =
-			0; i < directives.size(); i++) {
+		for (int i = 0; i < directives.size(); i++) {
 			System.out.println(directives.get(i));
 		}
 
-		System.out.println("Size: "
-			+ directives.size());
-		System.out.println("Files: "
-			+ findConditionalDirectives.files);
-		System.out.println("No Directives: "
-			+ findConditionalDirectives.fileNoDirectives);
+		System.out.println("Size: " + directives.size());
+		System.out.println("Files: " + findConditionalDirectives.files);
+		System.out.println("No Directives: " + findConditionalDirectives.fileNoDirectives);
 	}
 
 }

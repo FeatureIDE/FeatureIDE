@@ -38,10 +38,8 @@ import org.eclipse.ui.IWorkbenchWizard;
  */
 public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard {
 
-	private final List<AbstractWizardPage> pages =
-		new LinkedList<AbstractWizardPage>();
-	private final Map<String, Object> dataMap =
-		new HashMap<String, Object>();
+	private final List<AbstractWizardPage> pages = new LinkedList<AbstractWizardPage>();
+	private final Map<String, Object> dataMap = new HashMap<String, Object>();
 
 	public AbstractWizard(String title) {
 		super();

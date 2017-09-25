@@ -40,8 +40,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
  */
 public abstract class AbstractSortModeNode extends LazyParent implements IToolTip {
 
-	protected boolean sortByValue =
-		false;
+	protected boolean sortByValue = false;
 
 	public AbstractSortModeNode(String description, Object value) {
 		super(description, value);
@@ -58,8 +57,7 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 	}
 
 	public void setSortByValue(boolean sortByValue) {
-		this.sortByValue =
-			sortByValue;
+		this.sortByValue = sortByValue;
 	}
 
 	@Override
@@ -70,20 +68,15 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 				@Override
 				public int compare(Parent o1, Parent o2) {
 					if (o1.getValue() == null) {
-						if ((o1.getDescription() != null)
-							&& (o2.getDescription() != null)) {
-							final int i1 =
-								o1.getDescription().lastIndexOf(": ");
-							final int i2 =
-								o2.getDescription().lastIndexOf(": ");
-							if ((i1 > -1)
-								&& (i2 > -1)) {
+						if ((o1.getDescription() != null) && (o2.getDescription() != null)) {
+							final int i1 = o1.getDescription().lastIndexOf(": ");
+							final int i2 = o2.getDescription().lastIndexOf(": ");
+							if ((i1 > -1) && (i2 > -1)) {
 								return o2.getDescription().substring(i2).compareTo(o1.getDescription().substring(i1));
 							}
 						}
 					} else {
-						return ((Integer) o2.getValue())
-							- ((Integer) o1.getValue());
+						return ((Integer) o2.getValue()) - ((Integer) o1.getValue());
 					}
 					return 0;
 				}

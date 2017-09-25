@@ -35,22 +35,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMand
  */
 public class MandatoryAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.mandatory";
+	public static final String ID = "de.ovgu.featureide.mandatory";
 
 	private final IFeatureModel featureModel;
 
 	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
 		super("Mandatory", viewer);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isMandatory());
-		final SetFeatureToMandatoryOperation op =
-			new SetFeatureToMandatoryOperation(feature, featureModel);
+		final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -63,8 +60,7 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.getStructure().isRoot()
-			&& feature.getStructure().getParent().isAnd());
+		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().getParent().isAnd());
 		setChecked(feature.getStructure().isMandatory());
 	}
 

@@ -26,39 +26,31 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 
 	@Override
 	protected void parseHead(String[] parts) {
-		final String typeString =
-			parts[0];
+		final String typeString = parts[0];
 
 		// Type
 		if (typeString.equals("general")) {
-			tagFeatureNode =
-				null;
+			tagFeatureNode = null;
 		} else if (typeString.equals("feature")) {
-			tagFeatureNode =
-				getCurFeatureNode();
+			tagFeatureNode = getCurFeatureNode();
 		} else if (typeString.equals("new")) {
-			tagFeatureNode =
-				getCurFeatureNode();
+			tagFeatureNode = getCurFeatureNode();
 			featureTags.clear();
 		} else {
 			// warning?
-			tagFeatureNode =
-				null;
+			tagFeatureNode = null;
 		}
 
 		// Priority
 		if (parts.length == 2) {
 			try {
-				tagPriority =
-					Integer.parseInt(parts[1]);
+				tagPriority = Integer.parseInt(parts[1]);
 			} catch (final NumberFormatException e) {
 				// warning?
-				tagPriority =
-					0;
+				tagPriority = 0;
 			}
 		} else {
-			tagPriority =
-				0;
+			tagPriority = 0;
 		}
 	}
 

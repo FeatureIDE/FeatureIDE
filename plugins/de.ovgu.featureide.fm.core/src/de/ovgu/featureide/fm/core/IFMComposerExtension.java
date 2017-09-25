@@ -30,12 +30,9 @@ import org.eclipse.core.resources.IProject;
  */
 public interface IFMComposerExtension {
 
-	static final String ERROR_MESSAGE_NO_COMPOSER =
-		"The characaters  \", (, ) are not allowed and the feature name has to be non-empty.";
-	static final String ERROR_MESSAGE_COMPOSER =
-		"This feature name is not possible. The following regular expression descriptes all valid feature names: "
-			+ "\n   ^[a-zA-Z][a-zA-Z_0-9]*$\n\n"
-			+ ERROR_MESSAGE_NO_COMPOSER;
+	static final String ERROR_MESSAGE_NO_COMPOSER = "The characaters  \", (, ) are not allowed and the feature name has to be non-empty.";
+	static final String ERROR_MESSAGE_COMPOSER = "This feature name is not possible. The following regular expression descriptes all valid feature names: "
+		+ "\n   ^[a-zA-Z][a-zA-Z_0-9]*$\n\n" + ERROR_MESSAGE_NO_COMPOSER;
 
 	/*
 	 * This is necessary for feature models out of a feature project.

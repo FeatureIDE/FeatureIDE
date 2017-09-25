@@ -71,16 +71,11 @@ abstract public class Restriction {
 	 * @category SAT4J representation
 	 */
 	public int[] getIds() {
-		final int[] ids =
-			new int[terms.size()];
-		int i =
-			0;
+		final int[] ids = new int[terms.size()];
+		int i = 0;
 		for (final Term term : terms) {
 			// SAT4J interprets negative ids as 'not id'
-			ids[i++] =
-				term.isPositive()
-					? term.getId()
-					: -term.getId();
+			ids[i++] = term.isPositive() ? term.getId() : -term.getId();
 		}
 		return ids;
 	}
@@ -92,13 +87,10 @@ abstract public class Restriction {
 	 * @category SAT4J representation
 	 */
 	public BigInteger[] getCoefficients() {
-		final BigInteger[] coefficients =
-			new BigInteger[terms.size()];
-		int i =
-			0;
+		final BigInteger[] coefficients = new BigInteger[terms.size()];
+		int i = 0;
 		for (final Term term : terms) {
-			coefficients[i++] =
-				BigInteger.valueOf(term.getCoefficient());
+			coefficients[i++] = BigInteger.valueOf(term.getCoefficient());
 		}
 		return coefficients;
 	}
@@ -135,8 +127,7 @@ abstract public class Restriction {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb =
-			new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		for (final Term term : terms) {
 			sb.append(term.toString());
 			sb.append(" ");
@@ -150,50 +141,41 @@ abstract public class Restriction {
 
 	// transform all terms to have a positive variable (e.g. -3~x=0 <=> 3x=3)
 	protected void makeVarsPositive() {
-		final List<Term> positiveVars =
-			new ArrayList<Term>();
+		final List<Term> positiveVars = new ArrayList<Term>();
 		for (final Term term : terms) {
 			if (!term.isPositive()) {
 				positiveVars.add(term.flipBoth());
-				degree -=
-					term.getCoefficient();
+				degree -= term.getCoefficient();
 			} else {
 				positiveVars.add(term);
 			}
 		}
-		terms =
-			positiveVars;
+		terms = positiveVars;
 	}
 
 	// transform all term to have a positive coefficient (e.g. -3x=0 <=> 3~x=3)
 	protected void makeCoefficientsPositive() {
-		final List<Term> positiveTerms =
-			new ArrayList<Term>();
+		final List<Term> positiveTerms = new ArrayList<Term>();
 		for (final Term term : terms) {
 			if (term.getCoefficient() < 0) {
 				positiveTerms.add(term.flipBoth());
-				degree -=
-					term.getCoefficient();
+				degree -= term.getCoefficient();
 			} else {
 				positiveTerms.add(term);
 			}
 		}
-		terms =
-			positiveTerms;
+		terms = positiveTerms;
 	}
 
 	protected void negateBothSides() {
 		// negate the terms
-		final List<Term> negativedTerms =
-			new ArrayList<Term>();
+		final List<Term> negativedTerms = new ArrayList<Term>();
 		for (final Term term : terms) {
 			negativedTerms.add(term.flipCoefficientSign());
 		}
-		terms =
-			negativedTerms;
+		terms = negativedTerms;
 		// negate the degree
-		degree =
-			-degree;
+		degree = -degree;
 	}
 
 	protected void sortById() {
@@ -205,8 +187,7 @@ abstract public class Restriction {
 	}
 
 	protected static List<Term> makeDefensiveCopy(List<Term> terms) {
-		final List<Term> copy =
-			new ArrayList<Term>();
+		final List<Term> copy = new ArrayList<Term>();
 		for (final Term term : terms) {
 			copy.add(new Term(term));
 		}
@@ -222,8 +203,7 @@ abstract public class Restriction {
 
 		@Override
 		public int compare(Term term1, Term term2) {
-			return term1.getId()
-				- term2.getId();
+			return term1.getId() - term2.getId();
 		}
 	}
 
@@ -236,8 +216,7 @@ abstract public class Restriction {
 
 		@Override
 		public int compare(Term term1, Term term2) {
-			return term1.getCoefficient()
-				- term2.getCoefficient();
+			return term1.getCoefficient() - term2.getCoefficient();
 		}
 	}
 
@@ -247,8 +226,7 @@ abstract public class Restriction {
 		private String symbol;
 
 		private Op(String symbol) {
-			this.symbol =
-				symbol;
+			this.symbol = symbol;
 		}
 
 		@Override

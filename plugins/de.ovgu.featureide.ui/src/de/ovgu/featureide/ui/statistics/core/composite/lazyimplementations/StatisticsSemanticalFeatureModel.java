@@ -53,8 +53,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 		public ConfigNode(String description, IFeatureModel innerModel) {
 			super(description, "(double-click to calculate)");
-			this.innerModel =
-				innerModel;
+			this.innerModel = innerModel;
 		}
 
 		/**
@@ -64,46 +63,35 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 		 * @param priority for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			final LongRunningMethod<Boolean> job =
-				new TreeJob(this) {
+			final LongRunningMethod<Boolean> job = new TreeJob(this) {
 
-					private String calculateConfigs() {
-						final boolean ignoreAbstract =
-							description.equals(DESC_CONFIGS);
-						if (!ignoreAbstract
-							&& (innerModel.getAnalyser().countConcreteFeatures() == 0)) {
-							// case: there is no concrete feature so there is only one program variant,
-							// without this the calculation least much to long
-							return "1";
-						}
-
-						final long number =
-							new Configuration(innerModel, false, ignoreAbstract).number(timeout);
-
-						return ((number < 0)
-							? MORE_THAN
-								+ (-number
-									- 1)
-							: String.valueOf(number));
+				private String calculateConfigs() {
+					final boolean ignoreAbstract = description.equals(DESC_CONFIGS);
+					if (!ignoreAbstract && (innerModel.getAnalyser().countConcreteFeatures() == 0)) {
+						// case: there is no concrete feature so there is only one program variant,
+						// without this the calculation least much to long
+						return "1";
 					}
 
-					@Override
-					public Boolean execute(IMonitor workMonitor) throws Exception {
-						setValue(calculateConfigs());
-						return true;
-					}
+					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
 
-					@Override
-					public boolean cancel() {
-						return false;
-					}
-				};
-			final LongRunningJob<Boolean> runner =
-				new LongRunningJob<>(CALCULATING
-					+ description, job);
+					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
+				}
+
+				@Override
+				public Boolean execute(IMonitor workMonitor) throws Exception {
+					setValue(calculateConfigs());
+					return true;
+				}
+
+				@Override
+				public boolean cancel() {
+					return false;
+				}
+			};
+			final LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + description, job);
 			runner.setPriority(priority);
-			final JobDoneListener listener =
-				JobDoneListener.getInstance();
+			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
 				runner.addJobChangeListener(listener);
 			}
@@ -113,25 +101,20 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 	public StatisticsSemanticalFeatureModel(String description, IFeatureModel model) {
 		super(description);
-		this.model =
-			model;
+		this.model = model;
 	}
 
 	@Override
 	protected void initChildren() {
 
-		Boolean isValid =
-			null;
+		Boolean isValid = null;
 		try {
-			isValid =
-				model.getAnalyser().isValid();
+			isValid = model.getAnalyser().isValid();
 		} catch (final TimeoutException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 
-		addChild(new Parent(MODEL_VOID, isValid == null
-			? MODEL_TIMEOUT
-			: isValid));
+		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
 
 		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
 

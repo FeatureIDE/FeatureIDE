@@ -67,24 +67,19 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
  */
 public class NewFeatureProjectPage extends WizardPage {
 
-	protected IComposerExtensionBase composerExtension =
-		null;
-	protected IComposerExtensionBase[] extensions =
-		null;
+	protected IComposerExtensionBase composerExtension = null;
+	protected IComposerExtensionBase[] extensions = null;
 
 	protected Text sourcePath;
 	protected Text configsPath;
 	protected Text buildPath;
 
 	protected Combo toolCB;
-	protected GridData gd =
-		new GridData(GridData.FILL_HORIZONTAL);
-	protected GridLayout layout =
-		new GridLayout();
+	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+	protected GridLayout layout = new GridLayout();
 	protected Group pathGroup;
 	protected Label buildLabel;
-	private boolean canFlipToNextPage =
-		true;
+	private boolean canFlipToNextPage = true;
 
 	protected NewFeatureProjectPage() {
 		super("");
@@ -94,57 +89,39 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout =
-			new GridLayout();
-		gridLayout.numColumns =
-			1;
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		final Group toolGroup =
-			new Group(container, SWT.NONE);
+		final Group toolGroup = new Group(container, SWT.NONE);
 		toolGroup.setText("Composer Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final GridLayout projGridLayout =
-			new GridLayout();
-		projGridLayout.numColumns =
-			2;
+		final GridLayout projGridLayout = new GridLayout();
+		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
 
-		final Label helloLabel =
-			new Label(toolGroup, SWT.NONE);
-		final GridData gridData =
-			new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan =
-			2;
+		final Label helloLabel = new Label(toolGroup, SWT.NONE);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
 		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
 
-		Label label =
-			new Label(toolGroup, SWT.NONE);
+		Label label = new Label(toolGroup, SWT.NONE);
 		label.setText("Composers:");
-		toolCB =
-			new Combo(toolGroup, SWT.READ_ONLY
-				| SWT.DROP_DOWN);
+		toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 		toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		final Label descriptionLabel =
-			new Label(toolGroup, SWT.NONE);
-		final GridData gridData2 =
-			new GridData(GridData.FILL_BOTH);
-		gridData2.horizontalSpan =
-			2;
+		final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
+		final GridData gridData2 = new GridData(GridData.FILL_BOTH);
+		gridData2.horizontalSpan = 2;
 		descriptionLabel.setLayoutData(gridData2);
 
-		final StringBuilder descriptionStringBuilder =
-			new StringBuilder();
+		final StringBuilder descriptionStringBuilder = new StringBuilder();
 		descriptionStringBuilder.append("Possible choices are:\n\n");
-		final List<IComposerExtension> composerExtensions =
-			ComposerExtensionManager.getInstance().getComposers();
-		extensions =
-			new IComposerExtensionBase[composerExtensions.size()];
+		final List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
+		extensions = new IComposerExtensionBase[composerExtensions.size()];
 		composerExtensions.toArray(extensions);
 		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
 
@@ -162,11 +139,9 @@ public class NewFeatureProjectPage extends WizardPage {
 			toolCB.add(composerExtension.getName());
 		}
 
-		String descriptionString =
-			descriptionStringBuilder.toString();
+		String descriptionString = descriptionStringBuilder.toString();
 		if (composerExtensions.isEmpty()) {
-			descriptionString =
-				NO_COMPOSITION_ENGINES_INSTALLED_;
+			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
 			setDescription(descriptionString);
 			toolCB.setEnabled(false);
 		}
@@ -175,58 +150,42 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				composerExtension =
-					extensions[toolCB.getSelectionIndex()];
+				composerExtension = extensions[toolCB.getSelectionIndex()];
 			}
 		});
 		toolCB.select(0);
 
 		// Path Group
-		pathGroup =
-			new Group(container, SWT.NONE);
-		layout.numColumns =
-			2;
-		layout.verticalSpacing =
-			9;
+		pathGroup = new Group(container, SWT.NONE);
+		layout.numColumns = 2;
+		layout.verticalSpacing = 9;
 		pathGroup.setText("Path Specification:");
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 
-		String tooltip =
-			SETS_THE_PATH_OF_COMPOSED_FILES_;
-		buildLabel =
-			new Label(pathGroup, SWT.NULL);
+		String tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
+		buildLabel = new Label(pathGroup, SWT.NULL);
 		buildLabel.setText("&Source Path:");
 		buildLabel.setToolTipText(tooltip);
-		buildPath =
-			new Text(pathGroup, SWT.BORDER
-				| SWT.SINGLE);
+		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("src");
 		buildPath.setToolTipText(tooltip);
 
-		tooltip =
-			SETS_THE_PATH_OF_FEATUREFOLDERS_;
-		label =
-			new Label(pathGroup, SWT.NULL);
+		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
+		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Feature Path:");
 		label.setToolTipText(tooltip);
-		sourcePath =
-			new Text(pathGroup, SWT.BORDER
-				| SWT.SINGLE);
+		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText(FEATURES);
 		sourcePath.setToolTipText(tooltip);
 
-		tooltip =
-			SETS_THE_PATH_OF_CONFIGURATIONFILES_;
-		label =
-			new Label(pathGroup, SWT.NULL);
+		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
+		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
-		configsPath =
-			new Text(pathGroup, SWT.BORDER
-				| SWT.SINGLE);
+		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
 		configsPath.setToolTipText(tooltip);
@@ -277,77 +236,57 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 
 	protected void dialogChanged() {
-		final IComposerExtensionBase compositionTool =
-			getCompositionTool();
+		final IComposerExtensionBase compositionTool = getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
 
-		if (isEnabled(sourcePath)
-			&& isEnabled(configsPath)
-			&&
-			getSourcePath().equals(getConfigPath())) {
+		if (isEnabled(sourcePath) && isEnabled(configsPath) && getSourcePath().equals(getConfigPath())) {
 			updateStatus(SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isEnabled(sourcePath)
-			&& isEnabled(buildPath)
-			&&
-			getSourcePath().equals(getBuildPath())) {
+		if (isEnabled(sourcePath) && isEnabled(buildPath) && getSourcePath().equals(getBuildPath())) {
 			updateStatus(SOURCE_PATH_EQUALS_BUILD_PATH_);
 			return;
 		}
-		if (isEnabled(buildPath)
-			&& isEnabled(configsPath)
-			&&
-			getBuildPath().equals(getConfigPath())) {
+		if (isEnabled(buildPath) && isEnabled(configsPath) && getBuildPath().equals(getConfigPath())) {
 			updateStatus(BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isEnabled(sourcePath)
-			&& isPathEmpty(getSourcePath(), SOURCE)) {
+		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), SOURCE)) {
 			return;
 		}
-		if (isEnabled(buildPath)
-			&& isPathEmpty(getBuildPath(), BUILD)) {
+		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), BUILD)) {
 			return;
 		}
-		if (isEnabled(configsPath)
-			&& isPathEmpty(getConfigPath(), EQUATIONS)) {
+		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), EQUATIONS)) {
 			return;
 		}
 
-		if (isEnabled(sourcePath)
-			&& isInvalidPath(getSourcePath(), SOURCE)) {
+		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), SOURCE)) {
 			return;
 		}
-		if (isEnabled(buildPath)
-			&& isInvalidPath(getBuildPath(), BUILD)) {
+		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), BUILD)) {
 			return;
 		}
-		if (isEnabled(configsPath)
-			&& isInvalidPath(getConfigPath(), EQUATIONS)) {
+		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), EQUATIONS)) {
 			return;
 		}
 
 		if (compositionTool.supportsAndroid()) {
 
-			canFlipToNextPage =
-				false;
+			canFlipToNextPage = false;
 			setErrorMessage(null);
 			setPageComplete(true);
 
-			if (getSourcePath().equals("src")
-				|| getSourcePath().equals("res")) {
+			if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
 				updateStatus(SOURCE_PATH_RESTRICTION_ANDROID);
 				return;
 			}
-			if (getBuildPath().equals("src")
-				|| getBuildPath().equals("res")) {
+			if (getBuildPath().equals("src") || getBuildPath().equals("res")) {
 				updateStatus(BUILD_PATH_RESTRICTION_ANDROID);
 				return;
 			}
-			if (getConfigPath().equals("src")
-				|| getConfigPath().equals("res")) {
+			if (getConfigPath().equals("src") || getConfigPath().equals("res")) {
 				updateStatus(CONFIG_PATH_RESTRICTION_ANDROID);
 				return;
 			}
@@ -359,8 +298,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 
 	protected boolean isEnabled(Text text) {
-		if (text.isEnabled()
-			&& text.isVisible()) {
+		if (text.isEnabled() && text.isVisible()) {
 			return true;
 		}
 		return false;
@@ -368,34 +306,19 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	protected boolean isPathEmpty(String path, String name) {
 		if (path.length() == 0) {
-			updateStatus(name
-				+ PATH_MUST_BE_SPECIFIED_);
-			canFlipToNextPage =
-				false;
+			updateStatus(name + PATH_MUST_BE_SPECIFIED_);
+			canFlipToNextPage = false;
 			return true;
 		}
-		canFlipToNextPage =
-			true;
+		canFlipToNextPage = true;
 		return false;
 	}
 
 	protected boolean isInvalidPath(String path, String name) {
-		if (path.contains("*")
-			|| path.contains("?")
-			|| path.startsWith(".")
-			|| path.endsWith(".")
-			|| path.contains("//")
-			|| path.endsWith("/")
-			|| path.endsWith("/")
-			|| path.contains("/.")
-			|| path.contains("./")
-			|| path.contains("<")
-			|| path.contains(">")
-			|| path.contains("|")
-			|| path.contains(""
-				+ '"')) {
-			updateStatus(name
-				+ PATH_MUST_BE_VALID);
+		if (path.contains("*") || path.contains("?") || path.startsWith(".") || path.endsWith(".") || path.contains("//") || path.endsWith("/")
+			|| path.endsWith("/") || path.contains("/.") || path.contains("./") || path.contains("<") || path.contains(">") || path.contains("|")
+			|| path.contains("" + '"')) {
+			updateStatus(name + PATH_MUST_BE_VALID);
 			return true;
 		}
 		return false;
@@ -415,9 +338,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 
 	public String getConfigPath() {
-		return configsPath.isEnabled()
-			? configsPath.getText()
-			: "";
+		return configsPath.isEnabled() ? configsPath.getText() : "";
 
 	}
 

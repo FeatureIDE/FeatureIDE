@@ -42,12 +42,9 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 
 	public MoveConstraintOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
 		super(featureModel, MOVE_CONSTRAINT);
-		this.constraint =
-			constraint;
-		index =
-			newIndex;
-		this.oldIndex =
-			oldIndex;
+		this.constraint = constraint;
+		index = newIndex;
+		this.oldIndex = oldIndex;
 	}
 
 	@Override

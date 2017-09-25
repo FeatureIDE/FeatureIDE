@@ -42,8 +42,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IFeature)) {
+		if ((subject != null) && !(subject instanceof IFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -51,14 +50,12 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle =
-			getOracle();
+		final MusExtractor oracle = getOracle();
 		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
 			oracle.addAssumption(getSubject().getName(), true);
-			explanation =
-				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}

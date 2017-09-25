@@ -37,15 +37,11 @@ public class AndroidProjectConversion {
 	 * Adds the FeatureIDE nature to an Android project and transforms the folder structure.
 	 *
 	 */
-	public static void convertAndroidProject(IProject project, String compositionTool,
-			String sourcePath, String configPath, String buildPath) {
+	public static void convertAndroidProject(IProject project, String compositionTool, String sourcePath, String configPath, String buildPath) {
 		// Move Android src and res folders to feature source path
-		final IFolder folderSrc =
-			project.getFolder("src");
-		final IFolder folderRes =
-			project.getFolder("res");
-		final IFolder newSourceFolder =
-			project.getFolder(sourcePath);
+		final IFolder folderSrc = project.getFolder("src");
+		final IFolder folderRes = project.getFolder("res");
+		final IFolder newSourceFolder = project.getFolder(sourcePath);
 
 		try {
 			if (!newSourceFolder.exists()) {
@@ -70,8 +66,7 @@ public class AndroidProjectConversion {
 
 		// Hide build folder
 		try {
-			final IFolder buildFolder =
-				project.getFolder(buildPath);
+			final IFolder buildFolder = project.getFolder(buildPath);
 			if (buildFolder.exists()) {
 				buildFolder.setHidden(true);
 			}

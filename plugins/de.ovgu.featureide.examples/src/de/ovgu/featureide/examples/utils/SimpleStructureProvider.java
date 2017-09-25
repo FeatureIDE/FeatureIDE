@@ -44,8 +44,7 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	public SimpleStructureProvider(String project) {
 		super();
-		this.project =
-			project;
+		this.project = project;
 	}
 
 	@Override
@@ -55,14 +54,10 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public InputStream getContents(Object element) {
-		final IPath p =
-			new Path((String) element);
+		final IPath p = new Path((String) element);
 		try {
-			return new URL("platform:/plugin/de.ovgu.featureide.examples/featureide_examples/"
-				+ project
-				+ "/"
-				+ p.toString()).openConnection()
-						.getInputStream();
+			return new URL("platform:/plugin/de.ovgu.featureide.examples/featureide_examples/" + project + "/" + p.toString()).openConnection()
+					.getInputStream();
 		} catch (final IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 		}
@@ -76,8 +71,7 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public String getLabel(Object element) {
-		final IPath path =
-			new Path((String) element);
+		final IPath path = new Path((String) element);
 		return path.lastSegment();
 	}
 

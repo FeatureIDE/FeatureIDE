@@ -43,8 +43,7 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IFeature)) {
+		if ((subject != null) && !(subject instanceof IFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -52,15 +51,13 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 
 	@Override
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle =
-			getOracle();
+		final MusExtractor oracle = getOracle();
 		final FalseOptionalFeatureExplanation explanation;
 		oracle.push();
 		try {
 			oracle.addAssumption(getSubject().getName(), false);
 			oracle.addAssumption(FeatureUtils.getParent(getSubject()).getName(), true);
-			explanation =
-				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}

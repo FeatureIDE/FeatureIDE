@@ -44,19 +44,16 @@ public class FeatureInOnlyOneConfigFilter extends ConfigurationMapFilter {
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		final List<Configuration> configs =
-			configurationMap.getConfigurations();
+		final List<Configuration> configs = configurationMap.getConfigurations();
 
-		boolean isInConfig =
-			false;
+		boolean isInConfig = false;
 
 		for (final Configuration config : configs) {
 			if (config.getSelectedFeatures().contains(feature)) {
 				if (isInConfig) {
 					return false;
 				} else {
-					isInConfig =
-						true;
+					isInConfig = true;
 				}
 			}
 		}

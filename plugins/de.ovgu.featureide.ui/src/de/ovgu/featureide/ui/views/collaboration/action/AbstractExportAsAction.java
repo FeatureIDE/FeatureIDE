@@ -34,8 +34,7 @@ public abstract class AbstractExportAsAction extends Action {
 
 	public AbstractExportAsAction(String text, GraphicalViewerImpl view) {
 		super(text);
-		viewer =
-			view;
+		viewer = view;
 		setEnabled(true);
 	}
 

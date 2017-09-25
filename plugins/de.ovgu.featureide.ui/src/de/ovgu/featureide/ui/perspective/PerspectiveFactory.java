@@ -48,15 +48,12 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
  */
 public class PerspectiveFactory implements IPerspectiveFactory {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".FeatureIDEperspective";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureIDEperspective";
 
 	@Override
 	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
-		final String editorArea =
-			layout.getEditorArea();
+		final String editorArea = layout.getEditorArea();
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
@@ -65,12 +62,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
 
-		final IFolderLayout left =
-			layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
-		final IFolderLayout down =
-			layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
-		final IFolderLayout right =
-			layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
+		final IFolderLayout left = layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
+		final IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
+		final IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 
 		down.addView(CollaborationView.ID);
 		down.addView(ConfigurationMap.ID);

@@ -90,14 +90,9 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	protected AFeature(AFeature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel);
 
-		property =
-			oldFeature.property.clone(this);
-		structure =
-			newFeatrureStructure != null
-				? newFeatrureStructure
-				: oldFeature.structure;
-		propertyContainer =
-			clonePropertyContainer(oldFeature);
+		property = oldFeature.property.clone(this);
+		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
+		propertyContainer = clonePropertyContainer(oldFeature);
 		propertyContainer.setEntrySet(oldFeature.getCustomProperties().entrySet());
 	}
 
@@ -113,15 +108,11 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	 */
 	public AFeature(IFeatureModel featureModel, String name) {
 		super(featureModel);
-		this.name =
-			name;
+		this.name = name;
 
-		property =
-			createProperty();
-		structure =
-			createStructure();
-		propertyContainer =
-			createPropertyContainer();
+		property = createProperty();
+		structure = createStructure();
+		propertyContainer = createPropertyContainer();
 	}
 
 	protected IPropertyContainer createPropertyContainer() {
@@ -157,8 +148,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	@Override
 	public void setName(String name) {
-		final String oldName =
-			this.name;
+		final String oldName = this.name;
 		super.setName(name);
 		fireEvent(new FeatureIDEEvent(this, EventType.FEATURE_NAME_CHANGED, oldName, name));
 	}

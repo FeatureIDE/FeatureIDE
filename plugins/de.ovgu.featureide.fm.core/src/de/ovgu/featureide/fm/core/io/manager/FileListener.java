@@ -47,54 +47,40 @@ public abstract class FileListener<T> implements IResourceChangeListener {
 	private final IPath eclipseFile;
 
 	protected FileListener(AFileManager<T> fileManager) {
-		this.fileManager =
-			fileManager;
-		IPath absolutePath2 =
-			new org.eclipse.core.runtime.Path(fileManager.getAbsolutePath());
-		final IWorkspaceRoot root =
-			ResourcesPlugin.getWorkspace().getRoot();
-		final IPath rootLocation =
-			root.getLocation();
+		this.fileManager = fileManager;
+		IPath absolutePath2 = new org.eclipse.core.runtime.Path(fileManager.getAbsolutePath());
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IPath rootLocation = root.getLocation();
 		if (absolutePath2.matchingFirstSegments(rootLocation) != rootLocation.segmentCount()) {
 			try {
-				final IFile[] filesOfLocation =
-					root.findFilesForLocationURI(URI.create("file:/"
-						+ absolutePath2.toString().replace(" ", "%20")));
-				absolutePath2 =
-					filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
+				final IFile[] filesOfLocation = root.findFilesForLocationURI(URI.create("file:/" + absolutePath2.toString().replace(" ", "%20")));
+				absolutePath2 = filesOfLocation[0].getFullPath().makeRelativeTo(rootLocation);
 			} catch (final IndexOutOfBoundsException e) {
 				Logger.logError(e);
-				eclipseFile =
-					null;
+				eclipseFile = null;
 				return;
 			}
 		}
-		this.eclipseFile =
-			absolutePath2.makeRelativeTo(rootLocation);
+		this.eclipseFile = absolutePath2.makeRelativeTo(rootLocation);
 	}
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-			final IResourceDelta delta =
-				event.getDelta();
+			final IResourceDelta delta = event.getDelta();
 			if (delta != null) {
-				final IResourceDelta deltaMember =
-					delta.findMember(eclipseFile);
+				final IResourceDelta deltaMember = delta.findMember(eclipseFile);
 				if (deltaMember != null) {
-					final IResourceDeltaVisitor visitor =
-						new IResourceDeltaVisitor() {
+					final IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
 
-							@Override
-							public boolean visit(IResourceDelta delta) {
-								if ((delta.getKind() == IResourceDelta.CHANGED)
-									&& ((delta.getFlags()
-										& IResourceDelta.CONTENT) != 0)) {
-									fileManager.read();
-								}
-								return true;
+						@Override
+						public boolean visit(IResourceDelta delta) {
+							if ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & IResourceDelta.CONTENT) != 0)) {
+								fileManager.read();
 							}
-						};
+							return true;
+						}
+					};
 					try {
 						deltaMember.accept(visitor);
 					} catch (final CoreException e) {}
@@ -105,8 +91,7 @@ public abstract class FileListener<T> implements IResourceChangeListener {
 
 	@Override
 	public String toString() {
-		return "Resource change listener for "
-			+ fileManager.getAbsolutePath();
+		return "Resource change listener for " + fileManager.getAbsolutePath();
 	}
 
 }

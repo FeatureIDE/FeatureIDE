@@ -35,69 +35,40 @@ import de.ovgu.featureide.fm.core.PluginID;
  */
 public class FMPropertyManagerDefaults {
 
-	static final QualifiedName QN_HIDE_LEGEND =
-		createName("hidelegend");
-	static final QualifiedName QN_LEGEND_FORGOUND =
-		createName("legendforground");
-	static final QualifiedName QN_LEGEND_BACKGROUND =
-		createName("legendbackground");
-	static final QualifiedName QN_LEGEND_BORDER =
-		createName("legendboder");
+	static final QualifiedName QN_HIDE_LEGEND = createName("hidelegend");
+	static final QualifiedName QN_LEGEND_FORGOUND = createName("legendforground");
+	static final QualifiedName QN_LEGEND_BACKGROUND = createName("legendbackground");
+	static final QualifiedName QN_LEGEND_BORDER = createName("legendboder");
 
-	static final QualifiedName QN_LANGUAGE =
-		createName("language");
+	static final QualifiedName QN_LANGUAGE = createName("language");
 
-	static final QualifiedName QN_DIAGRAM_BACKGROUND =
-		createName("diagrambackground");
-	static final QualifiedName QN_FEATURE_FORGROUND =
-		createName("feature");
-	static final QualifiedName QN_FEATURE_CONCRETE =
-		createName("concrete");
-	static final QualifiedName QN_FEATURE_ABSTRACT =
-		createName(ABSTRACT);
-	static final QualifiedName QN_FEATURE_HIDEEN_FORGROUND =
-		createName("hiddenforground");
-	static final QualifiedName QN_FEATURE_HIDEEN_BACKGROUND =
-		createName("hiddenbackground");
-	static final QualifiedName QN_FEATURE_DEAD =
-		createName("dead");
-	static final QualifiedName QN_FEATURE_FALSE_OPT =
-		createName("falseoptional");
-	static final QualifiedName QN_CONSTRAINT =
-		createName("constraint");
-	static final QualifiedName QN_CONNECTION =
-		createName("connection");
-	static final QualifiedName QN_WARNING =
-		createName("warning");
-	static final QualifiedName QN_HIDE_BORDER_COLOR =
-		createName("hideBorderColor");
-	static final QualifiedName QN_FEATURE_BORDER =
-		createName("featureborder");
-	static final QualifiedName QN_INHERITED_FEATURE_BORDER =
-		createName("inheritedFeatureborder");
-	static final QualifiedName QN_IMPORTED_FEATURE_BORDER =
-		createName("inheritedFeatureborder");
-	static final QualifiedName QN_INTERFACED_FEATURE_BORDER =
-		createName("interfaceFeatureborder");
+	static final QualifiedName QN_DIAGRAM_BACKGROUND = createName("diagrambackground");
+	static final QualifiedName QN_FEATURE_FORGROUND = createName("feature");
+	static final QualifiedName QN_FEATURE_CONCRETE = createName("concrete");
+	static final QualifiedName QN_FEATURE_ABSTRACT = createName(ABSTRACT);
+	static final QualifiedName QN_FEATURE_HIDEEN_FORGROUND = createName("hiddenforground");
+	static final QualifiedName QN_FEATURE_HIDEEN_BACKGROUND = createName("hiddenbackground");
+	static final QualifiedName QN_FEATURE_DEAD = createName("dead");
+	static final QualifiedName QN_FEATURE_FALSE_OPT = createName("falseoptional");
+	static final QualifiedName QN_CONSTRAINT = createName("constraint");
+	static final QualifiedName QN_CONNECTION = createName("connection");
+	static final QualifiedName QN_WARNING = createName("warning");
+	static final QualifiedName QN_HIDE_BORDER_COLOR = createName("hideBorderColor");
+	static final QualifiedName QN_FEATURE_BORDER = createName("featureborder");
+	static final QualifiedName QN_INHERITED_FEATURE_BORDER = createName("inheritedFeatureborder");
+	static final QualifiedName QN_IMPORTED_FEATURE_BORDER = createName("inheritedFeatureborder");
+	static final QualifiedName QN_INTERFACED_FEATURE_BORDER = createName("interfaceFeatureborder");
 
-	static final QualifiedName QN_LAYOUT_MARGIN_X =
-		createName("margin_x");
-	static final QualifiedName QN_LAYOUT_MARGIN_Y =
-		createName("margin_y");
-	static final QualifiedName QN_FEATURE_X =
-		createName("feature_x");
-	static final QualifiedName QN_FEATURE_Y =
-		createName("feature_y");
-	static final QualifiedName QN_CONSTRAINT_SPACE =
-		createName("constraint_space");
+	static final QualifiedName QN_LAYOUT_MARGIN_X = createName("margin_x");
+	static final QualifiedName QN_LAYOUT_MARGIN_Y = createName("margin_y");
+	static final QualifiedName QN_FEATURE_X = createName("feature_x");
+	static final QualifiedName QN_FEATURE_Y = createName("feature_y");
+	static final QualifiedName QN_CONSTRAINT_SPACE = createName("constraint_space");
 
-	static final String TRUE =
-		"true";
-	static final String FALSE =
-		"false";
+	static final String TRUE = "true";
+	static final String FALSE = "false";
 
-	public static final IWorkspaceRoot workspaceRoot =
-		ResourcesPlugin.getWorkspace().getRoot();
+	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	/**
 	 * Creates a Qualified name.
@@ -106,11 +77,6 @@ public class FMPropertyManagerDefaults {
 	 * @return The new QualifiedName
 	 */
 	static QualifiedName createName(String name) {
-		return new QualifiedName(PluginID.PLUGIN_ID
-			+ "."
-			+ name,
-				PluginID.PLUGIN_ID
-					+ "."
-					+ name);
+		return new QualifiedName(PluginID.PLUGIN_ID + "." + name, PluginID.PLUGIN_ID + "." + name);
 	}
 }

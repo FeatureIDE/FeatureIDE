@@ -45,8 +45,7 @@ public interface PBSolver {
 	 * @param <T> The concrete type of the restrictions.
 	 * @param restrictions The restrictions to add.
 	 */
-	public <T extends Restriction> void addRestrictions(
-			Collection<T> restrictions);
+	public <T extends Restriction> void addRestrictions(Collection<T> restrictions);
 
 	/**
 	 * Is the currently submitted set of restrictions satisfiable?

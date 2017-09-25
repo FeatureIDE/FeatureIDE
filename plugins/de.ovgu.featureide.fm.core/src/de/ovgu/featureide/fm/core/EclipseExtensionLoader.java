@@ -39,26 +39,19 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 	protected final String extensionPointID;
 
 	public EclipseExtensionLoader(String pluginID, String extensionPointID, String extensionID, Class<T> classObject) {
-		this.pluginID =
-			pluginID;
-		this.extensionPointID =
-			extensionPointID;
-		this.extensionID =
-			extensionID;
-		this.classObject =
-			classObject;
+		this.pluginID = pluginID;
+		this.extensionPointID = extensionPointID;
+		this.extensionID = extensionID;
+		this.classObject = classObject;
 	}
 
 	@Override
 	public void loadProviders(ExtensionManager<T> extensionManager) {
-		final IExtension[] extensions =
-			Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
+		final IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
 		for (final IExtension extension : extensions) {
-			final IConfigurationElement[] configurationElements =
-				extension.getConfigurationElements();
+			final IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 			for (final IConfigurationElement configurationElement : configurationElements) {
-				final T extensionInstance =
-					parseExtension(configurationElement);
+				final T extensionInstance = parseExtension(configurationElement);
 				if (extensionInstance != null) {
 					extensionManager.addExtension(extensionInstance);
 				}

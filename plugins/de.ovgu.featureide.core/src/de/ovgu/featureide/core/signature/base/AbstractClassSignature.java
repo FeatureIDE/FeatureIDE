@@ -35,19 +35,13 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 
 	protected AbstractClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
 		super(parent, name, modifiers, type);
-		this.pckg =
-			pckg == null
-				? ""
-				: pckg;
+		this.pckg = pckg == null ? "" : pckg;
 		if (parent == null) {
 			setFullName(this.pckg);
 		}
-		importList =
-			new HashSet<String>();
-		extendList =
-			new HashSet<String>();
-		implementList =
-			new HashSet<String>();
+		importList = new HashSet<String>();
+		extendList = new HashSet<String>();
+		implementList = new HashSet<String>();
 	}
 
 	public String getPackage() {
@@ -72,14 +66,12 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 
 	public void addImplement(String implement) {
 		implementList.add(implement);
-		hasHashCode =
-			false;
+		hasHashCode = false;
 	}
 
 	public void addExtend(String extend) {
 		extendList.add(extend);
-		hasHashCode =
-			false;
+		hasHashCode = false;
 	}
 
 //	@Override

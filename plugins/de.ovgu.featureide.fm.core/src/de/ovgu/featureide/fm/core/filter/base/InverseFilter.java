@@ -32,8 +32,7 @@ public class InverseFilter<T> implements IFilter<T> {
 	private final IFilter<T> originalFilter;
 
 	public InverseFilter(IFilter<T> originalFilter) {
-		this.originalFilter =
-			originalFilter;
+		this.originalFilter = originalFilter;
 	}
 
 	@Override

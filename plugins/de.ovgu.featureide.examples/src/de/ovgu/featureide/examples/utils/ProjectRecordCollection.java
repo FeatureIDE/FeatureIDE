@@ -31,7 +31,6 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class ProjectRecordCollection extends ArrayList<ProjectRecord> {
 
-	private static final long serialVersionUID =
-		-2556126155509903720L;
+	private static final long serialVersionUID = -2556126155509903720L;
 
 }

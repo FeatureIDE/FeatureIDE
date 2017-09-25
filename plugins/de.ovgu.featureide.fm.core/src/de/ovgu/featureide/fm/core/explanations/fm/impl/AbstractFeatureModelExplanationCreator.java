@@ -69,8 +69,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	@Override
 	public void setSubject(Object subject) {
-		this.subject =
-			subject;
+		this.subject = subject;
 	}
 
 	@Override
@@ -80,16 +79,11 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
-		this.fm =
-			fm;
-		nodeCreator =
-			null;
-		cnf =
-			null;
-		traceModel =
-			null;
-		oracle =
-			null;
+		this.fm = fm;
+		nodeCreator = null;
+		cnf = null;
+		traceModel = null;
+		oracle = null;
 	}
 
 	/**
@@ -98,10 +92,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
-		if ((nodeCreator == null)
-			&& (getFeatureModel() != null)) {
-			nodeCreator =
-				createNodeCreator();
+		if ((nodeCreator == null) && (getFeatureModel() != null)) {
+			nodeCreator = createNodeCreator();
 		}
 		return nodeCreator;
 	}
@@ -112,8 +104,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc =
-			new AdvancedNodeCreator(getFeatureModel());
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
 		nc.setIncludeBooleanValues(false);
 		nc.setCnfType(CNFType.Regular);
 		nc.setRecordTraceModel(true);
@@ -126,10 +117,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if ((cnf == null)
-			&& (getFeatureModel() != null)) {
-			cnf =
-				createCnf();
+		if ((cnf == null) && (getFeatureModel() != null)) {
+			cnf = createCnf();
 		}
 		return cnf;
 	}
@@ -149,10 +138,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
-		if ((traceModel == null)
-			&& (getFeatureModel() != null)) {
-			traceModel =
-				createTraceModel();
+		if ((traceModel == null) && (getFeatureModel() != null)) {
+			traceModel = createTraceModel();
 		}
 		return traceModel;
 	}
@@ -172,10 +159,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the oracle; not null
 	 */
 	protected Object getOracle() {
-		if ((oracle == null)
-			&& (getFeatureModel() != null)) {
-			oracle =
-				createOracle();
+		if ((oracle == null) && (getFeatureModel() != null)) {
+			oracle = createOracle();
 		}
 		return oracle;
 	}
@@ -184,8 +169,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * Sets the oracle to null.
 	 */
 	protected void resetOracle() {
-		oracle =
-			null;
+		oracle = null;
 	}
 
 	/**
@@ -202,11 +186,9 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return an explanation
 	 */
 	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final Explanation explanation =
-			getConcreteExplanation();
+		final Explanation explanation = getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			final Reason reason =
-				getReason(clauseIndex);
+			final Reason reason = getReason(clauseIndex);
 			if (reason == null) {
 				continue;
 			}

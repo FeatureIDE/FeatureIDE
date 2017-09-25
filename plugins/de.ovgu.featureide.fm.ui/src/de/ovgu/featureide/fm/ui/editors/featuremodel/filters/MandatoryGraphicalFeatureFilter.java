@@ -33,11 +33,8 @@ public class MandatoryGraphicalFeatureFilter implements IFilter<IGraphicalFeatur
 
 	@Override
 	public boolean isValid(IGraphicalFeature object) {
-		final IFeatureStructure parent =
-			object.getObject().getStructure().getParent();
-		if ((parent != null)
-			&& parent.isAnd()
-			&& object.getObject().getStructure().isMandatory()) {
+		final IFeatureStructure parent = object.getObject().getStructure().getParent();
+		if ((parent != null) && parent.isAnd() && object.getObject().getStructure().isMandatory()) {
 			return true;
 		}
 		return false;

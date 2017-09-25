@@ -36,9 +36,7 @@ class ViewContentProvider implements ITreeContentProvider {
 			return ((List<?>) parentElement).toArray();
 		}
 		if (parentElement instanceof CppCheckerFileLogs) {
-			final Collection<CppCheckerLog> logs =
-				((CppCheckerFileLogs) parentElement)
-						.getLogs();
+			final Collection<CppCheckerLog> logs = ((CppCheckerFileLogs) parentElement).getLogs();
 
 			return logs.toArray();
 		}

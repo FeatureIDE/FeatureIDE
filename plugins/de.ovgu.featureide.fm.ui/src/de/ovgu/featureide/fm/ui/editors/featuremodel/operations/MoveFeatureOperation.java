@@ -44,12 +44,9 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 	public MoveFeatureOperation(FeatureOperationData data, Object editor, Point newPos, Point oldPos, IFeature feature) {
 		super(feature.getFeatureModel(), MOVE_FEATURE);
-		this.data =
-			data;
-		this.newPos =
-			newPos;
-		this.oldPos =
-			oldPos;
+		this.data = data;
+		this.newPos = newPos;
+		this.oldPos = oldPos;
 		setEditor(editor);
 	}
 
@@ -59,26 +56,20 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		final IGraphicalFeature feature =
-			data.getFeature();
+		final IGraphicalFeature feature = data.getFeature();
 		if (feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
-			final IGraphicalFeature oldParent =
-				data.getOldParent();
-			final IFeatureStructure featureStructure =
-				feature.getObject().getStructure();
+			final IGraphicalFeature oldParent = data.getOldParent();
+			final IFeatureStructure featureStructure = feature.getObject().getStructure();
 			oldParent.getObject().getStructure().removeChild(featureStructure);
 
-			final IGraphicalFeature newParent =
-				data.getNewParent();
+			final IGraphicalFeature newParent = data.getNewParent();
 
 			if (newParent.isCollapsed()) {
-				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount()
-					+ 1, featureStructure);
+				newParent.getObject().getStructure().addChildAtPosition(newParent.getObject().getStructure().getChildrenCount() + 1, featureStructure);
 
 				for (final IFeatureStructure fs : newParent.getObject().getStructure().getChildren()) {
 					if (fs != featureStructure) {
-						final IGraphicalFeature graphicalFS =
-							feature.getGraphicalModel().getGraphicalFeature(fs.getFeature());
+						final IGraphicalFeature graphicalFS = feature.getGraphicalModel().getGraphicalFeature(fs.getFeature());
 						graphicalFS.setCollapsed(true);
 					}
 				}
@@ -106,12 +97,10 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 		} else {
-			final IFeatureStructure structure2 =
-				data.getFeature().getObject().getStructure();
+			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
 			data.getNewParent().getObject().getStructure().removeChild(structure2);
 			if (data.getOldParent() != null) {
-				final IFeatureStructure structure =
-					data.getOldParent().getObject().getStructure();
+				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
 				structure.addChildAtPosition(data.getOldIndex(), structure2);
 			}
 		}

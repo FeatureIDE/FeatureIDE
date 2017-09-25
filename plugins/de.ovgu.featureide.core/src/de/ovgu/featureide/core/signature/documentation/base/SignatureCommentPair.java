@@ -32,10 +32,8 @@ public class SignatureCommentPair {
 		private final int featureID;
 
 		public Comment(String comment, int featureID) {
-			this.comment =
-				comment;
-			this.featureID =
-				featureID;
+			this.comment = comment;
+			this.featureID = featureID;
 		}
 
 		public int getFeatureID() {
@@ -52,10 +50,8 @@ public class SignatureCommentPair {
 
 	public SignatureCommentPair(AbstractSignature signature, List<Comment> comment) {
 		super();
-		this.signature =
-			signature;
-		this.comment =
-			comment;
+		this.signature = signature;
+		this.comment = comment;
 	}
 
 	public AbstractSignature getSignature() {

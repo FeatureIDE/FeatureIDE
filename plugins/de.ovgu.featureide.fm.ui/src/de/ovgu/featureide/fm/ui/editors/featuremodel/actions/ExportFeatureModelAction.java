@@ -39,8 +39,7 @@ public class ExportFeatureModelAction extends Action {
 
 	public ExportFeatureModelAction(FeatureModelEditor featureModelEditor) {
 		super(EXPORT_AS);
-		this.featureModelEditor =
-			featureModelEditor;
+		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
 	}
 

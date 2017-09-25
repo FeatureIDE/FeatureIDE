@@ -42,11 +42,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureModelClassGenerator {
 
-	protected static final String NEWLINE =
-		System.getProperty("line.separator", "\n");
+	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
 
-	private final StringBuilder stringBuilder =
-		new StringBuilder();
+	private final StringBuilder stringBuilder = new StringBuilder();
 
 	/**
 	 * The class that defines the file content.
@@ -61,17 +59,13 @@ public class FeatureModelClassGenerator {
 	 */
 	public FeatureModelClassGenerator(IFeatureModel featureModel, String method) {
 		if (method.equals(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML)) {
-			featureModelClass =
-				new FeatureModelJPFBDD(featureModel);
+			featureModelClass = new FeatureModelJPFBDD(featureModel);
 		} else if (method.equals(IFeatureProject.META_THEOREM_PROVING)) {
-			featureModelClass =
-				new FeatureModelKeY(featureModel);
+			featureModelClass = new FeatureModelKeY(featureModel);
 		} else if (method.equals(IFeatureProject.META_MODEL_CHECKING)) {
-			featureModelClass =
-				new FeatureModelJPFCore(featureModel);
+			featureModelClass = new FeatureModelJPFCore(featureModel);
 		} else if (method.equals(IFeatureProject.META_VAREXJ)) {
-			featureModelClass =
-				new FeatureModelVarexJ(featureModel);
+			featureModelClass = new FeatureModelVarexJ(featureModel);
 		} else {
 			return;
 		}
@@ -86,23 +80,18 @@ public class FeatureModelClassGenerator {
 	 */
 	public FeatureModelClassGenerator(IFeatureProject featureProject) {
 		if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML)) {
-			featureModelClass =
-				new FeatureModelJPFBDD(featureProject.getFeatureModel());
+			featureModelClass = new FeatureModelJPFBDD(featureProject.getFeatureModel());
 		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_THEOREM_PROVING)) {
-			featureModelClass =
-				new FeatureModelKeY(featureProject.getFeatureModel());
+			featureModelClass = new FeatureModelKeY(featureProject.getFeatureModel());
 		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_MODEL_CHECKING)) {
-			featureModelClass =
-				new FeatureModelJPFCore(featureProject.getFeatureModel());
+			featureModelClass = new FeatureModelJPFCore(featureProject.getFeatureModel());
 		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_VAREXJ)) {
-			featureModelClass =
-				new FeatureModelVarexJ(featureProject.getFeatureModel());
+			featureModelClass = new FeatureModelVarexJ(featureProject.getFeatureModel());
 		} else {
 			return;
 		}
 		printModel();
-		final IFolder FMFolder =
-			featureProject.getBuildFolder().getFolder("FM");
+		final IFolder FMFolder = featureProject.getBuildFolder().getFolder("FM");
 		try {
 			FMFolder.create(true, true, null);
 			saveToFile(FMFolder.getFile("FeatureModel.java"));
@@ -118,9 +107,7 @@ public class FeatureModelClassGenerator {
 	 */
 	@SuppressWarnings(DEPRECATION)
 	public void saveToFile(IFile file) {
-		final InputStream source =
-			new ByteArrayInputStream(stringBuilder.toString()
-					.getBytes(Charset.availableCharsets().get("UTF-8")));
+		final InputStream source = new ByteArrayInputStream(stringBuilder.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		try {
 			if (file.exists()) {
 				file.setContents(source, false, true, null);

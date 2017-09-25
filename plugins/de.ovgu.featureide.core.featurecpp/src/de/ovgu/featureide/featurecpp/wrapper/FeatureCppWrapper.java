@@ -67,87 +67,58 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 @SuppressWarnings(RESTRICTION)
 public class FeatureCppWrapper {
 
-	private final static String EXE_LINUX_64BIT =
-		"fc++v0.6Linux64bit";
-	private final static String EXE_LINUX_32BIT =
-		"fc++v0.8Linux32bit";
-	private final static String EXE_MAC_OS_X =
-		"fc++v0.8MacOSX";
-	private final static String EXE_WINDOWS =
-		"fc++v0.7WIN.exe";
+	private final static String EXE_LINUX_64BIT = "fc++v0.6Linux64bit";
+	private final static String EXE_LINUX_32BIT = "fc++v0.8Linux32bit";
+	private final static String EXE_MAC_OS_X = "fc++v0.8MacOSX";
+	private final static String EXE_WINDOWS = "fc++v0.7WIN.exe";
 
 	private ModelMarkerHandler<IResource> modelMarkerHandler;
 
 	final String featureCppExecutableName;
 
-	private String sourceFolder =
-		null;
+	private String sourceFolder = null;
 
-	private IFolder source =
-		null;
+	private IFolder source = null;
 
-	private String buildFolder =
-		null;
+	private String buildFolder = null;
 
-	private IFolder buildDirectory =
-		null;
+	private IFolder buildDirectory = null;
 
-	private int version =
-		7;
+	private int version = 7;
 
 	public FeatureCppWrapper() {
 		String featureCppExecutable;
 		if (LINUX.equals(System.getProperty("os.name"))) {
 			if (System.getProperty("os.arch").contains("64")) {
-				featureCppExecutable =
-					EXE_LINUX_64BIT;
-				version =
-					6;
+				featureCppExecutable = EXE_LINUX_64BIT;
+				version = 6;
 			} else {
-				featureCppExecutable =
-					EXE_LINUX_32BIT;
+				featureCppExecutable = EXE_LINUX_32BIT;
 				// The current 32bit version does not support 0.7 commands
-				version =
-					8;
+				version = 8;
 			}
 		} else if (System.getProperty("os.name").contains("Mac OS")) {
-			featureCppExecutable =
-				EXE_MAC_OS_X;
-			version =
-				8;
+			featureCppExecutable = EXE_MAC_OS_X;
+			version = 8;
 		} else {
-			featureCppExecutable =
-				EXE_WINDOWS;
-			version =
-				7;
+			featureCppExecutable = EXE_WINDOWS;
+			version = 7;
 		}
-		URL url =
-			BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/"
-				+ featureCppExecutable);
+		URL url = BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/" + featureCppExecutable);
 		try {
-			url =
-				FileLocator.toFileURL(url);
+			url = FileLocator.toFileURL(url);
 		} catch (final IOException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
-		final Path path =
-			new Path(url.getFile());
-		final String pathName =
-			path.toOSString();
+		final Path path = new Path(url.getFile());
+		final String pathName = path.toOSString();
 		if (!path.isAbsolute()) {
-			FeatureCppCorePlugin.getDefault().logWarning(pathName
-				+ IS_NOT_AN_ABSOLUTE_PATH_
-				+
-				"fc++ can not be found.");
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + IS_NOT_AN_ABSOLUTE_PATH_ + "fc++ can not be found.");
 		}
 		if (!path.isValidPath(pathName)) {
-			FeatureCppCorePlugin.getDefault().logWarning(pathName
-				+ IS_NO_VALID_PATH_
-				+
-				"fc++ can not be found.");
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + IS_NO_VALID_PATH_ + "fc++ can not be found.");
 		}
-		featureCppExecutableName =
-			pathName;
+		featureCppExecutableName = pathName;
 
 		// The FeatureC++ needs to be executable
 		new File(featureCppExecutableName).setExecutable(true);
@@ -155,17 +126,12 @@ public class FeatureCppWrapper {
 
 	public boolean initialize(IFolder source, IFolder build) {
 		if (source != null) {
-			this.source =
-				source;
-			sourceFolder =
-				source.getRawLocation().toOSString();
+			this.source = source;
+			sourceFolder = source.getRawLocation().toOSString();
 		}
-		buildFolder =
-			build.getRawLocation().toOSString();
-		buildDirectory =
-			build;
-		modelMarkerHandler =
-			new ModelMarkerHandler<IResource>(build.getProject());
+		buildFolder = build.getRawLocation().toOSString();
+		buildDirectory = build;
+		modelMarkerHandler = new ModelMarkerHandler<IResource>(build.getProject());
 		return true;
 	}
 
@@ -177,16 +143,13 @@ public class FeatureCppWrapper {
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		final LinkedList<String> command =
-			new LinkedList<String>();
+		final LinkedList<String> command = new LinkedList<String>();
 		command.add(featureCppExecutableName);
 		if (version == 7) {
 			command.add("--classinfo");
 		}
-		command.add("-o="
-			+ buildFolder);
-		command.add("-s="
-			+ sourceFolder);
+		command.add("-o=" + buildFolder);
+		command.add("-s=" + sourceFolder);
 		if (version == 7) {
 			command.add("--gpp");
 		} else {
@@ -199,27 +162,18 @@ public class FeatureCppWrapper {
 	}
 
 	private void process(AbstractList<String> command) {
-		final ProcessBuilder processBuilder =
-			new ProcessBuilder(command);
-		BufferedReader input =
-			null;
-		BufferedReader error =
-			null;
+		final ProcessBuilder processBuilder = new ProcessBuilder(command);
+		BufferedReader input = null;
+		BufferedReader error = null;
 		try {
-			final Process process =
-				processBuilder.start();
-			input =
-				new BufferedReader(new InputStreamReader(
-						process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
-			error =
-				new BufferedReader(new InputStreamReader(
-						process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
+			final Process process = processBuilder.start();
+			input = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+			error = new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
 			modelMarkerHandler.deleteAllModelMarkers();
 			while (true) {
 				try {
 					String line;
-					while ((line =
-						input.readLine()) != null) {
+					while ((line = input.readLine()) != null) {
 
 						if (line.contains(" : warning: ")) {
 							if (line.contains("warning: folder")) {
@@ -233,8 +187,7 @@ public class FeatureCppWrapper {
 //							FeatureCppCorePlugin.getDefault().logInfo("FeatureC++: " + line);
 //						}
 					}
-					while ((line =
-						error.readLine()) != null) {
+					while ((line = error.readLine()) != null) {
 						FeatureCppCorePlugin.getDefault().logWarning(line);
 					}
 					try {
@@ -242,13 +195,9 @@ public class FeatureCppWrapper {
 					} catch (final InterruptedException e) {
 						FeatureCppCorePlugin.getDefault().logError(e);
 					}
-					final int exitValue =
-						process.exitValue();
+					final int exitValue = process.exitValue();
 					if (exitValue != 0) {
-						throw new IOException(
-								"The process doesn't finish normally (exit="
-									+ exitValue
-									+ ")!");
+						throw new IOException("The process doesn't finish normally (exit=" + exitValue + ")!");
 					}
 					break;
 				} catch (final IllegalThreadStateException e) {
@@ -284,48 +233,31 @@ public class FeatureCppWrapper {
 	 */
 	@Deprecated
 	private void openMessageBox(IOException e) {
-		if ((e != null)
-			&& (e.getCause() != null)
-			&& "java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
-			final UIJob uiJob =
-				new UIJob("") {
+		if ((e != null) && (e.getCause() != null) && "java.io.IOException: java.io.IOException: error=13, Permission denied".equals(e.getCause().toString())) {
+			final UIJob uiJob = new UIJob("") {
 
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						final MessageBox d =
-							new MessageBox(new Shell(), SWT.ICON_ERROR);
-						d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n"
-							+
-							SEE
-							+ (LINUX.equals(System.getProperty("os.name"))
-								? "Properties/Permissions of "
-								: "")
-							+ "file:\n"
-							+
-							"\t"
-							+ featureCppExecutableName);
-						d.setText("FeatureC++ can not be executed.");
-						d.open();
-						return Status.OK_STATUS;
-					}
-				};
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					final MessageBox d = new MessageBox(new Shell(), SWT.ICON_ERROR);
+					d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n" + SEE
+						+ (LINUX.equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" + "\t" + featureCppExecutableName);
+					d.setText("FeatureC++ can not be executed.");
+					d.open();
+					return Status.OK_STATUS;
+				}
+			};
 			uiJob.setPriority(Job.SHORT);
 			uiJob.schedule();
 		}
 	}
 
 	private IFile getFile(String line) {
-		String fileName =
-			line.substring(0, line.indexOf(" : warning:"));
+		String fileName = line.substring(0, line.indexOf(" : warning:"));
 		if (fileName.contains("(")) {
-			fileName =
-				fileName.substring(0, fileName.indexOf('('));
+			fileName = fileName.substring(0, fileName.indexOf('('));
 		}
-		fileName =
-			fileName.substring(sourceFolder.length()
-				+ 1);
-		IFolder folder =
-			source;
+		fileName = fileName.substring(sourceFolder.length() + 1);
+		IFolder folder = source;
 		while (!"".equals(fileName)) {
 			if (!fileName.contains("\\")) {
 				if (fileName.endsWith(".h")) {
@@ -334,74 +266,61 @@ public class FeatureCppWrapper {
 					return null;
 				}
 			} else {
-				final String folderName =
-					fileName.substring(0, fileName.indexOf('\\'));
-				fileName =
-					fileName.substring(fileName.indexOf('\\')
-						+ 1);
-				folder =
-					folder.getFolder(folderName);
+				final String folderName = fileName.substring(0, fileName.indexOf('\\'));
+				fileName = fileName.substring(fileName.indexOf('\\') + 1);
+				folder = folder.getFolder(folderName);
 			}
 		}
 		return null;
 	}
 
 	private String getMessage(String line) {
-		return line.substring(line.indexOf(" : warning: ")
-			+ 12);
+		return line.substring(line.indexOf(" : warning: ") + 12);
 	}
 
 	private int getLineNumber(String line) {
 		if (line.contains(") : warning: ")) {
-			line =
-				line.substring(0, line.indexOf(") : warning: "));
-			line =
-				line.substring(line.indexOf('(')
-					+ 1);
+			line = line.substring(0, line.indexOf(") : warning: "));
+			line = line.substring(line.indexOf('(') + 1);
 			return Integer.parseInt(line);
 		}
 		return 0;
 	}
 
 	private void addMarker(final IFile file, final String message, final int line) {
-		final Job job =
-			new Job(PROPAGATE_PROBLEM_MARKERS_FOR
-				+ CorePlugin.getFeatureProject(file)) {
+		final Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
 
-				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					try {
-						if (!hasMarker(message, file)) {
-							final IMarker newMarker =
-								file.createMarker(CorePlugin.PLUGIN_ID
-									+ ".builderProblemMarker");
-							newMarker.setAttribute(IMarker.MESSAGE, message);
-							newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-							newMarker.setAttribute(IMarker.LINE_NUMBER, line);
-						}
-					} catch (final CoreException e) {
-						FeatureCppCorePlugin.getDefault().logError(e);
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					if (!hasMarker(message, file)) {
+						final IMarker newMarker = file.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+						newMarker.setAttribute(IMarker.MESSAGE, message);
+						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+						newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					}
-					return Status.OK_STATUS;
+				} catch (final CoreException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
 				}
+				return Status.OK_STATUS;
+			}
 
-				private boolean hasMarker(String message, IFile sourceFile) {
-					try {
-						final IMarker[] marker =
-							sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
-						if (marker.length > 0) {
-							for (final IMarker m : marker) {
-								if (message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
-									return true;
-								}
+			private boolean hasMarker(String message, IFile sourceFile) {
+				try {
+					final IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+					if (marker.length > 0) {
+						for (final IMarker m : marker) {
+							if (message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+								return true;
 							}
 						}
-					} catch (final CoreException e) {
-						FeatureCppCorePlugin.getDefault().logError(e);
 					}
-					return false;
+				} catch (final CoreException e) {
+					FeatureCppCorePlugin.getDefault().logError(e);
 				}
-			};
+				return false;
+			}
+		};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}

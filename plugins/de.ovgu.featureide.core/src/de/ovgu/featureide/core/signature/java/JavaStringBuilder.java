@@ -27,12 +27,10 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 public class JavaStringBuilder {
 
-	private static final String LINE_SEPARATOR =
-		System.getProperty("line.separator");
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	public static String getClassString(AbstractClassFragment cls, boolean shortString) {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		if (cls.getSignature().getParent() == null) {
 			if (!cls.getSignature().getPackage().isEmpty()) {
@@ -64,8 +62,7 @@ public class JavaStringBuilder {
 				sb.append(ext);
 				sb.append(", ");
 			}
-			sb.delete(sb.length()
-				- 2, sb.length());
+			sb.delete(sb.length() - 2, sb.length());
 		}
 
 		if (!cls.getSignature().getImplementList().isEmpty()) {
@@ -79,8 +76,7 @@ public class JavaStringBuilder {
 				sb.append(impl);
 				sb.append(", ");
 			}
-			sb.delete(sb.length()
-				- 2, sb.length());
+			sb.delete(sb.length() - 2, sb.length());
 		}
 
 		sb.append(" {");
@@ -91,14 +87,11 @@ public class JavaStringBuilder {
 				sb.append('\t');
 				String innerClassString;
 				if (shortString) {
-					innerClassString =
-						innerClass.toShortString();
+					innerClassString = innerClass.toShortString();
 				} else {
-					innerClassString =
-						innerClass.toString();
+					innerClassString = innerClass.toString();
 				}
-				sb.append(innerClassString.replace(LINE_SEPARATOR, LINE_SEPARATOR
-					+ '\t'));
+				sb.append(innerClassString.replace(LINE_SEPARATOR, LINE_SEPARATOR + '\t'));
 				sb.append(LINE_SEPARATOR);
 			}
 			sb.append(LINE_SEPARATOR);
@@ -107,22 +100,17 @@ public class JavaStringBuilder {
 		if (!cls.getMembers().isEmpty()) {
 			for (final AbstractSignature member : cls.getMembers()) {
 				sb.append("\t");
-				sb.append(member.toString().replace(LINE_SEPARATOR, LINE_SEPARATOR
-					+ '\t'));
+				sb.append(member.toString().replace(LINE_SEPARATOR, LINE_SEPARATOR + '\t'));
 				if (member instanceof AbstractFieldSignature) {
-					final AbstractFieldSignature field =
-						(AbstractFieldSignature) member;
-					if (shortString
-						|| !field.isFinal()) {
+					final AbstractFieldSignature field = (AbstractFieldSignature) member;
+					if (shortString || !field.isFinal()) {
 						sb.append(';');
 					} else {
 						sb.append(getFinalFieldInit(field));
 					}
 				} else if (member instanceof AbstractMethodSignature) {
-					final AbstractMethodSignature method =
-						(AbstractMethodSignature) member;
-					if (shortString
-						|| !"class".equals(cls.getSignature().getType())) {
+					final AbstractMethodSignature method = (AbstractMethodSignature) member;
+					if (shortString || !"class".equals(cls.getSignature().getType())) {
 						sb.append(';');
 					} else {
 						sb.append(" {");
@@ -133,8 +121,7 @@ public class JavaStringBuilder {
 							sb.append("\t\tsuper();");
 						}
 						if (!method.isConstructor()) {
-							sb.append("\t\t"
-								+ getReturnStatement(method));
+							sb.append("\t\t" + getReturnStatement(method));
 						}
 
 						sb.append(LINE_SEPARATOR);
@@ -152,28 +139,20 @@ public class JavaStringBuilder {
 	}
 
 	private static String getFinalFieldInit(AbstractFieldSignature field) {
-		return " = "
-			+ getTypeDefaultValue(field);
+		return " = " + getTypeDefaultValue(field);
 	}
 
 	private static String getReturnStatement(AbstractMethodSignature method) {
-		return "return "
-			+ getTypeDefaultValue(method);
+		return "return " + getTypeDefaultValue(method);
 	}
 
 	private static String getTypeDefaultValue(AbstractSignature element) {
-		final String type =
-			element.getType();
+		final String type = element.getType();
 		if (type.equals("void")) {
 			return ";";
 		} else if (type.equals("boolean")) {
 			return "true;";
-		} else if (type.equals("int")
-			|| type.equals("double")
-			|| type.equals("char")
-			|| type.equals("long")
-			|| type.equals("float")
-			|| type.equals("byte")
+		} else if (type.equals("int") || type.equals("double") || type.equals("char") || type.equals("long") || type.equals("float") || type.equals("byte")
 			|| type.equals("short")) {
 			return "0;";
 		} else {

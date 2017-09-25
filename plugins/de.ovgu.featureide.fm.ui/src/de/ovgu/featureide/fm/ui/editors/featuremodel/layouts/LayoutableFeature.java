@@ -46,16 +46,13 @@ public class LayoutableFeature {
 	}
 
 	public LayoutableFeature(IFeature feature, boolean showHidden) {
-		this.feature =
-			feature;
-		this.showHidden =
-			showHidden;
+		this.feature = feature;
+		this.showHidden = showHidden;
 	}
 
 	public LinkedList<LayoutableFeature> getChildren() {
 
-		final LinkedList<LayoutableFeature> children =
-			new LinkedList<LayoutableFeature>();
+		final LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
 
 		for (final IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			if (showHidden) {
@@ -79,8 +76,7 @@ public class LayoutableFeature {
 	}
 
 	public LayoutableFeature getLastChild() {
-		final LinkedList<LayoutableFeature> children =
-			getChildren();
+		final LinkedList<LayoutableFeature> children = getChildren();
 		if (!children.isEmpty()) {
 			return children.getLast();
 		}
@@ -99,8 +95,7 @@ public class LayoutableFeature {
 		if (showHidden) {
 			return Functional.toList(features);
 		} else {
-			final ArrayList<IFeature> newFeatures =
-				new ArrayList<IFeature>();
+			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
 			for (final IFeature feature : features) {
 				if (feature.getStructure().hasHiddenParent()) {
 					newFeatures.add(feature);
@@ -114,11 +109,9 @@ public class LayoutableFeature {
 		if (showHidden) {
 			return false;
 		}
-		final IFeatureStructure structure =
-			feature.getStructure();
+		final IFeatureStructure structure = feature.getStructure();
 		if (!structure.isRoot()) {
-			return (structure.isHidden()
-				|| isHidden(FeatureUtils.getParent(feature), showHidden));
+			return (structure.isHidden() || isHidden(FeatureUtils.getParent(feature), showHidden));
 		} else {
 			return structure.isHidden();
 		}

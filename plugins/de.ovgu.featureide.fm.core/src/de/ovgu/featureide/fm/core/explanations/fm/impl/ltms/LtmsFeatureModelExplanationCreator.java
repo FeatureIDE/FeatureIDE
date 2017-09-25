@@ -55,22 +55,17 @@ public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeature
 	 * @return the shortest explanation among the given ones
 	 */
 	protected Explanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		final List<Explanation> explanations =
-			new LinkedList<>();
+		final List<Explanation> explanations = new LinkedList<>();
 		for (final Set<Integer> c : clauseIndexes) {
 			explanations.add(getExplanation(c));
 		}
-		final Explanation cumulatedExplanation =
-			getConcreteExplanation();
+		final Explanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		Explanation shortestExplanation =
-			null;
+		Explanation shortestExplanation = null;
 		for (final Explanation explanation : explanations) {
 			cumulatedExplanation.addExplanation(explanation); // Remember that this explanation was generated.
-			if ((shortestExplanation == null)
-				|| (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
-				shortestExplanation =
-					explanation; // Remember the shortest explanation.
+			if ((shortestExplanation == null) || (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
+				shortestExplanation = explanation; // Remember the shortest explanation.
 			}
 		}
 		if (shortestExplanation == null) {

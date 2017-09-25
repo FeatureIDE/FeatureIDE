@@ -42,8 +42,7 @@ public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 				new SXFMFormat(), new GuidslFormat()));
 	}
 
-	private static FMFormatManager instance =
-		new FMFormatManager();
+	private static FMFormatManager instance = new FMFormatManager();
 
 	public static FMFormatManager getInstance() {
 		return instance;

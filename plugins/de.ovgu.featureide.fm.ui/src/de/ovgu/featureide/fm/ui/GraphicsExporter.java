@@ -63,44 +63,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 public class GraphicsExporter {
 
 	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor) {
-		final FileDialog fileDialog =
-			new FileDialog(new Shell(), SWT.SAVE);
-		final String[] extensions =
-			{
-				"*.png",
-				"*.jpg",
-				"*.bmp",
-				"*.m",
-				"*.xml",
-				".velvet",
-				"*.svg" };
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		final String[] filterNames =
-			{
-				"Portable Network Graphics *.png",
-				"JPEG *.jpg",
-				"Windows Bitmap *.bmp",
-				"GUIDSL Grammar *.m",
-				"XML Export *.xml",
-				"Velvet Export *.velvet",
-				"Scalable Vector Graphics *.svg" };
+		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
+			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
-		final String filePath =
-			fileDialog.open();
+		final String filePath = fileDialog.open();
 		if (filePath == null) {
 			return false;
 		}
 
-		if (filePath.endsWith(".m")
-			|| filePath.endsWith(".xml")
-			|| filePath.endsWith(".velvet")) {
+		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
 			return FeatureModelManager.save(featureModel, Paths.get(filePath));
 		} else {
-			final File file =
-				new File(filePath);
-			final boolean succ =
-				GraphicsExporter.exportAs(diagramEditor, file);
+			final File file = new File(filePath);
+			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
 			GraphicsExporter.printExportMessage(file, succ);
 			return succ;
 		}
@@ -108,111 +87,77 @@ public class GraphicsExporter {
 	}
 
 	public static boolean exportAs(GraphicalViewerImpl viewer) {
-		final FileDialog fileDialog =
-			new FileDialog(new Shell(), SWT.SAVE);
-		final String[] extensions =
-			{
-				"*.png",
-				"*.jpg",
-				"*.bmp",
-				"*.svg" };
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		final String[] filterNames =
-			{
-				"Portable Network Graphics *.png",
-				"JPEG *.jpg",
-				"Windows Bitmap *.bmp",
-				"Scalable Vector Graphics *.svg" };
+		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
-		final String filePath =
-			fileDialog.open();
+		final String filePath = fileDialog.open();
 		if (filePath == null) {
 			return false;
 		}
-		final File file =
-			new File(filePath);
+		final File file = new File(filePath);
 
 		return GraphicsExporter.exportAs(viewer, file);
 	}
 
 	public static boolean exportAs(GraphicalViewerImpl viewer, File file) {
-		boolean succ =
-			false;
+		boolean succ = false;
 
 		if (file.getAbsolutePath().endsWith(".svg")) {
-			final ScalableFreeformRootEditPart part =
-				(ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
-			final IFigure rootFigure =
-				part.getFigure();
+			final ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
+			final IFigure rootFigure = part.getFigure();
 
-			Bundle bundleExport =
-				null;
-			Bundle bundleExportSVG =
-				null;
+			Bundle bundleExport = null;
+			Bundle bundleExportSVG = null;
 			for (final Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 				if (b.getSymbolicName().equals(NL_UTWENTE_CE_IMAGEEXPORT)) {
-					bundleExport =
-						b;
+					bundleExport = b;
 				}
 				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
-					bundleExportSVG =
-						b;
+					bundleExportSVG = b;
 				}
-				if ((bundleExport != null)
-					&& (bundleExportSVG != null)) {
+				if ((bundleExport != null) && (bundleExportSVG != null)) {
 					break;
 				}
 			}
 
 			// check if gef-imageexport is existing and activated!
-			if ((bundleExport != null)
-				&& (bundleExportSVG != null)) {
+			if ((bundleExport != null) && (bundleExportSVG != null)) {
 				try {
 					final org.osgi.framework.BundleActivator act =
-						((org.osgi.framework.BundleActivator) bundleExport.loadClass(
-								NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
+						((org.osgi.framework.BundleActivator) bundleExport.loadClass(NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
-					final Class<?> cl =
-						bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-					final Object exportSVGObject =
-						cl.newInstance();
+					final Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
+					final Object exportSVGObject = cl.newInstance();
 
-					final Method provideSettings =
-						cl.getMethod(PROVIDESETTINGS, String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
+					final Method provideSettings = cl.getMethod(PROVIDESETTINGS, String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
 					provideSettings.invoke(exportSVGObject, "SVG", viewer.getControl(), FMUIPlugin.getDefault().getPreferenceStore());
 
-					final Method exportImage =
-						cl.getMethod("exportImage", String.class, String.class, IFigure.class);
+					final Method exportImage = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
 					exportImage.invoke(exportSVGObject, "SVG", file.getAbsolutePath(), rootFigure);
 
-					final Field disableClippingButton =
-						cl.getDeclaredField(DISABLECLIPPINGBUTTON);
+					final Field disableClippingButton = cl.getDeclaredField(DISABLECLIPPINGBUTTON);
 					disableClippingButton.setAccessible(true);
 
-					final Object disableClippingButtonObj =
-						disableClippingButton.get(exportSVGObject);
+					final Object disableClippingButtonObj = disableClippingButton.get(exportSVGObject);
 					if (disableClippingButtonObj instanceof Button) {
 						((Button) disableClippingButtonObj).dispose();
 					}
 
-					succ =
-						true;
+					succ = true;
 				} catch (final Exception e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
-				final String infoMessage =
-					ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_
-						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
+				final String infoMessage = ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_
+					+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
+					+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
 
-				final MessageDialog dialog =
-					new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
-							MessageDialog.INFORMATION, new String[] {
-								IDialogConstants.OK_LABEL },
-							0);
+				final MessageDialog dialog = new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
+						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 				dialog.open();
 				FMUIPlugin.getDefault().logInfo(infoMessage);
@@ -220,8 +165,7 @@ public class GraphicsExporter {
 			}
 		} else {
 			GEFImageWriter.writeToFile(viewer, file);
-			succ =
-				true;
+			succ = true;
 		}
 
 		GraphicsExporter.printExportMessage(file, succ);
@@ -230,14 +174,8 @@ public class GraphicsExporter {
 	}
 
 	public static void printExportMessage(File file, boolean successful) {
-		final boolean done =
-			successful
-				&& (file != null);
-		final String infoMessage =
-			done
-				? "Graphic export has been saved to\n"
-					+ file.getAbsolutePath()
-				: NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
+		final boolean done = successful && (file != null);
+		final String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
 		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }

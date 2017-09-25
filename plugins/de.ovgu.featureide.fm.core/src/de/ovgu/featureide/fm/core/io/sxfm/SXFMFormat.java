@@ -83,25 +83,11 @@ import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
  */
 public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.fm."
-			+ SXFMFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SXFMFormat.class.getSimpleName();
 
-	private static final Pattern CONTENT_REGEX =
-		Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<feature_model[\\s>]");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<feature_model[\\s>]");
 
-	private final static String[] symbols =
-		new String[] {
-			"~",
-			" and ",
-			" or ",
-			"",
-			"",
-			", ",
-			"",
-			"",
-			"" };
+	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
 
 	@Override
 	public String getSuffix() {
@@ -139,12 +125,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @param doc Document where the feature model is put
 	 */
 	private void createXmlDoc(Document doc) {
-		final Element elem =
-			doc.createElement("feature_model");
+		final Element elem = doc.createElement("feature_model");
 		elem.setAttribute("name", "FeatureIDE model");
 		doc.appendChild(elem);
-		final Node featTree =
-			doc.createElement("feature_tree");
+		final Node featTree = doc.createElement("feature_tree");
 		elem.appendChild(featTree);
 		featTree.appendChild(doc.createTextNode("\n"));
 		createXmlDocRec(doc, featTree, object.getStructure().getRoot().getFeature(), false, "");
@@ -164,88 +148,46 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		String newIndent;
 		Node textNode;
 		LinkedList<IFeature> children;
-		boolean nextAndMode =
-			false;
+		boolean nextAndMode = false;
 		if (feat == null) {
 			return;
 		}
-		final String fName =
-			feat.getName();
+		final String fName = feat.getName();
 		if (feat.getStructure().isRoot()) {
-			textNode =
-				doc.createTextNode(":r "
-					+ fName
-					+ "("
-					+ fName
-					+ ")\n");
-			newIndent =
-				"\t";
+			textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
+			newIndent = "\t";
 		} else if (andMode) {
 			if (feat.getStructure().isMandatory()) {
-				textNode =
-					doc.createTextNode(indent
-						+ ":m "
-						+ fName
-						+ "("
-						+ fName
-						+ ")\n");
+				textNode = doc.createTextNode(indent + ":m " + fName + "(" + fName + ")\n");
 			} else {
-				textNode =
-					doc.createTextNode(indent
-						+ ":o "
-						+ fName
-						+ "("
-						+ fName
-						+ ")\n");
+				textNode = doc.createTextNode(indent + ":o " + fName + "(" + fName + ")\n");
 			}
 		} else {
-			textNode =
-				doc.createTextNode(indent
-					+ ": "
-					+ fName
-					+ "("
-					+ fName
-					+ ")\n");
+			textNode = doc.createTextNode(indent + ": " + fName + "(" + fName + ")\n");
 		}
 		nod.appendChild(textNode);
-		children =
-			new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren())));
+		children = new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren())));
 		if (children.isEmpty()) {
 			return;
 		}
 		if (feat.getStructure().isAnd()) {
-			nextAndMode =
-				true;
-			newIndent =
-				indent
-					+ "\t";
+			nextAndMode = true;
+			newIndent = indent + "\t";
 		} else if (feat.getStructure().isOr()) {
-			textNode =
-				doc.createTextNode(indent
-					+ "\t:g [1,*]\n");
+			textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
 			nod.appendChild(textNode);
-			newIndent =
-				indent
-					+ "\t\t";
-			nextAndMode =
-				false;
+			newIndent = indent + "\t\t";
+			nextAndMode = false;
 		} else if (feat.getStructure().isAlternative()) {
-			textNode =
-				doc.createTextNode(indent
-					+ "\t:g [1,1]\n");
+			textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
 			nod.appendChild(textNode);
-			newIndent =
-				indent
-					+ "\t\t";
-			nextAndMode =
-				false;
+			newIndent = indent + "\t\t";
+			nextAndMode = false;
 		} else {
-			throw new IllegalStateException(CANT_DETERMINE
-				+ CONNECTIONTYPE_OF_ROOTFEATURE);
+			throw new IllegalStateException(CANT_DETERMINE + CONNECTIONTYPE_OF_ROOTFEATURE);
 		}
 
-		final Iterator<IFeature> i =
-			children.iterator();
+		final Iterator<IFeature> i = children.iterator();
 		while (i.hasNext()) {
 			createXmlDocRec(doc, nod, i.next(), nextAndMode, newIndent);
 		}
@@ -259,27 +201,22 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void createPropositionalConstraints(Document doc, Node FeatMod) {
 		// add a node for constraints in any case
-		final Node propConstr =
-			doc.createElement("constraints");
+		final Node propConstr = doc.createElement("constraints");
 		FeatMod.appendChild(propConstr);
-		final Node newNode =
-			doc.createTextNode("\n");
+		final Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
 		if (object.getConstraints().isEmpty()) {
 			return;
 		}
 		// as before
-		int i =
-			1;
+		int i = 1;
 		for (final org.prop4j.Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			// org.prop4j.Node cnf = node.clone().toCNF();
 
-			final org.prop4j.Node cnf =
-				node.toCNF();
+			final org.prop4j.Node cnf = node.toCNF();
 
-			final ArrayList<org.prop4j.Node> literalList =
-				new ArrayList<>();
+			final ArrayList<org.prop4j.Node> literalList = new ArrayList<>();
 			if (cnf instanceof And) {
 				for (final org.prop4j.Node child : cnf.getChildren()) {
 					if (child instanceof Or) {
@@ -294,18 +231,14 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				literalList.add(cnf);
 			}
 
-			final HashSet<org.prop4j.Node> literalSet =
-				new HashSet<>(literalList.size());
-			boolean invalid =
-				false;
+			final HashSet<org.prop4j.Node> literalSet = new HashSet<>(literalList.size());
+			boolean invalid = false;
 			for (final org.prop4j.Node literal : literalList) {
-				final Literal negativeliteral =
-					((Literal) literal).clone();
+				final Literal negativeliteral = ((Literal) literal).clone();
 				negativeliteral.flip();
 
 				if (literalSet.contains(negativeliteral)) {
-					invalid =
-						true;
+					invalid = true;
 				} else {
 					literalSet.add(literal);
 				}
@@ -314,12 +247,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			if (!invalid) {
 				if (cnf instanceof And) {
 					for (final org.prop4j.Node child : cnf.getChildren()) {
-						i =
-							createConstraint(doc, propConstr, i, child);
+						i = createConstraint(doc, propConstr, i, child);
 					}
 				} else {
-					i =
-						createConstraint(doc, propConstr, i, cnf);
+					i = createConstraint(doc, propConstr, i, cnf);
 				}
 			}
 		}
@@ -327,28 +258,17 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	private int createConstraint(Document doc, Node propConstr, int i, org.prop4j.Node node) {
 		Node newNode;
-		final NodeWriter nw =
-			new NodeWriter(node);
+		final NodeWriter nw = new NodeWriter(node);
 		nw.setSymbols(symbols);
 		nw.setEnforceBrackets(true);
-		String nodeString =
-			nw.nodeToString();
+		String nodeString = nw.nodeToString();
 		// remove the external parenthesis
-		if ((nodeString.startsWith("("))
-			&& (nodeString.endsWith(")"))) {
-			nodeString =
-				nodeString.substring(1, nodeString.length()
-					- 1);
+		if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
+			nodeString = nodeString.substring(1, nodeString.length() - 1);
 		}
 		// replace the space before a variable
-		nodeString =
-			nodeString.replace("~ ", "~");
-		newNode =
-			doc.createTextNode("C"
-				+ i
-				+ ":"
-				+ nodeString
-				+ "\n");
+		nodeString = nodeString.replace("~ ", "~");
+		newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");
 		propConstr.appendChild(newNode);
 		return ++i;
 	}
@@ -357,16 +277,14 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		idTable.clear();
 		warnings.clear();
-		line =
-			0;
+		line = 0;
 		object.reset();
 		buildFModelRec(doc);
 	}
 
 	private int line;
 
-	private final HashMap<String, IFeature> idTable =
-		new HashMap<>();
+	private final HashMap<String, IFeature> idTable = new HashMap<>();
 
 	/**
 	 * Recursively traverses the Document structure
@@ -376,9 +294,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFModelRec(Node n) throws UnsupportedModelException {
 		buildFModelStep(n);
-		for (Node child =
-			n.getFirstChild(); child != null; child =
-				child.getNextSibling()) {
+		for (Node child = n.getFirstChild(); child != null; child = child.getNextSibling()) {
 			buildFModelRec(child);
 		}
 	}
@@ -393,8 +309,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		if (n.getNodeType() != Node.ELEMENT_NODE) {
 			return;
 		}
-		final String tag =
-			n.getNodeName();
+		final String tag = n.getNodeName();
 		if ("feature_tree".equals(tag)) {
 			handleFeatureTree(n);
 		} else if ("feature_model".equals(tag)) {
@@ -405,8 +320,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 			handleConstraints(n);
 		} else if (META.equals(tag)) {
 			return;
-		} else if (DATA.equals(tag)
-			&& META.equals(n.getParentNode().getNodeName())) {
+		} else if (DATA.equals(tag) && META.equals(n.getParentNode().getNodeName())) {
 			return;
 		} else {
 			throw new UnsupportedModelException(UNKNOWN_XML_TAG, line);
@@ -420,44 +334,29 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @throws UnsupportedModelException
 	 */
 	private void handleFeatureTree(Node n) throws UnsupportedModelException {
-		final NodeList children =
-			n.getChildNodes();
-		final StringBuilder buffer =
-			new StringBuilder();
+		final NodeList children = n.getChildNodes();
+		final StringBuilder buffer = new StringBuilder();
 		Node node;
-		for (int i =
-			0; i < children.getLength(); i++) {
-			node =
-				children.item(i);
+		for (int i = 0; i < children.getLength(); i++) {
+			node = children.item(i);
 			if (node.getNodeType() == Node.TEXT_NODE) {
 				buffer.append(node.getNodeValue());
 			}
 		}
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(buffer.toString()));
+		final BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));
 		buildFeatureTree(reader);
 		removeUnnecessaryAbstractFeatures(object.getStructure().getRoot().getFeature());
 	}
 
 	private String removeWhitespaces(String str) {
-		str =
-			str.trim();
+		str = str.trim();
 		if (str.contains(" ")) {
-			final String temp =
-				str.substring(0, str.indexOf(' ')
-					+ 1);
-			str =
-				str.substring(str.indexOf(' ')
-					+ 1);
+			final String temp = str.substring(0, str.indexOf(' ') + 1);
+			str = str.substring(str.indexOf(' ') + 1);
 			while (str.contains(" ")) {
-				str =
-					str.substring(0, str.indexOf(' '))
-						+ str.substring(str.indexOf(' ')
-							+ 1, str.length());
+				str = str.substring(0, str.indexOf(' ')) + str.substring(str.indexOf(' ') + 1, str.length());
 			}
-			str =
-				temp
-					+ str;
+			str = temp + str;
 		}
 		return str;
 	}
@@ -471,23 +370,16 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			final IFeatureModelFactory factory =
-				FMFactoryManager.getFactory(object);
-			FeatureIndent lastFeat =
-				new FeatureIndent(null, -1, null);
+			final IFeatureModelFactory factory = FMFactoryManager.getFactory(object);
+			FeatureIndent lastFeat = new FeatureIndent(null, -1, null);
 			// List of Features with arbitrary cardinalities
-			final LinkedList<FeatCardinality> arbCardGroupFeats =
-				new LinkedList<FeatCardinality>();
-			String lineText =
-				reader.readLine();
+			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
+			String lineText = reader.readLine();
 			line++;
 			FeatureIndent feat;
-			String featId =
-				"";
-			while ((lineText =
-				reader.readLine()) != null) {
-				int countIndent =
-					0;
+			String featId = "";
+			while ((lineText = reader.readLine()) != null) {
+				int countIndent = 0;
 
 				if (lineText.trim().isEmpty()) {
 					line++;
@@ -495,12 +387,9 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 				}
 				while (lineText.startsWith("\t")) {
 					countIndent++;
-					lineText =
-						lineText.substring(1);
+					lineText = lineText.substring(1);
 				}
-				int relativeIndent =
-					countIndent
-						- lastFeat.getIndentation();
+				int relativeIndent = countIndent - lastFeat.getIndentation();
 				while (relativeIndent < 1) {
 					// if (lastFeat.isRoot()) throw new UnsupportedModelException(
 					// INDENTATION_ERROR_COMMA__FEATURE_HAS_NO_PARENT, line);
@@ -508,107 +397,71 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					// relativeIndent = countIndent - lastFeat.getIndentation();
 
 					if (lastFeat != null) {
-						lastFeat =
-							lastFeat.getParent();
-						relativeIndent =
-							countIndent
-								- lastFeat.getIndentation();
+						lastFeat = lastFeat.getParent();
+						relativeIndent = countIndent - lastFeat.getIndentation();
 					}
 				}
 				// Remove special characters and whitespaces from names
-				lineText =
-					removeWhitespaces(lineText);
+				lineText = removeWhitespaces(lineText);
 
-				final char[] lineTextChars =
-					lineText.toCharArray();
-				for (int i =
-					0; i < lineTextChars.length; i++) {
-					final Character c =
-						lineTextChars[i];
+				final char[] lineTextChars = lineText.toCharArray();
+				for (int i = 0; i < lineTextChars.length; i++) {
+					final Character c = lineTextChars[i];
 
-					if (!(Character.isLetterOrDigit(c)
-						|| c.equals(':')
-						|| c.equals('[')
-						|| c.equals(']')
-						|| c.equals(',')
-						|| c.equals('*')
-						|| c.equals('(')
+					if (!(Character.isLetterOrDigit(c) || c.equals(':') || c.equals('[') || c.equals(']') || c.equals(',') || c.equals('*') || c.equals('(')
 						|| c.equals(')'))) {
-						lineTextChars[i] =
-							'_';
+						lineTextChars[i] = '_';
 					}
 				}
 
-				lineText =
-					new String(lineTextChars);
+				lineText = new String(lineTextChars);
 
 				if (lineText.startsWith(":r")) {
-					feat =
-						new FeatureIndent(null, 0, factory.createFeature(object, ""));
+					feat = new FeatureIndent(null, 0, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(true);
-					featId =
-						setNameGetID(feat.getFeature(), lineText);
+					featId = setNameGetID(feat.getFeature(), lineText);
 					// if (feat.getName().trim().toLowerCase().equals("root"))
 					// feat.setName("root_");
 					object.getStructure().setRoot(feat.getFeature().getStructure());
 					feat.getFeature().getStructure().setAnd();
-					countIndent =
-						0;
+					countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
-					feat =
-						new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(true);
-					featId =
-						setNameGetID(feat.getFeature(), lineText);
+					featId = setNameGetID(feat.getFeature(), lineText);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":o")) {
-					feat =
-						new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(false);
-					featId =
-						setNameGetID(feat.getFeature(), lineText);
+					featId = setNameGetID(feat.getFeature(), lineText);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					feat.getFeature().getStructure().setAnd();
 				} else if (lineText.startsWith(":g")) {
 					// create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
-					feat =
-						new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(true);
 					feat.getFeature().getStructure().setAbstract(true);
 					// try to generate a name that hopefully does not exist in the model
-					featId =
-						lastFeat.getFeature().getName()
-							+ EMPTY___
-							+ (lastFeat.getFeature().getStructure().getChildrenCount()
-								+ 1);
+					featId = lastFeat.getFeature().getName() + EMPTY___ + (lastFeat.getFeature().getStructure().getChildrenCount() + 1);
 					feat.getFeature().setName(featId);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
-					lastFeat =
-						feat;
+					lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
 						lastFeat.getFeature().getStructure().setAlternative();
 					} else if (lineText.contains("[1,*]")) {
 						lastFeat.getFeature().getStructure().setOr();
-					} else if ((lineText.contains("["))
-						&& (lineText.contains("]"))) {
-						final int index =
-							lineText.indexOf('[');
-						final int start =
-							Character.getNumericValue(lineText.charAt(index
-								+ 1));
-						final int end =
-							Character.getNumericValue(lineText.charAt(index
-								+ 3));
-						final FeatCardinality featCard =
-							new FeatCardinality(lastFeat.getFeature(), start, end);
+					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
+						final int index = lineText.indexOf('[');
+						final int start = Character.getNumericValue(lineText.charAt(index + 1));
+						final int end = Character.getNumericValue(lineText.charAt(index + 3));
+						final FeatCardinality featCard = new FeatCardinality(lastFeat.getFeature(), start, end);
 						arbCardGroupFeats.add(featCard);
 					} else {
-						throw new UnsupportedModelException(COULDNT
-							+ DETERMINE_GROUP_CARDINALITY, line);
+						throw new UnsupportedModelException(COULDNT + DETERMINE_GROUP_CARDINALITY, line);
 					}
 					// lastFeat = feat;
 					// featId = featId + "_ ";
@@ -616,53 +469,39 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					addFeatureToModel(feat.getFeature());
 					continue;
 				} else if (lineText.startsWith(":")) {
-					feat =
-						new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
+					feat = new FeatureIndent(lastFeat, countIndent, factory.createFeature(object, ""));
 					feat.getFeature().getStructure().setMandatory(true);
 					String name;
 					if (lineText.contains("(")) {
-						name =
-							lineText.substring(2, lineText.indexOf('('));
-						featId =
-							lineText.substring(lineText.indexOf('(')
-								+ 1, lineText.indexOf(')'));
+						name = lineText.substring(2, lineText.indexOf('('));
+						featId = lineText.substring(lineText.indexOf('(') + 1, lineText.indexOf(')'));
 					} else {
-						name =
-							lineText.substring(2, lineText.length()); // + line;
-						featId =
-							name;
+						name = lineText.substring(2, lineText.length()); // + line;
+						featId = name;
 					}
 					if (Character.isDigit(name.charAt(0))) {
-						name =
-							"a"
-								+ name;
+						name = "a" + name;
 					}
 					feat.getFeature().setName(name);
 					feat.getFeature().getStructure().setParent(lastFeat.getFeature().getStructure());
 					lastFeat.getFeature().getStructure().addChild(feat.getFeature().getStructure());
 					feat.getFeature().getStructure().setAnd();
 				} else {
-					throw new UnsupportedModelException(COULDNT_MATCH_WITH
-						+ "known Types: :r, :m, :o, :g, :", line);
+					throw new UnsupportedModelException(COULDNT_MATCH_WITH + "known Types: :r, :m, :o, :g, :", line);
 				}
 				addFeatureToModel(feat.getFeature());
 
 				if (idTable.containsKey(featId)) {
-					throw new UnsupportedModelException("Feature \""
-						+ featId
-						+ "\" occured"
-						+ SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
+					throw new UnsupportedModelException("Feature \"" + featId + "\" occured" + SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
 				}
 				idTable.put(featId, feat.getFeature());
 
-				lastFeat =
-					feat;
+				lastFeat = feat;
 				line++;
 			}
 			// Check that there are only OR connections when the parent has more than one feature
 			for (final IFeature f : object.getFeatures()) {
-				if (f.getStructure().isOr()
-					&& (f.getStructure().getChildrenCount() <= 1)) {
+				if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
 					f.getStructure().setAnd();
 				}
 			}
@@ -675,8 +514,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 
 	private void removeUnnecessaryAbstractFeatures(IFeature feature) {
 		if (feature.getStructure().getChildrenCount() == 1) {
-			final IFeatureStructure child =
-				feature.getStructure().getFirstChild();
+			final IFeatureStructure child = feature.getStructure().getFirstChild();
 			if (child.isAbstract()) {
 				for (final IFeatureStructure grantChild : feature.getStructure().getFirstChild().getChildren()) {
 					grantChild.setParent(feature.getStructure());
@@ -705,14 +543,10 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @param feat
 	 */
 	private void addFeatureToModel(IFeature feat) {
-		final String orig_name =
-			feat.getName();
-		int i =
-			1;
+		final String orig_name = feat.getName();
+		int i = 1;
 		while (!object.addFeature(feat)) {
-			feat.setName(orig_name
-				+ EMPTY___
-				+ i++);
+			feat.setName(orig_name + EMPTY___ + i++);
 		}
 
 	}
@@ -720,21 +554,14 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private String setNameGetID(IFeature feat, String lineText) {
 		String featId, name;
 		if (lineText.contains("(")) {
-			name =
-				lineText.substring(3, lineText.indexOf('('));
-			featId =
-				lineText.substring(lineText.indexOf('(')
-					+ 1, lineText.indexOf(')'));
+			name = lineText.substring(3, lineText.indexOf('('));
+			featId = lineText.substring(lineText.indexOf('(') + 1, lineText.indexOf(')'));
 		} else {
-			name =
-				lineText.substring(3, lineText.length()); // + line;
-			featId =
-				name;
+			name = lineText.substring(3, lineText.length()); // + line;
+			featId = name;
 		}
 		if (Character.isDigit(name.charAt(0))) {
-			name =
-				"a"
-					+ name;
+			name = "a" + name;
 		}
 		feat.setName(name);
 		return featId;
@@ -749,35 +576,21 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	private void handleArbitrayCardinality(LinkedList<FeatCardinality> featList) throws UnsupportedModelException {
 		org.prop4j.Node node;
 		for (final FeatCardinality featCard : featList) {
-			final IFeature feat =
-				featCard.feat;
-			final List<IFeatureStructure> children =
-				feat.getStructure().getChildren();
+			final IFeature feat = featCard.feat;
+			final List<IFeatureStructure> children = feat.getStructure().getChildren();
 			for (final IFeatureStructure child : children) {
 				child.setMandatory(false);
 			}
-			final int start =
-				featCard.start;
-			final int end =
-				featCard.end;
-			if ((start < 0)
-				|| (start > end)
-				|| (end > children.size())) {
-				throw new UnsupportedModelException(GROUP_CARDINALITY
-					+ INVALID, line);
+			final int start = featCard.start;
+			final int end = featCard.end;
+			if ((start < 0) || (start > end) || (end > children.size())) {
+				throw new UnsupportedModelException(GROUP_CARDINALITY + INVALID, line);
 			}
-			final int f =
-				children.size();
-			node =
-				buildMinConstr(FeatureUtils.convertToFeatureList(children), (f
-					- start)
-					+ 1, feat.getName());
+			final int f = children.size();
+			node = buildMinConstr(FeatureUtils.convertToFeatureList(children), (f - start) + 1, feat.getName());
 			object.addConstraint(new Constraint(object, node));
-			if ((start > 0)
-				&& (end < f)) {
-				node =
-					buildMaxConstr(FeatureUtils.convertToFeatureList(children), end
-						+ 1);
+			if ((start > 0) && (end < f)) {
+				node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
 				object.addConstraint(new Constraint(object, node));
 			}
 		}
@@ -792,55 +605,34 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @return
 	 */
 	private org.prop4j.Node buildMinConstr(List<IFeature> list, int length, String parentName) {
-		final LinkedList<org.prop4j.Node> result =
-			new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult =
-			new LinkedList<org.prop4j.Node>();
-		final int listLength =
-			list.size();
-		final int[] indexes =
-			new int[length];
-		final int[] resIndexes =
-			new int[length];
-		for (int i =
-			0; i < length; i++) {
-			indexes[i] =
-				i;
-			resIndexes[i] =
-				i
-					+ (listLength
-						- length);
+		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final int listLength = list.size();
+		final int[] indexes = new int[length];
+		final int[] resIndexes = new int[length];
+		for (int i = 0; i < length; i++) {
+			indexes[i] = i;
+			resIndexes[i] = i + (listLength - length);
 		}
 		while (!Arrays.equals(indexes, resIndexes)) {
 			partResult.add(new Literal(parentName, false));
-			for (int i =
-				0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				partResult.add(new Literal(list.get(indexes[i]).getName()));
 			}
 			result.add(new Or(partResult));
-			for (int i =
-				length
-					- 1; i >= 0; i--) {
+			for (int i = length - 1; i >= 0; i--) {
 				if (indexes[i] >= resIndexes[i]) {
 					continue;
 				}
-				indexes[i] =
-					indexes[i]
-						+ 1;
-				for (int j =
-					i
-						+ 1; j < length; j++) {
-					indexes[j] =
-						indexes[j
-							- 1]
-							+ 1;
+				indexes[i] = indexes[i] + 1;
+				for (int j = i + 1; j < length; j++) {
+					indexes[j] = indexes[j - 1] + 1;
 				}
 				break;
 			}
 		}
 		partResult.add(new Literal(parentName, false));
-		for (int i =
-			0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			partResult.add(new Literal(list.get(indexes[i]).getName()));
 		}
 		result.add(new Or(partResult));
@@ -855,53 +647,32 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @return
 	 */
 	private org.prop4j.Node buildMaxConstr(List<IFeature> list, int length) {
-		final LinkedList<org.prop4j.Node> result =
-			new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult =
-			new LinkedList<org.prop4j.Node>();
-		final int listLength =
-			list.size();
-		final int[] indexes =
-			new int[length];
-		final int[] resIndexes =
-			new int[length];
-		for (int i =
-			0; i < length; i++) {
-			indexes[i] =
-				i;
-			resIndexes[i] =
-				i
-					+ (listLength
-						- length);
+		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final int listLength = list.size();
+		final int[] indexes = new int[length];
+		final int[] resIndexes = new int[length];
+		for (int i = 0; i < length; i++) {
+			indexes[i] = i;
+			resIndexes[i] = i + (listLength - length);
 		}
 		while (!Arrays.equals(indexes, resIndexes)) {
-			for (int i =
-				0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				partResult.add(new Literal(list.get(indexes[i]).getName(), false));
 			}
 			result.add(new Or(partResult));
-			for (int i =
-				length
-					- 1; i >= 0; i--) {
+			for (int i = length - 1; i >= 0; i--) {
 				if (indexes[i] >= resIndexes[i]) {
 					continue;
 				}
-				indexes[i] =
-					indexes[i]
-						+ 1;
-				for (int j =
-					i
-						+ 1; j < length; j++) {
-					indexes[j] =
-						indexes[j
-							- 1]
-							+ 1;
+				indexes[i] = indexes[i] + 1;
+				for (int j = i + 1; j < length; j++) {
+					indexes[j] = indexes[j - 1] + 1;
 				}
 				break;
 			}
 		}
-		for (int i =
-			0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			partResult.add(new Literal(list.get(indexes[i]).getName(), false));
 		}
 		result.add(new Or(partResult));
@@ -915,32 +686,25 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @throws UnsupportedModelException
 	 */
 	private void handleConstraints(Node n) throws UnsupportedModelException {
-		final NodeList children =
-			n.getChildNodes();
-		final StringBuilder buffer =
-			new StringBuilder();
+		final NodeList children = n.getChildNodes();
+		final StringBuilder buffer = new StringBuilder();
 		String lineText;
 		Node node;
-		for (int i =
-			0; i < children.getLength(); i++) {
-			node =
-				children.item(i);
+		for (int i = 0; i < children.getLength(); i++) {
+			node = children.item(i);
 			if (node.getNodeType() == Node.TEXT_NODE) {
 				buffer.append(node.getNodeValue());
 			}
 		}
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(buffer.toString()));
+		final BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));
 		try {
-			lineText =
-				reader.readLine();
+			lineText = reader.readLine();
 			line++;
 			while (lineText != null) {
 				if (!lineText.trim().equals("")) {
 					handleSingleConstraint(lineText);
 				}
-				lineText =
-					reader.readLine();
+				lineText = reader.readLine();
 				line++;
 			}
 		} catch (final IOException e) {
@@ -955,23 +719,17 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @throws UnsupportedModelException
 	 */
 	private void handleSingleConstraint(String lineText) throws UnsupportedModelException {
-		String newLine =
-			lineText.replace("(", " ( ");
-		newLine =
-			newLine.replace(")", " ) ");
-		newLine =
-			newLine.replace("~", " ~ ");
-		final Scanner scan =
-			new Scanner(newLine);
+		String newLine = lineText.replace("(", " ( ");
+		newLine = newLine.replace(")", " ) ");
+		newLine = newLine.replace("~", " ~ ");
+		final Scanner scan = new Scanner(newLine);
 		scan.skip(".*:");
-		final LinkedList<String> elements =
-			new LinkedList<String>();
+		final LinkedList<String> elements = new LinkedList<String>();
 		while (scan.hasNext()) {
 			elements.add(scan.next());
 		}
 		scan.close();
-		final org.prop4j.Node propNode =
-			buildPropNode(elements);
+		final org.prop4j.Node propNode = buildPropNode(elements);
 		object.addConstraint(new Constraint(object, propNode));
 	}
 
@@ -983,63 +741,47 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	 * @throws UnsupportedModelException
 	 */
 	private org.prop4j.Node buildPropNode(LinkedList<String> list) throws UnsupportedModelException {
-		final LinkedList<String> left =
-			new LinkedList<String>();
+		final LinkedList<String> left = new LinkedList<String>();
 		org.prop4j.Node leftResult, rightResult;
-		int bracketCount =
-			0;
+		int bracketCount = 0;
 		String element;
 		while (!list.isEmpty()) {
-			element =
-				list.removeFirst();
+			element = list.removeFirst();
 			if (element.equals("(")) {
 				bracketCount++;
 			}
 			if (element.equals(")")) {
 				bracketCount--;
 			}
-			if ((element.equals("~"))
-				&& (list.getFirst().equals("("))
-				&& (list.getLast().equals(")"))) {
+			if ((element.equals("~")) && (list.getFirst().equals("(")) && (list.getLast().equals(")"))) {
 				list.removeFirst();
 				list.removeLast();
 				return new Not(buildPropNode(list));
 			}
 			if (element.equals("AND")) {
-				element =
-					"and";
+				element = "and";
 			}
 			if (element.equals("OR")) {
-				element =
-					"or";
+				element = "or";
 			}
 			if (element.equals("IMP")) {
-				element =
-					"imp";
+				element = "imp";
 			}
 			if (element.equals("BIIMP")) {
-				element =
-					"biimp";
+				element = "biimp";
 			}
-			if ((element.equals("and"))
-				|| (element.equals("or"))
-				|| (element.equals("imp"))
-				|| (element.equals("biimp"))) {
+			if ((element.equals("and")) || (element.equals("or")) || (element.equals("imp")) || (element.equals("biimp"))) {
 				if (bracketCount == 0) {
-					if ((left.getFirst().equals("("))
-						&& (left.getLast().equals(")"))) {
+					if ((left.getFirst().equals("(")) && (left.getLast().equals(")"))) {
 						left.removeFirst();
 						left.removeLast();
 					}
-					leftResult =
-						buildPropNode(left);
-					if ((list.getFirst().equals("("))
-						&& (list.getLast().equals(")"))) {
+					leftResult = buildPropNode(left);
+					if ((list.getFirst().equals("(")) && (list.getLast().equals(")"))) {
 						list.removeFirst();
 						list.removeLast();
 					}
-					rightResult =
-						buildPropNode(list);
+					rightResult = buildPropNode(list);
 					if (element.equals("and")) {
 						return new And(leftResult, rightResult);
 					}
@@ -1064,22 +806,16 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		if (list.isEmpty()) {
 			throw new UnsupportedModelException(MISSING_ELEMENT, line);
 		}
-		element =
-			list.removeFirst();
-		if (("(".equals(element))
-			&& (!list.isEmpty())) {
-			element =
-				list.removeFirst();
+		element = list.removeFirst();
+		if (("(".equals(element)) && (!list.isEmpty())) {
+			element = list.removeFirst();
 		}
 		if ("~".equals(element)) {
 			return new Not(buildPropNode(list));
 		} else {
-			final IFeature feat =
-				idTable.get(element);
+			final IFeature feat = idTable.get(element);
 			if (feat == null) {
-				throw new UnsupportedModelException(THE_FEATURE_
-					+ element
-					+ "' does not occur in the grammar!", 0);
+				throw new UnsupportedModelException(THE_FEATURE_ + element + "' does not occur in the grammar!", 0);
 			}
 			return new Literal(feat.getName());
 		}
@@ -1092,12 +828,9 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		private final int indentation;
 
 		private FeatureIndent(FeatureIndent parent, int indentation, IFeature feature) {
-			this.parent =
-				parent;
-			this.indentation =
-				indentation;
-			this.feature =
-				feature;
+			this.parent = parent;
+			this.indentation = indentation;
+			this.feature = feature;
 		}
 
 		private int getIndentation() {
@@ -1121,20 +854,16 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		int end;
 
 		FeatCardinality(IFeature feat, int start, int end) {
-			this.feat =
-				feat;
-			this.start =
-				start;
-			this.end =
-				end;
+			this.feat = feat;
+			this.start = start;
+			this.end = end;
 		}
 
 	}
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead()
-			&& CONTENT_REGEX.matcher(content).find();
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

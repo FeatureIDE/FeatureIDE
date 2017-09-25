@@ -11,14 +11,11 @@ import br.ufal.ic.colligens.util.metrics.Metrics;
 
 public class MetricsView extends ViewPart {
 
-	public static final String ID =
-		Colligens.PLUGIN_ID
-			+ ".views.MetricsView";
+	public static final String ID = Colligens.PLUGIN_ID + ".views.MetricsView";
 	private final MetricsViewController viewController;
 
 	public MetricsView() {
-		viewController =
-			MetricsViewController.getInstance();
+		viewController = MetricsViewController.getInstance();
 		viewController.setView(this);
 	}
 

@@ -43,17 +43,13 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	private final static String HEAD =
 		"/**\r\n * Variability encoding of the feature model for JPF-BDD.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
-	private final static String FIELD_MODIFIER =
-		"\tpublic static boolean ";
-	private final static String ANNOTATION =
-		"\t@gov.nasa.jpf.bdd.TrackWithBDD\r\n";
-	private static final String SELECTFEATURES =
-		"\tpublic static void select_features() {\r\n";
+	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
+	private final static String ANNOTATION = "\t@gov.nasa.jpf.bdd.TrackWithBDD\r\n";
+	private static final String SELECTFEATURES = "\tpublic static void select_features() {\r\n";
 	private final IFeatureModel featureModel;
 
 	public FeatureModelJPFBDD(IFeatureModel featureModel) {
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
@@ -68,8 +64,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFeatureFields() {
-		final StringBuilder fields =
-			new StringBuilder();
+		final StringBuilder fields = new StringBuilder();
 		for (final CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(ANNOTATION);
 			fields.append(FIELD_MODIFIER);
@@ -91,18 +86,12 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final AdvancedNodeCreator nc =
-			new AdvancedNodeCreator(featureModel);
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
 		nc.setCnfType(CNFType.Compact);
 		nc.setIncludeBooleanValues(false);
-		final Node node =
-			nc.createNodes();
-		final String formula =
-			node.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
-		return VALID
-			+ "return "
-			+ formula
-			+ ";\r\n\t}\r\n";
+		final Node node = nc.createNodes();
+		final String formula = node.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		return VALID + "return " + formula + ";\r\n\t}\r\n";
 	}
 
 	@Override
@@ -112,30 +101,20 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getSelection() {
-		final StringBuilder stringBuilder =
-			new StringBuilder();
+		final StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection(boolean names) {\r\n\t\t");
-		final ArrayList<IFeature> features =
-			new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
+		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
 		stringBuilder.append("if (names) return ");
-		for (int i =
-			0; i < features.size(); i++) {
+		for (int i = 0; i < features.size(); i++) {
 			if (i != 0) {
 				stringBuilder.append(" + ");
 			}
-			final String name =
-				features.get(i).getName();
-			final String lowerName =
-				name.toLowerCase(Locale.ENGLISH);
-			stringBuilder.append(" ("
-				+ lowerName
-				+ " ? \""
-				+ name
-				+ "\\r\\n\" : \"\") ");
+			final String name = features.get(i).getName();
+			final String lowerName = name.toLowerCase(Locale.ENGLISH);
+			stringBuilder.append(" (" + lowerName + " ? \"" + name + "\\r\\n\" : \"\") ");
 		}
 		stringBuilder.append(";\r\n\t\treturn \"\" + ");
-		for (int i =
-			0; i < features.size(); i++) {
+		for (int i = 0; i < features.size(); i++) {
 			if (i != 0) {
 				stringBuilder.append(" + \"|\" + ");
 			}

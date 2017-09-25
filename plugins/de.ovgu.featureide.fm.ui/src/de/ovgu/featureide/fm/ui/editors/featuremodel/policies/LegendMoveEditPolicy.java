@@ -42,8 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 
-	private boolean isValidPosition =
-		true;
+	private boolean isValidPosition = true;
 
 	/*
 	 * (non-Javadoc)
@@ -51,8 +50,7 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 	 */
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-		final RectangleFigure r =
-			new RectangleFigure();
+		final RectangleFigure r = new RectangleFigure();
 		r.setLineStyle(Graphics.LINE_DASH);
 		r.setForegroundColor(ColorConstants.black);
 		r.setLineWidth(GUIDefaults.LEGEND_MOVING_FEEDBACK_BORDER_WIDTH);
@@ -76,36 +74,28 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
 		// Get the position where the the user wants to move the legend to
-		final PrecisionRectangle rect =
-			new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
+		final PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
 		// Check that no figure intersects with the new position of the legend
-		final Rectangle newFeedback =
-			new Rectangle(rect.getLocation(), rect.getSize());
+		final Rectangle newFeedback = new Rectangle(rect.getLocation(), rect.getSize());
 		getHostFigure().translateToRelative(newFeedback);
-		final List<?> children =
-			getHostFigure().getParent().getChildren();
+		final List<?> children = getHostFigure().getParent().getChildren();
 		for (final Object f : children) {
-			if ((f instanceof Figure)
-				&& !(f instanceof LegendFigure)) {
-				final Figure fFigure =
-					(Figure) f;
+			if ((f instanceof Figure) && !(f instanceof LegendFigure)) {
+				final Figure fFigure = (Figure) f;
 				if (newFeedback.intersects(fFigure.getBounds())) {
-					isValidPosition =
-						false;
+					isValidPosition = false;
 				}
 			}
 		}
 
 		// Create new feedback
-		final IFigure feedback =
-			getDragSourceFeedbackFigure();
+		final IFigure feedback = getDragSourceFeedbackFigure();
 		if (feedback instanceof RectangleFigure) {
-			final RectangleFigure r =
-				(RectangleFigure) feedback;
+			final RectangleFigure r = (RectangleFigure) feedback;
 			if (isValidPosition) {
 				r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_VALID);
 				r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);
@@ -117,8 +107,7 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 		feedback.translateToRelative(rect);
 		feedback.setBounds(rect);
 		feedback.validate();
-		isValidPosition =
-			true;
+		isValidPosition = true;
 	}
 
 	@Override

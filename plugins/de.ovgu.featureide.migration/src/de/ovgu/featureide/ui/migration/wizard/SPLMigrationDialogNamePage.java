@@ -41,8 +41,7 @@ import de.ovgu.featureide.migration.impl.DefaultSPLMigrator;
 
 public class SPLMigrationDialogNamePage extends WizardPage {
 
-	protected GridData gridDataFill =
-		new GridData(GridData.FILL_HORIZONTAL);
+	protected GridData gridDataFill = new GridData(GridData.FILL_HORIZONTAL);
 
 	private Text newProjectName;
 
@@ -54,35 +53,26 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NONE);
-		final GridLayout gridLayout =
-			new GridLayout();
+		final Composite container = new Composite(parent, SWT.NONE);
+		final GridLayout gridLayout = new GridLayout();
 
-		gridLayout.numColumns =
-			1;
+		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		gridLayout.numColumns =
-			2;
+		gridLayout.numColumns = 2;
 
-		final Group nameGroup =
-			new Group(container, SWT.NONE);
+		final Group nameGroup = new Group(container, SWT.NONE);
 		nameGroup.setLayout(gridLayout);
 		nameGroup.setLayoutData(gridDataFill);
 
-		final String tooltip =
-			GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
+		final String tooltip = GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
 
-		final Label newProductNameLabel =
-			new Label(nameGroup, SWT.NULL);
+		final Label newProductNameLabel = new Label(nameGroup, SWT.NULL);
 		newProductNameLabel.setText("&Project Name:");
 		newProductNameLabel.setToolTipText(tooltip);
 
-		newProjectName =
-			new Text(nameGroup, SWT.BORDER
-				| SWT.SINGLE);
+		newProjectName = new Text(nameGroup, SWT.BORDER | SWT.SINGLE);
 		newProjectName.setLayoutData(gridDataFill);
 		newProjectName.setText(DefaultSPLMigrator.DEFAULT_PROJECT_NAME);
 		newProjectName.setToolTipText(tooltip);
@@ -124,9 +114,7 @@ public class SPLMigrationDialogNamePage extends WizardPage {
 
 	@Override
 	public boolean canFlipToNextPage() {
-		return !((getProjectName() == null)
-			|| getProjectName().isEmpty())
-			&& isPageComplete();
+		return !((getProjectName() == null) || getProjectName().isEmpty()) && isPageComplete();
 	}
 
 }

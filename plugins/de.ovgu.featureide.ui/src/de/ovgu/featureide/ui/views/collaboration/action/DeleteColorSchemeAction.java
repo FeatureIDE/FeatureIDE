@@ -37,8 +37,7 @@ public class DeleteColorSchemeAction extends AbstractColorAction {
 
 	public DeleteColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 	}
 
 	/*

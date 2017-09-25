@@ -38,20 +38,17 @@ public class RoleFigureLabel extends Label {
 
 	public RoleFigureLabel(String text, Image image, String elementName, RoleElement<?> element) {
 		this(text, image, elementName);
-		roleElement =
-			element;
+		roleElement = element;
 	}
 
 	public RoleFigureLabel(String text, Image image, String elementName) {
 		super(text, image);
-		this.elementName =
-			elementName;
+		this.elementName = elementName;
 	}
 
 	public RoleFigureLabel(String text, String elementName) {
 		super(text);
-		this.elementName =
-			elementName;
+		this.elementName = elementName;
 	}
 
 	public String getElementName() {

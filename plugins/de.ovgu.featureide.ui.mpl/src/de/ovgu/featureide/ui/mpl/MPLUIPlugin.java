@@ -31,8 +31,7 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
  */
 public class MPLUIPlugin extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.ui.mpl";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.ui.mpl";
 
 	private static MPLUIPlugin plugin;
 
@@ -44,14 +43,12 @@ public class MPLUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

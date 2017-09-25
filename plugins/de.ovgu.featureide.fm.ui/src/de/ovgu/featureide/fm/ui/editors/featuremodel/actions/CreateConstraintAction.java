@@ -38,8 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
-	private static ImageDescriptor createImage =
-		PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	public CreateConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, CREATE_CONSTRAINT);

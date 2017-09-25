@@ -54,10 +54,8 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		final Set<Integer> indexes =
-			getMinimalUnsatisfiableSubsetIndexes();
-		final Set<Node> mus =
-			new LinkedHashSet<>(indexes.size());
+		final Set<Integer> indexes = getMinimalUnsatisfiableSubsetIndexes();
+		final Set<Node> mus = new LinkedHashSet<>(indexes.size());
 		for (final int index : indexes) {
 			mus.add(getClause(index));
 		}
@@ -71,13 +69,11 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		}
 		final int[] indexes;
 		try {
-			indexes =
-				getOracle().minimalExplanation();
+			indexes = getOracle().minimalExplanation();
 		} catch (final TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set =
-			new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}

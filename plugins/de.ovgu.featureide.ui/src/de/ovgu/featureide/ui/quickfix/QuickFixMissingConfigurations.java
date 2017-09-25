@@ -49,15 +49,12 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
  */
 public abstract class QuickFixMissingConfigurations implements IMarkerResolution {
 
-	private static final String PREFIX =
-		CONFIGURATION;
-	private static final AbstractCorePlugin LOGGER =
-		FMCorePlugin.getDefault();
+	private static final String PREFIX = CONFIGURATION;
+	private static final AbstractCorePlugin LOGGER = FMCorePlugin.getDefault();
 
 	protected final IFeatureProject project;
 	protected IFeatureModel featureModel;
-	private int configurationNr =
-		0;
+	private int configurationNr = 0;
 
 	@Override
 	public String getLabel() {
@@ -66,51 +63,38 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 
 	public QuickFixMissingConfigurations(final IMarker marker) {
 		if (marker != null) {
-			project =
-				CorePlugin.getFeatureProject(marker.getResource());
+			project = CorePlugin.getFeatureProject(marker.getResource());
 			if (project == null) {
-				featureModel =
-					null;
+				featureModel = null;
 			} else {
-				featureModel =
-					project.getFeatureModel();
+				featureModel = project.getFeatureModel();
 			}
 		} else {
-			featureModel =
-				null;
-			project =
-				null;
+			featureModel = null;
+			project = null;
 		}
 	}
 
 	public QuickFixMissingConfigurations(IFeatureModel model) {
-		featureModel =
-			model;
-		project =
-			null;
+		featureModel = model;
+		project = null;
 	}
 
 	protected IFile getConfigurationFile(final IFolder configFolder) {
-		IFile newConfig =
-			null;
-		while ((newConfig == null)
-			|| newConfig.exists()) {
-			newConfig =
-				configFolder.getFile(getConfigurationName(configurationNr));
+		IFile newConfig = null;
+		while ((newConfig == null) || newConfig.exists()) {
+			newConfig = configFolder.getFile(getConfigurationName(configurationNr));
 			configurationNr++;
 		}
 		return newConfig;
 	}
 
 	protected void writeConfigurations(final Collection<Configuration> confs) {
-		final FileHandler<Configuration> writer =
-			new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		try {
-			configurationNr =
-				0;
+			configurationNr = 0;
 			for (final Configuration c : confs) {
-				final IFile configurationFile =
-					getConfigurationFile(project.getConfigFolder());
+				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
 				writer.write(Paths.get(configurationFile.getLocationURI()), c);
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
@@ -120,17 +104,12 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 
 	private String getConfigurationName(final int number) {
-		return PREFIX
-			+ number
-			+ "."
-			+ project.getComposer().getConfigurationExtension();
+		return PREFIX + number + "." + project.getComposer().getConfigurationExtension();
 	}
 
 	protected String createShortMessage(Collection<String> features) {
-		final StringBuilder message =
-			new StringBuilder();
-		int addedFeatures =
-			0;
+		final StringBuilder message = new StringBuilder();
+		int addedFeatures = 0;
 		for (final String feature : features) {
 			message.append(feature);
 			message.append(", ");

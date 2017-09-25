@@ -49,8 +49,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IConstraint)) {
+		if ((subject != null) && !(subject instanceof IConstraint)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -64,8 +63,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	@Override
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc =
-			super.createNodeCreator();
+		final AdvancedNodeCreator nc = super.createNodeCreator();
 		nc.setModelType(ModelType.OnlyStructure);
 		return nc;
 	}
@@ -78,20 +76,14 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 * @return amount of clauses added
 	 */
 	private int addConstraint(IConstraint constraint, boolean negated) {
-		final AdvancedNodeCreator nc =
-			getNodeCreator();
-		int i =
-			getTraceModel().getTraceCount();
-		final Node constraintNode =
-			nc.createConstraintNode(constraint, negated);
-		int clauseCount =
-			0;
+		final AdvancedNodeCreator nc = getNodeCreator();
+		int i = getTraceModel().getTraceCount();
+		final Node constraintNode = nc.createConstraintNode(constraint, negated);
+		int clauseCount = 0;
 		for (final Node clause : constraintNode.getChildren()) {
-			final int added =
-				getOracle().addFormula(clause);
+			final int added = getOracle().addFormula(clause);
 			if (added > 0) {
-				clauseCount +=
-					added;
+				clauseCount += added;
 				i++;
 			} else {
 				getTraceModel().removeTrace(i);
@@ -103,30 +95,24 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
 		final RedundantConstraintExplanation explanation;
-		final MusExtractor oracle =
-			getOracle();
+		final MusExtractor oracle = getOracle();
 		oracle.push();
-		int constraintClauseCount =
-			0;
+		int constraintClauseCount = 0;
 		try {
 			// Add each constraint but the redundant one.
 			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
 				if (constraint == getSubject()) {
 					continue;
 				}
-				constraintClauseCount +=
-					addConstraint(constraint, true);
+				constraintClauseCount += addConstraint(constraint, true);
 			}
 
 			// Add the negated redundant constraint.
-			redundantConstraintClauseCount =
-				addConstraint(getSubject(), false);
-			constraintClauseCount +=
-				redundantConstraintClauseCount;
+			redundantConstraintClauseCount = addConstraint(getSubject(), false);
+			constraintClauseCount += redundantConstraintClauseCount;
 
 			// Get the explanation.
-			explanation =
-				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);
@@ -146,8 +132,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	@Override
 	protected Reason getReason(int clauseIndex) {
-		if (clauseIndex >= (getTraceModel().getTraceCount()
-			- redundantConstraintClauseCount)) {
+		if (clauseIndex >= (getTraceModel().getTraceCount() - redundantConstraintClauseCount)) {
 			return null; // Ignore the redundant constraint clauses.
 		}
 		return super.getReason(clauseIndex);

@@ -18,14 +18,8 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		switch (index) {
 		case 0:
 			if (obj instanceof FileProxy) {
-				return ((FileProxy) obj).getFileName()
-					+ " ("
-					+ ((FileProxy) obj).getLogs().size()
-					+ ERROR
-					+ ((((FileProxy) obj).getLogs().size() == 1)
-						? ""
-						: "s")
-					+ ")";
+				return ((FileProxy) obj).getFileName() + " (" + ((FileProxy) obj).getLogs().size() + ERROR
+					+ ((((FileProxy) obj).getLogs().size() == 1) ? "" : "s") + ")";
 			}
 			if (obj instanceof Log) {
 				return ((Log) obj).getMessage();
@@ -55,17 +49,14 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public Image getColumnImage(Object obj, int index) {
 		switch (index) {
 		case 0:
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 		case 1:
 			if (obj instanceof Log) {
-				return PlatformUI.getWorkbench().getSharedImages()
-						.getImage(ISharedImages.IMG_OBJ_FILE);
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
 			}
 		case 2:
 			if (obj instanceof Log) {
-				return PlatformUI.getWorkbench().getSharedImages()
-						.getImage(ISharedImages.IMG_OBJ_FOLDER);
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 			}
 		default:
 			return null;

@@ -39,8 +39,7 @@ public class FeatureModelReason extends Reason {
 	 * @param trace the trace of this reason; not null
 	 */
 	public FeatureModelReason(FeatureModelElementTrace trace) {
-		this.trace =
-			trace;
+		this.trace = trace;
 	}
 
 	/**
@@ -50,8 +49,7 @@ public class FeatureModelReason extends Reason {
 	 */
 	protected FeatureModelReason(FeatureModelReason reason) {
 		super(reason);
-		trace =
-			reason.trace;
+		trace = reason.trace;
 	}
 
 	/**
@@ -82,16 +80,9 @@ public class FeatureModelReason extends Reason {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((trace == null)
-					? 0
-					: trace.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((trace == null) ? 0 : trace.hashCode());
 		return result;
 	}
 
@@ -106,8 +97,7 @@ public class FeatureModelReason extends Reason {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FeatureModelReason other =
-			(FeatureModelReason) obj;
+		final FeatureModelReason other = (FeatureModelReason) obj;
 		if (trace == null) {
 			if (other.trace != null) {
 				return false;

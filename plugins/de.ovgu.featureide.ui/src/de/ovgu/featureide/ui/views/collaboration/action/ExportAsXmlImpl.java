@@ -59,26 +59,20 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 
 	@Override
 	public void run() {
-		final String file =
-			createXmlSaveDialog().open();
+		final String file = createXmlSaveDialog().open();
 		if (file == null) {
 			return;
 		}
 
 		try {
-			final XMLStreamWriter sw =
-				XMLOutputFactory.newInstance().createXMLStreamWriter(
-						new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			final XMLStreamWriter sw = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			sw.writeStartDocument("utf-8", "1.0");
 			sw.writeStartElement("configuration");
-			final ModelEditPart mep =
-				(ModelEditPart) viewer.getContents();
+			final ModelEditPart mep = (ModelEditPart) viewer.getContents();
 			for (final Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
-					final CollaborationEditPart cep =
-						(CollaborationEditPart) child;
-					final FSTFeature feature =
-						cep.getCollaborationModel();
+					final CollaborationEditPart cep = (CollaborationEditPart) child;
+					final FSTFeature feature = cep.getCollaborationModel();
 					if (!(feature instanceof FSTConfiguration)) {
 						writeElement(sw, feature);
 					} else {
@@ -96,10 +90,8 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 	}
 
 	private FileDialog createXmlSaveDialog() {
-		final FileDialog dlg =
-			new FileDialog(new Shell(), SWT.SAVE);
-		dlg.setFilterExtensions(new String[] {
-			"*.xml" });
+		final FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
+		dlg.setFilterExtensions(new String[] { "*.xml" });
 		dlg.setOverwrite(true);
 		return dlg;
 	}

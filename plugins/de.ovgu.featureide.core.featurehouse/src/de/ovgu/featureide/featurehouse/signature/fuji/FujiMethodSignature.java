@@ -41,16 +41,12 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	protected List<ParameterDeclaration> parameterList;
 	protected List<Access> exceptionList;
 
-	public FujiMethodSignature(AbstractClassSignature parent, String name,
-			String modifier, TypeDecl returnType, boolean isConstructor,
+	public FujiMethodSignature(AbstractClassSignature parent, String name, String modifier, TypeDecl returnType, boolean isConstructor,
 			List<ParameterDeclaration> parameterList, List<Access> exceptionList) {
 		super(parent, name, modifier, returnType.name(), new LinkedList<String>(), isConstructor);
-		this.returnType =
-			returnType;
-		this.parameterList =
-			parameterList;
-		this.exceptionList =
-			exceptionList;
+		this.returnType = returnType;
+		this.parameterList = parameterList;
+		this.exceptionList = exceptionList;
 		for (final ParameterDeclaration parameter : parameterList) {
 			parameterTypes.add(parameter.type().name());
 		}
@@ -58,8 +54,7 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 
 	@Override
 	public String toString() {
-		final StringBuilder methodString =
-			new StringBuilder();
+		final StringBuilder methodString = new StringBuilder();
 
 //		methodString.append(super.toString());
 //		if (methodString.length() > 0) {
@@ -84,14 +79,12 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 
 		methodString.append(name);
 		methodString.append('(');
-		boolean notfirst =
-			false;
+		boolean notfirst = false;
 		for (final ParameterDeclaration parameter : parameterList) {
 			if (notfirst) {
 				methodString.append(", ");
 			} else {
-				notfirst =
-					true;
+				notfirst = true;
 			}
 			methodString.append(parameter.type().name());
 			methodString.append(' ');
@@ -100,15 +93,13 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		methodString.append(')');
 
 		if (exceptionList.getNumChild() > 0) {
-			notfirst =
-				false;
+			notfirst = false;
 			methodString.append(" throws ");
 			for (final Access exception : exceptionList) {
 				if (notfirst) {
 					methodString.append(", ");
 				} else {
-					notfirst =
-						true;
+					notfirst = true;
 				}
 				methodString.append(exception.type().name());
 			}
@@ -121,22 +112,11 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	protected void computeHashCode() {
 		super.computeHashCode();
 
-		hashCode =
-			(hashCodePrime
-				* hashCode)
-				+ type.hashCode();
+		hashCode = (hashCodePrime * hashCode) + type.hashCode();
 
-		hashCode =
-			(hashCodePrime
-				* hashCode)
-				+ (isConstructor
-					? 1231
-					: 1237);
+		hashCode = (hashCodePrime * hashCode) + (isConstructor ? 1231 : 1237);
 		for (final ParameterDeclaration parameter : parameterList) {
-			hashCode =
-				(hashCodePrime
-					* hashCode)
-					+ parameter.type().name().hashCode();
+			hashCode = (hashCodePrime * hashCode) + parameter.type().name().hashCode();
 		}
 	}
 
@@ -145,13 +125,11 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 
-		final FujiMethodSignature otherSig =
-			(FujiMethodSignature) obj;
+		final FujiMethodSignature otherSig = (FujiMethodSignature) obj;
 
 		if (!super.sigEquals(otherSig)) {
 			return false;
@@ -168,10 +146,8 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 			return false;
 		}
 
-		final Iterator<ParameterDeclaration> thisIt =
-			parameterList.iterator();
-		final Iterator<ParameterDeclaration> otherIt =
-			otherSig.parameterList.iterator();
+		final Iterator<ParameterDeclaration> thisIt = parameterList.iterator();
+		final Iterator<ParameterDeclaration> otherIt = otherSig.parameterList.iterator();
 		while (thisIt.hasNext()) {
 			if (thisIt.next().type() != otherIt.next().type()) {
 				return false;

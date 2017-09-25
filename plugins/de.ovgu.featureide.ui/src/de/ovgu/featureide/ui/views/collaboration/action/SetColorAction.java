@@ -40,8 +40,7 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
  */
 public class SetColorAction extends AbstractColorAction {
 
-	private static final RGB BLACK =
-		new RGB(0, 0, 0);
+	private static final RGB BLACK = new RGB(0, 0, 0);
 
 	/**
 	 * ImageDescriptor for the "colorsquare" in the contextmenu
@@ -51,23 +50,12 @@ public class SetColorAction extends AbstractColorAction {
 		protected final ImageData id;
 
 		public UnselectedColorDescriptor(int color) {
-			id =
-				new ImageData(40, 20, 2, new PaletteData(new RGB[] {
-					ColorPalette.getRGB(color, 0.2f),
-					BLACK,
-					BLACK,
-					BLACK }));
-			id.transparentPixel =
-				3;
+			id = new ImageData(40, 20, 2, new PaletteData(new RGB[] { ColorPalette.getRGB(color, 0.2f), BLACK, BLACK, BLACK }));
+			id.transparentPixel = 3;
 
-			for (int i =
-				0; i < id.data.length; i +=
-					id.bytesPerLine) {
-				for (int j =
-					0; j < 5; j++) {
-					id.data[i
-						+ j] =
-							(byte) 0xff;
+			for (int i = 0; i < id.data.length; i += id.bytesPerLine) {
+				for (int j = 0; j < 5; j++) {
+					id.data[i + j] = (byte) 0xff;
 				}
 			}
 		}
@@ -86,76 +74,38 @@ public class SetColorAction extends AbstractColorAction {
 		public SelectedColorDescriptor(int color) {
 			super(color);
 
-			int offset =
-				6
-					* id.bytesPerLine;
-			for (int i =
-				offset; i < (id.data.length
-					- offset); i +=
-						id.bytesPerLine) {
-				id.data[i
-					+ 1] =
-						(byte) 0xd5;
-				id.data[i
-					+ 2] =
-						(byte) 0x55;
-				id.data[i
-					+ 3] =
-						(byte) 0x7f;
+			int offset = 6 * id.bytesPerLine;
+			for (int i = offset; i < (id.data.length - offset); i += id.bytesPerLine) {
+				id.data[i + 1] = (byte) 0xd5;
+				id.data[i + 2] = (byte) 0x55;
+				id.data[i + 3] = (byte) 0x7f;
 			}
-			id.data[offset
-				+ 1] =
-					(byte) 0xfd;
-			id.data[offset
-				+ 2] =
-					(byte) 0x57;
-			id.data[offset
-				+ 3] =
-					(byte) 0xff;
+			id.data[offset + 1] = (byte) 0xfd;
+			id.data[offset + 2] = (byte) 0x57;
+			id.data[offset + 3] = (byte) 0xff;
 
-			offset +=
-				id.bytesPerLine;
-			id.data[offset
-				+ 1] =
-					(byte) 0xf5;
-			id.data[offset
-				+ 3] =
-					(byte) 0xff;
+			offset += id.bytesPerLine;
+			id.data[offset + 1] = (byte) 0xf5;
+			id.data[offset + 3] = (byte) 0xff;
 
-			offset +=
-				5
-					* id.bytesPerLine;
-			id.data[offset
-				+ 1] =
-					(byte) 0xf5;
-			id.data[offset
-				+ 3] =
-					(byte) 0xff;
+			offset += 5 * id.bytesPerLine;
+			id.data[offset + 1] = (byte) 0xf5;
+			id.data[offset + 3] = (byte) 0xff;
 
-			offset +=
-				id.bytesPerLine;
-			id.data[offset
-				+ 1] =
-					(byte) 0xfd;
-			id.data[offset
-				+ 2] =
-					(byte) 0x57;
-			id.data[offset
-				+ 3] =
-					(byte) 0xff;
+			offset += id.bytesPerLine;
+			id.data[offset + 1] = (byte) 0xfd;
+			id.data[offset + 2] = (byte) 0x57;
+			id.data[offset + 3] = (byte) 0xff;
 		}
 	}
 
 	private final ImageDescriptor selectedColor, unselectedColor;
 
-	public SetColorAction(GraphicalViewerImpl view,
-			CollaborationView collaborationView, int index) {
+	public SetColorAction(GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
 		super(ColorPalette.getColorName(index), view, collaborationView, index);
 
-		selectedColor =
-			new SelectedColorDescriptor(index);
-		unselectedColor =
-			new UnselectedColorDescriptor(index);
+		selectedColor = new SelectedColorDescriptor(index);
+		unselectedColor = new UnselectedColorDescriptor(index);
 
 		setImageDescriptor(unselectedColor);
 	}
@@ -171,8 +121,7 @@ public class SetColorAction extends AbstractColorAction {
 
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		final IFeature feature =
-			fm.getFeature(collName);
+		final IFeature feature = fm.getFeature(collName);
 		if (feature != null) {
 			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
 			FeatureColorManager.notifyColorChange(feature);

@@ -64,10 +64,8 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 
 	public SPLCAToolConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject, String algorithm, int t) {
 		super(builder, featureModel, featureProject);
-		this.algorithm =
-			algorithm;
-		this.t =
-			t;
+		this.algorithm = algorithm;
+		this.t = t;
 	}
 
 	@Override
@@ -78,28 +76,21 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 
 	@SuppressWarnings("deprecation")
 	private void runSPLCATool() {
-		CoveringArray ca =
-			null;
-		final boolean casa =
-			algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
+		CoveringArray ca = null;
+		final boolean casa = algorithm.equals(CASA.substring(0, CASA.indexOf(" ")));
 		try {
 			if (casa) {
-				URL url =
-					BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
+				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
 				try {
-					url =
-						FileLocator.toFileURL(url);
+					url = FileLocator.toFileURL(url);
 				} catch (final IOException e) {
 					UIPlugin.getDefault().logError(e);
 				}
-				final Path path =
-					new Path(url.getFile());
-				CoveringArrayCASA.CASA_PATH =
-					path.toOSString();
+				final Path path = new Path(url.getFile());
+				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
-			ca =
-				new GUIDSL(new de.ovgu.featureide.fm.core.FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			ca = new GUIDSL(new de.ovgu.featureide.fm.core.FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
 				return;
 			}
@@ -108,39 +99,27 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 			UIPlugin.getDefault().logError(e);
 			return;
 		} catch (final Exception e) {
-			final Display display =
-				Display.getDefault();
+			final Display display = Display.getDefault();
 			display.syncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					final String errorMessage =
-						algorithm
-							+ " experienced an error during its execution.\n"
-							+ (casa
-								? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)"
-								: "Message:\n\t"
-									+ e.getMessage());
+					final String errorMessage = algorithm + " experienced an error during its execution.\n"
+						+ (casa ? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
 					new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
-							new String[] {
-								OK },
-							0).open();
+							new String[] { OK }, 0).open();
 				}
 			});
 			return;
 		}
 
-		List<List<String>> solutions =
-			Collections.emptyList();
+		List<List<String>> solutions = Collections.emptyList();
 		try {
-			solutions =
-				removeDuplicates(ca);
+			solutions = removeDuplicates(ca);
 		} catch (final Exception e) {
-			UIPlugin.getDefault().logWarning("Problems occurred during the execution of "
-				+ algorithm);
+			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
 		}
-		builder.configurationNumber =
-			solutions.size();
+		builder.configurationNumber = solutions.size();
 		for (final List<String> solution : solutions) {
 			configuration.resetValues();
 			for (final String selection : solution) {
@@ -156,23 +135,16 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	 * @return Duplicate free solutions
 	 */
 	private List<List<String>> removeDuplicates(final CoveringArray ca) {
-		final List<List<Integer>> solutions =
-			ca.getSolutionsAsList();
-		final HashSet<List<String>> duplicateFreeSolutions =
-			new HashSet<>();
-		final List<List<String>> duplicateFreeSolutionList =
-			new ArrayList<>();
+		final List<List<Integer>> solutions = ca.getSolutionsAsList();
+		final HashSet<List<String>> duplicateFreeSolutions = new HashSet<>();
+		final List<List<String>> duplicateFreeSolutionList = new ArrayList<>();
 		for (final List<Integer> solution : solutions) {
-			final List<String> convertedSolution =
-				new ArrayList<>();
+			final List<String> convertedSolution = new ArrayList<>();
 			for (final Integer i : solution) {
 				if (i > 0) {
-					final String id =
-						ca.getId(i);
-					final IFeature feature =
-						featureModel.getFeature(id);
-					if ((feature != null)
-						&& feature.getStructure().isConcrete()) {
+					final String id = ca.getId(i);
+					final IFeature feature = featureModel.getFeature(id);
+					if ((feature != null) && feature.getStructure().isConcrete()) {
 						convertedSolution.add(feature.getName());
 					}
 				}
@@ -182,12 +154,9 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 				duplicateFreeSolutionList.add(convertedSolution);
 			}
 		}
-		final int difference =
-			solutions.size()
-				- duplicateFreeSolutions.size();
+		final int difference = solutions.size() - duplicateFreeSolutions.size();
 		if (difference > 0) {
-			UIPlugin.getDefault().logInfo(difference
-				+ " duplicate solutions skipped!");
+			UIPlugin.getDefault().logInfo(difference + " duplicate solutions skipped!");
 		}
 		return duplicateFreeSolutionList;
 	}

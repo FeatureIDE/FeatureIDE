@@ -70,25 +70,19 @@ public class SPLMigrationUtils {
 	 * @throws CoreException
 	 */
 	public static void recursiveCopyFiles(IContainer source, IContainer destination) throws CoreException {
-		final IResource[] members =
-			source.members();
-		for (int i =
-			0; i < members.length; i++) {
-			final IResource member =
-				members[i];
-			final IPath currentPath =
-				new Path(member.getName());
+		final IResource[] members = source.members();
+		for (int i = 0; i < members.length; i++) {
+			final IResource member = members[i];
+			final IPath currentPath = new Path(member.getName());
 
 			if (member instanceof IContainer) {
-				final IFolder subFolder =
-					destination.getFolder(currentPath);
+				final IFolder subFolder = destination.getFolder(currentPath);
 				if (!subFolder.exists()) {
 					member.copy(subFolder.getFullPath(), true, null);
 					recursiveCopyFiles((IContainer) member, subFolder);
 				}
 			} else if (member instanceof IFile) {
-				final IFile copyFile =
-					destination.getFile(currentPath);
+				final IFile copyFile = destination.getFile(currentPath);
 				if (!copyFile.exists()) {
 					member.copy(copyFile.getFullPath(), true, null);
 				}
@@ -105,38 +99,26 @@ public class SPLMigrationUtils {
 	 * @param path a path relative to the project root.
 	 */
 	public static void createFolderInProject(IProject project, IPath path) {
-		if ((path == null)
-			|| path.isEmpty()) {
+		if ((path == null) || path.isEmpty()) {
 			return;
 		}
 
-		final IFolder newFolder =
-			project.getFolder(path);
+		final IFolder newFolder = project.getFolder(path);
 		if (newFolder.exists()) {
-			assert false : "Trying to create an already existing folder: "
-				+ path;
-			System.out.println(FOLDER
-				+ path
-				+ ALREADY_EXISTS);
+			assert false : "Trying to create an already existing folder: " + path;
+			System.out.println(FOLDER + path + ALREADY_EXISTS);
 			return;
 		}
 		try {
 			newFolder.create(true, true, null);
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-			System.out.println(CREATION_OF_FOLDER
-				+ path
-				+ SUCCESSFUL);
+			System.out.println(CREATION_OF_FOLDER + path + SUCCESSFUL);
 		} catch (final CoreException e) {
-			System.out.println(CREATION_OF_FOLDER
-				+ path
-				+ " lead to CoreException:"
-				+ e.getMessage());
+			System.out.println(CREATION_OF_FOLDER + path + " lead to CoreException:" + e.getMessage());
 			e.printStackTrace();
 		}
 		if (!newFolder.exists()) {
-			System.out.println(FOLDER
-				+ path
-				+ DOES_NOT_EXIST_AFTER_CREATION);
+			System.out.println(FOLDER + path + DOES_NOT_EXIST_AFTER_CREATION);
 		}
 
 	}
@@ -150,12 +132,8 @@ public class SPLMigrationUtils {
 	 * @see {@link #createFolderInProject(IProject, IPath)}
 	 */
 	public static void createFolderInProject(IProject project, String path) {
-		final IPath newPath =
-			new Path(path);
-		System.out.println(CREATING_FOLDER_AT
-			+ path
-			+ IN_PROJECT
-			+ project.getName());
+		final IPath newPath = new Path(path);
+		System.out.println(CREATING_FOLDER_AT + path + IN_PROJECT + project.getName());
 		createFolderInProject(project, newPath);
 	}
 
@@ -166,12 +144,9 @@ public class SPLMigrationUtils {
 	 * @return the new {@link IProject} if successful, null if not.
 	 */
 	public static IProject createProject(String projectName) {
-		final IProject newProject =
-			ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		final IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (newProject.exists()) {
-			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT
-				+ projectName
-				+ BECAUSE_IT_ALREADY_EXISTS_);
+			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT + projectName + BECAUSE_IT_ALREADY_EXISTS_);
 		}
 
 		try {
@@ -194,15 +169,10 @@ public class SPLMigrationUtils {
 	 * @throws CoreException
 	 * @throws UnsupportedEncodingException
 	 */
-	public static void createConfigFile(IProject project, String configPath, String projectName)
-			throws CoreException, UnsupportedEncodingException {
-		final IFolder configFolder =
-			project.getFolder(configPath);
-		final IFile configFile =
-			configFolder.getFile(projectName
-				+ ".config");
-		final InputStream defaultContent =
-			new ByteArrayInputStream(projectName.getBytes("UTF-8"));
+	public static void createConfigFile(IProject project, String configPath, String projectName) throws CoreException, UnsupportedEncodingException {
+		final IFolder configFolder = project.getFolder(configPath);
+		final IFile configFile = configFolder.getFile(projectName + ".config");
+		final InputStream defaultContent = new ByteArrayInputStream(projectName.getBytes("UTF-8"));
 
 		configFile.create(defaultContent, true, null);
 
@@ -215,14 +185,10 @@ public class SPLMigrationUtils {
 	 * @param featureModel
 	 */
 	public static void writeFeatureModelToDefaultFile(IProject featureProject, IFeatureModel featureModel) {
-		final IFeatureModelFormat format =
-			new XmlFeatureModelFormat();
-		final ProblemList problems =
-			SimpleFileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()),
-					featureModel, format);
+		final IFeatureModelFormat format = new XmlFeatureModelFormat();
+		final ProblemList problems = SimpleFileHandler.save(Paths.get(featureProject.getFile("model.xml").getLocationURI()), featureModel, format);
 		if (problems.containsError()) {
-			final ProblemList errors =
-				problems.getErrors();
+			final ProblemList errors = problems.getErrors();
 			SPLMigrationPlugin.getDefault().logError(errors.toString(), new Exception());
 		}
 	}
@@ -244,8 +210,6 @@ public class SPLMigrationUtils {
 			e.printStackTrace();
 		}
 
-		return folder.exists()
-			? folder.getFullPath()
-			: null;
+		return folder.exists() ? folder.getFullPath() : null;
 	}
 }

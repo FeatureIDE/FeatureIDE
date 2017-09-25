@@ -25,9 +25,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 public class NewInterfaceWizard extends AbstractWizard {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".wizards.InterfaceWizard";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.InterfaceWizard";
 
 	public NewInterfaceWizard(String title) {
 		super(title);

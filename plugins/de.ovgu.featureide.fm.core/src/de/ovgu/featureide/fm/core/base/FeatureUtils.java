@@ -64,63 +64,57 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  */
 public final class FeatureUtils {
 
-	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING =
-		new IFunction<CharSequence, String>() {
+	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING = new IFunction<CharSequence, String>() {
 
-			@Override
-			public String invoke(CharSequence t) {
-				requireNonNull(t);
+		@Override
+		public String invoke(CharSequence t) {
+			requireNonNull(t);
 
-				return t.toString();
-			}
+			return t.toString();
+		}
 
-		};
+	};
 
-	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER =
-		new ConcreteFeatureFilter();
+	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
-	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE =
-		new IFunction<IConstraint, Node>() {
+	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
 
-			@Override
-			public Node invoke(IConstraint t) {
-				requireNonNull(t);
+		@Override
+		public Node invoke(IConstraint t) {
+			requireNonNull(t);
 
-				return t.getNode();
-			}
+			return t.getNode();
+		}
 
-		};
+	};
 
-	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE =
-		new IFunction<IFeature, IFeatureStructure>() {
+	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new IFunction<IFeature, IFeatureStructure>() {
 
-			@Override
-			public IFeatureStructure invoke(IFeature t) {
-				requireNonNull(t);
+		@Override
+		public IFeatureStructure invoke(IFeature t) {
+			requireNonNull(t);
 
-				return t.getStructure();
-			}
-		};
+			return t.getStructure();
+		}
+	};
 
-	public static final IFunction<IFeature, String> GET_FEATURE_NAME =
-		new IFunction<IFeature, String>() {
+	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
 
-			@Override
-			public String invoke(IFeature t) {
-				return t.getName();
-			}
-		};
+		@Override
+		public String invoke(IFeature t) {
+			return t.getName();
+		}
+	};
 
-	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE =
-		new IFunction<IFeatureStructure, IFeature>() {
+	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
 
-			@Override
-			public IFeature invoke(IFeatureStructure t) {
-				requireNonNull(t);
+		@Override
+		public IFeature invoke(IFeatureStructure t) {
+			requireNonNull(t);
 
-				return t.getFeature();
-			}
-		};
+			return t.getFeature();
+		}
+	};
 
 	public static final void addAnnotation(IFeatureModel featureModel, CharSequence annotation) {
 		requireNonNull(featureModel);
@@ -447,10 +441,8 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraint);
 
-		final List<IConstraint> constraints =
-			featureModel.getConstraints();
-		for (int i =
-			0; i < constraints.size(); i++) {
+		final List<IConstraint> constraints = featureModel.getConstraints();
+		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).equals(constraint)) {
 				return i;
 			}
@@ -480,26 +472,20 @@ public final class FeatureUtils {
 		requireNonNull(constraint);
 		requireNonNull(fmDeadFeatures);
 
-		Collection<IFeature> deadFeaturesBefore =
-			null;
-		final Node propNode =
-			constraint.getNode();
+		Collection<IFeature> deadFeaturesBefore = null;
+		final Node propNode = constraint.getNode();
 		if (propNode != null) {
 			fm.removeConstraint(constraint);
-			deadFeaturesBefore =
-				fm.getAnalyser().getDeadFeatures();
+			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
 			fm.addConstraint(new Constraint(fm, propNode));
 			fm.handleModelDataChanged();
 		}
 
-		final Collection<IFeature> deadFeaturesAfter =
-			new LinkedList<IFeature>();
+		final Collection<IFeature> deadFeaturesAfter = new LinkedList<IFeature>();
 		for (final IFeature f : fmDeadFeatures) {
-			final IFeature feature =
-				fm.getFeature(f.getName());
+			final IFeature feature = fm.getFeature(f.getName());
 			// XXX why can the given feature not be found?
-			if ((feature != null)
-				&& !deadFeaturesBefore.contains(feature)) {
+			if ((feature != null) && !deadFeaturesBefore.contains(feature)) {
 				deadFeaturesAfter.add(f);
 			}
 		}
@@ -652,8 +638,7 @@ public final class FeatureUtils {
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
-			final IFeatureStructure parent =
-				feature.getStructure().getParent();
+			final IFeatureStructure parent = feature.getStructure().getParent();
 			if (parent != null) {
 				return parent.getFeature();
 			}
@@ -689,18 +674,11 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 		requireNonNull(constraints);
 
-		final StringBuilder relevant =
-			new StringBuilder();
+		final StringBuilder relevant = new StringBuilder();
 		for (final IConstraint constraint : constraints) {
 			for (final IFeature f : constraint.getContainedFeatures()) {
-				if ((f != null)
-					&& f.getName().equals(feature.getName())) {
-					relevant.append((relevant.length() == 0
-						? ""
-						: "\n")
-						+ "\u2022 "
-						+ constraint.getNode().toString(NodeWriter.logicalSymbols)
-						+ " ");
+				if ((f != null) && f.getName().equals(feature.getName())) {
+					relevant.append((relevant.length() == 0 ? "" : "\n") + "\u2022 " + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}
 			}
@@ -717,8 +695,7 @@ public final class FeatureUtils {
 	public static final IFeature getRoot(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		final IFeatureStructure root =
-			featureModel.getStructure().getRoot();
+		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			return root.getFeature();
 		}
@@ -1009,27 +986,16 @@ public final class FeatureUtils {
 		requireNonNull(string);
 
 		string.append(feature.getName());
-		string.append(", mandatory="
-			+ FeatureUtils.isMandatory(feature));
-		final List<IFeatureStructure> struct =
-			feature.getStructure().getChildren();
-		final boolean isLeaf =
-			struct.isEmpty();
+		string.append(", mandatory=" + FeatureUtils.isMandatory(feature));
+		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
+		final boolean isLeaf = struct.isEmpty();
 		if (!isLeaf) {
-			final String prop =
-				FeatureUtils.isOr(feature)
-					? " or"
-					: FeatureUtils.isAlternative(feature)
-						? " alt"
-						: " and";
-			string.append(" "
-				+ prop);
+			final String prop = FeatureUtils.isOr(feature) ? " or" : FeatureUtils.isAlternative(feature) ? " alt" : " and";
+			string.append(" " + prop);
 			string.append("[");
-			for (int i =
-				0; i < struct.size(); i++) {
+			for (int i = 0; i < struct.size(); i++) {
 				print(struct.get(i).getFeature(), string);
-				if ((i
-					+ 1) < struct.size()) {
+				if ((i + 1) < struct.size()) {
 					string.append(", ");
 				}
 			}
@@ -1063,10 +1029,8 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraint);
 
-		final List<IConstraint> constraints =
-			featureModel.getConstraints();
-		final int index =
-			getConstraintIndex(featureModel, constraint);
+		final List<IConstraint> constraints = featureModel.getConstraints();
+		final int index = getConstraintIndex(featureModel, constraint);
 		tryRemoveConstraint(featureModel, constraints, index);
 	}
 
@@ -1098,15 +1062,11 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(node);
 
-		final List<IConstraint> constraints =
-			featureModel.getConstraints();
-		int index =
-			-1;
-		for (int i =
-			0; i < constraints.size(); i++) {
+		final List<IConstraint> constraints = featureModel.getConstraints();
+		int index = -1;
+		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).getNode().equals(node)) {
-				index =
-					i;
+				index = i;
 				break;
 			}
 		}
@@ -1247,24 +1207,17 @@ public final class FeatureUtils {
 	public static final boolean setFalseOptionalFeatures(IConstraint constraint) {
 		requireNonNull(constraint);
 
-		boolean found =
-			false;
+		boolean found = false;
 
-		final Collection<IFeature> falseOptionalFeatures =
-			new ArrayList<>();
-		final IFeatureModel featureModel =
-			constraint.getFeatureModel();
-		final IFeatureModel clonedModel =
-			FeatureUtils.clone(constraint.getFeatureModel());
+		final Collection<IFeature> falseOptionalFeatures = new ArrayList<>();
+		final IFeatureModel featureModel = constraint.getFeatureModel();
+		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
 		clonedModel.removeConstraint(constraint);
-		final Collection<IFeature> foFeatures =
-			clonedModel.getAnalyser().getFalseOptionalFeatures();
+		final Collection<IFeature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
 		for (final IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
-			if (!foFeatures.contains(clonedModel.getFeature(feature.getName()))
-				&& !falseOptionalFeatures.contains(feature)) {
+			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
-				found =
-					true;
+				found = true;
 			}
 		}
 		return found;
@@ -1350,8 +1303,7 @@ public final class FeatureUtils {
 	public static void setRelevantConstraints(IFeature bone) {
 		requireNonNull(bone);
 
-		final List<Constraint> constraintList =
-			new LinkedList<Constraint>();
+		final List<Constraint> constraintList = new LinkedList<Constraint>();
 		for (final IConstraint constraint : bone.getFeatureModel().getConstraints()) {
 			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
@@ -1393,13 +1345,9 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 
 		if (writeMarks) {
-			final String featureName =
-				feature.getName();
-			if (featureName.contains(" ")
-				|| Operator.isOperatorName(featureName)) {
-				return "\""
-					+ feature.getName()
-					+ "\"";
+			final String featureName = feature.getName();
+			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
+				return "\"" + feature.getName() + "\"";
 			}
 			return feature.getName();
 		} else {
@@ -1417,8 +1365,7 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraints);
 
-		if ((index == -1)
-			|| (index >= constraints.size())) {
+		if ((index == -1) || (index >= constraints.size())) {
 			throw new NoSuchElementException();
 		} else {
 			constraints.remove(index);
@@ -1431,10 +1378,8 @@ public final class FeatureUtils {
 	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {
 		requireNonNull(s);
 
-		final StringBuilder stringBuilder =
-			new StringBuilder();
-		int i =
-			0;
+		final StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
 		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierStart(s.charAt(i))) {
 				stringBuilder.append(s.charAt(i));
@@ -1451,16 +1396,11 @@ public final class FeatureUtils {
 	}
 
 	public static String[] getFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		final SatInstance satInstance =
-			featureGraph.getSatInstance();
-		final String[] featureNames =
-			new String[satInstance.getNumberOfVariables()];
+		final SatInstance satInstance = featureGraph.getSatInstance();
+		final String[] featureNames = new String[satInstance.getNumberOfVariables()];
 
-		for (int i =
-			0; i < featureNames.length; i++) {
-			featureNames[i] =
-				(String) satInstance.getVariableObject(i
-					+ 1);
+		for (int i = 0; i < featureNames.length; i++) {
+			featureNames[i] = (String) satInstance.getVariableObject(i + 1);
 		}
 		return featureNames;
 	}
@@ -1474,18 +1414,13 @@ public final class FeatureUtils {
 	}
 
 	private static String[] getNonCommonFeaturesFromFeatureGraph(IFeatureGraph featureGraph, int mode) {
-		final SatInstance satInstance =
-			featureGraph.getSatInstance();
-		final ArrayList<String> featureNames =
-			new ArrayList<>(satInstance.getNumberOfVariables());
+		final SatInstance satInstance = featureGraph.getSatInstance();
+		final ArrayList<String> featureNames = new ArrayList<>(satInstance.getNumberOfVariables());
 
-		final int[] index =
-			featureGraph.getIndex();
-		for (int i =
-			0; i < index.length; i++) {
+		final int[] index = featureGraph.getIndex();
+		for (int i = 0; i < index.length; i++) {
 			if (index[i] == mode) {
-				featureNames.add((String) satInstance.getVariableObject(i
-					+ 1));
+				featureNames.add((String) satInstance.getVariableObject(i + 1));
 			}
 		}
 		return featureNames.toArray(new String[0]);

@@ -29,13 +29,11 @@ import org.sat4j.specs.TimeoutException;
 public abstract class ModelComparator {
 
 	public static boolean eq(Node fmNode1, final Node fmNode2) throws TimeoutException {
-		return compare(fmNode2, fmNode1)
-			&& compare(fmNode1, fmNode2);
+		return compare(fmNode2, fmNode1) && compare(fmNode1, fmNode2);
 	}
 
 	public static boolean compare(Node fmNode1, final Node fmNode2) throws TimeoutException {
-		final CNFSolver solver =
-			new CNFSolver(fmNode1);
+		final CNFSolver solver = new CNFSolver(fmNode1);
 		try {
 			if (fmNode2 instanceof And) {
 				for (final Node clause : fmNode2.getChildren()) {
@@ -54,17 +52,12 @@ public abstract class ModelComparator {
 
 	private static boolean checkOr(final CNFSolver solver, Node clause) throws TimeoutException, UnkownLiteralException {
 		if (clause instanceof Or) {
-			final Node[] clauseChildren =
-				clause.getChildren();
-			final Literal[] literals =
-				new Literal[clauseChildren.length];
-			for (int k =
-				0; k < literals.length; k++) {
-				final Literal literal =
-					(Literal) clauseChildren[k].clone();
+			final Node[] clauseChildren = clause.getChildren();
+			final Literal[] literals = new Literal[clauseChildren.length];
+			for (int k = 0; k < literals.length; k++) {
+				final Literal literal = (Literal) clauseChildren[k].clone();
 				literal.flip();
-				literals[k] =
-					literal;
+				literals[k] = literal;
 			}
 			if (solver.isSatisfiable(literals)) {
 				return false;
@@ -76,11 +69,9 @@ public abstract class ModelComparator {
 	}
 
 	private static boolean checkLiteral(final CNFSolver solver, Node clause) throws TimeoutException, UnkownLiteralException {
-		final Literal literal =
-			(Literal) clause.clone();
+		final Literal literal = (Literal) clause.clone();
 		literal.flip();
-		if (solver.isSatisfiable(new Literal[] {
-			literal })) {
+		if (solver.isSatisfiable(new Literal[] { literal })) {
 			return false;
 		}
 		return true;

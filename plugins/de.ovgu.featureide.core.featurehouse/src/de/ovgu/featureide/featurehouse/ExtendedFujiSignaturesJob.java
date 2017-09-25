@@ -84,10 +84,8 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 			if (!(arg0 instanceof SignatureMethodAccess)) {
 				return false;
 			}
-			final SignatureMethodAccess comp =
-				(SignatureMethodAccess) arg0;
-			if ((featureID != comp.featureID)
-				|| !absSig.equals(comp.absSig)) {
+			final SignatureMethodAccess comp = (SignatureMethodAccess) arg0;
+			if ((featureID != comp.featureID) || !absSig.equals(comp.absSig)) {
 				return false;
 			}
 			return true;
@@ -95,27 +93,19 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 
 		@Override
 		public int hashCode() {
-			int hashCode =
-				featureID;
-			hashCode =
-				(37
-					* hashCode)
-					+ absSig.hashCode();
+			int hashCode = featureID;
+			hashCode = (37 * hashCode) + absSig.hashCode();
 			return hashCode;
 		}
 
 		@Override
 		public String toString() {
-			return featureID
-				+ "; "
-				+ absSig.toString();
+			return featureID + "; " + absSig.toString();
 		}
 
 		public SignatureMethodAccess(int featureID, AbstractSignature absSig) {
-			this.featureID =
-				featureID;
-			this.absSig =
-				absSig;
+			this.featureID = featureID;
+			this.absSig = absSig;
 		}
 	}
 
@@ -174,10 +164,8 @@ public class ExtendedFujiSignaturesJob implements LongRunningMethod<ProjectSigna
 	}
 
 	public ExtendedFujiSignaturesJob(IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
-		projectSignatures =
-			new ProjectSignatures(this.featureProject.getFeatureModel());
+		this.featureProject = featureProject;
+		projectSignatures = new ProjectSignatures(this.featureProject.getFeatureModel());
 //		this.featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
 	}
 

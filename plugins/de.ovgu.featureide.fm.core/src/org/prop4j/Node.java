@@ -48,31 +48,22 @@ public abstract class Node {
 	@SuppressWarnings("unchecked")
 	public void setChildren(Object... newChildren) {
 		// allow collections as parameters
-		if ((newChildren.length == 1)
-			&& (newChildren[0] instanceof Collection)) {
-			newChildren =
-				((Collection<Object>) newChildren[0]).toArray();
+		if ((newChildren.length == 1) && (newChildren[0] instanceof Collection)) {
+			newChildren = ((Collection<Object>) newChildren[0]).toArray();
 		}
 		// copy children and create literals
-		children =
-			new Node[newChildren.length];
-		for (int i =
-			0; i < children.length; i++) {
-			children[i] =
-				getNode(newChildren[i]);
+		children = new Node[newChildren.length];
+		for (int i = 0; i < children.length; i++) {
+			children[i] = getNode(newChildren[i]);
 		}
 	}
 
 	public void setChildren(Object leftChild, Object rightChild) {
-		children =
-			new Node[] {
-				getNode(leftChild),
-				getNode(rightChild) };
+		children = new Node[] { getNode(leftChild), getNode(rightChild) };
 	}
 
 	public void setChildren(Node[] newChildren) {
-		children =
-			newChildren;
+		children = newChildren;
 	}
 
 	public Node[] getChildren() {
@@ -109,68 +100,49 @@ public abstract class Node {
 	public abstract boolean isClausalNormalForm();
 
 	public Node toCNF() {
-		Node cnf =
-			this;
-		cnf =
-			cnf.eliminateNonCNFOperators();
-		cnf =
-			deMorgan(cnf);
+		Node cnf = this;
+		cnf = cnf.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
 		return cnf.clausifyCNF();
 	}
 
 	public Node toDNF() {
-		Node cnf =
-			this;
-		cnf =
-			cnf.eliminateNonCNFOperators();
-		cnf =
-			deMorgan(cnf);
+		Node cnf = this;
+		cnf = cnf.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
 		return cnf.clausifyDNF();
 	}
 
 	public Node toRegularCNF() {
-		Node regularCNFNode =
-			toCNF();
+		Node regularCNFNode = toCNF();
 		if (regularCNFNode instanceof And) {
-			final Node[] children =
-				regularCNFNode.getChildren();
-			for (int i =
-				0; i < children.length; i++) {
-				final Node child =
-					children[i];
+			final Node[] children = regularCNFNode.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
 				if (child instanceof Literal) {
-					children[i] =
-						new Or(child);
+					children[i] = new Or(child);
 				}
 			}
 		} else if (regularCNFNode instanceof Or) {
-			regularCNFNode =
-				new And(regularCNFNode);
+			regularCNFNode = new And(regularCNFNode);
 		} else if (regularCNFNode instanceof Literal) {
-			regularCNFNode =
-				new And(new Or(regularCNFNode));
+			regularCNFNode = new And(new Or(regularCNFNode));
 		}
 		return regularCNFNode;
 	}
 
 	public static Node buildCNF(Node node) {
-		Node cnf =
-			node.eliminateNonCNFOperators();
-		cnf =
-			deMorgan(cnf);
-		cnf =
-			buildCNF_rec(cnf);
+		Node cnf = node.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
+		cnf = buildCNF_rec(cnf);
 		return cnf;
 	}
 
 	protected final Node eliminateNonCNFOperators() {
 		if (children != null) {
-			final Node[] newChildren =
-				new Node[children.length];
-			for (int i =
-				0; i < children.length; i++) {
-				newChildren[i] =
-					children[i].eliminateNonCNFOperators();
+			final Node[] newChildren = new Node[children.length];
+			for (int i = 0; i < children.length; i++) {
+				newChildren[i] = children[i].eliminateNonCNFOperators();
 			}
 			return eliminateNonCNFOperators(newChildren);
 		} else {
@@ -184,45 +156,32 @@ public abstract class Node {
 		if (node instanceof Literal) {
 			return node;
 		} else if (node instanceof Not) {
-			final Node notChild =
-				node.getChildren()[0];
+			final Node notChild = node.getChildren()[0];
 			if (notChild instanceof Literal) {
-				final Literal clone =
-					(Literal) notChild.clone();
+				final Literal clone = (Literal) notChild.clone();
 				clone.flip();
 				return clone;
 			} else if (notChild instanceof Not) {
 				return deMorgan(notChild.getChildren()[0]);
 			} else if (notChild instanceof Or) {
-				final Node[] children =
-					notChild.getChildren();
-				final Node[] newChildren =
-					new Node[children.length];
-				for (int i =
-					0; i < children.length; i++) {
-					newChildren[i] =
-						deMorgan(new Not(children[i]));
+				final Node[] children = notChild.getChildren();
+				final Node[] newChildren = new Node[children.length];
+				for (int i = 0; i < children.length; i++) {
+					newChildren[i] = deMorgan(new Not(children[i]));
 				}
 				return new And(newChildren);
 			} else {
-				final Node[] children =
-					notChild.getChildren();
-				final Node[] newChildren =
-					new Node[children.length];
-				for (int i =
-					0; i < children.length; i++) {
-					newChildren[i] =
-						deMorgan(new Not(children[i]));
+				final Node[] children = notChild.getChildren();
+				final Node[] newChildren = new Node[children.length];
+				for (int i = 0; i < children.length; i++) {
+					newChildren[i] = deMorgan(new Not(children[i]));
 				}
 				return new Or(newChildren);
 			}
 		} else {
-			final Node[] children =
-				node.getChildren();
-			for (int i =
-				0; i < children.length; i++) {
-				children[i] =
-					deMorgan(children[i]);
+			final Node[] children = node.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				children[i] = deMorgan(children[i]);
 			}
 			return node;
 		}
@@ -232,20 +191,14 @@ public abstract class Node {
 		if (node instanceof Literal) {
 			return node;
 		} else if (node instanceof Or) {
-			final ArrayList<Node> newChildren =
-				new ArrayList<>();
-			Node[] children =
-				node.getChildren();
-			boolean containsAnd =
-				false;
-			for (int i =
-				0; i < children.length; i++) {
-				final Node newNode =
-					buildCNF_rec(children[i]);
+			final ArrayList<Node> newChildren = new ArrayList<>();
+			Node[] children = node.getChildren();
+			boolean containsAnd = false;
+			for (int i = 0; i < children.length; i++) {
+				final Node newNode = buildCNF_rec(children[i]);
 				if (newNode != null) {
 					if (newNode instanceof And) {
-						containsAnd =
-							true;
+						containsAnd = true;
 						newChildren.add(newNode);
 					} else if (newNode instanceof Or) {
 						newChildren.addAll(Arrays.asList(newNode.getChildren()));
@@ -256,104 +209,68 @@ public abstract class Node {
 			}
 
 			if (containsAnd) {
-				final int[][] sizeArrays =
-					new int[newChildren.size()][];
-				children =
-					null;
+				final int[][] sizeArrays = new int[newChildren.size()][];
+				children = null;
 				node.setChildren(null);
-				for (int i =
-					0; i < newChildren.size(); i++) {
-					final Node newChild =
-						newChildren.get(i);
+				for (int i = 0; i < newChildren.size(); i++) {
+					final Node newChild = newChildren.get(i);
 					if (newChild instanceof And) {
-						final Node[] newChildChildren =
-							newChild.getChildren();
-						final int[] curSizeArray =
-							new int[newChildChildren.length];
-						sizeArrays[i] =
-							curSizeArray;
-						for (int j =
-							0; j < newChildChildren.length; j++) {
-							final Node child =
-								newChildChildren[j];
-							curSizeArray[j] =
-								(child instanceof Or)
-									? child.getChildren().length
-									: -1;
+						final Node[] newChildChildren = newChild.getChildren();
+						final int[] curSizeArray = new int[newChildChildren.length];
+						sizeArrays[i] = curSizeArray;
+						for (int j = 0; j < newChildChildren.length; j++) {
+							final Node child = newChildChildren[j];
+							curSizeArray[j] = (child instanceof Or) ? child.getChildren().length : -1;
 						}
 					} else {
-						sizeArrays[i] =
-							null;
+						sizeArrays[i] = null;
 					}
 				}
-				final HashSet<Node> newCleanChildren =
-					new HashSet<>();
+				final HashSet<Node> newCleanChildren = new HashSet<>();
 
-				final int[] indexArray =
-					new int[newChildren.size()];
+				final int[] indexArray = new int[newChildren.size()];
 				boolean carry;
 				do {
-					carry =
-						true;
-					int sum =
-						0;
-					for (int i =
-						0; i < sizeArrays.length; i++) {
-						final int[] curSizeArray =
-							sizeArrays[i];
+					carry = true;
+					int sum = 0;
+					for (int i = 0; i < sizeArrays.length; i++) {
+						final int[] curSizeArray = sizeArrays[i];
 						if (curSizeArray != null) {
-							int index =
-								indexArray[i];
+							int index = indexArray[i];
 							if (carry) {
 								index++;
 								if (index >= curSizeArray.length) {
-									index =
-										0;
-									carry =
-										true;
+									index = 0;
+									carry = true;
 								} else {
-									carry =
-										false;
+									carry = false;
 								}
-								indexArray[i] =
-									index;
+								indexArray[i] = index;
 							}
-							sum +=
-								Math.abs(curSizeArray[index]);
+							sum += Math.abs(curSizeArray[index]);
 						} else {
 							sum++;
 						}
 					}
 
-					final Node[] newClause =
-						new Node[sum];
-					int curIndex =
-						0;
-					for (int i =
-						0; i < sizeArrays.length; i++) {
-						final Node newChild =
-							newChildren.get(i);
-						final int[] curSizeArray =
-							sizeArrays[i];
+					final Node[] newClause = new Node[sum];
+					int curIndex = 0;
+					for (int i = 0; i < sizeArrays.length; i++) {
+						final Node newChild = newChildren.get(i);
+						final int[] curSizeArray = sizeArrays[i];
 
 						if (curSizeArray != null) {
-							final int index =
-								indexArray[i];
-							final Node newChildChild =
-								newChild.getChildren()[index];
+							final int index = indexArray[i];
+							final Node newChildChild = newChild.getChildren()[index];
 							if (curSizeArray[index] < 0) {
-								newClause[curIndex++] =
-									newChildChild;
+								newClause[curIndex++] = newChildChild;
 							} else {
-								final Node[] newChildChildChildren =
-									newChildChild.getChildren();
+								final Node[] newChildChildChildren = newChildChild.getChildren();
 								System.arraycopy(newChildChildChildren, 0, newClause, curIndex, newChildChildChildren.length);
-								curIndex +=
-									newChildChildChildren.length;
+								curIndex += newChildChildChildren.length;
 							}
 						} else {
-							newClause[curIndex++] =
-								newChild;
+							newClause[curIndex++] = newChild;
 						}
 					}
 
@@ -365,14 +282,10 @@ public abstract class Node {
 				return node;
 			}
 		} else {
-			final ArrayList<Node> newChildren =
-				new ArrayList<>();
-			final Node[] children =
-				node.getChildren();
-			for (int i =
-				0; i < children.length; i++) {
-				final Node newNode =
-					buildCNF_rec(children[i]);
+			final ArrayList<Node> newChildren = new ArrayList<>();
+			final Node[] children = node.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				final Node newNode = buildCNF_rec(children[i]);
 				if (newNode != null) {
 					if (newNode instanceof And) {
 						newChildren.addAll(Arrays.asList(newNode.getChildren()));
@@ -388,43 +301,33 @@ public abstract class Node {
 
 	@SuppressWarnings("unchecked")
 	public Node eliminateNotSupportedSymbols(final String[] symbols) {
-		Node node =
-			this;
-		for (int i =
-			0; i < symbols.length; i++) {
+		Node node = this;
+		for (int i = 0; i < symbols.length; i++) {
 			if (symbols[i].equals(NodeWriter.noSymbol)) {
 				switch (i) {
 				case 0:
-					node =
-						node.eliminate(Not.class);
+					node = node.eliminate(Not.class);
 					break;
 				case 1:
-					node =
-						node.eliminate(And.class);
+					node = node.eliminate(And.class);
 					break;
 				case 2:
-					node =
-						node.eliminate(Or.class);
+					node = node.eliminate(Or.class);
 					break;
 				case 3:
-					node =
-						node.eliminate(Implies.class);
+					node = node.eliminate(Implies.class);
 					break;
 				case 4:
-					node =
-						node.eliminate(Equals.class);
+					node = node.eliminate(Equals.class);
 					break;
 				case 6:
-					node =
-						node.eliminate(Choose.class);
+					node = node.eliminate(Choose.class);
 					break;
 				case 7:
-					node =
-						node.eliminate(AtLeast.class);
+					node = node.eliminate(AtLeast.class);
 					break;
 				case 8:
-					node =
-						node.eliminate(AtMost.class);
+					node = node.eliminate(AtMost.class);
 					break;
 				default:
 					break;
@@ -435,8 +338,7 @@ public abstract class Node {
 	}
 
 	public void simplify() {
-		for (int i =
-			0; i < children.length; i++) {
+		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
 		}
 	}
@@ -446,13 +348,9 @@ public abstract class Node {
 
 	@Override
 	public int hashCode() {
-		int hashCode =
-			children.length
-				* 37;
-		for (int i =
-			0; i < children.length; i++) {
-			hashCode +=
-				children[i].hashCode();
+		int hashCode = children.length * 37;
+		for (int i = 0; i < children.length; i++) {
+			hashCode += children[i].hashCode();
 		}
 		return hashCode;
 	}
@@ -465,17 +363,13 @@ public abstract class Node {
 		if (!getClass().isInstance(object)) {
 			return false;
 		}
-		final Node otherNode =
-			(Node) object;
+		final Node otherNode = (Node) object;
 		if (children.length != otherNode.children.length) {
 			return false;
 		}
-		final List<Node> thisChildrenList =
-			Arrays.asList(children);
-		final List<Node> otherChildrenList =
-			Arrays.asList(otherNode.children);
-		return thisChildrenList.containsAll(otherChildrenList)
-			&& otherChildrenList.containsAll(thisChildrenList);
+		final List<Node> thisChildrenList = Arrays.asList(children);
+		final List<Node> otherChildrenList = Arrays.asList(otherNode.children);
+		return thisChildrenList.containsAll(otherChildrenList) && otherChildrenList.containsAll(thisChildrenList);
 	}
 
 	@Override
@@ -495,27 +389,22 @@ public abstract class Node {
 	 * @return a string representing this node
 	 */
 	public String toString(String[] symbols) {
-		final NodeWriter nw =
-			new NodeWriter(this);
+		final NodeWriter nw = new NodeWriter(this);
 		nw.setSymbols(symbols);
 		nw.setEnquoteWhitespace(true);
 		return nw.nodeToString();
 	}
 
 	public static Node[] clone(Node[] array) {
-		final Node[] newArray =
-			new Node[array.length];
-		for (int i =
-			0; i < newArray.length; i++) {
-			newArray[i] =
-				array[i].clone();
+		final Node[] newArray = new Node[array.length];
+		for (int i = 0; i < newArray.length; i++) {
+			newArray[i] = array[i].clone();
 		}
 		return newArray;
 	}
 
 	public static LinkedList<Node> clone(LinkedList<Node> list) {
-		final LinkedList<Node> newList =
-			new LinkedList<Node>();
+		final LinkedList<Node> newList = new LinkedList<Node>();
 		for (final Node node : list) {
 			newList.add(node.clone());
 		}
@@ -528,22 +417,18 @@ public abstract class Node {
 	}
 
 	protected Node eliminate(List<Class<? extends Node>> list) {
-		for (int i =
-			0; i < children.length; i++) {
-			children[i] =
-				children[i].eliminate(list);
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].eliminate(list);
 		}
 		return this;
 	}
 
 	protected Node clausifyCNF() {
-		throw new RuntimeException(getClass().getName()
-			+ IS_NOT_SUPPORTING_THIS_METHOD);
+		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	protected Node clausifyDNF() {
-		throw new RuntimeException(getClass().getName()
-			+ IS_NOT_SUPPORTING_THIS_METHOD);
+		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature) {
@@ -558,104 +443,73 @@ public abstract class Node {
 	}
 
 	protected final void fuseWithSimilarChildren() {
-		int count =
-			children.length;
+		int count = children.length;
 		for (final Node child : children) {
 			if (getClass().isInstance(child)) {
-				count +=
-					child.children.length
-						- 1;
+				count += child.children.length - 1;
 			}
 		}
-		final Node[] newChildren =
-			new Node[count];
-		int i =
-			0;
+		final Node[] newChildren = new Node[count];
+		int i = 0;
 		for (final Node child : children) {
 			if (getClass().isInstance(child)) {
 				System.arraycopy(child.children, 0, newChildren, i, child.children.length);
-				i +=
-					child.children.length;
+				i += child.children.length;
 			} else {
-				newChildren[i++] =
-					child;
+				newChildren[i++] = child;
 			}
 		}
-		children =
-			newChildren;
+		children = newChildren;
 	}
 
 	protected static Node getNode(Object object) {
-		return object instanceof Node
-			? (Node) object
-			: new Literal(object);
+		return object instanceof Node ? (Node) object : new Literal(object);
 	}
 
 	protected Node[] chooseKofN(Node[] elements, int k, boolean negated) {
-		final int n =
-			elements.length;
+		final int n = elements.length;
 
 		// return tautology
-		if ((k == 0)
-			|| (k == (n
-				+ 1))) {
-			return new Node[] {
-				new Or(new Not(elements[0].clone()), elements[0].clone()) };
+		if ((k == 0) || (k == (n + 1))) {
+			return new Node[] { new Or(new Not(elements[0].clone()), elements[0].clone()) };
 		}
 
 		// return contradiction
-		if ((k < 0)
-			|| (k > (n
-				+ 1))) {
-			return new Node[] {
-				new And(new Not(elements[0].clone()), elements[0].clone()) };
+		if ((k < 0) || (k > (n + 1))) {
+			return new Node[] { new And(new Not(elements[0].clone()), elements[0].clone()) };
 		}
 
-		final Node[] newNodes =
-			new Node[binom(n, k)];
-		int j =
-			0;
+		final Node[] newNodes = new Node[binom(n, k)];
+		int j = 0;
 
 		// negate all elements
 		if (negated) {
 			negateNodes(elements);
 		}
 
-		final Node[] clause =
-			new Node[k];
-		final int[] index =
-			new int[k];
+		final Node[] clause = new Node[k];
+		final int[] index = new int[k];
 
 		// the position that is currently filled in clause
-		int level =
-			0;
-		index[level] =
-			-1;
+		int level = 0;
+		index[level] = -1;
 
 		while (level >= 0) {
 			// fill this level with the next element
 			index[level]++;
 			// did we reach the maximum for this level
-			if (index[level] >= (n
-				- (k
-					- 1
-					- level))) {
+			if (index[level] >= (n - (k - 1 - level))) {
 				// go to previous level
 				level--;
 			} else {
-				clause[level] =
-					elements[index[level]];
-				if (level == (k
-					- 1)) {
-					newNodes[j++] =
-						new Or(clone(clause));
+				clause[level] = elements[index[level]];
+				if (level == (k - 1)) {
+					newNodes[j++] = new Or(clone(clause));
 				} else {
 					// go to next level
 					level++;
 					// allow only ascending orders (to prevent from duplicates)
-					index[level] =
-						index[level
-							- 1];
+					index[level] = index[level - 1];
 				}
 			}
 		}
@@ -666,32 +520,21 @@ public abstract class Node {
 	}
 
 	public static int binom(int n, int k) {
-		if (k > (n
-			/ 2)) {
-			k =
-				n
-					- k;
+		if (k > (n / 2)) {
+			k = n - k;
 		}
-		if ((k < 0)
-			|| (n < 0)) {
+		if ((k < 0) || (n < 0)) {
 			return 0;
 		}
-		if ((k == 0)
-			|| (n == 0)) {
+		if ((k == 0) || (n == 0)) {
 			return 1;
 		}
-		return (binom(n
-			- 1, k
-				- 1)
-			* n)
-			/ k;
+		return (binom(n - 1, k - 1) * n) / k;
 	}
 
 	protected static void negateNodes(Node[] nodes) {
-		for (int i =
-			0; i < nodes.length; i++) {
-			nodes[i] =
-				new Not(nodes[i]);
+		for (int i = 0; i < nodes.length; i++) {
+			nodes[i] = new Not(nodes[i]);
 		}
 	}
 
@@ -826,23 +669,16 @@ public abstract class Node {
 	 * @return all accepted truth value assignments; not null
 	 */
 	private Set<Map<Object, Boolean>> getAssignments(Boolean result) {
-		final Set<Object> keys =
-			getUniqueVariables();
-		final Set<Map<Object, Boolean>> assignments =
-			new LinkedHashSet<>();
-		for (int assignment =
-			0; assignment < (1 << keys.size()); assignment++) {
-			final Map<Object, Boolean> map =
-				new LinkedHashMap<Object, Boolean>();
-			int i =
-				0;
+		final Set<Object> keys = getUniqueVariables();
+		final Set<Map<Object, Boolean>> assignments = new LinkedHashSet<>();
+		for (int assignment = 0; assignment < (1 << keys.size()); assignment++) {
+			final Map<Object, Boolean> map = new LinkedHashMap<Object, Boolean>();
+			int i = 0;
 			for (final Object key : keys) {
-				map.put(key, (assignment
-					& (1 << i)) != 0);
+				map.put(key, (assignment & (1 << i)) != 0);
 				i++;
 			}
-			if ((result == null)
-				|| (getValue(map) == result)) {
+			if ((result == null) || (getValue(map) == result)) {
 				assignments.add(map);
 			}
 		}

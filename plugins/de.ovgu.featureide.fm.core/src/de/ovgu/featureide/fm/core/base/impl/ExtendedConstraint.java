@@ -31,8 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class ExtendedConstraint extends Constraint {
 
-	private int type =
-		ExtendedFeature.TYPE_INTERN;
+	private int type = ExtendedFeature.TYPE_INTERN;
 
 	public ExtendedConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel, propNode);
@@ -40,8 +39,7 @@ public class ExtendedConstraint extends Constraint {
 
 	public ExtendedConstraint(ExtendedConstraint extendedConstraint, IFeatureModel newFeatureModel) {
 		super(extendedConstraint, newFeatureModel);
-		type =
-			extendedConstraint.type;
+		type = extendedConstraint.type;
 	}
 
 	public int getType() {
@@ -49,8 +47,7 @@ public class ExtendedConstraint extends Constraint {
 	}
 
 	public void setType(int type) {
-		this.type =
-			type;
+		this.type = type;
 	}
 
 	@Override

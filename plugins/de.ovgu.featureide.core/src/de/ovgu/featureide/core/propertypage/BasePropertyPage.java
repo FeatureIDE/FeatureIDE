@@ -43,33 +43,25 @@ import org.eclipse.ui.dialogs.PropertyPage;
 @SuppressWarnings(RESTRICTION)
 public class BasePropertyPage extends PropertyPage {
 
-	private static final String DESCRIPTION =
-		null;
+	private static final String DESCRIPTION = null;
 	private IProject project;
 
 	@Override
 	protected Control createContents(Composite parent) {
-		final Composite composite =
-			new Composite(parent, SWT.NULL);
-		final GridLayout layout =
-			new GridLayout();
-		layout.numColumns =
-			1;
-		layout.verticalSpacing =
-			9;
+		final Composite composite = new Composite(parent, SWT.NULL);
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
 
 		if (!getProject()) {
-			final Label label =
-				new Label(composite, SWT.NULL);
+			final Label label = new Label(composite, SWT.NULL);
 			label.setText(NO_RESOURCE_SELECTED);
 			return null;
 		}
 
-		final Label label =
-			new Label(composite, SWT.NULL);
-		label.setText("&Project: "
-			+ project.getName());
+		final Label label = new Label(composite, SWT.NULL);
+		label.setText("&Project: " + project.getName());
 
 		return composite;
 	}
@@ -80,16 +72,12 @@ public class BasePropertyPage extends PropertyPage {
 	 * @return <code>true</code> if successful
 	 */
 	private boolean getProject() {
-		final IAdaptable resource =
-			getElement();
+		final IAdaptable resource = getElement();
 		if (resource instanceof JavaElement) {
-			final IJavaProject javaProject =
-				((JavaElement) resource).getJavaProject();
-			project =
-				javaProject.getProject();
+			final IJavaProject javaProject = ((JavaElement) resource).getJavaProject();
+			project = javaProject.getProject();
 		} else if (resource instanceof IResource) {
-			project =
-				((IResource) resource).getProject();
+			project = ((IResource) resource).getProject();
 		} else {
 			return false;
 		}

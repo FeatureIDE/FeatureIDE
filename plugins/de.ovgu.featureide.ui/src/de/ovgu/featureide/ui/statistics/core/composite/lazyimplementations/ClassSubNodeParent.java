@@ -34,8 +34,7 @@ public class ClassSubNodeParent extends Parent {
 
 	public ClassSubNodeParent(String descString, FSTClassFragment fstClassFrag) {
 		super(descString.replace(":", ""));
-		frag =
-			fstClassFrag;
+		frag = fstClassFrag;
 	}
 
 	public FSTClassFragment getFragment() {

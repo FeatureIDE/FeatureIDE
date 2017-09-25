@@ -43,8 +43,7 @@ public abstract class AbstractConfigurationTest {
 
 	@Before
 	public void setModel() {
-		fm =
-			loadModel();
+		fm = loadModel();
 	}
 
 	/**
@@ -69,28 +68,20 @@ public abstract class AbstractConfigurationTest {
 	 * @return
 	 */
 	protected static IFeatureModel loadXML(String fmXml, String constraintsXml) {
-		String xml =
-			"<featureModel><struct>"
-				+ fmXml;
-		xml +=
-			"</struct>";
+		String xml = "<featureModel><struct>" + fmXml;
+		xml += "</struct>";
 		if (constraintsXml != null) {
-			xml +=
-				"<constraints>";
-			xml +=
-				constraintsXml
-					+ "</constraints>";
+			xml += "<constraints>";
+			xml += constraintsXml + "</constraints>";
 		}
-		xml +=
-			"</featureModel>";
+		xml += "</featureModel>";
 
 		return load(new XmlFeatureModelFormat(), xml);
 	}
 
 	private static IFeatureModel load(IFeatureModelFormat format, String xml) {
 		try {
-			final IFeatureModel fm =
-				FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
+			final IFeatureModel fm = FMFactoryManager.getDefaultFactoryForFormat(format).createFeatureModel();
 			if (format.read(fm, xml).containsError()) {
 				fail();
 			}

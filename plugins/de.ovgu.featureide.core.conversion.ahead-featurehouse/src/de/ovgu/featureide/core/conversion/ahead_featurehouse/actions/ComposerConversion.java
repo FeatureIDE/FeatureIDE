@@ -48,8 +48,7 @@ public abstract class ComposerConversion {
 	 * @param project
 	 */
 	void startProjectConversion(IFeatureProject project) {
-		featureProject =
-			project;
+		featureProject = project;
 		changeComposer(project);
 		changeFiles(project.getSourceFolder());
 		try {
@@ -93,11 +92,9 @@ public abstract class ComposerConversion {
 		if (newFileText == null) {
 			return;
 		}
-		FileWriter fw =
-			null;
+		FileWriter fw = null;
 		try {
-			fw =
-				new FileWriter(file.getRawLocation().toFile());
+			fw = new FileWriter(file.getRawLocation().toFile());
 			fw.write(newFileText);
 		} catch (final IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -117,13 +114,10 @@ public abstract class ComposerConversion {
 	 * @return The context of the given file
 	 */
 	private String getFileText(IFile res) {
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		try {
-			scanner =
-				new Scanner(res.getRawLocation().toFile(), "UTF-8");
-			final StringBuffer buffer =
-				new StringBuffer();
+			scanner = new Scanner(res.getRawLocation().toFile(), "UTF-8");
+			final StringBuffer buffer = new StringBuffer();
 			while (scanner.hasNext()) {
 				buffer.append(scanner.nextLine());
 				buffer.append("\r\n");

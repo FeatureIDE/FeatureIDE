@@ -32,15 +32,12 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHandler {
 
-	private static final String MODEL_MARKER =
-		PluginID.PLUGIN_ID
-			+ ".featureModelMarker";
+	private static final String MODEL_MARKER = PluginID.PLUGIN_ID + ".featureModelMarker";
 
 	private final T modelFile;
 
 	public ModelMarkerHandler(T modelFile) {
-		this.modelFile =
-			modelFile;
+		this.modelFile = modelFile;
 	}
 
 	public T getModelFile() {
@@ -50,17 +47,13 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 	@Override
 	public void createModelMarker(String message, int severity, int lineNumber) {
 		try {
-			final IResource resource =
-				modelFile.exists()
-					? modelFile
-					: modelFile.getProject();
+			final IResource resource = modelFile.exists() ? modelFile : modelFile.getProject();
 			for (final IMarker m : resource.findMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO)) {
 				if (m.getAttribute(IMarker.MESSAGE, "").equals(message)) {
 					return;
 				}
 			}
-			final IMarker marker =
-				resource.createMarker(MODEL_MARKER);
+			final IMarker marker = resource.createMarker(MODEL_MARKER);
 			if (marker.exists()) {
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, severity);
@@ -91,8 +84,7 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 
 	@Override
 	public boolean hasModelMarkers() {
-		return hasModelMarkers(modelFile.getProject())
-			|| hasModelMarkers(modelFile);
+		return hasModelMarkers(modelFile.getProject()) || hasModelMarkers(modelFile);
 	}
 
 	private boolean hasModelMarkers(IResource resource) {

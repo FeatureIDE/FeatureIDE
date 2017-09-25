@@ -47,22 +47,18 @@ public class ConversionWizard extends Wizard implements INewWizard {
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		setWindowTitle(ADD_FEATUREIDE_NATURE_TO_ANDROID_PROJECT);
-		page =
-			new ConversionPage();
-		this.selection =
-			selection;
+		page = new ConversionPage();
+		this.selection = selection;
 	}
 
 	@Override
 	public boolean performFinish() {
-		final SelectionWrapper<IProject> selectionWrapper =
-			SelectionWrapper.init(selection, IProject.class);
+		final SelectionWrapper<IProject> selectionWrapper = SelectionWrapper.init(selection, IProject.class);
 		IProject curProject;
-		while ((curProject =
-			selectionWrapper.getNext()) != null) {
+		while ((curProject = selectionWrapper.getNext()) != null) {
 			if (curProject.isAccessible()) {
-				AndroidProjectConversion.convertAndroidProject(curProject, page.getCompositionTool().getId(),
-						page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
+				AndroidProjectConversion.convertAndroidProject(curProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
+						page.getBuildPath());
 				AndroidUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, curProject.getFile("model.xml"));
 			}
 		}

@@ -48,10 +48,8 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	 */
 	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel completeModel) {
 		super(title);
-		subFm =
-			newModel;
-		completeFm =
-			completeModel;
+		subFm = newModel;
+		completeFm = completeModel;
 	}
 
 	/**

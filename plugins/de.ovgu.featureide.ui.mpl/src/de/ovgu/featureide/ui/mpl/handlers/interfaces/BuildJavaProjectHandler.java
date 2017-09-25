@@ -36,11 +36,9 @@ public class BuildJavaProjectHandler extends AFolderHandler {
 
 	@Override
 	protected void singleAction(IFolder folder) {
-		IResource[] members =
-			null;
+		IResource[] members = null;
 		try {
-			members =
-				folder.members();
+			members = folder.members();
 		} catch (final CoreException e) {
 			MPLUIPlugin.getDefault().logError(e);
 		}

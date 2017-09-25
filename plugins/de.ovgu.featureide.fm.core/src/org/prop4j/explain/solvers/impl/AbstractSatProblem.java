@@ -39,11 +39,9 @@ import org.prop4j.explain.solvers.SatProblem;
 public abstract class AbstractSatProblem implements SatProblem {
 
 	/** The clauses added to this problem. */
-	private final List<Node> clauses =
-		new ArrayList<>();
+	private final List<Node> clauses = new ArrayList<>();
 	/** The assumptions added to this problem. */
-	private final Map<Object, Boolean> assumptions =
-		new LinkedHashMap<>();
+	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
 
 	@Override
 	public int addFormulas(Node... formulas) {
@@ -52,21 +50,17 @@ public abstract class AbstractSatProblem implements SatProblem {
 
 	@Override
 	public int addFormulas(Collection<Node> formulas) {
-		int added =
-			0;
+		int added = 0;
 		for (final Node formula : formulas) {
-			added +=
-				addFormula(formula);
+			added += addFormula(formula);
 		}
 		return added;
 	}
 
 	@Override
 	public int addFormula(Node formula) {
-		formula =
-			formula.toRegularCNF();
-		final List<Node> clauses =
-			Arrays.asList(formula.getChildren());
+		formula = formula.toRegularCNF();
+		final List<Node> clauses = Arrays.asList(formula.getChildren());
 		return addClauses(clauses);
 	}
 
@@ -77,8 +71,7 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 * @return whether the problem changed as a result of this operation
 	 */
 	protected int addClauses(List<Node> clauses) {
-		int added =
-			0;
+		int added = 0;
 		for (final Node clause : clauses) {
 			if (addClause(clause)) {
 				added++;

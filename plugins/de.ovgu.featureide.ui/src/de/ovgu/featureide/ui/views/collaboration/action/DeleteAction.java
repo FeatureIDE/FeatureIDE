@@ -61,35 +61,26 @@ public class DeleteAction extends Action {
 	private final String text;
 
 	public DeleteAction(String text, GraphicalViewerImpl view) {
-		this.text =
-			text;
-		viewer =
-			view;
+		this.text = text;
+		viewer = view;
 	}
 
 	@Override
 	public void setEnabled(boolean enable) {
-		final IStructuredSelection selection =
-			(IStructuredSelection) viewer.getSelection();
-		part =
-			selection.getFirstElement();
-		if (!((part instanceof RoleEditPart)
-			|| (part instanceof ClassEditPart)
-			|| (part instanceof CollaborationEditPart))) {
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		part = selection.getFirstElement();
+		if (!((part instanceof RoleEditPart) || (part instanceof ClassEditPart) || (part instanceof CollaborationEditPart))) {
 			super.setText(text);
 			super.setEnabled(false);
 		} else {
 			if (part instanceof RoleEditPart) {
-				super.setText(text
-					+ ROLE);
+				super.setText(text + ROLE);
 			}
 			if (part instanceof ClassEditPart) {
-				super.setText(text
-					+ " Class");
+				super.setText(text + " Class");
 			}
 			if (part instanceof CollaborationEditPart) {
-				super.setText(text
-					+ " Feature");
+				super.setText(text + " Feature");
 			}
 			super.setEnabled(true);
 		}
@@ -100,29 +91,21 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		final MessageDialog messageDialog =
-			new MessageDialog(null, DELETE_RESOURCES, null, ARE_YOU_SURE_YOU_WANT_TO_REMOVE
-				+ getDialogText(), MessageDialog.INFORMATION,
-					new String[] {
-						OK,
-						CANCEL },
-					0);
+		final MessageDialog messageDialog = new MessageDialog(null, DELETE_RESOURCES, null, ARE_YOU_SURE_YOU_WANT_TO_REMOVE + getDialogText(),
+				MessageDialog.INFORMATION, new String[] { OK, CANCEL }, 0);
 		if (messageDialog.open() != 0) {
 			return;
 		}
 		if (part instanceof RoleEditPart) {
-			final FSTRole role =
-				((RoleEditPart) part).getRoleModel();
+			final FSTRole role = ((RoleEditPart) part).getRoleModel();
 			try {
 				role.getFile().delete(true, null);
 			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		} else if (part instanceof ClassEditPart) {
-			final FSTClass c =
-				((ClassEditPart) part).getClassModel();
-			final List<FSTRole> roles =
-				c.getRoles();
+			final FSTClass c = ((ClassEditPart) part).getClassModel();
+			final List<FSTRole> roles = c.getRoles();
 			for (final FSTRole role : roles) {
 				try {
 					role.getFile().delete(true, null);
@@ -132,8 +115,7 @@ public class DeleteAction extends Action {
 			}
 
 		} else if (part instanceof CollaborationEditPart) {
-			final FSTFeature coll =
-				((CollaborationEditPart) part).getCollaborationModel();
+			final FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
 			for (final FSTRole role : coll.getRoles()) {
 				try {
 					role.getFile().delete(true, null);
@@ -150,25 +132,14 @@ public class DeleteAction extends Action {
 	 */
 	private String getDialogText() {
 		if (part instanceof RoleEditPart) {
-			final FSTRole role =
-				((RoleEditPart) part).getRoleModel();
-			return THE_ROLE_OF_CLASS_
-				+ role.getClassFragment().getName()
-				+ AT_FEATURE_
-				+ role.getFeature().getName()
-				+ "'";
+			final FSTRole role = ((RoleEditPart) part).getRoleModel();
+			return THE_ROLE_OF_CLASS_ + role.getClassFragment().getName() + AT_FEATURE_ + role.getFeature().getName() + "'";
 		} else if (part instanceof ClassEditPart) {
-			final FSTClass c =
-				((ClassEditPart) part).getClassModel();
-			return ALL_FILES_OF_CLASS_
-				+ c.getName()
-				+ "'?";
+			final FSTClass c = ((ClassEditPart) part).getClassModel();
+			return ALL_FILES_OF_CLASS_ + c.getName() + "'?";
 		} else if (part instanceof CollaborationEditPart) {
-			final FSTFeature coll =
-				((CollaborationEditPart) part).getCollaborationModel();
-			return ALL_FILES_OF_FEATURE_
-				+ coll.getName()
-				+ "'?";
+			final FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
+			return ALL_FILES_OF_FEATURE_ + coll.getName() + "'?";
 		}
 		return null;
 	}

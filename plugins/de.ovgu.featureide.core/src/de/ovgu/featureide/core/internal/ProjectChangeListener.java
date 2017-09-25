@@ -46,8 +46,7 @@ public class ProjectChangeListener implements IResourceChangeListener {
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		final IResourceDelta delta =
-			event.getDelta();
+		final IResourceDelta delta = event.getDelta();
 		if (delta == null) {
 			return;
 		}
@@ -57,17 +56,14 @@ public class ProjectChangeListener implements IResourceChangeListener {
 				return;
 			}
 
-			final IProject project =
-				(IProject) child.getResource();
+			final IProject project = (IProject) child.getResource();
 			if (hasNature(project)) {
 				// FeatureIDE project created
-				if ((child.getFlags()
-					& IResourceDelta.DESCRIPTION) != 0) {
+				if ((child.getFlags() & IResourceDelta.DESCRIPTION) != 0) {
 					addProject(project);
 				}
 				// FeatureIDE project opened or imported
-				else if ((child.getFlags()
-					& IResourceDelta.OPEN) != 0) {
+				else if ((child.getFlags() & IResourceDelta.OPEN) != 0) {
 					addProject(project);
 				}
 			} else {
@@ -81,8 +77,7 @@ public class ProjectChangeListener implements IResourceChangeListener {
 
 	private boolean hasNature(IProject project) {
 		try {
-			if (project.isAccessible()
-				&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
+			if (project.isAccessible() && project.hasNature(FeatureProjectNature.NATURE_ID)) {
 				return true;
 			}
 		} catch (final CoreException e) {
@@ -96,15 +91,14 @@ public class ProjectChangeListener implements IResourceChangeListener {
 	}
 
 	private void removeProject(final IProject project) {
-		final Job job =
-			new Job(REMOVE_PROJECT) {
+		final Job job = new Job(REMOVE_PROJECT) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					CorePlugin.getDefault().removeProject(project);
-					return Status.OK_STATUS;
-				}
-			};
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				CorePlugin.getDefault().removeProject(project);
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}

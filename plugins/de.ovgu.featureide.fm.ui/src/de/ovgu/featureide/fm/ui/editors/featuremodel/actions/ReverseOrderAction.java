@@ -39,22 +39,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrde
  */
 public class ReverseOrderAction extends Action {
 
-	public static final String ID =
-		"de.ovgu.featureide.reverseorder";
+	public static final String ID = "de.ovgu.featureide.reverseorder";
 
 	private final IGraphicalFeatureModel featureModel;
 
 	public ReverseOrderAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(REVERSE_FEATURE_ORDER);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
 
-		final ModelReverseOrderOperation op =
-			new ModelReverseOrderOperation(featureModel);
+		final ModelReverseOrderOperation op = new ModelReverseOrderOperation(featureModel);
 		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 

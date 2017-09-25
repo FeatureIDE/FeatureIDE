@@ -27,15 +27,13 @@ package de.ovgu.featureide.fm.core.io;
  */
 public class UnsupportedModelException extends Exception {
 
-	private static final long serialVersionUID =
-		-4060297146846881685L;
+	private static final long serialVersionUID = -4060297146846881685L;
 
 	public final int lineNumber;
 
 	public UnsupportedModelException(String message, int lineNumber) {
 		super(message);
-		this.lineNumber =
-			lineNumber;
+		this.lineNumber = lineNumber;
 	}
 
 }

@@ -38,21 +38,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGro
  */
 public class AndAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.and";
+	public static final String ID = "de.ovgu.featureide.and";
 
 	private final IFeatureModel featureModel;
 
 	public AndAction(Object viewer, IFeatureModel featureModel) {
 		super(AND, viewer);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final ChangeFeatureGroupTypeOperation op =
-			new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.AND, feature, featureModel);
+		final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.AND, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -65,10 +62,8 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		final boolean and =
-			feature.getStructure().isAnd();
-		setEnabled(!and
-			&& feature.getStructure().hasChildren());
+		final boolean and = feature.getStructure().isAnd();
+		setEnabled(!and && feature.getStructure().hasChildren());
 		setChecked(and);
 	}
 

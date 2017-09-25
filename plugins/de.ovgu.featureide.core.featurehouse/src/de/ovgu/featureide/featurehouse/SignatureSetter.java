@@ -32,18 +32,14 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
  */
 public class SignatureSetter {
 
-	private final FujiSignaturesCreator sigCreator =
-		new FujiSignaturesCreator();
+	private final FujiSignaturesCreator sigCreator = new FujiSignaturesCreator();
 
-	private FSTModel fstModel =
-		null;
-	private ProjectSignatures signatures =
-		null;
+	private FSTModel fstModel = null;
+	private ProjectSignatures signatures = null;
 
 	public void setFstModel(FSTModel fstModel) {
 		synchronized (this) {
-			this.fstModel =
-				fstModel;
+			this.fstModel = fstModel;
 			if (signatures != null) {
 				assignSignatures();
 			}
@@ -51,11 +47,9 @@ public class SignatureSetter {
 	}
 
 	public void setFujiParameters(IFeatureProject fp, Program ast) {
-		final ProjectSignatures sigs =
-			sigCreator.createSignatures(fp, ast);
+		final ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
 		synchronized (this) {
-			signatures =
-				sigs;
+			signatures = sigs;
 			if (fstModel != null) {
 				assignSignatures();
 			}

@@ -45,8 +45,7 @@ public class HashMapNode extends AbstractSortModeNode {
 	 */
 	public HashMapNode(String description, Object value, HashMap<String, Integer> countMap) {
 		super(description, value);
-		this.countMap =
-			countMap;
+		this.countMap = countMap;
 		setSorted(true);
 	}
 

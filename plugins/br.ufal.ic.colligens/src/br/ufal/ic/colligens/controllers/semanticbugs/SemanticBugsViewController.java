@@ -37,14 +37,12 @@ public class SemanticBugsViewController extends ViewController {
 
 	private SemanticBugsViewController() {
 		super(InvalidConfigurationsView.ID);
-		viewContentProvider =
-			new ViewContentProvider();
+		viewContentProvider = new ViewContentProvider();
 	}
 
 	public static SemanticBugsViewController getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE =
-				new SemanticBugsViewController();
+			INSTANCE = new SemanticBugsViewController();
 		}
 		return INSTANCE;
 	}
@@ -88,16 +86,11 @@ public class SemanticBugsViewController extends ViewController {
 
 	public void createPartControl(Composite parent) {
 
-		final Tree tree =
-			new Tree(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.FULL_SELECTION
-				| SWT.LEFT);
+		final Tree tree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.LEFT);
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 
-		treeViewer =
-			new TreeViewer(tree);
+		treeViewer = new TreeViewer(tree);
 
 		createColumns(tree);
 
@@ -105,31 +98,22 @@ public class SemanticBugsViewController extends ViewController {
 		treeViewer.setInput(getView().getViewSite());
 		treeViewer.setLabelProvider(new ViewLabelProvider());
 
-		final IWorkbenchPage page =
-			getView().getSite().getPage();
+		final IWorkbenchPage page = getView().getSite().getPage();
 		tree.addListener(SWT.MouseDown, new Listener() {
 
 			@Override
 			public void handleEvent(Event event) {
-				final Point point =
-					new Point(event.x, event.y);
-				final TreeItem clickedItem =
-					treeViewer.getTree().getItem(point);
+				final Point point = new Point(event.x, event.y);
+				final TreeItem clickedItem = treeViewer.getTree().getItem(point);
 				if (clickedItem != null) {
-					final Object data =
-						clickedItem.getData();
+					final Object data = clickedItem.getData();
 					if (data instanceof CppCheckerLog) {
-						if ((event.button == MouseEvent.BUTTON1)
-							&& (event.count == 2)) {
-							final CppCheckerLog log =
-								(CppCheckerLog) data;
+						if ((event.button == MouseEvent.BUTTON1) && (event.count == 2)) {
+							final CppCheckerLog log = (CppCheckerLog) data;
 							try {
 
-								final IEditorPart editor =
-									IDE.openEditor(page, log
-											.getFileLogs().getFile());
-								editor.getSite().getSelectionProvider()
-										.setSelection(log);
+								final IEditorPart editor = IDE.openEditor(page, log.getFileLogs().getFile());
+								editor.getSite().getSelectionProvider().setSelection(log);
 
 							} catch (final PartInitException e) {
 								e.printStackTrace();
@@ -137,11 +121,9 @@ public class SemanticBugsViewController extends ViewController {
 						}
 					}
 					if (data instanceof CppCheckerFileLogs) {
-						if ((event.button == MouseEvent.BUTTON1)
-							&& (event.count == 2)) {
+						if ((event.button == MouseEvent.BUTTON1) && (event.count == 2)) {
 
-							final CppCheckerFileLogs FileLogs =
-								(CppCheckerFileLogs) data;
+							final CppCheckerFileLogs FileLogs = (CppCheckerFileLogs) data;
 							try {
 
 								IDE.openEditor(page, FileLogs.getFile());
@@ -160,56 +142,35 @@ public class SemanticBugsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		final String[] titles =
-			{
-				"Msg",
-				"Line",
-				"Severity",
-				"Config",
-				"Id" };
-		final int[] bounds =
-			{
-				300,
-				100,
-				100,
-				300,
-				100 };
+		final String[] titles = { "Msg", "Line", "Severity", "Config", "Id" };
+		final int[] bounds = { 300, 100, 100, 300, 100 };
 
-		for (int i =
-			0; i < bounds.length; i++) {
+		for (int i = 0; i < bounds.length; i++) {
 			createTreeViewerColumn(tree, titles[i], bounds[i], i);
 		}
 	}
 
-	private void createTreeViewerColumn(Tree tree, String title, int bound,
-			final int ColumnNumber) {
+	private void createTreeViewerColumn(Tree tree, String title, int bound, final int ColumnNumber) {
 
-		final int style =
-			(ColumnNumber == 0)
-				? SWT.RIGHT
-				: SWT.LEFT;
+		final int style = (ColumnNumber == 0) ? SWT.RIGHT : SWT.LEFT;
 
-		final TreeColumn treeColumn =
-			new TreeColumn(tree, style);
+		final TreeColumn treeColumn = new TreeColumn(tree, style);
 
 		treeColumn.setText(title);
 		treeColumn.setWidth(bound);
 		treeColumn.setResizable(true);
 		treeColumn.setMoveable(false);
-		treeColumn.addSelectionListener(getSelectionAdapter(treeColumn,
-				ColumnNumber));
+		treeColumn.addSelectionListener(getSelectionAdapter(treeColumn, ColumnNumber));
 	}
 
-	private SelectionAdapter getSelectionAdapter(final TreeColumn column,
-			final int index) {
-		final SelectionAdapter selectionAdapter =
-			new SelectionAdapter() {
+	private SelectionAdapter getSelectionAdapter(final TreeColumn column, final int index) {
+		final SelectionAdapter selectionAdapter = new SelectionAdapter() {
 
-				@Override
-				public void widgetSelected(SelectionEvent e) {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
 
 			}
-			};
+		};
 		return selectionAdapter;
 	}
 

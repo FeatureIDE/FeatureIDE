@@ -56,10 +56,8 @@ import de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard;
 public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 	protected Table projectTable;
-	protected HashMap<Widget, IFeatureProject> map =
-		new HashMap<Widget, IFeatureProject>();
-	protected HashSet<IFeatureProject> sel =
-		new HashSet<IFeatureProject>();
+	protected HashMap<Widget, IFeatureProject> map = new HashMap<Widget, IFeatureProject>();
+	protected HashSet<IFeatureProject> sel = new HashSet<IFeatureProject>();
 
 	public NewMultiFeatureProjectPage() {
 		super("");
@@ -69,52 +67,37 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout =
-			new GridLayout();
-		gridLayout.numColumns =
-			1;
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		final Group toolGroup =
-			new Group(container, SWT.NONE);
+		final Group toolGroup = new Group(container, SWT.NONE);
 		toolGroup.setText("Feature Project Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final GridLayout projGridLayout =
-			new GridLayout();
-		projGridLayout.numColumns =
-			2;
+		final GridLayout projGridLayout = new GridLayout();
+		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
 
-		final Label helloLabel =
-			new Label(toolGroup, SWT.NONE);
-		final GridData gridData =
-			new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan =
-			2;
+		final Label helloLabel = new Label(toolGroup, SWT.NONE);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
 		helloLabel.setText(PLEASE_SELECT_TWO_OR_MORE_PROJECTS_FROM_BELOW_);
 
-		projectTable =
-			new Table(toolGroup, SWT.CHECK
-				| SWT.BORDER
-				| SWT.V_SCROLL
-				| SWT.H_SCROLL);
+		projectTable = new Table(toolGroup, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		projectTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		projectTable.setHeaderVisible(true);
 		projectTable.setLinesVisible(true);
-		final TableColumn column =
-			new TableColumn(projectTable, SWT.NONE);
+		final TableColumn column = new TableColumn(projectTable, SWT.NONE);
 		column.setText(PROJECTS);
 		column.setResizable(true);
 		column.setMoveable(false);
 
 		for (final IFeatureProject p : CorePlugin.getFeatureProjects()) {
-			final TableItem item =
-				new TableItem(projectTable, SWT.NONE);
+			final TableItem item = new TableItem(projectTable, SWT.NONE);
 			item.setText(p.getProjectName());
 			item.setText(0, p.getProjectName());
 			map.put(item, p);
@@ -135,8 +118,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
-					final IFeatureProject p =
-						map.get(e.item);
+					final IFeatureProject p = map.get(e.item);
 					if (sel.contains(p)) {
 						sel.remove(p);
 					} else {

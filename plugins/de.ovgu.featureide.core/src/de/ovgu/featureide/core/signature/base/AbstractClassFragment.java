@@ -31,18 +31,11 @@ import java.util.Map.Entry;
  */
 public abstract class AbstractClassFragment {
 
-	protected static final String LINE_SEPARATOR =
-		System.getProperty("line.separator");
-	protected static final int hashCodePrime =
-		31;
+	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	protected static final int hashCodePrime = 31;
 
-	protected boolean hasHashCode =
-		false;
-	protected int hashCode =
-		0, nonPrivateMemberCount =
-			0,
-			nonPrivateInnerClassCount =
-				0;
+	protected boolean hasHashCode = false;
+	protected int hashCode = 0, nonPrivateMemberCount = 0, nonPrivateInnerClassCount = 0;
 
 	protected final AbstractClassSignature signature;
 
@@ -50,8 +43,7 @@ public abstract class AbstractClassFragment {
 	protected Map<String, AbstractClassFragment> innerClasses;
 
 	protected AbstractClassFragment(AbstractClassSignature signature) {
-		this.signature =
-			signature;
+		this.signature = signature;
 	}
 
 	public AbstractClassSignature getSignature() {
@@ -71,15 +63,11 @@ public abstract class AbstractClassFragment {
 	}
 
 	public int getMemberCount() {
-		int innerMembers =
-			0;
+		int innerMembers = 0;
 		for (final AbstractClassFragment innerClass : innerClasses.values()) {
-			innerMembers +=
-				innerClass.getMemberCount();
+			innerMembers += innerClass.getMemberCount();
 		}
-		return members.size()
-			+ innerClasses.size()
-			+ innerMembers;
+		return members.size() + innerClasses.size() + innerMembers;
 	}
 
 	public int getNonPrivateMemberCount() {
@@ -94,14 +82,12 @@ public abstract class AbstractClassFragment {
 		members.add(member);
 		if (!member.isPrivate()) {
 			nonPrivateMemberCount++;
-			hasHashCode =
-				false;
+			hasHashCode = false;
 		}
 	}
 
 	public void addInnerClass(AbstractClassFragment innerClass) {
-		final AbstractClassFragment orgInnerClass =
-			innerClasses.get(innerClass.getSignature().getFullName());
+		final AbstractClassFragment orgInnerClass = innerClasses.get(innerClass.getSignature().getFullName());
 		if (orgInnerClass == null) {
 			innerClasses.put(innerClass.getSignature().getFullName(), innerClass);
 			if (!innerClass.getSignature().isPrivate()) {
@@ -115,8 +101,7 @@ public abstract class AbstractClassFragment {
 				orgInnerClass.addInnerClass(innerInnerClass);
 			}
 		}
-		hasHashCode =
-			false;
+		hasHashCode = false;
 	}
 
 	@Override
@@ -128,32 +113,25 @@ public abstract class AbstractClassFragment {
 	public final int hashCode() {
 		if (!hasHashCode) {
 			computeHashCode();
-			hasHashCode =
-				true;
+			hasHashCode = true;
 		}
 		return hashCode;
 	}
 
 	protected void computeHashCode() {
-		hashCode =
-			hashCodePrime
-				+ signature.hashCode();
+		hashCode = hashCodePrime + signature.hashCode();
 
-		hashCode *=
-			hashCodePrime;
+		hashCode *= hashCodePrime;
 		for (final AbstractSignature member : members) {
 			if (!member.isPrivate()) {
-				hashCode +=
-					member.hashCode();
+				hashCode += member.hashCode();
 			}
 		}
 
-		hashCode *=
-			hashCodePrime;
+		hashCode *= hashCodePrime;
 		for (final AbstractClassFragment innerClass : innerClasses.values()) {
 			if (!innerClass.getSignature().isPrivate()) {
-				hashCode +=
-					innerClass.hashCode();
+				hashCode += innerClass.hashCode();
 			}
 		}
 	}
@@ -163,31 +141,25 @@ public abstract class AbstractClassFragment {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 
-		final AbstractClassFragment other =
-			(AbstractClassFragment) obj;
+		final AbstractClassFragment other = (AbstractClassFragment) obj;
 
-		if ((nonPrivateMemberCount != other.nonPrivateMemberCount)
-			|| (nonPrivateInnerClassCount != other.nonPrivateInnerClassCount)
+		if ((nonPrivateMemberCount != other.nonPrivateMemberCount) || (nonPrivateInnerClassCount != other.nonPrivateInnerClassCount)
 			|| !signature.equals(other.signature)) {
 			return false;
 		}
 		for (final AbstractSignature member : members) {
-			if (!member.isPrivate()
-				&& !other.members.contains(member)) {
+			if (!member.isPrivate() && !other.members.contains(member)) {
 				return false;
 			}
 		}
 		for (final Entry<String, AbstractClassFragment> entry : innerClasses.entrySet()) {
 			if (!entry.getValue().getSignature().isPrivate()) {
-				final AbstractClassFragment otherClassFragment =
-					other.innerClasses.get(entry.getKey());
-				if ((otherClassFragment == null)
-					|| !otherClassFragment.equals(entry.getValue())) {
+				final AbstractClassFragment otherClassFragment = other.innerClasses.get(entry.getKey());
+				if ((otherClassFragment == null) || !otherClassFragment.equals(entry.getValue())) {
 					return false;
 				}
 			}

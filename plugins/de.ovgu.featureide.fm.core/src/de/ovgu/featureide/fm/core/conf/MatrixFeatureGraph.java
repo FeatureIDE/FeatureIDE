@@ -26,16 +26,13 @@ import org.prop4j.solver.SatInstance;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
 
-	private static final long serialVersionUID =
-		3919685766908834399L;
+	private static final long serialVersionUID = 3919685766908834399L;
 
 	private byte[] adjMatrix;
 
 	public MatrixFeatureGraph(SatInstance satInstance, int[] index) {
 		super(satInstance, index);
-		adjMatrix =
-			new byte[size
-				* size];
+		adjMatrix = new byte[size * size];
 	}
 
 	public MatrixFeatureGraph() {
@@ -45,10 +42,8 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 	@Override
 	public void copyValues(IFeatureGraph otherGraph) {
 		super.copyValues(otherGraph);
-		final MatrixFeatureGraph matrixGraph =
-			(MatrixFeatureGraph) otherGraph;
-		adjMatrix =
-			Arrays.copyOf(matrixGraph.adjMatrix, matrixGraph.adjMatrix.length);
+		final MatrixFeatureGraph matrixGraph = (MatrixFeatureGraph) otherGraph;
+		adjMatrix = Arrays.copyOf(matrixGraph.adjMatrix, matrixGraph.adjMatrix.length);
 	}
 
 	@Override
@@ -56,146 +51,92 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		if (from == to) {
 			return false;
 		}
-		final int index =
-			(from
-				* size)
-				+ to;
+		final int index = (from * size) + to;
 
 		final int newValue;
 		final byte oldValue;
-		oldValue =
-			adjMatrix[index];
+		oldValue = adjMatrix[index];
 
 		switch (edgeType) {
 		case EDGE_NONE:
-			newValue =
-				EDGE_NONE;
+			newValue = EDGE_NONE;
 			break;
 		case EDGE_00Q:
-			if (!isEdge(oldValue, (byte) (EDGE_00
-				| EDGE_01))) {
-				newValue =
-					oldValue
-						| EDGE_00Q;
+			if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+				newValue = oldValue | EDGE_00Q;
 			} else {
-				newValue =
-					oldValue;
+				newValue = oldValue;
 			}
 			break;
 		case EDGE_00:
 			assert !isEdge(oldValue, EDGE_01);
-			newValue =
-				(oldValue
-					& MASK_0_CLEAR)
-					| EDGE_00;
+			newValue = (oldValue & MASK_0_CLEAR) | EDGE_00;
 			break;
 		case EDGE_01Q:
-			if (!isEdge(oldValue, (byte) (EDGE_00
-				| EDGE_01))) {
-				newValue =
-					oldValue
-						| EDGE_01Q;
+			if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+				newValue = oldValue | EDGE_01Q;
 			} else {
-				newValue =
-					oldValue;
+				newValue = oldValue;
 			}
 			break;
 		case EDGE_01:
 			assert !isEdge(oldValue, EDGE_00);
-			newValue =
-				(oldValue
-					& MASK_0_CLEAR)
-					| EDGE_01;
+			newValue = (oldValue & MASK_0_CLEAR) | EDGE_01;
 			break;
 
 		case EDGE_10Q:
-			if (!isEdge(oldValue, (byte) (EDGE_10
-				| EDGE_11))) {
-				newValue =
-					oldValue
-						| EDGE_10Q;
+			if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+				newValue = oldValue | EDGE_10Q;
 			} else {
-				newValue =
-					oldValue;
+				newValue = oldValue;
 			}
 			break;
 		case EDGE_10:
 			assert !isEdge(oldValue, EDGE_11);
-			newValue =
-				(oldValue
-					& MASK_1_CLEAR)
-					| EDGE_10;
+			newValue = (oldValue & MASK_1_CLEAR) | EDGE_10;
 			break;
 		case EDGE_11Q:
-			if (!isEdge(oldValue, (byte) (EDGE_10
-				| EDGE_11))) {
-				newValue =
-					oldValue
-						| EDGE_11Q;
+			if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+				newValue = oldValue | EDGE_11Q;
 			} else {
-				newValue =
-					oldValue;
+				newValue = oldValue;
 			}
 			break;
 		case EDGE_11:
 			assert !isEdge(oldValue, EDGE_10);
-			newValue =
-				(oldValue
-					& MASK_1_CLEAR)
-					| EDGE_11;
+			newValue = (oldValue & MASK_1_CLEAR) | EDGE_11;
 			break;
 		default:
-			newValue =
-				oldValue;
+			newValue = oldValue;
 			break;
 		}
 
-		adjMatrix[index] =
-			(byte) (0x000000ff
-				& newValue);
+		adjMatrix[index] = (byte) (0x000000ff & newValue);
 
 		return oldValue != newValue;
 	}
 
 	@Override
 	public byte getEdge(int fromIndex, int toIndex) {
-		final int index =
-			(fromIndex
-				* size)
-				+ toIndex;
+		final int index = (fromIndex * size) + toIndex;
 		return adjMatrix[index];
 	}
 
 	@Override
 	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
-		final int index =
-			(fromIndex
-				* size)
-				+ toIndex;
-		return (byte) (((fromSelected
-			? (adjMatrix[index] >>> 4)
-			: adjMatrix[index]))
-			& 0x0000000f);
+		final int index = (fromIndex * size) + toIndex;
+		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
 
 	@Override
 	public byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected) {
-		final int internalFrom =
-			index[fromIndex];
-		final int internalTo =
-			index[toIndex];
-		if ((internalFrom < 0)
-			|| (internalTo < 0)) {
+		final int internalFrom = index[fromIndex];
+		final int internalTo = index[toIndex];
+		if ((internalFrom < 0) || (internalTo < 0)) {
 			return -1;
 		}
-		final int index =
-			(internalFrom
-				* size)
-				+ internalTo;
-		return (byte) (((fromSelected
-			? (adjMatrix[index] >>> 4)
-			: adjMatrix[index]))
-			& 0x0000000f);
+		final int index = (internalFrom * size) + internalTo;
+		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
 
 }

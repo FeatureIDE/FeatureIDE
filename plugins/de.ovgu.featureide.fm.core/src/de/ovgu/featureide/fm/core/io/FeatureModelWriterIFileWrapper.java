@@ -47,8 +47,7 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 	private final IFeatureModelWriter writer;
 
 	public FeatureModelWriterIFileWrapper(IFeatureModelWriter writer) {
-		this.writer =
-			writer;
+		this.writer = writer;
 	}
 
 	@Override
@@ -72,9 +71,7 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 	}
 
 	public void writeToFile(IFile file) throws CoreException {
-		final InputStream source =
-			new ByteArrayInputStream(writeToString().getBytes(
-					Charset.availableCharsets().get("UTF-8")));
+		final InputStream source = new ByteArrayInputStream(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {

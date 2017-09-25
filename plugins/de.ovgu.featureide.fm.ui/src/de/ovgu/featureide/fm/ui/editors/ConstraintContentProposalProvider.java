@@ -45,16 +45,13 @@ import de.ovgu.featureide.fm.core.Features;
  */
 public class ConstraintContentProposalProvider implements IContentProposalProvider {
 
-	static final int CURRENT =
-		0;
-	static final int LAST =
-		1;
+	static final int CURRENT = 0;
+	static final int LAST = 1;
 	private final Set<String> features;
 
 	public ConstraintContentProposalProvider(Set<String> featureNames) {
 		super();
-		features =
-			featureNames;
+		features = featureNames;
 	}
 
 	/**
@@ -67,11 +64,9 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 
-		final String[] words =
-			getWords(contents, position);
+		final String[] words = getWords(contents, position);
 
-		final List<ContentProposal> proposalList =
-			getProposalList(words, contents);
+		final List<ContentProposal> proposalList = getProposalList(words, contents);
 
 		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
@@ -84,14 +79,10 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 *
 	 */
 	private List<ContentProposal> getProposalList(String[] words, String contents) {
-		List<ContentProposal> proposalList =
-			new ArrayList<ContentProposal>();
+		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
 
-		if ("(".equals(words[CURRENT])
-			|| " ".equals(words[CURRENT])
-			|| "".equals(words[CURRENT])) {
-			proposalList =
-				getProposalList(words[LAST], features);
+		if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
+			proposalList = getProposalList(words[LAST], features);
 		} else {
 			for (final ContentProposal proposal : getProposalList(words[LAST], features)) {
 				if ((proposal.getContent().length() > words[CURRENT].trim().length())
@@ -112,80 +103,56 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 */
 	static String[] getWords(String contents, int position) {
 
-		final String[] words =
-			new String[2];
+		final String[] words = new String[2];
 
-		int posMarker =
-			position
-				- 1;
+		int posMarker = position - 1;
 		if (position == 0) {
-			words[CURRENT] =
-				"";
-			words[LAST] =
-				"";
+			words[CURRENT] = "";
+			words[LAST] = "";
 		} else {
-			while ((posMarker > 0)
-				&& (contents.charAt(posMarker) != ' ')) {
+			while ((posMarker > 0) && (contents.charAt(posMarker) != ' ')) {
 				posMarker--;
 			}
-			words[CURRENT] =
-				contents.substring(posMarker, position);
+			words[CURRENT] = contents.substring(posMarker, position);
 
-			while ((posMarker > 0)
-				&& (contents.charAt(posMarker) == ' ')) {
+			while ((posMarker > 0) && (contents.charAt(posMarker) == ' ')) {
 				posMarker--;
 			}
-			int startBefore =
-				posMarker;
-			while ((startBefore > 0)
-				&& (contents.charAt(startBefore) != ' ')) {
+			int startBefore = posMarker;
+			while ((startBefore > 0) && (contents.charAt(startBefore) != ' ')) {
 				startBefore--;
 			}
 			if (posMarker == 0) {
 				if (contents.charAt(0) == '(') {
-					words[LAST] =
-						"(";
+					words[LAST] = "(";
 				} else {
-					words[LAST] =
-						"";
+					words[LAST] = "";
 				}
 			} else {
-				words[LAST] =
-					contents.substring(startBefore, posMarker
-						+ 1);
+				words[LAST] = contents.substring(startBefore, posMarker + 1);
 			}
 
 		}
 
-		if (words[LAST].trim().startsWith("(")
-			&& (words[LAST].length() > 1)) {
-			words[LAST] =
-				words[LAST].substring(words[LAST].indexOf('(')
-					+ 1);
+		if (words[LAST].trim().startsWith("(") && (words[LAST].length() > 1)) {
+			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
 
 		}
 		if (words[CURRENT].trim().startsWith("(")) {
-			words[CURRENT] =
-				words[CURRENT].trim();
-			words[CURRENT] =
-				words[CURRENT].substring(1);
-			words[LAST] =
-				"(";
+			words[CURRENT] = words[CURRENT].trim();
+			words[CURRENT] = words[CURRENT].substring(1);
+			words[LAST] = "(";
 		}
 		if (words[LAST].endsWith(")")) {
-			words[LAST] =
-				")";
+			words[LAST] = ")";
 			if (contents.charAt(posMarker) == ')') {
-				words[LAST] =
-					") ";
+				words[LAST] = ") ";
 			}
 
 		}
 		if (words[CURRENT].endsWith(")")) {
-			words[LAST] =
-				")";
-			words[CURRENT] =
-				"";
+			words[LAST] = ")";
+			words[CURRENT] = "";
 
 		}
 
@@ -201,14 +168,11 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 	 */
 	private static List<ContentProposal> getProposalList(String wordBefore, Set<String> features) {
 
-		final ArrayList<ContentProposal> proposals =
-			new ArrayList<ContentProposal>();
-		final ArrayList<String> featureList =
-			new ArrayList<String>(features);
+		final ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
+		final ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 
-		final Collection<String> operatorNamesInFeatures =
-			Features.extractOperatorNamesFromFeatuers(features);
+		final Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
 
 		// TODO: Add binary operators only iff their appearance makes sense in content proposal
 		// Example:
@@ -230,11 +194,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		// Show feature for "A implies |"
 		// Hide features for "A |"
 		for (final String s : featureList) {
-			proposals.add(new ContentProposal(s
-				+ (operatorNamesInFeatures.contains(s.trim())
-					? " "
-						+ Features.FEATURE_SUFFIX
-					: "")));
+			proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
 		}
 
 		return proposals;

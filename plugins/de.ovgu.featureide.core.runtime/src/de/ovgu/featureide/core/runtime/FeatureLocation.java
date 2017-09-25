@@ -42,25 +42,16 @@ class FeatureLocation {
 	boolean inConfig;
 	FSTDirectiveCommand cmd;
 
-	FeatureLocation(final String featureName, final int startLineNum,
-			final int endLineNum, final IFile classFile,
-			final String className, final FSTDirectiveCommand cmd) {
-		this.featureName =
-			featureName;
-		this.startLineNum =
-			startLineNum;
-		this.endLineNum =
-			endLineNum;
-		this.classFile =
-			classFile;
-		this.className =
-			className;
-		parent =
-			null;
-		inConfig =
-			false;
-		this.cmd =
-			cmd;
+	FeatureLocation(final String featureName, final int startLineNum, final int endLineNum, final IFile classFile, final String className,
+			final FSTDirectiveCommand cmd) {
+		this.featureName = featureName;
+		this.startLineNum = startLineNum;
+		this.endLineNum = endLineNum;
+		this.classFile = classFile;
+		this.className = className;
+		parent = null;
+		inConfig = false;
+		this.cmd = cmd;
 	}
 
 	public IFile getClassFile() {
@@ -100,32 +91,24 @@ class FeatureLocation {
 	}
 
 	public void setCmd(final FSTDirectiveCommand cmd) {
-		this.cmd =
-			cmd;
+		this.cmd = cmd;
 	}
 
 	public void setFeatureName(final String featureName) {
-		this.featureName =
-			featureName;
+		this.featureName = featureName;
 	}
 
 	public void setInConfig(final boolean inConfig) {
-		this.inConfig =
-			inConfig;
+		this.inConfig = inConfig;
 	}
 
 	public void setParent(final FeatureLocation parent) {
-		this.parent =
-			parent;
+		this.parent = parent;
 	}
 
 	@Override
 	public String toString() {
-		return getOSPath()
-			+ "_"
-			+ startLineNum
-			+ "_"
-			+ featureName;
+		return getOSPath() + "_" + startLineNum + "_" + featureName;
 	}
 
 }

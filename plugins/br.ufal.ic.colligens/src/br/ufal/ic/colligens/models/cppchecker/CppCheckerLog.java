@@ -20,34 +20,21 @@ public class CppCheckerLog implements ITextSelection {
 	private final String msg;
 	private final String config;
 
-	public static final String MARKER_TYPE =
-		Colligens.PLUGIN_ID
-			+ ".problem";
-	private final IDocument document =
-		null;
+	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".problem";
+	private final IDocument document = null;
 
-	public CppCheckerLog(CppCheckerFileLogs file, String line, String id,
-			String severity, String msg, String config) {
+	public CppCheckerLog(CppCheckerFileLogs file, String line, String id, String severity, String msg, String config) {
 
-		this.file =
-			file;
-		this.line =
-			line;
-		this.id =
-			id;
-		this.severity =
-			severity;
-		this.msg =
-			msg;
-		this.config =
-			config;
+		this.file = file;
+		this.line = line;
+		this.id = id;
+		this.severity = severity;
+		this.msg = msg;
+		this.config = config;
 
 		try {
-			final int startline =
-				getStartLine()
-					+ 1;
-			final IMarker marker =
-				this.file.getFile().createMarker(MARKER_TYPE);
+			final int startline = getStartLine() + 1;
+			final IMarker marker = this.file.getFile().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, msg);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LINE_NUMBER, startline);
@@ -91,8 +78,7 @@ public class CppCheckerLog implements ITextSelection {
 	public int getOffset() {
 		IDocument document;
 		try {
-			document =
-				getDocument();
+			document = getDocument();
 			return document.getLineOffset(getStartLine());
 		} catch (final CoreException e) {
 			return 0;
@@ -105,8 +91,7 @@ public class CppCheckerLog implements ITextSelection {
 	public int getLength() {
 		IDocument document;
 		try {
-			document =
-				getDocument();
+			document = getDocument();
 			return document.getLineLength(getStartLine());
 		} catch (final CoreException e) {
 			return 0;
@@ -118,8 +103,7 @@ public class CppCheckerLog implements ITextSelection {
 	@Override
 	public int getStartLine() {
 		// TODO Auto-generated method stub
-		return Integer.parseInt(line)
-			- 1;
+		return Integer.parseInt(line) - 1;
 	}
 
 	@Override
@@ -138,13 +122,8 @@ public class CppCheckerLog implements ITextSelection {
 		if (document != null) {
 			return document;
 		}
-		ITextFileBufferManager.DEFAULT.connect(getFileLogs().getFile()
-				.getFullPath(), LocationKind.IFILE, null);
-		return FileBuffers
-				.getTextFileBufferManager()
-				.getTextFileBuffer(getFileLogs().getFile().getFullPath(),
-						LocationKind.IFILE)
-				.getDocument();
+		ITextFileBufferManager.DEFAULT.connect(getFileLogs().getFile().getFullPath(), LocationKind.IFILE, null);
+		return FileBuffers.getTextFileBufferManager().getTextFileBuffer(getFileLogs().getFile().getFullPath(), LocationKind.IFILE).getDocument();
 	}
 
 }

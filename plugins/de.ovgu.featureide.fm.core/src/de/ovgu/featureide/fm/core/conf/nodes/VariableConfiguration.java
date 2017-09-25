@@ -25,34 +25,25 @@ import java.util.Iterator;
 public class VariableConfiguration implements Iterable<Variable> {
 
 	private final Variable[] conf;
-	private int valueCount =
-		0;
+	private int valueCount = 0;
 
 	public VariableConfiguration(int count) {
-		conf =
-			new Variable[count];
-		for (int i =
-			0; i < conf.length; i++) {
-			conf[i] =
-				new Variable(i);
+		conf = new Variable[count];
+		for (int i = 0; i < conf.length; i++) {
+			conf[i] = new Variable(i);
 		}
 	}
 
 	public void setVariable(int index, int newValue, boolean manual) {
-		final Variable variable =
-			conf[index];
-		final boolean hasValue =
-			variable.hasValue();
+		final Variable variable = conf[index];
+		final boolean hasValue = variable.hasValue();
 		if (manual) {
 			variable.setManualValue(newValue);
 		} else {
 			variable.setAutomaticValue(newValue);
 		}
 		if (hasValue != variable.hasValue()) {
-			valueCount +=
-				hasValue
-					? -1
-					: 1;
+			valueCount += hasValue ? -1 : 1;
 		}
 	}
 
@@ -61,9 +52,7 @@ public class VariableConfiguration implements Iterable<Variable> {
 	}
 
 	public int size(boolean definedVariablesOnly) {
-		return definedVariablesOnly
-			? valueCount
-			: conf.length;
+		return definedVariablesOnly ? valueCount : conf.length;
 	}
 
 	public Variable getVariable(int index) {
@@ -74,8 +63,7 @@ public class VariableConfiguration implements Iterable<Variable> {
 	public Iterator<Variable> iterator() {
 		return new Iterator<Variable>() {
 
-			private int index =
-				0;
+			private int index = 0;
 
 			@Override
 			public boolean hasNext() {
@@ -94,10 +82,8 @@ public class VariableConfiguration implements Iterable<Variable> {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb =
-			new StringBuffer();
-		for (int i =
-			0; i < conf.length; i++) {
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < conf.length; i++) {
 			sb.append(conf[i]);
 			sb.append('\n');
 		}
@@ -105,10 +91,8 @@ public class VariableConfiguration implements Iterable<Variable> {
 	}
 
 	public void reset() {
-		for (int i =
-			0; i < conf.length; i++) {
-			final Variable variable =
-				conf[i];
+		for (int i = 0; i < conf.length; i++) {
+			final Variable variable = conf[i];
 			variable.setManualValue(Variable.UNDEFINED);
 			variable.setAutomaticValue(Variable.UNDEFINED);
 		}

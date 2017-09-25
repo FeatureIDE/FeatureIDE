@@ -42,47 +42,19 @@ import org.eclipse.jface.text.source.Annotation;
  */
 public class ColorAnnotation extends Annotation {
 
-	public static final int TYPE_IMAGE =
-		0;
-	public static final int TYPE_HIGHLIGHT_OVERVIEW =
-		1;
-	public static final int TYPE_HIGHLIGHT =
-		2;
-	public static final int TYPE_OVERVIEW =
-		3;
+	public static final int TYPE_IMAGE = 0;
+	public static final int TYPE_HIGHLIGHT_OVERVIEW = 1;
+	public static final int TYPE_HIGHLIGHT = 2;
+	public static final int TYPE_OVERVIEW = 3;
 
-	private static final String[] ANNOTATIONTYPE_ID =
-		new String[31];
+	private static final String[] ANNOTATIONTYPE_ID = new String[31];
 	static {
-		final String PREFIX =
-			"de.ovgu.featureide.ui.editors.annotations.";
-		final String[] COLORS =
-			{
-				RED,
-				ORANGE,
-				YELLOW,
-				DARKGREEN,
-				LIGHTGREEN,
-				CYAN,
-				LIGHTGREY,
-				BLUE,
-				MARGENTA,
-				PINK };
-		ANNOTATIONTYPE_ID[0] =
-			PREFIX
-				+ "image";
+		final String PREFIX = "de.ovgu.featureide.ui.editors.annotations.";
+		final String[] COLORS = { RED, ORANGE, YELLOW, DARKGREEN, LIGHTGREEN, CYAN, LIGHTGREY, BLUE, MARGENTA, PINK };
+		ANNOTATIONTYPE_ID[0] = PREFIX + "image";
 
-		for (int i =
-			0; i < (ANNOTATIONTYPE_ID.length
-				- 1); i++) {
-			ANNOTATIONTYPE_ID[i
-				+ 1] =
-					PREFIX
-						+ COLORS[i
-							% COLORS.length]
-						+ ((i
-							/ COLORS.length)
-							+ 1);
+		for (int i = 0; i < (ANNOTATIONTYPE_ID.length - 1); i++) {
+			ANNOTATIONTYPE_ID[i + 1] = PREFIX + COLORS[i % COLORS.length] + ((i / COLORS.length) + 1);
 		}
 	}
 
@@ -92,12 +64,9 @@ public class ColorAnnotation extends Annotation {
 
 	public ColorAnnotation(int id, Position posistion, int annotationtype) {
 		super(getTypeString(id, annotationtype), false, COLOR_ANNOTATION);
-		position =
-			posistion;
-		this.id =
-			id;
-		type =
-			annotationtype;
+		position = posistion;
+		this.id = id;
+		type = annotationtype;
 	}
 
 	private static String getTypeString(int id, int type) {
@@ -108,14 +77,11 @@ public class ColorAnnotation extends Annotation {
 		case TYPE_IMAGE:
 			return ANNOTATIONTYPE_ID[0];
 		case TYPE_HIGHLIGHT_OVERVIEW:
-			return ANNOTATIONTYPE_ID[id
-				+ 1];
+			return ANNOTATIONTYPE_ID[id + 1];
 		case TYPE_HIGHLIGHT:
-			return ANNOTATIONTYPE_ID[id
-				+ 11];
+			return ANNOTATIONTYPE_ID[id + 11];
 		case TYPE_OVERVIEW:
-			return ANNOTATIONTYPE_ID[id
-				+ 21];
+			return ANNOTATIONTYPE_ID[id + 21];
 		default:
 			return null;
 		}
@@ -126,13 +92,11 @@ public class ColorAnnotation extends Annotation {
 	}
 
 	public void updateOffset(int deltaOffset) {
-		position.offset +=
-			deltaOffset;
+		position.offset += deltaOffset;
 	}
 
 	public void updateLength(int deltaLength) {
-		position.length +=
-			deltaLength;
+		position.length += deltaLength;
 	}
 
 	public String getId() {
@@ -140,7 +104,6 @@ public class ColorAnnotation extends Annotation {
 	}
 
 	public boolean isImageAnnotation() {
-		return (type == TYPE_IMAGE)
-			&& (id != -1);
+		return (type == TYPE_IMAGE) && (id != -1);
 	}
 }

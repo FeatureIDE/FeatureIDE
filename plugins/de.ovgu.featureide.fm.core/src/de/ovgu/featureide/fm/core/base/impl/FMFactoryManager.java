@@ -38,16 +38,14 @@ import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
  */
 public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactory> {
 
-	public static IFactoryWorkspaceProvider factoryWorkspaceProvider =
-		new CoreFactoryWorkspaceProvider();
+	public static IFactoryWorkspaceProvider factoryWorkspaceProvider = new CoreFactoryWorkspaceProvider();
 
 	private FMFactoryManager() {
 		setExtensionLoaderInternal(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
 		factoryWorkspaceProvider.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 	}
 
-	private static FMFactoryManager instance =
-		new FMFactoryManager();
+	private static FMFactoryManager instance = new FMFactoryManager();
 
 	public static FMFactoryManager getInstance() {
 		return instance;

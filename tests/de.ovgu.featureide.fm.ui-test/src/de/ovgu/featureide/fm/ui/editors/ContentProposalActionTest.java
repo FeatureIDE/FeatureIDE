@@ -40,33 +40,20 @@ public final class ContentProposalActionTest {
 	}
 
 	private Point getSelection(String inputText) {
-		final String text =
-			inputText;
-		final int selStart =
-			text.indexOf("|");
+		final String text = inputText;
+		final int selStart = text.indexOf("|");
 		if (selStart < 0) {
-			fail("Input text doest not contain a selection marker \"|\": "
-				+ text);
+			fail("Input text doest not contain a selection marker \"|\": " + text);
 		}
-		final String selectionEnd =
-			text.substring(selStart
-				+ 1, text.length());
-		final int selEnd =
-			selectionEnd.indexOf("|");
-		return new Point(selStart, selEnd < 0
-			? selStart
-			: selStart
-				+ selEnd);
+		final String selectionEnd = text.substring(selStart + 1, text.length());
+		final int selEnd = selectionEnd.indexOf("|");
+		return new Point(selStart, selEnd < 0 ? selStart : selStart + selEnd);
 	}
 
 	private String insertPipe(InsertionResult result) {
-		final String before =
-			result.text.substring(0, result.selection.x);
-		final String after =
-			result.text.substring(result.selection.x, result.text.length());
-		return before
-			+ "|"
-			+ after;
+		final String before = result.text.substring(0, result.selection.x);
+		final String after = result.text.substring(result.selection.x, result.text.length());
+		return before + "|" + after;
 	}
 
 	private String removePipe(String text) {

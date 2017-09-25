@@ -80,16 +80,12 @@ public class FeatureDiagramExtension {
 	 * @see de.ovgu.featureide.fm.ui.FeatureDiagram
 	 */
 	public static LinkedList<FeatureDiagramExtension> getExtensions() {
-		final LinkedList<FeatureDiagramExtension> extensions =
-			new LinkedList<FeatureDiagramExtension>();
+		final LinkedList<FeatureDiagramExtension> extensions = new LinkedList<FeatureDiagramExtension>();
 
-		final IConfigurationElement[] config =
-			Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID
-				+ ".FeatureDiagram");
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FeatureDiagram");
 		try {
 			for (final IConfigurationElement e : config) {
-				final Object o =
-					e.createExecutableExtension("class");
+				final Object o = e.createExecutableExtension("class");
 				if (o instanceof FeatureDiagramExtension) {
 					extensions.add(((FeatureDiagramExtension) o));
 				}

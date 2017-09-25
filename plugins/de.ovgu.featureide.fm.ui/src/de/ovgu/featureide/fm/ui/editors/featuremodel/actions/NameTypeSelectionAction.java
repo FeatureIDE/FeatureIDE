@@ -42,18 +42,14 @@ public class NameTypeSelectionAction extends Action {
 
 	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
 		super(FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType =
-			newNameType;
-		this.oldNameType =
-			oldNameType;
-		this.featureModel =
-			featureModel;
+		this.newNameType = newNameType;
+		this.oldNameType = oldNameType;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final NameTypeSelectionOperation op =
-			new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
+		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

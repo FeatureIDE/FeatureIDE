@@ -13,14 +13,11 @@ import br.ufal.ic.colligens.models.FileProxy;
 
 public class InvalidConfigurationsView extends ViewPart {
 
-	public static final String ID =
-		Colligens.PLUGIN_ID
-			+ ".views.InvalidConfigurationsView";
+	public static final String ID = Colligens.PLUGIN_ID + ".views.InvalidConfigurationsView";
 	private final InvalidConfigurationsViewController viewController;
 
 	public InvalidConfigurationsView() {
-		viewController =
-			InvalidConfigurationsViewController.getInstance();
+		viewController = InvalidConfigurationsViewController.getInstance();
 		viewController.setView(this);
 		setTitleToolTip(INVALID_CONFIGURATIONS___COLLIGENS);
 	}

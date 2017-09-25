@@ -56,31 +56,27 @@ public class FeatureDependenciesHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(final IFile inputFile) {
-		final IFeatureModel mod =
-			readModel(inputFile);
-		final Job job =
-			new Job(CALCULATING_FEATURE_DEPENDENCIES) {
+		final IFeatureModel mod = readModel(inputFile);
+		final Job job = new Job(CALCULATING_FEATURE_DEPENDENCIES) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					final String text =
-						new FeatureDependencies(mod).toStringWithLegend();
-					// UI access
-					final StringBuilder path =
-						new StringBuilder();
-					Display.getDefault().syncExec(new Runnable() {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				final String text = new FeatureDependencies(mod).toStringWithLegend();
+				// UI access
+				final StringBuilder path = new StringBuilder();
+				Display.getDefault().syncExec(new Runnable() {
 
-						@Override
-						public void run() {
-							path.append(openFileDialog());
-						}
+					@Override
+					public void run() {
+						path.append(openFileDialog());
+					}
 
-					});
-					saveFile(text, path.toString());
-					return Status.OK_STATUS;
-				}
+				});
+				saveFile(text, path.toString());
+				return Status.OK_STATUS;
+			}
 
-			};
+		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
@@ -95,13 +91,10 @@ public class FeatureDependenciesHandler extends AFileHandler {
 		if (path == null) {
 			return;
 		}
-		final File outputFile =
-			new File(path);
-		BufferedWriter out =
-			null;
+		final File outputFile = new File(path);
+		BufferedWriter out = null;
 		try {
-			out =
-				new BufferedWriter(new FileWriter(outputFile));
+			out = new BufferedWriter(new FileWriter(outputFile));
 			out.write(content);
 		} catch (final IOException e) {} finally {
 			if (out != null) {
@@ -123,8 +116,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 *
 	 */
 	private String openFileDialog() {
-		final FileDialog fileDialog =
-			new FileDialog(new Shell(), SWT.SAVE);
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		fileDialog.setFileName("*.txt");
 		fileDialog.setOverwrite(true);
 		return fileDialog.open();

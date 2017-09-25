@@ -37,16 +37,11 @@ public class FeatureOperationData {
 	private int oldIndex;
 
 	public FeatureOperationData(IGraphicalFeature feature, IGraphicalFeature oldParent, IGraphicalFeature newParent, int newIndex, int oldIndex) {
-		this.feature =
-			feature;
-		this.newIndex =
-			newIndex;
-		this.newParent =
-			newParent;
-		this.oldIndex =
-			oldIndex;
-		this.oldParent =
-			oldParent;
+		this.feature = feature;
+		this.newIndex = newIndex;
+		this.newParent = newParent;
+		this.oldIndex = oldIndex;
+		this.oldParent = oldParent;
 
 	}
 
@@ -61,8 +56,7 @@ public class FeatureOperationData {
 	 * @param oldParent the oldParent to set
 	 */
 	public void setOldParent(IGraphicalFeature oldParent) {
-		this.oldParent =
-			oldParent;
+		this.oldParent = oldParent;
 	}
 
 	/**
@@ -76,8 +70,7 @@ public class FeatureOperationData {
 	 * @param feature the feature to set
 	 */
 	public void setFeature(IGraphicalFeature feature) {
-		this.feature =
-			feature;
+		this.feature = feature;
 	}
 
 	/**
@@ -91,8 +84,7 @@ public class FeatureOperationData {
 	 * @param newParent the newParent to set
 	 */
 	public void setNewParent(IGraphicalFeature newParent) {
-		this.newParent =
-			newParent;
+		this.newParent = newParent;
 	}
 
 	/**
@@ -106,8 +98,7 @@ public class FeatureOperationData {
 	 * @param newIndex the newIndex to set
 	 */
 	public void setNewIndex(int newIndex) {
-		this.newIndex =
-			newIndex;
+		this.newIndex = newIndex;
 	}
 
 	/**
@@ -121,8 +112,7 @@ public class FeatureOperationData {
 	 * @param oldIndex the oldIndex to set
 	 */
 	public void setOldIndex(int oldIndex) {
-		this.oldIndex =
-			oldIndex;
+		this.oldIndex = oldIndex;
 	}
 
 }

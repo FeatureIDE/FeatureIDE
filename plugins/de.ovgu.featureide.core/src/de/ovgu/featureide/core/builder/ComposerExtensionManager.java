@@ -41,8 +41,7 @@ import de.ovgu.featureide.fm.core.ExtensionManager;
  */
 public class ComposerExtensionManager extends ExtensionManager<IComposerExtension> {
 
-	private static ComposerExtensionManager instance =
-		new ComposerExtensionManager();
+	private static ComposerExtensionManager instance = new ComposerExtensionManager();
 
 	private ComposerExtensionManager() {
 		setExtensionLoaderInternal(new EclipseExtensionLoader<IComposerExtension>(CorePlugin.PLUGIN_ID, IComposerExtensionBase.extensionPointID,
@@ -91,9 +90,7 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 				return tool;
 			}
 		}
-		CorePlugin.getDefault().logWarning(THE_REQUIRED_COMPOSER
-			+ composerID
-			+ IS_NOT_AVAILABLE_);
+		CorePlugin.getDefault().logWarning(THE_REQUIRED_COMPOSER + composerID + IS_NOT_AVAILABLE_);
 		return null;
 	}
 

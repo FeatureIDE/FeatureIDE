@@ -95,17 +95,12 @@ public class FeatureModeling extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		try {
-			final IContainer parent =
-				folder.getParent();
+			final IContainer parent = folder.getParent();
 			if (!parent.exists()) {
 				folder.create(true, true, null);
 			}
-			final IPersistentFormat<Configuration> format =
-				ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
-			final IFile configurationFile =
-				parent.getFile(new Path(congurationName
-					+ "."
-					+ format.getSuffix()));
+			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
+			final IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
 			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {

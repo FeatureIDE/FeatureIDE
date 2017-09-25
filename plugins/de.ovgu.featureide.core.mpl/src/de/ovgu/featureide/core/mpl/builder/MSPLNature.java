@@ -31,21 +31,16 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 
 public class MSPLNature implements IProjectNature {
 
-	public static final String NATURE_ID =
-		MPLPlugin.PLUGIN_ID
-			+ ".MSPLNature";
+	public static final String NATURE_ID = MPLPlugin.PLUGIN_ID + ".MSPLNature";
 
 	private IProject project;
 
 	@Override
 	public void configure() throws CoreException {
-		final IProjectDescription desc =
-			project.getDescription();
-		final ICommand[] commands =
-			desc.getBuildSpec();
+		final IProjectDescription desc = project.getDescription();
+		final ICommand[] commands = desc.getBuildSpec();
 
-		for (int i =
-			0; i < commands.length; ++i) {
+		for (int i = 0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 				commands[i].setBuilderName(MSPLBuilder.BUILDER_ID);
 			}
@@ -57,22 +52,13 @@ public class MSPLNature implements IProjectNature {
 
 	@Override
 	public void deconfigure() throws CoreException {
-		final IProjectDescription description =
-			getProject().getDescription();
-		final ICommand[] commands =
-			description.getBuildSpec();
-		for (int i =
-			0; i < commands.length; ++i) {
+		final IProjectDescription description = getProject().getDescription();
+		final ICommand[] commands = description.getBuildSpec();
+		for (int i = 0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(MSPLBuilder.BUILDER_ID)) {
-				final ICommand[] newCommands =
-					new ICommand[commands.length
-						- 1];
+				final ICommand[] newCommands = new ICommand[commands.length - 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
-				System.arraycopy(commands, i
-					+ 1, newCommands, i,
-						commands.length
-							- i
-							- 1);
+				System.arraycopy(commands, i + 1, newCommands, i, commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				getProject().setDescription(description, null);
 				return;
@@ -87,8 +73,7 @@ public class MSPLNature implements IProjectNature {
 
 	@Override
 	public void setProject(IProject project) {
-		this.project =
-			project;
+		this.project = project;
 	}
 
 }

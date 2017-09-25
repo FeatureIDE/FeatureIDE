@@ -45,8 +45,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	private Tree featuresTree;
-	private final HashSet<String> featureNames =
-		new HashSet<String>();
+	private final HashSet<String> featureNames = new HashSet<String>();
 
 	public SelectFeaturesWizardPage() {
 		super("Select Features");
@@ -56,25 +55,20 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 
-		final GridLayout layout =
-			new GridLayout();
+		final GridLayout layout = new GridLayout();
 		container.setLayout(layout);
 		setControl(container);
 
-		featuresTree =
-			new Tree(container, SWT.MULTI
-				| SWT.CHECK);
+		featuresTree = new Tree(container, SWT.MULTI | SWT.CHECK);
 		featuresTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		featuresTree.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
-					final TreeItem item =
-						(TreeItem) e.item;
+					final TreeItem item = (TreeItem) e.item;
 					if (item.getChecked()) {
 						featureNames.add(item.getText());
 					} else {
@@ -90,17 +84,13 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			}
 		});
 
-		final Composite buttonGroup =
-			new Composite(container, 0);
+		final Composite buttonGroup = new Composite(container, 0);
 		buttonGroup.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
-		final GridLayout gridLayout =
-			new GridLayout();
-		gridLayout.numColumns =
-			2;
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 2;
 		buttonGroup.setLayout(gridLayout);
 
-		final Button selectAllButton =
-			new Button(buttonGroup, SWT.PUSH);
+		final Button selectAllButton = new Button(buttonGroup, SWT.PUSH);
 		selectAllButton.setText("Select All");
 		selectAllButton.addSelectionListener(new SelectionListener() {
 
@@ -113,8 +103,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
-		final Button deselectAllButton =
-			new Button(buttonGroup, SWT.PUSH);
+		final Button deselectAllButton = new Button(buttonGroup, SWT.PUSH);
 		deselectAllButton.setText("Deselect All");
 		deselectAllButton.addSelectionListener(new SelectionListener() {
 
@@ -131,10 +120,8 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	}
 
 	private void checkItems(boolean checkStatus) {
-		final TreeItem[] items =
-			featuresTree.getItems();
-		for (int i =
-			0; i < items.length; i++) {
+		final TreeItem[] items = featuresTree.getItems();
+		for (int i = 0; i < items.length; i++) {
 			check(items[i], checkStatus);
 		}
 		updatePage();
@@ -147,10 +134,8 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		} else {
 			featureNames.remove(parent.getText());
 		}
-		final TreeItem[] items =
-			parent.getItems();
-		for (int i =
-			0; i < items.length; i++) {
+		final TreeItem[] items = parent.getItems();
+		for (int i = 0; i < items.length; i++) {
 			check(items[i], checkStatus);
 		}
 	}
@@ -160,8 +145,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		if (visible) {
 			featuresTree.setItemCount(0);
 			featureNames.clear();
-			final Object featureModel =
-				abstractWizard.getData(WizardConstants.KEY_IN_FEATUREMODEL);
+			final Object featureModel = abstractWizard.getData(WizardConstants.KEY_IN_FEATUREMODEL);
 			if (featureModel != null) {
 				addFeaturesToTree(((IFeatureModel) featureModel).getStructure().getRoot().getFeature());
 			} else {
@@ -178,8 +162,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	 * @param root the feature to add
 	 */
 	private void addFeaturesToTree(IFeature root) {
-		final TreeItem item =
-			new TreeItem(featuresTree, SWT.NORMAL);
+		final TreeItem item = new TreeItem(featuresTree, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 
@@ -196,8 +179,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	 * @param parent the parent item to add the feature as a child
 	 */
 	private void addFeaturesToTree(IFeature root, TreeItem parent) {
-		final TreeItem item =
-			new TreeItem(parent, SWT.NORMAL);
+		final TreeItem item = new TreeItem(parent, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 		item.setExpanded(true);

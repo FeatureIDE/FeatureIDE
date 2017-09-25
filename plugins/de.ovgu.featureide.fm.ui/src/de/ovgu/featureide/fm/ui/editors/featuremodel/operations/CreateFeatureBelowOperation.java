@@ -43,26 +43,20 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
-		this.feature =
-			feature;
+		this.feature = feature;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		int number =
-			1;
+		int number = 1;
 
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION
-			+ number)) {
+		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
 			number++;
 		}
 
-		newFeature =
-			new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION
-				+ number);
+		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
-		feature =
-			featureModel.getFeature(feature.getName());
+		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, newFeature);
@@ -70,8 +64,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		newFeature =
-			featureModel.getFeature(newFeature.getName());
+		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
 		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
 	}

@@ -32,8 +32,7 @@ public class ExtendedOutlineLabelProvider extends CollaborationOutlineLabelProvi
 	@Override
 	public String getText(Object element) {
 		if (element instanceof FSTClass) {
-			final FSTClass fstclass =
-				(FSTClass) element;
+			final FSTClass fstclass = (FSTClass) element;
 			return fstclass.getName();
 		} else {
 			return super.getText(element);

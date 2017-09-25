@@ -44,56 +44,38 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class FeatureIDEFormat implements IConfigurationFormat {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.config."
-			+ FeatureIDEFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + FeatureIDEFormat.class.getSimpleName();
 
-	public static final String EXTENSION =
-		StringTable.FIDECONF;
+	public static final String EXTENSION = StringTable.FIDECONF;
 
-	private static final String NEWLINE =
-		System.lineSeparator();
+	private static final String NEWLINE = System.lineSeparator();
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager =
-			configuration.getFeatureModel().getRenamingsManager();
-		final ProblemList warnings =
-			new ProblemList();
+		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final ProblemList warnings = new ProblemList();
 
-		final boolean orgPropagate =
-			configuration.isPropagate();
+		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
 
-		String line =
-			null;
-		int lineNumber =
-			1;
-		try (BufferedReader reader =
-			new BufferedReader(new StringReader(source.toString()))) {
-			while ((line =
-				reader.readLine()) != null) {
+		String line = null;
+		int lineNumber = 1;
+		try (BufferedReader reader = new BufferedReader(new StringReader(source.toString()))) {
+			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#")) {
 					continue;
 				}
-				line =
-					line.trim();
+				line = line.trim();
 				if (!line.isEmpty()) {
-					Selection manual =
-						Selection.UNDEFINED,
-							automatic =
-								Selection.UNDEFINED;
+					Selection manual = Selection.UNDEFINED, automatic = Selection.UNDEFINED;
 					try {
 						switch (Integer.parseInt(line.substring(0, 1))) {
 						case 0:
-							manual =
-								Selection.UNSELECTED;
+							manual = Selection.UNSELECTED;
 							break;
 						case 1:
-							manual =
-								Selection.SELECTED;
+							manual = Selection.SELECTED;
 							break;
 						case 2:
 							break;
@@ -103,12 +85,10 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 						}
 						switch (Integer.parseInt(line.substring(1, 2))) {
 						case 0:
-							automatic =
-								Selection.UNSELECTED;
+							automatic = Selection.UNSELECTED;
 							break;
 						case 1:
-							automatic =
-								Selection.SELECTED;
+							automatic = Selection.SELECTED;
 							break;
 						case 2:
 							break;
@@ -120,22 +100,17 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
-					final String name =
-						renamingsManager.getNewName(line.substring(2));
+					final String name = renamingsManager.getNewName(line.substring(2));
 
-					final SelectableFeature feature =
-						configuration.getSelectablefeature(name);
+					final SelectableFeature feature = configuration.getSelectablefeature(name);
 					if (feature == null) {
-						warnings.add(new Problem(FEATURE
-							+ name
-							+ DOES_NOT_EXIST, lineNumber));
+						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {
 						try {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
 						} catch (final SelectionNotPossibleException e) {
-							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE
-								+ name, lineNumber, e));
+							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber, e));
 						}
 					}
 				}
@@ -151,8 +126,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 
 	@Override
 	public String write(Configuration configuration) {
-		final StringBuilder buffer =
-			new StringBuilder();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("# Lists all features from the model with manual (first digit) and automatic (second digit) selection");
 		buffer.append(NEWLINE);
 		buffer.append("# 0 = deselected, 1 = selected, 2 = undefined");

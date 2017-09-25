@@ -35,8 +35,7 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
-	private static final String FEATUREMODELLING_NAME_PATTERN =
-		".+";
+	private static final String FEATUREMODELLING_NAME_PATTERN = ".+";
 
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
@@ -44,9 +43,7 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	}
 
 	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects for modelling purpose only do not\n"
-			+
-			NEED_AN_ORDER_COMMA__AS_THERE_IS_NO_SOURCE_CODE_TO_COMPOSE_;
+		"FeatureIDE projects for modelling purpose only do not\n" + NEED_AN_ORDER_COMMA__AS_THERE_IS_NO_SOURCE_CODE_TO_COMPOSE_;
 
 	@Override
 	public String getOrderPageMessage() {
@@ -54,8 +51,7 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean performRenaming(String oldName, String newName,
-			IProject project) {
+	public boolean performRenaming(String oldName, String newName, IProject project) {
 		return true;
 	}
 

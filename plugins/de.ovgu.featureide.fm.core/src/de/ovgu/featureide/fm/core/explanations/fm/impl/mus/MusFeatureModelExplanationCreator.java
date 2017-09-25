@@ -40,8 +40,7 @@ public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureM
 
 	@Override
 	protected MusExtractor createOracle() {
-		final MusExtractor oracle =
-			SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}

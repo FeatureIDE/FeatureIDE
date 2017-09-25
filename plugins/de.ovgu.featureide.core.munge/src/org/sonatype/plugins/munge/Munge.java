@@ -112,59 +112,36 @@ import de.ovgu.featureide.munge.MungeCorePlugin;
  */
 public class Munge {
 
-	static Hashtable<String, Object> symbols =
-		new Hashtable<String, Object>(2);
+	static Hashtable<String, Object> symbols = new Hashtable<String, Object>(2);
 
-	static Vector<String> oldTextStrings =
-		new Vector<String>();
-	static Vector<String> newTextStrings =
-		new Vector<String>();
+	static Vector<String> oldTextStrings = new Vector<String>();
+	static Vector<String> newTextStrings = new Vector<String>();
 
-	int errors =
-		0;
-	int line =
-		1;
+	int errors = 0;
+	int line = 1;
 	String inName;
 	BufferedReader in;
 	PrintWriter out;
-	Stack<Boolean> stack =
-		new Stack<Boolean>();
-	boolean printing =
-		true;
-	String source =
-		null;
-	String block =
-		null;
+	Stack<Boolean> stack = new Stack<Boolean>();
+	boolean printing = true;
+	String source = null;
+	String block = null;
 
-	static final String[] commands =
-		{
-			"if",
-			"if_not",
-			"else",
-			"end" };
-	static final int IF =
-		0;
-	static final int IF_NOT =
-		1;
-	static final int ELSE =
-		2;
-	static final int END =
-		3;
-	static final int numCommands =
-		4;
+	static final String[] commands = { "if", "if_not", "else", "end" };
+	static final int IF = 0;
+	static final int IF_NOT = 1;
+	static final int ELSE = 2;
+	static final int END = 3;
+	static final int numCommands = 4;
 
-	static final int EOF =
-		0;
-	static final int COMMENT =
-		1;     // text surrounded by /* */ delimiters
-	static final int CODE =
-		2;        // can just be whitespace
+	static final int EOF = 0;
+	static final int COMMENT = 1;     // text surrounded by /* */ delimiters
+	static final int CODE = 2;        // can just be whitespace
 
 	private IFeatureProject featureProject;
 
 	int getCommand(String s) {
-		for (int i =
-			0; i < numCommands; i++) {
+		for (int i = 0; i < numCommands; i++) {
 			if (s.equals(commands[i])) {
 				return i;
 			}
@@ -182,72 +159,55 @@ public class Munge {
 	 * @return
 	 */
 	private IFile getFile(String inName) {
-		final String projectName =
-			featureProject.getProjectName();
-		inName =
-			inName.substring(inName.indexOf(projectName
-				+ "\\")
-				+ projectName.length()
-				+ 1);
-		IFolder sourceFolder =
-			featureProject.getSourceFolder();
-		final String name =
-			sourceFolder.getName();
-		inName =
-			inName.substring(inName.indexOf(name
-				+ "\\")
-				+ name.length()
-				+ 1);
+		final String projectName = featureProject.getProjectName();
+		inName = inName.substring(inName.indexOf(projectName + "\\") + projectName.length() + 1);
+		IFolder sourceFolder = featureProject.getSourceFolder();
+		final String name = sourceFolder.getName();
+		inName = inName.substring(inName.indexOf(name + "\\") + name.length() + 1);
 
 		while (inName.contains("\\")) {
-			sourceFolder =
-				sourceFolder.getFolder(inName.substring(0, inName.indexOf('\\')));
+			sourceFolder = sourceFolder.getFolder(inName.substring(0, inName.indexOf('\\')));
 		}
 		return sourceFolder.getFile(inName);
 	}
 
 	public void addMarker(final String text, final IFile file, final int line) {
-		final Job job =
-			new Job(PROPAGATE_SYNTAX_MARKERS) {
+		final Job job = new Job(PROPAGATE_SYNTAX_MARKERS) {
 
-				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					try {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
 
-						if (!hasMarker()) {
-							final IMarker newMarker =
-								file.createMarker(CorePlugin.PLUGIN_ID
-									+ ".builderProblemMarker");
-							newMarker.setAttribute(IMarker.LINE_NUMBER, line);
-							newMarker.setAttribute(IMarker.MESSAGE, text);
-							newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-						}
-					} catch (final CoreException e) {
-						MungeCorePlugin.getDefault().logError(e);
+					if (!hasMarker()) {
+						final IMarker newMarker = file.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+						newMarker.setAttribute(IMarker.LINE_NUMBER, line);
+						newMarker.setAttribute(IMarker.MESSAGE, text);
+						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 					}
-					return Status.OK_STATUS;
+				} catch (final CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
 				}
+				return Status.OK_STATUS;
+			}
 
-				private boolean hasMarker() {
-					try {
-						final IMarker[] marker =
-							file.findMarkers(CorePlugin.PLUGIN_ID
-								+ ".builderProblemMarker", false, IResource.DEPTH_ZERO);
-						if (marker.length > 0) {
-							for (final IMarker m : marker) {
-								if (line == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
-									if (text.equals(m.getAttribute(IMarker.MESSAGE, null))) {
-										return true;
-									}
+			private boolean hasMarker() {
+				try {
+					final IMarker[] marker = file.findMarkers(CorePlugin.PLUGIN_ID + ".builderProblemMarker", false, IResource.DEPTH_ZERO);
+					if (marker.length > 0) {
+						for (final IMarker m : marker) {
+							if (line == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (text.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
 								}
 							}
 						}
-					} catch (final CoreException e) {
-						MungeCorePlugin.getDefault().logError(e);
 					}
-					return false;
+				} catch (final CoreException e) {
+					MungeCorePlugin.getDefault().logError(e);
 				}
-			};
+				return false;
+			}
+		};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
@@ -259,35 +219,27 @@ public class Munge {
 	}
 
 	public Munge(String inName, String outName, IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
-		this.inName =
-			inName;
+		this.featureProject = featureProject;
+		this.inName = inName;
 		if (inName == null) {
-			in =
-				new BufferedReader(new InputStreamReader(System.in));
+			in = new BufferedReader(new InputStreamReader(System.in));
 		} else {
 			try {
-				in =
-					new BufferedReader(new FileReader(inName));
+				in = new BufferedReader(new FileReader(inName));
 			} catch (final FileNotFoundException fnf) {
-				MungeCorePlugin.getDefault().logWarning(CANNOT_FIND_INPUT_FILE
-					+ inName);
+				MungeCorePlugin.getDefault().logWarning(CANNOT_FIND_INPUT_FILE + inName);
 				errors++;
 				return;
 			}
 		}
 
 		if (outName == null) {
-			out =
-				new PrintWriter(System.out);
+			out = new PrintWriter(System.out);
 		} else {
 			try {
-				out =
-					new PrintWriter(new FileWriter(outName));
+				out = new PrintWriter(new FileWriter(outName));
 			} catch (final IOException ioe) {
-				MungeCorePlugin.getDefault().logError(CANNOT_WRITE_TO_FILE
-					+ outName, ioe);
+				MungeCorePlugin.getDefault().logError(CANNOT_WRITE_TO_FILE + outName, ioe);
 				errors++;
 			}
 		}
@@ -299,9 +251,7 @@ public class Munge {
 
 	private void checkNesting() {
 		if (stack.size() > 1) {
-			printing =
-				stack.peek()
-					&& printing;
+			printing = stack.peek() && printing;
 		}
 	}
 
@@ -313,29 +263,24 @@ public class Munge {
 
 	void cmd_if(String version) {
 		stack.push(Boolean.valueOf(printing));
-		printing =
-			(symbols.get(version) != null);
+		printing = (symbols.get(version) != null);
 		checkNesting();
 	}
 
 	void cmd_if_not(String version) {
 		stack.push(Boolean.valueOf(printing));
-		printing =
-			(symbols.get(version) == null);
+		printing = (symbols.get(version) == null);
 		checkNesting();
 	}
 
 	void cmd_else() {
-		printing =
-			!printing;
+		printing = !printing;
 		checkNesting();
 	}
 
 	void cmd_end() throws EmptyStackException {
-		final Boolean b =
-			stack.pop();
-		printing =
-			b.booleanValue();
+		final Boolean b = stack.pop();
+		printing = b.booleanValue();
 	}
 
 	void print(String s) throws IOException {
@@ -343,10 +288,8 @@ public class Munge {
 			out.write(s);
 		} else {
 			// Output empty lines to preserve line numbering.
-			final int n =
-				countLines(s);
-			for (int i =
-				0; i < n; i++) {
+			final int n = countLines(s);
+			for (int i = 0; i < n; i++) {
 				out.write('\n');
 			}
 		}
@@ -354,13 +297,9 @@ public class Munge {
 
 	// Return the number of line endings in a string.
 	int countLines(String s) {
-		int i =
-			0;
-		int n =
-			0;
-		while ((i =
-			block.indexOf('\n', i)
-				+ 1) > 0) {
+		int i = 0;
+		int n = 0;
+		while ((i = block.indexOf('\n', i) + 1) > 0) {
 			n++;
 		}
 		return n;
@@ -370,43 +309,32 @@ public class Munge {
 	 * If there's a preprocessor tag in this comment, act on it and return any text within it. If not, just return the whole comment unchanged.
 	 */
 	void processComment(String comment) throws IOException {
-		final String commentText =
-			comment.substring(2, comment.length()
-				- 2);
-		final StringTokenizer st =
-			new StringTokenizer(
-					commentText, "[] \t\r\n", true);
-		boolean foundTag =
-			false;
-		final StringBuilder buffer =
-			new StringBuilder();
+		final String commentText = comment.substring(2, comment.length() - 2);
+		final StringTokenizer st = new StringTokenizer(commentText, "[] \t\r\n", true);
+		boolean foundTag = false;
+		final StringBuilder buffer = new StringBuilder();
 
 		try {
 			while (st.hasMoreTokens()) {
-				String token =
-					st.nextToken();
-				final int cmd =
-					getCommand(token);
+				String token = st.nextToken();
+				final int cmd = getCommand(token);
 				if (cmd == -1) {
 					buffer.append(token);
 					if (token.equals("\n")) {
 						line++;
 					}
 				} else {
-					token =
-						st.nextToken();
+					token = st.nextToken();
 					if (!token.equals("[")) {
 						// Not a real tag: save it and continue...
 						buffer.append(commands[cmd]);
 						buffer.append(token);
 					} else {
-						final String symbol =
-							st.nextToken();
+						final String symbol = st.nextToken();
 						if (!st.nextToken().equals("]")) {
 							error(INVALID_PREPROCESSOR_STATEMENT);
 						}
-						foundTag =
-							true;
+						foundTag = true;
 
 						// flush text, as command may change printing state
 						print(buffer.toString());
@@ -447,87 +375,61 @@ public class Munge {
 	// Munge views a Java source file as consisting of
 	// blocks, alternating between comments and the text between them.
 	int nextBlock() throws IOException {
-		if ((source == null)
-			|| (source.length() == 0)) {
-			block =
-				null;
+		if ((source == null) || (source.length() == 0)) {
+			block = null;
 			return EOF;
 		}
 		if (source.startsWith("/*")) {
 			// Return comment as next block.
-			int i =
-				source.indexOf("*/");
+			int i = source.indexOf("*/");
 			if (i == -1) {
 				// malformed comment, skip
-				block =
-					source;
+				block = source;
 				return CODE;
 			}
-			i +=
-				2;  // include comment close
-			block =
-				source.substring(0, i);
-			source =
-				source.substring(i);
+			i += 2;  // include comment close
+			block = source.substring(0, i);
+			source = source.substring(i);
 			return COMMENT;
 		}
 
 		// Return text up to next comment, or rest of file if no more comments.
-		final int i =
-			source.indexOf("/*");
+		final int i = source.indexOf("/*");
 		if (i != -1) {
-			block =
-				source.substring(0, i);
-			source =
-				source.substring(i);
+			block = source.substring(0, i);
+			source = source.substring(i);
 		} else {
-			block =
-				source;
-			source =
-				null;
+			block = source;
+			source = null;
 		}
 
 		// Update line count -- this isn't done for comments because
 		// line counting has to be done during parsing.
-		line +=
-			countLines(block);
+		line += countLines(block);
 
 		return CODE;
 	}
 
 	void substitute() {
-		for (int i =
-			0; i < oldTextStrings.size(); i++) {
-			final String oldText =
-				oldTextStrings.elementAt(i);
-			final String newText =
-				newTextStrings.elementAt(i);
+		for (int i = 0; i < oldTextStrings.size(); i++) {
+			final String oldText = oldTextStrings.elementAt(i);
+			final String newText = newTextStrings.elementAt(i);
 			int n;
-			while ((n =
-				source.indexOf(oldText)) >= 0) {
-				source =
-					source.substring(0, n)
-						+ newText
-						+
-						source.substring(n
-							+ oldText.length());
+			while ((n = source.indexOf(oldText)) >= 0) {
+				source = source.substring(0, n) + newText + source.substring(n + oldText.length());
 			}
 		}
 	}
 
 	public void process() throws IOException {
 		// Read all of file into a single stream for easier scanning.
-		final StringWriter sw =
-			new StringWriter();
-		final char[] buffer =
-			new char[8192];
+		final StringWriter sw = new StringWriter();
+		final char[] buffer = new char[8192];
 		int n;
-		while ((n =
-			in.read(buffer, 0, 8192)) > 0) {
+		while ((n = in.read(buffer, 0, 8192)) > 0) {
 			sw.write(buffer, 0, n);
 		}
-		source =
-			sw.toString();
+		source = sw.toString();
 
 		// Perform any text substitutions.
 		substitute();
@@ -535,8 +437,7 @@ public class Munge {
 		// Do preprocessing.
 		int blockType;
 		do {
-			blockType =
-				nextBlock();
+			blockType = nextBlock();
 			if (blockType == COMMENT) {
 				processComment(block);
 			} else if (blockType == CODE) {
@@ -554,19 +455,8 @@ public class Munge {
 	 * Report how this utility is used and exit.
 	 */
 	public static void usage() {
-		MungeCorePlugin.getDefault().logWarning("usage:"
-			+
-			"\n    java Munge [-D<symbol> ...] "
-			+
-			"[-s <old>=<new> ...] "
-			+
-			"[<in file>] [<out file>]"
-			+
-			"\n    java Munge [-D<symbol> ...] "
-			+
-			"[-s <old>=<new> ...] "
-			+
-			"<file> ... <directory>");
+		MungeCorePlugin.getDefault().logWarning("usage:" + "\n    java Munge [-D<symbol> ...] " + "[-s <old>=<new> ...] " + "[<in file>] [<out file>]"
+			+ "\n    java Munge [-D<symbol> ...] " + "[-s <old>=<new> ...] " + "<file> ... <directory>");
 		// System.exit(1);
 	}
 
@@ -579,29 +469,23 @@ public class Munge {
 	 * Munge's main entry point.
 	 */
 	public void main(String[] args, IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
+		this.featureProject = featureProject;
 		// Use a dummy object as the hash entry value.
-		final Object obj =
-			new Object();
+		final Object obj = new Object();
 
 		// Replace and @file arguments with the contents of the specified file.
 		try {
-			args =
-				CommandLine.parse(args);
+			args = CommandLine.parse(args);
 		} catch (final IOException e) {
 			MungeCorePlugin.getDefault().logError("Unable to read @file argument.", e);
 		}
 
 		// Load symbol definitions
-		int iArg =
-			0;
+		int iArg = 0;
 		symbols.clear();
-		while ((iArg < args.length)
-			&& args[iArg].startsWith("-")) {
+		while ((iArg < args.length) && args[iArg].startsWith("-")) {
 			if (args[iArg].startsWith("-D")) {
-				final String symbol =
-					args[iArg].substring(2);
+				final String symbol = args[iArg].substring(2);
 				symbols.put(symbol, obj);
 			}
 
@@ -611,29 +495,19 @@ public class Munge {
 				}
 
 				// Parse and store <old_text>=<new_text> parameter.
-				final String subst =
-					args[++iArg];
-				final int equals =
-					subst.indexOf('=');
-				if ((equals < 1)
-					|| (equals >= subst.length())) {
-					usage("invalid substitution string \""
-						+ subst
-						+ "\"");
+				final String subst = args[++iArg];
+				final int equals = subst.indexOf('=');
+				if ((equals < 1) || (equals >= subst.length())) {
+					usage("invalid substitution string \"" + subst + "\"");
 				}
-				final String oldText =
-					subst.substring(0, equals);
+				final String oldText = subst.substring(0, equals);
 				oldTextStrings.addElement(oldText);
-				final String newText =
-					subst.substring(equals
-						+ 1);
+				final String newText = subst.substring(equals + 1);
 				newTextStrings.addElement(newText);
 			}
 
 			else {
-				usage("invalid flag \""
-					+ args[iArg]
-					+ "\"");
+				usage("invalid flag \"" + args[iArg] + "\"");
 			}
 
 			iArg++;
@@ -641,55 +515,37 @@ public class Munge {
 
 		// Parse file name arguments into an array of input file names and
 		// output file names.
-		final String[] inFiles =
-			new String[Math.max(args.length
-				- iArg
-				- 1, 1)];
-		final String[] outFiles =
-			new String[inFiles.length];
+		final String[] inFiles = new String[Math.max(args.length - iArg - 1, 1)];
+		final String[] outFiles = new String[inFiles.length];
 
 		if (iArg < args.length) {
-			final File targetDir =
-				new File(args[args.length
-					- 1]);
+			final File targetDir = new File(args[args.length - 1]);
 			if (targetDir.isDirectory()) {
-				int i =
-					0;
-				for (; iArg < (args.length
-					- 1); i++, iArg++) {
-					inFiles[i] =
-						args[iArg];
-					final File inFile =
-						new File(args[iArg]);
-					final File outFile =
-						new File(targetDir, inFile.getName());
-					outFiles[i] =
-						outFile.getAbsolutePath();
+				int i = 0;
+				for (; iArg < (args.length - 1); i++, iArg++) {
+					inFiles[i] = args[iArg];
+					final File inFile = new File(args[iArg]);
+					final File outFile = new File(targetDir, inFile.getName());
+					outFiles[i] = outFile.getAbsolutePath();
 				}
 				if (i == 0) {
 					usage(NO_SOURCE_FILES_SPECIFIED_);
 				}
 			} else {
-				inFiles[0] =
-					args[iArg++];
+				inFiles[0] = args[iArg++];
 				if (iArg < args.length) {
-					outFiles[0] =
-						args[iArg++];
+					outFiles[0] = args[iArg++];
 				}
 				if (iArg < args.length) {
-					usage(args[args.length
-						- 1]
-						+ IS_NOT_A_DIRECTORY_);
+					usage(args[args.length - 1] + IS_NOT_A_DIRECTORY_);
 				}
 			}
 		}
 
 		// Now do the munging.
-		for (int i =
-			0; i < inFiles.length; i++) {
+		for (int i = 0; i < inFiles.length; i++) {
 
-			final Munge munge =
-				new Munge(inFiles[i], outFiles[i], featureProject);
+			final Munge munge = new Munge(inFiles[i], outFiles[i], featureProject);
 			if (munge.hasErrors()) {
 				munge.printErrorCount();
 
@@ -724,18 +580,12 @@ public class Munge {
 		 * using StreamTokenizer and the original '@file' argument replaced with the resulting tokens. Recursive command files are not supported. The '@'
 		 * character itself can be quoted with the sequence '@@'.
 		 */
-		static String[] parse(String[] args)
-				throws IOException {
-			final Vector<String> newArgs =
-				new Vector<String>(args.length);
-			for (int i =
-				0; i < args.length; i++) {
-				String arg =
-					args[i];
-				if ((arg.length() > 1)
-					&& (arg.charAt(0) == '@')) {
-					arg =
-						arg.substring(1);
+		static String[] parse(String[] args) throws IOException {
+			final Vector<String> newArgs = new Vector<String>(args.length);
+			for (int i = 0; i < args.length; i++) {
+				String arg = args[i];
+				if ((arg.length() > 1) && (arg.charAt(0) == '@')) {
+					arg = arg.substring(1);
 					if (arg.charAt(0) == '@') {
 						newArgs.addElement(arg);
 					} else {
@@ -745,18 +595,14 @@ public class Munge {
 					newArgs.addElement(arg);
 				}
 			}
-			final String[] newArgsArray =
-				new String[newArgs.size()];
+			final String[] newArgsArray = new String[newArgs.size()];
 			newArgs.copyInto(newArgsArray);
 			return newArgsArray;
 		}
 
-		private static void loadCmdFile(String name, Vector<String> args)
-				throws IOException {
-			final Reader r =
-				new BufferedReader(new FileReader(name));
-			final StreamTokenizer st =
-				new StreamTokenizer(r);
+		private static void loadCmdFile(String name, Vector<String> args) throws IOException {
+			final Reader r = new BufferedReader(new FileReader(name));
+			final StreamTokenizer st = new StreamTokenizer(r);
 			st.resetSyntax();
 			st.wordChars(' ', 255);
 			st.whitespaceChars(0, ' ');

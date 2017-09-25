@@ -42,18 +42,14 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 
 public abstract class OutlineProvider implements ISelectionChangedListener, ITreeViewerListener {
 
-	private OutlineTreeContentProvider treeProvider =
-		null;
-	private OutlineLabelProvider labelProvider =
-		null;
+	private OutlineTreeContentProvider treeProvider = null;
+	private OutlineLabelProvider labelProvider = null;
 
 	public OutlineProvider() {}
 
 	public OutlineProvider(OutlineTreeContentProvider treeProvider, OutlineLabelProvider labelProvider) {
-		this.treeProvider =
-			treeProvider;
-		this.labelProvider =
-			labelProvider;
+		this.treeProvider = treeProvider;
+		this.labelProvider = labelProvider;
 	}
 
 	/**
@@ -82,8 +78,7 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 
 	public void setTreeProvider(OutlineTreeContentProvider treeProvider) {
-		this.treeProvider =
-			treeProvider;
+		this.treeProvider = treeProvider;
 	}
 
 	public OutlineLabelProvider getLabelProvider() {
@@ -91,8 +86,7 @@ public abstract class OutlineProvider implements ISelectionChangedListener, ITre
 	}
 
 	public void setLabelProvider(OutlineLabelProvider labelProvider) {
-		this.labelProvider =
-			labelProvider;
+		this.labelProvider = labelProvider;
 	}
 
 	/**

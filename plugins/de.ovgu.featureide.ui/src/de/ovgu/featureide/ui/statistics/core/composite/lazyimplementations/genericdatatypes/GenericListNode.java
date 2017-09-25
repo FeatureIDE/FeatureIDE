@@ -42,8 +42,7 @@ public class GenericListNode<T> extends AbstractSortModeNode {
 	 */
 	public GenericListNode(String description, List<T> list) {
 		super(description, list.size());
-		this.list =
-			list;
+		this.list = list;
 		setSorted(true);
 	}
 
@@ -52,7 +51,6 @@ public class GenericListNode<T> extends AbstractSortModeNode {
 		for (final T element : list) {
 			addChild(new Parent(element.toString()));
 		}
-		value =
-			list.size();
+		value = list.size();
 	}
 }

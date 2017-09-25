@@ -52,8 +52,7 @@ public class ModelComparator {
 		WithoutIdenticalRules, SingleTesting, SingleTestingAborted
 	};
 
-	private final Set<Strategy> strategy =
-		new HashSet<Strategy>();
+	private final Set<Strategy> strategy = new HashSet<Strategy>();
 
 	private IFeatureModel oldModel;
 
@@ -86,8 +85,7 @@ public class ModelComparator {
 	}
 
 	public ModelComparator(long timeout, int strategyIndex) {
-		this.timeout =
-			timeout;
+		this.timeout = timeout;
 		if (strategyIndex > 0) {
 			strategy.add(Strategy.WithoutIdenticalRules);
 		}
@@ -100,93 +98,60 @@ public class ModelComparator {
 	}
 
 	public Comparison compare(IFeatureModel oldModel, IFeatureModel newModel) {
-		this.oldModel =
-			oldModel;
-		this.newModel =
-			newModel;
+		this.oldModel = oldModel;
+		this.newModel = newModel;
 		try {
-			addedFeatures =
-				calculateAddedFeatures(oldModel, newModel);
-			deletedFeatures =
-				calculateAddedFeatures(newModel, oldModel);
+			addedFeatures = calculateAddedFeatures(oldModel, newModel);
+			deletedFeatures = calculateAddedFeatures(newModel, oldModel);
 
-			final Map<Object, Node> oldMap =
-				NodeCreator
-						.calculateReplacingMap(oldModel);
-			final Map<Object, Node> newMap =
-				NodeCreator
-						.calculateReplacingMap(newModel);
+			final Map<Object, Node> oldMap = NodeCreator.calculateReplacingMap(oldModel);
+			final Map<Object, Node> newMap = NodeCreator.calculateReplacingMap(newModel);
 			optimizeReplacingMaps(oldMap, newMap);
 
-			oldRoot =
-				NodeCreator.createNodes(oldModel, oldMap);
-			newRoot =
-				NodeCreator.createNodes(newModel, newMap);
+			oldRoot = NodeCreator.createNodes(oldModel, oldMap);
+			newRoot = NodeCreator.createNodes(newModel, newMap);
 
-			oldRoot =
-				createFalseStatementForConcreteVariables(addedFeatures,
-						oldRoot);
-			newRoot =
-				createFalseStatementForConcreteVariables(deletedFeatures,
-						newRoot);
+			oldRoot = createFalseStatementForConcreteVariables(addedFeatures, oldRoot);
+			newRoot = createFalseStatementForConcreteVariables(deletedFeatures, newRoot);
 
-			oldRootUpdated =
-				removeIdenticalNodes(oldRoot, newRoot);
-			newRootUpdated =
-				removeIdenticalNodes(newRoot, oldRoot);
+			oldRootUpdated = removeIdenticalNodes(oldRoot, newRoot);
+			newRootUpdated = removeIdenticalNodes(newRoot, oldRoot);
 
-			removedProducts =
-				new ExampleCalculator(oldModel, timeout);
-			implies =
-				implies(oldRoot, newRootUpdated, removedProducts);
+			removedProducts = new ExampleCalculator(oldModel, timeout);
+			implies = implies(oldRoot, newRootUpdated, removedProducts);
 
-			addedProducts =
-				new ExampleCalculator(newModel, timeout);
-			isImplied =
-				implies(newRoot, oldRootUpdated, addedProducts);
+			addedProducts = new ExampleCalculator(newModel, timeout);
+			isImplied = implies(newRoot, oldRootUpdated, addedProducts);
 
 			if (implies) {
 				if (isImplied) {
-					result =
-						Comparison.REFACTORING;
+					result = Comparison.REFACTORING;
 				} else {
-					result =
-						Comparison.GENERALIZATION;
+					result = Comparison.GENERALIZATION;
 				}
 			} else if (isImplied) {
-				result =
-					Comparison.SPECIALIZATION;
+				result = Comparison.SPECIALIZATION;
 			} else {
-				result =
-					Comparison.ARBITRARY;
+				result = Comparison.ARBITRARY;
 			}
 		} catch (final OutOfMemoryError e) {
-			result =
-				Comparison.OUTOFMEMORY;
+			result = Comparison.OUTOFMEMORY;
 		} catch (final TimeoutException e) {
-			result =
-				Comparison.TIMEOUT;
+			result = Comparison.TIMEOUT;
 		} catch (final Exception e) {
 			Logger.logError(e);
-			result =
-				Comparison.ERROR;
+			result = Comparison.ERROR;
 		}
 		return result;
 	}
 
-	private Set<String> calculateAddedFeatures(IFeatureModel oldModel,
-			IFeatureModel newModel) {
-		final Set<String> addedFeatures =
-			new HashSet<String>();
+	private Set<String> calculateAddedFeatures(IFeatureModel oldModel, IFeatureModel newModel) {
+		final Set<String> addedFeatures = new HashSet<String>();
 		for (final IFeature feature : newModel.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
-				final String name =
-					newModel.getRenamingsManager().getOldName(feature.getName());
-				final IFeature associatedFeature =
-					oldModel.getFeature(oldModel
-							.getRenamingsManager().getNewName(name));
-				if ((associatedFeature == null)
-					|| associatedFeature.getStructure().isAbstract()) {
+				final String name = newModel.getRenamingsManager().getOldName(feature.getName());
+				final IFeature associatedFeature = oldModel.getFeature(oldModel.getRenamingsManager().getNewName(name));
+				if ((associatedFeature == null) || associatedFeature.getStructure().isAbstract()) {
 					addedFeatures.add(name);
 				}
 			}
@@ -195,18 +160,13 @@ public class ModelComparator {
 	}
 
 	private void optimizeReplacingMaps(Map<Object, Node> oldMap, Map<Object, Node> newMap) {
-		final List<Object> toBeRemoved =
-			new LinkedList<Object>();
+		final List<Object> toBeRemoved = new LinkedList<Object>();
 		for (final Entry<Object, Node> entry : oldMap.entrySet()) {
-			final Object var =
-				entry.getKey();
+			final Object var = entry.getKey();
 			if (newMap.containsKey(var)) {
-				final Node oldRepl =
-					entry.getValue();
-				final Node newRepl =
-					newMap.get(var);
-				if ((oldRepl != null)
-					&& oldRepl.equals(newRepl)) {
+				final Node oldRepl = entry.getValue();
+				final Node newRepl = newMap.get(var);
+				if ((oldRepl != null) && oldRepl.equals(newRepl)) {
 					toBeRemoved.add(var);
 				}
 			}
@@ -217,13 +177,11 @@ public class ModelComparator {
 		}
 	}
 
-	private Node createFalseStatementForConcreteVariables(
-			Set<String> addedFeatures, Node node) {
+	private Node createFalseStatementForConcreteVariables(Set<String> addedFeatures, Node node) {
 		if (addedFeatures.isEmpty()) {
 			return node;
 		}
-		final LinkedList<Node> children =
-			new LinkedList<Node>();
+		final LinkedList<Node> children = new LinkedList<Node>();
 		for (final Object var : addedFeatures) {
 			children.add(new Literal(var, false));
 		}
@@ -241,36 +199,29 @@ public class ModelComparator {
 		if (!strategy.contains(Strategy.WithoutIdenticalRules)) {
 			return node;
 		}
-		final LinkedList<Node> updatedNodes =
-			new LinkedList<Node>();
+		final LinkedList<Node> updatedNodes = new LinkedList<Node>();
 		for (final Node child : node.getChildren()) {
 			if (!containedIn(child, referenceNode.getChildren())) {
 				updatedNodes.add(child);
 			}
 		}
-		return updatedNodes.isEmpty()
-			? null
-			: new And(updatedNodes);
+		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 
-	public boolean implies(Node a, Node b, ExampleCalculator example)
-			throws TimeoutException {
+	public boolean implies(Node a, Node b, ExampleCalculator example) throws TimeoutException {
 		if (b == null) {
 			return true;
 		}
 
 		if (!strategy.contains(Strategy.SingleTesting)) {
-			final Node node =
-				new And(a.clone(), new Not(b.clone()));
-			final SatSolver solver =
-				new SatSolver(node, timeout);
+			final Node node = new And(a.clone(), new Not(b.clone()));
+			final SatSolver solver = new SatSolver(node, timeout);
 			return !solver.isSatisfiable();
 		}
 
 		example.setLeft(a);
 		example.setRight(b);
-		return !example.findSatisfiable(strategy
-				.contains(Strategy.SingleTestingAborted));
+		return !example.findSatisfiable(strategy.contains(Strategy.SingleTestingAborted));
 	}
 
 	private boolean containedIn(Node node, Node[] nodes) {
@@ -282,12 +233,8 @@ public class ModelComparator {
 		return false;
 	}
 
-	public Configuration calculateExample(boolean added)
-			throws TimeoutException {
-		return added
-			? addedProducts.nextExample()
-			: removedProducts
-					.nextExample();
+	public Configuration calculateExample(boolean added) throws TimeoutException {
+		return added ? addedProducts.nextExample() : removedProducts.nextExample();
 	}
 
 	public Set<Strategy> getStrategy() {

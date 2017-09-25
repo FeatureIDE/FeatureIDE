@@ -58,28 +58,19 @@ public class AheadWrapper {
 
 	private Vector<IFile> files;
 
-	private boolean createJob =
-		true;
+	private boolean createJob = true;
 
-	private static final String BUILDER_PROBLEM_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
+	private static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 
 	// Java 1.4 exclusions
-	private static final String RAW_TYPE =
-		"raw type";
-	private static final String GENERIC_TYPE =
-		"generic type";
-	private static final String TYPE_SAFETY =
-		"Type safety";
-	private static final String TASK =
-		"org.eclipse.jdt.core.task";
+	private static final String RAW_TYPE = "raw type";
+	private static final String GENERIC_TYPE = "generic type";
+	private static final String TYPE_SAFETY = "Type safety";
+	private static final String TASK = "org.eclipse.jdt.core.task";
 
 	public AheadWrapper(IFeatureProject featureProject) {
-		jak2java =
-			new Jak2JavaWrapper();
-		composer =
-			new ComposerWrapper(featureProject);
+		jak2java = new Jak2JavaWrapper();
+		composer = new ComposerWrapper(featureProject);
 	}
 
 	public void setConfiguration(IFile config) throws IOException {
@@ -91,11 +82,9 @@ public class AheadWrapper {
 	}
 
 	public void buildAll() {
-		IFile[] jakfiles =
-			null;
+		IFile[] jakfiles = null;
 		try {
-			jakfiles =
-				composer.composeAll();
+			jakfiles = composer.composeAll();
 		} catch (final IOException ex) {
 			CorePlugin.getDefault().logError(ex);
 		}
@@ -112,24 +101,16 @@ public class AheadWrapper {
 
 	private IFile[] reduceJak2Java(IFile[] jakFiles) {
 
-		final IFile[] javaFiles =
-			new IFile[jakFiles.length];
-		String filename =
-			null;
-		for (int i =
-			0; i < jakFiles.length; i++) {
-			final IFile jakFile =
-				jakFiles[i];
+		final IFile[] javaFiles = new IFile[jakFiles.length];
+		String filename = null;
+		for (int i = 0; i < jakFiles.length; i++) {
+			final IFile jakFile = jakFiles[i];
 			if (jakFile.exists()) {
 				jak2java.reduce2Java(jakFile.getRawLocation().toFile());
 
-				filename =
-					jakFile.getName();
-				filename =
-					filename.substring(0, filename.lastIndexOf('.'));
-				javaFiles[i] =
-					((IFolder) jakFile.getParent()).getFile(filename
-						+ ".java");
+				filename = jakFile.getName();
+				filename = filename.substring(0, filename.lastIndexOf('.'));
+				javaFiles[i] = ((IFolder) jakFile.getParent()).getFile(filename + ".java");
 			}
 		}
 		return javaFiles;
@@ -140,15 +121,13 @@ public class AheadWrapper {
 	}
 
 	public void postCompile(IFile file) {
-		final IFile jakFile =
-			((IFolder) file.getParent()).getFile(file.getName().replace(".java", ".jak"));
+		final IFile jakFile = ((IFolder) file.getParent()).getFile(file.getName().replace(".java", ".jak"));
 		if (!jakFile.exists()) {
 			return;
 		}
 
 		if (files == null) {
-			files =
-				new Vector<IFile>();
+			files = new Vector<IFile>();
 		}
 		if (!files.contains(file)) {
 			files.add(file);
@@ -156,44 +135,32 @@ public class AheadWrapper {
 		if (!createJob) {
 			return;
 		}
-		createJob =
-			false;
+		createJob = false;
 		final Job job =
-			new Job((PROPAGATE_PROBLEM_MARKERS_FOR
-				+ CorePlugin.getFeatureProject(file)) != null
-					? CorePlugin.getFeatureProject(file).toString()
-					: "") {
+			new Job((PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
 
 				@Override
 				public IStatus run(IProgressMonitor monitor) {
 					try {
 						while (!files.isEmpty()) {
-							final IFile file =
-								files.remove(0);
+							final IFile file = files.remove(0);
 							if (file.exists()) {
-								final IMarker[] markers =
-									file.findMarkers(null, false, IResource.DEPTH_ZERO);
+								final IMarker[] markers = file.findMarkers(null, false, IResource.DEPTH_ZERO);
 								if (markers != null) {
 									for (final IMarker marker : markers) {
-										if (marker.exists()
-											&& !TASK.equals(marker.getType())) {
-											final String content =
-												marker.getAttribute(IMarker.MESSAGE, null);
+										if (marker.exists() && !TASK.equals(marker.getType())) {
+											final String content = marker.getAttribute(IMarker.MESSAGE, null);
 											if ((content != null)
-												&& (content.contains(RAW_TYPE)
-													|| content.contains(GENERIC_TYPE)
-													|| content.contains(TYPE_SAFETY))) {
+												&& (content.contains(RAW_TYPE) || content.contains(GENERIC_TYPE) || content.contains(TYPE_SAFETY))) {
 												marker.delete();
 											} else {
 												final AheadBuildErrorEvent buildError =
 													new AheadBuildErrorEvent(file, marker.getAttribute(IMarker.MESSAGE).toString(),
 															AheadBuildErrorType.JAVAC_ERROR, (Integer) marker.getAttribute(IMarker.LINE_NUMBER));
 												if (!hasMarker(buildError)) {
-													final IResource res =
-														buildError.getResource();
+													final IResource res = buildError.getResource();
 													if (res.exists()) {
-														final IMarker newMarker =
-															res.createMarker(BUILDER_PROBLEM_MARKER);
+														final IMarker newMarker = res.createMarker(BUILDER_PROBLEM_MARKER);
 														if (newMarker.exists()) {
 															newMarker.setAttribute(IMarker.LINE_NUMBER, buildError.getLine());
 															newMarker.setAttribute(IMarker.MESSAGE, buildError.getMessage());
@@ -213,8 +180,7 @@ public class AheadWrapper {
 							AheadCorePlugin.getDefault().logError(e);
 						}
 					} finally {
-						createJob =
-							true;
+						createJob = true;
 					}
 					return Status.OK_STATUS;
 				}
@@ -222,12 +188,9 @@ public class AheadWrapper {
 				private boolean hasMarker(AheadBuildErrorEvent buildError) {
 					try {
 						if (buildError.getResource().exists()) {
-							final int LineNumber =
-								buildError.getLine();
-							final String Message =
-								buildError.getMessage();
-							final IMarker[] marker =
-								buildError.getResource().findMarkers(BUILDER_PROBLEM_MARKER, false, IResource.DEPTH_ZERO);
+							final int LineNumber = buildError.getLine();
+							final String Message = buildError.getMessage();
+							final IMarker[] marker = buildError.getResource().findMarkers(BUILDER_PROBLEM_MARKER, false, IResource.DEPTH_ZERO);
 							if (marker.length > 0) {
 								for (final IMarker m : marker) {
 									if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {

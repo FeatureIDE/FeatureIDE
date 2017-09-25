@@ -56,16 +56,13 @@ public class SearchField<T> {
 
 		@Override
 		public void modifyText(ModifyEvent e) {
-			curIndex =
-				0;
+			curIndex = 0;
 			search();
 		}
 	}
 
-	private final SearchModifyListener searchModifyListener =
-		new SearchModifyListener();
-	private final SearchNextListener searchNextListener =
-		new SearchNextListener();
+	private final SearchModifyListener searchModifyListener = new SearchModifyListener();
+	private final SearchNextListener searchNextListener = new SearchNextListener();
 
 	private final Text searchField;
 	private final ISearchable<T> searchable;
@@ -73,30 +70,18 @@ public class SearchField<T> {
 	private int curIndex;
 
 	public SearchField(Composite parent, final ISearchable<T> searchable) {
-		if ((searchable == null)
-			|| (parent == null)) {
+		if ((searchable == null) || (parent == null)) {
 			throw new NullPointerException();
 		}
-		this.searchable =
-			searchable;
-		this.searchField =
-			new Text(parent, SWT.SEARCH
-				| SWT.ICON_SEARCH
-				| SWT.ICON_CANCEL
-				| SWT.BORDER);
+		this.searchable = searchable;
+		this.searchField = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
 
-		final GridData gridData =
-			new GridData();
-		gridData.horizontalAlignment =
-			SWT.RIGHT;
-		gridData.verticalAlignment =
-			SWT.CENTER;
-		gridData.grabExcessHorizontalSpace =
-			true;
-		gridData.widthHint =
-			300;
-		gridData.minimumWidth =
-			150;
+		final GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.widthHint = 300;
+		gridData.minimumWidth = 150;
 
 		searchField.setLayoutData(gridData);
 		searchField.addModifyListener(searchModifyListener);
@@ -104,47 +89,34 @@ public class SearchField<T> {
 	}
 
 	private void search() {
-		final String searchString =
-			searchField.getText();
-		if ((searchString == null)
-			|| searchString.isEmpty()) {
-			curIndex =
-				0;
+		final String searchString = searchField.getText();
+		if ((searchString == null) || searchString.isEmpty()) {
+			curIndex = 0;
 			return;
 		}
-		final Iterator<T> it =
-			searchable.createIterator();
-		int i =
-			0;
-		T temp =
-			null;
-		int tempIndex =
-			-1;
+		final Iterator<T> it = searchable.createIterator();
+		int i = 0;
+		T temp = null;
+		int tempIndex = -1;
 
 		for (; it.hasNext(); i++) {
-			final T next =
-				it.next();
+			final T next = it.next();
 			if (searchable.matches(next, searchString)) {
 				if (i >= curIndex) {
-					curIndex =
-						i;
+					curIndex = i;
 					searchable.found(next);
 					return;
 				} else if (temp == null) {
-					temp =
-						next;
-					tempIndex =
-						i;
+					temp = next;
+					tempIndex = i;
 				}
 			}
 		}
 		if (temp != null) {
-			curIndex =
-				tempIndex;
+			curIndex = tempIndex;
 			searchable.found(temp);
 		} else {
-			curIndex =
-				0;
+			curIndex = 0;
 		}
 	}
 

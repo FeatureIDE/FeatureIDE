@@ -40,24 +40,13 @@ public class GUIBasics {
 	}
 
 	public static Color createColor(double r, double g, double b) {
-		return new Color(null, (int) (r
-			* 255),
-				(int) (g
-					* 255),
-				(int) (b
-					* 255));
+		return new Color(null, (int) (r * 255), (int) (g * 255), (int) (b * 255));
 	}
 
 	public static Color createBorderColor(Color color) {
-		final int r =
-			(int) (color.getRed()
-				* 0.75);
-		final int g =
-			(int) (color.getGreen()
-				* 0.75);
-		final int b =
-			(int) (color.getBlue()
-				* 0.75);
+		final int r = (int) (color.getRed() * 0.75);
+		final int g = (int) (color.getGreen() * 0.75);
+		final int b = (int) (color.getBlue() * 0.75);
 		return new Color(null, r, g, b);
 	}
 
@@ -70,12 +59,9 @@ public class GUIBasics {
 	}
 
 	public static boolean unicodeStringTest(Font swtFont, String s) {
-		final FontData fd =
-			swtFont.getFontData()[0];
-		final java.awt.Font awtFont =
-			new java.awt.Font(fd.getName(), 0, fd.getHeight());
-		for (int i =
-			0; i < s.length(); i++) {
+		final FontData fd = swtFont.getFontData()[0];
+		final java.awt.Font awtFont = new java.awt.Font(fd.getName(), 0, fd.getHeight());
+		for (int i = 0; i < s.length(); i++) {
 			if (!awtFont.canDisplay(s.charAt(i))) {
 				return false;
 			}

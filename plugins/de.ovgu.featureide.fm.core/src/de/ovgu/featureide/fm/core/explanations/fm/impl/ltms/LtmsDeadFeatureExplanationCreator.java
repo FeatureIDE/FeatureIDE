@@ -43,8 +43,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IFeature)) {
+		if ((subject != null) && !(subject instanceof IFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -57,8 +56,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms =
-			getOracle();
+		final Ltms ltms = getOracle();
 		ltms.clearPremises();
 		ltms.addPremise(getSubject().getName(), true);
 		return getExplanation(ltms.getExplanations());

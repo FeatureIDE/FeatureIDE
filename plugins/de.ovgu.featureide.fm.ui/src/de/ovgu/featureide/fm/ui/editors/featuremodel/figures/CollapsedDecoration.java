@@ -42,29 +42,24 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class CollapsedDecoration extends ConnectionDecoration implements GUIDefaults {
 
-	private final Label childrenCount =
-		new Label();
+	private final Label childrenCount = new Label();
 	// private static GridLayout gl = new GridLayout();
-	private static final FreeformLayout layout =
-		new FreeformLayout();
+	private static final FreeformLayout layout = new FreeformLayout();
 
 	private IGraphicalFeature graphicalFeature;
 
-	public boolean isLegendEntry =
-		false;
+	public boolean isLegendEntry = false;
 
 	public CollapsedDecoration(IGraphicalFeature parent) {
 		super();
-		graphicalFeature =
-			parent;
+		graphicalFeature = parent;
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setOpaque(true);
-		setDecoratorText(""
-			+ GetAllChildren(parent.getObject().getStructure()));
+		setDecoratorText("" + GetAllChildren(parent.getObject().getStructure()));
 		add(childrenCount);
 	}
 
@@ -77,8 +72,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 
-		isLegendEntry =
-			true;
+		isLegendEntry = true;
 
 		setOpaque(true);
 		childrenCount.setFont(DEFAULT_FONT);
@@ -97,24 +91,16 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		if (graphicalFeature != null) {
 			if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 4) {
 				// left to right layout
-				super.setLocation(p.translate((+getBounds().width
-					/ 2)
-					+ GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE,
-						-getBounds().height
-							/ 2));
+				super.setLocation(p.translate((+getBounds().width / 2) + GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE, -getBounds().height / 2));
 			}
 		}
-		super.setLocation(p.translate(-(getBounds().width
-			/ 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
+		super.setLocation(p.translate(-(getBounds().width / 2), GUIDefaults.COLLAPSED_DECORATOR_FEATURE_SPACE));
 	}
 
 	public int GetAllChildren(IFeatureStructure parent) {
-		int count =
-			0;
+		int count = 0;
 		for (final IFeatureStructure iterable_element : parent.getChildren()) {
-			count +=
-				1
-					+ GetAllChildren(iterable_element);
+			count += 1 + GetAllChildren(iterable_element);
 		}
 		return count;
 	}
@@ -125,31 +111,21 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		}
 		childrenCount.setText(newText);
 
-		final Dimension labelSize =
-			childrenCount.getPreferredSize();
-		minSize =
-			labelSize;
+		final Dimension labelSize = childrenCount.getPreferredSize();
+		minSize = labelSize;
 
 		if (!labelSize.equals(childrenCount.getSize())) {
 			childrenCount.setBounds(
 					new Rectangle(GUIDefaults.COLLAPSED_DECORATOR_X_SPACE, GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE, labelSize.width, labelSize.height));
 
-			final Rectangle bounds =
-				getBounds();
-			labelSize.width +=
-				GUIDefaults.COLLAPSED_DECORATOR_X_SPACE
-					* 2;
-			labelSize.height +=
-				GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE
-					* 2;
+			final Rectangle bounds = getBounds();
+			labelSize.width += GUIDefaults.COLLAPSED_DECORATOR_X_SPACE * 2;
+			labelSize.height += GUIDefaults.COLLAPSED_DECORATOR_Y_SPACE * 2;
 			bounds.setSize(labelSize);
 
-			final Dimension oldSize =
-				getSize();
+			final Dimension oldSize = getSize();
 			if (!oldSize.equals(0, 0)) {
-				bounds.x +=
-					(oldSize.width
-						- bounds.width) >> 1;
+				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
 			setBounds(bounds);
 		}
@@ -172,25 +148,14 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 			graphics.drawRoundRectangle(getBounds(), GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS, GUIDefaults.COLLAPSED_DECORATOR_ARC_RADIUS);
 			return;
 		}
-		final int x =
-			getBounds().x
-				+ 1;
-		final int y =
-			getBounds().y
-				+ 1;
-		int width =
-			getBounds().width
-				- 2;
-		if ((width
-			% 2) == 1) {
-			width +=
-				1;
-			setBounds(new Rectangle(getBounds().x, getBounds().y, getBounds().width
-				+ 1, getBounds().height));
+		final int x = getBounds().x + 1;
+		final int y = getBounds().y + 1;
+		int width = getBounds().width - 2;
+		if ((width % 2) == 1) {
+			width += 1;
+			setBounds(new Rectangle(getBounds().x, getBounds().y, getBounds().width + 1, getBounds().height));
 		}
-		final int height =
-			getBounds().height
-				- 2;
+		final int height = getBounds().height - 2;
 		graphics.setLineWidth(1);
 		graphics.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 

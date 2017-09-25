@@ -40,8 +40,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 
 	private final IFeature feature;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final LinkedList<Boolean> collapseStates =
-		new LinkedList<Boolean>();
+	private final LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
 
 	/**
 	 * @param label Description of this operation to be used in the menu
@@ -50,10 +49,8 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	 */
 	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
-		this.feature =
-			feature;
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
+		this.feature = feature;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	/**
@@ -68,8 +65,7 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	protected FeatureIDEEvent operation() {
 		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				final IGraphicalFeature graphicalFeature =
-					graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				collapseStates.add(graphicalFeature.isCollapsed());
 				if (!f.equals(feature.getStructure())) {
 					graphicalFeature.setCollapsed(true);
@@ -85,12 +81,10 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		int i =
-			0;
+		int i = 0;
 		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				final IGraphicalFeature graphicalFeature =
-					graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}

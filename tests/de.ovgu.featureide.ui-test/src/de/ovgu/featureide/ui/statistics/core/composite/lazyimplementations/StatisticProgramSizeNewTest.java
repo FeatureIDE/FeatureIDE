@@ -33,21 +33,14 @@ import org.junit.Test;
 public class StatisticProgramSizeNewTest {
 
 	private final static String getContent(final String name) {
-		final StringBuilder content =
-			new StringBuilder();
-		final File fileFolder =
-			getFolder();
+		final StringBuilder content = new StringBuilder();
+		final File fileFolder = getFolder();
 		for (final File f : fileFolder.listFiles()) {
 			if (f.getName().equals(name)) {
 				String s;
-				try (FileReader fr =
-					new FileReader(f.getPath().toString());
-						BufferedReader br =
-							new BufferedReader(fr)) {
-					while ((s =
-						br.readLine()) != null) {
-						content.append(s
-							+ "\n");
+				try (FileReader fr = new FileReader(f.getPath().toString()); BufferedReader br = new BufferedReader(fr)) {
+					while ((s = br.readLine()) != null) {
+						content.append(s + "\n");
 					}
 				} catch (final IOException e) {
 					e.printStackTrace();
@@ -60,26 +53,22 @@ public class StatisticProgramSizeNewTest {
 	}
 
 	private static File getFolder() {
-		File folder =
-			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
+		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
 		if (!folder.canRead()) {
-			folder =
-				new File(ClassLoader.getSystemResource("statisticsfiles").getPath());
+			folder = new File(ClassLoader.getSystemResource("statisticsfiles").getPath());
 		}
 		return folder;
 	}
 
 	@Test
 	public void testGraph() throws Exception {
-		final BufferedReader br =
-			new BufferedReader(new StringReader(getContent("Graph.jak")));
+		final BufferedReader br = new BufferedReader(new StringReader(getContent("Graph.jak")));
 		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}
 
 	@Test
 	public void testDaily() throws Exception {
-		final BufferedReader br =
-			new BufferedReader(new StringReader(getContent("Daily.jak")));
+		final BufferedReader br = new BufferedReader(new StringReader(getContent("Daily.jak")));
 		assertEquals(34, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}
 

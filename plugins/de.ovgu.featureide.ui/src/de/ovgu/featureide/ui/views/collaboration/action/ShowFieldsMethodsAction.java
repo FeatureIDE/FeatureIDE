@@ -36,39 +36,23 @@ import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
  */
 public class ShowFieldsMethodsAction extends Action {
 
-	public static final int FIELDS_WITH_REFINEMENTS =
-		0;
-	public static final int FIELDS_WITHOUT_REFINEMENTS =
-		1;
-	public static final int METHODS_WITH_REFINEMENTS =
-		2;
-	public static final int METHODS_WITHOUT_REFINEMENTS =
-		3;
-	public static final int ONLY_CONTRACTS =
-		4;
-	public static final int ONLY_INVARIANTS =
-		5;
-	public static final int SHOW_NESTED_CLASSES =
-		6;
-	public static final int HIDE_PARAMETERS_AND_TYPES =
-		7;
-	public static final int PUBLIC_FIELDSMETHODS =
-		8;
-	public static final int PROTECTED_FIELDSMETHODS =
-		9;
-	public static final int DEFAULT_FIELDSMETHODS =
-		10;
-	public static final int PRIVATE_FIELDSMETHODS =
-		11;
-	public static final int SELECT_ALL =
-		12;
-	public static final int DESELECT_ALL =
-		13;
+	public static final int FIELDS_WITH_REFINEMENTS = 0;
+	public static final int FIELDS_WITHOUT_REFINEMENTS = 1;
+	public static final int METHODS_WITH_REFINEMENTS = 2;
+	public static final int METHODS_WITHOUT_REFINEMENTS = 3;
+	public static final int ONLY_CONTRACTS = 4;
+	public static final int ONLY_INVARIANTS = 5;
+	public static final int SHOW_NESTED_CLASSES = 6;
+	public static final int HIDE_PARAMETERS_AND_TYPES = 7;
+	public static final int PUBLIC_FIELDSMETHODS = 8;
+	public static final int PROTECTED_FIELDSMETHODS = 9;
+	public static final int DEFAULT_FIELDSMETHODS = 10;
+	public static final int PRIVATE_FIELDSMETHODS = 11;
+	public static final int SELECT_ALL = 12;
+	public static final int DESELECT_ALL = 13;
 
-	public static final int SELECT_ALL_METHOD_ACCESS =
-		20;
-	public static final int DESELECT_ALL_METHOD_ACCESS =
-		21;
+	public static final int SELECT_ALL_METHOD_ACCESS = 20;
+	public static final int DESELECT_ALL_METHOD_ACCESS = 21;
 
 	private final CollaborationView collaborationView;
 	private int index;
@@ -82,15 +66,12 @@ public class ShowFieldsMethodsAction extends Action {
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index, int style) {
 		super(text, style);
 		setImageDescriptor(getImageDiscriptor(image));
-		this.collaborationView =
-			collaborationView;
-		this.index =
-			index;
+		this.collaborationView = collaborationView;
+		this.index = index;
 	}
 
 	public void setActionIndex(int index) {
-		this.index =
-			index;
+		this.index = index;
 	}
 
 	@Override
@@ -107,18 +88,15 @@ public class ShowFieldsMethodsAction extends Action {
 	}
 
 	private boolean[] selectAllAccessModifiers(boolean[] selected, boolean value) {
-		for (int i =
-			PUBLIC_FIELDSMETHODS; i <= PRIVATE_FIELDSMETHODS; i++) {
-			selected[i] =
-				value;
+		for (int i = PUBLIC_FIELDSMETHODS; i <= PRIVATE_FIELDSMETHODS; i++) {
+			selected[i] = value;
 		}
 		return selected;
 	}
 
 	@Override
 	public void run() {
-		final boolean[] selected =
-			RoleFigure.getSelectedFieldMethod();
+		final boolean[] selected = RoleFigure.getSelectedFieldMethod();
 		switch (index) {
 		case SELECT_ALL:
 			setSelected(true, selected);
@@ -133,28 +111,23 @@ public class ShowFieldsMethodsAction extends Action {
 			selectAllAccessModifiers(selected, false);
 			break;
 		case PUBLIC_FIELDSMETHODS:
-			selected[index] =
-				!selected[index];
+			selected[index] = !selected[index];
 			super.setChecked(selected[index]);
 			break;
 		case PRIVATE_FIELDSMETHODS:
-			selected[index] =
-				!selected[index];
+			selected[index] = !selected[index];
 			super.setChecked(selected[index]);
 			break;
 		case DEFAULT_FIELDSMETHODS:
-			selected[index] =
-				!selected[index];
+			selected[index] = !selected[index];
 			super.setChecked(selected[index]);
 			break;
 		case PROTECTED_FIELDSMETHODS:
-			selected[index] =
-				!selected[index];
+			selected[index] = !selected[index];
 			super.setChecked(selected[index]);
 			break;
 		default:
-			selected[index] =
-				!selected[index];
+			selected[index] = !selected[index];
 			super.setChecked(selected[index]);
 			break;
 		}
@@ -163,30 +136,23 @@ public class ShowFieldsMethodsAction extends Action {
 		collaborationView.reloadImage();
 		collaborationView.refresh();
 
-		if ((index == SELECT_ALL)
-			|| (index == DESELECT_ALL)) {
+		if ((index == SELECT_ALL) || (index == DESELECT_ALL)) {
 			collaborationView.selectAll();
 		}
 	}
 
 	private void setSelected(boolean value, boolean[] selected) {
-		for (int i =
-			FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
-			if ((i != HIDE_PARAMETERS_AND_TYPES)
-				&& (i != ONLY_CONTRACTS)
-				&& (i != ONLY_INVARIANTS)) {
-				selected[i] =
-					value;
+		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
+			if ((i != HIDE_PARAMETERS_AND_TYPES) && (i != ONLY_CONTRACTS) && (i != ONLY_INVARIANTS)) {
+				selected[i] = value;
 			}
 		}
 	}
 
 	private void setDeselected(boolean value, boolean[] selected) {
-		for (int i =
-			FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
+		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
 			if (i != HIDE_PARAMETERS_AND_TYPES) {
-				selected[i] =
-					value;
+				selected[i] = value;
 			}
 		}
 	}

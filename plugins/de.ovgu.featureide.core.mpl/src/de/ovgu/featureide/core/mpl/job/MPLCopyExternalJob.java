@@ -46,10 +46,8 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 
 		public Arguments(IFolder srcFolder, IFolder destFolder) {
 			super(Arguments.class);
-			this.srcFolder =
-				srcFolder;
-			this.destFolder =
-				destFolder;
+			this.srcFolder = srcFolder;
+			this.destFolder = destFolder;
 		}
 	}
 
@@ -59,20 +57,14 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor =
-			workMonitor;
-		final IPath destPath =
-			arguments.destFolder.getFullPath();
+		this.workMonitor = workMonitor;
+		final IPath destPath = arguments.destFolder.getFullPath();
 
 		try {
-			final IResource[] srcMembers =
-				arguments.srcFolder.members();
-			for (int i =
-				0; i < srcMembers.length; i++) {
-				final IResource srcMember =
-					srcMembers[i];
-				final IPath px =
-					destPath.append(srcMember.getName());
+			final IResource[] srcMembers = arguments.srcFolder.members();
+			for (int i = 0; i < srcMembers.length; i++) {
+				final IResource srcMember = srcMembers[i];
+				final IPath px = destPath.append(srcMember.getName());
 				if (!px.toFile().exists()) {
 					srcMember.move(px, true, null);
 				}

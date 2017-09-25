@@ -42,65 +42,39 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 public interface IFeatureProject extends IBuilderMarkerHandler {
 
-	QualifiedName composerConfigID =
-		new QualifiedName("featureproject.configs", "composer");
+	QualifiedName composerConfigID = new QualifiedName("featureproject.configs", "composer");
 
-	QualifiedName buildFolderConfigID =
-		new QualifiedName("featureproject.configs", "build");
-	QualifiedName configFolderConfigID =
-		new QualifiedName("featureproject.configs", "equations");
-	QualifiedName sourceFolderConfigID =
-		new QualifiedName("featureproject.configs", "source");
-	QualifiedName compositionMechanismConfigID =
-		new QualifiedName("featureproject.configs", "compositionmechanism");
+	QualifiedName buildFolderConfigID = new QualifiedName("featureproject.configs", "build");
+	QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	QualifiedName sourceFolderConfigID = new QualifiedName("featureproject.configs", "source");
+	QualifiedName compositionMechanismConfigID = new QualifiedName("featureproject.configs", "compositionmechanism");
 
-	String SOURCE_ARGUMENT =
-		"source";
-	String CONFIGS_ARGUMENT =
-		"equations";
-	String BUILD_ARGUMENT =
-		"build";
+	String SOURCE_ARGUMENT = "source";
+	String CONFIGS_ARGUMENT = "equations";
+	String BUILD_ARGUMENT = "build";
 
-	String DEFAULT_SOURCE_PATH =
-		"src";
-	String DEFAULT_CONFIGS_PATH =
-		"equations";
-	String DEFAULT_BUILD_PATH =
-		"build";
-	String DEFAULT_CONTRACT_COMPOSITION =
-		"None";
+	String DEFAULT_SOURCE_PATH = "src";
+	String DEFAULT_CONFIGS_PATH = "equations";
+	String DEFAULT_BUILD_PATH = "build";
+	String DEFAULT_CONTRACT_COMPOSITION = "None";
 
 	// TODO revise with enum
-	String META_THEOREM_PROVING =
-		THEOREM_PROVING;
-	String META_MODEL_CHECKING =
-		"Model Checking (JPF-core)";
-	String META_MODEL_CHECKING_BDD_JAVA_JML =
-		"Model Checking (JPF-BDD Java JML)";
-	String META_VAREXJ =
-		VARIABILITY_AWARE_TESTING;
-	String META_MODEL_CHECKING_BDD_JAVA =
-		"Model Checking (JPF-BDD Java)";
-	String META_MODEL_CHECKING_BDD_C =
-		"Model Checking (JPF-BDD C)";
+	String META_THEOREM_PROVING = THEOREM_PROVING;
+	String META_MODEL_CHECKING = "Model Checking (JPF-core)";
+	String META_MODEL_CHECKING_BDD_JAVA_JML = "Model Checking (JPF-BDD Java JML)";
+	String META_VAREXJ = VARIABILITY_AWARE_TESTING;
+	String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
+	String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
 
-	String DEFAULT_COMPOSITION_MECHANISM =
-		"Mixin";
-	QualifiedName configConfigID =
-		new QualifiedName("featureproject.configs", "currentEquation");
+	String DEFAULT_COMPOSITION_MECHANISM = "Mixin";
+	QualifiedName configConfigID = new QualifiedName("featureproject.configs", "currentEquation");
 
-	QualifiedName javaClassPathID =
-		new QualifiedName("featureproject.configs", "javaClassPath");
+	QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
 	QualifiedName contractCompositionID =
-		new QualifiedName(IFeatureProject.class.getName()
-			+ "#ContractComposition",
-				IFeatureProject.class.getName()
-					+ "#ContractComposition");
+		new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition", IFeatureProject.class.getName() + "#ContractComposition");
 
-	String MARKER_UNUSED =
-		"Unused: ";
-	String MARKER_FALSE_OPTIONAL =
-		"False optional: ";
+	String MARKER_UNUSED = "Unused: ";
+	String MARKER_FALSE_OPTIONAL = "False optional: ";
 
 	void dispose();
 

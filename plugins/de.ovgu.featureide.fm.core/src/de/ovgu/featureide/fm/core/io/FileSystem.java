@@ -45,8 +45,7 @@ public final class FileSystem {
 		boolean exists(Path path);
 	}
 
-	public static IFileSystem INSTANCE =
-		new JavaFileSystem();
+	public static IFileSystem INSTANCE = new JavaFileSystem();
 
 	public static void append(Path path, byte[] content) throws IOException {
 		INSTANCE.append(path, content);

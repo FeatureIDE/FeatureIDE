@@ -56,8 +56,7 @@ public class InvariantExpressionExplanation extends PreprocessorExplanation {
 	 * @param tautology true if the expression is a tautology or false if it is a contradiction
 	 */
 	public void setTautology(boolean tautology) {
-		this.tautology =
-			tautology;
+		this.tautology = tautology;
 	}
 
 	@Override

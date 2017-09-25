@@ -42,8 +42,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	private final IConstraint iConstraint;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final LinkedList<IGraphicalFeature> affectedFeatureList =
-		new LinkedList<IGraphicalFeature>();
+	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
 
 	/**
 	 * @param featureModel
@@ -51,10 +50,8 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
 		super(graphicalFeatureModel.getFeatureModel(), EXPAND_CONSTRAINT);
-		this.iConstraint =
-			iConstraint;
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
+		this.iConstraint = iConstraint;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	public void expandParents(IFeature feature) {
@@ -62,18 +59,14 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 			return;
 		}
 
-		IFeatureStructure p =
-			feature.getStructure().getParent();
-		IGraphicalFeature g =
-			null;
+		IFeatureStructure p = feature.getStructure().getParent();
+		IGraphicalFeature g = null;
 		while (!p.isRoot()) {
-			g =
-				graphicalFeatureModel.getGraphicalFeature(p.getFeature());
+			g = graphicalFeatureModel.getGraphicalFeature(p.getFeature());
 			if (g.isCollapsed()) {
 				expandFeature(g);
 			}
-			p =
-				p.getParent();
+			p = p.getParent();
 		}
 		if (g != null) {
 			g.setCollapsed(false);
@@ -83,8 +76,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		getCollapsedFeatures();
-		final CollapseAllOperation collapseAll =
-			new CollapseAllOperation(graphicalFeatureModel, true);
+		final CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();
@@ -98,8 +90,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		final CollapseAllOperation collapseAll =
-			new CollapseAllOperation(graphicalFeatureModel, true);
+		final CollapseAllOperation collapseAll = new CollapseAllOperation(graphicalFeatureModel, true);
 
 		// execute directly and push not in operation history otherwise no more than one undo possible
 		collapseAll.operation();

@@ -39,10 +39,8 @@ public class ConfigMapFilterAction extends Action {
 
 	public ConfigMapFilterAction(IConfigurationMapFilter filter, IConfigurationMapFilterable filterable) {
 		super(filter.getName(), IAction.AS_CHECK_BOX);
-		this.filter =
-			filter;
-		this.filterable =
-			filterable;
+		this.filter = filter;
+		this.filterable = filterable;
 		setChecked(filter.isDefault());
 	}
 

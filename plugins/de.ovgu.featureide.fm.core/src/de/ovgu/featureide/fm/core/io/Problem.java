@@ -38,8 +38,7 @@ public class Problem {
 		private final int level;
 
 		private Severity(int level) {
-			this.level =
-				level;
+			this.level = level;
 		}
 
 		public int getLevel() {
@@ -76,14 +75,10 @@ public class Problem {
 	}
 
 	protected Problem(String message, int line, Severity severity, Throwable error) {
-		this.message =
-			message;
-		this.line =
-			line;
-		this.severity =
-			severity;
-		this.error =
-			error;
+		this.message = message;
+		this.line = line;
+		this.severity = severity;
+		this.error = error;
 		if (error != null) {
 			Logger.logError(message, error);
 		} else {
@@ -105,10 +100,7 @@ public class Problem {
 
 	@Override
 	public String toString() {
-		return "Problem("
-			+ severity
-			+ ") "
-			+ message;
+		return "Problem(" + severity + ") " + message;
 	}
 
 	public Severity getSeverity() {

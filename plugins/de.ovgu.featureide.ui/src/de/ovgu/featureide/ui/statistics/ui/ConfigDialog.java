@@ -62,8 +62,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class ConfigDialog extends TitleAreaDialog {
 
-	private static final String MINUTE =
-		"60";
+	private static final String MINUTE = "60";
 
 	private int priority;
 	private long timeout;
@@ -89,8 +88,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	 */
 	public ConfigDialog(Shell parentShell, String titlePart) {
 		super(parentShell);
-		this.titlePart =
-			titlePart.toLowerCase();
+		this.titlePart = titlePart.toLowerCase();
 	}
 
 	@Override
@@ -111,23 +109,18 @@ public class ConfigDialog extends TitleAreaDialog {
 		setHelpAvailable(false);
 		setMessage("In this dialog you can set the options for the calculation. Be aware that\n"
 			+ YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_);
-		setTitle(CALCULATE
-			+ titlePart);
-		container =
-			(Composite) super.createDialogArea(parent);
-		final GridLayout gl_container =
-			new GridLayout(2, false);
+		setTitle(CALCULATE + titlePart);
+		container = (Composite) super.createDialogArea(parent);
+		final GridLayout gl_container = new GridLayout(2, false);
 		container.setLayout(gl_container);
 		new Label(container, SWT.NONE);
 
-		final Label priorityLabel =
-			new Label(container, SWT.NONE);
+		final Label priorityLabel = new Label(container, SWT.NONE);
 		priorityLabel.setText(" Choose priority:");
 
 		createPriorityComboBox();
 
-		final Label timeOutLabel =
-			new Label(container, SWT.NONE);
+		final Label timeOutLabel = new Label(container, SWT.NONE);
 		timeOutLabel.setText(" Choose timeout-length:");
 
 		createTimeOutComboBox();
@@ -139,21 +132,16 @@ public class ConfigDialog extends TitleAreaDialog {
 	}
 
 	private void createConverter() {
-		converterToMinutes =
-			new Text(container, SWT.BORDER);
+		converterToMinutes = new Text(container, SWT.BORDER);
 		converterToMinutes.setEditable(false);
-		final GridData gd_text_1 =
-			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
-		gd_text_1.heightHint =
-			20;
-		gd_text_1.widthHint =
-			175;
+		final GridData gd_text_1 = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		gd_text_1.heightHint = 20;
+		gd_text_1.widthHint = 175;
 		converterToMinutes.setLayoutData(gd_text_1);
 	}
 
 	private void createTimeOutComboBox() {
-		timeOutComboBox =
-			new Combo(container, SWT.NONE);
+		timeOutComboBox = new Combo(container, SWT.NONE);
 		timeOutComboBox.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -171,57 +159,34 @@ public class ConfigDialog extends TitleAreaDialog {
 		timeOutComboBox.setToolTipText(MAXIMUM_DURATION_OF_THE_CALCULATION_IN_SECONDS_);
 		timeOutComboBox.setTextLimit(300000);
 
-		timeOutComboBox.setItems(new String[] {
-			"1",
-			"10",
-			"30",
-			MINUTE,
-			"180",
-			"300",
-			"900",
-			"1800",
-			"3600" });
+		timeOutComboBox.setItems(new String[] { "1", "10", "30", MINUTE, "180", "300", "900", "1800", "3600" });
 
-		final GridData gd_timeOutComboBox =
-			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
-		gd_timeOutComboBox.widthHint =
-			160;
-		gd_timeOutComboBox.heightHint =
-			20;
+		final GridData gd_timeOutComboBox = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		gd_timeOutComboBox.widthHint = 160;
+		gd_timeOutComboBox.heightHint = 20;
 		timeOutComboBox.setLayoutData(gd_timeOutComboBox);
 		timeOutComboBox.select(3);
 		new Label(container, SWT.NONE);
 	}
 
 	private void createPriorityComboBox() {
-		priorityComboBox =
-			new Combo(container, SWT.READ_ONLY);
-		priorityComboBox.setToolTipText("Priority of the calculation.\n"
-			+ "Low coresponds to Thread.MIN_PRIORITY,\n"
-			+ "Average to Thread.NORM_PRIORITY and\n"
+		priorityComboBox = new Combo(container, SWT.READ_ONLY);
+		priorityComboBox.setToolTipText("Priority of the calculation.\n" + "Low coresponds to Thread.MIN_PRIORITY,\n" + "Average to Thread.NORM_PRIORITY and\n"
 			+ HIGH_TO_THREAD_MAX_PRIORITY_);
-		priorityComboBox.setItems(new String[] {
-			LOW,
-			AVERAGE,
-			HIGH });
-		final GridData gd_combo =
-			new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
-		gd_combo.heightHint =
-			20;
-		gd_combo.widthHint =
-			160;
+		priorityComboBox.setItems(new String[] { LOW, AVERAGE, HIGH });
+		final GridData gd_combo = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
+		gd_combo.heightHint = 20;
+		gd_combo.widthHint = 160;
 		priorityComboBox.setLayoutData(gd_combo);
 		priorityComboBox.select(1);
 	}
 
 	private void convertToReadable() {
 		try {
-			final long time =
-				Long.parseLong(timeOutComboBox.getText());
-			converterToMinutes.setText(String.format("%02d h %02d min %02d sec", TimeUnit.SECONDS.toHours(time), TimeUnit.SECONDS.toMinutes(time)
-				- TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(time)),
-					time
-						- TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(time))));
+			final long time = Long.parseLong(timeOutComboBox.getText());
+			converterToMinutes.setText(String.format("%02d h %02d min %02d sec", TimeUnit.SECONDS.toHours(time),
+					TimeUnit.SECONDS.toMinutes(time) - TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(time)),
+					time - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(time))));
 		} catch (final NumberFormatException ex) {
 
 		} catch (final NullPointerException ex) {
@@ -242,27 +207,20 @@ public class ConfigDialog extends TitleAreaDialog {
 
 	@Override
 	protected void okPressed() {
-		final String p =
-			priorityComboBox.getText();
+		final String p = priorityComboBox.getText();
 		if (p.equals(LOW)) {
-			priority =
-				Job.DECORATE;
+			priority = Job.DECORATE;
 		} else if (p.equals(AVERAGE)) {
-			priority =
-				Job.LONG;
+			priority = Job.LONG;
 		} else if (p.equals(HIGH)) {
-			priority =
-				Job.SHORT;
+			priority = Job.SHORT;
 		} else {
 			throw new RuntimeException(INVALID_SELECTION_);
 		}
 
-		final String t =
-			timeOutComboBox.getText();
+		final String t = timeOutComboBox.getText();
 		try {
-			timeout =
-				1000
-					* Long.parseLong(t);
+			timeout = 1000 * Long.parseLong(t);
 		} catch (final NumberFormatException ex) {
 			MessageDialog.openError(Display.getDefault().getActiveShell(), "Error", "That was not a valid number!\n(integer only)");
 			return;

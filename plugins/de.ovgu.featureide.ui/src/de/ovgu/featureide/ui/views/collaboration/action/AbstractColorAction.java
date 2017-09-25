@@ -47,38 +47,28 @@ public abstract class AbstractColorAction extends Action {
 
 	public AbstractColorAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
 		super(text);
-		viewer =
-			view;
-		this.index =
-			index;
-		this.collaborationView =
-			collaborationView;
+		viewer = view;
+		this.index = index;
+		this.collaborationView = collaborationView;
 	}
 
 	public AbstractColorAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index, int style) {
 		super(text, style);
-		viewer =
-			view;
-		this.index =
-			index;
-		this.collaborationView =
-			collaborationView;
+		viewer = view;
+		this.index = index;
+		this.collaborationView = collaborationView;
 	}
 
 	@Override
 	public void run() {
-		final Object selectedItem =
-			((IStructuredSelection) viewer.getSelection()).getFirstElement();
+		final Object selectedItem = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 		if (selectedItem instanceof CollaborationEditPart) {
-			final FSTFeature coll =
-				((CollaborationEditPart) selectedItem).getCollaborationModel();
+			final FSTFeature coll = ((CollaborationEditPart) selectedItem).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
-				final IFeatureModel fm =
-					collaborationView.getFeatureProject().getFeatureModel();
+				final IFeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 
-				final boolean refresh =
-					action(fm, coll.getName());
+				final boolean refresh = action(fm, coll.getName());
 
 				if (refresh) {
 					collaborationView.refreshAll();

@@ -30,19 +30,15 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes,
 			boolean isConstructor) {
 		super(parent, name, modifier, type);
-		this.isConstructor =
-			isConstructor;
-		this.parameterTypes =
-			parameterTypes;
+		this.isConstructor = isConstructor;
+		this.parameterTypes = parameterTypes;
 	}
 
 	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes,
 			boolean isConstructor, int startLine, int endLine) {
 		super(parent, name, modifier, type, startLine, endLine);
-		this.isConstructor =
-			isConstructor;
-		this.parameterTypes =
-			parameterTypes;
+		this.isConstructor = isConstructor;
+		this.parameterTypes = parameterTypes;
 	}
 
 	public abstract String getReturnType();

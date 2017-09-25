@@ -58,10 +58,8 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
  */
 public class CheckBoxTreeViewDialog extends Dialog {
 
-	private static final String TOOLTIP =
-		DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
-	private static final String TITLE =
-		CHOOSE_WHAT_TO_EXPORT;
+	private static final String TOOLTIP = DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
+	private static final String TITLE = CHOOSE_WHAT_TO_EXPORT;
 	private final Parent invisibleRoot;
 	private CheckboxTreeViewer viewer;
 	private final TreeViewer oldTree;
@@ -71,16 +69,11 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 *
 	 * @param parentShell
 	 */
-	public CheckBoxTreeViewDialog(Shell parentShell, Parent godfather,
-			TreeViewer oldTree) {
+	public CheckBoxTreeViewDialog(Shell parentShell, Parent godfather, TreeViewer oldTree) {
 		super(parentShell);
-		setShellStyle(SWT.DIALOG_TRIM
-			| SWT.MIN
-			| SWT.RESIZE);
-		this.oldTree =
-			oldTree;
-		invisibleRoot =
-			godfather;
+		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
+		this.oldTree = oldTree;
+		invisibleRoot = godfather;
 	}
 
 	/**
@@ -90,12 +83,10 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final Composite container =
-			(Composite) super.createDialogArea(parent);
+		final Composite container = (Composite) super.createDialogArea(parent);
 		container.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-		viewer =
-			new CheckboxTreeViewer(container, SWT.BORDER);
+		viewer = new CheckboxTreeViewer(container, SWT.BORDER);
 
 		viewer.setContentProvider(new ContentProvider(viewer) {
 
@@ -128,16 +119,15 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 *
 	 */
 	private void initViewer() {
-		final UIJob job =
-			new UIJob(INIT_DIALOG___TREEVIEWER) {
+		final UIJob job = new UIJob(INIT_DIALOG___TREEVIEWER) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					viewer.setExpandedElements(oldTree.getVisibleExpandedElements());
-					viewer.refresh();
-					return Status.OK_STATUS;
-				}
-			};
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				viewer.setExpandedElements(oldTree.getVisibleExpandedElements());
+				viewer.refresh();
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
@@ -157,10 +147,8 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
-				true);
-		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override
@@ -174,8 +162,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 */
 	@Override
 	protected void okPressed() {
-		new CsvExporter(getShell().getParent().getShell()).export(viewer
-				.getCheckedElements());
+		new CsvExporter(getShell().getParent().getShell()).export(viewer.getCheckedElements());
 		super.okPressed();
 	}
 

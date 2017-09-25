@@ -43,16 +43,9 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((rootFeature == null)
-					? 0
-					: rootFeature.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((rootFeature == null) ? 0 : rootFeature.hashCode());
 		return result;
 	}
 
@@ -67,8 +60,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FeatureModelStructure other =
-			(FeatureModelStructure) obj;
+		final FeatureModelStructure other = (FeatureModelStructure) obj;
 		if (correspondingFeatureModel == null) {
 			if (other.correspondingFeatureModel != null) {
 				return false;
@@ -90,22 +82,16 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	protected IFeatureStructure rootFeature;
 
-	protected boolean showHiddenFeatures =
-		false;
+	protected boolean showHiddenFeatures = false;
 
 	protected FeatureModelStructure(FeatureModelStructure oldStructure, IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel =
-			correspondingFeatureModel != null
-				? correspondingFeatureModel
-				: oldStructure.correspondingFeatureModel;
+		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldStructure.correspondingFeatureModel;
 
-		rootFeature =
-			oldStructure.rootFeature;
+		rootFeature = oldStructure.rootFeature;
 	}
 
 	public FeatureModelStructure(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel =
-			correspondingFeatureModel;
+		this.correspondingFeatureModel = correspondingFeatureModel;
 	}
 
 	@Override
@@ -120,8 +106,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public Collection<IFeature> getFeaturesPreorder() {
-		final List<IFeature> preorderFeatures =
-			new LinkedList<>();
+		final List<IFeature> preorderFeatures = new LinkedList<>();
 		if (rootFeature != null) {
 			getFeaturesPreorder(rootFeature, preorderFeatures);
 		}
@@ -142,8 +127,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public void setShowHiddenFeatures(boolean showHiddenFeatures) {
-		this.showHiddenFeatures =
-			showHiddenFeatures;
+		this.showHiddenFeatures = showHiddenFeatures;
 	}
 
 	@Override
@@ -159,8 +143,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAlternativeGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if ((f.getStructure().getChildrenCount() > 1)
-				&& f.getStructure().isAlternative()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				return true;
 			}
 		}
@@ -170,8 +153,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAndGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if ((f.getStructure().getChildrenCount() > 1)
-				&& f.getStructure().isAnd()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAnd()) {
 				return true;
 			}
 		}
@@ -211,11 +193,8 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasMandatoryFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			final IFeatureStructure parent =
-				f.getStructure().getParent();
-			if ((parent != null)
-				&& parent.isAnd()
-				&& f.getStructure().isMandatory()) {
+			final IFeatureStructure parent = f.getStructure().getParent();
+			if ((parent != null) && parent.isAnd() && f.getStructure().isMandatory()) {
 				return true;
 			}
 		}
@@ -225,9 +204,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if (!f.equals(rootFeature.getFeature())
-				&& (f.getStructure().getParent() != null)
-				&& f.getStructure().getParent().isAnd()
+			if (!f.equals(rootFeature.getFeature()) && (f.getStructure().getParent() != null) && f.getStructure().getParent().isAnd()
 				&& !f.getStructure().isMandatory()) {
 				return true;
 			}
@@ -238,8 +215,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOrGroup() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if ((f.getStructure().getChildrenCount() > 1)
-				&& f.getStructure().isOr()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				return true;
 			}
 		}
@@ -248,11 +224,9 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public int numAlternativeGroup() {
-		int count =
-			0;
+		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if ((f.getStructure().getChildrenCount() > 1)
-				&& f.getStructure().isAlternative()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				count++;
 			}
 		}
@@ -261,11 +235,9 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	@Override
 	public int numOrGroup() {
-		int count =
-			0;
+		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
-			if ((f.getStructure().getChildrenCount() > 1)
-				&& f.getStructure().isOr()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				count++;
 			}
 		}
@@ -278,20 +250,17 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		correspondingFeatureModel.deleteFeatureFromTable(rootFeature.getFeature());
 
 		feature.setParent(null);
-		rootFeature =
-			feature;
+		rootFeature = feature;
 	}
 
 	@Override
 	public void setRoot(IFeatureStructure root) {
-		rootFeature =
-			root;
+		rootFeature = root;
 	}
 
 	private boolean existsFeatureWithStatus(FeatureStatus status) {
 		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
-			if ((!f.getStructure().hasHiddenParent()
-				|| showHiddenFeatures)) {
+			if ((!f.getStructure().hasHiddenParent() || showHiddenFeatures)) {
 				if (f.getProperty().getFeatureStatus() == status) {
 					return true;
 				}
@@ -323,8 +292,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasDeadConstraints() {
 		for (final IConstraint c : getFeatureModel().getConstraints()) {
-			if ((c.getConstraintAttribute() == ConstraintAttribute.DEAD)
-				|| !c.getDeadFeatures().isEmpty()) {
+			if ((c.getConstraintAttribute() == ConstraintAttribute.DEAD) || !c.getDeadFeatures().isEmpty()) {
 				return true;
 			}
 		}

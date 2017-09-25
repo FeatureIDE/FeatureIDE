@@ -31,8 +31,7 @@ public class FSTAstemaLFunction extends FSTField {
 		super(name, type, modifiers);
 	}
 
-	public FSTAstemaLFunction(String fieldName, String typeName, String modifiers,
-			String body, int beginLine, int endLine) {
+	public FSTAstemaLFunction(String fieldName, String typeName, String modifiers, String body, int beginLine, int endLine) {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
 	}
 

@@ -38,17 +38,14 @@ import de.ovgu.featureide.ui.mpl.wizards.page.NewMultiFeatureProjectPage;
  */
 public class NewMultiFeatureProjectWizard extends Wizard implements IWorkbenchWizard {
 
-	public static final String ID =
-		MPLUIPlugin.PLUGIN_ID
-			+ ".wizards.MultiFeatureProjectWizard";
+	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.MultiFeatureProjectWizard";
 
 	private NewMultiFeatureProjectPage multiPage;
 
 	@Override
 	public void addPages() {
 		setWindowTitle(NEW_MULTI_FEATURE_PROJECT);
-		multiPage =
-			new NewMultiFeatureProjectPage();
+		multiPage = new NewMultiFeatureProjectPage();
 		addPage(multiPage);
 		super.addPages();
 	}

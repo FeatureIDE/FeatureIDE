@@ -50,31 +50,25 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	private IGraphicalFeatureModel featureModel;
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
-		this.fill =
-			fill;
-		this.lastChild =
-			lastChild;
+		this.fill = fill;
+		this.lastChild = lastChild;
 		if (lastChild == null) {
-			children =
-				null;
+			children = null;
 		} else {
-			children =
-				FeatureUIHelper.getGraphicalSiblings(lastChild);
+			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
 		}
 		setForegroundColor(FMPropertyManager.getDecoratorForegroundColor());
 		setBackgroundColor(FMPropertyManager.getDecoratorForegroundColor());
 		setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 		if (lastChild != null) {
-			featureModel =
-				lastChild.getGraphicalModel();
+			featureModel = lastChild.getGraphicalModel();
 		}
 	}
 
 	@Override
 	public void setLocation(final Point p) {
 		if (this instanceof LegendRelationDecoration) {
-			super.setLocation(p.translate((-getBounds().width >> 1)
-				+ 1, 0));
+			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
 			if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
@@ -87,8 +81,7 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 
 	@Override
 	public void setReferencePoint(final Point p) {
-		referencePoint =
-			p;
+		referencePoint = p;
 	}
 
 	@Override
@@ -101,58 +94,40 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 
 	private void drawShape(final Graphics graphics) {
 		if (getActiveReason() != null) {
-			final Color reasonColor =
-				FMPropertyManager.getReasonColor(getActiveReason());
+			final Color reasonColor = FMPropertyManager.getReasonColor(getActiveReason());
 			graphics.setForegroundColor(reasonColor);
 			graphics.setBackgroundColor(reasonColor);
 			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
 		}
 
-		boolean verticalLayout =
-			false;
+		boolean verticalLayout = false;
 		if (featureModel != null) {
-			verticalLayout =
-				FeatureUIHelper.hasVerticalLayout(featureModel);
+			verticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		}
-		double minAngle =
-			Double.MAX_VALUE;
-		double maxAngle =
-			Double.MIN_VALUE;
+		double minAngle = Double.MAX_VALUE;
+		double maxAngle = Double.MIN_VALUE;
 		final Rectangle r;
 		if (verticalLayout) {
-			r =
-				new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
+			r = new Rectangle(getBounds()).translate((-getBounds().width >> 1), 0).shrink(1, 1);
 		} else {
-			r =
-				new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
+			r = new Rectangle(getBounds()).translate(0, (-getBounds().height >> 1)).shrink(1, 1);
 		}
-		final Point center =
-			verticalLayout
-				? getBounds().getLeft()
-				: getBounds().getTop();
+		final Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
 
 		if (this instanceof LegendRelationDecoration) {
-			maxAngle =
-				calculateAngle(center, getFeatureLocation());
-			minAngle =
-				calculateAngle(center, referencePoint);
+			maxAngle = calculateAngle(center, getFeatureLocation());
+			minAngle = calculateAngle(center, referencePoint);
 		} else {
-			if ((children != null)
-				&& (children.size() > 1)) {
+			if ((children != null) && (children.size() > 1)) {
 				for (final IGraphicalFeature curChild : children) {
-					lastChild =
-						curChild;
-					final Point featureLocation =
-						FeatureUIHelper.getSourceLocation(curChild);
-					final double currentAngle =
-						calculateAngle(center, featureLocation);
+					lastChild = curChild;
+					final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);
+					final double currentAngle = calculateAngle(center, featureLocation);
 					if (currentAngle < minAngle) {
-						minAngle =
-							currentAngle;
+						minAngle = currentAngle;
 					}
 					if (currentAngle > maxAngle) {
-						maxAngle =
-							currentAngle;
+						maxAngle = currentAngle;
 					}
 				}
 			} else {
@@ -160,11 +135,9 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			}
 		}
 		if (fill) {
-			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle
-				- minAngle));
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int) (maxAngle - minAngle));
 		} else {
-			graphics.drawArc(r, (int) minAngle, (int) (maxAngle
-				- minAngle));
+			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}
 	}
 
@@ -177,15 +150,8 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	}
 
 	private double calculateAngle(final Point point, final Point referencePoint) {
-		final int dx =
-			referencePoint.x
-				- point.x;
-		final int dy =
-			referencePoint.y
-				- point.y;
-		return 360
-			- Math.round((Math.atan2(dy, dx)
-				/ Math.PI)
-				* 180);
+		final int dx = referencePoint.x - point.x;
+		final int dy = referencePoint.y - point.y;
+		return 360 - Math.round((Math.atan2(dy, dx) / Math.PI) * 180);
 	}
 }

@@ -29,18 +29,15 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 //TODO MPL: better implementation
 public class ClassFragmentComparator implements Comparator<AbstractClassFragment>, Serializable {
 
-	private static final long serialVersionUID =
-		-322298330373445431L;
+	private static final long serialVersionUID = -322298330373445431L;
 
 	private final String favoritClass;
 
 	public ClassFragmentComparator(String favoritClass) {
 		if (favoritClass == null) {
-			this.favoritClass =
-				null;
+			this.favoritClass = null;
 		} else {
-			this.favoritClass =
-				favoritClass.toLowerCase();
+			this.favoritClass = favoritClass.toLowerCase();
 		}
 	}
 
@@ -51,25 +48,17 @@ public class ClassFragmentComparator implements Comparator<AbstractClassFragment
 
 	private String buildCompareString(AbstractClassFragment frag) {
 		final String sigClassName;
-		final AbstractClassSignature fragmentSignature =
-			frag.getSignature();
-		AbstractClassSignature parentSig =
-			fragmentSignature.getParent();
+		final AbstractClassSignature fragmentSignature = frag.getSignature();
+		AbstractClassSignature parentSig = fragmentSignature.getParent();
 		if (parentSig != null) {
 			while (parentSig.getParent() != null) {
-				parentSig =
-					parentSig.getParent();
+				parentSig = parentSig.getParent();
 			}
-			sigClassName =
-				parentSig.getName();
+			sigClassName = parentSig.getName();
 		} else {
-			sigClassName =
-				fragmentSignature.getName();
+			sigClassName = fragmentSignature.getName();
 		}
 
-		return (sigClassName.toLowerCase().equals(favoritClass)
-			? 'a'
-			: 'b')
-			+ fragmentSignature.getName().toLowerCase();
+		return (sigClassName.toLowerCase().equals(favoritClass) ? 'a' : 'b') + fragmentSignature.getName().toLowerCase();
 	}
 }

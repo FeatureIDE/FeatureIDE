@@ -37,25 +37,21 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBel
  */
 public class CreateLayerAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.createlayer";
+	public static final String ID = "de.ovgu.featureide.createlayer";
 
-	private static ImageDescriptor createImage =
-		PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	private final IFeatureModel featureModel;
 
 	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final CreateFeatureBelowOperation op =
-			new CreateFeatureBelowOperation(feature, featureModel);
+		final CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

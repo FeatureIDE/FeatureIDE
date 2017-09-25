@@ -39,19 +39,14 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
 @SuppressWarnings("restriction")
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 
-	private static final String BUILDER_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 
-	private static final String CONFIGURATION_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".configurationProblemMarker";
+	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID + ".configurationProblemMarker";
 
 	protected final IProject project;
 
 	public BuilderMarkerHandler(IProject project) {
-		this.project =
-			project;
+		this.project = project;
 	}
 
 	/*
@@ -69,8 +64,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 				CorePlugin.getDefault().logError(e);
 			}
 		} else {
-			resource =
-				project;
+			resource = project;
 		}
 
 		// prevent duplicate error markers (e.g. caused by changing a jak file
@@ -78,8 +72,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		deleteIfExists(resource, message, lineNumber, severity);
 
 		try {
-			final IMarker marker =
-				resource.createMarker(BUILDER_MARKER);
+			final IMarker marker = resource.createMarker(BUILDER_MARKER);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
@@ -93,14 +86,12 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			if (!resource.exists()) {
 				return;
 			}
-			final IMarker[] markers =
-				resource.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_ZERO);
+			final IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_ZERO);
 			for (final IMarker marker : markers) {
 				// XXX Workaround for possible null pointer exception at this point
 				// TODO Fix cause of the null pointer or handle correctly
 				try {
-					if (marker.getAttribute(IMarker.MESSAGE).equals(message)
-						&& ((Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber)
+					if (marker.getAttribute(IMarker.MESSAGE).equals(message) && ((Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber)
 						&& ((Integer) marker.getAttribute(IMarker.SEVERITY) == severity)) {
 						marker.delete();
 					}
@@ -117,8 +108,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 */
 	@Override
 	public void deleteBuilderMarkers(IResource resource, int depth) {
-		if ((resource != null)
-			&& resource.exists()) {
+		if ((resource != null) && resource.exists()) {
 			try {
 				resource.deleteMarkers(BUILDER_MARKER, false, depth);
 			} catch (final CoreException e) {
@@ -132,12 +122,9 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 			return;
 		}
 		try {
-			final IMarker marker =
-				resource.createMarker(CONFIGURATION_MARKER);
-			final MarkerInfo info =
-				((Workspace) resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
-			if (marker.exists()
-				&& (info != null)) {
+			final IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
+			final MarkerInfo info = ((Workspace) resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
+			if (marker.exists() && (info != null)) {
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, severity);
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
@@ -157,19 +144,13 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 */
 	private boolean hasMarker(final IResource resource, final String message, final int lineNumber) {
 		try {
-			final IMarker[] marker =
-				resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
+			final IMarker[] marker = resource.findMarkers(CONFIGURATION_MARKER, false, IResource.DEPTH_ZERO);
 			if (marker != null) {
 				for (final IMarker m : marker) {
 					if (m != null) {
-						final Object markerMessage =
-							m.getAttribute(IMarker.MESSAGE);
-						final Object markerLine =
-							m.getAttribute(IMarker.LINE_NUMBER);
-						if ((markerMessage != null)
-							&& markerMessage.equals(message)
-							&& (markerLine != null)
-							&& markerLine.equals(lineNumber)) {
+						final Object markerMessage = m.getAttribute(IMarker.MESSAGE);
+						final Object markerLine = m.getAttribute(IMarker.LINE_NUMBER);
+						if ((markerMessage != null) && markerMessage.equals(message) && (markerLine != null) && markerLine.equals(lineNumber)) {
 							return true;
 						}
 					}

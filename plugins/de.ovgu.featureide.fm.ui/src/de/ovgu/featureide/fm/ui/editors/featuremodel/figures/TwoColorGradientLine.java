@@ -44,25 +44,16 @@ public class TwoColorGradientLine extends Shape implements GUIDefaults {
 	 *
 	 */
 	public TwoColorGradientLine(Color left, Color right, int width, int height) {
-		final XYLayout layout =
-			new XYLayout();
+		final XYLayout layout = new XYLayout();
 		setLayoutManager(layout);
 		setSize(width, height);
 		setBackgroundColor(left);
-		rDiff =
-			right.getRed()
-				- left.getRed();
-		gDiff =
-			right.getGreen()
-				- left.getGreen();
-		bDiff =
-			right.getBlue()
-				- left.getBlue();
+		rDiff = right.getRed() - left.getRed();
+		gDiff = right.getGreen() - left.getGreen();
+		bDiff = right.getBlue() - left.getBlue();
 
-		this.left =
-			left;
-		this.right =
-			right;
+		this.left = left;
+		this.right = right;
 		setOpaque(true);
 	}
 
@@ -73,10 +64,8 @@ public class TwoColorGradientLine extends Shape implements GUIDefaults {
 	@Override
 	protected void fillShape(Graphics graphics) {
 		// TODO Auto-generated method stub
-		final Color oldFore =
-			graphics.getForegroundColor();
-		final Color oldBack =
-			graphics.getBackgroundColor();
+		final Color oldFore = graphics.getForegroundColor();
+		final Color oldBack = graphics.getBackgroundColor();
 
 		graphics.setForegroundColor(left);
 		graphics.setBackgroundColor(right);

@@ -44,52 +44,40 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
 
-	private final List<List<String>> allconfigs =
-		new ArrayList<List<String>>();
-	private final List<List<String>> allsortedconfigs =
-		new ArrayList<List<String>>();
-	HashMap<String, Double> configsDistancesResult =
-		new HashMap<String, Double>();
+	private final List<List<String>> allconfigs = new ArrayList<List<String>>();
+	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
+	HashMap<String, Double> configsDistancesResult = new HashMap<String, Double>();
 
 	private final IFeatureModel featureModel;
 
 	public PriorizationSorter(IFeatureModel featureModel) {
 		super(featureModel);
-		super.sorted =
-			false;
-		this.featureModel =
-			featureModel;
+		super.sorted = false;
+		this.featureModel = featureModel;
 	}
 
-	private int configurationCounter =
-		1;
+	private int configurationCounter = 1;
 
 	@Override
 	protected int sort(final IMonitor monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
-		final List<List<String>> configs =
-			new ArrayList<List<String>>();
+		final List<List<String>> configs = new ArrayList<List<String>>();
 		for (final BuilderConfiguration c : configurations) {
 			configs.add(new ArrayList<String>(c.getSelectedFeatureNames()));
 		}
 		configurations.clear();
-		final List<List<String>> sortedConfigs =
-			sortConfigs(configs, monitor);
+		final List<List<String>> sortedConfigs = sortConfigs(configs, monitor);
 		for (final List<String> solution : sortedConfigs) {
-			System.out.println(CREATE_CONFIGS
-				+ configurationCounter
-				+ OF
-				+ sortedConfigs.size());
+			System.out.println(CREATE_CONFIGS + configurationCounter + OF + sortedConfigs.size());
 			configurations.add(createConfiguration(solution, configurationCounter++));
 		}
 		return configurations.size();
 	}
 
 	private BuilderConfiguration createConfiguration(final List<String> solution, int i) {
-		final Configuration configuration =
-			new Configuration(featureModel, false);
+		final Configuration configuration = new Configuration(featureModel, false);
 		for (final String selection : solution) {
 			configuration.setManual(selection, Selection.SELECTED);
 		}
@@ -102,8 +90,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		allconfigs.addAll(configs);
 
 		System.err.println("getconfigsDistanceMap");
-		configsDistancesResult =
-			getconfigsDistanceMap(allconfigs, monitor);
+		configsDistancesResult = getconfigsDistanceMap(allconfigs, monitor);
 		System.err.println("allyes");
 		allyesconfig();
 		while (!allconfigs.isEmpty()) {
@@ -115,29 +102,19 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 	@Override
 	public int getBufferSize() {
-		return allconfigs.size()
-			+ configurations.size();
+		return allconfigs.size() + configurations.size();
 	}
 
 	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor monitor) {
-		configsDistancesResult =
-			new HashMap<String, Double>();
+		configsDistancesResult = new HashMap<String, Double>();
 		String mapKey;
-		for (int i =
-			0; i < allConfig.size(); i++) {
+		for (int i = 0; i < allConfig.size(); i++) {
 			monitor.checkCancel();
-			for (int j =
-				i
-					+ 1; j < allConfig.size(); j++) {
-				final int xHashCode =
-					allConfig.get(i).hashCode();
-				final int yHashCode =
-					allConfig.get(j).hashCode();
+			for (int j = i + 1; j < allConfig.size(); j++) {
+				final int xHashCode = allConfig.get(i).hashCode();
+				final int yHashCode = allConfig.get(j).hashCode();
 
-				mapKey =
-					xHashCode
-						+ EMPTY___
-						+ yHashCode;
+				mapKey = xHashCode + EMPTY___ + yHashCode;
 
 				if (configsDistancesResult.get(mapKey) == null) {// not added before
 					configsDistancesResult.put(mapKey, clacDistance(allConfig.get(i), allConfig.get(j)));
@@ -151,19 +128,14 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		// here add the first element to the allsortedconfig list
 		// and Remove the element from the original list which is already added
 		// to the new sorted list
-		int allYes =
-			0;
-		int index =
-			0;
+		int allYes = 0;
+		int index = 0;
 
 		for (final List<String> x : allconfigs) {
-			final int tempAllYes =
-				x.size();
+			final int tempAllYes = x.size();
 			if (tempAllYes > allYes) {
-				allYes =
-					tempAllYes;
-				index =
-					allconfigs.indexOf(x);
+				allYes = tempAllYes;
+				index = allconfigs.indexOf(x);
 			}
 		}
 
@@ -174,60 +146,41 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	private List<String> selectConfig() {
-		double distance =
-			1.0;
-		int index =
-			0;
+		double distance = 1.0;
+		int index = 0;
 
-		int xHashCode =
-			0;
-		int yHashCode =
-			0;
+		int xHashCode = 0;
+		int yHashCode = 0;
 
 		String mapKeyXY;
 		String mapKeyYX;
 
 		for (final List<String> x : allconfigs) {
 
-			double tempDistance =
-				0.0;
+			double tempDistance = 0.0;
 			for (final List<String> y : allsortedconfigs) {
-				xHashCode =
-					x.hashCode();
-				yHashCode =
-					y.hashCode();
+				xHashCode = x.hashCode();
+				yHashCode = y.hashCode();
 
-				mapKeyXY =
-					xHashCode
-						+ EMPTY___
-						+ yHashCode;
-				mapKeyYX =
-					yHashCode
-						+ EMPTY___
-						+ xHashCode;
-				double tempDistanceLocal =
-					0.0;
+				mapKeyXY = xHashCode + EMPTY___ + yHashCode;
+				mapKeyYX = yHashCode + EMPTY___ + xHashCode;
+				double tempDistanceLocal = 0.0;
 				if (configsDistancesResult.get(mapKeyXY) != null) {
-					tempDistanceLocal =
-						configsDistancesResult.get(mapKeyXY);
+					tempDistanceLocal = configsDistancesResult.get(mapKeyXY);
 				} else if (configsDistancesResult.get(mapKeyYX) != null) {
-					tempDistanceLocal =
-						configsDistancesResult.get(mapKeyYX);
+					tempDistanceLocal = configsDistancesResult.get(mapKeyYX);
 
 				} else {
 					System.out.println(WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG);
 				}
 				if (tempDistanceLocal > tempDistance) {
-					tempDistance =
-						tempDistanceLocal;
+					tempDistance = tempDistanceLocal;
 
 				}
 			}
 			if (tempDistance < distance) {
-				distance =
-					tempDistance;
-				index =
-					allconfigs.indexOf(x);
+				distance = tempDistance;
+				index = allconfigs.indexOf(x);
 			}
 		}
 
@@ -236,10 +189,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	private double clacDistance(List<String> x, List<String> y) {
-		final Collection<String> similar =
-			new HashSet<String>(x);
-		final Collection<String> different =
-			new HashSet<String>();
+		final Collection<String> similar = new HashSet<String>(x);
+		final Collection<String> different = new HashSet<String>();
 
 		different.addAll(x);
 		different.addAll(y);
@@ -247,18 +198,11 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 		different.removeAll(similar);
 
-		final double s =
-			similar.size();
-		final double d =
-			different.size();
-		final double t =
-			concreteFeatures.size();
+		final double s = similar.size();
+		final double d = different.size();
+		final double t = concreteFeatures.size();
 
-		return (s
-			+ (t
-				- (s
-					+ d)))
-			/ t;
+		return (s + (t - (s + d))) / t;
 	}
 
 }
