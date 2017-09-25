@@ -21,14 +21,14 @@
 package de.ovgu.featureide.fm.core.explanations.config;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 
 /**
  * Generates explanations for circumstances involving {@link Configuration configurations}.
  *
  * @author Timo G&uuml;nther
  */
-public interface ConfigurationExplanationCreator extends ExplanationCreator {
+public interface ConfigurationExplanationCreator extends FeatureModelExplanationCreator {
 
 	/**
 	 * Returns the configuration.
