@@ -80,7 +80,7 @@ abstract public class FeatureDiagramLayoutManager {
 			for (final IGraphicalFeature entry : featureModel.getFeatures()) {
 				// Fix of #571: All feature in manual layout are loaded to their position. Because the layout
 				// does not change the position no event is performed and the connections are not drawn. So for the first
-				// start peform the location changed event to refresh the connection only in manual layout
+				// start perform the location changed event to refresh the connection only in manual layout
 				entry.update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
 				firstManualLayout =
 					true;
@@ -184,10 +184,13 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 	
+	/*
+	 * Repositions the legend - if it is intersected by an edge
+	 */
 	public void layoutLegendManual(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		final Iterable<IGraphicalFeature> nonHidden =
 				featureModel.getVisibleFeatures();
-
+		
 		Dimension legendSize = null;
 		LegendFigure legendFigure = null;
 		for (final Object obj : editor.getEditPartRegistry().values()) {
@@ -197,43 +200,32 @@ abstract public class FeatureDiagramLayoutManager {
 			}
 		}
 		
-		if ((legendSize == null) && (legendFigure == null)) {
+		if ((legendSize == null) && (legendFigure == null))
 			return;
-		}
 		
 		for (final IGraphicalFeature feature : nonHidden) {
-			final Point parentLocation = feature.getLocation();
-			Dimension parentSize = feature.getSize(); 
-			final Point source = new Point(
-					parentSize.width()/2 + parentLocation.x, 
-					parentSize.height()  + parentLocation.y);
+			final Point source = calculateSource(feature, featureModel.getLayout().verticalLayout());
 			
+			//Iterate over every child and check for an intersection
 			List<IGraphicalFeature> children = feature.getGraphicalChildren(true);
 			for (int i = 0; i < children.size(); i++) {
 				//Only check the outer edges
 				if (i > 0 && i < children.size() - 1)
 					continue;
 				
-				Point childLocation = children.get(i).getLocation();
-				Dimension childSize = children.get(i).getSize();
-				/*
-				 * TODO: Calculation of source and target is dependent on the feature-layout.
-				 */
-				
-				final Point target = new Point(
-						childSize.width()/2 + childLocation.x, 
-						childLocation.y);
-				
+				final Point target = calculateTarget(children.get(i), featureModel.getLayout().verticalLayout());
 				final Point legend = featureModel.getLayout().getLegendPos();
 				int legendMaxX = legend.x + legendSize.width;
 				int legendMaxY = legend.y + legendSize.height;
 				
+				//Edge is definitely not inside the legend, continue
 				if ((source.x <= legend.x && target.x <= legend.x) ||
 				    (source.y <= legend.y && target.y <= legend.y) ||
 				    (source.x >= legendMaxX && target.x >= legendMaxX) ||
 				    (source.y >= legendMaxY && target.y >= legendMaxY))
 					continue;
 				
+				//Check every side of the legend for an intersection
 				float m = (float)(target.y - source.y) / (float)(target.x - source.x);
 				float y = m * (float)(legend.x - source.x) + (float)source.y;
 				
@@ -254,6 +246,41 @@ abstract public class FeatureDiagramLayoutManager {
 			}
 		}
 	}
+	
+	/*
+	 * Calculate the starting point of the source
+	 */
+	public Point calculateSource(IGraphicalFeature feature, boolean verticalLayout) {
+		final Point sourceLocation = feature.getLocation();
+		Dimension sourceSize = feature.getSize(); 
+	 	if (verticalLayout) { //Top-Down
+	 		return new Point(
+	 				sourceSize.width()/2 + sourceLocation.x, 
+	 				sourceSize.height()  + sourceLocation.y);
+	 	} else { //Left-Right
+	 		return new Point(
+	 				sourceSize.width() + sourceLocation.x, 
+	 				sourceSize.height()/2  + sourceLocation.y);
+	 	}
+	}
+
+	/*
+	 * Calculate the ending point of the target
+	 */
+	public Point calculateTarget(IGraphicalFeature feature, boolean verticalLayout) {
+		final Point targetLocation = feature.getLocation();
+		Dimension targetSize = feature.getSize(); 
+	 	if (verticalLayout) { //Top-Down
+	 		return new Point(
+	 				targetSize.width()/2 + targetLocation.x, 
+	 				targetLocation.y);
+	 	} else { //Left-Right
+	 		return new Point(
+	 				targetLocation.x, 
+	 				targetSize.height()/2  + targetLocation.y);
+	 	}
+	}
+	
 	
 	/**
 	 * sets the position of the legend
