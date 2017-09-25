@@ -39,7 +39,7 @@ public abstract class MusPreprocessorExplanationCreator extends AbstractPreproce
 	}
 
 	@Override
-	protected Object createOracle() {
+	protected MusExtractor createOracle() {
 		final MusExtractor oracle =
 			SatSolverFactory.getDefault().getMusExtractor();
 		oracle.addFormula(getCnf());
