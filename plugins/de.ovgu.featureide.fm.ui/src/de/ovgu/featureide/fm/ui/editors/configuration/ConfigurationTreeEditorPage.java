@@ -1376,7 +1376,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 								manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
 							// Cast is necessary, don't remove
 							final IFile document =
-								getEditorInput().getAdapter(IFile.class);
+								(IFile) getEditorInput().getAdapter(IFile.class);
 
 							byte[] content;
 							try {

@@ -520,8 +520,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	protected void setInput(IEditorInput input) {
+		// Cast is necessary, don't remove
 		markerHandler =
-			new ModelMarkerHandler<>(input.getAdapter(IFile.class));
+			new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
 		setPartName(getModelFile().getProject().getName()
 			+ MODEL);
 		setTitleToolTip(input.getToolTipText());
@@ -752,8 +753,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 							if (editor.isDirty()) {
 								final IEditorInput editorInput =
 									editor.getEditorInput();
+								// Cast is necessary, don't remove
 								final IFile editorFile =
-									editorInput.getAdapter(IFile.class);
+									(IFile) editorInput.getAdapter(IFile.class);
 								if (editorFile.getProject().equals(project)) {
 									dirtyEditors.add(editorFile.getName());
 									dirtyEditors2.add(editor);

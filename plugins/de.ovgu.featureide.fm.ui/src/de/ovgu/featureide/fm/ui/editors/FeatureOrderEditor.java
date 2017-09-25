@@ -193,8 +193,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		// Cast is necessary, don't remove
 		final IProject project =
-			input.getAdapter(IFile.class).getProject();
+			((IFile) input.getAdapter(IFile.class)).getProject();
 		hasFeatureOrder =
 			FMComposerManager.getFMComposerExtension(project).hasFeatureOrder();
 		comp =
@@ -474,8 +475,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	// TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile() {
+		// Cast is necessary, don't remove
 		File file =
-			input.getAdapter(IFile.class).getProject().getLocation().toFile();
+			((IFile) input.getAdapter(IFile.class)).getProject().getLocation().toFile();
 		final String fileSep =
 			System.getProperty("file.separator");
 		file =

@@ -179,8 +179,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	protected void setInput(IEditorInput input) {
+		// Cast is necessary, don't remove
 		file =
-			input.getAdapter(IFile.class);
+			(IFile) input.getAdapter(IFile.class);
 		markerHandler =
 			new ModelMarkerHandler<>(file);
 
