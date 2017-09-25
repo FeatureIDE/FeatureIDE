@@ -28,6 +28,7 @@ import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
@@ -70,7 +71,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			selectedFeatures.clear();
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 				final Object var =
-					featureSelection.getFeature().getName();
+					NodeCreator.getVariable(featureSelection.getFeature());
 				final boolean value;
 				if (featureSelection == getSubject()) {
 					switch (featureSelection.getAutomatic()) {

@@ -769,12 +769,16 @@ public class NodeCreator {
 		return featureModel.getFeature(currentName);
 	}
 
-	public static String getVariable(String featureName, IFeatureModel featureModel) {
-		return featureModel.getRenamingsManager().getOldName(featureName);
+	public static String getVariable(IFeature feature) {
+		return getVariable(feature, feature.getFeatureModel());
 	}
 
 	public static String getVariable(IFeature feature, IFeatureModel featureModel) {
-		return featureModel.getRenamingsManager().getOldName(feature.getName());
+		return getVariable(feature.getName(), featureModel);
+	}
+
+	public static String getVariable(String featureName, IFeatureModel featureModel) {
+		return featureModel.getRenamingsManager().getOldName(featureName);
 	}
 
 }

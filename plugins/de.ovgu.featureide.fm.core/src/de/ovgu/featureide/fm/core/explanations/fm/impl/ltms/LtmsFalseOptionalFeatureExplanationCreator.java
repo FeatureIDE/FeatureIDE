@@ -25,6 +25,7 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -62,8 +63,8 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 		final Ltms ltms =
 			getOracle();
 		ltms.clearPremises();
-		ltms.addPremise(getSubject().getName(), false);
-		ltms.addPremise(FeatureUtils.getParent(getSubject()).getName(), true);
+		ltms.addPremise(NodeCreator.getVariable(getSubject()), false);
+		ltms.addPremise(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
 		return getExplanation(ltms.getExplanations());
 	}
 

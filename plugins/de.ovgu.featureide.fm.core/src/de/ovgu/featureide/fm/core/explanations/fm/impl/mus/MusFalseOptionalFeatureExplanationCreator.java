@@ -26,6 +26,7 @@ import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 
@@ -57,8 +58,8 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		final FalseOptionalFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getSubject().getName(), false);
-			oracle.addAssumption(FeatureUtils.getParent(getSubject()).getName(), true);
+			oracle.addAssumption(NodeCreator.getVariable(getSubject()), false);
+			oracle.addAssumption(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
 			explanation =
 				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
