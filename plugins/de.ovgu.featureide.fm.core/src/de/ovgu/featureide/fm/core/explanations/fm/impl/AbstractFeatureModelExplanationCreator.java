@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.prop4j.Node;
@@ -213,6 +216,38 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 			explanation.addReason(reason);
 		}
 		return explanation;
+	}
+
+	/**
+	 * Returns the shortest explanation among the given ones. Note that this may not be the shortest one possible.
+	 *
+	 * @param clauseIndexes indexes of clauses of explanations to roll into one
+	 * @return the shortest explanation among the given ones
+	 */
+	protected Explanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
+		final List<Explanation> explanations =
+			new LinkedList<>();
+		for (final Set<Integer> c : clauseIndexes) {
+			explanations.add(getExplanation(c));
+		}
+		final Explanation cumulatedExplanation =
+			getConcreteExplanation();
+		cumulatedExplanation.setExplanationCount(0);
+		Explanation shortestExplanation =
+			null;
+		for (final Explanation explanation : explanations) {
+			cumulatedExplanation.addExplanation(explanation); // Remember that this explanation was generated.
+			if ((shortestExplanation == null)
+				|| (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
+				shortestExplanation =
+					explanation; // Remember the shortest explanation.
+			}
+		}
+		if (shortestExplanation == null) {
+			return null;
+		}
+		shortestExplanation.setCounts(cumulatedExplanation); // Remember the reason and explanations that were generated before.
+		return shortestExplanation;
 	}
 
 	/**
