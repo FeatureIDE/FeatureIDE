@@ -183,4 +183,19 @@ public class English implements ILanguage {
 		return OPTIONAL;
 	}
 
+	@Override
+	public String getExplanation() {
+		return "The selected element is defect because of the highlighted dependencies:";
+	}
+
+	@Override
+	public String getLikelyCause() {
+		return "likely cause";
+	}
+
+	@Override
+	public String getUnlikelyCause() {
+		return "unlikely cause";
+	}
+
 }

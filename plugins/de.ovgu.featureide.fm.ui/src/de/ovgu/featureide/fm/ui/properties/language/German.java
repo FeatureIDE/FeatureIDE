@@ -191,4 +191,19 @@ public class German implements ILanguage {
 	public String getOptional() {
 		return OPTIONAL;
 	}
+
+	@Override
+	public String getExplanation() {
+		return "Das ausgewählte Element ist wegen der hervorgehobenen Abhängigkeiten defekt:";
+	}
+
+	@Override
+	public String getLikelyCause() {
+		return "wahrscheinliche Ursache";
+	}
+
+	@Override
+	public String getUnlikelyCause() {
+		return "unwahrscheinliche Ursache";
+	}
 }

@@ -929,10 +929,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		// Label left
 		final Label labelExplanation =
 			new Label();
-		final String circumstanceString =
-			explanation.getWriter().getCircumstanceString();
-		labelExplanation.setText(String.format("%s because of the highlighted dependencies:", circumstanceString));
-		explanationFigure.setToolTip(createToolTipContent(String.format("%s%nbecause of the highlighted dependencies.", circumstanceString)));
+		labelExplanation.setText(language.getExplanation());
+		explanationFigure.setToolTip(createToolTipContent(explanation.toString()));
 		final int widthInPixels =
 			createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width
 				+ 25;
@@ -969,7 +967,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		// Label left
 		final Label labelLeft =
-			new Label("likely cause");
+			new Label(language.getLikelyCause());
 		labelLeft.setLabelAlignment(PositionConstants.LEFT);
 		labelLeft.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
@@ -980,7 +978,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		// label right
 		final Label labelRight =
-			new Label("unlikely cause");
+			new Label(language.getUnlikelyCause());
 		labelRight.setLabelAlignment(PositionConstants.RIGHT);
 		labelRight.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
