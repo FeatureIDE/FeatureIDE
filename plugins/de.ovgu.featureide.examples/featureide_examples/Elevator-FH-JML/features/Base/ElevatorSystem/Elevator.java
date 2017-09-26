@@ -72,6 +72,7 @@ public class Elevator {
 	 */
 	/*@ \consecutive_contract
 	  @ ensures env.calledAt_Spec2[floorID];
+	  @ assignable floorButtons[*];
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
 		//@ set env.calledAt_Spec2[floorID] = true; 
@@ -96,6 +97,7 @@ public class Elevator {
 	  @ ensures env.calledAt_Spec1[currentFloorID] == env.calledAt_Spec1[currentFloorID] && areDoorsOpen() ? false : env.calledAt_Spec1[currentFloorID];
 	  @ ensures \old(getCurrentDirection()) == Direction.up && getCurrentDirection() == Direction.down ==> (\forall int i; getCurrentFloorID() < i && i < numFloors; !buttonForFloorIsPressed(i));
 	  @ ensures \old(getCurrentDirection()) == Direction.down && getCurrentDirection() == Direction.up ==> (\forall int i; 0 <= i && i < getCurrentFloorID(); !buttonForFloorIsPressed(i));
+	  @ assignable doors, persons, floorButtons[*],currentHeading,currentFloorID;
 	  @*/
 	public void timeShift() {
 		//System.out.println("--");

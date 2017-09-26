@@ -1,6 +1,7 @@
 public class Vertex {
     /*@requires end != null && end.adjacentNeighbors != null;@*/
     /*@ensures end.getLast().getWeight()==theWeight;@*/
+	/*@assignable \nothing; @*/
     public void addWeight( Vertex end, int theWeight ) 
     {
         Neighbor the_neighbor = 
@@ -10,6 +11,7 @@ public class Vertex {
     }
     /*@requires \original && sourceNeighbor != null;@*/
     /*@ensures \original && end.getLast().getWeight()==theWeight;@*/
+    /*@assignable \nothing; @*/
     public void adjustAdorns( Neighbor sourceNeighbor )
      {
         Neighbor targetNeighbor = 

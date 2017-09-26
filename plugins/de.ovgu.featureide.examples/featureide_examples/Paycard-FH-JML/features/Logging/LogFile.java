@@ -23,6 +23,7 @@ public class LogFile {
       @    ensures \old(currentRecord) + 1 != logFileSize ? 
       @        currentRecord == \old(currentRecord) + 1 : currentRecord == 0;
       @    ensures logArray[currentRecord].balance == balance;
+      @    assignable currentRecord, logArray[*];
       @*/
     public void addRecord(int balance) throws CardException {
 	currentRecord++;

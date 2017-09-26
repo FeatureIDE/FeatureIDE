@@ -24,6 +24,7 @@ public class Edge {
 	/*@ \final_method
 	 @ requires first != null && second != null;
 	 @ ensures \result > 17;
+	 @ assignable \nothing;
 	 @*/
 	@Override
 	public int hashCode() {
