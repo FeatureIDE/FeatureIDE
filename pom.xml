@@ -18,6 +18,28 @@
 	<modules>
 		<module>plugins/de.ovgu.featureide.fm.core</module>
 		<module>plugins/de.ovgu.featureide.fm.ui</module>
+
+		<module>plugins/de.ovgu.featureide.core</module>
+		<module>plugins/de.ovgu.featureide.ui</module>
+
+		<module>plugins/br.ufal.ic.colligens</module>
+		<module>plugins/de.ovgu.featureide.core.ahead</module>
+		<module>plugins/de.ovgu.featureide.core.antenna</module>
+		<module>plugins/de.ovgu.featureide.core.aspectj</module>
+		<module>plugins/de.ovgu.featureide.core.conversion.ahead-featurehouse</module>
+		<module>plugins/de.ovgu.featureide.core.featurecpp</module>
+		<module>plugins/de.ovgu.featureide.core.featurehouse</module>
+		<module>plugins/de.ovgu.featureide.core.framework</module>
+		<module>plugins/de.ovgu.featureide.core.images</module>
+		<module>plugins/de.ovgu.featureide.core.mpl</module>
+		<module>plugins/de.ovgu.featureide.core.munge</module>
+		<module>plugins/de.ovgu.featureide.core.munge.android</module>
+		<module>plugins/de.ovgu.featureide.core.runtime</module>
+		<module>plugins/de.ovgu.featureide.examples</module>
+		<module>plugins/de.ovgu.featureide.migration</module>
+		<module>plugins/de.ovgu.featureide.ui.android</module>
+		<module>plugins/de.ovgu.featureide.ui.mpl</module>
+
 		<module>tests/de.ovgu.featureide.fm.core-test</module>
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
 	</modules>
