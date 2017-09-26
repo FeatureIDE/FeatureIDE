@@ -26,14 +26,11 @@ public class SignatureGroup implements Comparable<SignatureGroup> {
 
 	private final int id;
 	private final IFolder folder;
-	private int size =
-		0;
+	private int size = 0;
 
 	public SignatureGroup(int id, IFolder folder) {
-		this.id =
-			id;
-		this.folder =
-			folder;
+		this.id = id;
+		this.folder = folder;
 	}
 
 	public void addSig() {
@@ -42,13 +39,8 @@ public class SignatureGroup implements Comparable<SignatureGroup> {
 
 	@Override
 	public int compareTo(SignatureGroup otherSigGroup) {
-		final int dSize =
-			size
-				- otherSigGroup.size;
-		return dSize != 0
-			? dSize
-			: otherSigGroup.id
-				- id;
+		final int dSize = size - otherSigGroup.size;
+		return dSize != 0 ? dSize : otherSigGroup.id - id;
 	}
 
 	public IFolder getFolder() {

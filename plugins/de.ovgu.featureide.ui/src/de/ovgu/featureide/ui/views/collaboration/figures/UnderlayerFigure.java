@@ -38,8 +38,7 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 
 	public UnderlayerFigure(FSTFeature coll) {
 		super();
-		collaborationFigure =
-			new CollaborationFigure(coll);
+		collaborationFigure = new CollaborationFigure(coll);
 		this.add(collaborationFigure);
 
 		collaborationFigure.setLocation(COLLFIGURE_LOCATION);
@@ -53,8 +52,7 @@ public class UnderlayerFigure extends Figure implements GUIDefaults {
 	}
 
 	public void setCollaborationFigureWidth(int width) {
-		collaborationFigure.getBounds().width =
-			width;
+		collaborationFigure.getBounds().width = width;
 	}
 
 	public int getCollaborationFigureWidth() {

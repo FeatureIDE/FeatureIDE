@@ -27,16 +27,10 @@ package de.ovgu.featureide.fm.core.configuration;
  */
 public class SelectionNotPossibleException extends RuntimeException {
 
-	private static final long serialVersionUID =
-		1793844229871267311L;
+	private static final long serialVersionUID = 1793844229871267311L;
 
 	public SelectionNotPossibleException(String feature, Selection selection) {
-		super("The feature \""
-			+ feature
-			+ "\" cannot be "
-			+ (selection == Selection.SELECTED
-				? "selected"
-				: "deselected"));
+		super("The feature \"" + feature + "\" cannot be " + (selection == Selection.SELECTED ? "selected" : "deselected"));
 	}
 
 }

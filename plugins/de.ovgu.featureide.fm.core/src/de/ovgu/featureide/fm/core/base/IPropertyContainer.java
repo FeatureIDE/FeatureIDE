@@ -40,12 +40,10 @@ public interface IPropertyContainer {
 	 */
 	class NoSuchPropertyException extends NoSuchElementException {
 
-		private static final long serialVersionUID =
-			6923332230285211910L;
+		private static final long serialVersionUID = 6923332230285211910L;
 
 		public NoSuchPropertyException(String key) {
-			super("The container does not contain a property with the given key:"
-				+ key);
+			super("The container does not contain a property with the given key:" + key);
 		}
 	}
 
@@ -53,13 +51,7 @@ public interface IPropertyContainer {
 
 		@Override
 		public String toString() {
-			return "Entry [key="
-				+ key
-				+ ", type="
-				+ type
-				+ ", value="
-				+ value
-				+ "]";
+			return "Entry [key=" + key + ", type=" + type + ", value=" + value + "]";
 		}
 
 		K key;
@@ -67,26 +59,16 @@ public interface IPropertyContainer {
 		V value;
 
 		public Entry(K key, T type, V value) {
-			this.key =
-				key;
-			this.type =
-				type;
-			this.value =
-				value;
+			this.key = key;
+			this.type = type;
+			this.value = value;
 		}
 
 		@Override
 		public int hashCode() {
-			final int prime =
-				31;
-			int result =
-				1;
-			result =
-				(prime
-					* result)
-					+ ((key == null)
-						? 0
-						: key.hashCode());
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((key == null) ? 0 : key.hashCode());
 			return result;
 		}
 
@@ -102,8 +84,7 @@ public interface IPropertyContainer {
 				return false;
 			}
 			@SuppressWarnings("unchecked")
-			final Entry<K, T, V> other =
-				(Entry<K, T, V>) obj;
+			final Entry<K, T, V> other = (Entry<K, T, V>) obj;
 			if (key == null) {
 				if (other.key != null) {
 					return false;

@@ -27,8 +27,7 @@ package de.ovgu.featureide.fm.core;
  */
 public final class PluginID {
 
-	public static String PLUGIN_ID =
-		"de.ovgu.featureide.fm.core";
+	public static String PLUGIN_ID = "de.ovgu.featureide.fm.core";
 
 	private PluginID() {}
 

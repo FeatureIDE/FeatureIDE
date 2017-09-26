@@ -23,31 +23,20 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IWorkbenchWindow window =
-			HandlerUtil
-					.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 
-		final ISelection selection =
-			window.getActivePage().getSelection();
+		final ISelection selection = window.getActivePage().getSelection();
 
-		final String cppCheckerPath =
-			Colligens.getDefault().getPreferenceStore()
-					.getString("CppCheck");
+		final String cppCheckerPath = Colligens.getDefault().getPreferenceStore().getString("CppCheck");
 
-		if ((cppCheckerPath != null)
-			&& !(new File(cppCheckerPath).isFile())) {
-			MessageDialog
-					.openError(
-							window.getShell(),
-							Colligens.PLUGIN_NAME,
-							"Go to the Colligens preferences, and set where you installed the CppChecker. \n"
-								+ "Window > Preferences > Colligens > CppCheck Settings");
+		if ((cppCheckerPath != null) && !(new File(cppCheckerPath).isFile())) {
+			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME,
+					"Go to the Colligens preferences, and set where you installed the CppChecker. \n" + "Window > Preferences > Colligens > CppCheck Settings");
 			return null;
 		}
 
 		if (controller == null) {
-			controller =
-				new SemanticBugsController();
+			controller = new SemanticBugsController();
 		}
 
 		controller.setWindow(window);
@@ -55,8 +44,7 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			final IWorkbenchPage page =
-				window.getActivePage();
+			final IWorkbenchPage page = window.getActivePage();
 			try {
 				page.showView(SemanticBugsView.ID);
 			} catch (final PartInitException e) {
@@ -66,8 +54,7 @@ public class SemanticBugsHandler extends ColligensAbstractHandler {
 			controller.run();
 
 		} else {
-			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME,
-					PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
+			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME, PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
 		}
 
 		return null;

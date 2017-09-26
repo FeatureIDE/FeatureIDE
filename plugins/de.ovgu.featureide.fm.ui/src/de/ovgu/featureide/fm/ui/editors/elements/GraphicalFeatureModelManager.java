@@ -45,8 +45,7 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 		public ObjectCreator(IGraphicalFeatureModel model) {
 			super(IGraphicalFeatureModel.class, GraphicalFeatureModelManager.class,
 					new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
-			this.model =
-				model;
+			this.model = model;
 		}
 
 		@Override

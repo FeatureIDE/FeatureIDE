@@ -52,15 +52,12 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter {
 	@Override
 	public void testFeatureConcrete() {
 		for (final IFeature origF : origFm.getFeatures()) {
-			if (!origF.getStructure().isConcrete()
-				&& origF.getStructure().isConcrete()) {
-				final IFeature newF =
-					newFm.getFeature(origF.getName());
+			if (!origF.getStructure().isConcrete() && origF.getStructure().isConcrete()) {
+				final IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage
-						+ origF, newFm.getFeature(origF.getName()).getStructure().isConcrete());
+					assertTrue(failureMessage + origF, newFm.getFeature(origF.getName()).getStructure().isConcrete());
 				}
 			}
 		}

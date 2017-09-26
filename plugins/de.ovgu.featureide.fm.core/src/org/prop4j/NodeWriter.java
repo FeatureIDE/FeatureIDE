@@ -58,84 +58,39 @@ public class NodeWriter {
 	}
 
 	/** Denotes an unsupported symbol. */
-	public static final String noSymbol =
-		"?";
+	public static final String noSymbol = "?";
 	/**
 	 * Symbols for a logical representation. These are best used for displaying to the user due to brevity and beauty. Since they consist of unwieldy Unicode
 	 * characters, do not use them for editing or serialization; in these cases, instead use {@link #textual long} or {@link #shortSymbols short textual
 	 * symbols} respectively.
 	 */
-	public static final String[] logicalSymbols =
-		new String[] {
-			"\u00AC",
-			"\u2227",
-			"\u2228",
-			"\u21D2",
-			"\u21D4",
-			", ",
-			"choose",
-			"atleast",
-			"atmost" };
+	public static final String[] logicalSymbols = new String[] { "\u00AC", "\u2227", "\u2228", "\u21D2", "\u21D4", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a long textual representation. These are best used for editing by the user due to simplicity and ease of handling. Use {@link #logicalSymbols
 	 * logical symbols} for displaying to the user and {@link #shortSymbols short textual symbols} for serialization.
 	 */
-	public static final String[] textualSymbols =
-		new String[] {
-			"not",
-			"and",
-			"or",
-			"implies",
-			"iff",
-			", ",
-			"choose",
-			"atleast",
-			"atmost" };
+	public static final String[] textualSymbols = new String[] { "not", "and", "or", "implies", "iff", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a short textual representation. Best used for serialization since they fall in the ASCII range but are still relatively short. Use
 	 * {@link #logicalSymbols} for displaying to the user and {@link #textualSymbols long textual symbols} for editing by the user.
 	 */
-	public static final String[] shortSymbols =
-		new String[] {
-			"-",
-			"&",
-			"|",
-			"=>",
-			"<=>",
-			", ",
-			"choose",
-			"atleast",
-			"atmost" };
+	public static final String[] shortSymbols = new String[] { "-", "&", "|", "=>", "<=>", ", ", "choose", "atleast", "atmost" };
 	/**
 	 * Symbols for a representation like in Java. These are inherently incomplete and should only be used if absolutely necessary.
 	 */
-	public static final String[] javaSymbols =
-		new String[] {
-			"!",
-			"&&",
-			"||",
-			noSymbol,
-			"==",
-			", ",
-			noSymbol,
-			noSymbol,
-			noSymbol };
+	public static final String[] javaSymbols = new String[] { "!", "&&", "||", noSymbol, "==", ", ", noSymbol, noSymbol, noSymbol };
 
 	/** The propositional node to convert. */
 	private final Node root;
 
 	/** The symbols for the operations: not, and, or, implies, iff, separator, choose, atleast, atmost. */
-	private String[] symbols =
-		shortSymbols;
+	private String[] symbols = shortSymbols;
 	/** The notation to use. */
-	private Notation notation =
-		Notation.INFIX;
+	private Notation notation = Notation.INFIX;
 	/** If true, this writer will always place brackets, even if they are semantically irrelevant. */
-	private boolean enforceBrackets =
-		false;
+	private boolean enforceBrackets = false;
 	/** If true, this writer will enquote variables if they contain whitespace. */
-	private boolean enquoteWhitespace =
-		false;
+	private boolean enquoteWhitespace = false;
 
 	/**
 	 * Constructs a new instance of this class with the given node to transform. By default, the set of short symbols and infix notation are used, brackets are
@@ -144,8 +99,7 @@ public class NodeWriter {
 	 * @param propositional node to transform; not null
 	 */
 	public NodeWriter(Node root) {
-		this.root =
-			root;
+		this.root = root;
 	}
 
 	/**
@@ -160,8 +114,7 @@ public class NodeWriter {
 	 * @see #javaSymbols
 	 */
 	public void setSymbols(String[] symbols) {
-		this.symbols =
-			symbols;
+		this.symbols = symbols;
 	}
 
 	/**
@@ -179,8 +132,7 @@ public class NodeWriter {
 	 * @param notation notation to use
 	 */
 	public void setNotation(Notation notation) {
-		this.notation =
-			notation;
+		this.notation = notation;
 	}
 
 	/**
@@ -198,8 +150,7 @@ public class NodeWriter {
 	 * @param enforceBrackets
 	 */
 	public void setEnforceBrackets(boolean enforceBrackets) {
-		this.enforceBrackets =
-			enforceBrackets;
+		this.enforceBrackets = enforceBrackets;
 	}
 
 	/**
@@ -217,8 +168,7 @@ public class NodeWriter {
 	 * @param enquoteWhitespace
 	 */
 	public void setEnquoteWhitespace(boolean enquoteWhitespace) {
-		this.enquoteWhitespace =
-			enquoteWhitespace;
+		this.enquoteWhitespace = enquoteWhitespace;
 	}
 
 	/**
@@ -251,13 +201,10 @@ public class NodeWriter {
 			return String.valueOf(node);
 		}
 		if (node instanceof Not) {
-			final Node child =
-				node.children[0];
+			final Node child = node.children[0];
 			if (child instanceof Literal) {
-				final Literal l =
-					(Literal) child;
-				node =
-					new Literal(l.var, !l.positive);
+				final Literal l = (Literal) child;
+				node = new Literal(l.var, !l.positive);
 			}
 		}
 		if (node instanceof Literal) {
@@ -274,25 +221,18 @@ public class NodeWriter {
 	 * @return the textual representation; not null
 	 */
 	protected String literalToString(Literal l, Class<? extends Node> parent) {
-		final String s =
-			variableToString(l.var);
+		final String s = variableToString(l.var);
 		if (!l.positive) {
-			final Notation notation =
-				getNotation();
+			final Notation notation = getNotation();
 			switch (notation) {
 			case INFIX:
-				return getSymbols()[0]
-					+ ((getSymbols() == textualSymbols)
-						? " "
-						: "")
-					+ s;
+				return getSymbols()[0] + ((getSymbols() == textualSymbols) ? " " : "") + s;
 			case PREFIX:
 				return String.format("(%s %s)", getSymbols()[0], s);
 			case POSTFIX:
 				return String.format("(%s %s)", s, getSymbols()[0]);
 			default:
-				throw new IllegalStateException("Unknown notation: "
-					+ notation);
+				throw new IllegalStateException("Unknown notation: " + notation);
 			}
 		}
 		return s;
@@ -306,15 +246,8 @@ public class NodeWriter {
 	 * @return the textual representation; not null
 	 */
 	protected String variableToString(Object variable) {
-		final String s =
-			String.valueOf(variable);
-		return (isEnquoteWhitespace()
-			&& (containsWhitespace(s)
-				|| equalsSymbol(s)))
-					? '"'
-						+ s
-						+ '"'
-					: s;
+		final String s = String.valueOf(variable);
+		return (isEnquoteWhitespace() && (containsWhitespace(s) || equalsSymbol(s))) ? '"' + s + '"' : s;
 	}
 
 	/**
@@ -325,46 +258,25 @@ public class NodeWriter {
 	 * @return the textual representation; not null
 	 */
 	protected String operationToString(Node node, Class<? extends Node> parent) {
-		final Node[] children =
-			node.getChildren();
+		final Node[] children = node.getChildren();
 
-		final String[] operands =
-			new String[children.length];
-		for (int i =
-			0; i < children.length; i++) {
-			operands[i] =
-				nodeToString(children[i], node.getClass());
+		final String[] operands = new String[children.length];
+		for (int i = 0; i < children.length; i++) {
+			operands[i] = nodeToString(children[i], node.getClass());
 		}
 
-		final String operator =
-			getOperator(node);
-		final Notation notation =
-			getNotation();
+		final String operator = getOperator(node);
+		final Notation notation = getNotation();
 		switch (notation) {
 		case INFIX:
 			if (isInfixCompatibleOperation(node)) {
-				final String s =
-					join(" "
-						+ operator
-						+ " ", operands);
+				final String s = join(" " + operator + " ", operands);
 				final int orderParent;
 				final int orderChild;
-				return (isEnforceBrackets()
-					|| ((orderParent =
-						getOrder(parent)) > (orderChild =
-							getOrder(node.getClass())))
-					|| ((orderParent == orderChild)
-						&& (orderParent == getOrder(Implies.class))))
-							? "("
-								+ s
-								+ ")"
-							: s;
+				return (isEnforceBrackets() || ((orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass())))
+					|| ((orderParent == orderChild) && (orderParent == getOrder(Implies.class)))) ? "(" + s + ")" : s;
 			} else {
-				return String.format("%s(%s)", operator
-					+ (((node instanceof Not)
-						&& (getSymbols() == textualSymbols))
-							? " "
-							: ""),
+				return String.format("%s(%s)", operator + (((node instanceof Not) && (getSymbols() == textualSymbols)) ? " " : ""),
 						join(getSymbols()[5], operands));
 			}
 		case PREFIX:
@@ -372,8 +284,7 @@ public class NodeWriter {
 		case POSTFIX:
 			return String.format("(%s %s)", join(" ", operands), operator);
 		default:
-			throw new IllegalStateException("Unknown notation: "
-				+ notation);
+			throw new IllegalStateException("Unknown notation: " + notation);
 		}
 	}
 
@@ -386,10 +297,7 @@ public class NodeWriter {
 	 * @return true iff the given operation can be written in infix notation
 	 */
 	protected boolean isInfixCompatibleOperation(Node node) {
-		return (node instanceof And)
-			|| (node instanceof Or)
-			|| (node instanceof Implies)
-			|| (node instanceof Equals);
+		return (node instanceof And) || (node instanceof Or) || (node instanceof Implies) || (node instanceof Equals);
 	}
 
 	/**
@@ -407,9 +315,7 @@ public class NodeWriter {
 		if (nodeClass.equals(Not.class)) {
 			return 0;
 		}
-		if (nodeClass.equals(AtMost.class)
-			|| nodeClass.equals(AtLeast.class)
-			|| nodeClass.equals(Choose.class)) {
+		if (nodeClass.equals(AtMost.class) || nodeClass.equals(AtLeast.class) || nodeClass.equals(Choose.class)) {
 			return 1;
 		}
 		if (nodeClass.equals(Equals.class)) {
@@ -424,8 +330,7 @@ public class NodeWriter {
 		if (nodeClass.equals(And.class)) {
 			return 5;
 		}
-		throw new IllegalArgumentException("Unrecognized node type: "
-			+ nodeClass);
+		throw new IllegalArgumentException("Unrecognized node type: " + nodeClass);
 	}
 
 	/**
@@ -452,19 +357,15 @@ public class NodeWriter {
 			return getSymbols()[4];
 		}
 		if (node instanceof Choose) {
-			return getSymbols()[6]
-				+ ((Choose) node).n;
+			return getSymbols()[6] + ((Choose) node).n;
 		}
 		if (node instanceof AtLeast) {
-			return getSymbols()[7]
-				+ ((AtLeast) node).min;
+			return getSymbols()[7] + ((AtLeast) node).min;
 		}
 		if (node instanceof AtMost) {
-			return getSymbols()[8]
-				+ ((AtMost) node).max;
+			return getSymbols()[8] + ((AtMost) node).max;
 		}
-		throw new IllegalArgumentException("Unrecognized node type: "
-			+ node.getClass());
+		throw new IllegalArgumentException("Unrecognized node type: " + node.getClass());
 	}
 
 	/**
@@ -501,10 +402,8 @@ public class NodeWriter {
 	 */
 	private static String join(String separator, String... strings) {
 		if (strings.length > 0) {
-			final StringBuilder sb =
-				new StringBuilder(strings[0]);
-			for (int i =
-				1; i < strings.length; i++) {
+			final StringBuilder sb = new StringBuilder(strings[0]);
+			for (int i = 1; i < strings.length; i++) {
 				sb.append(separator);
 				sb.append(strings[i]);
 			}

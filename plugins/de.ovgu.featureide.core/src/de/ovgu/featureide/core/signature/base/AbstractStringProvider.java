@@ -22,8 +22,7 @@ package de.ovgu.featureide.core.signature.base;
 
 public abstract class AbstractStringProvider {
 
-	protected static final String LINE_SEPARATOR =
-		System.getProperty("line.separator", "\n");
+	protected static final String LINE_SEPARATOR = System.getProperty("line.separator", "\n");
 
 	public abstract String getClassString(AbstractClassFragment cls, boolean shortString);
 }

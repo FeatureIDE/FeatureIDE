@@ -78,21 +78,16 @@ public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
 		if (!(reason instanceof FeatureModelReason)) {
 			return null;
 		}
-		final FeatureModelElementTrace trace =
-			((FeatureModelReason) reason).getTrace();
-		final Set<IFeatureModelElement> sourceElements =
-			trace.getElements();
-		final String joinedSourceElements =
-			joinElements(sourceElements);
+		final FeatureModelElementTrace trace = ((FeatureModelReason) reason).getTrace();
+		final Set<IFeatureModelElement> sourceElements = trace.getElements();
+		final String joinedSourceElements = joinElements(sourceElements);
 		final IFeature parent;
 		switch (trace.getOrigin()) {
 		case CHILD_UP:
-			parent =
-				(IFeature) trace.getElement();
+			parent = (IFeature) trace.getElement();
 			return String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 		case CHILD_DOWN:
-			parent =
-				(IFeature) trace.getElement();
+			parent = (IFeature) trace.getElement();
 			if (parent.getStructure().isAlternative()) {
 				return String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
 			} else if (parent.getStructure().isOr()) {
@@ -118,31 +113,19 @@ public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
 	 * @return joined elements
 	 */
 	private String joinElements(Set<IFeatureModelElement> elements) {
-		String s =
-			"";
-		int i =
-			0;
-		for (final Iterator<IFeatureModelElement> it =
-			elements.iterator(); it.hasNext();) {
-			final IFeatureModelElement element =
-				it.next();
+		String s = "";
+		int i = 0;
+		for (final Iterator<IFeatureModelElement> it = elements.iterator(); it.hasNext();) {
+			final IFeatureModelElement element = it.next();
 			if (i++ > 0) {
-				s +=
-					it.hasNext()
-						? ", "
-						: i > 2
-							? ", and "
-							: " and ";
+				s += it.hasNext() ? ", " : i > 2 ? ", and " : " and ";
 			}
 			if (element instanceof IConstraint) {
-				final NodeWriter w =
-					new NodeWriter(((IConstraint) element).getNode());
+				final NodeWriter w = new NodeWriter(((IConstraint) element).getNode());
 				w.setSymbols(getSymbols());
-				s +=
-					w.nodeToString();
+				s += w.nodeToString();
 			} else {
-				s +=
-					element.getName();
+				s += element.getName();
 			}
 		}
 		return s;

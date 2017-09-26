@@ -49,9 +49,7 @@ abstract public class AbstractCorePlugin extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		logInfo(STARTING_FEATUREIDE_PLUG_IN_
-			+ getID()
-			+ "'");
+		logInfo(STARTING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 	}
 
 	/*
@@ -60,9 +58,7 @@ abstract public class AbstractCorePlugin extends Plugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		logInfo(STOPPING_FEATUREIDE_PLUG_IN_
-			+ getID()
-			+ "'");
+		logInfo(STOPPING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 		super.stop(context);
 	}
 
@@ -123,9 +119,7 @@ abstract public class AbstractCorePlugin extends Plugin {
 	}
 
 	public void reportBug(int ticket) {
-		logWarning("This is a bug. Please report it. See Ticket #"
-			+ ticket
-			+ ".");
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
 	}
 
 }

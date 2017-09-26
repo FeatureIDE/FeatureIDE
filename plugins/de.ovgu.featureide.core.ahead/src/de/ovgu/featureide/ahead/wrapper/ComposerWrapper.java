@@ -73,44 +73,33 @@ public class ComposerWrapper {
 		private final ComposerWrapper composer;
 
 		public FeatureVisitor(ComposerWrapper composer) {
-			this.composer =
-				composer;
+			this.composer = composer;
 		}
 
 		public boolean visit(IResource resource) throws CoreException {
-			if (resource instanceof IFile
-				&& "jak".equals(resource.getFileExtension())) {
+			if (resource instanceof IFile && "jak".equals(resource.getFileExtension())) {
 				composer.addJakfileToCompose((IFile) resource);
 			}
 			return true;
 		}
 	}
 
-	private final TreeMap<String, LinkedList<IFile>> absoluteJakFilenames =
-		new TreeMap<>();
+	private final TreeMap<String, LinkedList<IFile>> absoluteJakFilenames = new TreeMap<>();
 
-	private final LinkedList<IFolder> allFeatureFolders =
-		new LinkedList<>();
-	private final LinkedList<IFolder> featureFolders =
-		new LinkedList<>();
-	private final LinkedList<AheadBuildErrorListener> errorListeners =
-		new LinkedList<>();
-	private final LinkedList<IFile> composedFiles =
-		new LinkedList<>();
+	private final LinkedList<IFolder> allFeatureFolders = new LinkedList<>();
+	private final LinkedList<IFolder> featureFolders = new LinkedList<>();
+	private final LinkedList<AheadBuildErrorListener> errorListeners = new LinkedList<>();
+	private final LinkedList<IFile> composedFiles = new LinkedList<>();
 
-	private final Mixin mixin =
-		new Mixin();
-	private final Jampack jampack =
-		new Jampack();
+	private final Mixin mixin = new Mixin();
+	private final Jampack jampack = new Jampack();
 
 	private final IFeatureProject featureProject;
 
 	private final AbstractJakModelBuilder<?> jakModelBuilder;
 
-	private IFolder compositionFolder =
-		null;
-	private IFile configFile =
-		null;
+	private IFolder compositionFolder = null;
+	private IFile configFile = null;
 
 	/**
 	 * Creates a new instance of Composer
@@ -118,20 +107,16 @@ public class ComposerWrapper {
 	 * @param featureProject
 	 */
 	public ComposerWrapper(IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
+		this.featureProject = featureProject;
 		if ("Jampack".equals(featureProject.getCompositionMechanism())) {
-			jakModelBuilder =
-				new JampackJakModelBuilder(featureProject);
+			jakModelBuilder = new JampackJakModelBuilder(featureProject);
 		} else {
-			jakModelBuilder =
-				new MixinJakModelBuilder(featureProject);
+			jakModelBuilder = new MixinJakModelBuilder(featureProject);
 		}
 	}
 
 	void setCompositionFolder(IFolder folder) {
-		compositionFolder =
-			folder;
+		compositionFolder = folder;
 	}
 
 	public IFile[] composeAll() throws IOException {
@@ -157,9 +142,7 @@ public class ComposerWrapper {
 				if (featureFolder.exists()) {
 					featureFolder.accept(new FeatureVisitor(this));
 				} else if (FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()).contains(featureFolder.getName())) {
-					featureProject.createBuilderMarker(featureProject.getProject(), "Feature folder "
-						+ featureFolder.getName()
-						+ DOES_NOT_EXIST, 0,
+					featureProject.createBuilderMarker(featureProject.getProject(), "Feature folder " + featureFolder.getName() + DOES_NOT_EXIST, 0,
 							IMarker.SEVERITY_WARNING);
 				}
 			} catch (CoreException e) {
@@ -174,8 +157,7 @@ public class ComposerWrapper {
 	 * Sets the current configuration file <br> This method has to be called before addJakfileToCompose
 	 */
 	void setConfiguration(IFile configFile) throws IOException {
-		this.configFile =
-			configFile;
+		this.configFile = configFile;
 
 		// Get feature folders
 		// Get composition folder
@@ -183,17 +165,12 @@ public class ComposerWrapper {
 		allFeatureFolders.clear();
 		featureFolders.clear();
 
-		configFile =
-			(configFile == null)
-				? featureProject.getCurrentConfiguration()
-				: configFile;
+		configFile = (configFile == null) ? featureProject.getCurrentConfiguration() : configFile;
 		if (configFile != null) {
-			final List<String> lines =
-				Files.readAllLines(Paths.get(configFile.getLocationURI()), Charset.forName("UTF-8"));
+			final List<String> lines = Files.readAllLines(Paths.get(configFile.getLocationURI()), Charset.forName("UTF-8"));
 			for (String line : lines) {
 				if (!line.startsWith("#")) {
-					final IFolder f =
-						featureProject.getSourceFolder().getFolder(line);
+					final IFolder f = featureProject.getSourceFolder().getFolder(line);
 					if (f != null) {
 						featureFolders.add(f);
 					}
@@ -204,24 +181,19 @@ public class ComposerWrapper {
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}
-		Collection<String> featureOrderList =
-			featureProject.getFeatureModel().getFeatureOrderList();
-		if (featureOrderList == null
-			|| featureOrderList.isEmpty()) {
-			featureOrderList =
-				FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
+		Collection<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
+		if (featureOrderList == null || featureOrderList.isEmpty()) {
+			featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
 		}
 		for (String feature : featureOrderList) {
-			IFolder folder =
-				featureProject.getSourceFolder().getFolder(feature);
+			IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 			if (!allFeatureFolders.contains(folder)) {
 				allFeatureFolders.add(folder);
 			}
 		}
 
 		if (compositionFolder == null) {
-			compositionFolder =
-				featureProject.getBuildFolder();
+			compositionFolder = featureProject.getBuildFolder();
 		}
 	}
 
@@ -247,46 +219,32 @@ public class ComposerWrapper {
 		// Store all corresponding file in Vector<IFile> with
 		// the relative filename as the key
 
-		String srcFolderPath =
-			featureProject.getSourceFolder().getRawLocation().toOSString();
-		String jakFilePath =
-			newJakFile.getRawLocation().toOSString();
+		String srcFolderPath = featureProject.getSourceFolder().getRawLocation().toOSString();
+		String jakFilePath = newJakFile.getRawLocation().toOSString();
 
 		if (!jakFilePath.startsWith(srcFolderPath)) {
-			AheadCorePlugin.getDefault().logWarning(SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_
-				+ jakFilePath
-				+ FILE_SKIPPED_);
+			AheadCorePlugin.getDefault().logWarning(SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_ + jakFilePath + FILE_SKIPPED_);
 			return;
 		}
 
 		// Cut path to the source folder
-		jakFilePath =
-			jakFilePath.substring(srcFolderPath.length()
-				+ 1);
+		jakFilePath = jakFilePath.substring(srcFolderPath.length() + 1);
 
 		// Cut feature folder
-		int pos =
-			jakFilePath.indexOf(java.io.File.separator);
+		int pos = jakFilePath.indexOf(java.io.File.separator);
 
 		if (pos < 0) {
-			AheadCorePlugin.getDefault().logWarning(NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_
-				+ jakFilePath
-				+ FILE_SKIPPED_);
+			AheadCorePlugin.getDefault().logWarning(NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_ + jakFilePath + FILE_SKIPPED_);
 			return;
 		}
-		jakFilePath =
-			jakFilePath.substring(pos
-				+ 1).replace("\\", "/");
+		jakFilePath = jakFilePath.substring(pos + 1).replace("\\", "/");
 
 		// don't add files twice
-		if (absoluteJakFilenames.containsKey(jakFilePath))
-			return;
+		if (absoluteJakFilenames.containsKey(jakFilePath)) return;
 
-		final LinkedList<IFile> fileVector =
-			new LinkedList<>();
+		final LinkedList<IFile> fileVector = new LinkedList<>();
 		for (IFolder root : allFeatureFolders) {
-			final IFile jakFile =
-				root.getFile(jakFilePath);
+			final IFile jakFile = root.getFile(jakFilePath);
 			if (jakFile.exists()) {
 				fileVector.add(jakFile);
 			}
@@ -307,12 +265,9 @@ public class ComposerWrapper {
 			composeMixinJakFiles(compositionFolder);
 		}
 		jakModelBuilder.addArbitraryFiles();
-		IFile[] composedFilesArray =
-			new IFile[composedFiles.size()];
-		for (int i =
-			0; i < composedFilesArray.length; i++) {
-			composedFilesArray[i] =
-				composedFiles.get(i);
+		IFile[] composedFilesArray = new IFile[composedFiles.size()];
+		for (int i = 0; i < composedFilesArray.length; i++) {
+			composedFilesArray[i] = composedFiles.get(i);
 			try {
 				composedFiles.get(i).refreshLocal(IResource.DEPTH_ZERO, null);
 			} catch (CoreException e) {
@@ -326,34 +281,23 @@ public class ComposerWrapper {
 	private void composeMixinJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 		jakModelBuilder.reset();
-		TreeMap<String, IFile> fileMap =
-			new TreeMap<>();
+		TreeMap<String, IFile> fileMap = new TreeMap<>();
 
 		for (String jakFile : new ArrayList<>(absoluteJakFilenames.keySet())) {
-			final LinkedList<IFile> filesVec =
-				absoluteJakFilenames.get(jakFile);
-			String[] files =
-				new String[filesVec.size()];
-			IFile[] files2 =
-				new IFile[filesVec.size()];
-			for (int i =
-				0; i < filesVec.size(); i++) {
-				final IFile file =
-					filesVec.get(i);
-				files[i] =
-					file.getRawLocation().toOSString();
-				files2[i] =
-					file;
+			final LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
+			String[] files = new String[filesVec.size()];
+			IFile[] files2 = new IFile[filesVec.size()];
+			for (int i = 0; i < filesVec.size(); i++) {
+				final IFile file = filesVec.get(i);
+				files[i] = file.getRawLocation().toOSString();
+				files2[i] = file;
 				fileMap.put(files[i], file);
 			}
 
-			IFile newJakIFile =
-				compositionDir.getFile(jakFile);
+			IFile newJakIFile = compositionDir.getFile(jakFile);
 			try {
-				mixin.AST_Program[] composedASTs =
-					new mixin.AST_Program[files.length];
-				mixin.AST_Program[] ownASTs =
-					new mixin.AST_Program[files.length];
+				mixin.AST_Program[] composedASTs = new mixin.AST_Program[files.length];
+				mixin.AST_Program[] ownASTs = new mixin.AST_Program[files.length];
 				mixin.compose(null, featureProject.getSourceFolder().getRawLocation().toOSString(), files, "x", composedASTs, ownASTs);
 
 				// Add the currently composed class to the JakProject
@@ -367,8 +311,7 @@ public class ComposerWrapper {
 				handleErrorMessage(e, fileMap);
 			} catch (Throwable e) {
 				AheadCorePlugin.getDefault().logError(e);
-				handleErrorMessage(featureProject.getSourceFolder(), UNEXPECTED_ERROR_WHILE_PARSING
-					+ newJakIFile.getName(), 0);
+				handleErrorMessage(featureProject.getSourceFolder(), UNEXPECTED_ERROR_WHILE_PARSING + newJakIFile.getName(), 0);
 			}
 		}
 	}
@@ -376,34 +319,23 @@ public class ComposerWrapper {
 	private void composeJampackJakFiles(IFolder compositionDir) {
 		composedFiles.clear();
 		jakModelBuilder.reset();
-		TreeMap<String, IFile> fileMap =
-			new TreeMap<>();
+		TreeMap<String, IFile> fileMap = new TreeMap<>();
 
 		for (String jakFile : new ArrayList<>(absoluteJakFilenames.keySet())) {
-			LinkedList<IFile> filesVec =
-				absoluteJakFilenames.get(jakFile);
-			String[] files =
-				new String[filesVec.size()];
-			IFile[] files2 =
-				new IFile[filesVec.size()];
-			for (int i =
-				0; i < filesVec.size(); i++) {
-				final IFile file =
-					filesVec.get(i);
-				files[i] =
-					file.getRawLocation().toOSString();
-				files2[i] =
-					file;
+			LinkedList<IFile> filesVec = absoluteJakFilenames.get(jakFile);
+			String[] files = new String[filesVec.size()];
+			IFile[] files2 = new IFile[filesVec.size()];
+			for (int i = 0; i < filesVec.size(); i++) {
+				final IFile file = filesVec.get(i);
+				files[i] = file.getRawLocation().toOSString();
+				files2[i] = file;
 				fileMap.put(files[i], file);
 			}
 
-			IFile newJakIFile =
-				compositionDir.getFile(jakFile);
+			IFile newJakIFile = compositionDir.getFile(jakFile);
 			try {
-				jampack.AST_Program[] composedASTs =
-					new jampack.AST_Program[files.length];
-				jampack.AST_Program[] ownASTs =
-					new jampack.AST_Program[files.length];
+				jampack.AST_Program[] composedASTs = new jampack.AST_Program[files.length];
+				jampack.AST_Program[] ownASTs = new jampack.AST_Program[files.length];
 				jampack.compose(null, featureProject.getSourceFolder().getRawLocation().toOSString(), files, "x", composedASTs, ownASTs);
 
 				// Add the currently composed class to the JakProject
@@ -417,67 +349,49 @@ public class ComposerWrapper {
 				handleErrorMessage(e, fileMap);
 			} catch (Throwable e) {
 				AheadCorePlugin.getDefault().logError(e);
-				handleErrorMessage(featureProject.getSourceFolder(), UNEXPECTED_ERROR_WHILE_PARSING
-					+ newJakIFile.getName(), 0);
+				handleErrorMessage(featureProject.getSourceFolder(), UNEXPECTED_ERROR_WHILE_PARSING + newJakIFile.getName(), 0);
 			}
 		}
 	}
 
 	private void runMixin(IFile[] files) throws CoreException, ExitError {
-		final String[] args =
-			prepareArgs(files);
+		final String[] args = prepareArgs(files);
 		if (args != null) {
 			Mixin.main(args);
 		}
 	}
 
 	private void runJampack(IFile[] files) throws CoreException, ExitError {
-		final String[] args =
-			prepareArgs(files);
+		final String[] args = prepareArgs(files);
 		if (args != null) {
 			Jampack.main(args);
 		}
 	}
 
 	private String[] prepareArgs(IFile[] files) throws CoreException {
-		files =
-			removeUnselectedFeatures(files);
+		files = removeUnselectedFeatures(files);
 		if (files.length == 0) {
 			return null;
 		}
 
-		final String layer =
-			setLayer(files[0].getParent());
-		int i =
-			(layer != null)
-				? 4
-				: 2;
+		final String layer = setLayer(files[0].getParent());
+		int i = (layer != null) ? 4 : 2;
 
-		final String[] args =
-			new String[files.length
-				+ i];
-		args[0] =
-			"-f";
-		args[1] =
-			setOutputFolder(layer).getRawLocation().toOSString()
-				+ File.separator
-				+ files[0].getName();
+		final String[] args = new String[files.length + i];
+		args[0] = "-f";
+		args[1] = setOutputFolder(layer).getRawLocation().toOSString() + File.separator + files[0].getName();
 		if (layer != null) {
-			args[2] =
-				"-a";
-			args[3] =
-				layer;
+			args[2] = "-a";
+			args[3] = layer;
 		}
 		for (IFile file : files) {
-			args[i++] =
-				file.getRawLocation().toOSString();
+			args[i++] = file.getRawLocation().toOSString();
 		}
 		return args;
 	}
 
 	private IFile[] removeUnselectedFeatures(IFile[] files) {
-		final ArrayList<IFile> selectedFiles =
-			new ArrayList<>(files.length);
+		final ArrayList<IFile> selectedFiles = new ArrayList<>(files.length);
 		for (IFile file : files) {
 			if (isSelectedFeature((IFolder) file.getParent())) {
 				selectedFiles.add(file);
@@ -494,17 +408,14 @@ public class ComposerWrapper {
 	}
 
 	private IFolder setOutputFolder(String layer) throws CoreException {
-		IFolder outputFolder =
-			compositionFolder;
+		IFolder outputFolder = compositionFolder;
 		if (!outputFolder.exists()) {
 			outputFolder.create(true, true, null);
 		}
 		if (layer != null) {
-			String[] packages =
-				layer.split("[.]");
+			String[] packages = layer.split("[.]");
 			for (String pack : packages) {
-				outputFolder =
-					outputFolder.getFolder(pack);
+				outputFolder = outputFolder.getFolder(pack);
 				if (!outputFolder.exists()) {
 					outputFolder.create(true, true, null);
 				}
@@ -520,46 +431,29 @@ public class ComposerWrapper {
 		if (setLayer(folder.getParent()) == null) {
 			return folder.getName();
 		}
-		return setLayer(folder.getParent())
-			+ "."
-			+ folder.getName();
+		return setLayer(folder.getParent()) + "." + folder.getName();
 	}
 
 	private void handleErrorMessage(mixin.ExtendedParseException e, TreeMap<String, IFile> fileMap) {
-		IFile source =
-			null;
-		String filename =
-			e.getFilename();
-		if (fileMap != null
-			&& filename != null
-			&& fileMap.containsKey(filename)) {
-			source =
-				fileMap.get(filename);
+		IFile source = null;
+		String filename = e.getFilename();
+		if (fileMap != null && filename != null && fileMap.containsKey(filename)) {
+			source = fileMap.get(filename);
 		}
-		handleErrorMessage(source, source != null
-			? e.getShortMessage()
-			: e.getFullMessage(), e.getLineNumber());
+		handleErrorMessage(source, source != null ? e.getShortMessage() : e.getFullMessage(), e.getLineNumber());
 	}
 
 	private void handleErrorMessage(jampack.ExtendedParseException e, TreeMap<String, IFile> fileMap) {
-		IFile source =
-			null;
-		String filename =
-			e.getFilename();
-		if (fileMap != null
-			&& filename != null
-			&& fileMap.containsKey(filename)) {
-			source =
-				fileMap.get(filename);
+		IFile source = null;
+		String filename = e.getFilename();
+		if (fileMap != null && filename != null && fileMap.containsKey(filename)) {
+			source = fileMap.get(filename);
 		}
-		handleErrorMessage(source, source != null
-			? e.getShortMessage()
-			: e.getFullMessage(), e.getLineNumber());
+		handleErrorMessage(source, source != null ? e.getShortMessage() : e.getFullMessage(), e.getLineNumber());
 	}
 
 	private void handleErrorMessage(IResource source, String message, int lineNumber) {
-		AheadBuildErrorEvent evt =
-			new AheadBuildErrorEvent(source, message, COMPOSER_ERROR, lineNumber);
+		AheadBuildErrorEvent evt = new AheadBuildErrorEvent(source, message, COMPOSER_ERROR, lineNumber);
 		for (AheadBuildErrorListener listener : errorListeners) {
 			listener.parseErrorFound(evt);
 		}

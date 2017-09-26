@@ -54,14 +54,12 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		if (legend == null) {
 			return;
 		}
-		this.legend =
-			legend;
+		this.legend = legend;
 	}
 
 	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
-		legend =
-			new Legend(featureModel);
+		legend = new Legend(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
@@ -95,26 +93,19 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final IGraphicalFeatureModel fm =
-			getModel();
+		final IGraphicalFeatureModel fm = getModel();
 
-		final List<IGraphicalConstraint> constraints =
-			fm.getVisibleConstraints();
-		final Collection<IGraphicalFeature> features =
-			fm.getVisibleFeatures();
+		final List<IGraphicalConstraint> constraints = fm.getVisibleConstraints();
+		final Collection<IGraphicalFeature> features = fm.getVisibleFeatures();
 
-		final ArrayList<Object> list =
-			new ArrayList<>(constraints.size()
-				+ features.size()
-				+ 1);
+		final ArrayList<Object> list = new ArrayList<>(constraints.size() + features.size() + 1);
 
 		list.addAll(features);
 		list.addAll(constraints);
 
 		if (!fm.isLegendHidden()) {
 			if (legend == null) {
-				legend =
-					new Legend(fm);
+				legend = new Legend(fm);
 			}
 			list.add(legend);
 			fm.setLegend(legend);

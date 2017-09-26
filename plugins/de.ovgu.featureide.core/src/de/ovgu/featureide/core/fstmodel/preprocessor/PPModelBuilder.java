@@ -64,26 +64,21 @@ public class PPModelBuilder {
 
 	protected FSTModelForPP model;
 	protected FSTModel modelOutline;
-	protected Collection<String> featureNames =
-		Collections.emptyList();
+	protected Collection<String> featureNames = Collections.emptyList();
 
 	public PPModelBuilder(IFeatureProject featureProject) {
-		model =
-			new FSTModelForPP(featureProject);
-		modelOutline =
-			new FSTModel(featureProject);
+		model = new FSTModelForPP(featureProject);
+		modelOutline = new FSTModel(featureProject);
 
 		featureProject.setFSTModel(model);
-		this.featureProject =
-			featureProject;
+		this.featureProject = featureProject;
 	}
 
 	public void buildModel() {
 		model.reset();
 		modelOutline.reset();
 
-		featureNames =
-			Functional.toList(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		featureNames = Functional.toList(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		for (final String featureName : featureNames) {
 			model.addFeature(featureName);
 			modelOutline.addFeature(featureName);
@@ -96,8 +91,7 @@ public class PPModelBuilder {
 		featureProject.setFSTModel(model);
 	}
 
-	protected IFile currentFile =
-		null;
+	protected IFile currentFile = null;
 
 	/**
 	 * @param folder
@@ -107,37 +101,22 @@ public class PPModelBuilder {
 	private void buildModel(IFolder folder, String packageName) throws CoreException {
 		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				buildModel((IFolder) res, packageName.isEmpty()
-					? res.getName()
-					: packageName
-						+ "/"
-						+ res.getName());
+				buildModel((IFolder) res, packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName());
 			} else if (res instanceof IFile) {
-				currentFile =
-					(IFile) res;
-				final String text =
-					getText(currentFile);
-				final String className =
-					packageName.isEmpty()
-						? res.getName()
-						: packageName
-							+ "/"
-							+ res.getName();
+				currentFile = (IFile) res;
+				final String text = getText(currentFile);
+				final String className = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
 
-				final Vector<String> lines =
-					PPComposerExtensionClass.loadStringsFromFile(currentFile);
-				boolean classAdded =
-					false;
+				final Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile(currentFile);
+				boolean classAdded = false;
 				for (final String feature : featureNames) {
 					if (containsFeature(text, feature)) {
 						model.addRole(feature, model.getAbsoluteClassName(currentFile), currentFile);
-						classAdded =
-							true;
+						classAdded = true;
 					}
 				}
 				if (classAdded) {
-					final LinkedList<FSTDirective> directives =
-						buildModelDirectivesForFile(lines);
+					final LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
 					addRoleElementsToDirectives(directives, currentFile, className);
 					addDirectivesToRoleElement(directives, currentFile, className);
 
@@ -156,8 +135,8 @@ public class PPModelBuilder {
 				if (!featureNames.contains(featureName)) {
 					continue;
 				}
-				final FSTRole role =
-					model.addRole(featureName, model.getAbsoluteClassName(res), res);// addRole(getFeatureName(d.getExpression()), res.getName(), res);
+				final FSTRole role = model.addRole(featureName, model.getAbsoluteClassName(res), res);// addRole(getFeatureName(d.getExpression()),
+																										// res.getName(), res);
 				role.add(d);
 				addDirectivesToModel(d.getChildrenList(), res, className);
 			}
@@ -167,22 +146,18 @@ public class PPModelBuilder {
 
 	private void addRoleElementsToDirectives(LinkedList<FSTDirective> directives, IFile res, String className) {
 		for (final FSTDirective fstDirective : directives) {
-			final List<AbstractSignature> addedSig =
-				new ArrayList<>();
-			final List<AbstractSignature> includedSig =
-				fstDirective.getIncludedSig();
+			final List<AbstractSignature> addedSig = new ArrayList<>();
+			final List<AbstractSignature> includedSig = fstDirective.getIncludedSig();
 			if (includedSig != null) {
 				for (final AbstractSignature abstractSignature : includedSig) {
 					if (abstractSignature instanceof AbstractMethodSignature) {
-						final AbstractMethodSignature tmp =
-							(AbstractMethodSignature) abstractSignature;
+						final AbstractMethodSignature tmp = (AbstractMethodSignature) abstractSignature;
 						final FSTMethod method =
 							new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), tmp.getModifiers()[0]);
 						method.setLine(tmp.getStartLine());
 
 						for (final String featureName : fstDirective.getFeatureNames()) {
-							final FSTRole role =
-								model.addRole(featureName, model.getAbsoluteClassName(res), res);
+							final FSTRole role = model.addRole(featureName, model.getAbsoluteClassName(res), res);
 							role.add(fstDirective);
 						}
 						fstDirective.addChild(method);
@@ -190,13 +165,10 @@ public class PPModelBuilder {
 
 						addedSig.add(abstractSignature);
 					} else if (abstractSignature instanceof AbstractFieldSignature) {
-						final AbstractFieldSignature tmp =
-							(AbstractFieldSignature) abstractSignature;
-						final FSTField field =
-							new FSTField(tmp.getName(), tmp.getType(), tmp.getModifiers()[0]);
+						final AbstractFieldSignature tmp = (AbstractFieldSignature) abstractSignature;
+						final FSTField field = new FSTField(tmp.getName(), tmp.getType(), tmp.getModifiers()[0]);
 						for (final String featureName : fstDirective.getFeatureNames()) {
-							final FSTRole role =
-								model.addRole(featureName, className, res);
+							final FSTRole role = model.addRole(featureName, className, res);
 							role.add(fstDirective);
 						}
 						fstDirective.addChild(field);
@@ -204,13 +176,10 @@ public class PPModelBuilder {
 					}
 				}
 			}
-			final FSTDirective[] children =
-				fstDirective.getChildren();
+			final FSTDirective[] children = fstDirective.getChildren();
 			if (children != null) {
 				for (final FSTDirective roleChild : children) {
-					if (addedSig.isEmpty()
-						|| ((roleChild.getInsideOfSig() != null)
-							&& !roleChild.getInsideOfSig().containsAll(addedSig))) {
+					if (addedSig.isEmpty() || ((roleChild.getInsideOfSig() != null) && !roleChild.getInsideOfSig().containsAll(addedSig))) {
 						fstDirective.addChild((RoleElement<?>) roleChild);
 					}
 				}
@@ -223,52 +192,41 @@ public class PPModelBuilder {
 	private void addDirectivesToRoleElement(LinkedList<FSTDirective> list, IFile res, String className) {
 		for (final FSTDirective d : list) {
 			for (final String featureName : d.getFeatureNames()) {
-				final FSTRole role =
-					modelOutline.addRole(featureName, modelOutline.getAbsoluteClassName(res), res);
+				final FSTRole role = modelOutline.addRole(featureName, modelOutline.getAbsoluteClassName(res), res);
 
-				final List<AbstractSignature> sig =
-					d.getInsideOfSig();
-				List<AbstractSignature> includedParentSig =
-					new ArrayList<>();
-				final FSTDirective parent =
-					d.getParent();
+				final List<AbstractSignature> sig = d.getInsideOfSig();
+				List<AbstractSignature> includedParentSig = new ArrayList<>();
+				final FSTDirective parent = d.getParent();
 				if (parent != null) {
-					includedParentSig =
-						parent.getIncludedSig();
+					includedParentSig = parent.getIncludedSig();
 				}
-				boolean added =
-					false;
+				boolean added = false;
 				if (sig != null) {
 					for (final AbstractSignature abstractSignature : sig) {
 						if (includedParentSig.contains(abstractSignature)) {
-							final RoleElement<?>[] roleElementChildren =
-								parent.getRoleElementChildren();
+							final RoleElement<?>[] roleElementChildren = parent.getRoleElementChildren();
 							for (final RoleElement<?> roleElement : roleElementChildren) {
 								if (roleElement.getName().equals(abstractSignature.getName())) {
 									if (roleElement instanceof FSTMethod) {
 										((FSTMethod) roleElement).add(d);
 										roleElement.setLine(abstractSignature.getStartLine());
-										final IRoleElement paren =
-											roleElement.getParent();
+										final IRoleElement paren = roleElement.getParent();
 										role.getClassFragment().add(roleElement);
 										roleElement.setParent(paren);
-										added =
-											true;
+										added = true;
 									}
 								}
 							}
 						} else {
 
 							if (abstractSignature instanceof AbstractMethodSignature) {
-								final AbstractMethodSignature tmp =
-									(AbstractMethodSignature) abstractSignature;
+								final AbstractMethodSignature tmp = (AbstractMethodSignature) abstractSignature;
 
 								for (final FSTMethod method : role.getClassFragment().getMethods()) {
 									if (method.getName().equals(tmp.getName())) {
 										method.add(d);
 										method.setLine(tmp.getStartLine());
-										added =
-											true;
+										added = true;
 										break;
 									}
 								}
@@ -279,8 +237,7 @@ public class PPModelBuilder {
 									method.setLine(tmp.getStartLine());
 									role.getClassFragment().add(method);
 									method.add(d);
-									added =
-										true;
+									added = true;
 								}
 							}
 						}
@@ -295,10 +252,8 @@ public class PPModelBuilder {
 	}
 
 	protected List<String> getFeatureNames(String expression) {
-		expression =
-			expression.replaceAll("[(]", "");
-		final List<String> featureNameList =
-			new LinkedList<String>();
+		expression = expression.replaceAll("[(]", "");
+		final List<String> featureNameList = new LinkedList<String>();
 		featureNameList.add(expression.replaceAll("[)]", "").trim());
 		return featureNameList;
 	}
@@ -327,15 +282,11 @@ public class PPModelBuilder {
 	 * @param iFile
 	 */
 	private String getText(IFile iFile) {
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		try {
-			final File file =
-				iFile.getRawLocation().toFile();
-			final StringBuilder fileText =
-				new StringBuilder();
-			scanner =
-				new Scanner(file, "UTF-8");
+			final File file = iFile.getRawLocation().toFile();
+			final StringBuilder fileText = new StringBuilder();
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");

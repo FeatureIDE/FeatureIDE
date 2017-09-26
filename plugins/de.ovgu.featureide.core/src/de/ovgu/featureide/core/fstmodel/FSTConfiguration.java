@@ -34,8 +34,7 @@ public class FSTConfiguration extends FSTFeature {
 
 	private final IFile file;
 	private final boolean selected;
-	private Collection<String> selectedFeatures =
-		Collections.emptySet();
+	private Collection<String> selectedFeatures = Collections.emptySet();
 
 	/**
 	 *
@@ -45,10 +44,8 @@ public class FSTConfiguration extends FSTFeature {
 	 */
 	public FSTConfiguration(final String name, final IFile file, final boolean selected) {
 		super(name, null);
-		this.file =
-			file;
-		this.selected =
-			selected;
+		this.file = file;
+		this.selected = selected;
 	}
 
 	public IFile getFile() {
@@ -61,8 +58,7 @@ public class FSTConfiguration extends FSTFeature {
 	}
 
 	public void setSelectedFeatures(final Collection<String> selectedFeatures) {
-		this.selectedFeatures =
-			Collections.unmodifiableCollection(selectedFeatures);
+		this.selectedFeatures = Collections.unmodifiableCollection(selectedFeatures);
 	}
 
 	/**

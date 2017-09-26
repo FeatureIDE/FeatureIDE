@@ -68,8 +68,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 
 	public FmOutlinePage(IDocumentProvider documentProvider, FeatureModelEditor editor) {
 		super();
-		fTextEditor =
-			editor;
+		fTextEditor = editor;
 	}
 
 	/**
@@ -78,8 +77,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 	 * @param input the input of this outline page
 	 */
 	public void setInput(IFeatureModel input) {
-		fInput =
-			input;
+		fInput = input;
 		fInput.addListener(this);
 		update(((FileEditorInput) fTextEditor.getEditorInput()).getFile());
 	}
@@ -90,48 +88,41 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 	 */
 	private void update(final IFile iFile) {
 		if (viewer != null) {
-			final Control control =
-				viewer.getControl();
-			if ((control != null)
-				&& !control.isDisposed()) {
+			final Control control = viewer.getControl();
+			if ((control != null) && !control.isDisposed()) {
 
-				if ((updateOutlineJob == null)
-					|| (updateOutlineJob.getState() == Job.NONE)) {
-					updateOutlineJob =
-						new UIJob(UPDATE_OUTLINE_VIEW) {
+				if ((updateOutlineJob == null) || (updateOutlineJob.getState() == Job.NONE)) {
+					updateOutlineJob = new UIJob(UPDATE_OUTLINE_VIEW) {
 
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
 
-								if (viewer != null) {
-									if ((viewer.getControl() != null)
-										&& !viewer.getControl().isDisposed()) {
-										viewer.getControl().setRedraw(false);
+							if (viewer != null) {
+								if ((viewer.getControl() != null) && !viewer.getControl().isDisposed()) {
+									viewer.getControl().setRedraw(false);
 
-										viewer.setContentProvider(contentProvider);
-										viewer.setLabelProvider(labelProvider);
-										if (iFile != null) {
-											viewer.setInput(iFile);
-											viewer.getContentProvider().inputChanged(viewer, null, fInput);
-											if (fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
-												if ((contextMenu == null)
-													|| (contextMenu.getFeatureModel() != ((FeatureModelEditor) fTextEditor.getEditorInput())
-															.getFeatureModel())) {
-													contextMenu =
-														new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
-																((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel(), false);
-												}
+									viewer.setContentProvider(contentProvider);
+									viewer.setLabelProvider(labelProvider);
+									if (iFile != null) {
+										viewer.setInput(iFile);
+										viewer.getContentProvider().inputChanged(viewer, null, fInput);
+										if (fTextEditor.getEditorInput() instanceof FeatureModelEditor) {
+											if ((contextMenu == null)
+												|| (contextMenu.getFeatureModel() != ((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel())) {
+												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) fTextEditor.getEditorInput(), viewer,
+														((FeatureModelEditor) fTextEditor.getEditorInput()).getFeatureModel(), false);
 											}
 										}
-
-										viewer.getControl().setRedraw(true);
-										viewer.getControl().setEnabled(true);
-										viewer.refresh();
 									}
+
+									viewer.getControl().setRedraw(true);
+									viewer.getControl().setEnabled(true);
+									viewer.refresh();
 								}
-								return Status.OK_STATUS;
 							}
-						};
+							return Status.OK_STATUS;
+						}
+					};
 					updateOutlineJob.setPriority(Job.SHORT);
 					updateOutlineJob.schedule();
 				}
@@ -143,13 +134,10 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		if (viewer == null) {
-			viewer =
-				getTreeViewer();
-			contentProvider =
-				new FMTreeContentProvider();
+			viewer = getTreeViewer();
+			contentProvider = new FMTreeContentProvider();
 			viewer.setContentProvider(contentProvider);
-			labelProvider =
-				new FMLabelProvider();
+			labelProvider = new FMLabelProvider();
 			viewer.setLabelProvider(labelProvider);
 		}
 
@@ -158,8 +146,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 		}
 
 		viewer.expandToLevel(2);
-		final FmOutlinePageContextMenu cm =
-			new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fInput);
+		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fInput);
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 

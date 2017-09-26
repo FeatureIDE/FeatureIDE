@@ -41,15 +41,12 @@ public class ColorScheme {
 	/**
 	 * Specifies whether the scheme is active-
 	 */
-	private boolean isCurrent =
-		false;
+	private boolean isCurrent = false;
 
-	private final Map<String, FeatureColor> colors =
-		new HashMap<>();
+	private final Map<String, FeatureColor> colors = new HashMap<>();
 
 	public ColorScheme(String name) {
-		this.name =
-			name;
+		this.name = name;
 	}
 
 	/**
@@ -68,8 +65,7 @@ public class ColorScheme {
 	}
 
 	public void setName(String name) {
-		this.name =
-			name;
+		this.name = name;
 	}
 
 	public boolean isCurrent() {
@@ -111,8 +107,7 @@ public class ColorScheme {
 	 * Activates the scheme.
 	 */
 	public void setCurrent(boolean current) {
-		isCurrent =
-			current;
+		isCurrent = current;
 	}
 
 	public void renameFeature(String oldName, String newName) {
@@ -123,12 +118,6 @@ public class ColorScheme {
 
 	@Override
 	public String toString() {
-		return name
-			+ ":"
-			+ (isCurrent
-				? "ACTIVE"
-				: "INACTIV")
-			+ "  "
-			+ colors;
+		return name + ":" + (isCurrent ? "ACTIVE" : "INACTIV") + "  " + colors;
 	}
 }

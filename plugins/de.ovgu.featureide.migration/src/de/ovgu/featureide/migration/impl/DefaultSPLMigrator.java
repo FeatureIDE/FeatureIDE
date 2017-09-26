@@ -64,12 +64,9 @@ import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 @SuppressWarnings(RESTRICTION)
 public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
-	public static final String PROJECT_PROPERTIES_FILE_NAME =
-		"project.properties";
-	public static final String DEFAULT_PROJECT_NAME =
-		"migratedSPL";
-	public static final String ANDROID_NATURE =
-		"com.android.ide.eclipse.adt.AndroidNature";
+	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";
+	public static final String DEFAULT_PROJECT_NAME = "migratedSPL";
+	public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
 
 	/**
 	 * The new project which contains the software product line, when the migration is done.
@@ -89,19 +86,16 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	@Override
 	public void registerProjectsForMigration(Set<IProject> projects) {
-		if ((projects == null)
-			|| projects.isEmpty()) {
+		if ((projects == null) || projects.isEmpty()) {
 			throw new IllegalArgumentException(NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION);
 		}
 
-		this.projects =
-			projects;
+		this.projects = projects;
 	}
 
 	@Override
 	public void migrate(MigrationConfigurationData configurationData) {
-		this.configurationData =
-			configurationData;
+		this.configurationData = configurationData;
 
 		createProject();
 
@@ -117,8 +111,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * be overwritten by extending classes to accomodate {@link IComposerExtensionBase Composers} needs.
 	 */
 	protected void createProject() {
-		newProject =
-			SPLMigrationUtils.createProject(configurationData.projectName);
+		newProject = SPLMigrationUtils.createProject(configurationData.projectName);
 
 		openProjectHandleExceptions(newProject);
 
@@ -148,16 +141,12 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 */
 	protected void migrateProjects() {
 		for (final IProject project : projects) {
-			final IPath destinationPath =
-				new Path(configurationData.sourcePath);
+			final IPath destinationPath = new Path(configurationData.sourcePath);
 
 			assert newProject.getFolder(destinationPath).isAccessible() : DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
-			assert project.isOpen() : PROJECT
-				+ project.getName()
-				+ IS_NOT_OPEN_;
+			assert project.isOpen() : PROJECT + project.getName() + IS_NOT_OPEN_;
 
-			final IPath featureFolderPath =
-				SPLMigrationUtils.setupFolder(newProject.getFolder(destinationPath).getFolder(project.getName()));
+			final IPath featureFolderPath = SPLMigrationUtils.setupFolder(newProject.getFolder(destinationPath).getFolder(project.getName()));
 
 			try {
 				migrateClassPathDependentContent(project, featureFolderPath);
@@ -178,21 +167,16 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 	@SuppressWarnings("unused")
 	private void copyProjectProperties(IProject project, IPath destinationPath) {
-		final IFile source =
-			project.getFile(PROJECT_PROPERTIES_FILE_NAME);
+		final IFile source = project.getFile(PROJECT_PROPERTIES_FILE_NAME);
 		if (!source.exists()) {
 			assert false : PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 			return;
 		}
 
-		final IFile destination =
-			newProject.getFile(destinationPath.makeRelativeTo(newProject.getFullPath()).append(PROJECT_PROPERTIES_FILE_NAME));
+		final IFile destination = newProject.getFile(destinationPath.makeRelativeTo(newProject.getFullPath()).append(PROJECT_PROPERTIES_FILE_NAME));
 		if (!destination.exists()) {
 			try {
-				System.out.println("source: "
-					+ source
-					+ " ; target: "
-					+ destination);
+				System.out.println("source: " + source + " ; target: " + destination);
 				source.copy(destination.getFullPath(), true, null);
 			} catch (final CoreException e) {
 				e.printStackTrace();
@@ -207,18 +191,13 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * @throws JavaModelException
 	 */
 	private void migrateClassPathDependentContent(IProject project, IPath destinationPath) throws JavaModelException {
-		final JavaProject javaProjectToMigrate =
-			new JavaProject(project, null);
-		final JavaProject newJavaProject =
-			new JavaProject(newProject, null);
+		final JavaProject javaProjectToMigrate = new JavaProject(project, null);
+		final JavaProject newJavaProject = new JavaProject(newProject, null);
 
-		assert ((javaProjectToMigrate != null)
-			&& (newJavaProject != null)) : JAVA_PROJECTS_COULD_NOT_BE_CREATED;
+		assert ((javaProjectToMigrate != null) && (newJavaProject != null)) : JAVA_PROJECTS_COULD_NOT_BE_CREATED;
 
-		final IClasspathEntry[] classpathToMigrate =
-			javaProjectToMigrate.getRawClasspath();
-		final List<IClasspathEntry> newClassPath =
-			new ArrayList<IClasspathEntry>();
+		final IClasspathEntry[] classpathToMigrate = javaProjectToMigrate.getRawClasspath();
+		final List<IClasspathEntry> newClassPath = new ArrayList<IClasspathEntry>();
 
 		newClassPath.addAll(Arrays.asList(newJavaProject.getRawClasspath()));
 
@@ -234,16 +213,14 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 */
 	private void migrateProjectNatures(IProject project) {
 		try {
-			final List<String> natureIds =
-				new ArrayList<String>();
+			final List<String> natureIds = new ArrayList<String>();
 			natureIds.addAll(Arrays.asList(newProject.getDescription().getNatureIds()));
 			for (final String natureId : project.getDescription().getNatureIds()) {
 				if (!natureIds.contains(natureId)) {
 					natureIds.add(natureId);
 				}
 			}
-			final IProjectDescription description =
-				newProject.getDescription();
+			final IProjectDescription description = newProject.getDescription();
 			description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
 			newProject.setDescription(description, null);
 		} catch (final CoreException e) {
@@ -257,22 +234,15 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * @param classpathToMigrate
 	 */
 	private void migrateSourceFiles(IProject project, IPath destinationPath, IClasspathEntry[] classpathToMigrate) {
-		final IPath relativeDestinationPath =
-			((IPath) destinationPath.clone()).makeRelativeTo(newProject.getFullPath());
-		System.out.println("migrate source destination: "
-			+ destinationPath
-			+ " relative: "
-			+ relativeDestinationPath);
-		final IFolder destination =
-			newProject.getFolder(relativeDestinationPath);
+		final IPath relativeDestinationPath = ((IPath) destinationPath.clone()).makeRelativeTo(newProject.getFullPath());
+		System.out.println("migrate source destination: " + destinationPath + " relative: " + relativeDestinationPath);
+		final IFolder destination = newProject.getFolder(relativeDestinationPath);
 
 		for (final IClasspathEntry entry : classpathToMigrate) {
 			if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 				try {
-					final IPath relativeSourcePath =
-						entry.getPath().makeRelativeTo(project.getFullPath());
-					final IFolder source =
-						project.getFolder(relativeSourcePath);
+					final IPath relativeSourcePath = entry.getPath().makeRelativeTo(project.getFullPath());
+					final IFolder source = project.getFolder(relativeSourcePath);
 
 					SPLMigrationUtils.recursiveCopyFiles(source, destination);
 
@@ -295,8 +265,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	private void migrateLibraryAndContainerEntries(JavaProject newJavaProject, IClasspathEntry[] classpathToMigrate, List<IClasspathEntry> newClassPath)
 			throws JavaModelException {
 		for (final IClasspathEntry entry : classpathToMigrate) {
-			if ((entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER)
-				|| (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY)) {
+			if ((entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER) || (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY)) {
 				if (!newClassPath.contains(entry)) {
 					newClassPath.add(entry);
 				}
@@ -311,20 +280,17 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
 	protected void adjustFeatureModel() {
-		final IFeatureModel featureModelOfVariants =
-			generateFeatureModelOfVariants();
+		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
 
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
 	}
 
 	private IFeatureModel generateFeatureModelOfVariants() {
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(newProject);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
 		if (featureProject == null) {
 			return null;
 		}
-		final IFeatureModel featureModel =
-			featureProject.getFeatureModel();
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
 
 		featureModel.reset();
 
@@ -366,13 +332,10 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * @param selection a selection that should contain {@link IProject}s
 	 */
 	protected void registerProjectsFromSelection(IStructuredSelection selection) {
-		final SelectionWrapper<IProject> selectionWrapper =
-			SelectionWrapper.init(selection, IProject.class);
-		final Set<IProject> projects =
-			new HashSet<IProject>();
+		final SelectionWrapper<IProject> selectionWrapper = SelectionWrapper.init(selection, IProject.class);
+		final Set<IProject> projects = new HashSet<IProject>();
 		IProject curProject;
-		while ((curProject =
-			selectionWrapper.getNext()) != null) {
+		while ((curProject = selectionWrapper.getNext()) != null) {
 			projects.add(curProject);
 		}
 		registerProjectsForMigration(projects);

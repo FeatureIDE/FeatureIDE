@@ -46,8 +46,7 @@ public class ClassBuilder {
 	FeatureHouseModelBuilder modelBuilder;
 
 	public ClassBuilder(FeatureHouseModelBuilder modelBuilder) {
-		this.modelBuilder =
-			modelBuilder;
+		this.modelBuilder = modelBuilder;
 	}
 
 	/**
@@ -84,14 +83,11 @@ public class ClassBuilder {
 	 * @return <code>ClassBuilder</code> for the given file
 	 */
 	public static ClassBuilder getClassBuilder(IFile file, FeatureHouseModelBuilder builder) {
-		final String fileExtension =
-			file.getFileExtension();
+		final String fileExtension = file.getFileExtension();
 		if ("java".equals(fileExtension)) {
 			return new JavaClassBuilder(builder);
 		}
-		if ("h".equals(fileExtension)
-			||
-			"c".equals(fileExtension)) {
+		if ("h".equals(fileExtension) || "c".equals(fileExtension)) {
 			return new CClassBuilder(builder);
 		}
 		if ("cs".equals(fileExtension)) {
@@ -126,22 +122,18 @@ public class ClassBuilder {
 	 */
 	IRoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine,
 			boolean isConstructor, String contract, String compKey, int contractLine) {
-		final FSTMethod method =
-			new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey, contractLine);
+		final FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey, contractLine);
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
-			body =
-				body.replaceAll(" ", "");
+			body = body.replaceAll(" ", "");
 			method.setRefines(body.contains("original("));
 		}
 		modelBuilder.getCurrentClassFragment().add(method);
 		return method;
 	}
 
-	protected IRoleElement addField(String fieldName, String typeName, String modifiers,
-			String body, int beginLine, int endLine) {
-		final FSTField field =
-			new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
+	protected IRoleElement addField(String fieldName, String typeName, String modifiers, String body, int beginLine, int endLine) {
+		final FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentClassFragment().add(field);
 		return field;
 	}

@@ -28,38 +28,20 @@ import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 
 public class FixedLiteralSelectionStrategy implements IPhaseSelectionStrategy {
 
-	private static final long serialVersionUID =
-		-1687370944480053808L;
+	private static final long serialVersionUID = -1687370944480053808L;
 
 	private final int[] model, phase;
 
 	public FixedLiteralSelectionStrategy(int[] model, boolean reverse) {
-		this.model =
-			model;
-		phase =
-			new int[model.length
-				+ 1];
+		this.model = model;
+		phase = new int[model.length + 1];
 		if (reverse) {
-			for (int i =
-				0; i < model.length; i++) {
-				phase[i
-					+ 1] =
-						model[i] >= 0
-							? negLit(i
-								+ 1)
-							: posLit(i
-								+ 1);
+			for (int i = 0; i < model.length; i++) {
+				phase[i + 1] = model[i] >= 0 ? negLit(i + 1) : posLit(i + 1);
 			}
 		} else {
-			for (int i =
-				0; i < model.length; i++) {
-				phase[i
-					+ 1] =
-						model[i] <= 0
-							? negLit(i
-								+ 1)
-							: posLit(i
-								+ 1);
+			for (int i = 0; i < model.length; i++) {
+				phase[i + 1] = model[i] <= 0 ? negLit(i + 1) : posLit(i + 1);
 			}
 		}
 	}
@@ -69,12 +51,9 @@ public class FixedLiteralSelectionStrategy implements IPhaseSelectionStrategy {
 
 	@Override
 	public void assignLiteral(int p) {
-		final int var =
-			var(p);
-		if (model[var
-			- 1] == 0) {
-			phase[var] =
-				p;
+		final int var = var(p);
+		if (model[var - 1] == 0) {
+			phase[var] = p;
 		}
 	}
 

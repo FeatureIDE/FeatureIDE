@@ -25,14 +25,11 @@ public class PlatformHeader extends AbstractHeader {
 
 	@Override
 	public void run() throws PlatformException {
-		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
-			+ System.getProperty("file.separator")
-			+ "projects").mkdirs();
+		new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects").mkdirs();
 
 		File platform;
 
-		platform =
-			new File(getIncludePath());
+		platform = new File(getIncludePath());
 
 		if (platform.exists()) {
 			return;
@@ -40,30 +37,23 @@ public class PlatformHeader extends AbstractHeader {
 
 		List<String> listFiles;
 
-		listFiles =
-			filesAllProject();
+		listFiles = filesAllProject();
 
 		monitorbeginTask(GENERATING_PLATFORM, listFiles.size());
 
-		IIncludeReference includes[] =
-			null;
+		IIncludeReference includes[] = null;
 		try {
-			includes =
-				super.getProject().getIncludeReferences();
+			includes = super.getProject().getIncludeReferences();
 		} catch (final CModelException e) {
 
 			e.printStackTrace();
 		}
 
 		List<String> arglist;
-		final Collection<String> platformTemp =
-			new HashSet<String>();
+		final Collection<String> platformTemp = new HashSet<String>();
 
-		for (final Iterator<String> iterator =
-			listFiles.iterator(); iterator
-					.hasNext();) {
-			final String filePath =
-				iterator.next();
+		for (final Iterator<String> iterator = listFiles.iterator(); iterator.hasNext();) {
+			final String filePath = iterator.next();
 			System.out.println(filePath);
 			super.monitorWorked(1);
 			super.monitorSubTask(filePath);
@@ -72,71 +62,47 @@ public class PlatformHeader extends AbstractHeader {
 			}
 			// System.out.println(filePath);
 
-			arglist =
-				new ArrayList<String>();
-			arglist.add(Colligens.getDefault().getPreferenceStore()
-					.getString("GCC"));
+			arglist = new ArrayList<String>();
+			arglist.add(Colligens.getDefault().getPreferenceStore().getString("GCC"));
 			arglist.add("-dM");
 			arglist.add("-E");
 			arglist.add("-std=gnu99");
 
-			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
-					.contentEquals("")) {
-				arglist.add(Colligens.getDefault().getPreferenceStore()
-						.getString("LIBS"));
+			if (!Colligens.getDefault().getPreferenceStore().getString("LIBS").contentEquals("")) {
+				arglist.add(Colligens.getDefault().getPreferenceStore().getString("LIBS"));
 			}
 
-			for (int i =
-				0; i < includes.length; i++) {
-				arglist.add("-I"
-					+ includes[i].getElementName());
+			for (int i = 0; i < includes.length; i++) {
+				arglist.add("-I" + includes[i].getElementName());
 			}
 
 			arglist.add(filePath);
 
-			final ProcessBuilder processBuilder =
-				new ProcessBuilder(arglist);
+			final ProcessBuilder processBuilder = new ProcessBuilder(arglist);
 
-			BufferedReader input =
-				null;
-			BufferedReader error =
-				null;
+			BufferedReader input = null;
+			BufferedReader error = null;
 			try {
-				final Process process =
-					processBuilder.start();
-				input =
-					new BufferedReader(new InputStreamReader(
-							process.getInputStream(), Charset.availableCharsets()
-									.get("UTF-8")));
-				error =
-					new BufferedReader(new InputStreamReader(
-							process.getErrorStream(), Charset.availableCharsets()
-									.get("UTF-8")));
-				boolean execute =
-					true;
+				final Process process = processBuilder.start();
+				input = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+				error = new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
+				boolean execute = true;
 
 				while (execute) {
 
 					try {
 						String line;
-						String errorLine =
-							"";
+						String errorLine = "";
 						try {
 
-							while ((line =
-								input.readLine()) != null) {
-								line =
-									line.trim();
+							while ((line = input.readLine()) != null) {
+								line = line.trim();
 								if (!platformTemp.contains(line)) {
 									if (line.contains("#define ")) {
-										final String[] temp =
-											line.trim().split(
-													Pattern.quote(" "));
-										if (super.countDirectives.directives
-												.contains(temp[1])) {
+										final String[] temp = line.trim().split(Pattern.quote(" "));
+										if (super.countDirectives.directives.contains(temp[1])) {
 											continue;
-										} else if (line.endsWith("_H_")
-											|| line.endsWith("_H")) {
+										} else if (line.endsWith("_H_") || line.endsWith("_H")) {
 											// line = "#undef " + temp[1];
 											if (platformTemp.contains(line)) {
 												continue;
@@ -147,15 +113,10 @@ public class PlatformHeader extends AbstractHeader {
 									platformTemp.add(line);
 								}
 							}
-							errorLine =
-								"";
-							while ((line =
-								error.readLine()) != null) {
+							errorLine = "";
+							while ((line = error.readLine()) != null) {
 								// if (line.contains(FATAL_ERROR)) {
-								errorLine =
-									errorLine
-										+ line
-										+ "\n";
+								errorLine = errorLine + line + "\n";
 								// break;
 								// }
 								System.err.println(line);
@@ -171,22 +132,17 @@ public class PlatformHeader extends AbstractHeader {
 							System.out.println(e.toString());
 							Colligens.getDefault().logError(e);
 						}
-						final int exitValue =
-							process.exitValue();
+						final int exitValue = process.exitValue();
 						if (exitValue != 0) {
 							platform.deleteOnExit();
 
 							if (errorLine.equals("")) {
-								errorLine =
-									"Was not possible to locate all the includes (exit="
-										+ exitValue
-										+ ")!";
+								errorLine = "Was not possible to locate all the includes (exit=" + exitValue + ")!";
 							}
 							throw new PlatformException(errorLine);
 						}
 
-						execute =
-							false;
+						execute = false;
 					} catch (final IllegalThreadStateException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
@@ -218,15 +174,12 @@ public class PlatformHeader extends AbstractHeader {
 
 		FileWriter fileW;
 		try {
-			fileW =
-				new FileWriter(platform);
-			final BufferedWriter buffW =
-				new BufferedWriter(fileW);
+			fileW = new FileWriter(platform);
+			final BufferedWriter buffW = new BufferedWriter(fileW);
 
 			for (final String line : platformTemp) {
 
-				buffW.write(line
-					+ "\n");
+				buffW.write(line + "\n");
 			}
 			buffW.close();
 			fileW.close();
@@ -242,19 +195,14 @@ public class PlatformHeader extends AbstractHeader {
 		// return super.getProject().getProject().getLocation().toOSString()
 		// + "/platform.h";
 
-		return Colligens.getDefault().getConfigDir().getAbsolutePath()
-			+ System.getProperty("file.separator")
-			+ "projects"
-			+ System.getProperty("file.separator")
-			+ super.getProject().getProject().getProject().getName()
-			+ "_platform.h";
+		return Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
+			+ System.getProperty("file.separator") + super.getProject().getProject().getProject().getName() + "_platform.h";
 
 	}
 
 	@Override
 	public Collection<String> getIncludes() {
-		final ArrayList<String> collection =
-			new ArrayList<String>();
+		final ArrayList<String> collection = new ArrayList<String>();
 
 		collection.add(getIncludePath());
 

@@ -50,16 +50,14 @@ public class ExpandConstraintAction extends Action {
 
 	private final IGraphicalFeatureModel graphcialFeatureModel;
 	private IConstraint constraint;
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-			}
-		};
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
 	/**
 	 * @param viewer
@@ -68,8 +66,7 @@ public class ExpandConstraintAction extends Action {
 	 */
 	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
 		super(EXPAND_CONSTRAINT);
-		this.graphcialFeatureModel =
-			graphcialFeatureModel;
+		this.graphcialFeatureModel = graphcialFeatureModel;
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		} else {
@@ -79,8 +76,7 @@ public class ExpandConstraintAction extends Action {
 
 	@Override
 	public void run() {
-		final ExpandConstraintOperation op =
-			new ExpandConstraintOperation(graphcialFeatureModel, constraint);
+		final ExpandConstraintOperation op = new ExpandConstraintOperation(graphcialFeatureModel, constraint);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
@@ -89,24 +85,19 @@ public class ExpandConstraintAction extends Action {
 	}
 
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection.size() == 1)
-			&& (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
-		final Iterator<?> iter =
-			selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			final Object editPart =
-				iter.next();
+			final Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint =
-					((ConstraintEditPart) editPart).getConstraintModel().getObject();
+				constraint = ((ConstraintEditPart) editPart).getConstraintModel().getObject();
 				return true;
 			}
 			if (editPart instanceof IConstraint) {
-				constraint =
-					(IConstraint) editPart;
+				constraint = (IConstraint) editPart;
 				return true;
 			}
 		}

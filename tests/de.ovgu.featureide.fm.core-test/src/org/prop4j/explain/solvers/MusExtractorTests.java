@@ -41,45 +41,37 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 
 	@Test
 	public void testMus() {
-		final MusExtractor solver =
-			getInstance();
+		final MusExtractor solver = getInstance();
 		solver.addFormula(new And("A", new Or(new Not("A"), "B"), "C", new Or("C", new Not("D")), new Not("B")));
-		final Set<Node> expected =
-			new LinkedHashSet<>();
+		final Set<Node> expected = new LinkedHashSet<>();
 		expected.add(new Or("A"));
 		expected.add(new Or(new Literal("A", false), "B"));
 		expected.add(new Or(new Literal("B", false)));
-		final Set<Node> actual =
-			solver.getMinimalUnsatisfiableSubset();
+		final Set<Node> actual = solver.getMinimalUnsatisfiableSubset();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void testMusEmpty() {
-		final MusExtractor solver =
-			getInstance();
+		final MusExtractor solver = getInstance();
 		exception.expect(IllegalStateException.class);
 		solver.getMinimalUnsatisfiableSubset();
 	}
 
 	@Test
 	public void testMusContradiction() {
-		final MusExtractor solver =
-			getInstance();
+		final MusExtractor solver = getInstance();
 		solver.addFormula(new And("A", new Literal("A", false)));
-		final Set<Node> expected =
-			new LinkedHashSet<>();
+		final Set<Node> expected = new LinkedHashSet<>();
 		expected.add(new Or("A"));
 		expected.add(new Or(new Literal("A", false)));
-		final Set<Node> actual =
-			solver.getMinimalUnsatisfiableSubset();
+		final Set<Node> actual = solver.getMinimalUnsatisfiableSubset();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void testMusSatisfiable() {
-		final MusExtractor solver =
-			getInstance();
+		final MusExtractor solver = getInstance();
 		solver.addFormula(new And("A", new Literal("B", false)));
 		exception.expect(IllegalStateException.class);
 		solver.getMinimalUnsatisfiableSubset();
@@ -87,15 +79,12 @@ public abstract class MusExtractorTests extends MutableSatSolverTests {
 
 	@Test
 	public void testMusAssumptions() {
-		final MusExtractor solver =
-			getInstance();
+		final MusExtractor solver = getInstance();
 		solver.addFormula(new And("A", "B"));
 		solver.addAssumption("A", false);
-		final Set<Node> expected =
-			new LinkedHashSet<>();
+		final Set<Node> expected = new LinkedHashSet<>();
 		expected.add(new Or("A"));
-		final Set<Node> actual =
-			solver.getMinimalUnsatisfiableSubset();
+		final Set<Node> actual = solver.getMinimalUnsatisfiableSubset();
 		assertEquals(expected, actual);
 	}
 

@@ -39,19 +39,15 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ConfigurationMapTreeContentProvider implements ITreeContentProvider, IConfigurationMapFilterable {
 
-	private static final Object[] emptyRoot =
-		new Object[] {
-			StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
+	private static final Object[] emptyRoot = new Object[] { StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
 
 	private IFeatureProject featureProject;
-	private Object[] featureRoots =
-		emptyRoot;
+	private Object[] featureRoots = emptyRoot;
 
 	private final ConfigurationMap configurationMap;
 
 	public ConfigurationMapTreeContentProvider(ConfigurationMap configurationMap) {
-		this.configurationMap =
-			configurationMap;
+		this.configurationMap = configurationMap;
 	}
 
 	@Override
@@ -85,8 +81,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	public void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
-			this.featureProject =
-				featureProject;
+			this.featureProject = featureProject;
 			if (featureProject != null) {
 				for (final IConfigurationMapFilter filter : configurationMap.getFilters()) {
 					filter.initialize(configurationMap);
@@ -98,26 +93,21 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 
 	public void updateElements() {
 		if (featureProject == null) {
-			featureRoots =
-				emptyRoot;
+			featureRoots = emptyRoot;
 			return;
 		}
 
-		final List<Object> featureRootList =
-			new ArrayList<>();
+		final List<Object> featureRootList = new ArrayList<>();
 
 		// add Features
 		for (final IFeature feature : featureProject.getFeatureModel().getFeatures()) {
 			// getParent(feature) == null <=> With the used filter, this feature is a root (although originally it may be not).
-			if (filter(feature)
-				&& (feature.getStructure().isRoot()
-					|| (getParent(feature) == null))) {
+			if (filter(feature) && (feature.getStructure().isRoot() || (getParent(feature) == null))) {
 				featureRootList.add(feature);
 			}
 		}
 
-		featureRoots =
-			featureRootList.toArray();
+		featureRoots = featureRootList.toArray();
 
 		configurationMap.updateTree();
 	}
@@ -142,16 +132,12 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFeature) {
-			final IFeature f =
-				(IFeature) parentElement;
-			final List<IFeatureStructure> childStructures =
-				f.getStructure().getChildren();
+			final IFeature f = (IFeature) parentElement;
+			final List<IFeatureStructure> childStructures = f.getStructure().getChildren();
 
-			final List<Object> children =
-				new ArrayList<>();
+			final List<Object> children = new ArrayList<>();
 			for (final IFeatureStructure struct : childStructures) {
-				final IFeature child =
-					struct.getFeature();
+				final IFeature child = struct.getFeature();
 				if (filter(child)) {
 					children.add(child);
 				}
@@ -173,10 +159,8 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof IFeature) {
-			final IFeature feature =
-				(IFeature) element;
-			final IFeatureStructure parentStructure =
-				feature.getStructure().getParent();
+			final IFeature feature = (IFeature) element;
+			final IFeatureStructure parentStructure = feature.getStructure().getParent();
 			if (parentStructure != null) {
 				return filter(parentStructure.getFeature());
 			}
@@ -194,8 +178,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature) {
-			final IFeature f =
-				(IFeature) element;
+			final IFeature f = (IFeature) element;
 
 			for (final IFeatureStructure childStruct : f.getStructure().getChildren()) {
 				// If at least one child is valid, the feature has children.

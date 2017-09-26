@@ -34,8 +34,7 @@ public enum Selection {
 	private final int value;
 
 	private Selection(int value) {
-		this.value =
-			value;
+		this.value = value;
 	}
 
 	public int getValue() {

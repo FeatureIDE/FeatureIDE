@@ -36,21 +36,17 @@ import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
  */
 public abstract class AProjectJobHandler extends ASelectionHandler {
 
-	protected final LinkedList<IProject> projects =
-		new LinkedList<IProject>();
+	protected final LinkedList<IProject> projects = new LinkedList<IProject>();
 
 	protected AbstractWizard wizard;
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
-		wizard =
-			instantiateWizard();
+		wizard = instantiateWizard();
 		if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
-			final SelectionWrapper<IProject> selectionWrapper =
-				SelectionWrapper.init(selection, IProject.class);
+			final SelectionWrapper<IProject> selectionWrapper = SelectionWrapper.init(selection, IProject.class);
 			projects.clear();
-			for (IProject curProject; (curProject =
-				selectionWrapper.getNext()) != null;) {
+			for (IProject curProject; (curProject = selectionWrapper.getNext()) != null;) {
 				projects.add(curProject);
 			}
 			return true;

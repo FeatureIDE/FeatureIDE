@@ -63,53 +63,40 @@ import de.ovgu.featureide.ui.views.collaboration.policy.ClassXYLayoutPolicy;
  */
 public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefaults {
 
-	private final LinkedList<CollaborationEditPart> collaborationEditPartList =
-		new LinkedList<CollaborationEditPart>();
-	private final LinkedList<ClassEditPart> classEditPartList =
-		new LinkedList<ClassEditPart>();
+	private final LinkedList<CollaborationEditPart> collaborationEditPartList = new LinkedList<CollaborationEditPart>();
+	private final LinkedList<ClassEditPart> classEditPartList = new LinkedList<ClassEditPart>();
 
 	/**
 	 * Defines the order of classes displayed at the collaboration view.
 	 */
-	private static final Comparator<? super FSTClass> CLASS_COMPARATOR =
-		new Comparator<FSTClass>() {
+	private static final Comparator<? super FSTClass> CLASS_COMPARATOR = new Comparator<FSTClass>() {
 
-			@Override
-			public int compare(final FSTClass class1, final FSTClass class2) {
-				final String name1 =
-					class1.getName();
-				final boolean isArbitrary1 =
-					name1.startsWith("*");
-				final String name2 =
-					class2.getName();
-				final boolean isArbitrary2 =
-					name2.startsWith("*");
-				if (!isArbitrary1
-					&& !isArbitrary2) {
-					final boolean class1Empty =
-						class1.getRoles().isEmpty();
-					final boolean class2Empty =
-						class2.getRoles().isEmpty();
-					if (class1Empty
-						&& !class2Empty) {
-						return 1;
-					} else if (!class1Empty
-						&& class2Empty) {
-						return -1;
-					}
-					return name1.compareToIgnoreCase(name2);
-				} else if (isArbitrary1
-					&& isArbitrary2) {
-					return name1.compareToIgnoreCase(name2);
+		@Override
+		public int compare(final FSTClass class1, final FSTClass class2) {
+			final String name1 = class1.getName();
+			final boolean isArbitrary1 = name1.startsWith("*");
+			final String name2 = class2.getName();
+			final boolean isArbitrary2 = name2.startsWith("*");
+			if (!isArbitrary1 && !isArbitrary2) {
+				final boolean class1Empty = class1.getRoles().isEmpty();
+				final boolean class2Empty = class2.getRoles().isEmpty();
+				if (class1Empty && !class2Empty) {
+					return 1;
+				} else if (!class1Empty && class2Empty) {
+					return -1;
+				}
+				return name1.compareToIgnoreCase(name2);
+			} else if (isArbitrary1 && isArbitrary2) {
+				return name1.compareToIgnoreCase(name2);
+			} else {
+				if (isArbitrary1) {
+					return 1;
 				} else {
-					if (isArbitrary1) {
-						return 1;
-					} else {
-						return -1;
-					}
+					return -1;
 				}
 			}
-		};
+		}
+	};
 
 	public ModelEditPart(FSTModel model) {
 		setModel(model);
@@ -121,8 +108,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 
 	@Override
 	protected IFigure createFigure() {
-		final Figure fig =
-			new FreeformLayer();
+		final Figure fig = new FreeformLayer();
 		fig.setLayoutManager(new FreeformLayout());
 		fig.setBorder(new MarginBorder(10));
 		fig.setBackgroundColor(GUIDefaults.DIAGRAM_BACKGROUND);
@@ -136,10 +122,8 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 
 	@Override
 	protected List<?> getModelChildren() {
-		final FSTModel model =
-			getCollaborationModel();
-		final List<Object> list =
-			new LinkedList<Object>();
+		final FSTModel model = getCollaborationModel();
+		final List<Object> list = new LinkedList<Object>();
 		addCollaborations(model, list);
 		addClasses(model.getClasses(), list);
 		return list;
@@ -147,12 +131,10 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 
 	private void addCollaborations(final FSTModel model, final Collection<Object> list) {
 		list.add(model.getConfiguration());
-		final IFeatureProject featureProject =
-			model.getFeatureProject();
+		final IFeatureProject featureProject = model.getFeatureProject();
 		if (featureProject != null) {
 			for (final String feature : featureProject.getFeatureModel().getFeatureOrderList()) {
-				final FSTFeature f =
-					model.addFeature(feature);
+				final FSTFeature f = model.addFeature(feature);
 				if (CollaborationModelBuilder.showFeature(f)) {
 					list.add(f);
 				}
@@ -195,52 +177,39 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 			return;
 		}
 
-		final Map<String, Integer> heightsMap =
-			getMapForCollaborationFigureHeights();
-		final int collFigureWidth =
-			getWidthForCollaborationFigures();
+		final Map<String, Integer> heightsMap = getMapForCollaborationFigureHeights();
+		final int collFigureWidth = getWidthForCollaborationFigures();
 
-		CollaborationEditPart lastCollaborationEditPart =
-			null;
+		CollaborationEditPart lastCollaborationEditPart = null;
 		for (final CollaborationEditPart collaborationEditPart : collaborationEditPartList) {
-			final UnderlayerFigure underlayer =
-				(UnderlayerFigure) collaborationEditPart.getFigure();
+			final UnderlayerFigure underlayer = (UnderlayerFigure) collaborationEditPart.getFigure();
 			// set height of Collaboration Figures
 			setHeightForCollaborationFigures(heightsMap, collaborationEditPart, lastCollaborationEditPart);
 			// set width of Underlayer Figure
 			underlayer.setCollaborationFigureWidth(collFigureWidth);
 
-			final List<?> list =
-				getModelChildren();
-			final FSTFeature coll =
-				(FSTFeature) list.get(collaborationEditPartList.indexOf(collaborationEditPart));
+			final List<?> list = getModelChildren();
+			final FSTFeature coll = (FSTFeature) list.get(collaborationEditPartList.indexOf(collaborationEditPart));
 			// set default background color of underlayerFigure
 			if (coll.getColor() == -1) {
-				if ((collaborationEditPartList.indexOf(collaborationEditPart)
-					% 2) == 0) {
+				if ((collaborationEditPartList.indexOf(collaborationEditPart) % 2) == 0) {
 					underlayer.setBackgroundColor(DEFAULT_UNDERLAYING_COLOR_1);
 				} else {
 					underlayer.setBackgroundColor(DEFAULT_UNDERLAYING_COLOR_2);
 				}
 			}
 
-			lastCollaborationEditPart =
-				collaborationEditPart;
+			lastCollaborationEditPart = collaborationEditPart;
 		}
 
-		ClassEditPart lastClassEditPart =
-			null;
+		ClassEditPart lastClassEditPart = null;
 		for (final ClassEditPart classEditPart : classEditPartList) {
 			// find max width of roleFigures
-			final RoleFigure figure =
-				getMaxWidthRoleFigure(classEditPart);
+			final RoleFigure figure = getMaxWidthRoleFigure(classEditPart);
 			if (figure != null) {
-				int width =
-					figure.getBounds().width;
+				int width = figure.getBounds().width;
 				if (width == 0) {
-					width =
-						classEditPart.getFigure().getBounds().width
-							- CLASS_INSETS.left;
+					width = classEditPart.getFigure().getBounds().width - CLASS_INSETS.left;
 				}
 				// set width for ClassFigure
 				setWidthForClassFigure(width, classEditPart);
@@ -255,8 +224,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 			setHeightForClassFigure(getHeightForClassFigures(heightsMap), classEditPart);
 			setHeightForRoleFigures(classEditPart);
 
-			lastClassEditPart =
-				classEditPart;
+			lastClassEditPart = classEditPart;
 		}
 
 		for (final CollaborationEditPart collaborationEditPart : collaborationEditPartList) {
@@ -267,30 +235,20 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setHeightForRoleFigures(ClassEditPart classEdit) {
 		for (final Object child : classEdit.getChildren()) {
 			if (child instanceof RoleEditPart) {
-				final RoleEditPart roleEditPart =
-					(RoleEditPart) child;
+				final RoleEditPart roleEditPart = (RoleEditPart) child;
 
-				final RoleFigure figure =
-					(RoleFigure) roleEditPart.getFigure();
+				final RoleFigure figure = (RoleFigure) roleEditPart.getFigure();
 				if (figure.getChildren().size() > 0) {
-					final Dimension size =
-						getConstraintForFigure(figure).getSize();
+					final Dimension size = getConstraintForFigure(figure).getSize();
 					for (final UnderlayerFigure ulf : getUnderlayerFigure(roleEditPart)) {
-						final CollaborationFigure colFigure =
-							ulf.getCollaborationFigure();
-						final Rectangle constraintCollaboration =
-							getConstraintForFigure(colFigure);
-						int height =
-							size.height;
-						final int alterHeight =
-							constraintCollaboration.height;
+						final CollaborationFigure colFigure = ulf.getCollaborationFigure();
+						final Rectangle constraintCollaboration = getConstraintForFigure(colFigure);
+						int height = size.height;
+						final int alterHeight = constraintCollaboration.height;
 						if (height < alterHeight) {
-							height =
-								alterHeight;
-							size.height =
-								height;
-							final Rectangle constraint =
-								new Rectangle(figure.getLocation(), size);
+							height = alterHeight;
+							size.height = height;
+							final Rectangle constraint = new Rectangle(figure.getLocation(), size);
 
 							classEdit.setLayoutConstraint(this, figure, constraint);
 							figure.setBounds(constraint);
@@ -304,66 +262,45 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setHeightForCollaborationFigures(Map<String, Integer> heightMap, CollaborationEditPart collaborationEditPart,
 			CollaborationEditPart lastCollaborationEditPart) {
 		if (lastCollaborationEditPart != null) {
-			final Rectangle constraint =
-				getConstraintForEditPart(lastCollaborationEditPart);
-			String name =
-				((FSTFeature) lastCollaborationEditPart.getModel()).getName();
-			final Rectangle rect =
-				new Rectangle(constraint);
+			final Rectangle constraint = getConstraintForEditPart(lastCollaborationEditPart);
+			String name = ((FSTFeature) lastCollaborationEditPart.getModel()).getName();
+			final Rectangle rect = new Rectangle(constraint);
 
-			int yValue =
-				constraint.height
-					+ 4;
+			int yValue = constraint.height + 4;
 
 			if (heightMap.containsKey(name)) {
-				final int alterYValue =
-					heightMap.get(name)
-						+ 4;
+				final int alterYValue = heightMap.get(name) + 4;
 				if (yValue < alterYValue) {
-					yValue =
-						alterYValue;
+					yValue = alterYValue;
 				}
 			}
-			yValue +=
-				constraint.y;
+			yValue += constraint.y;
 
-			rect.y =
-				yValue;
+			rect.y = yValue;
 
-			name =
-				((FSTFeature) collaborationEditPart.getModel()).getName();
-			int height =
-				((UnderlayerFigure) (collaborationEditPart.getFigure())).getCollaborationFigure().getBounds().height;
+			name = ((FSTFeature) collaborationEditPart.getModel()).getName();
+			int height = ((UnderlayerFigure) (collaborationEditPart.getFigure())).getCollaborationFigure().getBounds().height;
 			if (heightMap.containsKey(name)) {
-				height =
-					Math.max(height, heightMap.get(name))
-						+ 12;
+				height = Math.max(height, heightMap.get(name)) + 12;
 			} else {
-				height +=
-					12;
+				height += 12;
 			}
-			rect.height =
-				height;
+			rect.height = height;
 
 			setLayoutConstraint(collaborationEditPart, collaborationEditPart.getFigure(), rect);
 		}
 	}
 
 	private RoleFigure getMaxWidthRoleFigure(ClassEditPart editPart) {
-		RoleFigure maxFigure =
-			null;
+		RoleFigure maxFigure = null;
 		for (final Object child : editPart.getChildren()) {
 			if (child instanceof RoleEditPart) {
-				final RoleEditPart roleEditPart =
-					(RoleEditPart) child;
+				final RoleEditPart roleEditPart = (RoleEditPart) child;
 
-				final RoleFigure figure =
-					(RoleFigure) roleEditPart.getFigure();
+				final RoleFigure figure = (RoleFigure) roleEditPart.getFigure();
 
-				if ((maxFigure == null)
-					|| (maxFigure.getBounds().width < figure.getBounds().width)) {
-					maxFigure =
-						figure;
+				if ((maxFigure == null) || (maxFigure.getBounds().width < figure.getBounds().width)) {
+					maxFigure = figure;
 				}
 			}
 		}
@@ -374,18 +311,13 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setWidthForRoleFigures(int width, ClassEditPart editPart) {
 		for (final Object child : editPart.getChildren()) {
 			if (child instanceof RoleEditPart) {
-				final RoleEditPart roleEditPart =
-					(RoleEditPart) child;
+				final RoleEditPart roleEditPart = (RoleEditPart) child;
 
-				final RoleFigure figure =
-					(RoleFigure) roleEditPart.getFigure();
+				final RoleFigure figure = (RoleFigure) roleEditPart.getFigure();
 
-				final Dimension size =
-					getConstraintForFigure(figure).getSize();
-				size.width =
-					width;
-				final Rectangle constraint =
-					new Rectangle(figure.getLocation(), size);
+				final Dimension size = getConstraintForFigure(figure).getSize();
+				size.width = width;
+				final Rectangle constraint = new Rectangle(figure.getLocation(), size);
 
 				editPart.setLayoutConstraint(this, figure, constraint);
 				figure.setBounds(constraint);
@@ -401,18 +333,12 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private void setWidthForClassFigure(int width, ClassEditPart editPart) {
-		final ClassFigure figure =
-			(ClassFigure) editPart.getFigure();
-		final Dimension size =
-			figure.getSize();
-		final Rectangle constraintClass =
-			getConstraintForEditPart(editPart);
+		final ClassFigure figure = (ClassFigure) editPart.getFigure();
+		final Dimension size = figure.getSize();
+		final Rectangle constraintClass = getConstraintForEditPart(editPart);
 
-		if (width > (size.width
-			- (CLASS_INSETS.left))) {
-			size.width =
-				width
-					+ CLASS_INSETS.left;
+		if (width > (size.width - (CLASS_INSETS.left))) {
+			size.width = width + CLASS_INSETS.left;
 
 			constraintClass.setSize(size);
 
@@ -421,41 +347,26 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		}
 		for (final Object o : figure.getChildren()) {
 			if (o instanceof Label) {
-				final Rectangle rect =
-					((Label) o).getBounds();
-				final int xValue =
-					constraintClass.getLocation().x
-						+ ((constraintClass.width
-							- rect.width)
-							/ 2);
-				rect.x =
-					xValue;
+				final Rectangle rect = ((Label) o).getBounds();
+				final int xValue = constraintClass.getLocation().x + ((constraintClass.width - rect.width) / 2);
+				rect.x = xValue;
 			}
 		}
 	}
 
 	private void setLocationForClassFigure(GraphicalEditPart editPart, GraphicalEditPart lastEditPart) {
-		final IFigure figure =
-			editPart.getFigure();
-		final Rectangle constraintClass =
-			getConstraintForEditPart(editPart);
+		final IFigure figure = editPart.getFigure();
+		final Rectangle constraintClass = getConstraintForEditPart(editPart);
 
 		Rectangle constraintPreClass;
 		if (lastEditPart == null) {
-			constraintPreClass =
-				getConstraintForFigure(((UnderlayerFigure) collaborationEditPartList.getLast().getFigure())
-						.getCollaborationFigure());
+			constraintPreClass = getConstraintForFigure(((UnderlayerFigure) collaborationEditPartList.getLast().getFigure()).getCollaborationFigure());
 		} else {
-			constraintPreClass =
-				getConstraintForEditPart(lastEditPart);
+			constraintPreClass = getConstraintForEditPart(lastEditPart);
 		}
 
-		final int xValue =
-			constraintPreClass.getLocation().x
-				+ constraintPreClass.width
-				+ GENERAL_DISTANCE;
-		constraintClass.x =
-			xValue;
+		final int xValue = constraintPreClass.getLocation().x + constraintPreClass.width + GENERAL_DISTANCE;
+		constraintClass.x = xValue;
 
 		setLayoutConstraint(this, figure, constraintClass);
 		figure.setBounds(constraintClass);
@@ -464,35 +375,19 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	private void setLocationForRoleFigures(ClassEditPart editPart) {
 
 		for (final Object o : editPart.getChildren()) {
-			final RoleEditPart roleEditPart =
-				(RoleEditPart) o;
-			final RoleFigure figure =
-				(RoleFigure) (roleEditPart).getFigure();
-			final Rectangle constraintClass =
-				getConstraintForEditPart(editPart);
-			final Rectangle constraintRole =
-				figure.getBounds();
-			final List<UnderlayerFigure> ulFigure =
-				getUnderlayerFigure(roleEditPart);
+			final RoleEditPart roleEditPart = (RoleEditPart) o;
+			final RoleFigure figure = (RoleFigure) (roleEditPart).getFigure();
+			final Rectangle constraintClass = getConstraintForEditPart(editPart);
+			final Rectangle constraintRole = figure.getBounds();
+			final List<UnderlayerFigure> ulFigure = getUnderlayerFigure(roleEditPart);
 
 			for (final UnderlayerFigure ulf : ulFigure) {
-				final Rectangle constraintCollaboration =
-					getConstraintForFigure(ulf);
-				final int nY =
-					ulf.getCollaborationFigure().getLocation().y
-						- ulf.getLocation().y;
-				final int xValue =
-					constraintClass.getLocation().x
-						+ ((constraintClass.width
-							- constraintRole.width)
-							/ 2);
-				final int yValue =
-					constraintCollaboration.getLocation().y
-						+ nY;
-				constraintRole.x =
-					xValue;
-				constraintRole.y =
-					yValue;
+				final Rectangle constraintCollaboration = getConstraintForFigure(ulf);
+				final int nY = ulf.getCollaborationFigure().getLocation().y - ulf.getLocation().y;
+				final int xValue = constraintClass.getLocation().x + ((constraintClass.width - constraintRole.width) / 2);
+				final int yValue = constraintCollaboration.getLocation().y + nY;
+				constraintRole.x = xValue;
+				constraintRole.y = yValue;
 				setLayoutConstraint(this, figure, constraintRole);
 				figure.setBounds(constraintRole);
 
@@ -506,20 +401,15 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private Map<String, Integer> getMapForCollaborationFigureHeights() {
-		final Map<String, Integer> map =
-			new HashMap<String, Integer>();
+		final Map<String, Integer> map = new HashMap<String, Integer>();
 		for (final ClassEditPart classEditPart : classEditPartList) {
 			for (final Object o : classEditPart.getChildren()) {
 				if (o instanceof RoleEditPart) {
-					final RoleEditPart roleEdit =
-						(RoleEditPart) o;
-					final RoleFigure roleFigure =
-						(RoleFigure) roleEdit.getFigure();
-					final String name =
-						roleFigure.getRole().getFeature().toString();
+					final RoleEditPart roleEdit = (RoleEditPart) o;
+					final RoleFigure roleFigure = (RoleFigure) roleEdit.getFigure();
+					final String name = roleFigure.getRole().getFeature().toString();
 
-					final int height =
-						roleFigure.getBounds().height;
+					final int height = roleFigure.getBounds().height;
 
 					if (map.containsKey(name)) {
 						if (map.get(name) < height) {
@@ -535,15 +425,13 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private Rectangle getConstraintForEditPart(GraphicalEditPart editPart) {
-		final Figure partFigure =
-			(Figure) editPart.getFigure();
+		final Figure partFigure = (Figure) editPart.getFigure();
 
 		return getConstraintForFigure(partFigure);
 	}
 
 	private Rectangle getConstraintForFigure(IFigure partFigure) {
-		final Rectangle rect =
-			(Rectangle) getFigure().getLayoutManager().getConstraint(partFigure);
+		final Rectangle rect = (Rectangle) getFigure().getLayoutManager().getConstraint(partFigure);
 		if (rect != null) {
 			return rect;
 		}
@@ -552,13 +440,10 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private List<UnderlayerFigure> getUnderlayerFigure(RoleEditPart editPart) {
-		final FSTFeature feature =
-			editPart.getRoleModel().getFeature();
-		final List<UnderlayerFigure> ulFigures =
-			new LinkedList<UnderlayerFigure>();
+		final FSTFeature feature = editPart.getRoleModel().getFeature();
+		final List<UnderlayerFigure> ulFigures = new LinkedList<UnderlayerFigure>();
 		for (final CollaborationEditPart part : collaborationEditPartList) {
-			if (feature.getName().contains(part.getModel().toString())
-				&& feature.getRoles().equals(part.getCollaborationModel().getRoles())) {
+			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {
 				ulFigures.add((UnderlayerFigure) part.getFigure());
 			}
 		}
@@ -567,27 +452,17 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private int getHeightForClassFigures(Map<String, Integer> heightMap) {
-		final CollaborationEditPart part =
-			collaborationEditPartList.getLast();
+		final CollaborationEditPart part = collaborationEditPartList.getLast();
 
-		final Rectangle rect =
-			getConstraintForEditPart(part);
-		final String name =
-			((FSTFeature) part.getModel()).getName();
+		final Rectangle rect = getConstraintForEditPart(part);
+		final String name = ((FSTFeature) part.getModel()).getName();
 
-		int height =
-			rect.y
-				+ rect.height
-				+ COLLABORATION_INSETS.top;
+		int height = rect.y + rect.height + COLLABORATION_INSETS.top;
 
 		if (heightMap.containsKey(name)) {
-			final int alterHeight =
-				rect.y
-					+ heightMap.get(name)
-					+ COLLABORATION_INSETS.top;
+			final int alterHeight = rect.y + heightMap.get(name) + COLLABORATION_INSETS.top;
 			if (height < alterHeight) {
-				height =
-					alterHeight;
+				height = alterHeight;
 			}
 		}
 
@@ -595,48 +470,32 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 	}
 
 	private void setHeightForClassFigure(int height, GraphicalEditPart editPart) {
-		final Rectangle rect =
-			getConstraintForEditPart(editPart);
-		rect.height =
-			height;
-		final IFigure figure2 =
-			editPart.getFigure();
+		final Rectangle rect = getConstraintForEditPart(editPart);
+		rect.height = height;
+		final IFigure figure2 = editPart.getFigure();
 		setLayoutConstraint(this, figure2, rect);
 		figure2.setBounds(rect);
 	}
 
 	private int getWidthForCollaborationFigures() {
-		int width =
-			0;
+		int width = 0;
 		for (final CollaborationEditPart collaborationEditPart : collaborationEditPartList) {
-			final UnderlayerFigure ulFigure =
-				(UnderlayerFigure) collaborationEditPart.getFigure();
-			width =
-				(width > ulFigure.getCollaborationFigureWidth())
-					? width
-					: ulFigure.getCollaborationFigureWidth();
+			final UnderlayerFigure ulFigure = (UnderlayerFigure) collaborationEditPart.getFigure();
+			width = (width > ulFigure.getCollaborationFigureWidth()) ? width : ulFigure.getCollaborationFigureWidth();
 		}
 		return width;
 	}
 
 	private void setWidthForCollaborationFigure(int width, CollaborationEditPart editPart) {
-		final Rectangle ulConstraint =
-			new Rectangle(getConstraintForEditPart(editPart));
+		final Rectangle ulConstraint = new Rectangle(getConstraintForEditPart(editPart));
 		if (!classEditPartList.isEmpty()) {
-			final Rectangle lastClassConstraint =
-				getConstraintForEditPart(classEditPartList.getLast());
-			width =
-				(lastClassConstraint.x
-					+ lastClassConstraint.width)
-					- ulConstraint.x;
+			final Rectangle lastClassConstraint = getConstraintForEditPart(classEditPartList.getLast());
+			width = (lastClassConstraint.x + lastClassConstraint.width) - ulConstraint.x;
 		} else {
-			width +=
-				COLLABORATION_INSETS.right;
+			width += COLLABORATION_INSETS.right;
 		}
 
-		ulConstraint.width =
-			width
-				+ COLLABORATION_INSETS.right;
+		ulConstraint.width = width + COLLABORATION_INSETS.right;
 		setLayoutConstraint(this, editPart.getFigure(), ulConstraint);
 	}
 }

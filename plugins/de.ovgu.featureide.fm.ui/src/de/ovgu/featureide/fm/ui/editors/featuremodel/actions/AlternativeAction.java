@@ -38,21 +38,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGro
  */
 public class AlternativeAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.alternative";
+	public static final String ID = "de.ovgu.featureide.alternative";
 
 	private final IFeatureModel featureModel;
 
 	public AlternativeAction(Object viewer, IFeatureModel featureModel) {
 		super(ALTERNATIVE, viewer);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final ChangeFeatureGroupTypeOperation op =
-			new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.ALTERNATIVE, feature, featureModel);
+		final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.ALTERNATIVE, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -66,11 +63,8 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		final boolean alt =
-			feature.getStructure().isAlternative();
-		setEnabled(!alt
-			&& feature.getStructure().hasChildren()
-			&& (feature.getStructure().getChildrenCount() > 1));
+		final boolean alt = feature.getStructure().isAlternative();
+		setEnabled(!alt && feature.getStructure().hasChildren() && (feature.getStructure().getChildrenCount() > 1));
 		setChecked(alt);
 	}
 

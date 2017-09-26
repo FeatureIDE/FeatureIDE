@@ -36,10 +36,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_ABSTRACT =
-		SET_FEATURE_ABSTRACT;
-	private static final String LABEL_CONCRETE =
-		SET_FEATURE_CONCRETE;
+	private static final String LABEL_ABSTRACT = SET_FEATURE_ABSTRACT;
+	private static final String LABEL_CONCRETE = SET_FEATURE_CONCRETE;
 
 	private final IFeature feature;
 
@@ -50,8 +48,7 @@ public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation
 	 */
 	public SetFeatureToAbstractOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
-		this.feature =
-			feature;
+		this.feature = feature;
 	}
 
 	/**

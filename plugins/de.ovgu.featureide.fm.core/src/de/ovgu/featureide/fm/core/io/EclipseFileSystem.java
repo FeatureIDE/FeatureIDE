@@ -44,24 +44,17 @@ public class EclipseFileSystem implements IFileSystem {
 	}
 
 	public static IResource getResource(Path path) {
-		final IPath iPath =
-			getIPath(path);
-		final IWorkspaceRoot root =
-			ResourcesPlugin.getWorkspace().getRoot();
-		final IResource res =
-			Files.isDirectory(path)
-				? root.getContainerForLocation(iPath)
-				: root.getFileForLocation(iPath);
+		final IPath iPath = getIPath(path);
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final IResource res = Files.isDirectory(path) ? root.getContainerForLocation(iPath) : root.getFileForLocation(iPath);
 		return res;
 	}
 
-	private final JavaFileSystem JAVA =
-		new JavaFileSystem();
+	private final JavaFileSystem JAVA = new JavaFileSystem();
 
 	@Override
 	public void write(Path path, byte[] content) throws IOException {
-		final IFile file =
-			ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
+		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.write(path, content);
 		}
@@ -78,8 +71,7 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void append(Path path, byte[] content) throws IOException {
-		final IFile file =
-			ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
+		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.append(path, content);
 		}
@@ -97,19 +89,16 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void mkDir(Path path) throws IOException {
-		IContainer container =
-			ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
+		IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
 		if (container == null) {
 			JAVA.mkDir(path);
 		}
 		try {
 			if (container instanceof IFolder) {
-				final LinkedList<IFolder> folders =
-					new LinkedList<>();
+				final LinkedList<IFolder> folders = new LinkedList<>();
 				while (!container.exists()) {
 					folders.addFirst((IFolder) container);
-					container =
-						container.getParent();
+					container = container.getParent();
 				}
 				for (final IFolder folder : folders) {
 					folder.create(true, true, null);
@@ -122,8 +111,7 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public void delete(Path path) throws IOException {
-		final IResource res =
-			getResource(path);
+		final IResource res = getResource(path);
 		try {
 			if (res == null) {
 				JAVA.exists(path);
@@ -137,8 +125,7 @@ public class EclipseFileSystem implements IFileSystem {
 
 	@Override
 	public boolean exists(Path path) {
-		final IResource res =
-			getResource(path);
+		final IResource res = getResource(path);
 		if (res == null) {
 			return JAVA.exists(path);
 		}

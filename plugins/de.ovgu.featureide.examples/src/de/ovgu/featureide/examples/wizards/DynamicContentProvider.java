@@ -49,8 +49,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 	private final String contentProviderName;
 
 	public DynamicContentProvider(String contentProviderName) {
-		this.contentProviderName =
-			contentProviderName;
+		this.contentProviderName = contentProviderName;
 	}
 
 	@Override
@@ -61,8 +60,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 		if (pathToRecord != null) {
 			return pathToRecord.get(new Path("MYROOT")).toArray();
 		} else {
-			return new Object[] {
-				EXAMPLES_COULD_NOT_BE_LOADED_ };
+			return new Object[] { EXAMPLES_COULD_NOT_BE_LOADED_ };
 		}
 	}
 
@@ -73,8 +71,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 		} else if (parentElement instanceof ProjectRecord.TreeItem) {
 			return new Object[0];
 		} else {
-			return new Object[] {
-				CHILDREN_COULD_NOT_BE_LOADED_ };
+			return new Object[] { CHILDREN_COULD_NOT_BE_LOADED_ };
 		}
 	}
 
@@ -87,8 +84,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 				}
 			}
 		} else if (element instanceof IPath) {
-			final IPath returnPath =
-				((IPath) element).removeLastSegments(1);
+			final IPath returnPath = ((IPath) element).removeLastSegments(1);
 			if (returnPath.isEmpty()) {
 				return null;
 			}
@@ -100,8 +96,7 @@ public class DynamicContentProvider implements ITreeContentProvider {
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IPath) {
-			return pathToRecord.containsKey(element)
-				&& !pathToRecord.get(element).isEmpty();
+			return pathToRecord.containsKey(element) && !pathToRecord.get(element).isEmpty();
 		} else {
 			return false;
 		}
@@ -115,28 +110,19 @@ public class DynamicContentProvider implements ITreeContentProvider {
 
 	// TODO read XML only once
 	private void computeHashtable() {
-		pathToRecord =
-			new HashMap<>();
+		pathToRecord = new HashMap<>();
 		for (final ProjectRecord projectRecord : ProjectProvider.getProjects()) {
-			final Document doc =
-				projectRecord.getInformationDocument();
+			final Document doc = projectRecord.getInformationDocument();
 			if (doc != null) {
-				final NodeList nlInterfaces =
-					doc.getElementsByTagName("contentProvider");
-				for (int i =
-					0; i < nlInterfaces.getLength(); i++) {
-					final Node item1 =
-						nlInterfaces.item(i);
+				final NodeList nlInterfaces = doc.getElementsByTagName("contentProvider");
+				for (int i = 0; i < nlInterfaces.getLength(); i++) {
+					final Node item1 = nlInterfaces.item(i);
 					if (item1.getNodeType() == Node.ELEMENT_NODE) {
-						final Element el =
-							((Element) item1);
+						final Element el = ((Element) item1);
 						if (el.getAttribute("name").equals(contentProviderName)) {
-							final NodeList pathNode =
-								el.getElementsByTagName("path");
-							for (int j =
-								0; j < pathNode.getLength(); j++) {
-								final Node item2 =
-									pathNode.item(j);
+							final NodeList pathNode = el.getElementsByTagName("path");
+							for (int j = 0; j < pathNode.getLength(); j++) {
+								final Node item2 = pathNode.item(j);
 								if (item2.getNodeType() == Node.ELEMENT_NODE) {
 									assignProjectToRecPath(projectRecord, new Path(((Element) item2).getTextContent()));
 								}
@@ -149,41 +135,31 @@ public class DynamicContentProvider implements ITreeContentProvider {
 	}
 
 	private void assignProjectToRecPath(ProjectRecord projectRecord, IPath path) {
-		Set<Object> record =
-			pathToRecord.get(path);
+		Set<Object> record = pathToRecord.get(path);
 		if (record == null) {
-			record =
-				new HashSet<>();
+			record = new HashSet<>();
 			pathToRecord.put(path, record);
 
-			int length =
-				path.segmentCount();
+			int length = path.segmentCount();
 			while (length > 0) {
 				final IPath parent;
 				if (length == 1) {
-					parent =
-						new Path("MYROOT");
-					length =
-						0;
+					parent = new Path("MYROOT");
+					length = 0;
 				} else {
-					parent =
-						path.removeLastSegments(1);
-					length =
-						parent.segmentCount();
+					parent = path.removeLastSegments(1);
+					length = parent.segmentCount();
 				}
-				final Set<Object> parentRecord =
-					pathToRecord.get(parent);
+				final Set<Object> parentRecord = pathToRecord.get(parent);
 				if (parentRecord != null) {
 					parentRecord.add(path);
 					break;
 				} else {
-					final Set<Object> children =
-						new HashSet<>();
+					final Set<Object> children = new HashSet<>();
 					children.add(path);
 					pathToRecord.put(parent, children);
 				}
-				path =
-					parent;
+				path = parent;
 			}
 		}
 		record.add(projectRecord.createNewTreeItem(this));

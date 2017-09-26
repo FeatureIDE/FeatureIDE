@@ -38,8 +38,7 @@ public class ContextDocumentationHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		CorePlugin.getDefault().buildContextDocumentation(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+		CorePlugin.getDefault().buildContextDocumentation(projects, (String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
 				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
 	}
 

@@ -41,8 +41,7 @@ public abstract class AbstractConfigurationExplanationCreator extends AbstractFe
 
 	@Override
 	public void setConfiguration(Configuration config) {
-		this.config =
-			config;
+		this.config = config;
 		setFeatureModel();
 	}
 
@@ -50,8 +49,6 @@ public abstract class AbstractConfigurationExplanationCreator extends AbstractFe
 	 * Sets the feature model context.
 	 */
 	protected void setFeatureModel() {
-		setFeatureModel(getConfiguration() == null
-			? null
-			: getConfiguration().getFeatureModel());
+		setFeatureModel(getConfiguration() == null ? null : getConfiguration().getFeatureModel());
 	}
 }

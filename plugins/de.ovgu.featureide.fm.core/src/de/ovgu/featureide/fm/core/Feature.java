@@ -96,8 +96,7 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	 */
 	@Deprecated
 	public Feature(IFeature feature) {
-		this.feature =
-			feature;
+		this.feature = feature;
 	}
 
 	/**
@@ -924,11 +923,8 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	@Deprecated
 	public String toString(boolean writeMarks) {
 		if (writeMarks) {
-			if (feature.getName().contains(" ")
-				|| Operator.isOperatorName(feature.getName())) {
-				return "\""
-					+ feature.getName()
-					+ "\"";
+			if (feature.getName().contains(" ") || Operator.isOperatorName(feature.getName())) {
+				return "\"" + feature.getName() + "\"";
 			}
 			return feature.getName();
 		} else {

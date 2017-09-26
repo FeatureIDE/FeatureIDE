@@ -63,110 +63,56 @@ public interface IConfigurationBuilderBasics {
 
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#CreateNewProject",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#CreateNewProject");
-	QualifiedName T_WISE =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#T-Wise",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#T-Wise");
+		new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", IConfigurationBuilderBasics.class.getName() + "#CreateNewProject");
+	QualifiedName T_WISE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Wise", IConfigurationBuilderBasics.class.getName() + "#T-Wise");
 	QualifiedName T_INTERACTION =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#T-Order",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#T-Order");
+		new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#T-Order", IConfigurationBuilderBasics.class.getName() + "#T-Order");
 	QualifiedName GENERATE =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#Generate",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#Generate");
-	QualifiedName ORDER =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#Order",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#Order");
-	QualifiedName TEST =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#Test",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#Test");
-	QualifiedName MAX =
-		new QualifiedName(IConfigurationBuilderBasics.class.getName()
-			+ "#MaxConf",
-				IConfigurationBuilderBasics.class.getName()
-					+ "#MaxConf");
-	String TRUE =
-		"true";
-	String FALSE =
-		"false";
+		new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Generate", IConfigurationBuilderBasics.class.getName() + "#Generate");
+	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", IConfigurationBuilderBasics.class.getName() + "#Order");
+	QualifiedName TEST = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Test", IConfigurationBuilderBasics.class.getName() + "#Test");
+	QualifiedName MAX = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#MaxConf", IConfigurationBuilderBasics.class.getName() + "#MaxConf");
+	String TRUE = "true";
+	String FALSE = "false";
 
 //------------------------------------------------------------------------------
 
 	/**
 	 * Basics for the ConfigurationBuilder.
 	 */
-	String JOB_TITLE =
-		BUILD_ALL_VALID_CONFIGURATIONS;
-	String JOB_TITLE_CURRENT =
-		BUILD_ALL_CURRENT_CONFIGURATIONS;
-	String JOB_TITLE_T_WISE =
-		"Build t-wise configurations";
-	String JOB_TITLE_RANDOM =
-		"Build random configurations";
-	String JOB_TITLE_MODULE =
-		BUILD_INTEGRATION_CONFIGURATIONS;
+	String JOB_TITLE = BUILD_ALL_VALID_CONFIGURATIONS;
+	String JOB_TITLE_CURRENT = BUILD_ALL_CURRENT_CONFIGURATIONS;
+	String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	String JOB_TITLE_RANDOM = "Build random configurations";
+	String JOB_TITLE_MODULE = BUILD_INTEGRATION_CONFIGURATIONS;
 
-	String JOB_TITLE_COUNT_CONFIGURATIONS =
-		COUNT_CONFIGURATIONS;
+	String JOB_TITLE_COUNT_CONFIGURATIONS = COUNT_CONFIGURATIONS;
 
-	String CONFIGURATION_NAME =
-		VARIANT;
-	String FOLDER_NAME =
-		PRODUCTS;
-	String FOLDER_NAME_CURRENT =
-		"currentproducts";
-	String TEMPORARY_BIN_FOLDER =
-		".tmpBin";
+	String CONFIGURATION_NAME = VARIANT;
+	String FOLDER_NAME = PRODUCTS;
+	String FOLDER_NAME_CURRENT = "currentproducts";
+	String TEMPORARY_BIN_FOLDER = ".tmpBin";
 
-	String PROBLEM_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".variantMarker";
-	String ERROR_IGNOR_RAW_TYPE =
-		"raw type";
-	String ERROR_IGNOR_SERIIZABLE =
-		SERIALIZABLE_CLASS;
-	String ERROR_IGNOR_CAST =
-		REDUNDANT_CAST_TO;
-	String ERROR_IGNOR_DEPRECATION =
-		HAS_BEEN_DEPRECATED;
-	String ERROR_IGNOR_UNUSED_IMPORT =
-		THE_IMPORT;
+	String PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".variantMarker";
+	String ERROR_IGNOR_RAW_TYPE = "raw type";
+	String ERROR_IGNOR_SERIIZABLE = SERIALIZABLE_CLASS;
+	String ERROR_IGNOR_CAST = REDUNDANT_CAST_TO;
+	String ERROR_IGNOR_DEPRECATION = HAS_BEEN_DEPRECATED;
+	String ERROR_IGNOR_UNUSED_IMPORT = THE_IMPORT;
 
-	Pattern errorMessagePattern =
-		Pattern.compile("(.+):(\\d+):(.+)");
+	Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
 
-	String SEPARATOR_VARIANT =
-		"_v.";
-	String SEPARATOR_CONFIGURATION =
-		"_c.";
-	String SEPARATOR_T_WISE =
-		"_t.";
-	String SEPARATOR_RANDOM =
-		"_r.";
-	String SEPARATOR_INTEGRATION =
-		"_i.";
+	String SEPARATOR_VARIANT = "_v.";
+	String SEPARATOR_CONFIGURATION = "_c.";
+	String SEPARATOR_T_WISE = "_t.";
+	String SEPARATOR_RANDOM = "_r.";
+	String SEPARATOR_INTEGRATION = "_i.";
 
 	/**
 	 * Basics for the SPLCATool.
 	 */
-	int CHVATAL_MAX =
-		4;
-	int ICPL_MAX =
-		3;
-	int CASA_MAX =
-		6;
-	int MASK_MAX =
-		2;
+	int CHVATAL_MAX = 4;
+	int ICPL_MAX = 3;
+	int CASA_MAX = 6;
+	int MASK_MAX = 2;
 }

@@ -44,28 +44,21 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 	Iterable<IGraphicalFeature> features;
 	boolean collapse;
 
-	private final LinkedList<IGraphicalFeature> affectedFeatureList =
-		new LinkedList<IGraphicalFeature>();
+	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
 
 	public CollapseAllOperation(IGraphicalFeatureModel graphicalFeatureModel, boolean collapse) {
 		super(graphicalFeatureModel.getFeatureModel(), COLLAPSE_ALL);
-		features =
-			graphicalFeatureModel.getFeatures();
-		this.collapse =
-			collapse;
+		features = graphicalFeatureModel.getFeatures();
+		this.collapse = collapse;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		final Iterator<IGraphicalFeature> feautureModelIterator =
-			features.iterator();
+		final Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
 		while (feautureModelIterator.hasNext()) {
-			final IGraphicalFeature gFeature =
-				feautureModelIterator.next();
-			final IFeature feature =
-				gFeature.getObject();
-			if (!feature.getStructure().isRoot()
-				|| !collapse) {
+			final IGraphicalFeature gFeature = feautureModelIterator.next();
+			final IFeature feature = gFeature.getObject();
+			if (!feature.getStructure().isRoot() || !collapse) {
 				if (feature.getStructure().hasChildren()) {
 					if (gFeature.isCollapsed() != collapse) {
 						affectedFeatureList.add(gFeature);
@@ -79,8 +72,7 @@ public class CollapseAllOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		final Iterator<IGraphicalFeature> feautureModelIterator =
-			features.iterator();
+		final Iterator<IGraphicalFeature> feautureModelIterator = features.iterator();
 		for (final IGraphicalFeature f : affectedFeatureList) {
 			f.setCollapsed(!collapse);
 		}

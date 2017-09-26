@@ -53,13 +53,10 @@ public abstract class AbstractJakModelBuilder<AST_Program_Type> {
 
 	public AbstractJakModelBuilder(final IFeatureProject featureProject) {
 		if (featureProject != null) {
-			this.featureProject =
-				featureProject;
-			model =
-				featureProject.getFSTModel();
+			this.featureProject = featureProject;
+			model = featureProject.getFSTModel();
 			if (model == null) {
-				model =
-					new FSTModel(featureProject);
+				model = new FSTModel(featureProject);
 				featureProject.setFSTModel(model);
 			}
 		}
@@ -73,20 +70,16 @@ public abstract class AbstractJakModelBuilder<AST_Program_Type> {
 	 * @param composedASTs composed ahead ASTs during the composition step
 	 * @param ownASTs ahead ASTs of each source file without composing
 	 */
-	public abstract void addClass(String className, List<IFile> sources,
-			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
+	public abstract void addClass(String className, List<IFile> sources, AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
 
-	public abstract void updateAst(String currentClass, List<IFile> sources,
-			AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
+	public abstract void updateAst(String currentClass, List<IFile> sources, AST_Program_Type[] composedASTs, AST_Program_Type[] ownASTs);
 
 	public abstract void reset();
 
 	public void addArbitraryFiles() {
-		final IFolder folder =
-			featureProject.getSourceFolder();
+		final IFolder folder = featureProject.getSourceFolder();
 		for (final FSTFeature feature : model.getFeatures()) {
-			final IFolder featureFolder =
-				folder.getFolder(feature.getName());
+			final IFolder featureFolder = folder.getFolder(feature.getName());
 			addArbitraryFiles(featureFolder, feature);
 		}
 	}

@@ -35,8 +35,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
-	protected final Deque<AbstractFeatureModelOperation> operations =
-		new LinkedList<>();
+	protected final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
 
 	public MultiFeatureModelOperation(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
@@ -52,10 +51,8 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		for (final Iterator<AbstractFeatureModelOperation> it =
-			operations.iterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation =
-				it.next();
+		for (final Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+			final AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
 				operation.redo();
 			}
@@ -65,10 +62,8 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		for (final Iterator<AbstractFeatureModelOperation> it =
-			operations.descendingIterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation =
-				it.next();
+		for (final Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+			final AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {
 				operation.undo();
 			}

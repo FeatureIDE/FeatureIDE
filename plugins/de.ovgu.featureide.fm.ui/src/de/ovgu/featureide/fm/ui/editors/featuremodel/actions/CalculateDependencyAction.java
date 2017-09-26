@@ -53,8 +53,7 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * The ID which is used to return the respective action after a context menu selection.
 	 */
-	public static final String ID =
-		"de.ovgu.featureide.calculatedependency";
+	public static final String ID = "de.ovgu.featureide.calculatedependency";
 
 	/**
 	 * The complete feature model.
@@ -64,22 +63,19 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * The selected feature which will be used as new root.
 	 */
-	private final LinkedList<IFeature> selectedFeatures =
-		new LinkedList<IFeature>();
+	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	/**
 	 * The listener which remembers the selection and checks whether it is valid.
 	 */
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-			}
-		};
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
 	/**
 	 * Constructor.
@@ -89,8 +85,7 @@ public class CalculateDependencyAction extends Action {
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -108,8 +103,7 @@ public class CalculateDependencyAction extends Action {
 		if (selectedFeatures.size() != 1) {
 			throw new RuntimeException("Calculate dependencies for multiple selected features is not supported.");
 		}
-		final CalculateDependencyOperation op =
-			new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
+		final CalculateDependencyOperation op = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -126,41 +120,33 @@ public class CalculateDependencyAction extends Action {
 	 */
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if ((selection.size() == 1)
-			&& (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
 		selectedFeatures.clear();
-		final Iterator<?> iter =
-			selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			final Object editPart =
-				iter.next();
-			if (!(editPart instanceof FeatureEditPart)
-				&& !(editPart instanceof IFeature)) {
+			final Object editPart = iter.next();
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
 				continue;
 			}
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart) {
-				feature =
-					((FeatureEditPart) editPart).getModel().getObject();
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
 			} else {
-				feature =
-					(IFeature) editPart;
+				feature = (IFeature) editPart;
 			}
 
 			selectedFeatures.add(feature);
 		}
 
-		final boolean res =
-			!selectedFeatures.isEmpty();
+		final boolean res = !selectedFeatures.isEmpty();
 
 		// permit selection to be root of the origin feature model
 		if (res) {
-			final String s =
-				selectedFeatures.getFirst().toString();
+			final String s = selectedFeatures.getFirst().toString();
 			if (s.equals(FeatureUtils.getRoot(featureModel).toString())) {
 				return false;
 			}

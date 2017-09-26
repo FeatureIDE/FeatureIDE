@@ -38,8 +38,7 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
  */
 public interface ISatSolver extends Cloneable {
 
-	public static final int MAX_SOLUTION_BUFFER =
-		1000;
+	public static final int MAX_SOLUTION_BUFFER = 1000;
 
 	public static enum SatResult {
 		FALSE, TIMEOUT, TRUE

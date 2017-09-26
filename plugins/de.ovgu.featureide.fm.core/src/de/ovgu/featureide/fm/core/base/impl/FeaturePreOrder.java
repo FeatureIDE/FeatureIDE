@@ -35,8 +35,7 @@ public class FeaturePreOrder implements Iterable<IFeature> {
 	private final IFeatureModel featureModel;
 
 	public FeaturePreOrder(IFeatureModel featureModel) {
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override

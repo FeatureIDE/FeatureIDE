@@ -47,8 +47,7 @@ public abstract class PreprocessorExplanationWriter extends FeatureModelExplanat
 		if (!(reason instanceof PreprocessorReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final Node expression =
-			((PreprocessorReason) reason).getExpression();
-		return String.format("%s is an expression.", expression.toString(getSymbols()));
+		final Node expression = ((PreprocessorReason) reason).getExpression();
+		return String.format("%s is a parent expression.", expression.toString(getSymbols()));
 	}
 }

@@ -49,8 +49,7 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 		} else if (model instanceof Legend) {
 			return new LegendEditPart((Legend) model);
 		} else {
-			throw new UnsupportedOperationException("Not implememented for "
-				+ model.getClass());
+			throw new UnsupportedOperationException("Not implememented for " + model.getClass());
 		}
 
 	}

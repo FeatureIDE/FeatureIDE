@@ -32,21 +32,17 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class FeatureComparator implements Comparator<IFeature>, Serializable {
 
-	private static final long serialVersionUID =
-		3133122730880756050L;
+	private static final long serialVersionUID = 3133122730880756050L;
 
 	private final boolean caseSensitive;
 
 	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive =
-			caseSensitive;
+		this.caseSensitive = caseSensitive;
 	}
 
 	@Override
 	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive
-			? feature1.getName().compareTo(feature2.getName())
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
+		return caseSensitive ? feature1.getName().compareTo(feature2.getName()) : feature1.getName().compareToIgnoreCase(feature2.getName());
 	}
 
 }

@@ -20,8 +20,7 @@ public abstract class ViewController {
 	 * @param ID
 	 */
 	public ViewController(String ID) {
-		this.ID =
-			ID;
+		this.ID = ID;
 	}
 
 	public ViewPart getView() {
@@ -29,8 +28,7 @@ public abstract class ViewController {
 	}
 
 	public void setView(ViewPart view) {
-		this.view =
-			view;
+		this.view = view;
 	}
 
 	/**
@@ -43,12 +41,9 @@ public abstract class ViewController {
 			public void run() {
 				IWorkbenchWindow activeWindow;
 				IWorkbenchPage activePage;
-				activeWindow =
-					PlatformUI.getWorkbench()
-							.getActiveWorkbenchWindow();
+				activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 				if (activeWindow != null) {
-					activePage =
-						activeWindow.getActivePage();
+					activePage = activeWindow.getActivePage();
 					if (activePage != null) {
 						try {
 							activePage.showView(ID);

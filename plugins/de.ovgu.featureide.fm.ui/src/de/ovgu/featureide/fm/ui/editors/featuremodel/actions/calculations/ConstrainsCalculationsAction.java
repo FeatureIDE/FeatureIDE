@@ -37,33 +37,23 @@ public class ConstrainsCalculationsAction extends Action {
 
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_CONSTRAINT_ERRORS);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateConstraints);
 	}
 
 	@Override
 	public void run() {
 		if (featureModel.getAnalyser().calculateConstraints) {
-			featureModel.getAnalyser().calculateConstraints =
-				false;
-			featureModel.getAnalyser().calculateRedundantConstraints =
-				false;
-			featureModel.getAnalyser().calculateTautologyConstraints =
-				false;
+			featureModel.getAnalyser().calculateConstraints = false;
+			featureModel.getAnalyser().calculateRedundantConstraints = false;
+			featureModel.getAnalyser().calculateTautologyConstraints = false;
 		} else {
-			featureModel.getAnalyser().calculateConstraints =
-				true;
-			featureModel.getAnalyser().calculateFeatures =
-				true;
-			featureModel.getAnalyser().calculateRedundantConstraints =
-				true;
-			featureModel.getAnalyser().calculateTautologyConstraints =
-				true;
-			featureModel.getAnalyser().calculateDeadConstraints =
-				true;
-			featureModel.getAnalyser().calculateFOConstraints =
-				true;
+			featureModel.getAnalyser().calculateConstraints = true;
+			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateRedundantConstraints = true;
+			featureModel.getAnalyser().calculateTautologyConstraints = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

@@ -56,8 +56,7 @@ public interface IJob<T> {
 		private final int value;
 
 		private JobStatus(int value) {
-			this.value =
-				value;
+			this.value = value;
 		}
 
 		public int getValue() {

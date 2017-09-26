@@ -57,10 +57,8 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 
 		public Arguments(String foldername, IProject project) {
 			super(Arguments.class);
-			this.foldername =
-				foldername;
-			this.project =
-				project;
+			this.foldername = foldername;
+			this.project = project;
 		}
 	}
 
@@ -70,18 +68,14 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor =
-			workMonitor;
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(arguments.project);
+		this.workMonitor = workMonitor;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(arguments.project.getName()
-				+ " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
 			return false;
 		}
 
-		final IFolder folder =
-			CorePlugin.createFolder(arguments.project, arguments.foldername);
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
 		try {
 			folder.delete(true, null);
 		} catch (final CoreException e) {
@@ -90,30 +84,22 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		}
 		CorePlugin.createFolder(arguments.project, arguments.foldername);
 
-		final ProjectSignatures projectSignatures =
-			featureProject.getProjectSignatures();
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
 			CorePlugin.getDefault().logWarning("No signatures available!");
 			return false;
 		}
 
-		final int[] featureIDs =
-			new int[projectSignatures.getFeatureCount()];
-		int i =
-			0;
+		final int[] featureIDs = new int[projectSignatures.getFeatureCount()];
+		int i = 0;
 		for (final String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
-			featureIDs[i++] =
-				projectSignatures.getFeatureID(string);
+			featureIDs[i++] = projectSignatures.getFeatureID(string);
 		}
 
-		workMonitor.setRemainingWork((2
-			* featureIDs.length)
-			+ 5);
+		workMonitor.setRemainingWork((2 * featureIDs.length) + 5);
 
-		final int[] statisticDataChars =
-			new int[5];
-		final int[] statisticDataTags =
-			new int[5];
+		final int[] statisticDataChars = new int[5];
+		final int[] statisticDataTags = new int[5];
 
 		// ----------------------------------- SPL ---------------------------------------------
 //		AJavaDocCommentMerger.reset();
@@ -173,37 +159,28 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 
 		// -------------------------------- Variante ---------------------------------------------
 
-		statisticDataChars[1] =
-			statisticDataChars[0];
-		statisticDataTags[1] =
-			statisticDataTags[0];
+		statisticDataChars[1] = statisticDataChars[0];
+		statisticDataTags[1] = statisticDataTags[0];
 		workMonitor.worked();
 
 		// ------------------------------------------------------------------------------------------------------------
 
-		final StringBuilder sb =
-			new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
+		final StringBuilder sb = new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
 
-		int sum =
-			-statisticDataChars[0];
-		for (int j =
-			0; j < statisticDataChars.length; j++) {
+		int sum = -statisticDataChars[0];
+		for (int j = 0; j < statisticDataChars.length; j++) {
 			sb.append(statisticDataChars[j]);
 			sb.append(';');
-			sum +=
-				statisticDataChars[j];
+			sum += statisticDataChars[j];
 		}
 		sb.append(sum);
 		sb.append('\n');
 
-		int sum2 =
-			-statisticDataTags[0];
-		for (int j =
-			0; j < statisticDataTags.length; j++) {
+		int sum2 = -statisticDataTags[0];
+		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb.append(statisticDataTags[j]);
 			sb.append(';');
-			sum2 +=
-				statisticDataTags[j];
+			sum2 += statisticDataTags[j];
 		}
 		sb.append(sum2);
 		sb.append('\n');
@@ -214,47 +191,30 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		}
 		workMonitor.worked();
 
-		final StringBuilder sb2 =
-			new StringBuilder();
+		final StringBuilder sb2 = new StringBuilder();
 
-		final String[] texString =
-			new String[] {
-				VERFAHREN,
-				VARIANTE,
-				SPL,
-				KONTEXT,
-				FEATUREMODUL,
-				SUMME };
-		for (int j =
-			0; j < statisticDataTags.length; j++) {
+		final String[] texString = new String[] { VERFAHREN, VARIANTE, SPL, KONTEXT, FEATUREMODUL, SUMME };
+		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb2.append(texString[j]);
 			sb2.append(" & ");
 			sb2.append(statisticDataChars[j]);
 			sb2.append(" & ");
-			sb2.append((int) ((100
-				* ((double) statisticDataChars[j]))
-				/ (statisticDataChars[0])));
+			sb2.append((int) ((100 * ((double) statisticDataChars[j])) / (statisticDataChars[0])));
 			sb2.append("\\% & ");
 			sb2.append(statisticDataTags[j]);
 			sb2.append(" & ");
-			sb2.append((int) ((100
-				* ((double) statisticDataTags[j]))
-				/ (statisticDataTags[0])));
+			sb2.append((int) ((100 * ((double) statisticDataTags[j])) / (statisticDataTags[0])));
 			sb2.append("\\% \\\\\n");
 		}
 		sb2.append(texString[statisticDataTags.length]);
 		sb2.append(" & ");
 		sb2.append(sum);
 		sb2.append(" & ");
-		sb2.append((int) ((100
-			* ((double) sum))
-			/ (statisticDataChars[0])));
+		sb2.append((int) ((100 * ((double) sum)) / (statisticDataChars[0])));
 		sb2.append("\\% & ");
 		sb2.append(sum2);
 		sb2.append(" & ");
-		sb2.append((int) ((100
-			* ((double) sum2))
-			/ (statisticDataTags[0])));
+		sb2.append((int) ((100 * ((double) sum2)) / (statisticDataTags[0])));
 		sb2.append("\\% \\\\\n");
 
 		try {
@@ -264,14 +224,12 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		}
 		workMonitor.worked();
 
-		final StringBuilder sb3 =
-			new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
+		final StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
 //		for (int j = 0; j < statisticNumComments.length; j++) {
 //			sb3.append(statisticNumComments[j]);
 //			sb3.append(';');
 //		}
-		sb3.setCharAt(sb3.length()
-			- 1, '\n');
+		sb3.setCharAt(sb3.length() - 1, '\n');
 		try {
 			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
 		} catch (final IOException e) {

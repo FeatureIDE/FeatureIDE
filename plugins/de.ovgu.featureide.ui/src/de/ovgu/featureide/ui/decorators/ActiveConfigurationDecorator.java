@@ -47,12 +47,9 @@ public class ActiveConfigurationDecorator implements ILightweightLabelDecorator,
 	private final LinkedList<ILabelProviderListener> listeners;
 
 	public ActiveConfigurationDecorator() {
-		final URL url =
-			de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
-		icon =
-			ImageDescriptor.createFromURL(url);
-		listeners =
-			new LinkedList<ILabelProviderListener>();
+		final URL url = de.ovgu.featureide.ui.UIPlugin.getDefault().getBundle().getEntry("/icons/currentconfiguration.gif");
+		icon = ImageDescriptor.createFromURL(url);
+		listeners = new LinkedList<ILabelProviderListener>();
 
 		// add Listener to Activator
 		de.ovgu.featureide.core.CorePlugin.getDefault().addCurrentConfigurationListener(this);
@@ -60,10 +57,8 @@ public class ActiveConfigurationDecorator implements ILightweightLabelDecorator,
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
-		final IFeatureProject pd =
-			CorePlugin.getFeatureProject((IResource) element);
-		if ((pd != null)
-			&& ((IResource) element).equals(pd.getCurrentConfiguration())) {
+		final IFeatureProject pd = CorePlugin.getFeatureProject((IResource) element);
+		if ((pd != null) && ((IResource) element).equals(pd.getCurrentConfiguration())) {
 			decoration.addOverlay(icon, IDecoration.TOP_LEFT);
 		}
 	}
@@ -81,8 +76,7 @@ public class ActiveConfigurationDecorator implements ILightweightLabelDecorator,
 	}
 
 	private void refresh(IResource[] res) {
-		final LabelProviderChangedEvent e =
-			new LabelProviderChangedEvent(this, res);
+		final LabelProviderChangedEvent e = new LabelProviderChangedEvent(this, res);
 		for (final ILabelProviderListener l : listeners) {
 			l.labelProviderChanged(e);
 		}

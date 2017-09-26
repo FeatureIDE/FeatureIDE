@@ -58,17 +58,13 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IMonitor monitor) {
-		final AdvancedNodeCreator advancedNodeCreator =
-			new AdvancedNodeCreator(fm, new AbstractFeatureFilter());
+		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm, new AbstractFeatureFilter());
 		advancedNodeCreator.setCnfType(CNFType.Regular);
 		advancedNodeCreator.setIncludeBooleanValues(false);
 
-		final Node createNodes =
-			advancedNodeCreator.createNodes();
-		final SatInstance satInstance =
-			new SatInstance(createNodes, Functional.toList(FeatureUtils.getConcreteFeatureNames(fm)));
-		final PairWiseConfigurationGenerator gen =
-			getGenerator(satInstance, solutionCount);
+		final Node createNodes = advancedNodeCreator.createNodes();
+		final SatInstance satInstance = new SatInstance(createNodes, Functional.toList(FeatureUtils.getConcreteFeatureNames(fm)));
+		final PairWiseConfigurationGenerator gen = getGenerator(satInstance, solutionCount);
 		exec(satInstance, gen, monitor);
 	}
 
@@ -77,38 +73,34 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, IMonitor monitor) {
-		final Thread consumer =
-			new Thread() {
+		final Thread consumer = new Thread() {
 
-				@Override
-				public void run() {
-					int foundConfigurations =
-						0;
-					while (true) {
-						try {
-							generateConfiguration(satInstance.convertToString(as.q.take().getModel()));
-							foundConfigurations++;
-						} catch (final InterruptedException e) {
-							break;
-						}
-					}
-					foundConfigurations +=
-						as.q.size();
-					builder.configurationNumber =
-						foundConfigurations;
-					for (final org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
-						generateConfiguration(satInstance.convertToString(c.getModel()));
+			@Override
+			public void run() {
+				int foundConfigurations = 0;
+				while (true) {
+					try {
+						generateConfiguration(satInstance.convertToString(as.q.take().getModel()));
+						foundConfigurations++;
+					} catch (final InterruptedException e) {
+						break;
 					}
 				}
-
-				private void generateConfiguration(List<String> solution) {
-					configuration.resetValues();
-					for (final String selection : solution) {
-						configuration.setManual(selection, Selection.SELECTED);
-					}
-					addConfiguration(configuration);
+				foundConfigurations += as.q.size();
+				builder.configurationNumber = foundConfigurations;
+				for (final org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
+					generateConfiguration(satInstance.convertToString(c.getModel()));
 				}
-			};
+			}
+
+			private void generateConfiguration(List<String> solution) {
+				configuration.resetValues();
+				for (final String selection : solution) {
+					configuration.setManual(selection, Selection.SELECTED);
+				}
+				addConfiguration(configuration);
+			}
+		};
 		consumer.start();
 		LongRunningWrapper.runMethod(as, monitor);
 		consumer.interrupt();

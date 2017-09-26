@@ -32,39 +32,28 @@ import org.sat4j.specs.ISolver;
  */
 public class VarOrderHeap2 extends VarOrderHeap {
 
-	private static final long serialVersionUID =
-		1L;
+	private static final long serialVersionUID = 1L;
 	private int[] order;
 
 	public VarOrderHeap2(IPhaseSelectionStrategy strategy, int[] order) {
 		super(strategy);
-		this.order =
-			order;
+		this.order = order;
 	}
 
 	@Override
 	public void init() {
-		int nlength =
-			lits.nVars()
-				+ 1;
-		if ((activity == null)
-			|| (activity.length < nlength)) {
-			activity =
-				new double[nlength];
+		int nlength = lits.nVars() + 1;
+		if ((activity == null) || (activity.length < nlength)) {
+			activity = new double[nlength];
 		}
 		phaseStrategy.init(nlength);
-		activity[0] =
-			-1;
-		heap =
-			new Heap(activity);
+		activity[0] = -1;
+		heap = new Heap(activity);
 		heap.setBounds(nlength);
 		nlength--;
-		for (int i =
-			0; i < nlength; i++) {
-			final int x =
-				order[i];
-			activity[x] =
-				0.0;
+		for (int i = 0; i < nlength; i++) {
+			final int x = order[i];
+			activity[x] = 0.0;
 			if (lits.belongsToPool(x)) {
 				heap.insert(x);
 			}
@@ -76,8 +65,7 @@ public class VarOrderHeap2 extends VarOrderHeap {
 	}
 
 	public void setOrder(int[] order) {
-		this.order =
-			order;
+		this.order = order;
 	}
 
 }

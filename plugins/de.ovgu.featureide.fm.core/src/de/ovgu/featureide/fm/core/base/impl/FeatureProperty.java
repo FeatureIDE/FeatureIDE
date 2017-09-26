@@ -42,23 +42,15 @@ public class FeatureProperty implements IFeatureProperty {
 	protected FeatureStatus status;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
-		this.correspondingFeature =
-			correspondingFeature != null
-				? correspondingFeature
-				: oldProperty.correspondingFeature;
-		description =
-			oldProperty.description.toString();
-		status =
-			oldProperty.status;
+		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
+		description = oldProperty.description.toString();
+		status = oldProperty.status;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
-		this.correspondingFeature =
-			correspondingFeature;
-		description =
-			"";
-		status =
-			FeatureStatus.NORMAL;
+		this.correspondingFeature = correspondingFeature;
+		description = "";
+		status = FeatureStatus.NORMAL;
 	}
 
 	@Override
@@ -93,8 +85,7 @@ public class FeatureProperty implements IFeatureProperty {
 
 	@Override
 	public void setDescription(@Nonnull final CharSequence description) {
-		this.description =
-			description.toString();
+		this.description = description.toString();
 	}
 
 	@Override
@@ -102,14 +93,12 @@ public class FeatureProperty implements IFeatureProperty {
 
 	@Override
 	public void setFeatureStatus(FeatureStatus status) {
-		this.status =
-			status;
+		this.status = status;
 	}
 
 	@Override
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
-		status =
-			stat;
+		status = stat;
 		if (fire) {
 			correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}

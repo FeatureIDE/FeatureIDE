@@ -31,15 +31,13 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  */
 public class ContextMerger extends ADocumentationCommentMerger {
 
-	private static final long serialVersionUID =
-		2811545559986504025L;
+	private static final long serialVersionUID = 2811545559986504025L;
 
 	private static final class BlockTagFilter implements IFilter<BlockTag> {
 
 		@Override
 		public boolean isValid(BlockTag blockTag) {
-			return blockTag.isFeatureIndependent()
-				|| (blockTag.getPriority() >= 0);
+			return blockTag.isFeatureIndependent() || (blockTag.getPriority() >= 0);
 		}
 	}
 
@@ -49,12 +47,8 @@ public class ContextMerger extends ADocumentationCommentMerger {
 
 	@Override
 	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureSpecific()
-			&& (tag.getTagtype() != BlockTag.TAG_SEE)) {
-			tag.setDesc("<b>["
-				+ tag.getConstraint()
-				+ "]</b> "
-				+ tag.getDesc());
+		if (tag.isFeatureSpecific() && (tag.getTagtype() != BlockTag.TAG_SEE)) {
+			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
 		}
 		return tag;
 	}

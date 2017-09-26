@@ -31,8 +31,7 @@ public class FSTAsmetaLDomain extends FSTField {
 		super(name, type, modifiers);
 	}
 
-	public FSTAsmetaLDomain(String fieldName, String typeName, String modifiers,
-			String body, int beginLine, int endLine) {
+	public FSTAsmetaLDomain(String fieldName, String typeName, String modifiers, String body, int beginLine, int endLine) {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
 	}
 }

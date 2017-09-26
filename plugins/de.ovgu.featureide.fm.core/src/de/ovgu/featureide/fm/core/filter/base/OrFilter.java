@@ -32,8 +32,7 @@ import java.util.Collection;
  */
 public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
-	private static final long serialVersionUID =
-		1L;
+	private static final long serialVersionUID = 1L;
 
 	public OrFilter() {
 		super();

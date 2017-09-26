@@ -40,7 +40,6 @@ public class FSTModelForPP extends FSTModel {
 	}
 
 	public void setExtendedFst(FSTModel extendedFst) {
-		this.extendedFst =
-			extendedFst;
+		this.extendedFst = extendedFst;
 	}
 }

@@ -29,31 +29,24 @@ import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionController extends Refactoring {
 
-	private TextSelection textSelection =
-		null;
-	private IFile file =
-		null;
+	private TextSelection textSelection = null;
+	private IFile file = null;
 	private RefactoringType refactoringType;
 	private final RefactorSelectionProcessor processor;
-	protected List<Change> changes =
-		new LinkedList<Change>();
+	protected List<Change> changes = new LinkedList<Change>();
 
 	public RefactorSelectionController() {
-		processor =
-			new RefactorSelectionProcessor();
+		processor = new RefactorSelectionProcessor();
 	}
 
 	@Override
 	public String getName() {
-		return REFACTORING
-			+ refactoringType.getLabel();
+		return REFACTORING + refactoringType.getLabel();
 	}
 
 	@Override
-	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
-			throws CoreException, OperationCanceledException {
-		final RefactoringStatus status =
-			new RefactoringStatus();
+	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+		final RefactoringStatus status = new RefactoringStatus();
 
 		monitor.beginTask(CHECKING_PRECONDITIONS___, 2);
 
@@ -82,16 +75,13 @@ public class RefactorSelectionController extends Refactoring {
 	}
 
 	@Override
-	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
-			throws CoreException, OperationCanceledException {
-		final RefactoringStatus status =
-			new RefactoringStatus();
+	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+		final RefactoringStatus status = new RefactoringStatus();
 
 		monitor.beginTask(CHECKING_CHECKFINALCONDITIONS___, 2);
 
 		try {
-			changes =
-				processor.process(monitor);
+			changes = processor.process(monitor);
 		} catch (final IOException e) {
 
 			status.addFatalError(e.getMessage());
@@ -102,26 +92,20 @@ public class RefactorSelectionController extends Refactoring {
 	}
 
 	@Override
-	public Change createChange(IProgressMonitor pm) throws CoreException,
-			OperationCanceledException {
+	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		try {
 			pm.beginTask(CREATING_CHANGE___, 1);
 			//
-			return new CompositeChange(getName(),
-					changes.toArray(new Change[] {}));
+			return new CompositeChange(getName(), changes.toArray(new Change[] {}));
 		} finally {
 			pm.done();
 		}
 	}
 
-	public void setSelection(IFile file, TextSelection selection,
-			RefactoringType refactoringType) {
-		textSelection =
-			selection;
-		this.file =
-			file;
-		this.refactoringType =
-			refactoringType;
+	public void setSelection(IFile file, TextSelection selection, RefactoringType refactoringType) {
+		textSelection = selection;
+		this.file = file;
+		this.refactoringType = refactoringType;
 	}
 
 }

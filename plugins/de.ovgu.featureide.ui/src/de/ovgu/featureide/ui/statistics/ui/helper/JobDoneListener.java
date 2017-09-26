@@ -49,22 +49,15 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  */
 public class JobDoneListener implements IJobChangeListener {
 
-	protected static JobDoneListener instance =
-		new JobDoneListener();
-	private final List<IJob<?>> runningJobs =
-		new LinkedList<>();
-	protected List<TreeViewer> views =
-		new LinkedList<TreeViewer>();
+	protected static JobDoneListener instance = new JobDoneListener();
+	private final List<IJob<?>> runningJobs = new LinkedList<>();
+	protected List<TreeViewer> views = new LinkedList<TreeViewer>();
 
 	public void checkViews() {
 		synchronized (views) {
-			for (int i =
-				0; i < views.size();) {
-				final TreeViewer view =
-					views.get(i);
-				if ((view == null)
-					|| (view.getControl() == null)
-					|| view.getControl().isDisposed()) {
+			for (int i = 0; i < views.size();) {
+				final TreeViewer view = views.get(i);
+				if ((view == null) || (view.getControl() == null) || view.getControl().isDisposed()) {
 					views.remove(view);
 				} else {
 					i++;
@@ -97,40 +90,32 @@ public class JobDoneListener implements IJobChangeListener {
 	 */
 	@Override
 	public void done(final IJobChangeEvent event) {
-		if ((event.getResult() == Status.OK_STATUS)
-			|| (event.getResult() == Status.CANCEL_STATUS)) {
-			final UIJob refreshJob =
-				new UIJob(REFRESH_STATISTICS_VIEW) {
+		if ((event.getResult() == Status.OK_STATUS) || (event.getResult() == Status.CANCEL_STATUS)) {
+			final UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
 
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						final Job job =
-							event.getJob();
-						if (job instanceof LongRunningJob) {
-							final LongRunningJob<?> treeJob =
-								(LongRunningJob<?>) job;
-							final LongRunningMethod<?> method =
-								treeJob.getMethod();
-							final boolean expand =
-								(method instanceof StatisticTreeJob)
-									&& ((StatisticTreeJob) method).isExpand();
-							runningJobs.remove(treeJob);
-							final Parent calc =
-								((TreeJob) method).getCalculated();
-							calc.startCalculating(false);
-							checkViews();
-							synchronized (views) {
-								for (final TreeViewer view : views) {
-									view.refresh(calc);
-									if (expand) {
-										view.expandToLevel(calc, 1);
-									}
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					final Job job = event.getJob();
+					if (job instanceof LongRunningJob) {
+						final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
+						final LongRunningMethod<?> method = treeJob.getMethod();
+						final boolean expand = (method instanceof StatisticTreeJob) && ((StatisticTreeJob) method).isExpand();
+						runningJobs.remove(treeJob);
+						final Parent calc = ((TreeJob) method).getCalculated();
+						calc.startCalculating(false);
+						checkViews();
+						synchronized (views) {
+							for (final TreeViewer view : views) {
+								view.refresh(calc);
+								if (expand) {
+									view.expandToLevel(calc, 1);
 								}
 							}
 						}
-						return Status.OK_STATUS;
 					}
-				};
+					return Status.OK_STATUS;
+				}
+			};
 			refreshJob.setPriority(Job.INTERACTIVE);
 			refreshJob.schedule();
 		}
@@ -144,30 +129,26 @@ public class JobDoneListener implements IJobChangeListener {
 	 */
 	@Override
 	public void scheduled(final IJobChangeEvent event) {
-		final UIJob refreshJob =
-			new UIJob(REFRESH_STATISTICS_VIEW) {
+		final UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					final Job job =
-						event.getJob();
-					if (job instanceof LongRunningJob) {
-						final LongRunningJob<?> treeJob =
-							(LongRunningJob<?>) job;
-						runningJobs.add(treeJob);
-						final Parent calc =
-							((TreeJob) treeJob.getMethod()).getCalculated();
-						calc.startCalculating(true);
-						checkViews();
-						synchronized (views) {
-							for (final TreeViewer view : views) {
-								view.refresh(calc);
-							}
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				final Job job = event.getJob();
+				if (job instanceof LongRunningJob) {
+					final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
+					runningJobs.add(treeJob);
+					final Parent calc = ((TreeJob) treeJob.getMethod()).getCalculated();
+					calc.startCalculating(true);
+					checkViews();
+					synchronized (views) {
+						for (final TreeViewer view : views) {
+							view.refresh(calc);
 						}
 					}
-					return Status.OK_STATUS;
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 		refreshJob.setPriority(Job.INTERACTIVE);
 		refreshJob.schedule();
 	}

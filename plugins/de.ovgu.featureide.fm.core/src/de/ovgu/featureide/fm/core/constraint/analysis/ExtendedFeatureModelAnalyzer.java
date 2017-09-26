@@ -46,14 +46,10 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer {
 	public ExtendedFeatureModelAnalyzer(ExtendedFeatureModel fm) {
 		super(fm);
 
-		efm =
-			fm;
-		idGen =
-			new UniqueId();
-		map =
-			Translator.buildFeatureNameMap(efm, idGen);
-		deFactory =
-			new DeRestrictionFactory();
+		efm = fm;
+		idGen = new UniqueId();
+		map = Translator.buildFeatureNameMap(efm, idGen);
+		deFactory = new DeRestrictionFactory();
 	}
 
 	public boolean isValid_PBSolver() throws TimeoutException {
@@ -61,8 +57,7 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer {
 			setUpDeRestrictions();
 		}
 
-		final PBSolver solver =
-			new SAT4JPBSolver();
+		final PBSolver solver = new SAT4JPBSolver();
 		solver.addRestrictions(deFm);
 
 		if (!solver.isSatisfiable()) {
@@ -73,10 +68,8 @@ public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer {
 	}
 
 	private void setUpDeRestrictions() {
-		deFm =
-			Translator.translateFmTree(map, efm, deFactory);
+		deFm = Translator.translateFmTree(map, efm, deFactory);
 		deFm.addAll(Translator.translateFmConstraints(map, efm, deFactory));
-		deFm.addAll(Translator.translateEquations(map, efm,
-				efm.getIntegerAttributes(), efm.getAttributConstraints(), deFactory));
+		deFm.addAll(Translator.translateEquations(map, efm, efm.getIntegerAttributes(), efm.getAttributConstraints(), deFactory));
 	}
 }

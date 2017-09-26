@@ -42,19 +42,14 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  */
 public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProvider {
 
-	private static final String FACTORY_WORKSPACE_FILENAME =
-		".factoryWorkspace.";
-	private static final String DEFAULT_FACTORY_WORKSPACE_KEY =
-		"defaultFactoryWorkspace";
-	private static final String FM_CORE_NODE =
-		"de.ovgu.featureide.fm.core";
+	private static final String FACTORY_WORKSPACE_FILENAME = ".factoryWorkspace.";
+	private static final String DEFAULT_FACTORY_WORKSPACE_KEY = "defaultFactoryWorkspace";
+	private static final String FM_CORE_NODE = "de.ovgu.featureide.fm.core";
 
 	@Override
 	public FactoryWorkspace getFactoryWorkspace(String path) {
-		final IFile[] findFilesForLocationURI =
-			ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
-		if ((findFilesForLocationURI.length > 0)
-			&& (findFilesForLocationURI[0].getProject() != null)) {
+		final IFile[] findFilesForLocationURI = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
+		if ((findFilesForLocationURI.length > 0) && (findFilesForLocationURI[0].getProject() != null)) {
 			return super.getFactoryWorkspace(findFilesForLocationURI[0].getProject().toString());
 		}
 		return defaultWorkspace;
@@ -62,8 +57,7 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 	@Override
 	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
-		final IFile[] findFilesForLocationURI =
-			ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
+		final IFile[] findFilesForLocationURI = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(Paths.get(path).toUri());
 		if (findFilesForLocationURI.length > 0) {
 			super.addFactoryWorkspace(findFilesForLocationURI[0].getProject().toString(), workspace);
 		}
@@ -71,13 +65,10 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 	@Override
 	public void save() {
-		final IWorkspaceRoot root =
-			ResourcesPlugin.getWorkspace().getRoot();
-		final FactoryWorkspaceFormat format =
-			new FactoryWorkspaceFormat();
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final FactoryWorkspaceFormat format = new FactoryWorkspaceFormat();
 
-		final IEclipsePreferences preferences =
-			InstanceScope.INSTANCE.getNode(FM_CORE_NODE);
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(FM_CORE_NODE);
 		if (preferences != null) {
 			preferences.put(DEFAULT_FACTORY_WORKSPACE_KEY, format.getInstance().write(defaultWorkspace));
 			try {
@@ -86,9 +77,7 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 				FMCorePlugin.getDefault().logError(e);
 			}
 			for (final Entry<String, FactoryWorkspace> entry : projectMap.entrySet()) {
-				final IFile file =
-					root.getProject(entry.getKey()).getFile(FACTORY_WORKSPACE_FILENAME
-						+ format.getSuffix());
+				final IFile file = root.getProject(entry.getKey()).getFile(FACTORY_WORKSPACE_FILENAME + format.getSuffix());
 				SimpleFileHandler.save(Paths.get(file.getLocationURI()), entry.getValue(), format);
 			}
 		}
@@ -96,18 +85,14 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 	@Override
 	public boolean load() {
-		final IWorkspaceRoot root =
-			ResourcesPlugin.getWorkspace().getRoot();
-		final FactoryWorkspaceFormat format =
-			new FactoryWorkspaceFormat();
+		final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		final FactoryWorkspaceFormat format = new FactoryWorkspaceFormat();
 
-		final IEclipsePreferences preferences =
-			InstanceScope.INSTANCE.getNode(FM_CORE_NODE);
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(FM_CORE_NODE);
 		if (preferences == null) {
 			return false;
 		}
-		final String source =
-			preferences.get(DEFAULT_FACTORY_WORKSPACE_KEY, null);
+		final String source = preferences.get(DEFAULT_FACTORY_WORKSPACE_KEY, null);
 		if (source == null) {
 			return false;
 		}
@@ -115,11 +100,8 @@ public final class EclipseFactoryWorkspaceProvider extends AFactoryWorkspaceProv
 
 		for (final IProject project : root.getProjects()) {
 			if (project.isAccessible()) {
-				final IFile file =
-					project.getFile(FACTORY_WORKSPACE_FILENAME
-						+ format.getSuffix());
-				final FactoryWorkspace factoryWorkspace =
-					new FactoryWorkspace();
+				final IFile file = project.getFile(FACTORY_WORKSPACE_FILENAME + format.getSuffix());
+				final FactoryWorkspace factoryWorkspace = new FactoryWorkspace();
 				if (!SimpleFileHandler.load(Paths.get(file.getLocationURI()), factoryWorkspace, format.getInstance()).containsError()) {
 					projectMap.put(project.toString(), factoryWorkspace);
 				}

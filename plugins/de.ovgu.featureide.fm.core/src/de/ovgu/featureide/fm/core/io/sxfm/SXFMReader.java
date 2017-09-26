@@ -85,55 +85,41 @@ public class SXFMReader {
 
 	private IFeatureModel featureModel;
 
-	private final ProblemList warnings =
-		new ProblemList();
+	private final ProblemList warnings = new ProblemList();
 
 	private DocumentBuilder init() {
 		warnings.clear();
 		// Parse the XML-File to a DOM-Document
-		final boolean ignoreWhitespace =
-			false;
-		final boolean ignoreComments =
-			true;
-		final boolean putCDATAIntoText =
-			true;
-		final boolean createEntityRefs =
-			false;
-		final DocumentBuilderFactory dbf =
-			DocumentBuilderFactory.newInstance();
+		final boolean ignoreWhitespace = false;
+		final boolean ignoreComments = true;
+		final boolean putCDATAIntoText = true;
+		final boolean createEntityRefs = false;
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(ignoreComments);
 		dbf.setIgnoringElementContentWhitespace(ignoreWhitespace);
 		dbf.setCoalescing(putCDATAIntoText);
 		dbf.setExpandEntityReferences(!createEntityRefs);
-		DocumentBuilder db =
-			null;
+		DocumentBuilder db = null;
 		try {
-			db =
-				dbf.newDocumentBuilder();
+			db = dbf.newDocumentBuilder();
 		} catch (final ParserConfigurationException pce) {
 			System.err.println(pce);
 			Logger.logError(pce);
 		}
 		featureModel.reset();
-		line =
-			0;
-		idTable =
-			new Hashtable<String, IFeature>();
+		line = 0;
+		idTable = new Hashtable<String, IFeature>();
 		return db;
 	}
 
 	protected void parseInputStream(IFeatureModel featureModel, String source) throws UnsupportedModelException {
-		this.featureModel =
-			featureModel;
-		final DocumentBuilder db =
-			init();
+		this.featureModel = featureModel;
+		final DocumentBuilder db = init();
 
-		Document doc =
-			null;
+		Document doc = null;
 		try {
-			doc =
-				db.parse(new InputSource(new StringReader(source)));
+			doc = db.parse(new InputSource(new StringReader(source)));
 		} catch (final SAXException se) {
 			Logger.logError(se);
 		} catch (final IOException ioe) {
@@ -152,9 +138,7 @@ public class SXFMReader {
 	 */
 	private void buildFModelRec(Node n) throws UnsupportedModelException {
 		buildFModelStep(n);
-		for (Node child =
-			n.getFirstChild(); child != null; child =
-				child.getNextSibling()) {
+		for (Node child = n.getFirstChild(); child != null; child = child.getNextSibling()) {
 			buildFModelRec(child);
 		}
 	}
@@ -169,8 +153,7 @@ public class SXFMReader {
 		if (n.getNodeType() != Node.ELEMENT_NODE) {
 			return;
 		}
-		final String tag =
-			n.getNodeName();
+		final String tag = n.getNodeName();
 		if ("feature_tree".equals(tag)) {
 			handleFeatureTree(n);
 		} else if ("feature_model".equals(tag)) {
@@ -181,8 +164,7 @@ public class SXFMReader {
 			handleConstraints(n);
 		} else if (META.equals(tag)) {
 			return;
-		} else if (DATA.equals(tag)
-			&& META.equals(n.getParentNode().getNodeName())) {
+		} else if (DATA.equals(tag) && META.equals(n.getParentNode().getNodeName())) {
 			return;
 		} else {
 			throw new UnsupportedModelException(UNKNOWN_XML_TAG, line);
@@ -196,44 +178,29 @@ public class SXFMReader {
 	 * @throws UnsupportedModelException
 	 */
 	private void handleFeatureTree(Node n) throws UnsupportedModelException {
-		final NodeList children =
-			n.getChildNodes();
-		final StringBuilder buffer =
-			new StringBuilder();
+		final NodeList children = n.getChildNodes();
+		final StringBuilder buffer = new StringBuilder();
 		Node node;
-		for (int i =
-			0; i < children.getLength(); i++) {
-			node =
-				children.item(i);
+		for (int i = 0; i < children.getLength(); i++) {
+			node = children.item(i);
 			if (node.getNodeType() == Node.TEXT_NODE) {
 				buffer.append(node.getNodeValue());
 			}
 		}
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(buffer.toString()));
+		final BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));
 		buildFeatureTree(reader);
 		removeUnnecessaryAbstractFeatures(featureModel.getStructure().getRoot().getFeature());
 	}
 
 	private String removeWhitespaces(String str) {
-		str =
-			str.trim();
+		str = str.trim();
 		if (str.contains(" ")) {
-			final String temp =
-				str.substring(0, str.indexOf(' ')
-					+ 1);
-			str =
-				str.substring(str.indexOf(' ')
-					+ 1);
+			final String temp = str.substring(0, str.indexOf(' ') + 1);
+			str = str.substring(str.indexOf(' ') + 1);
 			while (str.contains(" ")) {
-				str =
-					str.substring(0, str.indexOf(' '))
-						+ str.substring(str.indexOf(' ')
-							+ 1, str.length());
+				str = str.substring(0, str.indexOf(' ')) + str.substring(str.indexOf(' ') + 1, str.length());
 			}
-			str =
-				temp
-					+ str;
+			str = temp + str;
 		}
 		return str;
 	}
@@ -247,21 +214,15 @@ public class SXFMReader {
 	 */
 	private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
 		try {
-			FeatureIndent lastFeat =
-				new FeatureIndent(featureModel, -1);
+			FeatureIndent lastFeat = new FeatureIndent(featureModel, -1);
 			// List of Features with arbitrary cardinalities
-			final LinkedList<FeatCardinality> arbCardGroupFeats =
-				new LinkedList<FeatCardinality>();
-			String lineText =
-				reader.readLine();
+			final LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
+			String lineText = reader.readLine();
 			line++;
 			FeatureIndent feat;
-			String featId =
-				"";
-			while ((lineText =
-				reader.readLine()) != null) {
-				int countIndent =
-					0;
+			String featId = "";
+			while ((lineText = reader.readLine()) != null) {
+				int countIndent = 0;
 
 				if (lineText.trim().isEmpty()) {
 					line++;
@@ -269,12 +230,9 @@ public class SXFMReader {
 				}
 				while (lineText.startsWith("\t")) {
 					countIndent++;
-					lineText =
-						lineText.substring(1);
+					lineText = lineText.substring(1);
 				}
-				int relativeIndent =
-					countIndent
-						- lastFeat.getIndentation();
+				int relativeIndent = countIndent - lastFeat.getIndentation();
 				while (relativeIndent < 1) {
 					// if (lastFeat.isRoot()) throw new UnsupportedModelException(
 					// INDENTATION_ERROR_COMMA__FEATURE_HAS_NO_PARENT, line);
@@ -282,107 +240,71 @@ public class SXFMReader {
 					// relativeIndent = countIndent - lastFeat.getIndentation();
 
 					if (!lastFeat.getStructure().isRoot()) {
-						lastFeat =
-							(FeatureIndent) lastFeat.getStructure().getParent().getFeature();
-						relativeIndent =
-							countIndent
-								- lastFeat.getIndentation();
+						lastFeat = (FeatureIndent) lastFeat.getStructure().getParent().getFeature();
+						relativeIndent = countIndent - lastFeat.getIndentation();
 					}
 				}
 				// Remove special characters and whitespaces from names
-				lineText =
-					removeWhitespaces(lineText);
+				lineText = removeWhitespaces(lineText);
 
-				final char[] lineTextChars =
-					lineText.toCharArray();
-				for (int i =
-					0; i < lineTextChars.length; i++) {
-					final Character c =
-						lineTextChars[i];
+				final char[] lineTextChars = lineText.toCharArray();
+				for (int i = 0; i < lineTextChars.length; i++) {
+					final Character c = lineTextChars[i];
 
-					if (!(Character.isLetterOrDigit(c)
-						|| c.equals(':')
-						|| c.equals('[')
-						|| c.equals(']')
-						|| c.equals(',')
-						|| c.equals('*')
-						|| c.equals('(')
+					if (!(Character.isLetterOrDigit(c) || c.equals(':') || c.equals('[') || c.equals(']') || c.equals(',') || c.equals('*') || c.equals('(')
 						|| c.equals(')'))) {
-						lineTextChars[i] =
-							'_';
+						lineTextChars[i] = '_';
 					}
 				}
 
-				lineText =
-					new String(lineTextChars);
+				lineText = new String(lineTextChars);
 
 				if (lineText.startsWith(":r")) {
-					feat =
-						new FeatureIndent(featureModel, 0);
+					feat = new FeatureIndent(featureModel, 0);
 					feat.getStructure().setMandatory(true);
-					featId =
-						setNameGetID(feat, lineText);
+					featId = setNameGetID(feat, lineText);
 					// if (feat.getName().trim().toLowerCase().equals("root"))
 					// feat.setName("root_");
 					featureModel.getStructure().setRoot(feat.getStructure());
 					feat.getStructure().changeToAnd();
-					countIndent =
-						0;
+					countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
-					feat =
-						new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(featureModel, countIndent);
 					feat.getStructure().setMandatory(true);
-					featId =
-						setNameGetID(feat, lineText);
+					featId = setNameGetID(feat, lineText);
 					feat.getStructure().setParent(lastFeat.getStructure());
 					lastFeat.getStructure().addChild(feat.getStructure());
 					feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":o")) {
-					feat =
-						new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(featureModel, countIndent);
 					feat.getStructure().setMandatory(false);
-					featId =
-						setNameGetID(feat, lineText);
+					featId = setNameGetID(feat, lineText);
 					feat.getStructure().setParent(lastFeat.getStructure());
 					lastFeat.getStructure().addChild(feat.getStructure());
 					feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":g")) {
 					// create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
-					feat =
-						new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(featureModel, countIndent);
 					feat.getStructure().setMandatory(true);
 					feat.getStructure().setAbstract(true);
 					// try to generate a name that hopefully does not exist in the model
-					featId =
-						lastFeat.getName()
-							+ EMPTY___
-							+ (lastFeat.getStructure().getChildrenCount()
-								+ 1);
+					featId = lastFeat.getName() + EMPTY___ + (lastFeat.getStructure().getChildrenCount() + 1);
 					feat.setName(featId);
 					feat.getStructure().setParent(lastFeat.getStructure());
 					lastFeat.getStructure().addChild(feat.getStructure());
-					lastFeat =
-						feat;
+					lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
 						lastFeat.getStructure().changeToAlternative();
 					} else if (lineText.contains("[1,*]")) {
 						lastFeat.getStructure().changeToOr();
-					} else if ((lineText.contains("["))
-						&& (lineText.contains("]"))) {
-						final int index =
-							lineText.indexOf('[');
-						final int start =
-							Character.getNumericValue(lineText.charAt(index
-								+ 1));
-						final int end =
-							Character.getNumericValue(lineText.charAt(index
-								+ 3));
-						final FeatCardinality featCard =
-							new FeatCardinality(lastFeat, start, end);
+					} else if ((lineText.contains("[")) && (lineText.contains("]"))) {
+						final int index = lineText.indexOf('[');
+						final int start = Character.getNumericValue(lineText.charAt(index + 1));
+						final int end = Character.getNumericValue(lineText.charAt(index + 3));
+						final FeatCardinality featCard = new FeatCardinality(lastFeat, start, end);
 						arbCardGroupFeats.add(featCard);
 					} else {
-						throw new UnsupportedModelException(COULDNT
-							+ DETERMINE_GROUP_CARDINALITY, line);
+						throw new UnsupportedModelException(COULDNT + DETERMINE_GROUP_CARDINALITY, line);
 					}
 					// lastFeat = feat;
 					// featId = featId + "_ ";
@@ -390,47 +312,34 @@ public class SXFMReader {
 					addFeatureToModel(feat);
 					continue;
 				} else if (lineText.startsWith(":")) {
-					feat =
-						new FeatureIndent(featureModel, countIndent);
+					feat = new FeatureIndent(featureModel, countIndent);
 					feat.getStructure().setMandatory(true);
 					String name;
 					if (lineText.contains("(")) {
-						name =
-							lineText.substring(2, lineText.indexOf('('));
-						featId =
-							lineText.substring(lineText.indexOf('(')
-								+ 1, lineText.indexOf(')'));
+						name = lineText.substring(2, lineText.indexOf('('));
+						featId = lineText.substring(lineText.indexOf('(') + 1, lineText.indexOf(')'));
 					} else {
-						name =
-							lineText.substring(2, lineText.length()); // + line;
-						featId =
-							name;
+						name = lineText.substring(2, lineText.length()); // + line;
+						featId = name;
 					}
 					if (Character.isDigit(name.charAt(0))) {
-						name =
-							"a"
-								+ name;
+						name = "a" + name;
 					}
 					feat.setName(name);
 					feat.getStructure().setParent(lastFeat.getStructure());
 					lastFeat.getStructure().addChild(feat.getStructure());
 					feat.getStructure().changeToAnd();
 				} else {
-					throw new UnsupportedModelException(COULDNT_MATCH_WITH
-						+ "known Types: :r, :m, :o, :g, :", line);
+					throw new UnsupportedModelException(COULDNT_MATCH_WITH + "known Types: :r, :m, :o, :g, :", line);
 				}
 				addFeatureToModel(feat);
 
 				if (idTable.containsKey(featId)) {
-					throw new UnsupportedModelException("Feature \""
-						+ featId
-						+ "\" occured"
-						+ SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
+					throw new UnsupportedModelException("Feature \"" + featId + "\" occured" + SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
 				}
 				idTable.put(featId, feat);
 
-				lastFeat =
-					feat;
+				lastFeat = feat;
 				line++;
 			}
 
@@ -442,8 +351,7 @@ public class SXFMReader {
 
 	private void removeUnnecessaryAbstractFeatures(IFeature feature) {
 		if (feature.getStructure().getChildrenCount() == 1) {
-			final IFeatureStructure child =
-				feature.getStructure().getFirstChild();
+			final IFeatureStructure child = feature.getStructure().getFirstChild();
 			if (child.isAbstract()) {
 				for (final IFeatureStructure grantChild : feature.getStructure().getFirstChild().getChildren()) {
 					grantChild.setParent(feature.getStructure());
@@ -472,14 +380,10 @@ public class SXFMReader {
 	 * @param feat
 	 */
 	private void addFeatureToModel(IFeature feat) {
-		final String orig_name =
-			feat.getName();
-		int i =
-			1;
+		final String orig_name = feat.getName();
+		int i = 1;
 		while (!featureModel.addFeature(feat)) {
-			feat.setName(orig_name
-				+ EMPTY___
-				+ i++);
+			feat.setName(orig_name + EMPTY___ + i++);
 		}
 
 	}
@@ -487,21 +391,14 @@ public class SXFMReader {
 	private String setNameGetID(IFeature feat, String lineText) {
 		String featId, name;
 		if (lineText.contains("(")) {
-			name =
-				lineText.substring(3, lineText.indexOf('('));
-			featId =
-				lineText.substring(lineText.indexOf('(')
-					+ 1, lineText.indexOf(')'));
+			name = lineText.substring(3, lineText.indexOf('('));
+			featId = lineText.substring(lineText.indexOf('(') + 1, lineText.indexOf(')'));
 		} else {
-			name =
-				lineText.substring(3, lineText.length()); // + line;
-			featId =
-				name;
+			name = lineText.substring(3, lineText.length()); // + line;
+			featId = name;
 		}
 		if (Character.isDigit(name.charAt(0))) {
-			name =
-				"a"
-					+ name;
+			name = "a" + name;
 		}
 		feat.setName(name);
 		return featId;
@@ -516,35 +413,21 @@ public class SXFMReader {
 	private void handleArbitrayCardinality(LinkedList<FeatCardinality> featList) throws UnsupportedModelException {
 		org.prop4j.Node node;
 		for (final FeatCardinality featCard : featList) {
-			final IFeature feat =
-				featCard.feat;
-			final List<IFeatureStructure> children =
-				feat.getStructure().getChildren();
+			final IFeature feat = featCard.feat;
+			final List<IFeatureStructure> children = feat.getStructure().getChildren();
 			for (final IFeatureStructure child : children) {
 				child.setMandatory(false);
 			}
-			final int start =
-				featCard.start;
-			final int end =
-				featCard.end;
-			if ((start < 0)
-				|| (start > end)
-				|| (end > children.size())) {
-				throw new UnsupportedModelException(GROUP_CARDINALITY
-					+ INVALID, line);
+			final int start = featCard.start;
+			final int end = featCard.end;
+			if ((start < 0) || (start > end) || (end > children.size())) {
+				throw new UnsupportedModelException(GROUP_CARDINALITY + INVALID, line);
 			}
-			final int f =
-				children.size();
-			node =
-				buildMinConstr(FeatureUtils.convertToFeatureList(children), (f
-					- start)
-					+ 1, feat.getName());
+			final int f = children.size();
+			node = buildMinConstr(FeatureUtils.convertToFeatureList(children), (f - start) + 1, feat.getName());
 			featureModel.addConstraint(new Constraint(featureModel, node));
-			if ((start > 0)
-				&& (end < f)) {
-				node =
-					buildMaxConstr(FeatureUtils.convertToFeatureList(children), end
-						+ 1);
+			if ((start > 0) && (end < f)) {
+				node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
 				featureModel.addConstraint(new Constraint(featureModel, node));
 			}
 		}
@@ -559,55 +442,34 @@ public class SXFMReader {
 	 * @return
 	 */
 	private org.prop4j.Node buildMinConstr(List<IFeature> list, int length, String parentName) {
-		final LinkedList<org.prop4j.Node> result =
-			new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult =
-			new LinkedList<org.prop4j.Node>();
-		final int listLength =
-			list.size();
-		final int[] indexes =
-			new int[length];
-		final int[] resIndexes =
-			new int[length];
-		for (int i =
-			0; i < length; i++) {
-			indexes[i] =
-				i;
-			resIndexes[i] =
-				i
-					+ (listLength
-						- length);
+		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final int listLength = list.size();
+		final int[] indexes = new int[length];
+		final int[] resIndexes = new int[length];
+		for (int i = 0; i < length; i++) {
+			indexes[i] = i;
+			resIndexes[i] = i + (listLength - length);
 		}
 		while (!Arrays.equals(indexes, resIndexes)) {
 			partResult.add(new Literal(parentName, false));
-			for (int i =
-				0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				partResult.add(new Literal(list.get(indexes[i]).getName()));
 			}
 			result.add(new Or(partResult));
-			for (int i =
-				length
-					- 1; i >= 0; i--) {
+			for (int i = length - 1; i >= 0; i--) {
 				if (indexes[i] >= resIndexes[i]) {
 					continue;
 				}
-				indexes[i] =
-					indexes[i]
-						+ 1;
-				for (int j =
-					i
-						+ 1; j < length; j++) {
-					indexes[j] =
-						indexes[j
-							- 1]
-							+ 1;
+				indexes[i] = indexes[i] + 1;
+				for (int j = i + 1; j < length; j++) {
+					indexes[j] = indexes[j - 1] + 1;
 				}
 				break;
 			}
 		}
 		partResult.add(new Literal(parentName, false));
-		for (int i =
-			0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			partResult.add(new Literal(list.get(indexes[i]).getName()));
 		}
 		result.add(new Or(partResult));
@@ -622,53 +484,32 @@ public class SXFMReader {
 	 * @return
 	 */
 	private org.prop4j.Node buildMaxConstr(List<IFeature> list, int length) {
-		final LinkedList<org.prop4j.Node> result =
-			new LinkedList<org.prop4j.Node>();
-		final LinkedList<org.prop4j.Node> partResult =
-			new LinkedList<org.prop4j.Node>();
-		final int listLength =
-			list.size();
-		final int[] indexes =
-			new int[length];
-		final int[] resIndexes =
-			new int[length];
-		for (int i =
-			0; i < length; i++) {
-			indexes[i] =
-				i;
-			resIndexes[i] =
-				i
-					+ (listLength
-						- length);
+		final LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
+		final LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
+		final int listLength = list.size();
+		final int[] indexes = new int[length];
+		final int[] resIndexes = new int[length];
+		for (int i = 0; i < length; i++) {
+			indexes[i] = i;
+			resIndexes[i] = i + (listLength - length);
 		}
 		while (!Arrays.equals(indexes, resIndexes)) {
-			for (int i =
-				0; i < length; i++) {
+			for (int i = 0; i < length; i++) {
 				partResult.add(new Literal(list.get(indexes[i]).getName(), false));
 			}
 			result.add(new Or(partResult));
-			for (int i =
-				length
-					- 1; i >= 0; i--) {
+			for (int i = length - 1; i >= 0; i--) {
 				if (indexes[i] >= resIndexes[i]) {
 					continue;
 				}
-				indexes[i] =
-					indexes[i]
-						+ 1;
-				for (int j =
-					i
-						+ 1; j < length; j++) {
-					indexes[j] =
-						indexes[j
-							- 1]
-							+ 1;
+				indexes[i] = indexes[i] + 1;
+				for (int j = i + 1; j < length; j++) {
+					indexes[j] = indexes[j - 1] + 1;
 				}
 				break;
 			}
 		}
-		for (int i =
-			0; i < length; i++) {
+		for (int i = 0; i < length; i++) {
 			partResult.add(new Literal(list.get(indexes[i]).getName(), false));
 		}
 		result.add(new Or(partResult));
@@ -682,32 +523,25 @@ public class SXFMReader {
 	 * @throws UnsupportedModelException
 	 */
 	private void handleConstraints(Node n) throws UnsupportedModelException {
-		final NodeList children =
-			n.getChildNodes();
-		final StringBuilder buffer =
-			new StringBuilder();
+		final NodeList children = n.getChildNodes();
+		final StringBuilder buffer = new StringBuilder();
 		String lineText;
 		Node node;
-		for (int i =
-			0; i < children.getLength(); i++) {
-			node =
-				children.item(i);
+		for (int i = 0; i < children.getLength(); i++) {
+			node = children.item(i);
 			if (node.getNodeType() == Node.TEXT_NODE) {
 				buffer.append(node.getNodeValue());
 			}
 		}
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(buffer.toString()));
+		final BufferedReader reader = new BufferedReader(new StringReader(buffer.toString()));
 		try {
-			lineText =
-				reader.readLine();
+			lineText = reader.readLine();
 			line++;
 			while (lineText != null) {
 				if (!lineText.trim().equals("")) {
 					handleSingleConstraint(lineText);
 				}
-				lineText =
-					reader.readLine();
+				lineText = reader.readLine();
 				line++;
 			}
 		} catch (final IOException e) {
@@ -722,23 +556,17 @@ public class SXFMReader {
 	 * @throws UnsupportedModelException
 	 */
 	private void handleSingleConstraint(String lineText) throws UnsupportedModelException {
-		String newLine =
-			lineText.replace("(", " ( ");
-		newLine =
-			newLine.replace(")", " ) ");
-		newLine =
-			newLine.replace("~", " ~ ");
-		final Scanner scan =
-			new Scanner(newLine);
+		String newLine = lineText.replace("(", " ( ");
+		newLine = newLine.replace(")", " ) ");
+		newLine = newLine.replace("~", " ~ ");
+		final Scanner scan = new Scanner(newLine);
 		scan.skip(".*:");
-		final LinkedList<String> elements =
-			new LinkedList<String>();
+		final LinkedList<String> elements = new LinkedList<String>();
 		while (scan.hasNext()) {
 			elements.add(scan.next());
 		}
 		scan.close();
-		final org.prop4j.Node propNode =
-			buildPropNode(elements);
+		final org.prop4j.Node propNode = buildPropNode(elements);
 		featureModel.addConstraint(new Constraint(featureModel, propNode));
 	}
 
@@ -750,63 +578,47 @@ public class SXFMReader {
 	 * @throws UnsupportedModelException
 	 */
 	private org.prop4j.Node buildPropNode(LinkedList<String> list) throws UnsupportedModelException {
-		final LinkedList<String> left =
-			new LinkedList<String>();
+		final LinkedList<String> left = new LinkedList<String>();
 		org.prop4j.Node leftResult, rightResult;
-		int bracketCount =
-			0;
+		int bracketCount = 0;
 		String element;
 		while (!list.isEmpty()) {
-			element =
-				list.removeFirst();
+			element = list.removeFirst();
 			if (element.equals("(")) {
 				bracketCount++;
 			}
 			if (element.equals(")")) {
 				bracketCount--;
 			}
-			if ((element.equals("~"))
-				&& (list.getFirst().equals("("))
-				&& (list.getLast().equals(")"))) {
+			if ((element.equals("~")) && (list.getFirst().equals("(")) && (list.getLast().equals(")"))) {
 				list.removeFirst();
 				list.removeLast();
 				return new Not(buildPropNode(list));
 			}
 			if (element.equals("AND")) {
-				element =
-					"and";
+				element = "and";
 			}
 			if (element.equals("OR")) {
-				element =
-					"or";
+				element = "or";
 			}
 			if (element.equals("IMP")) {
-				element =
-					"imp";
+				element = "imp";
 			}
 			if (element.equals("BIIMP")) {
-				element =
-					"biimp";
+				element = "biimp";
 			}
-			if ((element.equals("and"))
-				|| (element.equals("or"))
-				|| (element.equals("imp"))
-				|| (element.equals("biimp"))) {
+			if ((element.equals("and")) || (element.equals("or")) || (element.equals("imp")) || (element.equals("biimp"))) {
 				if (bracketCount == 0) {
-					if ((left.getFirst().equals("("))
-						&& (left.getLast().equals(")"))) {
+					if ((left.getFirst().equals("(")) && (left.getLast().equals(")"))) {
 						left.removeFirst();
 						left.removeLast();
 					}
-					leftResult =
-						buildPropNode(left);
-					if ((list.getFirst().equals("("))
-						&& (list.getLast().equals(")"))) {
+					leftResult = buildPropNode(left);
+					if ((list.getFirst().equals("(")) && (list.getLast().equals(")"))) {
 						list.removeFirst();
 						list.removeLast();
 					}
-					rightResult =
-						buildPropNode(list);
+					rightResult = buildPropNode(list);
 					if (element.equals("and")) {
 						return new And(leftResult, rightResult);
 					}
@@ -831,22 +643,16 @@ public class SXFMReader {
 		if (list.isEmpty()) {
 			throw new UnsupportedModelException(MISSING_ELEMENT, line);
 		}
-		element =
-			list.removeFirst();
-		if (("(".equals(element))
-			&& (!list.isEmpty())) {
-			element =
-				list.removeFirst();
+		element = list.removeFirst();
+		if (("(".equals(element)) && (!list.isEmpty())) {
+			element = list.removeFirst();
 		}
 		if ("~".equals(element)) {
 			return new Not(buildPropNode(list));
 		} else {
-			final IFeature feat =
-				idTable.get(element);
+			final IFeature feat = idTable.get(element);
 			if (feat == null) {
-				throw new UnsupportedModelException(THE_FEATURE_
-					+ element
-					+ "' does not occur in the grammar!", 0);
+				throw new UnsupportedModelException(THE_FEATURE_ + element + "' does not occur in the grammar!", 0);
 			}
 			return new Literal(feat.getName());
 		}
@@ -858,8 +664,7 @@ public class SXFMReader {
 
 		public FeatureIndent(IFeatureModel featureModel, int indent) {
 			super(featureModel, "");
-			indentation =
-				indent;
+			indentation = indent;
 		}
 
 		public int getIndentation() {
@@ -875,12 +680,9 @@ public class SXFMReader {
 		int end;
 
 		FeatCardinality(IFeature feat, int start, int end) {
-			this.feat =
-				feat;
-			this.start =
-				start;
-			this.end =
-				end;
+			this.feat = feat;
+			this.start = start;
+			this.end = end;
 		}
 
 	}

@@ -35,24 +35,16 @@ public class ConstraintContentAdapter extends TextContentAdapter {
 
 	@Override
 	public void insertControlContents(Control control, String text, int cursorPosition) {
-		final Point selection =
-			((Text) control).getSelection();
-		int posMarker =
-			selection.y
-				- 1;
+		final Point selection = ((Text) control).getSelection();
+		int posMarker = selection.y - 1;
 		if (cursorPosition != 0) {
-			final String constraintText =
-				((Text) control).getText();
+			final String constraintText = ((Text) control).getText();
 			while ((posMarker >= 0)
-				&& ((constraintText.charAt(posMarker) != ' ')
-					&& (constraintText.charAt(posMarker) != ')')
-					&& (constraintText.charAt(posMarker) != '('))) {
+				&& ((constraintText.charAt(posMarker) != ' ') && (constraintText.charAt(posMarker) != ')') && (constraintText.charAt(posMarker) != '('))) {
 				posMarker--;
 			}
 		}
-		selection.x =
-			posMarker
-				+ 1;
+		selection.x = posMarker + 1;
 
 		((Text) control).setSelection(selection);
 		((Text) control).insert(text);
@@ -60,10 +52,7 @@ public class ConstraintContentAdapter extends TextContentAdapter {
 		// Insert will leave the cursor at the end of the inserted text. If this
 		// is not what we wanted, reset the selection.
 		if (cursorPosition < text.length()) {
-			((Text) control).setSelection(selection.x
-				+ cursorPosition,
-					selection.x
-						+ cursorPosition);
+			((Text) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
 		}
 	}
 }

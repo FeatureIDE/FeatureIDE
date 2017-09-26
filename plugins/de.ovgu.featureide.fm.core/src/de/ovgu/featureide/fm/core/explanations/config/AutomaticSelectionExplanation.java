@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
@@ -34,8 +35,8 @@ public class AutomaticSelectionExplanation extends ConfigurationExplanation {
 	 *
 	 * @param subject the subject to be explained
 	 */
-	public AutomaticSelectionExplanation(SelectableFeature subject) {
-		super(subject);
+	public AutomaticSelectionExplanation(SelectableFeature subject, Configuration config) {
+		super(subject, config);
 	}
 
 	@Override

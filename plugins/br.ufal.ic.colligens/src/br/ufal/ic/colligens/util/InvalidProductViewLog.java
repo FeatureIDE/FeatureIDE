@@ -17,34 +17,20 @@ import br.ufal.ic.colligens.activator.Colligens;
 
 public class InvalidProductViewLog {
 
-	public static final String MARKER_TYPE =
-		Colligens.PLUGIN_ID
-			+ ".invalidproduct";
+	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".invalidproduct";
 
 	private String productName;
 	private String relativePath;
 
 	public InvalidProductViewLog(String path) {
-		final String pattern =
-			Pattern.quote(System.getProperty("file.separator"));
-		final String[] relativePath =
-			path.split(pattern);
-		this.relativePath =
-			relativePath[relativePath.length
-				- 3]
-				+ File.separator
-				+ relativePath[relativePath.length
-					- 2]
-				+ File.separator
-				+ relativePath[relativePath.length
-					- 1];
-		productName =
-			relativePath[relativePath.length
-				- 1];
+		final String pattern = Pattern.quote(System.getProperty("file.separator"));
+		final String[] relativePath = path.split(pattern);
+		this.relativePath = relativePath[relativePath.length - 3] + File.separator + relativePath[relativePath.length - 2] + File.separator
+			+ relativePath[relativePath.length - 1];
+		productName = relativePath[relativePath.length - 1];
 
 		try {
-			final IMarker marker =
-				getFolder().createMarker(MARKER_TYPE);
+			final IMarker marker = getFolder().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, INVALID_PRODUCT_VARIANT);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LOCATION, this.relativePath);
@@ -54,10 +40,8 @@ public class InvalidProductViewLog {
 	}
 
 	public IFolder getFolder() {
-		final IWorkspace workspace =
-			ResourcesPlugin.getWorkspace();
-		final IPath location =
-			Path.fromOSString(relativePath);
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IPath location = Path.fromOSString(relativePath);
 		return workspace.getRoot().getFolder(location);
 	}
 
@@ -66,8 +50,7 @@ public class InvalidProductViewLog {
 	}
 
 	public void setProductName(String productName) {
-		this.productName =
-			productName;
+		this.productName = productName;
 	}
 
 	public String getRelativePath() {
@@ -75,8 +58,7 @@ public class InvalidProductViewLog {
 	}
 
 	public void setRelativePath(String relativePath) {
-		this.relativePath =
-			relativePath;
+		this.relativePath = relativePath;
 	}
 
 }

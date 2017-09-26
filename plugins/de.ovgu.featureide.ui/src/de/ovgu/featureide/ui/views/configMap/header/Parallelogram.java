@@ -39,10 +39,8 @@ public class Parallelogram {
 	}
 
 	public Parallelogram(float width, float height, float skew) {
-		this.width =
-			width;
-		this.height =
-			height;
+		this.width = width;
+		this.height = height;
 	}
 
 	public float getX() {
@@ -54,10 +52,8 @@ public class Parallelogram {
 	}
 
 	public void setLocation(float x, float y) {
-		this.x =
-			x;
-		this.y =
-			y;
+		this.x = x;
+		this.y = y;
 	}
 
 	public float getWidth() {
@@ -65,8 +61,7 @@ public class Parallelogram {
 	}
 
 	public void setWidth(float width) {
-		this.width =
-			width;
+		this.width = width;
 	}
 
 	public float getHeight() {
@@ -74,8 +69,7 @@ public class Parallelogram {
 	}
 
 	public void setHeight(float height) {
-		this.height =
-			height;
+		this.height = height;
 	}
 
 	public float getSkew() {
@@ -83,43 +77,25 @@ public class Parallelogram {
 	}
 
 	public void setSkew(float skew) {
-		this.skew =
-			skew;
+		this.skew = skew;
 	}
 
 	public boolean containsPoint(float px, float py) {
-		final float totalWidth =
-			width
-				+ skew;
+		final float totalWidth = width + skew;
 		// check if point is in bounding rectangular
-		final boolean inXAxis =
-			(x <= px)
-				&& (px <= (x
-					+ totalWidth));
-		final boolean inYAxis =
-			(y <= py)
-				&& (py <= (y
-					+ height));
+		final boolean inXAxis = (x <= px) && (px <= (x + totalWidth));
+		final boolean inYAxis = (y <= py) && (py <= (y + height));
 
-		if (inXAxis
-			&& inYAxis) {
+		if (inXAxis && inYAxis) {
 			// skew = 0 <=> parallelogram is rectangle
 			if (skew == 0) {
 				return true;
 			}
 
 			// check if the point is not in one of the triangles at the left and right of the parallelogram
-			final float gradient =
-				height
-					/ skew;
-			final float dx =
-				px
-					- x;
-			return (py <= (gradient
-				* dx))
-				&& ((gradient
-					* (dx
-						- width)) <= py);
+			final float gradient = height / skew;
+			final float dx = px - x;
+			return (py <= (gradient * dx)) && ((gradient * (dx - width)) <= py);
 		}
 
 		return false;

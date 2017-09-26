@@ -43,37 +43,29 @@ public class ConstraintFilter implements IFilter<IConstrainedObject> {
 	}
 
 	public ConstraintFilter(boolean includeNullConstraint, Node... constraints) {
-		solver =
-			new SatSolver(new And(constraints), 2000);
-		this.includeNullConstraint =
-			includeNullConstraint;
+		solver = new SatSolver(new And(constraints), 2000);
+		this.includeNullConstraint = includeNullConstraint;
 	}
 
 	@Override
 	public boolean isValid(IConstrainedObject object) {
-		Node constraint =
-			object.getConstraint();
+		Node constraint = object.getConstraint();
 
 		if (constraint == null) {
 			return includeNullConstraint;
 		}
 
-		constraint =
-			new Not(constraint).toCNF();
+		constraint = new Not(constraint).toCNF();
 
 		try {
 			if ((constraint instanceof Literal)) {
-				return !solver.isSatisfiable(new Node[] {
-					constraint });
+				return !solver.isSatisfiable(new Node[] { constraint });
 			} else if (constraint instanceof Or) {
 				return checkOr(constraint);
 			} else {
-				final Node[] andChildren =
-					constraint.getChildren();
-				for (int i =
-					0; i < andChildren.length; i++) {
-					final Node andChild =
-						andChildren[i];
+				final Node[] andChildren = constraint.getChildren();
+				for (int i = 0; i < andChildren.length; i++) {
+					final Node andChild = andChildren[i];
 					if (andChild instanceof Or) {
 						if (checkOr(andChild)) {
 							return true;

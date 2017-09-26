@@ -74,10 +74,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private final boolean includeHiddenFeatures;
 
 		public IsValidMethod(boolean includeUndefinedFeatures, boolean includeHiddenFeatures) {
-			this.includeUndefinedFeatures =
-				includeUndefinedFeatures;
-			this.includeHiddenFeatures =
-				includeHiddenFeatures;
+			this.includeUndefinedFeatures = includeUndefinedFeatures;
+			this.includeHiddenFeatures = includeHiddenFeatures;
 		}
 
 		@Override
@@ -88,32 +86,22 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			final BasicSolver solver;
 			try {
-				solver =
-					new BasicSolver(rootNode);
+				solver = new BasicSolver(rootNode);
 			} catch (final ContradictionException e) {
 				Logger.logError(e);
 				return false;
 			}
 
 			for (final SelectableFeature feature : configuration.features) {
-				final IFeatureStructure structure =
-					feature.getFeature().getStructure();
-				if ((includeUndefinedFeatures
-					|| (feature.getSelection() != Selection.UNDEFINED))
-					&& (includeHiddenFeatures
-						|| !structure.hasHiddenParent())
-					&& (configuration.ignoreAbstractFeatures
-						|| structure.isConcrete())) {
-					final int variable =
-						rootNode.getVariable(feature.getFeature().getName());
-					solver.assignmentPush((feature.getSelection() == Selection.SELECTED)
-						? variable
-						: -variable);
+				final IFeatureStructure structure = feature.getFeature().getStructure();
+				if ((includeUndefinedFeatures || (feature.getSelection() != Selection.UNDEFINED)) && (includeHiddenFeatures || !structure.hasHiddenParent())
+					&& (configuration.ignoreAbstractFeatures || structure.isConcrete())) {
+					final int variable = rootNode.getVariable(feature.getFeature().getName());
+					solver.assignmentPush((feature.getSelection() == Selection.SELECTED) ? variable : -variable);
 				}
 			}
 
-			final SatResult satResult =
-				solver.isSatisfiable();
+			final SatResult satResult = solver.isSatisfiable();
 			switch (satResult) {
 			case FALSE:
 			case TIMEOUT:
@@ -136,38 +124,28 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			configuration.resetAutomaticValues();
 
-			final List<SelectableFeature> oldManualSelected =
-				new ArrayList<>();
+			final List<SelectableFeature> oldManualSelected = new ArrayList<>();
 			for (final SelectableFeature feature : configuration.features) {
 				if (feature.getManual() != Selection.UNDEFINED) {
 					oldManualSelected.add(feature);
 				}
 			}
 
-			workMonitor.setRemainingWork(oldManualSelected.size()
-				+ configuration.features.size()
-				+ 1);
+			workMonitor.setRemainingWork(oldManualSelected.size() + configuration.features.size() + 1);
 
-			final SatSolver manualSolver =
-				new SatSolver(rootNode.getCnf(), ConfigurationPropagator.TIMEOUT);
+			final SatSolver manualSolver = new SatSolver(rootNode.getCnf(), ConfigurationPropagator.TIMEOUT);
 
 			workMonitor.worked();
 
-			final LinkedList<Node> newManualSelected =
-				new LinkedList<>();
-			for (final Iterator<SelectableFeature> iterator =
-				oldManualSelected.iterator(); iterator.hasNext();) {
-				final SelectableFeature next =
-					iterator.next();
-				final Literal l =
-					new Literal(next.getFeature().getName(), next.getManual() == Selection.SELECTED);
+			final LinkedList<Node> newManualSelected = new LinkedList<>();
+			for (final Iterator<SelectableFeature> iterator = oldManualSelected.iterator(); iterator.hasNext();) {
+				final SelectableFeature next = iterator.next();
+				final Literal l = new Literal(next.getFeature().getName(), next.getManual() == Selection.SELECTED);
 				newManualSelected.addFirst(l);
 
-				boolean satisfiable =
-					false;
+				boolean satisfiable = false;
 				try {
-					satisfiable =
-						manualSolver.isSatisfiable(newManualSelected);
+					satisfiable = manualSolver.isSatisfiable(newManualSelected);
 				} catch (final TimeoutException e) {}
 				if (!satisfiable) {
 					next.setManual(Selection.UNDEFINED);
@@ -177,25 +155,19 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				workMonitor.worked();
 			}
 
-			final Node[] nodeArray =
-				createNodeArray(newManualSelected, rootNode.getCnf());
-			final SatSolver automaticSolver =
-				new SatSolver(new And(nodeArray), ConfigurationPropagator.TIMEOUT);
+			final Node[] nodeArray = createNodeArray(newManualSelected, rootNode.getCnf());
+			final SatSolver automaticSolver = new SatSolver(new And(nodeArray), ConfigurationPropagator.TIMEOUT);
 
-			final ListIterator<SelectableFeature> it =
-				configuration.features.listIterator();
+			final ListIterator<SelectableFeature> it = configuration.features.listIterator();
 			while (it.hasNext()) {
-				final SelectableFeature feature =
-					it.next();
+				final SelectableFeature feature = it.next();
 				if (feature.getManual() == Selection.UNDEFINED) {
-					Literal l =
-						new Literal(feature.getFeature().getName(), true);
+					Literal l = new Literal(feature.getFeature().getName(), true);
 					try {
 						if (!automaticSolver.isSatisfiable(l)) {
 							feature.setAutomatic(Selection.UNSELECTED);
 						} else {
-							l =
-								new Literal(feature.getFeature().getName(), false);
+							l = new Literal(feature.getFeature().getName(), false);
 							if (!automaticSolver.isSatisfiable(l)) {
 								feature.setAutomatic(Selection.SELECTED);
 							} else {
@@ -219,8 +191,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private final long timeout;
 
 		public CountSolutionsMethod(long timeout) {
-			this.timeout =
-				timeout;
+			this.timeout = timeout;
 		}
 
 		@Override
@@ -228,20 +199,17 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode == null) {
 				return 0L;
 			}
-			final List<Node> children =
-				new ArrayList<Node>();
+			final List<Node> children = new ArrayList<Node>();
 
 			for (final SelectableFeature feature : configuration.features) {
 				if ((feature.getSelection() != Selection.UNDEFINED)
-					&& (configuration.ignoreAbstractFeatures
-						|| feature.getFeature().getStructure().isConcrete())
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())
 					&& !feature.getFeature().getStructure().hasHiddenParent()) {
 					children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 				}
 			}
 
-			final Node[] nodeArray =
-				createNodeArray(children, rootNodeWithoutHidden.getCnf());
+			final Node[] nodeArray = createNodeArray(children, rootNodeWithoutHidden.getCnf());
 			return new SatSolver(new And(nodeArray), timeout).countSolutions();
 		}
 	}
@@ -251,8 +219,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private final List<SelectableFeature> featureList;
 
 		public FindClause(List<SelectableFeature> featureList) {
-			this.featureList =
-				featureList;
+			this.featureList = featureList;
 		}
 
 		@Override
@@ -260,19 +227,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode == null) {
 				return Collections.emptyList();
 			}
-			final boolean[] results =
-				new boolean[featureList.size()];
-			final List<Node> openClauses =
-				new ArrayList<>();
+			final boolean[] results = new boolean[featureList.size()];
+			final List<Node> openClauses = new ArrayList<>();
 
-			final Map<String, Boolean> featureMap =
-				new HashMap<String, Boolean>(configuration.features.size() << 1);
+			final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
 			for (final SelectableFeature selectableFeature : configuration.features) {
-				final IFeature feature =
-					selectableFeature.getFeature();
-				if ((configuration.ignoreAbstractFeatures
-					|| feature.getStructure().isConcrete())
-					&& !feature.getStructure().hasHiddenParent()) {
+				final IFeature feature = selectableFeature.getFeature();
+				if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
 					featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
 				}
 			}
@@ -282,56 +243,40 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				selectableFeature.clearOpenClauses();
 			}
 
-			final Node[] clauses =
-				rootNodeWithoutHidden.getCnf().getChildren();
-			final HashMap<Object, Literal> literalMap =
-				new HashMap<Object, Literal>();
+			final Node[] clauses = rootNodeWithoutHidden.getCnf().getChildren();
+			final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
 			workMonitor.setRemainingWork(clauses.length);
 
-			for (int i =
-				0; i < clauses.length; i++) {
+			for (int i = 0; i < clauses.length; i++) {
 				workMonitor.checkCancel();
-				final Node clause =
-					clauses[i];
+				final Node clause = clauses[i];
 				literalMap.clear();
 				if (clause instanceof Literal) {
-					final Literal literal =
-						(Literal) clause;
+					final Literal literal = (Literal) clause;
 					literalMap.put(literal.var, literal);
 				} else {
-					final Node[] orLiterals =
-						clause.getChildren();
-					for (int j =
-						0; j < orLiterals.length; j++) {
-						final Literal literal =
-							(Literal) orLiterals[j];
+					final Node[] orLiterals = clause.getChildren();
+					for (int j = 0; j < orLiterals.length; j++) {
+						final Literal literal = (Literal) orLiterals[j];
 						literalMap.put(literal.var, literal);
 					}
 				}
 
-				boolean satisfied =
-					false;
+				boolean satisfied = false;
 				for (final Literal literal : literalMap.values()) {
-					final Boolean selected =
-						featureMap.get(literal.var);
-					if ((selected != null)
-						&& (selected == literal.positive)) {
-						satisfied =
-							true;
+					final Boolean selected = featureMap.get(literal.var);
+					if ((selected != null) && (selected == literal.positive)) {
+						satisfied = true;
 						break;
 					}
 				}
 
 				if (!satisfied) {
-					int c =
-						0;
-					boolean newLiterals =
-						false;
+					int c = 0;
+					boolean newLiterals = false;
 					for (final SelectableFeature selectableFeature : featureList) {
-						if (literalMap.containsKey(selectableFeature.getFeature().getName())
-							&& !results[c]) {
-							results[c] =
-								true;
+						if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
+							results[c] = true;
 
 							switch (selectableFeature.getManual()) {
 							case SELECTED:
@@ -343,8 +288,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 								selectableFeature.setRecommended(Selection.SELECTED);
 								selectableFeature.addOpenClause(openClauses.size(), clauses[i]);
 							}
-							newLiterals =
-								true;
+							newLiterals = true;
 						}
 						c++;
 					}
@@ -363,8 +307,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private final int max;
 
 		public GetSolutionsMethod(int max) {
-			this.max =
-				max;
+			this.max = max;
 		}
 
 		@Override
@@ -372,8 +315,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode == null) {
 				return null;
 			}
-			final Node[] nodeArray =
-				createNodeArray(createNodeList(), rootNode.getCnf());
+			final Node[] nodeArray = createNodeArray(createNodeList(), rootNode.getCnf());
 			return new SatSolver(new And(nodeArray), TIMEOUT).getSolutionFeatures(max);
 		}
 	}
@@ -390,10 +332,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		private final boolean selection;
 
 		public CoverFeaturesMethod(Collection<String> features, boolean selection) {
-			this.features =
-				features;
-			this.selection =
-				selection;
+			this.features = features;
+			this.selection = selection;
 		}
 
 		@Override
@@ -401,26 +341,19 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode == null) {
 				return null;
 			}
-			final List<Node> children =
-				new ArrayList<Node>(configuration.features.size());
+			final List<Node> children = new ArrayList<Node>(configuration.features.size());
 			for (final SelectableFeature feature : configuration.features) {
 				if ((feature.getSelection() != Selection.UNDEFINED)
-					&& (configuration.ignoreAbstractFeatures
-						|| FeatureUtils.isConcrete(feature.getFeature()))) {
+					&& (configuration.ignoreAbstractFeatures || FeatureUtils.isConcrete(feature.getFeature()))) {
 					children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 				}
 			}
-			final Node[] allFeatures =
-				new Node[children.size()
-					+ 1];
+			final Node[] allFeatures = new Node[children.size() + 1];
 			children.toArray(allFeatures);
-			allFeatures[children.size()] =
-				rootNode.getCnf().clone();
+			allFeatures[children.size()] = rootNode.getCnf().clone();
 
-			final SatSolver satSolver =
-				new SatSolver(new And(allFeatures), TIMEOUT);
-			final List<List<String>> solutions =
-				new LinkedList<>();
+			final SatSolver satSolver = new SatSolver(new And(allFeatures), TIMEOUT);
+			final List<List<String>> solutions = new LinkedList<>();
 			while (!features.isEmpty()) {
 				solutions.add(satSolver.coverFeatures(features, selection, monitor));
 				monitor.checkCancel();
@@ -432,8 +365,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class LeadToValidConfiguration implements LongRunningMethod<Void> {
 
-		private static final int DEFAULT_MODE =
-			-1;
+		private static final int DEFAULT_MODE = -1;
 
 		private final List<SelectableFeature> featureList;
 		@SuppressWarnings("unused")
@@ -444,10 +376,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		public LeadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
-			this.featureList =
-				featureList;
-			this.mode =
-				mode;
+			this.featureList = featureList;
+			this.mode = mode;
 		}
 
 		@Override
@@ -461,101 +391,68 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode == null) {
 				return;
 			}
-			workMonitor.setRemainingWork(featureList.size()
-				+ 1);
-			final Map<String, Literal> featureMap =
-				new HashMap<String, Literal>(configuration.features.size() << 1);
-			final Map<String, Integer> featureToIndexMap =
-				new HashMap<String, Integer>(featureList.size() << 1);
+			workMonitor.setRemainingWork(featureList.size() + 1);
+			final Map<String, Literal> featureMap = new HashMap<String, Literal>(configuration.features.size() << 1);
+			final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
 
 			for (final SelectableFeature selectableFeature : configuration.features) {
-				final IFeature feature =
-					selectableFeature.getFeature();
-				if ((configuration.ignoreAbstractFeatures
-					|| feature.getStructure().isConcrete())
-					&& !feature.getStructure().hasHiddenParent()) {
-					final String featureName =
-						feature.getName();
+				final IFeature feature = selectableFeature.getFeature();
+				if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
+					final String featureName = feature.getName();
 					featureMap.put(featureName, new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
 				}
 			}
 			workMonitor.checkCancel();
 
-			final Literal[] literals =
-				new Literal[featureList.size()];
+			final Literal[] literals = new Literal[featureList.size()];
 
-			int i =
-				0;
+			int i = 0;
 			for (final SelectableFeature feature : featureList) {
-				final String featureName =
-					feature.getFeature().getName();
+				final String featureName = feature.getFeature().getName();
 				featureToIndexMap.put(featureName, i);
-				literals[i++] =
-					featureMap.remove(featureName);
+				literals[i++] = featureMap.remove(featureName);
 			}
 
-			final Node[] formula =
-				new Node[featureMap.size()
-					+ 1];
-			formula[0] =
-				rootNodeWithoutHidden.getCnf().clone();
-			i =
-				1;
+			final Node[] formula = new Node[featureMap.size() + 1];
+			formula[0] = rootNodeWithoutHidden.getCnf().clone();
+			i = 1;
 			for (final Literal literal : featureMap.values()) {
-				formula[i++] =
-					literal;
+				formula[i++] = literal;
 			}
 
-			final SatSolver solver =
-				new SatSolver(new And(formula), TIMEOUT);
+			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
 
-			final boolean[] changedLiterals =
-				new boolean[literals.length];
-			int j =
-				0;
+			final boolean[] changedLiterals = new boolean[literals.length];
+			int j = 0;
 			workMonitor.worked();
 			for (final SelectableFeature feature : featureList) {
 				workMonitor.checkCancel();
-				final Literal l =
-					literals[j++].clone();
-				l.positive =
-					!l.positive;
+				final Literal l = literals[j++].clone();
+				l.positive = !l.positive;
 
-				final List<Literal> knownValues =
-					solver.knownValues(l);
+				final List<Literal> knownValues = solver.knownValues(l);
 
 				for (final Literal literal : knownValues) {
-					final Integer index =
-						featureToIndexMap.get(literal.var);
+					final Integer index = featureToIndexMap.get(literal.var);
 					if (index != null) {
-						final Literal knownL =
-							literals[index];
-						changedLiterals[index] =
-							literal.positive != knownL.positive;
-						knownL.positive =
-							literal.positive;
+						final Literal knownL = literals[index];
+						changedLiterals[index] = literal.positive != knownL.positive;
+						knownL.positive = literal.positive;
 					}
 				}
 
 				boolean result;
 				try {
-					result =
-						solver.isSatisfiable(literals);
+					result = solver.isSatisfiable(literals);
 				} catch (final TimeoutException e) {
 					Logger.logError(e);
-					result =
-						false;
+					result = false;
 				}
 
-				for (int k =
-					0; k < literals.length; k++) {
-					final Literal knownL =
-						literals[k];
-					knownL.positive =
-						changedLiterals[k]
-							^ knownL.positive;
-					changedLiterals[k] =
-						false;
+				for (int k = 0; k < literals.length; k++) {
+					final Literal knownL = literals[k];
+					knownL.positive = changedLiterals[k] ^ knownL.positive;
+					changedLiterals[k] = false;
 				}
 
 				if (result) {
@@ -577,20 +474,15 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		private void leadToValidConfig2(List<SelectableFeature> featureList, IMonitor workMonitor) {
-			final boolean[] results =
-				new boolean[featureList.size()];
+			final boolean[] results = new boolean[featureList.size()];
 			if (rootNode == null) {
 				return;
 			}
-			final Map<String, Boolean> featureMap =
-				new HashMap<String, Boolean>(configuration.features.size() << 1);
+			final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
 
 			for (final SelectableFeature selectableFeature : configuration.features) {
-				final IFeature feature =
-					selectableFeature.getFeature();
-				if ((configuration.ignoreAbstractFeatures
-					|| feature.getStructure().isConcrete())
-					&& !feature.getStructure().hasHiddenParent()) {
+				final IFeature feature = selectableFeature.getFeature();
+				if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
 					featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
 				}
 			}
@@ -601,53 +493,38 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			workMonitor.checkCancel();
 
-			final Node[] clauses =
-				rootNodeWithoutHidden.getCnf().getChildren();
-			final HashMap<Object, Literal> literalMap =
-				new HashMap<Object, Literal>();
+			final Node[] clauses = rootNodeWithoutHidden.getCnf().getChildren();
+			final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
 			workMonitor.setRemainingWork(clauses.length);
 
-			for (int i =
-				0; i < clauses.length; i++) {
+			for (int i = 0; i < clauses.length; i++) {
 				workMonitor.checkCancel();
-				final Node clause =
-					clauses[i];
+				final Node clause = clauses[i];
 				literalMap.clear();
 				if (clause instanceof Literal) {
-					final Literal literal =
-						(Literal) clause;
+					final Literal literal = (Literal) clause;
 					literalMap.put(literal.var, literal);
 				} else {
-					final Node[] orLiterals =
-						clause.getChildren();
-					for (int j =
-						0; j < orLiterals.length; j++) {
-						final Literal literal =
-							(Literal) orLiterals[j];
+					final Node[] orLiterals = clause.getChildren();
+					for (int j = 0; j < orLiterals.length; j++) {
+						final Literal literal = (Literal) orLiterals[j];
 						literalMap.put(literal.var, literal);
 					}
 				}
 
-				boolean satisfied =
-					false;
+				boolean satisfied = false;
 				for (final Literal literal : literalMap.values()) {
-					final Boolean selected =
-						featureMap.get(literal.var);
-					if ((selected != null)
-						&& (selected == literal.positive)) {
-						satisfied =
-							true;
+					final Boolean selected = featureMap.get(literal.var);
+					if ((selected != null) && (selected == literal.positive)) {
+						satisfied = true;
 						break;
 					}
 				}
 				if (!satisfied) {
-					int c =
-						0;
+					int c = 0;
 					for (final SelectableFeature selectableFeature : featureList) {
-						if (literalMap.containsKey(selectableFeature.getFeature().getName())
-							&& !results[c]) {
-							results[c] =
-								true;
+						if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
+							results[c] = true;
 
 							switch (selectableFeature.getManual()) {
 							case SELECTED:
@@ -676,39 +553,28 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (rootNode != null) {
 				return null;
 			}
-			final IFeatureModel featureModel =
-				configuration.getFeatureModel();
+			final IFeatureModel featureModel = configuration.getFeatureModel();
 
 			final AdvancedNodeCreator nodeCreator1, nodeCreator2;
 			final IFilter<IFeature> filter1, filter2;
 			if (configuration.ignoreAbstractFeatures) {
-				filter1 =
-					new HiddenFeatureFilter();
-				filter2 =
-					null;
-				nodeCreator1 =
-					new AdvancedNodeCreator(featureModel, filter1);
-				nodeCreator2 =
-					new AdvancedNodeCreator(featureModel);
+				filter1 = new HiddenFeatureFilter();
+				filter2 = null;
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, filter1);
+				nodeCreator2 = new AdvancedNodeCreator(featureModel);
 			} else {
-				filter1 =
-					new OrFilter<>(Arrays.asList(new HiddenFeatureFilter(), new AbstractFeatureFilter()));
-				filter2 =
-					new AbstractFeatureFilter();
-				nodeCreator1 =
-					new AdvancedNodeCreator(featureModel, filter1);
-				nodeCreator2 =
-					new AdvancedNodeCreator(featureModel, filter2);
+				filter1 = new OrFilter<>(Arrays.asList(new HiddenFeatureFilter(), new AbstractFeatureFilter()));
+				filter2 = new AbstractFeatureFilter();
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, filter1);
+				nodeCreator2 = new AdvancedNodeCreator(featureModel, filter2);
 			}
 			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 			nodeCreator1.setIncludeBooleanValues(false);
 			nodeCreator2.setIncludeBooleanValues(false);
 
-			final IRunner<Node> buildThread1 =
-				LongRunningWrapper.getThread(nodeCreator1);
-			final IRunner<Node> buildThread2 =
-				LongRunningWrapper.getThread(nodeCreator2);
+			final IRunner<Node> buildThread1 = LongRunningWrapper.getThread(nodeCreator1);
+			final IRunner<Node> buildThread2 = LongRunningWrapper.getThread(nodeCreator2);
 
 			buildThread1.schedule();
 			buildThread2.schedule();
@@ -720,14 +586,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				Logger.logError(e);
 			}
 
-			final Iterable<IFeature> features =
-				featureModel.getFeatures();
+			final Iterable<IFeature> features = featureModel.getFeatures();
 			rootNodeWithoutHidden =
 				new SatInstance(buildThread1.getResults(), Functional.mapToList(features, new InverseFilter<>(filter1), FeatureUtils.GET_FEATURE_NAME));
-			rootNode =
-				new SatInstance(buildThread2.getResults(), Functional.mapToList(features, filter2 == null
-					? null
-					: new InverseFilter<>(filter2), FeatureUtils.GET_FEATURE_NAME));
+			rootNode = new SatInstance(buildThread2.getResults(),
+					Functional.mapToList(features, filter2 == null ? null : new InverseFilter<>(filter2), FeatureUtils.GET_FEATURE_NAME));
 			return null;
 		}
 	}
@@ -742,12 +605,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		public UpdateMethod(boolean redundantManual, List<SelectableFeature> featureOrder) {
-			this.redundantManual =
-				redundantManual;
-			this.featureOrder =
-				featureOrder != null
-					? featureOrder
-					: Collections.<SelectableFeature> emptyList();
+			this.redundantManual = redundantManual;
+			this.featureOrder = featureOrder != null ? featureOrder : Collections.<SelectableFeature> emptyList();
 		}
 
 		@Override
@@ -757,40 +616,31 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 			configuration.resetAutomaticValues();
 
-			final ArrayList<Literal> manualLiterals =
-				new ArrayList<>();
+			final ArrayList<Literal> manualLiterals = new ArrayList<>();
 			for (final SelectableFeature feature : featureOrder) {
 				if ((feature.getManual() != Selection.UNDEFINED)
-					&& (configuration.ignoreAbstractFeatures
-						|| feature.getFeature().getStructure().isConcrete())) {
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					manualLiterals.add(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
 				}
 			}
-			final HashSet<Literal> manualLiteralSet =
-				new HashSet<>(manualLiterals);
+			final HashSet<Literal> manualLiteralSet = new HashSet<>(manualLiterals);
 			for (final SelectableFeature feature : configuration.features) {
 				if ((feature.getManual() != Selection.UNDEFINED)
-					&& (configuration.ignoreAbstractFeatures
-						|| feature.getFeature().getStructure().isConcrete())) {
-					final Literal l =
-						new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+					final Literal l = new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
 					if (manualLiteralSet.add(l)) {
 						manualLiterals.add(l);
 					}
 				}
 			}
 
-			workMonitor.setRemainingWork(manualLiterals.size()
-				+ 1);
+			workMonitor.setRemainingWork(manualLiterals.size() + 1);
 			Collections.reverse(manualLiterals);
 
-			final ConditionallyCoreDeadAnalysis analysis =
-				new ConditionallyCoreDeadAnalysis(rootNode);
-			final int[] intLiterals =
-				rootNode.convertToInt(manualLiterals);
+			final ConditionallyCoreDeadAnalysis analysis = new ConditionallyCoreDeadAnalysis(rootNode);
+			final int[] intLiterals = rootNode.convertToInt(manualLiterals);
 			analysis.setAssumptions(intLiterals);
-			final int[] impliedFeatures =
-				LongRunningWrapper.runMethod(analysis, workMonitor.subTask(1));
+			final int[] impliedFeatures = LongRunningWrapper.runMethod(analysis, workMonitor.subTask(1));
 
 			// if there is a contradiction within the configuration
 			if (impliedFeatures == null) {
@@ -798,11 +648,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			}
 
 			for (final int i : impliedFeatures) {
-				final SelectableFeature feature =
-					configuration.getSelectablefeature((String) rootNode.getVariableObject(i));
-				configuration.setAutomatic(feature, i > 0
-					? Selection.SELECTED
-					: Selection.UNSELECTED);
+				final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(i));
+				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
 				workMonitor.invoke(feature);
 				manualLiteralSet.add(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
 			}
@@ -816,8 +663,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (redundantManual) {
 				final BasicSolver solver;
 				try {
-					solver =
-						new BasicSolver(rootNode);
+					solver = new BasicSolver(rootNode);
 				} catch (final ContradictionException e) {
 					Logger.logError(e);
 					return null;
@@ -827,27 +673,18 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 					solver.assignmentPush(feature);
 				}
 
-				int literalCount =
-					intLiterals.length;
-				final IVecInt assignment =
-					solver.getAssignment();
-				for (int i =
-					0; i < assignment.size(); i++) {
-					final int oLiteral =
-						intLiterals[i];
-					final SelectableFeature feature =
-						configuration.getSelectablefeature((String) rootNode.getVariableObject(oLiteral));
+				int literalCount = intLiterals.length;
+				final IVecInt assignment = solver.getAssignment();
+				for (int i = 0; i < assignment.size(); i++) {
+					final int oLiteral = intLiterals[i];
+					final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(oLiteral));
 					assignment.set(i, -oLiteral);
-					final SatResult satResult =
-						solver.isSatisfiable();
+					final SatResult satResult = solver.isSatisfiable();
 					switch (satResult) {
 					case FALSE:
-						configuration.setAutomatic(feature, oLiteral > 0
-							? Selection.SELECTED
-							: Selection.UNSELECTED);
+						configuration.setAutomatic(feature, oLiteral > 0 ? Selection.SELECTED : Selection.UNSELECTED);
 						workMonitor.invoke(feature);
-						intLiterals[i] =
-							intLiterals[--literalCount];
+						intLiterals[i] = intLiterals[--literalCount];
 						assignment.delete(i--);
 						break;
 					case TIMEOUT:
@@ -866,18 +703,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	}
 
-	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION =
-		150;
+	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
 
-	private static final int TIMEOUT =
-		1000;
+	private static final int TIMEOUT = 1000;
 
 	private final Configuration configuration;
 
-	private SatInstance rootNode =
-		null,
-			rootNodeWithoutHidden =
-				null;
+	private SatInstance rootNode = null, rootNodeWithoutHidden = null;
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
@@ -885,8 +717,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	 * @param configuration The configuration to clone
 	 */
 	ConfigurationPropagator(Configuration configuration) {
-		this.configuration =
-			configuration;
+		this.configuration = configuration;
 	}
 
 	ConfigurationPropagator(ConfigurationPropagator propagator) {
@@ -894,13 +725,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	ConfigurationPropagator(ConfigurationPropagator propagator, Configuration configuration) {
-		this.configuration =
-			configuration;
+		this.configuration = configuration;
 		if (propagator.isLoaded()) {
-			rootNode =
-				propagator.rootNode;
-			rootNodeWithoutHidden =
-				propagator.rootNodeWithoutHidden;
+			rootNode = propagator.rootNode;
+			rootNodeWithoutHidden = propagator.rootNodeWithoutHidden;
 		}
 	}
 
@@ -998,22 +826,16 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	private Node[] createNodeArray(List<Node> literals, Node... formula) {
-		final Node[] nodeArray =
-			new Node[literals.size()
-				+ formula.length];
+		final Node[] nodeArray = new Node[literals.size() + formula.length];
 		literals.toArray(nodeArray);
-		for (int i =
-			0; i < formula.length; i++) {
-			nodeArray[literals.size()
-				+ i] =
-					formula[i].clone();
+		for (int i = 0; i < formula.length; i++) {
+			nodeArray[literals.size() + i] = formula[i].clone();
 		}
 		return nodeArray;
 	}
 
 	private List<Node> createNodeList() {
-		final List<Node> children =
-			new ArrayList<Node>();
+		final List<Node> children = new ArrayList<Node>();
 
 		for (final SelectableFeature feature : configuration.features) {
 			if (feature.getSelection() != Selection.UNDEFINED) {

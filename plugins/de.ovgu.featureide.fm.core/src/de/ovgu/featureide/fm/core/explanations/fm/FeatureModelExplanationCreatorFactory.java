@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm;
 
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatureModelExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link FeatureModelExplanationCreator}.
@@ -36,7 +36,7 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	 * @return a default instance of this class
 	 */
 	public static FeatureModelExplanationCreatorFactory getDefault() {
-		return new MusFeatureModelExplanationCreatorFactory();
+		return new CompositeFeatureModelExplanationCreatorFactory();
 	}
 
 	/**

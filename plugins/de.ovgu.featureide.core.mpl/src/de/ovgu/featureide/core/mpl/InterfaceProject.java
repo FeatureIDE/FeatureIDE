@@ -51,17 +51,14 @@ public class InterfaceProject {
 	private final IProject projectReference;
 	private final IFeatureProject featureProject;
 
-	private ProjectSignatures projectSignatures =
-		null;
+	private ProjectSignatures projectSignatures = null;
 
 	// private final ViewTagPool viewTagPool = new ViewTagPool();
 	// private final AbstractStringProvider stringProvider = new
 	// JavaStringProvider();
 
-	private ViewTag filterViewTag =
-		null;
-	private int configLimit =
-		1000;
+	private ViewTag filterViewTag = null;
+	private int configLimit = 1000;
 
 	private Configuration configuration;
 
@@ -84,21 +81,18 @@ public class InterfaceProject {
 		private final int id;
 
 		public FeaturePropertyChangeListener(int id) {
-			this.id =
-				id;
+			this.id = id;
 		}
 
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			final EventType prop =
-				event.getEventType();
+			final EventType prop = event.getEventType();
 			if (EventType.LOCATION_CHANGED == prop) {
 
 			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
 
 			} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
-				featureNames[id] =
-					((IFeature) event.getSource()).getName();
+				featureNames[id] = ((IFeature) event.getSource()).getName();
 			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 
 			}
@@ -107,68 +101,53 @@ public class InterfaceProject {
 
 	public InterfaceProject(IProject projectReference, IFeatureProject featureProject) {
 		if (projectReference == null) {
-			this.projectReference =
-				featureProject.getProject();
+			this.projectReference = featureProject.getProject();
 		} else {
-			this.projectReference =
-				projectReference;
+			this.projectReference = projectReference;
 		}
-		this.featureProject =
-			featureProject;
+		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			featureModel =
-				FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI())).getObject();
+			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI())).getObject();
 		} else {
-			featureModel =
-				null;
+			featureModel = null;
 		}
 		initFeatureNames();
 	}
 
 	private void initFeatureNames() {
 		if (featureModel != null) {
-			final String[] tempFeatureNames =
-				new String[featureModel.getNumberOfFeatures()];
-			int count =
-				0;
+			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
+			int count = 0;
 
 			for (final IFeature feature : featureModel.getFeatures()) {
 				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
-					tempFeatureNames[count++] =
-						feature.getName();
+					tempFeatureNames[count++] = feature.getName();
 				}
 			}
-			featureNames =
-				new String[count];
+			featureNames = new String[count];
 			System.arraycopy(tempFeatureNames, 0, featureNames, 0, count);
 
 			// Arrays.sort(featureNames);
 			// loadSignatures(true);
 		} else {
-			featureNames =
-				null;
-			projectSignatures =
-				null;
+			featureNames = null;
+			projectSignatures = null;
 		}
 	}
 
 	public int[] getFeatureIDs(Collection<String> featureNames) {
-		final int[] ids =
-			new int[featureNames.size()];
-		int i =
-			-1;
+		final int[] ids = new int[featureNames.size()];
+		int i = -1;
 		for (final String featureName : featureNames) {
-			ids[++i] =
-				getFeatureID(featureName);
+			ids[++i] = getFeatureID(featureName);
 		}
 		return ids;
 	}
 
 	public int getFeatureID(String featureName) {
-		for (int i =
-			0; i < featureNames.length; ++i) {
+		for (int i = 0; i < featureNames.length; ++i) {
 			if (featureNames[i].equals(featureName)) {
 				return i;
 			}
@@ -217,10 +196,8 @@ public class InterfaceProject {
 
 	public Configuration getConfiguration() {
 		if (configuration == null) {
-			final IFile configFile =
-				featureProject.getCurrentConfiguration();
-			configuration =
-				new Configuration(featureModel);
+			final IFile configFile = featureProject.getCurrentConfiguration();
+			configuration = new Configuration(featureModel);
 			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;
@@ -239,13 +216,11 @@ public class InterfaceProject {
 	// }
 
 	public void setConfiguration(Configuration configuration) {
-		this.configuration =
-			configuration;
+		this.configuration = configuration;
 	}
 
 	public void setProjectSignatures(ProjectSignatures projectSignatures) {
-		this.projectSignatures =
-			projectSignatures;
+		this.projectSignatures = projectSignatures;
 		// loadJob = null;
 		// if (loadAgain) {
 		// loadSignatures(false);
@@ -254,25 +229,21 @@ public class InterfaceProject {
 	}
 
 	public void setConfigLimit(int configLimit) {
-		this.configLimit =
-			configLimit;
+		this.configLimit = configLimit;
 	}
 
 	public void setFilterViewTag(ViewTag filterViewTag) {
-		this.filterViewTag =
-			filterViewTag;
+		this.filterViewTag = filterViewTag;
 	}
 
 	public void setFilterViewTag(String viewName, int viewLevel) {
 		if (viewName != null) {
-			filterViewTag =
-				new ViewTag(viewName, viewLevel);
+			filterViewTag = new ViewTag(viewName, viewLevel);
 		}
 	}
 
 	public void clearFilterViewTag() {
-		filterViewTag =
-			null;
+		filterViewTag = null;
 	}
 
 	// public void scaleUpViewTag(String name, int level) {

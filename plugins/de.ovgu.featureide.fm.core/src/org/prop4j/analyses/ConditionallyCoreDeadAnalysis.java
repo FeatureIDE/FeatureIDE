@@ -47,28 +47,21 @@ public class ConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
 	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 =
-			solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 =
-				solver.findModel();
+			final int[] model2 = solver.findModel();
 
 			SatInstance.updateModel(model1, model2);
-			for (int i =
-				0; i < assumptions.length; i++) {
-				model1[Math.abs(assumptions[i])
-					- 1] =
-						0;
+			for (int i = 0; i < assumptions.length; i++) {
+				model1[Math.abs(assumptions[i]) - 1] = 0;
 			}
 
 			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
-			for (int i =
-				0; i < model1.length; i++) {
-				final int varX =
-					model1[i];
+			for (int i = 0; i < model1.length; i++) {
+				final int varX = model1[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {

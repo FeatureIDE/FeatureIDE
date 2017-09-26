@@ -51,47 +51,34 @@ public class KeYWrapper {
 	private static final boolean isKeYLoaded;
 	private static Class<?> mainClass, keYMediatorClass, guilClass, uiClass;
 	static {
-		Bundle bundleKeYStarter =
-			null;
+		Bundle bundleKeYStarter = null;
 		for (final Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 			if (b.getSymbolicName().equals("org.key_project.key4eclipse")) {
-				bundleKeYStarter =
-					b;
+				bundleKeYStarter = b;
 				break;
 			}
 		}
-		boolean isKeYLoadedtmp =
-			false;
+		boolean isKeYLoadedtmp = false;
 
 		try {
 			if (bundleKeYStarter != null) {
 				final org.osgi.framework.BundleActivator act =
-					((org.osgi.framework.BundleActivator) bundleKeYStarter.loadClass(
-							"org.key_project.key4eclipse.Activator").newInstance());
+					((org.osgi.framework.BundleActivator) bundleKeYStarter.loadClass("org.key_project.key4eclipse.Activator").newInstance());
 				act.start(InternalPlatform.getDefault().getBundleContext());
 
-				mainClass =
-					bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.Main");
-				keYMediatorClass =
-					bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.KeYMediator");
-				guilClass =
-					bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.GUIListener");
-				uiClass =
-					bundleKeYStarter.loadClass("de.uka.ilkd.key.ui.UserInterface");
+				mainClass = bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.Main");
+				keYMediatorClass = bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.KeYMediator");
+				guilClass = bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.GUIListener");
+				uiClass = bundleKeYStarter.loadClass("de.uka.ilkd.key.ui.UserInterface");
 
-				isKeYLoadedtmp =
-					(mainClass != null)
-						&& (keYMediatorClass != null)
-						&& (guilClass != null)
-						&& (uiClass != null);
+				isKeYLoadedtmp = (mainClass != null) && (keYMediatorClass != null) && (guilClass != null) && (uiClass != null);
 			}
 		} catch (final RuntimeException e) {
 			throw e;
 		} catch (final Exception e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {
-			isKeYLoaded =
-				isKeYLoadedtmp;
+			isKeYLoaded = isKeYLoadedtmp;
 		}
 
 	}
@@ -100,32 +87,26 @@ public class KeYWrapper {
 
 	public static KeYWrapper createGUIListener(final FeatureStubsGenerator featureStubsGenerator, final ProjectSignatures signatures,
 			final LinkedList<FSTFeature> features) {
-		return (isKeYLoaded)
-			? new KeYWrapper(featureStubsGenerator, signatures, features)
-			: null;
+		return (isKeYLoaded) ? new KeYWrapper(featureStubsGenerator, signatures, features) : null;
 	}
 
-	private KeYWrapper(final FeatureStubsGenerator featureStubsGenerator, final ProjectSignatures signatures,
-			final LinkedList<FSTFeature> features) {
-		final InvocationHandler h =
-			new InvocationHandler() {
+	private KeYWrapper(final FeatureStubsGenerator featureStubsGenerator, final ProjectSignatures signatures, final LinkedList<FSTFeature> features) {
+		final InvocationHandler h = new InvocationHandler() {
 
-				@Override
-				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-					if (method.getName().equals("shutDown")) {
-						featureStubsGenerator.nextElement(signatures, features);
-					}
-					return null;
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if (method.getName().equals("shutDown")) {
+					featureStubsGenerator.nextElement(signatures, features);
 				}
-			};
-		final Class<?> proxyguiL =
-			Proxy.getProxyClass(guilClass.getClassLoader(), guilClass);
+				return null;
+			}
+		};
+		final Class<?> proxyguiL = Proxy.getProxyClass(guilClass.getClassLoader(), guilClass);
 		try {
-			guiL =
-				proxyguiL.getConstructor(InvocationHandler.class).newInstance((Object) h);
+			guiL = proxyguiL.getConstructor(InvocationHandler.class).newInstance((Object) h);
 		} catch (
-				InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
+				InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
 			e.printStackTrace();
 		}
 
@@ -133,20 +114,13 @@ public class KeYWrapper {
 
 	public void runKeY(File file) throws IOException {
 		try {
-			final Constructor<?> mainC =
-				mainClass.getConstructor(String[].class);
-			final Object key =
-				mainC.newInstance((Object) (new String[] {
-					file.getCanonicalPath() }));
-			final Method getGui =
-				mainClass.getMethod("getUi");
-			final Object ui =
-				getGui.invoke(key);
+			final Constructor<?> mainC = mainClass.getConstructor(String[].class);
+			final Object key = mainC.newInstance((Object) (new String[] { file.getCanonicalPath() }));
+			final Method getGui = mainClass.getMethod("getUi");
+			final Object ui = getGui.invoke(key);
 			if (ui != null) {
-				final Method getMediator =
-					uiClass.getMethod("getMediator");
-				final Method addGuiListener =
-					keYMediatorClass.getMethod("addGUIListener", guilClass);
+				final Method getMediator = uiClass.getMethod("getMediator");
+				final Method addGuiListener = keYMediatorClass.getMethod("addGUIListener", guilClass);
 				addGuiListener.invoke(getMediator.invoke(ui), guiL);
 			} else {
 				FeatureHouseCorePlugin.getDefault().logError(KEY_COULD_NOT_BE_STARTED_, null);

@@ -32,19 +32,14 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
  */
 public class FeatureDataConstructor {
 
-	public static final int TYPE_FOP =
-		1,
-			TYPE_PP =
-				2;
+	public static final int TYPE_FOP = 1, TYPE_PP = 2;
 
 	private final ProjectSignatures sigs;
 	private final int dataType;
 
 	public FeatureDataConstructor(ProjectSignatures sigs, int dataType) {
-		this.sigs =
-			sigs;
-		this.dataType =
-			dataType;
+		this.sigs = sigs;
+		this.dataType = dataType;
 	}
 
 	public AFeatureData create(Node constraint, int startLineNumber, int endLineNumber) {
@@ -52,22 +47,18 @@ public class FeatureDataConstructor {
 		switch (dataType) {
 		case TYPE_FOP:
 			if (constraint instanceof Literal) {
-				data =
-					new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), startLineNumber, endLineNumber);
+				data = new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), startLineNumber, endLineNumber);
 			} else {
-				data =
-					new FOPFeatureData(-1, startLineNumber, endLineNumber);
+				data = new FOPFeatureData(-1, startLineNumber, endLineNumber);
 			}
 			data.setConstraint(constraint);
 			break;
 		case TYPE_PP:
-			data =
-				new PreprocessorFeatureData(startLineNumber, endLineNumber);
+			data = new PreprocessorFeatureData(startLineNumber, endLineNumber);
 			data.setConstraint(constraint);
 			break;
 		default:
-			data =
-				null;
+			data = null;
 		}
 		return data;
 	}
@@ -76,18 +67,15 @@ public class FeatureDataConstructor {
 		final AFeatureData data;
 		switch (dataType) {
 		case TYPE_FOP:
-			data =
-				new FOPFeatureData(id, startLineNumber, endLineNumber);
+			data = new FOPFeatureData(id, startLineNumber, endLineNumber);
 			data.setConstraint(new Literal(sigs.getFeatureName(id)));
 			break;
 		case TYPE_PP:
-			data =
-				new PreprocessorFeatureData(startLineNumber, endLineNumber);
+			data = new PreprocessorFeatureData(startLineNumber, endLineNumber);
 			data.setConstraint(new Literal(sigs.getFeatureName(id)));
 			break;
 		default:
-			data =
-				null;
+			data = null;
 		}
 		return data;
 	}

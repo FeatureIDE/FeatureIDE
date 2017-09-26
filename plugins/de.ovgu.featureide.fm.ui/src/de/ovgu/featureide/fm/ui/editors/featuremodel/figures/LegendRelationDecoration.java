@@ -33,8 +33,7 @@ public class LegendRelationDecoration extends RelationDecoration {
 
 	public LegendRelationDecoration(boolean fill, Point point) {
 		super(fill, null);
-		this.point =
-			point;
+		this.point = point;
 	}
 
 	@Override

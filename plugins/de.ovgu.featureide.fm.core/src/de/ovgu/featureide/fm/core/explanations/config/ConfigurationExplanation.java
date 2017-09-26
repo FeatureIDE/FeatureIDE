@@ -30,12 +30,24 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  */
 public abstract class ConfigurationExplanation extends Explanation {
 
+	/** The configuration. */
+	private final Configuration config;
+
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param subject the subject to be explained
+	 * @param config the configuration
 	 */
-	protected ConfigurationExplanation(Object subject) {
+	protected ConfigurationExplanation(Object subject, Configuration config) {
 		super(subject);
+		this.config = config;
+	}
+	/**
+	 * Returns the configuration.
+	 * @return the configuration
+	 */
+	public Configuration getConfiguration() {
+		return config;
 	}
 }

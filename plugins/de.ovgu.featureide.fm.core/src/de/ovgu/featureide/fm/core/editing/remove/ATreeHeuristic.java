@@ -32,13 +32,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 public abstract class ATreeHeuristic extends AFeatureOrderHeuristic {
 
 	protected final int[] indexArray;
-	protected int indexArrayIndex =
-		0;
+	protected int indexArrayIndex = 0;
 
 	public ATreeHeuristic(DeprecatedFeature[] map, int length, IFeatureModel featureModel) {
 		super(map, length);
-		indexArray =
-			new int[length];
+		indexArray = new int[length];
 		order(featureModel.getStructure().getRoot());
 	}
 
@@ -54,14 +52,10 @@ public abstract class ATreeHeuristic extends AFeatureOrderHeuristic {
 	}
 
 	protected final void find(IFeature feature) {
-		for (int i =
-			0; i < map.length; i++) {
-			final DeprecatedFeature deprecatedFeature =
-				map[i];
-			if ((deprecatedFeature != null)
-				&& deprecatedFeature.getFeature().equals(feature.getName())) {
-				indexArray[indexArrayIndex] =
-					i;
+		for (int i = 0; i < map.length; i++) {
+			final DeprecatedFeature deprecatedFeature = map[i];
+			if ((deprecatedFeature != null) && deprecatedFeature.getFeature().equals(feature.getName())) {
+				indexArray[indexArrayIndex] = i;
 				nextIndex();
 				break;
 			}

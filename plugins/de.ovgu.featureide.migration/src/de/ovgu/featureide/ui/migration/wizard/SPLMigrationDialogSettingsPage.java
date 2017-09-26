@@ -64,8 +64,7 @@ public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage {
 	 * Only allow finishing, when the composer is supported by the MigrationPlugin
 	 */
 	private void validateComposerMigrationSupport() {
-		final boolean composerSupported =
-			getCompositionTool().supportsMigration();
+		final boolean composerSupported = getCompositionTool().supportsMigration();
 
 		if (!composerSupported) {
 			updateStatus(MIGRATION_IS_CURRENTLY_NOT_SUPPORTED_FOR_THE_SELECTED_COMPOSER__PLEASE_CHOOSE_ANOTHER_ONE);
@@ -73,7 +72,6 @@ public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage {
 			setErrorMessage(null);
 		}
 
-		setPageComplete(isPageComplete()
-			&& composerSupported);
+		setPageComplete(isPageComplete() && composerSupported);
 	}
 }

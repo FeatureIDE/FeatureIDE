@@ -53,14 +53,10 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 		FEATURE_ORIENTED_PROGRAMMING, ASPECT_ORIENTED_PROGRAMMING, DELTA_ORIENTED_PROGRAMMING, PREPROCESSOR
 	};
 
-	final static String PACKAGE_PATTERN =
-		"#package#";
-	final static String REFINES_PATTERN =
-		"#refines#";
-	final static String CLASS_NAME_PATTERN =
-		"#classname#";
-	final static String FEATUE_PATTER =
-		"#featurename#";
+	final static String PACKAGE_PATTERN = "#package#";
+	final static String REFINES_PATTERN = "#refines#";
+	final static String CLASS_NAME_PATTERN = "#classname#";
+	final static String FEATUE_PATTER = "#featurename#";
 
 	boolean isInitialized();
 

@@ -40,8 +40,7 @@ public class CFeatureRemover23 extends AFeatureRemover {
 
 	private ICNFSolver newSolver;
 
-	private boolean first =
-		false;
+	private boolean first = false;
 
 	public CFeatureRemover23(Node cnf, Collection<String> features) {
 		super(cnf, features);
@@ -59,25 +58,17 @@ public class CFeatureRemover23 extends AFeatureRemover {
 	protected boolean detectRedundancy(DeprecatedFeature nextFeature) {
 		if (nextFeature.getClauseCount() > 0) {
 
-			final List<DeprecatedClause> relevantSubList =
-				relevantClauseList.subList(0, relevantPosIndex);
+			final List<DeprecatedClause> relevantSubList = relevantClauseList.subList(0, relevantPosIndex);
 			Collections.sort(newRelevantClauseList.subList(0, newRelevantDelIndex), lengthComparator);
 
-			final ArrayList<Clause> clauseList =
-				new ArrayList<>(newClauseList.size()
-					+ relevantSubList.size());
+			final ArrayList<Clause> clauseList = new ArrayList<>(newClauseList.size() + relevantSubList.size());
 			clauseList.addAll(newClauseList);
 			clauseList.addAll(relevantSubList);
-			final CNFSolver solver =
-				new CNFSolver(clauseList, featureNameArray.length
-					- 1);
+			final CNFSolver solver = new CNFSolver(clauseList, featureNameArray.length - 1);
 
 			// SAT NewRelevant
-			for (int i =
-				newRelevantDelIndex
-					- 1; i >= 0; --i) {
-				final DeprecatedClause curClause =
-					newRelevantClauseList.get(i);
+			for (int i = newRelevantDelIndex - 1; i >= 0; --i) {
+				final DeprecatedClause curClause = newRelevantClauseList.get(i);
 				if (isRemovable(solver, curClause)) {
 					removeNewRelevant(i);
 				} else {
@@ -95,11 +86,8 @@ public class CFeatureRemover23 extends AFeatureRemover {
 		if (nextFeature.getClauseCount() > 0) {
 			Collections.sort(newNewClauseList, lengthComparator);
 
-			for (int i =
-				newNewClauseList.size()
-					- 1; i >= 0; --i) {
-				final DeprecatedClause clause =
-					newNewClauseList.get(i);
+			for (int i = newNewClauseList.size() - 1; i >= 0; --i) {
+				final DeprecatedClause clause = newNewClauseList.get(i);
 				if (isRemovable(newSolver, clause)) {
 					deleteClause(clause);
 				} else {
@@ -113,30 +101,18 @@ public class CFeatureRemover23 extends AFeatureRemover {
 
 	@Override
 	protected void preRedundancyCheck(DeprecatedFeature nextFeature) {
-		if (first
-			&& (nextFeature.getClauseCount() > 0)) {
-			final String s =
-				heuristic.size()
-					+ ": "
-					+ nextFeature.getFeature()
-					+ " | Removing Old Rel: "
-					+ relevantClauseList.size();
+		if (first && (nextFeature.getClauseCount() > 0)) {
+			final String s = heuristic.size() + ": " + nextFeature.getFeature() + " | Removing Old Rel: " + relevantClauseList.size();
 			System.err.print(s);
-			first =
-				false;
+			first = false;
 			Collections.sort(relevantClauseList, lengthComparator);
 
 			addNewClauses(nextFeature);
-			final CNFSolver solver =
-				new CNFSolver(newClauseList, featureNameArray.length
-					- 1);
+			final CNFSolver solver = new CNFSolver(newClauseList, featureNameArray.length - 1);
 
 			// SAT Relevant
-			for (int i =
-				relevantPosIndex
-					- 1; i >= 0; --i) {
-				final DeprecatedClause mainClause =
-					relevantClauseList.get(i);
+			for (int i = relevantPosIndex - 1; i >= 0; --i) {
+				final DeprecatedClause mainClause = relevantClauseList.get(i);
 				if (isRemovable(solver, mainClause)) {
 					removeRelevant(i);
 				} else {
@@ -145,10 +121,8 @@ public class CFeatureRemover23 extends AFeatureRemover {
 			}
 			deleteOldRelevantClauses();
 
-			relevantPosIndex =
-				relevantClauseList.size();
-			relevantNegIndex =
-				relevantClauseList.size();
+			relevantPosIndex = relevantClauseList.size();
+			relevantNegIndex = relevantClauseList.size();
 
 			System.err.println(" Done.");
 		}
@@ -156,14 +130,10 @@ public class CFeatureRemover23 extends AFeatureRemover {
 
 	@Override
 	protected void prepareHeuristics() {
-		heuristic =
-			new MinimumClauseHeuristic(map, features.size());
+		heuristic = new MinimumClauseHeuristic(map, features.size());
 		// heuristic = new StaticMinimumClauseHeuristic(map, features.size());
-		first =
-			true;
-		newSolver =
-			new CNFSolver(newClauseList, featureNameArray.length
-				- 1);
+		first = true;
+		newSolver = new CNFSolver(newClauseList, featureNameArray.length - 1);
 	}
 
 	@Override

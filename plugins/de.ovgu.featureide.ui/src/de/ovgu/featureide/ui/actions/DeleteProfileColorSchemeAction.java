@@ -48,8 +48,7 @@ public class DeleteProfileColorSchemeAction extends Action {
 	 */
 	public DeleteProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
-		this.model =
-			model;
+		this.model = model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
 
 	}

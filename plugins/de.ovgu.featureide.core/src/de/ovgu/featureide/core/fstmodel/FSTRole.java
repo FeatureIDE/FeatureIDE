@@ -38,8 +38,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  */
 public class FSTRole {
 
-	private final TreeSet<FSTDirective> directives =
-		new TreeSet<FSTDirective>();
+	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
 	private final FSTClassFragment classFragment;
 
 	private final FSTFeature feature;
@@ -47,14 +46,10 @@ public class FSTRole {
 	private IFile file;
 
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
-		this.feature =
-			feature;
-		this.fstClass =
-			fstClass;
-		this.file =
-			file;
-		classFragment =
-			new FSTClassFragment(fstClass.getName());
+		this.feature = feature;
+		this.fstClass = fstClass;
+		this.file = file;
+		classFragment = new FSTClassFragment(fstClass.getName());
 		classFragment.setRole(this);
 	}
 
@@ -76,8 +71,7 @@ public class FSTRole {
 	}
 
 	public void setFile(IFile file) {
-		this.file =
-			file;
+		this.file = file;
 	}
 
 	public FSTClassFragment getClassFragment() {
@@ -111,8 +105,7 @@ public class FSTRole {
 
 	// get all fields of all nested classes
 	public LinkedList<FSTField> getAllFields() {
-		final LinkedList<FSTField> allFields =
-			new LinkedList<FSTField>();
+		final LinkedList<FSTField> allFields = new LinkedList<FSTField>();
 		getAllFieldsRec(allFields, getClassFragment());
 		return allFields;
 
@@ -127,8 +120,7 @@ public class FSTRole {
 
 	// get all methods of all nested classes
 	public LinkedList<FSTMethod> getAllMethods() {
-		final LinkedList<FSTMethod> allMethods =
-			new LinkedList<FSTMethod>();
+		final LinkedList<FSTMethod> allMethods = new LinkedList<FSTMethod>();
 		getAllMethodsRec(allMethods, getClassFragment());
 		return allMethods;
 
@@ -144,8 +136,7 @@ public class FSTRole {
 
 	// get all nested classes of all nested classes
 	public LinkedList<FSTClassFragment> getAllInnerClasses() {
-		final LinkedList<FSTClassFragment> allInnerClasses =
-			new LinkedList<FSTClassFragment>();
+		final LinkedList<FSTClassFragment> allInnerClasses = new LinkedList<FSTClassFragment>();
 		getAllInnerClassesRec(allInnerClasses, getClassFragment());
 		return allInnerClasses;
 
@@ -160,8 +151,7 @@ public class FSTRole {
 
 	// get list of all nested classes shared by multiple features
 	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment) {
-		final LinkedList<FSTClassFragment> frag =
-			new LinkedList<FSTClassFragment>();
+		final LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
 
 		for (final FSTRole role : fstClass.getRoles()) {
 			for (final FSTClassFragment currFrag : role.getAllInnerClasses()) {
@@ -177,8 +167,7 @@ public class FSTRole {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder =
-			new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append(fstClass.getName());
 		builder.append(" @ ");
 		builder.append(feature.getName());

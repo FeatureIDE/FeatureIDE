@@ -43,12 +43,9 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 
 	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
 		super(featureModel, EDIT_CONSTRAINT);
-		newNode =
-			propNode;
-		oldNode =
-			constraint.getNode();
-		this.constraint =
-			constraint;
+		newNode = propNode;
+		oldNode = constraint.getNode();
+		this.constraint = constraint;
 	}
 
 	@Override

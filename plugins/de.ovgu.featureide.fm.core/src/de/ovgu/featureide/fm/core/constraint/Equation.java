@@ -35,15 +35,11 @@ public class Equation {
 
 	private final int degree;
 
-	public Equation(List<WeightedTerm> weightedTerms, RelationOperator operator,
-			int degree) {
+	public Equation(List<WeightedTerm> weightedTerms, RelationOperator operator, int degree) {
 		super();
-		this.weightedTerms =
-			weightedTerms;
-		this.operator =
-			operator;
-		this.degree =
-			degree;
+		this.weightedTerms = weightedTerms;
+		this.operator = operator;
+		this.degree = degree;
 	}
 
 	public List<WeightedTerm> getWeightedTerms() {
@@ -60,14 +56,11 @@ public class Equation {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (final WeightedTerm term : weightedTerms) {
-			sb.append(term.toString()
-				+ " ");
+			sb.append(term.toString() + " ");
 		}
-		sb.append(operator.toString()
-			+ " ");
+		sb.append(operator.toString() + " ");
 		sb.append(degree);
 		return sb.toString();
 	}

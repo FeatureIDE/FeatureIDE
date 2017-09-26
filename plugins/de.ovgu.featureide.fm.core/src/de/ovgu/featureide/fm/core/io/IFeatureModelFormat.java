@@ -29,10 +29,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
 
-	public static String extensionPointID =
-		"FMFormat";
+	public static String extensionPointID = "FMFormat";
 
-	public static String extensionID =
-		"fmFormat";
+	public static String extensionID = "fmFormat";
 
 }

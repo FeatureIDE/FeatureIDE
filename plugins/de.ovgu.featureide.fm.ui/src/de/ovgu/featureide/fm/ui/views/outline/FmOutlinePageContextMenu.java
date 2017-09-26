@@ -106,75 +106,51 @@ public class FmOutlinePageContextMenu {
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
-	private boolean syncCollapsedFeatures =
-		false;
-	private boolean registerContextMenu =
-		true;
+	private boolean syncCollapsedFeatures = false;
+	private boolean registerContextMenu = true;
 
-	private static final String CONTEXT_MENU_ID =
-		"de.ovgu.feautureide.fm.view.outline.contextmenu";
+	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
-	public static final ImageDescriptor IMG_COLLAPSE =
-		FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
-	public static final ImageDescriptor IMG_EXPAND =
-		FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
+	public static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
+	public static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
 		this(site, viewer, fInput);
-		this.fTextEditor =
-			fTextEditor;
+		this.fTextEditor = fTextEditor;
 	}
 
 	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput) {
-		this.site =
-			site;
-		this.viewer =
-			viewer;
-		this.fInput =
-			fInput;
+		this.site = site;
+		this.viewer = viewer;
+		this.fInput = fInput;
 		initContextMenu();
 	}
 
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures) {
-		this.site =
-			site;
-		this.fTextEditor =
-			fTextEditor;
-		this.viewer =
-			viewer;
-		this.fInput =
-			fInput;
-		this.syncCollapsedFeatures =
-			syncCollapsedFeatures;
+		this.site = site;
+		this.fTextEditor = fTextEditor;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.syncCollapsedFeatures = syncCollapsedFeatures;
 		initContextMenu();
 	}
 
 	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput, boolean registerContextMenu) {
-		this.site =
-			site;
-		this.viewer =
-			viewer;
-		this.fInput =
-			fInput;
-		this.registerContextMenu =
-			registerContextMenu;
+		this.site = site;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.registerContextMenu = registerContextMenu;
 		initContextMenu();
 	}
 
 	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures,
 			boolean registerContextMenu) {
-		this.site =
-			site;
-		this.fTextEditor =
-			fTextEditor;
-		this.viewer =
-			viewer;
-		this.fInput =
-			fInput;
-		this.syncCollapsedFeatures =
-			syncCollapsedFeatures;
-		this.registerContextMenu =
-			registerContextMenu;
+		this.site = site;
+		this.fTextEditor = fTextEditor;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.syncCollapsedFeatures = syncCollapsedFeatures;
+		this.registerContextMenu = registerContextMenu;
 		initContextMenu();
 	}
 
@@ -187,8 +163,7 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initMenuManager() {
-		final MenuManager menuMgr =
-			new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 
@@ -197,8 +172,7 @@ public class FmOutlinePageContextMenu {
 				FmOutlinePageContextMenu.this.fillContextMenu(manager);
 			}
 		});
-		final Menu menu =
-			menuMgr.createContextMenu(viewer.getControl());
+		final Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
 
 		if (site instanceof IWorkbenchPartSite) {
@@ -209,78 +183,61 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
-		setFeatureColorAction =
-			new SetFeatureColorAction(viewer, fInput);
-		mAction =
-			new MandatoryAction(viewer, fInput);
-		hAction =
-			new HiddenAction(viewer, fInput);
+		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
+		mAction = new MandatoryAction(viewer, fInput);
+		hAction = new HiddenAction(viewer, fInput);
 		// collapseAction = new CollapseAction(viewer, fInput);
-		aAction =
-			new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
-		dAction =
-			new DeleteAction(viewer, fInput);
-		dAAction =
-			new DeleteAllAction(viewer, fInput);
-		ccAction =
-			new CreateConstraintAction(viewer, fInput);
-		ecAction =
-			new EditConstraintAction(viewer, fInput);
-		cAction =
-			new CreateCompoundAction(viewer, fInput);
-		clAction =
-			new CreateLayerAction(viewer, fInput);
+		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
+		dAction = new DeleteAction(viewer, fInput);
+		dAAction = new DeleteAllAction(viewer, fInput);
+		ccAction = new CreateConstraintAction(viewer, fInput);
+		ecAction = new EditConstraintAction(viewer, fInput);
+		cAction = new CreateCompoundAction(viewer, fInput);
+		clAction = new CreateLayerAction(viewer, fInput);
 
 		if (fTextEditor != null) {
-			reAction =
-				new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
+			reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
 		}
 
-		oAction =
-			new OrAction(viewer, fInput);
+		oAction = new OrAction(viewer, fInput);
 		// TODO _interfaces Removed Code
 		// roAction = new ReverseOrderAction(viewer, fInput);
-		andAction =
-			new AndAction(viewer, fInput);
-		altAction =
-			new AlternativeAction(viewer, fInput);
+		andAction = new AndAction(viewer, fInput);
+		altAction = new AlternativeAction(viewer, fInput);
 
-		collapseAllAction =
-			new Action() {
+		collapseAllAction = new Action() {
 
-				@Override
-				public void run() {
-					viewer.collapseAll();
-				}
-			};
+			@Override
+			public void run() {
+				viewer.collapseAll();
+			}
+		};
 		collapseAllAction.setToolTipText(COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
 
-		expandAllAction =
-			new Action() {
+		expandAllAction = new Action() {
 
-				@Override
-				public void run() {
-					viewer.expandAll();
-				}
-			};
+			@Override
+			public void run() {
+				viewer.expandAll();
+			}
+		};
 		expandAllAction.setToolTipText(EXPAND_ALL);
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
 
-		dblClickListener =
-			new IDoubleClickListener() {
+		dblClickListener = new IDoubleClickListener() {
 
-				@Override
-				public void doubleClick(DoubleClickEvent event) {
-					if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
-						if (syncCollapsedFeatures) {
-							// collapseAction.run();
-						} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
-							ecAction.run();
-						}
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
+					if (syncCollapsedFeatures) {
+						// collapseAction.run();
+					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
+						ecAction.run();
 					}
 				}
-			};
+			}
+		};
 
 	}
 
@@ -303,18 +260,14 @@ public class FmOutlinePageContextMenu {
 					EditPart part;
 					if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
 
-						final IFeature feat =
-							(IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+						final IFeature feat = (IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
-						part =
-							(EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(feat);
+						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(feat);
 					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
 
-						final IConstraint constr =
-							(IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+						final IConstraint constr = (IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
-						part =
-							(EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(constr);
+						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(constr);
 
 					} else {
 						return;
@@ -326,8 +279,7 @@ public class FmOutlinePageContextMenu {
 					}
 					((GraphicalViewerImpl) fTextEditor.diagramEditor).setSelection(new StructuredSelection(part));
 
-					final EditPartViewer view =
-						part.getViewer();
+					final EditPartViewer view = part.getViewer();
 					if (view != null) {
 						view.reveal(part);
 					}
@@ -342,14 +294,11 @@ public class FmOutlinePageContextMenu {
 	 * @param manager
 	 */
 	public void fillContextMenu(IMenuManager manager) {
-		final Object sel =
-			((IStructuredSelection) viewer.getSelection()).getFirstElement();
+		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 		if (sel instanceof FmOutlineGroupStateStorage) {
-			final IFeature feature =
-				((FmOutlineGroupStateStorage) sel).getFeature();
-			if ((feature instanceof ExtendedFeature)
-				&& ((ExtendedFeature) feature).isFromExtern()) {
+			final IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
+			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isFromExtern()) {
 				return;
 			}
 			manager.add(andAction);
@@ -379,9 +328,7 @@ public class FmOutlinePageContextMenu {
 
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-			if (oAction.isEnabled()
-				|| altAction.isEnabled()
-				|| andAction.isEnabled()) {
+			if (oAction.isEnabled() || altAction.isEnabled() || andAction.isEnabled()) {
 				manager.add(andAction);
 				manager.add(oAction);
 				manager.add(altAction);
@@ -430,15 +377,13 @@ public class FmOutlinePageContextMenu {
 	}
 
 	public void setFeatureModel(IFeatureModel fm) {
-		fInput =
-			fm;
+		fInput = fm;
 	}
 
 	/**
 	 * @param syncCollapsedFeaturesToggle
 	 */
 	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {
-		syncCollapsedFeatures =
-			syncCollapsedFeaturesToggle;
+		syncCollapsedFeatures = syncCollapsedFeaturesToggle;
 	}
 }

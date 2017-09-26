@@ -20,28 +20,21 @@ public class CppCheckAnalyzer {
 	private final HashMap<String, CppCheckerFileLogs> hashMap;
 
 	public CppCheckAnalyzer() {
-		hashMap =
-			new HashMap<String, CppCheckerFileLogs>();
+		hashMap = new HashMap<String, CppCheckerFileLogs>();
 	}
 
 	public void processFile(IFile iFile) {
-		final CppChecker checker =
-			new CppChecker();
+		final CppChecker checker = new CppChecker();
 
-		checker.checkFile(iFile.getLocation().toFile(), iFile.getProject()
-				.getName());
+		checker.checkFile(iFile.getLocation().toFile(), iFile.getProject().getName());
 
-		final String xml =
-			checker.getXmlFile();
+		final String xml = checker.getXmlFile();
 
 		// System.err.println(xml);
 
-		final SAXBuilder builder =
-			new SAXBuilder();
-		final Reader in =
-			new StringReader(xml);
-		Document doc =
-			null;
+		final SAXBuilder builder = new SAXBuilder();
+		final Reader in = new StringReader(xml);
+		Document doc = null;
 		// Element root = null;
 		// Element meta = null;
 		// Element _code = null;
@@ -53,8 +46,7 @@ public class CppCheckAnalyzer {
 		// String description = "";
 
 		try {
-			doc =
-				builder.build(in);
+			doc = builder.build(in);
 			// TODO xml não contem "commResponse"
 			//
 			// root = doc.getRootElement();
@@ -72,43 +64,27 @@ public class CppCheckAnalyzer {
 			e.printStackTrace();
 		}
 
-		final Element rootNode =
-			doc.getRootElement();
+		final Element rootNode = doc.getRootElement();
 
-		final List<Element> list =
-			rootNode.getChildren();
+		final List<Element> list = rootNode.getChildren();
 
-		for (final Iterator<Element> i =
-			list.iterator(); i.hasNext();) {
+		for (final Iterator<Element> i = list.iterator(); i.hasNext();) {
 
-			final Element element =
-				i.next();
+			final Element element = i.next();
 
-			String file =
-				element.getAttributeValue("file");
-			file =
-				file.substring(iFile.getProject().getLocation().toOSString()
-						.length(), file.length());
+			String file = element.getAttributeValue("file");
+			file = file.substring(iFile.getProject().getLocation().toOSString().length(), file.length());
 
-			CppCheckerFileLogs fileLogs =
-				null;
+			CppCheckerFileLogs fileLogs = null;
 			if (hashMap.containsKey(file)) {
-				fileLogs =
-					hashMap.get(file);
+				fileLogs = hashMap.get(file);
 			} else {
-				fileLogs =
-					new CppCheckerFileLogs(iFile.getProject().getFile(
-							file));
+				fileLogs = new CppCheckerFileLogs(iFile.getProject().getFile(file));
 				hashMap.put(file, fileLogs);
 			}
 
-			final CppCheckerLog log =
-				new CppCheckerLog(fileLogs,
-						element.getAttributeValue("line"),
-						element.getAttributeValue("id"),
-						element.getAttributeValue("severity"),
-						element.getAttributeValue("msg"),
-						element.getAttributeValue("config"));
+			final CppCheckerLog log = new CppCheckerLog(fileLogs, element.getAttributeValue("line"), element.getAttributeValue("id"),
+					element.getAttributeValue("severity"), element.getAttributeValue("msg"), element.getAttributeValue("config"));
 
 			fileLogs.addLog(log);
 
@@ -117,17 +93,12 @@ public class CppCheckAnalyzer {
 	}
 
 	public List<CppCheckerFileLogs> getFiles() {
-		final List<CppCheckerFileLogs> list =
-			new LinkedList<CppCheckerFileLogs>();
+		final List<CppCheckerFileLogs> list = new LinkedList<CppCheckerFileLogs>();
 
-		final Collection<CppCheckerFileLogs> collection =
-			hashMap.values();
+		final Collection<CppCheckerFileLogs> collection = hashMap.values();
 
-		for (final Iterator<CppCheckerFileLogs> iterator =
-			collection.iterator(); iterator
-					.hasNext();) {
-			final CppCheckerFileLogs fileLogs =
-				iterator.next();
+		for (final Iterator<CppCheckerFileLogs> iterator = collection.iterator(); iterator.hasNext();) {
+			final CppCheckerFileLogs fileLogs = iterator.next();
 			list.add(fileLogs);
 		}
 

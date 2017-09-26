@@ -64,12 +64,9 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @param generator The generator holding this compiler
 	 */
 	public JavaCompiler(int nr, Generator generator) {
-		this.generator =
-			generator;
+		this.generator = generator;
 
-		tmp =
-			generator.builder.tmp.getFolder(COMPILER
-				+ nr);
+		tmp = generator.builder.tmp.getFolder(COMPILER + nr);
 		if (!tmp.exists()) {
 			try {
 				tmp.create(true, true, null);
@@ -104,10 +101,8 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @param confName
 	 */
 	private void compile(String confName) {
-		final LinkedList<IFile> files =
-			getJavaFiles(generator.builder.folder.getFolder(confName));
-		final LinkedList<String> options =
-			new LinkedList<>();
+		final LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
+		final LinkedList<String> options = new LinkedList<>();
 		for (final IFile file : files) {
 			options.add(setupPath(file));
 		}
@@ -120,10 +115,8 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
 
-		final String output =
-			process(options);
-		final LinkedList<IFile> errorFiles =
-			parseJavacOutput(output, files, confName);
+		final String output = process(options);
+		final LinkedList<IFile> errorFiles = parseJavacOutput(output, files, confName);
 		for (final IFile file : errorFiles) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
@@ -140,31 +133,22 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * Adds quotation marks to the path name if it contains white spaces.
 	 */
 	private String setupPath(String location) {
-		return location.contains(" ")
-			? "\""
-				+ location
-				+ "\""
-			: location;
+		return location.contains(" ") ? "\"" + location + "\"" : location;
 	}
 
 	private String process(AbstractList<String> command) {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (final String string : command) {
 			sb.append(string);
 			sb.append(' ');
 		}
 
-		String output =
-			null;
-		try (StringWriter writer =
-			new StringWriter()) {
-			final String params =
-				sb.toString();
+		String output = null;
+		try (StringWriter writer = new StringWriter()) {
+			final String params = sb.toString();
 
 			BatchCompiler.compile(params, new PrintWriter(System.out), new PrintWriter(writer), null);
-			output =
-				writer.toString();
+			output = writer.toString();
 		} catch (final IOException e) {
 			UIPlugin.getDefault().logError(e);
 		}
@@ -180,34 +164,27 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @return
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
-		final LinkedList<IFile> errorFiles =
-			new LinkedList<IFile>();
+		final LinkedList<IFile> errorFiles = new LinkedList<IFile>();
 		if (output.isEmpty()) {
 			return errorFiles;
 		}
-		final TreeMap<String, IFile> sourcePaths =
-			new TreeMap<>();
+		final TreeMap<String, IFile> sourcePaths = new TreeMap<>();
 		for (final IFile file : files) {
 			sourcePaths.put(file.getLocation().toOSString(), file);
 		}
 
-		try (Scanner scanner =
-			new Scanner(output)) {
+		try (Scanner scanner = new Scanner(output)) {
 			String currentLine;
 			while (scanner.hasNextLine()) {
-				currentLine =
-					scanner.nextLine();
+				currentLine = scanner.nextLine();
 				// \S*\s(\w+)\sin\s(\w:[\w,\\,.,\s]*.java)\s[(]at line (\d+)[)]
-				final Pattern pattern =
-					Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
-				final Matcher matcher =
-					pattern.matcher(currentLine);
+				final Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S.*[.]java)\\s[(]at line (\\d+)[)]");
+				final Matcher matcher = pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;
 				}
 				try {
-					final boolean contains =
-						sourcePaths.containsKey(matcher.group(2));
+					final boolean contains = sourcePaths.containsKey(matcher.group(2));
 					if (!contains) {
 						continue;
 					}
@@ -215,37 +192,26 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 					UIPlugin.getDefault().logError(e);
 					continue;
 				}
-				final boolean warning =
-					"WARNING".equals(matcher.group(1));
-				final IFile currentFile =
-					sourcePaths.get(matcher.group(2));
-				final int line =
-					Integer.parseInt(matcher.group(3));
+				final boolean warning = "WARNING".equals(matcher.group(1));
+				final IFile currentFile = sourcePaths.get(matcher.group(2));
+				final int line = Integer.parseInt(matcher.group(3));
 				// get error message in from the next lines
 				while (scanner.hasNextLine()) {
-					currentLine =
-						scanner.nextLine();
-					final Pattern messagePattern =
-						Pattern.compile("\\w.*");
-					final Matcher m =
-						messagePattern.matcher(currentLine);
-					final boolean found =
-						m.matches();
+					currentLine = scanner.nextLine();
+					final Pattern messagePattern = Pattern.compile("\\w.*");
+					final Matcher m = messagePattern.matcher(currentLine);
+					final boolean found = m.matches();
 					if (found) {
 						break;
 					}
 				}
 
-				final String errorMessage =
-					currentLine;
+				final String errorMessage = currentLine;
 				// if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
 				// errorMessage = parseCannotFindSymbolMessage(scanner);
 				// }
-				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE)
-					|| errorMessage.contains(ERROR_IGNOR_CAST)
-					|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
-					|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT)
-						&& !errorMessage.contains("cannot be resolved"))
+				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) || errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
+					|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) && !errorMessage.contains("cannot be resolved"))
 					|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
 					continue;
 				}
@@ -253,16 +219,11 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 					errorFiles.add(currentFile);
 				}
 				IMarker newMarker;
-				newMarker =
-					currentFile.createMarker(PROBLEM_MARKER);
+				newMarker = currentFile.createMarker(PROBLEM_MARKER);
 				if (newMarker.exists()) {
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
-					newMarker.setAttribute(IMarker.MESSAGE, configurationName
-						+ " "
-						+ errorMessage);
-					newMarker.setAttribute(IMarker.SEVERITY, warning
-						? IMarker.SEVERITY_WARNING
-						: IMarker.SEVERITY_ERROR);
+					newMarker.setAttribute(IMarker.MESSAGE, configurationName + " " + errorMessage);
+					newMarker.setAttribute(IMarker.SEVERITY, warning ? IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR);
 				}
 			}
 		} catch (final CoreException e) {
@@ -275,15 +236,11 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	@SuppressWarnings("unused")
 	private String parseCannotFindSymbolMessage(Scanner scanner) {
 		while (scanner.hasNextLine()) {
-			final String currentLine =
-				scanner.nextLine();
+			final String currentLine = scanner.nextLine();
 			if (currentLine.startsWith(SYMBOL)) {
-				final String[] tokens =
-					currentLine.split(": ");
+				final String[] tokens = currentLine.split(": ");
 				if (tokens.length == 2) {
-					return CANNOT_FIND_SYMBOL
-						+ ": "
-						+ tokens[1];
+					return CANNOT_FIND_SYMBOL + ": " + tokens[1];
 				}
 				break;
 			}
@@ -298,8 +255,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @return A list with all java files at the folder
 	 */
 	private LinkedList<IFile> getJavaFiles(IFolder folder) {
-		final LinkedList<IFile> files =
-			new LinkedList<IFile>();
+		final LinkedList<IFile> files = new LinkedList<IFile>();
 		try {
 			for (final IResource res : folder.members()) {
 				if (res instanceof IFolder) {

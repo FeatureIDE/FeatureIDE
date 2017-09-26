@@ -36,14 +36,9 @@ public class LiteralComparator implements Comparator<Literal> {
 		if (arg0.positive == arg1.positive) {
 			if (arg0.var == arg1.var) {
 				return 0;
-			} else if ((arg0.var == NodeCreator.varTrue)
-				|| (arg0.var == NodeCreator.varFalse)) {
-				return ((arg0.var == NodeCreator.varTrue)
-					|| (arg1.var != NodeCreator.varTrue))
-						? -1
-						: 1;
-			} else if ((arg1.var == NodeCreator.varTrue)
-				|| (arg1.var == NodeCreator.varFalse)) {
+			} else if ((arg0.var == NodeCreator.varTrue) || (arg0.var == NodeCreator.varFalse)) {
+				return ((arg0.var == NodeCreator.varTrue) || (arg1.var != NodeCreator.varTrue)) ? -1 : 1;
+			} else if ((arg1.var == NodeCreator.varTrue) || (arg1.var == NodeCreator.varFalse)) {
 				return 1;
 			} else {
 				return ((String) arg0.var).compareTo((String) arg1.var);

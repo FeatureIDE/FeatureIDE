@@ -52,34 +52,28 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	protected Image image;
 
 	private boolean isCalculating;
-	private boolean sorted =
-		false;
+	private boolean sorted = false;
 
 	public boolean isSorted() {
 		return sorted;
 	}
 
 	public void setSorted(boolean sorted) {
-		this.sorted =
-			sorted;
+		this.sorted = sorted;
 	}
 
 	protected Parent parent;
-	protected List<Parent> children =
-		new LinkedList<Parent>();
+	protected List<Parent> children = new LinkedList<Parent>();
 
-	private static final String IS_CALCULATING =
-		"(calculating)";
-	public static final Image REFESH_TAB_IMAGE =
-		UIPlugin.getImage("refresh_tab.gif");
+	private static final String IS_CALCULATING = "(calculating)";
+	public static final Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
 
 	public Object getValue() {
 		return value;
 	}
 
 	public void setValue(Object value) {
-		this.value =
-			value;
+		this.value = value;
 	}
 
 	public Image getImage() {
@@ -91,13 +85,11 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public void setDescription(String description) {
-		this.description =
-			description;
+		this.description = description;
 	}
 
 	public void setImage(Image image) {
-		this.image =
-			image;
+		this.image = image;
 	}
 
 	protected Parent() {}
@@ -107,10 +99,8 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public Parent(String description, Object value) {
-		this.description =
-			description;
-		this.value =
-			value;
+		this.description = description;
+		this.value = value;
 	}
 
 	public void addChild(Parent child) {
@@ -151,29 +141,22 @@ public class Parent implements StatisticsIds, GUIDefaults {
 
 	@Override
 	public String toString() {
-		final StringBuilder buffer =
-			new StringBuilder();
-		buffer.append((description == null)
-			? ""
-			: description.toString());
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append((description == null) ? "" : description.toString());
 		if (isCalculating) {
 			buffer.append(SEPARATOR);
 			buffer.append(IS_CALCULATING);
 		} else {
-			if ((description != null)
-				&& (value != null)) {
+			if ((description != null) && (value != null)) {
 				buffer.append(SEPARATOR);
 			}
-			buffer.append(((value == null)
-				? ""
-				: value.toString()));
+			buffer.append(((value == null) ? "" : value.toString()));
 		}
 		return buffer.toString();
 	}
 
 	public void setParent(Parent parent) {
-		this.parent =
-			parent;
+		this.parent = parent;
 	}
 
 	public boolean isCalculating() {
@@ -181,8 +164,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public void setCalculating(boolean isCalculating) {
-		this.isCalculating =
-			isCalculating;
+		this.isCalculating = isCalculating;
 	}
 
 	public Parent getParent() {
@@ -190,10 +172,7 @@ public class Parent implements StatisticsIds, GUIDefaults {
 	}
 
 	public void startCalculating(boolean start) {
-		setImage(start
-			? REFESH_TAB_IMAGE
-			: null);
-		isCalculating =
-			start;
+		setImage(start ? REFESH_TAB_IMAGE : null);
+		isCalculating = start;
 	}
 }

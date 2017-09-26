@@ -38,15 +38,11 @@ public class ReverseLevelOrderHeuristic extends ATreeHeuristic {
 
 	@Override
 	protected void order(IFeatureStructure root) {
-		indexArrayIndex =
-			indexArray.length
-				- 1;
-		final LinkedList<IFeatureStructure> list =
-			new LinkedList<>();
+		indexArrayIndex = indexArray.length - 1;
+		final LinkedList<IFeatureStructure> list = new LinkedList<>();
 		list.add(root);
 		while (!list.isEmpty()) {
-			final IFeatureStructure nextFeature =
-				list.removeFirst();
+			final IFeatureStructure nextFeature = list.removeFirst();
 			list.addAll(nextFeature.getChildren());
 			find(nextFeature.getFeature());
 		}

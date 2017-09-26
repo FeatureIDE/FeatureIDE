@@ -32,14 +32,11 @@ import java.util.Set;
 public class RequirementCategory {
 
 	String catName;
-	Map<String, String> requirements =
-		new HashMap<String, String>();
+	Map<String, String> requirements = new HashMap<String, String>();
 
 	public RequirementCategory(String categoryName, Map<String, String> requirements) {
-		catName =
-			categoryName;
-		this.requirements =
-			requirements;
+		catName = categoryName;
+		this.requirements = requirements;
 	}
 
 	public String getCategory() {

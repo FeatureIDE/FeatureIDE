@@ -48,36 +48,28 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 
 	@Override
 	public List<int[]> analyze(IMonitor monitor) throws Exception {
-		final List<int[]> result =
-			new ArrayList<>();
+		final List<int[]> result = new ArrayList<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 =
-			solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 =
-				solver.findModel();
+			final int[] model2 = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
-			final byte[] done =
-				new byte[model1.length];
+			final byte[] done = new byte[model1.length];
 
-			final int[] model1Copy =
-				Arrays.copyOf(model1, model1.length);
+			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
 
 			SatInstance.updateModel(model1Copy, model2);
-			for (int i =
-				0; i < model1Copy.length; i++) {
-				final int varX =
-					model1Copy[i];
+			for (int i = 0; i < model1Copy.length; i++) {
+				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						done[i] =
-							2;
+						done[i] = 2;
 						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
@@ -91,42 +83,27 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 					}
 				}
 			}
-			final int fixedSize =
-				solver.getAssignment().size();
+			final int fixedSize = solver.getAssignment().size();
 			result.add(solver.getAssignmentArray(0, fixedSize));
 
-			for (int i =
-				0; i < model1.length; i++) {
+			for (int i = 0; i < model1.length; i++) {
 				if (done[i] == 0) {
-					done[i] =
-						2;
+					done[i] = 2;
 
-					int c =
-						0;
-					int[] xModel0 =
-						Arrays.copyOf(model1, model1.length);
+					int c = 0;
+					int[] xModel0 = Arrays.copyOf(model1, model1.length);
 
-					final int mx0 =
-						xModel0[i];
+					final int mx0 = xModel0[i];
 					solver.assignmentPush(mx0);
-					final RingList<int[]> solutions =
-						solver.getSolutionList();
+					final RingList<int[]> solutions = solver.getSolutionList();
 
-					inner: for (int j =
-						i
-							+ 1; j < xModel0.length; j++) {
-						final int my0 =
-							xModel0[j];
-						if ((my0 != 0)
-							&& (done[j] == 0)) {
-							for (int k =
-								1; k < solutions.size(); k++) {
-								final int[] solution =
-									solutions.get(k);
-								final int mxI =
-									solution[i];
-								final int myI =
-									solution[j];
+					inner: for (int j = i + 1; j < xModel0.length; j++) {
+						final int my0 = xModel0[j];
+						if ((my0 != 0) && (done[j] == 0)) {
+							for (int k = 1; k < solutions.size(); k++) {
+								final int[] solution = solutions.get(k);
+								final int mxI = solution[i];
+								final int myI = solution[j];
 								if ((mx0 == mxI) != (my0 == myI)) {
 									continue inner;
 								}
@@ -136,8 +113,7 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 
 							switch (solver.isSatisfiable()) {
 							case FALSE:
-								done[j] =
-									1;
+								done[j] = 1;
 								break;
 							case TIMEOUT:
 								break;
@@ -157,50 +133,39 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 					case FALSE:
 						break;
 					case TIMEOUT:
-						for (int j =
-							i
-								+ 1; j < xModel0.length; j++) {
-							done[j] =
-								0;
+						for (int j = i + 1; j < xModel0.length; j++) {
+							done[j] = 0;
 						}
 						break;
 					case TRUE:
-						xModel0 =
-							solver.getModel();
+						xModel0 = solver.getModel();
 						break;
 					}
 
-					for (int j =
-						i
-							+ 1; j < xModel0.length; j++) {
+					for (int j = i + 1; j < xModel0.length; j++) {
 						if (done[j] == 1) {
-							final int my0 =
-								xModel0[j];
+							final int my0 = xModel0[j];
 							if (my0 != 0) {
 								solver.assignmentPush(-my0);
 
 								switch (solver.isSatisfiable()) {
 								case FALSE:
-									done[j] =
-										2;
+									done[j] = 2;
 									solver.assignmentReplaceLast(my0);
 									break;
 								case TIMEOUT:
-									done[j] =
-										0;
+									done[j] = 0;
 									solver.assignmentPop();
 									break;
 								case TRUE:
-									done[j] =
-										0;
+									done[j] = 0;
 									SatInstance.updateModel(xModel0, solver.getModel());
 									updateSolver(c++);
 									solver.assignmentPop();
 									break;
 								}
 							} else {
-								done[j] =
-									0;
+								done[j] = 0;
 							}
 						}
 					}
@@ -214,8 +179,7 @@ public class AtomicSetAnalysis extends AbstractAnalysis<List<int[]>> {
 	}
 
 	private void updateSolver(int c) {
-		if (((c
-			% 2) == 0)) {
+		if (((c % 2) == 0)) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 		} else {
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);

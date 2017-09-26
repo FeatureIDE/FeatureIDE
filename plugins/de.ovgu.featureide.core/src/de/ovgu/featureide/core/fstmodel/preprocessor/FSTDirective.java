@@ -39,20 +39,16 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 public class FSTDirective extends RoleElement<FSTDirective> {
 
 	private String expression;
-	private List<String> featureNames =
-		null;
+	private List<String> featureNames = null;
 	private FSTDirectiveCommand command;
-	private LinkedList<FSTDirective> children =
-		new LinkedList<FSTDirective>();
-	private final LinkedList<RoleElement<?>> roleChildren =
-		new LinkedList<RoleElement<?>>();
+	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
+	private final LinkedList<RoleElement<?>> roleChildren = new LinkedList<RoleElement<?>>();
 	private @CheckForNull FSTDirective parent;
 	private int startLine;
 	private int startOffset;
 	private int endLine;
 	private int endLength;
-	private int id =
-		-1;
+	private int id = -1;
 	private @CheckForNull FSTRole role;
 	private List<AbstractSignature> insideOfSig;
 	private List<AbstractSignature> includedSig;
@@ -67,8 +63,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public void setCommand(FSTDirectiveCommand command) {
-		this.command =
-			command;
+		this.command = command;
 	}
 
 	public FSTDirectiveCommand getCommand() {
@@ -80,8 +75,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public void setExpression(String expression) {
-		this.expression =
-			expression;
+		this.expression = expression;
 	}
 
 	public boolean hasChildren() {
@@ -92,12 +86,9 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 * @return the children
 	 */
 	public FSTDirective[] getChildren() {
-		final FSTDirective[] elements =
-			new FSTDirective[children.size()];
-		for (int i =
-			0; i < children.size(); i++) {
-			elements[i] =
-				children.get(i);
+		final FSTDirective[] elements = new FSTDirective[children.size()];
+		for (int i = 0; i < children.size(); i++) {
+			elements[i] = children.get(i);
 		}
 		return elements;
 	}
@@ -114,8 +105,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 		for (final FSTDirective d : children) {
 			d.setParent(this);
 		}
-		this.children =
-			children;
+		this.children = children;
 	}
 
 	public void addChild(FSTDirective child) {
@@ -127,8 +117,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 * @param parent
 	 */
 	private void setParent(FSTDirective parent) {
-		this.parent =
-			parent;
+		this.parent = parent;
 	}
 
 	/**
@@ -137,9 +126,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 * @return
 	 */
 	public String toDependencyString() {
-		return (parent != null)
-			? parent.toDependencyString()
-			: toString(0);
+		return (parent != null) ? parent.toDependencyString() : toString(0);
 	}
 
 	/**
@@ -149,10 +136,8 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 * @return
 	 */
 	private String toString(int i) {
-		final StringBuilder ret =
-			new StringBuilder();
-		for (int j =
-			i; j > 0; j--) {
+		final StringBuilder ret = new StringBuilder();
+		for (int j = i; j > 0; j--) {
 			ret.append("     ");
 		}
 		ret.append(interpretCommand(command));
@@ -164,8 +149,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 				if (child.toString().startsWith("el")) {
 					ret.append(child.toString(i));
 				} else {
-					ret.append(child.toString(i
-						+ 1));
+					ret.append(child.toString(i + 1));
 				}
 			}
 		}
@@ -178,22 +162,15 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 * @return
 	 */
 	public String toCommandString() {
-		if (command.equals(FSTDirectiveCommand.ELSE)
-			|| command.equals(FSTDirectiveCommand.ELSE_NOT)) {
-			return "if !("
-				+ parent.getExpression()
-				+ ")";
+		if (command.equals(FSTDirectiveCommand.ELSE) || command.equals(FSTDirectiveCommand.ELSE_NOT)) {
+			return "if !(" + parent.getExpression() + ")";
 		}
-		return interpretCommand(command)
-			+ ' '
-			+ expression;
+		return interpretCommand(command) + ' ' + expression;
 	}
 
 	@Override
 	public String toString() {
-		return interpretCommand(command)
-			+ ' '
-			+ expression;
+		return interpretCommand(command) + ' ' + expression;
 	}
 
 	private String interpretCommand(FSTDirectiveCommand command) {
@@ -230,12 +207,8 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public int getColor() {
-		final FSTRole role2 =
-			getRole();
-		return ((role2 != null)
-			&& (role2.getFeature() != null))
-				? role2.getFeature().getColor()
-				: -1;
+		final FSTRole role2 = getRole();
+		return ((role2 != null) && (role2.getFeature() != null)) ? role2.getFeature().getColor() : -1;
 	}
 
 	public int getStartLine() {
@@ -256,31 +229,23 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public void setStartLine(int startLine, int startOffset) {
-		this.startLine =
-			startLine;
-		this.startOffset =
-			startOffset;
+		this.startLine = startLine;
+		this.startOffset = startOffset;
 	}
 
 	public void setEndLine(int endLine, int endLength) {
-		this.endLine =
-			endLine;
-		this.endLength =
-			endLength;
+		this.endLine = endLine;
+		this.endLength = endLength;
 	}
 
 	@Override
 	public void setRole(FSTRole fstRole) {
-		role =
-			fstRole;
+		role = fstRole;
 	}
 
 	@Override
 	public FSTRole getRole() {
-		return ((role == null)
-			&& (parent != null))
-				? parent.getRole()
-				: role;
+		return ((role == null) && (parent != null)) ? parent.getRole() : role;
 	}
 
 	public List<String> getFeatureNames() {
@@ -288,16 +253,13 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public void setFeatureNames(List<String> featureNames) {
-		this.featureNames =
-			featureNames;
+		this.featureNames = featureNames;
 	}
 
 	public void setFeatureName(String featureName) {
-		final List<String> fN =
-			new LinkedList<String>();
+		final List<String> fN = new LinkedList<String>();
 		fN.add(featureName);
-		featureNames =
-			fN;
+		featureNames = fN;
 	}
 
 	public int getId() {
@@ -305,8 +267,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public void setId(int id) {
-		this.id =
-			id;
+		this.id = id;
 	}
 
 	@Override
@@ -323,9 +284,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			return 0;
 		} else {
 			// TODO Is the linenumber check enough?
-			return getStartLine() > element.getStartLine()
-				? 1
-				: -1;
+			return getStartLine() > element.getStartLine() ? 1 : -1;
 		}
 	}
 
@@ -335,9 +294,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			return true;
 		}
 		if (obj instanceof FSTDirective) {
-			if ((((FSTDirective) obj).getStartLine() == getStartLine())
-				&&
-				(((FSTDirective) obj).getEndLine() == getEndLine())) {
+			if ((((FSTDirective) obj).getStartLine() == getStartLine()) && (((FSTDirective) obj).getEndLine() == getEndLine())) {
 				return super.equals(obj);
 			}
 		}
@@ -346,8 +303,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 
 	public void addSig_insideOf(AbstractSignature next) {
 		if (insideOfSig == null) {
-			insideOfSig =
-				new ArrayList<AbstractSignature>();
+			insideOfSig = new ArrayList<AbstractSignature>();
 		}
 		insideOfSig.add(next);
 	}
@@ -358,8 +314,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 
 	public void addSig_included(AbstractSignature next) {
 		if (includedSig == null) {
-			includedSig =
-				new ArrayList<AbstractSignature>();
+			includedSig = new ArrayList<AbstractSignature>();
 		}
 		includedSig.add(next);
 	}
@@ -372,13 +327,10 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	}
 
 	public RoleElement<?>[] getRoleElementChildren() {
-		final RoleElement<?>[] elements =
-			new RoleElement<?>[roleChildren.size()];
+		final RoleElement<?>[] elements = new RoleElement<?>[roleChildren.size()];
 
-		for (int i =
-			0; i < roleChildren.size(); i++) {
-			elements[i] =
-				roleChildren.get(i);
+		for (int i = 0; i < roleChildren.size(); i++) {
+			elements[i] = roleChildren.get(i);
 		}
 		return elements;
 	}

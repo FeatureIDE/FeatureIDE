@@ -40,8 +40,7 @@ public abstract class ModelElementFigure extends Figure {
 	 * @param activeReason new active reason; null to reset
 	 */
 	public void setActiveReason(FeatureModelReason activeReason) {
-		this.activeReason =
-			activeReason;
+		this.activeReason = activeReason;
 	}
 
 	/**

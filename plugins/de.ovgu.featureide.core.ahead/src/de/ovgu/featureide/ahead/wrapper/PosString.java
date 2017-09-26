@@ -34,28 +34,23 @@ public class PosString {
 	private int end;
 
 	public PosString(String string) {
-		this.string =
-			string;
+		this.string = string;
 		resetPosition(0, string.length());
 	}
 
 	public PosString(String string, int start) {
-		this.string =
-			string;
+		this.string = string;
 		resetPosition(start, string.length());
 	}
 
 	public PosString(String string, int start, int end) {
-		this.string =
-			string;
+		this.string = string;
 		resetPosition(start, end);
 	}
 
 	public void resetPosition(int start, int end) {
-		pos =
-			start;
-		this.end =
-			end;
+		pos = start;
+		this.end = end;
 	}
 
 	public String currentString() {
@@ -71,17 +66,11 @@ public class PosString {
 	}
 
 	public int lineNumber() {
-		int lineNumber =
-			1;
-		int start =
-			0;
+		int lineNumber = 1;
+		int start = 0;
 		int index;
-		while (((index =
-			string.indexOf('\n', start)) >= 0)
-			&& (index < pos)) {
-			start =
-				index
-					+ 1;
+		while (((index = string.indexOf('\n', start)) >= 0) && (index < pos)) {
+			start = index + 1;
 			lineNumber++;
 		}
 		return lineNumber;

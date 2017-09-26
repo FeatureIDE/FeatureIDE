@@ -54,10 +54,8 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	private final ModelLayoutEditPolicy superPolicy;
 
 	public ConstraintMoveEditPolicy(ConstraintEditPart child, ModelLayoutEditPolicy superPolicy) {
-		editPart =
-			child;
-		this.superPolicy =
-			superPolicy;
+		editPart = child;
+		this.superPolicy = superPolicy;
 	}
 
 	private RectangleFigure r;
@@ -67,23 +65,19 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
 
-		r =
-			new RectangleFigure();
+		r = new RectangleFigure();
 		FigureUtilities.makeGhostShape(r);
 		r.setLineStyle(Graphics.LINE_DOT);
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		final Point s =
-			editPart.getModel().getLocation().getCopy();
+		final Point s = editPart.getModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
-		c =
-			new PolylineConnection();
+		c = new PolylineConnection();
 		c.setForegroundColor(ColorConstants.white);
 		c.setLineWidth(3);
-		final FreeformLayer l =
-			new FreeformLayer();
+		final FreeformLayer l = new FreeformLayer();
 		// l.add(r);
 		l.add(c);
 
@@ -97,8 +91,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		final PrecisionRectangle rect =
-			new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
+		final PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
@@ -106,17 +99,12 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setBounds(rect);
 
 		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
-			final ConstraintDragAndDropCommand cmd =
-				(ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
-			final boolean isAutoLayout =
-				editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
-			if (cmd.canExecute()
-				&& isAutoLayout) {
+			final ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
+			final boolean isAutoLayout = editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
+			if (cmd.canExecute() && isAutoLayout) {
 				c.setForegroundColor(ColorConstants.black);
-				final Point l =
-					cmd.getLeftPoint();
-				final Point r =
-					cmd.getRightPoint();
+				final Point l = cmd.getLeftPoint();
+				final Point r = cmd.getRightPoint();
 				getHostFigure().translateToAbsolute(l);
 				getHostFigure().translateToAbsolute(r);
 				c.setSourceAnchor(new XYAnchor(l));
@@ -129,10 +117,8 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 	@Override
 	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
 		super.eraseChangeBoundsFeedback(request);
-		r =
-			null;
-		c =
-			null;
+		r = null;
+		c = null;
 	}
 
 }

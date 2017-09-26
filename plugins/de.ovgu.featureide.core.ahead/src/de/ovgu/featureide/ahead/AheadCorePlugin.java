@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
  */
 public class AheadCorePlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.core.ahead";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.core.ahead";
 
 	private static AheadCorePlugin plugin;
 
@@ -49,8 +48,7 @@ public class AheadCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 	}
 
 	/*
@@ -59,8 +57,7 @@ public class AheadCorePlugin extends AbstractCorePlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

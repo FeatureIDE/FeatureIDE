@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 public class AspectJCorePlugin extends AbstractCorePlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.core.aspectj"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "de.ovgu.featureide.core.aspectj"; //$NON-NLS-1$
 
 	// The shared instance
 	private static AspectJCorePlugin plugin;
@@ -52,8 +51,7 @@ public class AspectJCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 	}
 
 	/*
@@ -62,8 +60,7 @@ public class AspectJCorePlugin extends AbstractCorePlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

@@ -34,12 +34,9 @@ public class SubsetClauseHeuristic extends AFeatureOrderHeuristic {
 	@Override
 	protected int getNextIndex() {
 
-		for (int i =
-			1; i < map.length; i++) {
-			final DeprecatedFeature next =
-				map[i];
-			if ((next != null)
-				&& next.exp0()) {
+		for (int i = 1; i < map.length; i++) {
+			final DeprecatedFeature next = map[i];
+			if ((next != null) && next.exp0()) {
 				return i;
 			}
 		}
@@ -51,33 +48,21 @@ public class SubsetClauseHeuristic extends AFeatureOrderHeuristic {
 //			}
 //		}
 
-		DeprecatedFeature smallestFeature =
-			map[1];
-		int minIndex =
-			1;
-		for (int i =
-			2; i < map.length; i++) {
-			final DeprecatedFeature next =
-				map[i];
-			if ((next != null)
-				&& (next.getMixedCount() != 0)) {
-				if ((smallestFeature == null)
-					|| (smallestFeature.getMixedCount() == 0)) {
-					smallestFeature =
-						next;
-					minIndex =
-						i;
-				} else if ((smallestFeature.getClauseCount()
-					- next.getClauseCount()) > 0) {
-					smallestFeature =
-						next;
-					minIndex =
-						i;
+		DeprecatedFeature smallestFeature = map[1];
+		int minIndex = 1;
+		for (int i = 2; i < map.length; i++) {
+			final DeprecatedFeature next = map[i];
+			if ((next != null) && (next.getMixedCount() != 0)) {
+				if ((smallestFeature == null) || (smallestFeature.getMixedCount() == 0)) {
+					smallestFeature = next;
+					minIndex = i;
+				} else if ((smallestFeature.getClauseCount() - next.getClauseCount()) > 0) {
+					smallestFeature = next;
+					minIndex = i;
 				}
 			}
 		}
-		if ((smallestFeature == null)
-			|| (smallestFeature.getMixedCount() == 0)) {
+		if ((smallestFeature == null) || (smallestFeature.getMixedCount() == 0)) {
 			return 0;
 		}
 		return minIndex;

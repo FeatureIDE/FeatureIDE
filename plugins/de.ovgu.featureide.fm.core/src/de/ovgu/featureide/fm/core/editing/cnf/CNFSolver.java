@@ -44,48 +44,36 @@ import de.ovgu.featureide.fm.core.editing.remove.DeprecatedClause;
  */
 public class CNFSolver implements ICNFSolver {
 
-	private HashMap<Object, Integer> varToInt =
-		null;
+	private HashMap<Object, Integer> varToInt = null;
 	private final ISolver solver;
 
-	private boolean notSolveable =
-		false;
+	private boolean notSolveable = false;
 
 	public CNFSolver(Node cnf) {
-		varToInt =
-			new HashMap<Object, Integer>();
+		varToInt = new HashMap<Object, Integer>();
 		if (cnf instanceof And) {
 			for (final Node clause : cnf.getChildren()) {
 				if (clause instanceof Or) {
 					for (final Node literal : clause.getChildren()) {
-						final Object var =
-							((Literal) literal).var;
+						final Object var = ((Literal) literal).var;
 						if (!varToInt.containsKey(var)) {
-							final int index =
-								varToInt.size()
-									+ 1;
+							final int index = varToInt.size() + 1;
 							varToInt.put(var, index);
 						}
 					}
 				} else {
-					final Object var =
-						((Literal) clause).var;
+					final Object var = ((Literal) clause).var;
 					if (!varToInt.containsKey(var)) {
-						final int index =
-							varToInt.size()
-								+ 1;
+						final int index = varToInt.size() + 1;
 						varToInt.put(var, index);
 					}
 				}
 			}
 		} else if (cnf instanceof Or) {
 			for (final Node literal : cnf.getChildren()) {
-				final Object var =
-					((Literal) literal).var;
+				final Object var = ((Literal) literal).var;
 				if (!varToInt.containsKey(var)) {
-					final int index =
-						varToInt.size()
-							+ 1;
+					final int index = varToInt.size() + 1;
 					varToInt.put(var, index);
 				}
 			}
@@ -93,111 +81,77 @@ public class CNFSolver implements ICNFSolver {
 			varToInt.put(((Literal) cnf).var, 1);
 		}
 
-		solver =
-			createSolver(varToInt.size());
+		solver = createSolver(varToInt.size());
 
 		try {
 			if (cnf instanceof And) {
 				for (final Node andChild : cnf.getChildren()) {
 					if (andChild instanceof Or) {
-						final Node[] literals =
-							andChild.getChildren();
-						final int[] clause =
-							new int[literals.length];
-						int i =
-							0;
+						final Node[] literals = andChild.getChildren();
+						final int[] clause = new int[literals.length];
+						int i = 0;
 						for (final Node child : literals) {
-							final Literal literal =
-								(Literal) child;
-							clause[i++] =
-								literal.positive
-									? varToInt.get(literal.var)
-									: -varToInt.get(literal.var);
+							final Literal literal = (Literal) child;
+							clause[i++] = literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var);
 						}
 						solver.addClause(new VecInt(clause));
 					} else {
-						final Literal literal =
-							(Literal) andChild;
-						solver.addClause(new VecInt(new int[] {
-							literal.positive
-								? varToInt.get(literal.var)
-								: -varToInt.get(literal.var) }));
+						final Literal literal = (Literal) andChild;
+						solver.addClause(new VecInt(new int[] { literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var) }));
 					}
 				}
 			} else if (cnf instanceof Or) {
-				final Node[] literals =
-					cnf.getChildren();
-				final int[] clause =
-					new int[literals.length];
-				int i =
-					0;
+				final Node[] literals = cnf.getChildren();
+				final int[] clause = new int[literals.length];
+				int i = 0;
 				for (final Node child : literals) {
-					final Literal literal =
-						(Literal) child;
-					clause[i++] =
-						literal.positive
-							? varToInt.get(literal.var)
-							: -varToInt.get(literal.var);
+					final Literal literal = (Literal) child;
+					clause[i++] = literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var);
 				}
 				solver.addClause(new VecInt(clause));
 			} else {
-				final Literal literal =
-					(Literal) cnf;
-				solver.addClause(new VecInt(new int[] {
-					literal.positive
-						? varToInt.get(literal.var)
-						: -varToInt.get(literal.var) }));
+				final Literal literal = (Literal) cnf;
+				solver.addClause(new VecInt(new int[] { literal.positive ? varToInt.get(literal.var) : -varToInt.get(literal.var) }));
 			}
-			final int size =
-				varToInt.size();
-			final VecInt pseudoClause =
-				new VecInt(size
-					+ 1);
-			for (int i =
-				1; i <= size; i++) {
+			final int size = varToInt.size();
+			final VecInt pseudoClause = new VecInt(size + 1);
+			for (int i = 1; i <= size; i++) {
 				pseudoClause.push(i);
 			}
 			pseudoClause.push(-1);
 			solver.addClause(pseudoClause);
 		} catch (final ContradictionException e) {
 			// throw new RuntimeException(e);
-			notSolveable =
-				true;
+			notSolveable = true;
 		}
 	}
 
 	public CNFSolver(Collection<? extends Clause> clauses, int size) {
-		solver =
-			createSolver(size);
+		solver = createSolver(size);
 		addClauses(clauses);
 	}
 
 	public CNFSolver(int size) {
-		solver =
-			createSolver(size);
+		solver = createSolver(size);
 	}
 
 	public void addClauses(Collection<? extends Clause> clauses) {
 		// Before adding new clauses reset not solveable tag
-		notSolveable =
-			false;
+		notSolveable = false;
 
 		try {
 			for (final Clause node : clauses) {
-				final int[] literals =
-					node.getLiterals();
+				final int[] literals = node.getLiterals();
 				solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 			}
 		} catch (final ContradictionException e) {
 			// throw new RuntimeException(e);
-			notSolveable =
-				true; // Tag the CNF as not solvable
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 	}
 
 	private ISolver createSolver(int size) {
-		final ISolver solver =
-			SolverFactory.newDefault();
+		final ISolver solver = SolverFactory.newDefault();
 		solver.setTimeoutMs(1000);
 		solver.newVar(size);
 		return solver;
@@ -208,8 +162,7 @@ public class CNFSolver implements ICNFSolver {
 		if (notSolveable) {
 			return false;
 		}
-		final int[] unitClauses =
-			new int[literals.length];
+		final int[] unitClauses = new int[literals.length];
 		System.arraycopy(literals, 0, unitClauses, 0, unitClauses.length);
 
 		return solver.isSatisfiable(new VecInt(unitClauses));
@@ -219,20 +172,14 @@ public class CNFSolver implements ICNFSolver {
 		if (notSolveable) {
 			return false;
 		}
-		final int[] unitClauses =
-			new int[literals.length];
-		int i =
-			0;
+		final int[] unitClauses = new int[literals.length];
+		int i = 0;
 		for (final Literal literal : literals) {
-			final Integer value =
-				varToInt.get(literal.var);
+			final Integer value = varToInt.get(literal.var);
 			if (value == null) {
 				throw new UnkownLiteralException(literal);
 			}
-			unitClauses[i++] =
-				literal.positive
-					? value
-					: -value;
+			unitClauses[i++] = literal.positive ? value : -value;
 		}
 		return solver.isSatisfiable(new VecInt(unitClauses));
 	}
@@ -244,15 +191,13 @@ public class CNFSolver implements ICNFSolver {
 
 	@Override
 	public void addClause(DeprecatedClause mainClause) {
-		final int[] literals =
-			mainClause.literals;
+		final int[] literals = mainClause.literals;
 
 		try {
 			solver.addClause(new VecInt(Arrays.copyOf(literals, literals.length)));
 		} catch (final ContradictionException e) {
 //			throw new RuntimeException(e);
-			notSolveable =
-				true; // Tag the CNF as not solvable
+			notSolveable = true; // Tag the CNF as not solvable
 		}
 
 	}

@@ -71,10 +71,8 @@ public class Implies extends Node implements Cloneable {
 		if (!getClass().isInstance(object)) {
 			return false;
 		}
-		final Implies implies =
-			(Implies) object;
-		return children[0].equals(implies.children[0])
-			&& children[1].equals(implies.children[1]);
+		final Implies implies = (Implies) object;
+		return children[0].equals(implies.children[0]) && children[1].equals(implies.children[1]);
 	}
 
 	@Override
@@ -84,8 +82,7 @@ public class Implies extends Node implements Cloneable {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		return !children[0].getValue(map)
-			|| children[1].getValue(map);
+		return !children[0].getValue(map) || children[1].getValue(map);
 	}
 
 }

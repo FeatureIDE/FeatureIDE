@@ -49,8 +49,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	/** The CNF with all constraints but the redundant one. */
 	private Node cnfWithoutRedundantConstraint;
 	/** The amount of clauses added to the CNF that originate from a constraint. */
-	private int constraintClauseCount =
-		0;
+	private int constraintClauseCount = 0;
 
 	@Override
 	public IConstraint getSubject() {
@@ -59,8 +58,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IConstraint)) {
+		if ((subject != null) && !(subject instanceof IConstraint)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -75,41 +73,32 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 */
 	@Override
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc =
-			super.createNodeCreator();
+		final AdvancedNodeCreator nc = super.createNodeCreator();
 		nc.setModelType(ModelType.OnlyStructure);
 		return nc;
 	}
 
 	protected Node getCnfWithoutRedundantConstraint() {
-		if ((cnfWithoutRedundantConstraint == null)
-			&& (getFeatureModel() != null)) {
-			cnfWithoutRedundantConstraint =
-				createCnfWithoutRedundantConstraint();
+		if ((cnfWithoutRedundantConstraint == null) && (getFeatureModel() != null)) {
+			cnfWithoutRedundantConstraint = createCnfWithoutRedundantConstraint();
 		}
 		return cnfWithoutRedundantConstraint;
 	}
 
 	protected Node createCnfWithoutRedundantConstraint() {
 		getTraceModel().removeTraces(constraintClauseCount);
-		constraintClauseCount =
-			0;
+		constraintClauseCount = 0;
 
-		final List<Node> clauses =
-			new LinkedList<>();
+		final List<Node> clauses = new LinkedList<>();
 		Collections.addAll(clauses, getCnf().getChildren());
-		final AdvancedNodeCreator nc =
-			getNodeCreator();
+		final AdvancedNodeCreator nc = getNodeCreator();
 		for (final IConstraint constraint : getFeatureModel().getConstraints()) {
 			if (constraint == getSubject()) {
 				continue;
 			}
-			final Node constraintNode =
-				nc.createConstraintNode(constraint);
-			final Node[] constraintClauses =
-				constraintNode.getChildren();
-			constraintClauseCount +=
-				constraintClauses.length;
+			final Node constraintNode = nc.createConstraintNode(constraint);
+			final Node[] constraintClauses = constraintNode.getChildren();
+			constraintClauseCount += constraintClauses.length;
 			Collections.addAll(clauses, constraintClauses);
 		}
 		return new And(clauses.toArray(new Node[clauses.size()]));
@@ -130,15 +119,12 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 */
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
-		final RedundantConstraintExplanation cumulatedExplanation =
-			getConcreteExplanation();
+		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms =
-			getOracle();
+		final Ltms ltms = getOracle();
 		for (final Map<Object, Boolean> assignment : getSubject().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
-			final Explanation explanation =
-				getExplanation(ltms.getExplanations());
+			final Explanation explanation = getExplanation(ltms.getExplanations());
 			if (explanation == null) {
 				continue;
 			}

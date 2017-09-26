@@ -42,9 +42,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class ConversionWizard extends Wizard implements INewWizard {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".wizzard.ConversionWizzard";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizzard.ConversionWizzard";
 
 	private ConversionPage page;
 
@@ -52,8 +50,7 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		if (page.hasCompositionTool()
-			&& project.isOpen()) {
+		if (page.hasCompositionTool() && project.isOpen()) {
 			CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath(),
 					page.isEnabled(page.sourcePath), page.isEnabled(page.buildPath));
 			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
@@ -72,13 +69,10 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		final IResource res =
-			SelectionWrapper.init(selection, IResource.class).getNext();
+		final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
 		if (res != null) {
-			project =
-				res.getProject();
-			page =
-				new ConversionPage(project);
+			project = res.getProject();
+			page = new ConversionPage(project);
 		}
 	}
 }

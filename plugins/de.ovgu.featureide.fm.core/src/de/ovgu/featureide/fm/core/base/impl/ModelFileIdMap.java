@@ -39,8 +39,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class ModelFileIdMap {
 
-	private static final Map<String, Long> map =
-		new HashMap<>();
+	private static final Map<String, Long> map = new HashMap<>();
 
 	/**
 	 * Returns the feature models unique numeric identifier which is determined by the feature models physical file. A call to this method returns the id
@@ -55,13 +54,10 @@ public class ModelFileIdMap {
 	 * @return The identifier associated with <b>modelFile</b> if there is already such an association. </b>featureModel</b>'s identifier otherwise.
 	 */
 	public static synchronized long getModelId(IFeatureModel featureModel, Path modelFile) {
-		final String fileLocation =
-			modelFile.toAbsolutePath().toString();
-		Long id =
-			map.get(fileLocation);
+		final String fileLocation = modelFile.toAbsolutePath().toString();
+		Long id = map.get(fileLocation);
 		if (id == null) {
-			id =
-				featureModel.getId();
+			id = featureModel.getId();
 			map.put(fileLocation, id);
 		}
 		return id;

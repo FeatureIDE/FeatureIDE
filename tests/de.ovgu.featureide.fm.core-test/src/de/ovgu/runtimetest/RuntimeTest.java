@@ -146,22 +146,18 @@ public abstract class RuntimeTest {
 
 	class RangeException extends RuntimeException {
 
-		private static final long serialVersionUID =
-			5567220675749347664L;
+		private static final long serialVersionUID = 5567220675749347664L;
 
 		public RangeException(final Annotations.Constraint constraint) {
-			super("Constraint ranges for test are out of bounds or negative. Lower bound = method runtime - "
-				+ (-constraint.allowedMinus())
-				+ ", upper bound = method runtime + "
-				+ constraint.allowedPlus()
+			super("Constraint ranges for test are out of bounds or negative. Lower bound = method runtime - " + (-constraint.allowedMinus())
+				+ ", upper bound = method runtime + " + constraint.allowedPlus()
 				+ "]. Lower bound must be less method runtime and upper bound must be greater than runtime.");
 		}
 	}
 
 	class ViolationException extends AssertionError {
 
-		private static final long serialVersionUID =
-			7877278129859302108L;
+		private static final long serialVersionUID = 7877278129859302108L;
 
 		public ViolationException(final String msg) {
 			super(msg);
@@ -185,14 +181,10 @@ public abstract class RuntimeTest {
 			public PlainTextFileHistory(final Logger logger, final String directoryToStoreFiles, final String fileExtension) {
 				super(logger);
 				if (!new File(directoryToStoreFiles).isDirectory()) {
-					throw new RuntimeException(String.format(
-							"\"%s\" is not a accessible directory",
-							directoryToStoreFiles));
+					throw new RuntimeException(String.format("\"%s\" is not a accessible directory", directoryToStoreFiles));
 				} else {
-					this.directoryToStoreFiles =
-						directoryToStoreFiles;
-					this.fileExtension =
-						fileExtension;
+					this.directoryToStoreFiles = directoryToStoreFiles;
+					this.fileExtension = fileExtension;
 				}
 			}
 
@@ -209,10 +201,8 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected void clearHistory(final String clazz, final String method) {
-				assert ((clazz != null)
-					&& !clazz.isEmpty());
-				assert ((method != null)
-					&& !method.isEmpty());
+				assert ((clazz != null) && !clazz.isEmpty());
+				assert ((method != null) && !method.isEmpty());
 
 				clear(new File(autoName(clazz, method)));
 
@@ -221,59 +211,43 @@ public abstract class RuntimeTest {
 
 			@Override
 			protected boolean hasHistory(final String clazz, final String method) {
-				assert ((clazz != null)
-					&& !clazz.isEmpty());
-				assert ((method != null)
-					&& !method.isEmpty());
+				assert ((clazz != null) && !clazz.isEmpty());
+				assert ((method != null) && !method.isEmpty());
 
 				return new File(autoName(clazz, method)).exists();
 			}
 
 			@Override
 			protected Queue<Double> loadHistory(final String clazz, final String method) {
-				assert ((clazz != null)
-					&& !clazz.isEmpty());
-				assert ((method != null)
-					&& !method.isEmpty());
+				assert ((clazz != null) && !clazz.isEmpty());
+				assert ((method != null) && !method.isEmpty());
 
-				final Queue<Double> retval =
-					new LinkedList<>();
+				final Queue<Double> retval = new LinkedList<>();
 				try {
 					for (final String s : readAllLines(Paths.get(autoName(clazz, method)))) {
 						retval.add(Double.valueOf(s));
 					}
 				} catch (final Exception e) {
-					Assert.fail("Unable to load: "
-						+ autoName(clazz, method));
+					Assert.fail("Unable to load: " + autoName(clazz, method));
 				}
 
 				return retval;
 			}
 
 			private String autoName(final String clazz, final String method) {
-				assert ((clazz != null)
-					&& !clazz.isEmpty());
-				assert ((method != null)
-					&& !method.isEmpty());
-				return clazz
-					+ "_"
-					+ method
-					+ "."
-					+ fileExtension;
+				assert ((clazz != null) && !clazz.isEmpty());
+				assert ((method != null) && !method.isEmpty());
+				return clazz + "_" + method + "." + fileExtension;
 			}
 
 			@Override
 			protected void storeHistory(String clazz, String method, Collection<Double> runtimes) {
-				assert ((clazz != null)
-					&& !clazz.isEmpty());
-				assert ((method != null)
-					&& !method.isEmpty());
+				assert ((clazz != null) && !clazz.isEmpty());
+				assert ((method != null) && !method.isEmpty());
 				assert (runtimes != null);
 
-				final File file =
-					clear(new File(autoName(clazz, method)));
-				try (final PrintStream ps =
-					new PrintStream(file)) {
+				final File file = clear(new File(autoName(clazz, method)));
+				try (final PrintStream ps = new PrintStream(file)) {
 					for (final Double d : runtimes) {
 						ps.println(d);
 					}
@@ -285,77 +259,46 @@ public abstract class RuntimeTest {
 
 		public static class Result {
 
-			public static final Result PASSES =
-				new Result(true, "");
+			public static final Result PASSES = new Result(true, "");
 
 			String message;
 
-			boolean testPass =
-				false;
+			boolean testPass = false;
 
 			public Result(final boolean pass, final String msg) {
-				testPass =
-					pass;
-				message =
-					msg;
+				testPass = pass;
+				message = msg;
 			}
 		}
 
 		protected static Logger logger;
 
-		protected final Map<String, Map<String, Queue<Double>>> history =
-			new HashMap<>();
+		protected final Map<String, Map<String, Queue<Double>>> history = new HashMap<>();
 
 		public History(final Logger logger) {
-			History.logger =
-				logger;
+			History.logger = logger;
 		}
 
 		private boolean valid(final Class<? extends RuntimeTest> clazz, final Method method, final Queue<Double> runtimes,
 				final Annotations.Constraint constraint, final double avgRuntime) {
 			assert (clazz != null);
 			assert (method != null);
-			assert ((runtimes != null)
-				&& !runtimes.isEmpty());
+			assert ((runtimes != null) && !runtimes.isEmpty());
 			assert (constraint != null);
 
-			final double recordedAvg =
-				avg(runtimes);
-			final double max =
-				constraint.allowedPlus() == Double.POSITIVE_INFINITY
-					? constraint.allowedMinus()
-					: recordedAvg
-						+ constraint.allowedPlus();
-			final double min =
-				constraint.allowedMinus() == Double.NEGATIVE_INFINITY
-					? constraint.allowedMinus()
-					: recordedAvg
-						- constraint.allowedMinus();
+			final double recordedAvg = avg(runtimes);
+			final double max = constraint.allowedPlus() == Double.POSITIVE_INFINITY ? constraint.allowedMinus() : recordedAvg + constraint.allowedPlus();
+			final double min = constraint.allowedMinus() == Double.NEGATIVE_INFINITY ? constraint.allowedMinus() : recordedAvg - constraint.allowedMinus();
 
 			assert (recordedAvg >= 0);
 			assert (max >= recordedAvg);
 			assert (min <= recordedAvg);
 
-			final boolean pass =
-				((min == Double.NEGATIVE_INFINITY)
-					|| (avgRuntime >= min))
-					&& ((max == Double.POSITIVE_INFINITY)
-						|| (avgRuntime <= max));
+			final boolean pass = ((min == Double.NEGATIVE_INFINITY) || (avgRuntime >= min)) && ((max == Double.POSITIVE_INFINITY) || (avgRuntime <= max));
 
-			logger.logLn(Level.DEBUG, method.getName()
-				+ " average from history: "
-				+ recordedAvg
-				+ "msec");
-			logger.logLn(Level.DEBUG, "\tActual processing duration: "
-				+ avgRuntime
-				+ "msec in ["
-				+ min
-				+ ", "
-				+ max
-				+ "]"
-				+ (pass
-					? "...[PASSED]"
-					: "...[FAILED]"));
+			logger.logLn(Level.DEBUG, method.getName() + " average from history: " + recordedAvg + "msec");
+			logger.logLn(Level.DEBUG,
+					"\tActual processing duration: " + avgRuntime + "msec in [" + min + ", " + max + "]" + (pass ? "...[PASSED]" : "...[FAILED]"));
 
 			return pass;
 		}
@@ -371,24 +314,14 @@ public abstract class RuntimeTest {
 			assert (constraint != null);
 			assert (avgRuntime >= 0);
 
-			final Map<String, Queue<Double>> methodRuntimes =
-				getOrDefault(history, clazz.getName(), new HashMap<String, Queue<Double>>());
-			final Queue<Double> runtimes =
-				getOrDefault(methodRuntimes, method.getName(),
-						hasHistory(clazz.getName(), method.getName())
-							? loadHistory(clazz.getName(), method.getName())
-							: new LinkedList<Double>());
+			final Map<String, Queue<Double>> methodRuntimes = getOrDefault(history, clazz.getName(), new HashMap<String, Queue<Double>>());
+			final Queue<Double> runtimes = getOrDefault(methodRuntimes, method.getName(),
+					hasHistory(clazz.getName(), method.getName()) ? loadHistory(clazz.getName(), method.getName()) : new LinkedList<Double>());
 			if (historyConfig.maximumEntries > 0) {
-				if (!runtimes.isEmpty()
-					&& !valid(clazz, method, runtimes, constraint, avgRuntime)) {
-					final double recordedAvg =
-						avg(runtimes);
-					final double max =
-						recordedAvg
-							+ constraint.allowedPlus();
-					final double min =
-						recordedAvg
-							- constraint.allowedMinus();
+				if (!runtimes.isEmpty() && !valid(clazz, method, runtimes, constraint, avgRuntime)) {
+					final double recordedAvg = avg(runtimes);
+					final double max = recordedAvg + constraint.allowedPlus();
+					final double min = recordedAvg - constraint.allowedMinus();
 					return new Result(false, makeMessage(avgRuntime, min, max, clazz, method));
 				} else {
 					runtimes.add(avgRuntime);
@@ -413,16 +346,7 @@ public abstract class RuntimeTest {
 		}
 
 		private String format(final double avg, final double min, final Class<?> clazz, final Method method, final String bound) {
-			return clazz.getName()
-				+ ":"
-				+ method.getName()
-				+ " was expected to process in "
-				+ bound
-				+ " "
-				+ min
-				+ "msec but was actually "
-				+ avg
-				+ "msec";
+			return clazz.getName() + ":" + method.getName() + " was expected to process in " + bound + " " + min + "msec but was actually " + avg + "msec";
 		}
 
 		protected abstract Queue<Double> loadHistory(final String clazz, final String method);
@@ -452,17 +376,14 @@ public abstract class RuntimeTest {
 			}
 		}
 
-		public static final ClearHistory CLEAR_HISTORY =
-			new ClearHistory();
+		public static final ClearHistory CLEAR_HISTORY = new ClearHistory();
 
-		public static final HistoryLength FIVE_ENTRIES =
-			new DefaultHistoryLength();
+		public static final HistoryLength FIVE_ENTRIES = new DefaultHistoryLength();
 
 		public final int maximumEntries;
 
 		public HistoryLength(final int maximumEntries) {
-			this.maximumEntries =
-				maximumEntries;
+			this.maximumEntries = maximumEntries;
 		}
 	}
 
@@ -481,53 +402,38 @@ public abstract class RuntimeTest {
 		public static final class LogAllLogger extends Logger {
 
 			public LogAllLogger() {
-				logInfo =
-					logDebug =
-						logError =
-							true;
-				printerInfo =
-					printerDebug =
-						printerError =
-							System.out;
+				logInfo = logDebug = logError = true;
+				printerInfo = printerDebug = printerError = System.out;
 			}
 		}
 
 		public static final class LogNothingLogger extends Logger {
 
 			public LogNothingLogger() {
-				logInfo =
-					logDebug =
-						logError =
-							false;
+				logInfo = logDebug = logError = false;
 			}
 		}
 
-		public static final Logger LOG_ALL =
-			new LogAllLogger();
+		public static final Logger LOG_ALL = new LogAllLogger();
 
-		public static final Logger LOG_NOTHING =
-			new LogNothingLogger();
+		public static final Logger LOG_NOTHING = new LogNothingLogger();
 
 		protected boolean logDebug, logError, logInfo;
 
 		protected PrintStream printerDebug, printerError, printerInfo;
 
 		public final void log(final Level level, final String message) {
-			if (logInfo
-				&& (level == Level.INFO)) {
+			if (logInfo && (level == Level.INFO)) {
 				printerInfo.print(message);
-			} else if (logDebug
-				&& (level == Level.DEBUG)) {
+			} else if (logDebug && (level == Level.DEBUG)) {
 				printerDebug.print(message);
-			} else if (logError
-				&& (level == Level.ERROR)) {
+			} else if (logError && (level == Level.ERROR)) {
 				printerError.print(message);
 			}
 		}
 
 		public final void logLn(final Level level, final String message) {
-			log(level, message
-				+ "\n");
+			log(level, message + "\n");
 		}
 	}
 
@@ -542,39 +448,28 @@ public abstract class RuntimeTest {
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	protected static double avg(final Collection<Double> list) {
-		double retval =
-			0;
+		double retval = 0;
 		for (final double l : list) {
-			retval +=
-				l;
+			retval += l;
 		}
-		return retval
-			/ list.size();
+		return retval / list.size();
 	}
 
 	protected static double avg(final long[] list) {
-		double retval =
-			0;
+		double retval = 0;
 		for (final long l : list) {
-			retval +=
-				l;
+			retval += l;
 		}
-		return retval
-			/ list.length;
+		return retval / list.length;
 	}
 
 	protected static Collection<String> readAllLines(final Path path) {
 		assert (path != null);
-		final List<String> lines =
-			new ArrayList<String>();
-		try (final FileReader reader =
-			new FileReader(path.toFile())) {
-			String line =
-				null;
-			try (final BufferedReader bufferedReader =
-				new BufferedReader(reader)) {
-				while ((line =
-					bufferedReader.readLine()) != null) {
+		final List<String> lines = new ArrayList<String>();
+		try (final FileReader reader = new FileReader(path.toFile())) {
+			String line = null;
+			try (final BufferedReader bufferedReader = new BufferedReader(reader)) {
+				while ((line = bufferedReader.readLine()) != null) {
 					lines.add(line);
 				}
 			} catch (final Exception e) {
@@ -587,70 +482,52 @@ public abstract class RuntimeTest {
 	}
 
 	protected static <K, V> V getOrDefault(final Map<K, V> map, final K key, final V defaultValue) {
-		return map.containsKey(key)
-			? map.get(key)
-			: defaultValue;
+		return map.containsKey(key) ? map.get(key) : defaultValue;
 	}
 
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// F I E L D S
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	protected static boolean disableThisTest =
-		false;
+	protected static boolean disableThisTest = false;
 
-	protected static Logger logger =
-		Logger.LOG_ALL;
+	protected static Logger logger = Logger.LOG_ALL;
 
-	protected static History history =
-		new History.PlainTextFileHistory(logger, ".", "runtime");
+	protected static History history = new History.PlainTextFileHistory(logger, ".", "runtime");
 
-	protected static HistoryLength historyLength =
-		HistoryLength.FIVE_ENTRIES;
+	protected static HistoryLength historyLength = HistoryLength.FIVE_ENTRIES;
 
-	private static final String STR_COOLDOWN_PHASE =
-		"Run cooldown phase...";
+	private static final String STR_COOLDOWN_PHASE = "Run cooldown phase...";
 
-	private static final String STR_DONE =
-		"[DONE]";
+	private static final String STR_DONE = "[DONE]";
 
-	private static final String STR_EXCEPTION_CONSTRAINT_VIOLATION =
-		"Method under test violates constraints.";
+	private static final String STR_EXCEPTION_CONSTRAINT_VIOLATION = "Method under test violates constraints.";
 
-	private static final String STR_EXCEPTION_IN_METHOD =
-		"Exception in method under test.";
+	private static final String STR_EXCEPTION_IN_METHOD = "Exception in method under test.";
 
-	private static final String STR_EXCEPTION_JUNIT =
-		"JUnit test throws assertion.";
+	private static final String STR_EXCEPTION_JUNIT = "JUnit test throws assertion.";
 
-	private static final String STR_NO_METHODS =
-		"[NO METHODS DETECTED]";
+	private static final String STR_NO_METHODS = "[NO METHODS DETECTED]";
 
-	private static final String STR_STARTING_CONSTRAINT_TEST =
-		"Starting runtime constraint test: ";
+	private static final String STR_STARTING_CONSTRAINT_TEST = "Starting runtime constraint test: ";
 
-	private static final String STR_SKIP_CONSTRAINT_TEST =
-		"Skip runtime constraint test: ";
+	private static final String STR_SKIP_CONSTRAINT_TEST = "Skip runtime constraint test: ";
 
-	private static final String STR_WARMUP_PHASE =
-		"Run warmup phase...";
+	private static final String STR_WARMUP_PHASE = "Run warmup phase...";
 
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// P R O T E C T E D M E T H O D S
 	// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	protected void checkConstraintRanges(final Annotations.Constraint constraint) {
-		if (((constraint.allowedMinus() != Double.NEGATIVE_INFINITY)
-			&& (constraint.allowedMinus() < 0))
-			|| ((constraint.allowedPlus() != Double.POSITIVE_INFINITY)
-				&& (constraint.allowedPlus() < 0))) {
+		if (((constraint.allowedMinus() != Double.NEGATIVE_INFINITY) && (constraint.allowedMinus() < 0))
+			|| ((constraint.allowedPlus() != Double.POSITIVE_INFINITY) && (constraint.allowedPlus() < 0))) {
 			throw new RangeException(constraint);
 		}
 	}
 
 	protected List<Method> extractConstaintedMethods(final Class<? extends Annotation> annotation) throws SecurityException {
-		final List<Method> result =
-			new ArrayList<>();
+		final List<Method> result = new ArrayList<>();
 		for (final Method method : this.getClass().getMethods()) {
 			if (method.isAnnotationPresent(annotation)) {
 				result.add(method);
@@ -660,38 +537,27 @@ public abstract class RuntimeTest {
 	}
 
 	protected String formatException(final Throwable e, final String headerMessage) {
-		assert ((e != null)
-			&& (headerMessage != null)) : "Argument is null";
+		assert ((e != null) && (headerMessage != null)) : "Argument is null";
 
-		final StackTraceElement[] st =
-			e.getStackTrace();
-		final StringBuilder trace =
-			new StringBuilder(headerMessage);
+		final StackTraceElement[] st = e.getStackTrace();
+		final StringBuilder trace = new StringBuilder(headerMessage);
 		trace.append(" (");
-		trace.append(e.getClass().getName()
-			+ (e.getMessage() != null
-				? " "
-					+ e.getMessage()
-				: "")
-			+ ")");
+		trace.append(e.getClass().getName() + (e.getMessage() != null ? " " + e.getMessage() : "") + ")");
 		trace.append("\n\nSTACK TRACE\n\t");
-		for (int i =
-			0; i < st.length; i++) {
+		for (int i = 0; i < st.length; i++) {
 			trace.append(st[i].getClassName());
 			trace.append(".");
 			trace.append(st[i].getMethodName());
 			trace.append("\n\t");
 		}
 
-		assert ((trace != null)
-			&& (trace.length() > 0));
+		assert ((trace != null) && (trace.length() > 0));
 		return trace.toString();
 	}
 
-	protected void invokeMethodsWithAnnotation(final Class<? extends Annotation> annotation, final Object instance) throws IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		final List<Method> constraintedMethods =
-			extractConstaintedMethods(annotation);
+	protected void invokeMethodsWithAnnotation(final Class<? extends Annotation> annotation, final Object instance)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		final List<Method> constraintedMethods = extractConstaintedMethods(annotation);
 		if (constraintedMethods.isEmpty()) {
 			logger.logLn(Level.DEBUG, STR_NO_METHODS);
 		} else {
@@ -703,18 +569,15 @@ public abstract class RuntimeTest {
 		}
 	}
 
-	protected long measureMethodRuntime(final Method m, final Object instance) throws IllegalAccessException, IllegalArgumentException,
-			InvocationTargetException {
-		assert ((m != null)
-			&& (instance != null)) : "Argument is null";
+	protected long measureMethodRuntime(final Method m, final Object instance)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		assert ((m != null) && (instance != null)) : "Argument is null";
 
-		final long startTime =
-			System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 		try {
 			m.invoke(instance);
 		} catch (final Throwable e) {
-			if ((e instanceof InvocationTargetException)
-				&& (e.getCause() instanceof AssertionError)) {
+			if ((e instanceof InvocationTargetException) && (e.getCause() instanceof AssertionError)) {
 				((AssertionError) e.getCause()).printStackTrace();
 				Assert.fail(formatException((e.getCause()), STR_EXCEPTION_JUNIT));
 			} else {
@@ -722,9 +585,7 @@ public abstract class RuntimeTest {
 				Assert.fail(formatException(e.getCause(), STR_EXCEPTION_IN_METHOD));
 			}
 		}
-		final long delta =
-			System.currentTimeMillis()
-				- startTime;
+		final long delta = System.currentTimeMillis() - startTime;
 
 		assert (delta >= 0);
 		return delta;
@@ -739,19 +600,13 @@ public abstract class RuntimeTest {
 		assert (instance != null) : "Instance is null";
 
 		for (final Method m : extractConstaintedMethods(Annotations.Constraint.class)) {
-			final Annotations.Constraint constraint =
-				m.getAnnotation(Annotations.Constraint.class);
+			final Annotations.Constraint constraint = m.getAnnotation(Annotations.Constraint.class);
 			checkConstraintRanges(constraint);
-			double avgRuntime =
-				0;
-			History.Result passesTest =
-				History.Result.PASSES;
-			for (int i =
-				0; i < constraint.samples(); i++) {
-				avgRuntime =
-					measureMethodRuntime(m, instance);
-				passesTest =
-					history.addRun(historyLength, this.getClass(), m, constraint, avgRuntime);
+			double avgRuntime = 0;
+			History.Result passesTest = History.Result.PASSES;
+			for (int i = 0; i < constraint.samples(); i++) {
+				avgRuntime = measureMethodRuntime(m, instance);
+				passesTest = history.addRun(historyLength, this.getClass(), m, constraint, avgRuntime);
 				if (passesTest.testPass) {
 					break;
 				}
@@ -774,23 +629,19 @@ public abstract class RuntimeTest {
 	@Test
 	public void entryPoint() {
 		if (!disableThisTest) {
-			logger.logLn(Level.DEBUG, STR_STARTING_CONSTRAINT_TEST
-				+ this.getClass().getName());
+			logger.logLn(Level.DEBUG, STR_STARTING_CONSTRAINT_TEST + this.getClass().getName());
 			try {
-				final Object instance =
-					this.getClass().newInstance();
+				final Object instance = this.getClass().newInstance();
 				runWarmUpPhase(instance);
 				runTestPhase(instance);
 				runCoolDownPhase(instance);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-				logger.logLn(Level.ERROR, "Exception during test: "
-					+ e.getMessage());
+				logger.logLn(Level.ERROR, "Exception during test: " + e.getMessage());
 				e.printStackTrace();
 				Assert.fail(e.toString());
 			}
 		} else {
-			logger.logLn(Level.DEBUG, STR_SKIP_CONSTRAINT_TEST
-				+ this.getClass().getName());
+			logger.logLn(Level.DEBUG, STR_SKIP_CONSTRAINT_TEST + this.getClass().getName());
 		}
 	}
 }

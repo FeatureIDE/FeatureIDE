@@ -46,43 +46,26 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		yoffset =
-			0;
-		final IGraphicalFeature root =
-			FeatureUIHelper.getGraphicalRootFeature(featureModel);
+		yoffset = 0;
+		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
-		yoffset =
-			yoffset
-				+ FMPropertyManager.getFeatureSpaceX();
+		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getVisibleConstraints());
 	}
 
 	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {
-		if (!showHidden
-			&& feature.getObject().getStructure().hasHiddenParent()) {
+		if (!showHidden && feature.getObject().getStructure().hasHiddenParent()) {
 			return 0;
 		}
-		setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY()
-			+ (level
-				* FMPropertyManager.getFeatureSpaceY())));
-		int newX =
-			x;
-		if (yoffset < (FMPropertyManager.getLayoutMarginY()
-			+ (level
-				* FMPropertyManager.getFeatureSpaceY()))) {
-			yoffset =
-				FMPropertyManager.getLayoutMarginY()
-					+ (level
-						* FMPropertyManager.getFeatureSpaceY());
+		setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + (level * FMPropertyManager.getFeatureSpaceY())));
+		int newX = x;
+		if (yoffset < (FMPropertyManager.getLayoutMarginY() + (level * FMPropertyManager.getFeatureSpaceY()))) {
+			yoffset = FMPropertyManager.getLayoutMarginY() + (level * FMPropertyManager.getFeatureSpaceY());
 		}
 		for (final IGraphicalFeature child : getChildren(feature)) {
-			newX =
-				depthFirstLayout(child, level
-					+ 1, newX);
+			newX = depthFirstLayout(child, level + 1, newX);
 		}
-		return Math.max(newX, x
-			+ feature.getSize().width
-			+ FMPropertyManager.getFeatureSpaceX());
+		return Math.max(newX, x + feature.getSize().width + FMPropertyManager.getFeatureSpaceX());
 	}
 
 }

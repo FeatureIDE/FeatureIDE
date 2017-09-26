@@ -41,8 +41,7 @@ public class ExpandAllAction extends Action {
 	 */
 	public ExpandAllAction(TreeViewer viewer) {
 		super();
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif"));
 	}
 

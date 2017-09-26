@@ -52,79 +52,55 @@ public class AddRoleAction extends Action {
 
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collcaborationView) {
 		super(text);
-		viewer =
-			view;
-		collaborationView =
-			collcaborationView;
+		viewer = view;
+		collaborationView = collcaborationView;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
 	@Override
 	public void run() {
-		final IStructuredSelection selection =
-			(IStructuredSelection) viewer.getSelection();
-		final Object selectedItem =
-			selection.getFirstElement();
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		final Object selectedItem = selection.getFirstElement();
 
-		String feature =
-			getFeatureName();
-		String clss =
-			"";
-		String pack =
-			"";
+		String feature = getFeatureName();
+		String clss = "";
+		String pack = "";
 
 		if (selectedItem != null) {
 			if (selectedItem instanceof CollaborationEditPart) {
-				feature =
-					((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
+				feature = ((CollaborationEditPart) selectedItem).getCollaborationModel().getName();
 			} else if (selectedItem instanceof RoleEditPart) {
-				feature =
-					((RoleEditPart) selectedItem).getRoleModel().getFeature().getName();
-				clss =
-					((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getName();
-				pack =
-					((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getPackage();
+				feature = ((RoleEditPart) selectedItem).getRoleModel().getFeature().getName();
+				clss = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getName();
+				pack = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getPackage();
 				if (clss.contains(".")) {
-					clss =
-						clss.substring(0, clss.lastIndexOf('.'));
+					clss = clss.substring(0, clss.lastIndexOf('.'));
 				}
 				if (clss.contains("/")) {
-					clss =
-						clss.substring(clss.lastIndexOf("/")
-							+ 1, clss.length());
+					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
 				}
 			} else if (selectedItem instanceof ClassEditPart) {
-				clss =
-					((ClassEditPart) selectedItem).getClassModel().getName();
-				pack =
-					((ClassEditPart) selectedItem).getClassModel().getName().replace("/", ".");
+				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
+				pack = ((ClassEditPart) selectedItem).getClassModel().getName().replace("/", ".");
 				if (pack.indexOf(".") != pack.lastIndexOf(".")) {
-					pack =
-						pack.substring(0, pack.lastIndexOf("."));
-					pack =
-						pack.substring(0, pack.lastIndexOf('.'));
+					pack = pack.substring(0, pack.lastIndexOf("."));
+					pack = pack.substring(0, pack.lastIndexOf('.'));
 				} else {
-					pack =
-						"";
+					pack = "";
 				}
 				if (clss.contains(".")) {
-					clss =
-						clss.substring(0, clss.lastIndexOf('.'));
+					clss = clss.substring(0, clss.lastIndexOf('.'));
 				}
 				if (clss.contains("/")) {
-					clss =
-						clss.substring(clss.lastIndexOf("/")
-							+ 1, clss.length());
+					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
 				}
 			}
 		}
 
-		final NewFeatureIDEFileWizard wizard =
-			new NewFeatureIDEFileWizard();
+		final NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
 		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss, pack);
 
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 	}
@@ -133,59 +109,38 @@ public class AddRoleAction extends Action {
 	 * returns feature name of current cursor position
 	 */
 	private String getFeatureName() {
-		String feature =
-			"";
+		String feature = "";
 
-		final List<?> list =
-			viewer.getContents().getChildren();
-		final int cursorY =
-			collaborationView.getCursorPosition().y;
+		final List<?> list = viewer.getContents().getChildren();
+		final int cursorY = collaborationView.getCursorPosition().y;
 
 		for (final Object object : list) {
 			if (object instanceof CollaborationEditPart) {
-				final CollaborationFigure collFigure =
-					((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
+				final CollaborationFigure collFigure = ((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
 
 				if (collFigure.isConfiguration) {
 					continue;
 				}
 
-				final int index =
-					list.indexOf(object);
+				final int index = list.indexOf(object);
 
-				final int min =
-					collFigure.getBounds().y
-						- 4;
-				int max =
-					collFigure.getBounds().y
-						+ collFigure.getBounds().height
-						+ 4;
+				final int min = collFigure.getBounds().y - 4;
+				int max = collFigure.getBounds().y + collFigure.getBounds().height + 4;
 
-				if (list.size() > (index
-					+ 1)) {
-					final Object edit =
-						list.get(index
-							+ 1);
+				if (list.size() > (index + 1)) {
+					final Object edit = list.get(index + 1);
 					if (edit instanceof CollaborationEditPart) {
 
-						final CollaborationFigure nextCollFigure =
-							((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
+						final CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
 
-						max =
-							nextCollFigure.getBounds().y
-								- 4;
+						max = nextCollFigure.getBounds().y - 4;
 					} else if (edit instanceof ClassEditPart) {
-						final ClassFigure nextCollFigure =
-							((ClassFigure) ((ClassEditPart) edit).getFigure());
-						max =
-							nextCollFigure.getBounds().height
-								- 4;
+						final ClassFigure nextCollFigure = ((ClassFigure) ((ClassEditPart) edit).getFigure());
+						max = nextCollFigure.getBounds().height - 4;
 					}
 				}
-				if ((cursorY >= min)
-					&& (cursorY <= max)) {
-					feature =
-						((CollaborationEditPart) object).getCollaborationModel().getName();
+				if ((cursorY >= min) && (cursorY <= max)) {
+					feature = ((CollaborationEditPart) object).getCollaborationModel().getName();
 					break;
 				}
 			}

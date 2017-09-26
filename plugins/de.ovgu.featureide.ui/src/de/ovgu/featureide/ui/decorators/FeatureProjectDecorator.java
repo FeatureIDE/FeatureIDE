@@ -36,8 +36,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class FeatureProjectDecorator implements ILightweightLabelDecorator {
 
-	private static final ImageDescriptor OVERLAY =
-		UIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
+	private static final ImageDescriptor OVERLAY = UIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
 
 	public FeatureProjectDecorator() {}
 
@@ -46,8 +45,7 @@ public class FeatureProjectDecorator implements ILightweightLabelDecorator {
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
-		final IProject project =
-			(IProject) element;
+		final IProject project = (IProject) element;
 
 		// decorate feature projects
 		if (CorePlugin.hasProjectData(project)) {

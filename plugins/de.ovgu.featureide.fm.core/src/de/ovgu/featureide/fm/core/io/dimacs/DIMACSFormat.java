@@ -53,24 +53,18 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class DIMACSFormat implements IFeatureModelFormat {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.fm."
-			+ DIMACSFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
-		final ProblemList problemList =
-			new ProblemList();
+		final ProblemList problemList = new ProblemList();
 
 		// Transform the input into a propositional node.
-		final DimacsReader r =
-			new DimacsReader(source.toString());
+		final DimacsReader r = new DimacsReader(source.toString());
 		r.setReadingVariableDirectory(true);
 		final Node read;
 		try {
-			read =
-				r.read();
+			read = r.read();
 		} catch (final ParseException e) {
 			problemList.add(new Problem(e));
 			return problemList;
@@ -91,42 +85,32 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	 */
 	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
 		// Add a dummy feature as root.
-		final IFeatureModelFactory factory =
-			FMFactoryManager.getFactory(featureModel);
-		final IFeature rootFeature =
-			factory.createFeature(featureModel, "__Root__");
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
+		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		// Add a feature for each variable.
-		final Set<String> variables =
-			new LinkedHashSet<>(node.getContainedFeatures());
+		final Set<String> variables = new LinkedHashSet<>(node.getContainedFeatures());
 		for (final String variable : variables) {
-			final IFeature feature =
-				factory.createFeature(featureModel, variable);
+			final IFeature feature = factory.createFeature(featureModel, variable);
 			featureModel.addFeature(feature);
 			rootFeature.getStructure().addChild(feature.getStructure());
 		}
 
 		// Add a constraint for each conjunctive clause.
-		final List<Node> clauses =
-			node instanceof And
-				? Arrays.asList(node.getChildren())
-				: Collections.singletonList(node);
+		final List<Node> clauses = node instanceof And ? Arrays.asList(node.getChildren()) : Collections.singletonList(node);
 		for (final Node clause : clauses) {
-			final IConstraint constraint =
-				factory.createConstraint(featureModel, clause);
+			final IConstraint constraint = factory.createConstraint(featureModel, clause);
 			featureModel.addConstraint(constraint);
 		}
 	}
 
 	@Override
 	public String write(IFeatureModel featureModel) {
-		final Node in =
-			AdvancedNodeCreator.createRegularCNF(featureModel);
-		final DimacsWriter w =
-			new DimacsWriter(in);
+		final Node in = AdvancedNodeCreator.createRegularCNF(featureModel);
+		final DimacsWriter w = new DimacsWriter(in);
 		w.setWritingVariableDirectory(true);
 		return w.write();
 	}

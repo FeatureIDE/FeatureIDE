@@ -53,21 +53,14 @@ public class FMPrintAction extends PrintAction {
 		if (!(getWorkbenchPart() instanceof FeatureModelEditor)) {
 			return;
 		}
-		final FeatureDiagramEditor fmEditor =
-			((FeatureModelEditor) getWorkbenchPart()).diagramEditor;
-		final IGraphicalFeatureModel featureModel =
-			fmEditor.getGraphicalFeatureModel();
-		final FeatureModelLayout layout =
-			featureModel.getLayout();
-		final int layoutOld =
-			layout.getLayoutAlgorithm();
+		final FeatureDiagramEditor fmEditor = ((FeatureModelEditor) getWorkbenchPart()).diagramEditor;
+		final IGraphicalFeatureModel featureModel = fmEditor.getGraphicalFeatureModel();
+		final FeatureModelLayout layout = featureModel.getLayout();
+		final int layoutOld = layout.getLayoutAlgorithm();
 
-		final Collection<IGraphicalFeature> features =
-			featureModel.getFeatures();
-		final Iterator<IGraphicalFeature> featureIter =
-			features.iterator();
-		final Point minP =
-			featureIter.next().getLocation().getCopy();
+		final Collection<IGraphicalFeature> features = featureModel.getFeatures();
+		final Iterator<IGraphicalFeature> featureIter = features.iterator();
+		final Point minP = featureIter.next().getLocation().getCopy();
 
 		move(featureModel, layout, features, featureIter, minP);
 		// print
@@ -80,17 +73,13 @@ public class FMPrintAction extends PrintAction {
 			Iterator<IGraphicalFeature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
-			final IGraphicalFeature f =
-				featureIter.next();
-			final Point p =
-				f.getLocation();
+			final IGraphicalFeature f = featureIter.next();
+			final Point p = f.getLocation();
 			if (p.x < minP.x) {
-				minP.x =
-					p.x;
+				minP.x = p.x;
 			}
 			if (p.y < minP.y) {
-				minP.y =
-					p.y;
+				minP.y = p.y;
 			}
 		}
 
@@ -102,8 +91,7 @@ public class FMPrintAction extends PrintAction {
 	}
 
 	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
-		final Point minPneg =
-			new Point(-minP.x, -minP.y);
+		final Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
 		moveLegend(featureModel, layout, minPneg);
@@ -111,26 +99,16 @@ public class FMPrintAction extends PrintAction {
 	}
 
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
-		final FeatureModelEditor editor =
-			(FeatureModelEditor) getWorkbenchPart();
+		final FeatureModelEditor editor = (FeatureModelEditor) getWorkbenchPart();
 		if (editor.getEditorSite() instanceof FeatureDiagramEditor) {
 			FMUIPlugin.getDefault().logInfo("is feature diagramm editor");
-			final FeatureDiagramEditor fdEditor =
-				(FeatureDiagramEditor) editor.getEditorSite();
+			final FeatureDiagramEditor fdEditor = (FeatureDiagramEditor) editor.getEditorSite();
 			for (final Object obj : fdEditor.getEditPartRegistry().values()) {
-				FMUIPlugin.getDefault().logInfo(""
-					+ obj
-					+ " is of type "
-					+ obj.getClass());
+				FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
 				if (obj instanceof LegendEditPart) {
 					FMUIPlugin.getDefault().logInfo(" is legend whohoooo! ");
-					final Point legendPos =
-						layout.getLegendPos();
-					final Point newLegendPos =
-						new Point(legendPos.x
-							- minP.x,
-								legendPos.y
-									- minP.y);
+					final Point legendPos = layout.getLegendPos();
+					final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
 					((LegendEditPart) obj).getFigure().setLocation(newLegendPos);
 					layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 				}
@@ -140,22 +118,14 @@ public class FMPrintAction extends PrintAction {
 
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {
 		for (final IGraphicalConstraint c : featureModel.getConstraints()) {
-			final Point newPoint =
-				new Point(c.getLocation().x
-					- minP.x,
-						c.getLocation().y
-							- minP.y);
+			final Point newPoint = new Point(c.getLocation().x - minP.x, c.getLocation().y - minP.y);
 			c.setLocation(newPoint);
 		}
 	}
 
 	private void moveFeatures(Collection<IGraphicalFeature> features, Point minP) {
 		for (final IGraphicalFeature f : features) {
-			final Point newPoint =
-				new Point(f.getLocation().getCopy().x
-					- minP.x,
-						f.getLocation().getCopy().y
-							- minP.y);
+			final Point newPoint = new Point(f.getLocation().getCopy().x - minP.x, f.getLocation().getCopy().y - minP.y);
 			f.setLocation(newPoint);
 		}
 	}

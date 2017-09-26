@@ -33,12 +33,10 @@ public class EnableSignatureHandler extends AFeatureProjectHandler {
 	 */
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final IComposerExtensionClass composer =
-			featureProject.getComposer();
+		final IComposerExtensionClass composer = featureProject.getComposer();
 
 		if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
-			final MungePreprocessor mungePreprocessor =
-				(MungePreprocessor) composer;
+			final MungePreprocessor mungePreprocessor = (MungePreprocessor) composer;
 			mungePreprocessor.setCreateSignature(!mungePreprocessor.getCreateSignature());
 		}
 	}

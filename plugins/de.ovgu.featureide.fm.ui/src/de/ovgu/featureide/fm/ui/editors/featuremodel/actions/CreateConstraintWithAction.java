@@ -54,42 +54,30 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 		}
 	}
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-				if (selection.size() == 1) {
-					final Object editPart =
-						selection.getFirstElement();
+			if (selection.size() == 1) {
+				final Object editPart = selection.getFirstElement();
 
-					final IFeature feature =
-						editPart instanceof FeatureEditPart
-							? ((FeatureEditPart) editPart).getModel().getObject()
-							: null;
+				final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : null;
 
-					if (feature != null) {
-						updateConstraintActionText(feature.getName());
-					}
+				if (feature != null) {
+					updateConstraintActionText(feature.getName());
 				}
 			}
-		};
+		}
+	};
 
 	/**
 	 * @param featureName
 	 */
 	protected void updateConstraintActionText(String featureName) {
-		selectedFeature =
-			featureName;
-		setText(CREATE_CONSTRAINT
-			+ (featureName.isEmpty()
-				? ""
-				: " starting with \""
-					+ featureName
-					+ "\""));
+		selectedFeature = featureName;
+		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " starting with \"" + featureName + "\""));
 	}
 
 	/*
@@ -98,8 +86,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 */
 	@Override
 	public void run() {
-		final ConstraintDialog dialog =
-			new ConstraintDialog(super.featuremodel, null);
+		final ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
 		dialog.setInputText(selectedFeature);
 	}
 

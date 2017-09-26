@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.config;
 
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.config.impl.composite.CompositeConfigurationExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link ConfigurationExplanationCreator}.
@@ -36,7 +36,7 @@ public abstract class ConfigurationExplanationCreatorFactory implements Explanat
 	 * @return a default instance of this class
 	 */
 	public static ConfigurationExplanationCreatorFactory getDefault() {
-		return new MusConfigurationExplanationCreatorFactory();
+		return new CompositeConfigurationExplanationCreatorFactory();
 	}
 
 	/**

@@ -105,17 +105,13 @@ public class FMLabelProvider extends OutlineLabelProvider implements GUIDefaults
 	}
 
 	public Color getBackground(Object element) {
-		Color col =
-			null;
+		Color col = null;
 
 		if (element instanceof IFeature) {
-			final IFeature feature =
-				(IFeature) element;
-			final FeatureColor color =
-				FeatureColorManager.getColor(feature);
+			final IFeature feature = (IFeature) element;
+			final FeatureColor color = FeatureColorManager.getColor(feature);
 			if (color != FeatureColor.NO_COLOR) {
-				col =
-					new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
+				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
 			}
 		}
 		return col;

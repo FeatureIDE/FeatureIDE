@@ -28,8 +28,7 @@ public class FeatureFilter implements IFilter<AbstractSignature> {
 	private final int[] featureList;
 
 	public FeatureFilter(int... featureList) {
-		this.featureList =
-			featureList;
+		this.featureList = featureList;
 	}
 
 	@Override

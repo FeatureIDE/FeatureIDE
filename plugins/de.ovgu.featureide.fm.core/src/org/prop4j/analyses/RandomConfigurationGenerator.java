@@ -42,12 +42,10 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 
 	@Override
 	public List<List<String>> analyze(IMonitor monitor) throws Exception {
-		time =
-			System.nanoTime();
+		time = System.nanoTime();
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 
-		for (int i =
-			0; i < maxNumber; i++) {
+		for (int i = 0; i < maxNumber; i++) {
 			monitor.checkCancel();
 			if (handleNewConfig(solver.findModel())) {
 				break;
@@ -63,23 +61,17 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 			System.out.println("Found everything!");
 			return true;
 		}
-		final int partCount =
-			count(curModel);
-		final Configuration config =
-			new Configuration(curModel, partCount
-				- getLastCoverage(), partCount);
+		final int partCount = count(curModel);
+		final Configuration config = new Configuration(curModel, partCount - getLastCoverage(), partCount);
 
 		addCombinationsFromModel(curModel);
 
-		config.time =
-			System.nanoTime()
-				- time;
+		config.time = System.nanoTime() - time;
 		q.offer(config);
 		synchronized (tempConfigurationList) {
 			tempConfigurationList.add(config);
 		}
-		time =
-			System.nanoTime();
+		time = System.nanoTime();
 
 		try {
 			config.setBlockingClauseConstraint(solver.getInternalSolver().addBlockingClause(new VecInt(SatInstance.negateModel(curModel))));

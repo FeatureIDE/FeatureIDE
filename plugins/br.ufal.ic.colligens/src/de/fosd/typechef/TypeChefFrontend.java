@@ -138,60 +138,47 @@ public final class TypeChefFrontend {
 
 	public void processFile(FrontendOptions opt, FileProxy fileProxy) {
 
-		final RenderParserError renderParserError =
-			new RenderParserError();
+		final RenderParserError renderParserError = new RenderParserError();
 		renderParserError.setFile(fileProxy);
 
 		opt.setRenderParserError(renderParserError);
 
-		final StopWatch stopWatch =
-			new StopWatch();
+		final StopWatch stopWatch = new StopWatch();
 		stopWatch.start("loadFM");
 
-		final FeatureModel fm =
-			opt.getLexerFeatureModel()
-					.and(opt.getLocalFeatureModel())
-					.and(opt.getFilePresenceCondition());
+		final FeatureModel fm = opt.getLexerFeatureModel().and(opt.getLocalFeatureModel()).and(opt.getFilePresenceCondition());
 		opt.setFeatureModel(fm);// otherwise the lexer does not get the updated
 								// feature model with file presence conditions
 		if (!opt.getFilePresenceCondition().isSatisfiable(fm)) {
-			System.out
-					.println(FILE_HAS_CONTRADICTORY_PRESENCE_CONDITION__EXISTING_); // otherwise
-																					 // this
-																					 // can
-																					 // lead
-																					 // to
-																					 // strange
-																					 // parser
-																					 // errors,
-																					 // because
-																					 // True
-																					 // is
-																					 // satisfiable,
-																					 // but
-																					 // anything
-																					 // else
-																					 // isn't
+			System.out.println(FILE_HAS_CONTRADICTORY_PRESENCE_CONDITION__EXISTING_); // otherwise
+																						 // this
+																						 // can
+																						 // lead
+																						 // to
+																						 // strange
+																						 // parser
+																						 // errors,
+																						 // because
+																						 // True
+																						 // is
+																						 // satisfiable,
+																						 // but
+																						 // anything
+																						 // else
+																						 // isn't
 			return;
 		}
 
-		AST ast =
-			null;
-		if (opt.reuseAST
-			&& opt.parse
-			&& new File(opt.getSerializedASTFilename()).exists()) {
+		AST ast = null;
+		if (opt.reuseAST && opt.parse && new File(opt.getSerializedASTFilename()).exists()) {
 			System.out.println("loading AST.");
 			try {
-				ast =
-					Frontend
-							.loadSerializedAST(opt.getSerializedASTFilename());
-				ast =
-					Frontend.prepareAST(ast);
+				ast = Frontend.loadSerializedAST(opt.getSerializedASTFilename());
+				ast = Frontend.prepareAST(ast);
 			} catch (final Throwable e) {
 				System.out.println(e.toString());
 				e.printStackTrace();
-				ast =
-					null;
+				ast = null;
 			}
 			if (ast == null) {
 				System.out.println("... failed reading AST\n");
@@ -200,11 +187,9 @@ public final class TypeChefFrontend {
 
 		stopWatch.start("lexing");
 		// no parsing if read serialized ast
-		TokenReader<CToken, CTypeContext> in =
-			null;
+		TokenReader<CToken, CTypeContext> in = null;
 		if (ast == null) {
-			in =
-				Frontend.lex(opt);
+			in = Frontend.lex(opt);
 		}
 
 		if (opt.parse) {
@@ -212,19 +197,15 @@ public final class TypeChefFrontend {
 
 			if (ast == null) {
 				// no parsing and serialization if read serialized ast
-				final ParserMain parserMain =
-					new ParserMain(new CParser(fm, false));
-				ast =
-					parserMain.parserMain(in, opt);
+				final ParserMain parserMain = new ParserMain(new CParser(fm, false));
+				ast = parserMain.parserMain(in, opt);
 
 				if (ast == null) {
 					return;
 				}
-				ast =
-					Frontend.prepareAST(ast);
+				ast = Frontend.prepareAST(ast);
 
-				if ((ast != null)
-					&& opt.serializeAST) {
+				if ((ast != null) && opt.serializeAST) {
 					stopWatch.start("serialize");
 					Frontend.serializeAST(ast, opt.getSerializedASTFilename());
 				}
@@ -232,24 +213,17 @@ public final class TypeChefFrontend {
 			}
 
 			if (ast != null) {
-				final FeatureModel fm_ts =
-					opt.getTypeSystemFeatureModel()
-							.and(opt.getLocalFeatureModel())
-							.and(opt.getFilePresenceCondition());
+				final FeatureModel fm_ts = opt.getTypeSystemFeatureModel().and(opt.getLocalFeatureModel()).and(opt.getFilePresenceCondition());
 
 				// some dataflow analyses require typing information
-				final CTypeSystemFrontend ts =
-					new CTypeSystemFrontend(
-							(TranslationUnit) ast, fm_ts, opt);
+				final CTypeSystemFrontend ts = new CTypeSystemFrontend((TranslationUnit) ast, fm_ts, opt);
 
 				/**
 				 * I did some experiments with the TypeChef FeatureModel of Linux, in case I need the routines again, they are saved here.
 				 */
 				// Debug_FeatureModelExperiments.experiment(fm_ts)
 
-				if (opt.typecheck
-					|| opt.writeInterface
-					|| opt.typechecksa()) {
+				if (opt.typecheck || opt.writeInterface || opt.typechecksa()) {
 					// ProductGeneration.typecheckProducts(fm,fm_ts,ast,opt,
 					// logMessage=("Time for lexing(ms): " + (t2-t1) +
 					// "\nTime for parsing(ms): " + (t3-t2) + "\n"))
@@ -258,24 +232,18 @@ public final class TypeChefFrontend {
 					stopWatch.start("typechecking");
 					System.out.println("type checking.");
 					ts.checkAST(ts.checkAST$default$1());
-					final RenderTypeError renderTypeError =
-						new RenderTypeError();
+					final RenderTypeError renderTypeError = new RenderTypeError();
 					renderTypeError.setFile(fileProxy);
 					ts.errors().mapConserve(renderTypeError);
 				}
 				if (opt.writeInterface) {
 					stopWatch.start("interfaces");
 					final CInterface cinterface =
-						ts.getInferredInterface(
-								ts.getInferredInterface$default$1(),
-								ts.getInferredInterface$default$2()).and(
-										opt.getFilePresenceCondition());
+						ts.getInferredInterface(ts.getInferredInterface$default$1(), ts.getInferredInterface$default$2()).and(opt.getFilePresenceCondition());
 					stopWatch.start("writeInterfaces");
-					ts.writeInterface(cinterface,
-							new File(opt.getInterfaceFilename()));
+					ts.writeInterface(cinterface, new File(opt.getInterfaceFilename()));
 					if (opt.writeDebugInterface) {
-						ts.debugInterface(cinterface,
-								new File(opt.getDebugInterfaceFilename()));
+						ts.debugInterface(cinterface, new File(opt.getDebugInterfaceFilename()));
 					}
 				}
 				if (opt.dumpcfg) {
@@ -293,9 +261,7 @@ public final class TypeChefFrontend {
 				}
 
 				if (opt.staticanalyses()) {
-					final CIntraAnalysisFrontend sa =
-						new CIntraAnalysisFrontend(
-								(TranslationUnit) ast, ts, fm_ts);
+					final CIntraAnalysisFrontend sa = new CIntraAnalysisFrontend((TranslationUnit) ast, ts, fm_ts);
 					if (opt.warning_double_free()) {
 						stopWatch.start("doublefree");
 						sa.doubleFree();

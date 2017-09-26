@@ -47,12 +47,9 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 public class MungeFMComposerExtension extends FMComposerExtension {
 
 	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects based on preprocessors such as Munge do not\n"
-			+
-			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+		"FeatureIDE projects based on preprocessors such as Munge do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 
-	public static final String FEATURE_NAME_PATTERN =
-		"^[a-zA-Z]\\w*$";
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
 
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
@@ -66,14 +63,12 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
 
-		final IFolder sourceFolder =
-			featureProject.getSourceFolder();
+		final IFolder sourceFolder = featureProject.getSourceFolder();
 		if (!sourceFolder.exists()) {
 			return true;
 		}
@@ -92,8 +87,7 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				final IFile file =
-					(IFile) res;
+				final IFile file = (IFile) res;
 				performRenamings(oldName, newName, file);
 			}
 
@@ -104,30 +98,21 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 		setFilecontent(performRenamings(oldName, newName, getFileContent(iFile)), iFile);
 	}
 
-	public String performRenamings(String oldName, String newName,
-			String fileContent) {
+	public String performRenamings(String oldName, String newName, String fileContent) {
 		if (!fileContent.contains(oldName)) {
 			return null;
 		}
-		return fileContent.replaceAll("\\["
-			+ oldName
-			+ "\\]\\*\\/",
-				"["
-					+ newName
-					+ "]*/");
+		return fileContent.replaceAll("\\[" + oldName + "\\]\\*\\/", "[" + newName + "]*/");
 	}
 
 	private void setFilecontent(String filecontent, IFile iFile) {
 		if (filecontent == null) {
 			return;
 		}
-		final File file =
-			iFile.getRawLocation().toFile();
-		FileWriter fw =
-			null;
+		final File file = iFile.getRawLocation().toFile();
+		FileWriter fw = null;
 		try {
-			fw =
-				new FileWriter(file);
+			fw = new FileWriter(file);
 			fw.write(filecontent);
 		} catch (final FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
@@ -145,13 +130,10 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	}
 
 	private String getFileContent(IFile iFile) {
-		Scanner scanner =
-			null;
-		final StringBuilder fileText =
-			new StringBuilder();
+		Scanner scanner = null;
+		final StringBuilder fileText = new StringBuilder();
 		try {
-			scanner =
-				new Scanner(iFile.getRawLocation().toFile(), "UTF-8");
+			scanner = new Scanner(iFile.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");

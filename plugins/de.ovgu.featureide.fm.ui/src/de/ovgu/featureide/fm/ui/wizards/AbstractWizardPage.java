@@ -46,8 +46,7 @@ public abstract class AbstractWizardPage extends WizardPage {
 	}
 
 	protected AbstractWizard abstractWizard;
-	private boolean dirty =
-		true;
+	private boolean dirty = true;
 
 	protected AbstractWizardPage(String name) {
 		super(name);
@@ -58,20 +57,16 @@ public abstract class AbstractWizardPage extends WizardPage {
 	public void setWizard(IWizard newWizard) {
 		super.setWizard(newWizard);
 		if (newWizard instanceof AbstractWizard) {
-			abstractWizard =
-				(AbstractWizard) newWizard;
+			abstractWizard = (AbstractWizard) newWizard;
 		} else {
-			abstractWizard =
-				null;
+			abstractWizard = null;
 		}
 	}
 
 	public final void updatePage() {
-		final String message =
-			checkPage();
+		final String message = checkPage();
 		setErrorMessage(message);
-		dirty =
-			true;
+		dirty = true;
 		if (message == null) {
 			setPageComplete(true);
 		} else {
@@ -84,8 +79,7 @@ public abstract class AbstractWizardPage extends WizardPage {
 			if (abstractWizard != null) {
 				putData();
 			}
-			dirty =
-				false;
+			dirty = false;
 		}
 	}
 

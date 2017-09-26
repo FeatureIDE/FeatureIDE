@@ -42,8 +42,7 @@ public class SyncCollapsedStateAction extends Action {
 	public SyncCollapsedStateAction(TreeViewer viewer, boolean syncState) {
 		super("", AS_CHECK_BOX);
 		setChecked(syncState);
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/synch_toc_nav.gif"));
 	}
 

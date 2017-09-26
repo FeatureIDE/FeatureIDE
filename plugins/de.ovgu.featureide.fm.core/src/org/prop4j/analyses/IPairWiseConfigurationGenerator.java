@@ -36,26 +36,20 @@ public interface IPairWiseConfigurationGenerator extends LongRunningMethod<List<
 
 	public static class Configuration {
 
-		private static final double minBackJumpingDelta =
-			0.0;
+		private static final double minBackJumpingDelta = 0.0;
 
-		private IConstr blockingClauseConstraint =
-			null;
+		private IConstr blockingClauseConstraint = null;
 
 		private int deltaCoverage;
 		private final int[] model;
 		private int totalCoverage;
 
-		public long time =
-			0;
+		public long time = 0;
 
 		public Configuration(int[] model, int deltaCoverage, int totalCoverage) {
-			this.model =
-				model;
-			this.deltaCoverage =
-				deltaCoverage;
-			this.totalCoverage =
-				totalCoverage;
+			this.model = model;
+			this.deltaCoverage = deltaCoverage;
+			this.totalCoverage = totalCoverage;
 		}
 
 		public IConstr getBlockingClauseConstraint() {
@@ -75,30 +69,23 @@ public interface IPairWiseConfigurationGenerator extends LongRunningMethod<List<
 		}
 
 		public boolean isBetterThan(Configuration o) {
-			return (0 > (o.deltaCoverage
-				- (deltaCoverage
-					* (1
-						- minBackJumpingDelta))));
+			return (0 > (o.deltaCoverage - (deltaCoverage * (1 - minBackJumpingDelta))));
 		}
 
 		public void setBlockingClauseConstraint(IConstr blockingClauseConstraint) {
-			this.blockingClauseConstraint =
-				blockingClauseConstraint;
+			this.blockingClauseConstraint = blockingClauseConstraint;
 		}
 
 		public void setDeltaCoverage(int deltaCoverage) {
-			this.deltaCoverage =
-				deltaCoverage;
+			this.deltaCoverage = deltaCoverage;
 		}
 
 		public void setTotalCoverage(int totalCoverage) {
-			this.totalCoverage =
-				totalCoverage;
+			this.totalCoverage = totalCoverage;
 		}
 	}
 
-	public static final boolean VERBOSE =
-		false;
+	public static final boolean VERBOSE = false;
 
 	List<List<String>> getConfigurations();
 

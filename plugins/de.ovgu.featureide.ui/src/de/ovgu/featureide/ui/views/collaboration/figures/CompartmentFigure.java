@@ -37,8 +37,7 @@ import org.eclipse.draw2d.geometry.Point;
 public class CompartmentFigure extends Figure {
 
 	public CompartmentFigure() {
-		final ToolbarLayout layout =
-			new ToolbarLayout();
+		final ToolbarLayout layout = new ToolbarLayout();
 		layout.setMinorAlignment(OrderedLayout.ALIGN_TOPLEFT);
 		layout.setStretchMinorAxis(false);
 		layout.setSpacing(2);
@@ -55,16 +54,10 @@ public class CompartmentFigure extends Figure {
 
 		@Override
 		public void paint(IFigure figure, Graphics graphics, Insets insets) {
-			final Point left =
-				getPaintRectangle(figure, insets).getTopLeft();
-			final Point rigth =
-				tempRect.getTopRight();
-			left.y =
-				left.y
-					+ 17;
-			rigth.y =
-				rigth.y
-					+ 17;
+			final Point left = getPaintRectangle(figure, insets).getTopLeft();
+			final Point rigth = tempRect.getTopRight();
+			left.y = left.y + 17;
+			rigth.y = rigth.y + 17;
 			graphics.drawLine(left, rigth);
 		}
 

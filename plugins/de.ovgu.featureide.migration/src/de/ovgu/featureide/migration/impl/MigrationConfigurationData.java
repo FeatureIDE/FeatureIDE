@@ -30,17 +30,11 @@ public class MigrationConfigurationData {
 	public String configPath;
 	public String buildPath;
 
-	public MigrationConfigurationData(String projectName, IComposerExtensionBase composer,
-			String sourcePath, String configPath, String buildPath) {
-		this.projectName =
-			projectName;
-		this.composer =
-			composer;
-		this.sourcePath =
-			sourcePath;
-		this.configPath =
-			configPath;
-		this.buildPath =
-			buildPath;
+	public MigrationConfigurationData(String projectName, IComposerExtensionBase composer, String sourcePath, String configPath, String buildPath) {
+		this.projectName = projectName;
+		this.composer = composer;
+		this.sourcePath = sourcePath;
+		this.configPath = configPath;
+		this.buildPath = buildPath;
 	}
 }

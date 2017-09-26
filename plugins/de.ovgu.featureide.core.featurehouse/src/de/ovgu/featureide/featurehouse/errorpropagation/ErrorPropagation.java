@@ -62,22 +62,19 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public abstract class ErrorPropagation {
 
-	private static final String NO_ATTRIBUTE =
-		"#NO_ATTRIBUTE#";
+	private static final String NO_ATTRIBUTE = "#NO_ATTRIBUTE#";
 
 	/**
 	 * A list containing composed files. These files will be checked for propagation.
 	 */
-	private final Set<IFile> composedFiles =
-		Collections.newSetFromMap(new ConcurrentHashMap<IFile, Boolean>());
+	private final Set<IFile> composedFiles = Collections.newSetFromMap(new ConcurrentHashMap<IFile, Boolean>());
 
 	/**
 	 * The main background job calling the corresponding error propagation class for each file.
 	 */
 	public final Job job;
 
-	public boolean force =
-		false; // FOP Composed Lines
+	public boolean force = false; // FOP Composed Lines
 
 	/**
 	 * Propagates error markers for composed files to sources files.<br> Call {@link #addFile(IFile)} to propagate the markers of the given source file, to the
@@ -86,35 +83,29 @@ public abstract class ErrorPropagation {
 	 * @param sourceFile initial source file for determine project and language. </br>(must still be added by calling {@link #addFile(IFile)})
 	 */
 	public static ErrorPropagation createErrorPropagation(IFile sourceFile) {
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(sourceFile);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(sourceFile);
 		if (featureProject == null) {
 			return null;
 		}
-		final String fileExtension =
-			sourceFile.getFileExtension();
+		final String fileExtension = sourceFile.getFileExtension();
 		if ("java".equals(fileExtension)) {
 			return new JavaErrorPropagation(featureProject);
-		} else if ("c".equals(fileExtension)
-			|| "h".equals(fileExtension)) {
+		} else if ("c".equals(fileExtension) || "h".equals(fileExtension)) {
 			return new CErrorPropagation(featureProject);
 		}
 		return null;
 	}
 
 	protected ErrorPropagation(IFeatureProject featureProject) {
-		job =
-			new Job(PROPAGATE_PROBLEM_MARKERS_FOR
-				+ featureProject) {
+		job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + featureProject) {
 
-				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					propagateMarkers(monitor);
-					force =
-						false;
-					return Status.OK_STATUS;
-				}
-			};
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				propagateMarkers(monitor);
+				force = false;
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.SHORT);
 	}
 
@@ -126,8 +117,7 @@ public abstract class ErrorPropagation {
 		if (composedFiles.isEmpty()) {
 			return null;
 		}
-		final IFile file =
-			composedFiles.iterator().next();
+		final IFile file = composedFiles.iterator().next();
 		composedFiles.remove(file);
 		return file;
 	}
@@ -142,14 +132,11 @@ public abstract class ErrorPropagation {
 			return;
 		}
 
-		final String fileExtension =
-			sourceFile.getFileExtension();
+		final String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
 			return;
 		}
-		if ("java".equals(fileExtension)
-			|| "c".equals(fileExtension)
-			|| "h".equals(fileExtension)) {
+		if ("java".equals(fileExtension) || "c".equals(fileExtension) || "h".equals(fileExtension)) {
 			addComposedFile(sourceFile);
 
 			if (job.getState() == Job.NONE) {
@@ -167,14 +154,12 @@ public abstract class ErrorPropagation {
 		}
 
 		if (monitor == null) {
-			monitor =
-				new NullProgressMonitor();
+			monitor = new NullProgressMonitor();
 		}
 		monitor.beginTask(PROPAGATE_MARKERS_FOR, IProgressMonitor.UNKNOWN);
 
 		IFile file;
-		while ((file =
-			removeComposedFile()) != null) {
+		while ((file = removeComposedFile()) != null) {
 			if (monitor.isCanceled()) {
 				composedFiles.clear();
 				break;
@@ -194,24 +179,18 @@ public abstract class ErrorPropagation {
 			return;
 		}
 		try {
-			final IMarker[] markers =
-				file.findMarkers(null, true, IResource.DEPTH_INFINITE);
-			if (force
-				|| (markers.length != 0)) {
-				final LinkedList<IMarker> marker =
-					new LinkedList<IMarker>();
+			final IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
+			if (force || (markers.length != 0)) {
+				final LinkedList<IMarker> marker = new LinkedList<IMarker>();
 				for (final IMarker m : markers) {
-					final String message =
-						m.getAttribute(IMarker.MESSAGE, null);
-					if ((message == null)
-						|| deleteMarker(message)) {
+					final String message = m.getAttribute(IMarker.MESSAGE, null);
+					if ((message == null) || deleteMarker(message)) {
 						m.delete();
 					} else if (propagateMarker(m)) {
 						marker.add(m);
 					}
 				}
-				if (force
-					|| !marker.isEmpty()) {
+				if (force || !marker.isEmpty()) {
 					propagateMarkers(marker, file);
 				}
 			}
@@ -251,30 +230,23 @@ public abstract class ErrorPropagation {
 			return;
 		}
 
-		final String content =
-			getFileContent(file);
-		final LinkedList<FSTField> fields =
-			new LinkedList<FSTField>();
-		final LinkedList<FSTMethod> methods =
-			new LinkedList<FSTMethod>();
-		final IFeatureProject project =
-			CorePlugin.getFeatureProject(file);
+		final String content = getFileContent(file);
+		final LinkedList<FSTField> fields = new LinkedList<FSTField>();
+		final LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
+		final IFeatureProject project = CorePlugin.getFeatureProject(file);
 		if (project == null) {
 			return;
 		}
-		final FSTModel model =
-			project.getFSTModel();
+		final FSTModel model = project.getFSTModel();
 		if (model == null) {
 			return;
 		}
-		final FSTClass fstClass =
-			model.getClass(model.getAbsoluteClassName(file));
+		final FSTClass fstClass = model.getClass(model.getAbsoluteClassName(file));
 		if (fstClass == null) {
 			return;
 		}
 
-		final LinkedList<String> selectedFeatures =
-			getSelectedFeatures(CorePlugin.getFeatureProject(file));
+		final LinkedList<String> selectedFeatures = getSelectedFeatures(CorePlugin.getFeatureProject(file));
 		for (final FSTRole role : fstClass.getRoles()) {
 			if (!selectedFeatures.contains(role.getFeature().getName())) {
 				continue;
@@ -298,29 +270,20 @@ public abstract class ErrorPropagation {
 				propagateUnsupportedMarker(marker, file);
 				continue;
 			}
-			final int markerLine =
-				marker.getAttribute(IMarker.LINE_NUMBER, -1);
+			final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
 			if (markerLine == -1) {
 				continue;
 			}
 
-			boolean propagated =
-				false;
+			boolean propagated = false;
 			for (final FSTField f : fields) {
 				if (f.getEndLine() == -1) {
 					continue;
 				}
-				final int composedLine =
-					f.getComposedLine();
-				if ((markerLine >= composedLine)
-					&& (markerLine <= (composedLine
-						+ (f.getEndLine()
-							- f.getLine())))) {
-					propagateMarker(marker, f.getFile(), (f.getLine()
-						+ markerLine)
-						- composedLine);
-					propagated =
-						true;
+				final int composedLine = f.getComposedLine();
+				if ((markerLine >= composedLine) && (markerLine <= (composedLine + (f.getEndLine() - f.getLine())))) {
+					propagateMarker(marker, f.getFile(), (f.getLine() + markerLine) - composedLine);
+					propagated = true;
 					break;
 				}
 			}
@@ -333,16 +296,10 @@ public abstract class ErrorPropagation {
 				if (m.getEndLine() == -1) {
 					continue;
 				}
-				final int composedLine =
-					m.getComposedLine();
-				if ((markerLine >= composedLine)
-					&& (markerLine <= (composedLine
-						+ m.getMethodLength()))) {
-					propagateMarker(marker, m.getFile(), (m.getLine()
-						+ markerLine)
-						- m.getComposedLine());
-					propagated =
-						true;
+				final int composedLine = m.getComposedLine();
+				if ((markerLine >= composedLine) && (markerLine <= (composedLine + m.getMethodLength()))) {
+					propagateMarker(marker, m.getFile(), (m.getLine() + markerLine) - m.getComposedLine());
+					propagated = true;
 					break;
 				}
 			}
@@ -362,26 +319,20 @@ public abstract class ErrorPropagation {
 		}
 
 		final IFile iFile;
-		final LinkedList<String> list =
-			new LinkedList<String>();
-		iFile =
-			featureProject.getCurrentConfiguration();
+		final LinkedList<String> list = new LinkedList<String>();
+		iFile = featureProject.getCurrentConfiguration();
 
-		if ((iFile == null)
-			|| !iFile.exists()) {
+		if ((iFile == null) || !iFile.exists()) {
 			return null;
 		}
 
-		final File file =
-			iFile.getRawLocation().toFile();
-		final LinkedList<String> configurationFeatures =
-			readFeaturesfromConfigurationFile(file);
+		final File file = iFile.getRawLocation().toFile();
+		final LinkedList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
 		if (configurationFeatures == null) {
 			return null;
 		}
 
-		final Collection<IFeature> features =
-			Functional.toList(featureProject.getFeatureModel().getFeatures());
+		final Collection<IFeature> features = Functional.toList(featureProject.getFeatureModel().getFeatures());
 		for (final String confFeature : configurationFeatures) {
 			for (final IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
@@ -394,22 +345,19 @@ public abstract class ErrorPropagation {
 
 	private LinkedList<String> readFeaturesfromConfigurationFile(File file) {
 		LinkedList<String> list;
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		if (!file.exists()) {
 			return null;
 		}
 
 		try {
-			scanner =
-				new Scanner(file, "UTF-8");
+			scanner = new Scanner(file, "UTF-8");
 		} catch (final FileNotFoundException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 
 		if (scanner.hasNext()) {
-			list =
-				new LinkedList<String>();
+			list = new LinkedList<String>();
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}
@@ -425,8 +373,7 @@ public abstract class ErrorPropagation {
 	 * Propagates markers outside of methods and fields. <br> <code>Needs to be implemented by the Subclass.</code>
 	 */
 	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
-		FeatureHouseCorePlugin.getDefault().logInfo("Marker not propagated: "
-			+ marker.getAttribute(IMarker.MESSAGE, ""));
+		FeatureHouseCorePlugin.getDefault().logInfo("Marker not propagated: " + marker.getAttribute(IMarker.MESSAGE, ""));
 	}
 
 	/**
@@ -444,26 +391,20 @@ public abstract class ErrorPropagation {
 	 * @param line The marker line at the features file
 	 */
 	protected void propagateMarker(IMarker marker, IFile file, int line) {
-		if ((file != null)
-			&& file.exists()) {
-			Object severity =
-				null;
-			final String message =
-				marker.getAttribute(IMarker.MESSAGE, NO_ATTRIBUTE);
+		if ((file != null) && file.exists()) {
+			Object severity = null;
+			final String message = marker.getAttribute(IMarker.MESSAGE, NO_ATTRIBUTE);
 			if (NO_ATTRIBUTE.equals(message)) {
 				return;
 			}
 			try {
-				severity =
-					marker.getAttribute(IMarker.SEVERITY);
+				severity = marker.getAttribute(IMarker.SEVERITY);
 			} catch (final CoreException e) {
-				severity =
-					IMarker.SEVERITY_ERROR;
+				severity = IMarker.SEVERITY_ERROR;
 			}
 			if (!hasSameMarker(message, line, file)) {
 				try {
-					final IMarker newMarker =
-						file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+					final IMarker newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					newMarker.setAttribute(IMarker.MESSAGE, message);
 					newMarker.setAttribute(IMarker.SEVERITY, severity);
@@ -479,8 +420,7 @@ public abstract class ErrorPropagation {
 	 */
 	private boolean hasSameMarker(String message, int line, IFile file) {
 		try {
-			final IMarker[] markers =
-				file.findMarkers(null, true, IResource.DEPTH_INFINITE);
+			final IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
 			for (final IMarker m : markers) {
 				if (m.getAttribute(IMarker.LINE_NUMBER, -1) == line) {
 					if (m.getAttribute(IMarker.MESSAGE, "xxx").equals(message)) {
@@ -498,21 +438,17 @@ public abstract class ErrorPropagation {
 	 * Count the lines of the given substring.
 	 */
 	protected int countLines(String substring) {
-		return (substring
-			+ " ").split("[\n]").length;
+		return (substring + " ").split("[\n]").length;
 	}
 
 	/**
 	 * @return The content of the given file
 	 */
 	private String getFileContent(IFile file) {
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		try {
-			scanner =
-				new Scanner(file.getRawLocation().toFile(), "UTF-8");
-			final StringBuffer buffer =
-				new StringBuffer();
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
+			final StringBuffer buffer = new StringBuffer();
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
 					buffer.append(scanner.nextLine());

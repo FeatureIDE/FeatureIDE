@@ -96,28 +96,21 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param deleteOperation
 	 */
 	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
-		this.featureMap =
-			featureMap;
-		this.featureModel =
-			featureModel;
-		this.parent =
-			parent;
+		this.featureMap = featureMap;
+		this.featureModel = featureModel;
+		this.parent = parent;
 
-		final List<IFeature> toBeDeleted =
-			new LinkedList<IFeature>();
+		final List<IFeature> toBeDeleted = new LinkedList<IFeature>();
 		for (final IFeature f : featureMap.keySet()) {
 			if (featureMap.get(f).isEmpty()) {
 				toBeDeleted.add(f);
 			}
 		}
 
-		String labeltext =
-			" ";
+		String labeltext = " ";
 
 		for (final IFeature f : toBeDeleted) {
-			labeltext +=
-				f.getName()
-					+ ", ";
+			labeltext += f.getName() + ", ";
 			featureMap.remove(f);
 		}
 
@@ -132,38 +125,21 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * Initializes the window
 	 */
 	private void initShell() {
-		shell =
-			new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL
-				| SWT.DIALOG_TRIM);
+		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
 		shell.setText(FEATURE_DELETION_AND_REPLACEMENT_IN_CONSTRAINTS);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(520, 450);
-		final GridLayout shellLayout =
-			new GridLayout();
-		shellLayout.marginWidth =
-			0;
-		shellLayout.marginHeight =
-			0;
-		shellLayout.numColumns =
-			1;
+		final GridLayout shellLayout = new GridLayout();
+		shellLayout.marginWidth = 0;
+		shellLayout.marginHeight = 0;
+		shellLayout.numColumns = 1;
 		shell.setLayout(shellLayout);
 
-		final Monitor primary =
-			shell.getDisplay().getPrimaryMonitor();
-		final Rectangle bounds =
-			primary.getBounds();
-		final Rectangle rect =
-			shell.getBounds();
-		final int x =
-			bounds.x
-				+ ((bounds.width
-					- rect.width)
-					/ 2);
-		final int y =
-			bounds.y
-				+ ((bounds.height
-					- rect.height)
-					/ 2);
+		final Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		final Rectangle bounds = primary.getBounds();
+		final Rectangle rect = shell.getBounds();
+		final int x = bounds.x + ((bounds.width - rect.width) / 2);
+		final int y = bounds.y + ((bounds.height - rect.height) / 2);
 		shell.setLocation(x, y);
 		shell.addListener(SWT.Traverse, new Listener() {
 
@@ -183,57 +159,37 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param constraint
 	 */
 	private void initBottom(String labeltext) {
-		final Composite tableComposite =
-			new Composite(shell, SWT.NONE);
-		final GridData gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessVerticalSpace =
-			true;
-		gridData.grabExcessHorizontalSpace =
-			true;
+		final Composite tableComposite = new Composite(shell, SWT.NONE);
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessVerticalSpace = true;
+		gridData.grabExcessHorizontalSpace = true;
 		tableComposite.setLayoutData(gridData);
 
-		final Label label =
-			new Label(shell, 0);
-		final int textLength =
-			labeltext.length();
+		final Label label = new Label(shell, 0);
+		final int textLength = labeltext.length();
 		if ((textLength > 1)) {
-			label.setText("  The following features do not have any equivalents and cannot be deleted:\n  "
-				+ labeltext.substring(0, textLength
-					- 2));
+			label.setText("  The following features do not have any equivalents and cannot be deleted:\n  " + labeltext.substring(0, textLength - 2));
 		}
 		label.setLayoutData(gridData);
-		final Composite lastComposite =
-			new Composite(shell, SWT.NONE);
+		final Composite lastComposite = new Composite(shell, SWT.NONE);
 		lastComposite.setLayoutData(gridData);
 
-		final FormLayout lastCompositeLayout =
-			new FormLayout();
-		lastCompositeLayout.marginHeight =
-			5;
-		lastCompositeLayout.marginTop =
-			5;
-		lastCompositeLayout.marginWidth =
-			15;
-		lastCompositeLayout.marginBottom =
-			15;
+		final FormLayout lastCompositeLayout = new FormLayout();
+		lastCompositeLayout.marginHeight = 5;
+		lastCompositeLayout.marginTop = 5;
+		lastCompositeLayout.marginWidth = 15;
+		lastCompositeLayout.marginBottom = 15;
 		lastComposite.setLayout(lastCompositeLayout);
 
-		final Button okButton =
-			new Button(lastComposite, SWT.NONE);
+		final Button okButton = new Button(lastComposite, SWT.NONE);
 		okButton.setText(CLOSE);
-		final FormData formDataCancel =
-			new FormData();
-		formDataCancel.width =
-			70;
-		formDataCancel.right =
-			new FormAttachment(100, 5);
-		formDataCancel.bottom =
-			new FormAttachment(100, 15);
+		final FormData formDataCancel = new FormData();
+		formDataCancel.width = 70;
+		formDataCancel.right = new FormAttachment(100, 5);
+		formDataCancel.bottom = new FormAttachment(100, 15);
 		okButton.setLayoutData(formDataCancel);
 
-		lastComposite.setTabList(new Control[] {
-			okButton });
+		lastComposite.setTabList(new Control[] { okButton });
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
 			@Override
@@ -248,71 +204,44 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * initializes the upper part of the dialog
 	 */
 	private void initHead() {
-		final Composite headComposite =
-			new Composite(shell, SWT.NONE);
+		final Composite headComposite = new Composite(shell, SWT.NONE);
 		headComposite.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		GridData gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		headComposite.setLayoutData(gridData);
 
-		final GridLayout headLayout =
-			new GridLayout();
-		headLayout.numColumns =
-			3;
+		final GridLayout headLayout = new GridLayout();
+		headLayout.numColumns = 3;
 		headComposite.setLayout(headLayout);
 
-		final Label capture =
-			new Label(headComposite, SWT.NONE);
-		final FontData fontData =
-			capture.getFont().getFontData()[0];
-		final Font font =
-			new Font(shell.getDisplay(), new FontData(fontData.getName(), 10, SWT.NONE));
+		final Label capture = new Label(headComposite, SWT.NONE);
+		final FontData fontData = capture.getFont().getFontData()[0];
+		final Font font = new Font(shell.getDisplay(), new FontData(fontData.getName(), 10, SWT.NONE));
 		capture.setFont(font);
-		capture.setText("One or more features could not be deleted, because they are contained within one or\n"
-			+ "more constraints.\n"
+		capture.setText("One or more features could not be deleted, because they are contained within one or\n" + "more constraints.\n"
 			+ "To delete these features anyway you can replace their occurences in\n"
 			+ "constraints with another feature. Select one or more features on the left in order to\n"
-			+ "replace them with one of their respective semantically equivalent features shown\n"
-			+ ON_THE_RIGHT_HAND_SIDE_);
+			+ "replace them with one of their respective semantically equivalent features shown\n" + ON_THE_RIGHT_HAND_SIDE_);
 		capture.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-		gridData =
-			new GridData();
-		gridData.horizontalSpan =
-			2;
+		gridData = new GridData();
+		gridData.horizontalSpan = 2;
 		capture.setLayoutData(gridData);
-		final Label imageLabel =
-			new Label(headComposite, SWT.RIGHT
-				| SWT.DOWN);
+		final Label imageLabel = new Label(headComposite, SWT.RIGHT | SWT.DOWN);
 		imageLabel.setImage(BANNER_IMAGE);
 		imageLabel.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		gridData =
-			new GridData(GridData.FILL_VERTICAL
-				| GridData.END
-				| GridData.HORIZONTAL_ALIGN_END
-				| GridData.VERTICAL_ALIGN_END);
-		gridData.widthHint =
-			90;
-		gridData.verticalSpan =
-			3;
+		gridData = new GridData(GridData.FILL_VERTICAL | GridData.END | GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_END);
+		gridData.widthHint = 90;
+		gridData.verticalSpan = 3;
 		imageLabel.setLayoutData(gridData);
 
-		gridData =
-			new GridData(GridData.BEGINNING);
-		gridData.widthHint =
-			20;
-		gridData.heightHint =
-			20;
-		gridData.verticalSpan =
-			2;
-		gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessHorizontalSpace =
-			true;
-		gridData.grabExcessVerticalSpace =
-			true;
-		gridData.verticalSpan =
-			1;
+		gridData = new GridData(GridData.BEGINNING);
+		gridData.widthHint = 20;
+		gridData.heightHint = 20;
+		gridData.verticalSpan = 2;
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		gridData.verticalSpan = 1;
 	}
 
 	/**
@@ -321,43 +250,27 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param featuremodel
 	 */
 	private void initFeatureGroup() {
-		final Group featureGroup =
-			new Group(shell, SWT.NONE);
+		final Group featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
-		GridData gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessHorizontalSpace =
-			true;
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessHorizontalSpace = true;
 		featureGroup.setLayoutData(gridData);
-		final GridLayout featureGroupLayout =
-			new GridLayout();
-		featureGroupLayout.numColumns =
-			2;
+		final GridLayout featureGroupLayout = new GridLayout();
+		featureGroupLayout.numColumns = 2;
 		featureGroup.setLayout(featureGroupLayout);
 
-		Composite tableComposite =
-			new Composite(featureGroup, SWT.NONE);
-		gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessVerticalSpace =
-			true;
-		gridData.grabExcessHorizontalSpace =
-			true;
+		Composite tableComposite = new Composite(featureGroup, SWT.NONE);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessVerticalSpace = true;
+		gridData.grabExcessHorizontalSpace = true;
 		tableComposite.setLayoutData(gridData);
 
-		final TableViewer tableViewer =
-			new TableViewer(tableComposite, SWT.BORDER
-				| SWT.MULTI
-				| SWT.H_SCROLL
-				| SWT.V_SCROLL);
-		alternativefeatureTable =
-			tableViewer.getTable();
+		final TableViewer tableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		alternativefeatureTable = tableViewer.getTable();
 		alternativefeatureTable.setLayoutData(gridData);
 		alternativefeatureTable.setToolTipText(FEATURES_SUPPOSED_TO_BE_DELETED);
-		final TableViewerColumn viewerNameColumn =
-			new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumnLayout tableColumnLayout =
-			new TableColumnLayout();
+		final TableViewerColumn viewerNameColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumnLayout tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
 		tableColumnLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, false));
 
@@ -378,35 +291,23 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 			}
 		});
-		final Collection<IFeature> l =
-			new ArrayList<IFeature>();
+		final Collection<IFeature> l = new ArrayList<IFeature>();
 		l.addAll(featureMap.keySet());
 		tableViewer.setContentProvider(new ArrayContentProvider());
 		tableViewer.setInput(l);
 
-		tableComposite =
-			new Composite(featureGroup, SWT.NONE);
-		gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessVerticalSpace =
-			true;
-		gridData.grabExcessHorizontalSpace =
-			true;
+		tableComposite = new Composite(featureGroup, SWT.NONE);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.grabExcessVerticalSpace = true;
+		gridData.grabExcessHorizontalSpace = true;
 		tableComposite.setLayoutData(gridData);
 
-		final TableViewer tableViewer2 =
-			new TableViewer(tableComposite, SWT.BORDER
-				| SWT.SINGLE
-				| SWT.H_SCROLL
-				| SWT.V_SCROLL);
-		featureTable =
-			tableViewer2.getTable();
+		final TableViewer tableViewer2 = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		featureTable = tableViewer2.getTable();
 		featureTable.setLayoutData(gridData);
 		featureTable.setToolTipText(ALTERNATIVE_FEATURES);
-		final TableViewerColumn viewerNameColumn2 =
-			new TableViewerColumn(tableViewer2, SWT.NONE);
-		tableColumnLayout =
-			new TableColumnLayout();
+		final TableViewerColumn viewerNameColumn2 = new TableViewerColumn(tableViewer2, SWT.NONE);
+		tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
 		tableColumnLayout.setColumnData(viewerNameColumn2.getColumn(), new ColumnWeightData(100, 100, false));
 		tableViewer2.setContentProvider(new ArrayContentProvider());
@@ -423,14 +324,12 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 			@Override
 			public void handleEvent(Event event) {
-				final Collection<IFeature> l =
-					new ArrayList<IFeature>();
+				final Collection<IFeature> l = new ArrayList<IFeature>();
 				l.addAll(featureMap.get((alternativefeatureTable.getSelection()[0]).getData()));
-				for (int i =
-					0; i < alternativefeatureTable.getSelectionCount(); i++) {
+				for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 
-					if (!featureMap.get((alternativefeatureTable.getSelection()[0]).getData()).equals(
-							featureMap.get((alternativefeatureTable.getSelection()[i]).getData()))) {
+					if (!featureMap.get((alternativefeatureTable.getSelection()[0]).getData())
+							.equals(featureMap.get((alternativefeatureTable.getSelection()[i]).getData()))) {
 						l.clear();
 						break;
 					}
@@ -450,17 +349,13 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 			}
 		});
 
-		final Label label =
-			new Label(featureGroup, 0);
-		gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
+		final Label label = new Label(featureGroup, 0);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		label.setLayoutData(gridData);
 
-		final Button button =
-			new Button(featureGroup, SWT.PUSH);
+		final Button button = new Button(featureGroup, SWT.PUSH);
 		button.setText(REPLACE);
-		gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		button.setLayoutData(gridData);
 
 		button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -475,42 +370,33 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	void execute() {
 		IFeature toBeDeleted;
 		IFeature alternative;
-		final List<IFeature> delFeatures =
-			new LinkedList<IFeature>();
+		final List<IFeature> delFeatures = new LinkedList<IFeature>();
 
 		if (featureTable.getSelectionCount() > 0) {
-			alternative =
-				(IFeature) (featureTable.getSelection()[0]).getData();
+			alternative = (IFeature) (featureTable.getSelection()[0]).getData();
 		} else {
 			return;
 		}
 
-		for (int i =
-			0; i < alternativefeatureTable.getSelectionCount(); i++) {
-			toBeDeleted =
-				(IFeature) (alternativefeatureTable.getSelection()[i]).getData();
+		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
+			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
 			parent.addOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 
-		final List<Integer> removableIndices =
-			new LinkedList<Integer>();
+		final List<Integer> removableIndices = new LinkedList<Integer>();
 		for (final IFeature f : delFeatures) {
-			for (int j =
-				0; j < alternativefeatureTable.getItemCount(); j++) {
+			for (int j = 0; j < alternativefeatureTable.getItemCount(); j++) {
 				if (f.getName().equals(((IFeature) alternativefeatureTable.getItem(j).getData()).getName())) {
 					removableIndices.add(j);
 				}
 			}
 		}
 
-		final int rem[] =
-			new int[removableIndices.size()];
-		int i =
-			0;
+		final int rem[] = new int[removableIndices.size()];
+		int i = 0;
 		for (final int index : removableIndices) {
-			rem[i] =
-				index;
+			rem[i] = index;
 			i++;
 		}
 		alternativefeatureTable.remove(rem);

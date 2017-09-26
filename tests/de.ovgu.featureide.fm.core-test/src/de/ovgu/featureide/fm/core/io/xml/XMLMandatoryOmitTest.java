@@ -38,29 +38,23 @@ public class XMLMandatoryOmitTest {
 
 	@Test
 	public void testOmmitingMandatoryAttribute() {
-		final XmlFeatureModelFormat format =
-			new XmlFeatureModelFormat();
+		final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
 
 		// Create new Feature Model
-		final IFeatureModel fm =
-			new FeatureModel("OmitTest");
+		final IFeatureModel fm = new FeatureModel("OmitTest");
 
 		// Create root
-		final IFeature root =
-			new Feature(fm, "Root");
+		final IFeature root = new Feature(fm, "Root");
 		fm.getStructure().setRoot(root.getStructure());
 
 		// Create Or Group
-		final IFeature or =
-			new Feature(fm, "OrGroup");
+		final IFeature or = new Feature(fm, "OrGroup");
 		root.getStructure().addChild(or.getStructure());
 
-		final IFeature orOne =
-			new Feature(fm, "OrChild");
+		final IFeature orOne = new Feature(fm, "OrChild");
 		orOne.getStructure().setMandatory(true);
 		or.getStructure().addChild(orOne.getStructure());
-		final IFeature orTwo =
-			new Feature(fm, "OrChild2");
+		final IFeature orTwo = new Feature(fm, "OrChild2");
 		orTwo.getStructure().setMandatory(true);
 		or.getStructure().addChild(orTwo.getStructure());
 
@@ -68,16 +62,13 @@ public class XMLMandatoryOmitTest {
 		or.getStructure().changeToOr();
 
 		// Create Alternative Group
-		final IFeature alt =
-			new Feature(fm, "AlternativeGroup");
+		final IFeature alt = new Feature(fm, "AlternativeGroup");
 		root.getStructure().addChild(alt.getStructure());
 
-		final IFeature altOne =
-			new Feature(fm, "AlternativeChild");
+		final IFeature altOne = new Feature(fm, "AlternativeChild");
 		altOne.getStructure().setMandatory(true);
 		alt.getStructure().addChild(altOne.getStructure());
-		final IFeature altTwo =
-			new Feature(fm, "AlternativeChild2");
+		final IFeature altTwo = new Feature(fm, "AlternativeChild2");
 		altTwo.getStructure().setMandatory(true);
 		alt.getStructure().addChild(altTwo.getStructure());
 
@@ -85,16 +76,13 @@ public class XMLMandatoryOmitTest {
 		alt.getStructure().changeToAlternative();
 
 		// Create XML from feature model
-		String ausgabe =
-			format.write(fm);
+		String ausgabe = format.write(fm);
 
 		// Replace roots mandatory
-		ausgabe =
-			ausgabe.replaceFirst("mandatory=\"true\"", "");
+		ausgabe = ausgabe.replaceFirst("mandatory=\"true\"", "");
 
 		// Check if mandatory = true is present in current xml
-		final boolean isMandantoryPresent =
-			ausgabe.contains("mandatory=\"true\"");
+		final boolean isMandantoryPresent = ausgabe.contains("mandatory=\"true\"");
 
 		assertEquals(isMandantoryPresent, false);
 	}

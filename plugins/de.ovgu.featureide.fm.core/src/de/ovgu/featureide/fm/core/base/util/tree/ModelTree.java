@@ -46,8 +46,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 		@Override
 		public ModelTree<M, E> getNext() {
-			final ModelTree<M, E> next =
-				iteratorList.removeFirst();
+			final ModelTree<M, E> next = iteratorList.removeFirst();
 			iteratorList.addAll(0, next.children);
 			return next;
 		}
@@ -62,8 +61,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 		@Override
 		public ModelTree<M, E> getNext() {
-			final ModelTree<M, E> next =
-				iteratorList.removeFirst();
+			final ModelTree<M, E> next = iteratorList.removeFirst();
 			iteratorList.addAll(next.children);
 			return next;
 		}
@@ -80,23 +78,19 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	protected final M treeModel;
 
-	protected final List<ModelTree<M, E>> children =
-		new ArrayList<>();
+	protected final List<ModelTree<M, E>> children = new ArrayList<>();
 
 	protected E object;
 
-	protected ModelTree<M, E> parent =
-		null;
+	protected ModelTree<M, E> parent = null;
 
 	public ModelTree(E object) {
 		this(object, null);
 	}
 
 	public ModelTree(E object, M treeModel) {
-		this.object =
-			object;
-		this.treeModel =
-			treeModel;
+		this.object = object;
+		this.treeModel = treeModel;
 	}
 
 	public List<ModelTree<M, E>> getChildren() {
@@ -132,38 +126,30 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void addNode(E newChildObject) {
-		final ModelTree<M, E> newChild =
-			new ModelTree<>(newChildObject, this.treeModel);
-		newChild.parent =
-			this;
+		final ModelTree<M, E> newChild = new ModelTree<>(newChildObject, this.treeModel);
+		newChild.parent = this;
 		children.add(newChild);
 	}
 
 	public void addNodeAtIndex(E newChildObject, int index) {
-		final ModelTree<M, E> newChild =
-			new ModelTree<>(newChildObject, this.treeModel);
-		newChild.parent =
-			this;
+		final ModelTree<M, E> newChild = new ModelTree<>(newChildObject, this.treeModel);
+		newChild.parent = this;
 		children.add(index, newChild);
 	}
 
 	public void addSubTree(ModelTree<M, E> newChild) {
-		newChild.parent =
-			this;
+		newChild.parent = this;
 		children.add(newChild);
 	}
 
 	public void addSubTreeAtIndex(int index, ModelTree<M, E> newChild) {
-		newChild.parent =
-			this;
+		newChild.parent = this;
 		children.add(index, newChild);
 	}
 
 	public void removeSubTree(ModelTree<M, E> child) {
-		for (final Iterator<ModelTree<M, E>> it =
-			children.iterator(); it.hasNext();) {
-			final ModelTree<M, E> next =
-				it.next();
+		for (final Iterator<ModelTree<M, E>> it = children.iterator(); it.hasNext();) {
+			final ModelTree<M, E> next = it.next();
 			if (next.equals(child)) {
 				it.remove();
 				return;
@@ -172,8 +158,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public void removeNode(E child) {
-		for (final TreeIterator<E> it =
-			iterator(); it.hasNext();) {
+		for (final TreeIterator<E> it = iterator(); it.hasNext();) {
 			if (it.next().equals(child)) {
 				it.remove();
 				break;
@@ -198,14 +183,11 @@ public class ModelTree<M, E> implements Iterable<E> {
 	}
 
 	public int getNumberOfNodes() {
-		int count =
-			0;
-		final LinkedList<ModelTree<M, E>> countList =
-			new LinkedList<>();
+		int count = 0;
+		final LinkedList<ModelTree<M, E>> countList = new LinkedList<>();
 		countList.add(this);
 		do {
-			final ModelTree<M, E> next =
-				countList.removeFirst();
+			final ModelTree<M, E> next = countList.removeFirst();
 			countList.addAll(0, next.children);
 			count++;
 		} while (!countList.isEmpty());
@@ -220,28 +202,22 @@ public class ModelTree<M, E> implements Iterable<E> {
 		if (this == tree) {
 			return true;
 		}
-		ModelTree<M, E> curParent =
-			parent;
+		ModelTree<M, E> curParent = parent;
 		while (curParent != null) {
 			if (tree == curParent) {
 				return true;
 			}
-			curParent =
-				curParent.parent;
+			curParent = curParent.parent;
 		}
 		return false;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
-		for (final TreeIterator<E> it =
-			this.iterator(); it.hasNext();) {
-			final E element =
-				it.next();
-			for (int i =
-				0; i < it.getCurrentLevel(); i++) {
+		final StringBuilder sb = new StringBuilder();
+		for (final TreeIterator<E> it = this.iterator(); it.hasNext();) {
+			final E element = it.next();
+			for (int i = 0; i < it.getCurrentLevel(); i++) {
 				sb.append('\t');
 			}
 			sb.append(element.toString());

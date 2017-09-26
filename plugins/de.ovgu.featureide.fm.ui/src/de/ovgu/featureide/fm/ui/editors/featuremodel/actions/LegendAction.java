@@ -44,8 +44,7 @@ public class LegendAction extends Action {
 
 	public LegendAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super();
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 		if (!featureModel.isLegendHidden()) {
 			setText(HIDE_LEGEND);
 		} else {
@@ -56,8 +55,7 @@ public class LegendAction extends Action {
 
 	@Override
 	public void run() {
-		final HideLegendOperation op =
-			new HideLegendOperation(featureModel);
+		final HideLegendOperation op = new HideLegendOperation(featureModel);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

@@ -60,14 +60,11 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public class AheadComposer extends ComposerExtensionClass {
 
-	public static final String COMPOSER_ID =
-		"de.ovgu.featureide.composer.ahead";
+	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.ahead";
 
-	public static final String OLD_BUILD_COMMAND =
-		"FeatureIDE_Core.jakBuilder";
+	public static final String OLD_BUILD_COMMAND = "FeatureIDE_Core.jakBuilder";
 
-	private static final String LAYER_REPLACING =
-		"LAYER_REPLACING";
+	private static final String LAYER_REPLACING = "LAYER_REPLACING";
 
 	private AheadWrapper ahead;
 
@@ -76,9 +73,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		@Override
 		public void parseErrorFound(AheadBuildErrorEvent event) {
 			if (featureProject != null) {
-				featureProject.createBuilderMarker(event.getResource(),
-						event.getMessage(), event.getLine(),
-						IMarker.SEVERITY_ERROR);
+				featureProject.createBuilderMarker(event.getResource(), event.getMessage(), event.getLine(), IMarker.SEVERITY_ERROR);
 			}
 		}
 	}
@@ -86,8 +81,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
-		ahead =
-			new AheadWrapper(project);
+		ahead = new AheadWrapper(project);
 		ahead.addBuildErrorListener(new BuilderErrorListener());
 
 		return true;
@@ -133,11 +127,9 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @param file
 	 */
 	private void correctSourceFile(IFile file) {
-		String text =
-			getFileText(file);
+		String text = getFileText(file);
 		if (text != null) {
-			text =
-				correctFileText(text);
+			text = correctFileText(text);
 			if (text != null) {
 				setFileText(file, text);
 			}
@@ -153,14 +145,10 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @return
 	 */
 	public static String correctFileText(String fileContent) {
-		boolean changed =
-			false;
+		boolean changed = false;
 		if (fileContent.startsWith("import ")) {
-			changed =
-				true;
-			fileContent =
-				NEWLINE
-					+ fileContent;
+			changed = true;
+			fileContent = NEWLINE + fileContent;
 		}
 		if (!fileContent.equals(fileContent.replaceFirst("layer\\s+\\w+\\s*;", ""))
 			&& (fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf('{'))) {
@@ -178,13 +166,10 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @return the file content
 	 */
 	private String getFileText(IFile file) {
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		try {
-			final StringBuffer fileText =
-				new StringBuffer();
-			scanner =
-				new Scanner(file.getRawLocation().toFile(), "UTF-8");
+			final StringBuffer fileText = new StringBuffer();
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append(NEWLINE);
@@ -207,11 +192,9 @@ public class AheadComposer extends ComposerExtensionClass {
 	 * @param content
 	 */
 	private void setFileText(IFile file, String content) {
-		FileWriter fw =
-			null;
+		FileWriter fw = null;
 		try {
-			fw =
-				new FileWriter(file.getRawLocation().toFile());
+			fw = new FileWriter(file.getRawLocation().toFile());
 			fw.write(content);
 			try {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -231,12 +214,10 @@ public class AheadComposer extends ComposerExtensionClass {
 		}
 	}
 
-	private static final LinkedHashSet<String> EXTENSIONS =
-		createExtensions();
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
 
 	private static LinkedHashSet<String> createExtensions() {
-		final LinkedHashSet<String> extensions =
-			new LinkedHashSet<String>();
+		final LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add("jak");
 		return extensions;
 	}
@@ -257,12 +238,9 @@ public class AheadComposer extends ComposerExtensionClass {
 					performRenamings(source);
 				} else {
 					if (res instanceof IFile) {
-						final IFile file =
-							(IFile) res;
+						final IFile file = (IFile) res;
 						if (file.getName().endsWith(".java")) {
-							res.move(source.getFile(file.getName()
-									.replaceFirst(".java", ".jak"))
-									.getFullPath(), true, null);
+							res.move(source.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
 						}
 					}
 				}
@@ -279,13 +257,10 @@ public class AheadComposer extends ComposerExtensionClass {
 			if (res instanceof IFolder) {
 				performRenamings((IFolder) res);
 			} else if (res instanceof IFile) {
-				final IFile file =
-					(IFile) res;
+				final IFile file = (IFile) res;
 				if (file.getName().endsWith(".java")) {
 					performRenamings(file);
-					res.move(folder.getFile(file.getName()
-							.replaceFirst(".java", ".jak"))
-							.getFullPath(), true, null);
+					res.move(folder.getFile(file.getName().replaceFirst(".java", ".jak")).getFullPath(), true, null);
 				}
 			}
 
@@ -293,25 +268,18 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	private void performRenamings(IFile iFile) {
-		FileWriter fw =
-			null;
+		FileWriter fw = null;
 		try {
-			final File file =
-				iFile.getRawLocation().toFile();
-			final StringBuilder fileTextBuffer =
-				new StringBuilder();
-			final Scanner scanner =
-				new Scanner(file, "UTF-8");
+			final File file = iFile.getRawLocation().toFile();
+			final StringBuilder fileTextBuffer = new StringBuilder();
+			final Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
-				fileTextBuffer.append(scanner.nextLine()
-					+ NEWLINE);
+				fileTextBuffer.append(scanner.nextLine() + NEWLINE);
 			}
 			scanner.close();
 
-			final String fileText =
-				fileTextBuffer.toString().replaceFirst("package", "layer");
-			fw =
-				new FileWriter(file);
+			final String fileText = fileTextBuffer.toString().replaceFirst("package", "layer");
+			fw = new FileWriter(file);
 			fw.write(fileText);
 		} catch (final FileNotFoundException e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -338,41 +306,21 @@ public class AheadComposer extends ComposerExtensionClass {
 		return TEMPLATES;
 	}
 
-	private static final ArrayList<String[]> TEMPLATES =
-		createTempltes();
+	private static final ArrayList<String[]> TEMPLATES = createTempltes();
 
 	private static ArrayList<String[]> createTempltes() {
-		final ArrayList<String[]> list =
-			new ArrayList<String[]>(1);
-		list.add(new String[] {
-			"Jak",
-			"jak",
-			"/**"
-				+ NEWLINE
-				+ " * TODO description"
-				+ NEWLINE
-				+ " */"
-				+ NEWLINE
-				+ "public "
-				+ REFINES_PATTERN
-				+ " class "
-				+ CLASS_NAME_PATTERN
-				+ " {"
-				+ NEWLINE
-				+ NEWLINE
-				+ "}" });
+		final ArrayList<String[]> list = new ArrayList<String[]>(1);
+		list.add(new String[] { "Jak", "jak", "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public " + REFINES_PATTERN + " class "
+			+ CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" });
 		return list;
 	}
 
 	@Override
 	public String replaceSourceContentMarker(String text, boolean refines, String packageName) {
 		if (refines) {
-			text =
-				text.replace(REFINES_PATTERN, "refines");
+			text = text.replace(REFINES_PATTERN, "refines");
 		} else {
-			text =
-				text.replace(REFINES_PATTERN
-					+ " ", "");
+			text = text.replace(REFINES_PATTERN + " ", "");
 		}
 		return super.replaceSourceContentMarker(text, refines, packageName);
 	}
@@ -385,15 +333,13 @@ public class AheadComposer extends ComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, IFile file) {
 		super.postCompile(delta, file);
-		if ((ahead != null)
-			&& file.getName().endsWith(".java")) {
+		if ((ahead != null) && file.getName().endsWith(".java")) {
 			ahead.postCompile(file);
 		}
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
 		super.addCompiler(project, sourcePath, configPath, buildPath);
 		addSettings(project);
 		removeOldBuildCommand(project);
@@ -406,10 +352,8 @@ public class AheadComposer extends ComposerExtensionClass {
 	 */
 	private void removeOldBuildCommand(IProject project) {
 		try {
-			final IProjectDescription description =
-				project.getDescription();
-			final LinkedList<ICommand> newCommandList =
-				new LinkedList<ICommand>();
+			final IProjectDescription description = project.getDescription();
+			final LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
 			for (final ICommand command : description.getBuildSpec()) {
 				if (command.getBuilderName().equals(COMPOSER_ID)) {
 					newCommandList.addFirst(command);
@@ -418,13 +362,10 @@ public class AheadComposer extends ComposerExtensionClass {
 					newCommandList.add(command);
 				}
 			}
-			final ICommand[] newCommandArray =
-				new ICommand[newCommandList.size()];
-			int i =
-				0;
+			final ICommand[] newCommandArray = new ICommand[newCommandList.size()];
+			int i = 0;
 			for (final ICommand c : newCommandList) {
-				newCommandArray[i] =
-					c;
+				newCommandArray[i] = c;
 				i++;
 			}
 			description.setBuildSpec(newCommandArray);
@@ -434,8 +375,7 @@ public class AheadComposer extends ComposerExtensionClass {
 
 	// TODO this should be done with external classes
 	private void addSettings(IProject project) {
-		final IFolder settingsFolder =
-			project.getFolder(".settings");
+		final IFolder settingsFolder = project.getFolder(".settings");
 		if (!settingsFolder.exists()) {
 			try {
 				settingsFolder.create(true, true, null);
@@ -443,46 +383,15 @@ public class AheadComposer extends ComposerExtensionClass {
 				AheadCorePlugin.getDefault().logError(e);
 			}
 		}
-		final IFile settingsFile =
-			settingsFolder.getFile("org.eclipse.jdt.core.prefs");
+		final IFile settingsFile = settingsFolder.getFile("org.eclipse.jdt.core.prefs");
 		if (!settingsFile.exists()) {
-			final String text =
-				"eclipse.preferences.version=1"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.compliance=1.6"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.debug.lineNumber=generate"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.debug.localVariable=generate"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.debug.sourceFile=generate"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.problem.assertIdentifier=error"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.problem.enumIdentifier=error"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.compiler.source=1.6"
-					+ NEWLINE
-					+
-					"org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
-			final InputStream source =
-				new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
+			final String text = "eclipse.preferences.version=1" + NEWLINE + "org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.compliance=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.lineNumber=generate" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.debug.localVariable=generate" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.sourceFile=generate" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.problem.assertIdentifier=error" + NEWLINE + "org.eclipse.jdt.core.compiler.problem.enumIdentifier=error"
+				+ NEWLINE + "org.eclipse.jdt.core.compiler.source=1.6" + NEWLINE + "org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
+			final InputStream source = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
 				settingsFile.create(source, true, null);
 			} catch (final CoreException e) {
@@ -496,9 +405,7 @@ public class AheadComposer extends ComposerExtensionClass {
 		super.buildConfiguration(folder, configuration, configurationName);
 		ahead.setCompositionFolder(folder);
 		try {
-			ahead.setConfiguration(folder.getFile(configurationName
-				+ "."
-				+ getConfigurationExtension()));
+			ahead.setConfiguration(folder.getFile(configurationName + "." + getConfigurationExtension()));
 			ahead.buildAll();
 		} catch (final Exception e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -515,9 +422,7 @@ public class AheadComposer extends ComposerExtensionClass {
 
 	@Override
 	public String[] getCompositionMechanisms() {
-		return new String[] {
-			"Mixin",
-			"Jampack" };
+		return new String[] { "Mixin", "Jampack" };
 	}
 
 	@Override

@@ -46,20 +46,15 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 	/**
 	 * The count of found configurations.
 	 */
-	protected long confs =
-		0;
+	protected long confs = 0;
 
 	protected final IFeatureProject featureProject;
 
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		this.builder =
-			builder;
-		this.featureModel =
-			featureModel;
-		this.featureProject =
-			featureProject;
-		configuration =
-			new Configuration(featureModel, Configuration.PARAM_NONE);
+		this.builder = builder;
+		this.featureModel = featureModel;
+		this.featureProject = featureProject;
+		configuration = new Configuration(featureModel, Configuration.PARAM_NONE);
 	}
 
 	protected void cancelGenerationJobs() {

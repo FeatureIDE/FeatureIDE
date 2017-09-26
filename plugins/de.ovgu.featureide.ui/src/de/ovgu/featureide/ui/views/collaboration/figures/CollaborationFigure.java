@@ -38,27 +38,18 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  */
 public class CollaborationFigure extends Figure implements GUIDefaults {
 
-	private final Label label =
-		new Label();
-	public boolean selected =
-		true;
-	public boolean isConfiguration =
-		false;
+	private final Label label = new Label();
+	public boolean selected = true;
+	public boolean isConfiguration = false;
 
 	public CollaborationFigure(FSTFeature coll) {
 		super();
 
-		selected =
-			coll.isSelected();
-		isConfiguration =
-			coll instanceof FSTConfiguration;
-		final GridLayout gridLayout =
-			new GridLayout(1, true);
-		gridLayout.verticalSpacing =
-			GRIDLAYOUT_VERTICAL_SPACING;
-		gridLayout.marginHeight =
-			GRIDLAYOUT_MARGIN_HEIGHT
-				- 1;
+		selected = coll.isSelected();
+		isConfiguration = coll instanceof FSTConfiguration;
+		final GridLayout gridLayout = new GridLayout(1, true);
+		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
+		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT - 1;
 		setLayoutManager(gridLayout);
 
 		setBackgroundColor(ROLE_BACKGROUND);
@@ -86,31 +77,22 @@ public class CollaborationFigure extends Figure implements GUIDefaults {
 
 	private void setName(String name) {
 		label.setText(name);
-		final Dimension labelSize =
-			label.getPreferredSize();
+		final Dimension labelSize = label.getPreferredSize();
 
 		if (labelSize.equals(label.getSize())) {
 			return;
 		}
 		label.setSize(labelSize);
 
-		final Rectangle bounds =
-			getBounds();
-		final int w =
-			COLLABORATION_INSETS.getWidth();
-		final int h =
-			COLLABORATION_INSETS.getHeight();
+		final Rectangle bounds = getBounds();
+		final int w = COLLABORATION_INSETS.getWidth();
+		final int h = COLLABORATION_INSETS.getHeight();
 		bounds.setSize(labelSize.expand(w, h));
-		final Dimension oldSize =
-			getSize();
+		final Dimension oldSize = getSize();
 
 		if (!oldSize.equals(0, 0)) {
-			final int dx =
-				(oldSize.width
-					- bounds.width)
-					/ 2;
-			bounds.x +=
-				dx;
+			final int dx = (oldSize.width - bounds.width) / 2;
+			bounds.x += dx;
 		}
 		setBounds(bounds);
 	}

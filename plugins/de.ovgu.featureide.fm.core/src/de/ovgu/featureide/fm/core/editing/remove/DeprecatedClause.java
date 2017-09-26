@@ -34,8 +34,7 @@ public class DeprecatedClause extends Clause {
 	private int relevance;
 
 	public static DeprecatedClause createClause(int[] newLiterals, int curFeature) {
-		final HashSet<Integer> literalSet =
-			new HashSet<>(newLiterals.length << 1);
+		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
 		for (final int literal : newLiterals) {
 			if (curFeature != Math.abs(literal)) {
@@ -51,53 +50,37 @@ public class DeprecatedClause extends Clause {
 	}
 
 	public static DeprecatedClause createClause(int[] newLiterals, int curFeature, int[] helper) {
-		int uniqueVarCount =
-			newLiterals.length;
-		for (int i =
-			0; i < newLiterals.length; i++) {
-			final int l =
-				newLiterals[i];
-			final int index =
-				Math.abs(l);
+		int uniqueVarCount = newLiterals.length;
+		for (int i = 0; i < newLiterals.length; i++) {
+			final int l = newLiterals[i];
+			final int index = Math.abs(l);
 			if (index == curFeature) {
-				newLiterals[i] =
-					0;
+				newLiterals[i] = 0;
 				uniqueVarCount--;
 			} else {
-				final int h =
-					helper[index];
+				final int h = helper[index];
 				if (h == 0) {
-					helper[index] =
-						l;
+					helper[index] = l;
 				} else {
 					if (h != l) {
-						for (int j =
-							0; j < i; j++) {
-							helper[Math.abs(newLiterals[j])] =
-								0;
+						for (int j = 0; j < i; j++) {
+							helper[Math.abs(newLiterals[j])] = 0;
 						}
 						return null;
 					} else {
-						newLiterals[i] =
-							0;
+						newLiterals[i] = 0;
 						uniqueVarCount--;
 					}
 				}
 			}
 		}
-		final int[] uniqueVarArray =
-			new int[uniqueVarCount];
-		int k =
-			0;
-		for (int i =
-			0; i < newLiterals.length; i++) {
-			final int l =
-				newLiterals[i];
-			helper[Math.abs(l)] =
-				0;
+		final int[] uniqueVarArray = new int[uniqueVarCount];
+		int k = 0;
+		for (int i = 0; i < newLiterals.length; i++) {
+			final int l = newLiterals[i];
+			helper[Math.abs(l)] = 0;
 			if (l != 0) {
-				uniqueVarArray[k++] =
-					l;
+				uniqueVarArray[k++] = l;
 			}
 		}
 
@@ -105,8 +88,7 @@ public class DeprecatedClause extends Clause {
 	}
 
 	public static DeprecatedClause createClause(int[] newLiterals) {
-		final HashSet<Integer> literalSet =
-			new HashSet<>(newLiterals.length << 1);
+		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
 		for (final int literal : newLiterals) {
 			if (literalSet.contains(-literal)) {
@@ -120,27 +102,22 @@ public class DeprecatedClause extends Clause {
 	}
 
 	private static DeprecatedClause getClauseFromSet(final HashSet<Integer> literalSet) {
-		final int[] newLiterals =
-			new int[literalSet.size()];
-		int i =
-			0;
+		final int[] newLiterals = new int[literalSet.size()];
+		int i = 0;
 		for (final int lit : literalSet) {
-			newLiterals[i++] =
-				lit;
+			newLiterals[i++] = lit;
 		}
 		return new DeprecatedClause(newLiterals);
 	}
 
 	private DeprecatedClause(int[] literals) {
 		super(literals);
-		relevance =
-			0;
+		relevance = 0;
 	}
 
 	boolean computeRelevance(DeprecatedFeature[] map) {
 		for (final int literal : literals) {
-			final DeprecatedFeature df =
-				map[Math.abs(literal)];
+			final DeprecatedFeature df = map[Math.abs(literal)];
 			if (df != null) {
 				relevance++;
 				if (literal > 0) {
@@ -150,18 +127,14 @@ public class DeprecatedClause extends Clause {
 				}
 			}
 		}
-		return ((relevance > 0)
-			&& (relevance < literals.length));
+		return ((relevance > 0) && (relevance < literals.length));
 	}
 
 	public boolean delete(DeprecatedFeature[] map) {
 		if (literals.length > 1) {
-			final boolean mixed =
-				((relevance > 0)
-					&& (relevance < literals.length));
+			final boolean mixed = ((relevance > 0) && (relevance < literals.length));
 			for (final int literal : literals) {
-				final DeprecatedFeature df =
-					map[Math.abs(literal)];
+				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
 					if (literal > 0) {
 						df.decPositive();
@@ -176,8 +149,7 @@ public class DeprecatedClause extends Clause {
 			return mixed;
 		} else {
 			for (final int literal : literals) {
-				final DeprecatedFeature df =
-					map[Math.abs(literal)];
+				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
 					if (literal > 0) {
 						df.decPositive();

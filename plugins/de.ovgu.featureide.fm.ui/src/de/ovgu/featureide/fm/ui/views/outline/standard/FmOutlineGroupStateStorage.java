@@ -34,10 +34,8 @@ public class FmOutlineGroupStateStorage {
 	private final boolean isOrGroup;
 
 	public FmOutlineGroupStateStorage(IFeature parentFeature, boolean isOr) {
-		feature =
-			parentFeature;
-		isOrGroup =
-			isOr;
+		feature = parentFeature;
+		isOrGroup = isOr;
 	}
 
 	public boolean isOrGroup() {
@@ -54,21 +52,10 @@ public class FmOutlineGroupStateStorage {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((feature == null)
-					? 0
-					: feature.hashCode());
-		return (prime
-			* result)
-			+ (isOrGroup
-				? 1231
-				: 1237);
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((feature == null) ? 0 : feature.hashCode());
+		return (prime * result) + (isOrGroup ? 1231 : 1237);
 	}
 
 	/*
@@ -86,8 +73,7 @@ public class FmOutlineGroupStateStorage {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FmOutlineGroupStateStorage other =
-			(FmOutlineGroupStateStorage) obj;
+		final FmOutlineGroupStateStorage other = (FmOutlineGroupStateStorage) obj;
 		if (feature == null) {
 			if (other.feature != null) {
 				return false;

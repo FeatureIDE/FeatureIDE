@@ -46,7 +46,6 @@ public abstract class AbstractPreprocessorExplanationCreator extends AbstractFea
 
 	@Override
 	public void setExpressionStack(Collection<Node> expressionStack) {
-		this.expressionStack =
-			new ArrayDeque<>(expressionStack);
+		this.expressionStack = new ArrayDeque<>(expressionStack);
 	}
 }

@@ -42,19 +42,14 @@ class BlockTagConstructor {
 	private int priority;
 
 	public BlockTagConstructor(ProjectSignatures projectSignatures) {
-		this.projectSignatures =
-			projectSignatures;
+		this.projectSignatures = projectSignatures;
 	}
 
 	public BlockTag construct(String head, String body, int priority, Node featureNode) {
-		this.head =
-			head;
-		this.body =
-			body;
-		this.featureNode =
-			featureNode;
-		this.priority =
-			priority;
+		this.head = head;
+		this.body = body;
+		this.featureNode = featureNode;
+		this.priority = priority;
 
 		switch (head) {
 		case "":
@@ -90,45 +85,25 @@ class BlockTagConstructor {
 	}
 
 	private BlockTag construct(int keyParts, int type) {
-		final int featureID =
-			(featureNode instanceof Literal)
-				? projectSignatures.getFeatureID((String) ((Literal) featureNode).var)
-				: -1;
+		final int featureID = (featureNode instanceof Literal) ? projectSignatures.getFeatureID((String) ((Literal) featureNode).var) : -1;
 
 		switch (keyParts) {
 		case 0:
 			return new BlockTag(head, body, type, priority, featureID, featureNode);
 		case Integer.MAX_VALUE:
-			return new BlockTag(head
-				+ " "
-				+ body, "", type, priority, featureID, featureNode);
+			return new BlockTag(head + " " + body, "", type, priority, featureID, featureNode);
 		default:
-			final Pattern whiteSpace =
-				Pattern.compile("\\s+");
-			final Matcher m =
-				whiteSpace.matcher(body);
+			final Pattern whiteSpace = Pattern.compile("\\s+");
+			final Matcher m = whiteSpace.matcher(body);
 
-			int countParts =
-				0,
-					startIndex =
-						-1,
-					endIndex =
-						0;
-			while (m.find()
-				&& (countParts++ < keyParts)) {
-				startIndex =
-					m.start();
-				endIndex =
-					m.end();
+			int countParts = 0, startIndex = -1, endIndex = 0;
+			while (m.find() && (countParts++ < keyParts)) {
+				startIndex = m.start();
+				endIndex = m.end();
 			}
 			return (startIndex > -1)
-				? new BlockTag(head
-					+ " "
-					+ body.substring(0, startIndex), body.substring(endIndex), type, priority, featureID,
-						featureNode)
-				: new BlockTag(head
-					+ " "
-					+ body, "", type, priority, featureID, featureNode);
+				? new BlockTag(head + " " + body.substring(0, startIndex), body.substring(endIndex), type, priority, featureID, featureNode)
+				: new BlockTag(head + " " + body, "", type, priority, featureID, featureNode);
 		}
 	}
 

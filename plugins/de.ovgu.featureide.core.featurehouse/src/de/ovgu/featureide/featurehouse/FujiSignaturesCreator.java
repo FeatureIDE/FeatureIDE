@@ -69,23 +69,18 @@ public class FujiSignaturesCreator {
 
 	private static final class SignatureReference {
 
-		private final HashMap<Integer, FOPFeatureData> ids =
-			new HashMap<>();
+		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
 		private final AbstractSignature sig;
 
 		public SignatureReference(AbstractSignature sig) {
-			this.sig =
-				sig;
+			this.sig = sig;
 		}
 
 		public final FOPFeatureData[] getFeatureData() {
-			final FOPFeatureData[] ret =
-				new FOPFeatureData[ids.size()];
-			int i =
-				-1;
+			final FOPFeatureData[] ret = new FOPFeatureData[ids.size()];
+			int i = -1;
 			for (final FOPFeatureData id : ids.values()) {
-				ret[++i] =
-					id;
+				ret[++i] = id;
 			}
 			return ret;
 		}
@@ -101,98 +96,68 @@ public class FujiSignaturesCreator {
 		}
 	}
 
-	private java.util.List<String> featureModulePathnames =
-		null;
+	private java.util.List<String> featureModulePathnames = null;
 
 	private String getFeatureName(ASTNode<?> astNode) {
-		final int featureID =
-			astNode.featureID();
+		final int featureID = astNode.featureID();
 
-		final String featurename =
-			featureModulePathnames.get(featureID);
-		return featurename.substring(featurename.lastIndexOf(File.separator)
-			+ 1);
+		final String featurename = featureModulePathnames.get(featureID);
+		return featurename.substring(featurename.lastIndexOf(File.separator) + 1);
 	}
 
-	private final HashMap<AbstractSignature, SignatureReference> signatureSet =
-		new HashMap<AbstractSignature, SignatureReference>();
-	private final HashMap<String, AbstractSignature> signatureTable =
-		new HashMap<String, AbstractSignature>();
+	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
+	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
 
-	private FeatureDataConstructor featureDataConstructor =
-		null;
+	private FeatureDataConstructor featureDataConstructor = null;
 
 	public ProjectSignatures createSignatures(IFeatureProject fp, Program ast) {
-		featureModulePathnames =
-			ast.getSPLStructure().getFeatureModulePathnames();
+		featureModulePathnames = ast.getSPLStructure().getFeatureModulePathnames();
 
-		final ProjectSignatures projectSignatures =
-			new ProjectSignatures(fp.getFeatureModel());
-		featureDataConstructor =
-			new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
+		final ProjectSignatures projectSignatures = new ProjectSignatures(fp.getFeatureModel());
+		featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
 
-		final LinkedList<TypeDecl> stack =
-			new LinkedList<TypeDecl>();
-		final LinkedList<AbstractClassSignature> roleStack =
-			new LinkedList<AbstractClassSignature>();
+		final LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
+		final LinkedList<AbstractClassSignature> roleStack = new LinkedList<AbstractClassSignature>();
 
-		for (final Iterator<CompilationUnit> unitIter =
-			ast.compilationUnitIterator(); unitIter.hasNext();) {
-			final CompilationUnit unit =
-				unitIter.next();
+		for (final Iterator<CompilationUnit> unitIter = ast.compilationUnitIterator(); unitIter.hasNext();) {
+			final CompilationUnit unit = unitIter.next();
 			if (unit.featureID() < 0) {
 				continue;
 			}
-			String featurename =
-				getFeatureName(unit);
+			String featurename = getFeatureName(unit);
 
-			final List<TypeDecl> typeDeclList =
-				unit.getTypeDeclList();
-			final String pckg =
-				unit.getPackageDecl();
+			final List<TypeDecl> typeDeclList = unit.getTypeDeclList();
+			final String pckg = unit.getPackageDecl();
 
-			final List<ImportDecl> importList =
-				unit.getImportDeclList();
+			final List<ImportDecl> importList = unit.getImportDeclList();
 
 			for (final TypeDecl rootTypeDecl : typeDeclList) {
 				stack.push(rootTypeDecl);
 				do {
-					final TypeDecl typeDecl =
-						stack.pop();
-					String name =
-						typeDecl.name();
+					final TypeDecl typeDecl = stack.pop();
+					String name = typeDecl.name();
 
 					// get modifiers
-					final StringBuilder classModifierSB =
-						new StringBuilder();
+					final StringBuilder classModifierSB = new StringBuilder();
 					for (final Modifier modifier : typeDecl.getModifiers().getModifierList()) {
-						classModifierSB.append(modifier.getID()
-							+ " ");
+						classModifierSB.append(modifier.getID() + " ");
 					}
-					String modifierString =
-						classModifierSB.toString();
+					String modifierString = classModifierSB.toString();
 
-					String typeString =
-						null;
+					String typeString = null;
 					if (typeDecl instanceof ClassDecl) {
-						typeString =
-							"class";
+						typeString = "class";
 					} else if (typeDecl instanceof InterfaceDecl) {
-						typeString =
-							"interface";
+						typeString = "interface";
 					}
 
-					AbstractClassSignature parent =
-						null;
+					AbstractClassSignature parent = null;
 					if (!roleStack.isEmpty()) {
-						parent =
-							roleStack.pop();
+						parent = roleStack.pop();
 					}
-					featurename =
-						getFeatureName(typeDecl);
+					featurename = getFeatureName(typeDecl);
 					final FujiClassSignature curClassSig =
-						(FujiClassSignature) addFeatureID(
-								new FujiClassSignature(parent, name, modifierString, typeString, pckg, typeDecl, importList),
+						(FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString, typeString, pckg, typeDecl, importList),
 								projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
 					for (final ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
@@ -200,81 +165,56 @@ public class FujiSignaturesCreator {
 
 					for (final BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {
 						if (bodyDecl instanceof MethodDecl) {
-							final MethodDecl method =
-								(MethodDecl) bodyDecl;
+							final MethodDecl method = (MethodDecl) bodyDecl;
 
 							// get modifiers
-							final StringBuilder bodyModifierSB =
-								new StringBuilder();
+							final StringBuilder bodyModifierSB = new StringBuilder();
 							for (final Modifier modifier : method.getModifiers().getModifierList()) {
-								bodyModifierSB.append(modifier.getID()
-									+ " ");
+								bodyModifierSB.append(modifier.getID() + " ");
 							}
-							modifierString =
-								bodyModifierSB.toString();
-							name =
-								method.name();
-							final TypeDecl type =
-								method.type();
+							modifierString = bodyModifierSB.toString();
+							name = method.name();
+							final TypeDecl type = method.type();
 
-							final List<ParameterDeclaration> parameterList =
-								method.getParameterList();
-							final List<Access> exceptionList =
-								method.getExceptionList();
+							final List<ParameterDeclaration> parameterList = method.getParameterList();
+							final List<Access> exceptionList = method.getExceptionList();
 
-							featurename =
-								getFeatureName(bodyDecl);
+							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, false, parameterList, exceptionList),
 									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
-							final FieldDeclaration field =
-								(FieldDeclaration) bodyDecl;
+							final FieldDeclaration field = (FieldDeclaration) bodyDecl;
 
 							// get modifiers
-							final StringBuilder bodyModifierSB =
-								new StringBuilder();
+							final StringBuilder bodyModifierSB = new StringBuilder();
 							for (final Modifier modifier : field.getModifiers().getModifierList()) {
-								bodyModifierSB.append(modifier.getID()
-									+ " ");
+								bodyModifierSB.append(modifier.getID() + " ");
 							}
-							modifierString =
-								bodyModifierSB.toString();
-							name =
-								field.name();
-							final TypeDecl type =
-								field.type();
+							modifierString = bodyModifierSB.toString();
+							name = field.name();
+							final TypeDecl type = field.type();
 
-							featurename =
-								getFeatureName(bodyDecl);
+							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig, name, modifierString, type), projectSignatures.getFeatureID(featurename),
 									Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()));
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
-							final ConstructorDecl constructor =
-								(ConstructorDecl) bodyDecl;
+							final ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
 							if (!constructor.isDefaultConstructor()) {
 								// get modifiers
-								final StringBuilder bodyModifierSB =
-									new StringBuilder();
+								final StringBuilder bodyModifierSB = new StringBuilder();
 								for (final Modifier modifier : constructor.getModifiers().getModifierList()) {
-									bodyModifierSB.append(modifier.getID()
-										+ " ");
+									bodyModifierSB.append(modifier.getID() + " ");
 								}
-								modifierString =
-									bodyModifierSB.toString();
-								name =
-									constructor.name();
-								final TypeDecl type =
-									constructor.type();
+								modifierString = bodyModifierSB.toString();
+								name = constructor.name();
+								final TypeDecl type = constructor.type();
 
-								final List<ParameterDeclaration> parameterList =
-									constructor.getParameterList();
-								final List<Access> exceptionList =
-									constructor.getExceptionList();
+								final List<ParameterDeclaration> parameterList = constructor.getParameterList();
+								final List<Access> exceptionList = constructor.getExceptionList();
 
-								featurename =
-									getFeatureName(bodyDecl);
+								featurename = getFeatureName(bodyDecl);
 								addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, true, parameterList, exceptionList),
 										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()),
 										Symbol.getLine(constructor.getEnd()));
@@ -293,17 +233,13 @@ public class FujiSignaturesCreator {
 			}
 		}
 
-		final AbstractSignature[] sigArray =
-			new AbstractSignature[signatureSet.size()];
-		int i =
-			-1;
+		final AbstractSignature[] sigArray = new AbstractSignature[signatureSet.size()];
+		int i = -1;
 
 		for (final SignatureReference sigRef : signatureSet.values()) {
-			final AbstractSignature sig =
-				sigRef.getSig();
+			final AbstractSignature sig = sigRef.getSig();
 			sig.setFeatureData(sigRef.getFeatureData());
-			sigArray[++i] =
-				sig;
+			sigArray[++i] = sig;
 		}
 
 		projectSignatures.setSignatureArray(sigArray);
@@ -312,11 +248,9 @@ public class FujiSignaturesCreator {
 	}
 
 	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine) {
-		SignatureReference sigRef =
-			signatureSet.get(sig);
+		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
-			sigRef =
-				new SignatureReference(sig);
+			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
@@ -329,27 +263,19 @@ public class FujiSignaturesCreator {
 			FeatureHouseCorePlugin.getDefault().logInfo("Kein FSTModel!");
 		} else {
 			for (final FSTFeature fstFeature : fst.getFeatures()) {
-				final int id =
-					projectSignatures.getFeatureID(fstFeature.getName());
+				final int id = projectSignatures.getFeatureID(fstFeature.getName());
 
 				for (final FSTRole fstRole : fstFeature.getRoles()) {
-					final FSTClassFragment classFragment =
-						fstRole.getClassFragment();
+					final FSTClassFragment classFragment = fstRole.getClassFragment();
 					String fullName;
 					if (classFragment.getPackage() == null) {
-						fullName =
-							"."
-								+ classFragment.getName();
+						fullName = "." + classFragment.getName();
 					} else {
-						fullName =
-							classFragment.getName();
-						fullName =
-							fullName.replace('/', '.');
+						fullName = classFragment.getName();
+						fullName = fullName.replace('/', '.');
 					}
 					if (fullName.endsWith(".java")) {
-						fullName =
-							fullName.substring(0, fullName.length()
-								- ".java".length());
+						fullName = fullName.substring(0, fullName.length() - ".java".length());
 					}
 					copyComment_rec(classFragment, id, fullName);
 				}
@@ -361,16 +287,12 @@ public class FujiSignaturesCreator {
 		if (fullName == null) {
 			return;
 		}
-		final AbstractSignature sig =
-			signatureTable.get(fullName);
+		final AbstractSignature sig = signatureTable.get(fullName);
 
 		if (sig != null) {
-			final FOPFeatureData[] ids =
-				(FOPFeatureData[]) sig.getFeatureData();
-			for (int j =
-				0; j < ids.length; j++) {
-				final FOPFeatureData featureData =
-					ids[j];
+			final FOPFeatureData[] ids = (FOPFeatureData[]) sig.getFeatureData();
+			for (int j = 0; j < ids.length; j++) {
+				final FOPFeatureData featureData = ids[j];
 				if (featureData.getID() == id) {
 					featureData.setComment(element.getJavaDocComment());
 					break;
@@ -382,19 +304,13 @@ public class FujiSignaturesCreator {
 	private void copyComment_rec(FSTClassFragment classFragment, int id, String fullName) {
 		copyComment(classFragment, id, fullName);
 		for (final FSTField field : classFragment.getFields()) {
-			copyComment(field, id, fullName
-				+ "."
-				+ field.getName());
+			copyComment(field, id, fullName + "." + field.getName());
 		}
 		for (final FSTMethod method : classFragment.getMethods()) {
-			copyComment(method, id, fullName
-				+ "."
-				+ method.getName());
+			copyComment(method, id, fullName + "." + method.getName());
 		}
 		for (final FSTClassFragment innerClasses : classFragment.getInnerClasses()) {
-			copyComment_rec(innerClasses, id, fullName
-				+ "."
-				+ innerClasses.getName());
+			copyComment_rec(innerClasses, id, fullName + "." + innerClasses.getName());
 		}
 	}
 }

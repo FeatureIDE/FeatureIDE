@@ -35,30 +35,23 @@ class StoppableExecuter<T> extends Executer<T> {
 
 		private final IMonitor workMonitor;
 
-		private T result =
-			null;
-		private int success =
-			0;
+		private T result = null;
+		private int success = 0;
 
 		public InnerThread(IMonitor monitor) {
 			super();
-			this.workMonitor =
-				monitor;
+			this.workMonitor = monitor;
 		}
 
 		@Override
 		public void run() {
 			try {
-				result =
-					method.execute(workMonitor);
-				success =
-					1;
+				result = method.execute(workMonitor);
+				success = 1;
 			} catch (final MethodCancelException e) {
-				success =
-					-1;
+				success = -1;
 			} catch (final Exception e) {
-				success =
-					0;
+				success = 0;
 				Logger.logError(e);
 			}
 		}
@@ -67,15 +60,11 @@ class StoppableExecuter<T> extends Executer<T> {
 
 	private final int cancelingTimeout;
 
-	private InnerThread innerThread =
-		null;
+	private InnerThread innerThread = null;
 
 	public StoppableExecuter(LongRunningMethod<T> method, int cancelingTimeout) {
 		super(method);
-		this.cancelingTimeout =
-			(cancelingTimeout < 0)
-				? 300
-				: cancelingTimeout;
+		this.cancelingTimeout = (cancelingTimeout < 0) ? 300 : cancelingTimeout;
 	}
 
 	public StoppableExecuter(LongRunningMethod<T> method) {
@@ -116,8 +105,7 @@ class StoppableExecuter<T> extends Executer<T> {
 		synchronized (this) {
 			// in case job was started and canceled at the same time
 			monitor.checkCancel();
-			innerThread =
-				new InnerThread(monitor);
+			innerThread = new InnerThread(monitor);
 			innerThread.start();
 		}
 		try {

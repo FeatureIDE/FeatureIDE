@@ -80,16 +80,12 @@ public class FeatureUIHelper {
 	}
 
 	public static IGraphicalFeature getGraphicalParent(IFeature feature, IGraphicalFeatureModel model) {
-		final IFeatureStructure structure =
-			feature.getStructure();
-		return structure.isRoot()
-			? null
-			: getGraphicalFeature(structure.getParent(), model);
+		final IFeatureStructure structure = feature.getStructure();
+		return structure.isRoot() ? null : getGraphicalFeature(structure.getParent(), model);
 	}
 
 	public static List<IGraphicalFeature> getGraphicalSiblings(final IGraphicalFeature feature) {
-		final IFeatureStructure structure =
-			feature.getObject().getStructure();
+		final IFeatureStructure structure = feature.getObject().getStructure();
 		if (structure.isRoot()) {
 			return Arrays.asList(getGraphicalFeature(structure, feature.getGraphicalModel()));
 		}
@@ -101,16 +97,11 @@ public class FeatureUIHelper {
 	}
 
 	public static List<IGraphicalFeature> getGraphicalChildren(final IFeature feature, IGraphicalFeatureModel model) {
-		final List<IFeatureStructure> children =
-			feature.getStructure().getChildren();
-		final List<IGraphicalFeature> graphicalChildren =
-			new ArrayList<>(children.size());
+		final List<IFeatureStructure> children = feature.getStructure().getChildren();
+		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
 		for (final IFeatureStructure child : children) {
-			final IGraphicalFeature graphicChild =
-				getGraphicalFeature(child, model);
-			if (!graphicChild.hasCollapsedParent()
-				&& (!child.hasHiddenParent()
-					|| model.getLayout().showHiddenFeatures())) {
+			final IGraphicalFeature graphicChild = getGraphicalFeature(child, model);
+			if (!graphicChild.hasCollapsedParent() && (!child.hasHiddenParent() || model.getLayout().showHiddenFeatures())) {
 				graphicalChildren.add(graphicChild);
 			}
 		}
@@ -120,10 +111,8 @@ public class FeatureUIHelper {
 	/**
 	 * Necessary for correct manual drag-and-drop movement while zoomed.
 	 */
-	private static double zoomFactor =
-		1.0;
-	private static ZoomManager zoomManager =
-		null;
+	private static double zoomFactor = 1.0;
+	private static ZoomManager zoomManager = null;
 
 	private static Point getSourceLocation(Rectangle bounds, IGraphicalFeatureModel featureModel) {
 		if (featureModel.getLayout().verticalLayout()) {
@@ -144,16 +133,14 @@ public class FeatureUIHelper {
 	 * @param zoomFactor the zoomFactor to set
 	 */
 	public static void setZoomFactor(double zoomFactor) {
-		FeatureUIHelper.zoomFactor =
-			zoomFactor;
+		FeatureUIHelper.zoomFactor = zoomFactor;
 	}
 
 	/**
 	 * @param zoomManager
 	 */
 	public static void setZoomManager(ZoomManager zoomManager) {
-		FeatureUIHelper.zoomManager =
-			zoomManager;
+		FeatureUIHelper.zoomManager = zoomManager;
 		if (zoomManager == null) {
 			return;
 		}
@@ -161,8 +148,7 @@ public class FeatureUIHelper {
 
 			@Override
 			public void zoomChanged(double newZoomFactor) {
-				FeatureUIHelper.zoomFactor =
-					newZoomFactor;
+				FeatureUIHelper.zoomFactor = newZoomFactor;
 			}
 		});
 	}
@@ -187,8 +173,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(IGraphicalFeature feature) {
-		if ((feature.getLocation() == null)
-			|| (feature.getSize() == null)) {
+		if ((feature.getLocation() == null) || (feature.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			feature.getObject().getFeatureModel().handleModelDataChanged();
 		}
@@ -196,8 +181,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(IGraphicalConstraint constraint) {
-		if ((constraint.getLocation() == null)
-			|| (constraint.getSize() == null)) {
+		if ((constraint.getLocation() == null) || (constraint.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
 			constraint.getObject().getFeatureModel().handleModelDataChanged();
 		}
@@ -209,13 +193,10 @@ public class FeatureUIHelper {
 	 */
 	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
-		final List<ConnectionEditPart> editPartList =
-			new LinkedList<ConnectionEditPart>();
-		final Map<?, ?> registry =
-			viewer.getEditPartRegistry();
+		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
+		final Map<?, ?> registry = viewer.getEditPartRegistry();
 		for (final FeatureConnection connection : feature.getTargetConnections()) {
-			final Object connectionEditPart =
-				registry.get(connection);
+			final Object connectionEditPart = registry.get(connection);
 			if (connectionEditPart instanceof ConnectionEditPart) {
 				editPartList.add((ConnectionEditPart) connectionEditPart);
 			}
@@ -237,8 +218,7 @@ public class FeatureUIHelper {
 		 * Checks if the feature is hidden or has a hidden parent and hidden features should not be shown or if the feature has a collapsed parent and should
 		 * therefore not be shown.
 		 */
-		if ((feature.getObject().getStructure().hasHiddenParent()
-			&& !feature.getGraphicalModel().getLayout().showHiddenFeatures())
+		if ((feature.getObject().getStructure().hasHiddenParent() && !feature.getGraphicalModel().getLayout().showHiddenFeatures())
 			|| feature.hasCollapsedParent()) {
 			return getTargetLocation(getGraphicalParent(feature));
 		}
@@ -251,8 +231,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
-		final Rectangle bounds =
-			getBounds(feature);
+		final Rectangle bounds = getBounds(feature);
 		if (feature.getGraphicalModel().getLayout().verticalLayout()) {
 			return bounds.getRight();
 		}

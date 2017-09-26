@@ -61,11 +61,7 @@ import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
  */
 public class FrameworkProjectCreator {
 
-	private static String[] INTERFACETAG_STRUCTURE =
-		{
-			"\t<interface id=\"fullInterfaceName\">",
-			"\t\t<class>fullClassName</class>",
-			"\t</interface>" };
+	private static String[] INTERFACETAG_STRUCTURE = { "\t<interface id=\"fullInterfaceName\">", "\t\t<class>fullClassName</class>", "\t</interface>" };
 
 	/**
 	 * Creates a new subproject inside a folder
@@ -75,64 +71,46 @@ public class FrameworkProjectCreator {
 	 * @throws CoreException
 	 */
 	public static void createSubprojectFolder(String name, IFolder destination) throws CoreException {
-		final IProjectDescription description =
-			ResourcesPlugin.getWorkspace().newProjectDescription(name);
+		final IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(name);
 		description.setLocation(destination.getLocation());
 
-		final IProject project =
-			ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (project.exists()) {
 			return;
 		}
 		project.create(description, null);
 		project.open(null);
 
-		description.setNatureIds(new String[] {
-			JavaCore.NATURE_ID });
+		description.setNatureIds(new String[] { JavaCore.NATURE_ID });
 		project.setDescription(description, null);
 
-		final IJavaProject javaProject =
-			JavaCore.create(project);
+		final IJavaProject javaProject = JavaCore.create(project);
 		javaProject.open(null);
 
-		final IFolder binFolder =
-			project.getFolder("bin");
+		final IFolder binFolder = project.getFolder("bin");
 		binFolder.create(true, true, null);
 		javaProject.setOutputLocation(binFolder.getFullPath(), null);
 
-		final List<IClasspathEntry> entries =
-			new ArrayList<IClasspathEntry>();
-		final IVMInstall vmInstall =
-			JavaRuntime.getDefaultVMInstall();
-		final LibraryLocation[] locations =
-			JavaRuntime.getLibraryLocations(vmInstall);
+		final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+		final IVMInstall vmInstall = JavaRuntime.getDefaultVMInstall();
+		final LibraryLocation[] locations = JavaRuntime.getLibraryLocations(vmInstall);
 		for (final LibraryLocation element : locations) {
 			entries.add(JavaCore.newLibraryEntry(element.getSystemLibraryPath(), null, null));
 		}
 		javaProject.setRawClasspath(entries.toArray(new IClasspathEntry[entries.size()]), null);
-		final IFolder sourceFolder =
-			project.getFolder("src");
+		final IFolder sourceFolder = project.getFolder("src");
 		sourceFolder.create(false, true, null);
 
-		final IPackageFragmentRoot srcRoot =
-			javaProject.getPackageFragmentRoot(sourceFolder);
-		final IClasspathEntry[] oldEntries =
-			javaProject.getRawClasspath();
-		final int oldLength =
-			oldEntries.length;
-		final IClasspathEntry[] newEntries =
-			new IClasspathEntry[oldLength
-				+ 2];
+		final IPackageFragmentRoot srcRoot = javaProject.getPackageFragmentRoot(sourceFolder);
+		final IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+		final int oldLength = oldEntries.length;
+		final IClasspathEntry[] newEntries = new IClasspathEntry[oldLength + 2];
 		System.arraycopy(oldEntries, 0, newEntries, 0, oldEntries.length);
-		newEntries[oldLength] =
-			JavaCore.newSourceEntry(srcRoot.getPath());
-		newEntries[oldLength
-			+ 1] =
-				JavaCore.newProjectEntry(destination.getProject().getFullPath());
+		newEntries[oldLength] = JavaCore.newSourceEntry(srcRoot.getPath());
+		newEntries[oldLength + 1] = JavaCore.newProjectEntry(destination.getProject().getFullPath());
 		javaProject.setRawClasspath(newEntries, null);
 
-		final IFile infoXML =
-			destination.getFile("info.xml");
+		final IFile infoXML = destination.getFile("info.xml");
 		if (!infoXML.exists()) {
 			createInfoXML(destination);
 		}
@@ -146,39 +124,29 @@ public class FrameworkProjectCreator {
 	private static void createInfoXML(IFolder destination) {
 		try {
 			/** Create builder **/
-			final DocumentBuilderFactory dbFactory =
-				DocumentBuilderFactory.newInstance();
+			final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder;
-			dBuilder =
-				dbFactory.newDocumentBuilder();
-			final Document infoXML =
-				dBuilder.newDocument();
+			dBuilder = dbFactory.newDocumentBuilder();
+			final Document infoXML = dBuilder.newDocument();
 
 			/** Create content **/
-			final Element plugins =
-				infoXML.createElement("plugins");
+			final Element plugins = infoXML.createElement("plugins");
 			infoXML.appendChild(plugins);
 
 			for (final String comm : INTERFACETAG_STRUCTURE) {
-				final Comment interfaceTag =
-					infoXML.createComment(comm);
+				final Comment interfaceTag = infoXML.createComment(comm);
 				plugins.appendChild(interfaceTag);
 			}
 
 			infoXML.normalizeDocument();
 
 			/** Create output **/
-			final TransformerFactory transformerFactory =
-				TransformerFactory.newInstance();
-			final Transformer transformer =
-				transformerFactory.newTransformer();
+			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			final Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			final DOMSource source =
-				new DOMSource(infoXML);
+			final DOMSource source = new DOMSource(infoXML);
 			final StreamResult result =
-				new StreamResult(new File(destination.getLocationURI()).getAbsolutePath().concat(
-						FileSystems.getDefault().getSeparator()
-							+ "info.xml"));
+				new StreamResult(new File(destination.getLocationURI()).getAbsolutePath().concat(FileSystems.getDefault().getSeparator() + "info.xml"));
 			transformer.transform(source, result);
 		} catch (ParserConfigurationException | TransformerException e) {
 			FrameworkCorePlugin.getDefault().logError(e);

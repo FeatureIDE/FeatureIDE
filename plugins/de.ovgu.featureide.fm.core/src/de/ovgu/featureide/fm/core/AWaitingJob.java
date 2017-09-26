@@ -33,16 +33,14 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class AWaitingJob extends Job {
 
-	private boolean waiting =
-		false;
-	private final Job job =
-		new Job(getName()) {
+	private boolean waiting = false;
+	private final Job job = new Job(getName()) {
 
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				return execute(monitor);
-			}
-		};
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			return execute(monitor);
+		}
+	};
 
 	public AWaitingJob(String name) {
 		super(name);
@@ -54,8 +52,7 @@ public abstract class AWaitingJob extends Job {
 			if (waiting) {
 				return Status.OK_STATUS;
 			}
-			waiting =
-				true;
+			waiting = true;
 		}
 		try {
 			job.cancel();
@@ -64,8 +61,7 @@ public abstract class AWaitingJob extends Job {
 		} catch (final InterruptedException e) {
 			Logger.logError(e);
 		} finally {
-			waiting =
-				false;
+			waiting = false;
 		}
 		return Status.OK_STATUS;
 	}

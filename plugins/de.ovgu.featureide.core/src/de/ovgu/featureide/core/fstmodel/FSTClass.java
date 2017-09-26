@@ -35,18 +35,14 @@ import javax.annotation.Nonnull;
  */
 public class FSTClass {
 
-	private final HashMap<String, FSTRole> roles =
-		new HashMap<String, FSTRole>();
+	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	private final String name;
 	private final LinkedList<String> invariants;
-	public boolean hasComposedLines =
-		false;
+	public boolean hasComposedLines = false;
 
 	public FSTClass(String name) {
-		this.name =
-			name;
-		invariants =
-			new LinkedList<String>();
+		this.name = name;
+		invariants = new LinkedList<String>();
 	}
 
 	public String getName() {
@@ -80,12 +76,9 @@ public class FSTClass {
 	}
 
 	public List<List<FSTClassFragment>> getAllFSTFragments() {
-		final List<List<FSTClassFragment>> allFrags =
-			new ArrayList<>();
-		final HashSet<FSTClassFragment> helper =
-			new HashSet<>();
-		final List<FSTClassFragment> fragmentsOfThisClass =
-			new LinkedList<>();
+		final List<List<FSTClassFragment>> allFrags = new ArrayList<>();
+		final HashSet<FSTClassFragment> helper = new HashSet<>();
+		final List<FSTClassFragment> fragmentsOfThisClass = new LinkedList<>();
 
 		for (final FSTRole currRole : getRoles()) {
 			fragmentsOfThisClass.add(currRole.getClassFragment());

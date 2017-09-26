@@ -79,8 +79,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	@Override
 	public void performRequest(Request request) {
-		final IGraphicalConstraint constraintModel =
-			getModel();
+		final IGraphicalConstraint constraintModel = getModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
 			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
@@ -107,8 +106,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		final EventType prop =
-			event.getEventType();
+		final EventType prop = event.getEventType();
 		switch (prop) {
 		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
@@ -129,10 +127,7 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			setActiveReason((FeatureModelReason) event.getNewValue());
 			break;
 		default:
-			FMUIPlugin.getDefault().logWarning(event
-				+ " @ "
-				+ getModel()
-				+ " not handled.");
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getModel() + " not handled.");
 			break;
 		}
 	}

@@ -178,12 +178,10 @@ public class FeatureIDEEvent {
 		DEFAULT,
 	}
 
-	static FeatureIDEEvent[] defaultEvents =
-		new FeatureIDEEvent[EventType.values().length];
+	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];
 	static {
 		for (final EventType e : EventType.values()) {
-			defaultEvents[e.ordinal()] =
-				new FeatureIDEEvent(e);
+			defaultEvents[e.ordinal()] = new FeatureIDEEvent(e);
 		}
 	}
 
@@ -205,14 +203,10 @@ public class FeatureIDEEvent {
 	}
 
 	public FeatureIDEEvent(Object source, EventType eventType, Object oldValue, Object newValue) {
-		this.source =
-			source;
-		this.eventType =
-			eventType;
-		this.oldValue =
-			oldValue;
-		this.newValue =
-			newValue;
+		this.source = source;
+		this.eventType = eventType;
+		this.oldValue = oldValue;
+		this.newValue = newValue;
 	}
 
 	public Object getSource() {
@@ -233,15 +227,7 @@ public class FeatureIDEEvent {
 
 	@Override
 	public String toString() {
-		return "FeatureIDEEvent [source="
-			+ source
-			+ ", eventType="
-			+ eventType
-			+ ", oldValue="
-			+ oldValue
-			+ ", newValue="
-			+ newValue
-			+ "]";
+		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue + ", newValue=" + newValue + "]";
 	}
 
 }

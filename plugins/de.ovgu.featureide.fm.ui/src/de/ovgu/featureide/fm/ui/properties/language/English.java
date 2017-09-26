@@ -42,41 +42,24 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_
  */
 public class English implements ILanguage {
 
-	public static final String NAME =
-		ENGLISH;
+	public static final String NAME = ENGLISH;
 
-	private static final String LEGEND =
-		"Legend:";
-	private static final String MANDATORY =
-		"Mandatory";
-	private static final String ABSTRACT =
-		"Abstract";
-	private static final String INTERFACED =
-		FROM_INTERFACE;
-	private static final String CONCRETE =
-		"Concrete";
-	private static final String HIDDEN =
-		"Hidden";
-	private static final String COLLAPSED =
-		"Collapsed";
-	private static final String DEAD =
-		"Dead feature";
-	private static final String FALSE_OPTIONAL =
-		FALSE_OPTIONAL_FEATURE;
-	private static final String OPTIONAL =
-		"Optional";
-	private static final String INDETHIDDEN =
-		INDETERMINATE_HIDDEN;
-	private static final String REDUNDANT =
-		REDUNDANT_CONSTRAINT;
-	private static final String IMPLICIT =
-		"Implicit constraint";
-	private static final String UNSATISFIABLE_CONST =
-		UNSATISFIABLE_CONSTRAINT;
-	private static final String TAUTOLOGY_CONST =
-		CONSTRAINT_IS_TAUTOLOGY;
-	private static final String VOID_MODEL_CONST =
-		CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String LEGEND = "Legend:";
+	private static final String MANDATORY = "Mandatory";
+	private static final String ABSTRACT = "Abstract";
+	private static final String INTERFACED = FROM_INTERFACE;
+	private static final String CONCRETE = "Concrete";
+	private static final String HIDDEN = "Hidden";
+	private static final String COLLAPSED = "Collapsed";
+	private static final String DEAD = "Dead feature";
+	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
+	private static final String OPTIONAL = "Optional";
+	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
+	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
+	private static final String IMPLICIT = "Implicit constraint";
+	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
+	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
+	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
 
 	@Override
 	public String getRedundantConst() {
@@ -181,6 +164,21 @@ public class English implements ILanguage {
 	@Override
 	public String getOptional() {
 		return OPTIONAL;
+	}
+
+	@Override
+	public String getExplanation() {
+		return "The selected element is defect because of the highlighted dependencies:";
+	}
+
+	@Override
+	public String getLikelyCause() {
+		return "likely cause";
+	}
+
+	@Override
+	public String getUnlikelyCause() {
+		return "unlikely cause";
 	}
 
 }

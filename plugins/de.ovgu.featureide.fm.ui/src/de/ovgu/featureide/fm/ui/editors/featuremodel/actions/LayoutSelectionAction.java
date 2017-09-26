@@ -45,18 +45,14 @@ public class LayoutSelectionAction extends Action {
 	public LayoutSelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm,
 			int oldSelectedLayoutAlgorithm) {
 		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
-		this.newSelectedLayoutAlgorithm =
-			newSelectedLayoutAlgorithm;
-		this.oldSelectedLayoutAlgorithm =
-			oldSelectedLayoutAlgorithm;
-		this.featureModel =
-			featureModel;
+		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
+		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final LayoutSelectionOperation op =
-			new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
+		final LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
 		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 		try {

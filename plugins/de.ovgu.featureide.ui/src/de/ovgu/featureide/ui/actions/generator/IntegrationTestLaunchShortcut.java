@@ -40,12 +40,9 @@ public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 
 	@Override
 	public void launch(ISelection selection, String mode) {
-		final TreeSelection treeSelection =
-			(TreeSelection) selection;
-		final IFolder selectedFolder =
-			(IFolder) treeSelection.toArray()[0];
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(selectedFolder);
+		final TreeSelection treeSelection = (TreeSelection) selection;
+		final IFolder selectedFolder = (IFolder) treeSelection.toArray()[0];
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
 		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName(), 2, 1);
 	}
 

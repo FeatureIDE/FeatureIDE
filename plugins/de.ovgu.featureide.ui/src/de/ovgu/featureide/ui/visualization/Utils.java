@@ -43,15 +43,11 @@ import org.osgi.framework.Bundle;
 public class Utils {
 
 	public static File getFileFromPlugin(String pluginId, String relativePath) {
-		final Bundle bundle =
-			Platform.getBundle(pluginId);
-		final URL fileURL =
-			bundle.getEntry(relativePath);
-		File file =
-			null;
+		final Bundle bundle = Platform.getBundle(pluginId);
+		final URL fileURL = bundle.getEntry(relativePath);
+		File file = null;
 		try {
-			file =
-				new File(FileLocator.resolve(fileURL).toURI());
+			file = new File(FileLocator.resolve(fileURL).toURI());
 		} catch (final URISyntaxException e1) {
 			e1.printStackTrace();
 		} catch (final IOException e1) {
@@ -61,18 +57,13 @@ public class Utils {
 	}
 
 	public static List<String> getLinesOfFile(File file) {
-		final List<String> lines =
-			new ArrayList<String>();
+		final List<String> lines = new ArrayList<String>();
 		try {
-			final FileInputStream fstream =
-				new FileInputStream(file);
-			final DataInputStream in =
-				new DataInputStream(fstream);
-			final BufferedReader br =
-				new BufferedReader(new InputStreamReader(in));
+			final FileInputStream fstream = new FileInputStream(file);
+			final DataInputStream in = new DataInputStream(fstream);
+			final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			while ((strLine =
-				br.readLine()) != null) {
+			while ((strLine = br.readLine()) != null) {
 				lines.add(strLine);
 			}
 			in.close();
@@ -83,14 +74,11 @@ public class Utils {
 	}
 
 	public static String getStringOfFile(File file) {
-		final StringBuilder string =
-			new StringBuilder();
+		final StringBuilder string = new StringBuilder();
 		for (final String line : getLinesOfFile(file)) {
-			string.append(line
-				+ "\n");
+			string.append(line + "\n");
 		}
-		string.setLength(string.length()
-			- 1);
+		string.setLength(string.length() - 1);
 		return string.toString();
 	}
 

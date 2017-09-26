@@ -30,10 +30,8 @@ public class Renaming {
 	public final String newName;
 
 	public Renaming(String oldName, String newName) {
-		this.oldName =
-			oldName;
-		this.newName =
-			newName;
+		this.oldName = oldName;
+		this.newName = newName;
 	}
 
 }

@@ -69,106 +69,64 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  */
 public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider, GUIDefaults {
 
-	private static final String DEFAULT_MESSAGE =
-		OPEN_A_FEATURE_MODEL_;
-	private static final String DEFAULT_MANUAL_MESSAGE =
-		START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_;
-	private static final String CALCULATING_MESSAGE =
-		CALCULATING___;
+	private static final String DEFAULT_MESSAGE = OPEN_A_FEATURE_MODEL_;
+	private static final String DEFAULT_MANUAL_MESSAGE = START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_;
+	private static final String CALCULATING_MESSAGE = CALCULATING___;
 
-	private static final String HEAD_REFACTORING =
-		"Refactoring: SPL unchanged";
-	private static final String HEAD_GENERALIZATION =
-		"Generalization: Products added";
-	private static final String HEAD_SPECIALIZATION =
-		"Specialization: Products removed";
-	private static final String HEAD_ARBITRARY =
-		"Arbitrary edit: Products added and removed";
-	private static final String HEAD_OUTOFMEMORY =
-		"Out of memory error!";
-	private static final String HEAD_TIME_OUT =
-		"SAT4J time out!";
-	private static final String HEAD_ERROR =
-		"An error has occured!";
+	private static final String HEAD_REFACTORING = "Refactoring: SPL unchanged";
+	private static final String HEAD_GENERALIZATION = "Generalization: Products added";
+	private static final String HEAD_SPECIALIZATION = "Specialization: Products removed";
+	private static final String HEAD_ARBITRARY = "Arbitrary edit: Products added and removed";
+	private static final String HEAD_OUTOFMEMORY = "Out of memory error!";
+	private static final String HEAD_TIME_OUT = "SAT4J time out!";
+	private static final String HEAD_ERROR = "An error has occured!";
 
-	protected static final String NUMBER_FEATURES =
-		"Number of features: ";
-	protected static final String NUMBER_CONCRETE =
-		"Number of concrete features: ";
-	protected static final String NUMBER_ABSTRACT =
-		"Number of abstract features: ";
-	protected static final String NUMBER_PRIMITIVE =
-		"Number of primitive features: ";
-	protected static final String NUMBER_COMPOUND =
-		"Number of compound features: ";
-	protected static final String NUMBER_HIDDEN =
-		"Number of hidden features: ";
-	protected static final String NUMBER_CONSTRAINTS =
-		"Number of constraints: ";
-	protected static final String MODEL_VOID =
-		"Feature model is valid (not void): ";
-	protected static final String MODEL_TIMEOUT =
-		MODEL_VOID
-			+ TIMEOUT_STRING;
+	protected static final String NUMBER_FEATURES = "Number of features: ";
+	protected static final String NUMBER_CONCRETE = "Number of concrete features: ";
+	protected static final String NUMBER_ABSTRACT = "Number of abstract features: ";
+	protected static final String NUMBER_PRIMITIVE = "Number of primitive features: ";
+	protected static final String NUMBER_COMPOUND = "Number of compound features: ";
+	protected static final String NUMBER_HIDDEN = "Number of hidden features: ";
+	protected static final String NUMBER_CONSTRAINTS = "Number of constraints: ";
+	protected static final String MODEL_VOID = "Feature model is valid (not void): ";
+	protected static final String MODEL_TIMEOUT = MODEL_VOID + TIMEOUT_STRING;
 
-	private static final String STATISTICS_BEFORE =
-		STATISTICS_ON_BEFORE_EDIT_VERSION;
-	private static final String STATISTICS_AFTER =
-		STATISTICS_ON_AFTER_EDIT_VERSION;
+	private static final String STATISTICS_BEFORE = STATISTICS_ON_BEFORE_EDIT_VERSION;
+	private static final String STATISTICS_AFTER = STATISTICS_ON_AFTER_EDIT_VERSION;
 
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
-	private static final int TIMEOUT =
-		20000;
-	private static final long TIMEOUT_CONFIGURATION =
-		10000;
+	private static final int TIMEOUT = 20000;
+	private static final long TIMEOUT_CONFIGURATION = 10000;
 
-	private static final int INDEX_HEAD =
-		0;
-	private static final int INDEX_ADDED =
-		2;
-	private static final int INDEX_REMOVED =
-		3;
-	protected static final int INDEX_STATISTICS_BEFORE =
-		5;
-	protected static final int INDEX_STATISTICS_AFTER =
-		6;
+	private static final int INDEX_HEAD = 0;
+	private static final int INDEX_ADDED = 2;
+	private static final int INDEX_REMOVED = 3;
+	protected static final int INDEX_STATISTICS_BEFORE = 5;
+	protected static final int INDEX_STATISTICS_AFTER = 6;
 
-	private static final int INDEX_VALID =
-		0;
-	private static final int INDEX_FEATURES =
-		1;
-	private static final int INDEX_CONCRETE =
-		2;
-	private static final int INDEX_ABSTRACT =
-		3;
-	private static final int INDEX_PRIMITIVE =
-		4;
-	private static final int INDEX_COMPOUND =
-		5;
-	private static final int INDEX_HIDDEN =
-		6;
-	private static final int INDEX_CONSTRAINTS =
-		7;
-	private static final int INDEX_CONFIGS =
-		8;
-	private static final int INDEX_VARIANTS =
-		9;
+	private static final int INDEX_VALID = 0;
+	private static final int INDEX_FEATURES = 1;
+	private static final int INDEX_CONCRETE = 2;
+	private static final int INDEX_ABSTRACT = 3;
+	private static final int INDEX_PRIMITIVE = 4;
+	private static final int INDEX_COMPOUND = 5;
+	private static final int INDEX_HIDDEN = 6;
+	private static final int INDEX_CONSTRAINTS = 7;
+	private static final int INDEX_CONFIGS = 8;
+	private static final int INDEX_VARIANTS = 9;
 	/**
 	 * minimal number of available processors needed to activate parallelization
 	 */
-	private static final int PROCESSOR_LIMIT =
-		4;
+	private static final int PROCESSOR_LIMIT = 4;
 
 	private final FeatureModelEditView view;
 
-	TreeParent invisibleRoot =
-		new TreeParent("");
+	TreeParent invisibleRoot = new TreeParent("");
 
 	public ViewContentProvider(FeatureModelEditView view) {
-		this.view =
-			view;
+		this.view = view;
 	}
 
 	@Override
@@ -176,8 +134,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	@Override
 	public void dispose() {
-		invisibleRoot =
-			null;
+		invisibleRoot = null;
 	}
 
 	@Override
@@ -229,15 +186,12 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		}
 	}
 
-	private boolean cancel =
-		false;
+	private boolean cancel = false;
 
-	private static ModelComparator comparator =
-		new ModelComparator(TIMEOUT);
+	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
 
 	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
-		if ((oldModel.getStructure().getRoot() == null)
-			|| (newModel.getStructure().getRoot() == null)) {
+		if ((oldModel.getStructure().getRoot() == null) || (newModel.getStructure().getRoot() == null)) {
 			return;
 		}
 
@@ -272,39 +226,33 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				// case: running in parallel jobs
 				// TODO it is unnecessary to refresh this every time while nothing has changed
-				final Job oldCalculationJob =
-					new Job("Calculate: \""
-						+ STATISTICS_BEFORE
-						+ "\"") {
+				final Job oldCalculationJob = new Job("Calculate: \"" + STATISTICS_BEFORE + "\"") {
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							if (isCanceled()) {
-								return Status.OK_STATUS;
-							}
-							monitor.beginTask("", 2);
-							addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						if (isCanceled()) {
 							return Status.OK_STATUS;
 						}
-					};
+						monitor.beginTask("", 2);
+						addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
+						return Status.OK_STATUS;
+					}
+				};
 				oldCalculationJob.setPriority(Job.DECORATE);
 				oldCalculationJob.schedule();
 
-				final Job newCalculationJob =
-					new Job("Calculate: \""
-						+ STATISTICS_AFTER
-						+ "\"") {
+				final Job newCalculationJob = new Job("Calculate: \"" + STATISTICS_AFTER + "\"") {
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							if (isCanceled()) {
-								return Status.OK_STATUS;
-							}
-							monitor.beginTask("", 2);
-							addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						if (isCanceled()) {
 							return Status.OK_STATUS;
 						}
-					};
+						monitor.beginTask("", 2);
+						addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
+						return Status.OK_STATUS;
+					}
+				};
 				newCalculationJob.setPriority(Job.DECORATE);
 				newCalculationJob.schedule();
 
@@ -345,10 +293,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 */
 	private void setHeadAndExamples(IProgressMonitor monitor, IFeatureModel oldModel, IFeatureModel newModel) {
 		monitor.setTaskName(COMPARE_MODELS);
-		final TreeObject head =
-			calculateHead(oldModel, newModel, comparator);
-		final TreeElement[] children =
-			invisibleRoot.getChildren();
+		final TreeObject head = calculateHead(oldModel, newModel, comparator);
+		final TreeElement[] children = invisibleRoot.getChildren();
 		((TreeObject) children[INDEX_HEAD]).setContents(head.getName(), head.getImage());
 		((TreeObject) children[INDEX_ADDED]).set(new ExampleParent(true, comparator, 1, null));
 		((TreeObject) children[INDEX_REMOVED]).set(new ExampleParent(false, comparator, 1, null));
@@ -359,56 +305,36 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Calculates the content of the first line Compares the old with the new model
 	 */
 	private TreeObject calculateHead(IFeatureModel oldModel, IFeatureModel newModel, ModelComparator comparator) {
-		final long start =
-			System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 
-		final Comparison comparison =
-			comparator.compare(oldModel, newModel);
+		final Comparison comparison = comparator.compare(oldModel, newModel);
 
 		String message;
 		Image image;
 		if (comparison == Comparison.REFACTORING) {
-			message =
-				HEAD_REFACTORING;
-			image =
-				ZERO_IMAGE;
+			message = HEAD_REFACTORING;
+			image = ZERO_IMAGE;
 		} else if (comparison == Comparison.GENERALIZATION) {
-			message =
-				HEAD_GENERALIZATION;
-			image =
-				PLUS_IMAGE;
+			message = HEAD_GENERALIZATION;
+			image = PLUS_IMAGE;
 		} else if (comparison == Comparison.SPECIALIZATION) {
-			message =
-				HEAD_SPECIALIZATION;
-			image =
-				MINUS_IMAGE;
+			message = HEAD_SPECIALIZATION;
+			image = MINUS_IMAGE;
 		} else if (comparison == Comparison.ARBITRARY) {
-			message =
-				HEAD_ARBITRARY;
-			image =
-				PLUS_MINUS_IMAGE;
+			message = HEAD_ARBITRARY;
+			image = PLUS_MINUS_IMAGE;
 		} else if (comparison == Comparison.OUTOFMEMORY) {
-			message =
-				HEAD_OUTOFMEMORY;
-			image =
-				ERROR_IMAGE_TSK;
+			message = HEAD_OUTOFMEMORY;
+			image = ERROR_IMAGE_TSK;
 		} else if (comparison == Comparison.TIMEOUT) {
-			message =
-				HEAD_TIME_OUT;
-			image =
-				ERROR_IMAGE_TSK;
+			message = HEAD_TIME_OUT;
+			image = ERROR_IMAGE_TSK;
 		} else {
-			message =
-				HEAD_ERROR;
-			image =
-				ERROR_IMAGE_TSK;
+			message = HEAD_ERROR;
+			image = ERROR_IMAGE_TSK;
 		}
 
-		message +=
-			" ("
-				+ (System.currentTimeMillis()
-					- start)
-				+ "msec)";
+		message += " (" + (System.currentTimeMillis() - start) + "msec)";
 		return new TreeObject(message, image);
 	}
 
@@ -424,71 +350,49 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 */
 	private void addStatistics(TreeParent root, final String text, final IFeatureModel model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
-			monitor.setTaskName("Calculate: \""
-				+ text
-				+ "\"");
+			monitor.setTaskName("Calculate: \"" + text + "\"");
 		}
 
-		final int features =
-			model.getNumberOfFeatures();
-		final int constraints =
-			model.getConstraintCount();
-		final int concrete =
-			model.getAnalyser().countConcreteFeatures();
-		final int terminal =
-			model.getAnalyser().countTerminalFeatures();
-		final int hidden =
-			model.getAnalyser().countHiddenFeatures();
+		final int features = model.getNumberOfFeatures();
+		final int constraints = model.getConstraintCount();
+		final int concrete = model.getAnalyser().countConcreteFeatures();
+		final int terminal = model.getAnalyser().countTerminalFeatures();
+		final int hidden = model.getAnalyser().countHiddenFeatures();
 
 		if (init) {
 			// case: init
 			// does not count configurations and program variants
-			final TreeParent statistics =
-				new TreeParent(text, null, true) {
+			final TreeParent statistics = new TreeParent(text, null, true) {
 
-					@Override
-					public void initChildren() {
-						try {
-							addChild(MODEL_VOID
-								+ model.getAnalyser().isValid());
-						} catch (final TimeoutException e) {
-							addChild(MODEL_TIMEOUT);
-						}
-						addChild(NUMBER_FEATURES
-							+ features);
-						addChild(NUMBER_CONCRETE
-							+ concrete);
-						addChild(NUMBER_ABSTRACT
-							+ (features
-								- concrete));
-						addChild(NUMBER_PRIMITIVE
-							+ terminal);
-						addChild(NUMBER_COMPOUND
-							+ (features
-								- terminal));
-						addChild(NUMBER_HIDDEN
-							+ hidden);
-						addChild(NUMBER_CONSTRAINTS
-							+ constraints);
-						addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
-						addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
+				@Override
+				public void initChildren() {
+					try {
+						addChild(MODEL_VOID + model.getAnalyser().isValid());
+					} catch (final TimeoutException e) {
+						addChild(MODEL_TIMEOUT);
 					}
-				};
+					addChild(NUMBER_FEATURES + features);
+					addChild(NUMBER_CONCRETE + concrete);
+					addChild(NUMBER_ABSTRACT + (features - concrete));
+					addChild(NUMBER_PRIMITIVE + terminal);
+					addChild(NUMBER_COMPOUND + (features - terminal));
+					addChild(NUMBER_HIDDEN + hidden);
+					addChild(NUMBER_CONSTRAINTS + constraints);
+					addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
+					addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
+				}
+			};
 			root.addChild(statistics);
 		} else {
 			// case: update
 			// calculates the statistics
-			final TreeObject statistics =
-				(TreeObject) root.getChildren()[position];
-			final TreeElement[] children =
-				statistics.getChildren();
+			final TreeObject statistics = (TreeObject) root.getChildren()[position];
+			final TreeElement[] children = statistics.getChildren();
 			try {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID
-						+ model.getAnalyser().isValid());
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
 				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID
-						+ model.getAnalyser().isValid());
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
 				}
 			} catch (final TimeoutException e) {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
@@ -499,41 +403,29 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			} catch (final ConcurrentModificationException e) {
 
 			}
-			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES
-				+ features);
-			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE
-				+ concrete);
-			((TreeObject) children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT
-				+ (features
-					- concrete));
-			((TreeObject) children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE
-				+ terminal);
-			((TreeObject) children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND
-				+ (features
-					- terminal));
-			((TreeObject) children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN
-				+ hidden);
-			((TreeObject) children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS
-				+ constraints);
+			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
+			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
+			((TreeObject) children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT + (features - concrete));
+			((TreeObject) children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE + terminal);
+			((TreeObject) children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND + (features - terminal));
+			((TreeObject) children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject) children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS + constraints);
 
 			if (isCanceled()) {
 				return;
 			}
 
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
-				final Job job =
-					new Job("Calculate: \""
-						+ text
-						+ "\"") {
+				final Job job = new Job("Calculate: \"" + text + "\"") {
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							monitor.setTaskName(CALCULATE_NUMBER_OF_CONFIGURATIONS);
-							((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
-							refresh();
-							return Status.OK_STATUS;
-						}
-					};
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						monitor.setTaskName(CALCULATE_NUMBER_OF_CONFIGURATIONS);
+						((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
+						refresh();
+						return Status.OK_STATUS;
+					}
+				};
 				job.setPriority(Job.DECORATE);
 				job.schedule();
 
@@ -566,42 +458,27 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private TreeParent calculateNumberOfVariants(IFeatureModel model, boolean ignoreAbstractFeatures) {
 
-		final String variants =
-			ignoreAbstractFeatures
-				? CONFIGURATIONS
-				: PROGRAM_VARIANTS;
-		final TreeParent p =
-			new TreeParent(NUMBER_OF
-				+ variants, null, true) {
+		final String variants = ignoreAbstractFeatures ? CONFIGURATIONS : PROGRAM_VARIANTS;
+		final TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {
 
-				@Override
-				public void initChildren() {}
-			};
+			@Override
+			public void initChildren() {}
+		};
 
-		if (!ignoreAbstractFeatures
-			&& (model.getAnalyser().countConcreteFeatures() == 0)) {
+		if (!ignoreAbstractFeatures && (model.getAnalyser().countConcreteFeatures() == 0)) {
 			// case: there is no concrete feature so there is only one program variant,
 			// without this the calculation least much to long
-			p.addChild("1 "
-				+ variants);
+			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number =
-			new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
-		String s =
-			"";
+		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
+		String s = "";
 		if (number < 0) {
-			s +=
-				MORE_THAN
-					+ (-1
-						- number);
+			s += MORE_THAN + (-1 - number);
 		} else {
-			s +=
-				number;
+			s += number;
 		}
-		s +=
-			" "
-				+ variants;
+		s += " " + variants;
 		p.addChild(s);
 		return p;
 	}
@@ -610,17 +487,16 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Refreshes the tree in a fast running job with highest priority
 	 */
 	protected void refresh() {
-		final UIJob job_setColor =
-			new UIJob(REFRESH_EDIT_VIEW) {
+		final UIJob job_setColor = new UIJob(REFRESH_EDIT_VIEW) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if (!view.getViewer().getControl().isDisposed()) {
-						view.getViewer().refresh();
-					}
-					return Status.OK_STATUS;
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (!view.getViewer().getControl().isDisposed()) {
+					view.getViewer().refresh();
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 		job_setColor.setPriority(Job.INTERACTIVE);
 		job_setColor.schedule();
 	}
@@ -631,8 +507,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param value
 	 */
 	public void setCanceled(boolean value) {
-		cancel =
-			value;
+		cancel = value;
 	}
 
 	/**

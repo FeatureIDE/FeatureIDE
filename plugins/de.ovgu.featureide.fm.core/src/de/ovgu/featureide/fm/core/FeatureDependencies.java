@@ -46,23 +46,16 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
  */
 public class FeatureDependencies {
 
-	private static final String LEGEND_TEXT =
-		"X ALWAYS Y := If X is selected then Y is selected in every valid configuration."
-			+ "\n"
-			+ "X MAYBE  Y := If X is selected then Y is selected in at least one but not all valid configurations. "
-			+ "\n"
-			+ "X NEVER  Y := If X is selected then Y cannot be selected in any valid configuration."
-			+ "\n";
+	private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration." + "\n"
+		+ "X MAYBE  Y := If X is selected then Y is selected in at least one but not all valid configurations. " + "\n"
+		+ "X NEVER  Y := If X is selected then Y cannot be selected in any valid configuration." + "\n";
 
 	private final IFeatureModel fm;
 	private final Node rootNode;
 
-	private final Map<IFeature, Set<IFeature>> always =
-		new HashMap<IFeature, Set<IFeature>>();
-	private final Map<IFeature, Set<IFeature>> never =
-		new HashMap<IFeature, Set<IFeature>>();
-	private final Map<IFeature, Set<IFeature>> maybe =
-		new HashMap<IFeature, Set<IFeature>>();
+	private final Map<IFeature, Set<IFeature>> always = new HashMap<IFeature, Set<IFeature>>();
+	private final Map<IFeature, Set<IFeature>> never = new HashMap<IFeature, Set<IFeature>>();
+	private final Map<IFeature, Set<IFeature>> maybe = new HashMap<IFeature, Set<IFeature>>();
 
 	/**
 	 * @param fm
@@ -78,10 +71,8 @@ public class FeatureDependencies {
 	 * @param calculateDependencies <code>true</code> if dependencies should be calculated
 	 */
 	public FeatureDependencies(IFeatureModel fm, boolean calculateDependencies) {
-		this.fm =
-			fm;
-		rootNode =
-			createRootNode(fm);
+		this.fm = fm;
+		rootNode = createRootNode(fm);
 		if (calculateDependencies) {
 			calculateDependencies();
 		}
@@ -96,8 +87,7 @@ public class FeatureDependencies {
 			never.put(feature, new HashSet<IFeature>());
 			maybe.put(feature, new HashSet<IFeature>());
 
-			final Node nodeSel =
-				new And(rootNode, new Literal(feature.getName()));
+			final Node nodeSel = new And(rootNode, new Literal(feature.getName()));
 
 			for (final IFeature current_feature : fm.getFeatures()) {
 				if (!current_feature.equals(feature)) {
@@ -128,10 +118,8 @@ public class FeatureDependencies {
 			return always.get(feature);
 		}
 		always.put(feature, new HashSet<IFeature>());
-		final Node nodeSel =
-			new And(rootNode, new Literal(feature.getName()));
-		final Collection<IFeature> impliedFeatures =
-			always.get(feature);
+		final Node nodeSel = new And(rootNode, new Literal(feature.getName()));
+		final Collection<IFeature> impliedFeatures = always.get(feature);
 		try {
 			for (final IFeature f : fm.getFeatures()) {
 				if (!f.equals(feature)) {
@@ -155,8 +143,7 @@ public class FeatureDependencies {
 		if (always.containsKey(A)) {
 			return always.get(A).contains(B);
 		}
-		final Node nodeSel =
-			new And(rootNode, new Literal(A.getName()));
+		final Node nodeSel = new And(rootNode, new Literal(A.getName()));
 		try {
 			return nodeImpliesFeature(nodeSel, B.getName(), true);
 		} catch (final TimeoutException e) {
@@ -183,14 +170,11 @@ public class FeatureDependencies {
 	 * @throws TimeoutException
 	 */
 	private boolean nodeImpliesFeature(Node node, String featureName, boolean positive) throws TimeoutException {
-		Node nodeNeg =
-			null;
+		Node nodeNeg = null;
 		if (positive) {
-			nodeNeg =
-				new Not((new Implies(node, new Literal(featureName))));
+			nodeNeg = new Not((new Implies(node, new Literal(featureName))));
 		} else {
-			nodeNeg =
-				new Not((new Implies(node, new Not(featureName))));
+			nodeNeg = new Not((new Implies(node, new Not(featureName))));
 		}
 		return !new SatSolver(nodeNeg, 2500).isSatisfiable();
 	}
@@ -221,35 +205,24 @@ public class FeatureDependencies {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder =
-			new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		for (final IFeature feature : fm.getFeatures()) {
 			builder.append("\n");
 			for (final IFeature f : always.get(feature)) {
-				builder.append(feature.getName()
-					+ " ALWAYS "
-					+ f.getName()
-					+ "\n");
+				builder.append(feature.getName() + " ALWAYS " + f.getName() + "\n");
 			}
 			for (final IFeature f : never.get(feature)) {
-				builder.append(feature.getName()
-					+ " NEVER "
-					+ f.getName()
-					+ "\n");
+				builder.append(feature.getName() + " NEVER " + f.getName() + "\n");
 			}
 			for (final IFeature f : maybe.get(feature)) {
-				builder.append(feature.getName()
-					+ " MAYBE "
-					+ f.getName()
-					+ "\n");
+				builder.append(feature.getName() + " MAYBE " + f.getName() + "\n");
 			}
 		}
 		return builder.toString();
 	}
 
 	public String toStringWithLegend() {
-		return LEGEND_TEXT
-			+ toString();
+		return LEGEND_TEXT + toString();
 	}
 
 }

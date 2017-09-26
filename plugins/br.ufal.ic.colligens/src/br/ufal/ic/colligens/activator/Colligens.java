@@ -25,10 +25,8 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 public class Colligens extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID =
-		"br.ufal.ic.colligens"; //$NON-NLS-1$
-	public static final String PLUGIN_NAME =
-		"Colligens";
+	public static final String PLUGIN_ID = "br.ufal.ic.colligens"; //$NON-NLS-1$
+	public static final String PLUGIN_NAME = "Colligens";
 
 	// The shared instance
 	private static Colligens plugin;
@@ -40,11 +38,9 @@ public class Colligens extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 
-		final Start inicialize =
-			new Start();
+		final Start inicialize = new Start();
 		inicialize.SystemClear();
 	}
 
@@ -54,12 +50,10 @@ public class Colligens extends AbstractUIPlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		final Start inicialize =
-			new Start();
+		final Start inicialize = new Start();
 		inicialize.SystemClear();
 
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 
@@ -95,23 +89,17 @@ public class Colligens extends AbstractUIPlugin {
 	 * @return directory configuration
 	 */
 	public File getConfigDir() {
-		final Location location =
-			Platform.getConfigurationLocation();
-		File file =
-			null;
+		final Location location = Platform.getConfigurationLocation();
+		File file = null;
 		if (location != null) {
-			final URL configURL =
-				location.getURL();
-			if ((configURL != null)
-				&& configURL.getProtocol().startsWith("file")) {
-				file =
-					new File(configURL.getFile(), PLUGIN_ID);
+			final URL configURL = location.getURL();
+			if ((configURL != null) && configURL.getProtocol().startsWith("file")) {
+				file = new File(configURL.getFile(), PLUGIN_ID);
 				file.mkdirs();
 				return file;
 			}
 		}
-		file =
-			getStateLocation().toFile();
+		file = getStateLocation().toFile();
 		file.mkdirs();
 		return file;
 	}

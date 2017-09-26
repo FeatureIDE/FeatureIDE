@@ -50,12 +50,8 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	 */
 	@Nonnull
 	public static String getFileExtension(String fileName) {
-		final int extIndex =
-			fileName.lastIndexOf('.');
-		return extIndex > 0
-			? fileName.substring(extIndex
-				+ 1)
-			: "";
+		final int extIndex = fileName.lastIndexOf('.');
+		return extIndex > 0 ? fileName.substring(extIndex + 1) : "";
 	}
 
 	public T getFormatById(String id) throws NoSuchExtensionException {
@@ -78,8 +74,7 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 	@CheckForNull
 	public T getFormatByFileName(String fileName) {
 		if (fileName != null) {
-			final String extension =
-				getFileExtension(fileName);
+			final String extension = getFileExtension(fileName);
 			for (final T format : getExtensions()) {
 				if (extension.equals(format.getSuffix())) {
 					return format;
@@ -101,11 +96,9 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 
 	public T getFormatByContent(CharSequence content, String fileName) {
 		if (fileName != null) {
-			final String extension =
-				getFileExtension(fileName);
+			final String extension = getFileExtension(fileName);
 			for (final T format : getExtensions()) {
-				if (extension.equals(format.getSuffix())
-					&& format.supportsContent(content)) {
+				if (extension.equals(format.getSuffix()) && format.supportsContent(content)) {
 					return format;
 				}
 			}

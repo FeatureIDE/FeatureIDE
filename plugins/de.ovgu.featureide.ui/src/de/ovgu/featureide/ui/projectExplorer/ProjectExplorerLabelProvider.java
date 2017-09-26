@@ -62,8 +62,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
-	private List<String> selectedFeatures =
-		new ArrayList<String>();
+	private List<String> selectedFeatures = new ArrayList<String>();
 
 	public ProjectExplorerLabelProvider() {
 		super(new PackageExplorerContentProvider(true));
@@ -72,93 +71,73 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	/*
 	 * constant to create space for the image
 	 */
-	private static String SPACE_STRING =
-		" ";
+	private static String SPACE_STRING = " ";
 
 	@Override
 	public Image getImage(Object element) {
-		final Image superImage =
-			super.getImage(element);
-		final Set<Integer> elementColors =
-			new HashSet<Integer>();
+		final Image superImage = super.getImage(element);
+		final Set<Integer> elementColors = new HashSet<Integer>();
 
 		// first returns the image for packages
 		if (element instanceof PackageFragment) {
-			final PackageFragment frag =
-				(PackageFragment) element;
-			final IResource fragmentRes =
-				frag.getResource();
+			final PackageFragment frag = (PackageFragment) element;
+			final IResource fragmentRes = frag.getResource();
 			if (!(fragmentRes instanceof IFolder)) {
 				return superImage;
 			}
-			final IResource res =
-				frag.getParent().getResource();
+			final IResource res = frag.getParent().getResource();
 			if (res == null) {
 				return superImage;
 			}
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(res);
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
 			if (featureProject == null) {
 				return superImage;
 			}
 			readCurrentConfiguration(featureProject);
-			final IComposerExtensionClass composer =
-				featureProject.getComposer();
+			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
 			}
-			FSTModel model =
-				featureProject.getFSTModel();
-			if ((model == null)
-				|| model.getClasses().isEmpty()) {
+			FSTModel model = featureProject.getFSTModel();
+			if ((model == null) || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
-				model =
-					featureProject.getFSTModel();
+				model = featureProject.getFSTModel();
 				if (model == null) {
 					return superImage;
 				}
 			}
 
 			// Get current Package color
-			getPackageColors((IFolder) fragmentRes, elementColors, model, !composer.hasFeatureFolder()
-				&& !composer.hasSourceFolder());
+			getPackageColors((IFolder) fragmentRes, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 
 			// Get all packages colors
-			final Set<Integer> allPackageColors =
-				new HashSet<Integer>();
+			final Set<Integer> allPackageColors = new HashSet<Integer>();
 			if (fragmentRes instanceof IFolder) {
-				getAllPackageColors((IFolder) fragmentRes, allPackageColors, model, !composer.hasFeatureFolder()
-					&& !composer.hasSourceFolder());
+				getAllPackageColors((IFolder) fragmentRes, allPackageColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			}
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors),
 					new ArrayList<Integer>(allPackageColors), superImage);
 		} else if (element instanceof IResource) {
-			final IResource res =
-				(IResource) element;
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(res);
+			final IResource res = (IResource) element;
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
 			if (featureProject == null) {
 				return superImage;
 			}
 			readCurrentConfiguration(featureProject);
-			final IComposerExtensionClass composer =
-				featureProject.getComposer();
+			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
 			}
-			FSTModel model =
-				featureProject.getFSTModel();
-			if ((model == null)
-				|| model.getClasses().isEmpty()) {
+			FSTModel model = featureProject.getFSTModel();
+			if ((model == null) || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
-				model =
-					featureProject.getFSTModel();
+				model = featureProject.getFSTModel();
 				if (model == null) {
 					return superImage;
 				}
@@ -166,10 +145,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 			// Get color for the feature folder
 			if (res instanceof IFolder) {
-				final IFolder folder =
-					(IFolder) res;
-				if (composer.hasFeatureFolder()
-					&& isInFeatureFolder(folder)) {
+				final IFolder folder = (IFolder) res;
+				if (composer.hasFeatureFolder() && isInFeatureFolder(folder)) {
 					if (folder.getParent().equals(featureProject.getSourceFolder())) {
 						getFeatureFolderColors(folder, elementColors, featureProject);
 						return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
@@ -182,79 +159,59 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			// Return folder package images for the source folder when working with munge composer
 			if (composer.getName().equals("Munge")) {
 				if (element instanceof IFile) {
-					final IFile file =
-						(IFile) element;
+					final IFile file = (IFile) element;
 					if (isInMungeSource(file)) {
 						getColors(elementColors, file, model, true);
 						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
 					}
 				}
-				if ((element instanceof IFolder)
-					&& ((IFolder) element).getName().equals("source")) {
-					final IFolder folder =
-						(IFolder) element;
+				if ((element instanceof IFolder) && ((IFolder) element).getName().equals("source")) {
+					final IFolder folder = (IFolder) element;
 					getPackageColors(folder, elementColors, model, true);
 					return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
 				}
 			}
 
-			Set<Integer> parentColors =
-				null;
+			Set<Integer> parentColors = null;
 			// return images for composed files (.jak files)
-			if (isInBuildFolder(res)
-				&& (res instanceof IFile)
-				&& isJavaFile((IFile) res)) {
+			if (isInBuildFolder(res) && (res instanceof IFile) && isJavaFile((IFile) res)) {
 				if (res.getParent() instanceof IFolder) {
-					parentColors =
-						new HashSet<Integer>();
-					getAllPackageColors((IFolder) res.getParent(), parentColors, model, !composer.hasFeatureFolder()
-						&& !composer.hasSourceFolder());
+					parentColors = new HashSet<Integer>();
+					getAllPackageColors((IFolder) res.getParent(), parentColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 				}
-				getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder()
-					&& !composer.hasSourceFolder());
+				getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 				return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors),
 						new ArrayList<Integer>(parentColors), superImage);
 			}
 		} else if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 			// return images for compilation files
-			final CompilationUnit cu =
-				(CompilationUnit) element;
-			final IFile myfile =
-				(IFile) cu.getResource();
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(myfile);
+			final CompilationUnit cu = (CompilationUnit) element;
+			final IFile myfile = (IFile) cu.getResource();
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
 			if (featureProject == null) {
 				return superImage;
 			}
-			FSTModel model =
-				featureProject.getFSTModel();
-			final IComposerExtensionClass composer =
-				featureProject.getComposer();
+			FSTModel model = featureProject.getFSTModel();
+			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return superImage;
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return superImage;
 			}
-			if ((model == null)
-				|| model.getClasses().isEmpty()) {
+			if ((model == null) || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
-				model =
-					featureProject.getFSTModel();
+				model = featureProject.getFSTModel();
 				if (model == null) {
 					return superImage;
 				}
 			}
-			Set<Integer> parentColors =
-				null;
+			Set<Integer> parentColors = null;
 			if (cu.getParent() instanceof PackageFragment) {
-				parentColors =
-					new HashSet<Integer>();
-				getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model, !composer.hasFeatureFolder()
-					&& !composer.hasSourceFolder());
+				parentColors = new HashSet<Integer>();
+				getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			}
-			getColors(elementColors, myfile, model, !composer.hasFeatureFolder()
-				&& !composer.hasSourceFolder());
+			getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors),
 					new ArrayList<Integer>(parentColors), superImage);
 		}
@@ -268,11 +225,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @return true-When file is inside the munge source folder.
 	 */
 	private boolean isInMungeSource(IFile file) {
-		IResource currentObject =
-			file;
+		IResource currentObject = file;
 		while (currentObject.getParent() != null) {
-			currentObject =
-				currentObject.getParent();
+			currentObject = currentObject.getParent();
 			if (currentObject.getName().equals("source")) {
 				return true;
 			}
@@ -286,26 +241,21 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @param featureProject
 	 */
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
-		final Configuration config =
-			new Configuration(featureProject.getFeatureModel());
-		final IFile currentConfig =
-			featureProject.getCurrentConfiguration();
+		final Configuration config = new Configuration(featureProject.getFeatureModel());
+		final IFile currentConfig = featureProject.getCurrentConfiguration();
 		if (currentConfig != null) {
 			SimpleFileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigFormatManager.getInstance());
 		}
-		selectedFeatures =
-			new ArrayList<>(config.getSelectedFeatureNames());
+		selectedFeatures = new ArrayList<>(config.getSelectedFeatureNames());
 	}
 
 	private boolean isJavaFile(final IFile file) {
-		final String fileExtension =
-			file.getFileExtension();
+		final String fileExtension = file.getFileExtension();
 		if (fileExtension == null) {
 			return false;
 		}
 
-		return fileExtension.equals("java")
-			|| fileExtension.equals("jak");
+		return fileExtension.equals("java") || fileExtension.equals("jak");
 	}
 
 	/**
@@ -314,8 +264,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @return color for featureFolders
 	 */
 	private void getFeatureFolderColors(IFolder folder, Set<Integer> myColors, IFeatureProject featureProject) {
-		final IFeature feature =
-			featureProject.getFeatureModel().getFeature(folder.getName());
+		final IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
 		myColors.add(FeatureColorManager.getColor(feature).getValue());
 	}
 
@@ -330,20 +279,16 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		if (model == null) {
 			return;
 		}
-		String fileName =
-			model.getAbsoluteClassName(myfile);
+		String fileName = model.getAbsoluteClassName(myfile);
 		if (model.getFeatureProject().getComposerID().equals("de.ovgu.featureide.composer.ahead")) {
-			fileName =
-				fileName.replace(".java", ".jak");
+			fileName = fileName.replace(".java", ".jak");
 		}
-		final FSTClass clazz =
-			model.getClass(fileName);
+		final FSTClass clazz = model.getClass(fileName);
 		if (clazz == null) {
 			return;
 		}
 		for (final FSTRole r : clazz.getRoles()) {
-			if (colorUnselectedFeature
-				|| selectedFeatures.contains(r.getFeature().getName())) {
+			if (colorUnselectedFeature || selectedFeatures.contains(r.getFeature().getName())) {
 				if (r.getFeature().getColor() != FeatureColor.NO_COLOR.getValue()) {
 					myColors.add(r.getFeature().getColor());
 				}
@@ -360,8 +305,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		try {
 			for (final IResource member : folder.members()) {
 				if (member instanceof IFile) {
-					final IFile file =
-						(IFile) member;
+					final IFile file = (IFile) member;
 					getColors(myColors, file, model, colorUnselectedFeature);
 				}
 				if (member instanceof IFolder) {
@@ -429,8 +373,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	}
 
 	private boolean isInFolder(IResource folder, IFolder parentFolder) {
-		final IContainer parent =
-			folder.getParent();
+		final IContainer parent = folder.getParent();
 		if (parent.equals(parentFolder)) {
 			return true;
 		}
@@ -446,8 +389,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 */
 	@Override
 	public StyledString getStyledText(Object element) {
-		final String content =
-			getText(element);
+		final String content = getText(element);
 		if (content == null) {
 			return super.getStyledText(element);
 		}
@@ -457,71 +399,55 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		final Set<Integer> elementColors =
-			new HashSet<Integer>();
-		SPACE_STRING =
-			"";
+		final Set<Integer> elementColors = new HashSet<Integer>();
+		SPACE_STRING = "";
 
 		// text for Packages
 		if (element instanceof PackageFragment) {
-			final PackageFragment frag =
-				(PackageFragment) element;
-			final IResource parent =
-				frag.getParent().getResource();
+			final PackageFragment frag = (PackageFragment) element;
+			final IResource parent = frag.getParent().getResource();
 			if (parent == null) {
 				return null;
 			}
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(parent);
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(parent);
 			if (featureProject == null) {
 				return null;
 			}
 
 			readCurrentConfiguration(featureProject);
 
-			final IComposerExtensionClass composer =
-				featureProject.getComposer();
+			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return null;
 			}
 			if (composer.getGenerationMechanism() == Mechanism.ASPECT_ORIENTED_PROGRAMMING) {
 				return null;
 			}
-			final String elementName =
-				frag.getElementName();
+			final String elementName = frag.getElementName();
 
 			getAllPackageColors((IFolder) frag.getResource(), elementColors, CorePlugin.getFeatureProject(frag.getResource()).getFSTModel(),
-					!composer.hasFeatureFolder()
-						&& !composer.hasSourceFolder());
-			for (int i =
-				0; i < elementColors.size(); i++) {
-				SPACE_STRING +=
-					" ";
+					!composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			for (int i = 0; i < elementColors.size(); i++) {
+				SPACE_STRING += " ";
 			}
 
 			if (elementColors.size() == 0) {
-				SPACE_STRING =
-					"";
+				SPACE_STRING = "";
 			}
 
 			if (elementName.isEmpty()) {
-				return SPACE_STRING
-					+ "(default package)";
+				return SPACE_STRING + "(default package)";
 			}
-			if (!isInBuildFolder(frag.getResource())
-				&& !isInSourceFolder(frag.getResource())) {
+			if (!isInBuildFolder(frag.getResource()) && !isInSourceFolder(frag.getResource())) {
 				return null;
 			}
-			return SPACE_STRING
-				+ elementName;
+			return SPACE_STRING + elementName;
 		}
 
 		else if (element instanceof IResource) {
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject((IResource) element);
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
 			if (featureProject != null) {
-				final IComposerExtensionClass composer =
-					featureProject.getComposer();
+				final IComposerExtensionClass composer = featureProject.getComposer();
 				if (composer == null) {
 					return null;
 				}
@@ -529,99 +455,66 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					return null;
 				}
 
-				final IResource res =
-					(IResource) element;
+				final IResource res = (IResource) element;
 
-				if (isInSourceFolder(res)
-					&& (res instanceof IFile)) {
-					if (isInSourceFolder(res)
-						&& composer.getName().equals("AHEAD")) {
+				if (isInSourceFolder(res) && (res instanceof IFile)) {
+					if (isInSourceFolder(res) && composer.getName().equals("AHEAD")) {
 						return res.getName();
 					}
-					final FSTModel model =
-						featureProject.getFSTModel();
-					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder()
-						&& !composer.hasSourceFolder());
-					SPACE_STRING =
-						"";
-					for (int i =
-						0; i < elementColors.size(); i++) {
-						SPACE_STRING +=
-							" ";
+					final FSTModel model = featureProject.getFSTModel();
+					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					SPACE_STRING = "";
+					for (int i = 0; i < elementColors.size(); i++) {
+						SPACE_STRING += " ";
 					}
-					return SPACE_STRING
-						+ res.getName();
-				} else if (isInBuildFolder(res)
-					&& (res instanceof IFile)) {
-					final FSTModel model =
-						featureProject.getFSTModel();
-					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder()
-						&& !composer.hasSourceFolder());
-					SPACE_STRING =
-						"";
-					for (int i =
-						0; i < elementColors.size(); i++) {
-						SPACE_STRING +=
-							" ";
+					return SPACE_STRING + res.getName();
+				} else if (isInBuildFolder(res) && (res instanceof IFile)) {
+					final FSTModel model = featureProject.getFSTModel();
+					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					SPACE_STRING = "";
+					for (int i = 0; i < elementColors.size(); i++) {
+						SPACE_STRING += " ";
 					}
-					return SPACE_STRING
-						+ res.getName();
+					return SPACE_STRING + res.getName();
 				}
 
 				if (composer.hasFeatureFolder()) {
 					if (element instanceof IFolder) {
-						final IFolder folder =
-							(IFolder) element;
+						final IFolder folder = (IFolder) element;
 
 						// folder inSourceFolder but not SourceFolder itself
-						if (isInSourceFolder(folder)
-							&& folder.getParent().equals(featureProject.getSourceFolder())) {
-							return " "
-								+ folder.getName();
+						if (isInSourceFolder(folder) && folder.getParent().equals(featureProject.getSourceFolder())) {
+							return " " + folder.getName();
 						}
 					}
 
-				} else if (isInBuildFolder(res)
-					|| isInSourceFolder(res)) {
-					return SPACE_STRING
-						+ res.getName();
+				} else if (isInBuildFolder(res) || isInSourceFolder(res)) {
+					return SPACE_STRING + res.getName();
 				}
 
 				// Return spaces for the source folder when working with munge composer
 				if (composer.getName().equals("Munge")) {
-					final FSTModel model =
-						featureProject.getFSTModel();
-					if ((model == null)
-						|| model.getClasses().isEmpty()) {
-						return SPACE_STRING
-							+ res.getName();
+					final FSTModel model = featureProject.getFSTModel();
+					if ((model == null) || model.getClasses().isEmpty()) {
+						return SPACE_STRING + res.getName();
 					}
 					// Return text for munge source folder
-					if ((element instanceof IFolder)
-						&& ((IFolder) element).getName().equals("source")) {
-						final IFolder folder =
-							(IFolder) element;
+					if ((element instanceof IFolder) && ((IFolder) element).getName().equals("source")) {
+						final IFolder folder = (IFolder) element;
 						getPackageColors(folder, elementColors, model, true);
-						for (int i =
-							0; i < elementColors.size(); i++) {
-							SPACE_STRING +=
-								" ";
+						for (int i = 0; i < elementColors.size(); i++) {
+							SPACE_STRING += " ";
 						}
-						return SPACE_STRING
-							+ res.getName();
+						return SPACE_STRING + res.getName();
 					}
 					if (element instanceof IFile) {
-						final IFile file =
-							(IFile) element;
+						final IFile file = (IFile) element;
 						if (isInMungeSource(file)) {
 							getColors(elementColors, file, model, true);
-							for (int i =
-								0; i < elementColors.size(); i++) {
-								SPACE_STRING +=
-									" ";
+							for (int i = 0; i < elementColors.size(); i++) {
+								SPACE_STRING += " ";
 							}
-							return SPACE_STRING
-								+ res.getName();
+							return SPACE_STRING + res.getName();
 						}
 					}
 				}
@@ -632,17 +525,13 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 		// text for composed files
 		else if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
-			final CompilationUnit cu =
-				(CompilationUnit) element;
-			final IResource myfile =
-				cu.getResource();
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(myfile);
+			final CompilationUnit cu = (CompilationUnit) element;
+			final IResource myfile = cu.getResource();
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
 			if (featureProject == null) {
 				return null;
 			}
-			final IComposerExtensionClass composer =
-				featureProject.getComposer();
+			final IComposerExtensionClass composer = featureProject.getComposer();
 			if (composer == null) {
 				return null;
 			}
@@ -651,28 +540,21 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 
 			if (cu.getParent() instanceof PackageFragment) {
-				final PackageFragment parent =
-					(PackageFragment) cu.getParent();
+				final PackageFragment parent = (PackageFragment) cu.getParent();
 				getAllPackageColors((IFolder) parent.getResource(), elementColors, CorePlugin.getFeatureProject(parent.getResource()).getFSTModel(),
-						!composer.hasFeatureFolder()
-							&& !composer.hasSourceFolder());
+						!composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			} else {
-				getColors(elementColors, (IFile) myfile, featureProject.getFSTModel(), !composer.hasFeatureFolder()
-					&& !composer.hasSourceFolder());
+				getColors(elementColors, (IFile) myfile, featureProject.getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			}
-			for (int i =
-				0; i < elementColors.size(); i++) {
-				SPACE_STRING +=
-					" ";
+			for (int i = 0; i < elementColors.size(); i++) {
+				SPACE_STRING += " ";
 			}
 
 			if (elementColors.size() == 0) {
-				SPACE_STRING =
-					"";
+				SPACE_STRING = "";
 			}
 
-			return SPACE_STRING
-				+ myfile.getName();
+			return SPACE_STRING + myfile.getName();
 
 		}
 

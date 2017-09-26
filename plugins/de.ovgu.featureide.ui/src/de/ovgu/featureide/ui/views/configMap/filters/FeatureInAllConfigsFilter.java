@@ -44,8 +44,7 @@ public class FeatureInAllConfigsFilter extends ConfigurationMapFilter {
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		final List<Configuration> configs =
-			configurationMap.getConfigurations();
+		final List<Configuration> configs = configurationMap.getConfigurations();
 
 		for (final Configuration config : configs) {
 			if (!config.getSelectedFeatures().contains(feature)) {

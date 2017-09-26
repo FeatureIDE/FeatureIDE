@@ -45,15 +45,11 @@ public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter 
 
 	@Override
 	protected String getSubjectString() {
-		return getExplanation().isVoid()
-			? "feature model"
-			: getSubjectString(getExplanation().getSubject());
+		return getExplanation().isVoid() ? "feature model" : getSubjectString(getExplanation().getSubject());
 	}
 
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isVoid()
-			? "void"
-			: "dead";
+		return getExplanation().isVoid() ? "void" : "dead";
 	}
 }

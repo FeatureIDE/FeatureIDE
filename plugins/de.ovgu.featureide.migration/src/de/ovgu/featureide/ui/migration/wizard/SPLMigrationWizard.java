@@ -51,8 +51,7 @@ public class SPLMigrationWizard extends Wizard implements INewWizard {
 	private final ISPLMigrator migrator;
 
 	public SPLMigrationWizard(ISPLMigrator migrator) {
-		this.migrator =
-			migrator;
+		this.migrator = migrator;
 	}
 
 	@Override
@@ -64,10 +63,8 @@ public class SPLMigrationWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		setWindowTitle(IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE);
 
-		namePage =
-			new SPLMigrationDialogNamePage();
-		projectPage =
-			new SPLMigrationDialogSettingsPage();
+		namePage = new SPLMigrationDialogNamePage();
+		projectPage = new SPLMigrationDialogSettingsPage();
 
 		addPage(namePage);
 		addPage(projectPage);
@@ -78,11 +75,8 @@ public class SPLMigrationWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		final MigrationConfigurationData configurationData =
-			new MigrationConfigurationData(
-					namePage.getProjectName(), projectPage.getCompositionTool(),
-					projectPage.getSourcePath(), projectPage.getConfigPath(),
-					projectPage.getBuildPath());
+		final MigrationConfigurationData configurationData = new MigrationConfigurationData(namePage.getProjectName(), projectPage.getCompositionTool(),
+				projectPage.getSourcePath(), projectPage.getConfigPath(), projectPage.getBuildPath());
 
 		migrator.migrate(configurationData);
 

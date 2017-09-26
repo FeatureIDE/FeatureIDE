@@ -39,19 +39,12 @@ import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
  */
 public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
-	public static final String ID =
-		ExamplePlugin.PLUGIN_ID
-			+ ".format."
-			+ ProjectRecordFormat.class.getSimpleName();
+	public static final String ID = ExamplePlugin.PLUGIN_ID + ".format." + ProjectRecordFormat.class.getSimpleName();
 
-	private static final String ATTRIBUTE_PATH =
-		"path";
-	private static final String ATTRIBUTE_NAME =
-		"name";
-	private static final String PROJECT =
-		"project";
-	private static final String PROJECT_RECORDS =
-		"projectRecords";
+	private static final String ATTRIBUTE_PATH = "path";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String PROJECT = "project";
+	private static final String PROJECT_RECORDS = "projectRecords";
 
 	@Override
 	public String getId() {
@@ -83,12 +76,9 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	private void parseProjects(List<Element> elements, Collection<ProjectRecord> projectRecords) {
 		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
-				final String name =
-					element.getAttribute(ATTRIBUTE_NAME);
-				final String path =
-					element.getAttribute(ATTRIBUTE_PATH);
-				final ProjectRecord projectRecord =
-					new ProjectRecord(path, name);
+				final String name = element.getAttribute(ATTRIBUTE_NAME);
+				final String path = element.getAttribute(ATTRIBUTE_PATH);
+				final ProjectRecord projectRecord = new ProjectRecord(path, name);
 				object.add(projectRecord);
 				parseSubProjects(getElements(element.getChildNodes()), projectRecord);
 			}
@@ -98,12 +88,9 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	private void parseSubProjects(List<Element> elements, ProjectRecord parentRecord) {
 		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
-				final String name =
-					element.getAttribute(ATTRIBUTE_NAME);
-				final String path =
-					element.getAttribute(ATTRIBUTE_PATH);
-				final ProjectRecord projectRecord =
-					new ProjectRecord(path, name);
+				final String name = element.getAttribute(ATTRIBUTE_NAME);
+				final String path = element.getAttribute(ATTRIBUTE_PATH);
+				final ProjectRecord projectRecord = new ProjectRecord(path, name);
 				parentRecord.addSubProject(projectRecord);
 				parseSubProjects(getElements(element.getChildNodes()), projectRecord);
 			}
@@ -112,16 +99,14 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root =
-			doc.createElement(PROJECT_RECORDS);
+		final Element root = doc.createElement(PROJECT_RECORDS);
 		doc.appendChild(root);
 		addProjectRecords(doc, root, object);
 	}
 
 	private void addProjectRecords(Document doc, final Element root, Collection<ProjectRecord> projects) {
 		for (final ProjectRecord projectRecord : projects) {
-			final Element projectElement =
-				doc.createElement(PROJECT);
+			final Element projectElement = doc.createElement(PROJECT);
 			root.appendChild(projectElement);
 			projectElement.setAttribute(ATTRIBUTE_NAME, projectRecord.getProjectName());
 			projectElement.setAttribute(ATTRIBUTE_PATH, projectRecord.getProjectDescriptionRelativePath());

@@ -40,8 +40,7 @@ public class PreprocessorReason extends Reason {
 	 * @param expression an expression from the expression stack; not null
 	 */
 	public PreprocessorReason(Node expression) {
-		this.expression =
-			expression;
+		this.expression = expression;
 	}
 
 	/**
@@ -51,8 +50,7 @@ public class PreprocessorReason extends Reason {
 	 */
 	protected PreprocessorReason(PreprocessorReason reason) {
 		super(reason);
-		expression =
-			reason.expression;
+		expression = reason.expression;
 	}
 
 	/**
@@ -71,16 +69,9 @@ public class PreprocessorReason extends Reason {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((expression == null)
-					? 0
-					: expression.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((expression == null) ? 0 : expression.hashCode());
 		return result;
 	}
 
@@ -95,8 +86,7 @@ public class PreprocessorReason extends Reason {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final PreprocessorReason other =
-			(PreprocessorReason) obj;
+		final PreprocessorReason other = (PreprocessorReason) obj;
 		if (expression == null) {
 			if (other.expression != null) {
 				return false;

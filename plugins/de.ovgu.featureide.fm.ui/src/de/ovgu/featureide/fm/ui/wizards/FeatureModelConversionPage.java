@@ -65,34 +65,24 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout =
-			new GridLayout();
-		gridLayout.numColumns =
-			1;
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		final Group toolGroup =
-			new Group(container, SWT.NONE);
+		final Group toolGroup = new Group(container, SWT.NONE);
 		toolGroup.setText("Format Conversion:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final GridLayout projGridLayout =
-			new GridLayout();
-		projGridLayout.numColumns =
-			2;
+		final GridLayout projGridLayout = new GridLayout();
+		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
 
 		new Label(toolGroup, SWT.NONE).setText("From:");
 		new Label(toolGroup, SWT.NONE).setText("To:");
-		fromFormatCombo =
-			new Combo(toolGroup, SWT.READ_ONLY
-				| SWT.DROP_DOWN);
+		fromFormatCombo = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 		fromFormatCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
-		toFormatCombo =
-			new Combo(toolGroup, SWT.READ_ONLY
-				| SWT.DROP_DOWN);
+		toFormatCombo = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 		toFormatCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		for (final IFeatureModelFormat format : FMFormatManager.getInstance().getExtensions()) {
@@ -106,23 +96,16 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 		}
 
 		// Path Group
-		final Group pathGroup =
-			new Group(container, SWT.NONE);
-		final GridLayout layout =
-			new GridLayout();
-		final GridData gd =
-			new GridData(GridData.FILL_HORIZONTAL);
-		layout.numColumns =
-			2;
-		layout.verticalSpacing =
-			9;
+		final Group pathGroup = new Group(container, SWT.NONE);
+		final GridLayout layout = new GridLayout();
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		layout.numColumns = 2;
+		layout.verticalSpacing = 9;
 		pathGroup.setText("Output Path:");
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 
-		outputPath =
-			new Text(pathGroup, SWT.BORDER
-				| SWT.SINGLE);
+		outputPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		outputPath.setLayoutData(gd);
 		outputPath.setText("converted");
 
@@ -136,21 +119,17 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 
 	@Override
 	protected String checkPage() {
-		final String text =
-			outputPath.getText();
+		final String text = outputPath.getText();
 		try {
-			final Path path =
-				Paths.get(text);
+			final Path path = Paths.get(text);
 			if (Files.isDirectory(path)) {
-				return (text
-					+ " is not a directory!");
+				return (text + " is not a directory!");
 			}
 			if (Files.exists(path)) {
 				setMessage("Directory already exists. Files will be overridden!", WARNING);
 			}
 		} catch (InvalidPathException | NullPointerException ex) {
-			return (text
-				+ " is not a valid path name!");
+			return (text + " is not a valid path name!");
 		}
 		return super.checkPage();
 	}
@@ -158,16 +137,10 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, outputPath.getText());
-		int selectionIndex =
-			fromFormatCombo.getSelectionIndex();
-		abstractWizard.putData(WizardConstants.KEY_OUT_INPUTFORMAT, selectionIndex >= 0
-			? fromFormatCombo.getItem(selectionIndex)
-			: null);
-		selectionIndex =
-			toFormatCombo.getSelectionIndex();
-		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, selectionIndex >= 0
-			? toFormatCombo.getItem(selectionIndex)
-			: null);
+		int selectionIndex = fromFormatCombo.getSelectionIndex();
+		abstractWizard.putData(WizardConstants.KEY_OUT_INPUTFORMAT, selectionIndex >= 0 ? fromFormatCombo.getItem(selectionIndex) : null);
+		selectionIndex = toFormatCombo.getSelectionIndex();
+		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, selectionIndex >= 0 ? toFormatCombo.getItem(selectionIndex) : null);
 	}
 
 }

@@ -34,21 +34,16 @@ import org.junit.Test;
  */
 public class THaskellClassBuilder {
 
-	private final HaskellClassBuilder builder =
-		new HaskellClassBuilder(null);
+	private final HaskellClassBuilder builder = new HaskellClassBuilder(null);
 
 	// METHOD TEST 1
-	private final String TEST_METHOD_1 =
-		"mapResult :: (a -> Result b err) -> Result a err -> Result b err";
-	private final String EXPECTED_NAME_METHOD_1 =
-		"mapResult";
-	private final String EXPECTED_PARAMETER_1_METHOD_1 =
-		"(a -> Result b err) -> Result a err -> Result b err";
+	private final String TEST_METHOD_1 = "mapResult :: (a -> Result b err) -> Result a err -> Result b err";
+	private final String EXPECTED_NAME_METHOD_1 = "mapResult";
+	private final String EXPECTED_PARAMETER_1_METHOD_1 = "(a -> Result b err) -> Result a err -> Result b err";
 
 	@Test
 	public void methodTest1() {
-		final LinkedList<String> method =
-			builder.getMethod(TEST_METHOD_1);
+		final LinkedList<String> method = builder.getMethod(TEST_METHOD_1);
 		assertEquals(EXPECTED_NAME_METHOD_1, method.get(0));
 		assertEquals(EXPECTED_PARAMETER_1_METHOD_1, method.get(1));
 	}
