@@ -53,11 +53,6 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	private int scopeContradictionDistance =
 		0;
 
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jMutableSatSolver() {}
-
 	@Override
 	public boolean addClause(Node clause) {
 		final boolean changed =
