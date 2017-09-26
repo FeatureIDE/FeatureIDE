@@ -26,12 +26,14 @@ public class Client {
 	/*@ \conjunctive_contract
 	  @ requires signedMails.contains(msg) ==> Client.isKeyPairValid(client.getKeyringPublicKeyByClient(msg.getEmailFrom()), msg.getEmailSignKey());
 	  @ requires msg.isSigned() ==> !Client.isKeyPairValid(client.getKeyringPublicKeyByClient(msg.getEmailFrom()), msg.getEmailSignKey());
+	  @ assignable \nothing;
 	  @*/
 	static void verify(Client client, Email msg) {
 		original(client, msg);
 	}
 	
 	/*@ ensures msg.isSigned() ==> signedMails.contains(msg);
+	  @ assignable \nothing;
 	  @*/
 	static void mail(Client client, Email msg) {
 		//TODO add to signedMails if msg.isSigned()

@@ -42,7 +42,8 @@ public class Graph {
  	return true;
  	}@*/
     /*@ requires c != null;
-    ensures isSorted(vertices); @*/
+    ensures isSorted(vertices);
+    assignable vertices; @*/
     public void sortVertices(Comparator c) {
         Collections.sort(vertices, c);
     }
@@ -51,6 +52,7 @@ public class Graph {
 	/*@ requires v1 != null && v2 != null; @*/
 	/*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
     /*@ ensures findsEdge(start,getOtherVertex(theNeighbor)) != null && findsEdge(start, getOtherVertex(theNeighbor));@*/
+    /*@ assignable edges; @*/
     public EdgeIfc addEdge(Vertex start,  Vertex end) {
         Edge theEdge = new  Edge();
         theEdge.EdgeConstructor( start, end );
@@ -92,6 +94,7 @@ public class Graph {
     }
 
     /*@ ensures \result != null; @*/
+    /*@ assignable \nothing; @*/ 
     public VertexIter getVertices() {
         return new VertexIter() {
                 private Iterator iter = vertices.iterator();

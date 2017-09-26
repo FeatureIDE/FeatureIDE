@@ -16,6 +16,7 @@ public class Graph {
 	
 	/*@ \final_method
 	 @ requires path != null && source != null && target != null;
+	 @ assignable \nothing;
 	 @*/
 	// TODO Zeichen Zusätzlich den den Baum/ Bugfix 
 	private ArrayList<Node> doBFS(ArrayList<Node> path, Node source, Node target) {
@@ -44,6 +45,7 @@ public class Graph {
 	/*@ \final_method
 	 @ requires path != null && n != null;
 	 @ ensures path.contains(n);
+	 @ assignable \nothing;
 	 @*/
 	private ArrayList<Node> traverseBackwards(ArrayList<Node> path, Node n){
 		path.add(n);

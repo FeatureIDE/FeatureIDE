@@ -13,6 +13,7 @@ public class Graph {
 
     // Executes MSTPrim
 	/*@requires s != null;@*/
+	/*@assignable \nothing; @*/
     public void run( Vertex s )
      {
           	System.out.println("MSTPrim");
@@ -23,6 +24,7 @@ public class Graph {
         original( s );
     }
     /*@requires r != null;@*/
+    /*@assignable \nothing; @*/
     public  Graph Prim( Vertex r ) {
         Vertex root;
 

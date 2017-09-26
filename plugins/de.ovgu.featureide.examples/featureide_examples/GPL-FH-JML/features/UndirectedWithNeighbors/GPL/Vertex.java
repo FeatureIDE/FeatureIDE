@@ -16,6 +16,7 @@ public class Vertex
     }
       
     /*@ensures name == null && adjacentNeighbors != null;@*/
+    /*@assignable name, adjacentNeighbors; @*/
     public void VertexConstructor() 
     {
         name      = null;
@@ -24,7 +25,8 @@ public class Vertex
 
     /*@ requires name != null;
     ensures this.name == name;
-    ensures \result == this; @*/
+    ensures \result == this; 
+    assignable name; @*/
     public  Vertex assignName( String name ) 
     {
         this.name = name;
@@ -76,13 +78,15 @@ public class Vertex
 
     /*@requires n != null;@*/
     /*@ensures adjacentNeighbors.getLast()==n;@*/ 
+    /*@assignable adjacentNeighbors; @*/
     public void addEdge( Neighbor n ) 
     {
         adjacentNeighbors.add( n );
     }
 
     /*@requires sourceNeighbor != null;
-    ensures true;@*/
+    ensures true;
+    assignable \nothing; @*/
     public void adjustAdorns( Neighbor sourceNeighbor )
     {
     }

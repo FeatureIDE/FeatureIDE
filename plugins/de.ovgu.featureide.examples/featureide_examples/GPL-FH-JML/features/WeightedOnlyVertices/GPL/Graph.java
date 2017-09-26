@@ -8,6 +8,7 @@ public class Graph {
     // Adds an edge with weights
 	/*@requires start != null && end != null && weight != null;@*/
 	/*@ensures findsEdge(start,end) != null && findsEdge(start, end).getWeight()==weight;@*/
+	/*@assignable \nothing; @*/
     public void addAnEdge( Vertex start,  Vertex end, int weight )
    {
         addEdge( start,end, weight );
@@ -15,6 +16,7 @@ public class Graph {
     /*@requires start != null && end != null ;@*/
 	/*@ ensures \result.getOtherVertex(start)==end && \result.getOtherVertex(end)==start; @*/
     /*@ensures !isDirected ==> (theNeighbor.neighbor.getWeight()==theNeighbor.weight);@*/
+    /*@assignable \nothing; @*/
     public void addEdge( Vertex start,  Vertex end, int weight )
    {
         addEdge( start,end ); // adds the start and end as adjacent

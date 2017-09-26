@@ -11,6 +11,7 @@ import java.util.LinkedList;
 public class Graph {
 
 	/*@requires the_graph!=null;@*/
+	/*@assignable \nothing; @*/
     public  Graph ComputeTranspose( Graph the_graph )
    {
         int i;

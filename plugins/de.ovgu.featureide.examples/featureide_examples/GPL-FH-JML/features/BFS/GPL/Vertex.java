@@ -7,7 +7,8 @@ import java.util.LinkedList;
 public class Vertex 
 {
     public /*@spec_public@*/ boolean visited;
-    /*@ensures \original && visited == false;@*/ 
+    /*@ensures \original && visited == false;@*/
+    /*@assignable visited; @*/
     public void VertexConstructor( ) 
     {
         original();
@@ -15,6 +16,7 @@ public class Vertex
     }
   
     /*@requires w != null;@*/
+    /*@assignable visited; @*/
     public void init_vertex( WorkSpace w ) 
     {
         visited = false;
