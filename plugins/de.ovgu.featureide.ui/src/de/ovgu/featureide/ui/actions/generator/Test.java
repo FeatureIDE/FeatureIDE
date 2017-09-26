@@ -41,15 +41,10 @@ public class Test implements Comparable<Test> {
 	}
 
 	public Test(final String name, final long time, final String classname, Failure failure) {
-		this.name =
-			name;
-		this.time =
-			((float) time)
-				/ 1000;
-		this.classname =
-			classname;
-		this.failure =
-			failure;
+		this.name = name;
+		this.time = ((float) time) / 1000;
+		this.classname = classname;
+		this.failure = failure;
 	}
 
 	@Override
@@ -63,10 +58,8 @@ public class Test implements Comparable<Test> {
 	 */
 	@Override
 	public int hashCode() {
-		System.err.println("hashCode() not implemented for "
-			+ getClass());
-		UIPlugin.getDefault().logError(new Exception("hashCode() not implemented for "
-			+ getClass()));
+		System.err.println("hashCode() not implemented for " + getClass());
+		UIPlugin.getDefault().logError(new Exception("hashCode() not implemented for " + getClass()));
 		return 42;
 	}
 
@@ -76,10 +69,8 @@ public class Test implements Comparable<Test> {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		final Test otherTest =
-			(Test) other;
-		return classname.equals(otherTest.classname)
-			&& name.equals(otherTest.name);
+		final Test otherTest = (Test) other;
+		return classname.equals(otherTest.classname) && name.equals(otherTest.name);
 	}
 
 	/*
@@ -88,8 +79,6 @@ public class Test implements Comparable<Test> {
 	 */
 	@Override
 	public String toString() {
-		return classname
-			+ "."
-			+ name;
+		return classname + "." + name;
 	}
 }

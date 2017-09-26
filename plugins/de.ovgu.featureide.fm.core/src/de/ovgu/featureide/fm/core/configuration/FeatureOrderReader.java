@@ -43,10 +43,7 @@ public class FeatureOrderReader {
 	private final File file;
 
 	public FeatureOrderReader(File file) {
-		this.file =
-			new File(file.toString()
-				+ System.getProperty("file.separator")
-				+ ".order");
+		this.file = new File(file.toString() + System.getProperty("file.separator") + ".order");
 	}
 
 	/**
@@ -55,11 +52,9 @@ public class FeatureOrderReader {
 	 */
 
 	public LinkedList<String> featureOrderRead() {
-		final LinkedList<String> list =
-			new LinkedList<String>();
+		final LinkedList<String> list = new LinkedList<String>();
 		try {
-			final Scanner scanner =
-				new Scanner(file, "UTF-8");
+			final Scanner scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				list.add(scanner.next());
 			}

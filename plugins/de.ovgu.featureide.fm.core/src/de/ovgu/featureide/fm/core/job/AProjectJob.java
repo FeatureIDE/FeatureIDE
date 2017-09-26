@@ -36,13 +36,11 @@ public abstract class AProjectJob<T extends JobArguments, R> implements LongRunn
 	protected IMonitor workMonitor;
 
 	protected AProjectJob(T arguments) {
-		this.arguments =
-			arguments;
+		this.arguments = arguments;
 	}
 
 	protected AProjectJob(String name, T arguments) {
-		this.arguments =
-			arguments;
+		this.arguments = arguments;
 	}
 
 }

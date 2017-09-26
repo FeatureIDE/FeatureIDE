@@ -31,16 +31,12 @@ public abstract class AFeatureOrderHeuristic implements Iterator<DeprecatedFeatu
 
 	protected final DeprecatedFeature[] map;
 	protected final int maxIndex;
-	protected int curIndex =
-		0;
-	protected int realCurIndex =
-		0;
+	protected int curIndex = 0;
+	protected int realCurIndex = 0;
 
 	public AFeatureOrderHeuristic(DeprecatedFeature[] map, int length) {
-		this.map =
-			map;
-		maxIndex =
-			length;
+		this.map = map;
+		maxIndex = length;
 	}
 
 	@Override
@@ -53,12 +49,9 @@ public abstract class AFeatureOrderHeuristic implements Iterator<DeprecatedFeatu
 		if (!hasNext()) {
 			return null;
 		}
-		realCurIndex =
-			getNextIndex();
-		final DeprecatedFeature ret =
-			map[realCurIndex];
-		map[realCurIndex] =
-			null;
+		realCurIndex = getNextIndex();
+		final DeprecatedFeature ret = map[realCurIndex];
+		map[realCurIndex] = null;
 		curIndex++;
 		return ret;
 	}
@@ -71,8 +64,7 @@ public abstract class AFeatureOrderHeuristic implements Iterator<DeprecatedFeatu
 	}
 
 	public int size() {
-		return maxIndex
-			- curIndex;
+		return maxIndex - curIndex;
 	}
 
 }

@@ -39,8 +39,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_FEATURES);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 		setToolTipText("Test");
 		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}
@@ -48,25 +47,16 @@ public class FeaturesOnlyCalculationAction extends Action {
 	@Override
 	public void run() {
 		if (featureModel.getAnalyser().calculateFeatures) {
-			featureModel.getAnalyser().calculateFeatures =
-				false;
-			featureModel.getAnalyser().calculateConstraints =
-				false;
-			featureModel.getAnalyser().calculateRedundantConstraints =
-				false;
-			featureModel.getAnalyser().calculateTautologyConstraints =
-				false;
-			featureModel.getAnalyser().calculateDeadConstraints =
-				false;
-			featureModel.getAnalyser().calculateFOConstraints =
-				false;
+			featureModel.getAnalyser().calculateFeatures = false;
+			featureModel.getAnalyser().calculateConstraints = false;
+			featureModel.getAnalyser().calculateRedundantConstraints = false;
+			featureModel.getAnalyser().calculateTautologyConstraints = false;
+			featureModel.getAnalyser().calculateDeadConstraints = false;
+			featureModel.getAnalyser().calculateFOConstraints = false;
 		} else {
-			featureModel.getAnalyser().calculateFeatures =
-				true;
-			featureModel.getAnalyser().calculateDeadConstraints =
-				true;
-			featureModel.getAnalyser().calculateFOConstraints =
-				true;
+			featureModel.getAnalyser().calculateFeatures = true;
+			featureModel.getAnalyser().calculateDeadConstraints = true;
+			featureModel.getAnalyser().calculateFOConstraints = true;
 		}
 		featureModel.handleModelDataChanged();
 	}

@@ -41,8 +41,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection1() {
-		final Configuration c =
-			new Configuration(fm, true);
+		final Configuration c = new Configuration(fm, true);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
@@ -50,16 +49,14 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection2() {
-		final Configuration c =
-			new Configuration(fm, true);
+		final Configuration c = new Configuration(fm, true);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
 	}
 
 	@Test
 	public void testSelection3() {
-		final Configuration c =
-			new Configuration(fm, true);
+		final Configuration c = new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
@@ -68,8 +65,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection4() {
-		final Configuration c =
-			new Configuration(fm, true);
+		final Configuration c = new Configuration(fm, true);
 		c.setManual("A", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(1, c.number());
@@ -77,15 +73,12 @@ public class TConfigurationSelection extends AbstractConfigurationTest {
 
 	@Test
 	public void testSelection5() {
-		final Configuration c =
-			new Configuration(fm, true);
-		boolean exception =
-			false;
+		final Configuration c = new Configuration(fm, true);
+		boolean exception = false;
 		try {
 			c.setManual("B", Selection.SELECTED);
 		} catch (final SelectionNotPossibleException e) {
-			exception =
-				true;
+			exception = true;
 		}
 		assertTrue(exception);
 	}

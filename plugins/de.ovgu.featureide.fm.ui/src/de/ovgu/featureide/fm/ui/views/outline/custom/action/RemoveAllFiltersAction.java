@@ -40,8 +40,7 @@ public class RemoveAllFiltersAction extends Action {
 	 */
 	public RemoveAllFiltersAction(OutlineProvider provider) {
 		super();
-		this.provider =
-			provider;
+		this.provider = provider;
 		setText("Remove Filters");
 	}
 

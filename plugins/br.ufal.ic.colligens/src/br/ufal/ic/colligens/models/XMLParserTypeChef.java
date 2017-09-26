@@ -26,44 +26,33 @@ public class XMLParserTypeChef {
 	private FileProxy fileProxie;
 
 	public XMLParserTypeChef() {
-		builder =
-			new SAXBuilder();
+		builder = new SAXBuilder();
 	}
 
 	/**
 	 * @param fileProxie
 	 */
 	public void setFile(FileProxy fileProxie) {
-		this.fileProxie =
-			fileProxie;
+		this.fileProxie = fileProxie;
 	}
 
 	/**
 	 * @param xmlFile
 	 */
 	public void setXMLFile(File xmlFile) {
-		this.xmlFile =
-			xmlFile != null
-				? xmlFile
-				: this.xmlFile;
+		this.xmlFile = xmlFile != null ? xmlFile : this.xmlFile;
 	}
 
 	public void processFile() {
 		if (xmlFile == null) {
-			xmlFile =
-				new File(Colligens.getDefault().getConfigDir()
-						.getAbsolutePath()
-					+ System.getProperty("file.separator")
-					+ "output.xml");
+			xmlFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "output.xml");
 			if (!xmlFile.exists()) {
 				return;
 			}
 		}
 		try {
-			final Document document =
-				builder.build(xmlFile);
-			final Element rootNode =
-				document.getRootElement();
+			final Document document = builder.build(xmlFile);
+			final Element rootNode = document.getRootElement();
 
 			TypeErroProcessFile(rootNode, "typeerror");
 			TypeErroProcessFile(rootNode, "parsererror");
@@ -77,27 +66,19 @@ public class XMLParserTypeChef {
 
 	private void TypeErroProcessFile(Element rootNode, String type) {
 
-		final List<Element> list =
-			rootNode.getChildren(type);
+		final List<Element> list = rootNode.getChildren(type);
 
-		for (int i =
-			0; i < list.size(); i++) {
-			final Element node =
-				list.get(i);
+		for (int i = 0; i < list.size(); i++) {
+			final Element node = list.get(i);
 
-			final String file =
-				node.getChild(POSITION).getChildText("file").trim();
+			final String file = node.getChild(POSITION).getChildText("file").trim();
 
 			// compare with the log file that was analyzed
 			if (file.contains(fileProxie.getFileToAnalyse())) {
 
-				final Log log =
-					new Log(fileProxie, Integer.parseInt(node
-							.getChild(POSITION).getChildText("line").trim()), Integer.parseInt(
-									node
-											.getChild(POSITION).getChildText(COLUMN).trim()),
-							node.getChildText("featurestr"),
-							node.getChildText("severity"), node.getChildText("msg"));
+				final Log log = new Log(fileProxie, Integer.parseInt(node.getChild(POSITION).getChildText("line").trim()),
+						Integer.parseInt(node.getChild(POSITION).getChildText(COLUMN).trim()), node.getChildText("featurestr"), node.getChildText("severity"),
+						node.getChildText("msg"));
 
 				fileProxie.getLogs().add(log);
 

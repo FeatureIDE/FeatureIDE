@@ -42,10 +42,8 @@ public class RemoveThread extends AWorkerThread<Collection<String>> {
 		public final Node completeNode;
 
 		public SharedObjects(Collection<Node> nodeList, Node completeNode) {
-			this.nodeList =
-				nodeList;
-			this.completeNode =
-				completeNode;
+			this.nodeList = nodeList;
+			this.completeNode = completeNode;
 		}
 
 	}
@@ -54,27 +52,20 @@ public class RemoveThread extends AWorkerThread<Collection<String>> {
 
 	public RemoveThread(IMonitor monitor, Collection<Node> nodeList, Node completeNode) {
 		super(monitor);
-		sharedObjects =
-			new SharedObjects(nodeList, completeNode);
+		sharedObjects = new SharedObjects(nodeList, completeNode);
 	}
 
 	private RemoveThread(RemoveThread oldThread) {
 		super(oldThread);
-		sharedObjects =
-			new SharedObjects(oldThread.sharedObjects.nodeList, oldThread.sharedObjects.completeNode);
+		sharedObjects = new SharedObjects(oldThread.sharedObjects.nodeList, oldThread.sharedObjects.completeNode);
 	}
 
 	@Override
 	protected void work(Collection<String> removeFeatures) {
-		final IMonitor wm =
-			new ConsoleMonitor();
-		final FeatureRemover remover =
-			new FeatureRemover(sharedObjects.completeNode, removeFeatures);
-		final Node subNode =
-			remover.createNewClauseList(LongRunningWrapper.runMethod(remover, wm));
-		if ((subNode.getChildren().length > 0)
-			&& !((subNode.getChildren().length == 1)
-				&& (subNode.getChildren()[0].getChildren().length == 0))) {
+		final IMonitor wm = new ConsoleMonitor();
+		final FeatureRemover remover = new FeatureRemover(sharedObjects.completeNode, removeFeatures);
+		final Node subNode = remover.createNewClauseList(LongRunningWrapper.runMethod(remover, wm));
+		if ((subNode.getChildren().length > 0) && !((subNode.getChildren().length == 1) && (subNode.getChildren()[0].getChildren().length == 0))) {
 			addNode(subNode);
 		}
 	}

@@ -31,10 +31,12 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeFalseOptionalFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<FalseOptionalFeatureExplanationCreator> implements FalseOptionalFeatureExplanationCreator {
+public class CompositeFalseOptionalFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<FalseOptionalFeatureExplanationCreator>
+		implements FalseOptionalFeatureExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeFalseOptionalFeatureExplanationCreator(Collection<FalseOptionalFeatureExplanationCreator> composites) {

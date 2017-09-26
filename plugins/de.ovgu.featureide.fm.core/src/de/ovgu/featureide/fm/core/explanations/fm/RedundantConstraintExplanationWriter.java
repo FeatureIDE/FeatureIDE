@@ -50,8 +50,6 @@ public class RedundantConstraintExplanationWriter extends FeatureModelExplanatio
 
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isImplicit()
-			? "transitive"
-			: "redundant";
+		return getExplanation().isImplicit() ? "transitive" : "redundant";
 	}
 }

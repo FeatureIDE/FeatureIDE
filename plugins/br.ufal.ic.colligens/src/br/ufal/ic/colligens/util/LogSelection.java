@@ -9,12 +9,9 @@ public class LogSelection implements ITextSelection {
 	private final int offset;
 
 	public LogSelection(int line, int length, int offset) {
-		this.line =
-			line;
-		this.length =
-			length;
-		this.offset =
-			offset;
+		this.line = line;
+		this.length = length;
+		this.offset = offset;
 	}
 
 	@Override

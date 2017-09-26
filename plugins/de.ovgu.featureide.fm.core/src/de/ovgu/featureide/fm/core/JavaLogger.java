@@ -28,26 +28,22 @@ public class JavaLogger implements ILogger {
 
 	@Override
 	public void logInfo(String message) {
-		System.out.println("INFO: "
-			+ message);
+		System.out.println("INFO: " + message);
 	}
 
 	@Override
 	public void logWarning(String message) {
-		System.out.println("WARNING: "
-			+ message);
+		System.out.println("WARNING: " + message);
 	}
 
 	@Override
 	public void logError(String message) {
-		System.err.println("ERROR: "
-			+ message);
+		System.err.println("ERROR: " + message);
 	}
 
 	@Override
 	public void logError(String message, Throwable exception) {
-		System.err.println("ERROR: "
-			+ message);
+		System.err.println("ERROR: " + message);
 		exception.printStackTrace(System.err);
 	}
 
@@ -60,9 +56,7 @@ public class JavaLogger implements ILogger {
 
 	@Override
 	public void reportBug(int ticket) {
-		logWarning("This is a bug. Please report it. See Ticket #"
-			+ ticket
-			+ ".");
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
 	}
 
 }

@@ -43,16 +43,14 @@ public class MetaProductTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+		// Cast is necessary, don't remove
 		final State state =
-			PlatformUI.getWorkbench().getService(ICommandService.class).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
-		final IProject curProject =
-			SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
+			((ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class)).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
+		final IProject curProject = SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
 		if (curProject != null) {
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(curProject);
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(curProject);
 			if (featureProject != null) {
-				final IComposerExtensionClass composer =
-					featureProject.getComposer();
+				final IComposerExtensionClass composer = featureProject.getComposer();
 				if (FeatureHouseComposer.COMPOSER_ID.equals(composer.getId())) {
 					state.setValue(((FeatureHouseComposer) composer).buildMetaProduct());
 					return true;

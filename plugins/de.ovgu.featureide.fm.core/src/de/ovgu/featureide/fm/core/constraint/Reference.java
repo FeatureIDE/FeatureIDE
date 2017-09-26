@@ -31,23 +31,17 @@ public class Reference {
 
 	private final ReferenceType type;
 
-	private String attributeName =
-		null;
+	private String attributeName = null;
 
 	public Reference(String featureName, ReferenceType type, String attributeName) {
-		this.featureName =
-			featureName;
-		this.type =
-			type;
-		this.attributeName =
-			attributeName;
+		this.featureName = featureName;
+		this.type = type;
+		this.attributeName = attributeName;
 	}
 
 	public Reference(String featureName) {
-		this.featureName =
-			featureName;
-		type =
-			ReferenceType.FEATURE;
+		this.featureName = featureName;
+		type = ReferenceType.FEATURE;
 	}
 
 	public String getFeatureName() {
@@ -64,8 +58,7 @@ public class Reference {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append(featureName);
 
 		switch (type) {

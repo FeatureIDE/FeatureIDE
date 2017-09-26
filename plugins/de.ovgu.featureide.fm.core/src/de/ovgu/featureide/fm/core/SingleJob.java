@@ -32,8 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
  */
 public abstract class SingleJob extends Job {
 
-	private boolean running =
-		false;
+	private boolean running = false;
 
 	public SingleJob(String name) {
 		super(name);
@@ -41,22 +40,19 @@ public abstract class SingleJob extends Job {
 
 	@Override
 	protected IStatus run(final IProgressMonitor monitor) {
-		final Thread thread =
-			new Thread(new Runnable() {
+		final Thread thread = new Thread(new Runnable() {
 
-				@Override
-				public void run() {
-					try {
-						execute(monitor);
-					} catch (final Exception e) {
-						Logger.logError(e);
-					}
+			@Override
+			public void run() {
+				try {
+					execute(monitor);
+				} catch (final Exception e) {
+					Logger.logError(e);
 				}
+			}
 
-			}, "Thread-"
-				+ getName());
-		if ((getPriority() == SHORT)
-			|| (getPriority() == INTERACTIVE)) {
+		}, "Thread-" + getName());
+		if ((getPriority() == SHORT) || (getPriority() == INTERACTIVE)) {
 			thread.setPriority(Thread.MAX_PRIORITY);
 		} else if (getPriority() == LONG) {
 			thread.setPriority(Thread.NORM_PRIORITY);
@@ -70,16 +66,14 @@ public abstract class SingleJob extends Job {
 					thread.join();
 					return Status.OK_STATUS;
 				}
-				running =
-					true;
+				running = true;
 			}
 			thread.start();
 			thread.join();
 		} catch (final InterruptedException e) {
 			Logger.logError(e);
 		} finally {
-			running =
-				false;
+			running = false;
 		}
 		return Status.OK_STATUS;
 	}

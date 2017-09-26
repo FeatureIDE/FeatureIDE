@@ -38,11 +38,9 @@ public class EditorHighlightingHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IEditorPart targetEditor =
-			HandlerUtil.getActiveEditor(event);
+		final IEditorPart targetEditor = HandlerUtil.getActiveEditor(event);
 		if (targetEditor instanceof ITextEditor) {
-			final boolean oldValue =
-				HandlerUtil.toggleCommandState(event.getCommand());
+			final boolean oldValue = HandlerUtil.toggleCommandState(event.getCommand());
 			ColorAnnotationModel.setHighlighting(!oldValue, (ITextEditor) targetEditor);
 		}
 		return null;

@@ -91,9 +91,7 @@ import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionL
 
 public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener, IEventListener {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".views.configMap";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".views.configMap";
 
 	private int featureColumnWidth, defaultColumnWidth;
 
@@ -108,8 +106,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private Color columnHighlightColor;
 	private List<TreeColumn> configurationColumns;
 	private TreeColumn featuresColumn;
-	private int configColumnsOffset =
-		0;
+	private int configColumnsOffset = 0;
 	private int gridColumns;
 	private int selectedColumnIndex;
 	private boolean configUpdateNecessary;
@@ -123,8 +120,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private List<Configuration> configurations;
 	private Map<Configuration, Path> configPaths;
 
-	private final List<IConfigurationMapFilter> filters =
-		new ArrayList<>();
+	private final List<IConfigurationMapFilter> filters = new ArrayList<>();
 	private ConfigMapFilterMenuAction filterMenu;
 
 	private ConfigMapRefreshAction refresh;
@@ -134,80 +130,66 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private IFeatureProject featureProject;
 
 	public ConfigurationMap() {
-		final IConfigurationLoaderCallback configLoaderCallback =
-			new IConfigurationLoaderCallback() {
+		final IConfigurationLoaderCallback configLoaderCallback = new IConfigurationLoaderCallback() {
 
-				@Override
-				public void onLoadingStarted() {
-					// clear all old columns because new configurations are going to be loaded
-					for (final TreeColumn column : configurationColumns) {
-						column.dispose();
-					}
-					configurationColumns.clear();
-					configPaths.clear();
+			@Override
+			public void onLoadingStarted() {
+				// clear all old columns because new configurations are going to be loaded
+				for (final TreeColumn column : configurationColumns) {
+					column.dispose();
+				}
+				configurationColumns.clear();
+				configPaths.clear();
+			}
+
+			/**
+			 * Create a column in the view for each configuration, that has been loaded.
+			 */
+			@Override
+			public void onConfigurationLoaded(Configuration configuration, Path path) {
+				if (tableTree == null) {
+					return;
 				}
 
-				/**
-				 * Create a column in the view for each configuration, that has been loaded.
-				 */
-				@Override
-				public void onConfigurationLoaded(Configuration configuration, Path path) {
-					if (tableTree == null) {
-						return;
-					}
+				final String configFileName = path.getFileName().toString();
+				final String[] configFileNameParts = configFileName.split("\\.");
+				final String configName = configFileNameParts[0];
 
-					final String configFileName =
-						path.getFileName().toString();
-					final String[] configFileNameParts =
-						configFileName.split("\\.");
-					final String configName =
-						configFileNameParts[0];
-
-					final TreeColumn column =
-						new TreeColumn(tableTree, SWT.CENTER);
-					column.setAlignment(SWT.CENTER);
-					column.setWidth(defaultColumnWidth);
-					if (configName.length() < 15) {
-						column.setText(configName);
-					} else {
-						column.setText(configName.substring(0, 15)
-							+ "...");
-					}
-
-					configurationColumns.add(column);
-					configPaths.put(configuration, path);
+				final TreeColumn column = new TreeColumn(tableTree, SWT.CENTER);
+				column.setAlignment(SWT.CENTER);
+				column.setWidth(defaultColumnWidth);
+				if (configName.length() < 15) {
+					column.setText(configName);
+				} else {
+					column.setText(configName.substring(0, 15) + "...");
 				}
 
-				@Override
-				public void onLoadingFinished() {
-					final TreeColumn dummy =
-						new TreeColumn(tableTree, SWT.NULL);
-					dummy.setWidth(defaultColumnWidth);
-					configurationColumns.add(dummy);
-				}
+				configurationColumns.add(column);
+				configPaths.put(configuration, path);
+			}
 
-				@Override
-				public void onLoadingError(IOException exception) {}
+			@Override
+			public void onLoadingFinished() {
+				final TreeColumn dummy = new TreeColumn(tableTree, SWT.NULL);
+				dummy.setWidth(defaultColumnWidth);
+				configurationColumns.add(dummy);
+			}
 
-			};
+			@Override
+			public void onLoadingError(IOException exception) {}
 
-		featureColumnWidth =
-			200;
-		defaultColumnWidth =
-			40;
-		selectedColumnIndex =
-			-1;
+		};
 
-		openFileAction =
-			new OpenFileAction("Open Config");
+		featureColumnWidth = 200;
+		defaultColumnWidth = 40;
+		selectedColumnIndex = -1;
+
+		openFileAction = new OpenFileAction("Open Config");
 		openFileAction.setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("ConfigurationIcon.png")));
 
-		loader =
-			new ConfigurationLoader(configLoaderCallback);
-		configurationColumns =
-			new ArrayList<>();
-		configPaths =
-			new HashMap<>();
+		loader = new ConfigurationLoader(configLoaderCallback);
+		configurationColumns = new ArrayList<>();
+		configPaths = new HashMap<>();
 
 		FeatureColorManager.addListener(this);
 
@@ -223,42 +205,29 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		getFilters().add(new FeatureUnusedFilter(true));
 		getFilters().add(new DeadFeatureFilter(true));
 
-		final List<IConfigurationMapFilter> previousFiltersCopy =
-			new ArrayList<>(getFilters());
+		final List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(getFilters());
 
 		getFilters().add(new NotAnyFilterFiltersFeatureFilter("remaining features", true, previousFiltersCopy));
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
-		gridColumns =
-			1;
-		this.parent =
-			parent;
-		columnHighlightColor =
-			new Color(parent.getDisplay(), 181, 181, 197);
+		gridColumns = 1;
+		this.parent = parent;
+		columnHighlightColor = new Color(parent.getDisplay(), 181, 181, 197);
 
-		final GridLayout layout =
-			new GridLayout(gridColumns, true);
-		layout.verticalSpacing =
-			0;
-		layout.horizontalSpacing =
-			0;
+		final GridLayout layout = new GridLayout(gridColumns, true);
+		layout.verticalSpacing = 0;
+		layout.horizontalSpacing = 0;
 		parent.setLayout(layout);
 
 		// HEADER
-		header =
-			new CustomTableHeader(parent, SWT.FILL);
-		tableTree =
-			new Tree(parent, SWT.H_SCROLL
-				| SWT.V_SCROLL);
-		headerBackground =
-			header.getDisplay().getSystemColor(SWT.COLOR_WHITE);
+		header = new CustomTableHeader(parent, SWT.FILL);
+		tableTree = new Tree(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		headerBackground = header.getDisplay().getSystemColor(SWT.COLOR_WHITE);
 
-		final GridData headerGridData =
-			new GridData(SWT.FILL, SWT.CENTER, false, false);
-		headerGridData.horizontalSpan =
-			gridColumns;
+		final GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		headerGridData.horizontalSpan = gridColumns;
 		header.setLayoutData(headerGridData);
 		header.setBackground(headerBackground);
 		header.setGlobalRotation((float) CustomTableHeader.toRadians(-70));
@@ -267,76 +236,66 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		header.addColumnSelectionListener(this);
 
 		// TREE
-		final GridData tableTreeGridData =
-			new GridData(SWT.FILL, SWT.FILL, false, true);
-		tableTreeGridData.horizontalSpan =
-			gridColumns;
+		final GridData tableTreeGridData = new GridData(SWT.FILL, SWT.FILL, false, true);
+		tableTreeGridData.horizontalSpan = gridColumns;
 		tableTree.setLayoutData(tableTreeGridData);
 		tableTree.setHeaderVisible(false);
 		tableTree.setLinesVisible(true);
 
-		tree =
-			new TreeViewer(tableTree);
+		tree = new TreeViewer(tableTree);
 
-		labelProvider =
-			new ConfigurationMapLabelProvider(this);
-		treeViewerContentProvider =
-			new ConfigurationMapTreeContentProvider(this);
+		labelProvider = new ConfigurationMapLabelProvider(this);
+		treeViewerContentProvider = new ConfigurationMapTreeContentProvider(this);
 
-		featuresColumn =
-			new TreeColumn(tableTree, SWT.LEFT);
+		featuresColumn = new TreeColumn(tableTree, SWT.LEFT);
 		featuresColumn.setAlignment(SWT.CENTER);
 		featuresColumn.setText("Features");
 		featuresColumn.setWidth(featureColumnWidth);
 
 		// There is one column before the configuration columns
-		configColumnsOffset =
-			1;
+		configColumnsOffset = 1;
 
 		tree.setContentProvider(treeViewerContentProvider);
 		tree.setLabelProvider(labelProvider);
 
 		// init
-		final IWorkbenchPage page =
-			getSite().getPage();
-		partListener =
-			new IPartListener() {
+		final IWorkbenchPage page = getSite().getPage();
+		partListener = new IPartListener() {
 
-				@Override
-				public void partOpened(IWorkbenchPart part) {}
+			@Override
+			public void partOpened(IWorkbenchPart part) {}
 
-				@Override
-				public void partDeactivated(IWorkbenchPart part) {}
+			@Override
+			public void partDeactivated(IWorkbenchPart part) {}
 
-				@Override
-				public void partClosed(IWorkbenchPart part) {
-					if (part == currentEditor) {
-						setEditor(null);
-					}
+			@Override
+			public void partClosed(IWorkbenchPart part) {
+				if (part == currentEditor) {
+					setEditor(null);
+				}
+			}
+
+			@Override
+			public void partBroughtToTop(IWorkbenchPart part) {
+				update(part);
+			}
+
+			@Override
+			public void partActivated(IWorkbenchPart part) {
+				update(part);
+			}
+
+			private void update(IWorkbenchPart part) {
+				if (part instanceof IEditorPart) {
+					setEditor((IEditorPart) part);
 				}
 
-				@Override
-				public void partBroughtToTop(IWorkbenchPart part) {
-					update(part);
+				if (configUpdateNecessary) {
+					refresh();
+					configUpdateNecessary = false;
 				}
-
-				@Override
-				public void partActivated(IWorkbenchPart part) {
-					update(part);
-				}
-
-				private void update(IWorkbenchPart part) {
-					if (part instanceof IEditorPart) {
-						setEditor((IEditorPart) part);
-					}
-
-					if (configUpdateNecessary) {
-						refresh();
-						configUpdateNecessary =
-							false;
-					}
-				}
-			};
+			}
+		};
 		page.addPartListener(partListener);
 
 		setEditor(page.getActiveEditor());
@@ -361,20 +320,14 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 			@Override
 			public void mouseDown(MouseEvent e) {
-				final int columnCount =
-					tableTree.getColumnCount();
-				int xOffset =
-					0;
-				int clickedColumn =
-					-1;
+				final int columnCount = tableTree.getColumnCount();
+				int xOffset = 0;
+				int clickedColumn = -1;
 
-				for (int i =
-					0; i < columnCount; i++) {
-					xOffset +=
-						tableTree.getColumn(i).getWidth();
+				for (int i = 0; i < columnCount; i++) {
+					xOffset += tableTree.getColumn(i).getWidth();
 					if (e.x < xOffset) {
-						clickedColumn =
-							i;
+						clickedColumn = i;
 						break;
 					}
 				}
@@ -393,37 +346,30 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			tree.setInput(new Object());
 			updateGUI(true);
 		} else {
-			setFeatureColor =
-				new SetFeatureColorAction(tree, featureProject.getFeatureModel());
+			setFeatureColor = new SetFeatureColorAction(tree, featureProject.getFeatureModel());
 		}
 	}
 
 	private void createToolbar() {
-		final IActionBars bars =
-			getViewSite().getActionBars();
-		final IToolBarManager toolbarManager =
-			bars.getToolBarManager();
+		final IActionBars bars = getViewSite().getActionBars();
+		final IToolBarManager toolbarManager = bars.getToolBarManager();
 		toolbarManager.removeAll();
 		;
 		if (filterMenu == null) {
-			final IConfigurationMapFilter[] filtersArray =
-				new IConfigurationMapFilter[getFilters().size()];
+			final IConfigurationMapFilter[] filtersArray = new IConfigurationMapFilter[getFilters().size()];
 			getFilters().toArray(filtersArray);
-			filterMenu =
-				new ConfigMapFilterMenuAction(treeViewerContentProvider, filtersArray);
+			filterMenu = new ConfigMapFilterMenuAction(treeViewerContentProvider, filtersArray);
 		}
 		toolbarManager.add(filterMenu);
 
 		if (refresh == null) {
-			refresh =
-				new ConfigMapRefreshAction(this);
+			refresh = new ConfigMapRefreshAction(this);
 		}
 		toolbarManager.add(refresh);
 	}
 
 	public void createContextMenu() {
-		final MenuManager menuMgr =
-			new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
@@ -433,15 +379,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				fillContextMenu(m);
 			}
 		});
-		final Control control =
-			tree.getControl();
-		final Menu menu =
-			menuMgr.createContextMenu(control);
+		final Control control = tree.getControl();
+		final Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, tree);
 
-		final MenuManager headerMenu =
-			new MenuManager("#HeaderPopup");
+		final MenuManager headerMenu = new MenuManager("#HeaderPopup");
 		headerMenu.setRemoveAllWhenShown(true);
 		headerMenu.addMenuListener(new IMenuListener() {
 
@@ -481,31 +424,20 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		featuresColumn.setWidth(featureColumnWidth);
 
 		// Callback will handle creating columns
-		configurations =
-			loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
+		configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 		// update header
-		final TreeColumn[] columns =
-			tableTree.getColumns();
-		final List<CustomColumnStyle> styles =
-			new ArrayList<>(columns.length);
+		final TreeColumn[] columns = tableTree.getColumns();
+		final List<CustomColumnStyle> styles = new ArrayList<>(columns.length);
 
-		final Display display =
-			header.getDisplay();
-		final Color[] alternatingColors =
-			new Color[] {
-				new Color(display, 237, 237, 255),
-				new Color(display, 221, 221, 237) };
+		final Display display = header.getDisplay();
+		final Color[] alternatingColors = new Color[] { new Color(display, 237, 237, 255), new Color(display, 221, 221, 237) };
 
-		for (int i =
-			0; i < columns.length; i++) {
-			final TreeColumn col =
-				columns[i];
+		for (int i = 0; i < columns.length; i++) {
+			final TreeColumn col = columns[i];
 
-			final CustomColumnStyle style =
-				new CustomColumnStyle(col.getText(), defaultColumnWidth);
+			final CustomColumnStyle style = new CustomColumnStyle(col.getText(), defaultColumnWidth);
 			style.setVerticalAlignment(SWT.BOTTOM);
-			style.setBackground(alternatingColors[i
-				% alternatingColors.length]);
+			style.setBackground(alternatingColors[i % alternatingColors.length]);
 
 			if (!isConfigColumn(i)) {
 				style.setHorizontalAlignment(SWT.LEFT);
@@ -538,8 +470,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	public void updateGUI(boolean forceUpdate) {
-		if (forceUpdate
-			|| isActive()) {
+		if (forceUpdate || isActive()) {
 			updateHeaderHeight();
 			updateTree();
 		}
@@ -554,20 +485,15 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	private void updateHeaderHeight() {
-		final GridData headerGridData =
-			new GridData(SWT.FILL, SWT.CENTER, true, false);
-		headerGridData.horizontalSpan =
-			gridColumns;
-		headerGridData.heightHint =
-			header.getHeight();
+		final GridData headerGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		headerGridData.horizontalSpan = gridColumns;
+		headerGridData.heightHint = header.getHeight();
 		header.setLayoutData(headerGridData);
 		parent.layout();
 	}
 
 	public boolean isConfigColumn(int index) {
-		return (configColumnsOffset <= index)
-			&& (index < (tableTree.getColumnCount()
-				- 1)); // -1 for dummy column
+		return (configColumnsOffset <= index) && (index < (tableTree.getColumnCount() - 1)); // -1 for dummy column
 	}
 
 	public int getConfigColumnsOffset() {
@@ -575,8 +501,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	private boolean isActive() {
-		final IWorkbenchPartSite site =
-			getSite();
+		final IWorkbenchPartSite site = getSite();
 		return site.getPage().isPartVisible(site.getPart());
 	}
 
@@ -593,13 +518,11 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	private void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
-			this.featureProject =
-				featureProject;
+			this.featureProject = featureProject;
 			if (isActive()) {
 				loadConfigurations();
 			} else {
-				configUpdateNecessary =
-					true;
+				configUpdateNecessary = true;
 			}
 			treeViewerContentProvider.setFeatureProject(this.featureProject);
 		}
@@ -609,33 +532,25 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		if (currentEditor == newEditor) {
 			return;
 		}
-		boolean isNew =
-			false;
+		boolean isNew = false;
 
 		// update project
 		if (newEditor != null) {
-			final IEditorInput newInput =
-				newEditor.getEditorInput();
+			final IEditorInput newInput = newEditor.getEditorInput();
 
 			if (newInput != null) {
 				if (newInput instanceof FileEditorInput) {
-					final IFile projectFile =
-						((FileEditorInput) newInput).getFile();
-					final IFeatureProject newProject =
-						CorePlugin.getFeatureProject(projectFile);
-					if ((newProject != null)
-						&& !newProject.equals(featureProject)) {
+					final IFile projectFile = ((FileEditorInput) newInput).getFile();
+					final IFeatureProject newProject = CorePlugin.getFeatureProject(projectFile);
+					if ((newProject != null) && !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
-						isNew =
-							true;
+						isNew = true;
 					}
 				}
-				final Object[] expandedElements =
-					tree.getExpandedElements();
+				final Object[] expandedElements = tree.getExpandedElements();
 				tree.setInput(newInput);
 				updateTree();
-				if ((expandedElements.length > 0)
-					&& !isNew) {
+				if ((expandedElements.length > 0) && !isNew) {
 					tree.setExpandedElements(expandedElements);
 				} else {
 					tree.expandAll();
@@ -643,8 +558,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			}
 		}
 
-		currentEditor =
-			newEditor;
+		currentEditor = newEditor;
 	}
 
 	public List<Configuration> getConfigurations() {
@@ -656,8 +570,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public Configuration getConfigurationOfColumn(int columnIndex) {
 		if (isConfigColumn(columnIndex)) {
-			return configurations.get(columnIndex
-				- configColumnsOffset);
+			return configurations.get(columnIndex - configColumnsOffset);
 		}
 		return null;
 	}
@@ -670,8 +583,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		if (selectedColumnIndex == -1) {
 			return selectedColumnIndex;
 		}
-		return selectedColumnIndex
-			- configColumnsOffset;
+		return selectedColumnIndex - configColumnsOffset;
 	}
 
 	Color getColumnHighlightColor() {
@@ -679,15 +591,13 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	private IFile getFileOfConfiguration(int configurationIndex) {
-		final Configuration config =
-			configurations.get(configurationIndex);
+		final Configuration config = configurations.get(configurationIndex);
 		return featureProject.getConfigFolder().getFile(configPaths.get(config).getFileName().toString());
 	}
 
 	@Override
 	public void onColumnSelectionChanged(int columnIndex) {
-		selectedColumnIndex =
-			columnIndex;
+		selectedColumnIndex = columnIndex;
 		updateTree();
 	}
 
@@ -703,8 +613,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	@Override
 	public void dispose() {
 		FeatureColorManager.removeListener(this);
-		final IWorkbenchPage page =
-			getSite().getPage();
+		final IWorkbenchPage page = getSite().getPage();
 		page.removePartListener(partListener);
 		header.removeColumnSelectionListener(this);
 		header.dispose();
@@ -714,8 +623,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		final EventType prop =
-			event.getEventType();
+		final EventType prop = event.getEventType();
 		switch (prop) {
 		case COLOR_CHANGED:
 			updateTree();

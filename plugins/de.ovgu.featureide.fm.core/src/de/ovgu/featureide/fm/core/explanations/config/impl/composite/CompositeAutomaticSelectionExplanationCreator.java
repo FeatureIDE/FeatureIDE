@@ -11,10 +11,12 @@ import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanat
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeAutomaticSelectionExplanationCreator extends CompositeConfigurationExplanationCreator<AutomaticSelectionExplanationCreator> implements AutomaticSelectionExplanationCreator {
+public class CompositeAutomaticSelectionExplanationCreator extends CompositeConfigurationExplanationCreator<AutomaticSelectionExplanationCreator>
+		implements AutomaticSelectionExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeAutomaticSelectionExplanationCreator(Collection<AutomaticSelectionExplanationCreator> composites) {

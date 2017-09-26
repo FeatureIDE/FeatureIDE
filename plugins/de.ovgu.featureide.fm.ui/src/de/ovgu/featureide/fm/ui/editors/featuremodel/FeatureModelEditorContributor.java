@@ -58,51 +58,28 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS =
-		{
-			CreateLayerAction.ID,
-			CreateCompoundAction.ID,
-			CalculateDependencyAction.ID,
-			DeleteAction.ID,
-			MandatoryAction.ID,
-			AndAction.ID,
-			OrAction.ID,
-			AlternativeAction.ID,
-			ActionFactory.UNDO.getId(),
-			ActionFactory.REDO.getId(),
-			// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
-			// ActionFactory.PASTE.getId(),
-			ActionFactory.SELECT_ALL.getId(),
-			// ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(),
-			GEFActionConstants.ZOOM_IN,
-			GEFActionConstants.ZOOM_OUT,
-		// IDEActionFactory.BOOKMARK.getId()
-		};
+	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
+		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+		// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
+		// ActionFactory.PASTE.getId(),
+		ActionFactory.SELECT_ALL.getId(),
+		// ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
+			// IDEActionFactory.BOOKMARK.getId()
+	};
 
-	private static final String[] TEXTEDITOR_ACTION_IDS =
-		{
-			ActionFactory.DELETE.getId(),
-			ActionFactory.UNDO.getId(),
-			ActionFactory.REDO.getId(),
-			ActionFactory.CUT.getId(),
-			ActionFactory.COPY.getId(),
-			ActionFactory.PASTE.getId(),
-			ActionFactory.SELECT_ALL.getId(),
-			ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(),
-			IDEActionFactory.BOOKMARK.getId() };
+	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+		ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
-		final FeatureModelEditor editor =
-			(FeatureModelEditor) targetEditor;
+		final FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
 		setActivePage(editor, editor.getActivePage());
 	}
 
 	public void setActivePage(FeatureModelEditor editor, int pageIndex) {
-		final IActionBars actionBars =
-			getActionBars();
+		final IActionBars actionBars = getActionBars();
 		if (actionBars != null) {
 			switch (pageIndex) {
 			case 0:
@@ -117,17 +94,14 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	}
 
 	private void hookGlobalDiagramActions(FeatureModelEditor editor, IActionBars actionBars) {
-		for (int i =
-			0; i < DIAGRAM_ACTION_IDS.length; i++) {
+		for (int i = 0; i < DIAGRAM_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(DIAGRAM_ACTION_IDS[i], editor.getDiagramAction(DIAGRAM_ACTION_IDS[i]));
 		}
 	}
 
 	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {
-		final ITextEditor textEditor =
-			editor.getSourceEditor();
-		for (int i =
-			0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
+		final ITextEditor textEditor = editor.getSourceEditor();
+		for (int i = 0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(TEXTEDITOR_ACTION_IDS[i], textEditor.getAction(TEXTEDITOR_ACTION_IDS[i]));
 		}
 	}
@@ -141,33 +115,25 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 		if (org.eclipse.core.runtime.Platform.getOS().equals(org.eclipse.core.runtime.Platform.OS_WIN32)) {
 			manager.add(new ContributionItem() {
 
-				final Point size =
-					new Point(0, 30);
+				final Point size = new Point(0, 30);
 				private ToolItem widget;
 
 				@Override
 				public void fill(ToolBar parent, int index) {
-					if ((widget == null)
-						&& (parent != null)) {
-						final int flags =
-							SWT.PUSH;
+					if ((widget == null) && (parent != null)) {
+						final int flags = SWT.PUSH;
 
-						ToolItem ti =
-							null;
+						ToolItem ti = null;
 						if (index >= 0) {
-							ti =
-								new ToolItem(parent, flags, index);
+							ti = new ToolItem(parent, flags, index);
 						} else {
-							ti =
-								new ToolItem(parent, flags);
+							ti = new ToolItem(parent, flags);
 						}
 						ti.setData(this);
 
 						// create an image the height of the text field
-						final Image image =
-							new Image(Display.getCurrent(), 1, size.y);
-						final GC gc =
-							new GC(image);
+						final Image image = new Image(Display.getCurrent(), 1, size.y);
+						final GC gc = new GC(image);
 						gc.setBackground(parent.getBackground());
 						gc.fillRectangle(image.getBounds());
 						gc.dispose();
@@ -180,8 +146,7 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 						});
 						ti.setImage(image);
 
-						widget =
-							ti;
+						widget = ti;
 					}
 				}
 			});

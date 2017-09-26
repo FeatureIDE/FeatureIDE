@@ -77,13 +77,10 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 
-		FileSystem.INSTANCE =
-			new EclipseFileSystem();
-		LongRunningWrapper.INSTANCE =
-			new LongRunningEclipse();
+		FileSystem.INSTANCE = new EclipseFileSystem();
+		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
 
 		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
 				IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
@@ -96,10 +93,8 @@ public class FMCorePlugin extends AbstractCorePlugin {
 //		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
 //		FMFactoryManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
 
-		Logger.logger =
-			new EclipseLogger();
-		FMFactoryManager.factoryWorkspaceProvider =
-			new EclipseFactoryWorkspaceProvider();
+		Logger.logger = new EclipseLogger();
+		FMFactoryManager.factoryWorkspaceProvider = new EclipseFactoryWorkspaceProvider();
 
 		if (!FMFactoryManager.factoryWorkspaceProvider.load()) {
 			FMFactoryManager.factoryWorkspaceProvider.getFactoryWorkspace().assignID(VelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
@@ -109,8 +104,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		FMFactoryManager.factoryWorkspaceProvider.save();
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 
@@ -132,22 +126,17 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		case 0:
 			return null;
 		case 1:
-			final LongRunningMethod<?> newJob =
-				projects.get(0).createJob();
-			ret =
-				newJob;
+			final LongRunningMethod<?> newJob = projects.get(0).createJob();
+			ret = newJob;
 			break;
 		default:
-			final JobSequence jobSequence =
-				new JobSequence();
+			final JobSequence jobSequence = new JobSequence();
 			jobSequence.setIgnorePreviousJobFail(true);
 			for (final JobArguments p : projects) {
-				final LongRunningMethod<?> newSequenceJob =
-					p.createJob();
+				final LongRunningMethod<?> newSequenceJob = p.createJob();
 				jobSequence.addJob(newSequenceJob);
 			}
-			ret =
-				jobSequence;
+			ret = jobSequence;
 		}
 		if (autostart) {
 			LongRunningWrapper.getRunner(ret).schedule();
@@ -157,28 +146,21 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 	public void analyzeModel(IFile file) {
 		logInfo(READING_MODEL_FILE___);
-		final IContainer outputDir =
-			file.getParent();
-		if ((outputDir == null)
-			|| !(outputDir instanceof IFolder)) {
+		final IContainer outputDir = file.getParent();
+		if ((outputDir == null) || !(outputDir instanceof IFolder)) {
 			return;
 		}
 
-		final Path path =
-			file.getLocation().toFile().toPath();
+		final Path path = file.getLocation().toFile().toPath();
 		if (AFileManager.hasInstance(path)) {
-			final FeatureModelManager instance =
-				FeatureModelManager.getInstance(path);
+			final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 			if (instance != null) {
-				final IFeatureModel fm =
-					instance.getObject();
+				final IFeatureModel fm = instance.getObject();
 				try {
-					final FeatureModelAnalyzer fma =
-						new FeatureModelAnalyzer(fm);
+					final FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
 					fma.analyzeFeatureModel(null);
 
-					final StringBuilder sb =
-						new StringBuilder();
+					final StringBuilder sb = new StringBuilder();
 					sb.append("Number Features: ");
 					sb.append(fm.getNumberOfFeatures());
 					sb.append(" (");
@@ -186,12 +168,9 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					sb.append(")\n");
 
 					if (fm instanceof ExtendedFeatureModel) {
-						final ExtendedFeatureModel extFeatureModel =
-							(ExtendedFeatureModel) fm;
-						int countInherited =
-							0;
-						int countInstances =
-							0;
+						final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+						int countInherited = 0;
+						int countInstances = 0;
 						for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 							switch (usedModel.getType()) {
 							case ExtendedFeature.TYPE_INHERITED:
@@ -210,11 +189,9 @@ public class FMCorePlugin extends AbstractCorePlugin {
 						sb.append("\n");
 					}
 
-					final List<List<IFeature>> unnomralFeature =
-						fma.analyzeFeatures();
+					final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
 
-					Collection<IFeature> analyzedFeatures =
-						unnomralFeature.get(0);
+					Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
 					sb.append("Core Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
@@ -222,8 +199,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 						sb.append(coreFeature.getName());
 						sb.append(", ");
 					}
-					analyzedFeatures =
-						unnomralFeature.get(1);
+					analyzedFeatures = unnomralFeature.get(1);
 					sb.append("\nDead Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
@@ -231,8 +207,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 						sb.append(deadFeature.getName());
 						sb.append(", ");
 					}
-					analyzedFeatures =
-						fma.getFalseOptionalFeatures();
+					analyzedFeatures = fma.getFalseOptionalFeatures();
 					sb.append("\nFO Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
@@ -242,11 +217,8 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					}
 					sb.append("\n");
 
-					final IFile outputFile =
-						((IFolder) outputDir).getFile(file.getName()
-							+ "_output.txt");
-					final InputStream inputStream =
-						new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
+					final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
+					final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
 					if (outputFile.isAccessible()) {
 						outputFile.setContents(inputStream, false, true, null);
 					} else {

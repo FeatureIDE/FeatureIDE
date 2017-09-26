@@ -41,8 +41,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  */
 public class MoveElementsOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private final Deque<AbstractFeatureModelOperation> operations =
-		new LinkedList<AbstractFeatureModelOperation>();
+	private final Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	public MoveElementsOperation(IFeatureModel featureModel) {
 		super(featureModel, DELETE);
@@ -55,10 +54,8 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		for (final Iterator<AbstractFeatureModelOperation> it =
-			operations.iterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation =
-				it.next();
+		for (final Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+			final AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
 				operation.redo();
 			}
@@ -68,10 +65,8 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		for (final Iterator<AbstractFeatureModelOperation> it =
-			operations.descendingIterator(); it.hasNext();) {
-			final AbstractFeatureModelOperation operation =
-				it.next();
+		for (final Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+			final AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {
 				operation.undo();
 			}

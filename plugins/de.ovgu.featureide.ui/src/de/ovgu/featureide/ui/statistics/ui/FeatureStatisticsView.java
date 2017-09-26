@@ -69,22 +69,16 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private IEditorPart currentEditor;
 	private IResource currentInput;
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".statistics.ui.FeatureStatisticsView";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
 
-	public static final Image EXPORT_IMG =
-		FMUIPlugin.getImage("export_wiz.gif");
-	public static final Image REFRESH_IMG =
-		FMUIPlugin.getImage("refresh_tab.gif");
+	public static final Image EXPORT_IMG = FMUIPlugin.getImage("export_wiz.gif");
+	public static final Image REFRESH_IMG = FMUIPlugin.getImage("refresh_tab.gif");
 
 	@Override
 	public void createPartControl(Composite parent) {
 
-		viewer =
-			new TreeViewer(parent);
-		contentProvider =
-			new ContentProvider(viewer);
+		viewer = new TreeViewer(parent);
+		contentProvider = new ContentProvider(viewer);
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(new TreeLabelProvider());
 		viewer.setInput(viewer);
@@ -93,38 +87,31 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
-		currentInput =
-			(currentEditor == null)
-				? null
-				: ResourceUtil.getResource((currentEditor.getEditorInput()));
+		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
 
 		addButtons();
 	}
 
 	private void addButtons() {
 
-		final IToolBarManager toolBarManager =
-			getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
-		final Action checkBoxer =
-			new Action() {
+		final Action checkBoxer = new Action() {
 
-				@Override
-				public void run() {
-					final CheckBoxTreeViewDialog dial =
-						new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
-					dial.open();
-				}
-			};
+			@Override
+			public void run() {
+				final CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
+				dial.open();
+			}
+		};
 
-		final Action refresher =
-			new Action() {
+		final Action refresher = new Action() {
 
-				@Override
-				public void run() {
-					FeatureStatisticsView.this.refresh(true);
-				}
-			};
+			@Override
+			public void run() {
+				FeatureStatisticsView.this.refresh(true);
+			}
+		};
 
 		toolBarManager.add(refresher);
 		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
@@ -135,37 +122,36 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		checkBoxer.setToolTipText("Export to *.csv");
 	}
 
-	private final IPartListener editorListener =
-		new IPartListener() {
+	private final IPartListener editorListener = new IPartListener() {
 
-			@Override
-			public void partOpened(IWorkbenchPart part) {}
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
 
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
 
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-				if (part == currentEditor) {
-					setEditor(null);
-				}
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			if (part == currentEditor) {
+				setEditor(null);
 			}
+		}
 
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setEditor((IEditorPart) part);
-				}
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setEditor((IEditorPart) part);
 			}
+		}
 
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
-					setEditor((IEditorPart) part);
-				}
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
+				setEditor((IEditorPart) part);
 			}
-		};
+		}
+	};
 
 	@Override
 	public void setFocus() {
@@ -175,20 +161,18 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private final IEventListener modelListener =
-		new IEventListener() {
+	private final IEventListener modelListener = new IEventListener() {
 
-			@Override
-			public void propertyChange(FeatureIDEEvent evt) {
-				if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()) {
-					refresh(false);
-				}
+		@Override
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()) {
+				refresh(false);
 			}
+		}
 
-		};
+	};
 
-	private Job job =
-		null;
+	private Job job = null;
 
 	/**
 	 * Refresh the view.
@@ -201,62 +185,55 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		/*
 		 * This job waits for the calculation job to finish and starts immediately a new one
 		 */
-		final Job waiter =
-			new Job(UPDATING_FEATURESTATISTICSVIEW) {
+		final Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						if (job != null) {
-							if (contentProvider.isCanceled()) {
-								return Status.OK_STATUS;
-							}
-							contentProvider.setCanceled(true);
-							job.join();
-							contentProvider.setCanceled(false);
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					if (job != null) {
+						if (contentProvider.isCanceled()) {
+							return Status.OK_STATUS;
 						}
-					} catch (final InterruptedException e) {
-						FMUIPlugin.getDefault().logError(e);
+						contentProvider.setCanceled(true);
+						job.join();
+						contentProvider.setCanceled(false);
 					}
-
-					job =
-						new Job(UPDATING_FEATURESTATISTICSVIEW) {
-
-							@Override
-							protected IStatus run(IProgressMonitor monitor) {
-								if (currentEditor == null) {
-									contentProvider.defaultContent();
-								} else {
-									final IResource anyFile =
-										ResourceUtil.getResource(currentEditor.getEditorInput());
-									// TODO is refresh really necessary? -> true?
-
-									if (force
-										|| (currentInput == null)
-										|| !anyFile.getProject().equals(currentInput.getProject())) {
-										contentProvider.calculateContent(anyFile, true);
-										currentInput =
-											anyFile;
-									} else {
-										contentProvider.calculateContent(anyFile, false);
-									}
-								}
-								return Status.OK_STATUS;
-							}
-						};
-					job.setPriority(Job.DECORATE);
-					job.schedule();
-					return Status.OK_STATUS;
+				} catch (final InterruptedException e) {
+					FMUIPlugin.getDefault().logError(e);
 				}
-			};
+
+				job = new Job(UPDATING_FEATURESTATISTICSVIEW) {
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						if (currentEditor == null) {
+							contentProvider.defaultContent();
+						} else {
+							final IResource anyFile = ResourceUtil.getResource(currentEditor.getEditorInput());
+							// TODO is refresh really necessary? -> true?
+
+							if (force || (currentInput == null) || !anyFile.getProject().equals(currentInput.getProject())) {
+								contentProvider.calculateContent(anyFile, true);
+								currentInput = anyFile;
+							} else {
+								contentProvider.calculateContent(anyFile, false);
+							}
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.DECORATE);
+				job.schedule();
+				return Status.OK_STATUS;
+			}
+		};
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 		cancelJobs();
 	}
 
 	private void cancelJobs() {
-		final JobDoneListener jobListener =
-			JobDoneListener.getInstance();
+		final JobDoneListener jobListener = JobDoneListener.getInstance();
 		if (jobListener != null) {
 			jobListener.cancelAllRunningTreeJobs();
 		}
@@ -279,29 +256,21 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
-		boolean force =
-			true;
-		if ((newEditor != null)
-			&& (currentEditor != null)) {
-			final IEditorInput newInput =
-				newEditor.getEditorInput();
+		boolean force = true;
+		if ((newEditor != null) && (currentEditor != null)) {
+			final IEditorInput newInput = newEditor.getEditorInput();
 			if (newInput instanceof FileEditorInput) {
-				final IEditorInput oldInput =
-					currentEditor.getEditorInput();
+				final IEditorInput oldInput = currentEditor.getEditorInput();
 				if (oldInput instanceof FileEditorInput) {
-					final IProject newProject =
-						((FileEditorInput) newInput).getFile().getProject();
-					final IProject oldProject =
-						((FileEditorInput) oldInput).getFile().getProject();
+					final IProject newProject = ((FileEditorInput) newInput).getFile().getProject();
+					final IProject oldProject = ((FileEditorInput) oldInput).getFile().getProject();
 					if (newProject.equals(oldProject)) {
-						force =
-							false;
+						force = false;
 					}
 				}
 			}
 		}
-		currentEditor =
-			newEditor;
+		currentEditor = newEditor;
 		if (newEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}

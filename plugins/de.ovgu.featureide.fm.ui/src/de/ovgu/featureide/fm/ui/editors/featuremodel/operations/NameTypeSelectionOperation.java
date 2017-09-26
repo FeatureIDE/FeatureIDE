@@ -36,12 +36,9 @@ public class NameTypeSelectionOperation extends AbstractGraphicalFeatureModelOpe
 
 	public NameTypeSelectionOperation(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
 		super(featureModel, FeatureDiagramLayoutHelper.getNameTypeLabel(newNameType));
-		this.newNameType =
-			newNameType;
-		this.oldNameType =
-			oldNameType;
-		this.featureModel =
-			featureModel;
+		this.newNameType = newNameType;
+		this.oldNameType = oldNameType;
+		this.featureModel = featureModel;
 	}
 
 	@Override

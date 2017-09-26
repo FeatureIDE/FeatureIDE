@@ -34,22 +34,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHidd
  */
 public class HiddenAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.hidden";
+	public static final String ID = "de.ovgu.featureide.hidden";
 
 	private final IFeatureModel featureModel;
 
 	public HiddenAction(Object viewer, IFeatureModel featureModel) {
 		super("Hidden", viewer);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isHidden());
-		final SetFeatureToHiddenOperation op =
-			new SetFeatureToHiddenOperation(feature, featureModel);
+		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

@@ -29,15 +29,13 @@ import org.prop4j.Literal;
  */
 public class UnkownLiteralException extends Exception {
 
-	private static final long serialVersionUID =
-		6672272258524891712L;
+	private static final long serialVersionUID = 6672272258524891712L;
 
 	private final Literal unkownLiteral;
 
 	public UnkownLiteralException(Literal unkownLiteral) {
 		super();
-		this.unkownLiteral =
-			unkownLiteral;
+		this.unkownLiteral = unkownLiteral;
 	}
 
 	public final Literal getUnkownLiteral() {

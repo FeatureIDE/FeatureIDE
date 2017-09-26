@@ -46,29 +46,24 @@ public abstract class ConfigurationExplanationWriter extends FeatureModelExplana
 		if (!(reason instanceof ConfigurationReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final SelectableFeature selection =
-			((ConfigurationReason) reason).getFeatureSelection();
+		final SelectableFeature selection = ((ConfigurationReason) reason).getFeatureSelection();
 		String selectionString;
 		switch (selection.getSelection()) {
 		case SELECTED:
-			selectionString =
-				"selected";
+			selectionString = "selected";
 			break;
 		case UNSELECTED:
-			selectionString =
-				"unselected";
+			selectionString = "unselected";
 			break;
 		case UNDEFINED:
-			selectionString =
-				"neither selected nor unselected";
+			selectionString = "neither selected nor unselected";
 		default:
 			throw new IllegalStateException("Unknown feature selection state");
 		}
 		switch (selection.getManual()) {
 		case SELECTED:
 		case UNSELECTED:
-			selectionString =
-				String.format("manually %s", selectionString);
+			selectionString = String.format("manually %s", selectionString);
 			break;
 		case UNDEFINED:
 			break;

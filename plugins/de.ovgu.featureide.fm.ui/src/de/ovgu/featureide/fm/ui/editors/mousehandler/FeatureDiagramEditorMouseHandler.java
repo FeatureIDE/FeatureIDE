@@ -47,84 +47,57 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 	private Point positionAtClick;
 
 	public FeatureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAction) {
-		this.mouseWheelDownAction =
-			mouseWheelDownAction;
-		this.mouseWheelUpAction =
-			mouseWheelUpAction;
-		stateMask =
-			0x0;
+		this.mouseWheelDownAction = mouseWheelDownAction;
+		this.mouseWheelUpAction = mouseWheelUpAction;
+		stateMask = 0x0;
 	}
 
 	public FeatureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion, int stateMask) {
-		mouseWheelDownAction =
-			mouseWheelDownAtion;
-		this.mouseWheelUpAction =
-			mouseWheelUpAction;
-		this.stateMask =
-			stateMask;
+		mouseWheelDownAction = mouseWheelDownAtion;
+		this.mouseWheelUpAction = mouseWheelUpAction;
+		this.stateMask = stateMask;
 	}
 
 	public FeatureDiagramEditorMouseHandler(int stateMask, FigureCanvas figureCanvas) {
-		this.stateMask =
-			stateMask;
-		this.figureCanvas =
-			figureCanvas;
+		this.stateMask = stateMask;
+		this.figureCanvas = figureCanvas;
 	}
 
 	public FeatureDiagramEditorMouseHandler(final FigureCanvas figureCanvas) {
-		this.figureCanvas =
-			figureCanvas;
-		mouseMoveListener =
-			new MouseMoveListener() {
+		this.figureCanvas = figureCanvas;
+		mouseMoveListener = new MouseMoveListener() {
 
-				@Override
-				public void mouseMove(MouseEvent e) {
-					// Perform drag scrolling when middle mouse button is pressed
-					final Point currentMousePosition =
-						new Point(e.x, e.y);
-					final Dimension difference =
-						currentMousePosition.getDifference(positionAtClick);
-					final int xPosition =
-						figureCanvas.getViewport().getViewLocation().x
-							- difference.width;
-					final int yPosition =
-						figureCanvas.getViewport().getViewLocation().y
-							- difference.height;
-					// Don´t change this. The two seprate commands are necessary to prevent lag in huge feature models
-					figureCanvas.scrollToX(xPosition);
-					figureCanvas.scrollToY(yPosition);
-					positionAtClick =
-						new Point(e.x, e.y);
+			@Override
+			public void mouseMove(MouseEvent e) {
+				// Perform drag scrolling when middle mouse button is pressed
+				final Point currentMousePosition = new Point(e.x, e.y);
+				final Dimension difference = currentMousePosition.getDifference(positionAtClick);
+				final int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
+				final int yPosition = figureCanvas.getViewport().getViewLocation().y - difference.height;
+				// Don´t change this. The two seprate commands are necessary to prevent lag in huge feature models
+				figureCanvas.scrollToX(xPosition);
+				figureCanvas.scrollToY(yPosition);
+				positionAtClick = new Point(e.x, e.y);
 
-				}
-			};
+			}
+		};
 	}
 
 	@Override
 	public void mouseScrolled(MouseEvent e) {
 		// Perform actions when set
-		if ((mouseWheelUpAction != null)
-			|| (mouseWheelDownAction != null)) {
-			if ((e.stateMask == stateMask)
-				&& (e.count > 0)) {
+		if ((mouseWheelUpAction != null) || (mouseWheelDownAction != null)) {
+			if ((e.stateMask == stateMask) && (e.count > 0)) {
 				mouseWheelUpAction.run();
-			} else if ((e.stateMask == stateMask)
-				&& (e.count < 0)) {
+			} else if ((e.stateMask == stateMask) && (e.count < 0)) {
 				mouseWheelDownAction.run();
 			}
 			// Perform horizontal scroll when Shift is pressed while scrolling
-		} else if ((mouseWheelDownAction == null)
-			&& (mouseWheelUpAction == null)
-			&& (figureCanvas != null)
-			&& (figureCanvas.getViewport() != null)) {
-			if ((e.stateMask == stateMask)
-				&& (e.count > 0)) {
-				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x
-					+ 200, figureCanvas.getViewport().getViewLocation().y);
-			} else if ((e.stateMask == stateMask)
-				&& (e.count < 0)) {
-				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x
-					- 200, figureCanvas.getViewport().getViewLocation().y);
+		} else if ((mouseWheelDownAction == null) && (mouseWheelUpAction == null) && (figureCanvas != null) && (figureCanvas.getViewport() != null)) {
+			if ((e.stateMask == stateMask) && (e.count > 0)) {
+				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x + 200, figureCanvas.getViewport().getViewLocation().y);
+			} else if ((e.stateMask == stateMask) && (e.count < 0)) {
+				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x - 200, figureCanvas.getViewport().getViewLocation().y);
 			}
 		}
 	}
@@ -136,8 +109,7 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 	public void mouseDown(MouseEvent e) {
 		if (e.button == 2) {
 			figureCanvas.addMouseMoveListener(mouseMoveListener);
-			positionAtClick =
-				new Point(e.x, e.y);
+			positionAtClick = new Point(e.x, e.y);
 		}
 	}
 

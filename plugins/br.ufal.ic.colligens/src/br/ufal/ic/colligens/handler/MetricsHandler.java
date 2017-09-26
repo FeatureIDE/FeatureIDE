@@ -32,15 +32,12 @@ public class MetricsHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IWorkbenchWindow window =
-			HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 
-		final ISelection selection =
-			window.getActivePage().getSelection();
+		final ISelection selection = window.getActivePage().getSelection();
 
 		if (controller == null) {
-			controller =
-				new MetricsController();
+			controller = new MetricsController();
 		}
 
 		controller.setWindow(window);
@@ -48,8 +45,7 @@ public class MetricsHandler extends ColligensAbstractHandler {
 
 		if (super.saveAll()) {
 			// Open and active the Analyzer view
-			final IWorkbenchPage page =
-				window.getActivePage();
+			final IWorkbenchPage page = window.getActivePage();
 			try {
 				page.showView(MetricsView.ID);
 			} catch (final PartInitException e) {
@@ -59,8 +55,7 @@ public class MetricsHandler extends ColligensAbstractHandler {
 			controller.run();
 
 		} else {
-			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME,
-					PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
+			MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME, PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
 		}
 		return null;
 	}

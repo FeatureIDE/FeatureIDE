@@ -39,17 +39,11 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 	private final boolean fill;
 
 	public CircleDecoration(boolean fill) {
-		this.fill =
-			fill;
-		final Color decoratorForegroundColor =
-			FMPropertyManager.getDecoratorForegroundColor();
+		this.fill = fill;
+		final Color decoratorForegroundColor = FMPropertyManager.getDecoratorForegroundColor();
 		setForegroundColor(decoratorForegroundColor);
-		setBackgroundColor(fill
-			? decoratorForegroundColor
-			: FMPropertyManager.getDecoratorBackgroundColor());
-		setSize(SOURCE_ANCHOR_DIAMETER
-			+ 1, SOURCE_ANCHOR_DIAMETER
-				+ 1);
+		setBackgroundColor(fill ? decoratorForegroundColor : FMPropertyManager.getDecoratorBackgroundColor());
+		setSize(SOURCE_ANCHOR_DIAMETER + 1, SOURCE_ANCHOR_DIAMETER + 1);
 	}
 
 	@Override
@@ -59,12 +53,10 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 
 	@Override
 	protected void fillShape(Graphics graphics) {
-		if ((getActiveReason() != null)
-			&& fill) {
+		if ((getActiveReason() != null) && fill) {
 			graphics.setBackgroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
 		}
-		final Rectangle bounds =
-			new Rectangle(getBounds());
+		final Rectangle bounds = new Rectangle(getBounds());
 		bounds.shrink(1, 1);
 		Draw2dHelper.fillCircle(graphics, bounds);
 	}
@@ -75,8 +67,7 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 			graphics.setForegroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
 			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
 		}
-		final Rectangle bounds =
-			new Rectangle(getBounds());
+		final Rectangle bounds = new Rectangle(getBounds());
 		bounds.shrink(1, 1);
 		graphics.drawOval(bounds);
 	}

@@ -60,8 +60,6 @@ public class Draw2dHelper {
 	 * @param length The length of the arc.
 	 */
 	public static void fillArc(Graphics graphics, int x, int y, int width, int height, int offset, int length) {
-		graphics.fillArc(x, y, width
-			+ 1, height
-				+ 1, offset, length);
+		graphics.fillArc(x, y, width + 1, height + 1, offset, length);
 	}
 }

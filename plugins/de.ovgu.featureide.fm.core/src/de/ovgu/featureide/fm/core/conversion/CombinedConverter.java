@@ -37,15 +37,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class CombinedConverter implements IConverterStrategy {
 
-	private final List<IConverterStrategy> strategies =
-		new LinkedList<IConverterStrategy>();
-	private final IConverterStrategy bestStrategy =
-		new NNFConverter();
+	private final List<IConverterStrategy> strategies = new LinkedList<IConverterStrategy>();
+	private final IConverterStrategy bestStrategy = new NNFConverter();
 
-	private final double w_f =
-		1.0; // weight for features
-	private final double w_c =
-		1.0; // weight for simple constraints
+	private final double w_f = 1.0; // weight for features
+	private final double w_c = 1.0; // weight for simple constraints
 
 	/**
 	 *
@@ -53,18 +49,14 @@ public class CombinedConverter implements IConverterStrategy {
 	 * @return
 	 */
 	private double estimatedCosts(Node node) {
-		double costs =
-			w_f;
+		double costs = w_f;
 
-		if (!(node instanceof And)
-			&& !(node instanceof Or)) {
-			return w_f
-				+ w_c;
+		if (!(node instanceof And) && !(node instanceof Or)) {
+			return w_f + w_c;
 		}
 
 		for (final Node child : node.getChildren()) {
-			costs +=
-				estimatedCosts(child);
+			costs += estimatedCosts(child);
 		}
 		return costs;
 	}
@@ -75,17 +67,14 @@ public class CombinedConverter implements IConverterStrategy {
 	 * @return
 	 */
 	private double estimatedCosts(List<Node> preprocessed) {
-		double costs =
-			w_f; // costs for top-feature
+		double costs = w_f; // costs for top-feature
 		for (final Node node : preprocessed) {
 			// recognize simple constraints
 			if (ComplexConstraintConverter.isSimple(node)) {
-				costs +=
-					w_c;
+				costs += w_c;
 				continue;
 			}
-			costs +=
-				estimatedCosts(node);
+			costs += estimatedCosts(node);
 		}
 		// System.out.println(costs);
 		return costs;
@@ -98,22 +87,15 @@ public class CombinedConverter implements IConverterStrategy {
 
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		List<Node> result =
-			new LinkedList<Node>();
+		List<Node> result = new LinkedList<Node>();
 
-		double costs =
-			Double.MAX_VALUE;
+		double costs = Double.MAX_VALUE;
 		for (final IConverterStrategy strat : strategies) {
-			final List<Node> preprocessed =
-				strat.preprocess(constraint);
-			double cost =
-				0;
-			if ((cost =
-				estimatedCosts(preprocessed)) < costs) {
-				result =
-					preprocessed;
-				costs =
-					cost;
+			final List<Node> preprocessed = strat.preprocess(constraint);
+			double cost = 0;
+			if ((cost = estimatedCosts(preprocessed)) < costs) {
+				result = preprocessed;
+				costs = cost;
 			}
 		}
 		return result;

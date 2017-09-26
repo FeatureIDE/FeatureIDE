@@ -40,11 +40,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDelet
  */
 public class DeleteAllAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.deleteall";
+	public static final String ID = "de.ovgu.featureide.deleteall";
 	private final IFeatureModel featureModel;
-	private static ImageDescriptor deleteImage =
-		PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	/**
 	 *
@@ -53,17 +51,14 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 */
 	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
 		super(DELETE_INCLUDING_SUBFEATURES, viewer);
-		this.featureModel =
-			featureModel;
-		this.viewer =
-			viewer;
+		this.featureModel = featureModel;
+		this.viewer = viewer;
 		setImageDescriptor(deleteImage);
 	}
 
 	@Override
 	public void run() {
-		final FeatureTreeDeleteOperation op =
-			new FeatureTreeDeleteOperation(featureModel, feature);
+		final FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -79,8 +74,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.getStructure().isRoot()
-			&& feature.getStructure().hasChildren());
+		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().hasChildren());
 		setChecked(false);
 	}
 

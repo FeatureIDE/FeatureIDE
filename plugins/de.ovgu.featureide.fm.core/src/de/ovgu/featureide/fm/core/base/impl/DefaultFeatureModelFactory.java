@@ -32,9 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  */
 public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".DefaultFeatureModelFactory";
+	public static final String ID = PluginID.PLUGIN_ID + ".DefaultFeatureModelFactory";
 
 	public static DefaultFeatureModelFactory getInstance() {
 		return new DefaultFeatureModelFactory();

@@ -59,18 +59,15 @@ import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
  */
 public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
-	private static final Parent DEFAULT_TEXT =
-		new Parent(OPEN_FILE, null);
+	private static final Parent DEFAULT_TEXT = new Parent(OPEN_FILE, null);
 	private final TreeViewer viewer;
-	public Parent godfather =
-		new Parent("godfather", null);
+	public Parent godfather = new Parent("godfather", null);
 	private IFeatureProject project;
 	private boolean canceled;
 
 	public ContentProvider(TreeViewer viewer) {
 		super();
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 	}
 
 	public boolean isCanceled() {
@@ -78,14 +75,12 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	public void setCanceled(boolean canceled) {
-		this.canceled =
-			canceled;
+		this.canceled = canceled;
 	}
 
 	@Override
 	public void dispose() {
-		godfather =
-			null;
+		godfather = null;
 	}
 
 	@Override
@@ -132,51 +127,36 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * @param res Any file out of the current feature-project.
 	 */
 	public void calculateContent(IResource res) {
-		final IFeatureProject newProject =
-			CorePlugin.getFeatureProject(res);
-		final boolean hasChanged =
-			(newProject != null)
-				&& (project != null)
-				&& !newProject.equals(project);
+		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
+		final boolean hasChanged = (newProject != null) && (project != null) && !newProject.equals(project);
 		calculateContent(res, hasChanged);
 	}
 
 	public void calculateContent(IResource res, boolean hasChanged) {
-		final IFeatureProject newProject =
-			CorePlugin.getFeatureProject(res);
+		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
 
 		if (newProject == null) {
-			project =
-				newProject;
+			project = newProject;
 			defaultContent();
-		} else if (hasChanged
-			|| (project == null)) {
-			project =
-				newProject;
+		} else if (hasChanged || (project == null)) {
+			project = newProject;
 			addNodes();
 		}
 	}
 
 	private synchronized void addNodes() {
-		final IComposerExtensionClass composer =
-			project.getComposer();
-		final FSTModel fstModel =
-			getFSTModel(composer);
-		final IFeatureModel featModel =
-			project.getFeatureModel();
+		final IComposerExtensionClass composer = project.getComposer();
+		final FSTModel fstModel = getFSTModel(composer);
+		final IFeatureModel featModel = project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
 
-		godfather =
-			new Parent("GODFATHER", null);
-		final String composerName =
-			composer.getName();
-		final Parent composerParent =
-			new Parent(DESC_COMPOSER_NAME, composerName);
+		godfather = new Parent("GODFATHER", null);
+		final String composerName = composer.getName();
+		final Parent composerParent = new Parent(DESC_COMPOSER_NAME, composerName);
 
 		godfather.addChild(new Parent(PROJECT_NAME, project.getProjectName()));
 		godfather.addChild(composerParent);
-		final Parent featureModelStatistics =
-			new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
+		final Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
 		featureModelStatistics.addChild(new StatisticsSyntacticalFeatureModel(SYNTACTICAL_STATISTICS, featModel));
 		featureModelStatistics.addChild(new StatisticsSemanticalFeatureModel(SEMANTICAL_STATISTICS, featModel));
 		godfather.addChild(featureModelStatistics);
@@ -192,14 +172,10 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	private FSTModel getFSTModel(IComposerExtensionClass composer) {
-		FSTModel fstModel =
-			project.getFSTModel();
-		if ((fstModel == null)
-			|| fstModel.getClasses().isEmpty()
-			|| fstModel.getFeatures().isEmpty()) {
+		FSTModel fstModel = project.getFSTModel();
+		if ((fstModel == null) || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
 			composer.buildFSTModel();
-			fstModel =
-				project.getFSTModel();
+			fstModel = project.getFSTModel();
 		}
 		return fstModel;
 	}
@@ -208,8 +184,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * Prints a default message when the plug-in can't find necessary information.
 	 */
 	public void defaultContent() {
-		godfather =
-			new Parent("GODFATHER");
+		godfather = new Parent("GODFATHER");
 		godfather.addChild(DEFAULT_TEXT);
 		refresh();
 	}
@@ -218,17 +193,16 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * Refreshes the {@link ContentProvider#view} using a UI-Job with highest priority.
 	 */
 	protected void refresh() {
-		final UIJob job_setColor =
-			new UIJob(REFRESH_STATISTICS_VIEW) {
+		final UIJob job_setColor = new UIJob(REFRESH_STATISTICS_VIEW) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if (!viewer.getControl().isDisposed()) {
-						viewer.refresh();
-					}
-					return Status.OK_STATUS;
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (!viewer.getControl().isDisposed()) {
+					viewer.refresh();
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 		job_setColor.setPriority(Job.INTERACTIVE);
 		job_setColor.schedule();
 	}

@@ -45,14 +45,11 @@ public abstract class ASelectionHandler extends AbstractHandler {
 
 	@Override
 	public final Object execute(ExecutionEvent event) throws ExecutionException {
-		final ISelection selection =
-			HandlerUtil.getCurrentSelection(event);
+		final ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection) {
-			final IStructuredSelection strSelection =
-				(IStructuredSelection) selection;
+			final IStructuredSelection strSelection = (IStructuredSelection) selection;
 			if (startAction(strSelection)) {
-				for (final Iterator<?> it =
-					strSelection.iterator(); it.hasNext();) {
+				for (final Iterator<?> it = strSelection.iterator(); it.hasNext();) {
 					singleAction(it.next());
 				}
 				endAction();

@@ -42,8 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private static final String LABEL =
-		MOVE_LEGEND;
+	private static final String LABEL = MOVE_LEGEND;
 	private final Point newLocation;
 	private final Point oldLocation;
 	private boolean wasAutoLayout;
@@ -51,26 +50,21 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 
 	public LegendMoveOperation(IGraphicalFeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
 		super(featureModel, LABEL);
-		this.newLocation =
-			newLocation;
-		oldLocation =
-			legendFigure.getLocation();
-		this.legendFigure =
-			legendFigure;
+		this.newLocation = newLocation;
+		oldLocation = legendFigure.getLocation();
+		this.legendFigure = legendFigure;
 	}
 
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		wasAutoLayout =
-			graphicalFeatureModel.getLayout().hasLegendAutoLayout();
+		wasAutoLayout = graphicalFeatureModel.getLayout().hasLegendAutoLayout();
 		return redo(monitor, info);
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
 		legendFigure.setLocation(newLocation);
-		final FeatureModelLayout layout =
-			graphicalFeatureModel.getLayout();
+		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
 		graphicalFeatureModel.handleLegendLayoutChanged();
@@ -80,8 +74,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		legendFigure.setLocation(oldLocation);
-		final FeatureModelLayout layout =
-			graphicalFeatureModel.getLayout();
+		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
 		graphicalFeatureModel.handleLegendLayoutChanged();

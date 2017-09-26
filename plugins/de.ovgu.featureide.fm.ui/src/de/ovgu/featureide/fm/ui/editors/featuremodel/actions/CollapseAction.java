@@ -44,35 +44,31 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToColl
  */
 public class CollapseAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.collapse";
+	public static final String ID = "de.ovgu.featureide.collapse";
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-				if (isValidSelection(selection)) {
-					if (selection.getFirstElement() instanceof FeatureEditPart) {
-						setEnabled(true);
-					} else {
-						setEnabled(false);
-					}
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+			if (isValidSelection(selection)) {
+				if (selection.getFirstElement() instanceof FeatureEditPart) {
+					setEnabled(true);
 				} else {
 					setEnabled(false);
 				}
+			} else {
+				setEnabled(false);
 			}
-		};
+		}
+	};
 
 	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer);
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -84,12 +80,10 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		final IGraphicalFeature graphicalFeature =
-			graphicalFeatureModel.getGraphicalFeature(feature);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
 		// setChecked(feature.getStructure().isCollapsed());
-		final SetFeatureToCollapseOperation op =
-			new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
+		final SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -105,8 +99,7 @@ public class CollapseAction extends SingleSelectionAction {
 		setEnabled(true);
 		// setChecked(feature.getStructure().isCollapsed());
 
-		final IGraphicalFeature graphicalFeature =
-			graphicalFeatureModel.getGraphicalFeature(feature);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
 	}
 

@@ -38,8 +38,7 @@ public class UniqueId {
 	 * Creates an unique id generator instance and initializes internal state.
 	 */
 	public UniqueId() {
-		idGenerator =
-			new AtomicInteger();
+		idGenerator = new AtomicInteger();
 		idGenerator.set(0);
 	}
 

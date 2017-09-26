@@ -33,8 +33,7 @@ import de.ovgu.featureide.fm.core.io.Problem.Severity;
  */
 public class ProblemList extends ArrayList<Problem> {
 
-	private static final long serialVersionUID =
-		-8296890463897407370L;
+	private static final long serialVersionUID = -8296890463897407370L;
 
 	/**
 	 * Checks whether a given list of problems contains at least one problem with the specified or a greater severity level.
@@ -62,8 +61,7 @@ public class ProblemList extends ArrayList<Problem> {
 	}
 
 	public ProblemList getProblemType(int level) {
-		final ProblemList problemList =
-			new ProblemList();
+		final ProblemList problemList = new ProblemList();
 		for (final Problem problem : this) {
 			if (problem.severity.getLevel() == level) {
 				problemList.add(problem);

@@ -42,21 +42,15 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		String description =
-			"";
+		String description = "";
 		if (feature.getProperty().getDescription() != null) {
-			description =
-				feature.getProperty().getDescription();
-			description =
-				description.trim();
+			description = feature.getProperty().getDescription();
+			description = description.trim();
 		}
 		final ChangeFeatureDescriptionDialog dialog =
-			new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_
-				+ feature.getName()
-				+ "'", description);
+			new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_ + feature.getName() + "'", description);
 		dialog.open();
-		final String descriptemp =
-			dialog.getValue();
+		final String descriptemp = dialog.getValue();
 
 		if (!description.equals(descriptemp.trim())) {
 			feature.getProperty().setDescription(descriptemp);

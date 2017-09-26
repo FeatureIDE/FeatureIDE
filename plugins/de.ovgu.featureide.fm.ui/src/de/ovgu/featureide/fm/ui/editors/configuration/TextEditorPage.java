@@ -40,11 +40,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class TextEditorPage extends TextEditor implements IConfigurationEditorPage {
 
-	public static final String ID =
-		FMUIPlugin.PLUGIN_ID
-			+ "TextEditorPage";
-	private static final String PAGE_TEXT =
-		SOURCE;
+	public static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
+	private static final String PAGE_TEXT = SOURCE;
 
 	private int index;
 
@@ -62,14 +59,12 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public void setIndex(int index) {
-		this.index =
-			index;
+		this.index = index;
 	}
 
 	@Override
 	public void setConfigurationEditor(IConfigurationEditor configurationEditor) {
-		this.configurationEditor =
-			(ConfigurationEditor) configurationEditor;
+		this.configurationEditor = (ConfigurationEditor) configurationEditor;
 	}
 
 	@Override
@@ -97,15 +92,10 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	protected final void refresh() {
-		final ConfigurationManager configurationManager =
-			configurationEditor.getConfigurationManager();
-		if ((configurationManager != null)
-			&& (configurationEditor.getConfiguration() != null)
-			&& !configurationEditor.containsError()) {
-			final String source =
-				configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-			final IDocument document =
-				getDocumentProvider().getDocument(getEditorInput());
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
+		if ((configurationManager != null) && (configurationEditor.getConfiguration() != null) && !configurationEditor.containsError()) {
+			final String source = configurationManager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+			final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 			if (!source.equals(document.get())) {
 				document.set(source);
 			}
@@ -118,10 +108,8 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	public void updateConfiguration() {
-		final String text =
-			getDocumentProvider().getDocument(getEditorInput()).get();
-		final IPersistentFormat<Configuration> confFormat =
-			configurationEditor.getConfigurationManager().getFormat();
+		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
+		final IPersistentFormat<Configuration> confFormat = configurationEditor.getConfigurationManager().getFormat();
 		if (!confFormat.getInstance().write(configurationEditor.getConfiguration()).equals(text)) {
 			confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
 		}
@@ -146,24 +134,17 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 
 	@Override
 	public boolean allowPageChange(int newPageIndex) {
-		final ProblemList problems =
-			checkSource();
-		return !(problems.containsError()
-			|| (isDirty()
-				&& problems.containsWarning()));
+		final ProblemList problems = checkSource();
+		return !(problems.containsError() || (isDirty() && problems.containsWarning()));
 	}
 
 	protected ProblemList checkSource() {
-		final ConfigurationManager configurationManager =
-			configurationEditor.getConfigurationManager();
+		final ConfigurationManager configurationManager = configurationEditor.getConfigurationManager();
 		if (configurationManager != null) {
-			final Configuration configuration =
-				configurationEditor.getConfiguration();
-			final IPersistentFormat<Configuration> confFormat =
-				configurationManager.getFormat();
+			final Configuration configuration = configurationEditor.getConfiguration();
+			final IPersistentFormat<Configuration> confFormat = configurationManager.getFormat();
 
-			final ProblemList problems =
-				confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
+			final ProblemList problems = confFormat.getInstance().read(configuration, getDocumentProvider().getDocument(getEditorInput()).get());
 			configurationEditor.createModelFileMarkers(problems);
 			configurationEditor.setContainsError(problems.containsError());
 

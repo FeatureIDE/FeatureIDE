@@ -39,10 +39,8 @@ public class NewInterfaceHandler extends AFeatureProjectHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(IFeatureProject project) {
-		final NewInterfaceWizard wizard =
-			new NewInterfaceWizard(NEW_INTERFACES);
-		final WizardDialog dialog =
-			new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+		final NewInterfaceWizard wizard = new NewInterfaceWizard(NEW_INTERFACES);
+		final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Window.OK) {
 			MPLPlugin.getDefault().createInterface(project.getProject(), (IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT),
 					(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES));

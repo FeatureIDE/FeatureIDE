@@ -13,10 +13,12 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class CompositePreprocessorExplanationCreator<T extends PreprocessorExplanationCreator> extends CompositeFeatureModelExplanationCreator<T> implements PreprocessorExplanationCreator {
+public abstract class CompositePreprocessorExplanationCreator<T extends PreprocessorExplanationCreator> extends CompositeFeatureModelExplanationCreator<T>
+		implements PreprocessorExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators this composes
 	 */
 	public CompositePreprocessorExplanationCreator(Collection<T> composites) {

@@ -11,8 +11,7 @@ public class ProjectConfigurationErrorLogger {
 	private final List<String> projectsName;
 
 	private ProjectConfigurationErrorLogger() {
-		projectsName =
-			new LinkedList<String>();
+		projectsName = new LinkedList<String>();
 	}
 
 	public void clearLogList() {
@@ -32,8 +31,7 @@ public class ProjectConfigurationErrorLogger {
 
 	public static ProjectConfigurationErrorLogger getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE =
-				new ProjectConfigurationErrorLogger();
+			INSTANCE = new ProjectConfigurationErrorLogger();
 		}
 		return INSTANCE;
 	}

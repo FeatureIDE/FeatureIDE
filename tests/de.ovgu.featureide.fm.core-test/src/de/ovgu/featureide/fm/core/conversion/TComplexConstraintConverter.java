@@ -44,26 +44,20 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class TComplexConstraintConverter {
 
-	private static final IFeatureModelFactory factory =
-		FMFactoryManager.getDefaultFactory();
+	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 	private static IFeatureModel fm;
 
 	static {
 		// setup a test model
-		fm =
-			factory.createFeatureModel();
-		final IFeature root =
-			factory.createFeature(fm, "root");
+		fm = factory.createFeatureModel();
+		final IFeature root = factory.createFeature(fm, "root");
 
 		fm.addFeature(root);
 		fm.getStructure().setRoot(root.getStructure());
 
-		final IFeature A =
-			factory.createFeature(fm, "A");
-		final IFeature B =
-			factory.createFeature(fm, "B");
-		final IFeature C =
-			factory.createFeature(fm, "C");
+		final IFeature A = factory.createFeature(fm, "A");
+		final IFeature B = factory.createFeature(fm, "B");
+		final IFeature C = factory.createFeature(fm, "C");
 		// IFeature D = factory.createFeature(fm, "D");
 
 		A.getStructure().setMandatory(false);
@@ -81,16 +75,12 @@ public class TComplexConstraintConverter {
 		// fm.getStructure().getRoot().addChild(D.getStructure());
 		fm.getStructure().getRoot().setAnd();
 
-		final Node n1 =
-			new Or(A, B);
-		final Node n2 =
-			new Or(B, C);
+		final Node n1 = new Or(A, B);
+		final Node n2 = new Or(B, C);
 		// Node n3 = new Implies(new And(new Or(A,B), D), new Not(C));
 
-		final IConstraint c1 =
-			factory.createConstraint(fm, n1);
-		final IConstraint c2 =
-			factory.createConstraint(fm, n2);
+		final IConstraint c1 = factory.createConstraint(fm, n1);
+		final IConstraint c2 = factory.createConstraint(fm, n2);
 		// IConstraint c3 = factory.createConstraint(fm, n3);
 		fm.addConstraint(c1);
 		fm.addConstraint(c2);
@@ -102,25 +92,14 @@ public class TComplexConstraintConverter {
 	 */
 	@Test
 	public void testIsSimpleConstraint() throws UnsupportedModelException {
-		final Node[] simpleNodes =
-			new Node[] {
-				new Implies("f", "g"),
-				new Or("f", new Not("g")),
-				new Or(new Not("f"), "g"),
-				new Or(new Not("f"), new Not("g")),
-				new Implies("f", new Not(new Not("g"))),
-				new Implies("f", new Not("g")),
-				new Implies("f", new Literal("g")),
-				new Implies("f", new Not(new Literal("g"))),
-				new Implies(new Literal("f"), new Not("g")),
-				new Implies(new Literal("f"), new Literal("g")),
-				new Implies(new Literal("f"), new Not(new Literal("g"))) };
+		final Node[] simpleNodes = new Node[] { new Implies("f", "g"), new Or("f", new Not("g")), new Or(new Not("f"), "g"), new Or(new Not("f"), new Not("g")),
+			new Implies("f", new Not(new Not("g"))), new Implies("f", new Not("g")), new Implies("f", new Literal("g")),
+			new Implies("f", new Not(new Literal("g"))), new Implies(new Literal("f"), new Not("g")), new Implies(new Literal("f"), new Literal("g")),
+			new Implies(new Literal("f"), new Not(new Literal("g"))) };
 
-		boolean result =
-			true;
+		boolean result = true;
 		for (final Node node : simpleNodes) {
-			result &=
-				ComplexConstraintConverter.isSimple(node);
+			result &= ComplexConstraintConverter.isSimple(node);
 		}
 
 		assertTrue(result);
@@ -131,19 +110,12 @@ public class TComplexConstraintConverter {
 	 */
 	@Test
 	public void testIsComplexConstraint() throws UnsupportedModelException {
-		final Node[] complexNodes =
-			new Node[] {
-				new Implies(new Not("f"), "g"),
-				new Implies("f", new And("g", "h")),
-				new Implies("f", new Or("g", "h")),
-				new Or("f", "g"),
-				new And("f", "g") };
+		final Node[] complexNodes = new Node[] { new Implies(new Not("f"), "g"), new Implies("f", new And("g", "h")), new Implies("f", new Or("g", "h")),
+			new Or("f", "g"), new And("f", "g") };
 
-		boolean result =
-			true;
+		boolean result = true;
 		for (final Node node : complexNodes) {
-			result &=
-				ComplexConstraintConverter.isComplex(node);
+			result &= ComplexConstraintConverter.isComplex(node);
 		}
 
 		assertTrue(result);

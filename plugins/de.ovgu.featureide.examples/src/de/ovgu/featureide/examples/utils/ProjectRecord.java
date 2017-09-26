@@ -56,10 +56,8 @@ import de.ovgu.featureide.examples.ExamplePlugin;
  */
 public class ProjectRecord implements Comparable<ProjectRecord> {
 
-	public static final String PROJECT_INFORMATION_XML =
-		"projectInformation.xml";
-	public static final String INDEX_FILENAME =
-		"index.fileList";
+	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
+	public static final String INDEX_FILENAME = "index.fileList";
 
 	private final String projectDescriptionRelativePath;
 	private final String projectName;
@@ -71,14 +69,10 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	private String warning;
 	private String error;
 	private List<TreeItem> contentProviderItems;
-	private boolean hasWarnings =
-		false;
-	private boolean hasErrors =
-		false;
-	private boolean updated =
-		false;
-	private boolean needsComposer =
-		true;
+	private boolean hasWarnings = false;
+	private boolean hasErrors = false;
+	private boolean updated = false;
+	private boolean needsComposer = true;
 
 	/**
 	 * Create a record for a project based on the info given in the file.
@@ -86,10 +80,8 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	 * @param file
 	 */
 	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
-		this.projectName =
-			projectName;
-		this.projectDescriptionRelativePath =
-			projectDescriptionRelativePath;
+		this.projectName = projectName;
+		this.projectDescriptionRelativePath = projectDescriptionRelativePath;
 		initFields();
 	}
 
@@ -106,16 +98,11 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	private void initFields() {
-		warning =
-			"";
-		hasWarnings =
-			false;
-		error =
-			"";
-		hasErrors =
-			false;
-		contentProviderItems =
-			new ArrayList<>();
+		warning = "";
+		hasWarnings = false;
+		error = "";
+		hasErrors = false;
+		contentProviderItems = new ArrayList<>();
 	}
 
 	public List<TreeItem> getTreeItems() {
@@ -127,8 +114,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		private final IContentProvider contProv;
 
 		public TreeItem(IContentProvider contProv) {
-			this.contProv =
-				contProv;
+			this.contProv = contProv;
 		}
 
 		public ProjectRecord getRecord() {
@@ -153,27 +139,22 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	public TreeItem createNewTreeItem(IContentProvider prov) {
-		final TreeItem ti =
-			new TreeItem(prov);
+		final TreeItem ti = new TreeItem(prov);
 		contentProviderItems.add(ti);
 		return ti;
 	}
 
 	public boolean init() {
 		try (InputStream inputStream =
-			new URL("platform:/plugin/de.ovgu.featureide.examples/"
-				+ projectDescriptionRelativePath).openConnection()
-						.getInputStream()) {
-			projectDescription =
-				ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
+			new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
+			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
 
 		if (projectDescription != null) {
-			comment =
-				new CommentParser(projectDescription.getComment());
+			comment = new CommentParser(projectDescription.getComment());
 
 			performAlreadyExistsCheck();
 			performRequirementCheck();
@@ -190,85 +171,58 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	private void performAlreadyExistsCheck() {
-		hasErrors =
-			false;
-		error =
-			"";
+		hasErrors = false;
+		error = "";
 		if (isProjectInWorkspace(getProjectName())) {
-			error +=
-				THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
-			hasErrors =
-				true;
+			error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
+			hasErrors = true;
 		}
 	}
 
 	private void performRequirementCheck() {
-		hasWarnings =
-			false;
-		warning =
-			"";
-		final String[] natures =
-			projectDescription.getNatureIds();
-		IStatus status =
-			ResourcesPlugin.getWorkspace().validateNatureSet(natures);
+		hasWarnings = false;
+		warning = "";
+		final String[] natures = projectDescription.getNatureIds();
+		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
 
-		if ((natures.length == 1)
-			&& natures[0].equals("org.eclipse.jdt.core.javanature")) {
-			needsComposer =
-				false;
+		if ((natures.length == 1) && natures[0].equals("org.eclipse.jdt.core.javanature")) {
+			needsComposer = false;
 		}
 
-		if (status.isOK()
-			&& needsComposer) {
-			status =
-				CorePlugin.getDefault().isComposable(projectDescription);
+		if (status.isOK() && needsComposer) {
+			status = CorePlugin.getDefault().isComposable(projectDescription);
 		}
 
 		if (!status.isOK()) {
-			warning =
-				status.getMessage();
+			warning = status.getMessage();
 			if (status instanceof MultiStatus) {
-				final MultiStatus multi =
-					(MultiStatus) status;
+				final MultiStatus multi = (MultiStatus) status;
 				if (multi.getChildren().length > 0) {
-					warning +=
-						" (";
-					for (int j =
-						0; j < (multi.getChildren().length
-							- 1); j++) {
-						warning +=
-							multi.getChildren()[j].getMessage()
-								+ " ;";
+					warning += " (";
+					for (int j = 0; j < (multi.getChildren().length - 1); j++) {
+						warning += multi.getChildren()[j].getMessage() + " ;";
 					}
-					warning +=
-						multi.getChildren()[multi.getChildren().length
-							- 1].getMessage()
-							+ ")";
+					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
 				}
 			}
-			hasWarnings =
-				true;
+			hasWarnings = true;
 		}
 	}
 
 	public void addSubProject(ProjectRecord subProject) {
 		if (subProjects == null) {
-			subProjects =
-				new ArrayList<>();
+			subProjects = new ArrayList<>();
 		}
 		subProjects.add(subProject);
 	}
 
 	public boolean hasSubProjects() {
-		return !((subProjects == null)
-			|| subProjects.isEmpty());
+		return !((subProjects == null) || subProjects.isEmpty());
 	}
 
 	@SuppressWarnings("unchecked")
 	public Collection<ProjectRecord> getSubProjects() {
-		return (subProjects != null)
-			? subProjects
-			: Collections.EMPTY_LIST;
+		return (subProjects != null) ? subProjects : Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -286,9 +240,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	 * @return String
 	 */
 	public String getDescription() {
-		return comment == null
-			? ""
-			: comment.getDescription();
+		return comment == null ? "" : comment.getDescription();
 	}
 
 	public boolean hasWarnings() {
@@ -323,18 +275,10 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ projectDescriptionRelativePath.hashCode();
-		result =
-			(prime
-				* result)
-				+ projectName.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + projectDescriptionRelativePath.hashCode();
+		result = (prime * result) + projectName.hashCode();
 		return result;
 	}
 
@@ -349,10 +293,8 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final ProjectRecord other =
-			(ProjectRecord) obj;
-		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath)
-			&& projectName.equals(other.projectName);
+		final ProjectRecord other = (ProjectRecord) obj;
+		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
 	}
 
 	@Override
@@ -370,10 +312,8 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 		if (projectName == null) {
 			return false;
 		}
-		final IProject[] workspaceProjects =
-			getProjectsInWorkspace();
-		for (int i =
-			0; i < workspaceProjects.length; i++) {
+		final IProject[] workspaceProjects = getProjectsInWorkspace();
+		for (int i = 0; i < workspaceProjects.length; i++) {
 			if (projectName.equals(workspaceProjects[i].getName())) {
 				return true;
 			}
@@ -408,16 +348,12 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	public Document getInformationDocument() {
-		final DocumentBuilderFactory dbFactory =
-			DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		try {
 			final InputStream inputStream =
-				new URL("platform:/plugin/de.ovgu.featureide.examples/"
-					+ getInformationDocumentPath()).openConnection().getInputStream();
-			final DocumentBuilder dBuilder =
-				dbFactory.newDocumentBuilder();
-			final Document doc =
-				dBuilder.parse(inputStream);
+				new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
+			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			final Document doc = dBuilder.parse(inputStream);
 			return doc;
 		} catch (IOException | ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
@@ -434,8 +370,7 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	}
 
 	public void setUpdated(boolean updated) {
-		this.updated =
-			updated;
+		this.updated = updated;
 	}
 
 	public String getProjectDescriptionRelativePath() {

@@ -55,9 +55,7 @@ public abstract class AbstractBuildConfigurationsAction implements IObjectAction
 	 */
 	protected static void setToggleState(boolean value) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value
-				? TRUE
-				: FALSE);
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -69,8 +67,7 @@ public abstract class AbstractBuildConfigurationsAction implements IObjectAction
 	 */
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
-		this.selection =
-			selection;
+		this.selection = selection;
 	}
 
 	/*

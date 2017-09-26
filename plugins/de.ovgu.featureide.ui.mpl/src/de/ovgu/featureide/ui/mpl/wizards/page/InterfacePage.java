@@ -45,9 +45,7 @@ public class InterfacePage extends AbstractWizardPage {
 
 	private Text configLimitText, viewNameText, viewLevelText;
 
-	private int viewLevel =
-		1, configLimit =
-			1000;
+	private int viewLevel = 1, configLimit = 1000;
 
 	public InterfacePage() {
 		super(SELECT_A_COMPOSER);
@@ -56,64 +54,43 @@ public class InterfacePage extends AbstractWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NULL);
-		final GridLayout gridLayout =
-			new GridLayout();
-		gridLayout.numColumns =
-			1;
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
 
-		final GridLayout projGridLayout =
-			new GridLayout();
-		projGridLayout.numColumns =
-			2;
+		final GridLayout projGridLayout = new GridLayout();
+		projGridLayout.numColumns = 2;
 
-		final Group configGroup =
-			new Group(container, SWT.NONE);
+		final Group configGroup = new Group(container, SWT.NONE);
 		configGroup.setText("");
-		final GridData gridData =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan =
-			2;
-		gridData.verticalSpan =
-			3;
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		gridData.verticalSpan = 3;
 
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
 
-		final GridData gridData2 =
-			new GridData(GridData.FILL_HORIZONTAL);
-		gridData2.horizontalSpan =
-			1;
-		gridData2.verticalSpan =
-			1;
+		final GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
+		gridData2.horizontalSpan = 1;
+		gridData2.verticalSpan = 1;
 
-		final Label confiLimitLabel =
-			new Label(configGroup, 0);
+		final Label confiLimitLabel = new Label(configGroup, 0);
 		confiLimitLabel.setText("Config Limit: ");
-		configLimitText =
-			new Text(configGroup, SWT.BORDER
-				| SWT.SINGLE);
+		configLimitText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		configLimitText.setText("1000");
 		configLimitText.setLayoutData(gridData2);
 
-		final Label viewNameLabel =
-			new Label(configGroup, 0);
+		final Label viewNameLabel = new Label(configGroup, 0);
 		viewNameLabel.setText("View Name: ");
-		viewNameText =
-			new Text(configGroup, SWT.BORDER
-				| SWT.SINGLE);
+		viewNameText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
 
-		final Label viewLevelLabel =
-			new Label(configGroup, 0);
+		final Label viewLevelLabel = new Label(configGroup, 0);
 		viewLevelLabel.setText("View Level: ");
-		viewLevelText =
-			new Text(configGroup, SWT.BORDER
-				| SWT.SINGLE);
+		viewLevelText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewLevelText.setText("1");
 		viewLevelText.setLayoutData(gridData2);
 
@@ -130,10 +107,8 @@ public class InterfacePage extends AbstractWizardPage {
 			return ENTER_A_VIEW_NAME;
 		}
 		try {
-			viewLevel =
-				Integer.valueOf(viewLevelText.getText());
-			configLimit =
-				Integer.valueOf(configLimitText.getText());
+			viewLevel = Integer.valueOf(viewLevelText.getText());
+			configLimit = Integer.valueOf(configLimitText.getText());
 		} catch (final NumberFormatException e) {
 			return ENTER_A_NUMBER;
 		}

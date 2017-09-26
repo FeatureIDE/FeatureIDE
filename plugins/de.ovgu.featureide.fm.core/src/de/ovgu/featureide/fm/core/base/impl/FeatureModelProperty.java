@@ -41,28 +41,11 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((annotations == null)
-					? 0
-					: annotations.hashCode());
-		result =
-			(prime
-				* result)
-				+ ((comments == null)
-					? 0
-					: comments.hashCode());
-		result =
-			(prime
-				* result)
-				+ (featureOrderInXML
-					? 1231
-					: 1237);
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());
+		result = (prime * result) + ((comments == null) ? 0 : comments.hashCode());
+		result = (prime * result) + (featureOrderInXML ? 1231 : 1237);
 		return result;
 	}
 
@@ -81,8 +64,7 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FeatureModelProperty other =
-			(FeatureModelProperty) obj;
+		final FeatureModelProperty other = (FeatureModelProperty) obj;
 		if (annotations == null) {
 			if (other.annotations != null) {
 				return false;
@@ -125,31 +107,21 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	protected boolean featureOrderInXML;
 
 	protected FeatureModelProperty(FeatureModelProperty oldProperty, IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel =
-			correspondingFeatureModel != null
-				? correspondingFeatureModel
-				: oldProperty.correspondingFeatureModel;
+		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldProperty.correspondingFeatureModel;
 
-		featureOrderInXML =
-			oldProperty.featureOrderInXML;
+		featureOrderInXML = oldProperty.featureOrderInXML;
 
-		comments =
-			new LinkedList<>(oldProperty.comments);
-		annotations =
-			new LinkedList<>(oldProperty.annotations);
+		comments = new LinkedList<>(oldProperty.comments);
+		annotations = new LinkedList<>(oldProperty.annotations);
 	}
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel =
-			correspondingFeatureModel;
+		this.correspondingFeatureModel = correspondingFeatureModel;
 
-		featureOrderInXML =
-			false;
+		featureOrderInXML = false;
 
-		comments =
-			new LinkedList<>();
-		annotations =
-			new LinkedList<>();
+		comments = new LinkedList<>();
+		annotations = new LinkedList<>();
 	}
 
 	@Override
@@ -190,16 +162,14 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 
 	@Override
 	public void reset() {
-		featureOrderInXML =
-			false;
+		featureOrderInXML = false;
 		comments.clear();
 		annotations.clear();
 	}
 
 	@Override
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		this.featureOrderInXML =
-			featureOrderInXML;
+		this.featureOrderInXML = featureOrderInXML;
 	}
 
 }

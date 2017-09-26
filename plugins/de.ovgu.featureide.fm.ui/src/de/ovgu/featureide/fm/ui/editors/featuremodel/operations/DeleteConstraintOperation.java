@@ -41,14 +41,12 @@ public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
 
 	public DeleteConstraintOperation(IConstraint constraint, IFeatureModel featureModel) {
 		super(featureModel, DELETE_CONSTRAINT);
-		this.constraint =
-			constraint;
+		this.constraint = constraint;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		index =
-			featureModel.getConstraintIndex(constraint);
+		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removeConstraint(constraint);
 		return new FeatureIDEEvent(featureModel, EventType.CONSTRAINT_DELETE, constraint, null);
 	}

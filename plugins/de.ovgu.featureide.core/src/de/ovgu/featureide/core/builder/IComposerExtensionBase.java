@@ -33,11 +33,9 @@ import de.ovgu.featureide.fm.core.IExtension;
  */
 public interface IComposerExtensionBase extends IExtension {
 
-	public static String extensionPointID =
-		"composers";
+	public static String extensionPointID = "composers";
 
-	public static String extensionID =
-		"composer";
+	public static String extensionID = "composer";
 
 	String getName();
 

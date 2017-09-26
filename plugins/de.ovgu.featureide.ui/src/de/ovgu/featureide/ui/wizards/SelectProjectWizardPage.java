@@ -46,8 +46,7 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	private Composite container;
 	private Tree projectTree;
 
-	private IFeatureProject selectedProject =
-		null;
+	private IFeatureProject selectedProject = null;
 
 	public SelectProjectWizardPage() {
 		super("Select Project");
@@ -57,26 +56,20 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 
 	@Override
 	public void createControl(Composite parent) {
-		container =
-			new Composite(parent, SWT.NONE);
+		container = new Composite(parent, SWT.NONE);
 
-		final FillLayout layout =
-			new FillLayout();
+		final FillLayout layout = new FillLayout();
 		container.setLayout(layout);
 		setControl(container);
 
-		projectTree =
-			new Tree(container, SWT.NORMAL);
+		projectTree = new Tree(container, SWT.NORMAL);
 		projectTree.addSelectionListener(this);
 
 		for (final IFeatureProject project : CorePlugin.getFeatureProjects()) {
 			// try {
-			final IProject projectHandle =
-				project.getProject();
-			if ((projectHandle != null)
-				&& projectHandle.isAccessible()) { // && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
-				final TreeItem item =
-					new TreeItem(projectTree, SWT.NORMAL);
+			final IProject projectHandle = project.getProject();
+			if ((projectHandle != null) && projectHandle.isAccessible()) { // && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
+				final TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
 				item.setImage(GUIDefaults.FEATURE_SYMBOL);
 				item.setText(project.getProjectName());
 				item.setData(project);
@@ -89,12 +82,8 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		final TreeItem[] items =
-			projectTree.getSelection();
-		selectedProject =
-			(items.length == 0)
-				? null
-				: (IFeatureProject) items[0].getData();
+		final TreeItem[] items = projectTree.getSelection();
+		selectedProject = (items.length == 0) ? null : (IFeatureProject) items[0].getData();
 		updatePage();
 	}
 

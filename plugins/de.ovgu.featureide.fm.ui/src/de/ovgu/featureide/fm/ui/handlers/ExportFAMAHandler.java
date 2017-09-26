@@ -60,27 +60,19 @@ public class ExportFAMAHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel fm =
-			readModel(file);
+		final IFeatureModel fm = readModel(file);
 
-		IConverterStrategy strategy =
-			new NNFConverter();
-		final ComplexConstraintConverter converter =
-			new ComplexConstraintConverter();
-		String path =
-			"";
-		final boolean trivial =
-			ComplexConstraintConverter.trivialRefactoring(fm);
+		IConverterStrategy strategy = new NNFConverter();
+		final ComplexConstraintConverter converter = new ComplexConstraintConverter();
+		String path = "";
+		final boolean trivial = ComplexConstraintConverter.trivialRefactoring(fm);
 
-		if (!trivial
-			&& !MessageDialog.openQuestion(new Shell(), "Warning!",
-					"Complex constraints of current feature model cannot be transformed trivially! Proceed? (Feature model will become bigger.)")) {
+		if (!trivial && !MessageDialog.openQuestion(new Shell(), "Warning!",
+				"Complex constraints of current feature model cannot be transformed trivially! Proceed? (Feature model will become bigger.)")) {
 			return;
 		}
 
-		int pseudo =
-			0, strict =
-				0;
+		int pseudo = 0, strict = 0;
 		for (final IConstraint c : fm.getConstraints()) {
 			if (ComplexConstraintConverter.isSimple(c.getNode())) {} else if (ComplexConstraintConverter.isPseudoComplex(c.getNode())) {
 				pseudo++;
@@ -89,31 +81,25 @@ public class ExportFAMAHandler extends AFileHandler {
 			}
 		}
 
-		final EliminateConstraintsWizard wizard =
-			new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "fm");
+		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "fm");
 
-		final List<Option> options =
-			new ArrayList<Option>();
+		final List<Option> options = new ArrayList<Option>();
 		if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
-			strategy =
-				wizard.getStrategy();
+			strategy = wizard.getStrategy();
 			if (wizard.preserveConfigurations()) {
 				options.add(Option.COHERENT);
 			}
 			if (wizard.removeRedundancy()) {
 				options.add(Option.REMOVE_RDUNDANCY);
 			}
-			path =
-				wizard.getPath();
-			if ((new File(path)).exists()
-				&& !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
+			path = wizard.getPath();
+			if ((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
 				return;
 			}
 
 		}
 
-		final IFeatureModel result =
-			converter.convert(fm, strategy, options.toArray(new Option[options.size()]));
+		final IFeatureModel result = converter.convert(fm, strategy, options.toArray(new Option[options.size()]));
 		SimpleFileHandler.save(Paths.get(path), result, new FAMAFormat());
 	}
 
@@ -126,15 +112,12 @@ public class ExportFAMAHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		final IFeatureModelFormat format =
-			FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
+		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
 		IFeatureModel fm;
 		try {
-			fm =
-				FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
+			fm = FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
 		} catch (final NoSuchExtensionException e) {
-			fm =
-				FMFactoryManager.getDefaultFactory().createFeatureModel();
+			fm = FMFactoryManager.getDefaultFactory().createFeatureModel();
 		}
 		try {
 			SimpleFileHandler.load(inputFile.getContents(), fm, format);

@@ -29,11 +29,9 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public interface IConfigurationFormat extends IPersistentFormat<Configuration> {
 
-	public static String extensionPointID =
-		"ConfigFormat";
+	public static String extensionPointID = "ConfigFormat";
 
-	public static String extensionID =
-		"configFormat";
+	public static String extensionID = "configFormat";
 
 	String getName();
 

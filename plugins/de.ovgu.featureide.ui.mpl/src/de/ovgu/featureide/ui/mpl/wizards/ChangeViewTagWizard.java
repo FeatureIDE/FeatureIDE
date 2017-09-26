@@ -31,9 +31,7 @@ import de.ovgu.featureide.ui.mpl.wizards.page.ChangeViewTagPage;
  */
 public class ChangeViewTagWizard extends AbstractWizard {
 
-	public static final String ID =
-		MPLUIPlugin.PLUGIN_ID
-			+ ".wizards.ChangeViewTagWizard";
+	public static final String ID = MPLUIPlugin.PLUGIN_ID + ".wizards.ChangeViewTagWizard";
 
 	public ChangeViewTagWizard(String title) {
 		super(title);

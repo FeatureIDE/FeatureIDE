@@ -29,18 +29,13 @@ import java.util.HashMap;
  */
 public abstract class AFactoryWorkspaceProvider implements IFactoryWorkspaceProvider {
 
-	protected final HashMap<String, FactoryWorkspace> projectMap =
-		new HashMap<>();
-	protected final FactoryWorkspace defaultWorkspace =
-		new FactoryWorkspace();
+	protected final HashMap<String, FactoryWorkspace> projectMap = new HashMap<>();
+	protected final FactoryWorkspace defaultWorkspace = new FactoryWorkspace();
 
 	@Override
 	public FactoryWorkspace getFactoryWorkspace(String path) {
-		final FactoryWorkspace factoryWorkspace =
-			projectMap.get(path);
-		return factoryWorkspace != null
-			? factoryWorkspace
-			: defaultWorkspace;
+		final FactoryWorkspace factoryWorkspace = projectMap.get(path);
+		return factoryWorkspace != null ? factoryWorkspace : defaultWorkspace;
 	}
 
 	@Override

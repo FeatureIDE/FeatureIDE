@@ -29,37 +29,26 @@ public class Log {
 	private final int column;
 	private ITextSelection iTextSelection;
 
-	public static final String MARKER_TYPE =
-		Colligens.PLUGIN_ID
-			+ ".problem";
+	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".problem";
 
-	public Log(FileProxy fileProxy, int line, int column, String feature, String severity,
-			String message) {
-		this.fileProxy =
-			fileProxy;
+	public Log(FileProxy fileProxy, int line, int column, String feature, String severity, String message) {
+		this.fileProxy = fileProxy;
 
-		this.line =
-			line;
-		this.column =
-			column;
+		this.line = line;
+		this.column = column;
 
-		this.feature =
-			feature.trim();
+		this.feature = feature.trim();
 
 		if (severity == null) {
-			this.severity =
-				severity;
+			this.severity = severity;
 		} else {
-			this.severity =
-				severity.trim();
+			this.severity = severity.trim();
 		}
 
-		this.message =
-			message.trim();
+		this.message = message.trim();
 
 		try {
-			final IMarker marker =
-				getFile().createMarker(MARKER_TYPE);
+			final IMarker marker = getFile().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, this.message);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
@@ -100,45 +89,28 @@ public class Log {
 		return fileProxy;
 	}
 
-	public ITextSelection selection() throws IOException, CoreException,
-			BadLocationException {
+	public ITextSelection selection() throws IOException, CoreException, BadLocationException {
 
 		if (iTextSelection == null) {
 
-			final IDocument document =
-				getDocument();
+			final IDocument document = getDocument();
 
-			final int offset =
-				document.getLineOffset(line
-					- 1);
+			final int offset = document.getLineOffset(line - 1);
 
-			final int length =
-				document.getLineOffset(line)
-					- document.getLineOffset(line
-						- 1);
+			final int length = document.getLineOffset(line) - document.getLineOffset(line - 1);
 
-			iTextSelection =
-				new LogSelection(line, length
-					- column,
-						offset
-							+ column);
+			iTextSelection = new LogSelection(line, length - column, offset + column);
 
 		}
 		return iTextSelection;
 	}
 
 	public void setSelection(ITextSelection iTextSelection) {
-		this.iTextSelection =
-			iTextSelection;
+		this.iTextSelection = iTextSelection;
 	}
 
 	private IDocument getDocument() throws CoreException {
-		ITextFileBufferManager.DEFAULT.connect(getFile().getFullPath(),
-				LocationKind.IFILE, null);
-		return FileBuffers
-				.getTextFileBufferManager()
-				.getTextFileBuffer(getFile().getFullPath(),
-						LocationKind.IFILE)
-				.getDocument();
+		ITextFileBufferManager.DEFAULT.connect(getFile().getFullPath(), LocationKind.IFILE, null);
+		return FileBuffers.getTextFileBufferManager().getTextFileBuffer(getFile().getFullPath(), LocationKind.IFILE).getDocument();
 	}
 }

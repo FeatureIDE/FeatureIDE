@@ -51,11 +51,9 @@ public class GuidslWriter {
 	}
 
 	public String writeToString(IFeatureModel featureModel) {
-		object =
-			featureModel;
+		object = featureModel;
 		// open a string buffer for writing
-		final StringBuilder out =
-			new StringBuilder();// = new BufferedWriter(new FileWriter(file));
+		final StringBuilder out = new StringBuilder();// = new BufferedWriter(new FileWriter(file));
 
 		// write generating information
 //		DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, Locale.ENGLISH);
@@ -75,8 +73,7 @@ public class GuidslWriter {
 			out.append("##\r\n\r\n");
 			for (final IFeature feat : featureModel.getFeatures()) {
 				if (feat.getStructure().isHidden()) {
-					out.append(feat.getName()
-						+ " { hidden } \r\n");
+					out.append(feat.getName() + " { hidden } \r\n");
 				}
 			}
 		}
@@ -86,15 +83,12 @@ public class GuidslWriter {
 
 	private void writeComments(StringBuilder out) {
 		for (final String comment : object.getProperty().getComments()) {
-			out.append("//"
-				+ comment
-				+ "\n");
+			out.append("//" + comment + "\n");
 		}
 	}
 
 	private void writeGrammarDefinition(StringBuilder out) {
-		final IFeature root =
-			object.getStructure().getRoot().getFeature();
+		final IFeature root = object.getStructure().getRoot().getFeature();
 		if (root != null) {
 			if (root.getStructure().isOr()) {
 				out.append(root.getName());
@@ -116,8 +110,7 @@ public class GuidslWriter {
 		}
 		out.append("%%\r\n\r\n");
 		for (final Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
-			out.append(node.toString(NodeWriter.textualSymbols)
-				+ " ;\r\n");
+			out.append(node.toString(NodeWriter.textualSymbols) + " ;\r\n");
 		}
 		out.append("\r\n");
 	}
@@ -136,36 +129,27 @@ public class GuidslWriter {
 		if (!mainFeature.getStructure().hasChildren()) {
 			return;
 		}
-		final List<IFeature> mainChildren =
-			FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
+		final List<IFeature> mainChildren = FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
 
 		// left part of the rule
 		out.append(mainFeature.getName());
 		out.append(" :");
 
 		// check if a output over more than one line is possible
-		final boolean moreThanOneLine =
-			isMoreThanOneLinePossible(mainFeature, mainChildren);
+		final boolean moreThanOneLine = isMoreThanOneLinePossible(mainFeature, mainChildren);
 		// moreThanOneLine = !mainFeature.isAND();
 
 		// write out the line(s)
-		for (int i =
-			0; i < mainChildren.size(); i++) {
-			final IFeature feature =
-				mainChildren.get(i);
-			if (moreThanOneLine
-				&& (i > 0)) {
+		for (int i = 0; i < mainChildren.size(); i++) {
+			final IFeature feature = mainChildren.get(i);
+			if (moreThanOneLine && (i > 0)) {
 				out.append("\r\n\t|");
-			} else if (!mainFeature.getStructure().isAnd()
-				&& (i > 0)) {
+			} else if (!mainFeature.getStructure().isAnd() && (i > 0)) {
 				out.append("\r\n\t|");
 			}
-			if (!mainFeature.getStructure().isAnd()
-				&& feature.getStructure().hasInlineRule()) {
-				final List<IFeature> children =
-					FeatureUtils.convertToFeatureList(feature.getStructure().getChildren());
-				for (int j =
-					0; j < children.size(); j++) {
+			if (!mainFeature.getStructure().isAnd() && feature.getStructure().hasInlineRule()) {
+				final List<IFeature> children = FeatureUtils.convertToFeatureList(feature.getStructure().getChildren());
+				for (int j = 0; j < children.size(); j++) {
 					out.append(" ");
 					out.append(getRightGrammarToken(children.get(j)));
 				}
@@ -174,12 +158,9 @@ public class GuidslWriter {
 			} else {
 				out.append(" ");
 				out.append(getRightGrammarToken(feature));
-				if (!mainFeature.getStructure().isAnd()
-					&& (!feature.getStructure().isMandatory()
-						|| feature.getStructure().isMultiple())) {
+				if (!mainFeature.getStructure().isAnd() && (!feature.getStructure().isMandatory() || feature.getStructure().isMultiple())) {
 					out.append(" :: ");
-					out.append(feature.getName()
-						+ EMPTY___);
+					out.append(feature.getName() + EMPTY___);
 				}
 			}
 		}
@@ -195,10 +176,8 @@ public class GuidslWriter {
 
 	private boolean isMoreThanOneLinePossible(IFeature feature, List<IFeature> children) {
 		if (!feature.getStructure().isAnd()) {
-			for (int i =
-				0; i < children.size(); i++) {
-				final IFeature child =
-					children.get(i);
+			for (int i = 0; i < children.size(); i++) {
+				final IFeature child = children.get(i);
 				if (child.getStructure().hasInlineRule()) {
 					return true;
 				}
@@ -209,29 +188,17 @@ public class GuidslWriter {
 
 	public static String getRightGrammarToken(IFeature feature) {
 		if (feature.getStructure().isMultiple()) {
-			return feature.getName()
-				+ (feature.getStructure().isMandatory()
-					? "+"
-					: "*");
+			return feature.getName() + (feature.getStructure().isMandatory() ? "+" : "*");
 		}
-		return feature.getStructure().isMandatory()
-			? feature.getName()
-			: "["
-				+ feature.getName()
-				+ "]";
+		return feature.getStructure().isMandatory() ? feature.getName() : "[" + feature.getName() + "]";
 	}
 
 	private void writeChildRules(IFeature mainFeature, List<IFeature> mainChildren, StringBuilder out) {
-		for (int i =
-			0; i < mainChildren.size(); i++) {
-			final IFeature feature =
-				mainChildren.get(i);
-			if (!mainFeature.getStructure().isAnd()
-				&& feature.getStructure().hasInlineRule()) {
-				final List<IFeature> children =
-					FeatureUtils.convertToFeatureList(feature.getStructure().getChildren());
-				for (int j =
-					0; j < children.size(); j++) {
+		for (int i = 0; i < mainChildren.size(); i++) {
+			final IFeature feature = mainChildren.get(i);
+			if (!mainFeature.getStructure().isAnd() && feature.getStructure().hasInlineRule()) {
+				final List<IFeature> children = FeatureUtils.convertToFeatureList(feature.getStructure().getChildren());
+				for (int j = 0; j < children.size(); j++) {
 					writeRule(children.get(j), out);
 				}
 			} else {
@@ -248,12 +215,9 @@ public class GuidslWriter {
 	}
 
 	private boolean hasAbstractFeaturesRec(IFeature mainFeature) {
-		final List<IFeature> mainChildren =
-			FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
-		for (int i =
-			0; i < mainChildren.size(); i++) {
-			final IFeature feature =
-				mainChildren.get(i);
+		final List<IFeature> mainChildren = FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
+		for (int i = 0; i < mainChildren.size(); i++) {
+			final IFeature feature = mainChildren.get(i);
 			if (feature.getStructure().isAbstract()) {
 				return true;
 			} else if (feature.getStructure().hasChildren()) {
@@ -268,18 +232,13 @@ public class GuidslWriter {
 	}
 
 	private boolean hasConcreteCompoundsRec(IFeature mainFeature) {
-		if (!mainFeature.getStructure().isAbstract()
-			&& mainFeature.getStructure().hasChildren()) {
+		if (!mainFeature.getStructure().isAbstract() && mainFeature.getStructure().hasChildren()) {
 			return true;
 		}
-		final List<IFeature> mainChildren =
-			FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
-		for (int i =
-			0; i < mainChildren.size(); i++) {
-			final IFeature feature =
-				mainChildren.get(i);
-			if (!feature.getStructure().isAbstract()
-				&& feature.getStructure().hasChildren()) {
+		final List<IFeature> mainChildren = FeatureUtils.convertToFeatureList(mainFeature.getStructure().getChildren());
+		for (int i = 0; i < mainChildren.size(); i++) {
+			final IFeature feature = mainChildren.get(i);
+			if (!feature.getStructure().isAbstract() && feature.getStructure().hasChildren()) {
 				return true;
 			} else if (feature.getStructure().hasChildren()) {
 				return hasConcreteCompoundsRec(feature);

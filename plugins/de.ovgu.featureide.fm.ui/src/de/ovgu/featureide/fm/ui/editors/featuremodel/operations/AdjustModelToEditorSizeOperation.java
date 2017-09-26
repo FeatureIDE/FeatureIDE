@@ -49,17 +49,13 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	private final IFeatureModel fm;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private final LinkedList<IFeature> affectedFeatureList =
-		new LinkedList<IFeature>();
+	private final LinkedList<IFeature> affectedFeatureList = new LinkedList<IFeature>();
 
 	public AdjustModelToEditorSizeOperation(IGraphicalFeatureModel graphicalFeatureModel, Object editor) {
 		super(graphicalFeatureModel.getFeatureModel(), ADJUST_MODEL_TO_EDITOR);
-		fm =
-			graphicalFeatureModel.getFeatureModel();
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
-		this.editor =
-			editor;
+		fm = graphicalFeatureModel.getFeatureModel();
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.editor = editor;
 	}
 
 	@Override
@@ -68,8 +64,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
 			return new FeatureIDEEvent(null, EventType.DEFAULT);
 		}
-		final IFeatureStructure root =
-			fm.getStructure().getRoot();
+		final IFeatureStructure root = fm.getStructure().getRoot();
 		calculateVisibleLayer(root.getFeature());
 		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
@@ -80,8 +75,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			return new FeatureIDEEvent(null, EventType.DEFAULT);
 		}
 		for (final IFeature f : affectedFeatureList) {
-			final IGraphicalFeature graphicalF =
-				graphicalFeatureModel.getGraphicalFeature(f);
+			final IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
 			graphicalF.setCollapsed(!collapse);
 		}
 		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
@@ -95,60 +89,48 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 * @param root the root feature of the graphical feature model.
 	 */
 	public void calculateVisibleLayer(IFeature root) {
-		final FeatureDiagramEditor featureDiagramEditor =
-			(FeatureDiagramEditor) editor;
+		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 
-		final LinkedList<LinkedList<IFeature>> levels =
-			calculateLevels(root);
-		final CollapseAllOperation op =
-			new CollapseAllOperation(graphicalFeatureModel, true);
+		final LinkedList<LinkedList<IFeature>> levels = calculateLevels(root);
+		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, true);
 		try {
 			op.execute(null, null);
 		} catch (final ExecutionException e) {
 			e.printStackTrace();
 		}
-		LinkedList<IFeature> lastLevel =
-			levels.getFirst();
+		LinkedList<IFeature> lastLevel = levels.getFirst();
 		for (final LinkedList<IFeature> level : levels) {
 			/*
 			 * if the last level is not null AND the level exceeds neither the width nor the height of the editor
 			 */
-			if ((lastLevel != null)
-				&& featureDiagramEditor.isLevelSizeOverLimit()) {
+			if ((lastLevel != null) && featureDiagramEditor.isLevelSizeOverLimit()) {
 				affectedFeatureList.addAll(lastLevel);
 				collapseLayer(lastLevel);
 				break;
 			}
-			lastLevel =
-				level;
+			lastLevel = level;
 
 			// expand next level
 			for (final IFeature f : level) {
-				final IGraphicalFeature graphicalF =
-					graphicalFeatureModel.getGraphicalFeature(f);
+				final IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
 				graphicalF.setCollapsed(false);
 			}
 			((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 			((FeatureDiagramEditor) getEditor()).internRefresh(true);
 		}
 
-		LinkedList<IFeature> lastStep =
-			lastLevel;
+		LinkedList<IFeature> lastStep = lastLevel;
 		do {
-			lastStep =
-				calculateNextLevel(lastStep);
-		} while ((lastStep != null)
-			&& (lastStep.size() != 0));
+			lastStep = calculateNextLevel(lastStep);
+		} while ((lastStep != null) && (lastStep.size() != 0));
 		((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 	}
 
 	public LinkedList<IFeature> calculateNextLevel(LinkedList<IFeature> lastLevel) {
-		final FeatureDiagramEditor featureDiagramEditor =
-			(FeatureDiagramEditor) getEditor();
+		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) getEditor();
 
-		final LinkedList<IFeature> parents =
-			new LinkedList<IFeature>();
+		final LinkedList<IFeature> parents = new LinkedList<IFeature>();
 		for (final IFeature f : lastLevel) {
 			if (f.getStructure().getChildrenCount() > 0) {
 				parents.add(f);
@@ -157,15 +139,12 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		if (parents.size() == 0) {
 			return null;
 		}
-		LinkedList<IFeature> bestSolution =
-			new LinkedList<IFeature>();
+		LinkedList<IFeature> bestSolution = new LinkedList<IFeature>();
 		for (final LinkedList<IFeature> parentSet : powerSet(parents)) {
-			final LinkedList<IFeature> childList =
-				new LinkedList<IFeature>();
+			final LinkedList<IFeature> childList = new LinkedList<IFeature>();
 			for (final IFeature f : parentSet) {
 				// Expand and relayout parent
-				final IGraphicalFeature graphicalF =
-					graphicalFeatureModel.getGraphicalFeature(f);
+				final IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
 				graphicalF.setCollapsed(false);
 				((FeatureDiagramEditor) getEditor()).propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 				((FeatureDiagramEditor) getEditor()).internRefresh(true);
@@ -175,26 +154,22 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 				}
 			}
 
-			if ((childList.size() != 0)
-				&& !featureDiagramEditor.isLevelSizeOverLimit()) {
+			if ((childList.size() != 0) && !featureDiagramEditor.isLevelSizeOverLimit()) {
 				if (childList.size() > bestSolution.size()) {
-					bestSolution =
-						childList;
+					bestSolution = childList;
 				}
 			}
 
 			for (final IFeature f : parentSet) {
 				// collapse and relayout parent
-				final IGraphicalFeature graphicalF =
-					graphicalFeatureModel.getGraphicalFeature(f);
+				final IGraphicalFeature graphicalF = graphicalFeatureModel.getGraphicalFeature(f);
 				graphicalF.setCollapsed(true);
 			}
 		}
 
 		if (bestSolution.size() > 0) {
 			for (final IFeature f : bestSolution) {
-				final IGraphicalFeature graphicalFParent =
-					graphicalFeatureModel.getGraphicalFeature(f.getStructure().getParent().getFeature());
+				final IGraphicalFeature graphicalFParent = graphicalFeatureModel.getGraphicalFeature(f.getStructure().getParent().getFeature());
 				graphicalFParent.setCollapsed(false);
 			}
 		}
@@ -208,21 +183,16 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	}
 
 	public static <IFeatue> LinkedList<LinkedList<IFeatue>> powerSet(LinkedList<IFeatue> originalSet) {
-		final LinkedList<LinkedList<IFeatue>> sets =
-			new LinkedList<LinkedList<IFeatue>>();
+		final LinkedList<LinkedList<IFeatue>> sets = new LinkedList<LinkedList<IFeatue>>();
 		if (originalSet.isEmpty()) {
 			sets.add(new LinkedList<IFeatue>());
 			return sets;
 		}
-		final LinkedList<IFeatue> list =
-			new LinkedList<IFeatue>(originalSet);
-		final IFeatue head =
-			list.get(0);
-		final LinkedList<IFeatue> rest =
-			new LinkedList<IFeatue>(list.subList(1, list.size()));
+		final LinkedList<IFeatue> list = new LinkedList<IFeatue>(originalSet);
+		final IFeatue head = list.get(0);
+		final LinkedList<IFeatue> rest = new LinkedList<IFeatue>(list.subList(1, list.size()));
 		for (final LinkedList<IFeatue> set : powerSet(rest)) {
-			final LinkedList<IFeatue> newSet =
-				new LinkedList<IFeatue>();
+			final LinkedList<IFeatue> newSet = new LinkedList<IFeatue>();
 			newSet.add(head);
 			newSet.addAll(set);
 			sets.add(newSet);
@@ -238,8 +208,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 */
 	private void collapseLayer(LinkedList<IFeature> level) {
 		for (final IFeature feature : level) {
-			final IGraphicalFeature graphicalFeature =
-				graphicalFeatureModel.getGraphicalFeature(feature);
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(true);
 		}
 	}
@@ -251,24 +220,19 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 * @return list of levels, which are again lists of IFeatures
 	 */
 	private LinkedList<LinkedList<IFeature>> calculateLevels(IFeature root) {
-		final LinkedList<LinkedList<IFeature>> levels =
-			new LinkedList<LinkedList<IFeature>>();
-		LinkedList<IFeature> level =
-			new LinkedList<IFeature>();
+		final LinkedList<LinkedList<IFeature>> levels = new LinkedList<LinkedList<IFeature>>();
+		LinkedList<IFeature> level = new LinkedList<IFeature>();
 		level.add(root);
 		while (!level.isEmpty()) {
 			levels.add(level);
-			final LinkedList<IFeature> newLevel =
-				new LinkedList<IFeature>();
+			final LinkedList<IFeature> newLevel = new LinkedList<IFeature>();
 			for (final IFeature feature : level) {
-				final IGraphicalFeature graphicalFeature =
-					graphicalFeatureModel.getGraphicalFeature(feature);
+				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 				for (final IFeatureStructure child : graphicalFeature.getObject().getStructure().getChildren()) {
 					newLevel.add(child.getFeature());
 				}
 			}
-			level =
-				newLevel;
+			level = newLevel;
 		}
 
 		return levels;

@@ -41,10 +41,8 @@ public class BuildProductsHandler extends AFeatureProjectHandler implements ICon
 
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final BuildProductsWizard wizard =
-			new BuildProductsWizard(featureProject, getToggleState());
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final BuildProductsWizard wizard = new BuildProductsWizard(featureProject, getToggleState());
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 
@@ -68,9 +66,7 @@ public class BuildProductsHandler extends AFeatureProjectHandler implements ICon
 	 */
 	protected static void setToggleState(boolean value) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value
-				? TRUE
-				: FALSE);
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TOGGLE_STATE, value ? TRUE : FALSE);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

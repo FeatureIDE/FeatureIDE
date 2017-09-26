@@ -42,19 +42,15 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
  */
 public class FSTModel {
 
-	private final Map<String, FSTClass> classes =
-		new HashMap<String, FSTClass>();
-	private final Map<String, FSTFeature> features =
-		new HashMap<String, FSTFeature>();
+	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
+	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
 	private final IFeatureProject featureProject;
 	private FSTConfiguration configuration;
 
-	private ProjectSignatures projectSignatures =
-		null;
+	private ProjectSignatures projectSignatures = null;
 
 	public FSTModel(IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
+		this.featureProject = featureProject;
 	}
 
 	public void reset() {
@@ -75,13 +71,11 @@ public class FSTModel {
 	 * It is recommended {@link #addRole(String, String, IFile)} to generate a FST.
 	 */
 	public FSTFeature addFeature(String name) {
-		FSTFeature feature =
-			getFeature(name);
+		FSTFeature feature = getFeature(name);
 		if (feature != null) {
 			return feature;
 		}
-		feature =
-			new FSTFeature(name, this);
+		feature = new FSTFeature(name, this);
 		features.put(name, feature);
 		return feature;
 	}
@@ -99,33 +93,25 @@ public class FSTModel {
 	}
 
 	public FSTRole addRole(String featureName, String className, IFile file) {
-		FSTRole role =
-			getRole(featureName, className);
+		FSTRole role = getRole(featureName, className);
 		if (role != null) {
 			return role;
 		}
-		FSTClass c =
-			classes.get(className);
+		FSTClass c = classes.get(className);
 		if (c == null) {
-			c =
-				new FSTClass(className);
+			c = new FSTClass(className);
 			classes.put(className, c);
 		}
-		final FSTFeature feature =
-			addFeature(featureName);
-		role =
-			new FSTRole(file, feature, c);
+		final FSTFeature feature = addFeature(featureName);
+		role = new FSTRole(file, feature, c);
 		c.addRole(featureName, role);
 		feature.addRole(className, role);
 		return role;
 	}
 
 	public FSTRole getRole(String featureName, String className) {
-		final FSTClass c =
-			classes.get(className);
-		return (c == null)
-			? null
-			: c.getRole(featureName);
+		final FSTClass c = classes.get(className);
+		return (c == null) ? null : c.getRole(featureName);
 	}
 
 	public FSTClass getClass(String className) {
@@ -144,8 +130,7 @@ public class FSTModel {
 	 * @param configuration the configuration to set
 	 */
 	public void setConfiguration(FSTConfiguration configuration) {
-		this.configuration =
-			configuration;
+		this.configuration = configuration;
 	}
 
 	/**
@@ -156,36 +141,27 @@ public class FSTModel {
 	}
 
 	public FSTRole addArbitraryFile(final String featureName, final IFile file) {
-		final String fileExtension =
-			file.getFileExtension();
+		final String fileExtension = file.getFileExtension();
 		final String className;
 		if (fileExtension == null) {
-			className =
-				"*.";
+			className = "*.";
 		} else {
-			className =
-				"*."
-					+ file.getFileExtension();
+			className = "*." + file.getFileExtension();
 		}
-		final FSTRole role =
-			getRole(featureName, className);
+		final FSTRole role = getRole(featureName, className);
 		if (role != null) {
 			if (role instanceof FSTArbitraryRole) {
 				((FSTArbitraryRole) role).addFile(file);
 			}
 			return role;
 		}
-		FSTClass c =
-			classes.get(className);
+		FSTClass c = classes.get(className);
 		if (c == null) {
-			c =
-				new FSTClass(className);
+			c = new FSTClass(className);
 			classes.put(className, c);
 		}
-		final FSTFeature feature =
-			addFeature(featureName);
-		final FSTArbitraryRole arbitraryRole =
-			new FSTArbitraryRole(feature, c);
+		final FSTFeature feature = addFeature(featureName);
+		final FSTArbitraryRole arbitraryRole = new FSTArbitraryRole(feature, c);
 		arbitraryRole.addFile(file);
 		c.addRole(this.getAbsoluteClassName(file), arbitraryRole);
 		feature.addRole(className, arbitraryRole);
@@ -197,8 +173,7 @@ public class FSTModel {
 	}
 
 	public void setProjectSignatures(ProjectSignatures projectSignatures) {
-		this.projectSignatures =
-			projectSignatures;
+		this.projectSignatures = projectSignatures;
 	}
 
 	public String getAbsoluteClassName(IFile file) {
@@ -206,18 +181,12 @@ public class FSTModel {
 	}
 
 	public static String getAbsoluteClassName(IFile file, IFeatureProject project) {
-		final IPath filePath =
-			file.getFullPath();
+		final IPath filePath = file.getFullPath();
 		final int segments;
 		if (project.getBuildFolder().getFullPath().isPrefixOf(filePath)) {
-			segments =
-				project.getBuildFolder().getFullPath().segmentCount();
+			segments = project.getBuildFolder().getFullPath().segmentCount();
 		} else {
-			segments =
-				project.getSourceFolder().getFullPath().segmentCount()
-					+ ((project.getComposer().createFolderForFeatures())
-						? 1
-						: 0);
+			segments = project.getSourceFolder().getFullPath().segmentCount() + ((project.getComposer().createFolderForFeatures()) ? 1 : 0);
 		}
 		return filePath.removeFirstSegments(segments).toString();
 	}

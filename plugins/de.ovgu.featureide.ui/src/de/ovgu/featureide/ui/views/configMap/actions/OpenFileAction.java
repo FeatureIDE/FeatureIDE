@@ -44,8 +44,7 @@ public class OpenFileAction extends Action {
 
 	public OpenFileAction(String text, IFile file) {
 		super(text);
-		this.file =
-			file;
+		this.file = file;
 	}
 
 	public OpenFileAction(String text) {
@@ -53,8 +52,7 @@ public class OpenFileAction extends Action {
 	}
 
 	public void setFile(IFile file) {
-		this.file =
-			file;
+		this.file = file;
 	}
 
 	/*
@@ -72,34 +70,27 @@ public class OpenFileAction extends Action {
 	}
 
 	private void openEditor(IFile file) throws CoreException {
-		final IWorkbenchPage page =
-			UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		final IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		if (page == null) {
 			return;
 		}
 
-		String editorId =
-			"org.eclipse.ui.DefaultTextEditor";
+		String editorId = "org.eclipse.ui.DefaultTextEditor";
 
-		final IEditorDescriptor desc =
-			getDescriptor(file);
+		final IEditorDescriptor desc = getDescriptor(file);
 		if (desc != null) {
-			editorId =
-				desc.getId();
+			editorId = desc.getId();
 		}
 
 		page.openEditor(new FileEditorInput(file), editorId);
 	}
 
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
-		IContentType contentType =
-			null;
+		IContentType contentType = null;
 
-		final IContentDescription description =
-			file.getContentDescription();
+		final IContentDescription description = file.getContentDescription();
 		if (description != null) {
-			contentType =
-				description.getContentType();
+			contentType = description.getContentType();
 		}
 
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);

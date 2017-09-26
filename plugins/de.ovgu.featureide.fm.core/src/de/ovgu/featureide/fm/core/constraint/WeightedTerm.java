@@ -34,12 +34,9 @@ public class WeightedTerm {
 	private final Reference reference;
 
 	public WeightedTerm(int weight, boolean positive, Reference reference) {
-		this.weight =
-			weight;
-		this.positive =
-			positive;
-		this.reference =
-			reference;
+		this.weight = weight;
+		this.positive = positive;
+		this.reference = reference;
 	}
 
 	public int getWeight() {
@@ -56,8 +53,7 @@ public class WeightedTerm {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		sb.append(weight);
 		sb.append(" ");

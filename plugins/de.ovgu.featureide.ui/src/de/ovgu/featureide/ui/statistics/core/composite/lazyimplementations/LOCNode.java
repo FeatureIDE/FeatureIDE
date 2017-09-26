@@ -39,8 +39,7 @@ public class LOCNode extends LazyParent {
 
 	LOCNode(String description, HashMap<String, Integer> fExList) {
 		super(description);
-		featureExtensionLOCList =
-			fExList;
+		featureExtensionLOCList = fExList;
 	}
 
 	@Override

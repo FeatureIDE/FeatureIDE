@@ -38,12 +38,9 @@ public abstract class AFeatureData implements IConstrainedObject {
 	protected String comment;
 
 	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
-		startLineNumber =
-			lineNumber;
-		this.endLineNumber =
-			endLineNumber;
-		this.id =
-			id;
+		startLineNumber = lineNumber;
+		this.endLineNumber = endLineNumber;
+		this.id = id;
 	}
 
 	public int getStartLineNumber() {
@@ -60,8 +57,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public void setConstraint(Node constraint) {
-		this.constraint =
-			constraint;
+		this.constraint = constraint;
 	}
 
 	public String getComment() {
@@ -69,8 +65,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public void setComment(String comment) {
-		this.comment =
-			comment;
+		this.comment = comment;
 	}
 
 	public int getID() {
@@ -78,8 +73,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public boolean hasID(int id) {
-		return (this.id == -1)
-			|| (this.id == id);
+		return (this.id == -1) || (this.id == id);
 	}
 
 }

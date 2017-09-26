@@ -59,13 +59,11 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		}
 		final int[] indexes;
 		try {
-			indexes =
-				getOracle().minimalExplanation();
+			indexes = getOracle().minimalExplanation();
 		} catch (final TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set =
-			new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}
@@ -74,6 +72,7 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	/**
 	 * Returns the clauses for the given clause indexes.
+	 * 
 	 * @param indexes clause indexes
 	 * @return the clauses for the given clause indexes
 	 */

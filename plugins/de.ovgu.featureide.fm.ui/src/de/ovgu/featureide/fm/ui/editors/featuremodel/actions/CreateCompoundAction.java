@@ -52,35 +52,28 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
  */
 public class CreateCompoundAction extends Action {
 
-	public static final String ID =
-		"de.ovgu.featureide.createcompound";
+	public static final String ID = "de.ovgu.featureide.createcompound";
 
 	private final IFeatureModel featureModel;
 
-	private IFeature parent =
-		null;
+	private IFeature parent = null;
 
-	private final LinkedList<IFeature> selectedFeatures =
-		new LinkedList<IFeature>();
+	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
-	private static ImageDescriptor createImage =
-		PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-			}
-		};
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
 	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -93,8 +86,7 @@ public class CreateCompoundAction extends Action {
 	public void run() {
 		// if (selectedFeatures.size() != 1)
 		// throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
-		final CreateFeatureAboveOperation op =
-			new CreateFeatureAboveOperation(featureModel, selectedFeatures);
+		final CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -106,40 +98,31 @@ public class CreateCompoundAction extends Action {
 
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if ((selection.size() == 1)
-			&& (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
 		// check that selected features have the same parent
 		selectedFeatures.clear();
-		final Iterator<?> iter =
-			selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			final Object editPart =
-				iter.next();
-			if (!(editPart instanceof FeatureEditPart)
-				&& !(editPart instanceof IFeature)) {
+			final Object editPart = iter.next();
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
 				continue;
 			}
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart) {
-				feature =
-					((FeatureEditPart) editPart).getModel().getObject();
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
 			} else {
-				feature =
-					(IFeature) editPart;
+				feature = (IFeature) editPart;
 			}
 
-			final IFeatureStructure structureParent =
-				feature.getStructure().getParent();
+			final IFeatureStructure structureParent = feature.getStructure().getParent();
 			if (structureParent != null) {
-				final IFeature featureParent =
-					structureParent.getFeature();
+				final IFeature featureParent = structureParent.getFeature();
 				if (selectedFeatures.isEmpty()) {
-					parent =
-						featureParent;
+					parent = featureParent;
 				} else if (parent != featureParent) {
 					return false;
 				}

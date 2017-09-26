@@ -53,16 +53,13 @@ public class SettingsExport {
 	 * @throws IOException
 	 */
 	private void exportSettings(File file) {
-		FileWriter fw =
-			null;
+		FileWriter fw = null;
 		try {
 			if (!file.exists()) {
-				fw =
-					new FileWriter(file);
+				fw = new FileWriter(file);
 				fw.write(getSettings());
 			} else {
-				fw =
-					new FileWriter(file);
+				fw = new FileWriter(file);
 				fw.write(getSettings());
 			}
 		} catch (final IOException e) {
@@ -79,8 +76,7 @@ public class SettingsExport {
 	}
 
 	private String getSettings() {
-		final StringBuilder settings =
-			new StringBuilder();
+		final StringBuilder settings = new StringBuilder();
 		for (final QualifiedName qn : FMPropertyManager.getQualifiedNames()) {
 			try {
 				settings.append(qn.getQualifier());

@@ -55,24 +55,19 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if ((selection.size() == 1)
-			&& (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
-		final Iterator<?> iter =
-			selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			final Object editPart =
-				iter.next();
+			final Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint =
-					((ConstraintEditPart) editPart).getModel().getObject();
+				constraint = ((ConstraintEditPart) editPart).getModel().getObject();
 				return true;
 			}
 			if (editPart instanceof IConstraint) {
-				constraint =
-					(IConstraint) editPart;
+				constraint = (IConstraint) editPart;
 				return true;
 			}
 		}

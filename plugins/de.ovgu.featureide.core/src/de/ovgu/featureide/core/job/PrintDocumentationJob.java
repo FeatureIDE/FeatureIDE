@@ -84,16 +84,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 		public Arguments(String foldername, String[] options, ADocumentationCommentMerger merger, String featureName, IProject project) {
 			super(Arguments.class);
-			this.foldername =
-				foldername;
-			this.options =
-				options;
-			this.merger =
-				merger;
-			this.featureName =
-				featureName;
-			this.project =
-				project;
+			this.foldername = foldername;
+			this.options = options;
+			this.merger = merger;
+			this.featureName = featureName;
+			this.project = project;
 		}
 	}
 
@@ -103,124 +98,87 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor =
-			workMonitor;
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(arguments.project);
+		this.workMonitor = workMonitor;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(arguments.project);
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning(arguments.project.getName()
-				+ " is no FeatureIDE Project!");
+			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
 		}
 
 		if (!deleteOldFolder()) {
 			return false;
 		}
 
-		final ProjectSignatures projectSignatures =
-			featureProject.getProjectSignatures();
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
 			CorePlugin.getDefault().logWarning("No signatures available!");
 			return false;
 		}
 
-		final Collection<IFilter<?>> commentFilters =
-			new LinkedList<>();
-		final Collection<IFilter<?>> signatureFilters =
-			new LinkedList<>();
+		final Collection<IFilter<?>> commentFilters = new LinkedList<>();
+		final Collection<IFilter<?>> signatureFilters = new LinkedList<>();
 
-		final int[] featureIDs =
-			projectSignatures.getFeatureIDs();
+		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (arguments.merger instanceof VariantMerger) {
-			final Configuration conf =
-				new Configuration(featureProject.getFeatureModel(),
-						Configuration.PARAM_LAZY
-							| Configuration.PARAM_IGNOREABSTRACT);
+			final Configuration conf = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
-				final IFile file =
-					featureProject.getCurrentConfiguration();
+				final IFile file = featureProject.getCurrentConfiguration();
 				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
 			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
 			}
-			final Collection<String> featureNames =
-				conf.getSelectedFeatureNames();
+			final Collection<String> featureNames = conf.getSelectedFeatureNames();
 
-			final int[] tempFeatureList =
-				new int[featureNames.size()];
-			int count =
-				0;
+			final int[] tempFeatureList = new int[featureNames.size()];
+			int count = 0;
 			for (final String featureName : featureNames) {
-				final int id =
-					projectSignatures.getFeatureID(featureName);
+				final int id = projectSignatures.getFeatureID(featureName);
 				if (id >= 0) {
-					tempFeatureList[count++] =
-						id;
+					tempFeatureList[count++] = id;
 				}
 			}
-			final int[] validFeatureIDs =
-				new int[count];
+			final int[] validFeatureIDs = new int[count];
 
 			// sort feature list
-			int c =
-				0;
-			for (int j =
-				0; j < count; j++) {
-				final int curId =
-					tempFeatureList[j];
-				for (int k =
-					0; k < featureIDs.length; k++) {
+			int c = 0;
+			for (int j = 0; j < count; j++) {
+				final int curId = tempFeatureList[j];
+				for (int k = 0; k < featureIDs.length; k++) {
 					if (curId == featureIDs[k]) {
-						validFeatureIDs[c++] =
-							curId;
+						validFeatureIDs[c++] = curId;
 						break;
 					}
 				}
 			}
 
-			final Node[] nodes =
-				new Node[conf.getFeatures().size()
-					+ 1];
-			nodes[0] =
-				AdvancedNodeCreator.createCNF(conf.getFeatureModel());
-			int i =
-				1;
+			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
+			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
+			int i = 1;
 			for (final SelectableFeature feature : conf.getFeatures()) {
-				final Selection selection =
-					feature.getSelection();
-				nodes[i++] =
-					selection == Selection.UNDEFINED
-						? new Literal(NodeCreator.varTrue)
-						: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+				final Selection selection = feature.getSelection();
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
+					: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
 
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 		} else if (arguments.merger instanceof ContextMerger) {
-			final Node[] nodes =
-				new Node[2];
-			nodes[0] =
-				AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
-			nodes[1] =
-				new Literal(arguments.featureName, true);
+			final Node[] nodes = new Node[2];
+			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
+			nodes[1] = new Literal(arguments.featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
 
 			arguments.merger.setValidFeatureIDs(featureIDs.length, featureIDs);
 		} else if (arguments.merger instanceof FeatureModuleMerger) {
-			final int index =
-				projectSignatures.getFeatureID(arguments.featureName);
-			arguments.merger.setValidFeatureIDs(featureIDs.length, new int[] {
-				index });
+			final int index = projectSignatures.getFeatureID(arguments.featureName);
+			arguments.merger.setValidFeatureIDs(featureIDs.length, new int[] { index });
 
 			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
-				final Node[] nodes =
-					new Node[2];
-				nodes[0] =
-					AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
-				nodes[1] =
-					new Literal(arguments.featureName, true);
+				final Node[] nodes = new Node[2];
+				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
+				nodes[1] = new Literal(arguments.featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
 				commentFilters.add(new ConstraintFilter(nodes));
 
@@ -243,8 +201,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			}
 		}
 
-		final DocumentationBuilder builder =
-			new DocumentationBuilder(featureProject);
+		final DocumentationBuilder builder = new DocumentationBuilder(featureProject);
 		builder.build(arguments.merger, commentFilters);
 
 		buildJavaDoc(projectSignatures.iterator(signatureFilters));
@@ -252,14 +209,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		return true;
 	}
 
-	protected String folderPath =
-		null;
+	protected String folderPath = null;
 
 	private boolean deleteOldFolder() {
-		final IFolder folder =
-			CorePlugin.createFolder(arguments.project, arguments.foldername);
-		folderPath =
-			folder.getLocation().toOSString();
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
+		folderPath = folder.getLocation().toOSString();
 
 		try {
 			folder.delete(true, null);
@@ -271,53 +225,31 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	}
 
 	private void buildJavaDoc(final SignatureIterator it) {
-		final String extFoldername =
-			arguments.foldername
-				+ "/src/";
+		final String extFoldername = arguments.foldername + "/src/";
 
 		CorePlugin.createFolder(arguments.project, extFoldername);
 
-		final HashSet<String> packageSet =
-			new HashSet<String>();
-		final LinkedList<String> classList =
-			new LinkedList<String>();
-		final ProjectStructure structure =
-			new ProjectStructure(it);
-		final String docOutput =
-			folderPath
-				+ File.separator
-				+ "doc"
-				+ File.separator;
-		final String srcOutput =
-			folderPath
-				+ File.separator
-				+ "src"
-				+ File.separator;
+		final HashSet<String> packageSet = new HashSet<String>();
+		final LinkedList<String> classList = new LinkedList<String>();
+		final ProjectStructure structure = new ProjectStructure(it);
+		final String docOutput = folderPath + File.separator + "doc" + File.separator;
+		final String srcOutput = folderPath + File.separator + "src" + File.separator;
 
-		workMonitor.setRemainingWork(structure.getClasses().size()
-			+ 2);
+		workMonitor.setRemainingWork(structure.getClasses().size() + 2);
 
 		for (final AbstractClassFragment javaClass : structure.getClasses()) {
-			final String packagename =
-				javaClass.getSignature().getPackage();
+			final String packagename = javaClass.getSignature().getPackage();
 
-			final String path =
-				extFoldername
-					+ packagename.replace('.', '/');
+			final String path = extFoldername + packagename.replace('.', '/');
 
 			if (packagename.isEmpty()) {
-				classList.add(srcOutput
-					+ javaClass.getSignature().getName()
-					+ ".java");
+				classList.add(srcOutput + javaClass.getSignature().getName() + ".java");
 			} else {
 				packageSet.add(packagename);
 			}
 
-			final IFolder folder =
-				CorePlugin.createFolder(arguments.project, path);
-			final IFile file =
-				folder.getFile(javaClass.getSignature().getName()
-					+ ".java");
+			final IFolder folder = CorePlugin.createFolder(arguments.project, path);
+			final IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
 			try {
 				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
 			} catch (final IOException e) {
@@ -325,70 +257,47 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			}
 			workMonitor.worked();
 		}
-		final IFolder folder =
-			CorePlugin.createFolder(arguments.project, arguments.foldername
-				+ "/doc/");
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername + "/doc/");
 
-		final int defaultArguments =
-			4;
-		int numDefaultArguments =
-			defaultArguments;
-		String[] args0 =
-			null,
-				args1 =
-					null;
+		final int defaultArguments = 4;
+		int numDefaultArguments = defaultArguments;
+		String[] args0 = null, args1 = null;
 
 		if (!classList.isEmpty()) {
-			args0 =
-				new String[classList.size()];
+			args0 = new String[classList.size()];
 			classList.toArray(args0);
-			numDefaultArguments +=
-				args0.length;
+			numDefaultArguments += args0.length;
 		}
 		if (!packageSet.isEmpty()) {
 			if (args0 == null) {
-				args0 =
-					new String[packageSet.size()];
+				args0 = new String[packageSet.size()];
 				packageSet.toArray(args0);
 			} else {
-				args1 =
-					new String[packageSet.size()];
+				args1 = new String[packageSet.size()];
 				packageSet.toArray(args1);
 			}
-			numDefaultArguments +=
-				packageSet.size();
+			numDefaultArguments += packageSet.size();
 		}
 
 		final String[] javadocargs;
-		if ((arguments.options != null)
-			&& (arguments.options.length > 0)
-			&& !arguments.options[0].isEmpty()) {
-			javadocargs =
-				new String[numDefaultArguments
-					+ arguments.options.length];
+		if ((arguments.options != null) && (arguments.options.length > 0) && !arguments.options[0].isEmpty()) {
+			javadocargs = new String[numDefaultArguments + arguments.options.length];
 			System.arraycopy(arguments.options, 0, javadocargs, numDefaultArguments, arguments.options.length);
 		} else {
-			javadocargs =
-				new String[numDefaultArguments];
+			javadocargs = new String[numDefaultArguments];
 		}
-		javadocargs[0] =
-			"-d";
-		javadocargs[1] =
-			docOutput;
-		javadocargs[2] =
-			"-sourcepath";
-		javadocargs[3] =
-			srcOutput;
+		javadocargs[0] = "-d";
+		javadocargs[1] = docOutput;
+		javadocargs[2] = "-sourcepath";
+		javadocargs[3] = srcOutput;
 		if (args0 != null) {
 			System.arraycopy(args0, 0, javadocargs, defaultArguments, args0.length);
 		}
 		if (args1 != null) {
-			System.arraycopy(args1, 0, javadocargs, defaultArguments
-				+ args0.length, args1.length);
+			System.arraycopy(args1, 0, javadocargs, defaultArguments + args0.length, args1.length);
 		}
 
-		for (int j =
-			0; j < javadocargs.length; j++) {
+		for (int j = 0; j < javadocargs.length; j++) {
 			System.out.println(javadocargs[j]);
 		}
 

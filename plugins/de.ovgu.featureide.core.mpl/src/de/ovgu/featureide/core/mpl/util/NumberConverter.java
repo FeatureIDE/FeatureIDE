@@ -31,29 +31,19 @@ public class NumberConverter {
 	private final int highestNumber;
 
 	public NumberConverter(int highestNumber) {
-		this.highestNumber =
-			highestNumber;
-		final int maxLength =
-			(int) (Math.floor(Math.log10(highestNumber)))
-				+ 1;
-		final char[] charArray =
-			new char[maxLength];
-		for (int i =
-			0; i < maxLength; i++) {
-			charArray[i] =
-				'0';
+		this.highestNumber = highestNumber;
+		final int maxLength = (int) (Math.floor(Math.log10(highestNumber))) + 1;
+		final char[] charArray = new char[maxLength];
+		for (int i = 0; i < maxLength; i++) {
+			charArray[i] = '0';
 		}
-		zeros =
-			new String(charArray);
+		zeros = new String(charArray);
 	}
 
 	public String convert(int number) {
-		if ((number <= highestNumber)
-			&& (number >= 0)) {
-			final String s =
-				String.valueOf(number);
-			return zeros.substring(s.length())
-				+ s;
+		if ((number <= highestNumber) && (number >= 0)) {
+			final String s = String.valueOf(number);
+			return zeros.substring(s.length()) + s;
 		} else {
 			return String.valueOf(number);
 		}

@@ -10,14 +10,11 @@ import br.ufal.ic.colligens.controllers.invalidproducts.InvalidProductsViewContr
 
 public class InvalidProductView extends ViewPart {
 
-	public static final String ID =
-		Colligens.PLUGIN_ID
-			+ ".views.InvalidConfigurationsView";
+	public static final String ID = Colligens.PLUGIN_ID + ".views.InvalidConfigurationsView";
 	private final InvalidProductsViewController controller;
 
 	public InvalidProductView() {
-		controller =
-			InvalidProductsViewController.getInstance();
+		controller = InvalidProductsViewController.getInstance();
 		controller.setView(this);
 		setTitleToolTip(INVALID_PRODUCTS___COLLIGENS);
 	}

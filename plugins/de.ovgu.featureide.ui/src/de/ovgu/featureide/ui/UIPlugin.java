@@ -36,8 +36,7 @@ import de.ovgu.featureide.ui.editors.annotation.EditorTracker;
  */
 public class UIPlugin extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.ui";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.ui";
 
 	private static UIPlugin plugin;
 
@@ -51,17 +50,14 @@ public class UIPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 
-		editorTracker =
-			new EditorTracker(PlatformUI.getWorkbench());
+		editorTracker = new EditorTracker(PlatformUI.getWorkbench());
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 
 		if (editorTracker != null) {
 			editorTracker.dispose();
@@ -76,8 +72,7 @@ public class UIPlugin extends AbstractUIPlugin {
 
 	public static Image getImage(String name) {
 		if (getDefault() != null) {
-			return getDefault().getImageDescriptor("icons/"
-				+ name).createImage();
+			return getDefault().getImageDescriptor("icons/" + name).createImage();
 		}
 		return null;
 	}

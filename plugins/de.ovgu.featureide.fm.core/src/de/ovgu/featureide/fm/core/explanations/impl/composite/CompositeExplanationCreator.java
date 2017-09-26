@@ -31,11 +31,9 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
- * Implements {@link ExplanationCreator} by composing any number of other instances.
- * Delegates to these other composite instances to do the actual work.
- * Useful if some instances fail to consistently generate explanations but are otherwise preferable.
- * For example, {@link Ltms LTMS} is fast but incomplete.
- * If it fails, one might try again with a slower but complete {@link MusExtractor MUS extractor}.
+ * Implements {@link ExplanationCreator} by composing any number of other instances. Delegates to these other composite instances to do the actual work. Useful
+ * if some instances fail to consistently generate explanations but are otherwise preferable. For example, {@link Ltms LTMS} is fast but incomplete. If it
+ * fails, one might try again with a slower but complete {@link MusExtractor MUS extractor}.
  * 
  * @author Timo G&uuml;nther
  */
@@ -46,6 +44,7 @@ public abstract class CompositeExplanationCreator<T extends ExplanationCreator> 
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeExplanationCreator(Collection<T> composites) {
@@ -54,6 +53,7 @@ public abstract class CompositeExplanationCreator<T extends ExplanationCreator> 
 
 	/**
 	 * Returns the explanation creators this composes.
+	 * 
 	 * @return the explanation creators this composes
 	 */
 	public List<T> getComposites() {

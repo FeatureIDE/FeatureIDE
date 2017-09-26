@@ -32,54 +32,40 @@ import de.ovgu.featureide.fm.core.job.monitor.SyncMonitor;
 
 final class MasterThread<T> {
 
-	final ConcurrentLinkedQueue<T> objects =
-		new ConcurrentLinkedQueue<>();
+	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
 	final IMonitor workMonitor;
 
 	private final AWorkerThread<T> factory;
 
-	private List<Thread> threads =
-		Collections.emptyList();
-	private List<AWorkerThread<T>> workers =
-		Collections.emptyList();
-	private int initialized =
-		0;
+	private List<Thread> threads = Collections.emptyList();
+	private List<AWorkerThread<T>> workers = Collections.emptyList();
+	private int initialized = 0;
 
 	MasterThread(AWorkerThread<T> factory, IMonitor workMonitor) {
-		this.factory =
-			factory;
-		this.workMonitor =
-			(workMonitor != null)
-				? new SyncMonitor(workMonitor)
-				: new NullMonitor();
+		this.factory = factory;
+		this.workMonitor = (workMonitor != null) ? new SyncMonitor(workMonitor) : new NullMonitor();
 	}
 
 	private void init(int numberOfThreads) {
 		if (numberOfThreads < 1) {
-			throw new IndexOutOfBoundsException("Number of threads must be greater than 0 (was "
-				+ numberOfThreads
-				+ ").");
+			throw new IndexOutOfBoundsException("Number of threads must be greater than 0 (was " + numberOfThreads + ").");
 		} else if (initialized == numberOfThreads) {
 			threads.clear();
 			for (final AWorkerThread<T> worker : workers) {
 				threads.add(new Thread(worker));
 			}
 		} else {
-			threads =
-				new ArrayList<>(numberOfThreads);
-			workers =
-				new ArrayList<>(numberOfThreads);
+			threads = new ArrayList<>(numberOfThreads);
+			workers = new ArrayList<>(numberOfThreads);
 
 			workers.add(factory);
-			for (int i =
-				1; i < numberOfThreads; i++) {
+			for (int i = 1; i < numberOfThreads; i++) {
 				workers.add(factory.newThread());
 			}
 			for (final AWorkerThread<T> worker : workers) {
 				threads.add(new Thread(worker));
 			}
-			initialized =
-				numberOfThreads;
+			initialized = numberOfThreads;
 		}
 	}
 

@@ -53,33 +53,26 @@ public class RenamingsManager implements IEventManager {
 	/**
 	 * a list containing all renamings since the last save
 	 */
-	private final List<Renaming> renamings =
-		new LinkedList<Renaming>();
+	private final List<Renaming> renamings = new LinkedList<Renaming>();
 	private final IFeatureModel model;
 
-	private final DefaultEventManager eventManager =
-		new DefaultEventManager();
+	private final DefaultEventManager eventManager = new DefaultEventManager();
 
 	/*
 	 * ***************************************************************** Renaming #
 	 *****************************************************************/
 
 	public RenamingsManager(IFeatureModel model) {
-		this.model =
-			model;
+		this.model = model;
 	}
 
 	public boolean renameFeature(final String oldName, final String newName) {
-		final Map<String, IFeature> featureTable =
-			model.getFeatureTable();
-		if (!featureTable.containsKey(oldName)
-			|| featureTable.containsKey(newName)) {
+		final Map<String, IFeature> featureTable = model.getFeatureTable();
+		if (!featureTable.containsKey(oldName) || featureTable.containsKey(newName)) {
 			return false;
 		}
-		final List<IConstraint> constraints =
-			model.getConstraints();
-		final IFeature feature =
-			model.getFeature(oldName);
+		final List<IConstraint> constraints = model.getConstraints();
+		final IFeature feature = model.getFeature(oldName);
 		model.deleteFeatureFromTable(feature);
 		feature.setName(newName);
 		model.addFeature(feature);
@@ -90,10 +83,8 @@ public class RenamingsManager implements IEventManager {
 
 		// update the feature order list
 
-		final List<String> featureOrderList =
-			Functional.toList(model.getFeatureOrderList());
-		for (int i =
-			0; i < featureOrderList.size(); i++) {
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
+		for (int i = 0; i < featureOrderList.size(); i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
 				model.setFeatureOrderListItem(i, newName);
 				break;
@@ -108,8 +99,7 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public void performRenamings() {
-		final List<IConstraint> constraints =
-			model.getConstraints();
+		final List<IConstraint> constraints = model.getConstraints();
 		for (final Renaming renaming : renamings) {
 			for (final IConstraint c : constraints) {
 				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
@@ -123,17 +113,14 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public void performRenamings(Path path) {
-		final FeatureModelManager instance =
-			FeatureModelManager.getInstance(path);
+		final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 		if (instance == null) {
 			return;
 		}
-		final IFeatureModel projectModel =
-			instance.getObject();
+		final IFeatureModel projectModel = instance.getObject();
 		for (final Renaming renaming : renamings) {
 			// TODO check weather all these events are necessary
-			final FeatureIDEEvent event =
-				new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
 			// call to FMComposerExtension
@@ -145,8 +132,7 @@ public class RenamingsManager implements IEventManager {
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {
 			if (oldName.equals(((Literal) node).var)) {
-				((Literal) node).var =
-					newName;
+				((Literal) node).var = newName;
 			}
 			return;
 		}
@@ -187,8 +173,7 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public Set<String> getOldFeatureNames() {
-		final HashSet<String> names =
-			new HashSet<String>(model.getFeatureTable().keySet());
+		final HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
 		for (final Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);

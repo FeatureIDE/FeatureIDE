@@ -39,8 +39,7 @@ public class RenameColorSchemeAction extends AbstractColorAction {
 
 	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
 	/*
@@ -49,11 +48,9 @@ public class RenameColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		final RenameColorSchemeWizard wizard =
-			new RenameColorSchemeWizard(fm);
+		final RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
 
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		if (dialog.open() == Window.OK) {
 			collaborationView.refresh();

@@ -38,25 +38,19 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  */
 public class FSTFeature {
 
-	private final HashMap<String, FSTRole> roles =
-		new HashMap<String, FSTRole>();
+	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	protected String name;
 	private final FSTModel model;
-	private static final int hashCodePrime =
-		37;
-	private boolean hasMethodContracts =
-		false;
+	private static final int hashCodePrime = 37;
+	private boolean hasMethodContracts = false;
 
 	public FSTFeature(String name, final FSTModel model) {
-		this.name =
-			name;
-		this.model =
-			model;
+		this.name = name;
+		this.model = model;
 	}
 
 	public boolean isSelected() {
-		final FSTConfiguration config =
-			model.getConfiguration();
+		final FSTConfiguration config = model.getConfiguration();
 		if (config != null) {
 			return config.getSelectedFeatures().contains(name);
 		}
@@ -67,10 +61,8 @@ public class FSTFeature {
 		if (model == null) {
 			return FeatureColor.NO_COLOR.getValue();
 		}
-		final IFeatureModel featureModel =
-			model.getFeatureProject().getFeatureModel();
-		final IFeature feature =
-			featureModel.getFeature(name);
+		final IFeatureModel featureModel = model.getFeatureProject().getFeatureModel();
+		final IFeature feature = featureModel.getFeature(name);
 		return FeatureColorManager.getColor(feature).getValue();
 	}
 
@@ -92,8 +84,7 @@ public class FSTFeature {
 	}
 
 	public void setMethodContracts(boolean hasMethodContracts) {
-		this.hasMethodContracts =
-			hasMethodContracts;
+		this.hasMethodContracts = hasMethodContracts;
 	}
 
 	@Override
@@ -117,11 +108,8 @@ public class FSTFeature {
 		if (!(feature instanceof FSTFeature)) {
 			return false;
 		}
-		final FSTFeature comp =
-			(FSTFeature) feature;
-		if (!comp.getName().equals(getName())
-			||
-			!comp.model.getFeatureProject().getProjectName().equals(model.getFeatureProject().getProjectName())) {
+		final FSTFeature comp = (FSTFeature) feature;
+		if (!comp.getName().equals(getName()) || !comp.model.getFeatureProject().getProjectName().equals(model.getFeatureProject().getProjectName())) {
 			return false;
 		}
 		return true;
@@ -130,15 +118,9 @@ public class FSTFeature {
 	@Override
 	public int hashCode() {
 		if (model != null) {
-			int hashCode =
-				1;
-			hashCode =
-				(hashCodePrime
-					* hashCode)
-					+ getName().hashCode();
-			return (hashCodePrime
-				* hashCode)
-				+ model.getFeatureProject().getProjectName().hashCode();
+			int hashCode = 1;
+			hashCode = (hashCodePrime * hashCode) + getName().hashCode();
+			return (hashCodePrime * hashCode) + model.getFeatureProject().getProjectName().hashCode();
 		} else {
 			return super.hashCode();
 		}

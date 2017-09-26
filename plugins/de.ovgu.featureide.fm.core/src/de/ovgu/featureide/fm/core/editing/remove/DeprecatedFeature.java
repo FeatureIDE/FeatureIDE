@@ -35,17 +35,12 @@ public class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 	private long mixedCount;
 
 	public DeprecatedFeature(String feature, int id) {
-		this.feature =
-			feature;
-		this.id =
-			id;
+		this.feature = feature;
+		this.id = id;
 
-		positiveCount =
-			0;
-		negativeCount =
-			0;
-		mixedCount =
-			0;
+		positiveCount = 0;
+		negativeCount = 0;
+		mixedCount = 0;
 	}
 
 	public String getFeature() {
@@ -58,29 +53,23 @@ public class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 
 	@Override
 	public int compareTo(DeprecatedFeature arg0) {
-		return (int) Math.signum(arg0.getClauseCount()
-			- getClauseCount());
+		return (int) Math.signum(arg0.getClauseCount() - getClauseCount());
 	}
 
 	public long getClauseCount() {
 		try {
-			return ((positiveCount
-				* negativeCount)
-				- (positiveCount
-					+ negativeCount));// Math.multiplyExact(positiveCount, negativeCount);
+			return ((positiveCount * negativeCount) - (positiveCount + negativeCount));// Math.multiplyExact(positiveCount, negativeCount);
 		} catch (final ArithmeticException e) {
 			return Long.MAX_VALUE;
 		}
 	}
 
 	public boolean exp1() {
-		return (positiveCount < 2)
-			|| (negativeCount < 2);
+		return (positiveCount < 2) || (negativeCount < 2);
 	}
 
 	public boolean exp0() {
-		return (positiveCount == 0)
-			|| (negativeCount == 0);
+		return (positiveCount == 0) || (negativeCount == 0);
 	}
 
 	public long getMixedCount() {
@@ -129,8 +118,7 @@ public class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 		return id == ((DeprecatedFeature) obj).id;
@@ -138,9 +126,7 @@ public class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 
 	@Override
 	public String toString() {
-		return feature
-			+ ": "
-			+ getClauseCount();
+		return feature + ": " + getClauseCount();
 	}
 
 }

@@ -65,9 +65,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".wizards.NewConfigurationFileWizard";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewConfigurationFileWizard";
 
 	private NewConfigurationFilePage page;
 
@@ -84,8 +82,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		page =
-			new NewConfigurationFilePage(configFolder);
+		page = new NewConfigurationFilePage(configFolder);
 		addPage(page);
 		setWindowTitle(NEW_CONFIGURATION);
 	}
@@ -95,47 +92,34 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		configFolder =
-			page.getContainerObject();
-		final IFeatureProject featureProject =
-			page.getFeatureProject();
-		final IFeatureModel featureModel =
-			featureProject.getFeatureModel();
-		final IConfigurationFormat format =
-			page.getFormat();
+		configFolder = page.getContainerObject();
+		final IFeatureProject featureProject = page.getFeatureProject();
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		final IConfigurationFormat format = page.getFormat();
 
-		final String suffix =
-			"."
-				+ format.getSuffix();
-		final String name =
-			page.getFileName();
-		final String fileName =
-			name
-				+ (name.endsWith(suffix)
-					? ""
-					: suffix);
+		final String suffix = "." + format.getSuffix();
+		final String name = page.getFileName();
+		final String fileName = name + (name.endsWith(suffix) ? "" : suffix);
 
-		final IRunnableWithProgress op =
-			new IRunnableWithProgress() {
+		final IRunnableWithProgress op = new IRunnableWithProgress() {
 
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException {
-					try {
-						doFinish(configFolder, fileName, featureModel, format, monitor);
-					} catch (final CoreException e) {
-						throw new InvocationTargetException(e);
-					} finally {
-						monitor.done();
-					}
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+				try {
+					doFinish(configFolder, fileName, featureModel, format, monitor);
+				} catch (final CoreException e) {
+					throw new InvocationTargetException(e);
+				} finally {
+					monitor.done();
 				}
-			};
+			}
+		};
 		try {
 			getContainer().run(true, false, op);
 		} catch (final InterruptedException e) {
 			return false;
 		} catch (final InvocationTargetException e) {
-			final Throwable realException =
-				e.getTargetException();
+			final Throwable realException = e.getTargetException();
 			MessageDialog.openError(getShell(), "Error", realException.getMessage());
 			return false;
 		}
@@ -148,14 +132,12 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
 			throws CoreException {
 		// create a sample file
-		monitor.beginTask(CREATING
-			+ fileName, 2);
+		monitor.beginTask(CREATING + fileName, 2);
 		if (!container.exists()) {
 			throwCoreException(CONTAINER_DOES_NOT_EXIST_);
 		}
 
-		final IFile file =
-			container.getFile(new Path(fileName));
+		final IFile file = container.getFile(new Path(fileName));
 		SimpleFileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
 
 		monitor.worked(1);
@@ -164,8 +146,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 			@Override
 			public void run() {
-				final IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
 				} catch (final PartInitException e) {}
@@ -175,8 +156,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	}
 
 	private void throwCoreException(String message) throws CoreException {
-		final IStatus status =
-			new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
+		final IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
 
@@ -187,11 +167,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		final IFeatureProject data =
-			CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
-		configFolder =
-			(data == null)
-				? null
-				: data.getConfigFolder();
+		final IFeatureProject data = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+		configFolder = (data == null) ? null : data.getConfigFolder();
 	}
 }

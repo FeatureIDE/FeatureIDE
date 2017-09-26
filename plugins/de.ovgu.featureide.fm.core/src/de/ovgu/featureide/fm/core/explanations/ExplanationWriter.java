@@ -35,11 +35,9 @@ public abstract class ExplanationWriter {
 	/**
 	 * Whether to include the reason count versus explanation count when writing a reason. This acts as an explanation for the reason's confidence.
 	 */
-	private boolean writingReasonCounts =
-		true;
+	private boolean writingReasonCounts = true;
 	/** Symbols to use with {@link NodeWriter}. */
-	private String[] symbols =
-		NodeWriter.logicalSymbols;
+	private String[] symbols = NodeWriter.logicalSymbols;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -47,8 +45,7 @@ public abstract class ExplanationWriter {
 	 * @param explanation explanation to be transformed
 	 */
 	public ExplanationWriter(Explanation explanation) {
-		this.explanation =
-			explanation;
+		this.explanation = explanation;
 	}
 
 	/**
@@ -66,8 +63,7 @@ public abstract class ExplanationWriter {
 	 * @param writingReasonCounts new writing reason counts flag
 	 */
 	public void setWritingReasonCounts(boolean writingReasonCounts) {
-		this.writingReasonCounts =
-			writingReasonCounts;
+		this.writingReasonCounts = writingReasonCounts;
 	}
 
 	/**
@@ -97,8 +93,7 @@ public abstract class ExplanationWriter {
 	 * @param symbols symbols to use with {@link NodeWriter}
 	 */
 	public void setSymbols(String[] symbols) {
-		this.symbols =
-			symbols;
+		this.symbols = symbols;
 	}
 
 	/**
@@ -107,16 +102,12 @@ public abstract class ExplanationWriter {
 	 * @return a string describing the explanation
 	 */
 	public String getString() {
-		String s =
-			getHeaderString();
-		if ((explanation == null)
-			|| (explanation.getReasons() == null)
-			|| explanation.getReasons().isEmpty()) {
+		String s = getHeaderString();
+		if ((explanation == null) || (explanation.getReasons() == null) || explanation.getReasons().isEmpty()) {
 			return s;
 		}
 		for (final Reason reason : explanation.getReasons()) {
-			s +=
-				String.format("%n\u2022 %s", getReasonString(reason));
+			s += String.format("%n\u2022 %s", getReasonString(reason));
 		}
 		return s;
 	}
@@ -127,9 +118,7 @@ public abstract class ExplanationWriter {
 	 * @return a string introducing the explanation or one describing its absence
 	 */
 	public String getHeaderString() {
-		if ((explanation == null)
-			|| (explanation.getReasons() == null)
-			|| explanation.getReasons().isEmpty()) {
+		if ((explanation == null) || (explanation.getReasons() == null) || explanation.getReasons().isEmpty()) {
 			return getMissingExplanationString();
 		}
 		return getIntroductionString();
@@ -184,19 +173,12 @@ public abstract class ExplanationWriter {
 	 * @throws IllegalStateException if the reason's source attribute is unknown
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
-		String s =
-			getConcreteReasonString(reason);
-		final Explanation explanation =
-			reason.getExplanation();
-		final int reasonCount =
-			explanation.getReasonCounts().get(reason);
-		final int explanationCount =
-			explanation.getExplanationCount();
-		if (isWritingReasonCounts()
-			&& (reasonCount > 1)
-			&& (explanationCount > 1)) {
-			s =
-				String.format("%s (%d/%d)", s, reasonCount, explanationCount);
+		String s = getConcreteReasonString(reason);
+		final Explanation explanation = reason.getExplanation();
+		final int reasonCount = explanation.getReasonCounts().get(reason);
+		final int explanationCount = explanation.getExplanationCount();
+		if (isWritingReasonCounts() && (reasonCount > 1) && (explanationCount > 1)) {
+			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
 		}
 		return s;
 	}

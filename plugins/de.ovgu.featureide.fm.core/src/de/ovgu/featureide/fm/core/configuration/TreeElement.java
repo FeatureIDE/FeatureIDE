@@ -27,11 +27,9 @@ import java.util.ArrayList;
  */
 public class TreeElement {
 
-	ArrayList<TreeElement> children =
-		new ArrayList<TreeElement>();
+	ArrayList<TreeElement> children = new ArrayList<TreeElement>();
 
-	TreeElement parent =
-		null;
+	TreeElement parent = null;
 
 	public void addChild(TreeElement child) {
 		children.add(child);
@@ -39,8 +37,7 @@ public class TreeElement {
 	}
 
 	public void setParent(TreeElement parent) {
-		this.parent =
-			parent;
+		this.parent = parent;
 	}
 
 	public TreeElement getParent() {

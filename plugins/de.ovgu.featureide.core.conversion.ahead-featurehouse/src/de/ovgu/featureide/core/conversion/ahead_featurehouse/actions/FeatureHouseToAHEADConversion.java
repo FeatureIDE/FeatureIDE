@@ -71,34 +71,28 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 		if (featureProject == null) {
 			return;
 		}
-		this.featureProject =
-			featureProject;
-		ConversionPlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT
-			+ featureProject.getProjectName()
-			+
-			FROM_FEATUREHOUSE_TO_AHEAD_);
-		final Job job =
-			new Job(CHANGE_COMPOSER_) {
+		this.featureProject = featureProject;
+		ConversionPlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT + featureProject.getProjectName() + FROM_FEATUREHOUSE_TO_AHEAD_);
+		final Job job = new Job(CHANGE_COMPOSER_) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						setJavaBuildPath(featureProject);
-						monitor.beginTask(CHANGE_COMPOSER_, 2);
-						monitor.subTask("Build full FSTModel.");
-						buildFullFSTModel();
-						model =
-							featureProject.getFSTModel();
-						monitor.worked(1);
-						monitor.subTask(REPLACE_KEYWORDS_);
-						startProjectConversion(featureProject);
-						monitor.worked(1);
-					} finally {
-						monitor.done();
-					}
-					return Status.OK_STATUS;
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					setJavaBuildPath(featureProject);
+					monitor.beginTask(CHANGE_COMPOSER_, 2);
+					monitor.subTask("Build full FSTModel.");
+					buildFullFSTModel();
+					model = featureProject.getFSTModel();
+					monitor.worked(1);
+					monitor.subTask(REPLACE_KEYWORDS_);
+					startProjectConversion(featureProject);
+					monitor.worked(1);
+				} finally {
+					monitor.done();
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.BUILD);
 		job.schedule();
 
@@ -118,29 +112,21 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 */
 	private void setJavaBuildPath(IFeatureProject featureProject) {
 		try {
-			final JavaProject javaProject =
-				new JavaProject(featureProject.getProject(), null);
-			final IClasspathEntry[] classpathEntries =
-				javaProject.getRawClasspath();
-			for (int i =
-				0; i < classpathEntries.length; i++) {
+			final JavaProject javaProject = new JavaProject(featureProject.getProject(), null);
+			final IClasspathEntry[] classpathEntries = javaProject.getRawClasspath();
+			for (int i = 0; i < classpathEntries.length; i++) {
 				/** change the actual source entry **/
 				if (classpathEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					classpathEntries[i] =
-						setSourceEntry(classpathEntries[i]);
+					classpathEntries[i] = setSourceEntry(classpathEntries[i]);
 					javaProject.setRawClasspath(classpathEntries, null);
 					return;
 				}
 			}
 
 			/** case: no source entry **/
-			final IClasspathEntry[] newEntries =
-				new IClasspathEntry[classpathEntries.length
-					+ 1];
+			final IClasspathEntry[] newEntries = new IClasspathEntry[classpathEntries.length + 1];
 			System.arraycopy(classpathEntries, 0, newEntries, 0, classpathEntries.length);
-			newEntries[newEntries.length
-				- 1] =
-					getSourceEntry();
+			newEntries[newEntries.length - 1] = getSourceEntry();
 			javaProject.setRawClasspath(classpathEntries, null);
 		} catch (final JavaModelException e) {
 			AheadCorePlugin.getDefault().logError(e);
@@ -154,18 +140,16 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 * @return The entry with the new source path
 	 */
 	public IClasspathEntry setSourceEntry(IClasspathEntry e) {
-		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(),
-				featureProject.getBuildFolder().getFullPath(), e.getInclusionPatterns(), e.getExclusionPatterns(),
-				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null,
-				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), featureProject.getBuildFolder().getFullPath(), e.getInclusionPatterns(),
+				e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(),
+				e.combineAccessRules(), e.getExtraAttributes());
 	}
 
 	/**
 	 * @return A default source entry
 	 */
 	public IClasspathEntry getSourceEntry() {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE,
-				IClasspathEntry.CPE_SOURCE, featureProject.getBuildFolder().getFullPath(), new IPath[0],
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, featureProject.getBuildFolder().getFullPath(), new IPath[0],
 				new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
@@ -189,24 +173,15 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 
 	// XXX private fields used in refining classes need to be set package private
 	private String changeFile(String fileText, IFile file, AbstractList<String> methodNames) {
-		fileText =
-			fileText.replaceFirst("package\\s[\\w,\\s,.]*;", "");
+		fileText = fileText.replaceFirst("package\\s[\\w,\\s,.]*;", "");
 
 		if (fileText.contains("original(")) {
 			// XXX also set refines if the file exists in a feature before
-			fileText =
-				fileText.replaceFirst(" class ", " refines class ");
+			fileText = fileText.replaceFirst(" class ", " refines class ");
 		}
-		int i =
-			0;
+		int i = 0;
 		while (fileText.contains("original(")) {
-			fileText =
-				fileText.replaceFirst("original\\(", "Super()."
-					+
-					(file != null
-						? getMethodName(getLine(fileText), file)
-						: methodNames.get(i++))
-					+ "(");
+			fileText = fileText.replaceFirst("original\\(", "Super()." + (file != null ? getMethodName(getLine(fileText), file) : methodNames.get(i++)) + "(");
 		}
 		return fileText;
 	}
@@ -228,17 +203,14 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	 */
 	private String getMethodName(int line, IFile file) {
 		if (model != null) {
-			final String name =
-				model.getAbsoluteClassName(file);
+			final String name = model.getAbsoluteClassName(file);
 			if (model.getClass(name) != null) {
-				final LinkedList<FSTMethod> methods =
-					new LinkedList<FSTMethod>();
+				final LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
 				for (final FSTRole role : model.getClass(name).getRoles()) {
 					methods.addAll(role.getClassFragment().getMethods());
 				}
 				for (final FSTMethod method : methods) {
-					if ((method.getLine() <= line)
-						&& (method.getEndLine() >= line)) {
+					if ((method.getLine() <= line) && (method.getEndLine() >= line)) {
 						return method.getName();
 					}
 				}

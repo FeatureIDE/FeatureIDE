@@ -29,8 +29,7 @@ import org.eclipse.core.resources.IResource;
  */
 public interface IBuilderMarkerHandler {
 
-	public abstract void createBuilderMarker(IResource resource,
-			String message, int lineNumber, int severity);
+	public abstract void createBuilderMarker(IResource resource, String message, int lineNumber, int severity);
 
 	public abstract void deleteBuilderMarkers(IResource resource, int depth);
 }

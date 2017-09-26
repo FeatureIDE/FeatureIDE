@@ -34,49 +34,45 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 @Deprecated
 public final class FeatureUtilsLegacy {
 
-	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT =
-		new IFunction<Constraint, IConstraint>() {
+	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<Constraint, IConstraint>() {
 
-			@Override
-			public IConstraint invoke(Constraint t) {
-				FeatureUtils.requireNonNull(t);
+		@Override
+		public IConstraint invoke(Constraint t) {
+			FeatureUtils.requireNonNull(t);
 
-				return convert(t);
-			};
+			return convert(t);
 		};
+	};
 
-	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE =
-		new IFunction<Feature, IFeature>() {
+	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<Feature, IFeature>() {
 
-			@Override
-			public IFeature invoke(Feature t) {
-				FeatureUtils.requireNonNull(t);
+		@Override
+		public IFeature invoke(Feature t) {
+			FeatureUtils.requireNonNull(t);
 
-				return convert(t);
-			};
+			return convert(t);
 		};
+	};
 
-	public static final IFunction<IConstraint, Constraint> ICONSTRAINT_TO_CONSTRANT =
-		new IFunction<IConstraint, Constraint>() {
+	public static final IFunction<IConstraint, Constraint> ICONSTRAINT_TO_CONSTRANT = new IFunction<IConstraint, Constraint>() {
 
-			@Override
-			public Constraint invoke(IConstraint t) {
-				FeatureUtils.requireNonNull(t);
+		@Override
+		public Constraint invoke(IConstraint t) {
+			FeatureUtils.requireNonNull(t);
 
-				return convert(t);
-			};
+			return convert(t);
 		};
+	};
 
-	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE =
-		new IFunction<IFeature, Feature>() {
+	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, Feature>() {
 
-			@Override
-			public Feature invoke(IFeature t) {
-				FeatureUtils.requireNonNull(t);
+		@Override
+		public Feature invoke(IFeature t) {
+			FeatureUtils.requireNonNull(t);
 
-				return convert(t);
-			};
+			return convert(t);
 		};
+	};
 
 	public static final IConstraint convert(Constraint c) {
 		FeatureUtils.requireNonNull(c);

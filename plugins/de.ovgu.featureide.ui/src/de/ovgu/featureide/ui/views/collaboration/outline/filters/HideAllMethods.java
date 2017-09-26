@@ -39,13 +39,10 @@ public class HideAllMethods implements IOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {
-		final LinkedList<Object> resultList =
-			new LinkedList<Object>();
+		final LinkedList<Object> resultList = new LinkedList<Object>();
 
-		if ((obj.length > 0)
-			&& (obj[0] instanceof RoleElement)) {
-			for (int i =
-				0; i < obj.length; i++) {
+		if ((obj.length > 0) && (obj[0] instanceof RoleElement)) {
+			for (int i = 0; i < obj.length; i++) {
 				if (!(obj[i] instanceof FSTMethod)) {
 					resultList.add(obj[i]);
 				}

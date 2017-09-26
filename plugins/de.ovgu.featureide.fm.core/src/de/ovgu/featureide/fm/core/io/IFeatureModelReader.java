@@ -68,8 +68,7 @@ public interface IFeatureModelReader {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	public void readFromFile(File file)
-			throws UnsupportedModelException, FileNotFoundException;
+	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException;
 
 	/**
 	 * Parses a textual representation of a feature model.
@@ -77,8 +76,7 @@ public interface IFeatureModelReader {
 	 * @param text
 	 * @throws UnsupportedModelException
 	 */
-	public void readFromString(String text)
-			throws UnsupportedModelException;
+	public void readFromString(String text) throws UnsupportedModelException;
 
 	/**
 	 * Returns warnings occurred while last parsing.

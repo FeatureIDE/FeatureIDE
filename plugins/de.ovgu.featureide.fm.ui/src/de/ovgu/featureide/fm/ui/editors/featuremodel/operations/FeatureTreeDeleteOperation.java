@@ -57,24 +57,17 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 
 	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature parent) {
 		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
-		feature =
-			parent;
+		feature = parent;
 	}
 
 	@Override
 	protected void createSingleOperations() {
-		featureList =
-			new LinkedList<IFeature>();
-		containedFeatureList =
-			new LinkedList<IFeature>();
-		andList =
-			new LinkedList<IFeature>();
-		alternativeList =
-			new LinkedList<IFeature>();
-		orList =
-			new LinkedList<IFeature>();
-		final LinkedList<IFeature> list =
-			new LinkedList<IFeature>();
+		featureList = new LinkedList<IFeature>();
+		containedFeatureList = new LinkedList<IFeature>();
+		andList = new LinkedList<IFeature>();
+		alternativeList = new LinkedList<IFeature>();
+		orList = new LinkedList<IFeature>();
+		final LinkedList<IFeature> list = new LinkedList<IFeature>();
 		list.add(feature);
 		getFeaturesToDelete(list);
 
@@ -87,25 +80,15 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 				} else if (feat.getStructure().isAlternative()) {
 					alternativeList.add(feat);
 				}
-				final AbstractFeatureModelOperation op =
-					new DeleteFeatureOperation(featureModel, feat);
+				final AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
 				operations.add(op);
 			}
 		} else {
-			final String containedFeatures =
-				containedFeatureList.toString();
-			final MessageDialog dialog =
-				new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
-						"The following features are contained in constraints:"
-							+ '\n'
-							+ containedFeatures.substring(1, containedFeatures.length()
-								- 1)
-							+ '\n'
-							+ '\n'
-							+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
-						MessageDialog.ERROR, new String[] {
-							IDialogConstants.OK_LABEL },
-						0);
+			final String containedFeatures = containedFeatureList.toString();
+			final MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
+					"The following features are contained in constraints:" + '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
+						+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
+					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 			dialog.open();
 		}

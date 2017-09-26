@@ -33,14 +33,12 @@ public class Choose extends Node {
 	public int n;
 
 	public Choose(int n, Object... children) {
-		this.n =
-			n;
+		this.n = n;
 		setChildren(children);
 	}
 
 	public Choose(int n, Node[] children) {
-		this.n =
-			n;
+		this.n = n;
 		setChildren(children);
 	}
 
@@ -76,8 +74,7 @@ public class Choose extends Node {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		int trueCount =
-			0;
+		int trueCount = 0;
 		for (final Node child : children) {
 			if (child.getValue(map)) {
 				trueCount++;

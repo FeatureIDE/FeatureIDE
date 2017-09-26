@@ -36,32 +36,23 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public class FMComposerManager implements IFMComposerExtension {
 
-	private IFMComposerExtension fmComposerExtension =
-		new FMComposerExtension();
+	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
 	private String composerId;
 
 	// TODO duplicate entries
-	private final static String COMPOSER_KEY =
-		"composer";
-	private final static QualifiedName COMPOSER_CONFIG_ID =
-		new QualifiedName("featureproject.configs", "composer");
-	private final static QualifiedName SOURCE_FOLDER_CONFIG_ID =
-		new QualifiedName("featureproject.configs", "source");
-	private final static String SOURCE_ARGUMENT =
-		"source";
-	private final static String DEFAULT_SOURCE_PATH =
-		"src";
-	private final static String BUILDER_ID =
-		"de.ovgu.featureide.core"
-			+ ".extensibleFeatureProjectBuilder";
+	private final static String COMPOSER_KEY = "composer";
+	private final static QualifiedName COMPOSER_CONFIG_ID = new QualifiedName("featureproject.configs", "composer");
+	private final static QualifiedName SOURCE_FOLDER_CONFIG_ID = new QualifiedName("featureproject.configs", "source");
+	private final static String SOURCE_ARGUMENT = "source";
+	private final static String DEFAULT_SOURCE_PATH = "src";
+	private final static String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
 	private final IProject project;
 
 	/**
 	 *
 	 */
 	public FMComposerManager(IProject project) {
-		this.project =
-			project;
+		this.project = project;
 		setComposerID();
 		setComposer();
 	}
@@ -76,14 +67,12 @@ public class FMComposerManager implements IFMComposerExtension {
 
 	String getProjectSourcePath() {
 		try {
-			String path =
-				project.getPersistentProperty(SOURCE_FOLDER_CONFIG_ID);
+			String path = project.getPersistentProperty(SOURCE_FOLDER_CONFIG_ID);
 			if (path != null) {
 				return path;
 			}
 
-			path =
-				getPath(project, SOURCE_ARGUMENT);
+			path = getPath(project, SOURCE_ARGUMENT);
 			if (path == null) {
 				return DEFAULT_SOURCE_PATH;
 			}
@@ -112,21 +101,17 @@ public class FMComposerManager implements IFMComposerExtension {
 			return;
 		}
 		try {
-			String id =
-				project.getPersistentProperty(COMPOSER_CONFIG_ID);
+			String id = project.getPersistentProperty(COMPOSER_CONFIG_ID);
 			if (id != null) {
-				composerId =
-					id;
+				composerId = id;
 				return;
 			}
 
 			for (final ICommand command : project.getDescription().getBuildSpec()) {
 				if (BUILDER_ID.equals(command.getBuilderName())) {
-					id =
-						command.getArguments().get(COMPOSER_KEY);
+					id = command.getArguments().get(COMPOSER_KEY);
 					if (id != null) {
-						composerId =
-							id;
+						composerId = id;
 						return;
 					}
 				}
@@ -135,8 +120,7 @@ public class FMComposerManager implements IFMComposerExtension {
 		} catch (final CoreException e) {
 			Logger.logError(e);
 		}
-		composerId =
-			null;
+		composerId = null;
 	}
 
 	private void setComposer() {
@@ -144,17 +128,13 @@ public class FMComposerManager implements IFMComposerExtension {
 			return;
 		}
 
-		final IConfigurationElement[] config =
-			Platform.getExtensionRegistry().getConfigurationElementsFor(PluginID.PLUGIN_ID
-				+ ".FMComposer");
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(PluginID.PLUGIN_ID + ".FMComposer");
 		try {
 			for (final IConfigurationElement e : config) {
 				if (e.getAttribute("composer").equals(composerId)) {
-					final Object o =
-						e.createExecutableExtension("class");
+					final Object o = e.createExecutableExtension("class");
 					if (o instanceof IFMComposerExtension) {
-						fmComposerExtension =
-							(IFMComposerExtension) o;
+						fmComposerExtension = (IFMComposerExtension) o;
 					}
 				}
 			}
@@ -174,10 +154,8 @@ public class FMComposerManager implements IFMComposerExtension {
 	 * @param s
 	 */
 	public void setComposerID(String s, Object o) {
-		composerId =
-			s;
-		fmComposerExtension =
-			(IFMComposerExtension) o;
+		composerId = s;
+		fmComposerExtension = (IFMComposerExtension) o;
 	}
 
 	// TODO rename method
@@ -211,18 +189,15 @@ public class FMComposerManager implements IFMComposerExtension {
 		return fmComposerExtension.getErrorMessage();
 	}
 
-	private static final HashMap<IProject, IFMComposerExtension> map =
-		new HashMap<>();
+	private static final HashMap<IProject, IFMComposerExtension> map = new HashMap<>();
 
 	public static final IFMComposerExtension getFMComposerExtension(final IProject project) {
 		if (project == null) {
 			return new FMComposerManager(project);
 		}
-		IFMComposerExtension extension =
-			map.get(project);
+		IFMComposerExtension extension = map.get(project);
 		if (extension == null) {
-			extension =
-				new FMComposerManager(project);
+			extension = new FMComposerManager(project);
 			map.put(project, extension);
 		}
 		return extension;

@@ -40,9 +40,7 @@ public class ImportDIMACSHandler extends AbstractImportHandler {
 
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] {
-			"*.dimacs" });
-		fileDialog.setFilterNames(new String[] {
-			"DIMACS" });
+		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
+		fileDialog.setFilterNames(new String[] { "DIMACS" });
 	}
 }

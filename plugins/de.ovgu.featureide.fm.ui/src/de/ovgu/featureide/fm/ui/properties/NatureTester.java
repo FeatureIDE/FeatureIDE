@@ -32,17 +32,12 @@ public class NatureTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final boolean positiveResult =
-			(boolean) expectedValue;
-		final IResource res =
-			SelectionWrapper.checkClass(receiver, IResource.class);
+		final boolean positiveResult = (boolean) expectedValue;
+		final IResource res = SelectionWrapper.checkClass(receiver, IResource.class);
 		if (res != null) {
-			final IProject project =
-				res.getProject();
-			if ((project != null)
-				&& project.isAccessible()) {
-				for (int i =
-					0; i < args.length; i++) {
+			final IProject project = res.getProject();
+			if ((project != null) && project.isAccessible()) {
+				for (int i = 0; i < args.length; i++) {
 					try {
 						if (project.hasNature((String) args[i])) {
 							return positiveResult;

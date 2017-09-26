@@ -31,10 +31,8 @@ import java.util.TreeSet;
  */
 public class ViewTagPool {
 
-	private final HashMap<ViewTag, ViewTag> map =
-		new HashMap<ViewTag, ViewTag>();
-	private final TreeSet<ViewTag> set =
-		new TreeSet<ViewTag>();
+	private final HashMap<ViewTag, ViewTag> map = new HashMap<ViewTag, ViewTag>();
+	private final TreeSet<ViewTag> set = new TreeSet<ViewTag>();
 
 	public ViewTag getViewTag(String name, int level) {
 		return getViewTag(new ViewTag(name, level));
@@ -45,8 +43,7 @@ public class ViewTagPool {
 	}
 
 	private synchronized ViewTag getViewTag(ViewTag newVT) {
-		final ViewTag existingVT =
-			map.get(newVT);
+		final ViewTag existingVT = map.get(newVT);
 		if (existingVT == null) {
 			set.add(newVT);
 			map.put(newVT, newVT);
@@ -57,13 +54,9 @@ public class ViewTagPool {
 	}
 
 	public synchronized void removeViewTag(String name) {
-		final ViewTag startVt =
-			new ViewTag(name, 0),
-				endVt =
-					new ViewTag(name);
+		final ViewTag startVt = new ViewTag(name, 0), endVt = new ViewTag(name);
 
-		final NavigableSet<ViewTag> subSet =
-			set.subSet(startVt, true, endVt, true);
+		final NavigableSet<ViewTag> subSet = set.subSet(startVt, true, endVt, true);
 		for (final ViewTag viewTag : subSet) {
 			map.remove(viewTag);
 		}
@@ -71,10 +64,7 @@ public class ViewTagPool {
 	}
 
 	public synchronized void scaleUpViewTags(String name, int minimumLevel) {
-		final ViewTag startVt =
-			new ViewTag(name, minimumLevel),
-				endVt =
-					new ViewTag(name);
+		final ViewTag startVt = new ViewTag(name, minimumLevel), endVt = new ViewTag(name);
 
 		for (final ViewTag curVt : set.subSet(startVt, true, endVt, true)) {
 			curVt.scaleUp();

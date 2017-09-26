@@ -42,18 +42,13 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class FeatureCProjectPage extends NewFeatureProjectPage {
 
 	private final IProject project;
-	private static final String JAVA_NATURE =
-		"org.eclipse.jdt.core.javanature";
-	private static final String MESSAGE =
-		THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY;
+	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	private static final String MESSAGE = THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY;
 
 	public FeatureCProjectPage(IProject project) {
 		super();
-		setDescription(ADDS_THE_FEATUREIDE_NATURE_TO_THE_PROJECT
-			+ project.getName()
-			+ ".");
-		this.project =
-			project;
+		setDescription(ADDS_THE_FEATUREIDE_NATURE_TO_THE_PROJECT + project.getName() + ".");
+		this.project = project;
 	}
 
 	@Override
@@ -68,24 +63,17 @@ public class FeatureCProjectPage extends NewFeatureProjectPage {
 	private void setBuildPath() {
 		try {
 			if (project.hasNature(JAVA_NATURE)) {
-				final JavaProject javaProject =
-					new JavaProject(project, null);
+				final JavaProject javaProject = new JavaProject(project, null);
 				for (final IClasspathEntry entry : javaProject.getRawClasspath()) {
 					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-						String path =
-							entry.getPath().toOSString();
-						final String fileSeparator =
-							System.getProperty("file.separator");
+						String path = entry.getPath().toOSString();
+						final String fileSeparator = System.getProperty("file.separator");
 
 						if (path.contains(fileSeparator)) {
-							path =
-								path.substring(path.indexOf(fileSeparator)
-									+ 1);
+							path = path.substring(path.indexOf(fileSeparator) + 1);
 						}
 						if (path.contains(fileSeparator)) {
-							path =
-								path.substring(path.indexOf(fileSeparator)
-									+ 1);
+							path = path.substring(path.indexOf(fileSeparator) + 1);
 						}
 
 						buildPath.setText(path);

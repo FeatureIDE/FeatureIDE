@@ -61,13 +61,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public FeatureModel(IFeatureModel model) {
-		this.model =
-			model;
+		this.model = model;
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-		model =
-			oldFeatureModel.model.clone();
+		model = oldFeatureModel.model.clone();
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
@@ -133,8 +131,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-		final Hashtable<String, IFeature> iFeatureTable =
-			new Hashtable<>();
+		final Hashtable<String, IFeature> iFeatureTable = new Hashtable<>();
 		for (final String key : Functional.toIterator(featureTable.keys())) {
 			iFeatureTable.put(key, convert(featureTable.get(key)));
 		}
@@ -196,10 +193,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	 * @return the featureTable
 	 */
 	protected Map<String, Feature> getFeatureTable() {
-		final Map<String, Feature> result =
-			new HashMap<>();
-		final Map<String, IFeature> map =
-			FeatureUtils.getFeatureTable(model);
+		final Map<String, Feature> result = new HashMap<>();
+		final Map<String, IFeature> map = FeatureUtils.getFeatureTable(model);
 		for (final String key : map.keySet()) {
 			result.put(key, convert(map.get(key)));
 		}

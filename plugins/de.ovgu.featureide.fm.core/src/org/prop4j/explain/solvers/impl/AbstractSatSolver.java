@@ -30,8 +30,7 @@ import org.prop4j.explain.solvers.SatSolver;
 public abstract class AbstractSatSolver extends AbstractSatProblem implements SatSolver {
 
 	/** The SAT oracle used for the actual solving. */
-	private final Object oracle =
-		createOracle();
+	private final Object oracle = createOracle();
 
 	/**
 	 * Creates the oracle used for the actual solving.

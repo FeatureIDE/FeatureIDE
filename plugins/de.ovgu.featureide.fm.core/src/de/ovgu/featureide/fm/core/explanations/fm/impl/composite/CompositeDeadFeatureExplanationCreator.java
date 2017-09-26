@@ -31,10 +31,12 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeDeadFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<DeadFeatureExplanationCreator> implements DeadFeatureExplanationCreator {
+public class CompositeDeadFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<DeadFeatureExplanationCreator>
+		implements DeadFeatureExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeDeadFeatureExplanationCreator(Collection<DeadFeatureExplanationCreator> composites) {

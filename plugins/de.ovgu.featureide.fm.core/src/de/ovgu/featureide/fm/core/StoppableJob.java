@@ -56,22 +56,19 @@ public abstract class StoppableJob extends Job {
 
 	@Override
 	protected final IStatus run(final IProgressMonitor monitor) {
-		thread =
-			new Thread(new Runnable() {
+		thread = new Thread(new Runnable() {
 
-				@Override
-				public void run() {
-					try {
-						execute(monitor);
-					} catch (final Exception e) {
-						Logger.logError(e);
-					}
+			@Override
+			public void run() {
+				try {
+					execute(monitor);
+				} catch (final Exception e) {
+					Logger.logError(e);
 				}
+			}
 
-			}, "Thread-"
-				+ getName());
-		if ((getPriority() == SHORT)
-			|| (getPriority() == INTERACTIVE)) {
+		}, "Thread-" + getName());
+		if ((getPriority() == SHORT) || (getPriority() == INTERACTIVE)) {
 			thread.setPriority(Thread.MAX_PRIORITY);
 		} else if (getPriority() == LONG) {
 			thread.setPriority(Thread.NORM_PRIORITY);

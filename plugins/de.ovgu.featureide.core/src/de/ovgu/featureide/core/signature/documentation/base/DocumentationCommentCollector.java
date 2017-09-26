@@ -37,24 +37,17 @@ import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair
 class DocumentationCommentCollector {
 
 	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures) {
-		final SignatureIterator it =
-			projectSignatures.iterator();
+		final SignatureIterator it = projectSignatures.iterator();
 
-		final List<SignatureCommentPair> list =
-			new LinkedList<>();
+		final List<SignatureCommentPair> list = new LinkedList<>();
 
 		while (it.hasNext()) {
-			final AbstractSignature curSignature =
-				it.next();
-			final AFeatureData[] featureDataArray =
-				curSignature.getFeatureData();
-			final List<Comment> commentList =
-				new LinkedList<>();
+			final AbstractSignature curSignature = it.next();
+			final AFeatureData[] featureDataArray = curSignature.getFeatureData();
+			final List<Comment> commentList = new LinkedList<>();
 
-			for (int j =
-				0; j < featureDataArray.length; j++) {
-				final AFeatureData featureData =
-					featureDataArray[j];
+			for (int j = 0; j < featureDataArray.length; j++) {
+				final AFeatureData featureData = featureDataArray[j];
 				if (featureData.getComment() != null) {
 					commentList.add(new Comment(featureData.getComment(), featureData.getID()));
 				}

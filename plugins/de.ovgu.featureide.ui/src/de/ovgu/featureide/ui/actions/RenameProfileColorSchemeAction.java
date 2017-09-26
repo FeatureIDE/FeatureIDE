@@ -49,8 +49,7 @@ public class RenameProfileColorSchemeAction extends Action {
 	 */
 	public RenameProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
-		this.model =
-			model;
+		this.model = model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
@@ -59,11 +58,9 @@ public class RenameProfileColorSchemeAction extends Action {
 	 */
 	@Override
 	public void run() {
-		final RenameColorSchemeWizard wizard =
-			new RenameColorSchemeWizard(model);
+		final RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(model);
 
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 

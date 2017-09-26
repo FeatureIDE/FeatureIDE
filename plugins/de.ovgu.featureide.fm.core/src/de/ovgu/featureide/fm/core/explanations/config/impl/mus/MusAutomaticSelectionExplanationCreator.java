@@ -44,8 +44,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	/**
 	 * The features that have been added to the oracle. Stored for performance reasons.
 	 */
-	private final List<SelectableFeature> selectedFeatures =
-		new LinkedList<>();
+	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
 	@Override
 	public SelectableFeature getSubject() {
@@ -54,8 +53,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof SelectableFeature)) {
+		if ((subject != null) && !(subject instanceof SelectableFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -63,25 +61,21 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle =
-			getOracle();
+		final MusExtractor oracle = getOracle();
 		final AutomaticSelectionExplanation explanation;
 		oracle.push();
 		try {
 			selectedFeatures.clear();
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
-				final Object var =
-					NodeCreator.getVariable(featureSelection.getFeature());
+				final Object var = NodeCreator.getVariable(featureSelection.getFeature());
 				final boolean value;
 				if (featureSelection == getSubject()) {
 					switch (featureSelection.getAutomatic()) {
 					case SELECTED:
-						value =
-							false;
+						value = false;
 						break;
 					case UNSELECTED:
-						value =
-							true;
+						value = true;
 						break;
 					case UNDEFINED:
 						throw new IllegalStateException("Feature not automatically selected or unselected");
@@ -92,12 +86,10 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 				} else {
 					switch (featureSelection.getManual()) {
 					case SELECTED:
-						value =
-							true;
+						value = true;
 						break;
 					case UNSELECTED:
-						value =
-							false;
+						value = false;
 						break;
 					case UNDEFINED:
 						continue;
@@ -108,8 +100,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					selectedFeatures.add(featureSelection);
 				}
 			}
-			explanation =
-				getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
@@ -123,9 +114,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 
 	@Override
 	protected Reason getReason(int clauseIndex) {
-		final int selectionIndex =
-			clauseIndex
-				- getTraceModel().getTraceCount();
+		final int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (selectionIndex >= 0) {
 			return new ConfigurationReason(selectedFeatures.get(selectionIndex));
 		}

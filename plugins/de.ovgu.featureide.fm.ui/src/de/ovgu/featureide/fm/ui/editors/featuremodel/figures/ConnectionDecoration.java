@@ -50,7 +50,6 @@ public abstract class ConnectionDecoration extends Shape implements RotatableDec
 	 * @param activeReason new active reason
 	 */
 	public void setActiveReason(FeatureModelReason activeReason) {
-		this.activeReason =
-			activeReason;
+		this.activeReason = activeReason;
 	}
 }

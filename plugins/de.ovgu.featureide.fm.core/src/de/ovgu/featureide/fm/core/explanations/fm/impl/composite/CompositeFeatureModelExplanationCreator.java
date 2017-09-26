@@ -31,10 +31,12 @@ import de.ovgu.featureide.fm.core.explanations.impl.composite.CompositeExplanati
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class CompositeFeatureModelExplanationCreator<T extends FeatureModelExplanationCreator> extends CompositeExplanationCreator<T> implements FeatureModelExplanationCreator {
+public abstract class CompositeFeatureModelExplanationCreator<T extends FeatureModelExplanationCreator> extends CompositeExplanationCreator<T>
+		implements FeatureModelExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeFeatureModelExplanationCreator(Collection<T> composites) {

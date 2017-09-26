@@ -33,8 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class HideLegendOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL =
-		"Show/Hide Legend";
+	private static final String LABEL = "Show/Hide Legend";
 
 	IGraphicalFeatureModel model;
 
@@ -43,8 +42,7 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 	 */
 	public HideLegendOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel.getFeatureModel(), LABEL);
-		model =
-			featureModel;
+		model = featureModel;
 	}
 
 	@Override

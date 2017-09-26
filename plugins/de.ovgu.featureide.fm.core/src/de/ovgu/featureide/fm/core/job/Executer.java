@@ -31,8 +31,7 @@ class Executer<T> {
 	protected final LongRunningMethod<T> method;
 
 	public Executer(LongRunningMethod<T> method) {
-		this.method =
-			method;
+		this.method = method;
 	}
 
 	public void cancel() {}

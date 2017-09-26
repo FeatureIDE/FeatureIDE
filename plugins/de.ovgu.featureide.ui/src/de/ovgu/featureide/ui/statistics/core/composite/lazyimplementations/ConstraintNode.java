@@ -37,10 +37,8 @@ public class ConstraintNode extends LazyParent {
 
 	public ConstraintNode(IConstraint constr) {
 		super(CONSTRAINT, constr.toString());
-		this.constr =
-			constr;
-		lazy =
-			false;
+		this.constr = constr;
+		lazy = false;
 	}
 
 	@Override

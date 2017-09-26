@@ -46,27 +46,19 @@ public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<in
 	}
 
 	public void setFixedFeatures(int[] fixedVariables, int newCount) {
-		this.fixedVariables =
-			fixedVariables;
-		this.newCount =
-			newCount;
+		this.fixedVariables = fixedVariables;
+		this.newCount = newCount;
 	}
 
 	public void resetFixedFeatures() {
-		fixedVariables =
-			new int[0];
-		newCount =
-			0;
+		fixedVariables = new int[0];
+		newCount = 0;
 	}
 
 	protected static int countNegative(int[] model) {
-		int count =
-			0;
-		for (int i =
-			0; i < model.length; i++) {
-			count +=
-				model[i] >>> (Integer.SIZE
-					- 1);
+		int count = 0;
+		for (int i = 0; i < model.length; i++) {
+			count += model[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
 	}

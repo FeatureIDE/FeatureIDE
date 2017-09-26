@@ -39,13 +39,10 @@ import de.ovgu.featureide.core.signature.java.JavaClassCreator;
  */
 public class ProjectStructure {
 
-	protected final HashMap<String, AbstractClassFragment> classList =
-		new HashMap<String, AbstractClassFragment>();
+	protected final HashMap<String, AbstractClassFragment> classList = new HashMap<String, AbstractClassFragment>();
 
-	protected int hashCode =
-		0;
-	protected boolean hasHashCode =
-		false;
+	protected int hashCode = 0;
+	protected boolean hasHashCode = false;
 
 	public ProjectStructure(SignatureIterator it) {
 		construct(it, new JavaClassCreator());
@@ -53,42 +50,32 @@ public class ProjectStructure {
 
 	public void construct(SignatureIterator allMembers, AClassCreator aClassCreator) {
 		classList.clear();
-		final LinkedList<AbstractClassSignature> parents =
-			new LinkedList<AbstractClassSignature>();
+		final LinkedList<AbstractClassSignature> parents = new LinkedList<AbstractClassSignature>();
 		allMembers.reset();
 		while (allMembers.hasNext()) {
-			final AbstractSignature sig =
-				allMembers.next();
-			AbstractClassSignature parent =
-				sig.getParent();
+			final AbstractSignature sig = allMembers.next();
+			AbstractClassSignature parent = sig.getParent();
 			parents.clear();
 			final boolean isMember;
 			if (sig instanceof AbstractClassSignature) {
 				parents.addFirst((AbstractClassSignature) sig);
-				isMember =
-					false;
+				isMember = false;
 			} else {
-				isMember =
-					true;
+				isMember = true;
 			}
 			while (parent != null) {
 				parents.addFirst(parent);
-				parent =
-					parent.getParent();
+				parent = parent.getParent();
 			}
 
-			parent =
-				parents.removeFirst();
-			AbstractClassFragment parentClass =
-				getClass(parent.getFullName());
+			parent = parents.removeFirst();
+			AbstractClassFragment parentClass = getClass(parent.getFullName());
 			if (parentClass == null) {
-				parentClass =
-					aClassCreator.create(parent);
+				parentClass = aClassCreator.create(parent);
 				addClass(parentClass);
 			} else {
 				if (sig instanceof AbstractClassSignature) {
-					final AbstractClassSignature parentSig =
-						parentClass.getSignature();
+					final AbstractClassSignature parentSig = parentClass.getSignature();
 					for (final String newImport : ((AbstractClassSignature) sig).getImportList()) {
 						parentSig.addImport(newImport);
 					}
@@ -96,16 +83,13 @@ public class ProjectStructure {
 			}
 
 			for (final AbstractClassSignature child : parents) {
-				AbstractClassFragment childClass =
-					parentClass.getInnerClass(child.getFullName());
+				AbstractClassFragment childClass = parentClass.getInnerClass(child.getFullName());
 
 				if (childClass == null) {
-					childClass =
-						aClassCreator.create(child);
+					childClass = aClassCreator.create(child);
 					parentClass.addInnerClass(childClass);
 				}
-				parentClass =
-					childClass;
+				parentClass = childClass;
 			}
 			if (isMember) {
 				parentClass.addMember(sig);
@@ -135,17 +119,14 @@ public class ProjectStructure {
 			return false;
 		}
 
-		final ProjectStructure otherSig =
-			(ProjectStructure) obj;
+		final ProjectStructure otherSig = (ProjectStructure) obj;
 
 		if (classList.size() != otherSig.classList.size()) {
 			return false;
 		}
 		for (final Entry<String, AbstractClassFragment> entrySet : classList.entrySet()) {
-			final AbstractClassFragment otherClassSig =
-				otherSig.classList.get(entrySet.getKey());
-			if ((otherClassSig == null)
-				|| !otherClassSig.equals(entrySet.getValue())) {
+			final AbstractClassFragment otherClassSig = otherSig.classList.get(entrySet.getKey());
+			if ((otherClassSig == null) || !otherClassSig.equals(entrySet.getValue())) {
 				return false;
 			}
 		}
@@ -155,23 +136,18 @@ public class ProjectStructure {
 	@Override
 	public int hashCode() {
 		if (!hasHashCode) {
-			hashCode =
-				1;
+			hashCode = 1;
 			for (final AbstractClassFragment cls : classList.values()) {
-				hashCode =
-					hashCode
-						+ cls.hashCode();
+				hashCode = hashCode + cls.hashCode();
 			}
-			hasHashCode =
-				true;
+			hasHashCode = true;
 		}
 		return hashCode;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder sb =
-			new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (final AbstractClassFragment cls : classList.values()) {
 			sb.append(cls.toString());
 		}

@@ -46,10 +46,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPush() {
-		final MutableSatSolver instance =
-			getInstance();
-		final List<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final List<Node> expected = new LinkedList<>();
 		instance.addFormula(new Or("A", new Literal("B", false)));
 		expected.add(new Or("A", new Literal("B", false)));
 		assertEquals(expected, instance.getClauses());
@@ -65,10 +63,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPushEmpty() {
-		final MutableSatSolver instance =
-			getInstance();
-		final List<Node> expected =
-			Collections.emptyList();
+		final MutableSatSolver instance = getInstance();
+		final List<Node> expected = Collections.emptyList();
 		assertEquals(expected, instance.getClauses());
 		assertTrue(instance.isSatisfiable());
 		instance.push();
@@ -78,10 +74,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPushMultiple() {
-		final MutableSatSolver instance =
-			getInstance();
-		final List<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final List<Node> expected = new LinkedList<>();
 		instance.addFormula(new Or("A", "B"));
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
@@ -109,10 +103,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPop() {
-		final MutableSatSolver instance =
-			getInstance();
-		final Deque<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
 		instance.addFormula(new Or("A", new Literal("B", false)));
 		expected.add(new Or("A", new Literal("B", false)));
 		assertEquals(expected, instance.getClauses());
@@ -132,18 +124,15 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPopEmpty() {
-		final MutableSatSolver instance =
-			getInstance();
+		final MutableSatSolver instance = getInstance();
 		exception.expect(NoSuchElementException.class);
 		instance.pop();
 	}
 
 	@Test
 	public void testPopMultiple() {
-		final MutableSatSolver instance =
-			getInstance();
-		final Deque<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
 		instance.addFormula(new Or("A", "B"));
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
@@ -183,10 +172,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPopUnit() {
-		final MutableSatSolver instance =
-			getInstance();
-		final Deque<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
 		instance.addFormula(new Or("A"));
 		expected.add(new Or("A"));
 		assertEquals(expected, instance.getClauses());
@@ -206,10 +193,8 @@ public abstract class MutableSatSolverTests extends SatSolverTests {
 
 	@Test
 	public void testPopAssumptions() {
-		final MutableSatSolver instance =
-			getInstance();
-		final Deque<Node> expected =
-			new LinkedList<>();
+		final MutableSatSolver instance = getInstance();
+		final Deque<Node> expected = new LinkedList<>();
 		instance.addFormula(new And("A", "B"));
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));

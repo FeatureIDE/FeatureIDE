@@ -47,11 +47,8 @@ public class ViewLabelProvider extends LabelProvider implements GUIDefaults {
 			return ((TreeObject) o).getImage();
 		}
 		if (o instanceof SelectableFeature) {
-			final SelectableFeature feature =
-				(SelectableFeature) o;
-			return feature.getManual() == Selection.SELECTED
-				? IMAGE_ASELECTED
-				: IMAGE_ADESELECTED;
+			final SelectableFeature feature = (SelectableFeature) o;
+			return feature.getManual() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
 		}
 		return null;
 	}

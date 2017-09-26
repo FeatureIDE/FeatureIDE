@@ -41,43 +41,32 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
 
-	private final static String COMPOSER_ID =
-		"de.ovgu.featureide.core.composer.runtime";
+	private final static String COMPOSER_ID = "de.ovgu.featureide.core.composer.runtime";
 
 	@Override
 	public void launch(ILaunchConfiguration configuration, final String mode, final ILaunch launch, final IProgressMonitor monitor) throws CoreException {
-		final ILaunchConfigurationWorkingCopy launchConfigCopy =
-			configuration.getWorkingCopy();
-		IFeatureProject featureProject =
-			null;
+		final ILaunchConfigurationWorkingCopy launchConfigCopy = configuration.getWorkingCopy();
+		IFeatureProject featureProject = null;
 
 		if (launchConfigCopy.getMappedResources().length == 1) {
-			featureProject =
-				CorePlugin.getFeatureProject(launchConfigCopy.getMappedResources()[0]);
+			featureProject = CorePlugin.getFeatureProject(launchConfigCopy.getMappedResources()[0]);
 		}
 
-		if ((featureProject != null)
-			&& featureProject.getComposerID().equals(COMPOSER_ID)
+		if ((featureProject != null) && featureProject.getComposerID().equals(COMPOSER_ID)
 			&& RuntimeParameters.RUN_CONFIGURATION.equals(featureProject.getCompositionMechanism())) {
 
-			final Configuration featureProjectConfig =
-				new Configuration(featureProject.getFeatureModel());
+			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
 
-			final String userDefinedArgs =
-				launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
+			final String userDefinedArgs = launchConfigCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, "");
 
-			final Path configPath =
-				Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
+			final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
 			SimpleFileHandler.load(configPath, featureProjectConfig, ConfigFormatManager.getInstance());
 
-			String args =
-				userDefinedArgs;
+			String args = userDefinedArgs;
 			for (final SelectableFeature f : featureProjectConfig.getFeatures()) {
 				if (!f.getFeature().getStructure().isAbstract()) {
 					if (f.getSelection() == Selection.SELECTED) {
-						args +=
-							" "
-								+ f.getFeature().getName();
+						args += " " + f.getFeature().getName();
 						launchConfigCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, args);
 					}
 				}
@@ -86,8 +75,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 			new org.eclipse.jdt.launching.JavaLaunchDelegate().launch(launchConfigCopy, mode, launch, monitor);
 
 			launchConfigCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, userDefinedArgs);
-			configuration =
-				launchConfigCopy.doSave();
+			configuration = launchConfigCopy.doSave();
 
 		} else {
 			new org.eclipse.jdt.launching.JavaLaunchDelegate().launch(launchConfigCopy, mode, launch, monitor);

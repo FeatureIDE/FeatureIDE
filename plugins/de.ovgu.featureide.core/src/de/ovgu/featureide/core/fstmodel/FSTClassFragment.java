@@ -32,27 +32,16 @@ import javax.annotation.Nonnull;
  */
 public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 
-	protected final TreeSet<FSTMethod> methods =
-		new TreeSet<FSTMethod>();
-	protected final TreeSet<FSTField> fields =
-		new TreeSet<FSTField>();
-	protected final TreeSet<FSTClassFragment> innerClasses =
-		new TreeSet<FSTClassFragment>();
-	protected final TreeSet<FSTInvariant> invariants =
-		new TreeSet<FSTInvariant>();
+	protected final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
+	protected final TreeSet<FSTField> fields = new TreeSet<FSTField>();
+	protected final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
+	protected final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 
-	protected String pckg =
-		null;
+	protected String pckg = null;
 
-	protected boolean innerClass =
-		false;
+	protected boolean innerClass = false;
 
-	protected final HashSet<String> importList =
-		new HashSet<String>(),
-			extendList =
-				new HashSet<String>(),
-			implementList =
-				new HashSet<String>();
+	protected final HashSet<String> importList = new HashSet<String>(), extendList = new HashSet<String>(), implementList = new HashSet<String>();
 
 	public FSTClassFragment(String name) {
 		super(name, null, null, "", -1, -1);
@@ -60,11 +49,9 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 
 	@Override
 	public String getFullName() {
-		final StringBuilder fullname =
-			new StringBuilder();
+		final StringBuilder fullname = new StringBuilder();
 		fullname.append(name);
-		fullname.append(" : "
-			+ type);
+		fullname.append(" : " + type);
 		return fullname.toString();
 	}
 
@@ -149,18 +136,15 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	}
 
 	public void setPackage(String pckg) {
-		this.pckg =
-			pckg;
+		this.pckg = pckg;
 	}
 
 	public void setType(String type) {
-		this.type =
-			type;
+		this.type = type;
 	}
 
 	public void setModifiers(String modifiers) {
-		this.modifiers =
-			modifiers;
+		this.modifiers = modifiers;
 	}
 
 	public boolean isInnerClass() {
@@ -168,8 +152,7 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	}
 
 	public void setInnerClass(boolean innerClass) {
-		this.innerClass =
-			innerClass;
+		this.innerClass = innerClass;
 	}
 
 }

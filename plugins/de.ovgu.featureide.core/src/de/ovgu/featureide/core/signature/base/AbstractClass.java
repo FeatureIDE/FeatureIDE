@@ -28,9 +28,7 @@ public abstract class AbstractClass extends AbstractClassFragment {
 	protected AbstractClass(AbstractClassSignature signature) {
 		super(signature);
 
-		members =
-			new HashSet<AbstractSignature>();
-		innerClasses =
-			new HashMap<String, AbstractClassFragment>();
+		members = new HashSet<AbstractSignature>();
+		innerClasses = new HashMap<String, AbstractClassFragment>();
 	}
 }

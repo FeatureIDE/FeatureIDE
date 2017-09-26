@@ -55,8 +55,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
 	public ModelLayoutEditPolicy(IGraphicalFeatureModel featureModel) {
 		super();
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
@@ -83,51 +82,34 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
 	@Override
 	protected Command getMoveChildrenCommand(Request request) {
-		cmd =
-			null;
+		cmd = null;
 		if (request instanceof ChangeBoundsRequest) {
-			final ChangeBoundsRequest r =
-				(ChangeBoundsRequest) request;
+			final ChangeBoundsRequest r = (ChangeBoundsRequest) request;
 			if (r.getEditParts().size() != 1) {
 				return null;
 			}
 
-			final Object editPart =
-				r.getEditParts().get(0);
+			final Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
-				final FeatureEditPart featureEditPart =
-					(FeatureEditPart) editPart;
-				final IGraphicalFeature feature =
-					featureEditPart.getModel();
-				Rectangle bounds =
-					FeatureUIHelper.getBounds(feature);
-				bounds =
-					bounds.getTranslated(r.getMoveDelta().getScaled(1
-						/ FeatureUIHelper.getZoomFactor()));
-				cmd =
-					new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
+				final FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
+				final IGraphicalFeature feature = featureEditPart.getModel();
+				Rectangle bounds = FeatureUIHelper.getBounds(feature);
+				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
+				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				final IGraphicalConstraint constraint =
-					((ConstraintEditPart) editPart).getModel();
+				final IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
-					final Point point =
-						r.getLocation().getCopy();
+					final Point point = r.getLocation().getCopy();
 					getHostFigure().translateToRelative(point);
-					cmd =
-						new ConstraintDragAndDropCommand(featureModel, constraint, point);
+					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, point);
 				} else {
-					Rectangle bounds =
-						FeatureUIHelper.getBounds(constraint);
-					bounds =
-						bounds.getTranslated(r.getMoveDelta().getScaled(1
-							/ FeatureUIHelper.getZoomFactor()));
-					cmd =
-						new ConstraintDragAndDropCommand(featureModel, constraint, bounds.getLocation());
+					Rectangle bounds = FeatureUIHelper.getBounds(constraint);
+					bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
+					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, bounds.getLocation());
 				}
 			} else if (editPart instanceof LegendEditPart) {
-				cmd =
-					new LegendDragAndDropCommand(featureModel, (LegendEditPart) editPart, r.getMoveDelta());
+				cmd = new LegendDragAndDropCommand(featureModel, (LegendEditPart) editPart, r.getMoveDelta());
 			}
 		}
 		return cmd;

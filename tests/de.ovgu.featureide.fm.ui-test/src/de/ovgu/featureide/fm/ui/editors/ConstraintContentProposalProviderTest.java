@@ -39,163 +39,119 @@ import org.junit.Test;
 public class ConstraintContentProposalProviderTest {
 
 	// private static final String[] PROPS_OPERATORS = {"and","iff","implies","or"};
-	private static final String[] PROPS_NONE =
-		new String[0];
+	private static final String[] PROPS_NONE = new String[0];
 	// private static final String[] PROPS_FEATURES = {"not","FeatureA","FeatureB","FeatureC"};
-	static final int CURRENT =
-		ConstraintContentProposalProvider.CURRENT;
-	static final int LAST =
-		ConstraintContentProposalProvider.LAST;
+	static final int CURRENT = ConstraintContentProposalProvider.CURRENT;
+	static final int LAST = ConstraintContentProposalProvider.LAST;
 
-	Set<String> features =
-		new HashSet<String>();
+	Set<String> features = new HashSet<String>();
 
 	@Test
 	public void getWordsCursorAtFirstPos() {
-		final String content =
-			"|abcdef";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"";
+		final String content = "|abcdef";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAtFirstPosWithWhiteSpaces() {
-		final String content =
-			"|   abcdef";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"";
+		final String content = "|   abcdef";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAtThirdPosWithWhiteSpaces() {
-		final String content =
-			"   |abcdef";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"";
+		final String content = "   |abcdef";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAtEndOfFirstWord() {
-		final String content =
-			"abcdef|";
-		final String expectedCurrentWord =
-			"abcdef";
-		final String expectedLastWord =
-			"";
+		final String content = "abcdef|";
+		final String expectedCurrentWord = "abcdef";
+		final String expectedLastWord = "";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAfterFirstWord() {
-		final String content =
-			"abcdef |";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"abcdef";
+		final String content = "abcdef |";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "abcdef";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAfterFirstWord2() {
-		final String content =
-			"abcdef   | ";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"abcdef";
+		final String content = "abcdef   | ";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "abcdef";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAtSecWord() {
-		final String content =
-			"abcdef g|hijk";
-		final String expectedCurrentWord =
-			"g";
-		final String expectedLastWord =
-			"abcdef";
+		final String content = "abcdef g|hijk";
+		final String expectedCurrentWord = "g";
+		final String expectedLastWord = "abcdef";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsCursorAtSecWord2() {
-		final String content =
-			"abcdef gh|ijk";
-		final String expectedCurrentWord =
-			"gh";
-		final String expectedLastWord =
-			"abcdef";
+		final String content = "abcdef gh|ijk";
+		final String expectedCurrentWord = "gh";
+		final String expectedLastWord = "abcdef";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsWithParantheses() {
-		final String content =
-			"(ab|cdef)";
-		final String expectedCurrentWord =
-			"ab";
-		final String expectedLastWord =
-			"(";
+		final String content = "(ab|cdef)";
+		final String expectedCurrentWord = "ab";
+		final String expectedLastWord = "(";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsWithParantheses2() {
-		final String content =
-			"(  ab|cdef)";
-		final String expectedCurrentWord =
-			"ab";
-		final String expectedLastWord =
-			"(";
+		final String content = "(  ab|cdef)";
+		final String expectedCurrentWord = "ab";
+		final String expectedLastWord = "(";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsWithParantheses3() {
-		final String content =
-			"(  abcdef) (a|sddasd";
-		final String expectedCurrentWord =
-			"a";
-		final String expectedLastWord =
-			"(";
+		final String content = "(  abcdef) (a|sddasd";
+		final String expectedCurrentWord = "a";
+		final String expectedLastWord = "(";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsWithParantheses4() {
-		final String content =
-			"(  abcdef) (|asddasd";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"(";
+		final String content = "(  abcdef) (|asddasd";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "(";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	@Test
 	public void getWordsWithParantheses5() {
-		final String content =
-			"(abcdef) (word |";
-		final String expectedCurrentWord =
-			"";
-		final String expectedLastWord =
-			"word";
+		final String content = "(abcdef) (word |";
+		final String expectedCurrentWord = "";
+		final String expectedLastWord = "word";
 		testGetWords(content, expectedCurrentWord, expectedLastWord);
 	}
 
 	private void testGetWords(String content, String current, String last) {
-		final String[] words =
-			ConstraintContentProposalProvider.getWords(removeCursorFromString(content), getCursorPos(content));
+		final String[] words = ConstraintContentProposalProvider.getWords(removeCursorFromString(content), getCursorPos(content));
 		assertEquals(current, words[CURRENT].trim());
 		assertEquals(last, words[LAST].trim());
 	}
@@ -237,10 +193,8 @@ public class ConstraintContentProposalProviderTest {
 //	}
 	@Test
 	public void getProposalsCursorAfterFeature3() {
-		final String content =
-			"FeatureA and FeatureB|";
-		final String[] expectedProps =
-			PROPS_NONE;
+		final String content = "FeatureA and FeatureB|";
+		final String[] expectedProps = PROPS_NONE;
 		testGetProposals(content, expectedProps);
 
 	}
@@ -276,10 +230,8 @@ public class ConstraintContentProposalProviderTest {
 //	}
 	@Test
 	public void getProposalsCursorAfterAnd() {
-		final String content =
-			"FeatureA and| ";
-		final String[] expectedProps =
-			PROPS_NONE;
+		final String content = "FeatureA and| ";
+		final String[] expectedProps = PROPS_NONE;
 		testGetProposals(content, expectedProps);
 
 	}
@@ -294,70 +246,48 @@ public class ConstraintContentProposalProviderTest {
 
 	@Test
 	public void getProposalsPrefixOfFeature() {
-		final String content =
-			"Fea|  ";
-		final String[] expectedProps =
-			{
-				"FeatureA",
-				"FeatureB",
-				"FeatureC" };
+		final String content = "Fea|  ";
+		final String[] expectedProps = { "FeatureA", "FeatureB", "FeatureC" };
 		testGetProposals(content, expectedProps);
 
 	}
 
 	@Test
 	public void getProposalsCursorAfterNot() {
-		final String content =
-			"not|";
-		final String[] expectedProps =
-			PROPS_NONE;
+		final String content = "not|";
+		final String[] expectedProps = PROPS_NONE;
 		testGetProposals(content, expectedProps);
 
 	}
 
 	@Test
 	public void getProposalsPrefixOfFeatureAfterNot() {
-		final String content =
-			"not Fea|";
-		final String[] expectedProps =
-			{
-				"FeatureA",
-				"FeatureB",
-				"FeatureC" };
+		final String content = "not Fea|";
+		final String[] expectedProps = { "FeatureA", "FeatureB", "FeatureC" };
 		testGetProposals(content, expectedProps);
 
 	}
 
 	@Test
 	public void getProposalsPrefixOfAnd() {
-		final String content =
-			"FeatureA a|";
-		final String[] expectedProps =
-			{
-				"and" };
+		final String content = "FeatureA a|";
+		final String[] expectedProps = { "and" };
 		testGetProposals(content, expectedProps);
 
 	}
 
 	@Test
 	public void getProposalsPrefixOfOr() {
-		final String content =
-			"FeatureA o|";
-		final String[] expectedProps =
-			{
-				"or" };
+		final String content = "FeatureA o|";
+		final String[] expectedProps = { "or" };
 		testGetProposals(content, expectedProps);
 
 	}
 
 	@Test
 	public void getProposalsPrefixOfIff() {
-		final String content =
-			"FeatureA i|";
-		final String[] expectedProps =
-			{
-				"iff",
-				"implies" };
+		final String content = "FeatureA i|";
+		final String[] expectedProps = { "iff", "implies" };
 		testGetProposals(content, expectedProps);
 
 	}
@@ -405,16 +335,12 @@ public class ConstraintContentProposalProviderTest {
 //	}
 
 	private void testGetProposals(String content, String[] expectedProps) {
-		final Set<String> expectedPropsSet =
-			new HashSet<String>();
+		final Set<String> expectedPropsSet = new HashSet<String>();
 		expectedPropsSet.addAll(Arrays.asList(expectedProps));
-		final ConstraintContentProposalProvider propProv =
-			new ConstraintContentProposalProvider(features);
-		final IContentProposal[] proposals =
-			propProv.getProposals(removeCursorFromString(content), getCursorPos(content));
+		final ConstraintContentProposalProvider propProv = new ConstraintContentProposalProvider(features);
+		final IContentProposal[] proposals = propProv.getProposals(removeCursorFromString(content), getCursorPos(content));
 		assertEquals(expectedProps.length, proposals.length);
-		for (int i =
-			0; i < expectedProps.length; i++) {
+		for (int i = 0; i < expectedProps.length; i++) {
 			assertEquals(expectedProps[i], proposals[i].getContent());
 		}
 
@@ -433,29 +359,25 @@ public class ConstraintContentProposalProviderTest {
 
 	@Test
 	public void internalTestGetCursorPos() {
-		final String s =
-			"|";
+		final String s = "|";
 		assertEquals(0, getCursorPos(s));
 	}
 
 	@Test
 	public void internalTestGetCursorPos2() {
-		final String s =
-			"ab|";
+		final String s = "ab|";
 		assertEquals(2, getCursorPos(s));
 	}
 
 	@Test
 	public void internalTestRemoveCursorFromString() {
-		final String s =
-			"|";
+		final String s = "|";
 		assertEquals("", removeCursorFromString(s));
 	}
 
 	@Test
 	public void internalTestRemoveCursorFromString2() {
-		final String s =
-			"abcd|efg";
+		final String s = "abcd|efg";
 		assertEquals("abcdefg", removeCursorFromString(s));
 	}
 }

@@ -32,13 +32,11 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  */
 public class ModelScheduleRule implements ISchedulingRule {
 
-	public static ModelScheduleRule RULE =
-		new ModelScheduleRule();
+	public static ModelScheduleRule RULE = new ModelScheduleRule();
 
 	@Override
 	public boolean isConflicting(ISchedulingRule rule) {
-		if ((rule instanceof IProject)
-			|| (rule instanceof IFolder)) {
+		if ((rule instanceof IProject) || (rule instanceof IFolder)) {
 			return true;
 		}
 		return rule == this;
@@ -46,8 +44,7 @@ public class ModelScheduleRule implements ISchedulingRule {
 
 	@Override
 	public boolean contains(ISchedulingRule rule) {
-		if ((rule instanceof IProject)
-			|| (rule instanceof IFolder)) {
+		if ((rule instanceof IProject) || (rule instanceof IFolder)) {
 			return true;
 		}
 		return rule == this;

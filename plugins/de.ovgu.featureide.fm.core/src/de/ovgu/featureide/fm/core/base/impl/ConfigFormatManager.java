@@ -41,8 +41,7 @@ public final class ConfigFormatManager extends FormatManager<IConfigurationForma
 				new CoreExtensionLoader<>(new XMLConfFormat(), new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
 	}
 
-	private static ConfigFormatManager instance =
-		new ConfigFormatManager();
+	private static ConfigFormatManager instance = new ConfigFormatManager();
 
 	public static ConfigFormatManager getInstance() {
 		return instance;

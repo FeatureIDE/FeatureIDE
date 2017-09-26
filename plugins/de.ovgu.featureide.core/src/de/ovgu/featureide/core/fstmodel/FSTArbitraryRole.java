@@ -33,8 +33,7 @@ import org.eclipse.core.resources.IFile;
  */
 public class FSTArbitraryRole extends FSTRole {
 
-	private final List<IFile> files =
-		new LinkedList<IFile>();
+	private final List<IFile> files = new LinkedList<IFile>();
 
 	/**
 	 * @param file

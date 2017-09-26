@@ -32,15 +32,12 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
  */
 public class ExamplePlugin extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.examples";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.examples";
 
 	private static ExamplePlugin plugin;
 
-	public static final String FeatureIDE_EXAMPLE_DIR =
-		"featureide_examples";//$NON-NLS-1$
-	public static final String FeatureIDE_EXAMPLE_INDEX =
-		"projects.xml";//$NON-NLS-1$
+	public static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
+	public static final String FeatureIDE_EXAMPLE_INDEX = "projects.xml";//$NON-NLS-1$
 
 	@Override
 	public String getID() {
@@ -50,8 +47,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 		new Thread() {
 
 			@Override
@@ -67,8 +63,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

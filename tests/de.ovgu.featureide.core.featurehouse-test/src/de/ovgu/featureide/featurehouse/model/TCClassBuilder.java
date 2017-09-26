@@ -33,27 +33,19 @@ import org.junit.Test;
  */
 public class TCClassBuilder {
 
-	private final CClassBuilder builder =
-		new CClassBuilder(null);
+	private final CClassBuilder builder = new CClassBuilder(null);
 
 	// METHOD TEST 1
-	private final String TEST_METHOD_1 =
-		"int\nfindUserPublicKeyPair (void *listdata, void *searchdata){\n}";
-	private final String EXPECTED_NAME_METHOD_1 =
-		"findUserPublicKeyPair";
-	private final String EXPECTED_RETURNTYPE_METHOD_1 =
-		"int";
-	private final String EXPECTED_MODIFIER_METHOD_1 =
-		"";
-	private final String EXPECTED_PARAMETER_1_METHOD_1 =
-		"void *listdata";
-	private final String EXPECTED_PARAMETER_2_METHOD_1 =
-		"void *searchdata";
+	private final String TEST_METHOD_1 = "int\nfindUserPublicKeyPair (void *listdata, void *searchdata){\n}";
+	private final String EXPECTED_NAME_METHOD_1 = "findUserPublicKeyPair";
+	private final String EXPECTED_RETURNTYPE_METHOD_1 = "int";
+	private final String EXPECTED_MODIFIER_METHOD_1 = "";
+	private final String EXPECTED_PARAMETER_1_METHOD_1 = "void *listdata";
+	private final String EXPECTED_PARAMETER_2_METHOD_1 = "void *searchdata";
 
 	@Test
 	public void MethodTest1() {
-		final LinkedList<String> method =
-			builder.getMethod(TEST_METHOD_1);
+		final LinkedList<String> method = builder.getMethod(TEST_METHOD_1);
 		assertEquals(EXPECTED_NAME_METHOD_1, method.get(0));
 		assertEquals(EXPECTED_RETURNTYPE_METHOD_1, method.get(1));
 		assertEquals(EXPECTED_MODIFIER_METHOD_1, method.get(2));
@@ -62,21 +54,15 @@ public class TCClassBuilder {
 	}
 
 	// METHOD TEST 2
-	private final String TEST_METHOD_2 =
-		"unsigned int uni_int(unsigned int n){}";
-	private final String EXPECTED_NAME_METHOD_2 =
-		"uni_int";
-	private final String EXPECTED_RETURNTYPE_METHOD_2 =
-		"unsigned int";
-	private final String EXPECTED_MODIFIER_METHOD_2 =
-		"";
-	private final String EXPECTED_PARAMETER_1_METHOD_2 =
-		"unsigned int n";
+	private final String TEST_METHOD_2 = "unsigned int uni_int(unsigned int n){}";
+	private final String EXPECTED_NAME_METHOD_2 = "uni_int";
+	private final String EXPECTED_RETURNTYPE_METHOD_2 = "unsigned int";
+	private final String EXPECTED_MODIFIER_METHOD_2 = "";
+	private final String EXPECTED_PARAMETER_1_METHOD_2 = "unsigned int n";
 
 	@Test
 	public void MethodTest2() {
-		final LinkedList<String> method =
-			builder.getMethod(TEST_METHOD_2);
+		final LinkedList<String> method = builder.getMethod(TEST_METHOD_2);
 		assertEquals(EXPECTED_NAME_METHOD_2, method.get(0));
 		assertEquals(EXPECTED_RETURNTYPE_METHOD_2, method.get(1));
 		assertEquals(EXPECTED_MODIFIER_METHOD_2, method.get(2));
@@ -84,42 +70,30 @@ public class TCClassBuilder {
 	}
 
 	// FIELD TEST 1
-	private final String TEST_FIELD_1 =
-		"static long tps;";
-	private final String EXPECTED_MODIFIER_FIELD_1 =
-		"static";
-	private final String EXPECTED_TYPE_FIELD_1 =
-		"long";
-	private final String EXPECTED_NAME_FIELD_1 =
-		"tps";
+	private final String TEST_FIELD_1 = "static long tps;";
+	private final String EXPECTED_MODIFIER_FIELD_1 = "static";
+	private final String EXPECTED_TYPE_FIELD_1 = "long";
+	private final String EXPECTED_NAME_FIELD_1 = "tps";
 
 	@Test
 	public void FieldTest1() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_1);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_1);
 		assertEquals(EXPECTED_MODIFIER_FIELD_1, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_1, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_1, fields.get(2));
 	}
 
 	// FIELD TEST 2
-	private final String TEST_FIELD_2 =
-		"static int a, b , c ;";
-	private final String EXPECTED_MODIFIER_FIELD_2 =
-		"static";
-	private final String EXPECTED_TYPE_FIELD_2 =
-		"int";
-	private final String EXPECTED_NAME_FIELD_2_1 =
-		"a";
-	private final String EXPECTED_NAME_FIELD_2_2 =
-		"b";
-	private final String EXPECTED_NAME_FIELD_2_3 =
-		"c";
+	private final String TEST_FIELD_2 = "static int a, b , c ;";
+	private final String EXPECTED_MODIFIER_FIELD_2 = "static";
+	private final String EXPECTED_TYPE_FIELD_2 = "int";
+	private final String EXPECTED_NAME_FIELD_2_1 = "a";
+	private final String EXPECTED_NAME_FIELD_2_2 = "b";
+	private final String EXPECTED_NAME_FIELD_2_3 = "c";
 
 	@Test
 	public void FieldTest2() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_2);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_2);
 		assertEquals(EXPECTED_MODIFIER_FIELD_2, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_2, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_2_1, fields.get(2));

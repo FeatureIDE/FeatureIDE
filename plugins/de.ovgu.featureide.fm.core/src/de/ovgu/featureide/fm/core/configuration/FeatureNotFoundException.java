@@ -25,7 +25,6 @@ package de.ovgu.featureide.fm.core.configuration;
  */
 public class FeatureNotFoundException extends RuntimeException {
 
-	private static final long serialVersionUID =
-		-4112750233088590678L;
+	private static final long serialVersionUID = -4112750233088590678L;
 
 }

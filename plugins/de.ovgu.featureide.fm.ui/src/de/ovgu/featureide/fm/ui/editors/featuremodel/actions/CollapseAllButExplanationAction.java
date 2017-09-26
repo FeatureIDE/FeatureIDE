@@ -42,8 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButEx
 public class CollapseAllButExplanationAction extends Action {
 
 	/** The ID of this action. */
-	public static final String ID =
-		"de.ovgu.featureide.collapseallbutexplanation";
+	public static final String ID = "de.ovgu.featureide.collapseallbutexplanation";
 
 	/** The graphical feature model context. */
 	private final IGraphicalFeatureModel fm;
@@ -58,8 +57,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 */
 	public CollapseAllButExplanationAction(IGraphicalFeatureModel fm) {
 		super(COLLAPSE_ALL_BUT_EXPLANATION);
-		this.fm =
-			fm;
+		this.fm = fm;
 		addActiveExplanationListener();
 	}
 
@@ -103,15 +101,13 @@ public class CollapseAllButExplanationAction extends Action {
 	 * @param explanation the new active explanation
 	 */
 	public void setExplanation(FeatureModelExplanation explanation) {
-		this.explanation =
-			explanation;
+		this.explanation = explanation;
 		setEnabled(explanation != null);
 	}
 
 	@Override
 	public void run() {
-		final CollapseAllButExplanationOperation op =
-			new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
+		final CollapseAllButExplanationOperation op = new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

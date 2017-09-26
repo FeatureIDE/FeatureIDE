@@ -63,22 +63,19 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testPropNodes() {
 		for (final IConstraint constraint : newFm.getConstraints()) {
-			final Node n =
-				constraint.getNode();
+			final Node n = constraint.getNode();
 			if (n instanceof Literal) {
 				// case: feature
 				continue;
 			}
 			if (n instanceof Not) {
 				// case: ~feature
-				if ((n.getChildren().length == 1)
-					&& (n.getChildren()[0] instanceof Literal)) {
+				if ((n.getChildren().length == 1) && (n.getChildren()[0] instanceof Literal)) {
 					continue;
 				}
 			}
 			// case: feature1 or feature2 or feature3 ...
-			assertTrue(n
-				+ " is no Or Node", n instanceof Or);
+			assertTrue(n + " is no Or Node", n instanceof Or);
 			isCnf(n);
 		}
 	}
@@ -87,13 +84,11 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 		for (final Node n : node.getChildren()) {
 			if (n instanceof Not) {
 				assertTrue("Not statement has to much children", n.getChildren().length == 1);
-				assertTrue(n
-					+ "is not a Literal after Not", n.getChildren()[0] instanceof Literal);
+				assertTrue(n + "is not a Literal after Not", n.getChildren()[0] instanceof Literal);
 			} else if (n instanceof Or) {
 				isCnf(n);
 			} else {
-				assertTrue(n
-					+ " is no Literal", n instanceof Literal);
+				assertTrue(n + " is no Literal", n instanceof Literal);
 			}
 		}
 	}

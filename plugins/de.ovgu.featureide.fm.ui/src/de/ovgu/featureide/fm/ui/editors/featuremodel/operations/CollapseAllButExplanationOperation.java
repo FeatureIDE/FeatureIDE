@@ -56,10 +56,8 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 */
 	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation explanation) {
 		super(fm.getFeatureModel(), COLLAPSE_ALL_BUT_EXPLANATION);
-		this.fm =
-			fm;
-		this.explanation =
-			explanation;
+		this.fm = fm;
+		this.explanation = explanation;
 	}
 
 	/**
@@ -95,8 +93,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @param collapsedFeatures the features that will be collapsed during the operation
 	 */
 	protected void setCollapsedFeatures(Set<IGraphicalFeature> collapsedFeatures) {
-		this.collapsedFeatures =
-			collapsedFeatures;
+		this.collapsedFeatures = collapsedFeatures;
 	}
 
 	/**
@@ -105,16 +102,12 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @return the set of features that will be collapsed during the operation
 	 */
 	protected Set<IGraphicalFeature> createCollapsedFeatures() {
-		final Set<IFeature> explanationFeatures =
-			getExplanation().getAffectedFeatures();
-		final Set<IFeature> nonExplanationFeatures =
-			new HashSet<>(getGraphicalFeatureModel().getFeatureModel().getFeatureTable().values());
+		final Set<IFeature> explanationFeatures = getExplanation().getAffectedFeatures();
+		final Set<IFeature> nonExplanationFeatures = new HashSet<>(getGraphicalFeatureModel().getFeatureModel().getFeatureTable().values());
 		nonExplanationFeatures.removeAll(getAllParentFeatures(explanationFeatures));
-		final Set<IGraphicalFeature> collapsedFeatures =
-			new HashSet<>();
+		final Set<IGraphicalFeature> collapsedFeatures = new HashSet<>();
 		for (final IFeature f : nonExplanationFeatures) {
-			final IGraphicalFeature feature =
-				getGraphicalFeatureModel().getGraphicalFeature(f);
+			final IGraphicalFeature feature = getGraphicalFeatureModel().getGraphicalFeature(f);
 			if (feature.isCollapsed()) {
 				continue;
 			}
@@ -130,15 +123,13 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @return all parent features of the given features
 	 */
 	private static Set<IFeature> getAllParentFeatures(Collection<IFeature> features) {
-		final Set<IFeature> parents =
-			new HashSet<>();
+		final Set<IFeature> parents = new HashSet<>();
 		for (IFeature feature : features) {
 			while (true) {
 				if (feature.getStructure().getParent() == null) {
 					break;
 				}
-				feature =
-					feature.getStructure().getParent().getFeature();
+				feature = feature.getStructure().getParent().getFeature();
 				if (!parents.add(feature)) {
 					break;
 				}

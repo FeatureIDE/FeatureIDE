@@ -40,13 +40,10 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class VerticalLayout extends FeatureDiagramLayoutManager {
 
-	private static final int featureSpaceX =
-		32;
-	private static final int featureSpaceY =
-		8;
+	private static final int featureSpaceX = 32;
+	private static final int featureSpaceY = 8;
 
-	private final ArrayList<Integer> levelWidth =
-		new ArrayList<>();
+	private final ArrayList<Integer> levelWidth = new ArrayList<>();
 
 	private int heightStep;
 	private int height;
@@ -54,12 +51,8 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 
-		heightStep =
-			FeatureUIHelper.getGraphicalRootFeature(featureModel).getSize().height
-				+ featureSpaceY;
-		height =
-			FMPropertyManager.getLayoutMarginX()
-				- heightStep;
+		heightStep = FeatureUIHelper.getGraphicalRootFeature(featureModel).getSize().height + featureSpaceY;
+		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
 		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
 		centerOther(FeatureUIHelper.getGraphicalRootFeature(featureModel), 0);
@@ -70,30 +63,20 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * positions of features that have children are now set from right to left (for each level) (centered by their children's positions
 	 */
 	private int centerOther(IGraphicalFeature parent, int level) {
-		final Iterable<? extends IGraphicalFeature> children =
-			getChildren(parent);
+		final Iterable<? extends IGraphicalFeature> children = getChildren(parent);
 		if (!children.iterator().hasNext()) {
-			height +=
-				heightStep;
+			height += heightStep;
 			setLocation(parent, new Point(levelWidth.get(level), height));
 			return height;
 		} else {
-			final Iterator<? extends IGraphicalFeature> it =
-				children.iterator();
-			final int min =
-				centerOther(it.next(), level
-					+ 1);
-			int max =
-				min;
+			final Iterator<? extends IGraphicalFeature> it = children.iterator();
+			final int min = centerOther(it.next(), level + 1);
+			int max = min;
 			while (it.hasNext()) {
-				max =
-					centerOther(it.next(), level
-						+ 1);
+				max = centerOther(it.next(), level + 1);
 			}
 
-			final int yPos =
-				(min
-					+ max) >> 1;
+			final int yPos = (min + max) >> 1;
 			setLocation(parent, new Point(levelWidth.get(level), yPos));
 			return yPos;
 		}
@@ -101,23 +84,17 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 
 	private void calculateLevelWidth(IGraphicalFeature root) {
 		calculateLevelWidth(root, 0);
-		final ListIterator<Integer> it =
-			levelWidth.listIterator();
-		int maxWidth =
-			FMPropertyManager.getLayoutMarginX();
+		final ListIterator<Integer> it = levelWidth.listIterator();
+		int maxWidth = FMPropertyManager.getLayoutMarginX();
 		do {
-			final int curWidth =
-				it.next();
+			final int curWidth = it.next();
 			it.set(maxWidth);
-			maxWidth +=
-				curWidth
-					+ featureSpaceX;
+			maxWidth += curWidth + featureSpaceX;
 		} while (it.hasNext());
 	}
 
 	private void calculateLevelWidth(IGraphicalFeature parent, int level) {
-		final int parentWidth =
-			parent.getSize().width;
+		final int parentWidth = parent.getSize().width;
 		if (level >= levelWidth.size()) {
 			levelWidth.add(parentWidth);
 		} else if (levelWidth.get(level) < parentWidth) {
@@ -125,8 +102,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 		}
 
 		for (final IGraphicalFeature feature : getChildren(parent)) {
-			calculateLevelWidth(feature, level
-				+ 1);
+			calculateLevelWidth(feature, level + 1);
 		}
 	}
 

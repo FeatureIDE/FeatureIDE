@@ -32,17 +32,14 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ColorSchemeWizard extends Wizard {
 
-	public static final String ID =
-		FMUIPlugin.PLUGIN_ID
-			+ ".wizards.ManageColorSchemesWizard";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizards.ManageColorSchemesWizard";
 
 	private final IFeatureModel featureModel;
 
 	public ColorSchemeWizard(IFeatureModel featureModel) {
 		super();
 		setWindowTitle("Color-Scheme Manager");
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override

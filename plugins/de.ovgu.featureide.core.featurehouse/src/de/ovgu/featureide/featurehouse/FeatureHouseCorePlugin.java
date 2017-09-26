@@ -33,16 +33,11 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
  */
 public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.core.featurehouse";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.core.featurehouse";
 
-	public static final String CONTRACT_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".contractMarker";
+	public static final String CONTRACT_MARKER = CorePlugin.PLUGIN_ID + ".contractMarker";
 
-	public static final String BUILDER_PROBLEM_MARKER =
-		CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
+	public static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 
 	private static FeatureHouseCorePlugin plugin;
 
@@ -58,8 +53,7 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 	}
 
 	/*
@@ -68,8 +62,7 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

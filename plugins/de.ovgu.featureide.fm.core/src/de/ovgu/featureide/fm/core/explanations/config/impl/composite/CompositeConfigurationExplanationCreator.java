@@ -11,10 +11,12 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatur
  * 
  * @author Timo G&uuml;nther
  */
-public abstract class CompositeConfigurationExplanationCreator<T extends ConfigurationExplanationCreator> extends CompositeFeatureModelExplanationCreator<T> implements ConfigurationExplanationCreator {
+public abstract class CompositeConfigurationExplanationCreator<T extends ConfigurationExplanationCreator> extends CompositeFeatureModelExplanationCreator<T>
+		implements ConfigurationExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators this composes
 	 */
 	public CompositeConfigurationExplanationCreator(Collection<T> composites) {

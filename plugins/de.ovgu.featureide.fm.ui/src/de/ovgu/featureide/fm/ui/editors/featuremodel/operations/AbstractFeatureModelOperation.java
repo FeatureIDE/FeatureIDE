@@ -44,16 +44,13 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	protected final IFeatureModel featureModel;
 
-	protected Object editor =
-		null;
+	protected Object editor = null;
 
-	protected boolean executed =
-		false;
+	protected boolean executed = false;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 		addContext((IUndoContext) featureModel.getUndoContext());
 	}
 
@@ -88,8 +85,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	public void redo() {
 		fireEvent(operation());
-		executed =
-			true;
+		executed = true;
 	}
 
 	@Override
@@ -107,16 +103,13 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	public void undo() {
 		fireEvent(inverseOperation());
-		executed =
-			false;
+		executed = false;
 	}
 
 	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
-			System.out.println(getClass()
-				+ " operation() must return a FeatureIDEEvent");
-			event =
-				new FeatureIDEEvent(featureModel, null, null, null);
+			System.out.println(getClass() + " operation() must return a FeatureIDEEvent");
+			event = new FeatureIDEEvent(featureModel, null, null, null);
 		}
 		featureModel.fireEvent(event);
 	}
@@ -126,8 +119,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	}
 
 	public void setEditor(Object editor) {
-		this.editor =
-			editor;
+		this.editor = editor;
 	}
 
 }

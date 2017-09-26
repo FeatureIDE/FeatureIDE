@@ -36,8 +36,7 @@ public class ShowUnselectedAction extends Action {
 
 	public ShowUnselectedAction(String text, CollaborationView collaborationView) {
 		super(text);
-		this.collaborationView =
-			collaborationView;
+		this.collaborationView = collaborationView;
 	}
 
 	@Override

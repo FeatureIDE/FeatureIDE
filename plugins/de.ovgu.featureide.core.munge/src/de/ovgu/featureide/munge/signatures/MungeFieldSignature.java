@@ -34,20 +34,17 @@ import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
  */
 public class MungeFieldSignature extends AbstractFieldSignature {
 
-	public MungeFieldSignature(AbstractClassSignature parent, String name,
-			int modifiers, Type returnType) {
+	public MungeFieldSignature(AbstractClassSignature parent, String name, int modifiers, Type returnType) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString());
 	}
 
-	public MungeFieldSignature(AbstractClassSignature parent, String name,
-			int modifiers, Type returnType, int line) {
+	public MungeFieldSignature(AbstractClassSignature parent, String name, int modifiers, Type returnType, int line) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString(), line);
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder fieldString =
-			new StringBuilder();
+		final StringBuilder fieldString = new StringBuilder();
 
 //		fieldString.append(super.toString());
 //		if (fieldString.length() > 0) {
@@ -74,10 +71,7 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 	@Override
 	protected void computeHashCode() {
 		super.computeHashCode();
-		hashCode =
-			(hashCodePrime
-				* hashCode)
-				+ type.hashCode();
+		hashCode = (hashCodePrime * hashCode) + type.hashCode();
 	}
 
 	@Override
@@ -85,13 +79,11 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null)
-			|| (getClass() != obj.getClass())) {
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
 		}
 
-		final MungeFieldSignature otherSig =
-			(MungeFieldSignature) obj;
+		final MungeFieldSignature otherSig = (MungeFieldSignature) obj;
 
 		return super.sigEquals(otherSig);
 	}

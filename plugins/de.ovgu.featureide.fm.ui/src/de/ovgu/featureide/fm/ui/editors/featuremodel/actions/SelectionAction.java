@@ -45,42 +45,39 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class SelectionAction extends Action {
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-				if (isSelectionValid(selection)) {
-					for (final IGraphicalFeature feature : model.getFeatures()) {
-						if (feature.isConstraintSelected()) {
-							feature.setConstraintSelected(false);
-						}
-					}
-
-					for (final IGraphicalConstraint constraint : model.getConstraints()) {
-						if (constraint.isFeatureSelected()) {
-							constraint.setFeatureSelected(false);
-						}
-					}
-
-					if (selection.getFirstElement() instanceof ConstraintEditPart) {
-						((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-					} else if (selection.getFirstElement() instanceof FeatureEditPart) {
-						((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+			if (isSelectionValid(selection)) {
+				for (final IGraphicalFeature feature : model.getFeatures()) {
+					if (feature.isConstraintSelected()) {
+						feature.setConstraintSelected(false);
 					}
 				}
+
+				for (final IGraphicalConstraint constraint : model.getConstraints()) {
+					if (constraint.isFeatureSelected()) {
+						constraint.setFeatureSelected(false);
+					}
+				}
+
+				if (selection.getFirstElement() instanceof ConstraintEditPart) {
+					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+				} else if (selection.getFirstElement() instanceof FeatureEditPart) {
+					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+				}
 			}
-		};
+		}
+	};
 
 	private final IGraphicalFeatureModel model;
 
 	public SelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(SELECTION);
-		model =
-			graphicalFeatureModel;
+		model = graphicalFeatureModel;
 
 		viewer.addSelectionChangedListener(listener);
 	}

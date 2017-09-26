@@ -42,8 +42,7 @@ public class BuildExtendedModulesHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildExtendedModules(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
+		MPLPlugin.getDefault().buildExtendedModules(projects, (String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 
 }

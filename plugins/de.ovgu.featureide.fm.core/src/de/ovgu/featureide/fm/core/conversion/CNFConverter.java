@@ -44,8 +44,7 @@ public class CNFConverter extends NNFConverter {
 		super();
 		// continues number + level
 		naming.put(Or.class, "Clause%d");
-		topName =
-			"SubtreeCNF";
+		topName = "SubtreeCNF";
 	}
 
 	/**
@@ -53,11 +52,9 @@ public class CNFConverter extends NNFConverter {
 	 */
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
-		final List<Node> clauses =
-			new LinkedList<Node>();
+		final List<Node> clauses = new LinkedList<Node>();
 
-		final Node cnf =
-			constraint.getNode().toCNF();
+		final Node cnf = constraint.getNode().toCNF();
 
 		if (cnf instanceof And) {
 			clauses.addAll(Arrays.asList(cnf.getChildren()));

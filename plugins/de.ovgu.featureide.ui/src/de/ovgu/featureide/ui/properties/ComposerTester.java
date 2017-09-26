@@ -31,13 +31,10 @@ public class ComposerTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IResource res =
-			SelectionWrapper.checkClass(receiver, IResource.class);
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(res);
+		final IResource res = SelectionWrapper.checkClass(receiver, IResource.class);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
 		if (featureProject != null) {
-			for (int i =
-				0; i < args.length; i++) {
+			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals(featureProject.getComposerID())) {
 					return true;
 				}

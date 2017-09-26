@@ -34,8 +34,7 @@ public class FeatureConnection implements IGraphicItem {
 	private IGraphicalFeature target;
 
 	public FeatureConnection(IGraphicalFeature source) {
-		this.source =
-			source;
+		this.source = source;
 	}
 
 	public IGraphicalFeature getSource() {
@@ -47,15 +46,12 @@ public class FeatureConnection implements IGraphicItem {
 	}
 
 	public void setTarget(IGraphicalFeature target) {
-		this.target =
-			target;
+		this.target = target;
 	}
 
 	@Override
 	public String toString() {
-		return source
-			+ " - "
-			+ target;
+		return source + " - " + target;
 	}
 
 	@Override
@@ -65,16 +61,9 @@ public class FeatureConnection implements IGraphicItem {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((source == null)
-					? 0
-					: source.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((source == null) ? 0 : source.hashCode());
 		return result;
 	}
 
@@ -89,8 +78,7 @@ public class FeatureConnection implements IGraphicItem {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FeatureConnection other =
-			(FeatureConnection) obj;
+		final FeatureConnection other = (FeatureConnection) obj;
 		if (source == null) {
 			if (other.source != null) {
 				return false;

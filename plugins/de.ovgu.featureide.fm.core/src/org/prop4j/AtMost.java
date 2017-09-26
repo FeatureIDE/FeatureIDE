@@ -33,14 +33,12 @@ public class AtMost extends Node {
 	public int max;
 
 	public AtMost(int max, Object... children) {
-		this.max =
-			max;
+		this.max = max;
 		setChildren(children);
 	}
 
 	public AtMost(int max, Node[] children) {
-		this.max =
-			max;
+		this.max = max;
 		setChildren(children);
 	}
 
@@ -56,8 +54,7 @@ public class AtMost extends Node {
 
 	@Override
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
-		return new And(chooseKofN(newChildren, max
-			+ 1, true));
+		return new And(chooseKofN(newChildren, max + 1, true));
 	}
 
 	@Override
@@ -67,9 +64,7 @@ public class AtMost extends Node {
 			return this;
 		}
 
-		final Node[] newNodes =
-			chooseKofN(children, max
-				+ 1, true);
+		final Node[] newNodes = chooseKofN(children, max + 1, true);
 		return new And(newNodes);
 	}
 
@@ -80,8 +75,7 @@ public class AtMost extends Node {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		int trueCount =
-			0;
+		int trueCount = 0;
 		for (final Node child : children) {
 			if (child.getValue(map)) {
 				trueCount++;

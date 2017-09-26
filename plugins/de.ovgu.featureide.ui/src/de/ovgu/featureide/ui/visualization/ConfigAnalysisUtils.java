@@ -53,11 +53,9 @@ public class ConfigAnalysisUtils {
 	 * @throws CoreException
 	 */
 	public static boolean[][] getConfigsMatrix(IFeatureProject featureProject, List<String> featureList) throws CoreException {
-		final Collection<IFile> configs =
-			new ArrayList<IFile>();
+		final Collection<IFile> configs = new ArrayList<IFile>();
 		// check that they are config files
-		final IFolder configsFolder =
-			featureProject.getConfigFolder();
+		final IFolder configsFolder = featureProject.getConfigFolder();
 		for (final IResource res : configsFolder.members()) {
 			if (res instanceof IFile) {
 				if (((IFile) res).getName().endsWith(".config")) {
@@ -66,21 +64,15 @@ public class ConfigAnalysisUtils {
 			}
 		}
 
-		final boolean[][] matrix =
-			new boolean[configs.size()][featureList.size()];
-		int iconf =
-			0;
+		final boolean[][] matrix = new boolean[configs.size()][featureList.size()];
+		int iconf = 0;
 		for (final IFile config : configs) {
-			final Configuration configuration =
-				new Configuration(featureProject.getFeatureModel());
+			final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 			SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-			final Set<String> configFeatures =
-				configuration.getSelectedFeatureNames();
-			int ifeat =
-				0;
+			final Set<String> configFeatures = configuration.getSelectedFeatureNames();
+			int ifeat = 0;
 			for (final String f : featureList) {
-				matrix[iconf][ifeat] =
-					configFeatures.contains(f);
+				matrix[iconf][ifeat] = configFeatures.contains(f);
 				ifeat++;
 			}
 			iconf++;
@@ -97,15 +89,11 @@ public class ConfigAnalysisUtils {
 	 */
 	public static List<String> getNoCoreNoHiddenFeatures(IFeatureProject featureProject) {
 		// make a copy because it is unmodifiable
-		final List<String> featureList1 =
-			featureProject.getFeatureModel().getFeatureOrderList();
-		final List<String> featureList =
-			new ArrayList<String>();
+		final List<String> featureList1 = featureProject.getFeatureModel().getFeatureOrderList();
+		final List<String> featureList = new ArrayList<String>();
 		featureList.addAll(featureList1);
-		final List<IFeature> coreFeatures =
-			featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
-		final Collection<IFeature> hiddenFeatures =
-			featureProject.getFeatureModel().getAnalyser().getHiddenFeatures();
+		final List<IFeature> coreFeatures = featureProject.getFeatureModel().getAnalyser().getCoreFeatures();
+		final Collection<IFeature> hiddenFeatures = featureProject.getFeatureModel().getAnalyser().getHiddenFeatures();
 		for (final IFeature coref : coreFeatures) {
 			featureList.remove(coref.getName());
 		}

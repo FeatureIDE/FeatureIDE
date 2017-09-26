@@ -39,10 +39,8 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 
 	public RenameFeatureOperation(IFeatureModel featureModel, String oldName, String newName) {
 		super(featureModel, RENAME_FEATURE);
-		this.oldName =
-			oldName;
-		this.newName =
-			newName;
+		this.oldName = oldName;
+		this.newName = newName;
 	}
 
 	@Override

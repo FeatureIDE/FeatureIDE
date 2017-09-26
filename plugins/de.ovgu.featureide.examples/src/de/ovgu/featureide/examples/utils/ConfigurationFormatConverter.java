@@ -48,59 +48,42 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  */
 public class ConfigurationFormatConverter {
 
-	private static final IConfigurationFormat OLD_FORMAT =
-		new DefaultFormat();
-	private static final IConfigurationFormat NEW_FORMAT =
-		new XMLConfFormat();
-	private static final String SUFFIX =
-		"."
-			+ OLD_FORMAT.getSuffix();
+	private static final IConfigurationFormat OLD_FORMAT = new DefaultFormat();
+	private static final IConfigurationFormat NEW_FORMAT = new XMLConfFormat();
+	private static final String SUFFIX = "." + OLD_FORMAT.getSuffix();
 
-	private static HashSet<Path> configurationPathSet =
-		new HashSet<>();
+	private static HashSet<Path> configurationPathSet = new HashSet<>();
 
 	public static void main(String[] args) {
-		final Path indexFile =
-			Paths.get(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
-		final ProjectRecordCollection oldProjectFiles =
-			new ProjectRecordCollection();
+		final Path indexFile = Paths.get(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
+		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
 		if (!SimpleFileHandler.load(indexFile, oldProjectFiles, new ProjectRecordFormat()).containsError()) {
 			System.out.println("Found index file.");
 			System.out.println("Processing projects...");
 			for (final ProjectRecord projectRecord : oldProjectFiles) {
-				System.out.println("\t"
-					+ projectRecord.getProjectName());
+				System.out.println("\t" + projectRecord.getProjectName());
 				convertConfigFiles(projectRecord);
 			}
-			System.out.println("Finished. "
-				+ configurationPathSet.size()
-				+ " files were converted.");
+			System.out.println("Finished. " + configurationPathSet.size() + " files were converted.");
 		} else {
 			System.out.println("No index file found.");
 		}
 	}
 
 	private static void convertConfigFiles(ProjectRecord projectRecord) {
-		if (!projectRecord.hasErrors()
-			&& !projectRecord.hasWarnings()) {
+		if (!projectRecord.hasErrors() && !projectRecord.hasWarnings()) {
 			for (final ProjectRecord subProjectRecord : projectRecord.getSubProjects()) {
 				convertConfigFiles(subProjectRecord);
 			}
-			Path relativePath =
-				Paths.get(projectRecord.getProjectDescriptionRelativePath());
-			relativePath =
-				relativePath.subpath(0, relativePath.getNameCount()
-					- 1);
-			final List<Path> configurationFiles =
-				new ArrayList<>();
+			Path relativePath = Paths.get(projectRecord.getProjectDescriptionRelativePath());
+			relativePath = relativePath.subpath(0, relativePath.getNameCount() - 1);
+			final List<Path> configurationFiles = new ArrayList<>();
 			try {
 				Files.walkFileTree(relativePath, new SimpleFileVisitor<Path>() {
 
 					@Override
 					public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-						if (attributes.isRegularFile()
-							&& Files.isReadable(file)
-							&& file.getFileName().toString().endsWith(SUFFIX)) {
+						if (attributes.isRegularFile() && Files.isReadable(file) && file.getFileName().toString().endsWith(SUFFIX)) {
 							if (configurationPathSet.add(file)) {
 								configurationFiles.add(file);
 							}
@@ -114,24 +97,14 @@ public class ConfigurationFormatConverter {
 				return;
 			}
 			if (!configurationFiles.isEmpty()) {
-				final FileHandler<IFeatureModel> fileHandler =
-					FeatureModelManager.load(relativePath.resolve("model.xml"));
+				final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(relativePath.resolve("model.xml"));
 				if (!fileHandler.getLastProblems().containsError()) {
-					final Configuration object =
-						new Configuration(fileHandler.getObject(), Configuration.PARAM_PROPAGATE
-							| Configuration.PARAM_IGNOREABSTRACT);
+					final Configuration object = new Configuration(fileHandler.getObject(), Configuration.PARAM_PROPAGATE | Configuration.PARAM_IGNOREABSTRACT);
 					for (final Path oldFile : configurationFiles) {
 						if (!SimpleFileHandler.load(oldFile, object, OLD_FORMAT).containsError()) {
-							final String oldFileName =
-								oldFile.getFileName().toString();
-							final String newFileName =
-								oldFileName.substring(0, oldFileName.length()
-									- SUFFIX.length())
-									+ "."
-									+ NEW_FORMAT.getSuffix();
-							final Path newFile =
-								oldFile.subpath(0, oldFile.getNameCount()
-									- 1).resolve(newFileName);
+							final String oldFileName = oldFile.getFileName().toString();
+							final String newFileName = oldFileName.substring(0, oldFileName.length() - SUFFIX.length()) + "." + NEW_FORMAT.getSuffix();
+							final Path newFile = oldFile.subpath(0, oldFile.getNameCount() - 1).resolve(newFileName);
 							if (!SimpleFileHandler.save(newFile, object, NEW_FORMAT).containsError()) {
 								try {
 									Files.delete(oldFile);

@@ -37,18 +37,14 @@ public class ProgressMonitor extends ATaskMonitor {
 
 	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
 		super(parent);
-		this.monitor =
-			SubMonitor.convert(monitor, 1);
-		orgMonitor =
-			null;
+		this.monitor = SubMonitor.convert(monitor, 1);
+		orgMonitor = null;
 	}
 
 	public ProgressMonitor(String taskName, IProgressMonitor monitor) {
 		super(taskName);
-		this.monitor =
-			SubMonitor.convert(monitor, taskName, 1);
-		orgMonitor =
-			monitor;
+		this.monitor = SubMonitor.convert(monitor, taskName, 1);
+		orgMonitor = monitor;
 	}
 
 	@Override

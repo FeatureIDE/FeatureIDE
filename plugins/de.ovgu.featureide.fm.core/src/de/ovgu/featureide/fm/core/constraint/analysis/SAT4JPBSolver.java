@@ -47,20 +47,15 @@ public class SAT4JPBSolver implements PBSolver {
 	boolean alreadyContradiction;
 
 	public SAT4JPBSolver() {
-		solver =
-			SolverFactory.newDefault();
-		alreadyContradiction =
-			false;
+		solver = SolverFactory.newDefault();
+		alreadyContradiction = false;
 	}
 
 	@Override
 	public <T extends Restriction> void addRestriction(T restriction) {
-		final IVecInt ids =
-			new VecInt(restriction.getIds());
-		final Vec<BigInteger> coefficients =
-			new Vec<BigInteger>(restriction.getCoefficients());
-		final BigInteger degree =
-			BigInteger.valueOf(restriction.getDegree());
+		final IVecInt ids = new VecInt(restriction.getIds());
+		final Vec<BigInteger> coefficients = new Vec<BigInteger>(restriction.getCoefficients());
+		final BigInteger degree = BigInteger.valueOf(restriction.getDegree());
 
 		try {
 			// add the inequality "terms >= degree"
@@ -71,14 +66,12 @@ public class SAT4JPBSolver implements PBSolver {
 				solver.addPseudoBoolean(ids, coefficients, false, degree);
 			}
 		} catch (final ContradictionException e) {
-			alreadyContradiction =
-				true;
+			alreadyContradiction = true;
 		}
 	}
 
 	@Override
-	public <T extends Restriction> void addRestrictions(
-			Collection<T> restrictions) {
+	public <T extends Restriction> void addRestrictions(Collection<T> restrictions) {
 
 		for (final Restriction restriction : restrictions) {
 			addRestriction(restriction);
@@ -113,15 +106,12 @@ public class SAT4JPBSolver implements PBSolver {
 
 	@Override
 	public Set<Integer> backbone(Set<Integer> varibales) {
-		final Set<Integer> backbone =
-			new HashSet<Integer>();
+		final Set<Integer> backbone = new HashSet<Integer>();
 
 		for (final Integer variable : varibales) {
-			if (!isSatisfiable(new int[] {
-				variable })) {
+			if (!isSatisfiable(new int[] { variable })) {
 				backbone.add(-variable);
-			} else if (!isSatisfiable(new int[] {
-				-variable })) {
+			} else if (!isSatisfiable(new int[] { -variable })) {
 				backbone.add(variable);
 			}
 		}

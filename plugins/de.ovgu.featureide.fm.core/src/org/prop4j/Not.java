@@ -34,9 +34,7 @@ import java.util.Map;
 public class Not extends Node implements Cloneable {
 
 	public Not(Object child) {
-		children =
-			new Node[] {
-				getNode(child) };
+		children = new Node[] { getNode(child) };
 	}
 
 	@Override
@@ -51,11 +49,9 @@ public class Not extends Node implements Cloneable {
 
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
-		final Node node =
-			children[0];
+		final Node node = children[0];
 		if (!list.contains(getClass())) {
-			children[0] =
-				node.eliminate(list);
+			children[0] = node.eliminate(list);
 			return this;
 		}
 
@@ -83,17 +79,14 @@ public class Not extends Node implements Cloneable {
 		// transform Not(AtMostx(a,b)) to AtLeastx+1(a,b)
 		if (node instanceof AtMost) {
 			node.eliminate(list);
-			return new AtLeast(((AtMost) node).max
-				+ 1, (Object[]) node.children);
+			return new AtLeast(((AtMost) node).max + 1, (Object[]) node.children);
 		}
 		// transform Not(AtLeastx(a,b)) to AtMostx-1(a,b)
 		if (node instanceof AtLeast) {
 			node.eliminate(list);
-			return new AtMost(((AtLeast) node).min
-				- 1, (Object[]) node.children);
+			return new AtMost(((AtLeast) node).min - 1, (Object[]) node.children);
 		}
-		throw new RuntimeException(node.getClass().getName()
-			+ IS_NOT_SUPPORTED);
+		throw new RuntimeException(node.getClass().getName() + IS_NOT_SUPPORTED);
 	}
 
 	@Override

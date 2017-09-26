@@ -43,23 +43,18 @@ public class FilterAction extends Action {
 	private final GraphicalViewerImpl viewer;
 	private final CollaborationView collaborationView;
 
-	private final Set<String> classFilter =
-		new HashSet<String>();
-	private final Set<String> featureFilter =
-		new HashSet<String>();
+	private final Set<String> classFilter = new HashSet<String>();
+	private final Set<String> featureFilter = new HashSet<String>();
 
 	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
-		this.collaborationView =
-			collaborationView;
-		viewer =
-			view;
+		this.collaborationView = collaborationView;
+		viewer = view;
 	}
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		final IStructuredSelection selection =
-			(IStructuredSelection) viewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		super.setEnabled(false);
 
 		for (final Object part : selection.toList()) {
@@ -74,8 +69,7 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		final boolean filterDefined =
-			CollaborationModelBuilder.isFilterDefined();
+		final boolean filterDefined = CollaborationModelBuilder.isFilterDefined();
 		setChecked(filterDefined);
 		if (filterDefined) {
 			super.setEnabled(true);
@@ -84,10 +78,7 @@ public class FilterAction extends Action {
 
 	@Override
 	public void run() {
-		if ((!classFilter.isEmpty()
-			|| !featureFilter.isEmpty())
-			&&
-			!CollaborationModelBuilder.isFilterDefined()) {
+		if ((!classFilter.isEmpty() || !featureFilter.isEmpty()) && !CollaborationModelBuilder.isFilterDefined()) {
 			setChecked(true);
 			CollaborationModelBuilder.setClassFilter(new HashSet<String>(classFilter));
 			CollaborationModelBuilder.setFeatureFilter(new HashSet<String>(featureFilter));

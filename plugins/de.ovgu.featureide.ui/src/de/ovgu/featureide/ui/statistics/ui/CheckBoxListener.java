@@ -50,25 +50,20 @@ public class CheckBoxListener implements ICheckStateListener {
 
 	public CheckBoxListener(final CheckboxTreeViewer viewer) {
 		super();
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				final Object[] sources =
-					((TreeSelection) event.getSelection())
-							.toArray();
+				final Object[] sources = ((TreeSelection) event.getSelection()).toArray();
 				for (final Object source : sources) {
 					if (source instanceof Parent) {
-						final Parent selected =
-							(Parent) source;
+						final Parent selected = (Parent) source;
 						if (selected.hasChildren()) {
 							if (selected instanceof LazyParent) {
 								((LazyParent) selected).getChildren();
 							}
-							final boolean allChecked =
-								allChildrenChecked(selected);
+							final boolean allChecked = allChildrenChecked(selected);
 							viewer.setChecked(selected, !allChecked);
 							for (final Parent child : selected.getChildren()) {
 								viewer.setChecked(child, !allChecked);
@@ -106,12 +101,10 @@ public class CheckBoxListener implements ICheckStateListener {
 	 * @return
 	 */
 	private boolean allChildrenChecked(Object element) {
-		boolean allChildrenChecked =
-			true;
+		boolean allChildrenChecked = true;
 		for (final Object o : ((Parent) element).getChildren()) {
 			if (!viewer.getChecked(o)) {
-				allChildrenChecked =
-					false;
+				allChildrenChecked = false;
 				break;
 			}
 		}
@@ -119,15 +112,14 @@ public class CheckBoxListener implements ICheckStateListener {
 	}
 
 	private void refreshViewer() {
-		final UIJob job =
-			new UIJob(REFRESH_EXPORT_DIALOG) {
+		final UIJob job = new UIJob(REFRESH_EXPORT_DIALOG) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					viewer.refresh();
-					return Status.OK_STATUS;
-				}
-			};
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				viewer.refresh();
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}

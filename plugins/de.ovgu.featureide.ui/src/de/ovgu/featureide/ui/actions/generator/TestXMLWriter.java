@@ -67,29 +67,24 @@ public class TestXMLWriter implements XMLCoverage {
 	private final TestResults testResults;
 
 	public TestXMLWriter(TestResults testResults) {
-		this.testResults =
-			testResults;
+		this.testResults = testResults;
 	}
 
 	public String write() throws ParserConfigurationException, TransformerException {
-		final DocumentBuilderFactory dbf =
-			DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(true);
 		dbf.setExpandEntityReferences(true);
-		final DocumentBuilder db =
-			dbf.newDocumentBuilder();
-		final Document doc =
-			db.newDocument();
+		final DocumentBuilder db = dbf.newDocumentBuilder();
+		final Document doc = db.newDocument();
 		// Create the Xml Representation
 		return createXMLDocument(doc);
 	}
 
 	private String createXMLDocument(Document doc) throws TransformerException {
-		final Element root =
-			doc.createElement(TESTRUN);
+		final Element root = doc.createElement(TESTRUN);
 		root.setAttribute(IGNORED, Integer.valueOf(testResults.ignored).toString());
 		root.setAttribute(ERRORS, Integer.valueOf(testResults.errors).toString());
 		root.setAttribute(STARTED, Integer.valueOf(testResults.started).toString());
@@ -98,42 +93,32 @@ public class TestXMLWriter implements XMLCoverage {
 		root.setAttribute("name", testResults.name);
 
 		for (final Entry<String, Map<String, Set<Test>>> result : testResults.testResults.entrySet()) {
-			final Element suite =
-				doc.createElement(TESTSUITE);
+			final Element suite = doc.createElement(TESTSUITE);
 			suite.setAttribute("name", result.getKey());
-			float suiteTime =
-				0;
+			float suiteTime = 0;
 			for (final Entry<String, Set<Test>> configTest : result.getValue().entrySet()) {
-				final Element config1 =
-					doc.createElement(TESTSUITE);
+				final Element config1 = doc.createElement(TESTSUITE);
 				config1.setAttribute("name", configTest.getKey());
-				float configTime =
-					0;
+				float configTime = 0;
 				for (final Test test : configTest.getValue()) {
-					final Element testCase =
-						doc.createElement(TESTCASE);
+					final Element testCase = doc.createElement(TESTCASE);
 					testCase.setAttribute("name", test.name);
 					testCase.setAttribute(CLASSNAME, test.classname);
-					testCase.setAttribute(TIME, test.time
-						+ "");
+					testCase.setAttribute(TIME, test.time + "");
 					if (test.failure != null) {
 						Element failure;
 						if (test.failure.getException() instanceof AssertionError) {
-							failure =
-								doc.createElement(FAILURE);
+							failure = doc.createElement(FAILURE);
 						} else {
-							failure =
-								doc.createElement("error");
+							failure = doc.createElement("error");
 						}
 						failure.setTextContent(test.failure.getTrace());
 						testCase.appendChild(failure);
 					}
 					config1.appendChild(testCase);
-					configTime +=
-						test.time;
+					configTime += test.time;
 				}
-				suiteTime +=
-					configTime;
+				suiteTime += configTime;
 				config1.setAttribute(TIME, Double.valueOf(configTime).toString());
 				suite.appendChild(config1);
 			}
@@ -143,21 +128,17 @@ public class TestXMLWriter implements XMLCoverage {
 		doc.appendChild(root);
 
 		// Transform the Xml Representation into a String
-		final Transformer transfo =
-			TransformerFactory.newInstance().newTransformer();
+		final Transformer transfo = TransformerFactory.newInstance().newTransformer();
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		final StreamResult result =
-			new StreamResult(new StringWriter());
-		final DOMSource source =
-			new DOMSource(doc);
+		final StreamResult result = new StreamResult(new StringWriter());
+		final DOMSource source = new DOMSource(doc);
 		transfo.transform(source, result);
 		return prettyPrint(result.getWriter().toString());
 	}
 
 	public void writeToFile(File file) throws ParserConfigurationException, TransformerException {
-		try (FileOutputStream output =
-			new FileOutputStream(file)) {
+		try (FileOutputStream output = new FileOutputStream(file)) {
 			if (!file.exists()) {
 				file.createNewFile();
 			}
@@ -175,46 +156,37 @@ public class TestXMLWriter implements XMLCoverage {
 	 * @return
 	 */
 	private String prettyPrint(String text) {
-		final StringBuilder result =
-			new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		String line;
-		int indentLevel =
-			0;
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(text));
+		int indentLevel = 0;
+		final BufferedReader reader = new BufferedReader(new StringReader(text));
 		try {
-			line =
-				reader.readLine();
+			line = reader.readLine();
 			while (line != null) {
 				if (line.startsWith("</")) {
 					indentLevel--;
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
 
 				else if (line.startsWith("<")) {
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 					if (!line.contains("</")) {
 						indentLevel++;
 					}
 				} else {
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
-				result.append(line
-					+ "\n");
+				result.append(line + "\n");
 				if (line.contains("/>")) {
 					indentLevel--;
 				}
-				line =
-					reader.readLine();
+				line = reader.readLine();
 			}
 		} catch (final IOException e) {
 			e.printStackTrace();

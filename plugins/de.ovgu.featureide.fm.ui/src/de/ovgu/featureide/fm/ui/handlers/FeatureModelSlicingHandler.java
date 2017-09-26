@@ -43,16 +43,13 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel =
-			FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
+		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
 		if (featureModel != null) {
-			final AbstractWizard wizard =
-				new FeatureModelSlicingWizard("Feature-Model Slicing");
+			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
-				final JobArguments arguments =
-					new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
-							(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
+				final JobArguments arguments = new SliceFeatureModelJob.Arguments(Paths.get(file.getLocationURI()), featureModel,
+						(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES), true);
 				LongRunningWrapper.getRunner(arguments.createJob()).schedule();
 			}
 		}

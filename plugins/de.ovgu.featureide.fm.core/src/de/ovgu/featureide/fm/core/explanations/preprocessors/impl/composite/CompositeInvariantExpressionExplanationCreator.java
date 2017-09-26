@@ -12,10 +12,12 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpression
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeInvariantExpressionExplanationCreator extends CompositePreprocessorExplanationCreator<InvariantExpressionExplanationCreator> implements InvariantExpressionExplanationCreator {
+public class CompositeInvariantExpressionExplanationCreator extends CompositePreprocessorExplanationCreator<InvariantExpressionExplanationCreator>
+		implements InvariantExpressionExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeInvariantExpressionExplanationCreator(Collection<InvariantExpressionExplanationCreator> composites) {

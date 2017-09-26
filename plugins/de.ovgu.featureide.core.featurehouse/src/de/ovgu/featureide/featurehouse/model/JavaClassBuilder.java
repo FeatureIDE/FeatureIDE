@@ -43,39 +43,24 @@ public class JavaClassBuilder extends ClassBuilder {
 		super(builder);
 	}
 
-	private final String[] modifier =
-		{
-			"static",
-			"final",
-			"private",
-			"public",
-			"protected",
-			"nullable" };
+	private final String[] modifier = { "static", "final", "private", "public", "protected", "nullable" };
 
 	@Override
 	public void caseFieldDeclaration(FSTTerminal terminal) {
-		final LinkedList<String> fields =
-			getFields(terminal.getBody());
-		for (int i =
-			2; i < fields.size(); i++) {
+		final LinkedList<String> fields = getFields(terminal.getBody());
+		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			final IRoleElement r =
-				addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			final IRoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			r.setJavaDocComment(findJavaDocComments(terminal));
 		}
 	}
 
 	public static String findJavaDocComments(FSTTerminal terminal) {
-		final String prefix =
-			terminal.getSpecialTokenPrefix();
-		final int start =
-			prefix.indexOf("/**");
-		final int end =
-			prefix.lastIndexOf("*/");
-		if ((start > -1)
-			&& (end > -1)) {
-			return prefix.substring(start, end
-				+ "*/".length());
+		final String prefix = terminal.getSpecialTokenPrefix();
+		final int start = prefix.indexOf("/**");
+		final int end = prefix.lastIndexOf("*/");
+		if ((start > -1) && (end > -1)) {
+			return prefix.substring(start, end + "*/".length());
 		}
 		return null;
 	}
@@ -86,35 +71,22 @@ public class JavaClassBuilder extends ClassBuilder {
 	 * @return list(0) field modifiers<br> list(1) field type<br> ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
-		String modifiers =
-			"";
-		final StringBuilder type =
-			new StringBuilder();
-		final StringBuilder namesBuilder =
-			new StringBuilder();
-		boolean mod =
-			false;
-		boolean t1 =
-			false;
-		boolean t2 =
-			false;
+		String modifiers = "";
+		final StringBuilder type = new StringBuilder();
+		final StringBuilder namesBuilder = new StringBuilder();
+		boolean mod = false;
+		boolean t1 = false;
+		boolean t2 = false;
 
 		// removing comments
-		while (body.contains("/*")
-			&& body.contains("*/")) {
-			body =
-				body.substring(0, body.indexOf("/*"))
-					+ " "
-					+ body.substring(body.indexOf("*/")
-						+ 2);
+		while (body.contains("/*") && body.contains("*/")) {
+			body = body.substring(0, body.indexOf("/*")) + " " + body.substring(body.indexOf("*/") + 2);
 		}
 
 		while (body.contains("  ")) {
-			body =
-				body.replace("  ", " ");
+			body = body.replace("  ", " ");
 		}
-		body =
-			body.trim();
+		body = body.trim();
 		for (final String s : body.split(" ")) {
 			if (s.contains("=")) {
 				if (!s.startsWith("=")) {
@@ -123,79 +95,54 @@ public class JavaClassBuilder extends ClassBuilder {
 				break;
 			}
 
-			if (!mod
-				&& isModifier(s)) {
+			if (!mod && isModifier(s)) {
 				// case: modifier
 				if (modifiers.equals("")) {
-					modifiers =
-						s;
+					modifiers = s;
 				} else {
-					modifiers =
-						modifiers
-							+ " "
-							+ s;
+					modifiers = modifiers + " " + s;
 				}
 			} else if (!t1) {
 				// case: type
-				mod =
-					true;
-				t1 =
-					true;
+				mod = true;
+				t1 = true;
 				type.append(s);
 				if (s.contains("<")) {
 					// case: has type arguments
-					t2 =
-						true;
+					t2 = true;
 					if (s.contains(">")) {
-						t2 =
-							false;
+						t2 = false;
 					}
 				}
-			} else if (t2
-				|| s.contains("<")) {
+			} else if (t2 || s.contains("<")) {
 				// case: type with type arguments
-				t2 =
-					true;
+				t2 = true;
 				type.append(s);
 				if (s.contains(">")) {
-					t2 =
-						false;
+					t2 = false;
 				}
 			} else {
 				// case: name(s)
 				namesBuilder.append(s);
 			}
 		}
-		String names =
-			namesBuilder.toString();
-		if (names.endsWith(";")
-			|| names.endsWith("+")
-			|| names.endsWith("-")) {
-			names =
-				names.substring(0, names.length()
-					- 1);
+		String names = namesBuilder.toString();
+		if (names.endsWith(";") || names.endsWith("+") || names.endsWith("-")) {
+			names = names.substring(0, names.length() - 1);
 		}
 
-		final String[] namesArray =
-			names.split(",");
-		for (int i =
-			0; i < namesArray.length; i++) {
-			String f =
-				namesArray[i];
-			f =
-				f.replace("\n", "");
-			f =
-				f.replace("\r", "");
+		final String[] namesArray = names.split(",");
+		for (int i = 0; i < namesArray.length; i++) {
+			String f = namesArray[i];
+			f = f.replace("\n", "");
+			f = f.replace("\r", "");
 			while (f.startsWith(" ")) {
-				f =
-					f.substring(1);
+				f = f.substring(1);
 			}
-			namesArray[i] =
-				f;
+			namesArray[i] = f;
 		}
 
-		final LinkedList<String> field =
-			new LinkedList<String>();
+		final LinkedList<String> field = new LinkedList<String>();
 		field.add(modifiers);
 		field.add(type.toString());
 		for (final String name : namesArray) {
@@ -216,44 +163,29 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseMethodDeclaration(FSTTerminal terminal) {
 		// get name
-		final String name =
-			getMethodName(terminal);
+		final String name = getMethodName(terminal);
 
-		final String head =
-			getHead(terminal.getBody(), name).replace("/*", "");
-		final int index =
-			head.trim().lastIndexOf(' ');
+		final String head = getHead(terminal.getBody(), name).replace("/*", "");
+		final int index = head.trim().lastIndexOf(' ');
 
 		// get return type
-		final String returnType =
-			head.substring(index
-				+ 1).trim();
+		final String returnType = head.substring(index + 1).trim();
 
-		final String modifiers =
-			(index == -1)
-				? ""
-				: head.substring(0, index);
-		String contractBody =
-			"", contractCompKey =
-				"";
-		int startLine =
-			-1;
+		final String modifiers = (index == -1) ? "" : head.substring(0, index);
+		String contractBody = "", contractCompKey = "";
+		int startLine = -1;
 		for (final FSTNode nonT1 : terminal.getParent().getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
 				for (final FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
 						for (final FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
 							if (nonT3.getType().equals("SpecCaseSeq")) {
-								final FSTTerminal fstTerminal =
-									(FSTTerminal) nonT3;
-								startLine =
-									fstTerminal.beginLine;
-								contractBody =
-									fstTerminal.getBody();
+								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
+								startLine = fstTerminal.beginLine;
+								contractBody = fstTerminal.getBody();
 							}
 							if (nonT3.getType().equals("ContractCompKey")) {
-								contractCompKey =
-									((FSTTerminal) nonT3).getContractCompKey();
+								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
 							}
 						}
 					}
@@ -263,9 +195,8 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		}
 		// add method
-		final IRoleElement r =
-			addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody,
-					contractCompKey, startLine);
+		final IRoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine,
+				false, contractBody, contractCompKey, startLine);
 		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
@@ -279,54 +210,37 @@ public class JavaClassBuilder extends ClassBuilder {
 	 */
 	public String getHead(String body, String name) {
 		// remove @annotations
-		body =
-			body.replaceAll("@\\w*\\W*", "");
+		body = body.replaceAll("@\\w*\\W*", "");
 		// remove spaces between name and ()
-		body =
-			body.replaceAll(name
-				+ "\\W*\\(",
-					name
-						+ "(");
-		return body.substring(0, body.indexOf(name
-			+ "("));
+		body = body.replaceAll(name + "\\W*\\(", name + "(");
+		return body.substring(0, body.indexOf(name + "("));
 	}
 
 	@Override
 	public void caseConstructorDeclaration(FSTTerminal terminal) {
 		// get name
-		final String name =
-			getMethodName(terminal);
+		final String name = getMethodName(terminal);
 
 		// get modifiers
-		String modifiers =
-			"";
+		String modifiers = "";
 		if (terminal.getBody().indexOf(name) >= 1) {
-			modifiers =
-				terminal.getBody().substring(0, terminal.getBody().indexOf(name)
-					- 1);
+			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
 
-		String contractBody =
-			"", contractCompKey =
-				"";
-		int startLine =
-			-1;
+		String contractBody = "", contractCompKey = "";
+		int startLine = -1;
 		for (final FSTNode nonT1 : terminal.getParent().getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
 				for (final FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
 						for (final FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
 							if (nonT3.getType().equals("SpecCaseSeq")) {
-								final FSTTerminal fstTerminal =
-									(FSTTerminal) nonT3;
-								startLine =
-									fstTerminal.beginLine;
-								contractBody =
-									fstTerminal.getBody();
+								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
+								startLine = fstTerminal.beginLine;
+								contractBody = fstTerminal.getBody();
 							}
 							if (nonT3.getType().equals("ContractCompKey")) {
-								contractCompKey =
-									((FSTTerminal) nonT3).getContractCompKey();
+								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
 							}
 
 						}
@@ -337,9 +251,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		final IRoleElement r =
-			addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody,
-					contractCompKey, startLine);
+		final IRoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true,
+				contractBody, contractCompKey, startLine);
 		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
@@ -348,18 +261,11 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {
-		final String parameter =
-			terminal.getName().substring(terminal.getName().indexOf('(')
-				+ 1, terminal.getName().indexOf(')'));
-		final LinkedList<String> parameterTypes =
-			new LinkedList<String>();
-		if (!"".equals(parameter)
-			&& !parameter.startsWith("{")) {
-			final String[] p =
-				parameter.split("[-]");
-			for (int i =
-				0; i < p.length; i +=
-					2) {
+		final String parameter = terminal.getName().substring(terminal.getName().indexOf('(') + 1, terminal.getName().indexOf(')'));
+		final LinkedList<String> parameterTypes = new LinkedList<String>();
+		if (!"".equals(parameter) && !parameter.startsWith("{")) {
+			final String[] p = parameter.split("[-]");
+			for (int i = 0; i < p.length; i += 2) {
 				parameterTypes.add(p[i]);
 			}
 		}
@@ -372,10 +278,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseClassDeclarationType(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			final String body =
-				terminal.getBody().replaceAll("\\W", "");
-			final FSTClassFragment currentClassFragment =
-				modelBuilder.getCurrentClassFragment();
+			final String body = terminal.getBody().replaceAll("\\W", "");
+			final FSTClassFragment currentClassFragment = modelBuilder.getCurrentClassFragment();
 			currentClassFragment.setType(body);
 			currentClassFragment.setLine(terminal.beginLine);
 		}
@@ -398,10 +302,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseImplementsList(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			final String body =
-				terminal.getBody().replace("implements ", "");
-			final String[] classNames =
-				body.split(", ");
+			final String body = terminal.getBody().replace("implements ", "");
+			final String[] classNames = body.split(", ");
 			for (final String className : classNames) {
 				modelBuilder.getCurrentClassFragment().addImplement(className);
 			}
@@ -411,10 +313,8 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseExtendsList(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			final String body =
-				terminal.getBody().replace("extends ", "");
-			final String[] classNames =
-				body.split(", ");
+			final String body = terminal.getBody().replace("extends ", "");
+			final String[] classNames = body.split(", ");
 			for (final String className : classNames) {
 				modelBuilder.getCurrentClassFragment().addExtend(className);
 			}
@@ -423,12 +323,9 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseInvariant(FSTTerminal terminal) {
-		final FSTInvariant invariant =
-			new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
+		final FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
-			FeatureHouseCorePlugin.getDefault().logError("Invariant "
-				+ invariant.getBody()
-				+ "was not added to FSTModel.", null);
+			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);
 		}
 	}
 
@@ -438,8 +335,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseModifiers(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			final String body =
-				terminal.getBody().replaceAll("\\W", "");
+			final String body = terminal.getBody().replaceAll("\\W", "");
 			modelBuilder.getCurrentClassFragment().setModifiers(body);
 		}
 	}

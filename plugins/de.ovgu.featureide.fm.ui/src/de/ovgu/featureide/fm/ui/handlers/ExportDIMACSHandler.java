@@ -42,9 +42,7 @@ public class ExportDIMACSHandler extends AbstractExportHandler {
 	protected void configureFileDialog(FileDialog fileDialog) {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("model.dimacs");
-		fileDialog.setFilterExtensions(new String[] {
-			"*.dimacs" });
-		fileDialog.setFilterNames(new String[] {
-			"DIMACS format *.dimacs" });
+		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
+		fileDialog.setFilterNames(new String[] { "DIMACS format *.dimacs" });
 	}
 }

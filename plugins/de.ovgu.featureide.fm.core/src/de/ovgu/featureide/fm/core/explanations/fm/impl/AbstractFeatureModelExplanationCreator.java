@@ -72,8 +72,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	@Override
 	public void setSubject(Object subject) {
-		this.subject =
-			subject;
+		this.subject = subject;
 	}
 
 	@Override
@@ -83,16 +82,11 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
-		this.fm =
-			fm;
-		nodeCreator =
-			null;
-		cnf =
-			null;
-		traceModel =
-			null;
-		oracle =
-			null;
+		this.fm = fm;
+		nodeCreator = null;
+		cnf = null;
+		traceModel = null;
+		oracle = null;
 	}
 
 	/**
@@ -101,10 +95,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
-		if ((nodeCreator == null)
-			&& (getFeatureModel() != null)) {
-			nodeCreator =
-				createNodeCreator();
+		if ((nodeCreator == null) && (getFeatureModel() != null)) {
+			nodeCreator = createNodeCreator();
 		}
 		return nodeCreator;
 	}
@@ -115,8 +107,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc =
-			new AdvancedNodeCreator(getFeatureModel());
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
 		nc.setIncludeBooleanValues(false);
 		nc.setCnfType(CNFType.Regular);
 		nc.setRecordTraceModel(true);
@@ -129,10 +120,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if ((cnf == null)
-			&& (getFeatureModel() != null)) {
-			cnf =
-				createCnf();
+		if ((cnf == null) && (getFeatureModel() != null)) {
+			cnf = createCnf();
 		}
 		return cnf;
 	}
@@ -152,10 +141,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
-		if ((traceModel == null)
-			&& (getFeatureModel() != null)) {
-			traceModel =
-				createTraceModel();
+		if ((traceModel == null) && (getFeatureModel() != null)) {
+			traceModel = createTraceModel();
 		}
 		return traceModel;
 	}
@@ -175,10 +162,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the oracle; not null
 	 */
 	protected Object getOracle() {
-		if ((oracle == null)
-			&& (getFeatureModel() != null)) {
-			oracle =
-				createOracle();
+		if ((oracle == null) && (getFeatureModel() != null)) {
+			oracle = createOracle();
 		}
 		return oracle;
 	}
@@ -187,8 +172,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * Sets the oracle to null.
 	 */
 	protected void resetOracle() {
-		oracle =
-			null;
+		oracle = null;
 	}
 
 	/**
@@ -205,11 +189,9 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return an explanation
 	 */
 	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final Explanation explanation =
-			getConcreteExplanation();
+		final Explanation explanation = getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			final Reason reason =
-				getReason(clauseIndex);
+			final Reason reason = getReason(clauseIndex);
 			if (reason == null) {
 				continue;
 			}
@@ -225,22 +207,17 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the shortest explanation among the given ones
 	 */
 	protected Explanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		final List<Explanation> explanations =
-			new LinkedList<>();
+		final List<Explanation> explanations = new LinkedList<>();
 		for (final Set<Integer> c : clauseIndexes) {
 			explanations.add(getExplanation(c));
 		}
-		final Explanation cumulatedExplanation =
-			getConcreteExplanation();
+		final Explanation cumulatedExplanation = getConcreteExplanation();
 		cumulatedExplanation.setExplanationCount(0);
-		Explanation shortestExplanation =
-			null;
+		Explanation shortestExplanation = null;
 		for (final Explanation explanation : explanations) {
 			cumulatedExplanation.addExplanation(explanation); // Remember that this explanation was generated.
-			if ((shortestExplanation == null)
-				|| (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
-				shortestExplanation =
-					explanation; // Remember the shortest explanation.
+			if ((shortestExplanation == null) || (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
+				shortestExplanation = explanation; // Remember the shortest explanation.
 			}
 		}
 		if (shortestExplanation == null) {

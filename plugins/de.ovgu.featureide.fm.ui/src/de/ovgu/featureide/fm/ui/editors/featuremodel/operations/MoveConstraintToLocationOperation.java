@@ -43,18 +43,14 @@ public class MoveConstraintToLocationOperation extends AbstractFeatureModelOpera
 
 	public MoveConstraintToLocationOperation(IGraphicalFeatureModel graphicalFeatureModel, Point newPos, IConstraint constraint) {
 		super(graphicalFeatureModel.getFeatureModel(), MOVE_CONSTRAINT);
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
-		this.constraint =
-			constraint;
-		this.newPos =
-			newPos;
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.constraint = constraint;
+		this.newPos = newPos;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		oldPos =
-			graphicalFeatureModel.getGraphicalConstraint(constraint).getLocation();
+		oldPos = graphicalFeatureModel.getGraphicalConstraint(constraint).getLocation();
 		graphicalFeatureModel.getGraphicalConstraint(constraint).setLocation(newPos);
 		return FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE);
 	}

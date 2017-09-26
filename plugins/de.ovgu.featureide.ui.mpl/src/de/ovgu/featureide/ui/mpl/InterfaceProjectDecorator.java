@@ -35,8 +35,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
  */
 public class InterfaceProjectDecorator implements ILightweightLabelDecorator {
 
-	private static final ImageDescriptor OVERLAY =
-		MPLUIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
+	private static final ImageDescriptor OVERLAY = MPLUIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {

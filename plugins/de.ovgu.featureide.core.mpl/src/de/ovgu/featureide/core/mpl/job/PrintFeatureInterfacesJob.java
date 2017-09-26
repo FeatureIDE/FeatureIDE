@@ -58,10 +58,8 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 
 		public Arguments(String foldername, IProject project) {
 			super(Arguments.class);
-			this.foldername =
-				foldername;
-			this.project =
-				project;
+			this.foldername = foldername;
+			this.project = project;
 		}
 	}
 
@@ -71,22 +69,16 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor =
-			workMonitor;
-		final InterfaceProject interfaceProject =
-			MPLPlugin.getDefault().getInterfaceProject(arguments.project);
+		this.workMonitor = workMonitor;
+		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(arguments.project.getName()
-				+ " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
 			return false;
 		}
-		final ProjectSignatures projectSignatures =
-			interfaceProject.getProjectSignatures();
-		final List<SelectableFeature> features =
-			interfaceProject.getConfiguration().getFeatures();
+		final ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();
+		final List<SelectableFeature> features = interfaceProject.getConfiguration().getFeatures();
 
-		IFolder folder =
-			CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
+		IFolder folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername);
 
 		try {
 			folder.delete(true, null);
@@ -96,38 +88,23 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 		}
 
 		workMonitor.setRemainingWork(features.size());
-		final int[] curFeature =
-			new int[1];
-		final SignatureIterator it =
-			interfaceProject.getProjectSignatures().iterator();
+		final int[] curFeature = new int[1];
+		final SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
 
 		for (final SelectableFeature feature : features) {
-			curFeature[0] =
-				interfaceProject.getFeatureID(feature.getName());
+			curFeature[0] = interfaceProject.getFeatureID(feature.getName());
 			it.clearFilter();
 			it.addFilter(new FeatureFilter(curFeature));
 
-			final ProjectStructure structure =
-				new ProjectStructure(it);
+			final ProjectStructure structure = new ProjectStructure(it);
 			for (final AbstractClassFragment role : structure.getClasses()) {
-				final String packagename =
-					role.getSignature().getPackage();
+				final String packagename = role.getSignature().getPackage();
 
-				final String path =
-					arguments.foldername
-						+ "/"
-						+ feature.getName()
-						+
-						(packagename.isEmpty()
-							? ""
-							: "/"
-								+ packagename);
+				final String path = arguments.foldername + "/" + feature.getName() + (packagename.isEmpty() ? "" : "/" + packagename);
 
-				folder =
-					CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
+				folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), path);
 
-				FileSystem.write(Paths.get(folder.getFile(role.getSignature().getName()
-					+ ".java").getLocationURI()), role.toShortString());
+				FileSystem.write(Paths.get(folder.getFile(role.getSignature().getName() + ".java").getLocationURI()), role.toShortString());
 			}
 			workMonitor.worked();
 		}

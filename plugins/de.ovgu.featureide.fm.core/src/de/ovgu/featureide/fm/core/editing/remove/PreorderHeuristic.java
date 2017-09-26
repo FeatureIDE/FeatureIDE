@@ -38,12 +38,10 @@ public class PreorderHeuristic extends ATreeHeuristic {
 
 	@Override
 	protected void order(IFeatureStructure root) {
-		final LinkedList<IFeatureStructure> list =
-			new LinkedList<>();
+		final LinkedList<IFeatureStructure> list = new LinkedList<>();
 		list.add(root);
 		while (!list.isEmpty()) {
-			final IFeatureStructure nextFeature =
-				list.removeFirst();
+			final IFeatureStructure nextFeature = list.removeFirst();
 			list.addAll(0, nextFeature.getChildren());
 			find(nextFeature.getFeature());
 		}

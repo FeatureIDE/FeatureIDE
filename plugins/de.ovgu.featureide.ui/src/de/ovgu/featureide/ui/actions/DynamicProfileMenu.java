@@ -57,8 +57,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Marcus Pinnecke
  */
 
-@SuppressWarnings({
-	"restriction" })
+@SuppressWarnings({ "restriction" })
 public class DynamicProfileMenu extends ContributionItem {
 
 	private AddProfileColorSchemeAction addProfileSchemeAction;
@@ -66,15 +65,10 @@ public class DynamicProfileMenu extends ContributionItem {
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
 	private final IFeatureModel featureModel;
 	{
-		final IFeatureProject curFeatureProject =
-			getCurrentFeatureProject();
-		featureModel =
-			curFeatureProject == null
-				? FMFactoryManager.getEmptyFeatureModel()
-				: curFeatureProject.getFeatureModel();
+		final IFeatureProject curFeatureProject = getCurrentFeatureProject();
+		featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
 	}
-	private final boolean multipleSelected =
-		isMultipleSelection();
+	private final boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {}
 
@@ -90,8 +84,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		if (featureModel == null) {
 			return;
 		}
-		final MenuManager man =
-			new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
+		final MenuManager man = new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 
 			@Override
@@ -116,8 +109,7 @@ public class DynamicProfileMenu extends ContributionItem {
 			if (cs.isDefault()) {
 				continue;
 			}
-			final SetProfileColorSchemeAction setCSAction =
-				new SetProfileColorSchemeAction(cs.getName(), IAction.AS_CHECK_BOX, featureModel);
+			final SetProfileColorSchemeAction setCSAction = new SetProfileColorSchemeAction(cs.getName(), IAction.AS_CHECK_BOX, featureModel);
 			if (cs.isCurrent()) {
 				setCSAction.setChecked(true);
 			}
@@ -144,23 +136,18 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Creates functionality of the action-buttons.
 	 */
 	private void createActions() {
-		addProfileSchemeAction =
-			new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
-		renameProfileSchemeAction =
-			new RenameProfileColorSchemeAction("Change Name", featureModel);
-		deleteProfileSchemeAction =
-			new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
+		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
+		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel);
+		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
 	}
 
 	/**
 	 * Returns selection of type IStructuredSelection
 	 */
 	private static IStructuredSelection getIStructuredCurrentSelection() {
-		final ISelectionService selectionService =
-			Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();
+		final ISelectionService selectionService = Workbench.getInstance().getActiveWorkbenchWindow().getSelectionService();
 
-		final ISelection selection =
-			selectionService.getSelection();
+		final ISelection selection = selectionService.getSelection();
 		return (IStructuredSelection) selection;
 	}
 
@@ -168,14 +155,11 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Disables the profilemenu, if more than one project is selected
 	 */
 	private static boolean isMultipleSelection() {
-		final IStructuredSelection myselection =
-			getIStructuredCurrentSelection();
+		final IStructuredSelection myselection = getIStructuredCurrentSelection();
 
 		if (myselection instanceof ITreeSelection) {
-			final TreeSelection treeSelection =
-				(TreeSelection) myselection;
-			final TreePath[] treePaths =
-				treeSelection.getPaths();
+			final TreeSelection treeSelection = (TreeSelection) myselection;
+			final TreePath[] treePaths = treeSelection.getPaths();
 			if (treePaths.length > 1) {
 				return true;
 
@@ -189,29 +173,23 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Returns selected FeatureProject
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
-		final Object element =
-			getIStructuredCurrentSelection().getFirstElement();
+		final Object element = getIStructuredCurrentSelection().getFirstElement();
 		if (element != null) {
 			if (element instanceof IResource) {
 				return CorePlugin.getFeatureProject((IResource) element);
 			} else if (element instanceof PackageFragmentRootContainer) {
-				final IJavaProject jProject =
-					((PackageFragmentRootContainer) element).getJavaProject();
+				final IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
 				return CorePlugin.getFeatureProject(jProject.getProject());
 			} else if (element instanceof IJavaElement) {
 				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
 			} else if (element instanceof IAdaptable) {
-				final IProject project =
-					((IAdaptable) element).getAdapter(IProject.class);
+				// Cast is necessary, don't remove
+				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 				if (project != null) {
 					return CorePlugin.getFeatureProject(project);
 				}
 			}
-			throw new RuntimeException("element "
-				+ element
-				+ "("
-				+ element.getClass()
-				+ ") not covered");
+			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
 		return null;
 	}

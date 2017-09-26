@@ -51,16 +51,11 @@ public class LegendDragAndDropCommand extends Command {
 	private final Point newLocation;
 
 	public LegendDragAndDropCommand(IGraphicalFeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
-		this.legendEditPart =
-			legendEditPart;
-		this.model =
-			model;
+		this.legendEditPart = legendEditPart;
+		this.model = model;
 
-		final Rectangle bounds =
-			legendEditPart.getFigure().getBounds().getCopy();
-		newLocation =
-			bounds.getTranslated(moveDelta.getScaled(1
-				/ FeatureUIHelper.getZoomFactor())).getLocation();
+		final Rectangle bounds = legendEditPart.getFigure().getBounds().getCopy();
+		newLocation = bounds.getTranslated(moveDelta.getScaled(1 / FeatureUIHelper.getZoomFactor())).getLocation();
 	}
 
 	/**
@@ -70,8 +65,7 @@ public class LegendDragAndDropCommand extends Command {
 	 */
 	@Override
 	public boolean canExecute() {
-		final Rectangle newBounds =
-			new Rectangle(newLocation, legendEditPart.getFigure().getSize());
+		final Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
 		for (final IGraphicalFeature f : model.getVisibleFeatures()) {
@@ -79,8 +73,7 @@ public class LegendDragAndDropCommand extends Command {
 				return false;
 			}
 
-			final List<ConnectionEditPart> connectionList =
-				FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
+			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
 			for (final ConnectionEditPart connectionEditPart : connectionList) {
 				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
 					return false;
@@ -100,15 +93,13 @@ public class LegendDragAndDropCommand extends Command {
 
 	@Override
 	public void execute() {
-		final LegendFigure legendFigure =
-			legendEditPart.getFigure();
+		final LegendFigure legendFigure = legendEditPart.getFigure();
 
 		if (legendFigure.getLocation().equals(newLocation)) {
 			return;
 		}
 
-		final LegendMoveOperation op =
-			new LegendMoveOperation(model, newLocation, legendFigure);
+		final LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
 		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) model.getFeatureModel().getUndoContext());
 

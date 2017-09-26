@@ -41,8 +41,7 @@ public class CollapseAllAction extends Action {
 	 */
 	public CollapseAllAction(TreeViewer viewer) {
 		super();
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
 	}
 

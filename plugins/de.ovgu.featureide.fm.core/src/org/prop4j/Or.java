@@ -58,10 +58,8 @@ public class Or extends Node implements Cloneable {
 
 	@Override
 	protected Node clausifyCNF() {
-		for (int i =
-			0; i < children.length; i++) {
-			children[i] =
-				children[i].clausifyCNF();
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].clausifyCNF();
 		}
 		fuseWithSimilarChildren();
 		return createCNF(children);
@@ -69,47 +67,37 @@ public class Or extends Node implements Cloneable {
 
 	@Override
 	protected Node clausifyDNF() {
-		for (int i =
-			0; i < children.length; i++) {
-			children[i] =
-				children[i].clausifyDNF();
+		for (int i = 0; i < children.length; i++) {
+			children[i] = children[i].clausifyDNF();
 		}
 		fuseWithSimilarChildren();
 		return this;
 	}
 
 	private Node createCNF(Node[] children) {
-		LinkedList<LinkedList<Node>> clauses =
-			new LinkedList<>();
+		LinkedList<LinkedList<Node>> clauses = new LinkedList<>();
 		clauses.add(new LinkedList<Node>());
 		for (final Node child : children) {
-			final LinkedList<Node[]> newClauses =
-				new LinkedList<>();
+			final LinkedList<Node[]> newClauses = new LinkedList<>();
 			if (child instanceof And) {
 				for (final Node or : child.children) {
 					if (or instanceof Or) {
 						newClauses.add(or.children);
 					} else {
-						newClauses.add(new Node[] {
-							or });
+						newClauses.add(new Node[] { or });
 					}
 				}
 			} else {
-				newClauses.add(new Node[] {
-					child });
+				newClauses.add(new Node[] { child });
 			}
 
-			clauses =
-				updateClauses(clauses, newClauses);
+			clauses = updateClauses(clauses, newClauses);
 		}
 
-		final Node[] newChildren =
-			new Node[clauses.size()];
-		int i =
-			0;
+		final Node[] newChildren = new Node[clauses.size()];
+		int i = 0;
 		for (final LinkedList<Node> clause : clauses) {
-			newChildren[i++] =
-				new Or(clause);
+			newChildren[i++] = new Or(clause);
 		}
 		return new And(newChildren);
 	}
@@ -120,15 +108,12 @@ public class Or extends Node implements Cloneable {
 	}
 
 	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses, LinkedList<Node[]> newClauses) {
-		final LinkedList<LinkedList<Node>> updatedClauses =
-			new LinkedList<>();
+		final LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
 		for (final LinkedList<Node> clause : clauses) {
-			boolean intersection =
-				false;
+			boolean intersection = false;
 			for (final Node[] list : newClauses) {
 				if (clause.containsAll(Arrays.asList(list))) {
-					intersection =
-						true;
+					intersection = true;
 					break;
 				}
 			}
@@ -136,8 +121,7 @@ public class Or extends Node implements Cloneable {
 				add(updatedClauses, clause);
 			} else {
 				for (final Node[] list : newClauses) {
-					final LinkedList<Node> newClause =
-						clone(clause);
+					final LinkedList<Node> newClause = clone(clause);
 					for (final Node node : list) {
 						newClause.add(node.clone());
 					}
@@ -205,19 +189,15 @@ public class Or extends Node implements Cloneable {
 
 	@Override
 	public void simplify() {
-		final List<Node> nodes =
-			new ArrayList<Node>();
+		final List<Node> nodes = new ArrayList<Node>();
 
-		for (int i =
-			0; i < children.length; i++) {
+		for (int i = 0; i < children.length; i++) {
 			collectChildren(children[i], nodes);
 		}
 
-		final int size =
-			nodes.size();
+		final int size = nodes.size();
 		if (size != children.length) {
-			final Node[] newChildren =
-				nodes.toArray(new Node[size]);
+			final Node[] newChildren = nodes.toArray(new Node[size]);
 			setChildren(newChildren);
 		}
 

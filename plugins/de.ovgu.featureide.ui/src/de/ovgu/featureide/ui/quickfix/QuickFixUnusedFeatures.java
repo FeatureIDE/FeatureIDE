@@ -55,46 +55,37 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 
 	@Override
 	public void run(final IMarker marker) {
-		final Job job =
-			new Job(getLabel()) {
+		final Job job = new Job(getLabel()) {
 
-				@Override
-				protected IStatus run(final IProgressMonitor monitor) {
-					if (project != null) {
-						final IMonitor monitor2 =
-							new ProgressMonitor("Cover unused features", monitor);
-						monitor2.setRemainingWork(2);
-						final IMonitor subTask =
-							monitor2.subTask(1);
-						subTask.setTaskName("Collect unused features");
-						final Collection<String> unusedFeatures =
-							project.getUnusedConfigurationFeatures();
-						subTask.step();
-						subTask.done();
-						createConfigurations(unusedFeatures, monitor2.subTask(1), false);
-						monitor2.done();
-					}
-					return Status.OK_STATUS;
+			@Override
+			protected IStatus run(final IProgressMonitor monitor) {
+				if (project != null) {
+					final IMonitor monitor2 = new ProgressMonitor("Cover unused features", monitor);
+					monitor2.setRemainingWork(2);
+					final IMonitor subTask = monitor2.subTask(1);
+					subTask.setTaskName("Collect unused features");
+					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
+					subTask.step();
+					subTask.done();
+					createConfigurations(unusedFeatures, monitor2.subTask(1), false);
+					monitor2.done();
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 		job.schedule();
 	}
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IMonitor monitor, boolean collect) {
 		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
-		final List<Configuration> confs =
-			new LinkedList<Configuration>();
-		final FileHandler<Configuration> writer =
-			new FileHandler<>(ConfigurationManager.getDefaultFormat());
-		Configuration configuration =
-			new Configuration(featureModel, false);
+		final List<Configuration> confs = new LinkedList<Configuration>();
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		Configuration configuration = new Configuration(featureModel, false);
 		try {
-			final List<List<String>> solutions =
-				configuration.coverFeatures(unusedFeatures, monitor, true);
+			final List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, true);
 			for (final List<String> solution : solutions) {
-				configuration =
-					new Configuration(featureModel, false);
+				configuration = new Configuration(featureModel, false);
 				for (final String feature : solution) {
 					if (!"True".equals(feature)) {
 						configuration.setManual(feature, Selection.SELECTED);
@@ -103,8 +94,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 				if (collect) {
 					confs.add(configuration);
 				} else {
-					final IFile configurationFile =
-						getConfigurationFile(project.getConfigFolder());
+					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
 					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
 			}
@@ -123,8 +113,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 	 * @return
 	 */
 	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
-		featureModel =
-			fm;
+		featureModel = fm;
 		return createConfigurations(falseOptionalFeatures, new NullMonitor(), true);
 	}
 

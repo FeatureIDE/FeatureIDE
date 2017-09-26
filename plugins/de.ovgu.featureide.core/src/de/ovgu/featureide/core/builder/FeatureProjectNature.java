@@ -41,9 +41,7 @@ public class FeatureProjectNature implements IProjectNature {
 	/**
 	 * ID of this project nature
 	 */
-	public static final String NATURE_ID =
-		CorePlugin.PLUGIN_ID
-			+ ".featureProjectNature";
+	public static final String NATURE_ID = CorePlugin.PLUGIN_ID + ".featureProjectNature";
 
 	private IProject project;
 
@@ -52,49 +50,33 @@ public class FeatureProjectNature implements IProjectNature {
 		if (project == null) {
 			return;
 		}
-		final IProjectDescription desc =
-			project.getDescription();
-		final ICommand[] commands =
-			desc.getBuildSpec();
+		final IProjectDescription desc = project.getDescription();
+		final ICommand[] commands = desc.getBuildSpec();
 
-		for (int i =
-			0; i < commands.length; ++i) {
+		for (int i = 0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
 				return;
 			}
 		}
 
-		final ICommand[] newCommands =
-			new ICommand[commands.length
-				+ 1];
+		final ICommand[] newCommands = new ICommand[commands.length + 1];
 		System.arraycopy(commands, 0, newCommands, 1, commands.length);
-		final ICommand command =
-			desc.newCommand();
+		final ICommand command = desc.newCommand();
 		command.setBuilderName(ExtensibleFeatureProjectBuilder.BUILDER_ID);
-		newCommands[0] =
-			command;
+		newCommands[0] = command;
 		desc.setBuildSpec(newCommands);
 		project.setDescription(desc, null);
 	}
 
 	@Override
 	public void deconfigure() throws CoreException {
-		final IProjectDescription description =
-			getProject().getDescription();
-		final ICommand[] commands =
-			description.getBuildSpec();
-		for (int i =
-			0; i < commands.length; ++i) {
+		final IProjectDescription description = getProject().getDescription();
+		final ICommand[] commands = description.getBuildSpec();
+		for (int i = 0; i < commands.length; ++i) {
 			if (commands[i].getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)) {
-				final ICommand[] newCommands =
-					new ICommand[commands.length
-						- 1];
+				final ICommand[] newCommands = new ICommand[commands.length - 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
-				System.arraycopy(commands, i
-					+ 1, newCommands, i,
-						commands.length
-							- i
-							- 1);
+				System.arraycopy(commands, i + 1, newCommands, i, commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				getProject().setDescription(description, null);
 				return;
@@ -109,8 +91,7 @@ public class FeatureProjectNature implements IProjectNature {
 
 	@Override
 	public void setProject(IProject project) {
-		this.project =
-			project;
+		this.project = project;
 	}
 
 }

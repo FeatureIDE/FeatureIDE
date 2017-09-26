@@ -31,10 +31,12 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeRedundantConstraintExplanationCreator extends CompositeFeatureModelExplanationCreator<RedundantConstraintExplanationCreator> implements RedundantConstraintExplanationCreator {
+public class CompositeRedundantConstraintExplanationCreator extends CompositeFeatureModelExplanationCreator<RedundantConstraintExplanationCreator>
+		implements RedundantConstraintExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
+	 * 
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeRedundantConstraintExplanationCreator(Collection<RedundantConstraintExplanationCreator> composites) {

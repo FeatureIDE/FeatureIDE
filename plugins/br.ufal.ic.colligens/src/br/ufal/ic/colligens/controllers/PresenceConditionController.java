@@ -30,29 +30,21 @@ import tree.visitor.VisitorPrinter;
 
 public class PresenceConditionController {
 
-	private IFile file =
-		null;
+	private IFile file = null;
 	private final int line;
 	private final String code;
 	private Collection<Node> nodes, nodesCondition2;
-	public static final String MARKER_TYPE =
-		Colligens.PLUGIN_ID
-			+ ".presencecondition";
-	private FileProxy fileProxy =
-		null;
+	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".presencecondition";
+	private FileProxy fileProxy = null;
 
 	public PresenceConditionController(IFile file, int line, String code) {
-		this.file =
-			file;
-		this.line =
-			line;
-		this.code =
-			code;
+		this.file = file;
+		this.line = line;
+		this.code = code;
 	}
 
 	public void run() throws PluginException, OptionException, IOException {
-		final StubsHeader stubsHeader =
-			new StubsHeader();
+		final StubsHeader stubsHeader = new StubsHeader();
 		try {
 			stubsHeader.setProject(file.getProject().getName());
 			stubsHeader.run();
@@ -61,50 +53,39 @@ public class PresenceConditionController {
 			throw new PluginException("");
 		}
 
-		fileProxy =
-			new FileProxy(file);
+		fileProxy = new FileProxy(file);
 
-		final FrontendOptions opt =
-			new FrontendOptionsWithConfigFiles();
-		final ArrayList<String> paramters =
-			new ArrayList<String>();
+		final FrontendOptions opt = new FrontendOptionsWithConfigFiles();
+		final ArrayList<String> paramters = new ArrayList<String>();
 
 		paramters.add("--lexNoStdout");
 		paramters.add("--parse");
 
 		if (stubsHeader.getIncludes() != null) {
-			for (final Iterator<String> iterator =
-				stubsHeader.getIncludes()
-						.iterator(); iterator.hasNext();) {
+			for (final Iterator<String> iterator = stubsHeader.getIncludes().iterator(); iterator.hasNext();) {
 				paramters.add("-h");
 				paramters.add(iterator.next());
 			}
 		}
 		paramters.add(fileProxy.getNoIncludeFile());
 
-		final String[] paramterArray =
-			paramters
-					.toArray(new String[paramters.size()]);
+		final String[] paramterArray = paramters.toArray(new String[paramters.size()]);
 
 		opt.parseOptions(paramterArray);
 
-		final RenderParserError renderParserError =
-			new RenderParserError();
+		final RenderParserError renderParserError = new RenderParserError();
 		renderParserError.setFile(fileProxy);
 
 		opt.setRenderParserError(renderParserError);
 
-		final tree.Node ast =
-			GeneralFrontend.getAST(opt);
+		final tree.Node ast = GeneralFrontend.getAST(opt);
 
 		if (ast == null) {
 			return;
 		}
 
-		nodes =
-			new LinkedList<Node>();
-		nodesCondition2 =
-			new LinkedList<Node>();
+		nodes = new LinkedList<Node>();
+		nodesCondition2 = new LinkedList<Node>();
 
 		ast.accept(new PresenceConditionVisitor());
 
@@ -116,30 +97,19 @@ public class PresenceConditionController {
 	}
 
 	private void presenceCondition(Node node) {
-		if ((node.getPositionFrom() != null)
-			&& ((node.getPositionFrom().getLine() >= (line
-				- 10))
-				&& (node
-						.getPositionFrom().getLine() <= (line
-							+ 10)))) {
-			final PrintStream out =
-				System.out;
+		if ((node.getPositionFrom() != null) && ((node.getPositionFrom().getLine() >= (line - 10)) && (node.getPositionFrom().getLine() <= (line + 10)))) {
+			final PrintStream out = System.out;
 			node.accept(new VisitorPrinter(true));
 			System.setOut(out);
 			try {
-				Runtime.getRuntime().exec(
-						"/usr/bin/uncrustify -o "
-							+ RefactoringFrontend.outputFilePath
-							+ " -c default.cfg -f "
-							+ RefactoringFrontend.outputFilePath);
+				Runtime.getRuntime()
+						.exec("/usr/bin/uncrustify -o " + RefactoringFrontend.outputFilePath + " -c default.cfg -f " + RefactoringFrontend.outputFilePath);
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 
 			try {
-				final String codeNode =
-					readFile(RefactoringFrontend.outputFilePath)
-							.trim();
+				final String codeNode = readFile(RefactoringFrontend.outputFilePath).trim();
 				if (codeNode.contains(code.trim())) {
 					// System.out.println("Presence Condition: "
 					// + node.getPresenceCondition() + COMMA__FROM_LINE
@@ -147,8 +117,7 @@ public class PresenceConditionController {
 					node.accept(new VisitorPrinter(false));
 					// System.out.println("\n\n");
 					nodes.add(node);
-				} else if (Math.abs(node.getPositionFrom().getLine()
-					- line) < 10) {
+				} else if (Math.abs(node.getPositionFrom().getLine() - line) < 10) {
 					nodesCondition2.add(node);
 				}
 			} catch (final IOException e) {
@@ -161,19 +130,11 @@ public class PresenceConditionController {
 	}
 
 	private boolean markerLine(Collection<Node> nodes) {
-		Node nodeMarke =
-			null;
-		for (final Iterator<Node> iterator =
-			nodes.iterator(); iterator.hasNext();) {
-			final Node node =
-				iterator.next();
-			if ((nodeMarke == null)
-				|| (Math.abs(node.getPositionFrom().getLine()
-					- line) <= Math
-							.abs(nodeMarke.getPositionFrom().getLine()
-								- line))) {
-				nodeMarke =
-					node;
+		Node nodeMarke = null;
+		for (final Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
+			final Node node = iterator.next();
+			if ((nodeMarke == null) || (Math.abs(node.getPositionFrom().getLine() - line) <= Math.abs(nodeMarke.getPositionFrom().getLine() - line))) {
+				nodeMarke = node;
 			}
 		}
 		if (nodeMarke == null) {
@@ -181,11 +142,9 @@ public class PresenceConditionController {
 		}
 		IMarker marker;
 		try {
-			marker =
-				file.createMarker(MARKER_TYPE);
+			marker = file.createMarker(MARKER_TYPE);
 
-			marker.setAttribute(IMarker.MESSAGE, "Presence Condition: "
-				+ nodeMarke.getPresenceCondition());
+			marker.setAttribute(IMarker.MESSAGE, "Presence Condition: " + nodeMarke.getPresenceCondition());
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
 		} catch (final CoreException e) {
@@ -195,19 +154,15 @@ public class PresenceConditionController {
 	}
 
 	private String readFile(String fileName) throws IOException {
-		final BufferedReader br =
-			new BufferedReader(new FileReader(fileName));
+		final BufferedReader br = new BufferedReader(new FileReader(fileName));
 		try {
-			final StringBuilder sb =
-				new StringBuilder();
-			String line =
-				br.readLine();
+			final StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
 
 			while (line != null) {
 				sb.append(line);
 				sb.append("\n");
-				line =
-					br.readLine();
+				line = br.readLine();
 			}
 			return sb.toString();
 		} finally {
