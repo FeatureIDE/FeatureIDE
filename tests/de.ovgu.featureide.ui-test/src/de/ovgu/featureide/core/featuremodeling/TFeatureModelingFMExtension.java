@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.core.featuremodeling;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -26,13 +26,15 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
+import de.ovgu.featureide.fm.core.FMComposerExtension;
+import de.ovgu.featureide.fm.core.IFMComposerExtension;
 
 /**
  * Test class for the {@link FMComposerExtension}.
  *
  * @author Florian Proksch
  */
-public class TFMComposerExtension {
+public class TFeatureModelingFMExtension {
 
 	private static FeatureModelingFMExtension f1 = new FeatureModelingFMExtension();
 	private static IFMComposerExtension f2 = new FMComposerExtension();
