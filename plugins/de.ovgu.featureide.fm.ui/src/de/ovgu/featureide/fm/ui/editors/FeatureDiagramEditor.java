@@ -1371,7 +1371,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					if (obj instanceof LegendEditPart) {
 						final LegendFigure fig = ((LegendEditPart) obj).getFigure();
 						fig.recreateLegend();
-						final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+						final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.newLayoutLegend(graphicalFeatureModel, false);
 						if (newLegendPosition != null) {
 							fig.setLocation(newLegendPosition);
 						}
