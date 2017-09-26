@@ -48,17 +48,13 @@ public final class FeatureListNode extends LazyParent {
 	public FeatureListNode(String description, Collection<IFeature> collection, Object value, boolean expand) {
 		super(description, value);
 
-		this.expand =
-			expand;
+		this.expand = expand;
 
-		final List<IFeature> list =
-			new LinkedList<IFeature>(collection);
+		final List<IFeature> list = new LinkedList<IFeature>(collection);
 		Collections.sort(list, new FeatureComparator(false));
 
-		this.list =
-			list;
-		lazy =
-			(list.size() != 0);
+		this.list = list;
+		lazy = (list.size() != 0);
 	}
 
 	@Override

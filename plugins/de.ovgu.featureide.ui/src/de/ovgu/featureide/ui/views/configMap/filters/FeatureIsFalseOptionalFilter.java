@@ -46,8 +46,7 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		final IFeatureStructure structure =
-			feature.getStructure();
+		final IFeatureStructure structure = feature.getStructure();
 
 		if (structure.isMandatory()) {
 			return false;
@@ -61,8 +60,7 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 			return false;
 		}
 
-		final List<Configuration> configs =
-			configurationMap.getConfigurations();
+		final List<Configuration> configs = configurationMap.getConfigurations();
 		if (configs == null) {
 			return false;
 		}

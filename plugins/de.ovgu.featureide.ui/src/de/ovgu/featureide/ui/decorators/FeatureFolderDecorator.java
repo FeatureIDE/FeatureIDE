@@ -45,14 +45,11 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 	private static final ImageDescriptor OVERLAY;
 
 	static {
-		final URL url =
-			UIPlugin.getDefault().getBundle().getEntry("/icons/deleted.gif");
-		OVERLAY =
-			ImageDescriptor.createFromURL(url);
+		final URL url = UIPlugin.getDefault().getBundle().getEntry("/icons/deleted.gif");
+		OVERLAY = ImageDescriptor.createFromURL(url);
 	}
 
-	private final LinkedList<ILabelProviderListener> listenerList =
-		new LinkedList<ILabelProviderListener>();
+	private final LinkedList<ILabelProviderListener> listenerList = new LinkedList<ILabelProviderListener>();
 
 	public FeatureFolderDecorator() {
 		CorePlugin.getDefault().addFeatureFolderListener(this);
@@ -65,20 +62,16 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 
 	@Override
 	public void decorate(Object element, IDecoration decoration) {
-		final IFolder folder =
-			(IFolder) element;
+		final IFolder folder = (IFolder) element;
 
 		// decorate only files in our projects
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(folder);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(folder);
 		if (featureProject == null) {
 			return;
 		}
 
-		final IComposerExtensionClass composer =
-			featureProject.getComposer();
-		if ((composer == null)
-			|| !composer.hasFeatureFolder()) {
+		final IComposerExtensionClass composer = featureProject.getComposer();
+		if ((composer == null) || !composer.hasFeatureFolder()) {
 			return;
 		}
 		if (!featureProject.getSourceFolder().equals(folder.getParent())) {
@@ -86,10 +79,8 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		}
 
 		// handle only not-in-use folders
-		final IFeature feature =
-			featureProject.getFeatureModel().getFeature(folder.getName());
-		if ((feature == null)
-			|| feature.getStructure().isAbstract()) {
+		final IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		if ((feature == null) || feature.getStructure().isAbstract()) {
 			// decorate not-in-use folders
 			decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
 		}
@@ -114,8 +105,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 
 	@Override
 	public void featureFolderChanged(IFolder folder) {
-		final LabelProviderChangedEvent event =
-			new LabelProviderChangedEvent(this, folder);
+		final LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, folder);
 		for (final ILabelProviderListener listener : listenerList) {
 			listener.labelProviderChanged(event);
 		}

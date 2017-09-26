@@ -53,83 +53,48 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final static String[] ignoredExtensions =
-		{
-			"jpg",
-			"jpeg",
-			"raw",
-			"hdr",
-			"tiff",
-			"bmp",
-			"jpe",
-			"dib",
-			"gif",
-			"pdf",
-			"png",
-			"zip",
-			"wav",
-			"mp3",
-			"avi",
-			"flv",
-			"midi" };
+		{ "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3", "avi", "flv", "midi" };
 
-	private final HashMap<String, Integer> featureExtensionLOCList =
-		new HashMap<String, Integer>();
+	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;
 
-	private int numberOfLines =
-		0;
+	private int numberOfLines = 0;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
-		this.fstModel =
-			fstModel;
+		this.fstModel = fstModel;
 	}
 
 	@Override
 	protected void initChildren() {
 
-		int numberOfClasses =
-			0;
-		int numberOfRoles =
-			0;
-		int numberOfFields =
-			0;
-		int numberOfUniFields =
-			0;
-		int numberOfMethods =
-			0;
-		int numberOfUniMethods =
-			0;
+		int numberOfClasses = 0;
+		int numberOfRoles = 0;
+		int numberOfFields = 0;
+		int numberOfUniFields = 0;
+		int numberOfMethods = 0;
+		int numberOfUniMethods = 0;
 
 		for (final FSTClass fstClass : fstModel.getClasses()) {
-			final List<List<FSTClassFragment>> allFrag =
-				fstClass.getAllFSTFragments();
-			final HashSet<FSTMethod> methHelper =
-				new HashSet<FSTMethod>();
-			final HashSet<FSTField> fieldHelper =
-				new HashSet<FSTField>();
+			final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
+			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
 
 			for (final List<FSTClassFragment> linkedList : allFrag) {
-				numberOfRoles +=
-					linkedList.size();
+				numberOfRoles += linkedList.size();
 
 				for (final FSTClassFragment fstClassFragment : linkedList) {
 					methHelper.addAll(fstClassFragment.getMethods());
 					fieldHelper.addAll(fstClassFragment.getFields());
 
-					numberOfMethods +=
-						fstClassFragment.getMethods().size();
-					numberOfFields +=
-						fstClassFragment.getFields().size();
+					numberOfMethods += fstClassFragment.getMethods().size();
+					numberOfFields += fstClassFragment.getFields().size();
 				}
 			}
 
-			numberOfUniFields +=
-				fieldHelper.size();
-			numberOfUniMethods +=
-				methHelper.size();
-			numberOfClasses +=
-				allFrag.size();
+			numberOfUniFields += fieldHelper.size();
+			numberOfUniMethods += methHelper.size();
+			numberOfClasses += allFrag.size();
 		}
 
 		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
@@ -140,33 +105,13 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 		}
 
-		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS
-			+ SEPARATOR
-			+ numberOfClasses
-			+ " | "
-			+ NUMBER_ROLE
-			+ SEPARATOR
-			+ numberOfRoles, fstModel,
+		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
-		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U
-			+ SEPARATOR
-			+ numberOfUniFields
-			+ " | "
-			+ NUMBER_FIELD
-			+ SEPARATOR
-			+ numberOfFields,
+		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
-		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U
-			+ SEPARATOR
-			+ numberOfUniMethods
-			+ " | "
-			+ NUMBER_METHOD
-			+ SEPARATOR
-			+ numberOfMethods,
+		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-		addChild(new LOCNode(NUMBER_OF_CODELINES
-			+ SEPARATOR
-			+ numberOfLines, featureExtensionLOCList));
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
 	}
 
 	private static boolean isIgnoredExtension(String fileExtension) {
@@ -183,18 +128,12 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 			@Override
 			public boolean visit(IResource resource) throws CoreException {
-				int numberOfLinesInThisFile =
-					0;
+				int numberOfLinesInThisFile = 0;
 				if (resource instanceof IFolder) {
 					return true;
 				} else if (resource instanceof IFile) {
-					final IFile file =
-						(IFile) resource;
-					String oneLineComment =
-						"", moreLineStart =
-							"",
-							moreLineEnd =
-								"";
+					final IFile file = (IFile) resource;
+					String oneLineComment = "", moreLineStart = "", moreLineEnd = "";
 
 					if (!isIgnoredExtension(file.getFileExtension())) {
 						switch (file.getFileExtension()) {
@@ -204,20 +143,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						case "h":
 						case "jj":
 						case "jak":
-							oneLineComment =
-								"//";
-							moreLineStart =
-								"/*";
-							moreLineEnd =
-								"*/";
+							oneLineComment = "//";
+							moreLineStart = "/*";
+							moreLineEnd = "*/";
 							break;
 						case "cs":
-							oneLineComment =
-								"///";
-							moreLineStart =
-								"/*";
-							moreLineEnd =
-								"*/";
+							oneLineComment = "///";
+							moreLineStart = "/*";
+							moreLineEnd = "*/";
 							break;
 						// TODO Haskell comments
 						// case "hs":
@@ -229,18 +162,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 						case "xmi":
 							break;
 						default:
-							oneLineComment =
-								"#|#|#";
-							moreLineStart =
-								"#|#|#";
-							moreLineEnd =
-								"#|#|#";
+							oneLineComment = "#|#|#";
+							moreLineStart = "#|#|#";
+							moreLineEnd = "#|#|#";
 							break;
 						}
 
 						try {
-							numberOfLinesInThisFile =
-								countLOC(file, oneLineComment, moreLineStart, moreLineEnd/* , nested, nestedCounter */);
+							numberOfLinesInThisFile = countLOC(file, oneLineComment, moreLineStart, moreLineEnd/* , nested, nestedCounter */);
 
 						} catch (final FileNotFoundException e) {
 							e.printStackTrace();
@@ -248,31 +177,18 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							e.printStackTrace();
 						}
 
-						final String feat =
-							(file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES)
-								+ 9, file.getFullPath()
-										.toString().length()
-									- 1)).split("/")[0];
+						final String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES) + 9,
+								file.getFullPath().toString().length() - 1)).split("/")[0];
 
-						if (!featureExtensionLOCList.containsKey(file.getFileExtension()
-							+ "#"
-							+ feat)) {
-							featureExtensionLOCList.put(file.getFileExtension()
-								+ "#"
-								+ feat, numberOfLinesInThisFile);
+						if (!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {
+							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, numberOfLinesInThisFile);
 						} else {
-							featureExtensionLOCList.put(file.getFileExtension()
-								+ "#"
-								+ feat,
-									featureExtensionLOCList.get(file.getFileExtension()
-										+ "#"
-										+ feat)
-										+ numberOfLinesInThisFile);
+							featureExtensionLOCList.put(file.getFileExtension() + "#" + feat,
+									featureExtensionLOCList.get(file.getFileExtension() + "#" + feat) + numberOfLinesInThisFile);
 						}
 					}
 				}
-				numberOfLines +=
-					numberOfLinesInThisFile;
+				numberOfLines += numberOfLinesInThisFile;
 
 				return false;
 			}
@@ -281,29 +197,20 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	}
 
 	public static int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
-		final FileReader fr =
-			new FileReader(file.getLocation().toString());
-		final BufferedReader br =
-			new BufferedReader(fr);
+		final FileReader fr = new FileReader(file.getLocation().toString());
+		final BufferedReader br = new BufferedReader(fr);
 		return countLineNumber(oneLineComment, moreLineStart, moreLineEnd, br);
 	}
 
 	public static int countLineNumber(String oneLineComment, String moreLineStart, String moreLineEnd, BufferedReader br) throws IOException {
-		int numberOfLinesInThisFile =
-			0;
+		int numberOfLinesInThisFile = 0;
 		String s;
-		boolean isInComment =
-			false;
-		while ((s =
-			br.readLine()) != null) {
-			s =
-				s.trim();
-			if (!s.equals("")
-				&& !s.startsWith(oneLineComment)
-				&& !isInComment) {
+		boolean isInComment = false;
+		while ((s = br.readLine()) != null) {
+			s = s.trim();
+			if (!s.equals("") && !s.startsWith(oneLineComment) && !isInComment) {
 				if (s.startsWith(moreLineStart)) {
-					isInComment =
-						true;
+					isInComment = true;
 				} else {
 					numberOfLinesInThisFile++;
 				}
@@ -311,17 +218,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 			if (s.contains(moreLineEnd)) {
 
-				isInComment =
-					false;
+				isInComment = false;
 				if (!s.endsWith(moreLineEnd)) {
 					numberOfLinesInThisFile++;
 				}
 			}
 
-			if (s.contains(moreLineStart)
-				&& !s.startsWith("/*")) {
-				isInComment =
-					true;
+			if (s.contains(moreLineStart) && !s.startsWith("/*")) {
+				isInComment = true;
 			}
 		}
 		br.close();

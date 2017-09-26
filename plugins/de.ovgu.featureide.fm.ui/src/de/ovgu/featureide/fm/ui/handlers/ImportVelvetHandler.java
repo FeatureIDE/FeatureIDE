@@ -43,9 +43,7 @@ public class ImportVelvetHandler extends AbstractImportHandler {
 
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] {
-			"*.velvet" });
-		fileDialog.setFilterNames(new String[] {
-			VELVET });
+		fileDialog.setFilterExtensions(new String[] { "*.velvet" });
+		fileDialog.setFilterNames(new String[] { VELVET });
 	}
 }

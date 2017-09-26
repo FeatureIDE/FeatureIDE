@@ -39,39 +39,26 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	private boolean showShortNames;
 
 	public FeatureModelLayout() {
-		autoLayoutLegend =
-			true;
-		showHiddenFeatures =
-			true;
-		showCollapsedConstraints =
-			true;
-		hasVerticalLayout =
-			true;
-		legendPos =
-			new Point(0, 0);
-		selectedLayoutAlgorithm =
-			1;
+		autoLayoutLegend = true;
+		showHiddenFeatures = true;
+		showCollapsedConstraints = true;
+		hasVerticalLayout = true;
+		legendPos = new Point(0, 0);
+		selectedLayoutAlgorithm = 1;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
-		autoLayoutLegend =
-			featureModelLayout.autoLayoutLegend;
-		showHiddenFeatures =
-			featureModelLayout.showHiddenFeatures;
-		showCollapsedConstraints =
-			featureModelLayout.showCollapsedConstraints;
-		hasVerticalLayout =
-			featureModelLayout.hasVerticalLayout;
-		legendPos =
-			featureModelLayout.legendPos.getCopy();
-		selectedLayoutAlgorithm =
-			featureModelLayout.selectedLayoutAlgorithm;
+		autoLayoutLegend = featureModelLayout.autoLayoutLegend;
+		showHiddenFeatures = featureModelLayout.showHiddenFeatures;
+		showCollapsedConstraints = featureModelLayout.showCollapsedConstraints;
+		hasVerticalLayout = featureModelLayout.hasVerticalLayout;
+		legendPos = featureModelLayout.legendPos.getCopy();
+		selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
 	}
 
 	@Override
 	public void setLegendAutoLayout(boolean b) {
-		autoLayoutLegend =
-			b;
+		autoLayoutLegend = b;
 	}
 
 	@Override
@@ -86,8 +73,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void setShowShortNames(boolean b) {
-		showShortNames =
-			b;
+		showShortNames = b;
 	}
 
 	@Override
@@ -97,8 +83,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void showHiddenFeatures(boolean b) {
-		showHiddenFeatures =
-			b;
+		showHiddenFeatures = b;
 	}
 
 	@Override
@@ -108,8 +93,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void showCollapsedConstraints(boolean b) {
-		showCollapsedConstraints =
-			b;
+		showCollapsedConstraints = b;
 	}
 
 	@Override
@@ -119,8 +103,7 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void verticalLayout(boolean b) {
-		hasVerticalLayout =
-			b;
+		hasVerticalLayout = b;
 	}
 
 	@Override
@@ -130,14 +113,12 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 
 	@Override
 	public void setLegendPos(int x, int y) {
-		legendPos =
-			new Point(x, y);
+		legendPos = new Point(x, y);
 	}
 
 	@Override
 	public void setLayout(int newLayoutAlgorithm) {
-		selectedLayoutAlgorithm =
-			newLayoutAlgorithm;
+		selectedLayoutAlgorithm = newLayoutAlgorithm;
 	}
 
 	@Override

@@ -57,8 +57,7 @@ public class CustomFeaturesCustomPropertiesTest {
 
 	static class MyFeatureModelFactoryImplementation implements IFeatureModelFactory {
 
-		public final String ID =
-			MyFeatureModelFactoryImplementation.class.getName();
+		public final String ID = MyFeatureModelFactoryImplementation.class.getName();
 
 		@Override
 		public String getId() {
@@ -82,17 +81,12 @@ public class CustomFeaturesCustomPropertiesTest {
 
 	}
 
-	static final File modelFile =
-		new File("feature_model_tmp_"
-			+ System.currentTimeMillis()
-			+ ".xml");
-	static final IFeatureModelFactory factory =
-		new MyFeatureModelFactoryImplementation();
+	static final File modelFile = new File("feature_model_tmp_" + System.currentTimeMillis() + ".xml");
+	static final IFeatureModelFactory factory = new MyFeatureModelFactoryImplementation();
 
 	public static void setFileSystem() {
 		// TODO find better solution for setting JavaFileSystem under testing circumstances
-		FileSystem.INSTANCE =
-			new JavaFileSystem();
+		FileSystem.INSTANCE = new JavaFileSystem();
 	}
 
 	@Before
@@ -101,17 +95,12 @@ public class CustomFeaturesCustomPropertiesTest {
 
 		FMFactoryManager.getInstance().addExtension(factory);
 
-		final IFeatureModel model =
-			factory.createFeatureModel();
+		final IFeatureModel model = factory.createFeatureModel();
 
-		final IFeature f1 =
-			factory.createFeature(model, "A");
-		final IFeature f2 =
-			factory.createFeature(model, "B");
-		final IFeature f3 =
-			factory.createFeature(model, "C");
-		final IFeature f4 =
-			factory.createFeature(model, "D");
+		final IFeature f1 = factory.createFeature(model, "A");
+		final IFeature f2 = factory.createFeature(model, "B");
+		final IFeature f3 = factory.createFeature(model, "C");
+		final IFeature f4 = factory.createFeature(model, "D");
 
 		f1.getStructure().addChild(f2.getStructure());
 		f1.getStructure().addChild(f3.getStructure());
@@ -135,17 +124,14 @@ public class CustomFeaturesCustomPropertiesTest {
 		Assert.assertTrue(f3 instanceof MyFeatureImplementation);
 		Assert.assertTrue(f4 instanceof MyFeatureImplementation);
 
-		final ProblemList problems =
-			SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		final ProblemList problems = SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 	}
 
 	@Test
 	public void testCustomProperties() {
-		final IFeatureModel model =
-			factory.createFeatureModel();
-		final ProblemList problems =
-			SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		final IFeatureModel model = factory.createFeatureModel();
+		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.getErrors().toString(), problems.containsError());
 
 		System.out.println(model.getFeature("A").getClass().getName());
@@ -180,10 +166,8 @@ public class CustomFeaturesCustomPropertiesTest {
 		modelFile.delete();
 		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 
-		final IFeatureModel model2 =
-			factory.createFeatureModel();
-		final ProblemList problems2 =
-			SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
+		final IFeatureModel model2 = factory.createFeatureModel();
+		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
 
 		for (final Problem p : problems2.getErrors()) {
 			System.out.println(p.message);

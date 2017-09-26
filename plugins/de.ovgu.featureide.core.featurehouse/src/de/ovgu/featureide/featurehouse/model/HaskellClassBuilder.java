@@ -40,8 +40,7 @@ public class HaskellClassBuilder extends ClassBuilder {
 
 	@Override
 	void caseFieldDeclaration(FSTTerminal terminal) {
-		final FSTField field =
-			new FSTField(terminal.getBody(), "", "", terminal.getBody(), terminal.beginLine, terminal.endLine);
+		final FSTField field = new FSTField(terminal.getBody(), "", "", terminal.getBody(), terminal.beginLine, terminal.endLine);
 		modelBuilder.getCurrentClassFragment().add(field);
 	}
 
@@ -50,13 +49,11 @@ public class HaskellClassBuilder extends ClassBuilder {
 		if (!terminal.getBody().contains("::")) {
 			return;
 		}
-		final LinkedList<String> method =
-			getMethod(terminal.getBody());
+		final LinkedList<String> method = getMethod(terminal.getBody());
 		if (method == null) {
 			return;
 		}
-		final LinkedList<String> parameter =
-			new LinkedList<String>();
+		final LinkedList<String> parameter = new LinkedList<String>();
 		parameter.add(method.get(1));
 		addMethod(method.get(0), parameter, "void", "", terminal.getBody(), terminal.beginLine, terminal.endLine, false);
 	}
@@ -67,37 +64,26 @@ public class HaskellClassBuilder extends ClassBuilder {
 	 * @return list(0) method name list(1) method type
 	 */
 	public LinkedList<String> getMethod(String body) {
-		final LinkedList<String> method =
-			new LinkedList<String>();
-		String name =
-			body.substring(0, body.indexOf("::"));
+		final LinkedList<String> method = new LinkedList<String>();
+		String name = body.substring(0, body.indexOf("::"));
 		while (name.endsWith(" ")) {
-			name =
-				name.substring(0, name.length()
-					- 1);
+			name = name.substring(0, name.length() - 1);
 		}
 		if (name.contains(" ")) {
 			return null;
 		}
 		method.add(name);
 
-		String parameter =
-			body.substring(body.indexOf("::")
-				+ 2);
-		parameter =
-			parameter.replaceAll("\n", " ");
+		String parameter = body.substring(body.indexOf("::") + 2);
+		parameter = parameter.replaceAll("\n", " ");
 		while (parameter.startsWith(" ")) {
-			parameter =
-				parameter.substring(1);
+			parameter = parameter.substring(1);
 		}
 		while (parameter.endsWith(" ")) {
-			parameter =
-				parameter.substring(0, parameter.length()
-					- 1);
+			parameter = parameter.substring(0, parameter.length() - 1);
 		}
 		while (parameter.contains("  ")) {
-			parameter =
-				parameter.replaceAll("  ", " ");
+			parameter = parameter.replaceAll("  ", " ");
 		}
 		method.add(parameter);
 		return method;

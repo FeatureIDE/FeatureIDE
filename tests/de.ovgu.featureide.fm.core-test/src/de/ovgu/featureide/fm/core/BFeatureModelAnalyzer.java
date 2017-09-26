@@ -38,8 +38,7 @@ public class BFeatureModelAnalyzer {
 	 * Warm up the analyzer to prevent unpredictable timeout exceptions.
 	 */
 	static {
-		for (int i =
-			0; i < 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			analyze(10);
 			analyze(20);
 			analyze(21);

@@ -56,8 +56,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	/**
 	 *
 	 */
-	private static final Image FEATURE_ICON =
-		UIPlugin.getImage("FeatureIconSmall.ico");
+	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
 	public AnnoCompletion() {}
 
@@ -80,16 +79,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	public void sessionStarted() {}
 
 	public List<CompletionProposal> getCompl(final IFeatureProject featureProject, final CharSequence prefix) {
-		final LinkedList<CompletionProposal> ret_List =
-			new LinkedList<CompletionProposal>();
+		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
 
-		final Iterable<String> featureNames =
-			FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
+		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
 		for (final String string : featureNames) {
-			CompletionProposal pr =
-				null;
-			pr =
-				CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
+			CompletionProposal pr = null;
+			pr = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
 			pr.setName(string.toCharArray());
 			pr.setCompletion(string.toCharArray());
 
@@ -103,22 +98,16 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
 
-		JavaContentAssistInvocationContext context =
-			null;
+		JavaContentAssistInvocationContext context = null;
 		if (arg0 instanceof JavaContentAssistInvocationContext) {
-			context =
-				(JavaContentAssistInvocationContext) arg0;
+			context = (JavaContentAssistInvocationContext) arg0;
 		}
 
 		final IFile file =
-			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput())
-					.getFile();
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(file);
+			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
-		if ((context == null)
-			|| (file == null)
-			|| (featureProject == null)) {
+		if ((context == null) || (file == null) || (featureProject == null)) {
 			return Collections.emptyList();
 		}
 
@@ -126,24 +115,19 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			return Collections.emptyList();
 		}
 
-		CharSequence prefix =
-			"";
+		CharSequence prefix = "";
 		try {
-			prefix =
-				context.computeIdentifierPrefix();
+			prefix = context.computeIdentifierPrefix();
 		} catch (final BadLocationException e) {
 			e.printStackTrace();
 		}
 
-		final List<CompletionProposal> completionProp =
-			getCompl(featureProject, prefix);
+		final List<CompletionProposal> completionProp = getCompl(featureProject, prefix);
 
-		final ArrayList<ICompletionProposal> list =
-			new ArrayList<ICompletionProposal>();
+		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		for (final CompletionProposal prop : completionProp) {
 
-			final LazyJavaCompletionProposal curFeature =
-				new LazyJavaCompletionProposal(prop, context);
+			final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
 			curFeature.setImage(FEATURE_ICON);
 			// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
 			curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
@@ -159,17 +143,11 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 */
 	private boolean isContextValid(JavaContentAssistInvocationContext context) {
 		try {
-			final int line =
-				context.getDocument().getLineOfOffset(context.getInvocationOffset());
-			final int offsetOfLine =
-				context.getDocument().getLineOffset(line);
-			final int lineLength =
-				context.getDocument().getLineLength(line);
-			final String lineContent =
-				context.getDocument().get(offsetOfLine, lineLength);
-			if (!lineContent.contains("#if")
-				&& !lineContent.contains("#elif")
-				&& !lineContent.contains("#condition")) {
+			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
+			final int offsetOfLine = context.getDocument().getLineOffset(line);
+			final int lineLength = context.getDocument().getLineLength(line);
+			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
+			if (!lineContent.contains("#if") && !lineContent.contains("#elif") && !lineContent.contains("#condition")) {
 				return false;
 			}
 		} catch (final BadLocationException e1) {

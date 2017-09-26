@@ -38,17 +38,14 @@ public class AddColorSchemeAction extends AbstractColorAction {
 
 	public AddColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		final NewColorSchemeWizard wizard =
-			new NewColorSchemeWizard(fm, collaborationView);
+		final NewColorSchemeWizard wizard = new NewColorSchemeWizard(fm, collaborationView);
 
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 

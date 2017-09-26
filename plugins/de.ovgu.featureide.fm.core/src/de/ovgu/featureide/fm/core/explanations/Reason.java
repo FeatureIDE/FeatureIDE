@@ -60,8 +60,7 @@ public abstract class Reason implements Cloneable {
 	 * @param explanation the containing explanation; not null
 	 */
 	protected void setExplanation(Explanation explanation) {
-		this.explanation =
-			explanation;
+		this.explanation = explanation;
 	}
 
 	/**
@@ -70,11 +69,8 @@ public abstract class Reason implements Cloneable {
 	 * @return the confidence of this reason
 	 */
 	public float getConfidence() {
-		float confidence =
-			(float) explanation.getReasonCounts().get(this)
-				/ explanation.getExplanationCount();
-		confidence =
-			Math.max(0.0f, Math.min(1.0f, confidence)); // Clamp between 0 and 1 (just in case).
+		float confidence = (float) explanation.getReasonCounts().get(this) / explanation.getExplanationCount();
+		confidence = Math.max(0.0f, Math.min(1.0f, confidence)); // Clamp between 0 and 1 (just in case).
 		return confidence;
 	}
 

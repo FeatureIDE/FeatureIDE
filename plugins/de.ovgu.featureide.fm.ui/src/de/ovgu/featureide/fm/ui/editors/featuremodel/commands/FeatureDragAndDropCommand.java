@@ -63,26 +63,15 @@ public class FeatureDragAndDropCommand extends Command {
 	private final FeatureEditPart editPart;
 
 	public FeatureDragAndDropCommand(IGraphicalFeatureModel featureModel, IGraphicalFeature feature, Point newLocation, FeatureEditPart editPart) {
-		super("Moving "
-			+ feature.getObject().getName());
-		this.featureModel =
-			featureModel;
-		this.feature =
-			feature;
-		this.newLocation =
-			newLocation;
-		hasAutoLayout =
-			featureModel.getLayout().hasFeaturesAutoLayout();
-		hasVerticalLayout =
-			FeatureUIHelper.hasVerticalLayout(featureModel);
-		this.editPart =
-			editPart;
-		oldParent =
-			FeatureUIHelper.getGraphicalParent(feature);
-		oldIndex =
-			oldParent != null
-				? FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature)
-				: 0;
+		super("Moving " + feature.getObject().getName());
+		this.featureModel = featureModel;
+		this.feature = feature;
+		this.newLocation = newLocation;
+		hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
+		hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		this.editPart = editPart;
+		oldParent = FeatureUIHelper.getGraphicalParent(feature);
+		oldIndex = oldParent != null ? FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) : 0;
 	}
 
 	@Override
@@ -91,10 +80,8 @@ public class FeatureDragAndDropCommand extends Command {
 			if (editPart.getSelected() != 2) {
 				return false;
 			}
-			final Point referencePoint =
-				FeatureUIHelper.getSourceLocation(feature, newLocation);
-			final IGraphicalFeature next =
-				calculateNext(referencePoint);
+			final Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
+			final IGraphicalFeature next = calculateNext(referencePoint);
 			if (next == null) {
 				return false;
 			}
@@ -110,8 +97,7 @@ public class FeatureDragAndDropCommand extends Command {
 			}
 
 			// not accept the same position
-			if ((oldParent == newParent)
-				&& (oldIndex == newIndex)) {
+			if ((oldParent == newParent) && (oldIndex == newIndex)) {
 				return false;
 			}
 
@@ -129,10 +115,8 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public void execute() {
-		final FeatureOperationData data =
-			new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		final MoveFeatureOperation op =
-			new MoveFeatureOperation(data, editPart.getViewer(), newLocation, feature.getLocation().getCopy(), feature.getObject());
+		final FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
+		final MoveFeatureOperation op = new MoveFeatureOperation(data, editPart.getViewer(), newLocation, feature.getLocation().getCopy(), feature.getObject());
 		// TODO _interfaces Removed Code
 
 		try {
@@ -144,25 +128,17 @@ public class FeatureDragAndDropCommand extends Command {
 	}
 
 	private boolean calculateNewParentAndIndex(IGraphicalFeature next) {
-		final Point location =
-			FeatureUIHelper.getSourceLocation(feature, newLocation);
-		final Point nextLocation =
-			FeatureUIHelper.getTargetLocation(next);
-		final Dimension d =
-			location.getDifference(nextLocation);
+		final Point location = FeatureUIHelper.getSourceLocation(feature, newLocation);
+		final Point nextLocation = FeatureUIHelper.getTargetLocation(next);
+		final Dimension d = location.getDifference(nextLocation);
 		if (!hasVerticalLayout) {
 			if (d.height > 0) {
 				// insert below
-				newParent =
-					next;
-				newIndex =
-					0;
+				newParent = next;
+				newIndex = 0;
 				for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(next)) {
-					final Dimension cd =
-						FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
-					if ((d.width
-						/ (double) d.height) <= (cd.width
-							/ (double) cd.height)) {
+					final Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					if ((d.width / (double) d.height) <= (cd.width / (double) cd.height)) {
 						break;
 					} else {
 						newIndex++;
@@ -174,21 +150,16 @@ public class FeatureDragAndDropCommand extends Command {
 					// do not accept because root has no parent
 					return false;
 				} else {
-					newParent =
-						FeatureUIHelper.getGraphicalParent(next);
+					newParent = FeatureUIHelper.getGraphicalParent(next);
 					if (d.width < 0) {
-						newIndex =
-							FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next);
+						newIndex = FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next);
 					} else {
-						newIndex =
-							FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next)
-								+ 1;
+						newIndex = FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next) + 1;
 					}
 				}
 			}
 
-			if ((newParent == oldParent)
-				&& (FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) < newIndex)) {
+			if ((newParent == oldParent) && (FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) < newIndex)) {
 				newIndex--;
 			}
 
@@ -196,16 +167,11 @@ public class FeatureDragAndDropCommand extends Command {
 		} else {
 			if (d.width > 0) {
 				// insert below
-				newParent =
-					next;
-				newIndex =
-					0;
+				newParent = next;
+				newIndex = 0;
 				for (final IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(next)) {
-					final Dimension cd =
-						FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
-					if ((d.height
-						/ (double) d.width) <= (cd.height
-							/ (double) cd.width)) {
+					final Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					if ((d.height / (double) d.width) <= (cd.height / (double) cd.width)) {
 						break;
 					} else {
 						newIndex++;
@@ -217,21 +183,16 @@ public class FeatureDragAndDropCommand extends Command {
 					// do not accept because root has no parent
 					return false;
 				} else {
-					newParent =
-						FeatureUIHelper.getGraphicalParent(next);
+					newParent = FeatureUIHelper.getGraphicalParent(next);
 					if (d.height < 0) {
-						newIndex =
-							FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next);
+						newIndex = FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next);
 					} else {
-						newIndex =
-							FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next)
-								+ 1;
+						newIndex = FeatureUIHelper.getGraphicalChildren(newParent).indexOf(next) + 1;
 					}
 				}
 			}
 
-			if ((newParent == oldParent)
-				&& (FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) < newIndex)) {
+			if ((newParent == oldParent) && (FeatureUIHelper.getGraphicalChildren(oldParent).indexOf(feature) < newIndex)) {
 				newIndex--;
 			}
 
@@ -241,25 +202,15 @@ public class FeatureDragAndDropCommand extends Command {
 	}
 
 	public IGraphicalFeature calculateNext(final Point referencePoint) {
-		IGraphicalFeature next =
-			null;
-		int distance =
-			Integer.MAX_VALUE;
+		IGraphicalFeature next = null;
+		int distance = Integer.MAX_VALUE;
 		for (final IGraphicalFeature child : featureModel.getVisibleFeatures()) {
-			final Point targetLocation =
-				FeatureUIHelper.getTargetLocation(child);
-			if ((hasVerticalLayout
-				&& (targetLocation.x < referencePoint.x))
-				|| (!hasVerticalLayout
-					&& (targetLocation.y < referencePoint.y))) {
-				final int newDistance =
-					(int) targetLocation.getDistance(referencePoint);
-				if ((newDistance > 0)
-					&& (newDistance < distance)) {
-					next =
-						child;
-					distance =
-						newDistance;
+			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
+			if ((hasVerticalLayout && (targetLocation.x < referencePoint.x)) || (!hasVerticalLayout && (targetLocation.y < referencePoint.y))) {
+				final int newDistance = (int) targetLocation.getDistance(referencePoint);
+				if ((newDistance > 0) && (newDistance < distance)) {
+					next = child;
+					distance = newDistance;
 				}
 			}
 		}

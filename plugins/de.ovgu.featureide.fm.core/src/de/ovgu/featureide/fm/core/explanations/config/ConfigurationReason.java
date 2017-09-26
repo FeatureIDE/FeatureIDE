@@ -39,8 +39,7 @@ public class ConfigurationReason extends Reason {
 	 * @param featureSelection the feature that has been selected or unselected; not null
 	 */
 	public ConfigurationReason(SelectableFeature featureSelection) {
-		this.featureSelection =
-			featureSelection;
+		this.featureSelection = featureSelection;
 	}
 
 	/**
@@ -50,8 +49,7 @@ public class ConfigurationReason extends Reason {
 	 */
 	protected ConfigurationReason(ConfigurationReason reason) {
 		super(reason);
-		featureSelection =
-			reason.featureSelection;
+		featureSelection = reason.featureSelection;
 	}
 
 	/**
@@ -70,16 +68,9 @@ public class ConfigurationReason extends Reason {
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((featureSelection == null)
-					? 0
-					: featureSelection.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((featureSelection == null) ? 0 : featureSelection.hashCode());
 		return result;
 	}
 
@@ -94,8 +85,7 @@ public class ConfigurationReason extends Reason {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final ConfigurationReason other =
-			(ConfigurationReason) obj;
+		final ConfigurationReason other = (ConfigurationReason) obj;
 		if (featureSelection == null) {
 			if (other.featureSelection != null) {
 				return false;

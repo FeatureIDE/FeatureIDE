@@ -72,11 +72,8 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	 */
 	@Override
 	protected void refreshVisuals() {
-		getFigure().getBounds().x =
-			GUIDefaults.DEFAULT_INSET_TO_EDGE;
-		getFigure().getBounds().y =
-			getFigure().getBounds().y
-				+ GUIDefaults.DEFAULT_INSET_TO_EDGE;
+		getFigure().getBounds().x = GUIDefaults.DEFAULT_INSET_TO_EDGE;
+		getFigure().getBounds().y = getFigure().getBounds().y + GUIDefaults.DEFAULT_INSET_TO_EDGE;
 	}
 
 	/**
@@ -86,21 +83,17 @@ public class CollaborationEditPart extends AbstractGraphicalEditPart implements 
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
 			if (getCollaborationModel() instanceof FSTConfiguration) {
-				final IFile file =
-					((FSTConfiguration) getCollaborationModel()).getFile();
+				final IFile file = ((FSTConfiguration) getCollaborationModel()).getFile();
 
 				if (file == null) {
 					return;
 				}
 
-				final IWorkbenchWindow dw =
-					UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+				final IWorkbenchWindow dw = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
 				try {
-					final IWorkbenchPage page =
-						dw.getActivePage();
+					final IWorkbenchPage page = dw.getActivePage();
 					if (page != null) {
-						final FileEditorInput fileEditorInput =
-							new FileEditorInput(file);
+						final FileEditorInput fileEditorInput = new FileEditorInput(file);
 						page.openEditor(fileEditorInput, "de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor");
 					}
 				} catch (final PartInitException e) {

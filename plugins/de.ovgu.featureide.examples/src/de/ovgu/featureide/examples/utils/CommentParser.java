@@ -36,102 +36,54 @@ import java.util.Map;
  */
 public class CommentParser {
 
-	public static final String OPENTAG_BEGIN =
-		"[";
-	public static final String OPENTAG_END =
-		"[/";
-	public static final String CLOSETAG =
-		"]";
+	public static final String OPENTAG_BEGIN = "[";
+	public static final String OPENTAG_END = "[/";
+	public static final String CLOSETAG = "]";
 
-	public static final String DESCRIPTION_TAG =
-		"description";
-	public static final String REQUIREMENT_CATEGORYS_TAG =
-		"requirementcategory";
-	public static final String REQUIREMENT_CATEGORY_NAME_TAG =
-		"categoryname";
-	public static final String REQUIREMENT_TAG =
-		REQUIREMENT;
-	public static final String PLUGIN_ID_TAG =
-		"pluginid";
-	public static final String PLUGIN_MISSING_MSG_TAG =
-		"errormsg";
+	public static final String DESCRIPTION_TAG = "description";
+	public static final String REQUIREMENT_CATEGORYS_TAG = "requirementcategory";
+	public static final String REQUIREMENT_CATEGORY_NAME_TAG = "categoryname";
+	public static final String REQUIREMENT_TAG = REQUIREMENT;
+	public static final String PLUGIN_ID_TAG = "pluginid";
+	public static final String PLUGIN_MISSING_MSG_TAG = "errormsg";
 
 	private final String comment;
 	private String desc;
-	private final List<RequirementCategory> req =
-		new ArrayList<RequirementCategory>();
+	private final List<RequirementCategory> req = new ArrayList<RequirementCategory>();
 
 	public CommentParser(String comment) {
-		this.comment =
-			comment.replaceAll("\n", "").replaceAll("\t", "");
+		this.comment = comment.replaceAll("\n", "").replaceAll("\t", "");
 	}
 
 	private String getTextInTag(String tag, String text, int fromIdx) {
 		String openTag;
-		final int startId =
-			text.indexOf(openTag =
-				(OPENTAG_BEGIN
-					+ tag
-					+ CLOSETAG), fromIdx);
-		final int endId =
-			text.indexOf(OPENTAG_END
-				+ tag
-				+ CLOSETAG,
-					startId
-						+ openTag.length());
+		final int startId = text.indexOf(openTag = (OPENTAG_BEGIN + tag + CLOSETAG), fromIdx);
+		final int endId = text.indexOf(OPENTAG_END + tag + CLOSETAG, startId + openTag.length());
 
-		if ((startId < 0)
-			|| (endId < 0)) {
+		if ((startId < 0) || (endId < 0)) {
 			return "";
 		}
 
-		return text.substring(startId
-			+ openTag.length(), endId);
+		return text.substring(startId + openTag.length(), endId);
 	}
 
 	private List<String> getElements(String tag, String text, int fromIdx) {
 		String openTag;
-		final List<String> results =
-			new ArrayList<String>();
+		final List<String> results = new ArrayList<String>();
 
-		int startId =
-			0;
-		int endId =
-			0;
+		int startId = 0;
+		int endId = 0;
 
-		startId =
-			text.indexOf(openTag =
-				(OPENTAG_BEGIN
-					+ tag
-					+ CLOSETAG), fromIdx);
-		endId =
-			text.indexOf(OPENTAG_END
-				+ tag
-				+ CLOSETAG,
-					startId
-						+ openTag.length());
+		startId = text.indexOf(openTag = (OPENTAG_BEGIN + tag + CLOSETAG), fromIdx);
+		endId = text.indexOf(OPENTAG_END + tag + CLOSETAG, startId + openTag.length());
 
-		while ((startId >= 0)
-			&& (endId >= 0)
-			&& (startId < endId)) {
-			results.add(text.substring(startId
-				+ openTag.length(), endId));
+		while ((startId >= 0) && (endId >= 0) && (startId < endId)) {
+			results.add(text.substring(startId + openTag.length(), endId));
 
-			fromIdx =
-				endId
-					+ 1;
+			fromIdx = endId + 1;
 
-			startId =
-				text.indexOf(openTag =
-					(OPENTAG_BEGIN
-						+ tag
-						+ CLOSETAG), fromIdx);
-			endId =
-				text.indexOf(OPENTAG_END
-					+ tag
-					+ CLOSETAG,
-						startId
-							+ openTag.length());
+			startId = text.indexOf(openTag = (OPENTAG_BEGIN + tag + CLOSETAG), fromIdx);
+			endId = text.indexOf(OPENTAG_END + tag + CLOSETAG, startId + openTag.length());
 
 		}
 
@@ -147,8 +99,7 @@ public class CommentParser {
 			return desc;
 		}
 
-		return desc =
-			getTextInTag(DESCRIPTION_TAG, comment);
+		return desc = getTextInTag(DESCRIPTION_TAG, comment);
 	}
 
 	public List<RequirementCategory> getRequirements() {
@@ -157,10 +108,8 @@ public class CommentParser {
 		}
 
 		// get the requirements
-		final List<String> reqCats =
-			getElements(REQUIREMENT_CATEGORYS_TAG, comment, 0);
-		final Iterator<String> i =
-			reqCats.iterator();
+		final List<String> reqCats = getElements(REQUIREMENT_CATEGORYS_TAG, comment, 0);
+		final Iterator<String> i = reqCats.iterator();
 
 		String reqGroup;
 		String catName;
@@ -168,20 +117,14 @@ public class CommentParser {
 		Map<String, String> requirements;
 
 		while (i.hasNext()) {
-			reqGroup =
-				i.next();
-			catName =
-				getTextInTag(REQUIREMENT_CATEGORY_NAME_TAG, reqGroup);
-			requirements =
-				new HashMap<String, String>();
-			final List<String> reqs =
-				getElements(REQUIREMENT_TAG, reqGroup, 0);
-			final Iterator<String> j =
-				reqs.iterator();
+			reqGroup = i.next();
+			catName = getTextInTag(REQUIREMENT_CATEGORY_NAME_TAG, reqGroup);
+			requirements = new HashMap<String, String>();
+			final List<String> reqs = getElements(REQUIREMENT_TAG, reqGroup, 0);
+			final Iterator<String> j = reqs.iterator();
 
 			while (j.hasNext()) {
-				curReq =
-					j.next();
+				curReq = j.next();
 				requirements.put(getTextInTag(PLUGIN_ID_TAG, curReq), getTextInTag(PLUGIN_MISSING_MSG_TAG, curReq));
 
 			}

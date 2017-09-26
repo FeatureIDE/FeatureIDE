@@ -52,23 +52,16 @@ public class RenameColorSchemePage extends WizardPage {
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		final GridData gd =
-			new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 
-		final Composite composite =
-			new Composite(parent, SWT.NULL);
-		final GridLayout layout =
-			new GridLayout();
-		layout.numColumns =
-			3;
+		final Composite composite = new Composite(parent, SWT.NULL);
+		final GridLayout layout = new GridLayout();
+		layout.numColumns = 3;
 		composite.setLayout(layout);
 
-		final Label label =
-			new Label(composite, SWT.NULL);
+		final Label label = new Label(composite, SWT.NULL);
 		label.setText("&New Name: ");
-		textColorSchemeName =
-			new Text(composite, SWT.BORDER
-				| SWT.SINGLE);
+		textColorSchemeName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		textColorSchemeName.setLayoutData(gd);
 		new Label(composite, SWT.NULL);
 

@@ -37,8 +37,7 @@ public class SPLDocumentationHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		CorePlugin.getDefault().buildSPLDocumentation(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS));
+		CorePlugin.getDefault().buildSPLDocumentation(projects, (String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS));
 	}
 
 }

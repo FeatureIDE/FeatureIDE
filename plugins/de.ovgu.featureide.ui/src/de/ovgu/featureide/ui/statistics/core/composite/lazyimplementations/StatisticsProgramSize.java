@@ -50,92 +50,51 @@ public class StatisticsProgramSize extends LazyParent {
 	 */
 	public StatisticsProgramSize(String description, FSTModel fstModel) {
 		super(description);
-		this.fstModel =
-			fstModel;
+		this.fstModel = fstModel;
 	}
 
 	@Override
 	protected void initChildren() {
-		final HashMap<String, Integer> methodMap =
-			new HashMap<String, Integer>();
-		final HashMap<String, Integer> fieldMap =
-			new HashMap<String, Integer>();
-		final HashMap<String, Integer> classMap =
-			new HashMap<String, Integer>();
+		final HashMap<String, Integer> methodMap = new HashMap<String, Integer>();
+		final HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
+		final HashMap<String, Integer> classMap = new HashMap<String, Integer>();
 
 		for (final FSTClass class_ : fstModel.getClasses()) {
 			for (final FSTRole role : class_.getRoles()) {
-				final FSTClassFragment classFragment =
-					role.getClassFragment();
-				final String packageName =
-					classFragment.getPackage();
-				final String qualifiedPackageName =
-					(packageName == null)
-						? "(default package)"
-						: packageName;
+				final FSTClassFragment classFragment = role.getClassFragment();
+				final String packageName = classFragment.getPackage();
+				final String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
 
-				final String roleName =
-					classFragment.getName().endsWith(".java")
-						? classFragment.getName().substring(0, classFragment.getName().length()
-							- 5)
-						: classFragment.getName();
-				final String qualifiedRoleName =
-					qualifiedPackageName
-						+ "."
-						+ roleName;
+				final String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
+					: classFragment.getName();
+				final String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
-				final String qualifier =
-					qualifiedRoleName
-						+ ".";
+				final String qualifier = qualifiedRoleName + ".";
 
 				for (final FSTMethod method : classFragment.getMethods()) {
-					addToMap(qualifier
-						+ method.getFullName(), methodMap);
+					addToMap(qualifier + method.getFullName(), methodMap);
 				}
 				for (final FSTField field : classFragment.getFields()) {
-					addToMap(qualifier
-						+ field.getFullName(), fieldMap);
+					addToMap(qualifier + field.getFullName(), fieldMap);
 				}
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
 
-		addChild(new HashMapNode(NUMBER_CLASS
-			+ SEPARATOR
-			+ classMap.keySet().size()
-			+ " | "
-			+ NUMBER_ROLE
-			+ SEPARATOR
-			+ sum(classMap), null, classMap));
-		addChild(new HashMapNode(NUMBER_FIELD_U
-			+ SEPARATOR
-			+ fieldMap.keySet().size()
-			+ " | "
-			+ NUMBER_FIELD
-			+ SEPARATOR
-			+ sum(fieldMap), null, fieldMap));
-		addChild(new HashMapNode(NUMBER_METHOD_U
-			+ SEPARATOR
-			+ methodMap.keySet().size()
-			+ " | "
-			+ NUMBER_METHOD
-			+ SEPARATOR
-			+ sum(methodMap), null, methodMap));
+		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR + classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR + sum(classMap), null, classMap));
+		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), null, fieldMap));
+		addChild(
+				new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
 	}
 
 	private void addToMap(String name, HashMap<String, Integer> map) {
-		map.put(name, map.containsKey(name)
-			? map.get(name)
-				+ 1
-			: 1);
+		map.put(name, map.containsKey(name) ? map.get(name) + 1 : 1);
 	}
 
 	private Integer sum(HashMap<String, Integer> input) {
-		Integer sum =
-			0;
+		Integer sum = 0;
 		for (final Integer value : input.values()) {
-			sum +=
-				value;
+			sum += value;
 		}
 		return sum;
 	}

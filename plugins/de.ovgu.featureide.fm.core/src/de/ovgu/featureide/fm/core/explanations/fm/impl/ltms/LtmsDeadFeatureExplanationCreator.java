@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -43,8 +44,7 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 
 	@Override
 	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof IFeature)) {
+		if ((subject != null) && !(subject instanceof IFeature)) {
 			throw new IllegalArgumentException("Illegal subject type");
 		}
 		super.setSubject(subject);
@@ -57,10 +57,9 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms =
-			getOracle();
+		final Ltms ltms = getOracle();
 		ltms.clearPremises();
-		ltms.addPremise(getSubject().getName(), true);
+		ltms.addPremise(NodeCreator.getVariable(getSubject()), true);
 		return getExplanation(ltms.getExplanations());
 	}
 

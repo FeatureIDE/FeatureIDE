@@ -75,37 +75,28 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
 @SuppressWarnings(RESTRICTION)
 public class TestRunner {
 
-	private static final Object KEY =
-		new Object();
+	private static final Object KEY = new Object();
 	private final TestResults testResults;
-	private static final UIPlugin LOGGER =
-		UIPlugin.getDefault();
-	int compiled =
-		0;
+	private static final UIPlugin LOGGER = UIPlugin.getDefault();
+	int compiled = 0;
 
 	private final IFolder tmp;
 	private final ConfigurationBuilder builder;
 
 	public TestRunner(IFolder tmp, TestResults testResults, final ConfigurationBuilder builder) {
-		this.tmp =
-			tmp;
-		this.testResults =
-			testResults;
-		this.builder =
-			builder;
+		this.tmp = tmp;
+		this.testResults = testResults;
+		this.builder = builder;
 
 	}
 
 	@SuppressWarnings(RESOURCE)
 	public void runTests(final BuilderConfiguration configuration) {
-		final URL[] url =
-			getURLs();
-		final URLClassLoader classLoader =
-			new URLClassLoader(url, Thread.currentThread().getContextClassLoader());
+		final URL[] url = getURLs();
+		final URLClassLoader classLoader = new URLClassLoader(url, Thread.currentThread().getContextClassLoader());
 		for (final String file : getFiles(tmp)) {
 			try {
-				final Class<?> clazz =
-					classLoader.loadClass(file);
+				final Class<?> clazz = classLoader.loadClass(file);
 
 				if (isModuleTest(clazz)) {
 					synchronized (KEY) {
@@ -117,20 +108,17 @@ public class TestRunner {
 					}
 				}
 
-				final JUnitCore core =
-					new JUnitCore();
+				final JUnitCore core = new JUnitCore();
 				core.addListener(new RunListener() {
 
-					long time =
-						0;
+					long time = 0;
 
 					@Override
 					public void testStarted(Description description) throws Exception {
 						if (description.toString().startsWith("initializationError")) {
 							return;
 						}
-						time =
-							System.currentTimeMillis();
+						time = System.currentTimeMillis();
 					}
 
 					@Override
@@ -138,38 +126,23 @@ public class TestRunner {
 						if (time == -1) {
 							return;
 						}
-						time =
-							System.currentTimeMillis()
-								- time;
+						time = System.currentTimeMillis() - time;
 						testResults.addTest(file,
-								(builder.buildType == BuildType.ALL_CURRENT
-									? ""
-									: IConfigurationBuilderBasics.FOLDER_NAME
-										+ "\\")
-									+ configuration.getName(),
+								(builder.buildType == BuildType.ALL_CURRENT ? "" : IConfigurationBuilderBasics.FOLDER_NAME + "\\") + configuration.getName(),
 								new Test(description.toString(), time, file));
 					}
 
 					@Override
 					public void testFailure(Failure failure) throws Exception {
-						if (failure.getDescription().toString().startsWith("initializationError")
-							|| "No runnable methods".equals(failure.getMessage())) {
-							time =
-								-1;
+						if (failure.getDescription().toString().startsWith("initializationError") || "No runnable methods".equals(failure.getMessage())) {
+							time = -1;
 							return;
 						}
-						time =
-							System.currentTimeMillis()
-								- time;
+						time = System.currentTimeMillis() - time;
 						testResults.addTest(file,
-								(builder.buildType == BuildType.ALL_CURRENT
-									? ""
-									: IConfigurationBuilderBasics.FOLDER_NAME
-										+ "\\")
-									+ configuration.getName(),
+								(builder.buildType == BuildType.ALL_CURRENT ? "" : IConfigurationBuilderBasics.FOLDER_NAME + "\\") + configuration.getName(),
 								new Test(failure.getTestHeader(), time, file, failure));
-						time =
-							-1;
+						time = -1;
 					}
 
 					@Override
@@ -178,8 +151,7 @@ public class TestRunner {
 					}
 
 				});
-				final SecurityManager originalManager =
-					System.getSecurityManager();
+				final SecurityManager originalManager = System.getSecurityManager();
 				try {
 					System.setSecurityManager(NO_EXIT_MANAGER);
 					core.run(clazz);
@@ -191,41 +163,30 @@ public class TestRunner {
 			}
 		}
 
-		final IFeatureProject project =
-			CorePlugin.getFeatureProject(tmp);
+		final IFeatureProject project = CorePlugin.getFeatureProject(tmp);
 		if (project != null) {
-			final IFile iResultsXML =
-				project.getProject().getFile("test.xml");
+			final IFile iResultsXML = project.getProject().getFile("test.xml");
 			saveResults(iResultsXML, testResults);
 		}
 
 	}
 
 	private URL[] getURLs() {
-		final ArrayList<URL> urls =
-			new ArrayList<>();
+		final ArrayList<URL> urls = new ArrayList<>();
 		try {
-			URL url =
-				tmp.getLocationURI().toURL();
-			url =
-				new URL(url.toString()
-					+ "/");
+			URL url = tmp.getLocationURI().toURL();
+			url = new URL(url.toString() + "/");
 			urls.add(url);
 
-			final JavaProject proj =
-				new JavaProject(tmp.getProject(), null);
-			final IJavaElement[] elements =
-				proj.getChildren();
+			final JavaProject proj = new JavaProject(tmp.getProject(), null);
+			final IJavaElement[] elements = proj.getChildren();
 			for (final IJavaElement e : elements) {
-				final String path =
-					e.getPath().toOSString();
+				final String path = e.getPath().toOSString();
 				if (path.contains(":")) {
 					continue;
 				}
-				final IResource resource =
-					e.getResource();
-				if ((resource != null)
-					&& "jar".equals(resource.getFileExtension())) {
+				final IResource resource = e.getResource();
+				if ((resource != null) && "jar".equals(resource.getFileExtension())) {
 					urls.add(resource.getRawLocationURI().toURL());
 				}
 			}
@@ -249,8 +210,7 @@ public class TestRunner {
 		return false;
 	}
 
-	private static final NoExitSecurityManager NO_EXIT_MANAGER =
-		new NoExitSecurityManager();
+	private static final NoExitSecurityManager NO_EXIT_MANAGER = new NoExitSecurityManager();
 
 	private static class NoExitSecurityManager extends SecurityManager {
 
@@ -275,8 +235,7 @@ public class TestRunner {
 	private static class SystemExitException extends RuntimeException {
 
 		public SystemExitException(int status) {
-			super("Systen.exit: "
-				+ status);
+			super("Systen.exit: " + status);
 		}
 	}
 
@@ -290,24 +249,15 @@ public class TestRunner {
 	}
 
 	private List<String> getFiles(IFolder folder, String prefix) {
-		final List<String> files =
-			new LinkedList<>();
+		final List<String> files = new LinkedList<>();
 		try {
 
 			for (final IResource child : folder.members()) {
 				if (child instanceof IFolder) {
-					files.addAll(getFiles((IFolder) child, (prefix != null
-						? prefix
-							+ "."
-						: "")
-						+ child.getName()));
+					files.addAll(getFiles((IFolder) child, (prefix != null ? prefix + "." : "") + child.getName()));
 				} else if (child instanceof IFile) {
 					if ("class".equals(child.getFileExtension())) {
-						files.add((prefix != null
-							? prefix
-								+ "."
-							: "")
-							+ child.getName().substring(0, child.getName().lastIndexOf('.')));
+						files.add((prefix != null ? prefix + "." : "") + child.getName().substring(0, child.getName().lastIndexOf('.')));
 					}
 				}
 			}
@@ -318,8 +268,7 @@ public class TestRunner {
 	}
 
 	private static synchronized void saveResults(IFile iResultsXML, TestResults testResults) {
-		final File resultsXML =
-			new File(iResultsXML.getLocationURI());
+		final File resultsXML = new File(iResultsXML.getLocationURI());
 		try {
 			new TestXMLWriter(testResults).writeToFile(resultsXML);
 			iResultsXML.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -336,35 +285,29 @@ public class TestRunner {
 	 */
 	private static void openJunitView(final IFile file) {
 		if (!file.getFileExtension().equals("xml")) {
-			throw new RuntimeException(file
-				+ IS_NO_XML_FILE);
+			throw new RuntimeException(file + IS_NO_XML_FILE);
 		}
-		final UIJob job =
-			new UIJob(OPEN
-				+ file) {
+		final UIJob job = new UIJob(OPEN + file) {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					final IWorkbenchWindow window =
-						UIPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0];
-					final IWorkbenchPage page =
-						window.getActivePage();
-					if (page == null) {
-						return Status.OK_STATUS;
-					}
-
-					try {
-						final IEditorDescriptor desc =
-							getDescriptor(file);
-						if (desc != null) {
-							page.openEditor(new FileEditorInput(file), desc.getId());
-						}
-					} catch (final CoreException e) {
-						LOGGER.logError(e);
-					}
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				final IWorkbenchWindow window = UIPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0];
+				final IWorkbenchPage page = window.getActivePage();
+				if (page == null) {
 					return Status.OK_STATUS;
 				}
-			};
+
+				try {
+					final IEditorDescriptor desc = getDescriptor(file);
+					if (desc != null) {
+						page.openEditor(new FileEditorInput(file), desc.getId());
+					}
+				} catch (final CoreException e) {
+					LOGGER.logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
 		job.schedule();
 		try {
 			job.join();
@@ -374,13 +317,10 @@ public class TestRunner {
 	}
 
 	private static IEditorDescriptor getDescriptor(IFile file) throws CoreException {
-		IContentType contentType =
-			null;
-		final IContentDescription description =
-			file.getContentDescription();
+		IContentType contentType = null;
+		final IContentDescription description = file.getContentDescription();
 		if (description != null) {
-			contentType =
-				description.getContentType();
+			contentType = description.getContentType();
 		}
 		if (contentType != null) {
 			return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);

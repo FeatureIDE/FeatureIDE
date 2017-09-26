@@ -38,8 +38,7 @@ public class SetColorSchemeAction extends AbstractColorAction {
 
 	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index, String newColorSchemeName) {
 		super(text, view, collaborationView, index, IAction.AS_CHECK_BOX);
-		this.newColorSchemeName =
-			newColorSchemeName;
+		this.newColorSchemeName = newColorSchemeName;
 	}
 
 	/*

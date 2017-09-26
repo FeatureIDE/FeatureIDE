@@ -61,8 +61,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	/**
 	 * Remember explanation for redundant constraint. Key = constraintIndex, Value = explanation. Used as tool tip for redundant constraint.
 	 */
-	public static HashMap<Integer, List<String>> redundantExpl =
-		new HashMap<Integer, List<String>>();
+	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
 
 	/**
 	 * Constructor.
@@ -75,10 +74,8 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		setTitle("Hidden Dependencies of a Submodel");
 		setDescription("If the selected submodel contains hidden dependencies (implicit constraints), "
 			+ "they are presented below the feature model in a red border.");
-		subtreeModel =
-			fm;
-		completeFm =
-			completeModel;
+		subtreeModel = fm;
+		completeFm = completeModel;
 	}
 
 	/**
@@ -88,8 +85,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container =
-			new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 		setControl(container);
 		insertFeatureModel(container);
@@ -103,27 +99,18 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @param comp A composite which contains the sub feature model
 	 */
 	private void insertFeatureModel(Composite comp) {
-		final FeatureModelAnalyzer analyzer =
-			subtreeModel.getAnalyser();
+		final FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
 
-		final FeatureModelEditor modeleditor =
-			new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
-		final FeatureDiagramEditor diagramEditor =
-			new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
+		final FeatureModelEditor modeleditor = new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
+		final FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
 		subtreeModel.addListener(diagramEditor);
 
-		analyzer.calculateFeatures =
-			completeFm.getAnalyser().calculateFeatures;
-		analyzer.calculateConstraints =
-			completeFm.getAnalyser().calculateConstraints;
-		analyzer.calculateRedundantConstraints =
-			completeFm.getAnalyser().calculateRedundantConstraints;
-		analyzer.calculateTautologyConstraints =
-			completeFm.getAnalyser().calculateTautologyConstraints;
-		analyzer.calculateDeadConstraints =
-			completeFm.getAnalyser().calculateDeadConstraints;
-		analyzer.calculateFOConstraints =
-			completeFm.getAnalyser().calculateFOConstraints;
+		analyzer.calculateFeatures = completeFm.getAnalyser().calculateFeatures;
+		analyzer.calculateConstraints = completeFm.getAnalyser().calculateConstraints;
+		analyzer.calculateRedundantConstraints = completeFm.getAnalyser().calculateRedundantConstraints;
+		analyzer.calculateTautologyConstraints = completeFm.getAnalyser().calculateTautologyConstraints;
+		analyzer.calculateDeadConstraints = completeFm.getAnalyser().calculateDeadConstraints;
+		analyzer.calculateFOConstraints = completeFm.getAnalyser().calculateFOConstraints;
 
 		analyzer.analyzeFeatureModel(null); // analyze the subtree model
 		explainImplicitConstraints(analyzer, diagramEditor.getGraphicalFeatureModel()); // explain implicit, i.e. redundant, constraints
@@ -163,19 +150,14 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	 * @return result A list which contains implicit constraints for the subtree feature model
 	 */
 	private List<IConstraint> getImplicitConstraints() {
-		final List<IConstraint> newConstraints =
-			subtreeModel.getConstraints();
-		final List<IConstraint> oldConstraints =
-			completeFm.getConstraints();
-		final List<IConstraint> result =
-			new ArrayList<>();
+		final List<IConstraint> newConstraints = subtreeModel.getConstraints();
+		final List<IConstraint> oldConstraints = completeFm.getConstraints();
+		final List<IConstraint> result = new ArrayList<>();
 		result.addAll(newConstraints);
 
-		final Iterator<IConstraint> it =
-			result.iterator();
+		final Iterator<IConstraint> it = result.iterator();
 		while (it.hasNext()) {
-			final IConstraint constrNew =
-				it.next();
+			final IConstraint constrNew = it.next();
 			for (final IConstraint constrOld : oldConstraints) {
 				if (constrOld.getNode().toRegularCNF().equals(constrNew.getNode().toRegularCNF())) {
 					it.remove();

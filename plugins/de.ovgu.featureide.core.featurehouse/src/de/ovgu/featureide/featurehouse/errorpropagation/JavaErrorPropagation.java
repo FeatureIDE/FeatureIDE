@@ -49,24 +49,17 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  */
 public class JavaErrorPropagation extends ErrorPropagation {
 
-	private static final String REMOVED_LINES_2 =
-		"2Lines";
-	private static final String REMOVED_LINES_4 =
-		"4Lines";
+	private static final String REMOVED_LINES_2 = "2Lines";
+	private static final String REMOVED_LINES_4 = "4Lines";
 
 	// Java 1.4 exclusions
-	private static final String RAW_TYPE =
-		"raw type";
-	private static final String GENERIC_TYPE =
-		"generic type";
-	private static final String TYPE_SAFETY =
-		"Type safety";
+	private static final String RAW_TYPE = "raw type";
+	private static final String GENERIC_TYPE = "generic type";
+	private static final String TYPE_SAFETY = "Type safety";
 	// private static final String IMPORT = THE_IMPORT;
 
-	private static final String TASK =
-		"org.eclipse.jdt.core.task";
-	private Collection<String> layerNames =
-		null;
+	private static final String TASK = "org.eclipse.jdt.core.task";
+	private Collection<String> layerNames = null;
 
 	protected JavaErrorPropagation(IFeatureProject featureProject) {
 		super(featureProject);
@@ -82,71 +75,50 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			if (f.getBody() == null) {
 				continue;
 			}
-			final int i =
-				content.indexOf(f.getBody());
+			final int i = content.indexOf(f.getBody());
 			if (i == -1) {
 				continue;
 			}
-			final int line =
-				countLines(content.substring(0, i));
+			final int line = countLines(content.substring(0, i));
 			f.setComposedLine(line);
 		}
-		content =
-			content.replaceAll("__wrappee__\\w*\\s*", "");
+		content = content.replaceAll("__wrappee__\\w*\\s*", "");
 
-		content =
-			content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\) \\{[^}]*\\}\\n", REMOVED_LINES_4);
-		content =
-			content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\)[^;]*;\\n", REMOVED_LINES_2);
+		content = content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\) \\{[^}]*\\}\\n", REMOVED_LINES_4);
+		content = content.replaceAll("[^{]if \\(!FeatureModel.\\w*\\)[^;]*;\\n", REMOVED_LINES_2);
 
-		content =
-			content.replaceAll("/\\*@", "");
-		content =
-			content.replaceAll("@\\*/", "");
+		content = content.replaceAll("/\\*@", "");
+		content = content.replaceAll("@\\*/", "");
 		while (content.contains("  ")) {
-			content =
-				content.replaceAll("  ", " ");
+			content = content.replaceAll("  ", " ");
 		}
-		content =
-			content.replaceAll("\t", "");
+		content = content.replaceAll("\t", "");
 		while (content.contains(" (")) {
-			content =
-				content.replaceAll(" \\(", "(");
+			content = content.replaceAll(" \\(", "(");
 		}
 		for (final FSTMethod method : methods) {
 			if (method.getBody() == null) {
 				continue;
 			}
 			if (method.isConstructor()) {
-				int i =
-					-1;
-				String body =
-					method.getBody().substring(method.getBody().indexOf('{')
-						+ 1);
+				int i = -1;
+				String body = method.getBody().substring(method.getBody().indexOf('{') + 1);
 				while (body.contains("  ")) {
-					body =
-						body.replaceAll("  ", " ");
+					body = body.replaceAll("  ", " ");
 				}
-				body =
-					body.replaceAll("\t", "");
+				body = body.replaceAll("\t", "");
 				while (body.contains(" (")) {
-					body =
-						body.replaceAll(" \\(", "(");
+					body = body.replaceAll(" \\(", "(");
 				}
-				body =
-					body.replaceAll("\r\n", "\n");
-				body =
-					body.substring(0, body.lastIndexOf('}'));
-				i =
-					content.indexOf(body);
+				body = body.replaceAll("\r\n", "\n");
+				body = body.substring(0, body.lastIndexOf('}'));
+				i = content.indexOf(body);
 				if (i != -1) {
-					final int line =
-						countLines(content.substring(0, i));
+					final int line = countLines(content.substring(0, i));
 					method.setLine(line);
 				}
 			} else {
-				final boolean success =
-					findComposedLine(method, content, true);
+				final boolean success = findComposedLine(method, content, true);
 				if (!success) {
 					findComposedLine(method, content, false);
 				}
@@ -163,78 +135,54 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 * @return <code>true</code> if the composed line was found.
 	 */
 	private boolean findComposedLine(FSTMethod method, final String content, boolean replaceOriginal) {
-		String body =
-			method.getBody();
+		String body = method.getBody();
 		while (body.contains("  ")) {
-			body =
-				body.replaceAll("  ", " ");
+			body = body.replaceAll("  ", " ");
 		}
-		body =
-			body.replaceAll("\t", "");
+		body = body.replaceAll("\t", "");
 		while (body.contains(" (")) {
-			body =
-				body.replaceAll(" \\(", "(");
+			body = body.replaceAll(" \\(", "(");
 		}
 		if (body.startsWith("public")) {
-			body =
-				body.replaceFirst("public", "");
+			body = body.replaceFirst("public", "");
 		} else if (body.startsWith("protected")) {
-			body =
-				body.replaceFirst("protected", "");
+			body = body.replaceFirst("protected", "");
 		}
-		body =
-			body.replaceAll("\r\n", "\n");
+		body = body.replaceAll("\r\n", "\n");
 		if (replaceOriginal) {
-			body =
-				body.replaceAll("original\\(", method.getName()
-					+ "(");
-			body =
-				body.replaceAll("original\\s*\\(", method.getName()
-					+ " (");
+			body = body.replaceAll("original\\(", method.getName() + "(");
+			body = body.replaceAll("original\\s*\\(", method.getName() + " (");
 		}
-		final StringBuilder stringBuilder =
-			new StringBuilder();
-		int lineCounter =
-			1;
-		int methodOverhead =
-			0;
-		boolean found =
-			false;
+		final StringBuilder stringBuilder = new StringBuilder();
+		int lineCounter = 1;
+		int methodOverhead = 0;
+		boolean found = false;
 		for (final String line : content.split("[\n]")) {
 			stringBuilder.append(line);
 			stringBuilder.append("\n");
-			final String actualContent =
-				stringBuilder.toString();
+			final String actualContent = stringBuilder.toString();
 			if (actualContent.replaceAll(REMOVED_LINES_4, "").replaceAll(REMOVED_LINES_2, "").contains(body)) {
-				found =
-					true;
+				found = true;
 				if (!actualContent.contains(body)) {
 					if (actualContent.replaceAll(REMOVED_LINES_4, "").contains(body)) {
-						methodOverhead =
-							4;
+						methodOverhead = 4;
 					} else {
-						methodOverhead =
-							2;
+						methodOverhead = 2;
 					}
 				}
 				break;
 			}
 			if (line.startsWith(REMOVED_LINES_4)) {
-				lineCounter +=
-					4;
+				lineCounter += 4;
 			} else if (line.startsWith(REMOVED_LINES_2)) {
-				lineCounter +=
-					2;
+				lineCounter += 2;
 			}
 
 			lineCounter++;
 
 		}
 		if (found) {
-			method.setComposedLine(lineCounter
-				- ((method.getEndLine()
-					- method.getLine())
-					+ methodOverhead));
+			method.setComposedLine(lineCounter - ((method.getEndLine() - method.getLine()) + methodOverhead));
 		}
 		return found;
 
@@ -242,9 +190,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 
 	@Override
 	protected boolean deleteMarker(String message) {
-		return (message.contains(RAW_TYPE)
-			|| message.contains(TYPE_SAFETY)
-			|| message.contains(GENERIC_TYPE)
+		return (message.contains(RAW_TYPE) || message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE)
 		// ||message.contains(IMPORT)
 		);
 	}
@@ -259,15 +205,11 @@ public class JavaErrorPropagation extends ErrorPropagation {
 
 	@Override
 	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
-		final int markerLine =
-			marker.getAttribute(IMarker.LINE_NUMBER, -1);
-		final String lineContent =
-			getLineContent(file, markerLine);
-		final LinkedList<IFile> featureFiles =
-			getFeatureFiles(file);
+		final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
+		final String lineContent = getLineContent(file, markerLine);
+		final LinkedList<IFile> featureFiles = getFeatureFiles(file);
 		for (final IFile featureFile : featureFiles) {
-			final int newMarkerLine =
-				getLine(featureFile, lineContent);
+			final int newMarkerLine = getLine(featureFile, lineContent);
 			if (newMarkerLine != -1) {
 				propagateMarker(marker, featureFile, newMarkerLine);
 				return;
@@ -282,20 +224,14 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 * @return The line of the content or <code>-1</code> if the does not contain the content.
 	 */
 	private int getLine(IFile file, String lineContent) {
-		Scanner scanner =
-			null;
-		lineContent =
-			correctString(lineContent);
+		Scanner scanner = null;
+		lineContent = correctString(lineContent);
 		try {
-			int line =
-				1;
-			scanner =
-				new Scanner(file.getRawLocation().toFile(), "UTF-8");
+			int line = 1;
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
-				String content =
-					scanner.nextLine();
-				content =
-					correctString(content);
+				String content = scanner.nextLine();
+				content = correctString(content);
 				if (content.endsWith(lineContent)) {
 					return line;
 				}
@@ -316,17 +252,13 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 */
 	private String correctString(String string) {
 		while (string.contains("  ")) {
-			string =
-				string.replaceAll("  ", " ");
+			string = string.replaceAll("  ", " ");
 		}
 		if (string.endsWith("{")) {
-			string =
-				string.substring(0, string.indexOf('{'));
+			string = string.substring(0, string.indexOf('{'));
 		}
 		if (string.endsWith(" ")) {
-			string =
-				string.substring(0, string.length()
-					- 1);
+			string = string.substring(0, string.length() - 1);
 		}
 		return string;
 	}
@@ -336,37 +268,30 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 * @return A list containing all corresponding feature files
 	 */
 	private LinkedList<IFile> getFeatureFiles(IFile file) {
-		final IFeatureProject project =
-			CorePlugin.getFeatureProject(file);
+		final IFeatureProject project = CorePlugin.getFeatureProject(file);
 		if (project == null) {
 			return null;
 		}
 
 		if (layerNames == null) {
-			final IFeatureModel model =
-				project.getFeatureModel();
+			final IFeatureModel model = project.getFeatureModel();
 			if (model.isFeatureOrderUserDefined()) {
-				layerNames =
-					model.getFeatureOrderList();
+				layerNames = model.getFeatureOrderList();
 			} else {
-				layerNames =
-					Functional.toList(Functional.map(model.getFeatures(), new IFunction<IFeature, String>() {
+				layerNames = Functional.toList(Functional.map(model.getFeatures(), new IFunction<IFeature, String>() {
 
-						@Override
-						public String invoke(IFeature t) {
-							return t.getName();
-						}
+					@Override
+					public String invoke(IFeature t) {
+						return t.getName();
+					}
 
-					}));
+				}));
 			}
 		}
 
-		final LinkedList<IFile> featureFiles =
-			new LinkedList<IFile>();
-		final FSTModel fstModel =
-			project.getFSTModel();
-		final FSTClass c =
-			fstModel.getClass(fstModel.getAbsoluteClassName(file));
+		final LinkedList<IFile> featureFiles = new LinkedList<IFile>();
+		final FSTModel fstModel = project.getFSTModel();
+		final FSTClass c = fstModel.getClass(fstModel.getAbsoluteClassName(file));
 		for (final FSTRole role : c.getRoles()) {
 			featureFiles.add(role.getFile());
 		}
@@ -379,11 +304,9 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	 * @return the content at the given line of the file
 	 */
 	private String getLineContent(IFile file, int line) {
-		Scanner scanner =
-			null;
+		Scanner scanner = null;
 		try {
-			scanner =
-				new Scanner(file.getRawLocation().toFile(), "UTF-8");
+			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			if (scanner.hasNext()) {
 				while (scanner.hasNext()) {
 					if (line == 1) {

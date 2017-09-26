@@ -53,8 +53,7 @@ public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator {
 	}
 
 	private void initWizard(IStructuredSelection projectSelection) {
-		dialog =
-			new WizardDialog(null, new SPLMigrationWizard(this));
+		dialog = new WizardDialog(null, new SPLMigrationWizard(this));
 		dialog.open();
 	}
 

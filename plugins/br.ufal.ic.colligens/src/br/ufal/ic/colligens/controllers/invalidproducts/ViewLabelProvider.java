@@ -30,11 +30,9 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public Image getColumnImage(Object obj, int index) {
 		switch (index) {
 		case 0:
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 		case 1:
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJ_FOLDER);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 		default:
 			return null;
 		}

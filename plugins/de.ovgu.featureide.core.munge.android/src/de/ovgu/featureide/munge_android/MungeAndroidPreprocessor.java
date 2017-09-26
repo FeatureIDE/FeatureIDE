@@ -45,8 +45,7 @@ import de.ovgu.featureide.munge.MungePreprocessor;
  */
 public class MungeAndroidPreprocessor extends MungePreprocessor {
 
-	private static final LinkedHashSet<String> EXTENSIONS =
-		new LinkedHashSet<String>();
+	private static final LinkedHashSet<String> EXTENSIONS = new LinkedHashSet<String>();
 	static {
 		EXTENSIONS.add("java");
 		EXTENSIONS.add("xml");
@@ -62,22 +61,17 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 	@Override
 	public boolean clean() {
 		try {
-			final IProject project =
-				featureProject.getProject();
+			final IProject project = featureProject.getProject();
 
-			final IFolder srcFolder =
-				project.getFolder("src");
-			if (srcFolder.exists()
-				&& srcFolder.isAccessible()) {
+			final IFolder srcFolder = project.getFolder("src");
+			if (srcFolder.exists() && srcFolder.isAccessible()) {
 				for (final IResource member : srcFolder.members()) {
 					member.delete(false, null);
 				}
 			}
 
-			final IFolder resFolder =
-				project.getFolder("res");
-			if (resFolder.exists()
-				&& resFolder.isAccessible()) {
+			final IFolder resFolder = project.getFolder("res");
+			if (resFolder.exists() && resFolder.isAccessible()) {
 				for (final IResource member : resFolder.members()) {
 					member.delete(false, null);
 				}
@@ -91,8 +85,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 	@Override
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
 		if (destination == null) {
-			destination =
-				featureProject.getBuildFolder();
+			destination = featureProject.getBuildFolder();
 		}
 
 		// Copy not composed files
@@ -103,17 +96,12 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 		}
 
 		// Move src and res folders from FeatureIDE build path to project root
-		final IFolder build =
-			featureProject.getBuildFolder();
-		final IProject project =
-			featureProject.getProject();
+		final IFolder build = featureProject.getBuildFolder();
+		final IProject project = featureProject.getProject();
 
-		final IFolder srcFolder =
-			project.getFolder("src");
-		final IFolder resFolder =
-			project.getFolder("res");
-		final IPath dst =
-			project.getFullPath();
+		final IFolder srcFolder = project.getFolder("src");
+		final IFolder resFolder = project.getFolder("res");
+		final IPath dst = project.getFullPath();
 		try {
 			if (srcFolder.exists()) {
 				srcFolder.delete(true, null);
@@ -131,23 +119,17 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 
 	@Override
 	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
-		final LinkedList<String> packageArgs =
-			new LinkedList<String>(featureArgs);
-		boolean added =
-			false;
+		final LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
+		boolean added = false;
 		try {
 			createBuildFolder(buildFolder);
 			for (final IResource res : sourceFolder.members()) {
 				if (res instanceof IFolder) {
 					runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
 				} else if (res instanceof IFile) {
-					final String extension =
-						res.getFileExtension();
-					if ((extension != null)
-						&& (extension.equals("java")
-							|| extension.equals("xml"))) {
-						added =
-							true;
+					final String extension = res.getFileExtension();
+					if ((extension != null) && (extension.equals("java") || extension.equals("xml"))) {
+						added = true;
 						packageArgs.add(res.getRawLocation().toOSString());
 					}
 				}

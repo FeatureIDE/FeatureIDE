@@ -25,8 +25,7 @@ package de.ovgu.featureide.fm.core.annotation;
  */
 public class LogService {
 
-	private static LogService INSTANCE =
-		null;
+	private static LogService INSTANCE = null;
 
 	private LogService() {
 
@@ -34,8 +33,7 @@ public class LogService {
 
 	public static LogService getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE =
-				new LogService();
+			INSTANCE = new LogService();
 		}
 		return INSTANCE;
 	}
@@ -50,8 +48,7 @@ public class LogService {
 			System.out.println(message);
 			break;
 		default:
-			throw new RuntimeException("Unknown log level "
-				+ level.toString());
+			throw new RuntimeException("Unknown log level " + level.toString());
 		}
 	}
 

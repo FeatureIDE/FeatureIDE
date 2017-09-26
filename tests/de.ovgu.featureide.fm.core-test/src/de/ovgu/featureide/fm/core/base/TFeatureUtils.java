@@ -34,37 +34,30 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public class TFeatureUtils {
 
-	final static IFeatureModelFactory FACTORY =
-		FMFactoryManager.getDefaultFactory();
+	final static IFeatureModelFactory FACTORY = FMFactoryManager.getDefaultFactory();
 
 	/**
 	 * Test method for {@link de.ovgu.featureide.fm.core.base.FeatureUtils#getParent(de.ovgu.featureide.fm.core.base.IFeature)}.
 	 */
 	@Test
 	public void testGetParent() {
-		final IFeatureModel model =
-			FACTORY.createFeatureModel();
-		final IFeature featureA =
-			FACTORY.createFeature(model, "A");
+		final IFeatureModel model = FACTORY.createFeatureModel();
+		final IFeature featureA = FACTORY.createFeature(model, "A");
 		model.addFeature(featureA);
 		model.getStructure().setRoot(featureA.getStructure());
 
-		final IFeature featureB =
-			FACTORY.createFeature(model, "B");
+		final IFeature featureB = FACTORY.createFeature(model, "B");
 		model.addFeature(featureB);
 
 		featureA.getStructure().addChild(featureB.getStructure());
 
-		IFeature parent =
-			FeatureUtils.getParent(featureB);
+		IFeature parent = FeatureUtils.getParent(featureB);
 		assertTrue(parent == featureA);
 
-		parent =
-			FeatureUtils.getParent(featureA);
+		parent = FeatureUtils.getParent(featureA);
 		Assert.assertNull(parent);
 
-		parent =
-			FeatureUtils.getParent(null);
+		parent = FeatureUtils.getParent(null);
 		Assert.assertNull(parent);
 	}
 

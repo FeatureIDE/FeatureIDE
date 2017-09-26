@@ -83,9 +83,7 @@ public class EclipseLogger implements ILogger {
 
 	@Override
 	public void reportBug(int ticket) {
-		logWarning("This is a bug. Please report it. See Ticket #"
-			+ ticket
-			+ ".");
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
 	}
 
 	/**

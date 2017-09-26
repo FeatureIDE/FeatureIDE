@@ -30,17 +30,12 @@ import org.eclipse.jface.fieldassist.IContentProposal;
  */
 public class ContentProposal implements IContentProposal {
 
-	private static final String EMPTY =
-		""; //$NON-NLS-1$
+	private static final String EMPTY = ""; //$NON-NLS-1$
 
-	private String content =
-		EMPTY;
-	private String label =
-		EMPTY;
-	private String description =
-		EMPTY;
-	private int cursorPosition =
-		0;
+	private String content = EMPTY;
+	private String label = EMPTY;
+	private String description = EMPTY;
+	private int cursorPosition = 0;
 
 	/**
 	 * Create a content proposal whose label and content are the specified String. The cursor position will be located at the end of the content.
@@ -91,16 +86,11 @@ public class ContentProposal implements IContentProposal {
 	public ContentProposal(String content, String label, String description, int cursorPosition) {
 		Assert.isNotNull(content);
 		Assert.isNotNull(label);
-		Assert.isLegal((cursorPosition >= 0)
-			&& (cursorPosition <= content.length()));
-		this.content =
-			content;
-		this.label =
-			label;
-		this.description =
-			description;
-		this.cursorPosition =
-			cursorPosition;
+		Assert.isLegal((cursorPosition >= 0) && (cursorPosition <= content.length()));
+		this.content = content;
+		this.label = label;
+		this.description = description;
+		this.cursorPosition = cursorPosition;
 	}
 
 	/*
@@ -141,8 +131,6 @@ public class ContentProposal implements IContentProposal {
 
 	@Override
 	public String toString() {
-		return content
-			+ "-"
-			+ label;
+		return content + "-" + label;
 	}
 }

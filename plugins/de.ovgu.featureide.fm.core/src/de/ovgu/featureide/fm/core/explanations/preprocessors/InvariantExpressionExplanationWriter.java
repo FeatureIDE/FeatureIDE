@@ -50,8 +50,6 @@ public class InvariantExpressionExplanationWriter extends PreprocessorExplanatio
 
 	@Override
 	protected String getAttributeString() {
-		return getExplanation().isTautology()
-			? "a tautology"
-			: "a contradiction";
+		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
 	}
 }

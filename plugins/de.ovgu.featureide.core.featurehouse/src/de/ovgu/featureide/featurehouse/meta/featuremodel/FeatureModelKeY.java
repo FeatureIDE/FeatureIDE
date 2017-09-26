@@ -36,14 +36,12 @@ public class FeatureModelKeY implements IFeatureModelClass {
 
 	private final static String HEAD =
 		"/**\r\n * Variability encoding of the feature model for KeY.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
-	private final static String FIELD_MODIFIER =
-		"\tpublic static boolean ";
+	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 
 	private final IFeatureModel featureModel;
 
 	public FeatureModelKeY(IFeatureModel featureModel) {
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
@@ -58,8 +56,7 @@ public class FeatureModelKeY implements IFeatureModelClass {
 
 	@Override
 	public String getFeatureFields() {
-		final StringBuilder fields =
-			new StringBuilder();
+		final StringBuilder fields = new StringBuilder();
 		for (final CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toString().toLowerCase(Locale.ENGLISH));

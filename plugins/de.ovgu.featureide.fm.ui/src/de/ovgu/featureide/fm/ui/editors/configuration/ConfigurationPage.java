@@ -43,16 +43,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
-	private static final String ID =
-		FMUIPlugin.PLUGIN_ID
-			+ "ConfigurationPage";
-	private static final String PAGE_TEXT =
-		CONFIGURATION;
+	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
+	private static final String PAGE_TEXT = CONFIGURATION;
 
 	@Override
 	protected void createUITree(Composite parent) {
-		tree =
-			new Tree(parent, SWT.CHECK);
+		tree = new Tree(parent, SWT.CHECK);
 		tree.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -61,13 +57,10 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (event.detail == SWT.CHECK) {
-					final TreeItem item =
-						(TreeItem) event.item;
-					final Object data =
-						item.getData();
+					final TreeItem item = (TreeItem) event.item;
+					final Object data = item.getData();
 					if (data instanceof SelectableFeature) {
-						final SelectableFeature feature =
-							(SelectableFeature) item.getData();
+						final SelectableFeature feature = (SelectableFeature) item.getData();
 						if (updateFeatures.contains(feature)) {
 							item.setChecked(true);
 						} else {
@@ -101,11 +94,9 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 	@Override
 	public void pageChangeTo(int index) {
-		final Configuration configuration =
-			configurationEditor.getConfiguration();
+		final Configuration configuration = configurationEditor.getConfiguration();
 		for (final SelectableFeature feature : configuration.getFeatures()) {
-			if ((feature.getAutomatic() == Selection.UNDEFINED)
-				&& (feature.getManual() == Selection.UNSELECTED)) {
+			if ((feature.getAutomatic() == Selection.UNDEFINED) && (feature.getManual() == Selection.UNSELECTED)) {
 				configuration.setManual(feature, Selection.UNDEFINED);
 			}
 		}

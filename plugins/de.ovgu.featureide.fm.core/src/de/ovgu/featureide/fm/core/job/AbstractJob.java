@@ -50,8 +50,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		private final JobFinishListener listener;
 
 		public JobFL(@SuppressWarnings("rawtypes") JobFinishListener listener) {
-			this.listener =
-				listener;
+			this.listener = listener;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -66,8 +65,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 			if (this == obj) {
 				return true;
 			}
-			if ((obj == null)
-				|| (getClass() != obj.getClass())) {
+			if ((obj == null) || (getClass() != obj.getClass())) {
 				return false;
 			}
 			return listener.equals(((JobFL) obj).listener);
@@ -81,11 +79,9 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	private IConsumer<Object> intermediateFunction;
 
-	private T methodResult =
-		null;
+	private T methodResult = null;
 
-	private JobStatus status =
-		JobStatus.NOT_STARTED;
+	private JobStatus status = JobStatus.NOT_STARTED;
 
 	protected AbstractJob(String name, int priority) {
 		super(name);
@@ -116,25 +112,19 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	@Override
 	public final IStatus run(IProgressMonitor monitor) {
-		status =
-			JobStatus.RUNNING;
+		status = JobStatus.RUNNING;
 
 		// run job and catch possible runtime exceptions
-		final ProgressMonitor workMonitor =
-			new ProgressMonitor(getName(), monitor);
+		final ProgressMonitor workMonitor = new ProgressMonitor(getName(), monitor);
 		workMonitor.setIntermediateFunction(intermediateFunction);
 		try {
-			methodResult =
-				work(workMonitor);
-			status =
-				JobStatus.OK;
+			methodResult = work(workMonitor);
+			status = JobStatus.OK;
 		} catch (final MethodCancelException e) {
-			status =
-				JobStatus.FAILED;
+			status = JobStatus.FAILED;
 			throw new OperationCanceledException();
 		} catch (final Exception e) {
-			status =
-				JobStatus.FAILED;
+			status = JobStatus.FAILED;
 			Logger.logError(e);
 			return new Status(IStatus.ERROR, PluginID.PLUGIN_ID, "FAILED", e);
 		} finally {
@@ -147,8 +137,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	@Override
 	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
-		this.intermediateFunction =
-			intermediateFunction;
+		this.intermediateFunction = intermediateFunction;
 	}
 
 	@Override

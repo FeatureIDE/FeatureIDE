@@ -23,30 +23,24 @@ public class CodeAnalyzeHandler extends ColligensAbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		final IWorkbenchWindow window =
-			HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
 
-		final ISelection selection =
-			window.getActivePage().getSelection();
+		final ISelection selection = window.getActivePage().getSelection();
 
 		if (selection != null) {
 			if (controller == null) {
-				controller =
-					new CoreController();
+				controller = new CoreController();
 			}
 
 			controller.setWindow(HandlerUtil.getActiveWorkbenchWindow(event));
 			controller.setSelection(selection);
 
 			if (super.saveAll()) {
-				final IWorkbenchPage page =
-					window.getActivePage();
+				final IWorkbenchPage page = window.getActivePage();
 				try {
 
 					page.showView(InvalidConfigurationsView.ID);
-					final InvalidConfigurationsViewController analyzerViewController =
-						InvalidConfigurationsViewController
-								.getInstance();
+					final InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController.getInstance();
 
 					analyzerViewController.clear();
 
@@ -56,9 +50,7 @@ public class CodeAnalyzeHandler extends ColligensAbstractHandler {
 
 				controller.run();
 			} else {
-				MessageDialog.openError(window.getShell(),
-						Colligens.PLUGIN_NAME,
-						PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
+				MessageDialog.openError(window.getShell(), Colligens.PLUGIN_NAME, PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
 			}
 
 		}

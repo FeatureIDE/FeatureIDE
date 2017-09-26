@@ -53,18 +53,14 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID =
-		CorePlugin.PLUGIN_ID
-			+ ".extensibleFeatureProjectBuilder";
-	public static final String COMPOSER_KEY =
-		"composer";
+	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
+	public static final String COMPOSER_KEY = "composer";
 
 	private IFeatureProject featureProject;
 	private IComposerExtensionClass composerExtension;
 
 	private boolean featureProjectLoaded() {
-		if ((featureProject != null)
-			&& (composerExtension != null)) {
+		if ((featureProject != null) && (composerExtension != null)) {
 			return true;
 		}
 
@@ -72,19 +68,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logWarning(UNABLE_TO_GET_PROJECT_);
 			return false;
 		}
-		featureProject =
-			CorePlugin.getFeatureProject(getProject());
+		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
 
 			return false;
 		}
 
-		final IStatus status =
-			CorePlugin.getDefault().isComposable(getProject());
+		final IStatus status = CorePlugin.getDefault().isComposable(getProject());
 
-		if (!status.isOK()
-			|| ((composerExtension =
-				featureProject.getComposer()) == null)) {
+		if (!status.isOK() || ((composerExtension = featureProject.getComposer()) == null)) {
 			CorePlugin.getDefault().logWarning(NO_COMPOSITION_TOOL_FOUND_);
 			featureProject.createBuilderMarker(featureProject.getProject(), status.getMessage(), 0, IMarker.SEVERITY_ERROR);
 			return false;
@@ -92,11 +84,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		return true;
 	}
 
-	private boolean cleanBuild =
-		false;
+	private boolean cleanBuild = false;
 
-	private boolean cleaned =
-		false;
+	private boolean cleaned = false;
 
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
@@ -105,50 +95,39 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(), IResource.DEPTH_INFINITE);
-		final IProject project =
-			featureProject.getProject();
+		final IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
-			cleaned =
-				false;
+			cleaned = false;
 
 			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			return;
 		}
-		boolean hasOtherNature =
-			true;
-		if ((project.getDescription().getNatureIds().length == 1)
-			&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
-			hasOtherNature =
-				false;
+		boolean hasOtherNature = true;
+		if ((project.getDescription().getNatureIds().length == 1) && project.hasNature(FeatureProjectNature.NATURE_ID)) {
+			hasOtherNature = false;
 		}
 
-		final IFolder buildFolder =
-			featureProject.getBuildFolder();
+		final IFolder buildFolder = featureProject.getBuildFolder();
 		if (buildFolder != null) {
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
-		final IFolder binFolder =
-			featureProject.getBinFolder();
+		final IFolder binFolder = featureProject.getBinFolder();
 		if (!hasOtherNature) {
-			if ((binFolder != null)
-				&& binFolder.exists()) {
+			if ((binFolder != null) && binFolder.exists()) {
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 		}
 
 		if (cleanBuild) {
-			final IFile configFile =
-				featureProject.getCurrentConfiguration();
+			final IFile configFile = featureProject.getCurrentConfiguration();
 			if (configFile == null) {
 				return;
 			}
 		} else {
-			cleaned =
-				true;
+			cleaned = true;
 		}
 		if (!hasOtherNature) {
-			if ((binFolder != null)
-				&& binFolder.exists()) {
+			if ((binFolder != null) && binFolder.exists()) {
 				for (final IResource member : binFolder.members()) {
 					member.delete(true, monitor);
 				}
@@ -160,13 +139,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			if ((binFolder != null)
-				&& binFolder.exists()) {
+			if ((binFolder != null) && binFolder.exists()) {
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 		}
-		cleanBuild =
-			false;
+		cleanBuild = false;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -176,16 +153,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return null;
 		}
 
-		if (!featureProject.buildRelevantChanges()
-			&& !cleaned
-			&& (kind == AUTO_BUILD)) {
+		if (!featureProject.buildRelevantChanges() && !cleaned && (kind == AUTO_BUILD)) {
 			return null;
 		}
 
-		cleaned =
-			false;
-		final IFile configFile =
-			featureProject.getCurrentConfiguration();
+		cleaned = false;
+		final IFile configFile = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
 
 		try {
@@ -193,8 +166,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
-			cleanBuild =
-				true;
+			cleanBuild = true;
 			clean(monitor);
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -203,10 +175,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (configFile == null) {
 			return null;
 		}
-		final IFeatureModel featureModel =
-			featureProject.getFeatureModel();
-		if ((featureModel == null)
-			|| (featureModel.getStructure().getRoot() == null)) {
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null)) {
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
@@ -218,8 +188,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		final Configuration c =
-			new Configuration(featureModel);
+		final Configuration c = new Configuration(featureModel);
 		SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
 		composerExtension.copyNotComposedFiles(c, null);
 		try {

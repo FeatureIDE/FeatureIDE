@@ -38,14 +38,9 @@ public class DeRestriction extends Restriction {
 
 	@Override
 	protected void init(List<Term> terms, RelationOperator op, int degree) {
-		this.terms =
-			makeDefensiveCopy(terms);
-		this.op =
-			op == RelationOperator.EQUAL
-				? Op.EQ
-				: Op.GEQ;
-		this.degree =
-			degree;
+		this.terms = makeDefensiveCopy(terms);
+		this.op = op == RelationOperator.EQUAL ? Op.EQ : Op.GEQ;
+		this.degree = degree;
 
 		// if operator is "<=", multiply with (-1) to get ">="
 		if (op == RelationOperator.LESS_EQUAL) {
@@ -56,8 +51,7 @@ public class DeRestriction extends Restriction {
 	}
 
 	public List<DeRestriction> getInverse(UniqueId idGen) {
-		final List<DeRestriction> inverseConjunction =
-			new ArrayList<DeRestriction>();
+		final List<DeRestriction> inverseConjunction = new ArrayList<DeRestriction>();
 
 		if (op == Op.GEQ) {
 			// negated restriction for GEQ (>=):
@@ -65,14 +59,11 @@ public class DeRestriction extends Restriction {
 			// <=> +a_1*x_1 +a_2*x_2 ... < d
 			// <=> -a_1*x_1 -a_2*x_2 ... > -d
 			// <=> -a_1*x_1 -a_2*x_2 ... >= -d+1
-			final List<Term> newTerms =
-				new ArrayList<Term>();
+			final List<Term> newTerms = new ArrayList<Term>();
 			for (final Term term : terms) {
 				newTerms.add(term.flipCoefficientSign());
 			}
-			inverseConjunction.add(new DeRestriction(
-					newTerms, RelationOperator.GREATER_EQUAL, -degree
-						+ 1));
+			inverseConjunction.add(new DeRestriction(newTerms, RelationOperator.GREATER_EQUAL, -degree + 1));
 		} else {
 			// negated restriction for EQ (==):
 			// ~( +a_1*x_1 +a_2*x_2 ... == d)
@@ -86,37 +77,25 @@ public class DeRestriction extends Restriction {
 			// <=> (+e y +a_1*x_1 +a_2*x_2 ... >= e)
 			// && (+f~y +a_1*x_1 +a_2*x_2 ... >= f)
 			// where e=d+1 and f=(-d+1+a_1+a_2 ...)
-			final List<Term> newTerms1 =
-				new ArrayList<Term>();
-			final List<Term> newTerms2 =
-				new ArrayList<Term>();
-			int coefficientSum =
-				0;
+			final List<Term> newTerms1 = new ArrayList<Term>();
+			final List<Term> newTerms2 = new ArrayList<Term>();
+			int coefficientSum = 0;
 			for (final Term term : terms) {
-				coefficientSum +=
-					term.getCoefficient();
+				coefficientSum += term.getCoefficient();
 
 				newTerms1.add(new Term(term));
 				newTerms2.add(term.flipPositive());
 			}
-			final int e =
-				degree
-					+ 1;
-			final int f =
-				-degree
-					+ 1
-					+ coefficientSum;
+			final int e = degree + 1;
+			final int f = -degree + 1 + coefficientSum;
 
-			final int auxiliaryId =
-				idGen.getNext();
+			final int auxiliaryId = idGen.getNext();
 
 			newTerms1.add(new Term(auxiliaryId, e, true));
 			newTerms2.add(new Term(auxiliaryId, f, false));
 
-			inverseConjunction.add(new DeRestriction(
-					newTerms1, RelationOperator.GREATER_EQUAL, e));
-			inverseConjunction.add(new DeRestriction(
-					newTerms2, RelationOperator.GREATER_EQUAL, f));
+			inverseConjunction.add(new DeRestriction(newTerms1, RelationOperator.GREATER_EQUAL, e));
+			inverseConjunction.add(new DeRestriction(newTerms2, RelationOperator.GREATER_EQUAL, f));
 		}
 
 		return inverseConjunction;
@@ -133,12 +112,9 @@ public class DeRestriction extends Restriction {
 			return false;
 		}
 		// depth equality check
-		final DeRestriction restriction =
-			(DeRestriction) object;
+		final DeRestriction restriction = (DeRestriction) object;
 
-		if ((restriction.getDegree() != degree)
-			|| (restriction.getOp() != op)
-			|| (restriction.getTerms().size() != terms.size())) {
+		if ((restriction.getDegree() != degree) || (restriction.getOp() != op) || (restriction.getTerms().size() != terms.size())) {
 			return false;
 		}
 
@@ -153,19 +129,13 @@ public class DeRestriction extends Restriction {
 
 	@Override
 	public int hashCode() {
-		int hashCode =
-			7
-				* degree;
+		int hashCode = 7 * degree;
 
 		for (final Term term : terms) {
-			hashCode ^=
-				term.hashCode();
+			hashCode ^= term.hashCode();
 		}
 
-		hashCode ^=
-			op == Op.GEQ
-				? 251
-				: 257;
+		hashCode ^= op == Op.GEQ ? 251 : 257;
 
 		return hashCode;
 	}

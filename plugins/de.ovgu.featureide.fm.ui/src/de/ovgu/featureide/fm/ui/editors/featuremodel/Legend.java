@@ -36,10 +36,8 @@ public class Legend implements IGraphicItem {
 	private Point pos;
 
 	public Legend(IGraphicalFeatureModel model) {
-		this.model =
-			model;
-		pos =
-			model.getLayout().getLegendPos().getCopy();
+		this.model = model;
+		pos = model.getLayout().getLegendPos().getCopy();
 	}
 
 	public IGraphicalFeatureModel getModel() {
@@ -55,8 +53,7 @@ public class Legend implements IGraphicItem {
 	}
 
 	public void setPos(Point pos) {
-		this.pos =
-			pos;
+		this.pos = pos;
 		model.getLayout().setLegendPos(pos.x, pos.y);
 	}
 

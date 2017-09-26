@@ -52,12 +52,9 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 public class AntennaFMComposerExtension extends FMComposerExtension {
 
 	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects based on preprocessors such as Antenna do not\n"
-			+
-			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+		"FeatureIDE projects based on preprocessors such as Antenna do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 
-	public static final String FEATURE_NAME_PATTERN =
-		"^[a-zA-Z][\\w\\.\\-]*$";
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z][\\w\\.\\-]*$";
 
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
@@ -76,14 +73,12 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
 
-		final IFolder sourceFolder =
-			featureProject.getSourceFolder();
+		final IFolder sourceFolder = featureProject.getSourceFolder();
 		if (!sourceFolder.exists()) {
 			return true;
 		}
@@ -102,8 +97,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				final IFile file =
-					(IFile) res;
+				final IFile file = (IFile) res;
 				performRenamings(oldName, newName, file);
 			}
 
@@ -111,34 +105,26 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	}
 
 	private void performRenamings(String oldName, String newName, IFile iFile) {
-		Scanner scanner =
-			null;
-		FileWriter fw =
-			null;
+		Scanner scanner = null;
+		FileWriter fw = null;
 		try {
-			final File file =
-				iFile.getRawLocation().toFile();
+			final File file = iFile.getRawLocation().toFile();
 
-			final StringBuilder fileText =
-				new StringBuilder();
-			scanner =
-				new Scanner(file, "UTF-8");
+			final StringBuilder fileText = new StringBuilder();
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append(System.getProperty("line.separator"));
 			}
 
-			final String string =
-				fileText.toString();
-			final String newText =
-				replaceFeatureInText(string, oldName, newName);
+			final String string = fileText.toString();
+			final String newText = replaceFeatureInText(string, oldName, newName);
 
 			if (string.equals(newText)) {
 				return;
 			}
 
-			fw =
-				new FileWriter(file);
+			fw = new FileWriter(file);
 			fw.write(newText);
 
 		} catch (final FileNotFoundException e) {
@@ -160,18 +146,12 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	}
 
 	private String replaceFeatureInText(String text, String oldName, String newName) {
-		final Pattern pattern =
-			Pattern.compile(String.format(AntennaModelBuilder.REGEX, oldName));
-		final Matcher matcher =
-			pattern.matcher(text);
+		final Pattern pattern = Pattern.compile(String.format(AntennaModelBuilder.REGEX, oldName));
+		final Matcher matcher = pattern.matcher(text);
 
 		while (matcher.find()) {
-			final String newText =
-				matcher.group(1)
-					+ newName
-					+ matcher.group(3);
-			text =
-				text.replace(matcher.group(0), newText);
+			final String newText = matcher.group(1) + newName + matcher.group(3);
+			text = text.replace(matcher.group(0), newText);
 			matcher.reset(text);
 		}
 

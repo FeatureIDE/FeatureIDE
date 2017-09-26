@@ -63,34 +63,25 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	/**
 	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
 	 */
-	public Explanation currentlyActiveExplanation =
-		null;
+	public Explanation currentlyActiveExplanation = null;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel =
-			correspondingFeatureModel;
-		layout =
-			new FeatureModelLayout();
+		this.correspondingFeatureModel = correspondingFeatureModel;
+		layout = new FeatureModelLayout();
 	}
 
 	/**
 	 * Copy constructor
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
-		correspondingFeatureModel =
-			oldModel.correspondingFeatureModel;
+		correspondingFeatureModel = oldModel.correspondingFeatureModel;
 
-		layout =
-			oldModel.layout;
-		features =
-			new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
-				* 1.5));
+		layout = oldModel.layout;
+		features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
-		constraints =
-			new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
-				* 1.5));
+		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
 		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());
 		}
@@ -135,8 +126,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	@Override
 	public void setLegendHidden(boolean hidden) {
-		hiddenLegend =
-			hidden;
+		hiddenLegend = hidden;
 	}
 
 	/*
@@ -154,8 +144,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	@Override
 	public void setLegend(Legend legend) {
-		this.legend =
-			legend;
+		this.legend = legend;
 	}
 
 	@Override
@@ -175,8 +164,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
-		final ArrayList<IGraphicalFeature> featureList =
-			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 			featureList.add(getGraphicalFeature(f));
 		}
@@ -185,8 +173,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getAllFeatures() {
-		final ArrayList<IGraphicalFeature> featureList =
-			new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
 			featureList.add(getGraphicalFeature(f));
 		}
@@ -195,11 +182,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public IGraphicalFeature getGraphicalFeature(IFeature newFeature) {
-		IGraphicalFeature graphicalFeature =
-			features.get(newFeature);
+		IGraphicalFeature graphicalFeature = features.get(newFeature);
 		if (graphicalFeature == null) {
-			graphicalFeature =
-				new GraphicalFeature(newFeature, this);
+			graphicalFeature = new GraphicalFeature(newFeature, this);
 			features.put(newFeature, graphicalFeature);
 		}
 		return graphicalFeature;
@@ -207,8 +192,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public List<IGraphicalConstraint> getConstraints() {
-		final ArrayList<IGraphicalConstraint> constraintList =
-			new ArrayList<>(correspondingFeatureModel.getConstraintCount());
+		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraintCount());
 		for (final IConstraint c : correspondingFeatureModel.getConstraints()) {
 			constraintList.add(getGraphicalConstraint(c));
 		}
@@ -220,8 +204,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		if (getLayout().showCollapsedConstraints()) {
 			return getConstraints();
 		}
-		final List<IGraphicalConstraint> constraints =
-			new ArrayList<IGraphicalConstraint>();
+		final List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
 		for (final IGraphicalConstraint c : getConstraints()) {
 			if (!c.isCollapsed()) {
 				constraints.add(c);
@@ -232,11 +215,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
-		IGraphicalConstraint graphicalConstraint =
-			constraints.get(constraint);
+		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);
 		if (graphicalConstraint == null) {
-			graphicalConstraint =
-				new GraphicalConstraint(constraint, this);
+			graphicalConstraint = new GraphicalConstraint(constraint, this);
 			constraints.put(constraint, graphicalConstraint);
 		}
 		return graphicalConstraint;
@@ -245,49 +226,39 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	@Override
 	public String toString() {
 		if (features != null) {
-			return "Graphical feature-model tree:\n"
-				+ features.toString();
+			return "Graphical feature-model tree:\n" + features.toString();
 		}
 		return super.toString();
 	}
 
 	@Override
 	public GraphicalFeatureModel clone() {
-		final GraphicalFeatureModel copy =
-			new GraphicalFeatureModel(this);
+		final GraphicalFeatureModel copy = new GraphicalFeatureModel(this);
 		return copy;
 	}
 
 	@Override
 	public void init() {
-		final IFeatureStructure root =
-			correspondingFeatureModel.getStructure().getRoot();
+		final IFeatureStructure root = correspondingFeatureModel.getStructure().getRoot();
 		if (root != null) {
-			constraints =
-				new HashMap<>((int) (correspondingFeatureModel.getConstraintCount()
-					* 1.5));
+			constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
 			for (final IConstraint constraint : correspondingFeatureModel.getConstraints()) {
 				constraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
 
-			features =
-				new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures()
-					* 1.5));
+			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 			for (final IFeature feature : correspondingFeatureModel.getVisibleFeatures(getLayout().showHiddenFeatures())) {
 				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
-			constraints =
-				new HashMap<>();
-			features =
-				new HashMap<>();
+			constraints = new HashMap<>();
+			features = new HashMap<>();
 		}
 	}
 
 	@Override
 	public List<IGraphicalFeature> getVisibleFeatures() {
-		final List<IGraphicalFeature> features =
-			new ArrayList<IGraphicalFeature>();
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
 		for (final IGraphicalFeature f : getFeatures()) {
 			if (!f.hasCollapsedParent()) {
 				features.add(f);
@@ -302,15 +273,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	@Override
 	public int getConstraintIndex(Constraint constraint) {
-		final IGraphicalConstraint gConstarint =
-			getGraphicalConstraint(constraint);
+		final IGraphicalConstraint gConstarint = getGraphicalConstraint(constraint);
 
-		int index =
-			0;
-		for (int i =
-			0; i < constraints.size(); i++) {
-			final IGraphicalConstraint gTemp =
-				getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
+		int index = 0;
+		for (int i = 0; i < constraints.size(); i++) {
+			final IGraphicalConstraint gTemp = getGraphicalConstraint(getFeatureModel().getConstraints().get(i));
 			if (gTemp == gConstarint) {
 				return index;
 			}
@@ -328,8 +295,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	@Override
 	public void setActiveExplanation(Explanation exp) {
-		currentlyActiveExplanation =
-			exp;
+		currentlyActiveExplanation = exp;
 
 	}
 

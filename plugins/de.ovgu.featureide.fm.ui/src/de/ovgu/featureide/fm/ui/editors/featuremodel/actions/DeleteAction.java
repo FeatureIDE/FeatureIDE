@@ -52,33 +52,27 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOpe
  */
 public class DeleteAction extends Action {
 
-	public static final String ID =
-		ActionFactory.DELETE.getId();
+	public static final String ID = ActionFactory.DELETE.getId();
 
-	private static ImageDescriptor deleteImage =
-		PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	private final Object viewer;
 
 	private final IFeatureModel featureModel;
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-			}
-		};
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
 	public DeleteAction(Object viewer, IFeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
-		this.viewer =
-			viewer;
-		this.featureModel =
-			featureModel;
+		this.viewer = viewer;
+		this.featureModel = featureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -89,8 +83,7 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		final ElementDeleteOperation op =
-			new ElementDeleteOperation(viewer, featureModel);
+		final ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -103,37 +96,26 @@ public class DeleteAction extends Action {
 
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if ((selection.size() == 1)
-			&& (selection.getFirstElement() instanceof ModelEditPart)) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
 		}
 
 		// check that a possibly new root can be determined unique
-		final IFeature root =
-			featureModel.getStructure().getRoot().getFeature();
-		IFeature newRoot =
-			root;
-		final LinkedList<IFeature> features =
-			new LinkedList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		final Iterator<?> iter =
-			selection.iterator();
+		final IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature newRoot = root;
+		final LinkedList<IFeature> features = new LinkedList<IFeature>(Functional.toList(featureModel.getFeatures()));
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			final Object editPart =
-				iter.next();
-			if (!(editPart instanceof FeatureEditPart)
-				&& !(editPart instanceof IFeature)) {
+			final Object editPart = iter.next();
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
 				continue;
 			}
-			final IFeature feature =
-				editPart instanceof FeatureEditPart
-					? ((FeatureEditPart) editPart).getModel().getObject()
-					: (IFeature) editPart;
+			final IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getModel().getObject() : (IFeature) editPart;
 			if (feature == root) {
 				if (root.getStructure().getChildrenCount() != 1) {
 					return false;
 				}
-				newRoot =
-					root.getStructure().getFirstChild().getFeature();
+				newRoot = root.getStructure().getFirstChild().getFeature();
 				if (!newRoot.getStructure().hasChildren()) {
 					return false;
 				}
@@ -142,8 +124,7 @@ public class DeleteAction extends Action {
 		}
 
 		// check that the only child of a deleted root is not deleted too
-		if ((root != newRoot)
-			&& !features.contains(newRoot)) {
+		if ((root != newRoot) && !features.contains(newRoot)) {
 			return false;
 		}
 

@@ -39,16 +39,13 @@ public abstract class JobArguments {
 	protected JobArguments(Class<? extends JobArguments> cl) {
 		Constructor<? extends LongRunningMethod<?>> tempConstructor;
 		try {
-			tempConstructor =
-				(Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
+			tempConstructor = (Constructor<? extends LongRunningMethod<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
 			tempConstructor.setAccessible(true);
 		} catch (final Exception e) {
 			Logger.logError(e);
-			tempConstructor =
-				null;
+			tempConstructor = null;
 		}
-		constructor =
-			tempConstructor;
+		constructor = tempConstructor;
 	}
 
 	public LongRunningMethod<?> createJob() {

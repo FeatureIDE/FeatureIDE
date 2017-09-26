@@ -33,83 +33,20 @@ import de.ovgu.featureide.munge.MungeFMComposerExtension;
  */
 public class TMungeFMComposerExtension {
 
-	private final MungeFMComposerExtension fmComposerExtension =
-		new MungeFMComposerExtension();
+	private final MungeFMComposerExtension fmComposerExtension = new MungeFMComposerExtension();
 
-	private static final String OLD_NAME =
-		"Hello";
-	private static final String NEW_NAME =
-		"NewFeature";
+	private static final String OLD_NAME = "Hello";
+	private static final String NEW_NAME = "NewFeature";
 
-	private static final String OLD_FILE_CONTENT =
-		"public class Main {\r\n"
-			+
-			"\r\n"
-			+
-			"public static void main(String[] args){\r\n"
-			+
-			"	/*if[Hello]*/\r\n"
-			+
-			"	System.out.print(\"Hello\");\r\n"
-			+
-			"	/*end[Hello]*/\r\n"
-			+
-			"	/*if[Beautiful]*/	\r\n"
-			+
-			"	System.out.print(\" beautiful\");\r\n"
-			+
-			"	/*end[Beautiful]*/\r\n"
-			+
-			"	/*if[Wonderful]*/	\r\n"
-			+
-			"	System.out.print(\" wonderful\");\r\n"
-			+
-			"	/*end[Wonderful]*/\r\n"
-			+
-			"	/*if[World]*/		\r\n"
-			+
-			"	System.out.print(\" world!\");\r\n"
-			+
-			"	/*end[World]*/\r\n"
-			+
-			"	}\r\n"
-			+
-			"}";
+	private static final String OLD_FILE_CONTENT = "public class Main {\r\n" + "\r\n" + "public static void main(String[] args){\r\n" + "	/*if[Hello]*/\r\n"
+		+ "	System.out.print(\"Hello\");\r\n" + "	/*end[Hello]*/\r\n" + "	/*if[Beautiful]*/	\r\n" + "	System.out.print(\" beautiful\");\r\n"
+		+ "	/*end[Beautiful]*/\r\n" + "	/*if[Wonderful]*/	\r\n" + "	System.out.print(\" wonderful\");\r\n" + "	/*end[Wonderful]*/\r\n"
+		+ "	/*if[World]*/		\r\n" + "	System.out.print(\" world!\");\r\n" + "	/*end[World]*/\r\n" + "	}\r\n" + "}";
 
-	private static final String NEW_FILE_CONTENT =
-		"public class Main {\r\n"
-			+
-			"\r\n"
-			+
-			"public static void main(String[] args){\r\n"
-			+
-			"	/*if[NewFeature]*/\r\n"
-			+
-			"	System.out.print(\"Hello\");\r\n"
-			+
-			"	/*end[NewFeature]*/\r\n"
-			+
-			"	/*if[Beautiful]*/	\r\n"
-			+
-			"	System.out.print(\" beautiful\");\r\n"
-			+
-			"	/*end[Beautiful]*/\r\n"
-			+
-			"	/*if[Wonderful]*/	\r\n"
-			+
-			"	System.out.print(\" wonderful\");\r\n"
-			+
-			"	/*end[Wonderful]*/\r\n"
-			+
-			"	/*if[World]*/		\r\n"
-			+
-			"	System.out.print(\" world!\");\r\n"
-			+
-			"	/*end[World]*/\r\n"
-			+
-			"	}\r\n"
-			+
-			"}";
+	private static final String NEW_FILE_CONTENT = "public class Main {\r\n" + "\r\n" + "public static void main(String[] args){\r\n"
+		+ "	/*if[NewFeature]*/\r\n" + "	System.out.print(\"Hello\");\r\n" + "	/*end[NewFeature]*/\r\n" + "	/*if[Beautiful]*/	\r\n"
+		+ "	System.out.print(\" beautiful\");\r\n" + "	/*end[Beautiful]*/\r\n" + "	/*if[Wonderful]*/	\r\n" + "	System.out.print(\" wonderful\");\r\n"
+		+ "	/*end[Wonderful]*/\r\n" + "	/*if[World]*/		\r\n" + "	System.out.print(\" world!\");\r\n" + "	/*end[World]*/\r\n" + "	}\r\n" + "}";
 
 	@Test
 	public void performRenamingsTest_1() {

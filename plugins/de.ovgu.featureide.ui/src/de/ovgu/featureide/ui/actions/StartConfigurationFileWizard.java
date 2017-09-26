@@ -41,17 +41,14 @@ public class StartConfigurationFileWizard implements IWorkbenchWindowActionDeleg
 
 	@Override
 	public void init(IWorkbenchWindow window) {
-		this.window =
-			window;
+		this.window = window;
 	}
 
 	@Override
 	public void run(IAction action) {
 
-		final NewConfigurationFileWizard wizard =
-			new NewConfigurationFileWizard();
-		final ISelection selection =
-			window.getSelectionService().getSelection();
+		final NewConfigurationFileWizard wizard = new NewConfigurationFileWizard();
+		final ISelection selection = window.getSelectionService().getSelection();
 
 		if (selection instanceof IStructuredSelection) {
 			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);
@@ -59,8 +56,7 @@ public class StartConfigurationFileWizard implements IWorkbenchWindowActionDeleg
 			wizard.init(window.getWorkbench(), null);
 		}
 
-		final WizardDialog dialog =
-			new WizardDialog(window.getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 

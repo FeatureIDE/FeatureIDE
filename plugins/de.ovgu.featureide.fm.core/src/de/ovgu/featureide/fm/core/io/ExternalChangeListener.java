@@ -29,8 +29,7 @@ import de.ovgu.featureide.fm.core.io.manager.AFileManager;
  */
 public abstract class ExternalChangeListener {
 
-	public static ExternalChangeListener listener =
-		new DefaultExternalChangeListener();
+	public static ExternalChangeListener listener = new DefaultExternalChangeListener();
 
 	public static void update(AFileManager<?> fileManager) {
 		listener.doUpdate(fileManager);

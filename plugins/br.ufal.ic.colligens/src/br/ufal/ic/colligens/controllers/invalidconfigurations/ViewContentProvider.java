@@ -27,8 +27,7 @@ class ViewContentProvider implements ITreeContentProvider {
 			return ((List<?>) parentElement).toArray();
 		}
 		if (parentElement instanceof FileProxy) {
-			final List<Log> logs =
-				((FileProxy) parentElement).getLogs();
+			final List<Log> logs = ((FileProxy) parentElement).getLogs();
 			return logs.toArray();
 		}
 		return new Object[0];

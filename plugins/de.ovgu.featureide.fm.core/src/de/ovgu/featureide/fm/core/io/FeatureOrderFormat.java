@@ -34,36 +34,25 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.fm."
-			+ FeatureOrderFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FeatureOrderFormat.class.getSimpleName();
 
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
-		final String[] lines =
-			source.toString().split("[\n|\r]+");
+		final String[] lines = source.toString().split("[\n|\r]+");
 		object.setFeatureOrderList(Arrays.asList(lines));
 		return new ProblemList();
 	}
 
 	@Override
 	public String write(IFeatureModel object) {
-		final String newLine =
-			System.getProperty("line.separator");
-		final StringBuilder sb =
-			new StringBuilder();
+		final String newLine = System.getProperty("line.separator");
+		final StringBuilder sb = new StringBuilder();
 
-		sb.append(((object.isFeatureOrderUserDefined())
-			? "true"
-			: "false")
-			+ newLine);
+		sb.append(((object.isFeatureOrderUserDefined()) ? "true" : "false") + newLine);
 
-		Collection<String> list =
-			object.getFeatureOrderList();
+		Collection<String> list = object.getFeatureOrderList();
 		if (list.isEmpty()) {
-			list =
-				FeatureUtils.extractConcreteFeaturesAsStringList(object);
+			list = FeatureUtils.extractConcreteFeaturesAsStringList(object);
 		}
 
 		for (final String featureName : list) {

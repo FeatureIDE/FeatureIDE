@@ -36,8 +36,7 @@ public class GenerateFeatureStubsHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final FeatureStubsGenerator fsg =
-			new FeatureStubsGenerator(featureProject);
+		final FeatureStubsGenerator fsg = new FeatureStubsGenerator(featureProject);
 		if (fsg.generate()) {
 			FeatureHouseCorePlugin.getDefault().logInfo(FEATURE_STUBS_GENERATION_STARTED_);
 		}

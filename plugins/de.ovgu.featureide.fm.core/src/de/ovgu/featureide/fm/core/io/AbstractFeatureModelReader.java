@@ -55,8 +55,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * warnings occurred while parsing
 	 */
-	protected LinkedList<Problem> warnings =
-		new LinkedList<Problem>();
+	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
 
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
@@ -67,8 +66,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 
 	@Override
 	public void setFeatureModel(IFeatureModel featureModel) {
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
@@ -84,18 +82,13 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 * @throws FileNotFoundException
 	 */
 	@Override
-	public void readFromFile(File file) throws UnsupportedModelException,
-			FileNotFoundException {
+	public void readFromFile(File file) throws UnsupportedModelException, FileNotFoundException {
 		warnings.clear();
-		featureModelFile =
-			file;
-		final String fileName =
-			file.getPath();
-		InputStream inputStream =
-			null;
+		featureModelFile = file;
+		final String fileName = file.getPath();
+		InputStream inputStream = null;
 		try {
-			inputStream =
-				new FileInputStream(fileName);
+			inputStream = new FileInputStream(fileName);
 			parseInputStream(inputStream);
 			// TODO: REMOVE THIS, THIS IS A HACK
 			// THIS IS A HACK
@@ -123,9 +116,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	@Override
 	public void readFromString(String text) throws UnsupportedModelException {
 		warnings.clear();
-		final InputStream inputStream =
-			new ByteArrayInputStream(
-					text.getBytes(Charset.availableCharsets().get("UTF-8")));
+		final InputStream inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		parseInputStream(inputStream);
 	}
 
@@ -140,8 +131,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 * @param inputStream the textual representation of the feature model
 	 * @throws UnsupportedModelException
 	 */
-	protected abstract void parseInputStream(InputStream inputStream)
-			throws UnsupportedModelException;
+	protected abstract void parseInputStream(InputStream inputStream) throws UnsupportedModelException;
 
 	/**
 	 * Set the source file of the textual representation of the feature model.
@@ -150,8 +140,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 */
 	@Override
 	public void setFile(File featureModelFile) {
-		this.featureModelFile =
-			featureModelFile;
+		this.featureModelFile = featureModelFile;
 	}
 
 	public File getFile() {

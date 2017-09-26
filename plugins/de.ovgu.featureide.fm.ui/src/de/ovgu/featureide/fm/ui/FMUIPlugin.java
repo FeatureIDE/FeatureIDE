@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.EclipseExternalChangeListener;
  */
 public class FMUIPlugin extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.fm.ui";
+	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.ui";
 
 	private static FMUIPlugin plugin;
 
@@ -49,22 +48,17 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
-		final EclipseExternalChangeListener eclipseExternalChangeListener =
-			new EclipseExternalChangeListener();
-		ExternalChangeListener.listener =
-			eclipseExternalChangeListener;
+		plugin = this;
+		final EclipseExternalChangeListener eclipseExternalChangeListener = new EclipseExternalChangeListener();
+		ExternalChangeListener.listener = eclipseExternalChangeListener;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(eclipseExternalChangeListener);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
-		final ExternalChangeListener listener =
-			ExternalChangeListener.listener;
+		final ExternalChangeListener listener = ExternalChangeListener.listener;
 		if (listener instanceof IResourceChangeListener) {
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener((IResourceChangeListener) listener);
 		}
@@ -75,8 +69,7 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Image getImage(String name) {
-		return getDefault().getImageDescriptor("icons/"
-			+ name).createImage();
+		return getDefault().getImageDescriptor("icons/" + name).createImage();
 	}
 
 }

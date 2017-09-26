@@ -54,59 +54,42 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 
 	public IndeterminedAnalysis(SatInstance satInstance, List<String> variables) {
 		super(satInstance);
-		this.variables =
-			variables;
+		this.variables = variables;
 	}
 
 	public IndeterminedAnalysis(ISatSolver solver, List<String> variables) {
 		super(solver);
-		this.variables =
-			variables;
+		this.variables = variables;
 	}
 
 	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
-		monitor.setRemainingWork(variables.size()
-			+ 1);
+		monitor.setRemainingWork(variables.size() + 1);
 
-		final VecInt resultList =
-			new VecInt();
-		final ModifiableSolver modSolver =
-			new ModifiableSolver(solver.getSatInstance());
-		final List<Clause> relevantClauses =
-			new ArrayList<>();
+		final VecInt resultList = new VecInt();
+		final ModifiableSolver modSolver = new ModifiableSolver(solver.getSatInstance());
+		final List<Clause> relevantClauses = new ArrayList<>();
 
 		varLoop: for (final String varName : variables) {
-			final Node[] clauses =
-				solver.getSatInstance().getCnf().getChildren();
-			final int literal =
-				solver.getSatInstance().getVariable(varName);
+			final Node[] clauses = solver.getSatInstance().getCnf().getChildren();
+			final int literal = solver.getSatInstance().getVariable(varName);
 			relevantClauses.clear();
 
-			final ArrayList<String> removeVar =
-				new ArrayList<>(variables);
+			final ArrayList<String> removeVar = new ArrayList<>(variables);
 			removeVar.remove(varName);
-			final FeatureRemover remover =
-				new FeatureRemover(new And(clauses), removeVar, false, true);
-			final Node newClauseList =
-				remover.createNewClauseList(LongRunningWrapper.runMethod(remover));
+			final FeatureRemover remover = new FeatureRemover(new And(clauses), removeVar, false, true);
+			final Node newClauseList = remover.createNewClauseList(LongRunningWrapper.runMethod(remover));
 
 			for (final Node clause : newClauseList.getChildren()) {
-				final Node[] literals =
-					clause.getChildren();
+				final Node[] literals = clause.getChildren();
 
-				final VecInt newLiterals =
-					new VecInt();
-				boolean relevant =
-					false;
+				final VecInt newLiterals = new VecInt();
+				boolean relevant = false;
 
-				for (int i =
-					0; i < literals.length; i++) {
-					final int l =
-						solver.getSatInstance().getSignedVariable((Literal) literals[i]);
+				for (int i = 0; i < literals.length; i++) {
+					final int l = solver.getSatInstance().getSignedVariable((Literal) literals[i]);
 					if (Math.abs(l) == literal) {
-						relevant =
-							true;
+						relevant = true;
 					} else {
 						newLiterals.push(l);
 					}
@@ -127,8 +110,7 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 				continue varLoop;
 			}
 
-			final SatResult satResult =
-				modSolver.isSatisfiable();
+			final SatResult satResult = modSolver.isSatisfiable();
 			switch (satResult) {
 			case FALSE:
 			case TIMEOUT:

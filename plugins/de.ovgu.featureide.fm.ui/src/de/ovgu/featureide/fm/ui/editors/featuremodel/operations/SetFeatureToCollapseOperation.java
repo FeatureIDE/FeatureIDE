@@ -44,8 +44,7 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 
 	private final IFeature feature;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private List<FeatureConnection> targetConnections =
-		new ArrayList<>();
+	private List<FeatureConnection> targetConnections = new ArrayList<>();
 
 	/**
 	 * @param label Description of this operation to be used in the menu
@@ -54,10 +53,8 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	 */
 	public SetFeatureToCollapseOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(graphicalFeatureModel.getGraphicalFeature(feature)));
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
-		this.feature =
-			feature;
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.feature = feature;
 	}
 
 	/**
@@ -76,11 +73,9 @@ public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation
 	protected FeatureIDEEvent operation() {
 		if (feature.getStructure().hasChildren()) {
 
-			final IGraphicalFeature graphicalFeature =
-				graphicalFeatureModel.getGraphicalFeature(feature);
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
-			targetConnections =
-				graphicalFeature.getTargetConnections();
+			targetConnections = graphicalFeature.getTargetConnections();
 			graphicalFeature.getTargetConnections().clear();
 
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);

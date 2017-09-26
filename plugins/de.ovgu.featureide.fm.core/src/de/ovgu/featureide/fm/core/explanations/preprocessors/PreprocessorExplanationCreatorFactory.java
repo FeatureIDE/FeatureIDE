@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreprocessorExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite.CompositePreprocessorExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link PreprocessorExplanationCreator}.
@@ -36,7 +36,7 @@ public abstract class PreprocessorExplanationCreatorFactory implements Explanati
 	 * @return a default instance of this class
 	 */
 	public static PreprocessorExplanationCreatorFactory getDefault() {
-		return new MusPreprocessorExplanationCreatorFactory();
+		return new CompositePreprocessorExplanationCreatorFactory();
 	}
 
 	/**

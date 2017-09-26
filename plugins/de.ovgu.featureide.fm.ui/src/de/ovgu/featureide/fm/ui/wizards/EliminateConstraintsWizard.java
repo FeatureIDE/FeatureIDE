@@ -54,35 +54,24 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 	public EliminateConstraintsWizard(IFile file, String title, boolean trivial, int pseudocomplex, int strictcomplex, String fileExtension) {
 		super(title);
 		// TODO Auto-generated constructor stub
-		inputModelFile =
-			file;
-		this.trivial =
-			trivial;
-		this.pseudocomplex =
-			pseudocomplex;
-		this.strictcomplex =
-			strictcomplex;
-		this.fileExtension =
-			fileExtension;
+		inputModelFile = file;
+		this.trivial = trivial;
+		this.pseudocomplex = pseudocomplex;
+		this.strictcomplex = strictcomplex;
+		this.fileExtension = fileExtension;
 	}
 
 	@Override
 	public void addPages() {
 		setWindowTitle("Export Product-Equivalent Model Without Complex Constraints");
-		page =
-			new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
+		page = new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
 
 		if (strictcomplex == 0) {
 			page.setTitle("No Strict-Complex Constraints found");
-			page.setDescription("Number of pseudo-complex constraints: "
-				+ pseudocomplex);
+			page.setDescription("Number of pseudo-complex constraints: " + pseudocomplex);
 		} else {
 			page.setTitle("Strict-Complex Constraints found");
-			page.setDescription("Number of strict-complex constraints: "
-				+ strictcomplex
-				+ "\n"
-				+ "Number of pseudo-complex constraints: "
-				+ pseudocomplex);
+			page.setDescription("Number of strict-complex constraints: " + strictcomplex + "\n" + "Number of pseudo-complex constraints: " + pseudocomplex);
 		}
 
 		addPage(page);

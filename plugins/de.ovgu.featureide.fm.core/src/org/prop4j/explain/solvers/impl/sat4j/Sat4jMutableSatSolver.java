@@ -41,27 +41,17 @@ import org.sat4j.specs.IConstr;
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
 
 	/** The variables that were assumed in each scope except the current one. */
-	private final Deque<Map<Object, Boolean>> previousScopeAssumptions =
-		new LinkedList<>();
+	private final Deque<Map<Object, Boolean>> previousScopeAssumptions = new LinkedList<>();
 	/** The amount of clauses that were added in each scope except the current one. */
-	private final Deque<Integer> previousScopeClauseCounts =
-		new LinkedList<>();
+	private final Deque<Integer> previousScopeClauseCounts = new LinkedList<>();
 	/** The amount of clauses in the current scope. */
-	private int scopeClauseCount =
-		0;
+	private int scopeClauseCount = 0;
 	/** How often to pop until the scope containing the contradiction is reached. */
-	private int scopeContradictionDistance =
-		0;
-
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jMutableSatSolver() {}
+	private int scopeContradictionDistance = 0;
 
 	@Override
 	public boolean addClause(Node clause) {
-		final boolean changed =
-			super.addClause(clause);
+		final boolean changed = super.addClause(clause);
 		if (changed) {
 			scopeClauseCount++;
 		}
@@ -72,8 +62,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	public void push() {
 		// Push the clauses.
 		previousScopeClauseCounts.push(scopeClauseCount);
-		scopeClauseCount =
-			0;
+		scopeClauseCount = 0;
 
 		// Push the contradiction distance.
 		if (isContradiction()) {
@@ -81,8 +70,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		}
 
 		// Push the assumptions.
-		final Map<Object, Boolean> assumptions =
-			super.getAssumptions();
+		final Map<Object, Boolean> assumptions = super.getAssumptions();
 		previousScopeAssumptions.push(new LinkedHashMap<>(assumptions));
 		assumptions.clear();
 	}
@@ -90,13 +78,11 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	@Override
 	public List<Node> pop() throws NoSuchElementException {
 		// Pop the clauses.
-		final List<Node> removedClauses =
-			new LinkedList<>();
+		final List<Node> removedClauses = new LinkedList<>();
 		while (scopeClauseCount > 0) {
 			removedClauses.add(removeClause());
 		}
-		scopeClauseCount =
-			previousScopeClauseCounts.pop();
+		scopeClauseCount = previousScopeClauseCounts.pop();
 
 		// Pop the contradiction distance.
 		if (isContradiction()) {
@@ -108,8 +94,7 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		}
 
 		// Pop the assumptions.
-		final Map<Object, Boolean> assumptions =
-			super.getAssumptions();
+		final Map<Object, Boolean> assumptions = super.getAssumptions();
 		assumptions.clear();
 		assumptions.putAll(previousScopeAssumptions.pop());
 
@@ -128,23 +113,17 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		 * When a constraint is removed from a Sat4J oracle, its index is not freed up. To still be able to keep track of the constraint indexes, do not remove
 		 * the corresponding clause from the local list but just set it to null.
 		 */
-		final List<Node> clauses =
-			super.getClauses();
-		Node clause =
-			null;
-		for (int i =
-			clauses.size()
-				- 1; i >= 0; i--) {
-			clause =
-				clauses.get(i);
+		final List<Node> clauses = super.getClauses();
+		Node clause = null;
+		for (int i = clauses.size() - 1; i >= 0; i--) {
+			clause = clauses.get(i);
 			if (clause != null) {
 				clauses.set(i, null);
 				break;
 			}
 		}
 
-		final IConstr constraint =
-			clauseConstraints.remove(clause);
+		final IConstr constraint = clauseConstraints.remove(clause);
 		if (constraint != null) {
 			getOracle().removeSubsumedConstr(constraint);
 		}
@@ -157,10 +136,8 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		 * Sat4J does not free up a constraint's index when it is removed. In the local clause list, the resulting gaps in the index range are modeled using
 		 * null values. As such, return a copy without these null values to fulfill the interface's contract.
 		 */
-		final List<Node> clauses =
-			super.getClauses();
-		final List<Node> clausesWithoutNull =
-			new ArrayList<>(getClauseCount());
+		final List<Node> clauses = super.getClauses();
+		final List<Node> clausesWithoutNull = new ArrayList<>(getClauseCount());
 		for (final Node clause : clauses) {
 			if (clause != null) {
 				clausesWithoutNull.add(clause);
@@ -174,11 +151,9 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		/*
 		 * For performance reasons, do not generate the entire null-free list of clauses.
 		 */
-		int i =
-			0;
+		int i = 0;
 		for (final Node clause : super.getClauses()) {
-			if ((clause != null)
-				&& (i++ == index)) {
+			if ((clause != null) && (i++ == index)) {
 				return clause;
 			}
 		}
@@ -190,21 +165,17 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		/*
 		 * For performance reasons, do not generate the entire null-free list of clauses.
 		 */
-		int total =
-			scopeClauseCount;
+		int total = scopeClauseCount;
 		for (final int previousScopeClauseCount : previousScopeClauseCounts) {
-			total +=
-				previousScopeClauseCount;
+			total += previousScopeClauseCount;
 		}
 		return total;
 	}
 
 	@Override
 	public int getClauseIndexFromIndex(int index) {
-		index =
-			super.getClauseIndexFromIndex(index);
-		int i =
-			0;
+		index = super.getClauseIndexFromIndex(index);
+		int i = 0;
 		for (final Node clause : super.getClauses()) {
 			if (clause == null) {
 				index--;
@@ -220,10 +191,8 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		/*
 		 * Merge the assumptions of all scopes. Add the newer assumptions later to override the older ones.
 		 */
-		final Map<Object, Boolean> assumptions =
-			new LinkedHashMap<>();
-		for (final Iterator<Map<Object, Boolean>> it =
-			previousScopeAssumptions.descendingIterator(); it.hasNext();) {
+		final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+		for (final Iterator<Map<Object, Boolean>> it = previousScopeAssumptions.descendingIterator(); it.hasNext();) {
 			assumptions.putAll(it.next());
 		}
 		assumptions.putAll(super.getAssumptions());
@@ -235,14 +204,12 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		/*
 		 * For performance reasons, do not merge all assumptions.
 		 */
-		Boolean value =
-			super.getAssumptions().get(variable);
+		Boolean value = super.getAssumptions().get(variable);
 		if (value != null) {
 			return value;
 		}
 		for (final Map<Object, Boolean> prev : previousScopeAssumptions) {
-			value =
-				prev.get(variable);
+			value = prev.get(variable);
 			if (value != null) {
 				return value;
 			}

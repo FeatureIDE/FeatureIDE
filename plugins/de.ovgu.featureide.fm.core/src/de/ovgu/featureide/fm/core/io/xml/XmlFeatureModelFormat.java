@@ -72,13 +72,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.fm."
-			+ XmlFeatureModelFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + XmlFeatureModelFormat.class.getSimpleName();
 
-	private static final Pattern CONTENT_REGEX =
-		Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
 
@@ -96,11 +92,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
-		factory =
-			FMFactoryManager.getFactory(object);
+		factory = FMFactoryManager.getFactory(object);
 
-		final Collection<PropertiesParser> customProperties =
-			new ArrayList<>();
+		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
 		for (final Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
 			parseStruct(e.getElementsByTagName(STRUCT));
@@ -109,8 +103,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			parseComments(e.getElementsByTagName(COMMENTS));
 			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
 
-			final XmlPropertyLoader propertyLoader =
-				new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
+			final XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
 
@@ -123,20 +116,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root =
-			doc.createElement(FEATURE_MODEL);
-		final Element struct =
-			doc.createElement(STRUCT);
-		final Element properties =
-			doc.createElement(PROPERTIES);
-		final Element constraints =
-			doc.createElement(CONSTRAINTS);
-		final Element calculations =
-			doc.createElement(CALCULATIONS);
-		final Element comments =
-			doc.createElement(COMMENTS);
-		final Element order =
-			doc.createElement(FEATURE_ORDER);
+		final Element root = doc.createElement(FEATURE_MODEL);
+		final Element struct = doc.createElement(STRUCT);
+		final Element properties = doc.createElement(PROPERTIES);
+		final Element constraints = doc.createElement(CONSTRAINTS);
+		final Element calculations = doc.createElement(CALCULATIONS);
+		final Element comments = doc.createElement(COMMENTS);
+		final Element order = doc.createElement(FEATURE_ORDER);
 
 		doc.appendChild(root);
 		root.appendChild(properties);
@@ -146,52 +132,40 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
-		for (int i =
-			0; i < object.getConstraints().size(); i++) {
+		for (int i = 0; i < object.getConstraints().size(); i++) {
 			Element rule;
-			rule =
-				doc.createElement(RULE);
+			rule = doc.createElement(RULE);
 
 			constraints.appendChild(rule);
 			createPropositionalConstraints(doc, rule, object.getConstraints().get(i).getNode());
 		}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, ""
-			+ object.getAnalyser().runCalculationAutomatically);
-		calculations.setAttribute(CALCULATE_FEATURES, ""
-			+ object.getAnalyser().calculateFeatures);
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, ""
-			+ object.getAnalyser().calculateConstraints);
-		calculations.setAttribute(CALCULATE_REDUNDANT, ""
-			+ object.getAnalyser().calculateRedundantConstraints);
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, ""
-			+ object.getAnalyser().calculateTautologyConstraints);
+		calculations.setAttribute(CALCULATE_AUTO, "" + object.getAnalyser().runCalculationAutomatically);
+		calculations.setAttribute(CALCULATE_FEATURES, "" + object.getAnalyser().calculateFeatures);
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + object.getAnalyser().calculateConstraints);
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + object.getAnalyser().calculateRedundantConstraints);
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + object.getAnalyser().calculateTautologyConstraints);
 
 		root.appendChild(comments);
 		for (final String comment : object.getProperty().getComments()) {
-			final Element c =
-				doc.createElement(C);
+			final Element c = doc.createElement(C);
 			comments.appendChild(c);
-			final Text text =
-				doc.createTextNode(comment);
+			final Text text = doc.createTextNode(comment);
 			c.appendChild(text);
 		}
 		order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
 		root.appendChild(order);
 
 		if (object.isFeatureOrderUserDefined()) {
-			Collection<String> featureOrderList =
-				object.getFeatureOrderList();
+			Collection<String> featureOrderList = object.getFeatureOrderList();
 
 			if (featureOrderList.isEmpty()) {
-				featureOrderList =
-					FeatureUtils.extractConcreteFeaturesAsStringList(object);
+				featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(object);
 			}
 
 			for (final String featureName : featureOrderList) {
-				final Element feature =
-					doc.createElement(FEATURE);
+				final Element feature = doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
 				order.appendChild(feature);
 			}
@@ -199,8 +173,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
-		final Element result =
-			doc.createElement(FEATURE);
+		final Element result = doc.createElement(FEATURE);
 		result.setAttribute(NAME, featureName);
 		for (final Entry<String, Type, Object> entry : propertyEntries) {
 			result.appendChild(createPropertyEntriesNode(doc, entry));
@@ -209,8 +182,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private Node createPropertyEntriesNode(Document doc, Entry<String, Type, Object> entry) {
-		final Element propertyElement =
-			doc.createElement(XmlPropertyLoader.PROPERTY);
+		final Element propertyElement = doc.createElement(XmlPropertyLoader.PROPERTY);
 		propertyElement.setAttribute(XmlPropertyLoader.KEY, entry.getKey());
 		propertyElement.setAttribute(XmlPropertyLoader.VALUE, entry.getValue().toString());
 		propertyElement.setAttribute(XmlPropertyLoader.TYPE, entry.getType().toString());
@@ -230,61 +202,47 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		Element op;
 		if (node instanceof Literal) {
-			Literal literal =
-				(Literal) node;
+			Literal literal = (Literal) node;
 			if (literal.positive) {
-				op =
-					doc.createElement(VAR);
+				op = doc.createElement(VAR);
 				xmlNode.appendChild(op);
 				op.appendChild(doc.createTextNode(node.toString()));
 			} else {
-				op =
-					doc.createElement(NOT);
+				op = doc.createElement(NOT);
 				xmlNode.appendChild(op);
-				literal =
-					literal.clone();
-				literal.positive =
-					true;
+				literal = literal.clone();
+				literal.positive = true;
 				createPropositionalConstraints(doc, op, literal);
 			}
 			return;
 		}
 
 		if (node instanceof And) {
-			op =
-				doc.createElement(CONJ);
+			op = doc.createElement(CONJ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Or) {
-			op =
-				doc.createElement(DISJ);
+			op = doc.createElement(DISJ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Not) {
-			op =
-				doc.createElement(NOT);
+			op = doc.createElement(NOT);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Equals) {
-			op =
-				doc.createElement(EQ);
+			op = doc.createElement(EQ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Implies) {
-			op =
-				doc.createElement(IMP);
+			op = doc.createElement(IMP);
 			xmlNode.appendChild(op);
 		} else if (node instanceof AtMost) {
-			op =
-				doc.createElement(ATMOST1);
+			op = doc.createElement(ATMOST1);
 			xmlNode.appendChild(op);
 		} else {
-			op =
-				doc.createElement(UNKNOWN);
+			op = doc.createElement(UNKNOWN);
 			xmlNode.appendChild(op);
 		}
 
-		final org.prop4j.Node[] children =
-			node.getChildren();
+		final org.prop4j.Node[] children = node.getChildren();
 
-		for (int i =
-			0; i < children.length; i++) {
+		for (int i = 0; i < children.length; i++) {
 			createPropositionalConstraints(doc, op, children[i]);
 		}
 	}
@@ -301,28 +259,22 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			return;
 		}
 
-		final List<IFeature> children =
-			FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
+		final List<IFeature> children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
 
 		final Element fnod;
 		if (children.isEmpty()) {
-			fnod =
-				doc.createElement(FEATURE);
+			fnod = doc.createElement(FEATURE);
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 		} else {
 			if (feat.getStructure().isAnd()) {
-				fnod =
-					doc.createElement(AND);
+				fnod = doc.createElement(AND);
 			} else if (feat.getStructure().isOr()) {
-				fnod =
-					doc.createElement(OR);
+				fnod = doc.createElement(OR);
 			} else if (feat.getStructure().isAlternative()) {
-				fnod =
-					doc.createElement(ALT);
+				fnod = doc.createElement(ALT);
 			} else {
-				fnod =
-					doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
+				fnod = doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
 
 			addDescription(doc, feat, fnod);
@@ -337,32 +289,24 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
-		final String description =
-			feat.getProperty().getDescription();
-		if ((description != null)
-			&& !description.trim().isEmpty()) {
-			final Element descr =
-				doc.createElement(DESCRIPTION);
-			descr.setTextContent("\n"
-				+ description.replace("\r", "")
-				+ "\n");
+		final String description = feat.getProperty().getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 			fnod.appendChild(descr);
 		}
 	}
 
 	private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
 
-		if ((featureModel == null)
-			|| (propertiesNode == null)) {
+		if ((featureModel == null) || (propertiesNode == null)) {
 			throw new RuntimeException();
 		}
 
 		// Store per-feature properties
 		for (final IFeature feature : featureModel.getFeatures()) {
-			final String featureName =
-				feature.getName();
-			final Set<Entry<String, Type, Object>> propertyEntries =
-				feature.getCustomProperties().entrySet();
+			final String featureName = feature.getName();
+			final Set<Entry<String, Type, Object>> propertyEntries = feature.getCustomProperties().entrySet();
 			if (!propertyEntries.isEmpty()) {
 				propertiesNode.appendChild(createFeaturePropertyContainerNode(doc, featureName, propertyEntries));
 			}
@@ -382,8 +326,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 				break;
 			default:
-				throw new UnsupportedOperationException("Unkown property container parser type "
-					+ parser.getType());
+				throw new UnsupportedOperationException("Unkown property container parser type " + parser.getType());
 			}
 		}
 	}
@@ -394,34 +337,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private void parseCalculations(NodeList nodeList) throws UnsupportedModelException {
 		for (final Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
-				final NamedNodeMap nodeMap =
-					e.getAttributes();
-				for (int i =
-					0; i < nodeMap.getLength(); i++) {
-					final org.w3c.dom.Node node =
-						nodeMap.item(i);
-					final String nodeName =
-						node.getNodeName();
-					final boolean value =
-						node.getNodeValue().equals(TRUE);
+				final NamedNodeMap nodeMap = e.getAttributes();
+				for (int i = 0; i < nodeMap.getLength(); i++) {
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String nodeName = node.getNodeName();
+					final boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						object.getAnalyser().runCalculationAutomatically =
-							value;
+						object.getAnalyser().runCalculationAutomatically = value;
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						object.getAnalyser().calculateConstraints =
-							value;
+						object.getAnalyser().calculateConstraints = value;
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						object.getAnalyser().calculateRedundantConstraints =
-							value;
+						object.getAnalyser().calculateRedundantConstraints = value;
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						object.getAnalyser().calculateFeatures =
-							value;
+						object.getAnalyser().calculateFeatures = value;
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						object.getAnalyser().calculateTautologyConstraints =
-							value;
+						object.getAnalyser().calculateTautologyConstraints = value;
 					} else {
-						throwError("Unknown calculations attribute: "
-							+ nodeName, e);
+						throwError("Unknown calculations attribute: " + nodeName, e);
 					}
 
 				}
@@ -445,8 +377,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (e.getNodeName().equals(C)) {
 				object.getProperty().addComment(e.getTextContent());
 			} else {
-				throwError("Unknown comment attribute: "
-					+ e.getNodeName(), e);
+				throwError("Unknown comment attribute: " + e.getNodeName(), e);
 			}
 		}
 	}
@@ -457,73 +388,57 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
 		for (final Element e : getElements(nodeList)) {
 			for (final Element child : getElements(e.getChildNodes())) {
-				final String nodeName =
-					child.getNodeName();
+				final String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					final IConstraint c =
-						factory.createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
+					final IConstraint c = factory.createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
-						final NamedNodeMap nodeMap =
-							child.getAttributes();
-						for (int i =
-							0; i < nodeMap.getLength(); i++) {
-							final org.w3c.dom.Node node =
-								nodeMap.item(i);
-							final String attributeName =
-								node.getNodeName();
+						final NamedNodeMap nodeMap = child.getAttributes();
+						for (int i = 0; i < nodeMap.getLength(); i++) {
+							final org.w3c.dom.Node node = nodeMap.item(i);
+							final String attributeName = node.getNodeName();
 							if (attributeName.equals(COORDINATES)) {
 								// Legacy case, for backwards compatibility
 							} else {
-								throwError("Unknown constraint attribute: "
-									+ attributeName, node);
+								throwError("Unknown constraint attribute: " + attributeName, node);
 							}
 						}
 					}
 					object.addConstraint(c);
 				} else {
-					throwError("Unknown constraint node: "
-						+ nodeName, child);
+					throwError("Unknown constraint node: " + nodeName, child);
 				}
 			}
 		}
 	}
 
 	private LinkedList<org.prop4j.Node> parseConstraints2(NodeList nodeList) throws UnsupportedModelException {
-		final LinkedList<org.prop4j.Node> nodes =
-			new LinkedList<>();
+		final LinkedList<org.prop4j.Node> nodes = new LinkedList<>();
 		LinkedList<org.prop4j.Node> children;
 		for (final Element e : getElements(nodeList)) {
-			final String nodeName =
-				e.getNodeName();
+			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DISJ)) {
 				nodes.add(new Or(parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(CONJ)) {
 				nodes.add(new And(parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(EQ)) {
-				children =
-					parseConstraints2(e.getChildNodes());
+				children = parseConstraints2(e.getChildNodes());
 				nodes.add(new Equals(children.get(0), children.get(1)));
 			} else if (nodeName.equals(IMP)) {
-				children =
-					parseConstraints2(e.getChildNodes());
+				children = parseConstraints2(e.getChildNodes());
 				nodes.add(new Implies(children.get(0), children.get(1)));
 			} else if (nodeName.equals(NOT)) {
 				nodes.add(new Not((parseConstraints2(e.getChildNodes())).getFirst()));
 			} else if (nodeName.equals(ATMOST1)) {
 				nodes.add(new AtMost(1, parseConstraints2(e.getChildNodes())));
 			} else if (nodeName.equals(VAR)) {
-				final String featureName =
-					e.getTextContent();
+				final String featureName = e.getTextContent();
 				if (object.getFeature(featureName) != null) {
 					nodes.add(new Literal(featureName));
 				} else {
-					throwError("Feature \""
-						+ featureName
-						+ "\" does not exists", e);
+					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
 			} else {
-				throwError("Unknown constraint type: "
-					+ nodeName, e);
+				throwError("Unknown constraint type: " + nodeName, e);
 			}
 		}
 		return nodes;
@@ -533,33 +448,24 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * Parses the feature order section.
 	 */
 	private void parseFeatureOrder(NodeList nodeList) throws UnsupportedModelException {
-		final ArrayList<String> order =
-			new ArrayList<>(object.getNumberOfFeatures());
+		final ArrayList<String> order = new ArrayList<>(object.getNumberOfFeatures());
 		for (final Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
-				final NamedNodeMap nodeMap =
-					e.getAttributes();
-				for (int i =
-					0; i < nodeMap.getLength(); i++) {
-					final org.w3c.dom.Node node =
-						nodeMap.item(i);
-					final String attributeName =
-						node.getNodeName();
-					final String attributeValue =
-						node.getNodeValue();
+				final NamedNodeMap nodeMap = e.getAttributes();
+				for (int i = 0; i < nodeMap.getLength(); i++) {
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String attributeName = node.getNodeName();
+					final String attributeValue = node.getNodeValue();
 					if (attributeName.equals(USER_DEFINED)) {
 						object.setFeatureOrderUserDefined(attributeValue.equals(TRUE));
 					} else if (attributeName.equals(NAME)) {
 						if (object.getFeature(attributeValue) != null) {
 							order.add(attributeValue);
 						} else {
-							throwError("Feature \""
-								+ attributeValue
-								+ "\" does not exists", e);
+							throwError("Feature \"" + attributeValue + "\" does not exists", e);
 						}
 					} else {
-						throwError("Unknown feature order attribute: "
-							+ attributeName, e);
+						throwError("Unknown feature order attribute: " + attributeName, e);
 					}
 
 				}
@@ -575,77 +481,54 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
 		for (final Element e : getElements(nodeList)) {
-			final String nodeName =
-				e.getNodeName();
+			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
-				String nodeValue =
-					e.getFirstChild().getNodeValue();
-				if ((nodeValue != null)
-					&& !nodeValue.isEmpty()) {
-					nodeValue =
-						nodeValue.replace("\t", "");
-					nodeValue =
-						nodeValue.substring(1, nodeValue.length()
-							- 1);
-					nodeValue =
-						nodeValue.trim();
+				String nodeValue = e.getFirstChild().getNodeValue();
+				if ((nodeValue != null) && !nodeValue.isEmpty()) {
+					nodeValue = nodeValue.replace("\t", "");
+					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
+					nodeValue = nodeValue.trim();
 				}
 				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
-			boolean mandatory =
-				false;
-			boolean _abstract =
-				false;
-			boolean hidden =
-				false;
-			String name =
-				"";
+			boolean mandatory = false;
+			boolean _abstract = false;
+			boolean hidden = false;
+			String name = "";
 			// FMPoint featureLocation = null;
 			if (e.hasAttributes()) {
-				final NamedNodeMap nodeMap =
-					e.getAttributes();
-				for (int i =
-					0; i < nodeMap.getLength(); i++) {
-					final org.w3c.dom.Node node =
-						nodeMap.item(i);
-					final String attributeName =
-						node.getNodeName();
-					final String attributeValue =
-						node.getNodeValue();
+				final NamedNodeMap nodeMap = e.getAttributes();
+				for (int i = 0; i < nodeMap.getLength(); i++) {
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String attributeName = node.getNodeName();
+					final String attributeValue = node.getNodeValue();
 					if (attributeName.equals(ABSTRACT)) {
-						_abstract =
-							attributeValue.equals(TRUE);
+						_abstract = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(MANDATORY)) {
-						mandatory =
-							attributeValue.equals(TRUE);
+						mandatory = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(NAME)) {
-						name =
-							attributeValue;
+						name = attributeValue;
 					} else if (attributeName.equals(HIDDEN)) {
-						hidden =
-							attributeValue.equals(TRUE);
+						hidden = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(COORDINATES)) {
 						// Legacy case, for backwards compatibility
 					} else {
-						throwError("Unknown feature attribute: "
-							+ attributeName, e);
+						throwError("Unknown feature attribute: " + attributeName, e);
 					}
 
 				}
 			}
 
 			if (object.getFeature(name) != null) {
-				throwError("Duplicate entry for feature: "
-					+ name, e);
+				throwError("Duplicate entry for feature: " + name, e);
 			}
 			// TODO Consider feature name validity in all readers
 			// if (!object.getFMComposerExtension().isValidFeatureName(name)) {
 			// throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			// }
-			final IFeature f =
-				factory.createFeature(object, name);
+			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -656,8 +539,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (nodeName.equals(FEATURE)) {
 
 			} else {
-				throwError("Unknown feature type: "
-					+ nodeName, e);
+				throwError("Unknown feature type: " + nodeName, e);
 			}
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
@@ -676,8 +558,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		// Check that there are only OR connections when the parent has more than one feature
 		for (final IFeature f : object.getFeatures()) {
-			if (f.getStructure().isOr()
-				&& (f.getStructure().getChildrenCount() <= 1)) {
+			if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
 				f.getStructure().setAnd();
 			}
 		}
@@ -714,8 +595,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.setAttribute(HIDDEN, TRUE);
 		}
 		if (feat.getStructure().isMandatory()) {
-			if ((feat.getStructure().getParent() != null)
-				&& feat.getStructure().getParent().isAnd()) {
+			if ((feat.getStructure().getParent() != null) && feat.getStructure().getParent().isAnd()) {
 				fnod.setAttribute(MANDATORY, TRUE);
 			} else if (feat.getStructure().getParent() == null) {
 				fnod.setAttribute(MANDATORY, TRUE);
@@ -740,8 +620,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	@Override
 	public boolean supportsContent(CharSequence content) {
-		return supportsRead()
-			&& CONTENT_REGEX.matcher(content).find();
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

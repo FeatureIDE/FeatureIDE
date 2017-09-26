@@ -41,22 +41,12 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
  */
 public class AntennaModelBuilder extends PPModelBuilder {
 
-	public static final String OPERATORS =
-		"[\\s!=<>\",;&\\^\\|\\(\\)]";
-	public static final String REGEX =
-		"(//\\s*#.*"
-			+ OPERATORS
-			+ ")(%s)("
-			+ OPERATORS
-			+ ")";
+	public static final String OPERATORS = "[\\s!=<>\",;&\\^\\|\\(\\)]";
+	public static final String REGEX = "(//\\s*#.*" + OPERATORS + ")(%s)(" + OPERATORS + ")";
 
-	public static final String COMMANDS =
-		"ifdef|if|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
+	public static final String COMMANDS = "ifdef|if|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
 
-	Pattern patternCommands =
-		Pattern.compile("//\\s*#("
-			+ COMMANDS
-			+ ")");
+	Pattern patternCommands = Pattern.compile("//\\s*#(" + COMMANDS + ")");
 
 	public AntennaModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
@@ -66,63 +56,45 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	 * returns true if the regular expression regex can be matched by a substring of text
 	 */
 	protected static boolean containsRegex(String text, String regex) {
-		final Pattern pattern =
-			Pattern.compile(regex);
-		final Matcher matcher =
-			pattern.matcher(text);
+		final Pattern pattern = Pattern.compile(regex);
+		final Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
 
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		// for preprocessor outline
-		final Stack<FSTDirective> directivesStack =
-			new Stack<FSTDirective>();
-		final LinkedList<FSTDirective> directivesList =
-			new LinkedList<FSTDirective>();
-		int id =
-			0;
+		final Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
+		final LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
+		int id = 0;
 
-		for (int i =
-			0; i < lines.size(); i++) {
-			String line =
-				lines.get(i);
+		for (int i = 0; i < lines.size(); i++) {
+			String line = lines.get(i);
 
 			// if line is preprocessor directive
 			if (containsRegex(line, "//\\s*#")) {
-				FSTDirectiveCommand command =
-					null;
+				FSTDirectiveCommand command = null;
 
 				if (containsRegex(line, "//\\s*#if[ (]")) {// 1
-					command =
-						FSTDirectiveCommand.IF;
+					command = FSTDirectiveCommand.IF;
 				} else if (containsRegex(line, "//\\s*#ifdef[ (]")) {// 2
-					command =
-						FSTDirectiveCommand.IFDEF;
+					command = FSTDirectiveCommand.IFDEF;
 				} else if (containsRegex(line, "//\\s*#ifndef[ (]")) {// 3
-					command =
-						FSTDirectiveCommand.IFNDEF;
+					command = FSTDirectiveCommand.IFNDEF;
 				} else if (containsRegex(line, "//\\s*#elif[ (]")) {// 4
-					command =
-						FSTDirectiveCommand.ELIF;
+					command = FSTDirectiveCommand.ELIF;
 				} else if (containsRegex(line, "//\\s*#elifdef[ (]")) {// 5
-					command =
-						FSTDirectiveCommand.ELIFDEF;
+					command = FSTDirectiveCommand.ELIFDEF;
 				} else if (containsRegex(line, "//\\s*#elifndef[ (]")) {// 6
-					command =
-						FSTDirectiveCommand.ELIFNDEF;
+					command = FSTDirectiveCommand.ELIFNDEF;
 				} else if (containsRegex(line, "//\\s*#else")) {// 7
-					command =
-						FSTDirectiveCommand.ELSE;
+					command = FSTDirectiveCommand.ELSE;
 				} else if (containsRegex(line, "//\\s*#condition[ (]")) {// 8
-					command =
-						FSTDirectiveCommand.CONDITION;
+					command = FSTDirectiveCommand.CONDITION;
 				} else if (containsRegex(line, "//\\s*#define[ (]")) {// 9
-					command =
-						FSTDirectiveCommand.DEFINE;
+					command = FSTDirectiveCommand.DEFINE;
 				} else if (containsRegex(line, "//\\s*#undefine[ (]")) {// 10
-					command =
-						FSTDirectiveCommand.UNDEFINE;
+					command = FSTDirectiveCommand.UNDEFINE;
 				} else if (!containsRegex(line, "//\\s*#endif")) {// 11
 					continue;
 				}
@@ -131,31 +103,22 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					if (!directivesStack.isEmpty()) {
 						directivesStack.peek().setEndLine(i, line.length());
 						while (!directivesStack.isEmpty()) {
-							final FSTDirective parent =
-								directivesStack.pop();
-							if ((parent.getCommand() != FSTDirectiveCommand.ELIF)
-								&&
-								(parent.getCommand() != FSTDirectiveCommand.ELIFDEF)
-								&&
-								(parent.getCommand() != FSTDirectiveCommand.ELIFNDEF)
-								&&
-								(parent.getCommand() != FSTDirectiveCommand.ELSE)) {
+							final FSTDirective parent = directivesStack.pop();
+							if ((parent.getCommand() != FSTDirectiveCommand.ELIF) && (parent.getCommand() != FSTDirectiveCommand.ELIFDEF)
+								&& (parent.getCommand() != FSTDirectiveCommand.ELIFNDEF) && (parent.getCommand() != FSTDirectiveCommand.ELSE)) {
 								break;
 							}
 						}
 					}
 				} else {
-					final FSTDirective directive =
-						new FSTDirective();
+					final FSTDirective directive = new FSTDirective();
 
 					if (command == FSTDirectiveCommand.ELSE) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
 							directive.setFeatureNames(directivesStack.peek().getFeatureNames());
 						}
-					} else if ((command == FSTDirectiveCommand.ELIF)
-						|| (command == FSTDirectiveCommand.ELIFDEF)
-						|| (command == FSTDirectiveCommand.ELIFNDEF)) {
+					} else if ((command == FSTDirectiveCommand.ELIF) || (command == FSTDirectiveCommand.ELIFDEF) || (command == FSTDirectiveCommand.ELIFNDEF)) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
 						}
@@ -163,10 +126,8 @@ public class AntennaModelBuilder extends PPModelBuilder {
 
 					directive.setCommand(command);
 
-					final Matcher m =
-						patternCommands.matcher(line);
-					line =
-						m.replaceAll("").trim();
+					final Matcher m = patternCommands.matcher(line);
+					line = m.replaceAll("").trim();
 
 					if (directive.getFeatureNames() == null) {
 						directive.setFeatureNames(getFeatureNames(line));
@@ -184,8 +145,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 						directivesStack.peek().addChild(directive);
 					}
 
-					if ((command != FSTDirectiveCommand.DEFINE)
-						&& (command != FSTDirectiveCommand.UNDEFINE)) {
+					if ((command != FSTDirectiveCommand.DEFINE) && (command != FSTDirectiveCommand.UNDEFINE)) {
 						directivesStack.push(directive);
 					}
 				}
@@ -204,27 +164,19 @@ public class AntennaModelBuilder extends PPModelBuilder {
 	 * [operators]feature[operators]"</li> <li>match any further characters</li> </ul>
 	 */
 	public static boolean contains(String text, String feature) {
-		final Pattern pattern =
-			Pattern.compile(String.format(REGEX, feature));
-		final Matcher matcher =
-			pattern.matcher(text);
+		final Pattern pattern = Pattern.compile(String.format(REGEX, feature));
+		final Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
 
 	@Override
 	protected List<String> getFeatureNames(String expression) {
-		String exp =
-			expression.replaceAll("[()]", "");
-		exp =
-			exp.replaceAll("&&", "");
-		exp =
-			exp.replaceAll("!", "");
-		exp =
-			exp.replaceAll("\\|\\|", "");
-		exp =
-			exp.replaceAll("\\^", "");
-		final List<String> featureNameList =
-			new LinkedList<String>();
+		String exp = expression.replaceAll("[()]", "");
+		exp = exp.replaceAll("&&", "");
+		exp = exp.replaceAll("!", "");
+		exp = exp.replaceAll("\\|\\|", "");
+		exp = exp.replaceAll("\\^", "");
+		final List<String> featureNameList = new LinkedList<String>();
 		for (final String s : exp.split(" ")) {
 			if (s.trim().length() > 0) {
 				featureNameList.add(s);

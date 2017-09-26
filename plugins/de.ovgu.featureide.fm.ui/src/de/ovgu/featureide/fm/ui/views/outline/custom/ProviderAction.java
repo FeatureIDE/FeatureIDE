@@ -25,19 +25,15 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 
 public class ProviderAction extends Action {
 
-	private ITreeContentProvider treeProv =
-		null;
-	private OutlineLabelProvider lableProv =
-		null;
+	private ITreeContentProvider treeProv = null;
+	private OutlineLabelProvider lableProv = null;
 
 	public ProviderAction(String name, int type, ITreeContentProvider treeProv, OutlineLabelProvider prov) {
 		super("", AS_RADIO_BUTTON);
 
 		setText(name);
-		this.treeProv =
-			treeProv;
-		lableProv =
-			prov;
+		this.treeProv = treeProv;
+		lableProv = prov;
 
 	}
 

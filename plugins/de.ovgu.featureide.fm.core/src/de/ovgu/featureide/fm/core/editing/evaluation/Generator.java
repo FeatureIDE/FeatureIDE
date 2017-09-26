@@ -52,56 +52,34 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public abstract class Generator {
 
-	public static final int TIMEOUT =
-		60;
+	public static final int TIMEOUT = 60;
 
-	public final static int maxChildren =
-		10;
+	public final static int maxChildren = 10;
 
-	public final static int minLiterals =
-		2;
-	public final static int maxLiterals =
-		5;
+	public final static int minLiterals = 2;
+	public final static int maxLiterals = 5;
 
 	public static IFeatureModel generateFeatureModel(long id, int numberOfFeatures) {
-		final Random random =
-			new Random(id);
-		final IFeatureModel fm =
-			generateFeatureDiagram(random, numberOfFeatures);
-		generateConstraints(fm, random, numberOfFeatures
-			/ 10);
+		final Random random = new Random(id);
+		final IFeatureModel fm = generateFeatureDiagram(random, numberOfFeatures);
+		generateConstraints(fm, random, numberOfFeatures / 10);
 		return fm;
 	}
 
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		final IFeatureModelFactory factory =
-			FMFactoryManager.getDefaultFactory();
-		final IFeatureModel fm =
-			factory.createFeatureModel();
-		final List<IFeature> leaves =
-			new LinkedList<IFeature>();
+		final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
+		final IFeatureModel fm = factory.createFeatureModel();
+		final List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));
-		int count =
-			1;
+		int count = 1;
 		while (count < numberOfFeatures) {
-			final int parentIndex =
-				random.nextInt(leaves.size());
-			final IFeature parent =
-				leaves.remove(parentIndex);
-			fm.getRenamingsManager().renameFeature(parent.getName(), "A"
-				+ parent.getName().substring(1));
-			int childrenCount =
-				random.nextInt(maxChildren)
-					+ 1;
-			childrenCount =
-				Math.min(childrenCount, numberOfFeatures
-					- count);
-			for (int i =
-				1; i <= childrenCount; i++) {
-				final IFeature child =
-					factory.createFeature(fm, "C"
-						+ (count
-							+ i));
+			final int parentIndex = random.nextInt(leaves.size());
+			final IFeature parent = leaves.remove(parentIndex);
+			fm.getRenamingsManager().renameFeature(parent.getName(), "A" + parent.getName().substring(1));
+			int childrenCount = random.nextInt(maxChildren) + 1;
+			childrenCount = Math.min(childrenCount, numberOfFeatures - count);
+			for (int i = 1; i <= childrenCount; i++) {
+				final IFeature child = factory.createFeature(fm, "C" + (count + i));
 				fm.addFeature(child);
 				parent.getStructure().addChild(child.getStructure());
 				leaves.add(child);
@@ -114,76 +92,52 @@ public abstract class Generator {
 			} else if (random.nextBoolean()) {
 				parent.getStructure().changeToOr();
 			}
-			count +=
-				childrenCount;
+			count += childrenCount;
 		}
 		fm.getRenamingsManager().performRenamings();
 		return fm;
 	}
 
 	public static void generateConstraints(IFeatureModel fm, Random random, int numberOfConstraints) {
-		boolean valid =
-			true;
+		boolean valid = true;
 		try {
-			valid =
-				fm.getAnalyser().isValid();
+			valid = fm.getAnalyser().isValid();
 			if (!valid) {
 				Logger.logInfo("Feature model not valid!");
 			}
 		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
-		final Object[] names =
-			fm.getRenamingsManager().getOldFeatureNames().toArray();
-		int k =
-			0;
-		for (int i =
-			0; i < numberOfConstraints;) {
-			Node node =
-				getRandomLiteral(names, random);
-			for (int j =
-				random.nextInt((maxLiterals
-					- minLiterals)
-					+ 1)
-					+ minLiterals; j > 1; j--) {
+		final Object[] names = fm.getRenamingsManager().getOldFeatureNames().toArray();
+		int k = 0;
+		for (int i = 0; i < numberOfConstraints;) {
+			Node node = getRandomLiteral(names, random);
+			for (int j = random.nextInt((maxLiterals - minLiterals) + 1) + minLiterals; j > 1; j--) {
 				if (random.nextBoolean()) {
 					if (random.nextBoolean()) {
-						node =
-							new And(node, getRandomLiteral(names, random));
+						node = new And(node, getRandomLiteral(names, random));
 					} else {
-						node =
-							new Or(node, getRandomLiteral(names, random));
+						node = new Or(node, getRandomLiteral(names, random));
 					}
 				} else {
 					if (random.nextBoolean()) {
-						node =
-							new Implies(node, getRandomLiteral(names, random));
+						node = new Implies(node, getRandomLiteral(names, random));
 					} else {
-						node =
-							new Equals(node, getRandomLiteral(names, random));
+						node = new Equals(node, getRandomLiteral(names, random));
 					}
 				}
-				if (random.nextBoolean()
-					&& random.nextBoolean()) {
-					node =
-						new Not(node);
+				if (random.nextBoolean() && random.nextBoolean()) {
+					node = new Not(node);
 				}
 			}
 			fm.addConstraint(new Constraint(fm, node));
 			try {
-				if (!valid
-					|| fm.getAnalyser().isValid()) {
+				if (!valid || fm.getAnalyser().isValid()) {
 					i++;
-					System.out.println("E\t"
-						+ i
-						+ "\t"
-						+ node);
+					System.out.println("E\t" + i + "\t" + node);
 				} else {
 					fm.getConstraints().remove(new Constraint(fm, node));
-					Logger.logInfo("F\t"
-						+ ++k
-						+ "\t"
-						+ node);
+					Logger.logInfo("F\t" + ++k + "\t" + node);
 				}
 			} catch (final TimeoutException e) {
 				Logger.logError(e);
@@ -193,30 +147,22 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel refactoring(IFeatureModel originalFM, long id, int numberOfEdits) {
-		final IFeatureModel fm =
-			originalFM.clone(null);
-		final Random random =
-			new Random(id);
+		final IFeatureModel fm = originalFM.clone(null);
+		final Random random = new Random(id);
 
-		for (int i =
-			0; i < numberOfEdits; i++) {
-			final List<IFeature> list =
-				new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList =
-				new LinkedList<IFeature>();
+		for (int i = 0; i < numberOfEdits; i++) {
+			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
-			final int r =
-				random.nextInt(3);
+			final int r = random.nextInt(3);
 			if (r == 0) {
 				// Alternative to Or+Constraint
 				for (final IFeature feature : randomizedList) {
-					if ((feature.getStructure().getChildrenCount() > 1)
-						&& feature.getStructure().isAlternative()) {
+					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isAlternative()) {
 						feature.getStructure().changeToOr();
-						final LinkedList<Node> nodes =
-							new LinkedList<Node>();
+						final LinkedList<Node> nodes = new LinkedList<Node>();
 						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							nodes.add(new Literal(child.getFeature().getName()));
 						}
@@ -227,12 +173,8 @@ public abstract class Generator {
 			} else if (r == 1) {
 				// Mandatory to Optional+Constraint
 				for (final IFeature feature : randomizedList) {
-					final IFeatureStructure parent =
-						feature.getStructure().getParent();
-					if ((parent != null)
-						&& parent.isAnd()
-						&& !parent.isFirstChild(feature.getStructure())
-						&& feature.getStructure().isMandatory()) {
+					final IFeatureStructure parent = feature.getStructure().getParent();
+					if ((parent != null) && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
 						fm.addConstraint(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()), new Literal(feature.getName()))));
 						break;
@@ -241,16 +183,10 @@ public abstract class Generator {
 			} else {
 				// move feature to parent's parent
 				for (final IFeature child : randomizedList) {
-					final IFeatureStructure feature =
-						child.getStructure().getParent();
-					if ((feature != null)
-						&& feature.isMandatory()
-						&& feature.isAnd()
-						&& !feature.isFirstChild(child.getStructure())) {
-						final IFeatureStructure parent =
-							feature.getParent();
-						if ((parent != null)
-							&& parent.isAnd()) {
+					final IFeatureStructure feature = child.getStructure().getParent();
+					if ((feature != null) && feature.isMandatory() && feature.isAnd() && !feature.isFirstChild(child.getStructure())) {
+						final IFeatureStructure parent = feature.getParent();
+						if ((parent != null) && parent.isAnd()) {
 							feature.removeChild(child.getStructure());
 							parent.addChild(child.getStructure());
 							break;
@@ -263,30 +199,21 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel generalization(IFeatureModel originalFM, long id, int numberOfEdits) {
-		final IFeatureModel fm =
-			originalFM.clone(null);
-		final IFeatureModelFactory factory =
-			FMFactoryManager.getFactory(fm);
-		final Random random =
-			new Random(id);
+		final IFeatureModel fm = originalFM.clone(null);
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final Random random = new Random(id);
 
-		for (int i =
-			0; i < numberOfEdits; i++) {
-			final List<IFeature> list =
-				new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList =
-				new LinkedList<IFeature>();
+		for (int i = 0; i < numberOfEdits; i++) {
+			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
-			final int r =
-				1
-					+ random.nextInt(9);
+			final int r = 1 + random.nextInt(9);
 			if (r == 1) {
 				// Alternative to Or
 				for (final IFeature feature : randomizedList) {
-					if ((feature.getStructure().getChildrenCount() > 1)
-						&& feature.getStructure().isAlternative()) {
+					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isAlternative()) {
 						feature.getStructure().changeToOr();
 						break;
 					}
@@ -294,12 +221,8 @@ public abstract class Generator {
 			} else if (r == 2) {
 				// move Optional into Or
 				r2: for (final IFeature feature : randomizedList) {
-					final IFeatureStructure parent =
-						feature.getStructure().getParent();
-					if ((parent != null)
-						&& parent.isAnd()
-						&& feature.getStructure().isMandatory()
-						&& feature.getStructure().isOr()) {
+					final IFeatureStructure parent = feature.getStructure().getParent();
+					if ((parent != null) && parent.isAnd() && feature.getStructure().isMandatory() && feature.getStructure().isOr()) {
 						for (final IFeatureStructure child : parent.getChildren()) {
 							if (!child.isMandatory()) {
 								parent.removeChild(child);
@@ -312,8 +235,7 @@ public abstract class Generator {
 			} else if (r == 3) {
 				// And to Or
 				for (final IFeature feature : randomizedList) {
-					if ((feature.getStructure().getChildrenCount() > 1)
-						&& feature.getStructure().isAnd()) {
+					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isAnd()) {
 						feature.getStructure().changeToOr();
 						break;
 					}
@@ -321,15 +243,11 @@ public abstract class Generator {
 			} else if (r == 4) {
 				// new feature in Alternative
 				for (final IFeature feature : randomizedList) {
-					if (feature.getStructure().hasChildren()
-						&& feature.getStructure().isAlternative()) {
-						int j =
-							1;
+					if (feature.getStructure().hasChildren() && feature.getStructure().isAlternative()) {
+						int j = 1;
 						IFeature child;
 						do {
-							child =
-								factory.createFeature(fm, "C"
-									+ j++);
+							child = factory.createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						feature.getStructure().addChild(child.getStructure());
 						break;
@@ -338,13 +256,9 @@ public abstract class Generator {
 			} else if (r == 5) {
 				// Or to And
 				for (final IFeature feature : randomizedList) {
-					if ((feature.getStructure().getChildrenCount() > 1)
-						&& feature.getStructure().isOr()) {
-						final IFeatureStructure parent =
-							feature.getStructure().getParent();
-						if ((parent != null)
-							&& !parent.isFirstChild(feature.getStructure())
-							&& parent.isAnd()) {
+					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isOr()) {
+						final IFeatureStructure parent = feature.getStructure().getParent();
+						if ((parent != null) && !parent.isFirstChild(feature.getStructure()) && parent.isAnd()) {
 							parent.removeChild(feature.getStructure());
 							for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 								parent.addChild(child);
@@ -357,12 +271,8 @@ public abstract class Generator {
 			} else if (r == 6) {
 				// Mandatory to Optional
 				for (final IFeature feature : randomizedList) {
-					final IFeatureStructure parent =
-						feature.getStructure().getParent();
-					if ((parent != null)
-						&& parent.isAnd()
-						&& !parent.isFirstChild(feature.getStructure())
-						&& feature.getStructure().isMandatory()) {
+					final IFeatureStructure parent = feature.getStructure().getParent();
+					if ((parent != null) && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
 						fm.addConstraint(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()), new Literal(feature.getName()))));
 						break;
@@ -371,13 +281,9 @@ public abstract class Generator {
 			} else if (r == 7) {
 				// Alternative to And
 				for (final IFeature feature : randomizedList) {
-					if ((feature.getStructure().getChildrenCount() > 1)
-						&& feature.getStructure().isAlternative()) {
-						final IFeatureStructure parent =
-							feature.getStructure().getParent();
-						if ((parent != null)
-							&& !parent.isFirstChild(feature.getStructure())
-							&& parent.isAnd()) {
+					if ((feature.getStructure().getChildrenCount() > 1) && feature.getStructure().isAlternative()) {
+						final IFeatureStructure parent = feature.getStructure().getParent();
+						if ((parent != null) && !parent.isFirstChild(feature.getStructure()) && parent.isAnd()) {
 							parent.removeChild(feature.getStructure());
 							for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 								parent.addChild(child);
@@ -390,15 +296,11 @@ public abstract class Generator {
 			} else if (r == 8) {
 				// new Optional in And
 				for (final IFeature feature : randomizedList) {
-					if (feature.getStructure().hasChildren()
-						&& feature.getStructure().isAnd()) {
-						int j =
-							1;
+					if (feature.getStructure().hasChildren() && feature.getStructure().isAnd()) {
+						int j = 1;
 						IFeature child;
 						do {
-							child =
-								factory.createFeature(fm, "C"
-									+ j++);
+							child = factory.createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						child.getStructure().setMandatory(false);
 						feature.getStructure().addChild(child.getStructure());
@@ -407,11 +309,9 @@ public abstract class Generator {
 				}
 			} else {
 				// remove Constraint
-				final List<Node> nodes =
-					Functional.toList(FeatureUtils.getPropositionalNodes(fm.getConstraints()));
+				final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(fm.getConstraints()));
 				if (!nodes.isEmpty()) {
-					final int index =
-						random.nextInt(nodes.size());
+					final int index = random.nextInt(nodes.size());
 					fm.getConstraints().remove(new Constraint(fm, nodes.get(index)));
 				}
 			}
@@ -420,47 +320,31 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel arbitraryEdits(IFeatureModel originalFM, long id, int numberOfEdits) {
-		boolean valid =
-			false;
+		boolean valid = false;
 		try {
-			valid =
-				originalFM.getAnalyser().isValid();
+			valid = originalFM.getAnalyser().isValid();
 		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
-		IFeatureModel fm =
-			originalFM.clone(null);
-		final IFeatureModelFactory factory =
-			FMFactoryManager.getFactory(fm);
-		final Random random =
-			new Random(id);
+		IFeatureModel fm = originalFM.clone(null);
+		final IFeatureModelFactory factory = FMFactoryManager.getFactory(fm);
+		final Random random = new Random(id);
 
-		for (int i =
-			0; i < numberOfEdits; i++) {
-			final IFeatureModel backup =
-				valid
-					? fm.clone(null)
-					: null;
+		for (int i = 0; i < numberOfEdits; i++) {
+			final IFeatureModel backup = valid ? fm.clone(null) : null;
 
-			final List<IFeature> list =
-				new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
-			final List<IFeature> randomizedList =
-				new LinkedList<IFeature>();
+			final List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
+			final List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty()) {
 				randomizedList.add(list.remove(random.nextInt(list.size())));
 			}
-			final int r =
-				1
-					+ random.nextInt(5);
+			final int r = 1 + random.nextInt(5);
 			if (r == 1) {
 				// delete or add feature
 				if (random.nextBoolean()) {
 					for (final IFeature feature : randomizedList) {
-						final IFeatureStructure parent =
-							feature.getStructure().getParent();
-						if (!feature.getStructure().hasChildren()
-							&& (parent != null)
-							&& !parent.isFirstChild(feature.getStructure())) {
+						final IFeatureStructure parent = feature.getStructure().getParent();
+						if (!feature.getStructure().hasChildren() && (parent != null) && !parent.isFirstChild(feature.getStructure())) {
 							fm.deleteFeature(feature);
 							break;
 						}
@@ -468,13 +352,10 @@ public abstract class Generator {
 				} else {
 					for (final IFeature feature : randomizedList) {
 						if (feature.getStructure().hasChildren()) {
-							int j =
-								1;
+							int j = 1;
 							IFeature child;
 							do {
-								child =
-									factory.createFeature(fm, "C"
-										+ j++);
+								child = factory.createFeature(fm, "C" + j++);
 							} while (!fm.addFeature(child));
 							feature.getStructure().addChild(child.getStructure());
 							break;
@@ -508,11 +389,8 @@ public abstract class Generator {
 			} else if (r == 3) {
 				// change mandatory/optional
 				for (final IFeature feature : randomizedList) {
-					final IFeatureStructure parent =
-						feature.getStructure().getParent();
-					if ((parent != null)
-						&& parent.isAnd()
-						&& !parent.isFirstChild(feature.getStructure())) {
+					final IFeatureStructure parent = feature.getStructure().getParent();
+					if ((parent != null) && parent.isAnd() && !parent.isFirstChild(feature.getStructure())) {
 						feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
 						break;
 					}
@@ -520,19 +398,13 @@ public abstract class Generator {
 			} else if (r == 4) {
 				// move a concrete feature to another branch
 				for (final IFeature feature : randomizedList) {
-					final IFeatureStructure parent =
-						feature.getStructure().getParent();
-					if (!feature.getStructure().hasChildren()
-						&& (parent != null)
-						&& !parent.isFirstChild(feature.getStructure())) {
+					final IFeatureStructure parent = feature.getStructure().getParent();
+					if (!feature.getStructure().hasChildren() && (parent != null) && !parent.isFirstChild(feature.getStructure())) {
 						parent.removeChild(feature.getStructure());
-						IFeatureStructure newParent =
-							parent;
+						IFeatureStructure newParent = parent;
 						for (final IFeature compound : randomizedList) {
-							if (!compound.equals(parent.getFeature())
-								&& compound.getStructure().hasChildren()) {
-								newParent =
-									compound.getStructure();
+							if (!compound.equals(parent.getFeature()) && compound.getStructure().hasChildren()) {
+								newParent = compound.getStructure();
 							}
 						}
 						newParent.addChild(feature.getStructure());
@@ -541,10 +413,8 @@ public abstract class Generator {
 				}
 			} else {
 				// delete or add constraint
-				if ((fm.getConstraints().size() > 0)
-					&& random.nextBoolean()) {
-					final int index =
-						random.nextInt(fm.getConstraints().size());
+				if ((fm.getConstraints().size() > 0) && random.nextBoolean()) {
+					final int index = random.nextInt(fm.getConstraints().size());
 					fm.removeConstraint(index);
 				} else {
 					generateConstraints(fm, random, 1);
@@ -552,12 +422,9 @@ public abstract class Generator {
 			}
 
 			try {
-				if (valid
-					&& !fm.getAnalyser().isValid()) {
-					System.out.println("Void feature model by arbitrary edit	"
-						+ r);
-					fm =
-						backup;
+				if (valid && !fm.getAnalyser().isValid()) {
+					System.out.println("Void feature model by arbitrary edit	" + r);
+					fm = backup;
 					i--;
 				}
 			} catch (final TimeoutException e) {
@@ -568,38 +435,28 @@ public abstract class Generator {
 	}
 
 	private static Literal getRandomLiteral(Object[] names, Random random) {
-		final int index =
-			random.nextInt(names.length);
+		final int index = random.nextInt(names.length);
 		return new Literal(names[index], random.nextBoolean());
 	}
 
 	public static String getTimeString(long dur) {
 		if (dur < 1000000) {
-			return dur
-				+ "nsec";
+			return dur + "nsec";
 		}
-		dur /=
-			1000000;
+		dur /= 1000000;
 		if (dur < 1000) {
-			return dur
-				+ "msec";
+			return dur + "msec";
 		}
-		dur /=
-			1000;
+		dur /= 1000;
 		if (dur < 60) {
-			return dur
-				+ "sec";
+			return dur + "sec";
 		}
-		dur /=
-			60;
+		dur /= 60;
 		if (dur < 60) {
-			return dur
-				+ "min";
+			return dur + "min";
 		}
-		dur /=
-			60;
-		return dur
-			+ "h";
+		dur /= 60;
+		return dur + "h";
 	}
 
 }

@@ -29,13 +29,11 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public final class NullMonitor extends AMonitor {
 
-	private boolean cancel =
-		false;
+	private boolean cancel = false;
 
 	@Override
 	public void cancel() {
-		cancel =
-			true;
+		cancel = true;
 	}
 
 	@Override

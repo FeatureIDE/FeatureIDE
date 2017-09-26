@@ -34,8 +34,7 @@ public class UnmodifiablePropertyContainer implements IPropertyContainer {
 		new UnsupportedOperationException("Manipulation is not allowed. This is an unmodifiable property container");
 
 	public UnmodifiablePropertyContainer(IPropertyContainer container) {
-		this.container =
-			container;
+		this.container = container;
 	}
 
 	@Override
@@ -60,8 +59,7 @@ public class UnmodifiablePropertyContainer implements IPropertyContainer {
 
 	@Override
 	public Set<String> keySet() {
-		final Set<String> set =
-			new HashSet<>();
+		final Set<String> set = new HashSet<>();
 		for (final String s : container.keySet()) {
 			set.add(new String(s));
 		}

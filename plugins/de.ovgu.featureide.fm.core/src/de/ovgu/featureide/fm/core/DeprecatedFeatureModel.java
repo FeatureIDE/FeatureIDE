@@ -85,8 +85,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean areMutualExclusive(Set<IFeature> context,
-			List<Set<IFeature>> featureSets) throws TimeoutException {
+	public boolean areMutualExclusive(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
 		return getAnalyser().areMutualExclusive(context, featureSets);
 	}
 
@@ -94,8 +93,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean mayBeMissing(Set<IFeature> context,
-			List<Set<IFeature>> featureSets) throws TimeoutException {
+	public boolean mayBeMissing(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
 		return getAnalyser().mayBeMissing(context, featureSets);
 	}
 
@@ -143,8 +141,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
-	public LinkedList<String> commonFeatures(long timeout,
-			Object... selectedFeatures) {
+	public LinkedList<String> commonFeatures(long timeout, Object... selectedFeatures) {
 		return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
 	}
 

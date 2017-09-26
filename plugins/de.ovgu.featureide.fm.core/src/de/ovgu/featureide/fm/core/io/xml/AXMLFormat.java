@@ -62,17 +62,14 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
 
-	private static final String SUFFIX =
-		"xml";
+	private static final String SUFFIX = "xml";
 
 	protected T object;
 
 	public static Document readXML(CharSequence source) throws IOException, SAXException, ParserConfigurationException {
-		final Document doc =
-			DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
-		final InputSource inputSource =
-			new InputSource(new StringReader(source.toString()));
+		final InputSource inputSource = new InputSource(new StringReader(source.toString()));
 		SAXParserFactory.newInstance().newSAXParser().parse(inputSource, new PositionalXMLHandler(doc));
 		return doc;
 	}
@@ -82,15 +79,11 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	 * @return The child nodes from type Element of the given NodeList.
 	 */
 	protected static final List<Element> getElements(NodeList nodeList) {
-		final ArrayList<Element> elements =
-			new ArrayList<>(nodeList.getLength());
-		for (int temp =
-			0; temp < nodeList.getLength(); temp++) {
-			final org.w3c.dom.Node nNode =
-				nodeList.item(temp);
+		final ArrayList<Element> elements = new ArrayList<>(nodeList.getLength());
+		for (int temp = 0; temp < nodeList.getLength(); temp++) {
+			final org.w3c.dom.Node nNode = nodeList.item(temp);
 			if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-				final Element eElement =
-					(Element) nNode;
+				final Element eElement = (Element) nNode;
 				elements.add(eElement);
 			}
 		}
@@ -104,46 +97,37 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	 * @return
 	 */
 	private static String prettyPrint(String text) {
-		final StringBuilder result =
-			new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		String line;
-		int indentLevel =
-			0;
-		final BufferedReader reader =
-			new BufferedReader(new StringReader(text));
+		int indentLevel = 0;
+		final BufferedReader reader = new BufferedReader(new StringReader(text));
 		try {
-			line =
-				reader.readLine();
+			line = reader.readLine();
 			while (line != null) {
 				if (line.startsWith("</")) {
 					indentLevel--;
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
 
 				else if (line.startsWith("<")) {
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 					if (!line.contains("</")) {
 						indentLevel++;
 					}
 				} else {
-					for (int i =
-						0; i < indentLevel; i++) {
+					for (int i = 0; i < indentLevel; i++) {
 						result.append("\t");
 					}
 				}
-				result.append(line
-					+ "\n");
+				result.append(line + "\n");
 				if (line.contains("/>")) {
 					indentLevel--;
 				}
-				line =
-					reader.readLine();
+				line = reader.readLine();
 			}
 		} catch (final IOException e) {
 			Logger.logError(e);
@@ -158,13 +142,10 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	@Override
 	public ProblemList read(T object, CharSequence source) {
-		this.object =
-			object;
-		final ProblemList lastWarnings =
-			new ProblemList();
+		this.object = object;
+		final ProblemList lastWarnings = new ProblemList();
 		try {
-			final Document doc =
-				readXML(source);
+			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
 		} catch (final SAXParseException e) {
@@ -180,35 +161,28 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	@Override
 	public String write(T object) {
-		this.object =
-			object;
+		this.object = object;
 		// Create Empty DOM Document
-		final DocumentBuilderFactory dbf =
-			DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(true);
 		dbf.setExpandEntityReferences(true);
-		DocumentBuilder db =
-			null;
+		DocumentBuilder db = null;
 		try {
-			db =
-				dbf.newDocumentBuilder();
+			db = dbf.newDocumentBuilder();
 		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		final Document doc =
-			db.newDocument();
+		final Document doc = db.newDocument();
 		// Create the XML Representation
 		writeDocument(doc);
 
 		// Transform the XML Representation into a String
-		Transformer transfo =
-			null;
+		Transformer transfo = null;
 		try {
-			transfo =
-				TransformerFactory.newInstance().newTransformer();
+			transfo = TransformerFactory.newInstance().newTransformer();
 		} catch (final TransformerConfigurationException e) {
 			Logger.logError(e);
 		} catch (final TransformerFactoryConfigurationError e) {
@@ -217,10 +191,8 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 		transfo.setOutputProperty(OutputKeys.METHOD, SUFFIX);
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		final StreamResult result =
-			new StreamResult(new StringWriter());
-		final DOMSource source =
-			new DOMSource(doc);
+		final StreamResult result = new StreamResult(new StringWriter());
+		final DOMSource source = new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
 		} catch (final TransformerException e) {

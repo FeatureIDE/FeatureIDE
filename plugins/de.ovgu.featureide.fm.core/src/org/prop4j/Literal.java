@@ -54,22 +54,17 @@ public class Literal extends Node implements Cloneable {
 	 * @param positive whether the variable is positive or negated
 	 */
 	public Literal(Object var, boolean positive) {
-		this.var =
-			var;
-		this.positive =
-			positive;
+		this.var = var;
+		this.positive = positive;
 	}
 
 	protected Literal(Literal oldLiteral) {
-		var =
-			oldLiteral.var;
-		positive =
-			oldLiteral.positive;
+		var = oldLiteral.var;
+		positive = oldLiteral.positive;
 	}
 
 	public void flip() {
-		positive =
-			!positive;
+		positive = !positive;
 	}
 
 	@Override
@@ -113,8 +108,7 @@ public class Literal extends Node implements Cloneable {
 	@Override
 	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
 		if (var.equals(feature.getName())) {
-			var =
-				replaceWithFeature.getName();
+			var = replaceWithFeature.getName();
 			list.add(this);
 		}
 		return list;
@@ -127,10 +121,7 @@ public class Literal extends Node implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		return var.hashCode()
-			* (positive
-				? 31
-				: 37);
+		return var.hashCode() * (positive ? 31 : 37);
 	}
 
 	@Override
@@ -141,10 +132,8 @@ public class Literal extends Node implements Cloneable {
 		if (!(node instanceof Literal)) {
 			return false;
 		}
-		final Literal other =
-			(Literal) node;
-		return (positive == other.positive)
-			&& (var.equals(other.var));
+		final Literal other = (Literal) node;
+		return (positive == other.positive) && (var.equals(other.var));
 	}
 
 	@Override

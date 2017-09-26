@@ -41,19 +41,15 @@ public class RunManualCalculationsAction extends Action {
 
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final boolean oldValue =
-			featureModel.getAnalyser().runCalculationAutomatically;
-		featureModel.getAnalyser().runCalculationAutomatically =
-			true;
+		final boolean oldValue = featureModel.getAnalyser().runCalculationAutomatically;
+		featureModel.getAnalyser().runCalculationAutomatically = true;
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		featureModel.getAnalyser().runCalculationAutomatically =
-			oldValue;
+		featureModel.getAnalyser().runCalculationAutomatically = oldValue;
 	}
 
 }

@@ -38,29 +38,21 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 // TODO Implement prioritization
 public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
-	protected final List<JobFinishListener<T>> listenerList =
-		new LinkedList<>();
+	protected final List<JobFinishListener<T>> listenerList = new LinkedList<>();
 
 	private final LongRunningMethod<T> method;
 	private final IMonitor monitor;
 
-	private int cancelingTimeout =
-		-1;
-	private T methodResult =
-		null;
-	private JobStatus status =
-		JobStatus.NOT_STARTED;
+	private int cancelingTimeout = -1;
+	private T methodResult = null;
+	private JobStatus status = JobStatus.NOT_STARTED;
 
 	private boolean stoppable;
 
 	public LongRunningThread(String name, LongRunningMethod<T> method, IMonitor monitor) {
 		super(name);
-		this.method =
-			method;
-		this.monitor =
-			monitor != null
-				? monitor
-				: new NullMonitor();
+		this.method = method;
+		this.monitor = monitor != null ? monitor : new NullMonitor();
 	}
 
 	@Override
@@ -118,21 +110,14 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	@Override
 	public void run() {
-		status =
-			JobStatus.RUNNING;
+		status = JobStatus.RUNNING;
 		try {
-			final Executer<T> executer =
-				stoppable
-					? new StoppableExecuter<>(method, cancelingTimeout)
-					: new Executer<>(method);
-			methodResult =
-				executer.execute(monitor);
-			status =
-				JobStatus.OK;
+			final Executer<T> executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
+			methodResult = executer.execute(monitor);
+			status = JobStatus.OK;
 		} catch (final Exception e) {
 			Logger.logError(e);
-			status =
-				JobStatus.FAILED;
+			status = JobStatus.FAILED;
 		} finally {
 			monitor.done();
 			for (final JobFinishListener<T> listener : listenerList) {
@@ -152,8 +137,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	@Override
 	public void setCancelingTimeout(int cancelingTimeout) {
-		this.cancelingTimeout =
-			cancelingTimeout;
+		this.cancelingTimeout = cancelingTimeout;
 	}
 
 	@Override
@@ -163,8 +147,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 
 	@Override
 	public void setStoppable(boolean stoppable) {
-		this.stoppable =
-			stoppable;
+		this.stoppable = stoppable;
 	}
 
 	@Override

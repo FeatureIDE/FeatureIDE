@@ -44,45 +44,36 @@ public class TConfigurationReader {
 	private static final String FEATUREMODEL_PATH =
 		"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
 
-	protected static File MODEL_FILE_FOLDER =
-		getFolder();
+	protected static File MODEL_FILE_FOLDER = getFolder();
 
-	private static final FileFilter filter =
-		new FileFilter() {
+	private static final FileFilter filter = new FileFilter() {
 
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.getName().endsWith(".xml");
-			}
-		};
+		@Override
+		public boolean accept(File pathname) {
+			return pathname.getName().endsWith(".xml");
+		}
+	};
 
-	String text =
-		"";
+	String text = "";
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 
-	private final IFeatureModel FM_test_1 =
-		init("test_5.xml");
+	private final IFeatureModel FM_test_1 = init("test_5.xml");
 
 	private static File getFolder() {
-		File folder =
-			new File(FEATUREMODEL_PATH);
+		File folder = new File(FEATUREMODEL_PATH);
 		if (!folder.canRead()) {
-			folder =
-				new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
+			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
 		}
 		return folder;
 	}
 
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm =
-			null;
-		final File[] listFiles =
-			MODEL_FILE_FOLDER.listFiles(filter);
+		IFeatureModel fm = null;
+		final File[] listFiles = MODEL_FILE_FOLDER.listFiles(filter);
 		assertNotNull(listFiles);
 		for (final File f : listFiles) {
 			if (f.getName().equals(name)) {
-				fm =
-					FeatureModelManager.load(f.toPath()).getObject();
+				fm = FeatureModelManager.load(f.toPath()).getObject();
 				if (fm != null) {
 					break;
 				}
@@ -93,10 +84,8 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C#");
 
 		assertFalse(c.isValid());
@@ -104,8 +93,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration2() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
+		final Configuration c = new Configuration(FM_test_1, false);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
 		c.setManual("Bash   script   ", Selection.UNSELECTED);
@@ -115,8 +103,7 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration3() {
-		final Configuration c =
-			new Configuration(FM_test_1, true);
+		final Configuration c = new Configuration(FM_test_1, true);
 		c.setManual("C#", Selection.SELECTED);
 		c.setManual("Python Ruby", Selection.SELECTED);
 		c.setManual("Bash   script   ", Selection.SELECTED);
@@ -126,70 +113,56 @@ public class TConfigurationReader {
 
 	@Test
 	public void isValidConfiguration4() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \"");
 		assertFalse(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration5() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \"Python Ruby\"");
 		assertTrue(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration6() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
 		assertTrue(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration7() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration8() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration9() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 
 	@Test
 	public void isValidConfiguration10() {
-		final Configuration c =
-			new Configuration(FM_test_1, false);
-		final DefaultFormat r =
-			new DefaultFormat();
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
 		r.read(c, "jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");
 		assertTrue(c.isValid());
 	}

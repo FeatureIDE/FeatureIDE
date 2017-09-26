@@ -31,8 +31,7 @@ public enum RelationOperator {
 	private String symbol;
 
 	private RelationOperator(String symbol) {
-		this.symbol =
-			symbol;
+		this.symbol = symbol;
 	}
 
 	@Override

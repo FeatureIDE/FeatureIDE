@@ -58,9 +58,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		logInfo(STARTING_FEATUREIDE_PLUG_IN_
-			+ getID()
-			+ "'");
+		logInfo(STARTING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 	}
 
 	/*
@@ -69,9 +67,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		logInfo(STOPPING_FEATUREIDE_PLUG_IN_
-			+ getID()
-			+ "'");
+		logInfo(STOPPING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 		super.stop(context);
 	}
 
@@ -92,20 +88,14 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 * @param file file to open
 	 */
 	public void openEditor(String editorID, IFile file) {
-		final IFileEditorInput editorInput =
-			new FileEditorInput(file);
-		final IWorkbenchWindow window =
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		final IWorkbenchPage page =
-			window.getActivePage();
+		final IFileEditorInput editorInput = new FileEditorInput(file);
+		final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchPage page = window.getActivePage();
 
 		try {
 			page.openEditor(editorInput, editorID);
 		} catch (final PartInitException e) {
-			logError(UNABLE_TO_OPEN_FILE
-				+ file
-				+ IN_EDITOR
-				+ editorID, e);
+			logError(UNABLE_TO_OPEN_FILE + file + IN_EDITOR + editorID, e);
 		}
 	}
 
@@ -166,9 +156,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	}
 
 	public void reportBug(int ticket) {
-		logWarning("This is a bug. Please report it. See Ticket #"
-			+ ticket
-			+ ".");
+		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
 	}
 
 }

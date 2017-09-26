@@ -7,10 +7,8 @@ public class Metrics {
 
 	public Metrics(String name, String value) {
 		super();
-		Name =
-			name;
-		this.value =
-			value;
+		Name = name;
+		this.value = value;
 	}
 
 	public String getName() {

@@ -40,8 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AdjustModelToEdi
  */
 public class AdjustModelToEditorSizeAction extends Action {
 
-	public static final String ID =
-		"de.ovgu.featureide.adjustmodeltoeditor";
+	public static final String ID = "de.ovgu.featureide.adjustmodeltoeditor";
 
 	private FeatureDiagramEditor editor;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
@@ -49,31 +48,25 @@ public class AdjustModelToEditorSizeAction extends Action {
 	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
 		super(title);
 		if (viewer instanceof FeatureDiagramEditor) {
-			editor =
-				(FeatureDiagramEditor) viewer;
+			editor = (FeatureDiagramEditor) viewer;
 		}
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
 	public void run() {
-		final IFeature root =
-			graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
+		final IFeature root = graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature();
 		if (root == null) {
 			return;
 		}
-		final AdjustModelToEditorSizeOperation op =
-			new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
+		final AdjustModelToEditorSizeOperation op = new AdjustModelToEditorSizeOperation(graphicalFeatureModel, editor);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		if ((editor != null)
-			&& (editor instanceof FeatureDiagramEditor)) {
-			final IGraphicalFeature graphicalRoot =
-				FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
+		if ((editor != null) && (editor instanceof FeatureDiagramEditor)) {
+			final IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
 			editor.centerPointOnScreen(graphicalRoot.getObject());
 		}
 	}

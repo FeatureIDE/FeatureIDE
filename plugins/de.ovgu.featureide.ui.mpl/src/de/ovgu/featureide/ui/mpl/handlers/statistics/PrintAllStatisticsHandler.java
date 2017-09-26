@@ -43,7 +43,6 @@ public class PrintAllStatisticsHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().printStatistics(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
+		MPLPlugin.getDefault().printStatistics(projects, (String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 }

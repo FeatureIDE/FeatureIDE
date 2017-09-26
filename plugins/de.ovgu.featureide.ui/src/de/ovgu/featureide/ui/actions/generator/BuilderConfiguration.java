@@ -37,8 +37,7 @@ public class BuilderConfiguration extends Configuration {
 	 */
 	public BuilderConfiguration(Configuration configuration, String name) {
 		super(configuration);
-		this.name =
-			name;
+		this.name = name;
 	}
 
 	/**
@@ -47,14 +46,12 @@ public class BuilderConfiguration extends Configuration {
 	 */
 	public BuilderConfiguration(Configuration configuration, long number) {
 		super(configuration);
-		this.number =
-			number;
+		this.number = number;
 
 	}
 
 	public void setNumber(int number) {
-		this.number =
-			number;
+		this.number = number;
 	}
 
 	/**
@@ -64,23 +61,17 @@ public class BuilderConfiguration extends Configuration {
 		if (name == null) {
 			final String zeros;
 			if (number < 10) {
-				zeros =
-					"0000";
+				zeros = "0000";
 			} else if (number < 100) {
-				zeros =
-					"000";
+				zeros = "000";
 			} else if (number < 1000) {
-				zeros =
-					"00";
+				zeros = "00";
 			} else if (number < 10000) {
-				zeros =
-					"0";
+				zeros = "0";
 			} else {
-				zeros =
-					"";
+				zeros = "";
 			}
-			return zeros
-				+ number;
+			return zeros + number;
 		}
 		return name;
 	}

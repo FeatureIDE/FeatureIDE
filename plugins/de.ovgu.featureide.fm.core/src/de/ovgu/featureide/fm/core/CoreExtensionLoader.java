@@ -31,8 +31,7 @@ public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension
 
 	@SafeVarargs
 	public CoreExtensionLoader(T... extensions) {
-		this.extensionArray =
-			extensions;
+		this.extensionArray = extensions;
 	}
 
 	@Override

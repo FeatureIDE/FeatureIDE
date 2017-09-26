@@ -63,15 +63,13 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public static Node createCNF(IFeatureModel featureModel) {
-		final AdvancedNodeCreator nodeCreator =
-			new AdvancedNodeCreator(featureModel);
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
 	public static Node createRegularCNF(IFeatureModel featureModel) {
-		final AdvancedNodeCreator nodeCreator =
-			new AdvancedNodeCreator(featureModel);
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
 		return nodeCreator.createNodes();
@@ -91,36 +89,28 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	private CNFType cnfType =
-		CNFType.None;
+	private CNFType cnfType = CNFType.None;
 
-	private ModelType modelType =
-		ModelType.All;
+	private ModelType modelType = ModelType.All;
 
 	/**
 	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.</br> Default values is {@code true} (values will
 	 * be included).
 	 */
-	private boolean includeBooleanValues =
-		true;
+	private boolean includeBooleanValues = true;
 
-	private boolean useOldNames =
-		true;
+	private boolean useOldNames = true;
 
-	private boolean optionalRoot =
-		false;
+	private boolean optionalRoot = false;
 
-	private IFeatureModel featureModel =
-		null;
+	private IFeatureModel featureModel = null;
 
-	private Collection<String> excludedFeatureNames =
-		null;
+	private Collection<String> excludedFeatureNames = null;
 
 	/** The trace model. */
 	private FeatureModelToNodeTraceModel traceModel;
 	/** True to create the trace model while creating nodes. */
-	private boolean recordTraceModel =
-		false;
+	private boolean recordTraceModel = false;
 
 	public AdvancedNodeCreator() {}
 
@@ -138,23 +128,17 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
 			boolean includeBooleanValues) {
-		this.cnfType =
-			cnfType;
-		this.modelType =
-			modelType;
-		this.includeBooleanValues =
-			includeBooleanValues;
+		this.cnfType = cnfType;
+		this.modelType = modelType;
+		this.includeBooleanValues = includeBooleanValues;
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
 	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType,
 			boolean includeBooleanValues) {
-		this.cnfType =
-			cnfType;
-		this.modelType =
-			modelType;
-		this.includeBooleanValues =
-			includeBooleanValues;
+		this.cnfType = cnfType;
+		this.modelType = modelType;
+		this.includeBooleanValues = includeBooleanValues;
 		setFeatureModel(featureModel, featureFilter);
 	}
 
@@ -164,8 +148,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @return the transformed nodes
 	 */
 	private And createConstraintNodes() {
-		final List<Node> clauses =
-			new LinkedList<>();
+		final List<Node> clauses = new LinkedList<>();
 		for (final IConstraint constraint : featureModel.getConstraints()) {
 			createConstraintNodes(constraint, clauses, true);
 		}
@@ -190,10 +173,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @return the transformed node
 	 */
 	public Node createConstraintNode(IConstraint constraint, boolean positive) {
-		final List<Node> clauses =
-			createConstraintNodes(constraint, new LinkedList<Node>(), positive);
-		if ((cnfType != CNFType.Regular)
-			&& (clauses.size() == 1)) {
+		final List<Node> clauses = createConstraintNodes(constraint, new LinkedList<Node>(), positive);
+		if ((cnfType != CNFType.Regular) && (clauses.size() == 1)) {
 			return clauses.get(0);
 		}
 		return new And(clauses.toArray(new Node[clauses.size()]));
@@ -208,17 +189,13 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @return given clauses plus new clauses
 	 */
 	private List<Node> createConstraintNodes(IConstraint constraint, List<Node> clauses, boolean positive) {
-		Node clause =
-			constraint.getNode();
-		boolean compact =
-			true;
+		Node clause = constraint.getNode();
+		boolean compact = true;
 		switch (cnfType) {
 		case None:
-			clause =
-				clause.clone();
+			clause = clause.clone();
 			if (!positive) {
-				clause =
-					new Not(clause);
+				clause = new Not(clause);
 			}
 			clauses.add(clause);
 			if (isRecordingTraceModel()) {
@@ -226,34 +203,23 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			}
 			break;
 		case Regular:
-			compact =
-				false;
+			compact = false;
 		case Compact:
 		default:
 			if (!positive) {
-				clause =
-					new Not(clause);
+				clause = new Not(clause);
 			}
-			final Node cnfNode =
-				Node.buildCNF(clause);
+			final Node cnfNode = Node.buildCNF(clause);
 			if (cnfNode instanceof And) {
 				for (final Node andChild : cnfNode.getChildren()) {
-					clause =
-						compact
-							|| (andChild instanceof Or)
-								? andChild
-								: new Or(andChild);
+					clause = compact || (andChild instanceof Or) ? andChild : new Or(andChild);
 					clauses.add(clause);
 					if (isRecordingTraceModel()) {
 						traceModel.addTraceConstraint(constraint);
 					}
 				}
 			} else {
-				clause =
-					compact
-						|| (cnfNode instanceof Or)
-							? cnfNode
-							: new Or(cnfNode);
+				clause = compact || (cnfNode instanceof Or) ? cnfNode : new Or(cnfNode);
 				clauses.add(clause);
 				if (isRecordingTraceModel()) {
 					traceModel.addTraceConstraint(constraint);
@@ -270,10 +236,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public Node createNodes(IMonitor monitor) {
 		if (featureModel == null) {
-			final Or emptyNode =
-				includeBooleanValues
-					? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false))
-					: new Or();
+			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
 			switch (cnfType) {
 			case Regular:
 				return new And(emptyNode);
@@ -285,10 +248,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 
 		monitor.setRemainingWork(10);
-		final Node[] basicFormula =
-			createFormula(monitor.subTask(1));
-		final Node newFormula =
-			removeFeatures(basicFormula, monitor.subTask(9));
+		final Node[] basicFormula = createFormula(monitor.subTask(1));
+		final Node newFormula = removeFeatures(basicFormula, monitor.subTask(9));
 
 		return newFormula;
 	}
@@ -301,64 +262,43 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 		switch (modelType) {
 		case All:
-			andChildren1 =
-				createStructuralNodes().getChildren();
-			andChildren2 =
-				createConstraintNodes().getChildren();
+			andChildren1 = createStructuralNodes().getChildren();
+			andChildren2 = createConstraintNodes().getChildren();
 			break;
 		case OnlyConstraints:
-			andChildren1 =
-				new Node[0];
-			andChildren2 =
-				createConstraintNodes().getChildren();
+			andChildren1 = new Node[0];
+			andChildren2 = createConstraintNodes().getChildren();
 			break;
 		case OnlyStructure:
-			andChildren1 =
-				createStructuralNodes().getChildren();
-			andChildren2 =
-				new Node[0];
+			andChildren1 = createStructuralNodes().getChildren();
+			andChildren2 = new Node[0];
 			break;
 		default:
-			andChildren1 =
-				new Node[0];
-			andChildren2 =
-				new Node[0];
+			andChildren1 = new Node[0];
+			andChildren2 = new Node[0];
 			break;
 		}
 		monitor.step();
 
-		final int length =
-			andChildren1.length
-				+ andChildren2.length;
+		final int length = andChildren1.length + andChildren2.length;
 		final Node[] nodeArray;
 		if (includeBooleanValues) {
-			nodeArray =
-				new Node[length
-					+ 2];
+			nodeArray = new Node[length + 2];
 
 			switch (cnfType) {
 			case Regular:
-				nodeArray[length] =
-					new Or(new Literal[] {
-						new Literal(NodeCreator.varTrue) });
-				nodeArray[length
-					+ 1] =
-						new Or(new Literal[] {
-							new Literal(NodeCreator.varFalse, false) });
+				nodeArray[length] = new Or(new Literal[] { new Literal(NodeCreator.varTrue) });
+				nodeArray[length + 1] = new Or(new Literal[] { new Literal(NodeCreator.varFalse, false) });
 				break;
 			case None:
 			case Compact:
 			default:
-				nodeArray[length] =
-					new Literal(NodeCreator.varTrue);
-				nodeArray[length
-					+ 1] =
-						new Literal(NodeCreator.varFalse, false);
+				nodeArray[length] = new Literal(NodeCreator.varTrue);
+				nodeArray[length + 1] = new Literal(NodeCreator.varFalse, false);
 				break;
 			}
 		} else {
-			nodeArray =
-				new Node[length];
+			nodeArray = new Node[length];
 		}
 		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
 		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
@@ -368,10 +308,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private Node removeFeatures(final Node[] nodeArray, IMonitor monitor) {
-		if ((excludedFeatureNames != null)
-			&& !excludedFeatureNames.isEmpty()) {
-			final FeatureRemover remover =
-				new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
+		if ((excludedFeatureNames != null) && !excludedFeatureNames.isEmpty()) {
+			final FeatureRemover remover = new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular);
 			return remover.createNewClauseList(LongRunningWrapper.runMethod(remover, monitor));
 		} else {
 			return new And(nodeArray);
@@ -379,20 +317,16 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private And createStructuralNodes() {
-		final IFeature root =
-			FeatureUtils.getRoot(featureModel);
+		final IFeature root = FeatureUtils.getRoot(featureModel);
 		if (root != null) {
-			final List<Node> clauses =
-				new ArrayList<>(featureModel.getNumberOfFeatures());
+			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
 			Node clause;
 
 			if (!optionalRoot) {
-				clause =
-					getLiteral(root, true);
+				clause = getLiteral(root, true);
 				switch (cnfType) {
 				case Regular:
-					clause =
-						new Or(clause);
+					clause = new Or(clause);
 					break;
 				case None:
 				case Compact:
@@ -405,14 +339,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 				}
 			}
 
-			final Iterable<IFeature> features =
-				featureModel.getFeatures();
+			final Iterable<IFeature> features = featureModel.getFeatures();
 			for (final IFeature feature : features) {
 				for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-					final IFeature childFeature =
-						child.getFeature();
-					clause =
-						new Or(getLiteral(feature, true), getLiteral(childFeature, false));
+					final IFeature childFeature = child.getFeature();
+					clause = new Or(getLiteral(feature, true), getLiteral(childFeature, false));
 					clauses.add(clause);
 					if (isRecordingTraceModel()) {
 						traceModel.addTraceChildUp(feature, Collections.singleton(childFeature));
@@ -423,10 +354,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 					if (feature.getStructure().isAnd()) {
 						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
-								final IFeature childFeature =
-									child.getFeature();
-								clause =
-									new Or(getLiteral(childFeature, true), getLiteral(feature, false));
+								final IFeature childFeature = child.getFeature();
+								clause = new Or(getLiteral(childFeature, true), getLiteral(feature, false));
 								clauses.add(clause);
 								if (isRecordingTraceModel()) {
 									traceModel.addTraceChildDown(feature, Collections.singleton(childFeature));
@@ -434,64 +363,43 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 							}
 						}
 					} else if (feature.getStructure().isOr()) {
-						final List<IFeature> children =
-							new LinkedList<>();
-						final Literal[] orLiterals =
-							new Literal[feature.getStructure().getChildren().size()
-								+ 1];
-						int i =
-							0;
+						final List<IFeature> children = new LinkedList<>();
+						final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
+						int i = 0;
 						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-							final IFeature childFeature =
-								child.getFeature();
-							orLiterals[i++] =
-								getLiteral(childFeature, true);
+							final IFeature childFeature = child.getFeature();
+							orLiterals[i++] = getLiteral(childFeature, true);
 							children.add(childFeature);
 						}
-						orLiterals[i] =
-							getLiteral(feature, false);
-						clause =
-							new Or(orLiterals);
+						orLiterals[i] = getLiteral(feature, false);
+						clause = new Or(orLiterals);
 						clauses.add(clause);
 						if (isRecordingTraceModel()) {
 							traceModel.addTraceChildDown(feature, children);
 						}
 					} else if (feature.getStructure().isAlternative()) {
-						final List<IFeature> children =
-							new LinkedList<>();
-						final Literal[] alternativeLiterals =
-							new Literal[feature.getStructure().getChildrenCount()
-								+ 1];
-						int i =
-							0;
+						final List<IFeature> children = new LinkedList<>();
+						final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
+						int i = 0;
 						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
-							final IFeature childFeature =
-								child.getFeature();
-							alternativeLiterals[i++] =
-								getLiteral(childFeature, true);
+							final IFeature childFeature = child.getFeature();
+							alternativeLiterals[i++] = getLiteral(childFeature, true);
 							children.add(childFeature);
 						}
-						alternativeLiterals[i] =
-							getLiteral(feature, false);
-						clause =
-							new Or(alternativeLiterals);
+						alternativeLiterals[i] = getLiteral(feature, false);
+						clause = new Or(alternativeLiterals);
 						clauses.add(clause);
 						if (isRecordingTraceModel()) {
 							traceModel.addTraceChildDown(feature, children);
 						}
 
-						for (final ListIterator<IFeatureStructure> it1 =
-							feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
-							final IFeatureStructure fs =
-								it1.next();
-							final IFeature sibling1 =
-								fs.getFeature();
-							for (final ListIterator<IFeatureStructure> it2 =
-								feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-								final IFeature sibling2 =
-									it2.next().getFeature();
-								clause =
-									new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
+						for (final ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
+							final IFeatureStructure fs = it1.next();
+							final IFeature sibling1 = fs.getFeature();
+							for (final ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2
+									.hasNext();) {
+								final IFeature sibling2 = it2.next().getFeature();
+								clause = new Or(getLiteral(sibling1, false), getLiteral(sibling2, false));
 								clauses.add(clause);
 								if (isRecordingTraceModel()) {
 									traceModel.addTraceChildHorizontal(Arrays.asList(sibling1, sibling2));
@@ -512,9 +420,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private Object getVariable(IFeature feature) {
-		return useOldNames
-			? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName())
-			: feature.getName();
+		return useOldNames ? feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()) : feature.getName();
 	}
 
 	@Override
@@ -548,13 +454,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setCnfType(CNFType cnfType) {
-		this.cnfType =
-			cnfType;
+		this.cnfType = cnfType;
 	}
 
 	public void setUseOldNames(boolean useOldNames) {
-		this.useOldNames =
-			useOldNames;
+		this.useOldNames = useOldNames;
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
@@ -566,14 +470,9 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
-		this.featureModel =
-			featureModel;
-		this.excludedFeatureNames =
-			excludedFeatureNames;
-		traceModel =
-			isRecordingTraceModel()
-				? new FeatureModelToNodeTraceModel()
-				: null; // Reset the trace model.
+		this.featureModel = featureModel;
+		this.excludedFeatureNames = excludedFeatureNames;
+		traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; // Reset the trace model.
 	}
 
 	/**
@@ -582,13 +481,11 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @param includeBooleanValues the value to set
 	 */
 	public void setIncludeBooleanValues(boolean includeBooleanValues) {
-		this.includeBooleanValues =
-			includeBooleanValues;
+		this.includeBooleanValues = includeBooleanValues;
 	}
 
 	public void setModelType(ModelType modelType) {
-		this.modelType =
-			modelType;
+		this.modelType = modelType;
 	}
 
 	public boolean optionalRoot() {
@@ -596,8 +493,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setOptionalRoot(boolean optionalRoot) {
-		this.optionalRoot =
-			optionalRoot;
+		this.optionalRoot = optionalRoot;
 	}
 
 	/**
@@ -627,15 +523,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @param recordTraceModel whether to create a trace model while creating nodes
 	 */
 	public void setRecordTraceModel(boolean recordTraceModel) {
-		final boolean old =
-			this.recordTraceModel;
-		this.recordTraceModel =
-			recordTraceModel;
+		final boolean old = this.recordTraceModel;
+		this.recordTraceModel = recordTraceModel;
 		if (old != recordTraceModel) {
-			traceModel =
-				isRecordingTraceModel()
-					? new FeatureModelToNodeTraceModel()
-					: null; // Reset the trace model.
+			traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; // Reset the trace model.
 		}
 	}
 }

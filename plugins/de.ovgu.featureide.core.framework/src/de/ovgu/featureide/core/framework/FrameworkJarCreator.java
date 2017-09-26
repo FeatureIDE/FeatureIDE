@@ -50,19 +50,13 @@ public class FrameworkJarCreator {
 	 * @throws IOException
 	 */
 	public static void addFileToJar(JarOutputStream jarStream, IFile res, String path) throws IOException {
-		jarStream.putNextEntry(new ZipEntry(path
-			+ res.getName()));
-		final URL location =
-			FileLocator.toFileURL(res.getLocationURI().toURL());
-		final File file =
-			new File(location.getPath());
-		try (BufferedInputStream in =
-			new BufferedInputStream(new FileInputStream(file))) {
-			final byte[] buffer =
-				new byte[1024];
+		jarStream.putNextEntry(new ZipEntry(path + res.getName()));
+		final URL location = FileLocator.toFileURL(res.getLocationURI().toURL());
+		final File file = new File(location.getPath());
+		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
+			final byte[] buffer = new byte[1024];
 			while (true) {
-				final int count =
-					in.read(buffer);
+				final int count = in.read(buffer);
 				if (count == -1) {
 					break;
 				}
@@ -99,10 +93,7 @@ public class FrameworkJarCreator {
 	 */
 	public static void addToJar(JarOutputStream jarStream, IResource res, String path) throws IOException, CoreException {
 		if (res instanceof IFolder) {
-			final String path2 =
-				path
-					+ res.getName()
-					+ "/"; // Slash is needed for JAR creation -> DO NOT REPLACE WITH SYSTEM PROPERTIES
+			final String path2 = path + res.getName() + "/"; // Slash is needed for JAR creation -> DO NOT REPLACE WITH SYSTEM PROPERTIES
 			for (final IResource member : ((IFolder) res).members()) {
 				addToJar(jarStream, member, path2);
 			}

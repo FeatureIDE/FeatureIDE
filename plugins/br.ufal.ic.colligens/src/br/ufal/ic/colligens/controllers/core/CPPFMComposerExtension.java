@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 public class CPPFMComposerExtension extends FMComposerExtension {
 
 	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects based on preprocessors such as CPPs do not\n"
-			+ NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+		"FeatureIDE projects based on preprocessors such as CPPs do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 
 	@Override
 	public String getOrderPageMessage() {
@@ -46,12 +45,9 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	public boolean performRenaming(String oldName, String newName,
-			IProject project) {
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(project);
-		final IFolder sourceFolder =
-			featureProject.getSourceFolder();
+	public boolean performRenaming(String oldName, String newName, IProject project) {
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFolder sourceFolder = featureProject.getSourceFolder();
 		System.out.println(sourceFolder.getFullPath().toOSString());
 		if (!sourceFolder.exists()) {
 			return true;
@@ -66,14 +62,12 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 		return true;
 	}
 
-	private void performRenamings(String oldName, String newName, IFolder folder)
-			throws CoreException {
+	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
 		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				final IFile file =
-					(IFile) res;
+				final IFile file = (IFile) res;
 				performRenamings(oldName, newName, file);
 			}
 
@@ -81,33 +75,25 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 	}
 
 	private void performRenamings(String oldName, String newName, IFile iFile) {
-		Scanner scanner =
-			null;
-		FileWriter fw =
-			null;
+		Scanner scanner = null;
+		FileWriter fw = null;
 		try {
-			final File file =
-				iFile.getRawLocation().toFile();
+			final File file = iFile.getRawLocation().toFile();
 
-			final StringBuilder fileText =
-				new StringBuilder();
-			scanner =
-				new Scanner(file, "UTF-8");
+			final StringBuilder fileText = new StringBuilder();
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append(System.getProperty("line.separator"));
 			}
 
-			final String newText =
-				replaceFeatureInText(fileText.toString(), oldName,
-						newName);
+			final String newText = replaceFeatureInText(fileText.toString(), oldName, newName);
 
 			if (fileText.toString().equals(newText)) {
 				return;
 			}
 
-			fw =
-				new FileWriter(file);
+			fw = new FileWriter(file);
 			fw.write(newText);
 
 		} catch (final FileNotFoundException e) {
@@ -128,21 +114,13 @@ public class CPPFMComposerExtension extends FMComposerExtension {
 		}
 	}
 
-	private String replaceFeatureInText(String text, String oldName,
-			String newName) {
-		final Pattern pattern =
-			Pattern.compile(String.format(CPPModelBuilder.REGEX,
-					oldName));
-		final Matcher matcher =
-			pattern.matcher(text);
+	private String replaceFeatureInText(String text, String oldName, String newName) {
+		final Pattern pattern = Pattern.compile(String.format(CPPModelBuilder.REGEX, oldName));
+		final Matcher matcher = pattern.matcher(text);
 
 		while (matcher.find()) {
-			final String newText =
-				matcher.group(1)
-					+ newName
-					+ matcher.group(3);
-			text =
-				text.replace(matcher.group(0), newText);
+			final String newText = matcher.group(1) + newName + matcher.group(3);
+			text = text.replace(matcher.group(0), newText);
 			matcher.reset(text);
 		}
 

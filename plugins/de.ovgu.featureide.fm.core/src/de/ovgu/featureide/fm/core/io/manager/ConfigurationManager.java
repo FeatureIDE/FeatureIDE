@@ -44,8 +44,7 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 		public ObjectCreator(Configuration configuration) {
 			super(Configuration.class, ConfigurationManager.class, ConfigFormatManager.getInstance());
-			this.configuration =
-				configuration;
+			this.configuration = configuration;
 		}
 
 		@Override
@@ -83,11 +82,9 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	}
 
 	public void setConfiguration(Configuration configuration) {
-		variableObject =
-			configuration;
+		variableObject = configuration;
 		synchronized (syncObject) {
-			persistentObject =
-				copyObject(variableObject);
+			persistentObject = copyObject(variableObject);
 		}
 	}
 

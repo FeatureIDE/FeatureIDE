@@ -42,17 +42,13 @@ public class FactoryWorkspace {
 	private String defaultFactoryID;
 
 	public FactoryWorkspace(FactoryWorkspace oldWorkspace) {
-		defaultFactoryID =
-			oldWorkspace.defaultFactoryID;
-		map =
-			new HashMap<>(oldWorkspace.map);
+		defaultFactoryID = oldWorkspace.defaultFactoryID;
+		map = new HashMap<>(oldWorkspace.map);
 	}
 
 	public FactoryWorkspace() {
-		defaultFactoryID =
-			DefaultFeatureModelFactory.ID;
-		map =
-			new HashMap<>();
+		defaultFactoryID = DefaultFeatureModelFactory.ID;
+		map = new HashMap<>();
 	}
 
 	public String getID(IPersistentFormat<IFeatureModel> format) {
@@ -60,11 +56,8 @@ public class FactoryWorkspace {
 	}
 
 	public String getID(String formatID) {
-		final String factoryID =
-			map.get(formatID);
-		return factoryID == null
-			? defaultFactoryID
-			: factoryID;
+		final String factoryID = map.get(formatID);
+		return factoryID == null ? defaultFactoryID : factoryID;
 	}
 
 	public String getDefaultFactoryID() {
@@ -72,8 +65,7 @@ public class FactoryWorkspace {
 	}
 
 	public void setDefaultFactoryID(String defaultFactoryID) {
-		this.defaultFactoryID =
-			defaultFactoryID;
+		this.defaultFactoryID = defaultFactoryID;
 	}
 
 	public void assignID(IFeatureModelFormat format, String factoryID) {

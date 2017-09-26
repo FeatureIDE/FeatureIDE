@@ -61,8 +61,7 @@ public class RedundantConstraintExplanation extends FeatureModelExplanation {
 	 * @param implicit whether this explanation is for an implicit constraint
 	 */
 	public void setImplicit(boolean implicit) {
-		this.implicit =
-			implicit;
+		this.implicit = implicit;
 	}
 
 	@Override

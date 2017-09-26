@@ -43,33 +43,22 @@ public class CSClassBuilder extends ClassBuilder {
 	@Override
 	void caseConstructorDeclaration(FSTTerminal terminal) {
 		// get name
-		final String name =
-			getMethodName(terminal);
+		final String name = getMethodName(terminal);
 
-		final String modifiers =
-			terminal.getBody().substring(0, terminal.getBody().indexOf(name));
+		final String modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name));
 
 		// add method
 		addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true);
 	}
 
-	private final String[] modifier =
-		{
-			"static",
-			"final",
-			"private",
-			"public",
-			"protected" };
+	private final String[] modifier = { "static", "final", "private", "public", "protected" };
 
 	@Override
 	public void caseFieldDeclaration(FSTTerminal terminal) {
-		final LinkedList<String> fields =
-			getFields(terminal.getBody());
-		for (int i =
-			2; i < fields.size(); i++) {
+		final LinkedList<String> fields = getFields(terminal.getBody());
+		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			final FSTField field =
-				new FSTField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			final FSTField field = new FSTField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			modelBuilder.getCurrentClassFragment().add(field);
 		}
 	}
@@ -80,32 +69,20 @@ public class CSClassBuilder extends ClassBuilder {
 	 * @return list(0) field modifiers list(1) field type ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
-		String modifiers =
-			"";
-		final StringBuilder type =
-			new StringBuilder();
-		final StringBuilder namesBuilder =
-			new StringBuilder();
-		boolean mod =
-			false;
-		boolean t1 =
-			false;
-		boolean t2 =
-			false;
+		String modifiers = "";
+		final StringBuilder type = new StringBuilder();
+		final StringBuilder namesBuilder = new StringBuilder();
+		boolean mod = false;
+		boolean t1 = false;
+		boolean t2 = false;
 
 		// removing comments
-		while (body.contains("/*")
-			&& body.contains("*/")) {
-			body =
-				body.substring(0, body.indexOf("/*"))
-					+ " "
-					+ body.substring(body.indexOf("*/")
-						+ 2);
+		while (body.contains("/*") && body.contains("*/")) {
+			body = body.substring(0, body.indexOf("/*")) + " " + body.substring(body.indexOf("*/") + 2);
 		}
 
 		while (body.contains("  ")) {
-			body =
-				body.replace("  ", " ");
+			body = body.replace("  ", " ");
 		}
 
 		for (final String s : body.split(" ")) {
@@ -116,79 +93,54 @@ public class CSClassBuilder extends ClassBuilder {
 				break;
 			}
 
-			if (!mod
-				&& isModifier(s)) {
+			if (!mod && isModifier(s)) {
 				// case: modifier
 				if (modifiers.equals("")) {
-					modifiers =
-						s;
+					modifiers = s;
 				} else {
-					modifiers =
-						modifiers
-							+ " "
-							+ s;
+					modifiers = modifiers + " " + s;
 				}
 			} else if (!t1) {
 				// case: type
-				mod =
-					true;
-				t1 =
-					true;
+				mod = true;
+				t1 = true;
 				type.append(s);
 				if (s.contains("<")) {
 					// case: has type arguments
-					t2 =
-						true;
+					t2 = true;
 					if (s.contains(">")) {
-						t2 =
-							false;
+						t2 = false;
 					}
 				}
-			} else if (t2
-				|| s.contains("<")) {
+			} else if (t2 || s.contains("<")) {
 				// case: type with type arguments
-				t2 =
-					true;
+				t2 = true;
 				type.append(s);
 				if (s.contains(">")) {
-					t2 =
-						false;
+					t2 = false;
 				}
 			} else {
 				// case: name(s)
 				namesBuilder.append(s);
 			}
 		}
-		String names =
-			namesBuilder.toString();
-		if (names.endsWith(";")
-			|| names.endsWith("+")
-			|| names.endsWith("-")) {
-			names =
-				names.substring(0, names.length()
-					- 1);
+		String names = namesBuilder.toString();
+		if (names.endsWith(";") || names.endsWith("+") || names.endsWith("-")) {
+			names = names.substring(0, names.length() - 1);
 		}
 
-		final String[] namesArray =
-			names.split(",");
-		for (int i =
-			0; i < namesArray.length; i++) {
-			String f =
-				namesArray[i];
-			f =
-				f.replace("\n", "");
-			f =
-				f.replace("\r", "");
+		final String[] namesArray = names.split(",");
+		for (int i = 0; i < namesArray.length; i++) {
+			String f = namesArray[i];
+			f = f.replace("\n", "");
+			f = f.replace("\r", "");
 			while (f.startsWith(" ")) {
-				f =
-					f.substring(1);
+				f = f.substring(1);
 			}
-			namesArray[i] =
-				f;
+			namesArray[i] = f;
 		}
 
-		final LinkedList<String> field =
-			new LinkedList<String>();
+		final LinkedList<String> field = new LinkedList<String>();
 		field.add(modifiers);
 		field.add(type.toString());
 		for (final String name : namesArray) {
@@ -209,23 +161,16 @@ public class CSClassBuilder extends ClassBuilder {
 	@Override
 	void caseMethodDeclaration(FSTTerminal terminal) {
 		// get name
-		final String name =
-			getMethodName(terminal);
+		final String name = getMethodName(terminal);
 
 		// get return type
-		final String body =
-			terminal.getBody().substring(0, terminal.getBody().indexOf(name));
-		final String returnType =
-			body.split("[ ]")[body.split("[ ]").length
-				- 1];
+		final String body = terminal.getBody().substring(0, terminal.getBody().indexOf(name));
+		final String returnType = body.split("[ ]")[body.split("[ ]").length - 1];
 
 		// get modifiers
-		String modifiers =
-			"";
+		String modifiers = "";
 		if (body.indexOf(returnType) != 0) {
-			modifiers =
-				body.substring(0, body.indexOf(returnType)
-					- 1);
+			modifiers = body.substring(0, body.indexOf(returnType) - 1);
 		}
 
 		// add method
@@ -233,32 +178,19 @@ public class CSClassBuilder extends ClassBuilder {
 	}
 
 	private String getMethodName(FSTTerminal terminal) {
-		String name =
-			terminal.getBody().substring(0, terminal.getBody().indexOf('('));
+		String name = terminal.getBody().substring(0, terminal.getBody().indexOf('('));
 		while (name.endsWith(" ")) {
-			name =
-				name.substring(0, name.length()
-					- 1);
+			name = name.substring(0, name.length() - 1);
 		}
-		return name.substring(name.lastIndexOf(' ')
-			+ 1);
+		return name.substring(name.lastIndexOf(' ') + 1);
 	}
 
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {
-		final String parameter =
-			terminal.getBody().substring(
-					terminal.getBody().indexOf('(')
-						+ 1,
-					terminal.getBody().indexOf(')'));
-		final LinkedList<String> parameterTypes =
-			new LinkedList<String>();
-		if (!"".equals(parameter)
-			&& !parameter.startsWith("{")) {
-			final String[] p =
-				parameter.split("[-]");
-			for (int i =
-				0; i < p.length; i +=
-					2) {
+		final String parameter = terminal.getBody().substring(terminal.getBody().indexOf('(') + 1, terminal.getBody().indexOf(')'));
+		final LinkedList<String> parameterTypes = new LinkedList<String>();
+		if (!"".equals(parameter) && !parameter.startsWith("{")) {
+			final String[] p = parameter.split("[-]");
+			for (int i = 0; i < p.length; i += 2) {
 				parameterTypes.add(p[i]);
 			}
 		}

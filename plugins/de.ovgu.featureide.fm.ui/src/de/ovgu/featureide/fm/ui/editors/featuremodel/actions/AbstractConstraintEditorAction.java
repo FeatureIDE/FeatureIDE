@@ -50,23 +50,19 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 	protected String featuretext;
 
-	private final ISelectionChangedListener listener =
-		new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final IStructuredSelection selection =
-					(IStructuredSelection) event.getSelection();
-				setEnabled(isValidSelection(selection));
-			}
-		};
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			setEnabled(isValidSelection(selection));
+		}
+	};
 
 	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname) {
 		super(menuname);
-		this.viewer =
-			viewer;
-		this.featuremodel =
-			featuremodel;
+		this.viewer = viewer;
+		this.featuremodel = featuremodel;
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		} else {
@@ -76,10 +72,8 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 	@Override
 	public void run() {
-		writer =
-			new XmlFeatureModelFormat();
-		featuretext =
-			writer.write(featuremodel);
+		writer = new XmlFeatureModelFormat();
+		featuretext = writer.write(featuremodel);
 	}
 
 	protected void openEditor(IConstraint constraint) {

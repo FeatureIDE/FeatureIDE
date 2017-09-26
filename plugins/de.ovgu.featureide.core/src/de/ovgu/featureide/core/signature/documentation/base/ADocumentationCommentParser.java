@@ -40,24 +40,13 @@ import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair
  */
 public abstract class ADocumentationCommentParser implements IComposerObject {
 
-	static final String COMMENT_START =
-		"/**",
-			COMMENT_END =
-				"*/";
+	static final String COMMENT_START = "/**", COMMENT_END = "*/";
 
-	private static final Pattern pStart =
-		Pattern.compile("\\/\\*\\*[\\*\n\\s]*"),
-			pCommentType =
-				Pattern.compile("\\A\\s*[{]\\s*@(feature|general|new)(\\s+(\\w)+)*\\s*[}]"),
-			pBlockTag =
-				Pattern.compile("[^{]\\s*@\\w+\\s"),
-			pStar =
-				Pattern.compile("\n\\s*[*]");
+	private static final Pattern pStart = Pattern.compile("\\/\\*\\*[\\*\n\\s]*"),
+			pCommentType = Pattern.compile("\\A\\s*[{]\\s*@(feature|general|new)(\\s+(\\w)+)*\\s*[}]"), pBlockTag = Pattern.compile("[^{]\\s*@\\w+\\s"),
+			pStar = Pattern.compile("\n\\s*[*]");
 
-	protected final List<BlockTag> generalTags =
-		new ArrayList<BlockTag>(),
-			featureTags =
-				new LinkedList<BlockTag>();
+	protected final List<BlockTag> generalTags = new ArrayList<BlockTag>(), featureTags = new LinkedList<BlockTag>();
 
 	protected int curFeatureID, tagPriority;
 	protected Node tagFeatureNode;
@@ -65,19 +54,15 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 	private BlockTagConstructor tagConstructor;
 
 	public final void parse(ProjectSignatures projectSignatures, List<Comment> comments) {
-		tagConstructor =
-			new BlockTagConstructor(projectSignatures);
+		tagConstructor = new BlockTagConstructor(projectSignatures);
 		generalTags.clear();
 		featureTags.clear();
 
 		for (final Comment comment : comments) {
-			final String commentString =
-				comment.getComment();
-			curFeatureID =
-				comment.getFeatureID();
+			final String commentString = comment.getComment();
+			curFeatureID = comment.getFeatureID();
 
-			final Matcher startMatcher =
-				pStart.matcher(commentString);
+			final Matcher startMatcher = pStart.matcher(commentString);
 			while (startMatcher.find()) {
 				parseTags(commentString.substring(startMatcher.end(), commentString.indexOf(COMMENT_END, startMatcher.start())));
 			}
@@ -99,70 +84,45 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 	}
 
 	private void parseTags(String comment) {
-		final Matcher mc =
-			pCommentType.matcher(comment);
+		final Matcher mc = pCommentType.matcher(comment);
 		if (mc.find()) {
-			parseHead(comment.substring(comment.indexOf('@')
-				+ 1, mc.end()
-					- 1).split("\\s+"));
-			comment =
-				comment.substring(mc.end());
+			parseHead(comment.substring(comment.indexOf('@') + 1, mc.end() - 1).split("\\s+"));
+			comment = comment.substring(mc.end());
 		} else {
-			tagFeatureNode =
-				null;
-			tagPriority =
-				0;
+			tagFeatureNode = null;
+			tagPriority = 0;
 		}
 
 		addBlockTagToList(comment);
 	}
 
 	private void addBlockTagToList(String comment) {
-		final List<BlockTag> tagList =
-			(tagFeatureNode != null)
-				? featureTags
-				: generalTags;
+		final List<BlockTag> tagList = (tagFeatureNode != null) ? featureTags : generalTags;
 
-		comment =
-			pStar.matcher(comment).replaceAll("\n");
-		final Matcher m =
-			pBlockTag.matcher(comment);
+		comment = pStar.matcher(comment).replaceAll("\n");
+		final Matcher m = pBlockTag.matcher(comment);
 
 		int x, y, z;
 		if (m.find()) {
-			x =
-				m.start();
-			z =
-				m.end();
+			x = m.start();
+			z = m.end();
 
-			categorize(tagList, "", comment.substring(0, x
-				+ 1).trim());
+			categorize(tagList, "", comment.substring(0, x + 1).trim());
 
 			while (m.find()) {
-				y =
-					m.start();
-				categorize(tagList, comment.substring(x
-					+ 1, z
-						- 1).trim(), comment.substring(z,
-								y
-									+ 1)
-								.trim());
-				x =
-					y;
-				z =
-					m.end();
+				y = m.start();
+				categorize(tagList, comment.substring(x + 1, z - 1).trim(), comment.substring(z, y + 1).trim());
+				x = y;
+				z = m.end();
 			}
-			categorize(tagList, comment.substring(x
-				+ 1, z
-					- 1).trim(), comment.substring(z).trim());
+			categorize(tagList, comment.substring(x + 1, z - 1).trim(), comment.substring(z).trim());
 		} else {
 			categorize(tagList, "", comment.trim());
 		}
 	}
 
 	private void categorize(List<BlockTag> tagList, String head, String body) {
-		final BlockTag tag =
-			tagConstructor.construct(head, body, tagPriority, tagFeatureNode);
+		final BlockTag tag = tagConstructor.construct(head, body, tagPriority, tagFeatureNode);
 		if (tag != null) {
 			tagList.add(tag);
 		}

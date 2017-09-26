@@ -29,18 +29,14 @@ import java.util.HashMap;
  */
 public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 
-	private HashMap<String, Integer> featureExtensionLOCList =
-		new HashMap<String, Integer>();
-	private final HashMap<String, Integer> count =
-		new HashMap<String, Integer>();
+	private HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> count = new HashMap<String, Integer>();
 	private final int side;
 
 	public HashMapNodeTwoStrings(String description, int side, HashMap<String, Integer> extList) {
 		super(description);
-		featureExtensionLOCList =
-			extList;
-		this.side =
-			side;
+		featureExtensionLOCList = extList;
+		this.side = side;
 	}
 
 	@Override
@@ -50,15 +46,13 @@ public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 				if (!count.containsKey(name.split("#")[0])) {
 					count.put(name.split("#")[0], featureExtensionLOCList.get(name));
 				} else {
-					count.put(name.split("#")[0], count.get(name.split("#")[0])
-						+ featureExtensionLOCList.get(name));
+					count.put(name.split("#")[0], count.get(name.split("#")[0]) + featureExtensionLOCList.get(name));
 				}
 			} else if (side == 2) {
 				if (!count.containsKey(name.split("#")[1])) {
 					count.put(name.split("#")[1], featureExtensionLOCList.get(name));
 				} else {
-					count.put(name.split("#")[1], count.get(name.split("#")[1])
-						+ featureExtensionLOCList.get(name));
+					count.put(name.split("#")[1], count.get(name.split("#")[1]) + featureExtensionLOCList.get(name));
 				}
 			}
 		}

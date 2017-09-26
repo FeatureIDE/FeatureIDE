@@ -42,26 +42,22 @@ public class BuildMetaProductHandler extends AFeatureProjectHandler {
 	@Override
 	protected void singleAction(final IFeatureProject featureProject) {
 		if (FeatureHouseComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
-			final FeatureHouseComposer featureHouseComposer =
-				(FeatureHouseComposer) featureProject.getComposer();
+			final FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) featureProject.getComposer();
 			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.buildMetaProduct());
 
-			final LongRunningMethod<Boolean> job =
-				new LongRunningMethod<Boolean>() {
+			final LongRunningMethod<Boolean> job = new LongRunningMethod<Boolean>() {
 
-					@Override
-					public Boolean execute(IMonitor workMonitor) throws Exception {
-						try {
-							featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-						} catch (final CoreException e) {
-							FeatureHouseCorePlugin.getDefault().logError(e);
-						}
-						return true;
+				@Override
+				public Boolean execute(IMonitor workMonitor) throws Exception {
+					try {
+						featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
+					} catch (final CoreException e) {
+						FeatureHouseCorePlugin.getDefault().logError(e);
 					}
-				};
-			LongRunningWrapper.getRunner(job, "Build meta product for project \""
-				+ featureProject.getProjectName()
-				+ "\".").schedule();
+					return true;
+				}
+			};
+			LongRunningWrapper.getRunner(job, "Build meta product for project \"" + featureProject.getProjectName() + "\".").schedule();
 		}
 	}
 

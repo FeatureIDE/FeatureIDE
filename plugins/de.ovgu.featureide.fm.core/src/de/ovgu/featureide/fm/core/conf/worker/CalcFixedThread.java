@@ -41,18 +41,14 @@ public class CalcFixedThread extends AWorkerThread<String> {
 	private static class SharedObjects {
 
 		private final MultiThreadSatSolver solver;
-		private final ArrayList<Literal> fixedLiteralsList =
-			new ArrayList<>();
+		private final ArrayList<Literal> fixedLiteralsList = new ArrayList<>();
 		private final int numberOfSolvers;
 
-		private int lastSolverID =
-			0;
+		private int lastSolverID = 0;
 
 		public SharedObjects(Node fmNode, int numberOfSolvers) {
-			this.numberOfSolvers =
-				numberOfSolvers;
-			solver =
-				new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
+			this.numberOfSolvers = numberOfSolvers;
+			solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
 
 	}
@@ -70,18 +66,14 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 	public CalcFixedThread(Node fmNode, int numberOfSolvers, IMonitor monitor) {
 		super(monitor);
-		sharedObjects =
-			new SharedObjects(fmNode, numberOfSolvers);
-		id =
-			sharedObjects.lastSolverID;
+		sharedObjects = new SharedObjects(fmNode, numberOfSolvers);
+		id = sharedObjects.lastSolverID;
 	}
 
 	private CalcFixedThread(CalcFixedThread oldThread) {
 		super(oldThread);
-		sharedObjects =
-			oldThread.sharedObjects;
-		id =
-			++oldThread.sharedObjects.lastSolverID;
+		sharedObjects = oldThread.sharedObjects;
+		id = ++oldThread.sharedObjects.lastSolverID;
 	}
 
 	@Override
@@ -105,17 +97,14 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 	@Override
 	protected void work(String featureName) {
-		final Literal curLiteral =
-			new Literal(featureName);
-		final byte value =
-			sharedObjects.solver.getValueOf(curLiteral, id);
+		final Literal curLiteral = new Literal(featureName);
+		final byte value = sharedObjects.solver.getValueOf(curLiteral, id);
 		switch (value) {
 		case 1:
 			addLiteral(curLiteral);
 			break;
 		case -1:
-			curLiteral.positive =
-				false;
+			curLiteral.positive = false;
 			addLiteral(curLiteral);
 			break;
 		default:

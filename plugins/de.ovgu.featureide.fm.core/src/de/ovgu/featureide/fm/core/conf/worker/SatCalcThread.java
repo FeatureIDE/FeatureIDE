@@ -46,18 +46,13 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 		private final Node fmNode;
 		private final String[] featureNames;
 
-		private List<Literal> knownLiterals =
-			null;
-		private Literal l =
-			null;
+		private List<Literal> knownLiterals = null;
+		private Literal l = null;
 
 		public SharedObjects(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
-			this.variableConfiguration =
-				variableConfiguration;
-			this.fmNode =
-				fmNode;
-			featureNames =
-				FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
+			this.variableConfiguration = variableConfiguration;
+			this.fmNode = fmNode;
+			featureNames = FeatureUtils.getFeaturesFromFeatureGraph(featureGraph);
 		}
 	}
 
@@ -66,25 +61,19 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 
 	public SatCalcThread(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
 		super(new NullMonitor());
-		sharedObjects =
-			new SharedObjects(featureGraph, variableConfiguration, fmNode);
-		solver =
-			new SimpleSatSolver(fmNode, 1000);
+		sharedObjects = new SharedObjects(featureGraph, variableConfiguration, fmNode);
+		solver = new SimpleSatSolver(fmNode, 1000);
 	}
 
 	private SatCalcThread(SatCalcThread oldThread) {
 		super(oldThread);
-		sharedObjects =
-			oldThread.sharedObjects;
-		solver =
-			new SimpleSatSolver(oldThread.sharedObjects.fmNode, 1000);
+		sharedObjects = oldThread.sharedObjects;
+		solver = new SimpleSatSolver(oldThread.sharedObjects.fmNode, 1000);
 	}
 
 	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
-		sharedObjects.knownLiterals =
-			knownLiterals;
-		sharedObjects.l =
-			l;
+		sharedObjects.knownLiterals = knownLiterals;
+		sharedObjects.l = l;
 	}
 
 	@Override
@@ -95,8 +84,7 @@ public class SatCalcThread extends AWorkerThread<Integer> {
 
 	@Override
 	protected void work(Integer i) {
-		final byte value =
-			solver.getValueOf(new Literal(sharedObjects.featureNames[i]));
+		final byte value = solver.getValueOf(new Literal(sharedObjects.featureNames[i]));
 		switch (value) {
 		case 1:
 			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);

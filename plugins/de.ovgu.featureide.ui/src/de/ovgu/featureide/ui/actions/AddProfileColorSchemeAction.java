@@ -49,8 +49,7 @@ public class AddProfileColorSchemeAction extends Action {
 	 */
 	public AddProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
-		this.model =
-			model;
+		this.model = model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
@@ -60,11 +59,9 @@ public class AddProfileColorSchemeAction extends Action {
 	 */
 	@Override
 	public void run() {
-		final NewColorSchemeWizard wizard =
-			new NewColorSchemeWizard(model, null);
+		final NewColorSchemeWizard wizard = new NewColorSchemeWizard(model, null);
 
-		final WizardDialog dialog =
-			new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 

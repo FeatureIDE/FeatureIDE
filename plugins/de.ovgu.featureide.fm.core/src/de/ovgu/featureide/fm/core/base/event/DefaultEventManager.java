@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.core.Logger;
  */
 public class DefaultEventManager implements IEventManager, IEventListener {
 
-	protected final List<IEventListener> listenerList =
-		new LinkedList<>();
+	protected final List<IEventListener> listenerList = new LinkedList<>();
 
 	@Override
 	public synchronized void addListener(IEventListener listener) {

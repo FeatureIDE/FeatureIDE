@@ -53,19 +53,15 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 		if (featureProject == null) {
 			return;
 		}
-		AheadCorePlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT
-			+ featureProject.getProjectName()
-			+
-			FROM_AHEAD_TO_FEATUREHOUSE_);
-		final Job job =
-			new Job(CHANGE_COMPOSER_) {
+		AheadCorePlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT + featureProject.getProjectName() + FROM_AHEAD_TO_FEATUREHOUSE_);
+		final Job job = new Job(CHANGE_COMPOSER_) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					startProjectConversion(featureProject);
-					return Status.OK_STATUS;
-				}
-			};
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				startProjectConversion(featureProject);
+				return Status.OK_STATUS;
+			}
+		};
 		job.setPriority(Job.BUILD);
 		job.schedule();
 
@@ -87,10 +83,8 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	 */
 	@Override
 	public String changeFile(String fileText, IFile file) {
-		fileText =
-			fileText.replaceFirst("layer \\w*;", "");
-		fileText =
-			fileText.replaceFirst("refines ", "");
+		fileText = fileText.replaceFirst("layer \\w*;", "");
+		fileText = fileText.replaceFirst("refines ", "");
 		return fileText.replaceAll("Super\\(\\s*\\w*\\s*\\).\\w*\\(", "original(");
 	}
 

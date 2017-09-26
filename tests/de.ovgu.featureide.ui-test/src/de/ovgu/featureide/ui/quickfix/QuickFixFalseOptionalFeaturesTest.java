@@ -53,23 +53,17 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 @RunWith(Parameterized.class)
 public class QuickFixFalseOptionalFeaturesTest {
 
-	QuickFixFalseOptionalFeatures quickFix =
-		new QuickFixFalseOptionalFeatures(null);
+	QuickFixFalseOptionalFeatures quickFix = new QuickFixFalseOptionalFeatures(null);
 
-	protected static File MODEL_FILE_FOLDER =
-		new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
+	protected static File MODEL_FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
 
 	protected String failureMessage;
 
 	private final IFeatureModel fm;
 
 	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s) throws UnsupportedModelException {
-		this.fm =
-			fm;
-		failureMessage =
-			"("
-				+ s
-				+ ")";
+		this.fm = fm;
+		failureMessage = "(" + s + ")";
 
 	}
 
@@ -77,22 +71,16 @@ public class QuickFixFalseOptionalFeaturesTest {
 	public static Collection<Object[]> getModels() throws FileNotFoundException, UnsupportedModelException {
 		// first tries the location on build server, if this fails tries to use local location
 		if (!MODEL_FILE_FOLDER.canRead()) {
-			MODEL_FILE_FOLDER =
-				new File(ClassLoader.getSystemResource("models").getPath());
+			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("models").getPath());
 		}
-		final Collection<Object[]> params =
-			new ArrayList<>();
+		final Collection<Object[]> params = new ArrayList<>();
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
-			final Object[] models =
-				new Object[2];
+			final Object[] models = new Object[2];
 
-			final IFeatureModel fm =
-				DefaultFeatureModelFactory.getInstance().createFeatureModel();
+			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
 			SimpleFileHandler.load(f.toPath(), fm, FMFormatManager.getInstance());
-			models[0] =
-				fm;
-			models[1] =
-				f.getName();
+			models[0] = fm;
+			models[1] = f.getName();
 			params.add(models);
 		}
 
@@ -100,25 +88,21 @@ public class QuickFixFalseOptionalFeaturesTest {
 	}
 
 	private final static FileFilter getFileFilter(final String s) {
-		final FileFilter filter =
-			new FileFilter() {
+		final FileFilter filter = new FileFilter() {
 
-				@Override
-				public boolean accept(File pathname) {
-					return pathname.getName().endsWith(s);
-				}
-			};
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getName().endsWith(s);
+			}
+		};
 		return filter;
 	}
 
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete =
-			FeatureUtils.getConcreteFeatures(fm);
-		final Collection<IFeature> core =
-			fm.getAnalyser().getCoreFeatures();
-		final Collection<String> falseOptionalFeatures =
-			new LinkedList<String>();
+		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
+		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
+		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 
 		for (final IFeature feature : concrete) {
 			if (!core.contains(feature)) {
@@ -126,14 +110,11 @@ public class QuickFixFalseOptionalFeaturesTest {
 			}
 		}
 
-		final Collection<String> falseOptionalFeaturesTest =
-			new ArrayList<String>(falseOptionalFeatures);
-		final Collection<Configuration> confs =
-			quickFix.createConfigurations(falseOptionalFeatures, fm);
+		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
+		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
 		for (final Configuration conf : confs) {
 			for (final SelectableFeature feature : conf.getFeatures()) {
-				if ((feature.getSelection() == Selection.UNDEFINED)
-					|| (feature.getSelection() == Selection.UNSELECTED)) {
+				if ((feature.getSelection() == Selection.UNDEFINED) || (feature.getSelection() == Selection.UNSELECTED)) {
 					falseOptionalFeaturesTest.remove(feature.getName());
 				}
 			}

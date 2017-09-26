@@ -37,8 +37,7 @@ import de.ovgu.runtimetest.RuntimeTest.Annotations.WarmUp;
 public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 
 	static {
-		disableThisTest =
-			false;	// set this flag to true, if this test class should be skipped
+		disableThisTest = false;	// set this flag to true, if this test class should be skipped
 	}
 
 	/**
@@ -46,8 +45,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	 */
 	@WarmUp
 	public void warmup() {
-		for (int i =
-			0; i < 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			analyze(10);
 			analyze(20);
 			analyze(21);

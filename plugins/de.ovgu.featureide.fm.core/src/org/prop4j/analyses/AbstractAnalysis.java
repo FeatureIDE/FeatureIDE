@@ -37,22 +37,18 @@ public abstract class AbstractAnalysis<T> implements LongRunningMethod<T> {
 
 	protected ISatSolver solver;
 
-	protected int[] assumptions =
-		null;
+	protected int[] assumptions = null;
 
 	public AbstractAnalysis(SatInstance satInstance) {
 		try {
-			this.solver =
-				new BasicSolver(satInstance);
+			this.solver = new BasicSolver(satInstance);
 		} catch (final ContradictionException e) {
-			this.solver =
-				null;
+			this.solver = null;
 		}
 	}
 
 	public AbstractAnalysis(ISatSolver solver) {
-		this.solver =
-			solver;
+		this.solver = solver;
 	}
 
 	@Override
@@ -82,8 +78,7 @@ public abstract class AbstractAnalysis<T> implements LongRunningMethod<T> {
 	}
 
 	public void setAssumptions(int[] assumptions) {
-		this.assumptions =
-			assumptions;
+		this.assumptions = assumptions;
 	}
 
 }

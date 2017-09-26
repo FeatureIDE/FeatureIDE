@@ -65,13 +65,11 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 public class CsvExporter {
 
 	private final Shell shell;
-	public static final String SEPARATOR =
-		";";
+	public static final String SEPARATOR = ";";
 
 	public CsvExporter(Shell shell) {
 		super();
-		this.shell =
-			shell;
+		this.shell = shell;
 	}
 
 	private String returnVal;
@@ -80,44 +78,29 @@ public class CsvExporter {
 
 	public void export(final Object[] export) {
 
-		final UIJob uiJob =
-			new UIJob("") {
+		final UIJob uiJob = new UIJob("") {
 
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					visibleExpandedElements =
-						export;
-					final FileDialog dialog =
-						new FileDialog(shell, SWT.SAVE);
-					final String filterPath =
-						"/";
-					final String[] filterExtensions =
-						new String[] {
-							"*.csv",
-							"*" };
-					final String[] filterNames =
-						new String[] {
-							"CSV files ("
-								+ filterExtensions[0]
-								+ ')',
-							"All files ("
-								+ filterExtensions[1]
-								+ ')' };
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				visibleExpandedElements = export;
+				final FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+				final String filterPath = "/";
+				final String[] filterExtensions = new String[] { "*.csv", "*" };
+				final String[] filterNames = new String[] { "CSV files (" + filterExtensions[0] + ')', "All files (" + filterExtensions[1] + ')' };
 
-					dialog.setFilterNames(filterNames);
-					dialog.setFilterExtensions(filterExtensions);
-					dialog.setFilterPath(filterPath);
-					dialog.setText(EXPORT_STATISTICS_INTO_CSV);
-					dialog.setFileName("newfile.csv");
+				dialog.setFilterNames(filterNames);
+				dialog.setFilterExtensions(filterExtensions);
+				dialog.setFilterPath(filterPath);
+				dialog.setText(EXPORT_STATISTICS_INTO_CSV);
+				dialog.setFileName("newfile.csv");
 
-					returnVal =
-						dialog.open();
-					if (returnVal == null) {
-						return Status.CANCEL_STATUS;
-					}
-					return Status.OK_STATUS;
+				returnVal = dialog.open();
+				if (returnVal == null) {
+					return Status.CANCEL_STATUS;
 				}
-			};
+				return Status.OK_STATUS;
+			}
+		};
 
 		uiJob.setPriority(Job.INTERACTIVE);
 		uiJob.schedule();
@@ -153,136 +136,109 @@ public class CsvExporter {
 	 *
 	 */
 	private void exportToCSV() {
-		final Job job =
-			new Job(EXPORT_STATISTICS_INTO_CSV) {
+		final Job job = new Job(EXPORT_STATISTICS_INTO_CSV) {
 
-				private StringBuilder firstBuffer;
-				private StringBuilder secondBuffer;
+			private StringBuilder firstBuffer;
+			private StringBuilder secondBuffer;
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
 
-					final List<String> descs =
-						new LinkedList<String>();
-					final List<String> vals =
-						new LinkedList<String>();
-					getExportData(descs, vals);
-					firstBuffer =
-						new StringBuilder();
-					secondBuffer =
-						new StringBuilder();
-					prepareDataForExport(descs, vals, firstBuffer, secondBuffer);
-					return actualWriting();
+				final List<String> descs = new LinkedList<String>();
+				final List<String> vals = new LinkedList<String>();
+				getExportData(descs, vals);
+				firstBuffer = new StringBuilder();
+				secondBuffer = new StringBuilder();
+				prepareDataForExport(descs, vals, firstBuffer, secondBuffer);
+				return actualWriting();
+			}
+
+			private IStatus actualWriting() {
+				BufferedWriter writer = null;
+
+				if (!returnVal.endsWith(".csv")) {
+					returnVal += ".csv";
 				}
-
-				private IStatus actualWriting() {
-					BufferedWriter writer =
-						null;
-
-					if (!returnVal.endsWith(".csv")) {
-						returnVal +=
-							".csv";
+				final File file = new File(returnVal);
+				try {
+					if (!file.exists()) {
+						file.createNewFile();
 					}
-					final File file =
-						new File(returnVal);
-					try {
-						if (!file.exists()) {
-							file.createNewFile();
-						}
-						writer =
-							new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-						writer.write(firstBuffer.toString());
-						writer.newLine();
-						writer.write(secondBuffer.toString());
-					} catch (final FileNotFoundException e) {
-						giveUserFeedback(true);
-						return Status.CANCEL_STATUS;
-					} catch (final IOException e) {
-						UIPlugin.getDefault().logError(e);
-					} finally {
-						if (writer != null) {
-							try {
-								writer.close();
-							} catch (final IOException e) {
-								UIPlugin.getDefault().logError(e);
-							}
-						}
-					}
-					giveUserFeedback(false);
-					return Status.OK_STATUS;
-				}
-
-				private void giveUserFeedback(final boolean error) {
-					final UIJob errorJob =
-						new UIJob(error
-							? SHOW_ERRORDIALOG
-							: SHOW_DIALOG) {
-
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								final Shell shell =
-									Display.getDefault().getActiveShell();
-								if (error) {
-									final MessageDialog dial =
-										new MessageDialog(shell, "Error", GUIDefaults.FEATURE_SYMBOL, "The file cannot be accessed!\nTry again?",
-												MessageDialog.ERROR, new String[] {
-													OK,
-													CANCEL },
-												0);
-									if (dial.open() == 0) {
-										actualWriting();
-									}
-								} else {
-									new MessageDialog(shell, SUCCESS, GUIDefaults.FEATURE_SYMBOL, DATA_WAS_SUCCESSFULLY_EXPORTED, MessageDialog.INFORMATION,
-											new String[] {
-												OK },
-											0).open();
-								}
-
-								return Status.OK_STATUS;
-							}
-						};
-					errorJob.setPriority(INTERACTIVE);
-					errorJob.schedule();
-				}
-
-				private void prepareDataForExport(List<String> descs, List<String> vals, StringBuilder buffer, StringBuilder secBuf) {
-					for (final String desc : descs) {
-						buffer.append(desc);
-						buffer.append(SEPARATOR);
-					}
-					for (final String val : vals) {
-						secBuf.append(val);
-						secBuf.append(SEPARATOR);
-					}
-				}
-
-				private void getExportData(List<String> descs, List<String> vals) {
-					descs.add("Description: ");
-					vals.add("Value: ");
-					Parent last =
-						null;
-					for (final Object o : visibleExpandedElements) {
-						if (o instanceof Parent) {
-							final Parent parent =
-								((Parent) o);
-							if (parent.getParent().equals(last)) {
-								final int end =
-									descs.size()
-										- 1;
-								descs.set(end, descs.get(end)
-									+ ":");
-							}
-							descs.add(parent.getDescription());
-							vals.add(parent.getValue() != null
-								? parent.getValue().toString()
-								: "");
-							last =
-								parent;
+					writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+					writer.write(firstBuffer.toString());
+					writer.newLine();
+					writer.write(secondBuffer.toString());
+				} catch (final FileNotFoundException e) {
+					giveUserFeedback(true);
+					return Status.CANCEL_STATUS;
+				} catch (final IOException e) {
+					UIPlugin.getDefault().logError(e);
+				} finally {
+					if (writer != null) {
+						try {
+							writer.close();
+						} catch (final IOException e) {
+							UIPlugin.getDefault().logError(e);
 						}
 					}
 				}
-			};
+				giveUserFeedback(false);
+				return Status.OK_STATUS;
+			}
+
+			private void giveUserFeedback(final boolean error) {
+				final UIJob errorJob = new UIJob(error ? SHOW_ERRORDIALOG : SHOW_DIALOG) {
+
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
+						final Shell shell = Display.getDefault().getActiveShell();
+						if (error) {
+							final MessageDialog dial = new MessageDialog(shell, "Error", GUIDefaults.FEATURE_SYMBOL, "The file cannot be accessed!\nTry again?",
+									MessageDialog.ERROR, new String[] { OK, CANCEL }, 0);
+							if (dial.open() == 0) {
+								actualWriting();
+							}
+						} else {
+							new MessageDialog(shell, SUCCESS, GUIDefaults.FEATURE_SYMBOL, DATA_WAS_SUCCESSFULLY_EXPORTED, MessageDialog.INFORMATION,
+									new String[] { OK }, 0).open();
+						}
+
+						return Status.OK_STATUS;
+					}
+				};
+				errorJob.setPriority(INTERACTIVE);
+				errorJob.schedule();
+			}
+
+			private void prepareDataForExport(List<String> descs, List<String> vals, StringBuilder buffer, StringBuilder secBuf) {
+				for (final String desc : descs) {
+					buffer.append(desc);
+					buffer.append(SEPARATOR);
+				}
+				for (final String val : vals) {
+					secBuf.append(val);
+					secBuf.append(SEPARATOR);
+				}
+			}
+
+			private void getExportData(List<String> descs, List<String> vals) {
+				descs.add("Description: ");
+				vals.add("Value: ");
+				Parent last = null;
+				for (final Object o : visibleExpandedElements) {
+					if (o instanceof Parent) {
+						final Parent parent = ((Parent) o);
+						if (parent.getParent().equals(last)) {
+							final int end = descs.size() - 1;
+							descs.set(end, descs.get(end) + ":");
+						}
+						descs.add(parent.getDescription());
+						vals.add(parent.getValue() != null ? parent.getValue().toString() : "");
+						last = parent;
+					}
+				}
+			}
+		};
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}

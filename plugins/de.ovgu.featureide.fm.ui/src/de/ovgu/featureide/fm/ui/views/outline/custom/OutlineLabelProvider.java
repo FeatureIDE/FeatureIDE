@@ -32,18 +32,14 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public abstract class OutlineLabelProvider implements ILabelProvider {
 
-	public static final int OUTLINE_NOT_AVAILABLE =
-		-1;
-	public static final int OUTLINE_FEATURE_MODEL =
-		0;
-	public static final int OUTLINE_CODE =
-		1;
+	public static final int OUTLINE_NOT_AVAILABLE = -1;
+	public static final int OUTLINE_FEATURE_MODEL = 0;
+	public static final int OUTLINE_CODE = 1;
 
 	protected TreeViewer viewer;
 
 	public void initTreeViewer(TreeViewer viewer) {
-		this.viewer =
-			viewer;
+		this.viewer = viewer;
 		init();
 	}
 

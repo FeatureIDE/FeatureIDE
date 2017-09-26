@@ -50,24 +50,21 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private boolean toggleState;
 
 	public BuildProductsWizard(IFeatureProject featureProject, boolean toggleState) {
-		this.featureProject =
-			featureProject;
-		this.toggleState =
-			toggleState;
+		this.featureProject = featureProject;
+		this.toggleState = toggleState;
 	}
 
 	@Override
 	public boolean performFinish() {
-		toggleState =
-			page.getToggleState();
+		toggleState = page.getToggleState();
 		setTWise(page.getAlgorithm(), page.getT());
 		setTOrder(page.getTInteraction());
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
 		setTest(page.getTest());
 		setMax(page.getMax());
-		new ConfigurationBuilder(featureProject, page.getGeneration(),
-				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(), page.getMax(), page.getTInteraction());
+		new ConfigurationBuilder(featureProject, page.getGeneration(), toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest(),
+				page.getMax(), page.getTInteraction());
 
 		return true;
 	}
@@ -75,9 +72,8 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	@Override
 	public void addPages() {
 		setWindowTitle(BUILD_PRODUCTS);
-		page =
-			new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState,
-					getAlgorithm(), getT(), getT_Interaction(), getOrder(), getTest(), getMax());
+		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getT_Interaction(),
+				getOrder(), getTest(), getMax());
 		addPage(page);
 	}
 
@@ -89,20 +85,12 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	}
 
 	private String getAlgorithm() {
-		final String tWise =
-			getTWise();
+		final String tWise = getTWise();
 		if (tWise == null) {
 			return ICPL;
 		}
-		final String algorithm =
-			tWise.split("[|]")[0];
-		if (!(algorithm.equals(ICPL)
-			||
-			algorithm.equals(CASA)
-			||
-			algorithm.equals(INCLING)
-			||
-			algorithm.equals(CHVATAL))) {
+		final String algorithm = tWise.split("[|]")[0];
+		if (!(algorithm.equals(ICPL) || algorithm.equals(CASA) || algorithm.equals(INCLING) || algorithm.equals(CHVATAL))) {
 			// return the default algorithm if the algorithm was saved wrong
 			return ICPL;
 		}
@@ -110,8 +98,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	}
 
 	private int getT() {
-		final String tWise =
-			getTWise();
+		final String tWise = getTWise();
 		if (tWise == null) {
 			return 2;
 		}
@@ -135,8 +122,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	 */
 	protected static int getT_Interaction() {
 		try {
-			final String generate =
-				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(T_INTERACTION);
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(T_INTERACTION);
 			if (generate == null) {
 				return 2;
 			}
@@ -152,9 +138,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	 */
 	protected static void setTWise(String algorithm, int t) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_WISE, algorithm
-				+ "|"
-				+ t);
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_WISE, algorithm + "|" + t);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -162,8 +146,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private static String getGenerate() {
 		try {
-			final String generate =
-				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GENERATE);
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GENERATE);
 			if (generate == null) {
 				return ALL_VALID_CONFIGURATIONS;
 			}
@@ -184,8 +167,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private static String getOrder() {
 		try {
-			final String generate =
-				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(ORDER);
+			final String generate = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(ORDER);
 			if (generate == null) {
 				return DEFAULT;
 			}
@@ -206,8 +188,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private static boolean getTest() {
 		try {
-			final String test =
-				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TEST);
+			final String test = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TEST);
 			if ("true".equals(test)) {
 				return true;
 			}
@@ -223,31 +204,25 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private static void setTest(boolean test) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test
-				+ "");
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test + "");
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	private String getMax() {
-		String returnValue =
-			"";
+		String returnValue = "";
 		try {
-			returnValue =
-				ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(MAX);
+			returnValue = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(MAX);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		return returnValue != null
-			? returnValue
-			: "";
+		return returnValue != null ? returnValue : "";
 	}
 
 	private void setMax(int max) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(MAX, max
-				+ "");
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(MAX, max + "");
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -255,8 +230,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	private void setTOrder(int t) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_INTERACTION, t
-				+ "");
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(T_INTERACTION, t + "");
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

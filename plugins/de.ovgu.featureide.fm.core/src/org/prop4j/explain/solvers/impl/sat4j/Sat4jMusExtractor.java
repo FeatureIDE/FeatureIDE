@@ -36,11 +36,6 @@ import org.sat4j.tools.xplain.Xplain;
  */
 public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
 
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jMusExtractor() {}
-
 	@Override
 	protected Xplain<ISolver> createOracle() {
 		return new Xplain<ISolver>(super.createOracle());
@@ -54,14 +49,7 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		final Set<Integer> indexes =
-			getMinimalUnsatisfiableSubsetIndexes();
-		final Set<Node> mus =
-			new LinkedHashSet<>(indexes.size());
-		for (final int index : indexes) {
-			mus.add(getClause(index));
-		}
-		return mus;
+		return getClauses(getMinimalUnsatisfiableSubsetIndexes());
 	}
 
 	@Override
@@ -71,16 +59,28 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		}
 		final int[] indexes;
 		try {
-			indexes =
-				getOracle().minimalExplanation();
+			indexes = getOracle().minimalExplanation();
 		} catch (final TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set =
-			new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}
 		return set;
+	}
+
+	/**
+	 * Returns the clauses for the given clause indexes.
+	 * 
+	 * @param indexes clause indexes
+	 * @return the clauses for the given clause indexes
+	 */
+	private Set<Node> getClauses(Set<Integer> indexes) {
+		final Set<Node> clauses = new LinkedHashSet<>(indexes.size());
+		for (final int index : indexes) {
+			clauses.add(getClause(index));
+		}
+		return clauses;
 	}
 }

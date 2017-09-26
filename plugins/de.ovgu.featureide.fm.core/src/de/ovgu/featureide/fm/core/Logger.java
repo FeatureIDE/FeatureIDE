@@ -26,8 +26,7 @@ package de.ovgu.featureide.fm.core;
  */
 public class Logger {
 
-	static ILogger logger =
-		new JavaLogger();
+	static ILogger logger = new JavaLogger();
 
 	public static void logInfo(String message) {
 		logger.logInfo(message);

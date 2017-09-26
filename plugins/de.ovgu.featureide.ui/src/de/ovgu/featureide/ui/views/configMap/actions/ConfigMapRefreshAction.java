@@ -39,8 +39,7 @@ public class ConfigMapRefreshAction extends Action {
 		setImageDescriptor(ImageDescriptor.createFromImage(UIPlugin.getImage("refresh_tab.gif")));
 
 		setToolTipText("Refresh");
-		configMap =
-			map;
+		configMap = map;
 	}
 
 	/*

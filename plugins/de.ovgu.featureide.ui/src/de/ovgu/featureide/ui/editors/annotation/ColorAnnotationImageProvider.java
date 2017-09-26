@@ -42,10 +42,7 @@ public class ColorAnnotationImageProvider implements IAnnotationImageProvider {
 		private final ImageData imgdata;
 
 		public ColorAnnotationDescriptor(int color) {
-			imgdata =
-				new ImageData(10, 15, 1, new PaletteData(
-						new RGB[] {
-							ColorPalette.getRGB(color, 0.6f) }));
+			imgdata = new ImageData(10, 15, 1, new PaletteData(new RGB[] { ColorPalette.getRGB(color, 0.6f) }));
 		}
 
 		@Override
@@ -62,8 +59,7 @@ public class ColorAnnotationImageProvider implements IAnnotationImageProvider {
 	@Override
 	public String getImageDescriptorId(Annotation annotation) {
 		if (annotation instanceof ColorAnnotation) {
-			final ColorAnnotation ca =
-				(ColorAnnotation) annotation;
+			final ColorAnnotation ca = (ColorAnnotation) annotation;
 			if (ca.isImageAnnotation()) {
 				return ca.getId();
 			}

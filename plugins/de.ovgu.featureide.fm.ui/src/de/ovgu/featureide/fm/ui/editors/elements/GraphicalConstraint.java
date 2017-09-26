@@ -42,35 +42,24 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	protected final IConstraint correspondingConstraint;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
-	protected boolean featureSelected =
-		false;
-	public boolean isImplicit =
-		false;
+	protected boolean featureSelected = false;
+	public boolean isImplicit = false;
 
-	protected Point location =
-		new Point(0, 0);
-	protected Dimension dimension =
-		new Dimension(10, 10);
+	protected Point location = new Point(0, 0);
+	protected Dimension dimension = new Dimension(10, 10);
 	private IEventListener uiObject;
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
-		featureSelected =
-			constraint.featureSelected;
-		correspondingConstraint =
-			constraint.correspondingConstraint;
-		graphicalFeatureModel =
-			constraint.graphicalFeatureModel;
-		location =
-			constraint.location;
-		dimension =
-			constraint.dimension;
+		featureSelected = constraint.featureSelected;
+		correspondingConstraint = constraint.correspondingConstraint;
+		graphicalFeatureModel = constraint.graphicalFeatureModel;
+		location = constraint.location;
+		dimension = constraint.dimension;
 	}
 
 	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
-		this.correspondingConstraint =
-			correspondingConstraint;
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
+		this.correspondingConstraint = correspondingConstraint;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
@@ -104,8 +93,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void setFeatureSelected(boolean selected) {
 		if (featureSelected != selected) {
-			featureSelected =
-				selected;
+			featureSelected = selected;
 			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 		}
 	}
@@ -113,16 +101,14 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public void setConstraintImplicit(boolean implicit) {
 		if (isImplicit != implicit) {
-			isImplicit =
-				implicit;
+			isImplicit = implicit;
 		}
 	}
 
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!newLocation.equals(location)) {
-			location =
-				newLocation;
+			location = newLocation;
 			update(FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE));
 		}
 	}
@@ -134,8 +120,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	@Override
 	public void setSize(Dimension size) {
-		dimension =
-			size;
+		dimension = size;
 	}
 
 	@Override
@@ -162,8 +147,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	@Override
 	public void registerUIObject(IEventListener listener) {
-		uiObject =
-			listener;
+		uiObject = listener;
 	}
 
 	@Override

@@ -50,12 +50,9 @@ public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjec
 
 		public Arguments(ProjectStructure projectSig, IFilter<AbstractSignature> filter, IProject project) {
 			super(Arguments.class);
-			this.filter =
-				filter;
-			this.projectSig =
-				projectSig;
-			this.project =
-				project;
+			this.filter = filter;
+			this.projectSig = projectSig;
+			this.project = project;
 		}
 	}
 
@@ -65,17 +62,13 @@ public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjec
 
 	@Override
 	public Boolean execute(IMonitor workMonitor) throws Exception {
-		this.workMonitor =
-			workMonitor;
-		final InterfaceProject interfaceProject =
-			MPLPlugin.getDefault().getInterfaceProject(arguments.project);
+		this.workMonitor = workMonitor;
+		final InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(arguments.project);
 		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(arguments.project.getName()
-				+ " is no Interface Project!");
+			MPLPlugin.getDefault().logWarning(arguments.project.getName() + " is no Interface Project!");
 			return false;
 		}
-		final SignatureIterator it =
-			interfaceProject.getProjectSignatures().iterator();
+		final SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
 		it.addFilter(arguments.filter);
 		arguments.projectSig.construct(it, getClassCreator());
 		return true;

@@ -27,15 +27,7 @@ package de.ovgu.featureide.fm.core;
  */
 public class Operator {
 
-	public static final String[] NAMES =
-		{
-			"Not",
-			"And",
-			"Or",
-			"Implies",
-			"Iff",
-			"(",
-			")" };
+	public static final String[] NAMES = { "Not", "And", "Or", "Implies", "Iff", "(", ")" };
 
 	/**
 	 * @param name

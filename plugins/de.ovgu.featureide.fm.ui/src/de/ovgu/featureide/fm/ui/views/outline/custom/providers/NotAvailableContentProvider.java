@@ -57,8 +57,7 @@ public class NotAvailableContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		return new String[] {
-			AN_OUTLINE_IS_NOT_AVAILABLE_ };
+		return new String[] { AN_OUTLINE_IS_NOT_AVAILABLE_ };
 	}
 
 	@Override

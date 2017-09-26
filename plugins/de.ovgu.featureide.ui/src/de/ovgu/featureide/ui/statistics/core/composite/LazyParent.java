@@ -47,8 +47,7 @@ public abstract class LazyParent extends Parent {
 
 		private StatisticTreeJob(Parent calculated, boolean expand) {
 			super(calculated);
-			this.expand =
-				expand;
+			this.expand = expand;
 		}
 
 		public boolean isExpand() {
@@ -72,8 +71,7 @@ public abstract class LazyParent extends Parent {
 
 	}
 
-	protected boolean lazy =
-		true;
+	protected boolean lazy = true;
 
 	@Override
 	public Parent[] getChildren() {
@@ -85,21 +83,16 @@ public abstract class LazyParent extends Parent {
 	 */
 	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
-			final TreeJob job =
-				new StatisticTreeJob(this, expand);
-			final LongRunningJob<Boolean> runner =
-				new LongRunningJob<>(CALCULATE
-					+ this.getClass().getName(), job);
+			final TreeJob job = new StatisticTreeJob(this, expand);
+			final LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
 			runner.setPriority(Job.SHORT);
-			final JobDoneListener listener =
-				JobDoneListener.getInstance();
+			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
 				runner.addJobChangeListener(listener);
 			}
 			runner.schedule();
 		}
-		lazy =
-			false;
+		lazy = false;
 		return super.getChildren();
 	}
 
@@ -117,14 +110,12 @@ public abstract class LazyParent extends Parent {
 	}
 
 	public void setLazy(boolean lazy) {
-		this.lazy =
-			lazy;
+		this.lazy = lazy;
 	}
 
 	@Override
 	public Boolean hasChildren() {
-		return lazy
-			|| super.hasChildren();
+		return lazy || super.hasChildren();
 	}
 
 	/**
@@ -145,8 +136,7 @@ public abstract class LazyParent extends Parent {
 	}
 
 	public void recalculate() {
-		children =
-			new LinkedList<Parent>();
+		children = new LinkedList<Parent>();
 		initChildren();
 	}
 }

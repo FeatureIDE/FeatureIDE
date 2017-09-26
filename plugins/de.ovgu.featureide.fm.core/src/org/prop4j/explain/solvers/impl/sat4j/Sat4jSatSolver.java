@@ -47,24 +47,15 @@ import org.sat4j.specs.TimeoutException;
 public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/** Maps clauses to constraints (handles to the clauses in the oracle). */
-	protected final Map<Node, IConstr> clauseConstraints =
-		new LinkedHashMap<>();
+	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
 
 	/** Maps variables to Sat4J indexes. */
-	private final Map<Object, Integer> variableIndexes =
-		new LinkedHashMap<>();
+	private final Map<Object, Integer> variableIndexes = new LinkedHashMap<>();
 	/** Maps Sat4J indexes to variables. */
-	private final Map<Integer, Object> indexVariables =
-		new LinkedHashMap<>();
+	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
 
 	/** Whether an immediate contradiction occurred while adding the clauses. */
-	private boolean contradiction =
-		false;
-
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jSatSolver() {}
+	private boolean contradiction = false;
 
 	@Override
 	protected ISolver createOracle() {
@@ -89,8 +80,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		}
 		addVariables(clause.getUniqueVariables());
 		try {
-			final IConstr constraint =
-				getOracle().addClause(getVectorFromClause(clause));
+			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
 			if (constraint != null) {
 				clauseConstraints.put(clause, constraint);
 			}
@@ -140,13 +130,10 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		if (!isSatisfiable()) {
 			throw new IllegalStateException("Problem is unsatisfiable");
 		}
-		final int[] indexes =
-			getOracle().model();
-		final Map<Object, Boolean> model =
-			new LinkedHashMap<>();
+		final int[] indexes = getOracle().model();
+		final Map<Object, Boolean> model = new LinkedHashMap<>();
 		for (final int index : indexes) {
-			final Literal l =
-				getLiteralFromIndex(index);
+			final Literal l = getLiteralFromIndex(index);
 			model.put(l.var, l.positive);
 		}
 		return model;
@@ -167,8 +154,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @param contradiction contradiction flag
 	 */
 	protected void setContradiction(boolean contradiction) {
-		this.contradiction =
-			contradiction;
+		this.contradiction = contradiction;
 	}
 
 	/**
@@ -178,8 +164,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
 	public IVec<IVecInt> getVectorFromClauses(List<Node> clauses) {
-		final IVec<IVecInt> vector =
-			new Vec<>(clauses.size());
+		final IVec<IVecInt> vector = new Vec<>(clauses.size());
 		for (final Node clause : clauses) {
 			vector.push(getVectorFromClause(clause));
 		}
@@ -193,14 +178,10 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
 	public IVecInt getVectorFromClause(Node clause) {
-		final Node[] children =
-			clause.getChildren();
-		final int[] indexes =
-			new int[children.length];
-		for (int i =
-			0; i < children.length; i++) {
-			indexes[i] =
-				getIndexFromLiteral((Literal) children[i]);
+		final Node[] children = clause.getChildren();
+		final int[] indexes = new int[children.length];
+		for (int i = 0; i < children.length; i++) {
+			indexes[i] = getIndexFromLiteral((Literal) children[i]);
 		}
 		return new VecInt(indexes);
 	}
@@ -223,11 +204,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
 	public int getIndexFromLiteral(Object variable, boolean positive) {
-		int index =
-			getIndexFromVariable(variable);
+		int index = getIndexFromVariable(variable);
 		if (!positive) {
-			index =
-				-index;
+			index = -index;
 		}
 		return index;
 	}
@@ -239,11 +218,8 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a Sat4J index; 0 in case of an unknown variable
 	 */
 	public int getIndexFromVariable(Object variable) {
-		final Integer index =
-			variableIndexes.get(variable);
-		return index == null
-			? 0
-			: index;
+		final Integer index = variableIndexes.get(variable);
+		return index == null ? 0 : index;
 	}
 
 	/**
@@ -256,8 +232,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		if (variable == null) {
 			throw new NullPointerException();
 		}
-		final int index =
-			getOracle().nextFreeVarId(true);
+		final int index = getOracle().nextFreeVarId(true);
 		variableIndexes.put(variable, index);
 		indexVariables.put(index, variable);
 		return index;
@@ -270,8 +245,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a literal; null in case of an unknown index
 	 */
 	public Literal getLiteralFromIndex(int index) {
-		final Object variable =
-			getVariableFromIndex(index);
+		final Object variable = getVariableFromIndex(index);
 		if (variable == null) {
 			return null;
 		}
@@ -307,8 +281,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return a Sat4J vector; contains 0 in case of an unknown variable; not null
 	 */
 	public IVecInt getVectorFromAssumptions() {
-		final IVecInt vector =
-			new VecInt();
+		final IVecInt vector = new VecInt();
 		for (final Entry<Object, Boolean> assumption : getAssumptions().entrySet()) {
 			vector.push(getIndexFromLiteral(assumption.getKey(), assumption.getValue()));
 		}
@@ -322,7 +295,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @return internal clause index
 	 */
 	public int getClauseIndexFromIndex(int index) {
-		return index
-			- 1;
+		return index - 1;
 	}
 }

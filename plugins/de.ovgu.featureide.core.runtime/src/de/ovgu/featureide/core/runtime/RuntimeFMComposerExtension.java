@@ -47,8 +47,7 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class RuntimeFMComposerExtension extends FMComposerExtension {
 
-	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects based on runtime variability do not support any order.";
+	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on runtime variability do not support any order.";
 
 	public RuntimeFMComposerExtension() {
 
@@ -80,8 +79,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 	@Override
 	public boolean performRenaming(final String oldName, final String newName, final IProject project) {
 
-		final ArrayList<FeatureLocation> locations =
-			new ArrayList<FeatureLocation>();
+		final ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
 
 		// get FeatureLocation objects with the given oldName as feature name
 		for (final FeatureLocation loc : RuntimeParameters.featureLocs) {
@@ -90,44 +88,32 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 			}
 		}
 		// only load and parse each class file once
-		final HashMap<String, String[]> processedClassFiles =
-			new HashMap<String, String[]>();
+		final HashMap<String, String[]> processedClassFiles = new HashMap<String, String[]>();
 
 		for (final FeatureLocation loc : locations) {
-			String[] oldClassStringArray =
-				null;
-			final String classPath =
-				loc.getOSPath();
-			final int lineNumber =
-				loc.getStartLineNum();
+			String[] oldClassStringArray = null;
+			final String classPath = loc.getOSPath();
+			final int lineNumber = loc.getStartLineNum();
 
 			// if the class has not already been loaded, load it
 			if (!processedClassFiles.containsKey(classPath)) {
 
 				try {
-					final IFile classFile =
-						loc.getClassFile();
-					final InputStream oldClassStream =
-						classFile.getContents();
+					final IFile classFile = loc.getClassFile();
+					final InputStream oldClassStream = classFile.getContents();
 
-					final StringBuilder inputStringBuilder =
-						new StringBuilder();
-					BufferedReader bufferedReader =
-						null;
+					final StringBuilder inputStringBuilder = new StringBuilder();
+					BufferedReader bufferedReader = null;
 
-					bufferedReader =
-						new BufferedReader(new InputStreamReader(oldClassStream, "UTF-8"));
+					bufferedReader = new BufferedReader(new InputStreamReader(oldClassStream, "UTF-8"));
 
-					String line =
-						bufferedReader.readLine();
+					String line = bufferedReader.readLine();
 					while (line != null) {
 						inputStringBuilder.append(line);
 						inputStringBuilder.append('\n');
-						line =
-							bufferedReader.readLine();
+						line = bufferedReader.readLine();
 					}
-					oldClassStringArray =
-						inputStringBuilder.toString().split("\\n");
+					oldClassStringArray = inputStringBuilder.toString().split("\\n");
 					processedClassFiles.put(classPath, oldClassStringArray);
 
 				} catch (final UnsupportedEncodingException e) {
@@ -139,33 +125,20 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 				}
 				// else use the one in the map
 			} else {
-				oldClassStringArray =
-					processedClassFiles.get(classPath);
+				oldClassStringArray = processedClassFiles.get(classPath);
 			}
-			oldClassStringArray[lineNumber
-				- 1] =
-					oldClassStringArray[lineNumber
-						- 1].replace(RuntimeParameters.GET_PROPERTY_METHOD
-							+ "(\""
-							+ oldName
-							+ "\")",
-								RuntimeParameters.GET_PROPERTY_METHOD
-									+ "(\""
-									+ newName
-									+ "\")");
+			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1].replace(RuntimeParameters.GET_PROPERTY_METHOD + "(\"" + oldName + "\")",
+					RuntimeParameters.GET_PROPERTY_METHOD + "(\"" + newName + "\")");
 
-			final StringBuilder newClassString =
-				new StringBuilder();
-			for (int i =
-				0; i < oldClassStringArray.length; i++) {
+			final StringBuilder newClassString = new StringBuilder();
+			for (int i = 0; i < oldClassStringArray.length; i++) {
 				if (i != 0) {
 					newClassString.append(System.lineSeparator());
 				}
 				newClassString.append(oldClassStringArray[i]);
 			}
 
-			final InputStream newClassStream =
-				new ByteArrayInputStream(newClassString.toString().getBytes(StandardCharsets.UTF_8));
+			final InputStream newClassStream = new ByteArrayInputStream(newClassString.toString().getBytes(StandardCharsets.UTF_8));
 			try {
 				loc.getClassFile().setContents(newClassStream, IResource.FORCE, null);
 			} catch (final CoreException e) {

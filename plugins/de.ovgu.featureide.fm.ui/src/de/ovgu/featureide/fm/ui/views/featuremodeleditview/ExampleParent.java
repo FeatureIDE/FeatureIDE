@@ -55,42 +55,21 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 
 	public ExampleParent(boolean added, ModelComparator c, int number, Configuration example) {
 		super(NEXT);
-		this.added =
-			added;
-		this.c =
-			c;
-		this.number =
-			number;
-		this.example =
-			example;
+		this.added = added;
+		this.c = c;
+		this.number = number;
+		this.example = example;
 
 		if (number == 1) {
-			name =
-				added
-					? ADDED_PRODUCTS
-					: REMOVED_PRODUCTS;
+			name = added ? ADDED_PRODUCTS : REMOVED_PRODUCTS;
 		}
 		if (c.getResult() == Comparison.ERROR) {
-			image =
-				IMAGE_UNDEFINED;
+			image = IMAGE_UNDEFINED;
 		} else {
-			final String imageName =
-				added
-					&& !c.isImplied()
-						? PLUS
-						: !added
-							&& !c.isImplies()
-								? MINUS
-								: ZERO;
-			lazy =
-				!ZERO.equals(imageName);
+			final String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? MINUS : ZERO;
+			lazy = !ZERO.equals(imageName);
 
-			image =
-				PLUS.equals(imageName)
-					? PLUS_IMAGE
-					: MINUS.equals(imageName)
-						? MINUS_IMAGE
-						: ZERO_IMAGE;
+			image = PLUS.equals(imageName) ? PLUS_IMAGE : MINUS.equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
 		}
 	}
 
@@ -98,23 +77,18 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 	public void initChildren() {
 		try {
 			if (example == null) {
-				example =
-					c.calculateExample(added);
+				example = c.calculateExample(added);
 			}
 			if (example == null) {
 				addChild(NONE);
 			} else {
-				final SelectableFeature root =
-					example.getRoot();
-				root.setName(PRODUCT
-					+ number);
+				final SelectableFeature root = example.getRoot();
+				root.setName(PRODUCT + number);
 				addChild(root);
 
-				final Configuration example =
-					c.calculateExample(added);
+				final Configuration example = c.calculateExample(added);
 				if (example != null) {
-					addChild(new ExampleParent(added, c, number
-						+ 1, example));
+					addChild(new ExampleParent(added, c, number + 1, example));
 				}
 			}
 		} catch (final TimeoutException e) {

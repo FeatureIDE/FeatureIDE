@@ -33,21 +33,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class RenameAction extends SingleSelectionAction {
 
-	public static final String ID =
-		"de.ovgu.featureide.rename";
+	public static final String ID = "de.ovgu.featureide.rename";
 	private final Object diagramEditor;
 
 	public RenameAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
 		super("Rename (F2)", viewer);
 		setAccelerator(SWT.F2);
-		diagramEditor =
-			graphicalViewer;
+		diagramEditor = graphicalViewer;
 	}
 
 	@Override
 	public void run() {
-		final FeatureEditPart part =
-			getSelectedFeatureEditPart(diagramEditor);
+		final FeatureEditPart part = getSelectedFeatureEditPart(diagramEditor);
 		part.showRenameManager();
 	}
 

@@ -62,26 +62,17 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  */
 public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
-	public static final String ID =
-		FMUIPlugin.PLUGIN_ID
-			+ ".views.FeatureModelEditView";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.FeatureModelEditView";
 
-	public static final Image REFESH_TAB_IMAGE =
-		FMUIPlugin.getImage("refresh_tab.gif");
+	public static final Image REFESH_TAB_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
 
 	private static final QualifiedName ACTIVATOR_KEY =
-		new QualifiedName(FMUIPlugin.PLUGIN_ID
-			+ ".EditViewActivator",
-				FMUIPlugin.PLUGIN_ID
-					+ ".EditViewActivator");
+		new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
 
-	private static final String ACTIVATOR_ACTION_TEXT =
-		DISABLE_AUTOMATIC_CALCULATIONS;
-	private static final String MANUAL_CALCULATION_TEXT =
-		START_CALCULATION;
+	private static final String ACTIVATOR_ACTION_TEXT = DISABLE_AUTOMATIC_CALCULATIONS;
+	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;
 
-	private static final IWorkspaceRoot workspaceRoot =
-		ResourcesPlugin.getWorkspace().getRoot();
+	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
 	private TreeViewer viewer;
 
@@ -92,113 +83,102 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	/**
 	 * Button to start manual calculations.
 	 */
-	private final Action manualAction =
-		new Action() {
+	private final Action manualAction = new Action() {
 
-			@Override
-			public void run() {
-				final Job job =
-					new Job(UPDATING_FEATURE_MODEL_EDITS) {
+		@Override
+		public void run() {
+			final Job job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							if (featureModelEditor == null) {
-								contentProvider.defaultContent();
-							} else {
-								contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
-							}
-							return Status.OK_STATUS;
-						}
-					};
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-		};
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					if (featureModelEditor == null) {
+						contentProvider.defaultContent();
+					} else {
+						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+					}
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+		}
+	};
 
 	/**
 	 * Button to enable/disable automatic calculations.
 	 */
-	private final Action activatorAction =
-		new Action() {
+	private final Action activatorAction = new Action() {
 
-			@Override
-			public void run() {
-				final Job job =
-					new Job("") {
+		@Override
+		public void run() {
+			final Job job = new Job("") {
 
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							activatorAction.setChecked(activatorAction.isChecked());
-							manualAction.setEnabled(activatorAction.isChecked());
-							setActivatorChecked(activatorAction.isChecked());
-							return Status.OK_STATUS;
-						}
-
-					};
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-		};
-
-	private final IPartListener editorListener =
-		new IPartListener() {
-
-			@Override
-			public void partOpened(IWorkbenchPart part) {}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {}
-
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-				if (part == featureModelEditor) {
-					setFeatureModelEditor(null);
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					activatorAction.setChecked(activatorAction.isChecked());
+					manualAction.setEnabled(activatorAction.isChecked());
+					setActivatorChecked(activatorAction.isChecked());
+					return Status.OK_STATUS;
 				}
+
+			};
+			job.setPriority(Job.SHORT);
+			job.schedule();
+		}
+	};
+
+	private final IPartListener editorListener = new IPartListener() {
+
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
+
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
+
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			if (part == featureModelEditor) {
+				setFeatureModelEditor(null);
 			}
+		}
 
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setFeatureModelEditor(part);
-				}
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setFeatureModelEditor(part);
 			}
+		}
 
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setFeatureModelEditor(part);
-				}
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setFeatureModelEditor(part);
 			}
+		}
 
-		};
+	};
 
-	private final IEventListener modelListener =
-		new IEventListener() {
+	private final IEventListener modelListener = new IEventListener() {
 
-			@Override
-			public void propertyChange(FeatureIDEEvent evt) {
-				if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType())) {
-					refresh();
-				}
+		@Override
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType())) {
+				refresh();
 			}
-		};
+		}
+	};
 
-	private final ViewContentProvider contentProvider =
-		new ViewContentProvider(this);
+	private final ViewContentProvider contentProvider = new ViewContentProvider(this);
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer =
-			new TreeViewer(parent, SWT.MULTI
-				| SWT.H_SCROLL
-				| SWT.V_SCROLL);
+		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setInput(getViewSite());
 
 		getSite().getPage().addPartListener(editorListener);
-		final IWorkbenchPage page =
-			getSite().getPage();
+		final IWorkbenchPage page = getSite().getPage();
 		setFeatureModelEditor(page.getActiveEditor());
 
 		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
@@ -214,8 +194,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		activatorAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 
 		manager.add(manualAction);
-		manualAction.setEnabled(activatorAction.isEnabled()
-			&& activatorAction.isChecked());
+		manualAction.setEnabled(activatorAction.isEnabled() && activatorAction.isChecked());
 		manualAction.setToolTipText(MANUAL_CALCULATION_TEXT);
 		manualAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 	}
@@ -239,9 +218,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 */
 	private void setActivatorChecked(boolean checked) {
 		try {
-			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY, checked
-				? "true"
-				: "false");
+			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY, checked ? "true" : "false");
 		} catch (final CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -253,14 +230,12 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			if (job.getState() == Job.RUNNING) {
 				job.cancel();
 			}
-			job =
-				null;
+			job = null;
 		}
 		getSite().getPage().removePartListener(editorListener);
 		if (featureModelEditor != null) {
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
-			featureModelEditor =
-				null;
+			featureModelEditor = null;
 		}
 		super.dispose();
 	}
@@ -274,20 +249,17 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	}
 
 	private void setFeatureModelEditor(IWorkbenchPart activeEditor) {
-		if ((featureModelEditor != null)
-			&& (featureModelEditor == activeEditor)) {
+		if ((featureModelEditor != null) && (featureModelEditor == activeEditor)) {
 			return;
 		}
 
 		if (featureModelEditor != null) {
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
-			featureModelEditor =
-				null;
+			featureModelEditor = null;
 		}
 
 		if (activeEditor instanceof FeatureModelEditor) {
-			featureModelEditor =
-				(FeatureModelEditor) activeEditor;
+			featureModelEditor = (FeatureModelEditor) activeEditor;
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 		}
 		refresh();
@@ -301,49 +273,46 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		/*
 		 * This job waits for the calculation job to finish and starts immediately a new one
 		 */
-		final Job waiter =
-			new Job(UPDATING_FEATURE_MODEL_EDITS) {
+		final Job waiter = new Job(UPDATING_FEATURE_MODEL_EDITS) {
 
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					try {
-						if (job != null) {
-							if (contentProvider.isCanceled()) {
-								return Status.OK_STATUS;
-							}
-							contentProvider.setCanceled(true);
-							job.join();
-							contentProvider.setCanceled(false);
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					if (job != null) {
+						if (contentProvider.isCanceled()) {
+							return Status.OK_STATUS;
 						}
-					} catch (final InterruptedException e) {
-						FMUIPlugin.getDefault().logError(e);
+						contentProvider.setCanceled(true);
+						job.join();
+						contentProvider.setCanceled(false);
 					}
-
-					job =
-						new Job(UPDATING_FEATURE_MODEL_EDITS) {
-
-							@Override
-							protected IStatus run(IProgressMonitor monitor) {
-								activatorAction.setEnabled(true);
-								activatorAction.setChecked(isActivatorChecked());
-								manualAction.setEnabled(isActivatorChecked());
-
-								if (featureModelEditor == null) {
-									contentProvider.defaultContent();
-								} else if (isActivatorChecked()) {
-									contentProvider.defaultManualContent();
-								} else {
-									contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(),
-											monitor);
-								}
-								return Status.OK_STATUS;
-							}
-						};
-					job.setPriority(Job.DECORATE);
-					job.schedule();
-					return Status.OK_STATUS;
+				} catch (final InterruptedException e) {
+					FMUIPlugin.getDefault().logError(e);
 				}
-			};
+
+				job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor) {
+						activatorAction.setEnabled(true);
+						activatorAction.setChecked(isActivatorChecked());
+						manualAction.setEnabled(isActivatorChecked());
+
+						if (featureModelEditor == null) {
+							contentProvider.defaultContent();
+						} else if (isActivatorChecked()) {
+							contentProvider.defaultManualContent();
+						} else {
+							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setPriority(Job.DECORATE);
+				job.schedule();
+				return Status.OK_STATUS;
+			}
+		};
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 	}

@@ -45,34 +45,27 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class SortByOccurrenceInFeature implements IOutlineFilter {
 
 	private IFile file;
-	private boolean enabled =
-		false;
+	private boolean enabled = false;
 
 	public IFile getFile() {
 		return file;
 	}
 
 	public void setFile(IFile file) {
-		this.file =
-			file;
+		this.file = file;
 	}
 
 	@Override
 	public Object[] filter(Object[] obj) {
-		if ((obj.length > 0)
-			&& (obj[0] instanceof RoleElement)) {
+		if ((obj.length > 0) && (obj[0] instanceof RoleElement)) {
 			Arrays.sort(obj, new Comparator<Object>() {
 
 				@Override
 				public int compare(Object o1, Object o2) {
-					final boolean c1 =
-						isNotInCurrentFeature((IRoleElement) o1);
-					final boolean c2 =
-						isNotInCurrentFeature((IRoleElement) o2);
+					final boolean c1 = isNotInCurrentFeature((IRoleElement) o1);
+					final boolean c2 = isNotInCurrentFeature((IRoleElement) o2);
 					if (c1 != c2) {
-						return c1
-							? 1
-							: -1;
+						return c1 ? 1 : -1;
 					}
 					return 0;
 				}
@@ -84,16 +77,10 @@ public class SortByOccurrenceInFeature implements IOutlineFilter {
 	// check if element is in the current feature
 	public boolean isNotInCurrentFeature(IRoleElement element) {
 		for (final FSTRole role : element.getRole().getFSTClass().getRoles()) {
-			if (role.getFile().equals(file)
-				&& (((element instanceof FSTMethod)
-					&& role.getAllMethods().contains(element))
-					|| ((element instanceof FSTInvariant)
-						&& role.getClassFragment().getInvariants().contains(element))
-					|| ((element instanceof FSTField)
-						&& role.getAllFields().contains(element))
-					|| ((element instanceof FSTClassFragment)
-						&& role
-								.getAllInnerClasses().contains(element)))) {
+			if (role.getFile().equals(file) && (((element instanceof FSTMethod) && role.getAllMethods().contains(element))
+				|| ((element instanceof FSTInvariant) && role.getClassFragment().getInvariants().contains(element))
+				|| ((element instanceof FSTField) && role.getAllFields().contains(element))
+				|| ((element instanceof FSTClassFragment) && role.getAllInnerClasses().contains(element)))) {
 
 				return false;
 			}
@@ -106,8 +93,7 @@ public class SortByOccurrenceInFeature implements IOutlineFilter {
 	}
 
 	public void setEnabled(boolean enabled) {
-		this.enabled =
-			enabled;
+		this.enabled = enabled;
 	}
 
 	/*

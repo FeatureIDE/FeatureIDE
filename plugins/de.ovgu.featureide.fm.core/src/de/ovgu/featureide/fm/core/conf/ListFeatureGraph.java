@@ -24,15 +24,13 @@ import org.prop4j.solver.SatInstance;
 
 public class ListFeatureGraph extends AFeatureGraph {
 
-	private static final long serialVersionUID =
-		-1765516760216377029L;
+	private static final long serialVersionUID = -1765516760216377029L;
 
 	private final int[][] adjList;
 
 	public ListFeatureGraph(SatInstance satInstance, int[] index) {
 		super(satInstance, index);
-		adjList =
-			new int[size][4];
+		adjList = new int[size][4];
 	}
 
 	@Override
@@ -42,31 +40,22 @@ public class ListFeatureGraph extends AFeatureGraph {
 		}
 
 		final int[] oldValues;
-		oldValues =
-			adjList[from];
+		oldValues = adjList[from];
 
-		int index =
-			-1;
-		for (int i =
-			4; i < oldValues.length; i++) {
-			final int oldValue =
-				oldValues[i];
+		int index = -1;
+		for (int i = 4; i < oldValues.length; i++) {
+			final int oldValue = oldValues[i];
 			if (Math.abs(oldValue) == to) {
-				index =
-					i;
+				index = i;
 				break;
 			}
 		}
 
 		if (index < 0) {
-			final int[] newArray =
-				new int[oldValues.length
-					+ 1];
-			newArray[0] =
-				index;
+			final int[] newArray = new int[oldValues.length + 1];
+			newArray[0] = index;
 			System.arraycopy(oldValues, 0, newArray, 1, oldValues.length);
-			adjList[from] =
-				newArray;
+			adjList[from] = newArray;
 		} else if (index < oldValues[0]) {
 
 		} else {

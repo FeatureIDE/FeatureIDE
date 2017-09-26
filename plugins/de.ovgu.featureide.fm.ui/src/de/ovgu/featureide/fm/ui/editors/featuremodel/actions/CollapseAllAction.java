@@ -36,24 +36,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOpera
  */
 public class CollapseAllAction extends Action {
 
-	public static final String ID =
-		"de.ovgu.featureide.collapseall";
+	public static final String ID = "de.ovgu.featureide.collapseall";
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 	private final boolean collapse;
 
 	public CollapseAllAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, boolean collapse, String title) {
 		super(title);
-		this.graphicalFeatureModel =
-			graphicalFeatureModel;
-		this.collapse =
-			collapse;
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		this.collapse = collapse;
 	}
 
 	@Override
 	public void run() {
-		final CollapseAllOperation op =
-			new CollapseAllOperation(graphicalFeatureModel, collapse);
+		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, collapse);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

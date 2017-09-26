@@ -52,83 +52,54 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class DefaultFormat implements IConfigurationFormat {
 
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.config."
-			+ DefaultFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
 
-	private static final String NEWLINE =
-		System.lineSeparator();
+	private static final String NEWLINE = System.lineSeparator();
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
-		final RenamingsManager renamingsManager =
-			configuration.getFeatureModel().getRenamingsManager();
-		final ProblemList warnings =
-			new ProblemList();
+		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final ProblemList warnings = new ProblemList();
 
-		final boolean orgPropagate =
-			configuration.isPropagate();
+		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
 
-		String line =
-			null;
-		int lineNumber =
-			1;
-		try (BufferedReader reader =
-			new BufferedReader(new StringReader(source.toString()))) {
-			while ((line =
-				reader.readLine()) != null) {
-				if (line.startsWith("#")
-					|| line.isEmpty()
-					|| line.equals(" ")) {
+		String line = null;
+		int lineNumber = 1;
+		try (BufferedReader reader = new BufferedReader(new StringReader(source.toString()))) {
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
 					continue;
 				}
 				// the string tokenizer is used to also support the expression
 				// format used by FeatureHouse
-				final StringTokenizer tokenizer =
-					new StringTokenizer(line);
-				final LinkedList<String> hiddenFeatures =
-					new LinkedList<>();
+				final StringTokenizer tokenizer = new StringTokenizer(line);
+				final LinkedList<String> hiddenFeatures = new LinkedList<>();
 				while (tokenizer.hasMoreTokens()) {
-					String name =
-						tokenizer.nextToken(" ");
+					String name = tokenizer.nextToken(" ");
 					if (name.startsWith("\"")) {
 						try {
-							name =
-								name.substring(1);
-							name +=
-								tokenizer.nextToken("\"");
+							name = name.substring(1);
+							name += tokenizer.nextToken("\"");
 							if (!tokenizer.nextToken(" ").startsWith("\"")) {
-								warnings.add(new Problem(FEATURE_
-									+ name
-									+ IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
+								warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 							}
 						} catch (final RuntimeException e) {
-							warnings.add(new Problem(FEATURE_
-								+ name
-								+ IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
+							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
-					name =
-						renamingsManager.getNewName(name);
-					final IFeature feature =
-						configuration.getFeatureModel().getFeature(name);
-					if ((feature != null)
-						&& feature.getStructure().hasHiddenParent()) {
+					name = renamingsManager.getNewName(name);
+					final IFeature feature = configuration.getFeatureModel().getFeature(name);
+					if ((feature != null) && feature.getStructure().hasHiddenParent()) {
 						hiddenFeatures.add(name);
 					} else {
 						try {
 							configuration.setManual(name, Selection.SELECTED);
 						} catch (final FeatureNotFoundException e) {
-							warnings.add(new Problem(FEATURE
-								+ name
-								+ DOES_NOT_EXIST, lineNumber));
+							warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 						} catch (final SelectionNotPossibleException e) {
-							warnings.add(new Problem(FEATURE
-								+ name
-								+ CANNOT_BE_SELECTED, lineNumber));
+							warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
 						}
 					}
 				}
@@ -136,13 +107,9 @@ public class DefaultFormat implements IConfigurationFormat {
 					try {
 						configuration.setAutomatic(name, Selection.SELECTED);
 					} catch (final FeatureNotFoundException e) {
-						warnings.add(new Problem(FEATURE
-							+ name
-							+ DOES_NOT_EXIST, lineNumber));
+						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} catch (final SelectionNotPossibleException e) {
-						warnings.add(new Problem(FEATURE
-							+ name
-							+ CANNOT_BE_SELECTED, lineNumber));
+						warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
 					}
 				}
 				lineNumber++;
@@ -164,25 +131,17 @@ public class DefaultFormat implements IConfigurationFormat {
 
 	@Override
 	public String write(Configuration configuration) {
-		final StringBuilder buffer =
-			new StringBuilder();
-		final IFeatureModel featureModel =
-			configuration.getFeatureModel();
+		final StringBuilder buffer = new StringBuilder();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list =
-				Functional.toList(featureModel.getFeatureOrderList());
-			final Set<String> featureSet =
-				configuration.getSelectedFeatureNames();
+			final List<String> list = Functional.toList(featureModel.getFeatureOrderList());
+			final Set<String> featureSet = configuration.getSelectedFeatureNames();
 			for (final String s : list) {
 				if (featureSet.contains(s)) {
 					if (s.contains(" ")) {
-						buffer.append("\""
-							+ s
-							+ "\""
-							+ NEWLINE);
+						buffer.append("\"" + s + "\"" + NEWLINE);
 					} else {
-						buffer.append(s
-							+ NEWLINE);
+						buffer.append(s + NEWLINE);
 					}
 				}
 			}
@@ -194,16 +153,11 @@ public class DefaultFormat implements IConfigurationFormat {
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
-		if (feature.getFeature().getStructure().isConcrete()
-			&& (feature.getSelection() == Selection.SELECTED)) {
+		if (feature.getFeature().getStructure().isConcrete() && (feature.getSelection() == Selection.SELECTED)) {
 			if (feature.getName().contains(" ")) {
-				buffer.append("\""
-					+ feature.getName()
-					+ "\""
-					+ NEWLINE);
+				buffer.append("\"" + feature.getName() + "\"" + NEWLINE);
 			} else {
-				buffer.append(feature.getName()
-					+ NEWLINE);
+				buffer.append(feature.getName() + NEWLINE);
 			}
 		}
 		for (final TreeElement child : feature.getChildren()) {

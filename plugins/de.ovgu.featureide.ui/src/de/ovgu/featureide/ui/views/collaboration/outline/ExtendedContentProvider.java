@@ -76,13 +76,10 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if ((newInput != null)
-			&& (newInput instanceof IFile)) {
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject((IFile) newInput);
+		if ((newInput != null) && (newInput instanceof IFile)) {
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
 			if (featureProject != null) {
-				model =
-					featureProject.getFSTModel();
+				model = featureProject.getFSTModel();
 			}
 
 			if (viewer instanceof StructuredViewer) {
@@ -94,25 +91,19 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 					 */
 					@Override
 					public int compare(Viewer viewer, Object o1, Object o2) {
-						final int startLineO1 =
-							getLine(o1);
-						final int startLineO2 =
-							getLine(o2);
+						final int startLineO1 = getLine(o1);
+						final int startLineO2 = getLine(o2);
 
-						return startLineO1
-							- startLineO2;
+						return startLineO1 - startLineO2;
 					}
 
 					private int getLine(Object o1) {
-						int startLineO1 =
-							-1;
+						int startLineO1 = -1;
 
 						if (o1 instanceof FSTDirective) {
-							startLineO1 =
-								((FSTDirective) o1).getStartLine();
+							startLineO1 = ((FSTDirective) o1).getStartLine();
 						} else if (o1 instanceof RoleElement<?>) {
-							startLineO1 =
-								((RoleElement<?>) o1).getLine();
+							startLineO1 = ((RoleElement<?>) o1).getLine();
 						}
 						return startLineO1;
 					}
@@ -123,57 +114,41 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if ((inputElement == null)
-			|| !(inputElement instanceof IFile)) {
-			return new String[] {
-				NO_FILE_FOUND };
+		if ((inputElement == null) || !(inputElement instanceof IFile)) {
+			return new String[] { NO_FILE_FOUND };
 		}
 
-		final IFile file =
-			(IFile) inputElement;
-		final IFeatureProject featureProject =
-			CorePlugin.getFeatureProject(file);
+		final IFile file = (IFile) inputElement;
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
 		if (featureProject != null) {
-			model =
-				featureProject.getFSTModel();
+			model = featureProject.getFSTModel();
 
-			if ((model instanceof FSTModelForPP)
-				&& (((FSTModelForPP) model).getExtendedFst() != null)) {
-				model =
-					((FSTModelForPP) model).getExtendedFst();
+			if ((model instanceof FSTModelForPP) && (((FSTModelForPP) model).getExtendedFst() != null)) {
+				model = ((FSTModelForPP) model).getExtendedFst();
 			}
 
 			if (model != null) {
-				final FSTClass c =
-					model.getClass(model.getAbsoluteClassName(file));
+				final FSTClass c = model.getClass(model.getAbsoluteClassName(file));
 
 				if (c != null) {
-					return new Object[] {
-						c };
+					return new Object[] { c };
 				}
 			}
 		}
-		return new String[] {
-			"Create signature is not enabled" };
+		return new String[] { "Create signature is not enabled" };
 	}
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		Object[] obj =
-			null;
+		Object[] obj = null;
 		if (parentElement instanceof FSTClass) {
 			// get all fields, methods, directives and invariants
-			final TreeSet<FSTMethod> methods =
-				new TreeSet<FSTMethod>();
-			final TreeSet<FSTField> fields =
-				new TreeSet<FSTField>();
-			final TreeSet<FSTInvariant> invariants =
-				new TreeSet<FSTInvariant>();
-			final TreeSet<FSTDirective> directives =
-				new TreeSet<FSTDirective>();
-			final TreeSet<FSTClassFragment> innerClasses =
-				new TreeSet<FSTClassFragment>();
+			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
+			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
+			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
+			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
+			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
 
 			for (final FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
@@ -183,8 +158,7 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 					}
 				}
 				fields.addAll(role.getFields());
-				final TreeSet<FSTDirective> roleDirectives =
-					role.getDirectives();
+				final TreeSet<FSTDirective> roleDirectives = role.getDirectives();
 				for (final FSTDirective directive : roleDirectives) {
 					if (directive.getParent() == null) {
 						directives.add(directive);
@@ -193,32 +167,20 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 				innerClasses.addAll(role.getInnerClasses());
 			}
 
-			obj =
-				new IRoleElement[methods.size()
-					+ fields.size()
-					+ invariants.size()
-					+ directives.size()
-					+ innerClasses.size()];
-			int pos =
-				0;
+			obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + directives.size() + innerClasses.size()];
+			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
-			System.arraycopy(fields.toArray(), 0, obj, pos +=
-				invariants.size(), fields.size());
-			System.arraycopy(methods.toArray(), 0, obj, pos +=
-				fields.size(), methods.size());
-			System.arraycopy(directives.toArray(), 0, obj, pos +=
-				methods.size(), directives.size());
-			System.arraycopy(innerClasses.toArray(), 0, obj, pos +=
-				directives.size(), innerClasses.size());
+			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
+			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
+			System.arraycopy(directives.toArray(), 0, obj, pos += methods.size(), directives.size());
+			System.arraycopy(innerClasses.toArray(), 0, obj, pos += directives.size(), innerClasses.size());
 
 			return filter(obj);
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
 
-			final Set<FSTRole> roleList =
-				new HashSet<FSTRole>();
-			final Set<FSTMethod> methods =
-				new HashSet<FSTMethod>();
+			final Set<FSTRole> roleList = new HashSet<FSTRole>();
+			final Set<FSTMethod> methods = new HashSet<FSTMethod>();
 			for (final FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
 				for (final FSTMethod m : role.getAllMethods()) {
 					if (// m.isOwn(role.file) &&
@@ -235,37 +197,28 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 				}
 			}
 
-			final IFeatureProject project =
-				CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
-			Collection<String> featureOrder =
-				new ArrayList<>();
+			final IFeatureProject project = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
+			Collection<String> featureOrder = new ArrayList<>();
 			if (project != null) {
-				featureOrder =
-					project.getFeatureModel().getFeatureOrderList();
+				featureOrder = project.getFeatureModel().getFeatureOrderList();
 			}
 
 			if (((FSTMethod) parentElement).getFSTDirectives().size() == 0) {
-				obj =
-					new FSTRole[roleList.size()];
-				int index =
-					0;
+				obj = new FSTRole[roleList.size()];
+				int index = 0;
 				for (final String featureName : featureOrder) {
 
-					for (final Iterator<FSTRole> it =
-						roleList.iterator(); it.hasNext();) {
-						final FSTRole next =
-							it.next();
+					for (final Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
+						final FSTRole next = it.next();
 						if (next.getFeature().getName().equals(featureName)) {
-							obj[index++] =
-								next;
+							obj[index++] = next;
 							it.remove();
 							break;
 						}
 					}
 				}
 			} else {
-				final List<FSTDirective> dirs =
-					new ArrayList<>();
+				final List<FSTDirective> dirs = new ArrayList<>();
 				for (final FSTRole role : roleList) {
 					if (role.getMethods().contains(parentElement)) {
 						// equals works correct?
@@ -282,8 +235,7 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 
 		} else if (parentElement instanceof FSTInvariant) {
 			// get all the roles that belong to an invariant
-			final LinkedList<FSTRole> roleList =
-				new LinkedList<FSTRole>();
+			final LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (final FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) {
 				for (final FSTInvariant i : role.getClassFragment().getInvariants()) {
 					if (((FSTInvariant) parentElement).getFullName().equals(i.getFullName())) {
@@ -296,8 +248,7 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
-			final LinkedList<FSTRole> roleList =
-				new LinkedList<FSTRole>();
+			final LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (final FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
 				for (final FSTField f : role.getAllFields()) {
 					if (f.getFullName().equals(((FSTField) parentElement).getFullName())) {
@@ -310,41 +261,27 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 		} else if (parentElement instanceof FSTDirective) {
 			return ((FSTDirective) parentElement).getRoleElementChildren();
 		} else if (parentElement instanceof FSTClassFragment) {
-			final TreeSet<FSTMethod> methods =
-				new TreeSet<FSTMethod>();
-			final TreeSet<FSTField> fields =
-				new TreeSet<FSTField>();
-			final TreeSet<FSTClassFragment> innerClasses =
-				new TreeSet<FSTClassFragment>();
-			final TreeSet<FSTInvariant> invariants =
-				new TreeSet<FSTInvariant>();
+			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
+			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
+			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
+			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 
-			final FSTClassFragment innerClassCast =
-				(FSTClassFragment) parentElement;
+			final FSTClassFragment innerClassCast = (FSTClassFragment) parentElement;
 
 			invariants.addAll(innerClassCast.getInvariants());
-			final LinkedList<FSTClassFragment> allFragments =
-				innerClassCast.getRole().getAllEqualFSTFragments(innerClassCast);
+			final LinkedList<FSTClassFragment> allFragments = innerClassCast.getRole().getAllEqualFSTFragments(innerClassCast);
 			for (final FSTClassFragment fstClassFragment : allFragments) {
 				methods.addAll(fstClassFragment.getMethods());
 				fields.addAll(fstClassFragment.getFields());
 			}
 			innerClasses.addAll(innerClassCast.getInnerClasses());
 
-			obj =
-				new IRoleElement[methods.size()
-					+ fields.size()
-					+ invariants.size()
-					+ innerClasses.size()];
-			int pos =
-				0;
+			obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + innerClasses.size()];
+			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
-			System.arraycopy(fields.toArray(), 0, obj, pos +=
-				invariants.size(), fields.size());
-			System.arraycopy(methods.toArray(), 0, obj, pos +=
-				fields.size(), methods.size());
-			System.arraycopy(innerClasses.toArray(), 0, obj, pos +=
-				methods.size(), innerClasses.size());
+			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
+			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
+			System.arraycopy(innerClasses.toArray(), 0, obj, pos += methods.size(), innerClasses.size());
 
 		}
 
@@ -360,9 +297,7 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 	public boolean hasChildren(Object element) {
 		if (element instanceof FSTClass) {
 			for (final FSTRole role : ((FSTClass) element).getRoles()) {
-				if (!role.getClassFragment().getMethods().isEmpty()
-					|| !role.getClassFragment().getFields().isEmpty()
-					|| !role.getDirectives().isEmpty()
+				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty() || !role.getDirectives().isEmpty()
 					|| !role.getInnerClasses().isEmpty()) {
 					return true;
 				}
@@ -371,12 +306,9 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 		}
 
 		if (element instanceof FSTMethod) {
-			final FSTMethod fstMethod =
-				(FSTMethod) element;
-			final FSTRole role =
-				fstMethod.getRole();
-			return role.getMethods().contains(element)
-				|| !fstMethod.getFSTDirectives().isEmpty();
+			final FSTMethod fstMethod = (FSTMethod) element;
+			final FSTRole role = fstMethod.getRole();
+			return role.getMethods().contains(element) || !fstMethod.getFSTDirectives().isEmpty();
 		}
 		if (element instanceof FSTField) {
 			return false;
@@ -390,11 +322,8 @@ public class ExtendedContentProvider extends OutlineTreeContentProvider {
 			return ((FSTDirective) element).getRoleElementChildren().length != 0;
 		}
 		if (element instanceof FSTClassFragment) {
-			final FSTClassFragment innerClass =
-				(FSTClassFragment) element;
-			if (!innerClass.getMethods().isEmpty()
-				|| !innerClass.getFields().isEmpty()
-				|| !innerClass.getInnerClasses().isEmpty()) {
+			final FSTClassFragment innerClass = (FSTClassFragment) element;
+			if (!innerClass.getMethods().isEmpty() || !innerClass.getFields().isEmpty() || !innerClass.getInnerClasses().isEmpty()) {
 				return true;
 			}
 		}

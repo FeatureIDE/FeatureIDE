@@ -40,8 +40,7 @@ public class FilterOutlineAction extends Action {
 	 */
 	public FilterOutlineAction(IOutlineFilter filter) {
 		super("", AS_CHECK_BOX);
-		this.filter =
-			filter;
+		this.filter = filter;
 		setText(filter.getName());
 		setImageDescriptor(filter.getImage());
 	}

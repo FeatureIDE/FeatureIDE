@@ -48,12 +48,9 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	 */
 	public SourceChangedOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
 		super(featureModel, SOURCE_CHANGE);
-		this.featureModelEditor =
-			featureModelEditor;
-		this.newText =
-			newText;
-		this.oldText =
-			oldText;
+		this.featureModelEditor = featureModelEditor;
+		this.newText = newText;
+		this.oldText = oldText;
 	}
 
 	@Override

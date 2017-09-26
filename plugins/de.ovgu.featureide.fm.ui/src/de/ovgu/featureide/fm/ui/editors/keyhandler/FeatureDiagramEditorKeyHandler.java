@@ -52,15 +52,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  */
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEventListener {
 
-	private static final long timeoutThreshold =
-		750;
+	private static final long timeoutThreshold = 750;
 	private final IGraphicalFeatureModel featureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final FeatureDiagramEditor viewer;
 
-	private final ArrayList<String> featureList =
-		new ArrayList<>();
+	private final ArrayList<String> featureList = new ArrayList<>();
 
 	private int curIndex;
 	private String curSearchString;
@@ -72,19 +70,14 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, IGraphicalFeatureModel featureModel) {
 		super();
 
-		this.featureModel =
-			featureModel;
-		viewer =
-			view;
+		this.featureModel = featureModel;
+		viewer = view;
 
-		alternativeKeyHandler =
-			new KeyHandler();
-		gvKeyHandler =
-			new GraphicalViewerKeyHandler(view);
+		alternativeKeyHandler = new KeyHandler();
+		gvKeyHandler = new GraphicalViewerKeyHandler(view);
 		gvKeyHandler.setParent(alternativeKeyHandler);
 		setParent(gvKeyHandler);
-		lastTime =
-			0;
+		lastTime = 0;
 
 		resetFeatureList();
 		featureModel.getFeatureModel().addListener(this);
@@ -108,48 +101,32 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 			}
 		}
 
-		final long currentTime =
-			System.currentTimeMillis();
-		if ((currentTime
-			- lastTime) > timeoutThreshold) {
-			curSearchString =
-				"";
+		final long currentTime = System.currentTimeMillis();
+		if ((currentTime - lastTime) > timeoutThreshold) {
+			curSearchString = "";
 		}
-		lastTime =
-			currentTime;
+		lastTime = currentTime;
 
-		curIndex =
-			updateIterator();
+		curIndex = updateIterator();
 
-		if ((curSearchString.length() == 1)
-			&& (curSearchString.charAt(0) == Character.toLowerCase(e.character))) {
-			curSearchString =
-				"";
-			curIndex =
-				(curIndex
-					+ 1)
-					% featureList.size();
+		if ((curSearchString.length() == 1) && (curSearchString.charAt(0) == Character.toLowerCase(e.character))) {
+			curSearchString = "";
+			curIndex = (curIndex + 1) % featureList.size();
 		}
-		curSearchString +=
-			Character.toLowerCase(e.character);
+		curSearchString += Character.toLowerCase(e.character);
 
-		final int foundIndex =
-			search();
+		final int foundIndex = search();
 		if (foundIndex >= 0) {
 			// select the new feature
-			final IFeature curFeature =
-				featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
+			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
-				final Map<?, ?> editPartRegistry =
-					viewer.getEditPartRegistry();
-				final FeatureEditPart part =
-					(FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
+				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
+				final FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
 				if (part != null) {
 					viewer.setSelection(new StructuredSelection(part));
 					viewer.reveal(part);
 				}
-				curIndex =
-					foundIndex;
+				curIndex = foundIndex;
 			}
 		}
 
@@ -179,51 +156,36 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 				return t.getName();
 			}
 		})));
-		curSearchString =
-			"";
-		curIndex =
-			0;
+		curSearchString = "";
+		curIndex = 0;
 	}
 
 	private int search() {
-		for (int i =
-			curIndex, end =
-				curIndex
-					+ featureList.size(); i < end; i++) {
-			final String name =
-				featureList.get(i
-					% featureList.size());
+		for (int i = curIndex, end = curIndex + featureList.size(); i < end; i++) {
+			final String name = featureList.get(i % featureList.size());
 			if (name.toLowerCase().startsWith(curSearchString)) {
-				return i
-					% featureList.size();
+				return i % featureList.size();
 			}
 		}
 		return -1;
 	}
 
 	private int updateIterator() {
-		final IStructuredSelection sel =
-			(IStructuredSelection) viewer.getSelection();
+		final IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 
-		if ((sel.size() == 1)
-			&& !(sel.getFirstElement() instanceof ModelEditPart)) {
-			final Object element =
-				sel.getFirstElement();
+		if ((sel.size() == 1) && !(sel.getFirstElement() instanceof ModelEditPart)) {
+			final Object element = sel.getFirstElement();
 			final String featureName;
 
 			if (element instanceof FeatureEditPart) {
-				featureName =
-					((FeatureEditPart) element).getModel().getObject().getName();
+				featureName = ((FeatureEditPart) element).getModel().getObject().getName();
 			} else if (element instanceof IFeature) {
-				featureName =
-					((IFeature) element).getName();
+				featureName = ((IFeature) element).getName();
 			} else {
 				return 0;
 			}
 
-			return (!featureName.equalsIgnoreCase(featureList.get(curIndex)))
-				? featureList.indexOf(featureName)
-				: curIndex;
+			return (!featureName.equalsIgnoreCase(featureList.get(curIndex))) ? featureList.indexOf(featureName) : curIndex;
 		}
 		return 0;
 	}

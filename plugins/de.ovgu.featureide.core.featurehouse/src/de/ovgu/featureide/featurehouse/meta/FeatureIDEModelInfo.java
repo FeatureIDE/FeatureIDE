@@ -52,19 +52,13 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	private final IFeatureModel featureModel;
 	private final Configuration currentConfig;
 	private List<String> coreFeatureNames;
-	private boolean validSelect =
-		true;
-	private boolean validReject =
-		true;
-	private HashMap<String, HashMap<String, List<IFeature>>> rootsForMethod =
-		new HashMap<String, HashMap<String, List<IFeature>>>();
+	private boolean validSelect = true;
+	private boolean validReject = true;
+	private HashMap<String, HashMap<String, List<IFeature>>> rootsForMethod = new HashMap<String, HashMap<String, List<IFeature>>>();
 
-	private final boolean obligatory =
-		true;
-	private final boolean obligatoryMethod =
-		true;
-	private final boolean fm =
-		true;// ??
+	private final boolean obligatory = true;
+	private final boolean obligatoryMethod = true;
+	private final boolean fm = true;// ??
 	private final String validClause;
 	private final boolean useValidMethod;
 
@@ -72,33 +66,22 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	 * @param useValidMethod Defines whether the valid() or the complete formula is used as requieres clause.
 	 */
 	public FeatureIDEModelInfo(final IFeatureModel featureModel, final boolean useValidMethod) {
-		this.featureModel =
-			featureModel;
-		this.useValidMethod =
-			useValidMethod;
-		currentConfig =
-			new Configuration(featureModel);
-		validClause =
-			createdValidClause();
+		this.featureModel = featureModel;
+		this.useValidMethod = useValidMethod;
+		currentConfig = new Configuration(featureModel);
+		validClause = createdValidClause();
 	}
 
 	private String createdValidClause() {
-		final AdvancedNodeCreator nc =
-			new AdvancedNodeCreator(featureModel);
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(featureModel);
 		nc.setCnfType(CNFType.Compact);
 		nc.setIncludeBooleanValues(false);
-		final Node nodes =
-			nc.createNodes().eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
-		String formula =
-			" "
-				+ nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
+		final Node nodes = nc.createNodes().eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		String formula = " " + nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 
 		for (final CharSequence feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
-			formula =
-				formula.replaceAll("([\\s,\\(])"
-					+ feature.toString().toLowerCase(Locale.ENGLISH),
-						"$1FM.FeatureModel."
-							+ feature.toString().toLowerCase(Locale.ENGLISH));
+			formula = formula.replaceAll("([\\s,\\(])" + feature.toString().toLowerCase(Locale.ENGLISH),
+					"$1FM.FeatureModel." + feature.toString().toLowerCase(Locale.ENGLISH));
 		}
 		return formula.trim();
 	}
@@ -109,10 +92,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			return false;
 		}
 		if (coreFeatureNames == null) {
-			final Configuration newConfig =
-				new Configuration(featureModel);
-			coreFeatureNames =
-				new LinkedList<String>();
+			final Configuration newConfig = new Configuration(featureModel);
+			coreFeatureNames = new LinkedList<String>();
 			for (final IFeature feature : newConfig.getSelectedFeatures()) {
 				coreFeatureNames.add(feature.getName());
 			}
@@ -144,20 +125,17 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!obligatoryMethod) {
 			return false;
 		}
-		final HashMap<String, List<IFeature>> methodFeatures =
-			rootsForMethod.get(className);
+		final HashMap<String, List<IFeature>> methodFeatures = rootsForMethod.get(className);
 		if (methodFeatures == null) {
 			return false;
 		}
-		final List<IFeature> features =
-			methodFeatures.get(methodName);
+		final List<IFeature> features = methodFeatures.get(methodName);
 		if (features == null) {
 			return false;
 		}
 		for (final IFeature rootFeature : features) {
 			if (!rootFeature.getName().equals(featureName)) {
-				final Configuration config =
-					new Configuration(featureModel);
+				final Configuration config = new Configuration(featureModel);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
 				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED) {
 					return false;
@@ -178,20 +156,17 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			return isMethodCoreFeature(className, methodName, featureName);
 		}
 
-		final HashMap<String, List<IFeature>> methodFeatures =
-			rootsForMethod.get(className);
+		final HashMap<String, List<IFeature>> methodFeatures = rootsForMethod.get(className);
 		if (methodFeatures == null) {
 			return false;
 		}
-		final List<IFeature> features =
-			methodFeatures.get(methodName);
+		final List<IFeature> features = methodFeatures.get(methodName);
 		if (features == null) {
 			return false;
 		}
 		for (final IFeature rootFeature : features) {
 			if (!rootFeature.getName().equals(featureName)) {
-				final Configuration config =
-					new Configuration(featureModel);
+				final Configuration config = new Configuration(featureModel);
 				for (final IFeature feat : currentConfig.getSelectedFeatures()) {
 					config.setManual(feat.getName(), Selection.SELECTED);
 				}
@@ -216,8 +191,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		try {
 			currentConfig.setManual(featureName, Selection.SELECTED);
 		} catch (final SelectionNotPossibleException ex) {
-			validSelect =
-				false;
+			validSelect = false;
 		}
 	}
 
@@ -229,8 +203,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		try {
 			currentConfig.setManual(featureName, Selection.UNSELECTED);
 		} catch (final SelectionNotPossibleException ex) {
-			validReject =
-				false;
+			validReject = false;
 		}
 	}
 
@@ -242,8 +215,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		for (final IFeature feature : currentConfig.getSelectedFeatures()) {
 			currentConfig.setManual(feature.getName(), Selection.UNDEFINED);
 		}
-		validSelect =
-			true;
+		validSelect = true;
 
 	}
 
@@ -255,8 +227,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		for (final IFeature feature : currentConfig.getUnSelectedFeatures()) {
 			currentConfig.setManual(feature.getName(), Selection.UNDEFINED);
 		}
-		validReject =
-			true;
+		validReject = true;
 	}
 
 	@Override
@@ -265,10 +236,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			return;
 		}
 		currentConfig.resetValues();
-		validSelect =
-			true;
-		validReject =
-			true;
+		validSelect = true;
+		validReject = true;
 	}
 
 	@Override
@@ -276,9 +245,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		return validSelect
-			&& validReject
-			&& (currentConfig.number() > 0);
+		return validSelect && validReject && (currentConfig.number() > 0);
 	}
 
 	@Override
@@ -286,10 +253,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		final SelectableFeature feature =
-			currentConfig.getSelectablefeature(featureName);
-		final Selection oldManual =
-			feature.getManual();
+		final SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		final Selection oldManual = feature.getManual();
 		try {
 			currentConfig.setManual(feature, Selection.SELECTED);
 			currentConfig.setManual(feature, oldManual);
@@ -304,10 +269,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		final SelectableFeature feature =
-			currentConfig.getSelectablefeature(featureName);
-		final Selection oldManual =
-			feature.getManual();
+		final SelectableFeature feature = currentConfig.getSelectablefeature(featureName);
+		final Selection oldManual = feature.getManual();
 		try {
 			currentConfig.setManual(feature, Selection.UNSELECTED);
 			currentConfig.setManual(feature, oldManual);
@@ -338,32 +301,24 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!obligatoryMethod) {
 			return;
 		}
-		rootsForMethod =
-			new HashMap<String, HashMap<String, List<IFeature>>>();
+		rootsForMethod = new HashMap<String, HashMap<String, List<IFeature>>>();
 		for (final FSTNonTerminal featureNode : features) {
-			final String featureName =
-				getFeatureName(featureNode);
+			final String featureName = getFeatureName(featureNode);
 
 			// get all method-Nodes
 			for (final FSTNode methodNode : getMethodNodes(featureNode)) {
-				final String className =
-					getClassName(methodNode);
-				final String methodName =
-					getMethodName(methodNode);
+				final String className = getClassName(methodNode);
+				final String methodName = getMethodName(methodNode);
 
-				HashMap<String, List<IFeature>> methodFeature =
-					rootsForMethod.get(className);
+				HashMap<String, List<IFeature>> methodFeature = rootsForMethod.get(className);
 				if (methodFeature == null) {
-					methodFeature =
-						new HashMap<String, List<IFeature>>();
+					methodFeature = new HashMap<String, List<IFeature>>();
 					rootsForMethod.put(className, methodFeature);
 				}
 
-				List<IFeature> featureList =
-					methodFeature.get(methodName);
+				List<IFeature> featureList = methodFeature.get(methodName);
 				if (featureList == null) {
-					featureList =
-						new LinkedList<IFeature>();
+					featureList = new LinkedList<IFeature>();
 					methodFeature.put(methodName, featureList);
 				}
 
@@ -379,11 +334,9 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			return "";
 		}
 		if (methodNode.getType().contains("MethodDeclaration")) {
-			String name =
-				methodNode.getName();
+			String name = methodNode.getName();
 			if (name.contains("(")) {
-				name =
-					name.substring(0, name.indexOf("(")).trim();
+				name = name.substring(0, name.indexOf("(")).trim();
 			}
 			return name;
 		}
@@ -401,8 +354,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	}
 
 	private List<FSTNode> getMethodNodes(FSTNode featureNode) {
-		final LinkedList<FSTNode> result =
-			new LinkedList<FSTNode>();
+		final LinkedList<FSTNode> result = new LinkedList<FSTNode>();
 		if (featureNode == null) {
 			return result;
 		}

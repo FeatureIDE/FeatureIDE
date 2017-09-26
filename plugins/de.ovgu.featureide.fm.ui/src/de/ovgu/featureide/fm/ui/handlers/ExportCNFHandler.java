@@ -44,10 +44,8 @@ public class ExportCNFHandler extends AbstractExportHandler {
 	protected void configureFileDialog(FileDialog fileDialog) {
 		super.configureFileDialog(fileDialog);
 		fileDialog.setFileName("cnf.txt");
-		fileDialog.setFilterExtensions(new String[] {
-			"*.txt" });
-		fileDialog.setFilterNames(new String[] {
-			"CNF format *.txt" });
+		fileDialog.setFilterExtensions(new String[] { "*.txt" });
+		fileDialog.setFilterNames(new String[] { "CNF format *.txt" });
 	}
 
 }

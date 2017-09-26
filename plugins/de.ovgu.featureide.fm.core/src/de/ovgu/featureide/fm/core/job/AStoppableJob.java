@@ -40,13 +40,10 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	private class InnerThread extends Thread {
 
 		public InnerThread() {
-			super("Thread-"
-				+ AStoppableJob.this.getName());
+			super("Thread-" + AStoppableJob.this.getName());
 
-			final int prio =
-				AStoppableJob.this.getPriority();
-			if ((prio == SHORT)
-				|| (prio == INTERACTIVE)) {
+			final int prio = AStoppableJob.this.getPriority();
+			if ((prio == SHORT) || (prio == INTERACTIVE)) {
 				setPriority(Thread.MAX_PRIORITY);
 			} else if (prio == LONG) {
 				setPriority(Thread.NORM_PRIORITY);
@@ -65,11 +62,9 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		}
 	}
 
-	private int cancelingTimeout =
-		300;
+	private int cancelingTimeout = 300;
 
-	private final InnerThread innerThread =
-		new InnerThread();;
+	private final InnerThread innerThread = new InnerThread();;
 
 	protected AStoppableJob(String name, int priority) {
 		super(name, priority);
@@ -112,8 +107,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 
 	@Override
 	public final void setCancelingTimeout(int cancelingTimeout) {
-		this.cancelingTimeout =
-			cancelingTimeout;
+		this.cancelingTimeout = cancelingTimeout;
 	}
 
 	/**

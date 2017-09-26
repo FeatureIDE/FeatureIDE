@@ -40,58 +40,43 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 
 	public ConditionallyCoreDeadAnalysisFG(ISatSolver solver, IFeatureGraph featureGraph) {
 		super(solver);
-		this.featureGraph =
-			featureGraph;
+		this.featureGraph = featureGraph;
 	}
 
 	public ConditionallyCoreDeadAnalysisFG(SatInstance satInstance, IFeatureGraph featureGraph) {
 		super(satInstance);
-		this.featureGraph =
-			featureGraph;
+		this.featureGraph = featureGraph;
 	}
 
 	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
-		satCount =
-			0;
+		satCount = 0;
 		solver.getAssignment().ensure(fixedVariables.length);
-		for (int i =
-			0; i < fixedVariables.length; i++) {
-			final int var =
-				fixedVariables[i];
+		for (int i = 0; i < fixedVariables.length; i++) {
+			final int var = fixedVariables[i];
 			solver.assignmentPush(var);
 		}
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 =
-			solver.findModel();
+		final int[] model1 = solver.findModel();
 		satCount++;
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 =
-				solver.findModel();
+			final int[] model2 = solver.findModel();
 			satCount++;
 
 			// if there are more negative than positive literals
-			solver.setSelectionStrategy((model1.length < (countNegative(model2)
-				+ countNegative(model1))
-					? SelectionStrategy.POSITIVE
-					: SelectionStrategy.NEGATIVE));
+			solver.setSelectionStrategy(
+					(model1.length < (countNegative(model2) + countNegative(model1)) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE));
 
 			SatInstance.updateModel(model1, model2);
-			for (int i =
-				0; i < fixedVariables.length; i++) {
-				model1[Math.abs(fixedVariables[i])
-					- 1] =
-						0;
+			for (int i = 0; i < fixedVariables.length; i++) {
+				model1[Math.abs(fixedVariables[i]) - 1] = 0;
 			}
 
-			final VecInt v =
-				new VecInt();
-			for (int i =
-				0; i < newCount; i++) {
-				final int var =
-					fixedVariables[i];
+			final VecInt v = new VecInt();
+			for (int i = 0; i < newCount; i++) {
+				final int var = fixedVariables[i];
 				traverse(model1, v, var);
 			}
 
@@ -102,12 +87,9 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 
 	private void sat(int[] model1, VecInt v) {
 		while (!v.isEmpty()) {
-			final int varX =
-				v.get(v.size()
-					- 1);
+			final int varX = v.get(v.size() - 1);
 			v.pop();
-			if (model1[Math.abs(varX)
-				- 1] == varX) {
+			if (model1[Math.abs(varX) - 1] == varX) {
 				solver.assignmentPush(-varX);
 				satCount++;
 				switch (solver.isSatisfiable()) {
@@ -128,37 +110,27 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 	}
 
 	private void traverse(int[] model1, VecInt v, int var) {
-		final boolean fromSelected =
-			var > 0;
+		final boolean fromSelected = var > 0;
 
-		for (int j =
-			0; j < model1.length; j++) {
+		for (int j = 0; j < model1.length; j++) {
 			if (model1[j] != 0) {
-				final byte value =
-					featureGraph.getValueInternal(Math.abs(var)
-						- 1, j, fromSelected);
+				final byte value = featureGraph.getValueInternal(Math.abs(var) - 1, j, fromSelected);
 				switch (value) {
 				case AFeatureGraph.VALUE_0:
-					solver.assignmentPush(-(j
-						+ 1));
+					solver.assignmentPush(-(j + 1));
 					break;
 				case AFeatureGraph.VALUE_1:
-					solver.assignmentPush((j
-						+ 1));
+					solver.assignmentPush((j + 1));
 					break;
 				case AFeatureGraph.VALUE_0Q:
-					v.push(-(j
-						+ 1));
+					v.push(-(j + 1));
 					break;
 				case AFeatureGraph.VALUE_1Q:
-					v.push(j
-						+ 1);
+					v.push(j + 1);
 					break;
 				case AFeatureGraph.VALUE_10Q:
-					v.push(j
-						+ 1);
-					v.push(-(j
-						+ 1));
+					v.push(j + 1);
+					v.push(-(j + 1));
 					break;
 				default:
 					break;
@@ -168,18 +140,11 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 	}
 
 	private void traverse2(VecInt v, int var) {
-		final boolean fromSelected =
-			var > 0;
+		final boolean fromSelected = var > 0;
 
-		for (int i =
-			v.size()
-				- 1; i >= 0; i--) {
-			final int varX =
-				v.get(i);
-			final byte value =
-				featureGraph.getValueInternal(Math.abs(var)
-					- 1, Math.abs(varX)
-						- 1, fromSelected);
+		for (int i = v.size() - 1; i >= 0; i--) {
+			final int varX = v.get(i);
+			final byte value = featureGraph.getValueInternal(Math.abs(var) - 1, Math.abs(varX) - 1, fromSelected);
 			switch (value) {
 			case AFeatureGraph.VALUE_0:
 				if (varX < 0) {

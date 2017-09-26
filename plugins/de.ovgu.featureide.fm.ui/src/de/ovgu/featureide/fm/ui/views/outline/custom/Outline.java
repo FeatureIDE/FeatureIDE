@@ -87,72 +87,61 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.providers.NotAvailableOutli
  */
 public class Outline extends ViewPart implements ISelectionChangedListener, ITreeViewerListener, IPropertyListener {
 
-	private static final String OUTLINE_ID =
-		"de.ovgu.featureide.fm.ui.Outline";
-	public static final String ID =
-		"de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline";
-	private static final String CONTEXT_MENU_ID =
-		"de.ovgu.feautureide.fm.ui.view.outline.contextmenu";
+	private static final String OUTLINE_ID = "de.ovgu.featureide.fm.ui.Outline";
+	public static final String ID = "de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline";
+	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.ui.view.outline.contextmenu";
 
 	private TreeViewer viewer;
 	private IFile curFile;
 	private UIJob updateOutlineJob;
 
-	private final List<OutlineProvider> providers =
-		new ArrayList<>();
-	private final OutlineProvider defaultProvider =
-		new NotAvailableOutlineProvider();
-	private OutlineProvider provider =
-		defaultProvider;
+	private final List<OutlineProvider> providers = new ArrayList<>();
+	private final OutlineProvider defaultProvider = new NotAvailableOutlineProvider();
+	private OutlineProvider provider = defaultProvider;
 
-	private final IPartListener editorListener =
-		new IPartListener() {
+	private final IPartListener editorListener = new IPartListener() {
 
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setEditorActions(part);
-				}
+		@Override
+		public void partOpened(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setEditorActions(part);
 			}
+		}
 
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
 
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setEditorActions(part);
-				}
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setEditorActions(part);
 			}
+		}
 
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-				if (part instanceof IEditorPart) {
-					setEditorActions(part);
-				}
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				setEditorActions(part);
 			}
+		}
 
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if ((part instanceof IEditorPart)
-					|| (part instanceof ViewPart)) {
-					setEditorActions(part);
-				}
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+			if ((part instanceof IEditorPart) || (part instanceof ViewPart)) {
+				setEditorActions(part);
 			}
+		}
 
-		};
+	};
 
 	private void checkForExtensions() {
-		final IConfigurationElement[] config =
-			Platform.getExtensionRegistry().getConfigurationElementsFor(OUTLINE_ID);
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(OUTLINE_ID);
 
 		for (final IConfigurationElement e : config) {
 			try {
-				final Object outlineProvider =
-					e.createExecutableExtension("OutlineProvider");
+				final Object outlineProvider = e.createExecutableExtension("OutlineProvider");
 				if (outlineProvider instanceof OutlineProvider) {
-					final OutlineProvider provider =
-						(OutlineProvider) outlineProvider;
+					final OutlineProvider provider = (OutlineProvider) outlineProvider;
 					provider.getLabelProvider().initTreeViewer(viewer);
 					providers.add(provider);
 				}
@@ -171,70 +160,53 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	 *
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
-		OutlineProvider newProvider =
-			null;
-		IFile file =
-			null;
+		OutlineProvider newProvider = null;
+		IFile file = null;
 
-		IEditorPart part =
-			null;
+		IEditorPart part = null;
 
 		if (activeEditor != null) {
-			final IWorkbenchPage page =
-				activeEditor.getSite().getPage();
+			final IWorkbenchPage page = activeEditor.getSite().getPage();
 			if (page != null) {
-				part =
-					page.getActiveEditor();
+				part = page.getActiveEditor();
 				if (part != null) {
-					final IEditorInput editorInput =
-						part.getEditorInput();
+					final IEditorInput editorInput = part.getEditorInput();
 					if (editorInput instanceof FileEditorInput) {
 
 						// case: open editor
-						final FileEditorInput inputFile =
-							(FileEditorInput) part.getEditorInput();
-						file =
-							inputFile.getFile();
+						final FileEditorInput inputFile = (FileEditorInput) part.getEditorInput();
+						file = inputFile.getFile();
 						part.addPropertyListener(this);
 
-						final Control control =
-							viewer.getControl();
-						if ((control != null)
-							&& !control.isDisposed()) {
+						final Control control = viewer.getControl();
+						if ((control != null) && !control.isDisposed()) {
 
 							if (file != null) {
 								// Check whether we must change the actual provider
-								if (!provider.isSupported(file)
-									|| (provider == defaultProvider)) {
+								if (!provider.isSupported(file) || (provider == defaultProvider)) {
 									// Get the first provider that supports the resource
 									for (final OutlineProvider p : providers) {
 										if (p.isSupported(file)) {
-											newProvider =
-												p;
+											newProvider = p;
 											break;
 										}
 									}
 								} else {
-									newProvider =
-										provider;
+									newProvider = provider;
 								}
 							}
 						}
 					}
 				}
 			}
-			if ((file != curFile)
-				|| (provider != newProvider)) {
+			if ((file != curFile) || (provider != newProvider)) {
 				// Fallback when no provider is found -> NotAvailable
 				if (newProvider == null) {
-					newProvider =
-						defaultProvider;
+					newProvider = defaultProvider;
 				}
 				// Set actual provider and file and update the outline
-				provider =
-					newProvider;
-				curFile =
-					file;
+				provider = newProvider;
+				curFile = file;
 				update(file);
 			}
 		}
@@ -242,10 +214,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer =
-			new TreeViewer(parent, SWT.MULTI
-				| SWT.H_SCROLL
-				| SWT.V_SCROLL);
+		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getControl().setEnabled(false);
 		viewer.setAutoExpandLevel(2);
 		viewer.addSelectionChangedListener(this);
@@ -253,17 +222,14 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 		checkForExtensions();
 
-		final IWorkbenchPage page =
-			getSite().getPage();
+		final IWorkbenchPage page = getSite().getPage();
 		page.addPartListener(editorListener);
 
-		final IEditorPart activeEditor =
-			page.getActiveEditor();
+		final IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor != null) {
 			setEditorActions(activeEditor);
 		} else {
-			provider =
-				defaultProvider;
+			provider = defaultProvider;
 			update(null);
 		}
 
@@ -278,8 +244,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 		manager.removeAll();
 		provider.initToolbarActions(manager);
 
-		final CollapseAllAction collapseAllAction =
-			new CollapseAllAction(viewer);
+		final CollapseAllAction collapseAllAction = new CollapseAllAction(viewer);
 		collapseAllAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
 			@Override
@@ -287,8 +252,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 				handleCollapseAll(event);
 			}
 		});
-		final ExpandAllAction expandAllAction =
-			new ExpandAllAction(viewer);
+		final ExpandAllAction expandAllAction = new ExpandAllAction(viewer);
 		expandAllAction.addPropertyChangeListener(new IPropertyChangeListener() {
 
 			@Override
@@ -301,13 +265,11 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 		manager.add(expandAllAction);
 
 		if (provider.getFilters() != null) {
-			final IAction filterSelection =
-				new Action("", SWT.DROP_DOWN) {};
+			final IAction filterSelection = new Action("", SWT.DROP_DOWN) {};
 			filterSelection.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/filter_history.gif"));
 			filterSelection.setMenuCreator(new IMenuCreator() {
 
-				Menu fMenu =
-					null;
+				Menu fMenu = null;
 
 				@Override
 				public Menu getMenu(Menu parent) {
@@ -316,47 +278,40 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 				@Override
 				public Menu getMenu(Control parent) {
-					fMenu =
-						new Menu(parent);
+					fMenu = new Menu(parent);
 					if (curFile != null) {
 						for (final IOutlineFilter filter : provider.getFilters()) {
-							final IAction filterSelectionSpecific =
-								new FilterOutlineAction(filter) {
-
-									@Override
-									public void run() {
-										final OutlineTreeContentProvider treeProvider =
-											provider.getTreeProvider();
-										if (!treeProvider.hasFilter(getFilter())) {
-											treeProvider.addFilter(getFilter());
-										} else {
-											treeProvider.removeFilter(getFilter());
-										}
-										update(curFile);
-									}
-
-								};
-
-							final ActionContributionItem item =
-								new ActionContributionItem(filterSelectionSpecific);
-							item.fill(fMenu, -1);
-						}
-						final Separator sep =
-							new Separator(IWorkbenchActionConstants.MB_ADDITIONS);
-						sep.fill(fMenu, -1);
-						final IAction providerSelectionSpecific =
-							new RemoveAllFiltersAction(provider) {
+							final IAction filterSelectionSpecific = new FilterOutlineAction(filter) {
 
 								@Override
 								public void run() {
-									provider.getTreeProvider().removeAllFilters();
+									final OutlineTreeContentProvider treeProvider = provider.getTreeProvider();
+									if (!treeProvider.hasFilter(getFilter())) {
+										treeProvider.addFilter(getFilter());
+									} else {
+										treeProvider.removeFilter(getFilter());
+									}
 									update(curFile);
 								}
 
 							};
 
-						final ActionContributionItem item =
-							new ActionContributionItem(providerSelectionSpecific);
+							final ActionContributionItem item = new ActionContributionItem(filterSelectionSpecific);
+							item.fill(fMenu, -1);
+						}
+						final Separator sep = new Separator(IWorkbenchActionConstants.MB_ADDITIONS);
+						sep.fill(fMenu, -1);
+						final IAction providerSelectionSpecific = new RemoveAllFiltersAction(provider) {
+
+							@Override
+							public void run() {
+								provider.getTreeProvider().removeAllFilters();
+								update(curFile);
+							}
+
+						};
+
+						final ActionContributionItem item = new ActionContributionItem(providerSelectionSpecific);
 						item.fill(fMenu, -1);
 					}
 					return fMenu;
@@ -373,13 +328,11 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 			manager.add(filterSelection);
 		}
 
-		final IAction providerSelection =
-			new Action("", SWT.DROP_DOWN) {};
+		final IAction providerSelection = new Action("", SWT.DROP_DOWN) {};
 		providerSelection.setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		providerSelection.setMenuCreator(new IMenuCreator() {
 
-			Menu fMenu =
-				null;
+			Menu fMenu = null;
 
 			@Override
 			public Menu getMenu(Menu parent) {
@@ -388,27 +341,22 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 
 			@Override
 			public Menu getMenu(Control parent) {
-				fMenu =
-					new Menu(parent);
+				fMenu = new Menu(parent);
 
 				if (curFile != null) {
 					for (final OutlineProvider p : providers) {
-						if (p.isSupported(curFile)
-							&& !p.getProviderName().isEmpty()) {
-							final IAction providerSelectionSpecific =
-								new ChangeOutlineProviderAction(p, provider == p) {
+						if (p.isSupported(curFile) && !p.getProviderName().isEmpty()) {
+							final IAction providerSelectionSpecific = new ChangeOutlineProviderAction(p, provider == p) {
 
-									@Override
-									public void run() {
-										provider =
-											getProvider();
-										update(curFile);
-									}
+								@Override
+								public void run() {
+									provider = getProvider();
+									update(curFile);
+								}
 
-								};
+							};
 
-							final ActionContributionItem item =
-								new ActionContributionItem(providerSelectionSpecific);
+							final ActionContributionItem item = new ActionContributionItem(providerSelectionSpecific);
 							item.fill(fMenu, -1);
 
 						}
@@ -444,8 +392,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	}
 
 	private void fillContextMenu() {
-		final MenuManager menuMgr =
-			new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 
@@ -454,8 +401,7 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 				provider.initContextMenuActions(manager);
 			}
 		});
-		final Menu menu =
-			menuMgr.createContextMenu(viewer.getControl());
+		final Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
 
 		if (getSite() instanceof IWorkbenchPartSite) {
@@ -476,41 +422,36 @@ public class Outline extends ViewPart implements ISelectionChangedListener, ITre
 	 */
 	private void update(final IFile iFile) {
 		if (viewer != null) {
-			final Control control =
-				viewer.getControl();
-			if ((control != null)
-				&& !control.isDisposed()) {
+			final Control control = viewer.getControl();
+			if ((control != null) && !control.isDisposed()) {
 
-				if ((updateOutlineJob == null)
-					|| (updateOutlineJob.getState() == Job.NONE)) {
-					updateOutlineJob =
-						new UIJob(UPDATE_OUTLINE_VIEW) {
+				if ((updateOutlineJob == null) || (updateOutlineJob.getState() == Job.NONE)) {
+					updateOutlineJob = new UIJob(UPDATE_OUTLINE_VIEW) {
 
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor) {
 
-								if (viewer != null) {
-									if ((viewer.getControl() != null)
-										&& !viewer.getControl().isDisposed()) {
-										viewer.getControl().setRedraw(false);
+							if (viewer != null) {
+								if ((viewer.getControl() != null) && !viewer.getControl().isDisposed()) {
+									viewer.getControl().setRedraw(false);
 
-										viewer.setContentProvider(provider.getTreeProvider());
-										viewer.setLabelProvider(provider.getLabelProvider());
-										if (iFile != null) {
-											viewer.setInput(iFile);
-											provider.handleUpdate(viewer, iFile);
-											fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
-											fillContextMenu();
-										}
-
-										viewer.getControl().setRedraw(true);
-										viewer.getControl().setEnabled(true);
-										viewer.refresh();
+									viewer.setContentProvider(provider.getTreeProvider());
+									viewer.setLabelProvider(provider.getLabelProvider());
+									if (iFile != null) {
+										viewer.setInput(iFile);
+										provider.handleUpdate(viewer, iFile);
+										fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+										fillContextMenu();
 									}
+
+									viewer.getControl().setRedraw(true);
+									viewer.getControl().setEnabled(true);
+									viewer.refresh();
 								}
-								return Status.OK_STATUS;
 							}
-						};
+							return Status.OK_STATUS;
+						}
+					};
 					updateOutlineJob.setPriority(Job.SHORT);
 					updateOutlineJob.schedule();
 				}

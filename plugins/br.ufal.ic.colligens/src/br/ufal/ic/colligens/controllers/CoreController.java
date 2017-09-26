@@ -31,13 +31,11 @@ public class CoreController {
 	private static IWorkbenchWindow window;
 
 	public CoreController() {
-		projectExplorerController =
-			new ProjectExplorerController();
+		projectExplorerController = new ProjectExplorerController();
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
-		CoreController.window =
-			window;
+		CoreController.window = window;
 		projectExplorerController.setWindow(window);
 	}
 
@@ -50,61 +48,58 @@ public class CoreController {
 	 */
 	public void run() {
 
-		typeChef =
-			new TypeChef();
+		typeChef = new TypeChef();
 
-		final Job job =
-			new Job(ANALYZING_FILES) {
+		final Job job = new Job(ANALYZING_FILES) {
 
-				/*
-				 * (non-Javadoc)
-				 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime .IProgressMonitor)
-				 */
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime .IProgressMonitor)
+			 */
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
 
-					typeChef.setMonitor(monitor);
+				typeChef.setMonitor(monitor);
+
+				if (monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+
+				try {
+					// checks files in ProjectExplorer or PackageExplorer
+					projectExplorerController.run();
 
 					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
 					}
 
-					try {
-						// checks files in ProjectExplorer or PackageExplorer
-						projectExplorerController.run();
+					final List<IResource> list = projectExplorerController.getList();
 
-						if (monitor.isCanceled()) {
-							return Status.CANCEL_STATUS;
-						}
+					// get files to analyze e run;
+					typeChef.run(list);
 
-						final List<IResource> list =
-							projectExplorerController.getList();
+					// returns the result to view
+					syncWithPluginView();
 
-						// get files to analyze e run;
-						typeChef.run(list);
-
-						// returns the result to view
-						syncWithPluginView();
-
-						if (monitor.isCanceled()) {
-							return Status.CANCEL_STATUS;
-						}
-
-					} catch (final TypeChefException e) {
-						e.printStackTrace();
+					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
-					} catch (final ProjectExplorerException e) {
-						e.printStackTrace();
-						return Status.CANCEL_STATUS;
-					} finally {
-
-						monitor.done();
-
 					}
 
-					return Status.OK_STATUS;
+				} catch (final TypeChefException e) {
+					e.printStackTrace();
+					return Status.CANCEL_STATUS;
+				} catch (final ProjectExplorerException e) {
+					e.printStackTrace();
+					return Status.CANCEL_STATUS;
+				} finally {
+
+					monitor.done();
+
 				}
-			};
+
+				return Status.OK_STATUS;
+			}
+		};
 
 		job.setUser(true);
 		job.schedule();
@@ -120,26 +115,20 @@ public class CoreController {
 			@Override
 			public void run() {
 
-				final IViewPart view =
-					window.getActivePage().findView(
-							InvalidConfigurationsView.ID);
+				final IViewPart view = window.getActivePage().findView(InvalidConfigurationsView.ID);
 				if (view instanceof InvalidConfigurationsView) {
-					final InvalidConfigurationsView analyzerView =
-						(InvalidConfigurationsView) view;
+					final InvalidConfigurationsView analyzerView = (InvalidConfigurationsView) view;
 
 					// Typechef checks performed at least one analysis
 					if (typeChef.isFinish()) {
 						// get list of error logs
 						List<FileProxy> logs;
-						logs =
-							typeChef.getFilesLog();
+						logs = typeChef.getFilesLog();
 						// returns the list to view
 						analyzerView.setInput(logs);
 						//
 						if (logs.isEmpty()) {
-							MessageDialog.openInformation(window.getShell(),
-									Colligens.PLUGIN_NAME,
-									"This file was successfully verified!");
+							MessageDialog.openInformation(window.getShell(), Colligens.PLUGIN_NAME, "This file was successfully verified!");
 						}
 					}
 				}

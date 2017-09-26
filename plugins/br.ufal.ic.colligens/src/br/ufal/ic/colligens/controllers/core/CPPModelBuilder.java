@@ -23,69 +23,45 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
  */
 public class CPPModelBuilder extends PPModelBuilder {
 
-	public static final String OPERATORS =
-		"[\\s!=<>\",;&\\^\\|\\(\\)]";
-	public static final String REGEX =
-		"(\\s*#.*"
-			+ OPERATORS
-			+ ")(%s)("
-			+ OPERATORS
-			+ ")";
+	public static final String OPERATORS = "[\\s!=<>\",;&\\^\\|\\(\\)]";
+	public static final String REGEX = "(\\s*#.*" + OPERATORS + ")(%s)(" + OPERATORS + ")";
 
-	public static final String COMMANDS =
-		"if|ifdef|ifndef|elif|else|define|undef|endif";
+	public static final String COMMANDS = "if|ifdef|ifndef|elif|else|define|undef|endif";
 
-	Pattern patternCommands =
-		Pattern.compile("\\s*#("
-			+ COMMANDS
-			+ ")");
+	Pattern patternCommands = Pattern.compile("\\s*#(" + COMMANDS + ")");
 
 	public CPPModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
 	}
 
 	@Override
-	public LinkedList<FSTDirective> buildModelDirectivesForFile(
-			Vector<String> lines) {
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		// for preprocessor outline
-		final Stack<FSTDirective> directivesStack =
-			new Stack<FSTDirective>();
-		final LinkedList<FSTDirective> directivesList =
-			new LinkedList<FSTDirective>();
-		int id =
-			0;
+		final Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
+		final LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
+		int id = 0;
 
-		for (int i =
-			0; i < lines.size(); i++) {
-			String line =
-				lines.get(i);
+		for (int i = 0; i < lines.size(); i++) {
+			String line = lines.get(i);
 
 			// if line is preprocessor directive
 			if (line.matches("\\s*#")) {
-				FSTDirectiveCommand command =
-					null;
+				FSTDirectiveCommand command = null;
 
 				if (line.matches("\\s*#if[ (]")) {// 1
-					command =
-						FSTDirectiveCommand.IF;
+					command = FSTDirectiveCommand.IF;
 				} else if (line.matches("\\s*#ifdef[ (]")) {// 2
-					command =
-						FSTDirectiveCommand.IFDEF;
+					command = FSTDirectiveCommand.IFDEF;
 				} else if (line.matches("\\s*#ifndef[ (]")) {// 3
-					command =
-						FSTDirectiveCommand.IFNDEF;
+					command = FSTDirectiveCommand.IFNDEF;
 				} else if (line.matches("\\s*#elif[ (]")) {// 4
-					command =
-						FSTDirectiveCommand.ELIF;
+					command = FSTDirectiveCommand.ELIF;
 				} else if (line.matches("\\s*#else")) {// 7
-					command =
-						FSTDirectiveCommand.ELSE;
+					command = FSTDirectiveCommand.ELSE;
 				} else if (line.matches("\\s*#define[ (]")) {// 9
-					command =
-						FSTDirectiveCommand.DEFINE;
+					command = FSTDirectiveCommand.DEFINE;
 				} else if (line.matches("//\\s*#undef[ (]")) {// 10
-					command =
-						FSTDirectiveCommand.UNDEFINE;
+					command = FSTDirectiveCommand.UNDEFINE;
 				} else if (!line.matches("//\\s*#endif")) {// 11
 					continue;
 				}
@@ -94,23 +70,19 @@ public class CPPModelBuilder extends PPModelBuilder {
 					if (!directivesStack.isEmpty()) {
 						directivesStack.peek().setEndLine(i, line.length());
 						while (!directivesStack.isEmpty()) {
-							final FSTDirective parent =
-								directivesStack.pop();
-							if ((parent.getCommand() != FSTDirectiveCommand.ELIF)
-								&& (parent.getCommand() != FSTDirectiveCommand.ELSE)) {
+							final FSTDirective parent = directivesStack.pop();
+							if ((parent.getCommand() != FSTDirectiveCommand.ELIF) && (parent.getCommand() != FSTDirectiveCommand.ELSE)) {
 								break;
 							}
 						}
 					}
 				} else {
-					final FSTDirective directive =
-						new FSTDirective();
+					final FSTDirective directive = new FSTDirective();
 
 					if (command == FSTDirectiveCommand.ELSE) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
-							directive.setFeatureNames(directivesStack.peek()
-									.getFeatureNames());
+							directive.setFeatureNames(directivesStack.peek().getFeatureNames());
 						}
 					} else if (command == FSTDirectiveCommand.ELIF) {
 						if (!directivesStack.isEmpty()) {
@@ -120,10 +92,8 @@ public class CPPModelBuilder extends PPModelBuilder {
 
 					directive.setCommand(command);
 
-					final Matcher m =
-						patternCommands.matcher(line);
-					line =
-						m.replaceAll("").trim(); // #ifdef => ""
+					final Matcher m = patternCommands.matcher(line);
+					line = m.replaceAll("").trim(); // #ifdef => ""
 
 					if (directive.getFeatureNames() == null) {
 						directive.setFeatureNames(getFeatureNames(line));
@@ -138,8 +108,7 @@ public class CPPModelBuilder extends PPModelBuilder {
 						directivesStack.peek().addChild(directive);
 					}
 
-					if ((command != FSTDirectiveCommand.DEFINE)
-						&& (command != FSTDirectiveCommand.UNDEFINE)) {
+					if ((command != FSTDirectiveCommand.DEFINE) && (command != FSTDirectiveCommand.UNDEFINE)) {
 						directivesStack.push(directive);
 					}
 				}
@@ -150,8 +119,7 @@ public class CPPModelBuilder extends PPModelBuilder {
 
 	@Override
 	protected List<String> getFeatureNames(String expression) {
-		final List<String> featureNameList =
-			new LinkedList<String>();
+		final List<String> featureNameList = new LinkedList<String>();
 		featureNameList.add(expression.replaceAll("[()]|defined", "").trim());
 		return featureNameList;
 	}
@@ -166,10 +134,8 @@ public class CPPModelBuilder extends PPModelBuilder {
 	 * [operators]feature[operators]"</li> <li>match any further characters</li> </ul>
 	 */
 	public static boolean contains(String text, String feature) {
-		final Pattern pattern =
-			Pattern.compile(String.format(REGEX, feature));
-		final Matcher matcher =
-			pattern.matcher(text);
+		final Pattern pattern = Pattern.compile(String.format(REGEX, feature));
+		final Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
 }

@@ -15,10 +15,8 @@ import java.util.regex.Pattern;
  */
 public class CountDirectives {
 
-	public Set<String> directives =
-		new HashSet<String>();
-	public int numberLine =
-		0;
+	public Set<String> directives = new HashSet<String>();
+	public int numberLine = 0;
 
 	public int count(String path) throws Exception {
 		listFile(new File(path));
@@ -35,8 +33,7 @@ public class CountDirectives {
 	}
 
 	public void listFiles(File path) throws Exception {
-		final File[] files =
-			path.listFiles();
+		final File[] files = path.listFiles();
 		for (final File file : files) {
 			if (file.isDirectory()) {
 				listFiles(file);
@@ -49,37 +46,27 @@ public class CountDirectives {
 	public Set<String> getDirectives(File file) throws Exception {
 		// Set<String> directives = new HashSet<String>();
 
-		final FileInputStream fstream =
-			new FileInputStream(file);
-		final DataInputStream in =
-			new DataInputStream(fstream);
-		final BufferedReader br =
-			new BufferedReader(new InputStreamReader(in));
+		final FileInputStream fstream = new FileInputStream(file);
+		final DataInputStream in = new DataInputStream(fstream);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		String strLine;
 
-		while ((strLine =
-			br.readLine()) != null) {
+		while ((strLine = br.readLine()) != null) {
 
 			// removes // style comments
-			strLine =
-				strLine.replaceAll("//.*", "");
+			strLine = strLine.replaceAll("//.*", "");
 			// removes comments
 			if (Pattern.matches(".*/\\*.*", strLine)) {
 				if (Pattern.matches(".*/\\*.*\\*/.*", strLine)) {
-					strLine =
-						strLine.replaceAll("/\\*.*\\*/", "");
+					strLine = strLine.replaceAll("/\\*.*\\*/", "");
 				} else {
-					strLine =
-						"";
-					while ((strLine =
-						br.readLine()) != null) {
+					strLine = "";
+					while ((strLine = br.readLine()) != null) {
 						if (Pattern.matches(".*\\*/.*", strLine)) {
-							strLine =
-								strLine.replaceAll(".*\\*/", "");
+							strLine = strLine.replaceAll(".*\\*/", "");
 							break;
 						} else {
-							strLine =
-								"";
+							strLine = "";
 						}
 					}
 				}
@@ -92,35 +79,21 @@ public class CountDirectives {
 				continue;
 			}
 
-			strLine =
-				strLine.trim();
+			strLine = strLine.trim();
 			if (!strLine.isEmpty()) {
 				numberLine++;
 			}
 
-			if (strLine.startsWith("#if")
-				|| strLine.startsWith("#elif")) {
+			if (strLine.startsWith("#if") || strLine.startsWith("#elif")) {
 
-				String directive =
-					strLine.replace("#ifdef", "")
-							.replace("#ifndef", "").replace("#if", "");
-				directive =
-					directive.replace("defined", "").replace("(", "")
-							.replace(")", "");
-				directive =
-					directive.replace("||", "").replace("&&", "")
-							.replace("!", "").replace("<", "").replace(">", "")
-							.replace("=", "");
+				String directive = strLine.replace("#ifdef", "").replace("#ifndef", "").replace("#if", "");
+				directive = directive.replace("defined", "").replace("(", "").replace(")", "");
+				directive = directive.replace("||", "").replace("&&", "").replace("!", "").replace("<", "").replace(">", "").replace("=", "");
 
-				final String[] directivesStr =
-					directive.split(" ");
+				final String[] directivesStr = directive.split(" ");
 
-				for (int i =
-					0; i < directivesStr.length; i++) {
-					if (!directivesStr[i].trim().equals("")
-						&& ProductGenerator
-								.isValidJavaIdentifier(directivesStr[i]
-										.trim())) {
+				for (int i = 0; i < directivesStr.length; i++) {
+					if (!directivesStr[i].trim().equals("") && ProductGenerator.isValidJavaIdentifier(directivesStr[i].trim())) {
 						directives.add(directivesStr[i].trim());
 					}
 				}

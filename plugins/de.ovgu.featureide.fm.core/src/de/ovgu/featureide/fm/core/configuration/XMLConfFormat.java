@@ -42,20 +42,12 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
-	private static final String NODE_FEATURE =
-		"feature";
-	private static final String ATTRIBUTE_NAME =
-		"name";
-	private static final String ATTRIBUTE_MANUAL =
-		"manual";
-	private static final String ATTRIBUTE_AUTOMATIC =
-		"automatic";
-	public static final String ID =
-		PluginID.PLUGIN_ID
-			+ ".format.config."
-			+ XMLConfFormat.class.getSimpleName();
-	public static final String EXTENSION =
-		StringTable.CONF;
+	private static final String NODE_FEATURE = "feature";
+	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_MANUAL = "manual";
+	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
+	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
+	public static final String EXTENSION = StringTable.CONF;
 
 	@Override
 	public IPersistentFormat<Configuration> getInstance() {
@@ -74,8 +66,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		final Element root =
-			doc.getDocumentElement();
+		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
 			return;
@@ -84,13 +75,10 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			for (final Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
-					final String featureName =
-						feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature =
-						object.getSelectablefeature(featureName);
+					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
+					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
-						createError("Invalid feature name: "
-							+ featureName, feature, warnings);
+						createError("Invalid feature name: " + featureName, feature, warnings);
 						continue;
 					}
 				} else {
@@ -112,21 +100,17 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					continue;
 				}
 
-				final NamedNodeMap attributes =
-					feature.getAttributes();
+				final NamedNodeMap attributes = feature.getAttributes();
 				if (attributes.getLength() > 3) {
-					for (int i =
-						0; i < attributes.getLength(); i++) {
-						final String attributeName =
-							attributes.item(i).getNodeName();
+					for (int i = 0; i < attributes.getLength(); i++) {
+						final String attributeName = attributes.item(i).getNodeName();
 						switch (attributeName) {
 						case ATTRIBUTE_NAME:
 						case ATTRIBUTE_MANUAL:
 						case ATTRIBUTE_AUTOMATIC:
 							break;
 						default:
-							createWarning("Unknown attribute: "
-								+ attributeName, feature, warnings);
+							createWarning("Unknown attribute: " + attributeName, feature, warnings);
 							break;
 						}
 					}
@@ -138,25 +122,18 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	}
 
 	protected void createWarning(final String message, Element element, List<Problem> warnings) {
-		final Object lineNumber =
-			element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
-		warnings.add(new Problem(message, (lineNumber instanceof Integer)
-			? (int) lineNumber
-			: 1, Problem.Severity.WARNING));
+		final Object lineNumber = element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.WARNING));
 	}
 
 	protected void createError(final String message, Element element, List<Problem> warnings) {
-		final Object lineNumber =
-			element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
-		warnings.add(new Problem(message, (lineNumber instanceof Integer)
-			? (int) lineNumber
-			: 1, Problem.Severity.ERROR));
+		final Object lineNumber = element.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME);
+		warnings.add(new Problem(message, (lineNumber instanceof Integer) ? (int) lineNumber : 1, Problem.Severity.ERROR));
 	}
 
 	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
 		if (selection == null) {
-			createError("Selection state not specified"
-				+ selection, feature, warnings);
+			createError("Selection state not specified" + selection, feature, warnings);
 			return Selection.UNDEFINED;
 		} else {
 			switch (selection) {
@@ -167,8 +144,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			case "unselected":
 				return Selection.UNSELECTED;
 			default:
-				createError("Invalid selection state: "
-					+ selection, feature, warnings);
+				createError("Invalid selection state: " + selection, feature, warnings);
 				return Selection.UNDEFINED;
 			}
 		}
@@ -189,12 +165,10 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root =
-			doc.createElement("configuration");
+		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
-			final Element featureNode =
-				doc.createElement(NODE_FEATURE);
+			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
 			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
 			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));

@@ -33,44 +33,32 @@ import org.junit.Test;
  */
 public class TCSClassBuilder {
 
-	private final JavaClassBuilder builder =
-		new JavaClassBuilder(null);
+	private final JavaClassBuilder builder = new JavaClassBuilder(null);
 
 	// TEST 1
-	private final String TEST_FIELD_1 =
-		"List<Node> nodes = new List<Node>();";
-	private final String EXPECTED_MODIFIER_FIELD_1 =
-		"";
-	private final String EXPECTED_TYPE_FIELD_1 =
-		"List<Node>";
-	private final String EXPECTED_NAME_FIELD_1 =
-		"nodes";
+	private final String TEST_FIELD_1 = "List<Node> nodes = new List<Node>();";
+	private final String EXPECTED_MODIFIER_FIELD_1 = "";
+	private final String EXPECTED_TYPE_FIELD_1 = "List<Node>";
+	private final String EXPECTED_NAME_FIELD_1 = "nodes";
 
 	@Test
 	public void FieldTest1() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_1);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_1);
 		assertEquals(EXPECTED_MODIFIER_FIELD_1, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_1, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_1, fields.get(2));
 	}
 
 	// TEST 2
-	private final String TEST_FIELD_2 =
-		"public Node a, b;";
-	private final String EXPECTED_MODIFIER_FIELD_2 =
-		"public";
-	private final String EXPECTED_TYPE_FIELD_2 =
-		"Node";
-	private final String EXPECTED_NAME_FIELD_2_1 =
-		"a";
-	private final String EXPECTED_NAME_FIELD_2_2 =
-		"b";
+	private final String TEST_FIELD_2 = "public Node a, b;";
+	private final String EXPECTED_MODIFIER_FIELD_2 = "public";
+	private final String EXPECTED_TYPE_FIELD_2 = "Node";
+	private final String EXPECTED_NAME_FIELD_2_1 = "a";
+	private final String EXPECTED_NAME_FIELD_2_2 = "b";
 
 	@Test
 	public void FieldTest2() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_2);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_2);
 		assertEquals(EXPECTED_MODIFIER_FIELD_2, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_2, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_2_1, fields.get(2));
@@ -78,38 +66,28 @@ public class TCSClassBuilder {
 	}
 
 	// TEST 3
-	private final String TEST_FIELD_3 =
-		"int int;";
-	private final String EXPECTED_MODIFIER_FIELD_3 =
-		"";
-	private final String EXPECTED_TYPE_FIELD_3 =
-		"int";
-	private final String EXPECTED_NAME_FIELD_3 =
-		"int";
+	private final String TEST_FIELD_3 = "int int;";
+	private final String EXPECTED_MODIFIER_FIELD_3 = "";
+	private final String EXPECTED_TYPE_FIELD_3 = "int";
+	private final String EXPECTED_NAME_FIELD_3 = "int";
 
 	@Test
 	public void FieldTestModifiers3() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_3);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_3);
 		assertEquals(EXPECTED_MODIFIER_FIELD_3, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_3, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_3, fields.get(2));
 	}
 
 	// Test 4
-	private final String TEST_FIELD_4 =
-		"protected /*@ spec_public @*/ HashSet nodeSet;";
-	private final String EXPECTED_MODIFIER_FIELD_4 =
-		"protected";
-	private final String EXPECTED_TYPE_FIELD_4 =
-		"HashSet";
-	private final String EXPECTED_NAME_FIELD_4 =
-		"nodeSet";
+	private final String TEST_FIELD_4 = "protected /*@ spec_public @*/ HashSet nodeSet;";
+	private final String EXPECTED_MODIFIER_FIELD_4 = "protected";
+	private final String EXPECTED_TYPE_FIELD_4 = "HashSet";
+	private final String EXPECTED_NAME_FIELD_4 = "nodeSet";
 
 	@Test
 	public void FieldTestModifiers4() {
-		final LinkedList<String> fields =
-			builder.getFields(TEST_FIELD_4);
+		final LinkedList<String> fields = builder.getFields(TEST_FIELD_4);
 		assertEquals(EXPECTED_MODIFIER_FIELD_4, fields.get(0));
 		assertEquals(EXPECTED_TYPE_FIELD_4, fields.get(1));
 		assertEquals(EXPECTED_NAME_FIELD_4, fields.get(2));

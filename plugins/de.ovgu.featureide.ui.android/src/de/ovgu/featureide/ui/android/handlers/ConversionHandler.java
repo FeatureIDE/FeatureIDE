@@ -36,8 +36,7 @@ public class ConversionHandler extends ASelectionHandler {
 
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
-		final ConversionWizard wizard =
-			new ConversionWizard();
+		final ConversionWizard wizard = new ConversionWizard();
 		wizard.init(null, selection);
 		new WizardDialog(null, wizard).open();
 		return false;

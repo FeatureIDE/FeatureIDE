@@ -131,4 +131,10 @@ public interface ILanguage {
 	 * @return The word for: OPTIONAL
 	 */
 	public String getOptional();
+
+	public String getExplanation();
+
+	public String getLikelyCause();
+	
+	public String getUnlikelyCause();
 }

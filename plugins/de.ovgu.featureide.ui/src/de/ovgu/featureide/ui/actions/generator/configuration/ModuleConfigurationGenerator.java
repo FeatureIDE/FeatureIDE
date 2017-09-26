@@ -44,8 +44,7 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 
 	public ModuleConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject, String featureName) {
 		super(builder, featureModel, featureProject);
-		this.featureName =
-			featureName;
+		this.featureName = featureName;
 	}
 
 	@Override
@@ -62,31 +61,26 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 	 */
 	private void buildModule(IFeatureProject featureProject, IMonitor monitor, String featureName) {
 		// create a configuration where the feature is selected
-		Configuration configuration =
-			new Configuration(featureModel, true);
-		final boolean success =
-			createValidConfiguration(configuration, featureName, Selection.SELECTED);
+		Configuration configuration = new Configuration(featureModel, true);
+		final boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);
 		if (success) {
 			builder.addConfiguration(new BuilderConfiguration(configuration, featureName));
 		}
 
 		for (final IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
 			if (coreFeature.getName().equals(featureName)) {
-				builder.configurationNumber =
-					1;
+				builder.configurationNumber = 1;
 				return;
 			}
 		}
 		// create a configuration without the feature
-		configuration =
-			new Configuration(featureModel, true);
+		configuration = new Configuration(featureModel, true);
 		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
 			return;
 		}
 		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
 		if (success) {
-			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_
-				+ featureName));
+			builder.addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
 		}
 	}
 
@@ -105,32 +99,26 @@ public class ModuleConfigurationGenerator extends AConfigurationGenerator {
 			if (configuration.isValid()) {
 				break;
 			}
-			final SelectableFeature selectableFeature =
-				configuration.getSelectablefeature(feature.getName());
+			final SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
 			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
 				configuration.setManual(selectableFeature, Selection.SELECTED);
 			}
 		}
-		boolean canDeselect =
-			true;
+		boolean canDeselect = true;
 		while (canDeselect) {
-			canDeselect =
-				false;
+			canDeselect = false;
 			for (final IFeature feature : configuration.getSelectedFeatures()) {
 				if (feature.getName().equals(featureName)) {
 					continue;
 				}
-				final SelectableFeature selectableFeature =
-					configuration.getSelectablefeature(feature.getName());
+				final SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
 				try {
-					if ((selectableFeature.getAutomatic() == Selection.UNDEFINED)
-						&& (selectableFeature.getManual() == Selection.SELECTED)) {
+					if ((selectableFeature.getAutomatic() == Selection.UNDEFINED) && (selectableFeature.getManual() == Selection.SELECTED)) {
 						configuration.setManual(selectableFeature, Selection.UNDEFINED);
 						if (!configuration.isValid()) {
 							configuration.setManual(selectableFeature, Selection.SELECTED);
 						} else {
-							canDeselect =
-								true;
+							canDeselect = true;
 						}
 					}
 				} catch (final Exception e) {

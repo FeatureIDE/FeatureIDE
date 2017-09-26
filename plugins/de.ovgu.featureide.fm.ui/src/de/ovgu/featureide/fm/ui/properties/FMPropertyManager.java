@@ -58,112 +58,61 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	/*
 	 * **************************************************** current values
 	 ******************************************************/
-	private volatile static Boolean CURRENT_HIDE_LEGEND =
-		null;
-	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR =
-		null;
-	private volatile static Color CURRENT_LEGEND_FORGOUND =
-		null;
-	private volatile static Color CURRENT_LEGEND_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR =
-		null;
-	private volatile static Color CURRENT_FEATURE_FOREGROUND =
-		null;
-	private volatile static Color CURRENT_CONCRETE_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_ABSTRACT_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_CONNECTION_FOREGROUND =
-		null;
-	private volatile static Color CURRENT_DIAGRAM_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_LEGEND_BORDER_COLOR =
-		null;
-	private volatile static Color CURRENT_HIDDEN_FOREGROUND =
-		null;
-	private volatile static Color CURRENT_HIDDEN_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_DEAD_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_FEATURE_DEAD =
-		null;
-	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_WARNING_BACKGROUND =
-		null;
-	private volatile static Color CURRENT_FEATURE_BORDER =
-		null;
-	private volatile static Color CURRENT_INHERITED_FEATURE_BORDER =
-		null;
-	private volatile static Color CURRENT_IMPORTED_FEATURE_BORDER =
-		null;
-	private volatile static Color CURRENT_INTERFACED_FEATURE_BORDER =
-		null;
-	private volatile static Color FEATURE_BORDER_SAVE =
-		GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
-	private volatile static Integer CURRENT_CONSTRAINT_SPACE_Y =
-		null;
-	private volatile static Integer CURRENT_FEATURE_SPACE_Y =
-		null;
-	private volatile static Integer CURRENT_FEATURE_SPACE_X =
-		null;
-	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y =
-		null;
-	private volatile static Integer CURRENT_LAYOUT_MARGIN_X =
-		null;
+	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
+	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR = null;
+	private volatile static Color CURRENT_LEGEND_FORGOUND = null;
+	private volatile static Color CURRENT_LEGEND_BACKGROUND = null;
+	private volatile static Color CURRENT_DECORATOR_FORGROUND_COLOR = null;
+	private volatile static Color CURRENT_FEATURE_FOREGROUND = null;
+	private volatile static Color CURRENT_CONCRETE_BACKGROUND = null;
+	private volatile static Color CURRENT_ABSTRACT_BACKGROUND = null;
+	private volatile static Color CURRENT_CONNECTION_FOREGROUND = null;
+	private volatile static Color CURRENT_DIAGRAM_BACKGROUND = null;
+	private volatile static Color CURRENT_LEGEND_BORDER_COLOR = null;
+	private volatile static Color CURRENT_HIDDEN_FOREGROUND = null;
+	private volatile static Color CURRENT_HIDDEN_BACKGROUND = null;
+	private volatile static Color CURRENT_DEAD_BACKGROUND = null;
+	private volatile static Color CURRENT_FEATURE_DEAD = null;
+	private volatile static Color CURRENT_CONSTRAINT_BACKGROUND = null;
+	private volatile static Color CURRENT_WARNING_BACKGROUND = null;
+	private volatile static Color CURRENT_FEATURE_BORDER = null;
+	private volatile static Color CURRENT_INHERITED_FEATURE_BORDER = null;
+	private volatile static Color CURRENT_IMPORTED_FEATURE_BORDER = null;
+	private volatile static Color CURRENT_INTERFACED_FEATURE_BORDER = null;
+	private volatile static Color FEATURE_BORDER_SAVE = GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
+	private volatile static Integer CURRENT_CONSTRAINT_SPACE_Y = null;
+	private volatile static Integer CURRENT_FEATURE_SPACE_Y = null;
+	private volatile static Integer CURRENT_FEATURE_SPACE_X = null;
+	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y = null;
+	private volatile static Integer CURRENT_LAYOUT_MARGIN_X = null;
 
 	public static void reset() {
-		CURRENT_HIDE_LEGEND =
-			null;
-		CURRENT_LEGEND_FORGOUND =
-			null;
-		CURRENT_LEGEND_BACKGROUND =
-			null;
-		CURRENT_DECORATOR_FORGROUND_COLOR =
-			null;
-		CURRENT_FEATURE_FOREGROUND =
-			null;
-		CURRENT_CONCRETE_BACKGROUND =
-			null;
-		CURRENT_ABSTRACT_BACKGROUND =
-			null;
-		CURRENT_CONNECTION_FOREGROUND =
-			null;
-		CURRENT_DIAGRAM_BACKGROUND =
-			null;
-		CURRENT_LEGEND_BORDER_COLOR =
-			null;
-		CURRENT_HIDDEN_FOREGROUND =
-			null;
-		CURRENT_HIDDEN_BACKGROUND =
-			null;
-		CURRENT_DEAD_BACKGROUND =
-			null;
-		CURRENT_FEATURE_DEAD =
-			null;
-		CURRENT_CONSTRAINT_BACKGROUND =
-			null;
-		CURRENT_WARNING_BACKGROUND =
-			null;
-		CURRENT_CONSTRAINT_SPACE_Y =
-			null;
-		CURRENT_FEATURE_SPACE_Y =
-			null;
-		CURRENT_FEATURE_SPACE_X =
-			null;
-		CURRENT_LAYOUT_MARGIN_Y =
-			null;
-		CURRENT_LAYOUT_MARGIN_X =
-			null;
-		CURRENT_HIDE_BORDER_COLOR =
-			null;
-		CURRENT_FEATURE_BORDER =
-			null;
+		CURRENT_HIDE_LEGEND = null;
+		CURRENT_LEGEND_FORGOUND = null;
+		CURRENT_LEGEND_BACKGROUND = null;
+		CURRENT_DECORATOR_FORGROUND_COLOR = null;
+		CURRENT_FEATURE_FOREGROUND = null;
+		CURRENT_CONCRETE_BACKGROUND = null;
+		CURRENT_ABSTRACT_BACKGROUND = null;
+		CURRENT_CONNECTION_FOREGROUND = null;
+		CURRENT_DIAGRAM_BACKGROUND = null;
+		CURRENT_LEGEND_BORDER_COLOR = null;
+		CURRENT_HIDDEN_FOREGROUND = null;
+		CURRENT_HIDDEN_BACKGROUND = null;
+		CURRENT_DEAD_BACKGROUND = null;
+		CURRENT_FEATURE_DEAD = null;
+		CURRENT_CONSTRAINT_BACKGROUND = null;
+		CURRENT_WARNING_BACKGROUND = null;
+		CURRENT_CONSTRAINT_SPACE_Y = null;
+		CURRENT_FEATURE_SPACE_Y = null;
+		CURRENT_FEATURE_SPACE_X = null;
+		CURRENT_LAYOUT_MARGIN_Y = null;
+		CURRENT_LAYOUT_MARGIN_X = null;
+		CURRENT_HIDE_BORDER_COLOR = null;
+		CURRENT_FEATURE_BORDER = null;
 	}
 
-	private static LinkedList<FeatureModelEditor> editors =
-		new LinkedList<>();
+	private static LinkedList<FeatureModelEditor> editors = new LinkedList<>();
 
 	/**
 	 * Register the model for property changes.
@@ -193,251 +142,215 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static void setHideLegend(boolean value) {
-		CURRENT_HIDE_LEGEND =
-			value;
+		CURRENT_HIDE_LEGEND = value;
 		setBoolean(QN_HIDE_LEGEND, value);
 	}
 
 	public static boolean isLegendHidden() {
 		if (CURRENT_HIDE_LEGEND == null) {
-			CURRENT_HIDE_LEGEND =
-				getBoolean(QN_HIDE_LEGEND);
+			CURRENT_HIDE_LEGEND = getBoolean(QN_HIDE_LEGEND);
 		}
 		return CURRENT_HIDE_LEGEND;
 	}
 
 	public static void setHideBorderColor(boolean value) {
-		CURRENT_HIDE_BORDER_COLOR =
-			value;
+		CURRENT_HIDE_BORDER_COLOR = value;
 		setBoolean(QN_HIDE_BORDER_COLOR, value);
 	}
 
 	public static boolean isBorderColorHidden() {
 		if (CURRENT_HIDE_BORDER_COLOR == null) {
-			CURRENT_HIDE_BORDER_COLOR =
-				getBoolean(QN_HIDE_BORDER_COLOR);
+			CURRENT_HIDE_BORDER_COLOR = getBoolean(QN_HIDE_BORDER_COLOR);
 		}
 		return CURRENT_HIDE_BORDER_COLOR;
 	}
 
 	public static void setLegendForgroundColor(Color color) {
-		CURRENT_LEGEND_FORGOUND =
-			color;
+		CURRENT_LEGEND_FORGOUND = color;
 		setColor(QN_LEGEND_FORGOUND, color);
 	}
 
 	public static Color getLegendForgroundColor() {
 		if (CURRENT_LEGEND_FORGOUND == null) {
-			CURRENT_LEGEND_FORGOUND =
-				getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
+			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
 		}
 		return CURRENT_LEGEND_FORGOUND;
 	}
 
 	public static void setLegendBackgroundColor(Color color) {
-		CURRENT_LEGEND_BACKGROUND =
-			color;
+		CURRENT_LEGEND_BACKGROUND = color;
 		setColor(QN_LEGEND_BACKGROUND, color);
 	}
 
 	public static Color getLegendBackgroundColor() {
 		if (CURRENT_LEGEND_BACKGROUND == null) {
-			CURRENT_LEGEND_BACKGROUND =
-				getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
+			CURRENT_LEGEND_BACKGROUND = getColor(QN_LEGEND_BACKGROUND, LEGEND_BACKGROUND);
 		}
 		return CURRENT_LEGEND_BACKGROUND;
 	}
 
 	public static void setLegendBorderColor(Color color) {
-		CURRENT_LEGEND_BORDER_COLOR =
-			color;
+		CURRENT_LEGEND_BORDER_COLOR = color;
 		setColor(QN_LEGEND_BORDER, color);
 	}
 
 	public static Color getLegendBorderColor() {
 		if (CURRENT_LEGEND_BORDER_COLOR == null) {
-			CURRENT_LEGEND_BORDER_COLOR =
-				getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
+			CURRENT_LEGEND_BORDER_COLOR = getColor(QN_LEGEND_BORDER, LEGEND_BORDER_COLOR);
 		}
 		return CURRENT_LEGEND_BORDER_COLOR;
 	}
 
 	public static void setFeatureForgroundColor(Color color) {
-		CURRENT_FEATURE_FOREGROUND =
-			color;
+		CURRENT_FEATURE_FOREGROUND = color;
 		setColor(QN_FEATURE_FORGROUND, color);
 	}
 
 	public static Color getFeatureForgroundColor() {
 		if (CURRENT_FEATURE_FOREGROUND == null) {
-			CURRENT_FEATURE_FOREGROUND =
-				getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
+			CURRENT_FEATURE_FOREGROUND = getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
 		}
 		return CURRENT_FEATURE_FOREGROUND;
 	}
 
 	public static Color getDiagramBackgroundColor() {
 		if (CURRENT_DIAGRAM_BACKGROUND == null) {
-			CURRENT_DIAGRAM_BACKGROUND =
-				getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
+			CURRENT_DIAGRAM_BACKGROUND = getColor(QN_DIAGRAM_BACKGROUND, DIAGRAM_BACKGROUND);
 		}
 		return CURRENT_DIAGRAM_BACKGROUND;
 	}
 
 	public static void setDiagramBackgroundColor(Color color) {
-		CURRENT_DIAGRAM_BACKGROUND =
-			color;
+		CURRENT_DIAGRAM_BACKGROUND = color;
 		setColor(QN_DIAGRAM_BACKGROUND, color);
 	}
 
 	public static void setConcreteFeatureBackgroundColor(Color color) {
-		CURRENT_CONCRETE_BACKGROUND =
-			color;
+		CURRENT_CONCRETE_BACKGROUND = color;
 		setColor(QN_FEATURE_CONCRETE, color);
 	}
 
 	public static Color getConcreteFeatureBackgroundColor() {
 		if (CURRENT_CONCRETE_BACKGROUND == null) {
-			CURRENT_CONCRETE_BACKGROUND =
-				getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
+			CURRENT_CONCRETE_BACKGROUND = getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
 		}
 		return CURRENT_CONCRETE_BACKGROUND;
 	}
 
 	public static Color getAbstractFeatureBackgroundColor() {
 		if (CURRENT_ABSTRACT_BACKGROUND == null) {
-			CURRENT_ABSTRACT_BACKGROUND =
-				getColor(QN_FEATURE_ABSTRACT, ABSTRACT_BACKGROUND);
+			CURRENT_ABSTRACT_BACKGROUND = getColor(QN_FEATURE_ABSTRACT, ABSTRACT_BACKGROUND);
 		}
 		return CURRENT_ABSTRACT_BACKGROUND;
 	}
 
 	public static void setAbstractFeatureBackgroundColor(Color color) {
-		CURRENT_ABSTRACT_BACKGROUND =
-			color;
+		CURRENT_ABSTRACT_BACKGROUND = color;
 		setColor(QN_FEATURE_ABSTRACT, color);
 	}
 
 	public static Color getHiddenFeatureForgroundColor() {
 		if (CURRENT_HIDDEN_FOREGROUND == null) {
-			CURRENT_HIDDEN_FOREGROUND =
-				getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
+			CURRENT_HIDDEN_FOREGROUND = getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
 		}
 		return CURRENT_HIDDEN_FOREGROUND;
 	}
 
 	public static void setHiddenFeatureForgroundColor(Color color) {
-		CURRENT_HIDDEN_FOREGROUND =
-			color;
+		CURRENT_HIDDEN_FOREGROUND = color;
 		setColor(QN_FEATURE_HIDEEN_FORGROUND, color);
 	}
 
 	public static Color getHiddenFeatureBackgroundColor() {
 		if (CURRENT_HIDDEN_BACKGROUND == null) {
-			CURRENT_HIDDEN_BACKGROUND =
-				getColor(QN_FEATURE_HIDEEN_BACKGROUND, HIDDEN_BACKGROUND);
+			CURRENT_HIDDEN_BACKGROUND = getColor(QN_FEATURE_HIDEEN_BACKGROUND, HIDDEN_BACKGROUND);
 		}
 		return CURRENT_HIDDEN_BACKGROUND;
 	}
 
 	public static void setHiddenFeatureBackgroundColor(Color color) {
-		CURRENT_HIDDEN_BACKGROUND =
-			color;
+		CURRENT_HIDDEN_BACKGROUND = color;
 		setColor(QN_FEATURE_HIDEEN_BACKGROUND, color);
 	}
 
 	public static Color getDeadFeatureBackgroundColor() {
 		if (CURRENT_DEAD_BACKGROUND == null) {
-			CURRENT_DEAD_BACKGROUND =
-				getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+			CURRENT_DEAD_BACKGROUND = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
 		}
 		return CURRENT_DEAD_BACKGROUND;
 	}
 
 	public static void setDeadFeatureBackgroundColor(Color color) {
-		CURRENT_DEAD_BACKGROUND =
-			color;
+		CURRENT_DEAD_BACKGROUND = color;
 		setColor(QN_FEATURE_DEAD, color);
 	}
 
 	public static Color getFalseOptionalFeatureBackgroundColor() {
 		if (CURRENT_FEATURE_DEAD == null) {
-			CURRENT_FEATURE_DEAD =
-				getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+			CURRENT_FEATURE_DEAD = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
 		}
 		return CURRENT_FEATURE_DEAD;
 	}
 
 	public static void setFalseOptionalFeatureBackgroundColor(Color color) {
-		CURRENT_FEATURE_DEAD =
-			color;
+		CURRENT_FEATURE_DEAD = color;
 		setColor(QN_FEATURE_DEAD, color);
 	}
 
 	public static Color getConstraintBackgroundColor() {
 		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
-			CURRENT_CONSTRAINT_BACKGROUND =
-				getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
+			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
 		}
 		return CURRENT_CONSTRAINT_BACKGROUND;
 	}
 
 	public static Color getImplicitConstraintBackgroundColor() {
 		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
-			CURRENT_CONSTRAINT_BACKGROUND =
-				getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
+			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
 		}
 		return IMPLICIT_CONSTRAINT;
 	}
 
-	Color color =
-		new Color(null, 255, 0, 0);
+	Color color = new Color(null, 255, 0, 0);
 
 	public static void setConstraintBackgroundColor(Color color) {
-		CURRENT_CONSTRAINT_BACKGROUND =
-			color;
+		CURRENT_CONSTRAINT_BACKGROUND = color;
 		setColor(QN_CONSTRAINT, color);
 	}
 
 	public static void setConnectionForegroundColor(Color color) {
-		CURRENT_CONNECTION_FOREGROUND =
-			color;
+		CURRENT_CONNECTION_FOREGROUND = color;
 		setColor(QN_CONNECTION, color);
 	}
 
 	public static Color getConnectionForegroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
-			CURRENT_CONNECTION_FOREGROUND =
-				getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
+			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
 		}
 		return CURRENT_CONNECTION_FOREGROUND;
 	}
 
 	public static Color getWarningColor() {
 		if (CURRENT_WARNING_BACKGROUND == null) {
-			CURRENT_WARNING_BACKGROUND =
-				getColor(QN_WARNING, WARNING_BACKGROUND);
+			CURRENT_WARNING_BACKGROUND = getColor(QN_WARNING, WARNING_BACKGROUND);
 		}
 		return CURRENT_WARNING_BACKGROUND;
 	}
 
 	public static void setWarningColor(Color color) {
-		CURRENT_WARNING_BACKGROUND =
-			color;
+		CURRENT_WARNING_BACKGROUND = color;
 		setColor(QN_WARNING, color);
 	}
 
 	public static Color getFeatureBorderColor() {
 		if (CURRENT_FEATURE_BORDER == null) {
-			CURRENT_FEATURE_BORDER =
-				getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
+			CURRENT_FEATURE_BORDER = getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
 		}
 		return CURRENT_FEATURE_BORDER;
 	}
 
 	public static void setFeatureBorderColor(Color color) {
-		CURRENT_FEATURE_BORDER =
-			color;
+		CURRENT_FEATURE_BORDER = color;
 		setColor(QN_FEATURE_BORDER, color);
 	}
 
@@ -446,8 +359,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static void setFeatureBorderColorSave(Color color) {
-		FEATURE_BORDER_SAVE =
-			color;
+		FEATURE_BORDER_SAVE = color;
 	}
 
 	public static void setLanguage(String text) {
@@ -463,71 +375,61 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static int getLayoutMarginX() {
 		if (CURRENT_LAYOUT_MARGIN_X == null) {
-			CURRENT_LAYOUT_MARGIN_X =
-				getInt(QN_LAYOUT_MARGIN_X, LAYOUT_MARGIN_X);
+			CURRENT_LAYOUT_MARGIN_X = getInt(QN_LAYOUT_MARGIN_X, LAYOUT_MARGIN_X);
 		}
 		return CURRENT_LAYOUT_MARGIN_X;
 	}
 
 	public static void setlayoutMagrginX(int value) {
-		CURRENT_LAYOUT_MARGIN_X =
-			value;
+		CURRENT_LAYOUT_MARGIN_X = value;
 		setInt(QN_LAYOUT_MARGIN_X, value);
 	}
 
 	public static int getLayoutMarginY() {
 		if (CURRENT_LAYOUT_MARGIN_Y == null) {
-			CURRENT_LAYOUT_MARGIN_Y =
-				getInt(QN_LAYOUT_MARGIN_Y, LAYOUT_MARGIN_Y);
+			CURRENT_LAYOUT_MARGIN_Y = getInt(QN_LAYOUT_MARGIN_Y, LAYOUT_MARGIN_Y);
 		}
 		return CURRENT_LAYOUT_MARGIN_Y;
 	}
 
 	public static void setlayoutMagrginY(int value) {
-		CURRENT_LAYOUT_MARGIN_Y =
-			value;
+		CURRENT_LAYOUT_MARGIN_Y = value;
 		setInt(QN_LAYOUT_MARGIN_Y, value);
 	}
 
 	public static int getFeatureSpaceX() {
 		if (CURRENT_FEATURE_SPACE_X == null) {
-			CURRENT_FEATURE_SPACE_X =
-				getInt(QN_FEATURE_X, FEATURE_SPACE_X);
+			CURRENT_FEATURE_SPACE_X = getInt(QN_FEATURE_X, FEATURE_SPACE_X);
 		}
 		return CURRENT_FEATURE_SPACE_X;
 	}
 
 	public static void setFeatureSpaceX(int value) {
-		CURRENT_FEATURE_SPACE_X =
-			value;
+		CURRENT_FEATURE_SPACE_X = value;
 		setInt(QN_FEATURE_X, value);
 	}
 
 	public static int getFeatureSpaceY() {
 		if (CURRENT_FEATURE_SPACE_Y == null) {
-			CURRENT_FEATURE_SPACE_Y =
-				getInt(QN_FEATURE_Y, FEATURE_SPACE_Y);
+			CURRENT_FEATURE_SPACE_Y = getInt(QN_FEATURE_Y, FEATURE_SPACE_Y);
 		}
 		return CURRENT_FEATURE_SPACE_Y;
 	}
 
 	public static void setFeatureSpaceY(int value) {
-		CURRENT_FEATURE_SPACE_Y =
-			value;
+		CURRENT_FEATURE_SPACE_Y = value;
 		setInt(QN_FEATURE_Y, value);
 	}
 
 	public static int getConstraintSpace() {
 		if (CURRENT_CONSTRAINT_SPACE_Y == null) {
-			CURRENT_CONSTRAINT_SPACE_Y =
-				getInt(QN_CONSTRAINT_SPACE, CONSTRAINT_SPACE_Y);
+			CURRENT_CONSTRAINT_SPACE_Y = getInt(QN_CONSTRAINT_SPACE, CONSTRAINT_SPACE_Y);
 		}
 		return CURRENT_CONSTRAINT_SPACE_Y;
 	}
 
 	public static void setConstraintSpace(int value) {
-		CURRENT_CONSTRAINT_SPACE_Y =
-			value;
+		CURRENT_CONSTRAINT_SPACE_Y = value;
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
 
@@ -602,15 +504,13 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getInheritedFeatureBorderColor() {
 		if (CURRENT_INHERITED_FEATURE_BORDER == null) {
-			CURRENT_INHERITED_FEATURE_BORDER =
-				getColor(QN_INHERITED_FEATURE_BORDER, INHERITED_BORDER_COLOR);
+			CURRENT_INHERITED_FEATURE_BORDER = getColor(QN_INHERITED_FEATURE_BORDER, INHERITED_BORDER_COLOR);
 		}
 		return CURRENT_INHERITED_FEATURE_BORDER;
 	}
 
 	public static void setInheritedFeatureBorderColor(Color color) {
-		CURRENT_INHERITED_FEATURE_BORDER =
-			color;
+		CURRENT_INHERITED_FEATURE_BORDER = color;
 		setColor(QN_INHERITED_FEATURE_BORDER, color);
 	}
 
@@ -620,15 +520,13 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getImportedFeatureBorderColor() {
 		if (CURRENT_IMPORTED_FEATURE_BORDER == null) {
-			CURRENT_IMPORTED_FEATURE_BORDER =
-				getColor(QN_IMPORTED_FEATURE_BORDER, IMPORTED_BORDER_COLOR);
+			CURRENT_IMPORTED_FEATURE_BORDER = getColor(QN_IMPORTED_FEATURE_BORDER, IMPORTED_BORDER_COLOR);
 		}
 		return CURRENT_IMPORTED_FEATURE_BORDER;
 	}
 
 	public static void setImportedFeatureBorderColor(Color color) {
-		CURRENT_IMPORTED_FEATURE_BORDER =
-			color;
+		CURRENT_IMPORTED_FEATURE_BORDER = color;
 		setColor(QN_IMPORTED_FEATURE_BORDER, color);
 	}
 
@@ -638,15 +536,13 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getInterfacedFeatureBorderColor() {
 		if (CURRENT_INTERFACED_FEATURE_BORDER == null) {
-			CURRENT_INTERFACED_FEATURE_BORDER =
-				getColor(QN_INTERFACED_FEATURE_BORDER, INTERFACED_BORDER_COLOR);
+			CURRENT_INTERFACED_FEATURE_BORDER = getColor(QN_INTERFACED_FEATURE_BORDER, INTERFACED_BORDER_COLOR);
 		}
 		return CURRENT_INTERFACED_FEATURE_BORDER;
 	}
 
 	public static void setInterfacedFeatureBorderColor(Color color) {
-		CURRENT_INTERFACED_FEATURE_BORDER =
-			color;
+		CURRENT_INTERFACED_FEATURE_BORDER = color;
 		setColor(QN_INTERFACED_FEATURE_BORDER, color);
 	}
 
@@ -671,8 +567,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getDecoratorForegroundColor() {
 		if (CURRENT_DECORATOR_FORGROUND_COLOR == null) {
-			CURRENT_DECORATOR_FORGROUND_COLOR =
-				getConnectionForegroundColor();
+			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForegroundColor();
 		}
 		return CURRENT_DECORATOR_FORGROUND_COLOR;
 	}
@@ -703,10 +598,8 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	private static int getInt(QualifiedName name, int defaultValue) {
 		try {
-			final String property =
-				workspaceRoot.getPersistentProperty(name);
-			if ((property != null)
-				&& !"".equals(property)) {
+			final String property = workspaceRoot.getPersistentProperty(name);
+			if ((property != null) && !"".equals(property)) {
 				return Integer.parseInt(property);
 			}
 		} catch (final CoreException e) {
@@ -752,9 +645,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	private static void setBoolean(QualifiedName name, boolean value) {
 		try {
-			workspaceRoot.setPersistentProperty(name, value
-				? TRUE
-				: FALSE);
+			workspaceRoot.setPersistentProperty(name, value ? TRUE : FALSE);
 		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
@@ -769,11 +660,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	private static Color getColor(QualifiedName name, Color deafaultColor) {
 		try {
-			final String property =
-				workspaceRoot.getPersistentProperty(name);
+			final String property = workspaceRoot.getPersistentProperty(name);
 			if (property != null) {
-				final String[] color =
-					property.split("[|]");
+				final String[] color = property.split("[|]");
 				if (color.length == 3) {
 					return new Color(null, Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
 				}
@@ -791,12 +680,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * @param color The color to set
 	 */
 	private static void setColor(QualifiedName name, Color color) {
-		final String c =
-			color.getRed()
-				+ "|"
-				+ color.getGreen()
-				+ "|"
-				+ color.getBlue();
+		final String c = color.getRed() + "|" + color.getGreen() + "|" + color.getBlue();
 		try {
 			workspaceRoot.setPersistentProperty(name, c);
 		} catch (final CoreException e) {
@@ -836,8 +720,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static LinkedList<QualifiedName> getQualifiedNames() {
-		final LinkedList<QualifiedName> names =
-			new LinkedList<QualifiedName>();
+		final LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
 		names.add(QN_HIDE_LEGEND);
 		// names.add(QN_LEGEND_FORGOUND);
 		names.add(QN_LEGEND_BACKGROUND);

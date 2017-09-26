@@ -36,16 +36,13 @@ public class InvariantNodeParent extends Parent {
 
 	public InvariantNodeParent(String discription, FSTInvariant fstInvariant, LinkedList<FSTInvariant> allInvariants) {
 		super(discription);
-		this.fstInvariant =
-			fstInvariant;
-		final int numberOfInvariants =
-			countInvariantsWithSameName(allInvariants);
+		this.fstInvariant = fstInvariant;
+		final int numberOfInvariants = countInvariantsWithSameName(allInvariants);
 		setValue(new Integer(numberOfInvariants));
 	}
 
 	private int countInvariantsWithSameName(LinkedList<FSTInvariant> invariants) {
-		int c =
-			0;
+		int c = 0;
 		for (final FSTInvariant tempInvariant : invariants) {
 			if (tempInvariant.getRole().getClassFragment().getFullIdentifier().equals(fstInvariant.getRole().getClassFragment().getFullIdentifier())) {
 				c++;

@@ -38,11 +38,9 @@ public abstract class Explanation {
 	/** The subject to be explained. */
 	private final Object subject;
 	/** The reasons this explanation is composed of mapped to how often the respective reason has been generated. */
-	private final Map<Reason, Integer> reasonCounts =
-		new LinkedHashMap<>();
+	private final Map<Reason, Integer> reasonCounts = new LinkedHashMap<>();
 	/** How many explanations have been generated and rolled into one for this explanation. */
-	private int explanationCount =
-		1;
+	private int explanationCount = 1;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -50,8 +48,7 @@ public abstract class Explanation {
 	 * @param subject the subject to be explained
 	 */
 	protected Explanation(Object subject) {
-		this.subject =
-			subject;
+		this.subject = subject;
 	}
 
 	/**
@@ -78,8 +75,7 @@ public abstract class Explanation {
 	 * @param explanationCount explanation count
 	 */
 	public void setExplanationCount(int explanationCount) {
-		this.explanationCount =
-			explanationCount;
+		this.explanationCount = explanationCount;
 	}
 
 	/**
@@ -136,15 +132,10 @@ public abstract class Explanation {
 	 * @param count how often to add the given reason
 	 */
 	protected void addReason(Reason reason, int count) {
-		reason =
-			reason.clone();
+		reason = reason.clone();
 		reason.setExplanation(this);
-		final Integer reasonCount =
-			reasonCounts.get(reason);
-		reasonCounts.put(reason, (reasonCount == null
-			? 0
-			: reasonCount)
-			+ count);
+		final Integer reasonCount = reasonCounts.get(reason);
+		reasonCounts.put(reason, (reasonCount == null ? 0 : reasonCount) + count);
 	}
 
 	/**
@@ -164,11 +155,9 @@ public abstract class Explanation {
 	 * @param reason reason to add
 	 */
 	public void addUniqueReason(Reason reason) {
-		final Integer value =
-			reasonCounts.get(reason);
+		final Integer value = reasonCounts.get(reason);
 		if (value == null) {
-			reason =
-				reason.clone();
+			reason = reason.clone();
 			reason.setExplanation(this);
 			reasonCounts.put(reason, 1);
 		}
@@ -183,8 +172,7 @@ public abstract class Explanation {
 		for (final Entry<Reason, Integer> reasonCount : explanation.reasonCounts.entrySet()) {
 			addReason(reasonCount.getKey(), reasonCount.getValue());
 		}
-		explanationCount +=
-			explanation.explanationCount;
+		explanationCount += explanation.explanationCount;
 	}
 
 	/**
@@ -197,8 +185,7 @@ public abstract class Explanation {
 		for (final Entry<Reason, Integer> reasonCount : reasonCounts.entrySet()) {
 			reasonCount.setValue(explanation.reasonCounts.get(reasonCount.getKey()));
 		}
-		explanationCount =
-			explanation.explanationCount;
+		explanationCount = explanation.explanationCount;
 	}
 
 	/**

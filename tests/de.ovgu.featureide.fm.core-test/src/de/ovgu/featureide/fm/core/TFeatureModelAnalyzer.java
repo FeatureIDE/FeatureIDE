@@ -44,120 +44,76 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class TFeatureModelAnalyzer {
 
-	protected static File MODEL_FILE_FOLDER =
-		getFolder();
+	protected static File MODEL_FILE_FOLDER = getFolder();
 
-	private static final FileFilter filter =
-		new FileFilter() {
+	private static final FileFilter filter = new FileFilter() {
 
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.getName().endsWith(".xml");
-			}
-		};
+		@Override
+		public boolean accept(File pathname) {
+			return pathname.getName().endsWith(".xml");
+		}
+	};
 
-	private final IFeatureModel FM_test_1 =
-		init("test_1.xml");
-	private final IFeature FM1_F1 =
-		FM_test_1.getFeature("F1");
-	private final IFeature FM1_F2 =
-		FM_test_1.getFeature("F2");
-	private final IConstraint FM1_C1 =
-		FM_test_1.getConstraints().get(0);
-	private final HashMap<Object, Object> FM1_DATA =
-		FM_test_1.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_1 = init("test_1.xml");
+	private final IFeature FM1_F1 = FM_test_1.getFeature("F1");
+	private final IFeature FM1_F2 = FM_test_1.getFeature("F2");
+	private final IConstraint FM1_C1 = FM_test_1.getConstraints().get(0);
+	private final HashMap<Object, Object> FM1_DATA = FM_test_1.getAnalyser().analyzeFeatureModel(null);
 
-	private final IFeatureModel FM_test_2 =
-		init("test_2.xml");
-	private final IFeature FM2_F1 =
-		FM_test_2.getFeature("F1");
-	private final IFeature FM2_F2 =
-		FM_test_2.getFeature("F2");
-	private final IFeature FM2_F3 =
-		FM_test_2.getFeature("F3");
-	private final IConstraint FM2_C1 =
-		FM_test_2.getConstraints().get(0);
-	private final IConstraint FM2_C2 =
-		FM_test_2.getConstraints().get(1);
-	private final IConstraint FM2_C3 =
-		FM_test_2.getConstraints().get(2);
-	private final HashMap<Object, Object> FM2_DATA =
-		FM_test_2.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_2 = init("test_2.xml");
+	private final IFeature FM2_F1 = FM_test_2.getFeature("F1");
+	private final IFeature FM2_F2 = FM_test_2.getFeature("F2");
+	private final IFeature FM2_F3 = FM_test_2.getFeature("F3");
+	private final IConstraint FM2_C1 = FM_test_2.getConstraints().get(0);
+	private final IConstraint FM2_C2 = FM_test_2.getConstraints().get(1);
+	private final IConstraint FM2_C3 = FM_test_2.getConstraints().get(2);
+	private final HashMap<Object, Object> FM2_DATA = FM_test_2.getAnalyser().analyzeFeatureModel(null);
 
-	private final IFeatureModel FM_test_3 =
-		init("test_3.xml");
-	private final IFeature FM3_F2 =
-		FM_test_3.getFeature("F2");
-	private final IFeature FM3_F3 =
-		FM_test_3.getFeature("F3");
-	private final IConstraint FM3_C1 =
-		FM_test_3.getConstraints().get(0);
-	private final HashMap<Object, Object> FM3_DATA =
-		FM_test_3.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_3 = init("test_3.xml");
+	private final IFeature FM3_F2 = FM_test_3.getFeature("F2");
+	private final IFeature FM3_F3 = FM_test_3.getFeature("F3");
+	private final IConstraint FM3_C1 = FM_test_3.getConstraints().get(0);
+	private final HashMap<Object, Object> FM3_DATA = FM_test_3.getAnalyser().analyzeFeatureModel(null);
 
-	private final IFeatureModel FM_test_4 =
-		init("test_4.xml");
-	private final IFeature FM4_F1 =
-		FM_test_4.getFeature("I");
-	private final IFeature FM4_F2 =
-		FM_test_4.getFeature("D");
-	private final IFeature FM4_F3 =
-		FM_test_4.getFeature("E");
-	private final IFeature FM4_F4 =
-		FM_test_4.getFeature("K");
-	private final IFeature FM4_F5 =
-		FM_test_4.getFeature("L");
-	private final IFeature FM4_F6 =
-		FM_test_4.getFeature("N");
-	private final IFeature FM4_F7 =
-		FM_test_4.getFeature("P");
-	private final IFeature FM4_F8 =
-		FM_test_4.getFeature("M");
-	private final IFeature FM4_F9 =
-		FM_test_4.getFeature("C");
-	private final IFeature FM4_F10 =
-		FM_test_4.getFeature("J");
-	private final HashMap<Object, Object> FM4_DATA =
-		FM_test_4.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_4 = init("test_4.xml");
+	private final IFeature FM4_F1 = FM_test_4.getFeature("I");
+	private final IFeature FM4_F2 = FM_test_4.getFeature("D");
+	private final IFeature FM4_F3 = FM_test_4.getFeature("E");
+	private final IFeature FM4_F4 = FM_test_4.getFeature("K");
+	private final IFeature FM4_F5 = FM_test_4.getFeature("L");
+	private final IFeature FM4_F6 = FM_test_4.getFeature("N");
+	private final IFeature FM4_F7 = FM_test_4.getFeature("P");
+	private final IFeature FM4_F8 = FM_test_4.getFeature("M");
+	private final IFeature FM4_F9 = FM_test_4.getFeature("C");
+	private final IFeature FM4_F10 = FM_test_4.getFeature("J");
+	private final HashMap<Object, Object> FM4_DATA = FM_test_4.getAnalyser().analyzeFeatureModel(null);
 
-	private final IFeatureModel FM_test_7 =
-		init("test_7.xml");
-	private final IFeature FM7_F1 =
-		FM_test_7.getFeature("H");
-	private final IConstraint FM7_C1 =
-		FM_test_7.getConstraints().get(0);
-	private final HashMap<Object, Object> FM7_DATA =
-		FM_test_7.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_7 = init("test_7.xml");
+	private final IFeature FM7_F1 = FM_test_7.getFeature("H");
+	private final IConstraint FM7_C1 = FM_test_7.getConstraints().get(0);
+	private final HashMap<Object, Object> FM7_DATA = FM_test_7.getAnalyser().analyzeFeatureModel(null);
 
-	private final IFeatureModel FM_test_8 =
-		init("test_8.xml");
-	private final IFeature FM8_F1 =
-		FM_test_8.getFeature("B");
-	private final IFeature FM8_F2 =
-		FM_test_8.getFeature("C");
-	private final HashMap<Object, Object> FM8_DATA =
-		FM_test_8.getAnalyser().analyzeFeatureModel(null);
+	private final IFeatureModel FM_test_8 = init("test_8.xml");
+	private final IFeature FM8_F1 = FM_test_8.getFeature("B");
+	private final IFeature FM8_F2 = FM_test_8.getFeature("C");
+	private final HashMap<Object, Object> FM8_DATA = FM_test_8.getAnalyser().analyzeFeatureModel(null);
 
 	/**
 	 * @return
 	 */
 	private static File getFolder() {
-		File folder =
-			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
+		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
 		if (!folder.canRead()) {
-			folder =
-				new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
+			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
 		}
 		return folder;
 	}
 
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm =
-			null;
+		IFeatureModel fm = null;
 		for (final File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
-				fm =
-					FeatureModelManager.load(f.toPath()).getObject();
+				fm = FeatureModelManager.load(f.toPath()).getObject();
 				if (fm != null) {
 					break;
 				}

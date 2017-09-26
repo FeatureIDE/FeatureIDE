@@ -56,18 +56,13 @@ public class SettingsImport {
 	 * @param persitentProperties
 	 */
 	private void importSettings(File settingsFile) {
-		final String content =
-			getContents(settingsFile);
-		final String[] settings =
-			content.split("\r\n");
+		final String content = getContents(settingsFile);
+		final String[] settings = content.split("\r\n");
 		for (final String s : settings) {
 			try {
-				final String value =
-					s.split("[=]")[1];
-				if (s.contains("=")
-					&& !"null".equals(value)) {
-					final String qualifier =
-						s.split("[=]")[0];
+				final String value = s.split("[=]")[1];
+				if (s.contains("=") && !"null".equals(value)) {
+					final String qualifier = s.split("[=]")[0];
 					FMPropertyManagerDefaults.workspaceRoot.setPersistentProperty(new QualifiedName(qualifier, qualifier), value);
 				}
 			} catch (final CoreException e) {
@@ -82,17 +77,12 @@ public class SettingsImport {
 	 * @return
 	 */
 	private String getContents(File settingsFile) {
-		final StringBuilder buffer =
-			new StringBuilder();
-		BufferedReader reader =
-			null;
+		final StringBuilder buffer = new StringBuilder();
+		BufferedReader reader = null;
 		try {
-			reader =
-				new BufferedReader(new FileReader(settingsFile));
-			String line =
-				null;
-			while ((line =
-				reader.readLine()) != null) {
+			reader = new BufferedReader(new FileReader(settingsFile));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
 				buffer.append(line);
 				buffer.append("\r\n");
 			}

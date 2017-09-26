@@ -56,23 +56,17 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 
-	private final static Image colorImage =
-		FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureIconSmall.ico").createImage();
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".FeatureProjectWizard";
+	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureIconSmall.ico").createImage();
+	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 
 	protected NewFeatureProjectPage page;
-	private DefaultNewFeatureProjectWizardExtension wizardExtension =
-		null;
+	private DefaultNewFeatureProjectWizardExtension wizardExtension = null;
 
 	@Override
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
-		page =
-			new NewFeatureProjectPage();
-		final Shell shell =
-			getShell();
+		page = new NewFeatureProjectPage();
+		final Shell shell = getShell();
 		if (shell != null) {
 			shell.setImage(colorImage);
 		}
@@ -114,8 +108,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			// determine next page (reference page) after project has been named
 			return super.getNextPage(page);
 		} else if (wizardExtension != null) {
-			final IWizardPage nextExtensionPage =
-				wizardExtension.getNextPage(page);
+			final IWizardPage nextExtensionPage = wizardExtension.getNextPage(page);
 			if (nextExtensionPage != null) {
 				// determine next page (extension pages) when extension exists and reference page or an extension page active
 				return nextExtensionPage;
@@ -132,13 +125,11 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 
 //		this.wizardExtension = null;
-		final IConfigurationElement[] conf =
-			Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
+		final IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
 		for (final IConfigurationElement c : conf) {
 			try {
 				if (c.getAttribute("composerid").equals(page.getCompositionTool().getId())) {
-					wizardExtension =
-						(DefaultNewFeatureProjectWizardExtension) c.createExecutableExtension("class");
+					wizardExtension = (DefaultNewFeatureProjectWizardExtension) c.createExecutableExtension("class");
 					wizardExtension.setWizard(this);
 				}
 			} catch (final CoreException e) {
@@ -147,24 +138,22 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		}
 
 		if (wizardExtension == null) {
-			wizardExtension =
-				new DefaultNewFeatureProjectWizardExtension();
+			wizardExtension = new DefaultNewFeatureProjectWizardExtension();
 			wizardExtension.setWizard(this);
 		}
 
 		if (wizardExtension.performOwnFinish()) {
-			final UIJob job =
-				new UIJob(CREATING_ANDROID_PROJECT) {
+			final UIJob job = new UIJob(CREATING_ANDROID_PROJECT) {
 
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						if (wizardExtension.performBeforeFinish(page)) {
-							return Status.OK_STATUS;
-						} else {
-							return Status.CANCEL_STATUS;
-						}
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (wizardExtension.performBeforeFinish(page)) {
+						return Status.OK_STATUS;
+					} else {
+						return Status.CANCEL_STATUS;
 					}
-				};
+				}
+			};
 			job.setPriority(Job.LONG);
 			job.schedule();
 			return true;
@@ -176,8 +165,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			// enhance project depending on extension
 			if (wizardExtension.isFinished()) {
 				try {
-					final IProject newProject =
-						getNewProject();
+					final IProject newProject = getNewProject();
 					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
 							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled());
 					// open editor

@@ -11,10 +11,8 @@ public class CppCheckerFileLogs {
 	private final Collection<CppCheckerLog> logs;
 
 	public CppCheckerFileLogs(IFile file) {
-		this.file =
-			file;
-		logs =
-			new LinkedList<CppCheckerLog>();
+		this.file = file;
+		logs = new LinkedList<CppCheckerLog>();
 	}
 
 	public IFile getFile() {

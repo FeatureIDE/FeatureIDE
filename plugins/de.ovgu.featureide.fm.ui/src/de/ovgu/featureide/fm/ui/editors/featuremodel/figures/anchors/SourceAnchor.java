@@ -39,14 +39,12 @@ public class SourceAnchor extends AbstractConnectionAnchor {
 
 	public SourceAnchor(IFigure owner, IGraphicalFeature model) {
 		super(owner);
-		this.model =
-			model;
+		this.model = model;
 	}
 
 	@Override
 	public Point getLocation(Point reference) {
-		final Point ref =
-			FeatureUIHelper.getSourceLocation(model);
+		final Point ref = FeatureUIHelper.getSourceLocation(model);
 		getOwner().translateToAbsolute(ref);
 		return ref;
 	}

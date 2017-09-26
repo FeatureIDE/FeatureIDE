@@ -38,18 +38,14 @@ public class DocumentationBuilder {
 	private final IFeatureProject featureProject;
 
 	public DocumentationBuilder(IFeatureProject featureProject) {
-		this.featureProject =
-			featureProject;
-		parser =
-			featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
+		this.featureProject = featureProject;
+		parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
 	}
 
 	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<?>> filters) {
-		final FSTModel fstModel =
-			featureProject.getFSTModel();
+		final FSTModel fstModel = featureProject.getFSTModel();
 		if (fstModel != null) {
-			final ProjectSignatures projectSignatures =
-				fstModel.getProjectSignatures();
+			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();
 			if (projectSignatures != null) {
 				if (parser.addExtraFilters()) {
 					for (final IFilter<?> filter : filters) {

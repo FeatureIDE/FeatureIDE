@@ -44,7 +44,6 @@ public interface RestrictionFactory<T> {
 	 * @param restrictions The collection where the new restriction will be stored.
 	 * @return An instance representing an equivalent restriction.
 	 */
-	void createAndAdd(List<Term> terms, RelationOperator op, int degree,
-			Collection<T> restrictions);
+	void createAndAdd(List<Term> terms, RelationOperator op, int degree, Collection<T> restrictions);
 
 }

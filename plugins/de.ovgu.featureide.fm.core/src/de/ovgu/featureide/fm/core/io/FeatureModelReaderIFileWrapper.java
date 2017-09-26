@@ -47,14 +47,12 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	private final AbstractFeatureModelReader reader;
 
 	public FeatureModelReaderIFileWrapper(AbstractFeatureModelReader reader) {
-		this.reader =
-			reader;
+		this.reader = reader;
 	}
 
 	@Override
 	public void setFeatureModel(IFeatureModel featureModel) {
-		reader.featureModel =
-			featureModel;
+		reader.featureModel = featureModel;
 	}
 
 	@Override
@@ -75,20 +73,17 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		reader.readFromString(text);
 	}
 
-	public void readFromFile(IFile ifile) throws UnsupportedModelException,
-			FileNotFoundException {
+	public void readFromFile(IFile ifile) throws UnsupportedModelException, FileNotFoundException {
 		////
 		FMComposerManager.getFMComposerExtension(ifile.getProject());
 		/////
-		final File file =
-			ifile.getRawLocation().makeAbsolute().toFile();
+		final File file = ifile.getRawLocation().makeAbsolute().toFile();
 
 		reader.readFromFile(file);
 	}
 
 	@Override
-	public void readFromFile(File file) throws FileNotFoundException,
-			UnsupportedModelException {
+	public void readFromFile(File file) throws FileNotFoundException, UnsupportedModelException {
 		reader.readFromFile(file);
 	}
 
@@ -102,8 +97,7 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	}
 
 	@Override
-	protected void parseInputStream(InputStream inputStream)
-			throws UnsupportedModelException {
+	protected void parseInputStream(InputStream inputStream) throws UnsupportedModelException {
 		reader.parseInputStream(inputStream);
 	}
 
@@ -114,7 +108,6 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	 * @param featureModelFile
 	 */
 	public void setFile(IFile featureModelFile) {
-		reader.setFile(featureModelFile.getRawLocation().makeAbsolute()
-				.toFile());
+		reader.setFile(featureModelFile.getRawLocation().makeAbsolute().toFile());
 	}
 }

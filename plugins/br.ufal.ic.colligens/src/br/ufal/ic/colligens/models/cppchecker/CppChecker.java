@@ -20,83 +20,55 @@ import br.ufal.ic.colligens.activator.Colligens;
 
 public class CppChecker {
 
-	private String xmlFile =
-		"";
+	private String xmlFile = "";
 
 	public CppChecker() {
-		xmlFile =
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n";
-		xmlFile +=
-			"<results> \n";
+		xmlFile = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n";
+		xmlFile += "<results> \n";
 	}
 
 	public String getXmlFile() {
-		xmlFile +=
-			"</results>";
+		xmlFile += "</results>";
 		return xmlFile;
 	}
 
 	public void checkProjects(File path, String projectName) {
 		for (final File file : path.listFiles()) {
 			if (!file.isDirectory()) {
-				if (file.getName().endsWith(".c")
-					|| file.getName().endsWith(".h")) {
+				if (file.getName().endsWith(".c") || file.getName().endsWith(".h")) {
 					try {
 
 						final Process proc =
-							new ProcessBuilder(Colligens
-									.getDefault().getPreferenceStore()
-									.getString("CppCheck"), "--xml", "--force",
-									file.getAbsolutePath()).redirectErrorStream(
-											true).start();
-						final BufferedReader stdInput =
-							new BufferedReader(
-									new InputStreamReader(proc.getInputStream()));
+							new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+									.redirectErrorStream(true).start();
+						final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-						String s =
-							null;
-						String config =
-							null;
+						String s = null;
+						String config = null;
 
 						// read the output from the command
-						while ((s =
-							stdInput.readLine()) != null) {
-							s =
-								s.trim();
+						while ((s = stdInput.readLine()) != null) {
+							s = s.trim();
 
 							if (s.startsWith("Checking")) {
 								if (s.contains(":")) {
-									final String[] parts =
-										s.split(":");
+									final String[] parts = s.split(":");
 									if (parts.length > 1) {
-										parts[1] =
-											parts[1].trim();
-										config =
-											parts[1].replace("...", "");
+										parts[1] = parts[1].trim();
+										config = parts[1].replace("...", "");
 									}
 								} else {
-									config =
-										"1";
+									config = "1";
 								}
 							}
-							if (s.startsWith("<error file")
-								&& !s.contains("/"
-									+ projectName
-									+ "/bin/")) {
-								xmlFile +=
-									"\t"
-										+ s.replace("/>", " config=\""
-											+ config
-											+ "\"/>")
-										+ "\n";
+							if (s.startsWith("<error file") && !s.contains("/" + projectName + "/bin/")) {
+								xmlFile += "\t" + s.replace("/>", " config=\"" + config + "\"/>") + "\n";
 							}
 
 						}
 
 					} catch (final IOException e) {
-						System.out.println("Error analyzing file + "
-							+ file.getAbsolutePath()
-							+ "...");
+						System.out.println("Error analyzing file + " + file.getAbsolutePath() + "...");
 						e.printStackTrace();
 					}
 				}
@@ -111,58 +83,36 @@ public class CppChecker {
 		try {
 
 			final Process proc =
-				new ProcessBuilder(Colligens.getDefault()
-						.getPreferenceStore().getString("CppCheck"), "--xml",
-						"--force", file.getAbsolutePath())
-								.redirectErrorStream(true).start();
-			final BufferedReader stdInput =
-				new BufferedReader(new InputStreamReader(
-						proc.getInputStream()));
+				new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+						.redirectErrorStream(true).start();
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-			String s =
-				null;
-			String config =
-				null;
+			String s = null;
+			String config = null;
 
 			// read the output from the command
-			while ((s =
-				stdInput.readLine()) != null) {
-				s =
-					s.trim();
+			while ((s = stdInput.readLine()) != null) {
+				s = s.trim();
 
 				if (s.startsWith("Checking")) {
 					if (s.contains(":")) {
-						final String[] parts =
-							s.split(":");
+						final String[] parts = s.split(":");
 						if (parts.length > 1) {
-							parts[1] =
-								parts[1].trim();
-							config =
-								parts[1].replace("...", "");
+							parts[1] = parts[1].trim();
+							config = parts[1].replace("...", "");
 						}
 					} else {
-						config =
-							"1";
+						config = "1";
 					}
 				}
-				if (s.startsWith("<error file")
-					&& !s.contains("/"
-						+ projectName
-						+ "/bin/")) {
-					xmlFile +=
-						"\t"
-							+ s.replace("/>", " config=\""
-								+ config
-								+ "\"/>")
-							+ "\n";
+				if (s.startsWith("<error file") && !s.contains("/" + projectName + "/bin/")) {
+					xmlFile += "\t" + s.replace("/>", " config=\"" + config + "\"/>") + "\n";
 				}
 
 			}
 
 		} catch (final IOException e) {
-			System.out.println("Error analyzing file + "
-				+ file.getAbsolutePath()
-				+ "...");
+			System.out.println("Error analyzing file + " + file.getAbsolutePath() + "...");
 			e.printStackTrace();
 		}
 	}

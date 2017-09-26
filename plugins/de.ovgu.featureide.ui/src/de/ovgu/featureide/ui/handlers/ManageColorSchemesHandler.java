@@ -36,8 +36,7 @@ public class ManageColorSchemesHandler extends AFeatureProjectHandler {
 
 	@Override
 	protected void singleAction(IFeatureProject featureProject) {
-		final ColorSchemeWizard wizard =
-			new ColorSchemeWizard(featureProject.getFeatureModel());
+		final ColorSchemeWizard wizard = new ColorSchemeWizard(featureProject.getFeatureModel());
 		new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard).open();
 	}
 

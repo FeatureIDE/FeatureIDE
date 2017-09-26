@@ -19,8 +19,7 @@ public class SemanticBugsController {
 	private final ProjectExplorerController projectExplorer;
 
 	public SemanticBugsController() {
-		projectExplorer =
-			new ProjectExplorerController();
+		projectExplorer = new ProjectExplorerController();
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
@@ -39,22 +38,17 @@ public class SemanticBugsController {
 
 			projectExplorer.run();
 
-			final List<IResource> resources =
-				projectExplorer.getList();
+			final List<IResource> resources = projectExplorer.getList();
 
 			Display.getDefault().asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					final CppCheckAnalyzer analyser =
-						new CppCheckAnalyzer();
+					final CppCheckAnalyzer analyser = new CppCheckAnalyzer();
 
-					for (final Iterator<IResource> iterator =
-						resources.iterator(); iterator
-								.hasNext();) {
+					for (final Iterator<IResource> iterator = resources.iterator(); iterator.hasNext();) {
 
-						final IResource iResource =
-							iterator.next();
+						final IResource iResource = iterator.next();
 
 						// System.out.println(iResource);
 
@@ -62,13 +56,10 @@ public class SemanticBugsController {
 
 					}
 
-					final List<CppCheckerFileLogs> fileLogs =
-						analyser.getFiles();
+					final List<CppCheckerFileLogs> fileLogs = analyser.getFiles();
 
 					// returns the list to view
-					final SemanticBugsViewController statisticsViewController =
-						SemanticBugsViewController
-								.getInstance();
+					final SemanticBugsViewController statisticsViewController = SemanticBugsViewController.getInstance();
 
 					statisticsViewController.setInput(fileLogs);
 

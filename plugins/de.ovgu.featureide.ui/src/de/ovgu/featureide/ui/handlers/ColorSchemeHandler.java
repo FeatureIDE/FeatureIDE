@@ -60,43 +60,31 @@ public class ColorSchemeHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		editorPart =
-			HandlerUtil.getActiveEditor(event);
-		editor =
-			editorPart.getAdapter(ITextEditor.class);
-		provider =
-			editor.getDocumentProvider();
+		editorPart = HandlerUtil.getActiveEditor(event);
+		// Cast is necessary, don't remove
+		editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+		provider = editor.getDocumentProvider();
 
-		final int line =
-			getCursorPos();
+		final int line = getCursorPos();
 
-		ColorAnnotationModel colormodel =
-			null;
-		final IEditorInput input =
-			editor.getEditorInput();
-		if ((provider != null)
-			&& (input instanceof FileEditorInput)) {
-			final IAnnotationModel model =
-				provider.getAnnotationModel(input);
+		ColorAnnotationModel colormodel = null;
+		final IEditorInput input = editor.getEditorInput();
+		if ((provider != null) && (input instanceof FileEditorInput)) {
+			final IAnnotationModel model = provider.getAnnotationModel(input);
 
 			if (model instanceof IAnnotationModelExtension) {
-				final IAnnotationModelExtension modelex =
-					(IAnnotationModelExtension) model;
-				colormodel =
-					(ColorAnnotationModel) modelex.getAnnotationModel(ColorAnnotationModel.KEY);
+				final IAnnotationModelExtension modelex = (IAnnotationModelExtension) model;
+				colormodel = (ColorAnnotationModel) modelex.getAnnotationModel(ColorAnnotationModel.KEY);
 			}
 		}
 
 		if (colormodel != null) {
-			final IFeature feature =
-				colormodel.getFeature(line);
+			final IFeature feature = colormodel.getFeature(line);
 			if (feature == null) {
 				return true;
 			}
-			final IStructuredSelection structuredSelection =
-				new StructuredSelection(feature);
-			final SetFeatureColorAction sfca =
-				new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModel());
+			final IStructuredSelection structuredSelection = new StructuredSelection(feature);
+			final SetFeatureColorAction sfca = new SetFeatureColorAction(structuredSelection, colormodel.getFeatureModel());
 			sfca.run();
 			return true;
 		}
@@ -104,17 +92,12 @@ public class ColorSchemeHandler extends AbstractHandler {
 	}
 
 	private int getCursorPos() {
-		final IDocument document =
-			provider.getDocument(editorPart.getEditorInput());
-		final ITextSelection textSelection =
-			(ITextSelection) editorPart.getSite().getSelectionProvider().getSelection();
-		final int offset =
-			textSelection.getOffset();
-		int lineNumber =
-			0;
+		final IDocument document = provider.getDocument(editorPart.getEditorInput());
+		final ITextSelection textSelection = (ITextSelection) editorPart.getSite().getSelectionProvider().getSelection();
+		final int offset = textSelection.getOffset();
+		int lineNumber = 0;
 		try {
-			lineNumber =
-				document.getLineOfOffset(offset);
+			lineNumber = document.getLineOfOffset(offset);
 		} catch (final BadLocationException e) {
 			e.printStackTrace();
 		}

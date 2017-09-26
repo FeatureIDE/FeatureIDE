@@ -50,12 +50,9 @@ public final class Term implements Cloneable {
 	 */
 	public Term(Term term) {
 		super();
-		id =
-			term.getId();
-		positive =
-			term.isPositive();
-		coefficient =
-			term.getCoefficient();
+		id = term.getId();
+		positive = term.isPositive();
+		coefficient = term.getCoefficient();
 	}
 
 	/**
@@ -67,12 +64,9 @@ public final class Term implements Cloneable {
 	 */
 	public Term(int id, int coefficient, boolean positive) {
 		super();
-		this.id =
-			id;
-		this.positive =
-			positive;
-		this.coefficient =
-			coefficient;
+		this.id = id;
+		this.positive = positive;
+		this.coefficient = coefficient;
 	}
 
 	/**
@@ -122,14 +116,8 @@ public final class Term implements Cloneable {
 
 	@Override
 	public String toString() {
-		final String sign =
-			coefficient >= 0
-				? "+"
-				: "";
-		final String pos =
-			!positive
-				? "~"
-				: "";
+		final String sign = coefficient >= 0 ? "+" : "";
+		final String pos = !positive ? "~" : "";
 		return String.format("%s%s%sx%s", sign, coefficient, pos, id);
 	}
 
@@ -144,35 +132,22 @@ public final class Term implements Cloneable {
 			return false;
 		}
 		// depth equality check
-		final Term term =
-			(Term) object;
-		return (term.getId() == id)
-			&& (term.getCoefficient() == coefficient)
-			&& (term.isPositive() == positive);
+		final Term term = (Term) object;
+		return (term.getId() == id) && (term.getCoefficient() == coefficient) && (term.isPositive() == positive);
 	}
 
 	@Override
 	public int hashCode() {
-		final int hashCode =
-			(id
-				* 17)
-				^ coefficient;
-		return positive
-			? hashCode
-				+ 1
-			: hashCode;
+		final int hashCode = (id * 17) ^ coefficient;
+		return positive ? hashCode + 1 : hashCode;
 	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		final Term clone =
-			(Term) super.clone();
-		clone.id =
-			id;
-		clone.positive =
-			positive;
-		clone.coefficient =
-			coefficient;
+		final Term clone = (Term) super.clone();
+		clone.id = id;
+		clone.positive = positive;
+		clone.coefficient = coefficient;
 		return clone;
 	}
 }

@@ -39,8 +39,7 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
  */
 public class ClassFigure extends Figure implements GUIDefaults {
 
-	private final Label label =
-		new Label();
+	private final Label label = new Label();
 	private final int height;
 
 	public ClassFigure(FSTClass c, int height) {
@@ -49,11 +48,9 @@ public class ClassFigure extends Figure implements GUIDefaults {
 
 		setLayoutManager(new FreeformLayout());
 
-		final IFile editorFile =
-			CollaborationModelBuilder.editorFile;
+		final IFile editorFile = CollaborationModelBuilder.editorFile;
 
-		if ((editorFile != null)
-			&& c.getName().equals(editorFile.getName())) {
+		if ((editorFile != null) && c.getName().equals(editorFile.getName())) {
 			setBackgroundColor(OPEN_CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER_SELECTED);
 		} else {
@@ -65,15 +62,11 @@ public class ClassFigure extends Figure implements GUIDefaults {
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
-		this.height =
-			height;
+		this.height = height;
 
-		String name =
-			c.getName();
+		String name = c.getName();
 		if (name.contains("/")) {
-			name =
-				name.substring(name.lastIndexOf("/")
-					+ 1, name.length());
+			name = name.substring(name.lastIndexOf("/") + 1, name.length());
 		}
 		setName(name);
 
@@ -84,12 +77,10 @@ public class ClassFigure extends Figure implements GUIDefaults {
 
 	private void setName(String name) {
 		label.setText(name);
-		final Dimension labelSize =
-			label.getPreferredSize();
+		final Dimension labelSize = label.getPreferredSize();
 
 		if (labelSize.width < DEFAULT_CLASS_WIDTH) {
-			labelSize.width =
-				DEFAULT_CLASS_WIDTH;
+			labelSize.width = DEFAULT_CLASS_WIDTH;
 		}
 
 		if (labelSize.equals(label.getSize())) {
@@ -98,22 +89,15 @@ public class ClassFigure extends Figure implements GUIDefaults {
 
 		label.setSize(labelSize);
 
-		final Rectangle bounds =
-			getBounds();
-		final int w =
-			CLASS_INSETS.getWidth();
+		final Rectangle bounds = getBounds();
+		final int w = CLASS_INSETS.getWidth();
 
 		bounds.setSize(labelSize.expand(w, height));
 
-		final Dimension oldSize =
-			getSize();
+		final Dimension oldSize = getSize();
 		if (!oldSize.equals(0, 0)) {
-			final int dx =
-				(oldSize.width
-					- bounds.width)
-					/ 2;
-			bounds.x +=
-				dx;
+			final int dx = (oldSize.width - bounds.width) / 2;
+			bounds.x += dx;
 		}
 		setBounds(bounds);
 	}

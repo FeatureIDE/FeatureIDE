@@ -118,14 +118,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @param up true for {@link Origin#CHILD_UP upward child relationship}, false for {@link Origin#CHILD_DOWN downward child relationship}
 		 */
 		protected FeatureModelElementTrace(IFeature parent, Collection<IFeature> children, boolean up) {
-			origin =
-				up
-					? Origin.CHILD_UP
-					: Origin.CHILD_DOWN;
-			element =
-				parent;
-			elements =
-				new LinkedHashSet<IFeatureModelElement>(children);
+			origin = up ? Origin.CHILD_UP : Origin.CHILD_DOWN;
+			element = parent;
+			elements = new LinkedHashSet<IFeatureModelElement>(children);
 		}
 
 		/**
@@ -134,12 +129,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @param children the children of the relationship; not null or empty
 		 */
 		protected FeatureModelElementTrace(Collection<IFeature> children) {
-			origin =
-				Origin.CHILD_HORIZONTAL;
-			element =
-				null;
-			elements =
-				new LinkedHashSet<IFeatureModelElement>(children);
+			origin = Origin.CHILD_HORIZONTAL;
+			element = null;
+			elements = new LinkedHashSet<IFeatureModelElement>(children);
 		}
 
 		/**
@@ -148,12 +140,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @param root the root feature; not null
 		 */
 		protected FeatureModelElementTrace(IFeature root) {
-			origin =
-				Origin.ROOT;
-			element =
-				root;
-			elements =
-				null;
+			origin = Origin.ROOT;
+			element = root;
+			elements = null;
 		}
 
 		/**
@@ -162,12 +151,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @param constraint a constraint; not null
 		 */
 		protected FeatureModelElementTrace(IConstraint constraint) {
-			origin =
-				Origin.CONSTRAINT;
-			element =
-				constraint;
-			elements =
-				null;
+			origin = Origin.CONSTRAINT;
+			element = constraint;
+			elements = null;
 		}
 
 		/**
@@ -178,12 +164,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @param elements the multiple source feature model elements
 		 */
 		private FeatureModelElementTrace(Origin origin, IFeatureModelElement element, Set<IFeatureModelElement> elements) {
-			this.origin =
-				origin;
-			this.element =
-				element;
-			this.elements =
-				elements;
+			this.origin = origin;
+			this.element = element;
+			this.elements = elements;
 		}
 
 		/**
@@ -258,16 +241,12 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 *
 		 * @return literals for the multiple source elements; not null
 		 */
-		private Literal[] getLiterals() {
-			final Set<IFeatureModelElement> elements =
-				getElements();
-			final Literal[] literals =
-				new Literal[elements.size()];
-			int i =
-				0;
+		private Node[] getLiterals() {
+			final Set<IFeatureModelElement> elements = getElements();
+			final Node[] literals = new Node[elements.size()];
+			int i = 0;
 			for (final IFeatureModelElement element : elements) {
-				literals[i++] =
-					getLiteral((IFeature) element);
+				literals[i++] = getLiteral((IFeature) element);
 			}
 			return literals;
 		}
@@ -288,7 +267,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @return a literal for the given feature; not null
 		 */
 		private Literal getLiteral(IFeature feature) {
-			return new Literal(feature.getName());
+			return new Literal(NodeCreator.getVariable(feature));
 		}
 
 		@Override
@@ -298,28 +277,11 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 		@Override
 		public int hashCode() {
-			final int prime =
-				31;
-			int result =
-				1;
-			result =
-				(prime
-					* result)
-					+ ((origin == null)
-						? 0
-						: origin.hashCode());
-			result =
-				(prime
-					* result)
-					+ ((element == null)
-						? 0
-						: element.hashCode());
-			result =
-				(prime
-					* result)
-					+ ((elements == null)
-						? 0
-						: elements.hashCode());
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((origin == null) ? 0 : origin.hashCode());
+			result = (prime * result) + ((element == null) ? 0 : element.hashCode());
+			result = (prime * result) + ((elements == null) ? 0 : elements.hashCode());
 			return result;
 		}
 
@@ -334,8 +296,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 			if (getClass() != obj.getClass()) {
 				return false;
 			}
-			final FeatureModelElementTrace other =
-				(FeatureModelElementTrace) obj;
+			final FeatureModelElementTrace other = (FeatureModelElementTrace) obj;
 			if (origin != other.origin) {
 				return false;
 			}
@@ -368,16 +329,14 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @return this trace as a string; not null
 		 */
 		public String toString(String[] symbols) {
-			final NodeWriter w =
-				new NodeWriter(getNode());
+			final NodeWriter w = new NodeWriter(getNode());
 			w.setSymbols(symbols);
 			return w.nodeToString();
 		}
 	}
 
 	/** The traces of this model. */
-	private final List<FeatureModelElementTrace> traces =
-		new ArrayList<>();
+	private final List<FeatureModelElementTrace> traces = new ArrayList<>();
 
 	/**
 	 * Adds a trace for an {@link Origin#CHILD_UP upward child relationship}.
@@ -432,8 +391,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 	 * @param amount amount of traces to remove
 	 */
 	public void removeTraces(int amount) {
-		int size =
-			getTraceCount();
+		int size = getTraceCount();
 		while (--amount >= 0) {
 			removeTrace(--size);
 		}
@@ -469,24 +427,16 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	@Override
 	protected FeatureModelToNodeTraceModel clone() {
-		final FeatureModelToNodeTraceModel clone =
-			new FeatureModelToNodeTraceModel();
+		final FeatureModelToNodeTraceModel clone = new FeatureModelToNodeTraceModel();
 		clone.traces.addAll(traces);
 		return clone;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime =
-			31;
-		int result =
-			1;
-		result =
-			(prime
-				* result)
-				+ ((traces == null)
-					? 0
-					: traces.hashCode());
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((traces == null) ? 0 : traces.hashCode());
 		return result;
 	}
 
@@ -501,8 +451,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final FeatureModelToNodeTraceModel other =
-			(FeatureModelToNodeTraceModel) obj;
+		final FeatureModelToNodeTraceModel other = (FeatureModelToNodeTraceModel) obj;
 		if (traces == null) {
 			if (other.traces != null) {
 				return false;
@@ -515,10 +464,6 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()
-			+ " ["
-			+ "traces="
-			+ traces
-			+ "]";
+		return getClass().getSimpleName() + " [" + "traces=" + traces + "]";
 	}
 }

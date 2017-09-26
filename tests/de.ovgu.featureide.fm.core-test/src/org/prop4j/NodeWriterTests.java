@@ -34,9 +34,7 @@ public class NodeWriterTests {
 
 	@Test
 	public void testSimple() {
-		testEquals(new And(
-				new Or("A", new Not("B")),
-				new Or("C", "B", new Not("A"))), "(A | -B) & (C | B | -A)");
+		testEquals(new And(new Or("A", new Not("B")), new Or("C", "B", new Not("A"))), "(A | -B) & (C | B | -A)");
 	}
 
 	@Test
@@ -105,297 +103,208 @@ public class NodeWriterTests {
 
 	@Test
 	public void testNestedAnd() {
-		testEquals(new And(
-				"A",
-				"B",
-				new And("C", new And("D", "E")),
-				"F"), "A & B & C & D & E & F");
+		testEquals(new And("A", "B", new And("C", new And("D", "E")), "F"), "A & B & C & D & E & F");
 	}
 
 	@Test
 	public void testNestedOr() {
-		testEquals(new Or(
-				new Or("A", new Or("B", "C")),
-				"D",
-				"E",
-				new Or("F", "G")), "A | B | C | D | E | F | G");
+		testEquals(new Or(new Or("A", new Or("B", "C")), "D", "E", new Or("F", "G")), "A | B | C | D | E | F | G");
 	}
 
 	@Test
 	public void testNestedImplies() {
-		testEquals(new Implies(
-				new Implies("A", new Implies("B", "A")),
-				new Implies(new Implies("B", "C"), "C")), "(A => (B => A)) => ((B => C) => C)");
+		testEquals(new Implies(new Implies("A", new Implies("B", "A")), new Implies(new Implies("B", "C"), "C")), "(A => (B => A)) => ((B => C) => C)");
 	}
 
 	@Test
 	public void testNestedEquals() {
-		testEquals(new Equals(
-				new Equals("A", "B"),
-				new Equals("B", "A")), "A <=> B <=> B <=> A");
+		testEquals(new Equals(new Equals("A", "B"), new Equals("B", "A")), "A <=> B <=> B <=> A");
 	}
 
 	@Test
 	public void testNestedChoose() {
-		testEquals(new Choose(314,
-				"A",
-				new Choose(3, "A", "B", "C", "D"),
-				"B",
-				"C",
-				"D"), "choose314(A, choose3(A, B, C, D), B, C, D)");
+		testEquals(new Choose(314, "A", new Choose(3, "A", "B", "C", "D"), "B", "C", "D"), "choose314(A, choose3(A, B, C, D), B, C, D)");
 	}
 
 	@Test
 	public void testNestedAtLeast() {
-		testEquals(new AtLeast(2,
-				"B",
-				new AtLeast(2, "A", "B", new AtLeast(2, "B", "D", "E"), "D"),
-				"D",
-				new AtLeast(4, "A", "B", "C", "D", "E", "F"),
-				"F"), "atleast2(B, atleast2(A, B, atleast2(B, D, E), D), D, atleast4(A, B, C, D, E, F), F)");
+		testEquals(new AtLeast(2, "B", new AtLeast(2, "A", "B", new AtLeast(2, "B", "D", "E"), "D"), "D", new AtLeast(4, "A", "B", "C", "D", "E", "F"), "F"),
+				"atleast2(B, atleast2(A, B, atleast2(B, D, E), D), D, atleast4(A, B, C, D, E, F), F)");
 	}
 
 	@Test
 	public void testNestedAtMost() {
-		testEquals(new AtMost(2,
-				new AtMost(123, "A", "B"),
-				new AtMost(456, "B", "C")), "atmost2(atmost123(A, B), atmost456(B, C))");
+		testEquals(new AtMost(2, new AtMost(123, "A", "B"), new AtMost(456, "B", "C")), "atmost2(atmost123(A, B), atmost456(B, C))");
 	}
 
 	public void testNull() {
-		testEquals(null,
-				"null");
+		testEquals(null, "null");
 	}
 
 	public void testNullLiteral() {
-		testEquals(new Literal(null),
-				"null");
+		testEquals(new Literal(null), "null");
 	}
 
 	@Test
 	public void testVariablesLetters() {
-		testEquals(new And(
-				"A",
-				new AtMost(3, "A", "B", "C")), "A & atmost3(A, B, C)");
+		testEquals(new And("A", new AtMost(3, "A", "B", "C")), "A & atmost3(A, B, C)");
 	}
 
 	@Test
 	public void testVariablesFoo() {
-		testEquals(new And(
-				"Foo",
-				new AtMost(3, "Foo", "Bar", "Baz")), "Foo & atmost3(Foo, Bar, Baz)");
+		testEquals(new And("Foo", new AtMost(3, "Foo", "Bar", "Baz")), "Foo & atmost3(Foo, Bar, Baz)");
 	}
 
 	@Test
 	public void testVariablesNumbers() {
-		testEquals(new And(
-				"5",
-				new AtMost(3, "5", "0", "1234")), "5 & atmost3(5, 0, 1234)");
+		testEquals(new And("5", new AtMost(3, "5", "0", "1234")), "5 & atmost3(5, 0, 1234)");
 	}
 
 	@Test
 	public void testVariablesIntegers() {
-		testEquals(new And(
-				5,
-				new AtMost(3, 5, 0, 1234)), "5 & atmost3(5, 0, 1234)");
+		testEquals(new And(5, new AtMost(3, 5, 0, 1234)), "5 & atmost3(5, 0, 1234)");
 	}
 
 	@Test
 	public void testOrderNotNot() {
-		testEquals(new Not(
-				new Not("A")), "-(-A)");
+		testEquals(new Not(new Not("A")), "-(-A)");
 	}
 
 	@Test
 	public void testOrderNotAnd() {
-		testEquals(new Not(
-				new And("A", "B")), "-(A & B)");
+		testEquals(new Not(new And("A", "B")), "-(A & B)");
 	}
 
 	@Test
 	public void testOrderNotOr() {
-		testEquals(new Not(
-				new Or("A", "B")), "-(A | B)");
+		testEquals(new Not(new Or("A", "B")), "-(A | B)");
 	}
 
 	@Test
 	public void testOrderNotImplies() {
-		testEquals(new Not(
-				new Implies("A", "B")), "-(A => B)");
+		testEquals(new Not(new Implies("A", "B")), "-(A => B)");
 	}
 
 	@Test
 	public void testOrderNotEquals() {
-		testEquals(new Not(
-				new Equals("A", "B")), "-(A <=> B)");
+		testEquals(new Not(new Equals("A", "B")), "-(A <=> B)");
 	}
 
 	@Test
 	public void testOrderNotChoose() {
-		testEquals(new Not(
-				new Choose(1, "A")), "-(choose1(A))");
+		testEquals(new Not(new Choose(1, "A")), "-(choose1(A))");
 	}
 
 	@Test
 	public void testOrderNotAtLeast() {
-		testEquals(new Not(
-				new AtLeast(1, "A")), "-(atleast1(A))");
+		testEquals(new Not(new AtLeast(1, "A")), "-(atleast1(A))");
 	}
 
 	@Test
 	public void testOrderNotAtMost() {
-		testEquals(new Not(
-				new AtMost(1, "A")), "-(atmost1(A))");
+		testEquals(new Not(new AtMost(1, "A")), "-(atmost1(A))");
 	}
 
 	@Test
 	public void testOrderAnd() {
-		testEquals(new And(
-				new Not("A"),
-				new And("A", "B"),
-				new Or("A", "B"),
-				new Implies("A", "B"),
-				new Equals("A", "B"),
-				new Choose(1, "A"),
-				new AtLeast(1, "A"),
-				new AtMost(1, "A")), "-A & A & B & (A | B) & (A => B) & (A <=> B) & choose1(A) & atleast1(A) & atmost1(A)");
+		testEquals(new And(new Not("A"), new And("A", "B"), new Or("A", "B"), new Implies("A", "B"), new Equals("A", "B"), new Choose(1, "A"),
+				new AtLeast(1, "A"), new AtMost(1, "A")), "-A & A & B & (A | B) & (A => B) & (A <=> B) & choose1(A) & atleast1(A) & atmost1(A)");
 	}
 
 	@Test
 	public void testOrderOr() {
-		testEquals(new Or(
-				new Not("A"),
-				new And("A", "B"),
-				new Or("A", "B"),
-				new Implies("A", "B"),
-				new Equals("A", "B"),
-				new Choose(1, "A"),
-				new AtLeast(1, "A"),
-				new AtMost(1, "A")), "-A | A & B | A | B | (A => B) | (A <=> B) | choose1(A) | atleast1(A) | atmost1(A)");
+		testEquals(new Or(new Not("A"), new And("A", "B"), new Or("A", "B"), new Implies("A", "B"), new Equals("A", "B"), new Choose(1, "A"),
+				new AtLeast(1, "A"), new AtMost(1, "A")), "-A | A & B | A | B | (A => B) | (A <=> B) | choose1(A) | atleast1(A) | atmost1(A)");
 	}
 
 	@Test
 	public void testOrderImpliesNot() {
-		testEquals(new Implies(
-				new Not("A"),
-				new Not("A")), "-A => -A");
+		testEquals(new Implies(new Not("A"), new Not("A")), "-A => -A");
 	}
 
 	@Test
 	public void testOrderImpliesAnd() {
-		testEquals(new Implies(
-				new And("A", "B"),
-				new And("A", "B")), "A & B => A & B");
+		testEquals(new Implies(new And("A", "B"), new And("A", "B")), "A & B => A & B");
 	}
 
 	@Test
 	public void testOrderImpliesOr() {
-		testEquals(new Implies(
-				new Or("A", "B"),
-				new Or("A", "B")), "A | B => A | B");
+		testEquals(new Implies(new Or("A", "B"), new Or("A", "B")), "A | B => A | B");
 	}
 
 	@Test
 	public void testOrderImpliesImplies() {
-		testEquals(new Implies(
-				new Implies("A", "B"),
-				new Implies("A", "B")), "(A => B) => (A => B)");
+		testEquals(new Implies(new Implies("A", "B"), new Implies("A", "B")), "(A => B) => (A => B)");
 	}
 
 	@Test
 	public void testOrderImpliesEquals() {
-		testEquals(new Implies(
-				new Equals("A", "B"),
-				new Equals("A", "B")), "(A <=> B) => (A <=> B)");
+		testEquals(new Implies(new Equals("A", "B"), new Equals("A", "B")), "(A <=> B) => (A <=> B)");
 	}
 
 	@Test
 	public void testOrderImpliesChoose() {
-		testEquals(new Implies(
-				new Choose(1, "A"),
-				new Choose(1, "A")), "choose1(A) => choose1(A)");
+		testEquals(new Implies(new Choose(1, "A"), new Choose(1, "A")), "choose1(A) => choose1(A)");
 	}
 
 	@Test
 	public void testOrderImpliesAtLeast() {
-		testEquals(new Implies(
-				new AtLeast(1, "A"),
-				new AtLeast(1, "A")), "atleast1(A) => atleast1(A)");
+		testEquals(new Implies(new AtLeast(1, "A"), new AtLeast(1, "A")), "atleast1(A) => atleast1(A)");
 	}
 
 	@Test
 	public void testOrderImpliesAtMost() {
-		testEquals(new Implies(
-				new AtMost(1, "A"),
-				new AtMost(1, "A")), "atmost1(A) => atmost1(A)");
+		testEquals(new Implies(new AtMost(1, "A"), new AtMost(1, "A")), "atmost1(A) => atmost1(A)");
 	}
 
 	@Test
 	public void testOrderEqualsNot() {
-		testEquals(new Equals(
-				new Not("A"),
-				new Not("A")), "-A <=> -A");
+		testEquals(new Equals(new Not("A"), new Not("A")), "-A <=> -A");
 	}
 
 	@Test
 	public void testOrderEqualsAnd() {
-		testEquals(new Equals(
-				new And("A", "B"),
-				new And("A", "B")), "A & B <=> A & B");
+		testEquals(new Equals(new And("A", "B"), new And("A", "B")), "A & B <=> A & B");
 	}
 
 	@Test
 	public void testOrderEqualsOr() {
-		testEquals(new Equals(
-				new Or("A", "B"),
-				new Or("A", "B")), "A | B <=> A | B");
+		testEquals(new Equals(new Or("A", "B"), new Or("A", "B")), "A | B <=> A | B");
 	}
 
 	@Test
 	public void testOrderEqualsImplies() {
-		testEquals(new Equals(
-				new Implies("A", "B"),
-				new Implies("A", "B")), "A => B <=> A => B");
+		testEquals(new Equals(new Implies("A", "B"), new Implies("A", "B")), "A => B <=> A => B");
 	}
 
 	@Test
 	public void testOrderEqualsEquals() {
-		testEquals(new Equals(
-				new Equals("A", "B"),
-				new Equals("A", "B")), "A <=> B <=> A <=> B");
+		testEquals(new Equals(new Equals("A", "B"), new Equals("A", "B")), "A <=> B <=> A <=> B");
 	}
 
 	@Test
 	public void testOrderEqualsChoose() {
-		testEquals(new Equals(
-				new Choose(1, "A"),
-				new Choose(1, "A")), "choose1(A) <=> choose1(A)");
+		testEquals(new Equals(new Choose(1, "A"), new Choose(1, "A")), "choose1(A) <=> choose1(A)");
 	}
 
 	@Test
 	public void testOrderEqualsAtLeast() {
-		testEquals(new Equals(
-				new AtLeast(1, "A"),
-				new AtLeast(1, "A")), "atleast1(A) <=> atleast1(A)");
+		testEquals(new Equals(new AtLeast(1, "A"), new AtLeast(1, "A")), "atleast1(A) <=> atleast1(A)");
 	}
 
 	@Test
 	public void testOrderEqualsAtMost() {
-		testEquals(new Equals(
-				new AtMost(1, "A"),
-				new AtMost(1, "A")), "atmost1(A) <=> atmost1(A)");
+		testEquals(new Equals(new AtMost(1, "A"), new AtMost(1, "A")), "atmost1(A) <=> atmost1(A)");
 	}
 
 	@Test
 	public void testSymbolsShort() {
-		testSymbols(NodeWriter.shortSymbols,
-				"A & B | (B <=> -A) | (-B => C) | choose42(A) | atleast24(C, -(-C), C) | atmost2(B)");
+		testSymbols(NodeWriter.shortSymbols, "A & B | (B <=> -A) | (-B => C) | choose42(A) | atleast24(C, -(-C), C) | atmost2(B)");
 	}
 
 	@Test
 	public void testSymbolsTextual() {
-		testSymbols(NodeWriter.textualSymbols,
-				"A and B or (B iff not A) or (not B implies C) or choose42(A) or atleast24(C, not (not C), C) or atmost2(B)");
+		testSymbols(NodeWriter.textualSymbols, "A and B or (B iff not A) or (not B implies C) or choose42(A) or atleast24(C, not (not C), C) or atmost2(B)");
 	}
 
 	@Test
@@ -406,73 +315,48 @@ public class NodeWriterTests {
 
 	@Test
 	public void testSymbolsJava() {
-		testSymbols(NodeWriter.javaSymbols,
-				"A && B || (B == !A) || (!B ? C) || ?42(A) || ?24(C, !(!C), C) || ?2(B)");
+		testSymbols(NodeWriter.javaSymbols, "A && B || (B == !A) || (!B ? C) || ?42(A) || ?24(C, !(!C), C) || ?2(B)");
 	}
 
 	@Test
 	public void testNotationInfix() {
-		testNotation(Notation.INFIX,
-				"A & B | (B <=> -A) | (-B => C) | choose42(A) | atleast24(C, -(-C), C) | atmost2(B)");
+		testNotation(Notation.INFIX, "A & B | (B <=> -A) | (-B => C) | choose42(A) | atleast24(C, -(-C), C) | atmost2(B)");
 	}
 
 	@Test
 	public void testNotationPrefix() {
-		testNotation(Notation.PREFIX,
-				"(| (& A B) (<=> B (- A)) (=> (- B) C) (choose42 A) (atleast24 C (- (- C)) C) (atmost2 B))");
+		testNotation(Notation.PREFIX, "(| (& A B) (<=> B (- A)) (=> (- B) C) (choose42 A) (atleast24 C (- (- C)) C) (atmost2 B))");
 	}
 
 	@Test
 	public void testNotationPostfix() {
-		testNotation(Notation.POSTFIX,
-				"((A B &) (B (A -) <=>) ((B -) C =>) (A choose42) (C ((C -) -) C atleast24) (B atmost2) |)");
+		testNotation(Notation.POSTFIX, "((A B &) (B (A -) <=>) ((B -) C =>) (A choose42) (C ((C -) -) C atleast24) (B atmost2) |)");
 	}
 
 	@Test
 	public void testEnforceBrackets() {
-		final Node in =
-			new Equals(
-					new Implies(new And("A", "B"), "B"),
-					new Or(new And("C", "A"), "B", "B", new Or(new AtMost(2, "C"), "A")));
-		final NodeWriter w =
-			new NodeWriter(in);
-		String actual =
-			w.nodeToString();
-		String expected =
-			"A & B => B <=> C & A | B | B | atmost2(C) | A";
+		final Node in = new Equals(new Implies(new And("A", "B"), "B"), new Or(new And("C", "A"), "B", "B", new Or(new AtMost(2, "C"), "A")));
+		final NodeWriter w = new NodeWriter(in);
+		String actual = w.nodeToString();
+		String expected = "A & B => B <=> C & A | B | B | atmost2(C) | A";
 		assertEquals(expected, actual);
 		w.setEnforceBrackets(true);
-		actual =
-			w.nodeToString();
-		expected =
-			"(((A & B) => B) <=> ((C & A) | B | B | (atmost2(C) | A)))";
+		actual = w.nodeToString();
+		expected = "(((A & B) => B) <=> ((C & A) | B | B | (atmost2(C) | A)))";
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	public void testEnquoteWhitespace() {
-		final Node in =
-			new And(
-					"nowhitespace",
-					"white space",
-					"with\ttab",
-					"with\nnewline",
-					new Not("nowhitespace"),
-					new Not("white space"),
-					new Literal("nowhitespace", false),
-					new Literal("white space", false));
-		final NodeWriter w =
-			new NodeWriter(in);
-		String actual =
-			w.nodeToString();
-		String expected =
-			"nowhitespace & white space & with\ttab & with\nnewline & -nowhitespace & -white space & -nowhitespace & -white space";
+		final Node in = new And("nowhitespace", "white space", "with\ttab", "with\nnewline", new Not("nowhitespace"), new Not("white space"),
+				new Literal("nowhitespace", false), new Literal("white space", false));
+		final NodeWriter w = new NodeWriter(in);
+		String actual = w.nodeToString();
+		String expected = "nowhitespace & white space & with\ttab & with\nnewline & -nowhitespace & -white space & -nowhitespace & -white space";
 		assertEquals(expected, actual);
 		w.setEnquoteWhitespace(true);
-		actual =
-			w.nodeToString();
-		expected =
-			"nowhitespace & \"white space\" & \"with\ttab\" & \"with\nnewline\" & -nowhitespace & -\"white space\" & -nowhitespace & -\"white space\"";
+		actual = w.nodeToString();
+		expected = "nowhitespace & \"white space\" & \"with\ttab\" & \"with\nnewline\" & -nowhitespace & -\"white space\" & -nowhitespace & -\"white space\"";
 		assertEquals(expected, actual);
 	}
 
@@ -481,11 +365,9 @@ public class NodeWriterTests {
 	}
 
 	private void testSymbols(Node in, String[] symbols, String expected) {
-		final NodeWriter w =
-			new NodeWriter(in);
+		final NodeWriter w = new NodeWriter(in);
 		w.setSymbols(symbols);
-		final String actual =
-			w.nodeToString();
+		final String actual = w.nodeToString();
 		assertEquals(expected, actual);
 	}
 
@@ -494,29 +376,20 @@ public class NodeWriterTests {
 	}
 
 	private void testNotation(Node in, Notation notation, String expected) {
-		final NodeWriter w =
-			new NodeWriter(in);
+		final NodeWriter w = new NodeWriter(in);
 		w.setNotation(notation);
-		final String actual =
-			w.nodeToString();
+		final String actual = w.nodeToString();
 		assertEquals(expected, actual);
 	}
 
 	private void testEquals(Node in, String expected) {
-		final NodeWriter w =
-			new NodeWriter(in);
-		final String actual =
-			w.nodeToString();
+		final NodeWriter w = new NodeWriter(in);
+		final String actual = w.nodeToString();
 		assertEquals(expected, actual);
 	}
 
 	private Node getDefaultIn() {
-		return new Or(
-				new And("A", "B"),
-				new Equals("B", new Not("A")),
-				new Implies(new Literal("B", false), "C"),
-				new Choose(42, "A"),
-				new AtLeast(24, "C", new Not(new Not("C")), "C"),
-				new AtMost(2, "B"));
+		return new Or(new And("A", "B"), new Equals("B", new Not("A")), new Implies(new Literal("B", false), "C"), new Choose(42, "A"),
+				new AtLeast(24, "C", new Not(new Not("C")), "C"), new AtMost(2, "B"));
 	}
 }

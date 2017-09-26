@@ -45,28 +45,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
 public class AutoLayoutConstraintAction extends Action {
 
 	private final IGraphicalFeatureModel featureModel;
-	private final LinkedList<LinkedList<Point>> oldPos =
-		new LinkedList<LinkedList<Point>>();
+	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
 	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(AUTO_LAYOUT_CONSTRAINTS);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final LinkedList<Point> newList =
-			new LinkedList<Point>();
-		for (int i =
-			0; i < featureModel.getConstraints().size(); i++) {
+		final LinkedList<Point> newList = new LinkedList<Point>();
+		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
 			newList.add(featureModel.getConstraints().get(i).getLocation());
 		}
-		final int counter =
-			oldPos.size();
+		final int counter = oldPos.size();
 		oldPos.add(newList);
-		final AutoLayoutConstraintOperation op =
-			new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
+		final AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
 		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 

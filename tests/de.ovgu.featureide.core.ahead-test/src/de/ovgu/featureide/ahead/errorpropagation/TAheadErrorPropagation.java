@@ -44,35 +44,27 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public class TAheadErrorPropagation {
 
-	protected static File FILE_FOLDER =
-		new File(
-				"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
+	protected static File FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
 
-	AheadBuildErrorEvent event =
-		new AheadBuildErrorEvent();
+	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
 
 	private String project;
 
 	private void setHelloWorld() {
-		project =
-			"HelloWorld";
+		project = "HelloWorld";
 	}
 
 	private void setDesktopSearcher() {
-		project =
-			"DesktopSearcher";
+		project = "DesktopSearcher";
 	}
 
 	public File getFile(String name) {
 		// first tries the location on build server, if this fails tries to use
 		// local location
 		if (!FILE_FOLDER.canRead()) {
-			FILE_FOLDER =
-				new File(ClassLoader.getSystemResource(
-						"testcases").getPath());
+			FILE_FOLDER = new File(ClassLoader.getSystemResource("testcases").getPath());
 		}
-		final File folder =
-			FILE_FOLDER.listFiles(getFileFilter(project))[0];
+		final File folder = FILE_FOLDER.listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
 	}
 
@@ -96,59 +88,22 @@ public class TAheadErrorPropagation {
 	 * @param jakLine The line at the source file
 	 */
 	private void test(String className, String feature, int javaLine, int composedLine, int jakLine) {
-		final int composedJakLine =
-			calculateComposedJakLine(javaLine, className
-				+ ".javaX");
+		final int composedJakLine = calculateComposedJakLine(javaLine, className + ".javaX");
 		if (composedLine != composedJakLine) {
-			System.out.println("Wrong composed line @ "
-				+ className
-				+ ".java (expected: "
-				+ composedLine
-				+
-				" but was: "
-				+ composedJakLine
-				+ ")");
+			System.out.println("Wrong composed line @ " + className + ".java (expected: " + composedLine + " but was: " + composedJakLine + ")");
 		}
 
-		final String content =
-			readFile(getFile(className
-				+ ".jak"));
-		final int line =
-			event.setSourceFile(content, composedJakLine);
+		final String content = readFile(getFile(className + ".jak"));
+		final int line = event.setSourceFile(content, composedJakLine);
 
-		if (!event.fileName.equals("../features/"
-			+ feature
-			+ "/"
-			+ className
-			+ ".jak")) {
-			System.out.println("Wrong source files @ "
-				+ className
-				+ ".java (expected: "
-				+ "../features/"
-				+ feature
-				+ "/"
-				+ className
-				+ ".jak"
-				+
-				" but was: "
-				+ event.fileName
-				+ ")");
+		if (!event.fileName.equals("../features/" + feature + "/" + className + ".jak")) {
+			System.out.println("Wrong source files @ " + className + ".java (expected: " + "../features/" + feature + "/" + className + ".jak" + " but was: "
+				+ event.fileName + ")");
 		}
 
-		final int sourceLine =
-			event.setSourceLine(composedJakLine, line, readFile(getFile(feature
-				+ "_"
-				+ className
-				+ ".jak")));
+		final int sourceLine = event.setSourceLine(composedJakLine, line, readFile(getFile(feature + "_" + className + ".jak")));
 		if (jakLine != sourceLine) {
-			System.out.println("Wrong source line @ "
-				+ className
-				+ ".java (expected: "
-				+ jakLine
-				+
-				" but was: "
-				+ sourceLine
-				+ ")");
+			System.out.println("Wrong source line @ " + className + ".java (expected: " + jakLine + " but was: " + sourceLine + ")");
 		}
 		// TODO #457 AHEAD error propagation add this test
 		// assertEquals(jakLine, sourceLine);
@@ -159,13 +114,10 @@ public class TAheadErrorPropagation {
 	}
 
 	private String readFile(File file) {
-		Scanner scanner =
-			null;
-		final StringBuilder builder =
-			new StringBuilder();
+		Scanner scanner = null;
+		final StringBuilder builder = new StringBuilder();
 		try {
-			scanner =
-				new Scanner(file, "UTF-8");
+			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				builder.append(scanner.nextLine());
 				builder.append("\r\n");

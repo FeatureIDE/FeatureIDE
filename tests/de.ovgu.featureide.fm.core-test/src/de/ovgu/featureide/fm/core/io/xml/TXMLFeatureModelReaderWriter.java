@@ -43,22 +43,17 @@ public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel fmOrig =
-			Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmCollapsed =
-			Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmNotCollapsed =
-			Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-					Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmOrig = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmCollapsed = Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
+				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
 
-		final IGraphicalFeatureModel gFM =
-			new GraphicalFeatureModel(fmOrig);
+		final IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
 		gFM.init();
 
-		final IGraphicalFeatureModel gfmCollapsed =
-			new GraphicalFeatureModel(fmCollapsed);
+		final IGraphicalFeatureModel gfmCollapsed = new GraphicalFeatureModel(fmCollapsed);
 		gfmCollapsed.init();
 		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.getObject().getName().equals("Root")) {
@@ -66,8 +61,7 @@ public class TXMLFeatureModelReaderWriter {
 			}
 		}
 
-		final IGraphicalFeatureModel gfmNotCollapsed =
-			new GraphicalFeatureModel(fmNotCollapsed);
+		final IGraphicalFeatureModel gfmNotCollapsed = new GraphicalFeatureModel(fmNotCollapsed);
 		gfmNotCollapsed.init();
 		gfmCollapsed.init();
 		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
@@ -76,16 +70,14 @@ public class TXMLFeatureModelReaderWriter {
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getFeatures().size());
 
-		int notVisible =
-			0;
+		int notVisible = 0;
 		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
 			if (feature.hasCollapsedParent()) {
 				notVisible++;
 			}
 		}
 
-		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size()
-			+ notVisible);
+		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size() + notVisible);
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmNotCollapsed.getVisibleFeatures().size());
 		//

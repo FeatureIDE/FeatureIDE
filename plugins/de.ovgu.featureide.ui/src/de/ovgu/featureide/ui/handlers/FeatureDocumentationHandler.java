@@ -37,8 +37,7 @@ public class FeatureDocumentationHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		CorePlugin.getDefault().buildFeatureDocumentation(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+		CorePlugin.getDefault().buildFeatureDocumentation(projects, (String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
 				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
 	}
 

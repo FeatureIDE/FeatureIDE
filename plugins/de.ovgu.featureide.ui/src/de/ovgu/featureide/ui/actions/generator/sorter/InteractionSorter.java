@@ -43,24 +43,19 @@ import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
  */
 public class InteractionSorter extends AbstractConfigurationSorter {
 
-	private static final UIPlugin LOGGER =
-		UIPlugin.getDefault();
+	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
 	private final int t;
 
-	private final Map<BuilderConfiguration, Set<Interaction>> interactions =
-		new HashMap<BuilderConfiguration, Set<Interaction>>();
+	private final Map<BuilderConfiguration, Set<Interaction>> interactions = new HashMap<BuilderConfiguration, Set<Interaction>>();
 
 	private final boolean skippConfigurations;
 
 	public InteractionSorter(final int t, final IFeatureModel featureModel, final boolean skippConfigurations) {
 		super(featureModel);
-		super.sorted =
-			false;
-		this.t =
-			t;
-		this.skippConfigurations =
-			skippConfigurations;
+		super.sorted = false;
+		this.t = t;
+		this.skippConfigurations = skippConfigurations;
 	}
 
 	/**
@@ -77,15 +72,12 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 				configurations.clear();
 				return 0;
 			}
-			interactions.put(c, new HashSet<Interaction>(concreteFeatures.size()
-				* (10
-					^ t)));
+			interactions.put(c, new HashSet<Interaction>(concreteFeatures.size() * (10 ^ t)));
 			getInteractions(interactions.get(c), c.getSelectedFeatureNames(), new ArrayList<String>(0), new ArrayList<String>(0), 1, null);
 			monitor.worked();
 		}
 
-		final LinkedList<BuilderConfiguration> sorted =
-			new LinkedList<BuilderConfiguration>();
+		final LinkedList<BuilderConfiguration> sorted = new LinkedList<BuilderConfiguration>();
 		while (!interactions.isEmpty()) {
 			try {
 				monitor.checkCancel();
@@ -94,14 +86,11 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 				return 0;
 			}
 
-			final BuilderConfiguration mostCovering =
-				getMostCoveringConfiguration(interactions);
-			final Set<Interaction> coveredInteractions =
-				interactions.get(mostCovering);
+			final BuilderConfiguration mostCovering = getMostCoveringConfiguration(interactions);
+			final Set<Interaction> coveredInteractions = interactions.get(mostCovering);
 			if (coveredInteractions.isEmpty()) {
 				if (skippConfigurations) {
-					LOGGER.logInfo(interactions.size()
-						+ " solutions skipped because interactions are already covered!");
+					LOGGER.logInfo(interactions.size() + " solutions skipped because interactions are already covered!");
 				} else {
 					sorted.addAll(interactions.keySet());
 				}
@@ -115,37 +104,29 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			}
 			monitor.worked();
 		}
-		configurations =
-			sorted;
+		configurations = sorted;
 		return configurations.size();
 	}
 
 	@Override
 	public int getBufferSize() {
-		return interactions.size()
-			+ configurations.size();
+		return interactions.size() + configurations.size();
 	}
 
 	/**
 	 * Gets the configuration that covers the most interactions that are left.<br> Basically, the configurations with the greatest set of interactions.
 	 */
 	private BuilderConfiguration getMostCoveringConfiguration(final Map<BuilderConfiguration, Set<Interaction>> interactions) {
-		BuilderConfiguration mostCovering =
-			null;
-		int longest =
-			-1;
+		BuilderConfiguration mostCovering = null;
+		int longest = -1;
 		for (final BuilderConfiguration config : interactions.keySet()) {
-			final int size =
-				interactions.get(config).size();
+			final int size = interactions.get(config).size();
 			if (size > longest) {
-				longest =
-					size;
-				mostCovering =
-					config;
+				longest = size;
+				mostCovering = config;
 			} else if (size == longest) {
 				if (mostCovering.getName().compareTo(config.getName()) > 0) {
-					mostCovering =
-						config;
+					mostCovering = config;
 				}
 			}
 		}
@@ -162,48 +143,38 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 * @param t The current size of the interaction
 	 * @param lastFeature A marker for the last feature
 	 */
-	private void getInteractions(final Set<Interaction> interactions, final Set<String> configSelectedFeatures,
-			final List<String> selectedFeatures, final List<String> unselectedFeatures, final int t, final String lastFeature) {
+	private void getInteractions(final Set<Interaction> interactions, final Set<String> configSelectedFeatures, final List<String> selectedFeatures,
+			final List<String> unselectedFeatures, final int t, final String lastFeature) {
 		if (t > this.t) {
 			return;
 		}
 
-		boolean marker =
-			lastFeature == null;
+		boolean marker = lastFeature == null;
 		for (final String feature : concreteFeatures) {
-			if (!marker
-				&& feature.equals(lastFeature)) {
+			if (!marker && feature.equals(lastFeature)) {
 				// skip all features until the feature of the last iteration is found
-				marker =
-					true;
+				marker = true;
 				continue;
 			}
 			if (marker) {
-				List<String> selected =
-					selectedFeatures;
-				List<String> unselected =
-					unselectedFeatures;
+				List<String> selected = selectedFeatures;
+				List<String> unselected = unselectedFeatures;
 
 				if (configSelectedFeatures.contains(feature)) {
 					// CASE selected
-					selected =
-						new ArrayList<String>(t);
+					selected = new ArrayList<String>(t);
 					selected.addAll(selectedFeatures);
 					selected.add(feature);
-					selected =
-						Collections.unmodifiableList(selected);
+					selected = Collections.unmodifiableList(selected);
 				} else {
 					// CASE unselected
-					unselected =
-						new ArrayList<String>(t);
+					unselected = new ArrayList<String>(t);
 					unselected.addAll(unselectedFeatures);
 					unselected.add(feature);
-					unselected =
-						Collections.unmodifiableList(unselected);
+					unselected = Collections.unmodifiableList(unselected);
 				}
 				interactions.add(new Interaction(selected, unselected));
-				getInteractions(interactions, configSelectedFeatures, selected, unselected, t
-					+ 1, feature);
+				getInteractions(interactions, configSelectedFeatures, selected, unselected, t + 1, feature);
 			}
 		}
 	}
@@ -218,28 +189,18 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 		 * Represents an interaction between n selected features and m unselected features.
 		 */
 		Interaction(final Collection<String> selectedFeatures, final Collection<String> unselectedFeatures) {
-			this.selectedFeatures =
-				selectedFeatures;
-			this.unselectedFeatures =
-				unselectedFeatures;
+			this.selectedFeatures = selectedFeatures;
+			this.unselectedFeatures = unselectedFeatures;
 
 			// TODO _Sebastian Revise Hash Function
-			int hash =
-				0;
+			int hash = 0;
 			for (final String feature : selectedFeatures) {
-				hash =
-					(hash
-						* 3)
-						+ feature.hashCode();
+				hash = (hash * 3) + feature.hashCode();
 			}
 			for (final String feature : unselectedFeatures) {
-				hash +=
-					(hash
-						* 7)
-						+ feature.hashCode();
+				hash += (hash * 7) + feature.hashCode();
 			}
-			hashCode =
-				hash;
+			hashCode = hash;
 		}
 
 		@Override
@@ -247,8 +208,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			if (obj.hashCode() != hashCode()) {
 				return false;
 			}
-			return selectedFeatures.equals(((Interaction) obj).selectedFeatures)
-				&& unselectedFeatures.equals(((Interaction) obj).unselectedFeatures);
+			return selectedFeatures.equals(((Interaction) obj).selectedFeatures) && unselectedFeatures.equals(((Interaction) obj).unselectedFeatures);
 		}
 
 		@Override

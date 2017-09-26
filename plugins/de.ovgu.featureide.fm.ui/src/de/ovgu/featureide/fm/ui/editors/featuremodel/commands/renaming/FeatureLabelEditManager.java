@@ -53,18 +53,14 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 
 	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, IFeatureModel featureModel) {
 		super(editpart, editorType, locator);
-		this.featureModel =
-			featureModel;
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	protected void initCellEditor() {
-		final CellEditor cellEditor =
-			getCellEditor();
-		final Control control =
-			cellEditor.getControl();
-		final String oldValue =
-			((FeatureEditPart) getEditPart()).getModel().getObject().getName();
+		final CellEditor cellEditor = getCellEditor();
+		final Control control = cellEditor.getControl();
+		final String oldValue = ((FeatureEditPart) getEditPart()).getModel().getObject().getName();
 
 		control.setFont(DEFAULT_FONT);
 		cellEditor.setValue(oldValue);
@@ -76,20 +72,14 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 			@Override
 			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
 				closeTooltip();
-				final String value =
-					(String) cellEditor.getValue();
+				final String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue)) {
-						createTooltip(IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME
-							+ oldValue
-							+ " to "
-							+ value
-							+ ".",
+						createTooltip(IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME + oldValue + " to " + value + ".",
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
 					} else {
-						final IFMComposerExtension fmComposerExtension =
-							FMComposerManager.getFMComposerExtension(null);
+						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(null);
 						if ((!fmComposerExtension.isValidFeatureName(value))) {
 							createTooltip(fmComposerExtension.getErrorMessage(), SWT.ICON_ERROR);
 						} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
@@ -110,13 +100,9 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 			}
 
 			private void createTooltip(String message, int icon) {
-				tooltip =
-					new ToolTip(control.getShell(), SWT.BALLOON
-						| icon);
+				tooltip = new ToolTip(control.getShell(), SWT.BALLOON | icon);
 				tooltip.setAutoHide(false);
-				tooltip.setLocation(control.toDisplay(control.getSize().x
-					/ 2, control.getSize().y
-						+ 5));
+				tooltip.setLocation(control.toDisplay(control.getSize().x / 2, control.getSize().y + 5));
 				tooltip.setText(INVALID_NAME);
 				tooltip.setMessage(message);
 				tooltip.setVisible(true);
@@ -125,8 +111,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 			private void closeTooltip() {
 				if (tooltip != null) {
 					tooltip.setVisible(false);
-					tooltip =
-						null;
+					tooltip = null;
 				}
 			}
 		});

@@ -44,76 +44,49 @@ public class PresenceConditionHandler extends ColligensAbstractHandler {
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IWorkbenchWindow window =
-			HandlerUtil.getActiveWorkbenchWindow(event);
-		final IWorkbenchPage page =
-			window.getActivePage();
-		final IEditorPart editor =
-			page.getActiveEditor();
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchPage page = window.getActivePage();
+		final IEditorPart editor = page.getActiveEditor();
 
 		if (editor instanceof ITextEditor) {
 
-			final ISelectionProvider selectionProvider =
-				((ITextEditor) editor)
-						.getSelectionProvider();
-			final ISelection selection =
-				selectionProvider.getSelection();
+			final ISelectionProvider selectionProvider = ((ITextEditor) editor).getSelectionProvider();
+			final ISelection selection = selectionProvider.getSelection();
 
 			if (selection instanceof ITextSelection) {
 
-				final TextSelection textSelection =
-					(TextSelection) selection;
+				final TextSelection textSelection = (TextSelection) selection;
 
-				final IDocumentProvider provider =
-					((ITextEditor) editor)
-							.getDocumentProvider();
-				final IDocument document =
-					provider.getDocument(editor
-							.getEditorInput());
-				final int line =
-					textSelection.getStartLine();
+				final IDocumentProvider provider = ((ITextEditor) editor).getDocumentProvider();
+				final IDocument document = provider.getDocument(editor.getEditorInput());
+				final int line = textSelection.getStartLine();
 
-				final FileEditorInput fileEditorInput =
-					(FileEditorInput) window
-							.getActivePage().getActiveEditor().getEditorInput();
+				final FileEditorInput fileEditorInput = (FileEditorInput) window.getActivePage().getActiveEditor().getEditorInput();
 
-				final IFile file =
-					fileEditorInput.getFile();
-				String code =
-					null;
+				final IFile file = fileEditorInput.getFile();
+				String code = null;
 				try {
-					code =
-						document.get(document.getLineOffset(line),
-								document.getLineLength(line));
+					code = document.get(document.getLineOffset(line), document.getLineLength(line));
 				} catch (final BadLocationException e1) {
 
 					e1.printStackTrace();
 				}
 
-				final PresenceConditionController conditionController =
-					new PresenceConditionController(
-							file, line
-								+ 1,
-							code);
+				final PresenceConditionController conditionController = new PresenceConditionController(file, line + 1, code);
 
 				try {
 					conditionController.run();
 
 					// show erros
 
-					if ((conditionController.getFileProxy() != null)
-						&& !conditionController.getFileProxy().getLogs()
-								.isEmpty()) {
+					if ((conditionController.getFileProxy() != null) && !conditionController.getFileProxy().getLogs().isEmpty()) {
 						try {
 							page.showView(InvalidConfigurationsView.ID);
-							final InvalidConfigurationsViewController analyzerViewController =
-								InvalidConfigurationsViewController
-										.getInstance();
+							final InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController.getInstance();
 
 							analyzerViewController.clear();
 
-							final List<FileProxy> list =
-								new LinkedList<FileProxy>();
+							final List<FileProxy> list = new LinkedList<FileProxy>();
 
 							list.add(conditionController.getFileProxy());
 

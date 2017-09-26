@@ -52,8 +52,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public class FeatureNode extends LazyParent implements IToolTip {
 
-	private static final String TOOLTIP_SEPARATOR =
-		" | ";
+	private static final String TOOLTIP_SEPARATOR = " | ";
 
 	protected final String tooltip;
 
@@ -62,25 +61,18 @@ public class FeatureNode extends LazyParent implements IToolTip {
 
 	public FeatureNode(final IFeature feat, boolean expand) {
 		super(feat.getName());
-		this.feat =
-			feat;
-		this.expand =
-			expand;
-		tooltip =
-			buildToolTip();
-		hasConstraints =
-			!feat.getStructure().getRelevantConstraints().isEmpty();
-		if (!(feat.getStructure().hasChildren()
-			|| hasConstraints)) {
-			lazy =
-				false;
+		this.feat = feat;
+		this.expand = expand;
+		tooltip = buildToolTip();
+		hasConstraints = !feat.getStructure().getRelevantConstraints().isEmpty();
+		if (!(feat.getStructure().hasChildren() || hasConstraints)) {
+			lazy = false;
 		}
 	}
 
 	@Override
 	public Boolean hasChildren() {
-		return expand
-			&& super.hasChildren();
+		return expand && super.hasChildren();
 	}
 
 	/**
@@ -89,8 +81,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	 */
 	@Override
 	protected void initChildren() {
-		if (feat.getStructure().hasChildren()
-			&& hasConstraints) {
+		if (feat.getStructure().hasChildren() && hasConstraints) {
 			addChild(findChildFeatures(new Parent("Child features: ", null)));
 			addChild(findConstraints(new Parent("Constraints: ", null)));
 		} else {
@@ -104,15 +95,11 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	 * <description>]
 	 */
 	private String buildToolTip() {
-		final List<String> attribute =
-			new ArrayList<String>();
-		final FeatureStatus status =
-			feat.getProperty().getFeatureStatus();
+		final List<String> attribute = new ArrayList<String>();
+		final FeatureStatus status = feat.getProperty().getFeatureStatus();
 
-		if ((status != FeatureStatus.NORMAL)
-			&& (status != FeatureStatus.INDETERMINATE_HIDDEN)) {
-			attribute.add("STATUS: "
-				+ status);
+		if ((status != FeatureStatus.NORMAL) && (status != FeatureStatus.INDETERMINATE_HIDDEN)) {
+			attribute.add("STATUS: " + status);
 		}
 
 		if (feat.getStructure().isAbstract()) {
@@ -127,20 +114,15 @@ public class FeatureNode extends LazyParent implements IToolTip {
 			attribute.add(OPTIONAL);
 		}
 
-		String connectionType =
-			null;
+		String connectionType = null;
 		if (feat.getStructure().isAlternative()) {
-			connectionType =
-				"alternative";
+			connectionType = "alternative";
 		} else if (feat.getStructure().isOr()) {
-			connectionType =
-				"or";
+			connectionType = "or";
 		} else if (feat.getStructure().isAnd()) {
-			connectionType =
-				"and";
+			connectionType = "and";
 		}
-		attribute.add(connectionType
-			+ " - connection");
+		attribute.add(connectionType + " - connection");
 
 		if (status == FeatureStatus.INDETERMINATE_HIDDEN) {
 			attribute.add(HIDDEN_BY_ANCESTOR);
@@ -158,17 +140,13 @@ public class FeatureNode extends LazyParent implements IToolTip {
 			attribute.add(IS_AFFECTED_BY_CONSTRAINTS);
 		}
 
-		final StringBuilder buffer =
-			new StringBuilder();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("attributes: ");
-		for (int i =
-			0; i < (attribute.size()
-				- 1); i++) {
+		for (int i = 0; i < (attribute.size() - 1); i++) {
 			buffer.append(attribute.get(i));
 			buffer.append(TOOLTIP_SEPARATOR);
 		}
-		buffer.append(attribute.get(attribute.size()
-			- 1));
+		buffer.append(attribute.get(attribute.size() - 1));
 
 		printDescription(buffer);
 		return buffer.toString();
@@ -178,10 +156,8 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	 * Adds the description to the features tooltip, if it has one.
 	 */
 	private void printDescription(StringBuilder buffer) {
-		final String featDesc =
-			feat.getProperty().getDescription();
-		if ((featDesc != null)
-			&& !featDesc.equals("")) {
+		final String featDesc = feat.getProperty().getDescription();
+		if ((featDesc != null) && !featDesc.equals("")) {
 			buffer.append("\n");
 			buffer.append("Description: ");
 			buffer.append(featDesc);
@@ -200,8 +176,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	private Parent findChildFeatures(Parent childFeat) {
 		if (feat.getStructure().hasChildren()) {
 			for (final IFeatureStructure tempStructure : feat.getStructure().getChildren()) {
-				final IFeature temp =
-					tempStructure.getFeature();
+				final IFeature temp = tempStructure.getFeature();
 				childFeat.addChild(new FeatureNode(temp, expand));
 			}
 		}

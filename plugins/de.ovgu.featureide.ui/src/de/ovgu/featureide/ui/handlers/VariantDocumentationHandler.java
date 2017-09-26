@@ -37,8 +37,7 @@ public class VariantDocumentationHandler extends AProjectJobHandler {
 
 	@Override
 	protected void endAction() {
-		CorePlugin.getDefault().buildVariantDocumentation(projects,
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS));
+		CorePlugin.getDefault().buildVariantDocumentation(projects, (String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS));
 	}
 
 }

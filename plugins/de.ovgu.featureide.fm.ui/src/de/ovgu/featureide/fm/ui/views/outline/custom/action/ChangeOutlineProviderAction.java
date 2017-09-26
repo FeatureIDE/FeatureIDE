@@ -40,8 +40,7 @@ public class ChangeOutlineProviderAction extends Action {
 	 */
 	public ChangeOutlineProviderAction(OutlineProvider provider, boolean checked) {
 		super();
-		this.provider =
-			provider;
+		this.provider = provider;
 		setText(provider.getProviderName());
 		setChecked(checked);
 	}

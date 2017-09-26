@@ -27,8 +27,7 @@ package de.ovgu.featureide.core.framework;
  */
 public class FrameworkFMComposerExtension extends de.ovgu.featureide.fm.core.FMComposerExtension {
 
-	private static String ORDER_PAGE_MESSAGE =
-		"FeatureIDE projects based on frameworks do not support any order.";
+	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on frameworks do not support any order.";
 
 	@Override
 	public String getOrderPageMessage() {

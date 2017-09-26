@@ -42,40 +42,24 @@ public class JavaVersionTest {
 	 * @throws Exception if the version of a class is higher then Java 7, or the jar cannot be read.
 	 */
 	public static void testJavaVersion(final Class<?> c) throws Exception {
-		final CodeSource source =
-			c.getProtectionDomain().getCodeSource();
-		final File file =
-			new File(source.getLocation().toURI());
-		try (JarFile jarFile =
-			new JarFile(file)) {
-			final Enumeration<JarEntry> iterator =
-				jarFile.entries();
+		final CodeSource source = c.getProtectionDomain().getCodeSource();
+		final File file = new File(source.getLocation().toURI());
+		try (JarFile jarFile = new JarFile(file)) {
+			final Enumeration<JarEntry> iterator = jarFile.entries();
 			while (iterator.hasMoreElements()) {
-				final JarEntry entry =
-					iterator.nextElement();
-				final String name =
-					entry.getName();
+				final JarEntry entry = iterator.nextElement();
+				final String name = entry.getName();
 				if (!name.endsWith(".class")) {
 					continue;
 				}
-				try (InputStream in =
-					jarFile.getInputStream(entry);
-						DataInputStream data =
-							new DataInputStream(in)) {
+				try (InputStream in = jarFile.getInputStream(entry); DataInputStream data = new DataInputStream(in)) {
 					if (0xCAFEBABE != data.readInt()) {
 						throw new IOException("invalid header");
 					}
-					final int minor =
-						data.readUnsignedShort();
-					final int major =
-						data.readUnsignedShort();
+					final int minor = data.readUnsignedShort();
+					final int major = data.readUnsignedShort();
 					if (major > 51) {
-						throw new Exception("Class "
-							+ name
-							+ " is compiled with version higher then Java 7: "
-							+ major
-							+ "."
-							+ minor);
+						throw new Exception("Class " + name + " is compiled with version higher then Java 7: " + major + "." + minor);
 					}
 				}
 			}

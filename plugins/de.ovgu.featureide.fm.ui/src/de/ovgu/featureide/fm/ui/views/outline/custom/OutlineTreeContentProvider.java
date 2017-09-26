@@ -34,8 +34,7 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
  */
 public abstract class OutlineTreeContentProvider implements ITreeContentProvider {
 
-	private final Set<IOutlineFilter> filters =
-		new HashSet<>();
+	private final Set<IOutlineFilter> filters = new HashSet<>();
 
 	/*
 	 * (non-Javadoc)
@@ -95,8 +94,7 @@ public abstract class OutlineTreeContentProvider implements ITreeContentProvider
 	// apply all filters from filter set
 	protected Object[] filter(Object[] obj) {
 		for (final IOutlineFilter filter : filters) {
-			obj =
-				filter.filter(obj);
+			obj = filter.filter(obj);
 		}
 		return obj;
 	}

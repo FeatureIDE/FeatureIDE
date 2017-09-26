@@ -30,8 +30,7 @@ import java.util.HashSet;
  */
 public class PreprocessorFeatureData extends AFeatureData {
 
-	private final HashSet<Integer> involvedFeatures =
-		new HashSet<>();
+	private final HashSet<Integer> involvedFeatures = new HashSet<>();
 
 	PreprocessorFeatureData(int startLineNumber, int endLineNumber) {
 		super(-1, startLineNumber, endLineNumber);

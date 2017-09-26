@@ -50,68 +50,43 @@ import de.ovgu.featureide.ui.UIPlugin;
 @SuppressWarnings(RESTRICTION)
 public class JavaEditor extends CompilationUnitEditor {
 
-	public static final String ID =
-		UIPlugin.PLUGIN_ID
-			+ ".editors.JavaEditor";
-	private static final Image TITLE_IMAGE =
-		UIPlugin
-				.getImage("JakFileIcon.png");
+	public static final String ID = UIPlugin.PLUGIN_ID + ".editors.JavaEditor";
+	private static final Image TITLE_IMAGE = UIPlugin.getImage("JakFileIcon.png");
 	private IComposerExtensionClass composer;
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		if (input instanceof IFileEditorInput) {
-			final IFile file =
-				((IFileEditorInput) input).getFile();
-			final IFeatureProject featureProject =
-				CorePlugin.getFeatureProject(file);
+			final IFile file = ((IFileEditorInput) input).getFile();
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 			// check that the project is a FeatureIDE project and registered
 			if (featureProject == null) {
 				return;
 			}
-			composer =
-				featureProject.getComposer();
+			composer = featureProject.getComposer();
 			if (composer.hasFeatureFolder()) {
-				final String feature =
-					featureProject.getFeatureName(file);
+				final String feature = featureProject.getFeatureName(file);
 				if (feature != null) {
 					// case: a source file
 					if (composer.hasFeatureFolder()) {
-						setPartName(file.getName()
-							+ "["
-							+ feature
-							+ "]");
+						setPartName(file.getName() + "[" + feature + "]");
 					}
 				} else {
-					if (isComposedFile(file.getParent(),
-							featureProject.getBuildFolder())) {
+					if (isComposedFile(file.getParent(), featureProject.getBuildFolder())) {
 						// case: a composed file
-						final IFile configuration =
-							featureProject
-									.getCurrentConfiguration();
+						final IFile configuration = featureProject.getCurrentConfiguration();
 						if (configuration != null) {
-							final String config =
-								configuration.getName()
-										.split("[.]")[0];
+							final String config = configuration.getName().split("[.]")[0];
 							if (config != null) {
-								setPartName(file.getName()
-									+ "<"
-									+ config
-									+ ">");
+								setPartName(file.getName() + "<" + config + ">");
 							}
 						}
 					} else {
-						final String configuration =
-							getConfiguration(file
-									.getParent());
+						final String configuration = getConfiguration(file.getParent());
 						if (configuration != null) {
 							// case: a generated products file
-							setPartName(file.getName()
-								+ "<"
-								+ configuration
-								+ ">");
+							setPartName(file.getName() + "<" + configuration + ">");
 						}
 					}
 				}
@@ -130,8 +105,7 @@ public class JavaEditor extends CompilationUnitEditor {
 		try {
 			for (final IResource res : parent.members()) {
 				if (res instanceof IFile) {
-					if (composer.getConfigurationExtension().equals(
-							res.getFileExtension())) {
+					if (composer.getConfigurationExtension().equals(res.getFileExtension())) {
 						return res.getName().split("[.]")[0];
 					}
 				}
@@ -139,8 +113,7 @@ public class JavaEditor extends CompilationUnitEditor {
 		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		final IContainer p =
-			parent.getParent();
+		final IContainer p = parent.getParent();
 		if (p != null) {
 			return getConfiguration(p);
 		}

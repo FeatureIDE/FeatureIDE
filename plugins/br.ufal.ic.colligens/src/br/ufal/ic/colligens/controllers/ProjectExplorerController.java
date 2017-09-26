@@ -39,8 +39,7 @@ public class ProjectExplorerController {
 	private IWorkbenchWindow window;
 
 	public ProjectExplorerController() {
-		iResources =
-			new HashSet<IResource>();
+		iResources = new HashSet<IResource>();
 	}
 
 	/**
@@ -50,28 +49,21 @@ public class ProjectExplorerController {
 	public List<IResource> start() throws ProjectExplorerException {
 		iResources.clear();
 
-		final List<IResource> iResources =
-			new LinkedList<IResource>();
+		final List<IResource> iResources = new LinkedList<IResource>();
 
 		if (iSelection instanceof IStructuredSelection) {
 
-			final IStructuredSelection selection =
-				(IStructuredSelection) iSelection;
+			final IStructuredSelection selection = (IStructuredSelection) iSelection;
 
 			@SuppressWarnings("unchecked")
-			final List<Object> list =
-				selection.toList();
+			final List<Object> list = selection.toList();
 
 			for (final Object object : list) {
 				if (object instanceof Project) {
-					final ICProject project =
-						CoreModel.getDefault().getCModel()
-								.getCProject(((Project) object).getName());
+					final ICProject project = CoreModel.getDefault().getCModel().getCProject(((Project) object).getName());
 					if (project != null) {
 						try {
-							final ISourceRoot iSourceRoots[] =
-								project
-										.getSourceRoots();
+							final ISourceRoot iSourceRoots[] = project.getSourceRoots();
 
 							for (final ISourceRoot iSourceRoot : iSourceRoots) {
 								iResources.add(iSourceRoot.getResource());
@@ -95,17 +87,14 @@ public class ProjectExplorerController {
 			}
 
 		} else if (iSelection instanceof TextSelection) {
-			final FileEditorInput fileEditorInput =
-				(FileEditorInput) window
-						.getActivePage().getActiveEditor().getEditorInput();
+			final FileEditorInput fileEditorInput = (FileEditorInput) window.getActivePage().getActiveEditor().getEditorInput();
 			if (fileEditorInput != null) {
 				iResources.add(fileEditorInput.getFile());
 			}
 		}
 
 		if (iResources.isEmpty()) {
-			throw new ProjectExplorerException(
-					SELECT_A_VALID_FILE_OR_DIRECTORY_);
+			throw new ProjectExplorerException(SELECT_A_VALID_FILE_OR_DIRECTORY_);
 		}
 
 		return iResources;
@@ -115,8 +104,7 @@ public class ProjectExplorerController {
 	 * @throws ProjectExplorerException
 	 */
 	public void run() throws ProjectExplorerException {
-		final List<IResource> list =
-			start();
+		final List<IResource> list = start();
 
 		for (final IResource iResource : list) {
 			addResource(iResource);
@@ -127,8 +115,7 @@ public class ProjectExplorerController {
 	 * @return list containing the file paths
 	 */
 	public List<String> getListToString() {
-		final List<String> resourcesAsString =
-			new LinkedList<String>();
+		final List<String> resourcesAsString = new LinkedList<String>();
 		for (final IResource resource : iResources) {
 			// adds .c and .h files only
 			resourcesAsString.add(resource.getLocation().toString());
@@ -137,15 +124,12 @@ public class ProjectExplorerController {
 	}
 
 	public void setWindow(IWorkbenchWindow window) {
-		this.window =
-			window;
-		iSelection =
-			window.getSelectionService().getSelection();
+		this.window = window;
+		iSelection = window.getSelectionService().getSelection();
 	}
 
 	public void setSelection(ISelection selection) {
-		iSelection =
-			selection;
+		iSelection = selection;
 	}
 
 	public List<IResource> getList() {
@@ -155,8 +139,7 @@ public class ProjectExplorerController {
 	public void addResource(IResource iResource) {
 		if (iResource instanceof IFile) {
 			// adds .c and .h files only
-			if (iResource.getLocation().toString().trim().endsWith(".c")
-				|| iResource.getLocation().toString().trim().endsWith(".h")) {
+			if (iResource.getLocation().toString().trim().endsWith(".c") || iResource.getLocation().toString().trim().endsWith(".h")) {
 				iResources.add(iResource);
 			}
 		} else if (iResource instanceof IFolder) {

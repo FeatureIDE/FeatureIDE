@@ -32,8 +32,7 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 public class MungeCorePlugin extends AbstractCorePlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID =
-		"de.ovgu.featureide.core.munge"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "de.ovgu.featureide.core.munge"; //$NON-NLS-1$
 
 	// The shared instance
 	private static MungeCorePlugin plugin;
@@ -50,8 +49,7 @@ public class MungeCorePlugin extends AbstractCorePlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		plugin =
-			this;
+		plugin = this;
 	}
 
 	/*
@@ -60,8 +58,7 @@ public class MungeCorePlugin extends AbstractCorePlugin {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		plugin =
-			null;
+		plugin = null;
 		super.stop(context);
 	}
 

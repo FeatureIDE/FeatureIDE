@@ -34,8 +34,7 @@ public class SyncMonitor implements IMonitor {
 	private final IMonitor monitor;
 
 	public SyncMonitor(IMonitor monitor) {
-		this.monitor =
-			monitor;
+		this.monitor = monitor;
 	}
 
 	@Override

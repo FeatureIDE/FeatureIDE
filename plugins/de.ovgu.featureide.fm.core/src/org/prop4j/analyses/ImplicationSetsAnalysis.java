@@ -57,26 +57,19 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 
 	public static class Relationship implements Comparable<Relationship> {
 
-		public static final byte BIT_11 =
-			1 << 3;
-		public static final byte BIT_10 =
-			1 << 2;
-		public static final byte BIT_01 =
-			1 << 1;
-		public static final byte BIT_00 =
-			1 << 0;
+		public static final byte BIT_11 = 1 << 3;
+		public static final byte BIT_10 = 1 << 2;
+		public static final byte BIT_01 = 1 << 1;
+		public static final byte BIT_00 = 1 << 0;
 
 		private final int featureID1, featureID2;
 
 		private byte relation;
 
 		public Relationship(int featureID1, int featureID2) {
-			this.featureID1 =
-				featureID1;
-			this.featureID2 =
-				featureID2;
-			relation =
-				0;
+			this.featureID1 = featureID1;
+			this.featureID2 = featureID2;
+			relation = 0;
 		}
 
 		public byte getRelation() {
@@ -84,8 +77,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 		}
 
 		public void addRelation(byte relation) {
-			this.relation |=
-				relation;
+			this.relation |= relation;
 		}
 
 		public int getFeatureID1() {
@@ -98,29 +90,16 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 
 		@Override
 		public int compareTo(Relationship arg0) {
-			final int diff1 =
-				featureID1
-					- arg0.featureID1;
-			return diff1 != 0
-				? diff1
-				: featureID2
-					- arg0.featureID2;
+			final int diff1 = featureID1 - arg0.featureID1;
+			return diff1 != 0 ? diff1 : featureID2 - arg0.featureID2;
 		}
 
 		@Override
 		public int hashCode() {
-			final int prime =
-				31;
-			int result =
-				1;
-			result =
-				(prime
-					* result)
-					+ featureID1;
-			result =
-				(prime
-					* result)
-					+ featureID2;
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + featureID1;
+			result = (prime * result) + featureID2;
 			return result;
 		}
 
@@ -129,51 +108,31 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			if (this == obj) {
 				return true;
 			}
-			if ((obj == null)
-				|| (getClass() != obj.getClass())) {
+			if ((obj == null) || (getClass() != obj.getClass())) {
 				return false;
 			}
-			final Relationship other =
-				(Relationship) obj;
-			return (featureID1 == other.featureID1)
-				&& (featureID2 == other.featureID2);
+			final Relationship other = (Relationship) obj;
+			return (featureID1 == other.featureID1) && (featureID2 == other.featureID2);
 		}
 
 		@Override
 		public String toString() {
-			return "Relationship [featureID1="
-				+ featureID1
-				+ ", featureID2="
-				+ featureID2
-				+ ", relation="
-				+ relation
-				+ "]";
+			return "Relationship [featureID1=" + featureID1 + ", featureID2=" + featureID2 + ", relation=" + relation + "]";
 		}
 	}
 
-	private static final byte BIT_CHECK =
-		1 << 6;
-	private static final byte BITS_POSITIVE_IMPLY =
-		BIT_11
-			| BIT_10;
-	private static final byte BITS_NEGATIVE_IMPLY =
-		BIT_01
-			| BIT_00;
+	private static final byte BIT_CHECK = 1 << 6;
+	private static final byte BITS_POSITIVE_IMPLY = BIT_11 | BIT_10;
+	private static final byte BITS_NEGATIVE_IMPLY = BIT_01 | BIT_00;
 
-	private byte[] combinations =
-		new byte[0];
-	private byte[] core =
-		new byte[0];
-	private byte[] recArray =
-		new byte[0];
-	private int numVariables =
-		0;
+	private byte[] combinations = new byte[0];
+	private byte[] core = new byte[0];
+	private byte[] recArray = new byte[0];
+	private int numVariables = 0;
 
-	private final Deque<Integer> parentStack =
-		new LinkedList<>();
+	private final Deque<Integer> parentStack = new LinkedList<>();
 
-	private final HashMap<Relationship, Relationship> relationSet =
-		new HashMap<>();
+	private final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 	@Override
 	public Set<Relationship> analyze(IMonitor monitor) throws Exception {
@@ -182,37 +141,27 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 
 		solver.initSolutionList(Math.min(solver.getSatInstance().getNumberOfVariables(), ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 =
-			solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 =
-				solver.findModel();
+			final int[] model2 = solver.findModel();
 			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 			// find core/dead features
-			core =
-				new byte[model1.length];
-			recArray =
-				new byte[model1.length];
-			final int[] model1Copy =
-				Arrays.copyOf(model1, model1.length);
+			core = new byte[model1.length];
+			recArray = new byte[model1.length];
+			final int[] model1Copy = Arrays.copyOf(model1, model1.length);
 			SatInstance.updateModel(model1Copy, model2);
-			for (int i =
-				0; i < model1Copy.length; i++) {
-				final int varX =
-					model1Copy[i];
+			for (int i = 0; i < model1Copy.length; i++) {
+				final int varX = model1Copy[i];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
 					// solver.shuffleOrder();
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						core[i] =
-							(byte) (varX > 0
-								? 1
-								: -1);
+						core[i] = (byte) (varX > 0 ? 1 : -1);
 						solver.assignmentReplaceLast(varX);
 						break;
 					case TIMEOUT:
@@ -226,25 +175,15 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 					}
 				}
 			}
-			numVariables =
-				model1.length;
-			combinations =
-				new byte[numVariables
-					* numVariables];
+			numVariables = model1.length;
+			combinations = new byte[numVariables * numVariables];
 
 			outer: for (final Node clause : solver.getSatInstance().getCnf().getChildren()) {
-				final Node[] literals =
-					clause.getChildren();
-				int childrenCount =
-					literals.length;
-				for (int i =
-					0; i < childrenCount; i++) {
-					final int var =
-						solver.getSatInstance().getSignedVariable((Literal) literals[i]);
-					final int coreB =
-						var
-							* core[Math.abs(var)
-								- 1];
+				final Node[] literals = clause.getChildren();
+				int childrenCount = literals.length;
+				for (int i = 0; i < childrenCount; i++) {
+					final int var = solver.getSatInstance().getSignedVariable((Literal) literals[i]);
+					final int coreB = var * core[Math.abs(var) - 1];
 					if (coreB > 0) {
 						continue outer;
 					} else if (coreB < 0) {
@@ -252,46 +191,27 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 							continue outer;
 						}
 						childrenCount--;
-						final Node temp =
-							literals[i];
-						literals[i] =
-							literals[childrenCount];
-						literals[childrenCount] =
-							temp;
+						final Node temp = literals[i];
+						literals[i] = literals[childrenCount];
+						literals[childrenCount] = temp;
 						i--;
 					}
 				}
 				if (childrenCount == 2) {
-					final int x =
-						solver.getSatInstance().getSignedVariable((Literal) literals[0]);
-					final int y =
-						solver.getSatInstance().getSignedVariable((Literal) literals[1]);
+					final int x = solver.getSatInstance().getSignedVariable((Literal) literals[0]);
+					final int y = solver.getSatInstance().getSignedVariable((Literal) literals[1]);
 					if (Math.abs(x) < Math.abs(y)) {
 						addRelation(-x, y);
 					} else {
 						addRelation(-y, x);
 					}
 				}
-				for (int i =
-					0; i < (childrenCount
-						- 1); i++) {
-					final int x =
-						solver.getSatInstance().getVariable((Literal) literals[i])
-							- 1;
-					for (int j =
-						i
-							+ 1; j < childrenCount; j++) {
-						final int y =
-							solver.getSatInstance().getVariable((Literal) literals[j])
-								- 1;
-						combinations[(x
-							* numVariables)
-							+ y] |=
-								BIT_CHECK;
-						combinations[(y
-							* numVariables)
-							+ x] |=
-								BIT_CHECK;
+				for (int i = 0; i < (childrenCount - 1); i++) {
+					final int x = solver.getSatInstance().getVariable((Literal) literals[i]) - 1;
+					for (int j = i + 1; j < childrenCount; j++) {
+						final int y = solver.getSatInstance().getVariable((Literal) literals[j]) - 1;
+						combinations[(x * numVariables) + y] |= BIT_CHECK;
+						combinations[(y * numVariables) + x] |= BIT_CHECK;
 					}
 				}
 			}
@@ -299,36 +219,18 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			boolean incomplete;
 
 			do {
-				incomplete =
-					false;
-				for (int x1 =
-					0; x1 < model1Copy.length; x1++) {
-					for (int y1 =
-						0; y1 < model1Copy.length; y1++) {
-						final int combinationIndexX1Y1 =
-							(x1
-								* numVariables)
-								+ y1;
-						if ((combinations[combinationIndexX1Y1]
-							& BIT_CHECK) != 0) {
-							for (int x2 =
-								0; x2 < model1Copy.length; x2++) {
-								final int combinationIndexY1X2 =
-									(y1
-										* numVariables)
-										+ x2;
-								if ((combinations[combinationIndexY1X2]
-									& BIT_CHECK) != 0) {
-									final int combinationIndexX1X2 =
-										(x1
-											* numVariables)
-											+ x2;
-									if ((combinations[combinationIndexX1X2]
-										& BIT_CHECK) == 0) {
-										combinations[combinationIndexX1X2] |=
-											BIT_CHECK;
-										incomplete =
-											true;
+				incomplete = false;
+				for (int x1 = 0; x1 < model1Copy.length; x1++) {
+					for (int y1 = 0; y1 < model1Copy.length; y1++) {
+						final int combinationIndexX1Y1 = (x1 * numVariables) + y1;
+						if ((combinations[combinationIndexX1Y1] & BIT_CHECK) != 0) {
+							for (int x2 = 0; x2 < model1Copy.length; x2++) {
+								final int combinationIndexY1X2 = (y1 * numVariables) + x2;
+								if ((combinations[combinationIndexY1X2] & BIT_CHECK) != 0) {
+									final int combinationIndexX1X2 = (x1 * numVariables) + x2;
+									if ((combinations[combinationIndexX1X2] & BIT_CHECK) == 0) {
+										combinations[combinationIndexX1X2] |= BIT_CHECK;
+										incomplete = true;
 									}
 								}
 							}
@@ -338,33 +240,24 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			} while (incomplete);
 
 			do {
-				incomplete =
-					false;
-				for (int i =
-					0; i < model1.length; i++) {
-					parentStack.add((i
-						+ 1));
+				incomplete = false;
+				for (int i = 0; i < model1.length; i++) {
+					parentStack.add((i + 1));
 					if (testVariable2()) {
-						incomplete =
-							true;
+						incomplete = true;
 					}
-					parentStack.add(-(i
-						+ 1));
+					parentStack.add(-(i + 1));
 					if (testVariable2()) {
-						incomplete =
-							true;
+						incomplete = true;
 					}
 				}
 			} while (incomplete);
 
 			Arrays.fill(recArray, (byte) 0);
-			for (int i =
-				0; i < model1.length; i++) {
-				parentStack.add((i
-					+ 1));
+			for (int i = 0; i < model1.length; i++) {
+				parentStack.add((i + 1));
 				testVariable();
-				parentStack.add(-(i
-					+ 1));
+				parentStack.add(-(i + 1));
 				testVariable();
 			}
 		}
@@ -372,75 +265,43 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 	}
 
 	private boolean testVariable2() {
-		boolean changed =
-			false;
-		final int mx1 =
-			parentStack.peek();
-		final int i =
-			Math.abs(mx1)
-				- 1;
-		final boolean positive =
-			mx1 > 0;
-		final byte compareB =
-			(byte) (positive
-				? 1
-				: 2);
+		boolean changed = false;
+		final int mx1 = parentStack.peek();
+		final int i = Math.abs(mx1) - 1;
+		final boolean positive = mx1 > 0;
+		final byte compareB = (byte) (positive ? 1 : 2);
 
-		if ((core[i] == 0)
-			&& ((recArray[i]
-				& compareB) == 0)) {
-			recArray[i] |=
-				compareB;
+		if ((core[i] == 0) && ((recArray[i] & compareB) == 0)) {
+			recArray[i] |= compareB;
 
-			final int rowIndex =
-				i
-					* numVariables;
+			final int rowIndex = i * numVariables;
 
-			for (int j =
-				0; j < numVariables; j++) {
-				if ((i != j)
-					&& (core[j] == 0)) {
-					final byte b =
-						combinations[rowIndex
-							+ j];
-					int my1 =
-						0;
+			for (int j = 0; j < numVariables; j++) {
+				if ((i != j) && (core[j] == 0)) {
+					final byte b = combinations[rowIndex + j];
+					int my1 = 0;
 					if (positive) {
-						if ((b
-							& BIT_11) == BIT_11) {
-							my1 =
-								(j
-									+ 1);
-						} else if ((b
-							& BIT_10) == BIT_10) {
-							my1 =
-								-(j
-									+ 1);
+						if ((b & BIT_11) == BIT_11) {
+							my1 = (j + 1);
+						} else if ((b & BIT_10) == BIT_10) {
+							my1 = -(j + 1);
 						}
 					} else {
-						if ((b
-							& BIT_01) == BIT_01) {
-							my1 =
-								(j
-									+ 1);
-						} else if ((b
-							& BIT_00) == BIT_00) {
-							my1 =
-								-(j
-									+ 1);
+						if ((b & BIT_01) == BIT_01) {
+							my1 = (j + 1);
+						} else if ((b & BIT_00) == BIT_00) {
+							my1 = -(j + 1);
 						}
 					}
 					if (my1 != 0) {
 						for (final int mx0 : parentStack) {
 							if (addRelation2(mx0, my1)) {
-								changed =
-									true;
+								changed = true;
 							}
 						}
 						parentStack.push(my1);
 						if (testVariable2()) {
-							changed =
-								true;
+							changed = true;
 						}
 					}
 				}
@@ -451,30 +312,18 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 	}
 
 	private void testVariable() {
-		final int mx1 =
-			parentStack.peek();
-		final int i =
-			Math.abs(mx1)
-				- 1;
-		final boolean positive =
-			mx1 > 0;
-		final byte compareB =
-			(byte) (positive
-				? 1
-				: 2);
+		final int mx1 = parentStack.peek();
+		final int i = Math.abs(mx1) - 1;
+		final boolean positive = mx1 > 0;
+		final byte compareB = (byte) (positive ? 1 : 2);
 
-		if ((core[i] == 0)
-			&& ((recArray[i]
-				& compareB) == 0)) {
-			recArray[i] |=
-				compareB;
+		if ((core[i] == 0) && ((recArray[i] & compareB) == 0)) {
+			recArray[i] |= compareB;
 
-			int[] xModel1 =
-				null;
+			int[] xModel1 = null;
 			for (final int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
-					xModel1 =
-						solution;
+					xModel1 = solution;
 					break;
 				}
 			}
@@ -482,48 +331,27 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 				throw new RuntimeException();
 			}
 
-			int c =
-				0;
+			int c = 0;
 
 			solver.assignmentPush(mx1);
-			final int rowIndex =
-				i
-					* numVariables;
+			final int rowIndex = i * numVariables;
 
-			inner1: for (int j =
-				i
-					+ 1; j < xModel1.length; j++) {
-				final byte b =
-					combinations[rowIndex
-						+ j];
-				if ((core[j] == 0)
-					&& ((b
-						& BIT_CHECK) != 0)
-					&& ((positive
-						&& ((b
-							& BITS_POSITIVE_IMPLY) == 0))
-						|| (!positive
-							&& ((b
-								& BITS_NEGATIVE_IMPLY) == 0)))) {
+			inner1: for (int j = i + 1; j < xModel1.length; j++) {
+				final byte b = combinations[rowIndex + j];
+				if ((core[j] == 0) && ((b & BIT_CHECK) != 0)
+					&& ((positive && ((b & BITS_POSITIVE_IMPLY) == 0)) || (!positive && ((b & BITS_NEGATIVE_IMPLY) == 0)))) {
 
-					final int my1 =
-						xModel1[j];
+					final int my1 = xModel1[j];
 					for (final int[] solution : solver.getSolutionList()) {
-						final int mxI =
-							solution[i];
-						final int myI =
-							solution[j];
-						if ((mx1 == mxI)
-							&& (my1 != myI)) {
+						final int mxI = solution[i];
+						final int myI = solution[j];
+						if ((mx1 == mxI) && (my1 != myI)) {
 							continue inner1;
 						}
 					}
 
 					solver.assignmentPush(-my1);
-					solver.setSelectionStrategy(((c++
-						% 2) != 0)
-							? SelectionStrategy.POSITIVE
-							: SelectionStrategy.NEGATIVE);
+					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.isSatisfiable()) {
 					case FALSE:
@@ -553,118 +381,77 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 	}
 
 	private void addRelation(final int mx0, final int my0) {
-		final Relationship newRelationship =
-			new Relationship(Math.abs(mx0), Math.abs(my0));
-		Relationship curRelationship =
-			relationSet.get(newRelationship);
+		final Relationship newRelationship = new Relationship(Math.abs(mx0), Math.abs(my0));
+		Relationship curRelationship = relationSet.get(newRelationship);
 		if (curRelationship == null) {
 			relationSet.put(newRelationship, newRelationship);
-			curRelationship =
-				newRelationship;
+			curRelationship = newRelationship;
 		}
 
-		final int indexX =
-			Math.abs(mx0)
-				- 1;
-		final int indexY =
-			Math.abs(my0)
-				- 1;
-		final int combinationIndexXY =
-			(indexX
-				* numVariables)
-				+ indexY;
-		final int combinationIndexYX =
-			(indexY
-				* numVariables)
-				+ indexX;
+		final int indexX = Math.abs(mx0) - 1;
+		final int indexY = Math.abs(my0) - 1;
+		final int combinationIndexXY = (indexX * numVariables) + indexY;
+		final int combinationIndexYX = (indexY * numVariables) + indexX;
 
 		if (mx0 > 0) {
 			if (my0 > 0) {
-				combinations[combinationIndexXY] |=
-					BIT_11;
-				combinations[combinationIndexYX] |=
-					BIT_00;
+				combinations[combinationIndexXY] |= BIT_11;
+				combinations[combinationIndexYX] |= BIT_00;
 				curRelationship.addRelation(BIT_11);
 			} else {
-				combinations[combinationIndexXY] |=
-					BIT_10;
-				combinations[combinationIndexYX] |=
-					BIT_10;
+				combinations[combinationIndexXY] |= BIT_10;
+				combinations[combinationIndexYX] |= BIT_10;
 				curRelationship.addRelation(BIT_10);
 			}
 		} else {
 			if (my0 > 0) {
-				combinations[combinationIndexXY] |=
-					BIT_01;
-				combinations[combinationIndexYX] |=
-					BIT_01;
+				combinations[combinationIndexXY] |= BIT_01;
+				combinations[combinationIndexYX] |= BIT_01;
 				curRelationship.addRelation(BIT_01);
 			} else {
-				combinations[combinationIndexXY] |=
-					BIT_00;
-				combinations[combinationIndexYX] |=
-					BIT_11;
+				combinations[combinationIndexXY] |= BIT_00;
+				combinations[combinationIndexYX] |= BIT_11;
 				curRelationship.addRelation(BIT_00);
 			}
 		}
 	}
 
 	private boolean addRelation2(final int mx0, final int my0) {
-		final int indexX =
-			Math.abs(mx0)
-				- 1;
-		final int indexY =
-			Math.abs(my0)
-				- 1;
+		final int indexX = Math.abs(mx0) - 1;
+		final int indexY = Math.abs(my0) - 1;
 		if (indexX == indexY) {
 			return false;
 		}
-		final int combinationIndexXY =
-			(indexX
-				* numVariables)
-				+ indexY;
-		final int combinationIndexYX =
-			(indexY
-				* numVariables)
-				+ indexX;
+		final int combinationIndexXY = (indexX * numVariables) + indexY;
+		final int combinationIndexYX = (indexY * numVariables) + indexX;
 
 		final Relationship newRelationship;
 		if (indexX < indexY) {
-			newRelationship =
-				new Relationship(Math.abs(mx0), Math.abs(my0));
+			newRelationship = new Relationship(Math.abs(mx0), Math.abs(my0));
 		} else {
-			newRelationship =
-				new Relationship(Math.abs(my0), Math.abs(mx0));
+			newRelationship = new Relationship(Math.abs(my0), Math.abs(mx0));
 		}
-		Relationship curRelationship =
-			relationSet.get(newRelationship);
+		Relationship curRelationship = relationSet.get(newRelationship);
 		if (curRelationship == null) {
 			relationSet.put(newRelationship, newRelationship);
-			curRelationship =
-				newRelationship;
+			curRelationship = newRelationship;
 		}
 
-		final byte oldXY =
-			combinations[combinationIndexXY];
-		final byte oldYX =
-			combinations[combinationIndexYX];
+		final byte oldXY = combinations[combinationIndexXY];
+		final byte oldYX = combinations[combinationIndexYX];
 
 		if (mx0 > 0) {
 			if (my0 > 0) {
-				combinations[combinationIndexXY] |=
-					BIT_11;
-				combinations[combinationIndexYX] |=
-					BIT_00;
+				combinations[combinationIndexXY] |= BIT_11;
+				combinations[combinationIndexYX] |= BIT_00;
 				if (indexX < indexY) {
 					curRelationship.addRelation(BIT_11);
 				} else {
 					curRelationship.addRelation(BIT_00);
 				}
 			} else {
-				combinations[combinationIndexXY] |=
-					BIT_10;
-				combinations[combinationIndexYX] |=
-					BIT_10;
+				combinations[combinationIndexXY] |= BIT_10;
+				combinations[combinationIndexYX] |= BIT_10;
 				if (indexX < indexY) {
 					curRelationship.addRelation(BIT_10);
 				} else {
@@ -673,20 +460,16 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			}
 		} else {
 			if (my0 > 0) {
-				combinations[combinationIndexXY] |=
-					BIT_01;
-				combinations[combinationIndexYX] |=
-					BIT_01;
+				combinations[combinationIndexXY] |= BIT_01;
+				combinations[combinationIndexYX] |= BIT_01;
 				if (indexX < indexY) {
 					curRelationship.addRelation(BIT_01);
 				} else {
 					curRelationship.addRelation(BIT_01);
 				}
 			} else {
-				combinations[combinationIndexXY] |=
-					BIT_00;
-				combinations[combinationIndexYX] |=
-					BIT_11;
+				combinations[combinationIndexXY] |= BIT_00;
+				combinations[combinationIndexYX] |= BIT_11;
 				if (indexX < indexY) {
 					curRelationship.addRelation(BIT_00);
 				} else {
@@ -695,8 +478,7 @@ public class ImplicationSetsAnalysis extends AbstractAnalysis<Set<Relationship>>
 			}
 		}
 
-		return (oldXY != combinations[combinationIndexXY])
-			|| (oldYX != combinations[combinationIndexYX]);
+		return (oldXY != combinations[combinationIndexXY]) || (oldYX != combinations[combinationIndexYX]);
 	}
 
 }

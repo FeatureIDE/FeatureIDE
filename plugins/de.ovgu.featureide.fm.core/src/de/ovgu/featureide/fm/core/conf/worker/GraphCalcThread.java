@@ -53,10 +53,8 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 		}
 
 		public CalcObject(int id, ValueType valueTye) {
-			this.id =
-				id;
-			this.valueTye =
-				valueTye;
+			this.id = id;
+			this.valueTye = valueTye;
 		}
 
 		@Override
@@ -73,20 +71,14 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 		private final IConfigurationChanger variableConfiguration;
 		private final int numberOfSolvers;
 
-		private int lastSolverID =
-			0;
-		private List<Literal> knownLiterals =
-			null;
+		private int lastSolverID = 0;
+		private List<Literal> knownLiterals = null;
 
 		public SharedObjects(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
-			this.featureArray =
-				featureArray;
-			this.variableConfiguration =
-				variableConfiguration;
-			this.numberOfSolvers =
-				numberOfSolvers;
-			solver =
-				new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
+			this.featureArray = featureArray;
+			this.variableConfiguration = variableConfiguration;
+			this.numberOfSolvers = numberOfSolvers;
+			solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
 
 	}
@@ -100,23 +92,18 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 
 	public GraphCalcThread(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
 		super(new NullMonitor());
-		sharedObjects =
-			new SharedObjects(featureArray, variableConfiguration, fmNode, numberOfSolvers);
-		id =
-			sharedObjects.lastSolverID;
+		sharedObjects = new SharedObjects(featureArray, variableConfiguration, fmNode, numberOfSolvers);
+		id = sharedObjects.lastSolverID;
 	}
 
 	private GraphCalcThread(GraphCalcThread oldThread) {
 		super(oldThread);
-		sharedObjects =
-			oldThread.sharedObjects;
-		id =
-			++oldThread.sharedObjects.lastSolverID;
+		sharedObjects = oldThread.sharedObjects;
+		id = ++oldThread.sharedObjects.lastSolverID;
 	}
 
 	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
-		sharedObjects.knownLiterals =
-			knownLiterals;
+		sharedObjects.knownLiterals = knownLiterals;
 	}
 
 	public void setKnownLiterals(List<Literal> knownLiterals) {
@@ -145,26 +132,18 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 
 	@Override
 	protected void work(CalcObject calcOject) {
-		final int featureID =
-			calcOject.getId();
+		final int featureID = calcOject.getId();
 
 		final int value;
 		switch (calcOject.getValueType()) {
 		case ALL:
-			value =
-				sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureArray[featureID]), id);
+			value = sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureArray[featureID]), id);
 			break;
 		case FALSE:
-			value =
-				sharedObjects.solver.isFalse(new Literal(sharedObjects.featureArray[featureID]), id)
-					? -1
-					: 0;
+			value = sharedObjects.solver.isFalse(new Literal(sharedObjects.featureArray[featureID]), id) ? -1 : 0;
 			break;
 		case TRUE:
-			value =
-				sharedObjects.solver.isTrue(new Literal(sharedObjects.featureArray[featureID]), id)
-					? 1
-					: 0;
+			value = sharedObjects.solver.isTrue(new Literal(sharedObjects.featureArray[featureID]), id) ? 1 : 0;
 			break;
 		default:
 			return;

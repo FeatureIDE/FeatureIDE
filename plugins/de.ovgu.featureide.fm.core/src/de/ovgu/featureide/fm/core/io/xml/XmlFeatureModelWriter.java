@@ -72,20 +72,13 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	@Override
 	protected void createXmlDoc(Document doc) {
-		final Element root =
-			doc.createElement(FEATURE_MODEL);
-		final Element struct =
-			doc.createElement(STRUCT);
-		final Element properties =
-			doc.createElement(PROPERTIES);
-		final Element constraints =
-			doc.createElement(CONSTRAINTS);
-		final Element calculations =
-			doc.createElement(CALCULATIONS);
-		final Element comments =
-			doc.createElement(COMMENTS);
-		final Element order =
-			doc.createElement(FEATURE_ORDER);
+		final Element root = doc.createElement(FEATURE_MODEL);
+		final Element struct = doc.createElement(STRUCT);
+		final Element properties = doc.createElement(PROPERTIES);
+		final Element constraints = doc.createElement(CONSTRAINTS);
+		final Element calculations = doc.createElement(CALCULATIONS);
+		final Element comments = doc.createElement(COMMENTS);
+		final Element order = doc.createElement(FEATURE_ORDER);
 		// root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, "" + featureModel.getGraphicRepresenation().getLayout().getLayoutAlgorithm());
 		//
 		// if (featureModel.getGraphicRepresenation().getLayout().verticalLayout() &&
@@ -104,11 +97,9 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
 
 		root.appendChild(constraints);
-		for (int i =
-			0; i < object.getConstraints().size(); i++) {
+		for (int i = 0; i < object.getConstraints().size(); i++) {
 			Element rule;
-			rule =
-				doc.createElement(RULE);
+			rule = doc.createElement(RULE);
 			// if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
 			// rule.setAttribute(COORDINATES, "" + featureModel.getConstraints().get(i).getGraphicRepresenation().getLocation().x + "," + " "
 			// + featureModel.getConstraints().get(i).getGraphicRepresenation().getLocation().y);
@@ -119,41 +110,31 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, ""
-			+ object.getAnalyser().runCalculationAutomatically);
-		calculations.setAttribute(CALCULATE_FEATURES, ""
-			+ object.getAnalyser().calculateFeatures);
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, ""
-			+ object.getAnalyser().calculateConstraints);
-		calculations.setAttribute(CALCULATE_REDUNDANT, ""
-			+ object.getAnalyser().calculateRedundantConstraints);
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, ""
-			+ object.getAnalyser().calculateTautologyConstraints);
+		calculations.setAttribute(CALCULATE_AUTO, "" + object.getAnalyser().runCalculationAutomatically);
+		calculations.setAttribute(CALCULATE_FEATURES, "" + object.getAnalyser().calculateFeatures);
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + object.getAnalyser().calculateConstraints);
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + object.getAnalyser().calculateRedundantConstraints);
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + object.getAnalyser().calculateTautologyConstraints);
 
 		root.appendChild(comments);
 		for (final String comment : object.getProperty().getComments()) {
-			final Element c =
-				doc.createElement(C);
+			final Element c = doc.createElement(C);
 			comments.appendChild(c);
-			final Text text =
-				doc.createTextNode(comment);
+			final Text text = doc.createTextNode(comment);
 			c.appendChild(text);
 		}
 		order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
 		root.appendChild(order);
 
 		if (object.isFeatureOrderUserDefined()) {
-			Collection<String> featureOrderList =
-				object.getFeatureOrderList();
+			Collection<String> featureOrderList = object.getFeatureOrderList();
 
 			if (featureOrderList.isEmpty()) {
-				featureOrderList =
-					FeatureUtils.extractConcreteFeaturesAsStringList(object);
+				featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(object);
 			}
 
 			for (final String featureName : featureOrderList) {
-				final Element feature =
-					doc.createElement(FEATURE);
+				final Element feature = doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
 				order.appendChild(feature);
 			}
@@ -162,17 +143,14 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 	private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
 
-		if ((featureModel == null)
-			|| (propertiesNode == null)) {
+		if ((featureModel == null) || (propertiesNode == null)) {
 			throw new RuntimeException();
 		}
 
 		// Store per-feature properties
 		for (final IFeature feature : featureModel.getFeatures()) {
-			final String featureName =
-				feature.getName();
-			final Set<Entry<String, Type, Object>> propertyEntries =
-				feature.getCustomProperties().entrySet();
+			final String featureName = feature.getName();
+			final Set<Entry<String, Type, Object>> propertyEntries = feature.getCustomProperties().entrySet();
 			if (!propertyEntries.isEmpty()) {
 				propertiesNode.appendChild(createFeaturePropertyContainerNode(doc, featureName, propertyEntries));
 			}
@@ -183,8 +161,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 	}
 
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
-		final Element result =
-			doc.createElement(FEATURE);
+		final Element result = doc.createElement(FEATURE);
 		result.setAttribute(NAME, featureName);
 		for (final Entry<String, Type, Object> entry : propertyEntries) {
 			result.appendChild(createPropertyEntriesNode(doc, entry));
@@ -193,8 +170,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 	}
 
 	private Node createPropertyEntriesNode(Document doc, Entry<String, Type, Object> entry) {
-		final Element propertyElement =
-			doc.createElement(XmlPropertyLoader.PROPERTY);
+		final Element propertyElement = doc.createElement(XmlPropertyLoader.PROPERTY);
 		propertyElement.setAttribute(XmlPropertyLoader.KEY, entry.getKey());
 		propertyElement.setAttribute(XmlPropertyLoader.VALUE, entry.getValue().toString());
 		propertyElement.setAttribute(XmlPropertyLoader.TYPE, entry.getType().toString());
@@ -217,51 +193,36 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		Element fnod;
 		List<IFeature> children;
 
-		children =
-			FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
+		children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
 		if (children.isEmpty()) {
-			fnod =
-				doc.createElement(FEATURE);
-			final String description =
-				feat.getProperty().getDescription();
+			fnod = doc.createElement(FEATURE);
+			final String description = feat.getProperty().getDescription();
 			if (description != null) {
-				final Element descr =
-					doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n"
-					+ description.replace("\r", "")
-					+ "\n");
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 				fnod.appendChild(descr);
 			}
 			writeAttributes(node, fnod, feat);
 		} else {
 			if (feat.getStructure().isAnd()) {
-				fnod =
-					doc.createElement(AND);
+				fnod = doc.createElement(AND);
 			} else if (feat.getStructure().isOr()) {
-				fnod =
-					doc.createElement(OR);
+				fnod = doc.createElement(OR);
 			} else if (feat.getStructure().isAlternative()) {
-				fnod =
-					doc.createElement(ALT);
+				fnod = doc.createElement(ALT);
 			} else {
-				fnod =
-					doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
+				fnod = doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
-			final String description =
-				feat.getProperty().getDescription();
+			final String description = feat.getProperty().getDescription();
 			if (description != null) {
-				final Element descr =
-					doc.createElement(DESCRIPTION);
-				descr.setTextContent("\n"
-					+ description.replace("\r", "")
-					+ "\n");
+				final Element descr = doc.createElement(DESCRIPTION);
+				descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 				fnod.appendChild(descr);
 			}
 
 			writeAttributes(node, fnod, feat);
 
-			final Iterator<IFeature> i =
-				children.iterator();
+			final Iterator<IFeature> i = children.iterator();
 			while (i.hasNext()) {
 				createXmlDocRec(doc, fnod, i.next());
 			}
@@ -300,61 +261,47 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 		Element op;
 		if (node instanceof Literal) {
-			Literal literal =
-				(Literal) node;
+			Literal literal = (Literal) node;
 			if (literal.positive) {
-				op =
-					doc.createElement(VAR);
+				op = doc.createElement(VAR);
 				xmlNode.appendChild(op);
 				op.appendChild(doc.createTextNode(node.toString()));
 			} else {
-				op =
-					doc.createElement(NOT);
+				op = doc.createElement(NOT);
 				xmlNode.appendChild(op);
-				literal =
-					literal.clone();
-				literal.positive =
-					true;
+				literal = literal.clone();
+				literal.positive = true;
 				createPropositionalConstraints(doc, op, literal);
 			}
 			return;
 		}
 
 		if (node instanceof And) {
-			op =
-				doc.createElement(CONJ);
+			op = doc.createElement(CONJ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Or) {
-			op =
-				doc.createElement(DISJ);
+			op = doc.createElement(DISJ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Not) {
-			op =
-				doc.createElement(NOT);
+			op = doc.createElement(NOT);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Equals) {
-			op =
-				doc.createElement(EQ);
+			op = doc.createElement(EQ);
 			xmlNode.appendChild(op);
 		} else if (node instanceof Implies) {
-			op =
-				doc.createElement(IMP);
+			op = doc.createElement(IMP);
 			xmlNode.appendChild(op);
 		} else if (node instanceof AtMost) {
-			op =
-				doc.createElement(ATMOST1);
+			op = doc.createElement(ATMOST1);
 			xmlNode.appendChild(op);
 		} else {
-			op =
-				doc.createElement(UNKNOWN);
+			op = doc.createElement(UNKNOWN);
 			xmlNode.appendChild(op);
 		}
 
-		final org.prop4j.Node[] children =
-			node.getChildren();
+		final org.prop4j.Node[] children = node.getChildren();
 
-		for (int i =
-			0; i < children.length; i++) {
+		for (int i = 0; i < children.length; i++) {
 			createPropositionalConstraints(doc, op, children[i]);
 		}
 	}

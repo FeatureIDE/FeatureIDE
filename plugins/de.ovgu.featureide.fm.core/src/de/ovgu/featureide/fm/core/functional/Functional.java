@@ -189,8 +189,7 @@ public abstract class Functional {
 		private final Iterator<T> iterator;
 
 		public DefaultIterable(Iterator<T> iterator) {
-			this.iterator =
-				iterator;
+			this.iterator = iterator;
 		}
 
 		@Override
@@ -226,10 +225,8 @@ public abstract class Functional {
 			assert (it != null);
 			assert (function != null);
 
-			this.collectionIterator =
-				it.iterator();
-			this.function =
-				function;
+			this.collectionIterator = it.iterator();
+			this.function = function;
 		}
 
 		@Override
@@ -287,23 +284,19 @@ public abstract class Functional {
 			assert (it != null);
 			assert (filter != null);
 
-			this.collectionIterator =
-				it;
-			this.filter =
-				filter;
+			this.collectionIterator = it;
+			this.filter = filter;
 		}
 
 		@Override
 		public boolean hasNext() {
 			while (collectionIterator.hasNext()) {
-				next =
-					collectionIterator.next();
+				next = collectionIterator.next();
 				if (filter.isValid(next)) {
 					return true;
 				}
 			}
-			next =
-				null;
+			next = null;
 			return false;
 		}
 
@@ -337,15 +330,11 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
-		return predicate == null
-			? source
-			: new FilterIterator<U, T>(source, predicate);
+		return predicate == null ? source : new FilterIterator<U, T>(source, predicate);
 	}
 
 	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
-		return predicate == null
-			? new DefaultIterable<>(source)
-			: new FilterIterator<U, T>(source, predicate);
+		return predicate == null ? new DefaultIterable<>(source) : new FilterIterator<U, T>(source, predicate);
 	}
 
 	/**
@@ -392,8 +381,7 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> List<T> toList(final Iterable<T> source) {
-		final ArrayList<T> retval =
-			new ArrayList<T>();
+		final ArrayList<T> retval = new ArrayList<T>();
 		for (final T t : source) {
 			retval.add(t);
 		}
@@ -411,8 +399,7 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> Set<T> toSet(final Iterable<T> source) {
-		final HashSet<T> retval =
-			new HashSet<T>();
+		final HashSet<T> retval = new HashSet<T>();
 		for (final T t : source) {
 			retval.add(t);
 		}
@@ -486,8 +473,7 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
-		final Collection<T> collection =
-			new ArrayList<>();
+		final Collection<T> collection = new ArrayList<>();
 		while (enumeration.hasMoreElements()) {
 			collection.add(enumeration.nextElement());
 		}
@@ -520,18 +506,12 @@ public abstract class Functional {
 	 */
 	public static <T, R> R join(final Iterable<T> source, final R delimiter, final IProvider<R> newInstanceOfR, final IFunction<T, R> convert,
 			final IBinaryFunction<R, R, R> concat) {
-		R result =
-			newInstanceOfR.invoke();
-		final List<T> list =
-			toList(source);
-		for (int i =
-			0; i < list.size(); i++) {
-			result =
-				concat.invoke(result, convert.invoke(list.get(i)));
-			if ((i
-				+ 1) < list.size()) {
-				result =
-					concat.invoke(result, delimiter);
+		R result = newInstanceOfR.invoke();
+		final List<T> list = toList(source);
+		for (int i = 0; i < list.size(); i++) {
+			result = concat.invoke(result, convert.invoke(list.get(i)));
+			if ((i + 1) < list.size()) {
+				result = concat.invoke(result, delimiter);
 			}
 		}
 		return result;
@@ -574,8 +554,7 @@ public abstract class Functional {
 
 			@Override
 			public String invoke(String t, String u) {
-				return t
-					+ u;
+				return t + u;
 			}
 
 		});
@@ -598,10 +577,8 @@ public abstract class Functional {
 	 * @since 3.0
 	 */
 	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T, U> map) {
-		final Set<U> left =
-			Functional.toSet(Functional.map(lhs, map));
-		final Set<U> right =
-			Functional.toSet(Functional.map(rhs, map));
+		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
+		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
 		return left.equals(right);
 	}
 
@@ -620,8 +597,7 @@ public abstract class Functional {
 	 * @return Returns an empty type-safe iterable of type <b>T</b>
 	 */
 	public static <T> Iterable<T> getEmptyIterable(Class<? extends T> className) {
-		final Collection<T> collection =
-			new ArrayList<T>(0);
+		final Collection<T> collection = new ArrayList<T>(0);
 		return collection;
 	}
 

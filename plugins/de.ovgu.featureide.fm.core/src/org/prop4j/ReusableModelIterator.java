@@ -33,40 +33,29 @@ import org.sat4j.specs.TimeoutException;
 public class ReusableModelIterator implements Iterator<int[]> {
 
 	private final ISolver solver;
-	private final ArrayList<IConstr> constraints =
-		new ArrayList<>();
+	private final ArrayList<IConstr> constraints = new ArrayList<>();
 	private final long max;
 
-	private long count =
-		0;
-	private boolean timeout =
-		false;
-	private IVecInt assumptions =
-		null;
+	private long count = 0;
+	private boolean timeout = false;
+	private IVecInt assumptions = null;
 
-	private int[] nextModel =
-		null;
-	private boolean finished =
-		false;
+	private int[] nextModel = null;
+	private boolean finished = false;
 
 	public ReusableModelIterator(ISolver solver) {
 		this(solver, -1);
 	}
 
 	public ReusableModelIterator(ISolver solver, long max) {
-		this.solver =
-			solver;
-		this.max =
-			max;
+		this.solver = solver;
+		this.max = max;
 	}
 
 	public void reset() {
-		count =
-			0;
-		assumptions =
-			null;
-		timeout =
-			false;
+		count = 0;
+		assumptions = null;
+		timeout = false;
 		solver.expireTimeout();
 		for (final IConstr constraint : constraints) {
 			solver.removeConstr(constraint);
@@ -76,58 +65,45 @@ public class ReusableModelIterator implements Iterator<int[]> {
 
 	public long count() {
 		while (findNext()) {}
-		final long result =
-			timeout
-				? -count
-				: count;
+		final long result = timeout ? -count : count;
 		reset();
 		return result;
 	}
 
 	private boolean findNext() {
-		if (finished
-			|| ((max >= 0)
-				&& (count >= max))) {
+		if (finished || ((max >= 0) && (count >= max))) {
 			return false;
 		}
 		try {
 			if (assumptions == null) {
-				finished =
-					!solver.isSatisfiable(true);
+				finished = !solver.isSatisfiable(true);
 			} else {
-				finished =
-					!solver.isSatisfiable(assumptions, true);
+				finished = !solver.isSatisfiable(assumptions, true);
 			}
 		} catch (final TimeoutException e) {
-			finished =
-				true;
-			timeout =
-				true;
+			finished = true;
+			timeout = true;
 		}
 		if (finished) {
 			return false;
 		}
-		nextModel =
-			solver.model();
+		nextModel = solver.model();
 		count++;
-		final IVecInt clause =
-			new VecInt(nextModel.length);
+		final IVecInt clause = new VecInt(nextModel.length);
 		for (final int q : nextModel) {
 			clause.push(-q);
 		}
 		try {
 			constraints.add(solver.addBlockingClause(clause));
 		} catch (final ContradictionException e) {
-			finished =
-				true;
+			finished = true;
 		}
 		return true;
 	}
 
 	@Override
 	public boolean hasNext() {
-		return (nextModel != null)
-			|| findNext();
+		return (nextModel != null) || findNext();
 	}
 
 	@Override
@@ -135,10 +111,8 @@ public class ReusableModelIterator implements Iterator<int[]> {
 		if (nextModel == null) {
 			findNext();
 		}
-		final int[] model =
-			nextModel;
-		nextModel =
-			null;
+		final int[] model = nextModel;
+		nextModel = null;
 		return model;
 	}
 
@@ -150,7 +124,6 @@ public class ReusableModelIterator implements Iterator<int[]> {
 	}
 
 	public void setAssumptions(IVecInt assumptions) {
-		this.assumptions =
-			assumptions;
+		this.assumptions = assumptions;
 	}
 }
