@@ -27,11 +27,15 @@ import java.util.Map.Entry;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.PrecisionPoint;
+import org.eclipse.draw2d.geometry.Ray;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.draw2d.geometry.Vector;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -46,6 +50,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
+ * @author Stefanie Schober
+ * @author Jann-Ole Henningson
  */
 abstract public class FeatureDiagramLayoutManager {
 
@@ -69,14 +75,18 @@ abstract public class FeatureDiagramLayoutManager {
 			for (final IGraphicalFeature entry : featureModel.getFeatures()) {
 				// Fix of #571: All feature in manual layout are loaded to their position. Because the layout
 				// does not change the position no event is performed and the connections are not drawn. So for the first
-				// start peform the location changed event to refresh the connection only in manual layout
+				// start perform the location changed event to refresh the connection only in manual layout
 				entry.update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
 				firstManualLayout = true;
 			}
 		}
 
-		if (!featureModel.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
-			layoutLegend(featureModel, showHidden);
+		if (!featureModel.isLegendHidden()) {
+			if (featureModel.getLayout().hasLegendAutoLayout()) {
+				layoutLegend(featureModel, showHidden);
+			} else {
+				layoutLegendManual(featureModel, showHidden);
+			}
 		}
 		newLocations.clear();
 	}
@@ -137,7 +147,105 @@ abstract public class FeatureDiagramLayoutManager {
 			y += size.height;
 		}
 	}
+	
+	/*
+	 * Repositions the legend - if it is intersected by an edge
+	 */
+	public void layoutLegendManual(IGraphicalFeatureModel featureModel, boolean showHidden) {
+		final Iterable<IGraphicalFeature> nonHidden =
+				featureModel.getVisibleFeatures();
+		
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		for (final Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
+		}
+		
+		if ((legendSize == null) && (legendFigure == null))
+			return;
+		
+		for (final IGraphicalFeature feature : nonHidden) {
+			final Point source = calculateSource(feature, featureModel.getLayout().verticalLayout());
+			
+			//Iterate over every child and check for an intersection
+			List<IGraphicalFeature> children = feature.getGraphicalChildren(true);
+			for (int i = 0; i < children.size(); i++) {
+				//Only check the outer edges
+				if (i > 0 && i < children.size() - 1)
+					continue;
+				
+				final Point target = calculateTarget(children.get(i), featureModel.getLayout().verticalLayout());
+				final Point legend = featureModel.getLayout().getLegendPos();
+				int legendMaxX = legend.x + legendSize.width;
+				int legendMaxY = legend.y + legendSize.height;
+				
+				//Edge is definitely not inside the legend, continue
+				if ((source.x <= legend.x && target.x <= legend.x) ||
+				    (source.y <= legend.y && target.y <= legend.y) ||
+				    (source.x >= legendMaxX && target.x >= legendMaxX) ||
+				    (source.y >= legendMaxY && target.y >= legendMaxY))
+					continue;
+				
+				//Check every side of the legend for an intersection
+				float m = (float)(target.y - source.y) / (float)(target.x - source.x);
+				float y = m * (float)(legend.x - source.x) + (float)source.y;
+				
+			    if (y > legend.y && y < legendMaxY)
+			    	layoutLegend(featureModel, showHidden);
 
+			    y = m * (float)(legendMaxX - source.x) + (float)source.y;
+			    if (y > legend.y && y < legendMaxY)
+			    	layoutLegend(featureModel, showHidden);
+
+			    float x = (float)(legend.y - source.y) / m + (float)source.x;
+			    if (x > legend.x && x < legendMaxX)
+			    	layoutLegend(featureModel, showHidden);
+
+			    x = (float)(legendMaxY - source.y) / m + (float)source.x;
+			    if (x > legend.x && x < legendMaxX)
+			    	layoutLegend(featureModel, showHidden);
+			}
+		}
+	}
+	
+	/*
+	 * Calculate the starting point of the source
+	 */
+	public Point calculateSource(IGraphicalFeature feature, boolean verticalLayout) {
+		final Point sourceLocation = feature.getLocation();
+		Dimension sourceSize = feature.getSize(); 
+	 	if (verticalLayout) { //Top-Down
+	 		return new Point(
+	 				sourceSize.width()/2 + sourceLocation.x, 
+	 				sourceSize.height()  + sourceLocation.y);
+	 	} else { //Left-Right
+	 		return new Point(
+	 				sourceSize.width() + sourceLocation.x, 
+	 				sourceSize.height()/2  + sourceLocation.y);
+	 	}
+	}
+
+	/*
+	 * Calculate the ending point of the target
+	 */
+	public Point calculateTarget(IGraphicalFeature feature, boolean verticalLayout) {
+		final Point targetLocation = feature.getLocation();
+		Dimension targetSize = feature.getSize(); 
+	 	if (verticalLayout) { //Top-Down
+	 		return new Point(
+	 				targetSize.width()/2 + targetLocation.x, 
+	 				targetLocation.y);
+	 	} else { //Left-Right
+	 		return new Point(
+	 				targetLocation.x, 
+	 				targetSize.height()/2  + targetLocation.y);
+	 	}
+	}
+	
+	
 	/**
 	 * sets the position of the legend
 	 */
@@ -231,6 +339,7 @@ abstract public class FeatureDiagramLayoutManager {
 				}
 			}
 		}
+    
 		/*
 		 * check if constraints would intersect with the legend on the edges
 		 */
@@ -259,6 +368,7 @@ abstract public class FeatureDiagramLayoutManager {
 				}
 			}
 		}
+		
 
 		/*
 		 * set the legend position
