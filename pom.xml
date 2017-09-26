@@ -44,7 +44,6 @@
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
 
 		<module>tests/de.ovgu.featureide.core.antenna-test</module>
-		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
 	</modules>
