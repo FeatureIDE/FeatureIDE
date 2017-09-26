@@ -53,7 +53,8 @@ public class StatisticProgramSizeNewTest {
 	}
 
 	private static File getFolder() {
-		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
+		File folderTeamcity = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
+		File folder = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
 		if (!folder.canRead()) {
 			folder = new File(ClassLoader.getSystemResource("statisticsfiles").getPath());
 		}

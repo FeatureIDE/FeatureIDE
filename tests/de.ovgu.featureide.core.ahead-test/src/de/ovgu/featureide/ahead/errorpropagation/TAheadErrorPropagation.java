@@ -44,7 +44,8 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public class TAheadErrorPropagation {
 
-	protected static File FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
+	protected static File FILE_FOLDER_TEAMCITY = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
+	protected static File FILE_FOLDER = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
 
 	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
 

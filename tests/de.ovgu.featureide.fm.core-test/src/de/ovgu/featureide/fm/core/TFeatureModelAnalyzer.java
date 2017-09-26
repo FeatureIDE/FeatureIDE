@@ -102,7 +102,8 @@ public class TFeatureModelAnalyzer {
 	 * @return
 	 */
 	private static File getFolder() {
-		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
+		File folderTeamcity = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
+		File folder = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
 		if (!folder.canRead()) {
 			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
 		}

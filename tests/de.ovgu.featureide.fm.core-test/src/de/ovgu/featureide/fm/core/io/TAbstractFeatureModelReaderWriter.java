@@ -65,8 +65,11 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
 
+	protected static File MODEL_FILE_FOLDER_TEAMCITY =
+			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+
 	protected static File MODEL_FILE_FOLDER =
-		new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+			new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
 	static boolean online = false;
 	protected IFeatureModel origFm;

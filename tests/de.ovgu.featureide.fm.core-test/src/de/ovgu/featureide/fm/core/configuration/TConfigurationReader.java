@@ -41,8 +41,11 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class TConfigurationReader {
 
+	private static final String FEATUREMODEL_PATH_TEAMCITY =
+			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
+
 	private static final String FEATUREMODEL_PATH =
-		"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
+			"/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
 
 	protected static File MODEL_FILE_FOLDER = getFolder();
 

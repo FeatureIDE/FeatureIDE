@@ -55,7 +55,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	QuickFixFalseOptionalFeatures quickFix = new QuickFixFalseOptionalFeatures(null);
 
-	protected static File MODEL_FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
+	protected static File MODEL_FILE_FOLDER_TEAMCITY = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
+	protected static File MODEL_FILE_FOLDER = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.ui-test/src/models/");
 
 	protected String failureMessage;
 
