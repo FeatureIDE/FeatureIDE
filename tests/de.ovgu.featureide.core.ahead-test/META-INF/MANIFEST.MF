@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AHEAD Test Fragment
-Bundle-SymbolicName: de.ovgu.featureide.core.ahead_test;singleton:=true
+Bundle-SymbolicName: de.ovgu.featureide.core.ahead-test;singleton:=true
 Bundle-Version: 3.4.0.qualifier
 Fragment-Host: de.ovgu.featureide.core.conversion.ahead_featurehouse
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
