@@ -143,9 +143,12 @@ abstract public class FeatureDiagramLayoutManager {
 				max.y = position.bottom();
 			}
 		}
+		
+		//Since a rectangle doesn't contain its values after returning it, we do have to return an array of Points
 		Point[] bounds = new Point[2];
 		bounds[0] = new Point(min.x, min.y);
 		bounds[1] = new Point(max.x, max.y);
+		
 		return bounds;
 	}
 	
@@ -153,30 +156,30 @@ abstract public class FeatureDiagramLayoutManager {
 		int legendWidth = legendPos.x + legendSize.width;
 		int legendHeight = legendPos.y + legendSize.height;
 		
-		//Edge is definitely not inside the legend, continue
-		if ((source.x <= legendPos.x && target.x <= legendPos.x) ||
-		    (source.y <= legendPos.y && target.y <= legendPos.y) ||
-		    (source.x >= legendWidth && target.x >= legendWidth) ||
-		    (source.y >= legendHeight && target.y >= legendHeight))
+		//Edge is definitely not inside the legend
+		if ((source.x < legendPos.x && target.x < legendPos.x) ||
+		    (source.y < legendPos.y && target.y < legendPos.y) ||
+		    (source.x > legendWidth && target.x > legendWidth) ||
+		    (source.y > legendHeight && target.y > legendHeight))
 			return false;
 		
 		//Check every side of the legend for an intersection
 		float m = (float)(target.y - source.y) / (float)(target.x - source.x);
 		float y = m * (float)(legendPos.x - source.x) + (float)source.y;
 		
-	    if (y > legendPos.y && y < legendHeight)
+	    if (y >= legendPos.y && y <= legendHeight)
 	    	return true;
 
 	    y = m * (float)(legendWidth - source.x) + (float)source.y;
-	    if (y > legendPos.y && y < legendHeight)
+	    if (y >= legendPos.y && y <= legendHeight)
 	    	return true;
 
 	    float x = (float)(legendPos.y - source.y) / m + (float)source.x;
-	    if (x > legendPos.x && x < legendWidth)
+	    if (x >= legendPos.x && x <= legendWidth)
 	    	return true;
 
 	    x = (float)(legendHeight - source.y) / m + (float)source.x;
-	    if (x > legendPos.x && x < legendWidth)
+	    if (x >= legendPos.x && x <= legendWidth)
 	    	return true;
 	    
 	    return false;
@@ -216,6 +219,7 @@ abstract public class FeatureDiagramLayoutManager {
 		
 		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
 		for (final IGraphicalFeature feature : nonHidden) {
+			
 			//Check for overlap on each side of the feature Model
 			Rectangle featureRect = new Rectangle(feature.getLocation().x, feature.getLocation().y,
 												feature.getSize().width(), feature.getSize().height());
@@ -252,7 +256,6 @@ abstract public class FeatureDiagramLayoutManager {
 					
 					if (!bottomRight)
 						bottomRight = checkIntersection(source, target, bottomRightLegend.getLocation(), bottomRightLegend.getSize());
-
 					
 					if (topRight && topLeft && bottomLeft && bottomRight)
 						break;
@@ -260,9 +263,10 @@ abstract public class FeatureDiagramLayoutManager {
 			}
 		}
 		
+		//We don't need to check if we can't find any empty space
 		if (!(topRight && topLeft && bottomLeft && bottomRight)) {
 			for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
-				//Check for overlap on each side of the feature Model
+				//Check for overlap with the constraints
 				Rectangle constraintRect = new Rectangle(constraint.getLocation().x, constraint.getLocation().y,
 													constraint.getSize().width(), constraint.getSize().height());
 				if (!topRight)
@@ -303,242 +307,6 @@ abstract public class FeatureDiagramLayoutManager {
 			return featureModel.getLayout().getLegendPos();
 		}
 	}
-//	
-//	
-//	/**
-//	 * sets the position of the legend
-//	 */
-//	public void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
-//		Point[] featureModelBounds = getFeatureModelBounds(featureModel, showHidden);
-//		final Point min = featureModelBounds[0];
-//		final Point max = featureModelBounds[1];
-//		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
-//		
-//		if (editor == null) {
-//			return;
-//		}
-//		Dimension legendSize = null;
-//		LegendFigure legendFigure = null;
-//		// Find Legend Figure
-//		for (final Object obj : editor.getEditPartRegistry().values()) {
-//			if (obj instanceof LegendEditPart) {
-//				legendFigure = ((LegendEditPart) obj).getFigure();
-//				legendSize = legendFigure.getSize();
-//			}
-//		}
-//		if ((legendSize == null) && (legendFigure == null)) {
-//			return;
-//		}
-//
-//		boolean topRight = true;
-//		boolean topLeft = true;
-//		boolean botLeft = true;
-//		boolean botRight = true;
-//
-//		/*
-//		 * check if features would intersect with the legend on the edges
-//		 */
-//		for (final IGraphicalFeature feature : nonHidden) {
-//			final Point tempLocation = feature.getLocation();
-//			if (null != tempLocation) {
-//				final Dimension tempSize = feature.getSize();
-//				if (tempSize != null) {
-//					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						topRight = false;
-//					}
-//					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						topLeft = false;
-//					}
-//					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						botLeft = false;
-//					}
-//					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						botRight = false;
-//					}
-//				}
-//			}
-//		}
-//    
-//		/*
-//		 * check if constraints would intersect with the legend on the edges
-//		 */
-//		if (topRight || topLeft || botLeft || botRight) {
-//			for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
-//				final Point tempLocation = constraint.getLocation();
-//				if (null == tempLocation) {
-//					continue;
-//				}
-//				final Dimension tempSize = constraint.getSize();
-//				if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//					&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//					topRight = false;
-//				}
-//				if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//					&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//					topLeft = false;
-//				}
-//				if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//					&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//					botLeft = false;
-//				}
-//				if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//					&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//					botRight = false;
-//				}
-//			}
-//		}
-//		
-//
-//		/*
-//		 * set the legend position
-//		 */
-//		if (topRight) {
-//			featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
-//		} else if (topLeft) {
-//			featureModel.getLayout().setLegendPos(min.x, min.y);
-//		} else if (botLeft) {
-//			featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
-//		} else if (botRight) {
-//			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
-//		} else {
-//			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
-//		}
-//	}
-//
-//	/**
-//	 * sets the position of the legend only when intersecting
-//	 */
-//	public Point layoutLegendOnIntersect(IGraphicalFeatureModel featureModel) {
-//		
-//
-//		Point[] featureModelBounds = getFeatureModelBounds(featureModel, showHidden);
-//		final Point min = featureModelBounds[0];
-//		final Point max = featureModelBounds[1];
-//		if (editor == null) {
-//			return null;
-//		}
-//		Dimension legendSize = null;
-//		LegendFigure legendFigure = null;
-//		// Find Legend Figure
-//		for (final Object obj : editor.getEditPartRegistry().values()) {
-//			if (obj instanceof LegendEditPart) {
-//				legendFigure = ((LegendEditPart) obj).getFigure();
-//				legendSize = legendFigure.getSize();
-//			}
-//		}
-//		if ((legendSize == null) && (legendFigure == null)) {
-//			return null;
-//		}
-//
-//		boolean topRight = true;
-//		boolean topLeft = true;
-//		boolean botLeft = true;
-//		boolean botRight = true;
-//
-//		boolean intersects = false;
-//
-//		final Rectangle legend = legendFigure.getBounds();
-//		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
-//		for (final IGraphicalFeature feature : nonHidden) {
-//			final Point tempLocation = feature.getLocation();
-//			if (null != tempLocation) {
-//				final Rectangle featureRect = new Rectangle(tempLocation, feature.getSize());
-//				if (legend.intersects(featureRect)) {
-//					intersects = true;
-//				}
-//			}
-//		}
-//		for (final IGraphicalConstraint consts : featureModel.getVisibleConstraints()) {
-//			final Point tempLocation = consts.getLocation();
-//			if (null != tempLocation) {
-//				final Rectangle featureRect = new Rectangle(tempLocation, consts.getSize());
-//				if (legend.intersects(featureRect)) {
-//					intersects = true;
-//				}
-//			}
-//		}
-//
-//		if (intersects) {
-//			/*
-//			 * check if features would intersect with the legend on the edges
-//			 */
-//			for (final IGraphicalFeature feature : nonHidden) {
-//				final Point tempLocation = feature.getLocation();
-//				if (null != tempLocation) {
-//					final Dimension tempSize = feature.getSize();
-//					if (tempSize != null) {
-//						if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//							topRight = false;
-//						}
-//						if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//							topLeft = false;
-//						}
-//						if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//							botLeft = false;
-//						}
-//						if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//							botRight = false;
-//						}
-//					}
-//				}
-//			}
-//			/*
-//			 * check if constraints would intersect with the legend on the edges
-//			 */
-//			if (topRight || topLeft || botLeft || botRight) {
-//				for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
-//					final Point tempLocation = constraint.getLocation();
-//					if (null == tempLocation) {
-//						continue;
-//					}
-//					final Dimension tempSize = constraint.getSize();
-//					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						topRight = false;
-//					}
-//					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						topLeft = false;
-//					}
-//					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						botLeft = false;
-//					}
-//					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-//						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
-//						botRight = false;
-//					}
-//				}
-//			}
-//
-//			/*
-//			 * set the legend position
-//			 */
-//			if (topRight) {
-//				System.out.println("LLOnIntersect:" + (max.x - legendSize.width) + " " + min.y);
-//				featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
-//			} else if (topLeft) {
-//				featureModel.getLayout().setLegendPos(min.x, min.y);
-//			} else if (botLeft) {
-//				featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
-//			} else if (botRight) {
-//				featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
-//			} else {
-//				featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
-//			}
-//			return featureModel.getLayout().getLegendPos();
-//		} else {
-//			return null;
-//		}
-//	}
 
 	/**
 	 * Stores locations separately to {@link IGraphicalFeature}.
