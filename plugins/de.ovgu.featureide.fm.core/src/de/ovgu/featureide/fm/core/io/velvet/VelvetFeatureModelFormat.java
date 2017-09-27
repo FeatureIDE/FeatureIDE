@@ -1389,4 +1389,9 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "Velvet";
+	}
+
 }

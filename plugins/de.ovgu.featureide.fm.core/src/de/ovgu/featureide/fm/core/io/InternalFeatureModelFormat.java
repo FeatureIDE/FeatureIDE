@@ -149,4 +149,9 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 		return ID;
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE Internal";
+	}
+
 }

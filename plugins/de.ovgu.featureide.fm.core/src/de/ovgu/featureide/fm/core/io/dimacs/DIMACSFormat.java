@@ -144,4 +144,9 @@ public class DIMACSFormat implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "DIMACS";
+	}
+
 }

@@ -85,5 +85,10 @@ public class GuidslFormat implements IFeatureModelFormat {
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
 	}
+
+	@Override
+	public String getName() {
+		return "Guidsl";
+	}
 	
 }

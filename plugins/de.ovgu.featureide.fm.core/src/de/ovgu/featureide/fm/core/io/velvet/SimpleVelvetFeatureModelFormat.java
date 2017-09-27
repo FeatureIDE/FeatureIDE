@@ -782,4 +782,9 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "Simple Velevet";
+	}
+
 }

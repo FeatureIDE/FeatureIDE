@@ -95,4 +95,9 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE";
+	}
+
 }

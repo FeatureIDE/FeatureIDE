@@ -18,58 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.ui.wizards;
+
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 /**
- * Default implementation of {@link IPersistentFormat}.
  * 
  * @author Sebastian Krieter
  */
-public class PersistentFormat<T> implements IPersistentFormat<T> {
+public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
 
-	@Override
-	public String getId() {
-		return "";
-	}
-
-	@Override
-	public ProblemList read(T object, CharSequence source) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String write(T object) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getSuffix() {
-		return "";
-	}
-
-	@Override
-	public String getName() {
-		return "";
-	}
-
-	@Override
-	public IPersistentFormat<T> getInstance() {
-		return this;
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
+	public NewFeatureModelFileLocationPage(String pageName, IStructuredSelection selection) {
+		super(pageName, selection);
+		setTitle("Choose Location");
+		setDescription("Select a path to the new feature model file.");
 	}
 
 }
