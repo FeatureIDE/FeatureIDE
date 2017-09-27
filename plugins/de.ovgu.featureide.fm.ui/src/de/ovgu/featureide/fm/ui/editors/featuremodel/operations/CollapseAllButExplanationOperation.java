@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,20 +35,22 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation for collapsing all features but those affected by the active explanation.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class CollapseAllButExplanationOperation extends AbstractFeatureModelOperation {
+
 	/** The graphical feature model context. */
 	private final IGraphicalFeatureModel fm;
 	/** The currently active explanation. */
 	private final FeatureModelExplanation explanation;
-	
+
 	/** The features that will be collapsed during the operation. */
 	private Set<IGraphicalFeature> collapsedFeatures;
-	
+
 	/**
 	 * Constructs a new instance of this class.
+	 *
 	 * @param fm the feature model context
 	 * @param explanation the currently active explanation
 	 */
@@ -57,41 +59,46 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		this.fm = fm;
 		this.explanation = explanation;
 	}
-	
+
 	/**
 	 * Returns the graphical feature model context.
+	 *
 	 * @return the graphical feature model context
 	 */
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {
 		return fm;
 	}
-	
+
 	/**
 	 * Returns the currently active explanation.
+	 *
 	 * @return the currently active explanation
 	 */
 	public FeatureModelExplanation getExplanation() {
 		return explanation;
 	}
-	
+
 	/**
 	 * Returns the features that will be collapsed during the operation.
+	 *
 	 * @return the features that will be collapsed during the operation
 	 */
 	public Set<IGraphicalFeature> getCollapsedFeatures() {
 		return collapsedFeatures;
 	}
-	
+
 	/**
 	 * Sets the features that will be collapsed during the operation.
+	 *
 	 * @param collapsedFeatures the features that will be collapsed during the operation
 	 */
 	protected void setCollapsedFeatures(Set<IGraphicalFeature> collapsedFeatures) {
 		this.collapsedFeatures = collapsedFeatures;
 	}
-	
+
 	/**
 	 * Creates the set of features that will be collapsed during the operation.
+	 *
 	 * @return the set of features that will be collapsed during the operation
 	 */
 	protected Set<IGraphicalFeature> createCollapsedFeatures() {
@@ -108,9 +115,10 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		}
 		return collapsedFeatures;
 	}
-	
+
 	/**
 	 * Returns all parent features of the given features (not only the direct parents).
+	 *
 	 * @param features features with parents
 	 * @return all parent features of the given features
 	 */
@@ -129,7 +137,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		}
 		return parents;
 	}
-	
+
 	@Override
 	protected FeatureIDEEvent operation() {
 		setCollapsedFeatures(createCollapsedFeatures());
@@ -138,7 +146,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 		}
 		return new FeatureIDEEvent(getExplanation().getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
-	
+
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		for (final IGraphicalFeature collapsedFeature : getCollapsedFeatures()) {

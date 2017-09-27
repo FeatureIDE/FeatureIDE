@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,9 +36,8 @@ import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
- * A wizard page to select the project the user wants to import from. Shows all
- * project in workbench.
- * 
+ * A wizard page to select the project the user wants to import from. Shows all project in workbench.
+ *
  * @author Christoph Giesel
  * @author Sebastian Krieter
  */
@@ -59,25 +58,25 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	public void createControl(Composite parent) {
 		container = new Composite(parent, SWT.NONE);
 
-		FillLayout layout = new FillLayout();
+		final FillLayout layout = new FillLayout();
 		container.setLayout(layout);
 		setControl(container);
 
 		projectTree = new Tree(container, SWT.NORMAL);
 		projectTree.addSelectionListener(this);
 
-		for (IFeatureProject project : CorePlugin.getFeatureProjects()) {
-			//			try {
-			IProject projectHandle = project.getProject();
-			if (projectHandle != null && projectHandle.isAccessible()) { //&& !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
-				TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
+		for (final IFeatureProject project : CorePlugin.getFeatureProjects()) {
+			// try {
+			final IProject projectHandle = project.getProject();
+			if ((projectHandle != null) && projectHandle.isAccessible()) { // && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
+				final TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
 				item.setImage(GUIDefaults.FEATURE_SYMBOL);
 				item.setText(project.getProjectName());
 				item.setData(project);
 			}
-			//			} catch (CoreException e) {
-			//				CorePlugin.getDefault().logError(e);
-			//			}
+			// } catch (CoreException e) {
+			// CorePlugin.getDefault().logError(e);
+			// }
 		}
 	}
 

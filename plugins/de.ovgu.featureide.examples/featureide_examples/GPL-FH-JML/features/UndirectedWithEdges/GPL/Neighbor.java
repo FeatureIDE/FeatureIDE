@@ -10,6 +10,7 @@ public class Neighbor implements NeighborIfc
     public /*@spec_public@*/ Edge   edge;
         
     /*@ensures end == null && edge == null;@*/
+    /*@assignable end, edge; @*/
     public Neighbor( )
     {
         end = null;
@@ -18,6 +19,7 @@ public class Neighbor implements NeighborIfc
         
     /*@requires v != null && e != null;@*/
     /*@ensures end == v && edge == e;@*/ 
+    /*@assignable end, edge; @*/
      public Neighbor( Vertex v,  Edge e )
     {
         end = v;

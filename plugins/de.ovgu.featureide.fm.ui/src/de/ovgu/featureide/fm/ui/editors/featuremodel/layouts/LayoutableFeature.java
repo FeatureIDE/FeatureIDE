@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,18 +31,18 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * A feature representation for layout.
- * 
+ *
  * @author Patrick Sulkowski
  * @author Marcus Pinnecke
  */
-// TODO unused? 
+// TODO unused?
 public class LayoutableFeature {
 
-	private boolean showHidden;
-	private IFeature feature;
-	
+	private final boolean showHidden;
+	private final IFeature feature;
+
 	public LayoutableFeature(IFeatureStructure featureStructure, boolean showHidden) {
-		this (featureStructure.getFeature(), showHidden);
+		this(featureStructure.getFeature(), showHidden);
 	}
 
 	public LayoutableFeature(IFeature feature, boolean showHidden) {
@@ -52,9 +52,9 @@ public class LayoutableFeature {
 
 	public LinkedList<LayoutableFeature> getChildren() {
 
-		LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
+		final LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
 
-		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
+		for (final IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			if (showHidden) {
 				children.add(new LayoutableFeature(child, showHidden));
 			} else {
@@ -69,13 +69,14 @@ public class LayoutableFeature {
 	}
 
 	public LayoutableFeature getFirstChild() {
-		if (getChildren().isEmpty())
+		if (getChildren().isEmpty()) {
 			return null;
+		}
 		return getChildren().get(0);
 	}
 
 	public LayoutableFeature getLastChild() {
-		LinkedList<LayoutableFeature> children = getChildren();
+		final LinkedList<LayoutableFeature> children = getChildren();
 		if (!children.isEmpty()) {
 			return children.getLast();
 		}
@@ -95,7 +96,7 @@ public class LayoutableFeature {
 			return Functional.toList(features);
 		} else {
 			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
-			for (IFeature feature : features) {
+			for (final IFeature feature : features) {
 				if (feature.getStructure().hasHiddenParent()) {
 					newFeatures.add(feature);
 				}
@@ -105,13 +106,15 @@ public class LayoutableFeature {
 	}
 
 	public static boolean isHidden(IFeature feature, boolean showHidden) {
-		if (showHidden)
+		if (showHidden) {
 			return false;
+		}
 		final IFeatureStructure structure = feature.getStructure();
-		if (!structure.isRoot())
+		if (!structure.isRoot()) {
 			return (structure.isHidden() || isHidden(FeatureUtils.getParent(feature), showHidden));
-		else
+		} else {
 			return structure.isHidden();
+		}
 	}
 
 }

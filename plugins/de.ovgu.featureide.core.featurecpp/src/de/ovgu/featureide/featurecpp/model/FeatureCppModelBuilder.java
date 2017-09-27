@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,17 +39,18 @@ import de.ovgu.featureide.featurecpp.FeatureCppCorePlugin;
 
 /**
  * Builds the FSTModel for feature c++ projects
- * 
+ *
  * @author Jens Meinicke
  */
 public class FeatureCppModelBuilder {
-	private FSTModel model;
 
-	private IFeatureProject featureProject;
+	private final FSTModel model;
+
+	private final IFeatureProject featureProject;
 
 	private FSTRole currentRole;
 
-	private IFolder tempFolder;
+	private final IFolder tempFolder;
 
 	public FeatureCppModelBuilder(IFeatureProject featureProject, IFolder tempFolder) {
 		this.tempFolder = tempFolder;
@@ -66,11 +67,11 @@ public class FeatureCppModelBuilder {
 	 * Builds The full FSTModel
 	 */
 	public boolean buildModel() {
-		LinkedList<IFile> infoFiles = getInfoFiles();
+		final LinkedList<IFile> infoFiles = getInfoFiles();
 		if (infoFiles.isEmpty()) {
 			return false;
 		}
-		for (IFile file : infoFiles) {
+		for (final IFile file : infoFiles) {
 			buildModel(file);
 		}
 		addArbitraryFiles();
@@ -79,13 +80,13 @@ public class FeatureCppModelBuilder {
 
 	/**
 	 * adds the informations of this class to the FSTModel
-	 * 
+	 *
 	 * @param file
 	 */
 	private void buildModel(IFile file) {
-		LinkedList<String> infos = getInfo(file);
-		String className = infos.getFirst().split("[;]")[2] + ".h";
-		for (String info : infos) {
+		final LinkedList<String> infos = getInfo(file);
+		final String className = infos.getFirst().split("[;]")[2] + ".h";
+		for (final String info : infos) {
 			final String[] array = info.split("[;]");
 			final String featureName = array[0];
 			final IFile classFile = featureProject.getSourceFolder().getFolder(featureName).getFile(className);
@@ -109,7 +110,7 @@ public class FeatureCppModelBuilder {
 	}
 
 	private LinkedList<String> getParameter(String... array) {
-		LinkedList<String> parameter = new LinkedList<String>();
+		final LinkedList<String> parameter = new LinkedList<String>();
 		for (int i = 8; i < array.length; i++) {
 			parameter.add(array[i]);
 		}
@@ -117,14 +118,14 @@ public class FeatureCppModelBuilder {
 	}
 
 	private LinkedList<String> getInfo(IFile file) {
-		LinkedList<String> informations = new LinkedList<String>();
+		final LinkedList<String> informations = new LinkedList<String>();
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				informations.add(scanner.nextLine());
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		} finally {
 			if (scanner != null) {
@@ -138,35 +139,35 @@ public class FeatureCppModelBuilder {
 	 * @return all info files
 	 */
 	private LinkedList<IFile> getInfoFiles() {
-		LinkedList<IFile> files = new LinkedList<IFile>();
+		final LinkedList<IFile> files = new LinkedList<IFile>();
 		if (!tempFolder.exists()) {
 			return files;
 		}
 		try {
-			for (IResource res : tempFolder.members()) {
+			for (final IResource res : tempFolder.members()) {
 				if (res instanceof IFile) {
 					if (res.getName().endsWith(".info")) {
 						files.add((IFile) res);
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 		return files;
 	}
 
 	private void addArbitraryFiles() {
-		IFolder folder = featureProject.getSourceFolder();
-		for (FSTFeature feature : model.getFeatures()) {
-			IFolder featureFolder = folder.getFolder(feature.getName());
+		final IFolder folder = featureProject.getSourceFolder();
+		for (final FSTFeature feature : model.getFeatures()) {
+			final IFolder featureFolder = folder.getFolder(feature.getName());
 			addArbitraryFiles(featureFolder, feature);
 		}
 	}
 
 	private void addArbitraryFiles(IFolder featureFolder, FSTFeature feature) {
 		try {
-			for (IResource res : featureFolder.members()) {
+			for (final IResource res : featureFolder.members()) {
 				if (res instanceof IFolder) {
 					addArbitraryFiles((IFolder) res, feature);
 				} else if (res instanceof IFile) {
@@ -175,7 +176,7 @@ public class FeatureCppModelBuilder {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureCppCorePlugin.getDefault().logError(e);
 		}
 	}

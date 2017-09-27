@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
- * 
+ *
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class SelectableFeature extends TreeElement {
@@ -65,7 +65,7 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setManual(Selection manual) {
-		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED) {
+		if ((manual == Selection.UNDEFINED) || (automatic == Selection.UNDEFINED)) {
 			this.manual = manual;
 		} else if (manual != automatic) {
 			throw new SelectionNotPossibleException(getName(), manual);
@@ -77,7 +77,7 @@ public class SelectableFeature extends TreeElement {
 	}
 
 	public void setAutomatic(Selection automatic) {
-		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
+		if ((automatic == Selection.UNDEFINED) || (manual == Selection.UNDEFINED) || (manual == automatic)) {
 			this.automatic = automatic;
 		} else {
 			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
@@ -95,6 +95,7 @@ public class SelectableFeature extends TreeElement {
 		return feature;
 	}
 
+	@Override
 	public String toString() {
 		return getName();
 	}

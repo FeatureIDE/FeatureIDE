@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,16 +24,15 @@ import java.util.HashSet;
 
 /**
  * Abstract signature for one class.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AbstractClassSignature extends AbstractSignature {
 
 	protected final String pckg;
 
-	protected final HashSet<String> 
-		importList, extendList, implementList;
-	
+	protected final HashSet<String> importList, extendList, implementList;
+
 	protected AbstractClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
 		super(parent, name, modifiers, type);
 		this.pckg = pckg == null ? "" : pckg;
@@ -48,7 +47,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 	public String getPackage() {
 		return pckg;
 	}
-	
+
 	public HashSet<String> getImportList() {
 		return importList;
 	}
@@ -81,7 +80,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 //		hashCode = hashCodePrime * hashCode + fullName.hashCode();
 //		hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
 //		hashCode = hashCodePrime * hashCode + type.hashCode();
-//		
+//
 //		hashCode *= hashCodePrime;
 //		for (String extend : extendList) {
 //			hashCode += extend.hashCode();
@@ -98,16 +97,16 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 //			return true;
 //		if (obj == null || getClass() != obj.getClass())
 //			return false;
-//		
+//
 //		AbstractClassSignature otherSig = (AbstractClassSignature) obj;
-//		
-//		if (!super.sigEquals(otherSig)) 
+//
+//		if (!super.sigEquals(otherSig))
 //			return false;
 //		if (extendList.size() != otherSig.extendList.size()
 //				|| implementList.size() != otherSig.implementList.size()) {
 //			return false;
 //		}
-//		
+//
 //		for (String thisExtend : extendList) {
 //			if (!otherSig.extendList.contains(thisExtend)) {
 //				return false;

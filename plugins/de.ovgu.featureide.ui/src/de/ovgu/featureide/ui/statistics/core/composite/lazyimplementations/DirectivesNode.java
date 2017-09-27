@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,24 +43,21 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
- * TreeNode who stores the number of used preprocessor directives, directives
- * per class and features per directives.<br>
- * This node should only be used for a preprocessor project.
- * 
+ * TreeNode who stores the number of used preprocessor directives, directives per class and features per directives.<br> This node should only be used for a
+ * preprocessor project.
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class DirectivesNode extends LazyParent {
-	
+
 	private final FSTModel fstModel;
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
-	 * 
-	 * @param description
-	 *            description of the node shown in the view
-	 * @param fstModel
-	 *            FSTModel for the calculation
+	 *
+	 * @param description description of the node shown in the view
+	 * @param fstModel FSTModel for the calculation
 	 */
 	public DirectivesNode(String description, FSTModel fstModel) {
 		super(description);
@@ -69,20 +66,20 @@ public class DirectivesNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		
-		Parent project = new Parent(PROJECT_STATISTICS);
+
+		final Parent project = new Parent(PROJECT_STATISTICS);
 		final Aggregator aggProject = new Aggregator();
 		aggProject.processAll(fstModel);
-		
+
 		// 1.1 Project statistics
 		// 1.1.1 Number of Directives Node
-		Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
+		final Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
 		directives.setValue(aggProject.getDirectiveCount());
 		project.addChild(directives);
-		
+
 		// 1.1.2 Directives per class
-		final Map.Entry<String,Integer> maximumSum = aggProject.getMaximumNumberOfDirectives();
-		final Map.Entry<String,Integer> minimumSum = aggProject.getMinimumNumberOfDirectives();
+		final Map.Entry<String, Integer> maximumSum = aggProject.getMaximumNumberOfDirectives();
+		final Map.Entry<String, Integer> minimumSum = aggProject.getMinimumNumberOfDirectives();
 		final Double averageSum = aggProject.getAverageNumberOfDirectives();
 
 		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
@@ -97,33 +94,36 @@ public class DirectivesNode extends LazyParent {
 		// 1.1.3 Directives per class
 		final Parent featuresPerDirectives = new Parent(FEATURES_PER_DIRECTIVE);
 		project.addChild(featuresPerDirectives);
-		
-		final Map.Entry<String,Integer> maximumNumberOfFeatures = aggProject.getMaxNumberOfFeatures();
-		final Map.Entry<String,Integer> minimumNumberOfFeatures = aggProject.getMinNumberOfFeatures();
+
+		final Map.Entry<String, Integer> maximumNumberOfFeatures = aggProject.getMaxNumberOfFeatures();
+		final Map.Entry<String, Integer> minimumNumberOfFeatures = aggProject.getMinNumberOfFeatures();
 		final Double averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
-		
+
 		// 1.1.3.1 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey()));
+		featuresPerDirectives
+				.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey()));
 		// 1.1.3.2 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey()));
+		featuresPerDirectives
+				.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey()));
 		// 1.1.3.3 Average number of features per directives:
 		featuresPerDirectives.addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, averageNumberOfFeatures));
 
-		final Map.Entry<String,Integer> maxNesting = aggProject.getMaxNesting();
-		// 1.1.4 Maximum nesting of directives: 
+		final Map.Entry<String, Integer> maxNesting = aggProject.getMaxNesting();
+		// 1.1.4 Maximum nesting of directives:
 		project.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES + ": " + maxNesting.getValue() + IN_CLASS + maxNesting.getKey()));
 
 		addChild(project);
-		
+
 		// 1.2 Class Statistics Node
-		Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
+		final Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
+
 			@Override
 			protected void initChildren() {
-				for(FSTClass c : fstModel.getClasses()){
+				for (final FSTClass c : fstModel.getClasses()) {
 					String className = c.getName();
 					final int pIndex = className.lastIndexOf('/');
 					className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
-					Parent p = new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
+					final Parent p = new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
 					p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
 					addChild(p);
 				}

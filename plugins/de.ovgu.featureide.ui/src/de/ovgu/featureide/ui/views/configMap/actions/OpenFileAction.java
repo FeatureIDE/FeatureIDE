@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,21 +41,22 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class OpenFileAction extends Action {
 
 	private IFile file;
-	
-	public OpenFileAction(String text, IFile file){
+
+	public OpenFileAction(String text, IFile file) {
 		super(text);
 		this.file = file;
-	}	
-	
-	public OpenFileAction(String text){
+	}
+
+	public OpenFileAction(String text) {
 		this(text, null);
 	}
-	
-	public void setFile(IFile file){
+
+	public void setFile(IFile file) {
 		this.file = file;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
 	@Override
@@ -63,34 +64,36 @@ public class OpenFileAction extends Action {
 		super.run();
 		try {
 			openEditor(file);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		if (page == null) return;
+		final IWorkbenchPage page = UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		if (page == null) {
+			return;
+		}
 
 		String editorId = "org.eclipse.ui.DefaultTextEditor";
 
-		IEditorDescriptor desc = getDescriptor(file);
-		if (desc != null)
+		final IEditorDescriptor desc = getDescriptor(file);
+		if (desc != null) {
 			editorId = desc.getId();
-		
+		}
+
 		page.openEditor(new FileEditorInput(file), editorId);
 	}
-	
 
-	
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType = null;
-		
-		IContentDescription description = file.getContentDescription();
-		if (description != null)
+
+		final IContentDescription description = file.getContentDescription();
+		if (description != null) {
 			contentType = description.getContentType();
-			
+		}
+
 		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 	}
-	
+
 }

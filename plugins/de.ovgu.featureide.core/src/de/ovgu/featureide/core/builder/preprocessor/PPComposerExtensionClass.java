@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,9 +62,8 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * Abstract class for FeatureIDE preprocessor composer extensions with
- * predefined functions.
- * 
+ * Abstract class for FeatureIDE preprocessor composer extensions with predefined functions.
+ *
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke (Feature Interface)
@@ -79,63 +78,56 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	static final int SAT_TAUTOLOGY = 2;
 	protected static final String MESSAGE_DEAD_CODE = ": This expression is a contradiction and causes a dead code block.";
 	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
-	protected static final String MESSAGE_ABSTRACT = IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
+	protected static final String MESSAGE_ABSTRACT =
+		IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 
 	/** Creates explanations for expressions that are contradictions or tautologies. */
-	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator = PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
+	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator =
+		PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
 
 	/**
-	 * Feature model node generated in {@link #performFullBuild(IFile)} and used
-	 * for expression checking.
+	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
 	 */
 	protected Node featureModel;
 
 	/**
-	 * Preprocessor name used for messages in build markers (must set in
-	 * subclass).
+	 * Preprocessor name used for messages in build markers (must set in subclass).
 	 */
 	protected String pluginName = PREPROCESSOR;
 
 	/**
-	 * List of activated features. List will be generated in
-	 * {@link #prepareFullBuild(IFile)}.
+	 * List of activated features. List will be generated in {@link #prepareFullBuild(IFile)}.
 	 */
 	protected ArrayList<String> activatedFeatures;
 
 	/**
-	 * List of all features from model as ArrayList. List will be generated in
-	 * {@link #prepareFullBuild(IFile)}.
+	 * List of all features from model as ArrayList. List will be generated in {@link #prepareFullBuild(IFile)}.
 	 */
 	protected Collection<String> featureList;
 
 	/**
-	 * Pattern for checking of concrete feature:
-	 * "feature1|feature2|feature3|...".
+	 * Pattern for checking of concrete feature: "feature1|feature2|feature3|...".
 	 */
 	protected Pattern patternIsConcreteFeature;
 
 	/**
-	 * Pattern for checking of abstract feature:
-	 * "feature1|feature2|feature3|...".
+	 * Pattern for checking of abstract feature: "feature1|feature2|feature3|...".
 	 */
 	protected Pattern patternIsAbstractFeature;
 
 	/**
-	 * Node Reader for parsing expressions in preprocessor annotations to check
-	 * for tautologies and contradictions.
+	 * Node Reader for parsing expressions in preprocessor annotations to check for tautologies and contradictions.
 	 */
 	protected NodeReader nodereader = new NodeReader();
 
 	/**
-	 * Stack for preprocessor directives (for nested expressions). Have to be
-	 * initialized in subclass.
+	 * Stack for preprocessor directives (for nested expressions). Have to be initialized in subclass.
 	 */
 	protected Stack<Node> expressionStack;
 
 	/**
-	 * Stack for count of "if" and "else" instructions for each level. Have to
-	 * be initialized in subclass.
+	 * Stack for count of "if" and "else" instructions for each level. Have to be initialized in subclass.
 	 */
 	protected Stack<Integer> ifelseCountStack;
 
@@ -153,13 +145,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Initializes class fields. Should called at start of
-	 * {@link #performFullBuild(IFile)}.
-	 * 
-	 * @param config
-	 *            Path to the activated configuration file.
-	 * @return Return <code>false</code> if configuration file does not exists
-	 *         or its feature list is empty.
+	 * Initializes class fields. Should called at start of {@link #performFullBuild(IFile)}.
+	 *
+	 * @param config Path to the activated configuration file.
+	 * @return Return <code>false</code> if configuration file does not exists or its feature list is empty.
 	 */
 	public boolean prepareFullBuild(IFile config) {
 		usedFeatures.clear();
@@ -167,18 +156,19 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if (config != null) {
 			final String configPath = config.getRawLocation().toOSString();
 
-			if (configPath == null)
+			if (configPath == null) {
 				return false;
+			}
 
 			// // read activated features from configuration
 			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
 
 		}
 		// get all concrete and abstract features and generate pattern
-		StringBuilder concreteFeatures = new StringBuilder();
-		StringBuilder abstractFeatures = new StringBuilder();
-		IFeatureModel fm = featureProject.getFeatureModel();
-		for (IFeature feature : fm.getFeatures()) {
+		final StringBuilder concreteFeatures = new StringBuilder();
+		final StringBuilder abstractFeatures = new StringBuilder();
+		final IFeatureModel fm = featureProject.getFeatureModel();
+		for (final IFeature feature : fm.getFeatures()) {
 			if (feature.getStructure().isConcrete()) {
 				concreteFeatures.append(feature.getName());
 				concreteFeatures.append("|");
@@ -188,10 +178,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			}
 		}
 		// checking if there are any abstract features
-		if (abstractFeatures.length() > 0)
+		if (abstractFeatures.length() > 0) {
 			patternIsAbstractFeature = Pattern.compile(abstractFeatures.substring(0, abstractFeatures.length() - 1));
-		if (concreteFeatures.length() > 0)
+		}
+		if (concreteFeatures.length() > 0) {
 			patternIsConcreteFeature = Pattern.compile(concreteFeatures.substring(0, concreteFeatures.length() - 1));
+		}
 
 		// create expression of feature model
 		featureModel = AdvancedNodeCreator.createNodes(fm);
@@ -202,9 +194,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Checks the expression on top of the expression stack for a contradiction or a tautology.
-	 * Does not set any markers.
-	 * 
+	 * Checks the expression on top of the expression stack for a contradiction or a tautology. Does not set any markers.
+	 *
 	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
 	 */
 	protected int isContradictionOrTautology() {
@@ -213,13 +204,13 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		Node nestedExpressions = null;
 		if (expressionStack.size() > 1) {
 			Node[] children = expressionStack.toArray(new Node[expressionStack.size()]);
-			children = Arrays.copyOfRange(children, 0, children.length - 1); //Exclude the topmost expression because it is examined separately.
+			children = Arrays.copyOfRange(children, 0, children.length - 1); // Exclude the topmost expression because it is examined separately.
 			nestedExpressions = new And(children);
 		}
 
 		try {
 			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 			return SAT_NONE;
 		}
@@ -239,11 +230,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 
 		/*
-		 *   TAUT(FM & nestedExpressions => expression)
-		 * = -SAT(-(FM & nestedExpressions => expression))
-		 * = -SAT(-(-(FM & nestedExpressions) | expression))
-		 * = -SAT(-(-FM | -nestedExpressions | expression))
-		 * = -SAT(FM & nestedExpressions & -expression)
+		 * TAUT(FM & nestedExpressions => expression) = -SAT(-(FM & nestedExpressions => expression)) = -SAT(-(-(FM & nestedExpressions) | expression)) =
+		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
 		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
 			return SAT_TAUTOLOGY;
@@ -254,22 +242,19 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * Set marker for tautology or contradiction on given line in given file.
-	 * 
-	 * @param status
-	 *            expects {@link #SAT_CONTRADICTION} or {@link #SAT_TAUTOLOGY}.
-	 * @param lineNumber
-	 *            number of line
-	 * @param res
-	 *            file path
+	 *
+	 * @param status expects {@link #SAT_CONTRADICTION} or {@link #SAT_TAUTOLOGY}.
+	 * @param lineNumber number of line
+	 * @param res file path
 	 */
 	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
-		if (status != SAT_CONTRADICTION && status != SAT_TAUTOLOGY) {
+		if ((status != SAT_CONTRADICTION) && (status != SAT_TAUTOLOGY)) {
 			return;
 		}
 		String message = pluginName;
 		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
 		final InvariantExpressionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
-		if (explanation != null && explanation.getReasons() != null && !explanation.getReasons().isEmpty()) {
+		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 			message += String.format("%n%s", explanation);
 		}
 		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
@@ -277,27 +262,24 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * Returns an explanation for why the expression currently on top of the expression stack is a contradiction or a tautology.
+	 *
 	 * @param tautology true if the expression to explain is a tautology; false if it is a contradiction
 	 * @return an explanation
 	 */
 	private InvariantExpressionExplanation getInvariantExpressionExplanation(boolean tautology) {
 		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
 		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
-		Collections.reverse(reverseExpressionStack); //Iteration order of Stack is from bottom to top instead of top to bottom.
+		Collections.reverse(reverseExpressionStack); // Iteration order of Stack is from bottom to top instead of top to bottom.
 		invariantExpressionExplanationCreator.setExpressionStack(reverseExpressionStack);
 		invariantExpressionExplanationCreator.setTautology(tautology);
 		return invariantExpressionExplanationCreator.getExplanation();
 	}
 
 	/**
-	 * <p>
-	 * Checks whether the expression in the given line is a tautology or a contradiction.
-	 * If so, a marker is added to the given line.
-	 * </p>
-	 * 
-	 * <p>
-	 * It is assumed that the expression to check is on top of the expression stack.
-	 * </p>
+	 * <p> Checks whether the expression in the given line is a tautology or a contradiction. If so, a marker is added to the given line. </p>
+	 *
+	 * <p> It is assumed that the expression to check is on top of the expression stack. </p>
+	 *
 	 * @param lineNumber line number of the expression
 	 * @param res file containing the expression
 	 */
@@ -311,7 +293,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if (ppExpression instanceof Literal) {
 			usedFeatures.add(((Literal) ppExpression).var.toString());
 		} else {
-			for (Node child : ppExpression.getChildren()) {
+			for (final Node child : ppExpression.getChildren()) {
 				findLiterals(child);
 			}
 		}
@@ -319,23 +301,22 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * Set marker if given feature does not exists or is abstract.
-	 * 
-	 * @param name
-	 *            feature name
-	 * @param lineNumber
-	 *            current line number
-	 * @param res
-	 *            file containing the feature name
+	 *
+	 * @param name feature name
+	 * @param lineNumber current line number
+	 * @param res file containing the feature name
 	 */
 	protected boolean setMarkersOnNotExistingOrAbstractFeature(String name, int lineNumber, IFile res) {
-		if (name == null)
+		if (name == null) {
 			return false;
+		}
 
 		Matcher matcherFeature = null;
-		if (patternIsAbstractFeature != null)
+		if (patternIsAbstractFeature != null) {
 			matcherFeature = patternIsAbstractFeature.matcher(name);
+		}
 
-		if (matcherFeature != null && matcherFeature.matches()) {
+		if ((matcherFeature != null) && matcherFeature.matches()) {
 			featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_ABSTRACT, lineNumber, IMarker.SEVERITY_WARNING);
 		} else {
 			Matcher matcherConreteFeature = null;
@@ -343,7 +324,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				matcherConreteFeature = patternIsConcreteFeature.matcher(name);
 			}
 
-			if (matcherConreteFeature != null && !matcherConreteFeature.matches()) {
+			if ((matcherConreteFeature != null) && !matcherConreteFeature.matches()) {
 				featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_NOT_DEFINED, lineNumber, IMarker.SEVERITY_WARNING);
 				return false;
 			}
@@ -353,13 +334,12 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * Read all lines of a file into a vector.
-	 * 
-	 * @param res
-	 *            file path
+	 *
+	 * @param res file path
 	 * @return lines of the given file
 	 */
 	public static Vector<String> loadStringsFromFile(IFile res) {
-		Vector<String> lines = new Vector<String>();
+		final Vector<String> lines = new Vector<String>();
 
 		Scanner scanner = null;
 		try {
@@ -368,28 +348,29 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			while (scanner.hasNext()) {
 				lines.add(scanner.nextLine());
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		} finally {
-			if (scanner != null)
+			if (scanner != null) {
 				scanner.close();
+			}
 		}
 		return lines;
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void deleteAllPreprocessorAnotationMarkers() {
 		try {
-			IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() : featureProject.getBuildFolder();
-			IMarker[] markers = sourceFolder.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_INFINITE);
-			for (IMarker marker : markers) {
+			final IFolder sourceFolder = featureProject.getComposer().hasFeatureFolder() ? featureProject.getSourceFolder() : featureProject.getBuildFolder();
+			final IMarker[] markers = sourceFolder.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_INFINITE);
+			for (final IMarker marker : markers) {
 				if (isPreprocessorAnotationMarker(marker)) {
 					marker.delete();
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
@@ -400,23 +381,22 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @throws CoreException
 	 */
 	private boolean isPreprocessorAnotationMarker(IMarker marker) throws CoreException {
-		String message = marker.getAttribute(IMarker.MESSAGE, "");
-		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE) || message.contains(MESSAGE_NOT_DEFINED)) {
+		final String message = marker.getAttribute(IMarker.MESSAGE, "");
+		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE)
+			|| message.contains(MESSAGE_NOT_DEFINED)) {
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Creates following markers at the Feature Model:<br>
-	 * -A Feature is never used in a preprocessor annotation<br>
-	 * -A used Feature does not exist at the Feature Model<br>
-	 * -A used Feature is abstract
+	 * Creates following markers at the Feature Model:<br> -A Feature is never used in a preprocessor annotation<br> -A used Feature does not exist at the
+	 * Feature Model<br> -A used Feature is abstract
 	 */
 	protected void setModelMarkers() {
 		removeModelMarkers();
-		LinkedList<String> features = new LinkedList<>(usedFeatures);
-		for (IFeature f : featureProject.getFeatureModel().getFeatures()) {
+		final LinkedList<String> features = new LinkedList<>(usedFeatures);
+		for (final IFeature f : featureProject.getFeatureModel().getFeatures()) {
 			if (f.getStructure().isAbstract() && features.contains(f.getName())) {
 				features.remove(f.getName());
 				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");
@@ -426,7 +406,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				features.remove(f.getName());
 			}
 		}
-		for (String f : features) {
+		for (final String f : features) {
 			createMarker("You should create a Feature named \"" + f + "\".");
 		}
 	}
@@ -437,50 +417,51 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	private void removeModelMarkers() {
 		try {
 			featureProject.getModelFile().deleteMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Creates a marker with the given message at the feature model.
-	 * 
+	 *
 	 * @param message
 	 */
 	private void createMarker(String message) {
 		try {
 			if (!hasMarker(message)) {
-				IMarker marker = featureProject.getModelFile().createMarker(FEATURE_MODULE_MARKER);
+				final IMarker marker = featureProject.getModelFile().createMarker(FEATURE_MODULE_MARKER);
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 				marker.setAttribute(IMarker.LINE_NUMBER, -1);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Tests if the marker with the given message already exists.
-	 * 
+	 *
 	 * @param message
 	 * @return
 	 */
 	private boolean hasMarker(String message) {
 		try {
-			for (IMarker m : featureProject.getModelFile().findMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO)) {
+			for (final IMarker m : featureProject.getModelFile().findMarkers(FEATURE_MODULE_MARKER, false, IResource.DEPTH_ZERO)) {
 				if (m.getAttribute(IMarker.MESSAGE, "").equals(message)) {
 					return true;
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Further processing after the files are preprocessed. 
+	 * Further processing after the files are preprocessed.
+	 *
 	 * @param folder The folder containing the preprocessed files
 	 */
 	public void postProcess(IFolder folder) {}

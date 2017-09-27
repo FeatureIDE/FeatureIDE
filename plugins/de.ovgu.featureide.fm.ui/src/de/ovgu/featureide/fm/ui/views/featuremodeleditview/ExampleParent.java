@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,16 +40,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * Calculates an example for added or removed products.
- * 
+ *
  * @author Thomas Thuem
  */
 public class ExampleParent extends TreeParent implements GUIDefaults {
 
-	private ModelComparator c;
+	private final ModelComparator c;
 
-	private boolean added;
+	private final boolean added;
 
-	private int number;
+	private final int number;
 
 	private Configuration example;
 
@@ -60,12 +60,13 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 		this.number = number;
 		this.example = example;
 
-		if (number == 1)
+		if (number == 1) {
 			name = added ? ADDED_PRODUCTS : REMOVED_PRODUCTS;
+		}
 		if (c.getResult() == Comparison.ERROR) {
 			image = IMAGE_UNDEFINED;
 		} else {
-			String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? MINUS : ZERO;
+			final String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? MINUS : ZERO;
 			lazy = !ZERO.equals(imageName);
 
 			image = PLUS.equals(imageName) ? PLUS_IMAGE : MINUS.equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
@@ -81,16 +82,16 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 			if (example == null) {
 				addChild(NONE);
 			} else {
-				SelectableFeature root = example.getRoot();
+				final SelectableFeature root = example.getRoot();
 				root.setName(PRODUCT + number);
 				addChild(root);
 
-				Configuration example = c.calculateExample(added);
+				final Configuration example = c.calculateExample(added);
 				if (example != null) {
 					addChild(new ExampleParent(added, c, number + 1, example));
 				}
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			addChild(TIMEOUT_STRING);
 		}
 	}

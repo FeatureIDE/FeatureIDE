@@ -12,11 +12,13 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof Metrics)
+			if (obj instanceof Metrics) {
 				return ((Metrics) obj).getName();
+			}
 		case 1:
-			if (obj instanceof Metrics)
+			if (obj instanceof Metrics) {
 				return ((Metrics) obj).getValue();
+			}
 		default:
 			return "";
 		}

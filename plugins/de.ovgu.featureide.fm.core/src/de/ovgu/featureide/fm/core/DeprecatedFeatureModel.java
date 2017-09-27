@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,34 +36,33 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Contains all deprecated functionality of {@link IFeatureModel}.
- * 
+ *
  * @author Jens Meinicke
  */
 abstract class DeprecatedFeatureModel {
-	
-    public abstract FeatureModelAnalyzer getAnalyser();
-	
-    public abstract IFeatureModelLayout getLayout();
-    
+
+	public abstract FeatureModelAnalyzer getAnalyser();
+
+	public abstract IFeatureModelLayout getLayout();
+
 	public abstract RenamingsManager getRenamingsManager();
-	
+
 	abstract FMComposerManager getFMComposerManager(final IProject project);
-    
-    /**
-     * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead. 
-     */
+
+	/**
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#analyzeFeatureModel()} instead.
+	 */
 	@Deprecated
 	public HashMap<Object, Object> analyzeFeatureModel() {
-	    return getAnalyser().analyzeFeatureModel(null);
+		return getAnalyser().analyzeFeatureModel(null);
 	}
-	
 
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#isValid()} instead.
 	 */
 	@Deprecated
 	public boolean isValid() throws TimeoutException {
-	    return getAnalyser().isValid();
+		return getAnalyser().isValid();
 	}
 
 	/**
@@ -71,7 +70,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean checkImplies(Set<IFeature> a, Set<IFeature> b) throws TimeoutException {
-	    	return getAnalyser().checkImplies(a, b);
+		return getAnalyser().checkImplies(a, b);
 	}
 
 	/**
@@ -79,24 +78,22 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean checkCondition(Node condition) {
-	    	return getAnalyser().checkCondition(condition);
+		return getAnalyser().checkCondition(condition);
 	}
 
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean areMutualExclusive(Set<IFeature> context,
-			List<Set<IFeature>> featureSets) throws TimeoutException {
-	    	return getAnalyser().areMutualExclusive(context, featureSets);
+	public boolean areMutualExclusive(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
+		return getAnalyser().areMutualExclusive(context, featureSets);
 	}
 
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean mayBeMissing(Set<IFeature> context,
-			List<Set<IFeature>> featureSets) throws TimeoutException {
+	public boolean mayBeMissing(Set<IFeature> context, List<Set<IFeature>> featureSets) throws TimeoutException {
 		return getAnalyser().mayBeMissing(context, featureSets);
 	}
 
@@ -105,7 +102,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean exists(Set<IFeature> features) throws TimeoutException {
-	    	return getAnalyser().exists(features);
+		return getAnalyser().exists(features);
 	}
 
 	/**
@@ -113,7 +110,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public Node conjunct(Set<IFeature> b) {
-	    	return getAnalyser().conjunct(b);
+		return getAnalyser().conjunct(b);
 	}
 
 	/**
@@ -121,7 +118,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countConcreteFeatures() {
-	    return getAnalyser().countConcreteFeatures();
+		return getAnalyser().countConcreteFeatures();
 	}
 
 	/**
@@ -129,7 +126,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countHiddenFeatures() {
-	    return getAnalyser().countHiddenFeatures();
+		return getAnalyser().countHiddenFeatures();
 	}
 
 	/**
@@ -137,16 +134,15 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int countTerminalFeatures() {
-	    return getAnalyser().countTerminalFeatures();
+		return getAnalyser().countTerminalFeatures();
 	}
 
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#commonFeatures(long, Object...)} instead.
 	 */
 	@Deprecated
-	public LinkedList<String> commonFeatures(long timeout,
-			Object... selectedFeatures) {
-	    	return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
+	public LinkedList<String> commonFeatures(long timeout, Object... selectedFeatures) {
+		return new LinkedList<String>(getAnalyser().commonFeatures(timeout, selectedFeatures));
 	}
 
 	/**
@@ -156,6 +152,7 @@ abstract class DeprecatedFeatureModel {
 	public LinkedList<IFeature> getDeadFeatures() {
 		return new LinkedList<IFeature>(getAnalyser().getDeadFeatures());
 	}
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
 	 */
@@ -232,12 +229,12 @@ abstract class DeprecatedFeatureModel {
 	public void verticalLayout(boolean b) {
 //	    getLayout().verticalLayout(b);
 	}
-	
+
 	@Deprecated
 	public boolean hasDead() {
 		return getDeadFeatures().size() > 0;
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#setLayout(int)} instead.
 	 */
@@ -254,7 +251,7 @@ abstract class DeprecatedFeatureModel {
 //	    return getLayout().getLayoutAlgorithm();
 		return 0;
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#getOldName(String)} instead.
 	 */
@@ -286,7 +283,7 @@ abstract class DeprecatedFeatureModel {
 	public void performRenamings() {
 		getRenamingsManager().performRenamings();
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#isRenamed()} instead.
 	 */
@@ -294,7 +291,7 @@ abstract class DeprecatedFeatureModel {
 	public boolean isRenamed() {
 		return getRenamingsManager().isRenamed();
 	}
-	
+
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link RenamingsManager#performRenamings(IFile)} instead.
 	 */
@@ -335,11 +332,9 @@ abstract class DeprecatedFeatureModel {
 		return getAnalyser().valid();
 	}
 
-
 	/**
-	 * @deprecated Will be removed in a future release. 
-	 * Use {@link FeatureModelAnalyzer#getCachedFalseOptionalFeatures()} instead.
-	 * Or use {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
+	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedFalseOptionalFeatures()} instead. Or use
+	 *             {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
 	 */
 	@Deprecated
 	public LinkedList<IFeature> getFalseOptionalFeatures() {

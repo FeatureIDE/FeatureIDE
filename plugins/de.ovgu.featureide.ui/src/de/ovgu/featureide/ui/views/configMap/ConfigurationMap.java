@@ -82,15 +82,15 @@ import de.ovgu.featureide.ui.views.configMap.header.CustomTableHeader;
 import de.ovgu.featureide.ui.views.configMap.header.ICustomTableHeaderSelectionListener;
 
 /**
- * The ConfigurationMap is an overview of all configurations
- * of a feature project. It shows which features of the current
- * project are used in which configurations.
+ * The ConfigurationMap is an overview of all configurations of a feature project. It shows which features of the current project are used in which
+ * configurations.
  *
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 
 public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSelectionListener, IEventListener {
+
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.configMap";
 
 	private int featureColumnWidth, defaultColumnWidth;
@@ -131,6 +131,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 
 	public ConfigurationMap() {
 		final IConfigurationLoaderCallback configLoaderCallback = new IConfigurationLoaderCallback() {
+
 			@Override
 			public void onLoadingStarted() {
 				// clear all old columns because new configurations are going to be loaded
@@ -175,8 +176,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			}
 
 			@Override
-			public void onLoadingError(IOException exception) {
-			}
+			public void onLoadingError(IOException exception) {}
 
 		};
 
@@ -197,8 +197,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	/**
-	 * If you want to add filters to the view, do it here.
-	 * The gui elements will be created automatically.
+	 * If you want to add filters to the view, do it here. The gui elements will be created automatically.
 	 */
 	private void createFilters() {
 		getFilters().add(new CoreFeatureFilter(true));
@@ -262,13 +261,12 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		// init
 		final IWorkbenchPage page = getSite().getPage();
 		partListener = new IPartListener() {
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-			}
 
 			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-			}
+			public void partOpened(IWorkbenchPart part) {}
+
+			@Override
+			public void partDeactivated(IWorkbenchPart part) {}
 
 			@Override
 			public void partClosed(IWorkbenchPart part) {
@@ -303,6 +301,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		setEditor(page.getActiveEditor());
 
 		CorePlugin.getDefault().addConfigurationChangedListener(new IConfigurationChangedListener() {
+
 			@Override
 			public void configurationChanged(IFeatureProject featureProject) {
 				refresh();
@@ -374,6 +373,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+
 			@Override
 			public void menuAboutToShow(IMenuManager m) {
 				fillContextMenu(m);
@@ -387,6 +387,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 		final MenuManager headerMenu = new MenuManager("#HeaderPopup");
 		headerMenu.setRemoveAllWhenShown(true);
 		headerMenu.addMenuListener(new IMenuListener() {
+
 			@Override
 			public void menuAboutToShow(IMenuManager m) {
 				fillHeaderMenu(m);
@@ -421,7 +422,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 			return;
 		}
 		featuresColumn.setWidth(featureColumnWidth);
-		
+
 		// Callback will handle creating columns
 		configurations = loader.loadConfigurations(featureProject.getFeatureModel(), featureProject.getConfigPath());
 		// update header
@@ -505,8 +506,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	}
 
 	@Override
-	public void setFocus() {
-	}
+	public void setFocus() {}
 
 	protected CustomTableHeader getHeader() {
 		return header;
@@ -542,16 +542,19 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 				if (newInput instanceof FileEditorInput) {
 					final IFile projectFile = ((FileEditorInput) newInput).getFile();
 					final IFeatureProject newProject = CorePlugin.getFeatureProject(projectFile);
-					if (newProject != null && !newProject.equals(featureProject)) {
+					if ((newProject != null) && !newProject.equals(featureProject)) {
 						setFeatureProject(newProject);
 						isNew = true;
 					}
 				}
-				Object[] expandedElements = tree.getExpandedElements();
+				final Object[] expandedElements = tree.getExpandedElements();
 				tree.setInput(newInput);
 				updateTree();
-				if (expandedElements.length > 0 && !isNew) tree.setExpandedElements(expandedElements);
-				else tree.expandAll();
+				if ((expandedElements.length > 0) && !isNew) {
+					tree.setExpandedElements(expandedElements);
+				} else {
+					tree.expandAll();
+				}
 			}
 		}
 

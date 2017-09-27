@@ -20,6 +20,7 @@ public class PayCard {
     
     /*@
       @ ensures \result.limit==100;
+      @ assignable \nothing;
       @*/
     public static PayCard createJuniorCard() {
 	return new PayCard(100);
@@ -38,6 +39,7 @@ public class PayCard {
       @
       @     requires amount + balance >= limit || isValid() == false;
       @     ensures \result == false;
+      @		assignable \nothing;
       @ |}
       @ 	
       @ also

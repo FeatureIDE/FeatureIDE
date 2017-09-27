@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,9 +31,9 @@ import org.eclipse.swt.events.MouseWheelListener;
 
 /**
  * The mouse listener performs actions depending on mouse input including scrolling and zooming
- * 
+ *
  * The default state mask is 0x0
- * 
+ *
  * @author Enis Belli
  * @author Joshua Sprey
  */
@@ -53,7 +53,7 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 	}
 
 	public FeatureDiagramEditorMouseHandler(Action mouseWheelUpAction, Action mouseWheelDownAtion, int stateMask) {
-		this.mouseWheelDownAction = mouseWheelDownAtion;
+		mouseWheelDownAction = mouseWheelDownAtion;
 		this.mouseWheelUpAction = mouseWheelUpAction;
 		this.stateMask = stateMask;
 	}
@@ -70,11 +70,11 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 			@Override
 			public void mouseMove(MouseEvent e) {
 				// Perform drag scrolling when middle mouse button is pressed
-				Point currentMousePosition = new Point(e.x, e.y);
-				Dimension difference = currentMousePosition.getDifference(positionAtClick);
-				int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
-				int yPosition = figureCanvas.getViewport().getViewLocation().y - difference.height;
-				//Don´t change this. The two seprate commands are necessary to prevent lag in huge feature models
+				final Point currentMousePosition = new Point(e.x, e.y);
+				final Dimension difference = currentMousePosition.getDifference(positionAtClick);
+				final int xPosition = figureCanvas.getViewport().getViewLocation().x - difference.width;
+				final int yPosition = figureCanvas.getViewport().getViewLocation().y - difference.height;
+				// Don´t change this. The two seprate commands are necessary to prevent lag in huge feature models
 				figureCanvas.scrollToX(xPosition);
 				figureCanvas.scrollToY(yPosition);
 				positionAtClick = new Point(e.x, e.y);
@@ -86,25 +86,24 @@ public class FeatureDiagramEditorMouseHandler implements MouseWheelListener, Mou
 	@Override
 	public void mouseScrolled(MouseEvent e) {
 		// Perform actions when set
-		if (mouseWheelUpAction != null || mouseWheelDownAction != null) {
-			if (e.stateMask == stateMask && e.count > 0) {
+		if ((mouseWheelUpAction != null) || (mouseWheelDownAction != null)) {
+			if ((e.stateMask == stateMask) && (e.count > 0)) {
 				mouseWheelUpAction.run();
-			} else if (e.stateMask == stateMask && e.count < 0) {
+			} else if ((e.stateMask == stateMask) && (e.count < 0)) {
 				mouseWheelDownAction.run();
 			}
 			// Perform horizontal scroll when Shift is pressed while scrolling
-		} else if (mouseWheelDownAction == null && mouseWheelUpAction == null && figureCanvas != null && figureCanvas.getViewport() != null) {
-			if (e.stateMask == stateMask && e.count > 0) {
+		} else if ((mouseWheelDownAction == null) && (mouseWheelUpAction == null) && (figureCanvas != null) && (figureCanvas.getViewport() != null)) {
+			if ((e.stateMask == stateMask) && (e.count > 0)) {
 				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x + 200, figureCanvas.getViewport().getViewLocation().y);
-			} else if (e.stateMask == stateMask && e.count < 0) {
+			} else if ((e.stateMask == stateMask) && (e.count < 0)) {
 				figureCanvas.scrollTo(figureCanvas.getViewport().getViewLocation().x - 200, figureCanvas.getViewport().getViewLocation().y);
 			}
 		}
 	}
 
 	@Override
-	public void mouseDoubleClick(MouseEvent e) {
-	}
+	public void mouseDoubleClick(MouseEvent e) {}
 
 	@Override
 	public void mouseDown(MouseEvent e) {

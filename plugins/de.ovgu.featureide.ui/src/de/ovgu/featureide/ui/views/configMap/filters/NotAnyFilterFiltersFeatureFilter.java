@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,15 +28,15 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 import de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter;
 
 /**
- * A Filter that only allows Features, that aren't allowed by any of the given
- * Filters.
- * 
+ * A Filter that only allows Features, that aren't allowed by any of the given Filters.
+ *
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  */
 public class NotAnyFilterFiltersFeatureFilter extends ConfigurationMapFilter {
-	private List<IConfigurationMapFilter> filters;
-	
+
+	private final List<IConfigurationMapFilter> filters;
+
 	/**
 	 * @param name
 	 * @param isDefault
@@ -46,28 +46,33 @@ public class NotAnyFilterFiltersFeatureFilter extends ConfigurationMapFilter {
 		this.filters = filters;
 		setImagePath(Image_Empty);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter#initialize(de.ovgu.featureide.ui.views.configMap.ConfigurationMap)
 	 */
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
 		super.initialize(configurationMap);
-		for (IConfigurationMapFilter filter : filters)
+		for (final IConfigurationMapFilter filter : filters) {
 			filter.initialize(configurationMap);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap, de.ovgu.featureide.fm.core.base.IFeature)
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.views.configMap.IConfigurationMapFilter#test(de.ovgu.featureide.ui.views.configMap.ConfigurationMap,
+	 * de.ovgu.featureide.fm.core.base.IFeature)
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		for (IConfigurationMapFilter filter : filters) {
-			if (filter.test(configurationMap, feature))
+		for (final IConfigurationMapFilter filter : filters) {
+			if (filter.test(configurationMap, feature)) {
 				return false;
+			}
 		}
-		
+
 		return true;
 	}
-	
+
 }

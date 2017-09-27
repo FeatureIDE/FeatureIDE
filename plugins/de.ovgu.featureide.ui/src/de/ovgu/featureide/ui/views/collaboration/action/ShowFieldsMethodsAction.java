@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.views.collaboration.action;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
@@ -28,9 +29,8 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 
 /**
- * Collaboration diagram context menu option
- * Filter methods and fields of roles
- * 
+ * Collaboration diagram context menu option Filter methods and fields of roles
+ *
  * @author Steffen Schulze
  * @author Christian Lausberger
  */
@@ -59,13 +59,13 @@ public class ShowFieldsMethodsAction extends Action {
 
 	// Custom action with checkbox
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index) {
-		this(text, image, collaborationView, index, Action.AS_CHECK_BOX);
+		this(text, image, collaborationView, index, IAction.AS_CHECK_BOX);
 	}
 
 	// Custom action with style
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index, int style) {
 		super(text, style);
-		this.setImageDescriptor(getImageDiscriptor(image));
+		setImageDescriptor(getImageDiscriptor(image));
 		this.collaborationView = collaborationView;
 		this.index = index;
 	}
@@ -94,8 +94,9 @@ public class ShowFieldsMethodsAction extends Action {
 		return selected;
 	}
 
+	@Override
 	public void run() {
-		boolean[] selected = RoleFigure.getSelectedFieldMethod();
+		final boolean[] selected = RoleFigure.getSelectedFieldMethod();
 		switch (index) {
 		case SELECT_ALL:
 			setSelected(true, selected);
@@ -135,13 +136,14 @@ public class ShowFieldsMethodsAction extends Action {
 		collaborationView.reloadImage();
 		collaborationView.refresh();
 
-		if (index == SELECT_ALL || index == DESELECT_ALL)
+		if ((index == SELECT_ALL) || (index == DESELECT_ALL)) {
 			collaborationView.selectAll();
+		}
 	}
 
 	private void setSelected(boolean value, boolean[] selected) {
 		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
-			if (i != HIDE_PARAMETERS_AND_TYPES && i != ONLY_CONTRACTS && i != ONLY_INVARIANTS) {
+			if ((i != HIDE_PARAMETERS_AND_TYPES) && (i != ONLY_CONTRACTS) && (i != ONLY_INVARIANTS)) {
 				selected[i] = value;
 			}
 		}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.editing.cnf.ICNFSolver;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CFeatureRemover23 extends AFeatureRemover {
@@ -101,14 +101,14 @@ public class CFeatureRemover23 extends AFeatureRemover {
 
 	@Override
 	protected void preRedundancyCheck(DeprecatedFeature nextFeature) {
-		if (first && nextFeature.getClauseCount() > 0) {
+		if (first && (nextFeature.getClauseCount() > 0)) {
 			final String s = heuristic.size() + ": " + nextFeature.getFeature() + " | Removing Old Rel: " + relevantClauseList.size();
 			System.err.print(s);
 			first = false;
 			Collections.sort(relevantClauseList, lengthComparator);
 
 			addNewClauses(nextFeature);
-			CNFSolver solver = new CNFSolver(newClauseList, featureNameArray.length - 1);
+			final CNFSolver solver = new CNFSolver(newClauseList, featureNameArray.length - 1);
 
 			// SAT Relevant
 			for (int i = relevantPosIndex - 1; i >= 0; --i) {
@@ -123,7 +123,7 @@ public class CFeatureRemover23 extends AFeatureRemover {
 
 			relevantPosIndex = relevantClauseList.size();
 			relevantNegIndex = relevantClauseList.size();
-			
+
 			System.err.println(" Done.");
 		}
 	}
@@ -131,7 +131,7 @@ public class CFeatureRemover23 extends AFeatureRemover {
 	@Override
 	protected void prepareHeuristics() {
 		heuristic = new MinimumClauseHeuristic(map, features.size());
-		//		heuristic = new StaticMinimumClauseHeuristic(map, features.size());
+		// heuristic = new StaticMinimumClauseHeuristic(map, features.size());
 		first = true;
 		newSolver = new CNFSolver(newClauseList, featureNameArray.length - 1);
 	}

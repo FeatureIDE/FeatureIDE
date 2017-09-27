@@ -6,6 +6,7 @@ public class Account {
 	
 	/*@
 	 @ ensures balance == 0;
+	 @ assignable balance;
 	 @*/
 	Account() {
 	}
@@ -13,6 +14,7 @@ public class Account {
 	/*@
 	 @ ensures (!\result ==> balance == \old(balance)) 
 	 @   && (\result ==> balance == \old(balance) + x); 
+	 @ assignable balance;
 	 @*/
 	boolean update(int x) {
 		int newBalance = balance + x;
@@ -25,6 +27,7 @@ public class Account {
 	/*@
 	 @  ensures (!\result ==> balance == \old(balance)) 
 	 @   && (\result ==> balance == \old(balance) - x);
+	 @ assignable balance;
 	 @*/
 	boolean undoUpdate(int x) {
 		int newBalance = balance - x;

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
 
 /**
  * Command to move the feature model legend using drag and drop
- * 
+ *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
@@ -48,7 +48,7 @@ public class LegendDragAndDropCommand extends Command {
 
 	private final IGraphicalFeatureModel model;
 	private final LegendEditPart legendEditPart;
-	private Point newLocation;
+	private final Point newLocation;
 
 	public LegendDragAndDropCommand(IGraphicalFeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
 		this.legendEditPart = legendEditPart;
@@ -60,21 +60,21 @@ public class LegendDragAndDropCommand extends Command {
 
 	/**
 	 * Checks whether the movement is valid.
-	 * 
-	 * @returns
-	 *          {@code false} if the legend overlaps with a feature or constraint, {@code true} otherwise
+	 *
+	 * @returns {@code false} if the legend overlaps with a feature or constraint, {@code true} otherwise
 	 */
+	@Override
 	public boolean canExecute() {
-		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
+		final Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
-		for (IGraphicalFeature f : model.getVisibleFeatures()) {
+		for (final IGraphicalFeature f : model.getVisibleFeatures()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}
 
 			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
-			for (ConnectionEditPart connectionEditPart : connectionList) {
+			for (final ConnectionEditPart connectionEditPart : connectionList) {
 				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
 					return false;
 				}
@@ -82,7 +82,7 @@ public class LegendDragAndDropCommand extends Command {
 		}
 
 		// check if legend intersects with a constraint
-		for (IGraphicalConstraint c : model.getConstraints()) {
+		for (final IGraphicalConstraint c : model.getConstraints()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
 				return false;
 			}
@@ -91,20 +91,21 @@ public class LegendDragAndDropCommand extends Command {
 		return true;
 	}
 
+	@Override
 	public void execute() {
-		final LegendFigure legendFigure = (LegendFigure) legendEditPart.getFigure();
+		final LegendFigure legendFigure = legendEditPart.getFigure();
 
 		if (legendFigure.getLocation().equals(newLocation)) {
 			return;
 		}
 
-		LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
-		//TODO _interfaces Removed Code
+		final LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
+		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) model.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}

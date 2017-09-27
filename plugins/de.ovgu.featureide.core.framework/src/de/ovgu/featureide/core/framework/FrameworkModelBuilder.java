@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -71,7 +71,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 
 /**
  * Class for building FSTModel
- * 
+ *
  * @author Daniel Hohmann
  */
 public class FrameworkModelBuilder {
@@ -89,17 +89,14 @@ public class FrameworkModelBuilder {
 		if (model == null) {
 			model = new FSTModel(featureProject);
 		}
-		//		featureProject.setFSTModel(model);
+		// featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
 
 	/**
-	 * Will build model depending on <code>info.xml</code> inside feature folders<br>
-	 * <ul>
-	 * <li>May take a moment
-	 * <li>Only referenced interfaces inside <code>info.xml</code> will be noted
-	 * </ul>
-	 * 
+	 * Will build model depending on <code>info.xml</code> inside feature folders<br> <ul> <li>May take a moment <li>Only referenced interfaces inside
+	 * <code>info.xml</code> will be noted </ul>
+	 *
 	 * @throws CoreException
 	 */
 	public void buildModel() throws CoreException {
@@ -123,7 +120,7 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * builds model depending on collected information
-	 * 
+	 *
 	 * @param featureMap
 	 */
 	private void buildModel(Map<String, Map<String, List<String>>> featureMap) {
@@ -164,7 +161,7 @@ public class FrameworkModelBuilder {
 			interfaceVisitor = new MyASTVisitor(true);
 			interfaceUnit.accept(interfaceVisitor);
 		} catch (final IOException e) {
-			//Interface not found
+			// Interface not found
 			FrameworkCorePlugin.getDefault().logWarning(e.getMessage());
 			return;
 		}
@@ -206,6 +203,7 @@ public class FrameworkModelBuilder {
 
 				final boolean isRefinement = calculateRefinement(parameterTypes, interfaceVisitor.getMethodSignature(m));
 				final FSTMethod met = new FSTMethod(m.getElementName(), parameterTypes, Signature.toString(m.getReturnType()), getModifiers(m)) {
+
 					/**
 					 * Returns true, if method is from interface or abstract class
 					 */
@@ -229,7 +227,7 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * Calculates highlighting.
-	 * 
+	 *
 	 * @param parameterTypes
 	 * @param methodSignature
 	 * @return
@@ -279,7 +277,7 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * Gives you the java file inside the given location
-	 * 
+	 *
 	 * @param feature
 	 * @param implementingClass
 	 * @return class file as {@link IFile}
@@ -314,7 +312,7 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * Reads the info.xml file inside a jar
-	 * 
+	 *
 	 * @param info - info.xml file inside a jar
 	 * @return Map with name of interfaces and implementing classes
 	 */
@@ -361,7 +359,7 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * Iterates over a file and turns its content into a string
-	 * 
+	 *
 	 * @param classFile
 	 * @return null, if classFile is {@code null}
 	 * @throws IOException
@@ -388,12 +386,13 @@ public class FrameworkModelBuilder {
 	}
 
 	/**
-	 * 
+	 *
 	 * ASTVisitor iterating over java file
-	 * 
+	 *
 	 * @author Daniel Hohmann
 	 */
 	private class MyASTVisitor extends ASTVisitor {
+
 		Map<String, Block> methods;
 		Map<String, Integer> fields;
 		Map<String, List<String>> interfaceMethods;
@@ -408,7 +407,7 @@ public class FrameworkModelBuilder {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param b - {@code true}, if visitor iterates over interface
 		 */
 		MyASTVisitor(boolean b) {
@@ -419,11 +418,8 @@ public class FrameworkModelBuilder {
 		}
 
 		/**
-		 * Visit methods depending on ast node structure
-		 * <ul>
-		 * <li>if structure is java structure, it will save body of method
-		 * <li>if structure is interface structure, it will save parameters
-		 * </ul>
+		 * Visit methods depending on ast node structure <ul> <li>if structure is java structure, it will save body of method <li>if structure is interface
+		 * structure, it will save parameters </ul>
 		 */
 		@Override
 		public boolean visit(MethodDeclaration node) {
@@ -456,7 +452,7 @@ public class FrameworkModelBuilder {
 
 		/**
 		 * Getter for data for specified method
-		 * 
+		 *
 		 * @param m - method
 		 * @return block of method
 		 */
@@ -466,7 +462,7 @@ public class FrameworkModelBuilder {
 
 		/**
 		 * Getter for data for specified field
-		 * 
+		 *
 		 * @param f - field
 		 * @return line number as {@code Integer}
 		 */
@@ -476,7 +472,7 @@ public class FrameworkModelBuilder {
 
 		/**
 		 * Getter for method signature for method with same name
-		 * 
+		 *
 		 * @param m
 		 * @return
 		 */

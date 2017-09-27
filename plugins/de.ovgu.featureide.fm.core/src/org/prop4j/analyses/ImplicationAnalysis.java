@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,12 +33,12 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
-	private List<int[]> pairs;
+	private final List<int[]> pairs;
 
 	public ImplicationAnalysis(SatInstance satInstance, List<int[]> pairs) {
 		super(satInstance);
@@ -50,6 +50,7 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 		this.pairs = pairs;
 	}
 
+	@Override
 	public List<int[]> analyze(IMonitor monitor) throws Exception {
 		final List<int[]> resultList = new ArrayList<>();
 
@@ -62,32 +63,32 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 
 		monitor.checkCancel();
-		int[] model1 = solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		if (model1 != null) {
 			solutionList.add(model1);
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 
 			monitor.checkCancel();
-			int[] model2 = solver.findModel();
+			final int[] model2 = solver.findModel();
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
-			if (model1.length - countNegative(model1) < countNegative(model2)) {
+			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
 				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 			}
 
-			pairLoop: for (int[] pair : pairs) {
+			pairLoop: for (final int[] pair : pairs) {
 				monitor.checkCancel();
-				solutionLoop: for (int[] is : solutionList) {
-					for (int i : pair) {
+				solutionLoop: for (final int[] is : solutionList) {
+					for (final int i : pair) {
 						if (is[Math.abs(i) - 1] == i) {
 							continue solutionLoop;
 						}
 					}
 					continue pairLoop;
 				}
-				for (int i : pair) {
+				for (final int i : pair) {
 					solver.assignmentPush(-i);
 				}
 				switch (solver.isSatisfiable()) {

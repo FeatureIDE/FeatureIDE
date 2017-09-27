@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,18 +44,17 @@ import de.ovgu.featureide.fm.core.Preferences;
 public class FeatureIDEPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private static final SelectionListener completionSelectionListener = new SelectionListener() {
+
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Preferences.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
 		}
 
 		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
+		public void widgetDefaultSelected(SelectionEvent e) {}
 	};
 
-	public FeatureIDEPreferencePage() {
-	}
+	public FeatureIDEPreferencePage() {}
 
 	public FeatureIDEPreferencePage(String title) {
 		super(title);
@@ -66,19 +65,17 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 	}
 
 	@Override
-	public void init(IWorkbench workbench) {
-	}
+	public void init(IWorkbench workbench) {}
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
+		final Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 
 		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
 		completionGroup.setText(CONFIGURATION_COLORING);
 		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
-		completionGroup
-				.setToolTipText(THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_);
+		completionGroup.setToolTipText(THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_);
 		final Button noneButton = new Button(completionGroup, SWT.RADIO);
 		final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
 		final Button contradictionButton = new Button(completionGroup, SWT.RADIO);

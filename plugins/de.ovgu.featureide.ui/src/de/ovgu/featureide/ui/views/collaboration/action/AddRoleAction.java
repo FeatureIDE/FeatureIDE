@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,25 +40,27 @@ import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 
 /**
  * Add a role to the CollaborationDiagramm.
- * 
+ *
  * @author Constanze Adler
  * @author Stephan Besecke
  * @author Jens Meinicke
  */
 public class AddRoleAction extends Action {
-	private GraphicalViewerImpl viewer;
-	private CollaborationView collaborationView;
+
+	private final GraphicalViewerImpl viewer;
+	private final CollaborationView collaborationView;
 
 	public AddRoleAction(String text, GraphicalViewerImpl view, CollaborationView collcaborationView) {
 		super(text);
 		viewer = view;
-		this.collaborationView = collcaborationView;
+		collaborationView = collcaborationView;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 
+	@Override
 	public void run() {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
-		Object selectedItem = selection.getFirstElement();
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		final Object selectedItem = selection.getFirstElement();
 
 		String feature = getFeatureName();
 		String clss = "";
@@ -71,10 +73,12 @@ public class AddRoleAction extends Action {
 				feature = ((RoleEditPart) selectedItem).getRoleModel().getFeature().getName();
 				clss = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getName();
 				pack = ((RoleEditPart) selectedItem).getRoleModel().getClassFragment().getPackage();
-				if (clss.contains("."))
+				if (clss.contains(".")) {
 					clss = clss.substring(0, clss.lastIndexOf('.'));
-				if (clss.contains("/"))
+				}
+				if (clss.contains("/")) {
 					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
+				}
 			} else if (selectedItem instanceof ClassEditPart) {
 				clss = ((ClassEditPart) selectedItem).getClassModel().getName();
 				pack = ((ClassEditPart) selectedItem).getClassModel().getName().replace("/", ".");
@@ -84,17 +88,19 @@ public class AddRoleAction extends Action {
 				} else {
 					pack = "";
 				}
-				if (clss.contains("."))
+				if (clss.contains(".")) {
 					clss = clss.substring(0, clss.lastIndexOf('.'));
-				if (clss.contains("/"))
+				}
+				if (clss.contains("/")) {
 					clss = clss.substring(clss.lastIndexOf("/") + 1, clss.length());
+				}
 			}
 		}
 
-		NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
+		final NewFeatureIDEFileWizard wizard = new NewFeatureIDEFileWizard();
 		wizard.init(PlatformUI.getWorkbench(), selection, feature, clss, pack);
 
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+		final WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
 	}
@@ -105,34 +111,35 @@ public class AddRoleAction extends Action {
 	private String getFeatureName() {
 		String feature = "";
 
-		List<?> list = viewer.getContents().getChildren();
-		int cursorY = collaborationView.getCursorPosition().y;
+		final List<?> list = viewer.getContents().getChildren();
+		final int cursorY = collaborationView.getCursorPosition().y;
 
-		for (Object object : list) {
+		for (final Object object : list) {
 			if (object instanceof CollaborationEditPart) {
-				CollaborationFigure collFigure = ((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
+				final CollaborationFigure collFigure = ((UnderlayerFigure) ((CollaborationEditPart) object).getFigure()).getCollaborationFigure();
 
-				if (collFigure.isConfiguration)
+				if (collFigure.isConfiguration) {
 					continue;
+				}
 
-				int index = list.indexOf(object);
+				final int index = list.indexOf(object);
 
-				int min = collFigure.getBounds().y - 4;
+				final int min = collFigure.getBounds().y - 4;
 				int max = collFigure.getBounds().y + collFigure.getBounds().height + 4;
 
-				if (list.size() > index + 1) {
-					Object edit = list.get(index + 1);
+				if (list.size() > (index + 1)) {
+					final Object edit = list.get(index + 1);
 					if (edit instanceof CollaborationEditPart) {
 
-						CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
+						final CollaborationFigure nextCollFigure = ((UnderlayerFigure) ((CollaborationEditPart) edit).getFigure()).getCollaborationFigure();
 
 						max = nextCollFigure.getBounds().y - 4;
 					} else if (edit instanceof ClassEditPart) {
-						ClassFigure nextCollFigure = ((ClassFigure) ((ClassEditPart) edit).getFigure());
+						final ClassFigure nextCollFigure = ((ClassFigure) ((ClassEditPart) edit).getFigure());
 						max = nextCollFigure.getBounds().height - 4;
 					}
 				}
-				if (cursorY >= min && cursorY <= max) {
+				if ((cursorY >= min) && (cursorY <= max)) {
 					feature = ((CollaborationEditPart) object).getCollaborationModel().getName();
 					break;
 				}

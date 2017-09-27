@@ -8,17 +8,19 @@ import org.eclipse.ui.PlatformUI;
 
 import br.ufal.ic.colligens.util.InvalidProductViewLog;
 
-class ViewLabelProvider extends LabelProvider implements ITableLabelProvider{
+class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 	@Override
 	public String getColumnText(Object obj, int index) {
 		switch (index) {
 		case 0:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getProductName();
+			}
 		case 1:
-			if (obj instanceof InvalidProductViewLog)
+			if (obj instanceof InvalidProductViewLog) {
 				return ((InvalidProductViewLog) obj).getRelativePath();
+			}
 		default:
 			return "";
 		}
@@ -28,11 +30,9 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider{
 	public Image getColumnImage(Object obj, int index) {
 		switch (index) {
 		case 0:
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 		case 1:
-			return PlatformUI.getWorkbench().getSharedImages()
-					.getImage(ISharedImages.IMG_OBJ_FOLDER);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
 		default:
 			return null;
 		}

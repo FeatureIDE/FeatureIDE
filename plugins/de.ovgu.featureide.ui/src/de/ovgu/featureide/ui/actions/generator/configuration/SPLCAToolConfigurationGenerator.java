@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -53,7 +53,7 @@ import splar.core.fm.FeatureModelException;
 
 /**
  * Generates T-wise configurations using SPLATool.
- * 
+ *
  * @author Jens Meinicke
  */
 @SuppressWarnings("restriction")
@@ -83,10 +83,10 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 				URL url = BundleUtility.find(UIPlugin.getDefault().getBundle(), "lib/cover.exe");
 				try {
 					url = FileLocator.toFileURL(url);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					UIPlugin.getDefault().logError(e);
 				}
-				Path path = new Path(url.getFile());
+				final Path path = new Path(url.getFile());
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
@@ -101,10 +101,11 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		} catch (final Exception e) {
 			final Display display = Display.getDefault();
 			display.syncExec(new Runnable() {
+
 				@Override
 				public void run() {
-					final String errorMessage = algorithm + " experienced an error during its execution.\n" + (casa
-							? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
+					final String errorMessage = algorithm + " experienced an error during its execution.\n"
+						+ (casa ? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
 					new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
 							new String[] { OK }, 0).open();
 				}
@@ -115,7 +116,7 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 		List<List<String>> solutions = Collections.emptyList();
 		try {
 			solutions = removeDuplicates(ca);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			UIPlugin.getDefault().logWarning("Problems occurred during the execution of " + algorithm);
 		}
 		builder.configurationNumber = solutions.size();
@@ -129,11 +130,8 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * The result of the generator can:<br>
-	 * a) contain duplicate solutions<br>
-	 * b) duplicate solutions that differ only by the selection of abstract
-	 * features
-	 * 
+	 * The result of the generator can:<br> a) contain duplicate solutions<br> b) duplicate solutions that differ only by the selection of abstract features
+	 *
 	 * @return Duplicate free solutions
 	 */
 	private List<List<String>> removeDuplicates(final CoveringArray ca) {
@@ -144,9 +142,9 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 			final List<String> convertedSolution = new ArrayList<>();
 			for (final Integer i : solution) {
 				if (i > 0) {
-					String id = ca.getId(i);
+					final String id = ca.getId(i);
 					final IFeature feature = featureModel.getFeature(id);
-					if (feature != null && feature.getStructure().isConcrete()) {
+					if ((feature != null) && feature.getStructure().isConcrete()) {
 						convertedSolution.add(feature.getName());
 					}
 				}

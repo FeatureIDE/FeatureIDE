@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -114,9 +114,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraint
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 
 /**
- * A simple editor for propositional constraints written below the feature
- * diagram.
- * 
+ * A simple editor for propositional constraints written below the feature diagram.
+ *
  * @author Christian Becker
  * @author Thomas Thuem
  * @author David Broneske
@@ -126,20 +125,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOp
 public class ConstraintDialog implements GUIDefaults {
 
 	/**
-	 * The dialogs current state which correspond to the current validation
-	 * process. Because some validation tests will take a long time span to be
-	 * finished, the dialog has three states.
-	 * 
-	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this
-	 * state everything is okay and the constraint is valid.
-	 * 
-	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there
-	 * are syntax errors for the constraint text or the validation process has
-	 * finished with an error found.
-	 * 
-	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not
-	 * recommended. However, some tests are running in this case.
-	 * 
+	 * The dialogs current state which correspond to the current validation process. Because some validation tests will take a long time span to be finished,
+	 * the dialog has three states.
+	 *
+	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this state everything is okay and the constraint is valid.
+	 *
+	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there are syntax errors for the constraint text or the validation process has finished
+	 * with an error found.
+	 *
+	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not recommended. However, some tests are running in this case.
+	 *
 	 * @author Marcus Pinnecke
 	 */
 	private enum DialogState {
@@ -147,16 +142,15 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * This is the panel on the top of the dialog. It contains the current
-	 * heading as well as a current state description.
-	 * 
+	 * This is the panel on the top of the dialog. It contains the current heading as well as a current state description.
+	 *
 	 * @author Marcus Pinnecke
 	 */
 	public static class HeaderPanel {
 
 		/**
 		 * Image types for description inside header panel {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
-		 * 
+		 *
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
@@ -174,39 +168,34 @@ public class ConstraintDialog implements GUIDefaults {
 
 		/**
 		 * The actual image of the headers description label
-		 * 
+		 *
 		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
 		 */
-		private Label headerDescriptionImageLabel;
+		private final Label headerDescriptionImageLabel;
 
 		/**
-		 * Brief text what's the current mode for the dialog. This is more or
-		 * less a visualization of EDITING or "creating" mode of this dialog.
+		 * Brief text what's the current mode for the dialog. This is more or less a visualization of EDITING or "creating" mode of this dialog.
 		 */
-		private Label headerLabel;
+		private final Label headerLabel;
 
 		/**
-		 * Area which contains useful information about current progresses. It
-		 * contains e.g. a list of dead features if any exists.
+		 * Area which contains useful information about current progresses. It contains e.g. a list of dead features if any exists.
 		 */
-		private Text detailsLabel;
+		private final Text detailsLabel;
 
 		/**
 		 * The composite to be used for placing the GUI elements
 		 */
-		private Composite headComposite;
+		private final Composite headComposite;
 
 		/**
-		 * Constructs a new header panel to the shell. This panel contains a
-		 * header text ({@link #setHeader(String)}), a details text ( {@link #setDetails(String)}).
-		 * 
-		 * By default a short info about possibilities with this dialog is
-		 * display as details and that a new constraint will be created now.
-		 * This should be altered with the methods above depending on the
-		 * current state.
-		 * 
-		 * @param shell
-		 *            Shell to use
+		 * Constructs a new header panel to the shell. This panel contains a header text ({@link #setHeader(String)}), a details text (
+		 * {@link #setDetails(String)}).
+		 *
+		 * By default a short info about possibilities with this dialog is display as details and that a new constraint will be created now. This should be
+		 * altered with the methods above depending on the current state.
+		 *
+		 * @param shell Shell to use
 		 */
 		public HeaderPanel(Shell shell) {
 			headComposite = new Composite(shell, SWT.NONE);
@@ -216,7 +205,7 @@ public class ConstraintDialog implements GUIDefaults {
 			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 			headComposite.setLayoutData(gridData);
 
-			GridLayout headLayout = new GridLayout();
+			final GridLayout headLayout = new GridLayout();
 			headLayout.numColumns = 2;
 			headLayout.marginBottom = 7;
 			headLayout.marginLeft = 10;
@@ -228,14 +217,14 @@ public class ConstraintDialog implements GUIDefaults {
 			headerDescriptionImageLabel.setImage(null);
 
 			headerLabel = new Label(headComposite, SWT.NONE);
-			FontData fontData = headerLabel.getFont().getFontData()[0];
-			Font fontActionLabel = new Font(shell.getDisplay(), new FontData(fontData.getName(), 12, SWT.BOLD));
+			final FontData fontData = headerLabel.getFont().getFontData()[0];
+			final Font fontActionLabel = new Font(shell.getDisplay(), new FontData(fontData.getName(), 12, SWT.BOLD));
 			headerLabel.setFont(fontActionLabel);
 			headerLabel.setText(STRING_HEADER_LABEL_DEFAULT);
 
 			new Label(headComposite, SWT.NONE); // adds an invisible separator
-												// to align details text field
-												// correctly
+												 // to align details text field
+												 // correctly
 
 			detailsLabel = new Text(headComposite, SWT.WRAP | SWT.V_SCROLL);
 			gridData = new GridData(GridData.FILL_BOTH);
@@ -262,14 +251,12 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 
 		/**
-		 * Set the details for this panel. This text should explain more in
-		 * details what is going on or should provide useful hints or an error
-		 * message. It can contain e.g. the list of dead features.
-		 * 
+		 * Set the details for this panel. This text should explain more in details what is going on or should provide useful hints or an error message. It can
+		 * contain e.g. the list of dead features.
+		 *
 		 * To set the header panels text, consider to use {@link #setHeader(String)}
-		 * 
-		 * @param text
-		 *            Text to display
+		 *
+		 * @param text Text to display
 		 */
 		public void setDetails(String text, HeaderDescriptionImage image) {
 			detailsLabel.setText(text);
@@ -277,14 +264,12 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 
 		/**
-		 * Sets the header text for this panel. This text should highlight the
-		 * current dialogs state, e.g. editing an existing constraint. More
-		 * information should be displayed in the details text are.
-		 * 
+		 * Sets the header text for this panel. This text should highlight the current dialogs state, e.g. editing an existing constraint. More information
+		 * should be displayed in the details text are.
+		 *
 		 * {@link ConstraintDialog.HeaderPanel#setDetails(String)}
-		 * 
-		 * @param text
-		 *            Text to display
+		 *
+		 * @param text Text to display
 		 */
 		public void setHeader(String text) {
 			headerLabel.setText(text.trim());
@@ -292,11 +277,10 @@ public class ConstraintDialog implements GUIDefaults {
 
 		/**
 		 * Set current image for the details text.
-		 * 
+		 *
 		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage} {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
-		 * 
-		 * @param image
-		 *            The image to set
+		 *
+		 * @param image The image to set
 		 */
 		private void setImage(HeaderDescriptionImage image) {
 			switch (image) {
@@ -316,9 +300,8 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint
-	 * should be edited and "CREATE" otherwise
-	 * 
+	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint should be edited and "CREATE" otherwise
+	 *
 	 * @author Marcus Pinnecke
 	 */
 	public enum Mode {
@@ -389,14 +372,12 @@ public class ConstraintDialog implements GUIDefaults {
 	private static final String FILTERTEXT = TYPE_FILTER_TEXT;
 
 	/**
-	 * The panel on the top of this dialog showing useful information and
-	 * details.
+	 * The panel on the top of this dialog showing useful information and details.
 	 */
 	private HeaderPanel headerPanel;
 
 	/**
-	 * An object which contains several validation functionalities used in this
-	 * dialog to check if a given constraint text is valid.
+	 * An object which contains several validation functionalities used in this dialog to check if a given constraint text is valid.
 	 */
 	private static final ConstraintTextValidator VALIDATOR = new ConstraintTextValidator();
 
@@ -410,10 +391,10 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private Button okButton;
 
-	private IConstraint constraint;
+	private final IConstraint constraint;
 	private String defaultDetailsText;
 
 	private String defaultHeaderText;
@@ -437,7 +418,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when a validation test is just started.
 	 */
-	private IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
@@ -450,7 +432,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for VOIDS_MODEL has completed.
 	 */
-	private IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -462,7 +445,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for FALSE_OPTIONAL has completed.
 	 */
-	private IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -474,7 +458,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for DEAD_FEATURES has completed.
 	 */
-	private IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -486,7 +471,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for REDUNDANT_CHECK has completed.
 	 */
-	private IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -498,7 +484,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test has finished.
 	 */
-	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CHECK_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE),
@@ -510,7 +497,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for "tautology" has completed.
 	 */
-	private IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -522,7 +510,8 @@ public class ConstraintDialog implements GUIDefaults {
 	/**
 	 * Called when the validation test for SATISFIABLE_TEST has completed.
 	 */
-	private IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
+	private final IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
+
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
@@ -533,7 +522,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
 		this.constraint = constraint;
-		this.featureModel = featuremodel;
+		featureModel = featuremodel;
 
 		if (constraint == null) {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
@@ -561,23 +550,22 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setSelection(constraintText.getCharCount());
 		shell.open();
 
-		if (constraint != null)
+		if (constraint != null) {
 			validate();
+		}
 
 		updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 	}
 
 	/**
-	 * Depending on the current editing mode of this dialog the OK button text
-	 * will be altered.
+	 * Depending on the current editing mode of this dialog the OK button text will be altered.
 	 */
 	private void autoSetOkButtonText() {
 		okButton.setText(String.format(StringTable.OK_BUTTON_TEXT, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE)));
 	}
 
 	/**
-	 * Logic for pressing cancel-button. This method is called when pressing ESC
-	 * or hit the cancel button.
+	 * Logic for pressing cancel-button. This method is called when pressing ESC or hit the cancel button.
 	 */
 	private void cancelButtonPressEvent() {
 		VALIDATOR.cancelValidation();
@@ -586,7 +574,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * closes the shell and adds new constraint to the feature model if possible
-	 * 
+	 *
 	 * @param featureModel
 	 * @param constraint
 	 */
@@ -596,8 +584,8 @@ public class ConstraintDialog implements GUIDefaults {
 		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		AbstractOperation op = null;
-		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			for (IConstraint c : featureModel.getConstraints()) {
+		if ((constraint != null) && featureModel.getConstraints().contains(constraint)) {
+			for (final IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
 					op = new EditConstraintOperation(featureModel, c, propNode);
 					break;
@@ -609,7 +597,7 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 
@@ -618,43 +606,45 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Initializes the bottom part of the dialog
-	 * 
+	 *
 	 * @param featuremodel
 	 * @param constraint
 	 */
 	private void initBottom(final IFeatureModel featuremodel, final IConstraint constraint) {
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
-		Composite lastComposite = new Composite(shell, SWT.NONE);
+		final Composite lastComposite = new Composite(shell, SWT.NONE);
 		lastComposite.setLayoutData(gridData);
 
-		FormLayout lastCompositeLayout = new FormLayout();
+		final FormLayout lastCompositeLayout = new FormLayout();
 		lastCompositeLayout.marginHeight = 5;
 		lastCompositeLayout.marginTop = 85;
 		lastCompositeLayout.marginWidth = 5;
 		lastComposite.setLayout(lastCompositeLayout);
-		ToolBar helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
-		ToolItem helpButton = new ToolItem(helpButtonBar, SWT.NONE);
+		final ToolBar helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
+		final ToolItem helpButton = new ToolItem(helpButtonBar, SWT.NONE);
 		helpButton.setImage(HELP_IMAGE);
 		helpButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				Program.launch(StringTable.HREF_HELP_LINK);
 			}
 		});
-		FormData formDataHelp = new FormData();
+		final FormData formDataHelp = new FormData();
 		formDataHelp.left = new FormAttachment(0, 5);
 		helpButtonBar.setLayoutData(formDataHelp);
 
 		cancelButton = new Button(lastComposite, SWT.NONE);
 		cancelButton.setText(CANCEL);
-		FormData formDataCancel = new FormData();
+		final FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
 		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
 
 		okButton = new Button(lastComposite, SWT.NONE);
 		autoSetOkButtonText();
-		FormData formDataOk = new FormData();
+		final FormData formDataOk = new FormData();
 		formDataOk.width = 120;
 		formDataOk.right = new FormAttachment(cancelButton, -5);
 		formDataOk.bottom = new FormAttachment(100, -5);
@@ -665,6 +655,8 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setTabList(new Control[] { featureGroup, buttonGroup, constraintTextComposite, lastComposite });
 
 		cancelButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 
 				cancelButtonPressEvent();
@@ -674,6 +666,8 @@ public class ConstraintDialog implements GUIDefaults {
 		lastComposite.setTabList(new Control[] { okButton, cancelButton });
 
 		okButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
+			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 
 				okButtonPressEvent();
@@ -692,7 +686,7 @@ public class ConstraintDialog implements GUIDefaults {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
 		buttonGroup.setLayoutData(gridData);
-		GridLayout buttonGroupLayout = new GridLayout();
+		final GridLayout buttonGroupLayout = new GridLayout();
 		buttonGroupLayout.numColumns = 7;
 		buttonGroup.setLayout(buttonGroupLayout);
 
@@ -703,6 +697,8 @@ public class ConstraintDialog implements GUIDefaults {
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			button.setLayoutData(gridData);
 			button.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
+				@Override
 				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 					constraintText.copyIn(button.getText().toLowerCase(Locale.ENGLISH));
 				}
@@ -716,25 +712,26 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private void initConstraintText() {
 		constraintTextComposite = new Composite(shell, SWT.NONE);
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		constraintTextComposite.setLayoutData(gridData);
-		FormLayout constraintTextLayout = new FormLayout();
+		final FormLayout constraintTextLayout = new FormLayout();
 		constraintTextComposite.setLayout(constraintTextLayout);
 		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER, Operator.NAMES);
 
 		setupContentProposal();
 
-		FormData formDataConstraintText = new FormData();
+		final FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
-		//formDataConstraintText.height = 50;
+		// formDataConstraintText.height = 50;
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
 		constraintText.setPossibleWords(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (constraintText.getText().trim().isEmpty()) {
@@ -750,7 +747,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Initializes the group containing the searchText and featureTable.
-	 * 
+	 *
 	 * @param featuremodel
 	 */
 	private void initFeatureGroup(final IFeatureModel featuremodel) {
@@ -760,7 +757,7 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		featureGroup.setLayoutData(gridData);
-		GridLayout featureGroupLayout = new GridLayout();
+		final GridLayout featureGroupLayout = new GridLayout();
 		featureGroupLayout.numColumns = 1;
 		featureGroup.setLayout(featureGroupLayout);
 
@@ -771,7 +768,7 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		searchFeatureText.setLayoutData(gridData);
 
-		Composite tableComposite = new Composite(featureGroup, SWT.NONE);
+		final Composite tableComposite = new Composite(featureGroup, SWT.NONE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
@@ -780,8 +777,8 @@ public class ConstraintDialog implements GUIDefaults {
 		final TableViewer featureTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		featureTable = featureTableViewer.getTable();
 		featureTableViewer.setContentProvider(new ArrayContentProvider());
-		TableViewerColumn viewerNameColumn = new TableViewerColumn(featureTableViewer, SWT.NONE);
-		TableColumnLayout tableColumnLayout = new TableColumnLayout();
+		final TableViewerColumn viewerNameColumn = new TableViewerColumn(featureTableViewer, SWT.NONE);
+		final TableColumnLayout tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
 		tableColumnLayout.setColumnData(viewerNameColumn.getColumn(), new ColumnWeightData(100, 100, false));
 
@@ -796,6 +793,7 @@ public class ConstraintDialog implements GUIDefaults {
 		});
 
 		viewerNameColumn.setLabelProvider(new CellLabelProvider() {
+
 			@Override
 			public void update(ViewerCell cell) {
 				cell.setText(((IFeature) cell.getElement()).getName());
@@ -808,7 +806,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (!FILTERTEXT.equalsIgnoreCase(searchFeatureText.getText())) {
-					ViewerFilter searchFilter = new ViewerFilter() {
+					final ViewerFilter searchFilter = new ViewerFilter() {
 
 						@Override
 						public boolean select(Viewer viewer, Object parentElement, Object element) {
@@ -854,14 +852,15 @@ public class ConstraintDialog implements GUIDefaults {
 		featureTable.setLayoutData(gridData);
 
 		featureTable.addListener(SWT.MouseDoubleClick, new Listener() {
+
 			@Override
 			public void handleEvent(Event event) {
-				TableItem[] selectedItem = featureTable.getSelection();
+				final TableItem[] selectedItem = featureTable.getSelection();
 				String featureName = selectedItem[0].getText();
 				if (featureName.matches(".*?\\s+.*")) {
 					featureName = "\"" + featureName + "\"";
 				} else {
-					for (String op : Operator.NAMES) {
+					for (final String op : Operator.NAMES) {
 						if (featureName.equalsIgnoreCase(op)) {
 							featureName = "\"" + featureName + "\"";
 							break;
@@ -893,20 +892,22 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(500, 585);
 
-		GridLayout shellLayout = new GridLayout();
+		final GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
 
-		Monitor primary = shell.getDisplay().getPrimaryMonitor();
-		Rectangle bounds = primary.getBounds();
-		Rectangle rect = shell.getBounds();
-		int x = bounds.x + (bounds.width - rect.width) / 2;
-		int y = bounds.y + (bounds.height - rect.height) / 2;
+		final Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		final Rectangle bounds = primary.getBounds();
+		final Rectangle rect = shell.getBounds();
+		final int x = bounds.x + ((bounds.width - rect.width) / 2);
+		final int y = bounds.y + ((bounds.height - rect.height) / 2);
 		shell.setLocation(x, y);
 		shell.addListener(SWT.Traverse, new Listener() {
+
+			@Override
 			public void handleEvent(Event event) {
-				if (event.detail == SWT.TRAVERSE_ESCAPE && !adapter.isProposalPopupOpen()) {
+				if ((event.detail == SWT.TRAVERSE_ESCAPE) && !adapter.isProposalPopupOpen()) {
 
 					cancelButtonPressEvent();
 
@@ -916,8 +917,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-	 * Logic for pressing okay-button. This is used because to be consistent to
-	 * the {@link #cancelButtonPressEvent()} method.
+	 * Logic for pressing okay-button. This is used because to be consistent to the {@link #cancelButtonPressEvent()} method.
 	 */
 	private void okButtonPressEvent() {
 		if (okButton.isEnabled()) {
@@ -930,17 +930,18 @@ public class ConstraintDialog implements GUIDefaults {
 		String constrainText = Operator.isOperatorName(text) || text.contains(" ") ? "\"" + text + "\"" : text;
 		constrainText += " ";
 
-		this.constraintText.setText(constrainText);
-		this.constraintText.setSelection(constrainText.length());
+		constraintText.setText(constrainText);
+		constraintText.setSelection(constrainText.length());
 	}
 
 	private void setupContentProposal() {
 		try {
 			final KeyStroke keyStroke = KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
 
-			char[] autoActivationCharacters = new char[Character.MAX_VALUE];
-			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++)
+			final char[] autoActivationCharacters = new char[Character.MAX_VALUE];
+			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++) {
 				autoActivationCharacters[c] = c;
+			}
 
 			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(),
 					new ConstraintContentProposalProvider(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))), keyStroke,
@@ -951,17 +952,16 @@ public class ConstraintDialog implements GUIDefaults {
 
 			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
 
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Updates the dialogs state, changing the default button and setting the
-	 * text for this button depending on the current {@link ConstraintDialog.DialogState}.
-	 * 
-	 * @param state
-	 *            The state to consider
+	 * Updates the dialogs state, changing the default button and setting the text for this button depending on the current
+	 * {@link ConstraintDialog.DialogState}.
+	 *
+	 * @param state The state to consider
 	 */
 	private void updateDialogState(DialogState state) {
 		switch (state) {
@@ -985,11 +985,12 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Validates the current constraint in constraintText.
-	 * 
+	 *
 	 */
 	private void validate() {
 		headerPanel.setDetails(StringTable.CHECKING_CONSTRAINTS, HeaderPanel.HeaderDescriptionImage.NONE);
 		Display.getDefault().syncExec(new Runnable() {
+
 			@Override
 			public void run() {
 				final String text = constraintText.getText();
@@ -1005,7 +1006,8 @@ public class ConstraintDialog implements GUIDefaults {
 							onIsNotSatisfiable);
 					updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 				} else {
-					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()), HeaderPanel.HeaderDescriptionImage.ERROR);
+					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
+							HeaderPanel.HeaderDescriptionImage.ERROR);
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				}
 			}

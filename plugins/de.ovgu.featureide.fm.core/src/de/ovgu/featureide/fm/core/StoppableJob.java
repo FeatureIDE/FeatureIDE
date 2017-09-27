@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,11 +28,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
- * This internal job can be canceled.<br>
- * Cancel can cause invalid program states. 
- * 
+ * This internal job can be canceled.<br> Cancel can cause invalid program states.
+ *
  * Use {@link AStoppableJob} instead.
- * 
+ *
  * @author Jens Meinicke
  */
 @Deprecated
@@ -41,36 +40,35 @@ public abstract class StoppableJob extends Job {
 	private Thread thread;
 
 	/**
-	 * Creates a new job with the specified name.  The job name is a human-readable
-	 * value that is displayed to users.  The name does not need to be unique, but it
+	 * Creates a new job with the specified name. The job name is a human-readable value that is displayed to users. The name does not need to be unique, but it
 	 * must not be <code>null</code>.
-	 * 
+	 *
 	 * @param name the name of the job.
 	 */
 	public StoppableJob(String name) {
 		super(name);
 	}
-	
+
 	/**
 	 * The run method executes this method as an internal thread.
 	 */
 	protected abstract IStatus execute(IProgressMonitor monitor);
-	
+
 	@Override
 	protected final IStatus run(final IProgressMonitor monitor) {
 		thread = new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				try {
 					execute(monitor);
-				} catch (Exception e){
+				} catch (final Exception e) {
 					Logger.logError(e);
 				}
 			}
-			
+
 		}, "Thread-" + getName());
-		if (getPriority() == SHORT || getPriority() == INTERACTIVE) {		
+		if ((getPriority() == SHORT) || (getPriority() == INTERACTIVE)) {
 			thread.setPriority(Thread.MAX_PRIORITY);
 		} else if (getPriority() == LONG) {
 			thread.setPriority(Thread.NORM_PRIORITY);
@@ -80,12 +78,12 @@ public abstract class StoppableJob extends Job {
 		thread.start();
 		try {
 			thread.join();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			Logger.logError(e);
 		}
-		return Status.OK_STATUS; 
+		return Status.OK_STATUS;
 	}
-	
+
 	@Override
 	protected void canceling() {
 		thread.stop();

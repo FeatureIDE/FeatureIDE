@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,9 +31,8 @@ import org.prop4j.solver.SatInstance;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Creates a complete implication graph.</br>
- * This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
- * 
+ * Creates a complete implication graph.</br> This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
+ *
  * @author Sebastian Krieter AtomicSetAnalysis
  */
 public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relationship, Relationship>> {
@@ -56,7 +55,7 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 = solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
@@ -138,7 +137,7 @@ public class NaiveImplicationSetsAnalysis extends AbstractAnalysis<HashMap<Relat
 			relationSet.put(newRelationship, newRelationship);
 			curRelationship = newRelationship;
 		}
-		curRelationship.addRelation((byte) (mx0 > 0 ? (my0 > 0 ? BIT_11 : BIT_10) : (my0 > 0 ? BIT_01 : BIT_00)));
+		curRelationship.addRelation(mx0 > 0 ? (my0 > 0 ? BIT_11 : BIT_10) : (my0 > 0 ? BIT_01 : BIT_00));
 	}
 
 }

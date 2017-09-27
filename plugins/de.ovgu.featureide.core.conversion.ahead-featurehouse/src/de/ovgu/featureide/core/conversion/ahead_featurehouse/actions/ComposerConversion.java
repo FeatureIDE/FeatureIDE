@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,15 +35,16 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * Abstract class for composer replacements.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class ComposerConversion {
-	
+
 	IFeatureProject featureProject;
-	
+
 	/**
 	 * Starts the conversion.
+	 *
 	 * @param project
 	 */
 	void startProjectConversion(IFeatureProject project) {
@@ -53,35 +54,37 @@ public abstract class ComposerConversion {
 		try {
 			project.getProject().close(null);
 			project.getProject().open(null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Iterates through all files of the feature folders.
-	 * @param folder 
-	 * 
+	 *
+	 * @param folder
+	 *
 	 */
 	private void changeFiles(IFolder folder) {
 		try {
-			for (IResource res : folder.members()) {
+			for (final IResource res : folder.members()) {
 				if (res instanceof IFolder) {
-					changeFiles((IFolder)res);
+					changeFiles((IFolder) res);
 				} else {
 					if (canConvert(res.getFileExtension())) {
-						setFileText(changeFile(getFileText((IFile)res), (IFile)res), (IFile)res);
-						replaceFileExtension((IFile)res);
+						setFileText(changeFile(getFileText((IFile) res), (IFile) res), (IFile) res);
+						replaceFileExtension((IFile) res);
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Sets the context of the given file.
+	 *
 	 * @param newFileText The new context
 	 * @param file
 	 */
@@ -93,13 +96,13 @@ public abstract class ComposerConversion {
 		try {
 			fw = new FileWriter(file.getRawLocation().toFile());
 			fw.write(newFileText);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		} finally {
 			if (fw != null) {
 				try {
 					fw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					AheadCorePlugin.getDefault().logError(e);
 				}
 			}
@@ -113,14 +116,14 @@ public abstract class ComposerConversion {
 	private String getFileText(IFile res) {
 		Scanner scanner = null;
 		try {
-			 scanner = new Scanner(res.getRawLocation().toFile(), "UTF-8");
-			StringBuffer buffer = new StringBuffer();
+			scanner = new Scanner(res.getRawLocation().toFile(), "UTF-8");
+			final StringBuffer buffer = new StringBuffer();
 			while (scanner.hasNext()) {
 				buffer.append(scanner.nextLine());
 				buffer.append("\r\n");
 			}
 			return buffer.toString();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		} finally {
 			if (scanner != null) {
@@ -132,13 +135,15 @@ public abstract class ComposerConversion {
 
 	/**
 	 * Changes the composer of the given project.
-	 * @param project 
-	 * 
+	 *
+	 * @param project
+	 *
 	 */
 	abstract void changeComposer(IFeatureProject project);
 
 	/**
 	 * Changes the context of the given file.
+	 *
 	 * @param fileText the context
 	 * @param file The file
 	 * @return The replaced context
@@ -147,6 +152,7 @@ public abstract class ComposerConversion {
 
 	/**
 	 * Replaces the file extension of the given file.
+	 *
 	 * @param file
 	 */
 	abstract void replaceFileExtension(IFile file);

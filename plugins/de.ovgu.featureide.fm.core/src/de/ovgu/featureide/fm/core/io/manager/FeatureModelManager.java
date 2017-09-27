@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,28 +35,29 @@ import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
-	private static final ObjectCreator<IFeatureModel> objectCreator = new ObjectCreator<IFeatureModel>(IFeatureModel.class, FeatureModelManager.class,
-			FMFormatManager.getInstance()) {
-		@Override
-		protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
-			final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
-			featureModel.setSourceFile(path);
-			return featureModel;
-		}
-	};
+	private static final ObjectCreator<IFeatureModel> objectCreator =
+		new ObjectCreator<IFeatureModel>(IFeatureModel.class, FeatureModelManager.class, FMFormatManager.getInstance()) {
+
+			@Override
+			protected IFeatureModel createObject(Path path, IPersistentFormat<IFeatureModel> format) throws NoSuchExtensionException {
+				final IFeatureModel featureModel = FMFactoryManager.getFactory(path.toAbsolutePath().toString(), format).createFeatureModel();
+				featureModel.setSourceFile(path);
+				return featureModel;
+			}
+		};
 
 	/**
 	 * Returns an instance of a {@link IFileManager} for a certain file.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
-	 * 
+	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
-	 * 
+	 *
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@CheckForNull
@@ -71,11 +72,11 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	public static boolean save(IFeatureModel featureModel, Path path) {
 		final String pathString = path.toAbsolutePath().toString();
 		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
-		return !FileHandler.save(path, featureModel, format).containsError();
+		return !SimpleFileHandler.save(path, featureModel, format).containsError();
 	}
 
 	public static boolean convert(Path inPath, Path outPath) {
-		IFeatureModel featureModel = load(inPath).getObject();
+		final IFeatureModel featureModel = load(inPath).getObject();
 		if (featureModel == null) {
 			return false;
 		}

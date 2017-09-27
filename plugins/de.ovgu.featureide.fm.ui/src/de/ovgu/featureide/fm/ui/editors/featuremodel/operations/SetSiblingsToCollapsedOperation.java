@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,23 +32,20 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Operation with functionality to set all siblings to collapsed. Enables
- * undo/redo functionality.
- * 
+ * Operation with functionality to set all siblings to collapsed. Enables undo/redo functionality.
+ *
  * @author Maximilian Kühl
  */
 public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperation {
 
-	private IFeature feature;
-	private IGraphicalFeatureModel graphicalFeatureModel;
-	private LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
+	private final IFeature feature;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+	private final LinkedList<Boolean> collapseStates = new LinkedList<Boolean>();
 
 	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
-	 * 
+	 * @param label Description of this operation to be used in the menu
+	 * @param feature feature on which this operation will be executed
+	 *
 	 */
 	public SetSiblingsToCollapsedOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(graphicalFeatureModel.getFeatureModel(), getLabel(feature));
@@ -65,22 +62,19 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {		
-		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
+	protected FeatureIDEEvent operation() {
+		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				collapseStates.add(graphicalFeature.isCollapsed());
 				if (!f.equals(feature.getStructure())) {
 					graphicalFeature.setCollapsed(true);
 				}
 			}
 		}
-		if(feature.getStructure().getParent() != null)
-		{
+		if (feature.getStructure().getParent() != null) {
 			return new FeatureIDEEvent(feature.getStructure().getParent().getFeature(), EventType.COLLAPSED_CHANGED);
-		}
-		else
-		{
+		} else {
 			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED);
 		}
 	}
@@ -88,9 +82,9 @@ public class SetSiblingsToCollapsedOperation extends AbstractFeatureModelOperati
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		int i = 0;
-		for (IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
+		for (final IFeatureStructure f : feature.getStructure().getParent().getChildren()) {
 			if (f.hasChildren()) {
-				IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
+				final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(f.getFeature());
 				graphicalFeature.setCollapsed(collapseStates.get(i++));
 			}
 		}

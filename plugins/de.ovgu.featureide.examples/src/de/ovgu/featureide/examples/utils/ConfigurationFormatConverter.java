@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,11 +39,11 @@ import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * Converts .config files in example projects into .xml files.<br/>
- * Uses the index file of the example plug-in.
- * 
+ * Converts .config files in example projects into .xml files.<br/> Uses the index file of the example plug-in.
+ *
  * @author Sebastian Krieter
  */
 public class ConfigurationFormatConverter {
@@ -57,10 +57,10 @@ public class ConfigurationFormatConverter {
 	public static void main(String[] args) {
 		final Path indexFile = Paths.get(ExamplePlugin.FeatureIDE_EXAMPLE_INDEX);
 		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
-		if (!FileHandler.load(indexFile, oldProjectFiles, new ProjectRecordFormat()).containsError()) {
+		if (!SimpleFileHandler.load(indexFile, oldProjectFiles, new ProjectRecordFormat()).containsError()) {
 			System.out.println("Found index file.");
 			System.out.println("Processing projects...");
-			for (ProjectRecord projectRecord : oldProjectFiles) {
+			for (final ProjectRecord projectRecord : oldProjectFiles) {
 				System.out.println("\t" + projectRecord.getProjectName());
 				convertConfigFiles(projectRecord);
 			}
@@ -72,7 +72,7 @@ public class ConfigurationFormatConverter {
 
 	private static void convertConfigFiles(ProjectRecord projectRecord) {
 		if (!projectRecord.hasErrors() && !projectRecord.hasWarnings()) {
-			for (ProjectRecord subProjectRecord : projectRecord.getSubProjects()) {
+			for (final ProjectRecord subProjectRecord : projectRecord.getSubProjects()) {
 				convertConfigFiles(subProjectRecord);
 			}
 			Path relativePath = Paths.get(projectRecord.getProjectDescriptionRelativePath());
@@ -80,6 +80,7 @@ public class ConfigurationFormatConverter {
 			final List<Path> configurationFiles = new ArrayList<>();
 			try {
 				Files.walkFileTree(relativePath, new SimpleFileVisitor<Path>() {
+
 					@Override
 					public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
 						if (attributes.isRegularFile() && Files.isReadable(file) && file.getFileName().toString().endsWith(SUFFIX)) {
@@ -91,23 +92,23 @@ public class ConfigurationFormatConverter {
 					}
 
 				});
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 				return;
 			}
 			if (!configurationFiles.isEmpty()) {
-				FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(relativePath.resolve("model.xml"));
+				final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(relativePath.resolve("model.xml"));
 				if (!fileHandler.getLastProblems().containsError()) {
 					final Configuration object = new Configuration(fileHandler.getObject(), Configuration.PARAM_PROPAGATE | Configuration.PARAM_IGNOREABSTRACT);
-					for (Path oldFile : configurationFiles) {
-						if (!FileHandler.load(oldFile, object, OLD_FORMAT).containsError()) {
+					for (final Path oldFile : configurationFiles) {
+						if (!SimpleFileHandler.load(oldFile, object, OLD_FORMAT).containsError()) {
 							final String oldFileName = oldFile.getFileName().toString();
 							final String newFileName = oldFileName.substring(0, oldFileName.length() - SUFFIX.length()) + "." + NEW_FORMAT.getSuffix();
 							final Path newFile = oldFile.subpath(0, oldFile.getNameCount() - 1).resolve(newFileName);
-							if (!FileHandler.save(newFile, object, NEW_FORMAT).containsError()) {
+							if (!SimpleFileHandler.save(newFile, object, NEW_FORMAT).containsError()) {
 								try {
 									Files.delete(oldFile);
-								} catch (IOException e) {
+								} catch (final IOException e) {
 									e.printStackTrace();
 								}
 							}

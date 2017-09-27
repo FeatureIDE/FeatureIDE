@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,17 +26,17 @@ import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 
 /**
  * Used by {@link FeatureRemover}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class DeprecatedClause extends Clause {
 
 	private int relevance;
-	
+
 	public static DeprecatedClause createClause(int[] newLiterals, int curFeature) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
-		for (int literal : newLiterals) {
+		for (final int literal : newLiterals) {
 			if (curFeature != Math.abs(literal)) {
 				if (literalSet.contains(-literal)) {
 					return null;
@@ -48,7 +48,7 @@ public class DeprecatedClause extends Clause {
 
 		return getClauseFromSet(literalSet);
 	}
-	
+
 	public static DeprecatedClause createClause(int[] newLiterals, int curFeature, int[] helper) {
 		int uniqueVarCount = newLiterals.length;
 		for (int i = 0; i < newLiterals.length; i++) {
@@ -74,7 +74,7 @@ public class DeprecatedClause extends Clause {
 				}
 			}
 		}
-		int[] uniqueVarArray = new int[uniqueVarCount];
+		final int[] uniqueVarArray = new int[uniqueVarCount];
 		int k = 0;
 		for (int i = 0; i < newLiterals.length; i++) {
 			final int l = newLiterals[i];
@@ -83,14 +83,14 @@ public class DeprecatedClause extends Clause {
 				uniqueVarArray[k++] = l;
 			}
 		}
-		
+
 		return new DeprecatedClause(uniqueVarArray);
 	}
 
 	public static DeprecatedClause createClause(int[] newLiterals) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
-		for (int literal : newLiterals) {
+		for (final int literal : newLiterals) {
 			if (literalSet.contains(-literal)) {
 				return null;
 			} else {
@@ -102,9 +102,9 @@ public class DeprecatedClause extends Clause {
 	}
 
 	private static DeprecatedClause getClauseFromSet(final HashSet<Integer> literalSet) {
-		int[] newLiterals = new int[literalSet.size()];
+		final int[] newLiterals = new int[literalSet.size()];
 		int i = 0;
-		for (int lit : literalSet) {
+		for (final int lit : literalSet) {
 			newLiterals[i++] = lit;
 		}
 		return new DeprecatedClause(newLiterals);
@@ -112,11 +112,11 @@ public class DeprecatedClause extends Clause {
 
 	private DeprecatedClause(int[] literals) {
 		super(literals);
-		this.relevance = 0;
+		relevance = 0;
 	}
 
 	boolean computeRelevance(DeprecatedFeature[] map) {
-		for (int literal : literals) {
+		for (final int literal : literals) {
 			final DeprecatedFeature df = map[Math.abs(literal)];
 			if (df != null) {
 				relevance++;
@@ -127,13 +127,13 @@ public class DeprecatedClause extends Clause {
 				}
 			}
 		}
-		return (relevance > 0 && relevance < literals.length);
+		return ((relevance > 0) && (relevance < literals.length));
 	}
 
 	public boolean delete(DeprecatedFeature[] map) {
 		if (literals.length > 1) {
-			final boolean mixed = (relevance > 0 && relevance < literals.length);
-			for (int literal : literals) {
+			final boolean mixed = ((relevance > 0) && (relevance < literals.length));
+			for (final int literal : literals) {
 				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
 					if (literal > 0) {
@@ -148,7 +148,7 @@ public class DeprecatedClause extends Clause {
 			}
 			return mixed;
 		} else {
-			for (int literal : literals) {
+			for (final int literal : literals) {
 				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
 					if (literal > 0) {

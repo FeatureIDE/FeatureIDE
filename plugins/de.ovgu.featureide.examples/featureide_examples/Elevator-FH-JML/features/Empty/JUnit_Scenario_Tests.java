@@ -14,6 +14,7 @@ public  class  JUnit_Scenario_Tests {
 	 * test-termination)
 	 */
 	/*@ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec9.length; !env.calledAt_Spec9[i]);
+	  @ assignable \nothing;
 	  @*/
 	public void testFinished(Environment env) {
 		original(env);

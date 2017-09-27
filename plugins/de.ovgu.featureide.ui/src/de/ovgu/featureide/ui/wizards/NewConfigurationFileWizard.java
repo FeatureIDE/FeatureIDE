@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,13 +54,13 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * This is a wizard for configuration files.
- * 
+ *
  * @author Marcus Leich
  */
 public class NewConfigurationFileWizard extends Wizard implements INewWizard {
@@ -80,16 +80,17 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	 * Adding the page to the wizard.
 	 */
 
+	@Override
 	public void addPages() {
 		page = new NewConfigurationFilePage(configFolder);
 		addPage(page);
-		this.setWindowTitle(NEW_CONFIGURATION);
+		setWindowTitle(NEW_CONFIGURATION);
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in the wizard. We
-	 * will create an operation and run it using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using wizard as execution context.
 	 */
+	@Override
 	public boolean performFinish() {
 		configFolder = page.getContainerObject();
 		final IFeatureProject featureProject = page.getFeatureProject();
@@ -101,10 +102,12 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		final String fileName = name + (name.endsWith(suffix) ? "" : suffix);
 
 		final IRunnableWithProgress op = new IRunnableWithProgress() {
+
+			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
 					doFinish(configFolder, fileName, featureModel, format, monitor);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
 					monitor.done();
@@ -113,10 +116,10 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		};
 		try {
 			getContainer().run(true, false, op);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			return false;
-		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
+		} catch (final InvocationTargetException e) {
+			final Throwable realException = e.getTargetException();
 			MessageDialog.openError(getShell(), "Error", realException.getMessage());
 			return false;
 		}
@@ -124,9 +127,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * The worker method. It will find the container, create the file if missing
-	 * or just replace its contents, and open the editor on the newly created
-	 * file.
+	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
 	 */
 	private void doFinish(IContainer container, String fileName, IFeatureModel featureModel, IConfigurationFormat format, IProgressMonitor monitor)
 			throws CoreException {
@@ -137,33 +138,34 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		}
 
 		final IFile file = container.getFile(new Path(fileName));
-		FileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
+		SimpleFileHandler.save(Paths.get(file.getLocationURI()), new Configuration(featureModel), format);
 
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
 		getShell().getDisplay().asyncExec(new Runnable() {
+
+			@Override
 			public void run() {
-				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
-				} catch (PartInitException e) {
-				}
+				} catch (final PartInitException e) {}
 			}
 		});
 		monitor.worked(1);
 	}
 
 	private void throwCoreException(String message) throws CoreException {
-		IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
+		final IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if we can initialize
-	 * from it.
-	 * 
+	 * We will accept the selection in the workbench to see if we can initialize from it.
+	 *
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		final IFeatureProject data = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
 		configFolder = (data == null) ? null : data.getConfigFolder();

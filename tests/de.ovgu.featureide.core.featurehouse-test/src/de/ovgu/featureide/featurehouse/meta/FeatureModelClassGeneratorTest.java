@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,7 +24,7 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 
 /**
  * Test for {@link FeatureModelClassGenerator}.
- * 
+ *
  * @author Jens Meinicke
  */
 public class FeatureModelClassGeneratorTest {
@@ -40,7 +40,7 @@ public class FeatureModelClassGeneratorTest {
 //		System.out.println("------------------------- End Test JPF  ---------------------");
 //		System.out.println();
 //	}
-//	
+//
 //	@Test
 //	public void testMetaKeY() {
 //		System.out.println();
@@ -52,7 +52,7 @@ public class FeatureModelClassGeneratorTest {
 //		System.out.println("------------------------- End Test KEY  ---------------------");
 //		System.out.println();
 //	}
-//	
+//
 //	@Test
 //	public void testMetaBDD() {
 //		System.out.println();
@@ -64,7 +64,7 @@ public class FeatureModelClassGeneratorTest {
 //		System.out.println("------------------------- End Test BDD  ---------------------");
 //		System.out.println();
 //	}
-//	
+//
 //	@Test
 //	public void testMetaVarexJ() {
 //		System.out.println();
@@ -76,27 +76,27 @@ public class FeatureModelClassGeneratorTest {
 //		System.out.println("------------------------- End Test VarexJ  ---------------------");
 //		System.out.println();
 //	}
-//	
+//
 //	protected static File MODEL_FILE_FOLDER = getFolder();
-//	
+//
 //	private static final FileFilter filter = new FileFilter() {
 //		@Override
 //		public boolean accept(File pathname) {
 //			return pathname.getName().endsWith(".xml");
 //		}
 //	};
-//	
-//	private static File getFolder() { 
-//		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.featurehouse-test/src/metafeaturemodels/"); 
-//		if (!folder.canRead()) { 
-//			folder =  new File(ClassLoader.getSystemResource("metafeaturemodels").getPath()); 
+//
+//	private static File getFolder() {
+//		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.featurehouse-test/src/metafeaturemodels/");
+//		if (!folder.canRead()) {
+//			folder =  new File(ClassLoader.getSystemResource("metafeaturemodels").getPath());
 //		}
-//		return folder; 
+//		return folder;
 //	}
-//	
+//
 //	private final IFeatureModel init(String name) {
 //		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
-//		
+//
 //		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 //			if (f.getName().equals(name)) {
 //				try {

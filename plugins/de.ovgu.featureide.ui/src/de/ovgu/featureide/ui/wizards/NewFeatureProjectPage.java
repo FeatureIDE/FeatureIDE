@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -62,80 +62,83 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * A dialog page for creating FeatureIDE projects.
- * 
+ *
  * @author Marcus Leich
  */
 public class NewFeatureProjectPage extends WizardPage {
 
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
-	
+
 	protected Text sourcePath;
 	protected Text configsPath;
 	protected Text buildPath;
-	
+
 	protected Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 	protected GridLayout layout = new GridLayout();
 	protected Group pathGroup;
 	protected Label buildLabel;
 	private boolean canFlipToNextPage = true;
-	
+
 	protected NewFeatureProjectPage() {
 		super("");
 		setTitle(SELECT_A_COMPOSER);
 		setDescription(CREATES_A_FEATUREIDE_PROJECT);
 	}
-	
+
+	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
-	    final GridLayout gridLayout = new GridLayout();
-	    gridLayout.numColumns = 1;
-	    container.setLayout(gridLayout);
-	    setControl(container);
-	    
-	    Group toolGroup = new Group(container, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NULL);
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
+		container.setLayout(gridLayout);
+		setControl(container);
+
+		final Group toolGroup = new Group(container, SWT.NONE);
 		toolGroup.setText("Composer Selection:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout projGridLayout = new GridLayout();
+		final GridLayout projGridLayout = new GridLayout();
 		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
-		
+
 		final Label helloLabel = new Label(toolGroup, SWT.NONE);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
 		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
-		
-	    Label label = new Label(toolGroup, SWT.NONE);
-	    label.setText("Composers:");
-	    toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-	    toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
-	    
-	    final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
-	    GridData gridData2 = new GridData(GridData.FILL_BOTH);
+
+		Label label = new Label(toolGroup, SWT.NONE);
+		label.setText("Composers:");
+		toolCB = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
+		toolCB.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		final Label descriptionLabel = new Label(toolGroup, SWT.NONE);
+		final GridData gridData2 = new GridData(GridData.FILL_BOTH);
 		gridData2.horizontalSpan = 2;
-	    descriptionLabel.setLayoutData(gridData2);
-	    
-	    StringBuilder descriptionStringBuilder = new StringBuilder();
-	    descriptionStringBuilder.append("Possible choices are:\n\n");
-	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-	    extensions = new IComposerExtensionBase[composerExtensions.size()]; 
-	    composerExtensions.toArray(extensions);
-	    Arrays.sort(extensions, new Comparator<IComposerExtensionBase> () {
+		descriptionLabel.setLayoutData(gridData2);
+
+		final StringBuilder descriptionStringBuilder = new StringBuilder();
+		descriptionStringBuilder.append("Possible choices are:\n\n");
+		final List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
+		extensions = new IComposerExtensionBase[composerExtensions.size()];
+		composerExtensions.toArray(extensions);
+		Arrays.sort(extensions, new Comparator<IComposerExtensionBase>() {
+
+			@Override
 			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
-	    });
-	    
-		for (IComposerExtensionBase composerExtension : extensions) {
+		});
+
+		for (final IComposerExtensionBase composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
 			descriptionStringBuilder.append("\n");
 			toolCB.add(composerExtension.getName());
 		}
-		
+
 		String descriptionString = descriptionStringBuilder.toString();
 		if (composerExtensions.isEmpty()) {
 			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
@@ -144,20 +147,22 @@ public class NewFeatureProjectPage extends WizardPage {
 		}
 		descriptionLabel.setText(descriptionString);
 		toolCB.addModifyListener(new ModifyListener() {
+
+			@Override
 			public void modifyText(ModifyEvent e) {
 				composerExtension = extensions[toolCB.getSelectionIndex()];
 			}
 		});
 		toolCB.select(0);
-		
-		//Path Group
+
+		// Path Group
 		pathGroup = new Group(container, SWT.NONE);
 		layout.numColumns = 2;
 		layout.verticalSpacing = 9;
 		pathGroup.setText("Path Specification:");
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
-		
+
 		String tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
 		buildLabel = new Label(pathGroup, SWT.NULL);
 		buildLabel.setText("&Source Path:");
@@ -166,7 +171,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		buildPath.setLayoutData(gd);
 		buildPath.setText("src");
 		buildPath.setToolTipText(tooltip);
-		
+
 		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Feature Path:");
@@ -175,7 +180,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText(FEATURES);
 		sourcePath.setToolTipText(tooltip);
-		
+
 		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
@@ -184,86 +189,95 @@ public class NewFeatureProjectPage extends WizardPage {
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
 		configsPath.setToolTipText(tooltip);
-		
+
 		addListeners();
-	}	
-	
+	}
+
 	public IComposerExtensionBase getCompositionTool() {
 		return composerExtension;
 	}
-	
+
 	public boolean hasCompositionTool() {
 		return composerExtension != null;
 	}
-	
+
 	protected void addListeners() {
 		toolCB.addModifyListener(new ModifyListener() {
-			
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
 		});
-		
+
 		sourcePath.addModifyListener(new ModifyListener() {
-			
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
 		});
-		
+
 		buildPath.addModifyListener(new ModifyListener() {
-			
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
 		});
-		
+
 		configsPath.addModifyListener(new ModifyListener() {
-	
+
 			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
 		});
 	}
-	
+
 	protected void dialogChanged() {
-		IComposerExtensionBase compositionTool = getCompositionTool();
+		final IComposerExtensionBase compositionTool = getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
-		
-		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
-				getSourcePath().equals(getConfigPath())) {
+
+		if (isEnabled(sourcePath) && isEnabled(configsPath) && getSourcePath().equals(getConfigPath())) {
 			updateStatus(SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isEnabled(sourcePath) && isEnabled(buildPath) &&
-				getSourcePath().equals(getBuildPath())) {
+		if (isEnabled(sourcePath) && isEnabled(buildPath) && getSourcePath().equals(getBuildPath())) {
 			updateStatus(SOURCE_PATH_EQUALS_BUILD_PATH_);
 			return;
 		}
-		if (isEnabled(buildPath) && isEnabled(configsPath) && 
-				getBuildPath().equals(getConfigPath())) {
+		if (isEnabled(buildPath) && isEnabled(configsPath) && getBuildPath().equals(getConfigPath())) {
 			updateStatus(BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), SOURCE))return;
-		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), BUILD))return;
-		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), EQUATIONS))return;
-		
-		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), SOURCE))return;
-		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), BUILD))return;
-		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), EQUATIONS))return;
-		
+		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), SOURCE)) {
+			return;
+		}
+		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), BUILD)) {
+			return;
+		}
+		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), EQUATIONS)) {
+			return;
+		}
+
+		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), SOURCE)) {
+			return;
+		}
+		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), BUILD)) {
+			return;
+		}
+		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), EQUATIONS)) {
+			return;
+		}
+
 		if (compositionTool.supportsAndroid()) {
-			
+
 			canFlipToNextPage = false;
 			setErrorMessage(null);
 			setPageComplete(true);
-			
+
 			if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
 				updateStatus(SOURCE_PATH_RESTRICTION_ANDROID);
 				return;
@@ -276,10 +290,10 @@ public class NewFeatureProjectPage extends WizardPage {
 				updateStatus(CONFIG_PATH_RESTRICTION_ANDROID);
 				return;
 			}
-			
+
 			return;
 		}
-		
+
 		updateStatus(null);
 	}
 
@@ -293,37 +307,28 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected boolean isPathEmpty(String path, String name) {
 		if (path.length() == 0) {
 			updateStatus(name + PATH_MUST_BE_SPECIFIED_);
-			canFlipToNextPage  = false;
+			canFlipToNextPage = false;
 			return true;
 		}
-		canFlipToNextPage  = true;
+		canFlipToNextPage = true;
 		return false;
 	}
+
 	protected boolean isInvalidPath(String path, String name) {
-		if (path.contains("*")
-				|| path.contains("?")
-				|| path.startsWith(".")
-				|| path.endsWith(".")
-				|| path.contains("//")
-				|| path.endsWith("/")
-				|| path.endsWith("/")
-				|| path.contains("/.")
-				|| path.contains("./")
-				|| path.contains("<")
-				|| path.contains(">")
-				|| path.contains("|")
-				|| path.contains(""+'"')) {
+		if (path.contains("*") || path.contains("?") || path.startsWith(".") || path.endsWith(".") || path.contains("//") || path.endsWith("/")
+			|| path.endsWith("/") || path.contains("/.") || path.contains("./") || path.contains("<") || path.contains(">") || path.contains("|")
+			|| path.contains("" + '"')) {
 			updateStatus(name + PATH_MUST_BE_VALID);
 			return true;
 		}
 		return false;
 	}
-	
+
 	protected void updateStatus(String message) {
 		setErrorMessage(message);
 		setPageComplete(message == null);
 	}
-	
+
 	public String getSourcePath() {
 		if (sourcePath.isEnabled()) {
 			return sourcePath.getText();
@@ -331,17 +336,18 @@ public class NewFeatureProjectPage extends WizardPage {
 			return getBuildPath();
 		}
 	}
-	
+
 	public String getConfigPath() {
 		return configsPath.isEnabled() ? configsPath.getText() : "";
 
 	}
-	
+
 	public String getBuildPath() {
 		return buildPath.getText();
 	}
 
+	@Override
 	public boolean canFlipToNextPage() {
-		return this.canFlipToNextPage;
+		return canFlipToNextPage;
 	}
 }

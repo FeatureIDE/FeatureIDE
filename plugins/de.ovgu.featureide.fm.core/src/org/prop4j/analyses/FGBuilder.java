@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
@@ -68,7 +68,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 		// Math.min(solver.getSatInstance().getNumberOfVariables(),
 		// ISatSolver.MAX_SOLUTION_BUFFER));
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		int[] model1 = solver.findModel();
+		final int[] model1 = solver.findModel();
 
 		// satisfiable?
 		if (model1 != null) {
@@ -127,8 +127,8 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 			final SatInstance satInstance = solver.getSatInstance();
 			featureGraph = new MatrixFeatureGraph(satInstance, index);
 
-			Node cnf = satInstance.getCnf();
-			outer: for (Node clause : cnf.getChildren()) {
+			final Node cnf = satInstance.getCnf();
+			outer: for (final Node clause : cnf.getChildren()) {
 				final Node[] literals = clause.getChildren();
 				int childrenCount = literals.length;
 				for (int i = 0; i < childrenCount; i++) {
@@ -152,7 +152,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					final int y = satInstance.getSignedVariable((Literal) literals[1]);
 					addRelation(x, y);
 				} else {
-					for (int i = 0; i < childrenCount - 1; i++) {
+					for (int i = 0; i < (childrenCount - 1); i++) {
 						final int x = satInstance.getSignedVariable((Literal) literals[i]);
 						final int indexX = index[Math.abs(x) - 1];
 
@@ -227,8 +227,8 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 	}
 
 	private void addRelation(final int x, final int y) {
-		int indexX = index[Math.abs(x) - 1];
-		int indexY = index[Math.abs(y) - 1];
+		final int indexX = index[Math.abs(x) - 1];
+		final int indexY = index[Math.abs(y) - 1];
 
 		if (x > 0) {
 			if (y > 0) {
@@ -255,11 +255,11 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 		final boolean positive = mx1 > 0;
 		final byte compareB = (byte) (positive ? 1 : 2);
 
-		if (core[i] == 0 && (recArray[i] & compareB) == 0) {
+		if ((core[i] == 0) && ((recArray[i] & compareB) == 0)) {
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solver.getSolutionList()) {
+			for (final int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -282,13 +282,12 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					continue;
 				}
 				final byte b = getRelation(i, j);
-				if (AFeatureGraph.isWeakEdge(b) && ((positive && !(AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_10Q)
-						|| AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_11Q)))
-						|| (!positive && !(AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_00Q)
-								|| AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_01Q))))) {
+				if (AFeatureGraph.isWeakEdge(b)
+					&& ((positive && !(AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_10Q) || AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_11Q)))
+						|| (!positive && !(AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_00Q) || AFeatureGraph.isEdge(b, AFeatureGraph.EDGE_01Q))))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solver.getSolutionList()) {
+					for (final int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -297,12 +296,11 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					}
 
 					solver.assignmentPush(-my1);
-					solver.setSelectionStrategy(
-							(c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
+					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							addRelation(-mx0, my1);
 						}
 						parentStack.push(my1);
@@ -398,8 +396,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 		}
 	}
 
-	private void dfs_rec(byte[] visited, boolean[] complete, int curFeature, int parentFeature, byte selected,
-			boolean parentSelected) {
+	private void dfs_rec(byte[] visited, boolean[] complete, int curFeature, int parentFeature, byte selected, boolean parentSelected) {
 		final boolean incomplete = !complete[curFeature];
 		for (int j = 0; j < visited.length; j++) {
 			final byte visit = visited[j];
@@ -412,36 +409,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = 2;
 						childSelected = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = 3;
 						childSelected = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -452,36 +443,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = 2;
 						childSelected = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = 3;
 						childSelected = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -492,36 +477,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = 2;
 						childSelected = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = 3;
 						childSelected = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 2;
 						visited[j] = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 3;
 						visited[j] = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -532,36 +511,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = 2;
 						childSelected = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = 3;
 						childSelected = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 2;
 						visited[j] = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 3;
 						visited[j] = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -572,36 +545,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = 2;
 						childSelected = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = 3;
 						childSelected = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 2;
 						visited[j] = 2;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 3;
 						visited[j] = 3;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -610,36 +577,30 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_0Q:
 						visited[j] = (byte) ((visited[j] == 3) ? 4 : 2);
 						childSelected = (byte) ((childSelected == 3) ? 4 : 2);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1Q:
 						visited[j] = (byte) ((visited[j] == 2) ? 4 : 3);
 						childSelected = (byte) ((childSelected == 2) ? 4 : 3);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = (byte) ((childSelected == 3) ? 4 : 2);
 						visited[j] = (byte) ((visited[j] == 3) ? 4 : 2);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = (byte) ((childSelected == 2) ? 4 : 3);
 						visited[j] = (byte) ((visited[j] == 2) ? 4 : 3);
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -654,22 +615,19 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -681,22 +639,19 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -709,8 +664,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -723,8 +677,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -737,8 +690,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -749,8 +701,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -765,22 +716,19 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -792,22 +740,19 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -820,8 +765,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						continue;
@@ -834,8 +778,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						continue;
@@ -848,8 +791,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						break;
@@ -860,8 +802,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 					case AFeatureGraph.VALUE_10Q:
 						visited[j] = 4;
 						childSelected = 4;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						break;
@@ -876,15 +817,13 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -896,15 +835,13 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 						// don't select child
 						childSelected = 0;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
 						break;
 					case AFeatureGraph.VALUE_1:
 						// select child
 						childSelected = 1;
 						visited[j] = 5;
-						featureGraph.setEdge(parentFeature, j,
-								parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
+						featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
 						break;
 					default:
 						continue;
@@ -915,7 +852,7 @@ public class FGBuilder extends AbstractAnalysis<IFeatureGraph> {
 				}
 			}
 
-			if (incomplete && childSelected >= 0) {
+			if (incomplete && (childSelected >= 0)) {
 				dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
 			}
 		}

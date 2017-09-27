@@ -17,5 +17,6 @@ public interface EdgeIfc
     public /*@pure@*/ Vertex getOtherVertex( Vertex vertex );
     
     /*@ requires the_edge != null; @*/
+    /*@ assignable \nothing; @*/
     public void adjustAdorns( EdgeIfc the_edge );
 }

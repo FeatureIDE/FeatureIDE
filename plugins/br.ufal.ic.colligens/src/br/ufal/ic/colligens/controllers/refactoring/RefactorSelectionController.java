@@ -28,6 +28,7 @@ import de.fosd.typechef.lexer.LexerException;
 import de.fosd.typechef.options.OptionException;
 
 public class RefactorSelectionController extends Refactoring {
+
 	private TextSelection textSelection = null;
 	private IFile file = null;
 	private RefactoringType refactoringType;
@@ -44,29 +45,28 @@ public class RefactorSelectionController extends Refactoring {
 	}
 
 	@Override
-	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
-			throws CoreException, OperationCanceledException {
-		RefactoringStatus status = new RefactoringStatus();
-		
+	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+		final RefactoringStatus status = new RefactoringStatus();
+
 		monitor.beginTask(CHECKING_PRECONDITIONS___, 2);
 
 		try {
 
 			processor.selectToFile(file, textSelection, refactoringType);
 
-		} catch (LexerException e) {
+		} catch (final LexerException e) {
 			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART_);
 
-		} catch (OptionException e) {
+		} catch (final OptionException e) {
 			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR__TRY_AGAIN_);
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART__TRY_AGAIN_);
 
-		} catch (NullPointerException e) {
+		} catch (final NullPointerException e) {
 			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART_);
 
-		} catch (RefactorException e) {
+		} catch (final RefactorException e) {
 			status.addFatalError(THE_SELECTED_PART_CONTAINS_ERRORS_);
 		} finally {
 			monitor.done();
@@ -75,15 +75,14 @@ public class RefactorSelectionController extends Refactoring {
 	}
 
 	@Override
-	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
-			throws CoreException, OperationCanceledException {
-		RefactoringStatus status = new RefactoringStatus();
+	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
+		final RefactoringStatus status = new RefactoringStatus();
 
 		monitor.beginTask(CHECKING_CHECKFINALCONDITIONS___, 2);
 
 		try {
 			changes = processor.process(monitor);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 
 			status.addFatalError(e.getMessage());
 			e.printStackTrace();
@@ -93,21 +92,18 @@ public class RefactorSelectionController extends Refactoring {
 	}
 
 	@Override
-	public Change createChange(IProgressMonitor pm) throws CoreException,
-			OperationCanceledException {
+	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
 		try {
 			pm.beginTask(CREATING_CHANGE___, 1);
 			//
-			return new CompositeChange(getName(),
-					changes.toArray(new Change[] {}));
+			return new CompositeChange(getName(), changes.toArray(new Change[] {}));
 		} finally {
 			pm.done();
 		}
 	}
 
-	public void setSelection(IFile file, TextSelection selection,
-			RefactoringType refactoringType) {
-		this.textSelection = selection;
+	public void setSelection(IFile file, TextSelection selection, RefactoringType refactoringType) {
+		textSelection = selection;
 		this.file = file;
 		this.refactoringType = refactoringType;
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -42,7 +42,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile modelFile) {
 		// Ask for file name
-		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		configureFileDialog(fileDialog);
 		final String filepath = fileDialog.open();
 		if (filepath == null) {
@@ -54,13 +54,13 @@ public abstract class AbstractExportHandler extends AFileHandler {
 		IFeatureModelFactory factory;
 		try {
 			factory = FMFactoryManager.getFactory(path.toString(), format);
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);
 			factory = FMFactoryManager.getDefaultFactory();
 		}
 		final IFeatureModel fm = factory.createFeatureModel();
 
-		FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
+		final FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
 		// Read model
 		handler.read(path, format);
 		handler.write(Paths.get(filepath), getFormat());

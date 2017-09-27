@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Test Fragment
-Bundle-SymbolicName: de.ovgu.featureide.fm.core_test;singleton:=true
-Bundle-Version: 2.2.4.qualifier
-Fragment-Host: de.ovgu.featureide.core
+Bundle-SymbolicName: de.ovgu.featureide.fm.core-test;singleton:=true
+Bundle-Version: 3.4.0.qualifier
+Fragment-Host: de.ovgu.featureide.fm.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit

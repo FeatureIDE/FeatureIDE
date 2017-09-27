@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Counts and categorizes features in the given feature model.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -62,7 +62,7 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 			final List<IFeature> listOfAbstractFeatures = new ArrayList<IFeature>();
 			final List<IFeature> listOfConcreteFeatures = new ArrayList<IFeature>();
 
-			for (IFeature f : listOfFeatures) {
+			for (final IFeature f : listOfFeatures) {
 				if (f.getStructure().getChildren().isEmpty()) {
 					listOfPrimitiveFeatures.add(f);
 				} else {
@@ -76,7 +76,7 @@ public final class StatisticsSyntacticalFeatureModel extends LazyParent {
 			}
 
 			final HashSet<IFeature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
-			for (IConstraint constraint : model.getConstraints()) {
+			for (final IConstraint constraint : model.getConstraints()) {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
 

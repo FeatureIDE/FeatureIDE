@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.Logger;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public class SimpleSatSolver extends SatSolver {
@@ -49,15 +49,15 @@ public class SimpleSatSolver extends SatSolver {
 
 	public void setBackbone(List<Literal> knownLiterals, Literal curLiteral) {
 		backbone = new VecInt((knownLiterals.size() + 1) << 1);
-		for (Literal node : knownLiterals) {
+		for (final Literal node : knownLiterals) {
 			backbone.push(getIntOfLiteral(node));
 		}
-		int x = getIntOfLiteral(curLiteral);
+		final int x = getIntOfLiteral(curLiteral);
 
 		backbone.push(x);
 		try {
 			satisfiable = solver.isSatisfiable(backbone);
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 		}
 		if (satisfiable) {
@@ -81,7 +81,7 @@ public class SimpleSatSolver extends SatSolver {
 					if (solver.isSatisfiable(backbone)) {
 						backbone.pop();
 						final int[] tempModel = solver.model();
-						for (int j = 0; j < tempModel.length; j++) { //i + 1
+						for (int j = 0; j < tempModel.length; j++) { // i + 1
 							if (b[j] != (byte) Math.signum(tempModel[j])) {
 								b[j] = 0;
 							}
@@ -90,7 +90,7 @@ public class SimpleSatSolver extends SatSolver {
 						backbone.pop().push(x);
 						return (byte) Math.signum(x);
 					}
-				} catch (TimeoutException e) {
+				} catch (final TimeoutException e) {
 					Logger.logError(e);
 					backbone.pop();
 				}

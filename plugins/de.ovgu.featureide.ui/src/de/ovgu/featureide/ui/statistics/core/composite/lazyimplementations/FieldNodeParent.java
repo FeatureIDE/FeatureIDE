@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,7 +27,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 
 /**
  * Node to display the fields in the StatisticsProgrammSize
- * 
+ *
  * @author Schleicher Miro
  */
 public class FieldNodeParent extends AbstractSortModeNode {
@@ -37,13 +37,13 @@ public class FieldNodeParent extends AbstractSortModeNode {
 	public FieldNodeParent(String descString, FSTField fstField, LinkedList<FSTField> allFields) {
 		super(descString);
 		this.fstField = fstField;
-		int numberOfRoles = countFieldsWithSameName(allFields);
+		final int numberOfRoles = countFieldsWithSameName(allFields);
 		setValue(new Integer(numberOfRoles));
 	}
 
 	private int countFieldsWithSameName(LinkedList<FSTField> fields) {
 		int c = 0;
-		for (FSTField tempField : fields) {
+		for (final FSTField tempField : fields) {
 			if (tempField.getFullIdentifier().equals(fstField.getFullIdentifier())) {
 				c++;
 
@@ -55,7 +55,7 @@ public class FieldNodeParent extends AbstractSortModeNode {
 
 	@Override
 	protected void initChildren() {
-		
+
 	}
 
 }

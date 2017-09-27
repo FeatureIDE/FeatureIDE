@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * A constraint that is true iff all child nodes are true.
- * 
+ *
  * @author Thomas Thuem
  */
 public class And extends Node {
@@ -91,10 +91,10 @@ public class And extends Node {
 	private Node createDNF(Node[] children) {
 		LinkedList<LinkedList<Node>> clauses = new LinkedList<>();
 		clauses.add(new LinkedList<Node>());
-		for (Node child : children) {
-			LinkedList<Node[]> newClauses = new LinkedList<>();
+		for (final Node child : children) {
+			final LinkedList<Node[]> newClauses = new LinkedList<>();
 			if (child instanceof Or) {
-				for (Node and : child.children) {
+				for (final Node and : child.children) {
 					if (and instanceof And) {
 						newClauses.add(and.children);
 					} else {
@@ -110,17 +110,17 @@ public class And extends Node {
 
 		final Node[] newChildren = new Node[clauses.size()];
 		int i = 0;
-		for (LinkedList<Node> clause : clauses) {
+		for (final LinkedList<Node> clause : clauses) {
 			newChildren[i++] = new And(clause);
 		}
 		return new Or(newChildren);
 	}
 
 	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses, LinkedList<Node[]> newClauses) {
-		LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
-		for (LinkedList<Node> clause : clauses) {
+		final LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<>();
+		for (final LinkedList<Node> clause : clauses) {
 			boolean intersection = false;
-			for (Node[] list : newClauses) {
+			for (final Node[] list : newClauses) {
 				if (clause.containsAll(Arrays.asList(list))) {
 					intersection = true;
 					break;
@@ -129,9 +129,9 @@ public class And extends Node {
 			if (intersection) {
 				add(updatedClauses, clause);
 			} else {
-				for (Node[] list : newClauses) {
-					LinkedList<Node> newClause = clone(clause);
-					for (Node node : list) {
+				for (final Node[] list : newClauses) {
+					final LinkedList<Node> newClause = clone(clause);
+					for (final Node node : list) {
 						newClause.add(node.clone());
 					}
 					add(updatedClauses, newClause);
@@ -142,7 +142,7 @@ public class And extends Node {
 	}
 
 	private void add(LinkedList<LinkedList<Node>> clauses, LinkedList<Node> newClause) {
-		for (LinkedList<Node> clause : clauses) {
+		for (final LinkedList<Node> clause : clauses) {
 			if (newClause.containsAll(clause)) {
 				return;
 			}
@@ -157,7 +157,7 @@ public class And extends Node {
 
 	protected void collectChildren(Node node, List<Node> nodes) {
 		if (node instanceof And) {
-			for (Node childNode : node.getChildren()) {
+			for (final Node childNode : node.getChildren()) {
 				collectChildren(childNode, nodes);
 			}
 		} else {
@@ -167,15 +167,15 @@ public class And extends Node {
 
 	@Override
 	public void simplify() {
-		List<Node> nodes = new ArrayList<Node>();
+		final List<Node> nodes = new ArrayList<Node>();
 
 		for (int i = 0; i < children.length; i++) {
 			collectChildren(children[i], nodes);
 		}
 
-		int size = nodes.size();
+		final int size = nodes.size();
 		if (size != children.length) {
-			Node[] newChildren = nodes.toArray(new Node[size]);
+			final Node[] newChildren = nodes.toArray(new Node[size]);
 			setChildren(newChildren);
 		}
 
@@ -189,7 +189,7 @@ public class And extends Node {
 
 	@Override
 	public boolean getValue(Map<Object, Boolean> map) {
-		for (Node child : children) {
+		for (final Node child : children) {
 			if (!child.getValue(map)) {
 				return false;
 			}

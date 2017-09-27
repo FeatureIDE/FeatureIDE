@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,12 +32,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_BORDE
 import static de.ovgu.featureide.fm.core.localization.StringTable.SPACES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SPACE_BETWEEN_THE_MODEL_AND_THE_FIRST_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERTICALLY_SPACE_BETWEEN_TWO_FEATURES;
+
 /**
  * This interface provides all labels, tool tips and some values used at the {@link FMPropertyPage}
- * 
+ *
  * @author Jens Meinicke
  */
 public interface IFMPropertyPage {
+
 	static final String DESCRIPTION = "At this page you can define settings for the \"Feature Model Editor\".";
 
 	/**************************************************************
@@ -73,8 +75,7 @@ public interface IFMPropertyPage {
 	static final String SPACES_TIP_CONSTRIANT = SPACE_BETWEEN_THE_MODEL_AND_THE_FIRST_CONSTRAINT;
 
 	/*
-	 *  with this values adjusting the shown spaces, 
-	 *  it is more logical for the user
+	 * with this values adjusting the shown spaces, it is more logical for the user
 	 */
 	static final int SPECES_FEATURE_X_ADJUST = 20;
 	static final int SPECES_CONSTRAIT_ADJUST = 21;
@@ -87,7 +88,7 @@ public interface IFMPropertyPage {
 	static final String COLOR_DIAGRAM_LABEL = "Diagram background:";
 	static final String COLOR_CONCRETE_LABEL = "Concrete feature color:";
 	static final String COLOR_ABSTRACT_LABEL = "Abstract feature color:";
-	//	static final String COLOR_HIDDEN = "Hidden feature background color:";
+	// static final String COLOR_HIDDEN = "Hidden feature background color:";
 	static final String COLOR_ERROR = "Error color:";
 	static final String COLOR_CONSTRAINT = "Constraint color:";
 	static final String COLOR_WARNING = "Warning color:";
@@ -96,7 +97,7 @@ public interface IFMPropertyPage {
 	static final String COLOR_BORDER = "Feature border color:";
 
 	/* color group tool tips: */
-	//	static final String COLOR_HIDDEN_TIP = "";
+	// static final String COLOR_HIDDEN_TIP = "";
 	static final String COLOR_DEAD_TIP = "";
 	static final String COLOR_CONNECTION_TIP = "";
 	static final String COLOR_CONSTRAINT_TIP = "";

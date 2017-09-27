@@ -20,6 +20,7 @@ public class Edge {
 	/*@ \final_method
 	 @ requires weight != null && weight >= 0;
 	 @ ensures this.weight = weight;
+	 @ assignable weight;
 	 @*/
 	public void setWeight(Integer weight) {
 		this.weight = weight;

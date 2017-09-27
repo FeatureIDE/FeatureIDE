@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,13 +49,14 @@ import org.prop4j.Or;
 
 /**
  * Tests for {@link SatProblem}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public abstract class SatProblemTests {
+
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
-	
+
 	@Test
 	public void testAddFormulasVarargs() {
 		final SatProblem instance = getInstance();
@@ -66,7 +67,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulasVarargsEmpty() {
 		final SatProblem instance = getInstance();
@@ -75,7 +76,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulasVarargsNullArray() {
 		final SatProblem instance = getInstance();
@@ -83,19 +84,19 @@ public abstract class SatProblemTests {
 		exception.expect(NullPointerException.class);
 		instance.addFormulas(in);
 	}
-	
+
 	@Test
 	public void testAddFormulasVarargsNullElement() {
 		final SatProblem instance = getInstance();
-		final Node[] in = new Node[] {null};
+		final Node[] in = new Node[] { null };
 		exception.expect(NullPointerException.class);
 		instance.addFormulas(in);
 	}
-	
+
 	@Test
 	public void testAddFormulasCollection() {
 		final SatProblem instance = getInstance();
-		final Collection<Node> in = Arrays.<Node>asList(new Literal("A", false), new Or("A", "B"));
+		final Collection<Node> in = Arrays.<Node> asList(new Literal("A", false), new Or("A", "B"));
 		instance.addFormulas(in);
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false)));
@@ -103,7 +104,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulasCollectionEmpty() {
 		final SatProblem instance = getInstance();
@@ -113,7 +114,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulasCollectionNullArray() {
 		final SatProblem instance = getInstance();
@@ -121,7 +122,7 @@ public abstract class SatProblemTests {
 		exception.expect(NullPointerException.class);
 		instance.addFormulas(in);
 	}
-	
+
 	@Test
 	public void testAddFormulasCollectionNullElement() {
 		final SatProblem instance = getInstance();
@@ -129,7 +130,7 @@ public abstract class SatProblemTests {
 		exception.expect(NullPointerException.class);
 		instance.addFormulas(in);
 	}
-	
+
 	@Test
 	public void testAddFormula() {
 		final SatProblem instance = getInstance();
@@ -140,7 +141,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaEmpty() {
 		final SatProblem instance = getInstance();
@@ -149,14 +150,14 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaNull() {
 		final SatProblem instance = getInstance();
 		exception.expect(NullPointerException.class);
 		instance.addFormula(null);
 	}
-	
+
 	@Test
 	public void testAddFormulaMultiple() {
 		final SatProblem instance = getInstance();
@@ -174,7 +175,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaIncremental() {
 		final SatProblem instance = getInstance();
@@ -195,7 +196,7 @@ public abstract class SatProblemTests {
 		expected.add(new Or(new Literal("C", false)));
 		assertEquals(expected, instance.getClauses());
 	}
-	
+
 	@Test
 	public void testAddFormulaAnd() {
 		final SatProblem instance = getInstance();
@@ -206,7 +207,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaOr() {
 		final SatProblem instance = getInstance();
@@ -216,7 +217,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaNotLiteral() {
 		final SatProblem instance = getInstance();
@@ -226,7 +227,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaNotNode() {
 		final SatProblem instance = getInstance();
@@ -236,7 +237,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaImplies() {
 		final SatProblem instance = getInstance();
@@ -246,7 +247,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaEquals() {
 		final SatProblem instance = getInstance();
@@ -257,7 +258,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaAtLeast() {
 		final SatProblem instance = getInstance();
@@ -269,7 +270,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaAtMost() {
 		final SatProblem instance = getInstance();
@@ -279,7 +280,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaChoose() {
 		final SatProblem instance = getInstance();
@@ -292,7 +293,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaVariablesLetters() {
 		final SatProblem instance = getInstance();
@@ -304,7 +305,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaVariablesNumbers() {
 		final SatProblem instance = getInstance();
@@ -316,7 +317,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaVariablesIntegers() {
 		final SatProblem instance = getInstance();
@@ -328,7 +329,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddFormulaVariablesFoo() {
 		final SatProblem instance = getInstance();
@@ -340,7 +341,7 @@ public abstract class SatProblemTests {
 		final List<Node> actual = instance.getClauses();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetClause() {
 		final SatProblem instance = getInstance();
@@ -349,7 +350,7 @@ public abstract class SatProblemTests {
 		final Node actual = instance.getClause(2);
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testGetClauseCount() {
 		final SatProblem instance = getInstance();
@@ -358,7 +359,7 @@ public abstract class SatProblemTests {
 		final int actual = instance.getClauseCount();
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	public void testAddAssumptions() {
 		final SatProblem instance = getInstance();
@@ -389,7 +390,7 @@ public abstract class SatProblemTests {
 		assertFalse(instance.getAssumption("B"));
 		assertFalse(instance.getAssumption("C"));
 	}
-	
+
 	@Test
 	public void testAddAssumption() {
 		final SatProblem instance = getInstance();
@@ -399,6 +400,6 @@ public abstract class SatProblemTests {
 		assertEquals(expected, instance.getAssumptions());
 		assertFalse(instance.getAssumption("A"));
 	}
-	
+
 	protected abstract SatProblem getInstance();
 }

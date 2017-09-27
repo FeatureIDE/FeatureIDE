@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,9 +47,9 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Prints a feature model in XML format.
- * 
+ *
  * @deprecated Use {@link AXMLFormat} and {@link FileHandler} instead.
- * 
+ *
  * @author Fabian Wielgorz
  * @author Dariusz Krolikowski
  * @author Maik Lampe
@@ -60,7 +60,7 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 
 	/**
 	 * Creates a new writer and sets the feature model to write out.
-	 * 
+	 *
 	 * @param object the structure to write
 	 */
 	public AbstractXMLFeatureModelWriter(T object) {
@@ -69,22 +69,22 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 
 	/**
 	 * Creates XML-Document
-	 * 
+	 *
 	 * @param doc document to write
 	 */
 	protected abstract void createXmlDoc(Document doc);
 
 	/**
 	 * Inserts indentations into the text
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
 	private static String prettyPrint(String text) {
-		StringBuilder result = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		String line;
 		int indentLevel = 0;
-		BufferedReader reader = new BufferedReader(new StringReader(text));
+		final BufferedReader reader = new BufferedReader(new StringReader(text));
 		try {
 			line = reader.readLine();
 			while (line != null) {
@@ -113,15 +113,16 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 				}
 				line = reader.readLine();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Logger.logError(e);
 		}
 		return result.toString();
 	}
 
+	@Override
 	public String writeToString() {
-		//Create Empty DOM Document
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		// Create Empty DOM Document
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(false);
@@ -130,30 +131,30 @@ public abstract class AbstractXMLFeatureModelWriter<T> extends AbstractObjectWri
 		DocumentBuilder db = null;
 		try {
 			db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException pce) {
+		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
 		}
-		Document doc = db.newDocument();
-		//Create the Xml Representation
+		final Document doc = db.newDocument();
+		// Create the Xml Representation
 		createXmlDoc(doc);
 
-		//Transform the Xml Representation into a String
+		// Transform the Xml Representation into a String
 		Transformer transfo = null;
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
-		} catch (TransformerConfigurationException e) {
+		} catch (final TransformerConfigurationException e) {
 			Logger.logError(e);
-		} catch (TransformerFactoryConfigurationError e) {
+		} catch (final TransformerFactoryConfigurationError e) {
 			Logger.logError(e);
 		}
 
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
+		final StreamResult result = new StreamResult(new StringWriter());
+		final DOMSource source = new DOMSource(doc);
 		try {
 			transfo.transform(source, result);
-		} catch (TransformerException e) {
+		} catch (final TransformerException e) {
 			Logger.logError(e);
 		}
 

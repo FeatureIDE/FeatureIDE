@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,30 +31,31 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Filter to hide methods in the collaboration outline.
- * 
-  * @author Dominic Labsch
-  * @author Daniel P�sche
+ *
+ * @author Dominic Labsch
+ * @author Daniel P�sche
  */
 public class HideAllMethods implements IOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
+		final LinkedList<Object> resultList = new LinkedList<Object>();
 
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
+		if ((obj.length > 0) && (obj[0] instanceof RoleElement)) {
 			for (int i = 0; i < obj.length; i++) {
 				if (!(obj[i] instanceof FSTMethod)) {
 					resultList.add(obj[i]);
 				}
 			}
-		}else{
+		} else {
 			return obj;
 		}
 		return resultList.toArray();
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getName()
 	 */
 	@Override
@@ -62,7 +63,8 @@ public class HideAllMethods implements IOutlineFilter {
 		return "Hide All Methods";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter#getImage()
 	 */
 	@Override

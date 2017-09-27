@@ -9,7 +9,7 @@ public class Initializer extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
+		final IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
 
 		store.setDefault("FEATURE_MODEL", true);
 		store.setDefault("USE_INCLUDES", false);

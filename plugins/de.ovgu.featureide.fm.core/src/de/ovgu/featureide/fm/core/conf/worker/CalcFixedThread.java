@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * TODO description
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CalcFixedThread extends AWorkerThread<String> {
@@ -48,7 +48,7 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 		public SharedObjects(Node fmNode, int numberOfSolvers) {
 			this.numberOfSolvers = numberOfSolvers;
-			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
+			solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
 
 	}
@@ -67,13 +67,13 @@ public class CalcFixedThread extends AWorkerThread<String> {
 	public CalcFixedThread(Node fmNode, int numberOfSolvers, IMonitor monitor) {
 		super(monitor);
 		sharedObjects = new SharedObjects(fmNode, numberOfSolvers);
-		this.id = sharedObjects.lastSolverID;
+		id = sharedObjects.lastSolverID;
 	}
 
 	private CalcFixedThread(CalcFixedThread oldThread) {
 		super(oldThread);
-		this.sharedObjects = oldThread.sharedObjects;
-		this.id = ++oldThread.sharedObjects.lastSolverID;
+		sharedObjects = oldThread.sharedObjects;
+		id = ++oldThread.sharedObjects.lastSolverID;
 	}
 
 	@Override

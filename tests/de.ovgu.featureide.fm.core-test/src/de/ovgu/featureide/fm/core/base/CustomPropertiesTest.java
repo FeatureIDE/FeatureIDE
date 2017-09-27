@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 public class CustomPropertiesTest {
@@ -41,7 +41,7 @@ public class CustomPropertiesTest {
 	@Before
 	public void setup() {
 		CustomFeaturesCustomPropertiesTest.setFileSystem();
-		
+
 		final IFeatureModel model = factory.createFeatureModel();
 
 		final IFeature f1 = factory.createFeature(model, "A");
@@ -66,13 +66,13 @@ public class CustomPropertiesTest {
 
 		model.getStructure().setRoot(f1.getStructure());
 
-		FileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
 	}
 
 	@Test
 	public void testCustomProperties() {
 		final IFeatureModel model = factory.createFeatureModel();
-		ProblemList problems = FileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
+		final ProblemList problems = SimpleFileHandler.load(modelFile.toPath(), model, new XmlFeatureModelFormat());
 		Assert.assertFalse(problems.containsError());
 
 		Assert.assertTrue(model.getFeature("A").getCustomProperties().has("key1"));
@@ -98,14 +98,15 @@ public class CustomPropertiesTest {
 		Assert.assertFalse(model.getFeature("A").getCustomProperties().has("key1"));
 
 		modelFile.delete();
-		FileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
-		
+		SimpleFileHandler.save(modelFile.toPath(), model, new XmlFeatureModelFormat());
+
 		final IFeatureModel model2 = factory.createFeatureModel();
-		ProblemList problems2 = FileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
-		
-		for (Problem p : problems2.getErrors())
+		final ProblemList problems2 = SimpleFileHandler.load(modelFile.toPath(), model2, new XmlFeatureModelFormat());
+
+		for (final Problem p : problems2.getErrors()) {
 			System.out.println(p.message);
-		
+		}
+
 		Assert.assertFalse(problems2.containsError());
 
 		Assert.assertFalse(model2.getFeature("A").getCustomProperties().has("key1"));

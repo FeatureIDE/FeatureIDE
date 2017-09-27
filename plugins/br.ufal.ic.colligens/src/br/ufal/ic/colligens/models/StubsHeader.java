@@ -49,6 +49,7 @@ import util.TypeGeneratorVisitor;
 
 @SuppressWarnings(RESTRICTION)
 public class StubsHeader extends AbstractHeader {
+
 	// It keeps the C types.
 	private final HashSet<String> types = new HashSet<String>();
 
@@ -61,15 +62,15 @@ public class StubsHeader extends AbstractHeader {
 
 	@Override
 	public void run() throws PlatformException {
-		File stubs = new File(this.getIncludePath());
+		final File stubs = new File(getIncludePath());
 
-		if (stubs.exists())
+		if (stubs.exists()) {
 			return;
+		}
 
-		new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects").mkdirs();
+		new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects").mkdirs();
 
-		this.stubsCDT();
+		stubsCDT();
 
 	}
 
@@ -77,27 +78,24 @@ public class StubsHeader extends AbstractHeader {
 	public String getIncludePath() {
 		// return super.getProject().getProject().getLocation().toOSString()
 		// + "/stubs.h";
-		return Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator")
-				+ super.getProject().getProject().getName() + "_stubs.h";
+		return Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
+			+ System.getProperty("file.separator") + super.getProject().getProject().getName() + "_stubs.h";
 	}
 
 	@Override
 	public Collection<String> getIncludes() {
-		ArrayList<String> collection = new ArrayList<String>();
+		final ArrayList<String> collection = new ArrayList<String>();
 
-		collection.add(this.getIncludePath());
+		collection.add(getIncludePath());
 
-		IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
+		final IPreferenceStore store = Colligens.getDefault().getPreferenceStore();
 		if (store.getBoolean("USE_INCLUDES")) {
-			PlatformHeader platformHeader = new PlatformHeader();
+			final PlatformHeader platformHeader = new PlatformHeader();
 			try {
-				platformHeader.setProject(this.getProject().getProject()
-						.getName());
+				platformHeader.setProject(getProject().getProject().getName());
 				platformHeader.run();
 				collection.add(platformHeader.getIncludePath());
-			} catch (PlatformException e) {
+			} catch (final PlatformException e) {
 				e.printStackTrace();
 			}
 		}
@@ -106,13 +104,13 @@ public class StubsHeader extends AbstractHeader {
 	}
 
 	public void stubsCDT() throws PlatformException {
-		Collection<String> files = filesAllProject();
-		for (Iterator<String> iterator = files.iterator(); iterator.hasNext();) {
-			this.generateTypes(iterator.next());
+		final Collection<String> files = filesAllProject();
+		for (final Iterator<String> iterator = files.iterator(); iterator.hasNext();) {
+			generateTypes(iterator.next());
 		}
 
-		File fileTemp = writeTypesToPlatformHeader();
-		fileTemp.renameTo(new File(this.getIncludePath()));
+		final File fileTemp = writeTypesToPlatformHeader();
+		fileTemp.renameTo(new File(getIncludePath()));
 
 	}
 
@@ -173,24 +171,24 @@ public class StubsHeader extends AbstractHeader {
 		// + System.getProperty("file.separator") + "temp.c")
 		// .deleteOnExit();
 
-		IFolder folder = super.getProject().getProject().getFolder("/includes");
+		final IFolder folder = super.getProject().getProject().getFolder("/includes");
 
-		ProjectExplorerController explorerController = new ProjectExplorerController();
+		final ProjectExplorerController explorerController = new ProjectExplorerController();
 
 		explorerController.addResource(folder);
 
-		List<IResource> list = explorerController.getList();
+		final List<IResource> list = explorerController.getList();
 
 		IIncludeReference iIncludeReference[] = null;
 		try {
 			iIncludeReference = super.getProject().getIncludeReferences();
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 			e.printStackTrace();
 		}
 
-		List<Type> typesAll = new ArrayList<Type>();
+		final List<Type> typesAll = new ArrayList<Type>();
 
-		PlatformHeader platformHeader = new PlatformHeader();
+		final PlatformHeader platformHeader = new PlatformHeader();
 
 		platformHeader.setProject(super.getProject().getProject().getName());
 
@@ -200,8 +198,8 @@ public class StubsHeader extends AbstractHeader {
 
 		monitorbeginTask("Generating stubs (TypeChef)", list.size());
 
-		for (Iterator<IResource> iterator = list.iterator(); iterator.hasNext();) {
-			IResource iResource = iterator.next();
+		for (final Iterator<IResource> iterator = list.iterator(); iterator.hasNext();) {
+			final IResource iResource = iterator.next();
 			// FileProxy fileProxy = new FileProxy(iResource);
 			monitorWorked(1);
 			monitorSubTask(iResource.getLocation().toString());
@@ -209,7 +207,7 @@ public class StubsHeader extends AbstractHeader {
 			if (monitorIsCanceled()) {
 				return;
 			}
-			ArrayList<String> paramters = new ArrayList<String>();
+			final ArrayList<String> paramters = new ArrayList<String>();
 
 			paramters.add("--lexNoStdout");
 			paramters.add("--parse");
@@ -228,33 +226,33 @@ public class StubsHeader extends AbstractHeader {
 			paramters.add(iResource.getLocation().toString());
 
 			try {
-				Node myAst = GeneralFrontend.getAST(paramters);
+				final Node myAst = GeneralFrontend.getAST(paramters);
 
 				myAst.accept(new PresenceConditionVisitor());
 
-				TypeGeneratorVisitor typeGenerator = new TypeGeneratorVisitor();
+				final TypeGeneratorVisitor typeGenerator = new TypeGeneratorVisitor();
 				myAst.accept(typeGenerator);
 
 				// myAst.accept(new VisitorPrinter(false));
 				//
 				// myAst.toString();
 
-				List<Type> types = typeGenerator.getTypes();
-				for (Type type : types) {
+				final List<Type> types = typeGenerator.getTypes();
+				for (final Type type : types) {
 					typesAll.add(type);
 				}
 
-			} catch (OptionException e) {
+			} catch (final OptionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (NullPointerException e) {
+			} catch (final NullPointerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new PlatformException("");
 			}
 		}
 		System.err.println(typesAll.size());
-		for (Type type : typesAll) {
+		for (final Type type : typesAll) {
 			System.out.println(type.getPresenceCondition().toString());
 			System.out.println(type.getSource());
 		}
@@ -268,22 +266,19 @@ public class StubsHeader extends AbstractHeader {
 		try {
 			// file = activateConfigs(filePath);
 			// System.out.println(file.getAbsolutePath());
-			ITranslationUnit tu = (ITranslationUnit) CoreModel.getDefault()
-					.create(getFile(filePath));
+			final ITranslationUnit tu = (ITranslationUnit) CoreModel.getDefault().create(getFile(filePath));
 
 			IASTTranslationUnit ast = null;
 
-			IIndex index = CCorePlugin.getIndexManager().getIndex(
-					super.getProject());
+			final IIndex index = CCorePlugin.getIndexManager().getIndex(super.getProject());
 			// The AST is ready for use..
 			ast = tu.getAST(index, ITranslationUnit.AST_PARSE_INACTIVE_CODE);
 
-			this.setTypes(ast);
-			this.setMacros(ast);
-		} catch (CoreException e1) {
+			setTypes(ast);
+			setMacros(ast);
+		} catch (final CoreException e1) {
 
-			throw new PlatformException(
-					WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS);
+			throw new PlatformException(WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS);
 			// } catch (IOException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
@@ -295,12 +290,11 @@ public class StubsHeader extends AbstractHeader {
 
 	// It finds probable macros in the node.
 	private void setMacros(IASTNode node) {
-		IASTPreprocessorMacroDefinition[] definitions = node
-				.getTranslationUnit().getMacroDefinitions();
-		for (IASTPreprocessorMacroDefinition definition : definitions) {
-			String macro = definition.getRawSignature();
-			if (!this.macros.contains(macro)) {
-				this.macros.add(macro);
+		final IASTPreprocessorMacroDefinition[] definitions = node.getTranslationUnit().getMacroDefinitions();
+		for (final IASTPreprocessorMacroDefinition definition : definitions) {
+			final String macro = definition.getRawSignature();
+			if (!macros.contains(macro)) {
+				macros.add(macro);
 			}
 
 		}
@@ -308,23 +302,20 @@ public class StubsHeader extends AbstractHeader {
 
 	// It finds probable types in the node.
 	private void setTypes(IASTNode node) {
-		IASTNode[] nodes = node.getChildren();
-		if (node.getClass()
-				.getCanonicalName()
-				.equals("org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier")) {
+		final IASTNode[] nodes = node.getChildren();
+		if (node.getClass().getCanonicalName().equals("org.eclipse.cdt.internal.core.dom.parser.c.CASTTypedefNameSpecifier")) {
 
-			CASTTypedefNameSpecifier s = (CASTTypedefNameSpecifier) node;
-			String type = s.getRawSignature().replace("extern", "")
-					.replace("static", "").replace("const", "").trim();
-			String type2 = type;
+			final CASTTypedefNameSpecifier s = (CASTTypedefNameSpecifier) node;
+			String type = s.getRawSignature().replace("extern", "").replace("static", "").replace("const", "").trim();
+			final String type2 = type;
 			type = "typedef struct " + type + ";";
-			if (!this.types.contains(type) && this.isValidJavaIdentifier(type2)) {
-				this.types.add(type);
+			if (!types.contains(type) && isValidJavaIdentifier(type2)) {
+				types.add(type);
 			}
 		}
 
 		for (int i = 0; i < nodes.length; i++) {
-			this.setTypes(nodes[i]);
+			setTypes(nodes[i]);
 		}
 
 	}
@@ -332,27 +323,23 @@ public class StubsHeader extends AbstractHeader {
 	// All types found are defined in the platform.h header file.
 	private File writeTypesToPlatformHeader() throws PlatformException {
 
-		File platformTemp = new File(super.getProject().getProject()
-				.getLocation().toOSString()
-				+ System.getProperty("file.separator") + "sutbs_temp.h");
+		final File platformTemp = new File(super.getProject().getProject().getLocation().toOSString() + System.getProperty("file.separator") + "sutbs_temp.h");
 
 		try {
-			FileWriter writer = new FileWriter(platformTemp);
-			for (Iterator<String> i = this.types.iterator(); i.hasNext();) {
-				String type = i.next();
+			final FileWriter writer = new FileWriter(platformTemp);
+			for (final Iterator<String> i = types.iterator(); i.hasNext();) {
+				final String type = i.next();
 				if (!countDirectives.directives.contains(type)) {
 					// writer.write("typedef struct {} " + type + ";\n");
 					writer.write(type + "\n");
 				}
 			}
 
-			for (Iterator<String> i = this.macros.iterator(); i.hasNext();) {
-				String next = i.next();
+			for (final Iterator<String> i = macros.iterator(); i.hasNext();) {
+				final String next = i.next();
 				if (next.contains("#define ")) {
-					String[] temp = next.trim().split(Pattern.quote(" "));
-					if (!(countDirectives.directives.contains(temp[1])
-							|| temp[1].endsWith("_H_") || temp[1]
-								.endsWith("_H"))) {
+					final String[] temp = next.trim().split(Pattern.quote(" "));
+					if (!(countDirectives.directives.contains(temp[1]) || temp[1].endsWith("_H_") || temp[1].endsWith("_H"))) {
 						writer.write(next + "\n");
 					}
 				} else {
@@ -362,9 +349,8 @@ public class StubsHeader extends AbstractHeader {
 
 			writer.flush();
 			writer.close();
-		} catch (IOException e) {
-			throw new PlatformException(
-					"was not possible to generate the stubs");
+		} catch (final IOException e) {
+			throw new PlatformException("was not possible to generate the stubs");
 		}
 
 		super.refreshLocal();
@@ -374,11 +360,11 @@ public class StubsHeader extends AbstractHeader {
 
 	private boolean isValidJavaIdentifier(String s) {
 		// An empty or null string cannot be a valid identifier
-		if (s == null || s.length() == 0) {
+		if ((s == null) || (s.length() == 0)) {
 			return false;
 		}
 
-		char[] c = s.toCharArray();
+		final char[] c = s.toCharArray();
 		if (!Character.isJavaIdentifierStart(c[0])) {
 			return false;
 		}
@@ -413,35 +399,29 @@ public class StubsHeader extends AbstractHeader {
 
 		List<String> list;
 
-		List<String> listFiles = filesAllProject();
+		final List<String> listFiles = filesAllProject();
 
 		list = new ArrayList<String>(listFiles);
 
 		try {
-			IIncludeReference includes[] = super.getProject()
-					.getIncludeReferences();
+			final IIncludeReference includes[] = super.getProject().getIncludeReferences();
 			for (int i = 0; i < includes.length; i++) {
 				// System.out.println(includes[i].getElementName());
 				list.add(0, "-I" + includes[i].getElementName());
 			}
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 
 			e.printStackTrace();
 		}
 
-		if (!Colligens.getDefault().getPreferenceStore().getString("LIBS")
-				.contentEquals("")) {
-			list.add(
-					0,
-					Colligens.getDefault().getPreferenceStore()
-							.getString("LIBS"));
+		if (!Colligens.getDefault().getPreferenceStore().getString("LIBS").contentEquals("")) {
+			list.add(0, Colligens.getDefault().getPreferenceStore().getString("LIBS"));
 		}
 
 		list.add(0, "-M");
-		list.add(0, Colligens.getDefault().getPreferenceStore()
-				.getString("GCC"));
+		list.add(0, Colligens.getDefault().getPreferenceStore().getString("GCC"));
 
-		ProcessBuilder processBuilder = new ProcessBuilder(list);
+		final ProcessBuilder processBuilder = new ProcessBuilder(list);
 
 		BufferedReader input = null;
 		BufferedReader error = null;
@@ -449,13 +429,9 @@ public class StubsHeader extends AbstractHeader {
 		String output = new String();
 
 		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get(
-							"UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get(
-							"UTF-8")));
+			final Process process = processBuilder.start();
+			input = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
+			error = new BufferedReader(new InputStreamReader(process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
 			boolean execute = true;
 
 			while (execute) {
@@ -476,35 +452,34 @@ public class StubsHeader extends AbstractHeader {
 							}
 							System.err.println(line);
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						e.printStackTrace();
 						Colligens.getDefault().logError(e);
 					}
 
 					try {
 						process.waitFor();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						System.out.println(e.toString());
 						Colligens.getDefault().logError(e);
 					}
-					int exitValue = process.exitValue();
+					final int exitValue = process.exitValue();
 					if (exitValue != 0) {
 
 						if (errorLine.equals("")) {
-							errorLine = "Was not possible to locate all the includes (exit="
-									+ exitValue + ")!";
+							errorLine = "Was not possible to locate all the includes (exit=" + exitValue + ")!";
 						}
 						throw new PlatformException(errorLine);
 					}
 
 					execute = false;
-				} catch (IllegalThreadStateException e) {
+				} catch (final IllegalThreadStateException e) {
 					System.out.println(e.toString());
 					Colligens.getDefault().logError(e);
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			System.out.println(e.toString());
 			Colligens.getDefault().logError(e);
 		} finally {
@@ -513,91 +488,79 @@ public class StubsHeader extends AbstractHeader {
 					input.close();
 				}
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				Colligens.getDefault().logError(e);
 			} finally {
-				if (error != null)
+				if (error != null) {
 					try {
 						error.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Colligens.getDefault().logError(e);
 					}
+				}
 			}
 		}
 
-		Collection<String> listTemp = new HashSet<String>(Arrays.asList(output
-				.split(" ")));
+		final Collection<String> listTemp = new HashSet<String>(Arrays.asList(output.split(" ")));
 
-		Collection<String> includesTemp = new HashSet<String>();
+		final Collection<String> includesTemp = new HashSet<String>();
 
-		String projectPath = super.getProject().getProject().getLocation()
-				.toOSString();
+		final String projectPath = super.getProject().getProject().getLocation().toOSString();
 
-		for (Iterator<String> iterator = listTemp.iterator(); iterator
-				.hasNext();) {
+		for (final Iterator<String> iterator = listTemp.iterator(); iterator.hasNext();) {
 			String string = iterator.next();
 			string = string.trim();
-			if (!(string.contains("\\") || string.contains(".o:"))
-					&& !includesTemp.contains(string)) {
+			if (!(string.contains("\\") || string.contains(".o:")) && !includesTemp.contains(string)) {
 				includesTemp.add(string);
 			}
 		}
 
 		listTemp.clear();
 
-		new File(projectPath + System.getProperty("file.separator")
-				+ "includes").mkdirs();
+		new File(projectPath + System.getProperty("file.separator") + "includes").mkdirs();
 
 		IIncludeReference includesPath[] = null;
 		try {
 			includesPath = super.getProject().getIncludeReferences();
-		} catch (CModelException e) {
+		} catch (final CModelException e) {
 			e.printStackTrace();
 		}
 
 		includes = new HashSet<String>();
 
-		for (Iterator<String> iterator = includesTemp.iterator(); iterator
-				.hasNext();) {
-			String string = iterator.next();
+		for (final Iterator<String> iterator = includesTemp.iterator(); iterator.hasNext();) {
+			final String string = iterator.next();
 
 			for (int i = 0; i < includesPath.length; i++) {
 				if (string.contains(includesPath[i].getElementName())) {
 					System.err.println(string);
-					String temp = string.substring(includesPath[i]
-							.getElementName().length());
+					final String temp = string.substring(includesPath[i].getElementName().length());
 
-					File file = new File(projectPath + "/includes" + temp);
+					final File file = new File(projectPath + "/includes" + temp);
 
 					if (file.exists()) {
 						continue;
 					}
 
-					new File(projectPath
-							+ "/includes"
-							+ temp.substring(0, temp.length()
-									- file.getName().length())).mkdir();
+					new File(projectPath + "/includes" + temp.substring(0, temp.length() - file.getName().length())).mkdir();
 
 					includes.add(file.getAbsolutePath());
 					try {
-						FileWriter fstreamout = new FileWriter(
-								file.getAbsolutePath());
-						BufferedWriter out = new BufferedWriter(fstreamout);
+						final FileWriter fstreamout = new FileWriter(file.getAbsolutePath());
+						final BufferedWriter out = new BufferedWriter(fstreamout);
 
 						FileInputStream fstream;
 
 						fstream = new FileInputStream(string);
 
 						// Get the object of DataInputStream
-						DataInputStream in = new DataInputStream(fstream);
-						BufferedReader br = new BufferedReader(
-								new InputStreamReader(in));
+						final DataInputStream in = new DataInputStream(fstream);
+						final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 						String strLine;
 						// Read File Line By Line
 						while ((strLine = br.readLine()) != null) {
 
-							if ((strLine.contains("include") && strLine
-									.startsWith("#"))) {
+							if ((strLine.contains("include") && strLine.startsWith("#"))) {
 								// out.write("//" + strLine + "\n");
 							} else {
 								out.write(strLine + "\n");
@@ -607,10 +570,10 @@ public class StubsHeader extends AbstractHeader {
 
 						in.close();
 						out.close();
-					} catch (FileNotFoundException e) {
+					} catch (final FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -623,43 +586,30 @@ public class StubsHeader extends AbstractHeader {
 
 	}
 
-	public File activateConfigs(String path) throws IOException,
-			PlatformException {
-		File file = new File(path);
+	public File activateConfigs(String path) throws IOException, PlatformException {
+		final File file = new File(path);
 		if (file.getName().endsWith(".c") || file.getName().endsWith(".h")) {
 
-			File temp = new File(super.getProject().getProject().getLocation()
-					.toOSString()
-					+ System.getProperty("file.separator") + "temp.c");
-			FileWriter fw = new FileWriter(temp);
-			BufferedWriter bw = new BufferedWriter(fw);
+			final File temp = new File(super.getProject().getProject().getLocation().toOSString() + System.getProperty("file.separator") + "temp.c");
+			final FileWriter fw = new FileWriter(temp);
+			final BufferedWriter bw = new BufferedWriter(fw);
 
 			bw.write("#define COLLIGENS\n");
 
-			FileInputStream fstream = new FileInputStream(
-					file.getAbsoluteFile());
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			final FileInputStream fstream = new FileInputStream(file.getAbsoluteFile());
+			final DataInputStream in = new DataInputStream(fstream);
+			final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			while ((strLine = br.readLine()) != null) {
 				strLine = strLine.trim();
-				if (strLine.startsWith("#if") || strLine.startsWith("# if")
-						|| strLine.startsWith("#  if")
-						|| strLine.startsWith("#   if")) {
+				if (strLine.startsWith("#if") || strLine.startsWith("# if") || strLine.startsWith("#  if") || strLine.startsWith("#   if")) {
 					bw.write("#ifdef COLLIGENS\n");
-				} else if (strLine.startsWith("#el")
-						|| strLine.startsWith("# el")
-						|| strLine.startsWith("#  el")
-						|| strLine.startsWith("#   el")) {
+				} else if (strLine.startsWith("#el") || strLine.startsWith("# el") || strLine.startsWith("#  el") || strLine.startsWith("#   el")) {
 					bw.write("#endif\n");
 					bw.write("#ifdef COLLIGENS\n");
-				} else if (strLine.startsWith("#error")
-						|| strLine.startsWith("# error")
-						|| strLine.startsWith("#pragma")
-						|| strLine.startsWith("# pragma")) {
+				} else if (strLine.startsWith("#error") || strLine.startsWith("# error") || strLine.startsWith("#pragma") || strLine.startsWith("# pragma")) {
 					// bw.write("\\" + strLine + "\n");
-				} else if ((strLine.contains("include") && strLine
-						.startsWith("//#"))) {
+				} else if ((strLine.contains("include") && strLine.startsWith("//#"))) {
 					bw.write(strLine.substring(2, strLine.length()) + "\n");
 				} else {
 					bw.write(strLine + "\n");

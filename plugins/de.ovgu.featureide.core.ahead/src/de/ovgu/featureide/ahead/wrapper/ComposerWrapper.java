@@ -58,10 +58,8 @@ import mixin.Mixin;
 
 /**
  * 
- * The class encapsulates everything that has to do with the composing step. It
- * composes several given jak files. for each jak file all corresponding jak
- * files according to one configuration file were searched to compose them with the
- * help of the Mixin class
+ * The class encapsulates everything that has to do with the composing step. It composes several given jak files. for each jak file all corresponding jak files
+ * according to one configuration file were searched to compose them with the help of the Mixin class
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
@@ -71,6 +69,7 @@ import mixin.Mixin;
 public class ComposerWrapper {
 
 	private static class FeatureVisitor implements IResourceVisitor {
+
 		private final ComposerWrapper composer;
 
 		public FeatureVisitor(ComposerWrapper composer) {
@@ -130,7 +129,7 @@ public class ComposerWrapper {
 	 * @param configFile
 	 * @return Array of composed jakfiles
 	 */
-	//	@SuppressWarnings("unchecked")
+	// @SuppressWarnings("unchecked")
 	public IFile[] composeAll(IFile configFile) throws IOException {
 		// Set the given configuration file as the current one
 		// Search in all feature directories for jakfiles and add
@@ -155,8 +154,7 @@ public class ComposerWrapper {
 	}
 
 	/**
-	 * Sets the current configuration file <br>
-	 * This method has to be called before addJakfileToCompose
+	 * Sets the current configuration file <br> This method has to be called before addJakfileToCompose
 	 */
 	void setConfiguration(IFile configFile) throws IOException {
 		this.configFile = configFile;
@@ -209,9 +207,7 @@ public class ComposerWrapper {
 	}
 
 	/**
-	 * Adds a jakfile to the composition list <br>
-	 * This method automaticaly searches for corresponding jakfiles in all
-	 * specified feature folders
+	 * Adds a jakfile to the composition list <br> This method automaticaly searches for corresponding jakfiles in all specified feature folders
 	 * 
 	 * @param newJakFile
 	 * @throws ComposerException
@@ -244,8 +240,7 @@ public class ComposerWrapper {
 		jakFilePath = jakFilePath.substring(pos + 1).replace("\\", "/");
 
 		// don't add files twice
-		if (absoluteJakFilenames.containsKey(jakFilePath))
-			return;
+		if (absoluteJakFilenames.containsKey(jakFilePath)) return;
 
 		final LinkedList<IFile> fileVector = new LinkedList<>();
 		for (IFolder root : allFeatureFolders) {
@@ -254,11 +249,11 @@ public class ComposerWrapper {
 				fileVector.add(jakFile);
 			}
 		}
-		//if (fileVector.size() == 0) {
+		// if (fileVector.size() == 0) {
 		// this is the case if you try to add a jak file that lies in a
 		// folder
 		// that isn't contained in the configuration file
-		//	} else
+		// } else
 		absoluteJakFilenames.put(jakFilePath, fileVector);
 	}
 

@@ -11,12 +11,10 @@ import br.ufal.ic.colligens.util.Log;
 class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public Object[] getElements(Object files) {
@@ -25,10 +23,11 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof List)
+		if (parentElement instanceof List) {
 			return ((List<?>) parentElement).toArray();
+		}
 		if (parentElement instanceof FileProxy) {
-			List<Log> logs = ((FileProxy) parentElement).getLogs();
+			final List<Log> logs = ((FileProxy) parentElement).getLogs();
 			return logs.toArray();
 		}
 		return new Object[0];
@@ -44,8 +43,9 @@ class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof List)
+		if (element instanceof List) {
 			return ((List<?>) element).size() > 0;
+		}
 		if (element instanceof FileProxy) {
 			return (!((FileProxy) element).getLogs().isEmpty());
 		}

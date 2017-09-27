@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package br.ufal.ic.colligens.handler;
 
@@ -34,86 +34,74 @@ import de.fosd.typechef.options.OptionException;
 
 /**
  * @author thiago
- * 
+ *
  */
 public class PresenceConditionHandler extends ColligensAbstractHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands. ExecutionEvent)
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-		IWorkbenchPage page = window.getActivePage();
-		IEditorPart editor = page.getActiveEditor();
-		
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		final IWorkbenchPage page = window.getActivePage();
+		final IEditorPart editor = page.getActiveEditor();
+
 		if (editor instanceof ITextEditor) {
-			
-			ISelectionProvider selectionProvider = ((ITextEditor) editor)
-					.getSelectionProvider();
-			ISelection selection = selectionProvider.getSelection();
-			
+
+			final ISelectionProvider selectionProvider = ((ITextEditor) editor).getSelectionProvider();
+			final ISelection selection = selectionProvider.getSelection();
+
 			if (selection instanceof ITextSelection) {
-				
-				TextSelection textSelection = (TextSelection) selection;
-				
-				IDocumentProvider provider = ((ITextEditor) editor)
-						.getDocumentProvider();
-				IDocument document = provider.getDocument(editor
-						.getEditorInput());
-				int line = textSelection.getStartLine();
 
-				FileEditorInput fileEditorInput = (FileEditorInput) window
-						.getActivePage().getActiveEditor().getEditorInput();
+				final TextSelection textSelection = (TextSelection) selection;
 
-				IFile file = fileEditorInput.getFile();
+				final IDocumentProvider provider = ((ITextEditor) editor).getDocumentProvider();
+				final IDocument document = provider.getDocument(editor.getEditorInput());
+				final int line = textSelection.getStartLine();
+
+				final FileEditorInput fileEditorInput = (FileEditorInput) window.getActivePage().getActiveEditor().getEditorInput();
+
+				final IFile file = fileEditorInput.getFile();
 				String code = null;
 				try {
-					code = document.get(document.getLineOffset(line),
-							document.getLineLength(line));
-				} catch (BadLocationException e1) {
+					code = document.get(document.getLineOffset(line), document.getLineLength(line));
+				} catch (final BadLocationException e1) {
 
 					e1.printStackTrace();
 				}
 
-				PresenceConditionController conditionController = new PresenceConditionController(
-						file, line + 1, code);
+				final PresenceConditionController conditionController = new PresenceConditionController(file, line + 1, code);
 
 				try {
 					conditionController.run();
 
 					// show erros
 
-					if (conditionController.getFileProxy() != null
-							&& !conditionController.getFileProxy().getLogs()
-									.isEmpty()) {
+					if ((conditionController.getFileProxy() != null) && !conditionController.getFileProxy().getLogs().isEmpty()) {
 						try {
 							page.showView(InvalidConfigurationsView.ID);
-							InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController
-									.getInstance();
+							final InvalidConfigurationsViewController analyzerViewController = InvalidConfigurationsViewController.getInstance();
 
 							analyzerViewController.clear();
 
-							List<FileProxy> list = new LinkedList<FileProxy>();
+							final List<FileProxy> list = new LinkedList<FileProxy>();
 
 							list.add(conditionController.getFileProxy());
 
 							analyzerViewController.setInput(list);
 
-						} catch (PartInitException e) {
+						} catch (final PartInitException e) {
 							e.printStackTrace();
 						}
 					}
 					// ---
-				} catch (PluginException e) {
+				} catch (final PluginException e) {
 					e.printStackTrace();
-				} catch (OptionException e) {
+				} catch (final OptionException e) {
 					e.printStackTrace();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 

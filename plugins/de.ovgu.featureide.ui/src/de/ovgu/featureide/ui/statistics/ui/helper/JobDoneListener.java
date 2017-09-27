@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,21 +43,21 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
  * Listener for {@link TreeJob}s. Uses Singleton-Pattern.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class JobDoneListener implements IJobChangeListener {
 
 	protected static JobDoneListener instance = new JobDoneListener();
-	private List<IJob<?>> runningJobs = new LinkedList<>();
+	private final List<IJob<?>> runningJobs = new LinkedList<>();
 	protected List<TreeViewer> views = new LinkedList<TreeViewer>();
 
 	public void checkViews() {
 		synchronized (views) {
 			for (int i = 0; i < views.size();) {
-				TreeViewer view = views.get(i);
-				if (view == null || view.getControl() == null || view.getControl().isDisposed()) {
+				final TreeViewer view = views.get(i);
+				if ((view == null) || (view.getControl() == null) || view.getControl().isDisposed()) {
 					views.remove(view);
 				} else {
 					i++;
@@ -65,47 +65,47 @@ public class JobDoneListener implements IJobChangeListener {
 			}
 		}
 	}
-	
+
 	public void init(final TreeViewer view) {
 		views.add(view);
 	}
-	
+
 	public static JobDoneListener getInstance() {
 		return instance;
 	}
-	
+
 	/**
 	 * Private constructor for singleton-pattern.
 	 */
 	private JobDoneListener() {}
-	
+
 	@Override
 	public void aboutToRun(IJobChangeEvent event) {}
-	
+
 	@Override
 	public void awake(IJobChangeEvent event) {}
-	
+
 	/**
-	 * Reverses the actions of
-	 * {@link JobDoneListener#scheduled(IJobChangeEvent)}
+	 * Reverses the actions of {@link JobDoneListener#scheduled(IJobChangeEvent)}
 	 */
 	@Override
 	public void done(final IJobChangeEvent event) {
-		if (event.getResult() == Status.OK_STATUS || event.getResult() == Status.CANCEL_STATUS) {
-			UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
+		if ((event.getResult() == Status.OK_STATUS) || (event.getResult() == Status.CANCEL_STATUS)) {
+			final UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
+
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					final Job job = event.getJob();
 					if (job instanceof LongRunningJob) {
 						final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
-						LongRunningMethod<?> method = treeJob.getMethod();
-						final boolean expand = (method instanceof StatisticTreeJob) && ((StatisticTreeJob)method).isExpand();
+						final LongRunningMethod<?> method = treeJob.getMethod();
+						final boolean expand = (method instanceof StatisticTreeJob) && ((StatisticTreeJob) method).isExpand();
 						runningJobs.remove(treeJob);
-						final Parent calc = ((TreeJob)method).getCalculated();
+						final Parent calc = ((TreeJob) method).getCalculated();
 						calc.startCalculating(false);
 						checkViews();
 						synchronized (views) {
-							for (TreeViewer view : views) {
+							for (final TreeViewer view : views) {
 								view.refresh(calc);
 								if (expand) {
 									view.expandToLevel(calc, 1);
@@ -120,28 +120,28 @@ public class JobDoneListener implements IJobChangeListener {
 			refreshJob.schedule();
 		}
 	}
-	
+
 	@Override
 	public void running(IJobChangeEvent event) {}
-	
+
 	/**
-	 * Adds the scheduled job to the list of running jobs and gives the user
-	 * optical feedback that the requested node is being calculated.
+	 * Adds the scheduled job to the list of running jobs and gives the user optical feedback that the requested node is being calculated.
 	 */
 	@Override
 	public void scheduled(final IJobChangeEvent event) {
-		UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
+		final UIJob refreshJob = new UIJob(REFRESH_STATISTICS_VIEW) {
+
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				final Job job = event.getJob();
 				if (job instanceof LongRunningJob) {
 					final LongRunningJob<?> treeJob = (LongRunningJob<?>) job;
 					runningJobs.add(treeJob);
-					Parent calc = ((TreeJob)treeJob.getMethod()).getCalculated();
+					final Parent calc = ((TreeJob) treeJob.getMethod()).getCalculated();
 					calc.startCalculating(true);
 					checkViews();
 					synchronized (views) {
-						for (TreeViewer view : views) {
+						for (final TreeViewer view : views) {
 							view.refresh(calc);
 						}
 					}
@@ -152,12 +152,12 @@ public class JobDoneListener implements IJobChangeListener {
 		refreshJob.setPriority(Job.INTERACTIVE);
 		refreshJob.schedule();
 	}
-	
+
 	@Override
 	public void sleeping(IJobChangeEvent event) {}
-	
+
 	public void cancelAllRunningTreeJobs() {
-		for (IJob<?> job : runningJobs) {
+		for (final IJob<?> job : runningJobs) {
 			job.cancel();
 		}
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,10 +30,11 @@ import org.eclipse.core.runtime.QualifiedName;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManagerDefaults;
 
 /**
  * Imports the persistent properties from a file.
- * 
+ *
  * @author Jens Meinicke
  */
 public class SettingsImport {
@@ -55,16 +56,16 @@ public class SettingsImport {
 	 * @param persitentProperties
 	 */
 	private void importSettings(File settingsFile) {
-		String content = getContents(settingsFile);
-		String[] settings = content.split("\r\n");
-		for (String s : settings) {
+		final String content = getContents(settingsFile);
+		final String[] settings = content.split("\r\n");
+		for (final String s : settings) {
 			try {
-				String value = s.split("[=]")[1];
+				final String value = s.split("[=]")[1];
 				if (s.contains("=") && !"null".equals(value)) {
-					String qualifier = s.split("[=]")[0];
-					FMPropertyManager.workspaceRoot.setPersistentProperty(new QualifiedName(qualifier, qualifier), value);
+					final String qualifier = s.split("[=]")[0];
+					FMPropertyManagerDefaults.workspaceRoot.setPersistentProperty(new QualifiedName(qualifier, qualifier), value);
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
@@ -76,7 +77,7 @@ public class SettingsImport {
 	 * @return
 	 */
 	private String getContents(File settingsFile) {
-		StringBuilder buffer = new StringBuilder();
+		final StringBuilder buffer = new StringBuilder();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(settingsFile));
@@ -85,14 +86,14 @@ public class SettingsImport {
 				buffer.append(line);
 				buffer.append("\r\n");
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			FMUIPlugin.getDefault().logError(e);
 		} finally {
 			try {
 				if (reader != null) {
 					reader.close();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}

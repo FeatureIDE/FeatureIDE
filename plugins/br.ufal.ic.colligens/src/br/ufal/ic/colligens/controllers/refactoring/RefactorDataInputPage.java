@@ -17,18 +17,18 @@ public class RefactorDataInputPage extends UserInputWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite result = new Composite(parent, SWT.NONE);
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+		final Composite result = new Composite(parent, SWT.NONE);
+		final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		gridData.horizontalSpan = 2;
 		result.setLayoutData(gridData);
 		result.setLayout(new GridLayout(1, false));
 
-		Label label = new Label(result, SWT.NONE);
+		final Label label = new Label(result, SWT.NONE);
 		label.setText(THIS_IS_A_LABEL);
 		// Create new layout data
-		GridData data = new GridData(SWT.FILL, SWT.LEFT, true, false, 2, 1);
+		final GridData data = new GridData(SWT.FILL, SWT.LEFT, true, false, 2, 1);
 		label.setLayoutData(data);
-		
+
 		setControl(result);
 	}
 

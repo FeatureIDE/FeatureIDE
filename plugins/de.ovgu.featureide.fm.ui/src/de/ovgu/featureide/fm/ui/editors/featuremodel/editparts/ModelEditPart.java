@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,11 +36,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ModelFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 
 /**
- * The main editpart that has all <code>FeatureEditPart</code>s as children.
- * Notice that Draw2D calls a figure child of another when its drawn within the
- * parent figure. Therefore, all features need to by direct children of this
- * editpart.
- * 
+ * The main editpart that has all <code>FeatureEditPart</code>s as children. Notice that Draw2D calls a figure child of another when its drawn within the parent
+ * figure. Therefore, all features need to by direct children of this editpart.
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -53,18 +51,19 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 	}
 
 	public void setLegend(Legend legend) {
-		if (legend == null)
+		if (legend == null) {
 			return;
+		}
 		this.legend = legend;
 	}
 
 	ModelEditPart(IGraphicalFeatureModel featureModel) {
 		setModel(featureModel);
-		this.legend = new Legend(featureModel);
+		legend = new Legend(featureModel);
 	}
 
 	public IGraphicalFeatureModel getFeatureModel() {
-		return (IGraphicalFeatureModel) getModel();
+		return getModel();
 	}
 
 	@Override
@@ -82,6 +81,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		return (ModelFigure) super.getFigure();
 	}
 
+	@Override
 	protected ModelFigure createFigure() {
 		return new ModelFigure();
 	}
@@ -104,8 +104,9 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		list.addAll(constraints);
 
 		if (!fm.isLegendHidden()) {
-			if (legend == null)
+			if (legend == null) {
 				legend = new Legend(fm);
+			}
 			list.add(legend);
 			fm.setLegend(legend);
 		}

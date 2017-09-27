@@ -9,6 +9,7 @@ public class UnionFind{
        ensures count == N; 
 	   ensures (\forall int i; 0 <= i && i < N;
 id[i] == i);
+	   assignable count, id, id[*];
      */
     public UnionFind(int N) {
         count = N;
@@ -20,6 +21,7 @@ id[i] == i);
     // return number of connected components
     /*@
       ensures \result == count;
+      assignable \nothing;
      */
     public int count() {
         return count;
@@ -38,6 +40,7 @@ id[i] == i);
    ensures connected(p,q);  
    ensures \old(connected(p,q)) ==> (count == \old(count));
    ensures \old(!connected(p,q)) ==> (count == \old(count) -1);
+   assignable count;
  */
 public void union(int p, int q) {
  

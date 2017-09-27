@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,30 +36,30 @@ import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 
 /**
  * Calculates added or deleted products for a feature model edit.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExampleCalculator {
-	
-	private IFeatureModel fm;
+
+	private final IFeatureModel fm;
 
 	private Node a;
 
 	private Node[] bChildren;
-	
+
 	private LinkedList<Integer> bSatisfiable;
 
 	private int bIndex;
-	
+
 	private SatSolver solver;
 
 	private SatSolver exampleSolver = null;
 
 	private String lastSolution = null;
 
-	private long timeout;
-	
+	private final long timeout;
+
 	public ExampleCalculator(IFeatureModel fm, long timeout) {
 		this.fm = fm;
 		this.timeout = timeout;
@@ -73,16 +73,19 @@ public class ExampleCalculator {
 
 	public void setRight(Node b) {
 		b = b.clone().toCNF();
-		if (b instanceof Or)
+		if (b instanceof Or) {
 			b = new And(b);
+		}
 		bChildren = b.getChildren();
 		bSatisfiable = new LinkedList<Integer>();
 		bIndex = -1;
 	}
 
 	public boolean hasNextChild() {
-		if(bChildren==null)return false;
-		return bIndex + 1 < bChildren.length;
+		if (bChildren == null) {
+			return false;
+		}
+		return (bIndex + 1) < bChildren.length;
 	}
 
 	public Node nextChild() {
@@ -92,16 +95,17 @@ public class ExampleCalculator {
 	public void childIsSatisfiable() {
 		bSatisfiable.add(bIndex);
 	}
-	
-	//might return some examples multiple times
+
+	// might return some examples multiple times
 	public Configuration nextExample() throws TimeoutException {
 		if (exampleSolver == null) {
-			if (bSatisfiable.isEmpty() && !findSatisfiable(true))
+			if (bSatisfiable.isEmpty() && !findSatisfiable(true)) {
 				return null;
-			Node child = bChildren[bSatisfiable.removeFirst()];
+			}
+			final Node child = bChildren[bSatisfiable.removeFirst()];
 			exampleSolver = new SatSolver(new And(a, new Not(child.clone())), timeout);
 		}
-		String solution = exampleSolver.getSolution();
+		final String solution = exampleSolver.getSolution();
 		if (solution == null) {
 			return null;
 		}
@@ -121,15 +125,18 @@ public class ExampleCalculator {
 		boolean sat = false;
 		while (hasNextChild()) {
 			Node child = nextChild();
-			if (!(child instanceof Or))
+			if (!(child instanceof Or)) {
 				child = new Or(child);
-			Node[] list = Node.clone(child.getChildren());
-			for (Node node : list)
+			}
+			final Node[] list = Node.clone(child.getChildren());
+			for (final Node node : list) {
 				((Literal) node).positive ^= true;
+			}
 			if (solver.isSatisfiable(list)) {
 				childIsSatisfiable();
-				if (stopEarly)
+				if (stopEarly) {
 					return true;
+				}
 				sat = true;
 			}
 		}

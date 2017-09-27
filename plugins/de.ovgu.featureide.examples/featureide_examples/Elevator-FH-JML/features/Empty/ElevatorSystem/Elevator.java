@@ -19,6 +19,7 @@ public class Elevator {
 	 */
 	/*@ ensures \old(isEmpty()) && areDoorsOpen() ==> floors[getCurrentFloorID()].hasCall();
 	  @ ensures isEmpty() ==> (\forall int i; 0 <= i && i < env.calledAt_Spec9.length; !env.calledAt_Spec9[i]);
+	  @ assignable \nothing;
 	  @*/
 	public void timeShift() {
 		original();
@@ -26,6 +27,7 @@ public class Elevator {
 	}
 
 	/*@ ensures env.calledAt_Spec9[floorID];
+	  @ assignable \nothing;
 	  @*/
 	public void pressInLiftFloorButton(int floorID) {
 		//@ set env.calledAt_Spec9[floorID] = true; 

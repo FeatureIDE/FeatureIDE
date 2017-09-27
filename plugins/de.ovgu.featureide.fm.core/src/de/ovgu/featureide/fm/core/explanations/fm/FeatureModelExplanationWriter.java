@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,20 +35,23 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
  * {@link ExplanationWriter} for instances of {@link FeatureModelExplanation}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
+
 	/**
 	 * Constructs a new instance of this class.
+	 *
 	 * @param explanation explanation to be transformed; not null
 	 */
 	public FeatureModelExplanationWriter(Explanation explanation) {
 		super(explanation);
 	}
-	
+
 	/**
 	 * Returns the given feature as a string.
+	 *
 	 * @param feature feature to transform; not null
 	 * @return the given feature as a string
 	 */
@@ -59,16 +62,17 @@ public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
 			return String.format("concrete feature %s", feature.getName());
 		}
 	}
-	
+
 	/**
 	 * Returns the given constraint as a string.
+	 *
 	 * @param constraint constraint to transform; not null
 	 * @return the given constraint as a string
 	 */
 	protected String getSubjectString(IConstraint constraint) {
 		return String.format("constraint %s", constraint.getNode().toString(getSymbols()));
 	}
-	
+
 	@Override
 	protected String getConcreteReasonString(Reason reason) throws IllegalArgumentException {
 		if (!(reason instanceof FeatureModelReason)) {
@@ -79,31 +83,32 @@ public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
 		final String joinedSourceElements = joinElements(sourceElements);
 		final IFeature parent;
 		switch (trace.getOrigin()) {
-			case CHILD_UP:
-				parent = (IFeature) trace.getElement();
-				return String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-			case CHILD_DOWN:
-				parent = (IFeature) trace.getElement();
-				if (parent.getStructure().isAlternative()) {
-					return String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else if (parent.getStructure().isOr()) {
-					return String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				} else {
-					return String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
-				}
-			case CHILD_HORIZONTAL:
-				return String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
-			case CONSTRAINT:
-				return String.format("%s is a constraint.", joinedSourceElements);
-			case ROOT:
-				return String.format("%s is the root.", joinedSourceElements);
-			default:
-				throw new IllegalStateException("Reason has unexpected source attribute");
+		case CHILD_UP:
+			parent = (IFeature) trace.getElement();
+			return String.format("%s is a child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+		case CHILD_DOWN:
+			parent = (IFeature) trace.getElement();
+			if (parent.getStructure().isAlternative()) {
+				return String.format("%s are alternative children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			} else if (parent.getStructure().isOr()) {
+				return String.format("%s are or-children of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			} else {
+				return String.format("%s is a mandatory child of %s (i.e., %s).", joinedSourceElements, parent.getName(), trace.toString(getSymbols()));
+			}
+		case CHILD_HORIZONTAL:
+			return String.format("%s are alternatives (i.e., %s).", joinedSourceElements, trace.toString(getSymbols()));
+		case CONSTRAINT:
+			return String.format("%s is a constraint.", joinedSourceElements);
+		case ROOT:
+			return String.format("%s is the root.", joinedSourceElements);
+		default:
+			throw new IllegalStateException("Reason has unexpected source attribute");
 		}
 	}
-	
+
 	/**
 	 * Joins the given elements.
+	 *
 	 * @param elements elements to join
 	 * @return joined elements
 	 */

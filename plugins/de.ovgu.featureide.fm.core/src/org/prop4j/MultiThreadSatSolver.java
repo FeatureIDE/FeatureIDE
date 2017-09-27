@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,12 +35,13 @@ import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * SatSolver wrapper for multi-thread usage.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MultiThreadSatSolver {
 
 	private static final class Solver {
+
 		private final ISolver solver;
 		private IVecInt backbone = new VecInt();
 
@@ -88,7 +89,7 @@ public class MultiThreadSatSolver {
 		if (id == 0) {
 			try {
 				satisfiable = solvers[0].isSatisfiable();
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				satisfiable = false;
 				Logger.logError(e);
 			}
@@ -99,14 +100,14 @@ public class MultiThreadSatSolver {
 					model = new int[solvers[0].solver.nVars()];
 					System.arraycopy(solverModel, 0, model, 0, solverModel.length);
 				}
-				this.notifyAll();
+				notifyAll();
 			}
 		} else {
 			synchronized (this) {
-				if (satisfiable && model == null) {
+				if (satisfiable && (model == null)) {
 					try {
 						this.wait();
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						Logger.logError(e);
 					}
 				}
@@ -124,7 +125,7 @@ public class MultiThreadSatSolver {
 				varToInt.put(var, index);
 			}
 		} else {
-			for (Node child : node.getChildren()) {
+			for (final Node child : node.getChildren()) {
 				readVars(child);
 			}
 		}
@@ -133,13 +134,13 @@ public class MultiThreadSatSolver {
 	private void addClauses(Node root, int id) {
 		try {
 			if (root instanceof And) {
-				for (Node node : root.getChildren()) {
+				for (final Node node : root.getChildren()) {
 					addClause(node, id);
 				}
 			} else {
 				addClause(root, id);
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			satisfiable = false;
 		}
 	}
@@ -148,7 +149,7 @@ public class MultiThreadSatSolver {
 		if (node instanceof Or) {
 			final int[] clause = new int[node.children.length];
 			int i = 0;
-			for (Node child : node.getChildren()) {
+			for (final Node child : node.getChildren()) {
 				clause[i++] = getIntOfLiteral(child);
 			}
 			addClause(clause, id);
@@ -162,7 +163,7 @@ public class MultiThreadSatSolver {
 	}
 
 	private VecInt newCopiedVecInt(int[] literals, int additionalSpace) {
-		int[] copiedLiterals = new int[literals.length + additionalSpace];
+		final int[] copiedLiterals = new int[literals.length + additionalSpace];
 		System.arraycopy(literals, 0, copiedLiterals, 0, literals.length);
 		final VecInt vecInt = new VecInt(copiedLiterals);
 		vecInt.shrinkTo(literals.length);
@@ -181,7 +182,7 @@ public class MultiThreadSatSolver {
 		model = null;
 		literals = new int[knownLiterals.size()];
 		int i = 0;
-		for (Literal node : knownLiterals) {
+		for (final Literal node : knownLiterals) {
 			literals[i++] = getIntOfLiteral(node);
 		}
 	}
@@ -193,12 +194,12 @@ public class MultiThreadSatSolver {
 
 	public boolean isFalse(Literal literal, int solverIndex) {
 		final int i = getIntOfLiteral(literal) - 1;
-		return (model[i] < 0) && getValueOf(i, solverIndex) != 0;
+		return (model[i] < 0) && (getValueOf(i, solverIndex) != 0);
 	}
 
 	public boolean isTrue(Literal literal, int solverIndex) {
 		final int i = getIntOfLiteral(literal) - 1;
-		return (model[i] > 0) && getValueOf(i, solverIndex) != 0;
+		return (model[i] > 0) && (getValueOf(i, solverIndex) != 0);
 	}
 
 	private byte getValueOf(int varIndex, int solverIndex) {
@@ -225,7 +226,7 @@ public class MultiThreadSatSolver {
 						}
 						return (byte) Math.signum(x);
 					}
-				} catch (TimeoutException e) {
+				} catch (final TimeoutException e) {
 					Logger.logError(e);
 					solver.backbone.pop();
 				} finally {

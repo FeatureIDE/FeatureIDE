@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,23 +38,24 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.actions.generator.BuilderConfiguration;
 
 /**
- * Sorts configurations before they are generated based on their difference. 
- * 
+ * Sorts configurations before they are generated based on their difference.
+ *
  * @author Mustafa Alhajjaj
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
+
 	private final List<List<String>> allconfigs = new ArrayList<List<String>>();
 	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
-	HashMap<String,Double> configsDistancesResult = new HashMap<String,Double>();
+	HashMap<String, Double> configsDistancesResult = new HashMap<String, Double>();
 
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	public PriorizationSorter(IFeatureModel featureModel) {
 		super(featureModel);
 		super.sorted = false;
 		this.featureModel = featureModel;
 	}
-	
+
 	private int configurationCounter = 1;
 
 	@Override
@@ -74,7 +75,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		}
 		return configurations.size();
 	}
-	
+
 	private BuilderConfiguration createConfiguration(final List<String> solution, int i) {
 		final Configuration configuration = new Configuration(featureModel, false);
 		for (final String selection : solution) {
@@ -87,9 +88,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		// bring the first product with maximum number of optional feature.\
 		System.err.println("START sort");
 		allconfigs.addAll(configs);
-		
+
 		System.err.println("getconfigsDistanceMap");
-		configsDistancesResult=getconfigsDistanceMap(allconfigs, monitor);
+		configsDistancesResult = getconfigsDistanceMap(allconfigs, monitor);
 		System.err.println("allyes");
 		allyesconfig();
 		while (!allconfigs.isEmpty()) {
@@ -98,20 +99,20 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		}
 		return allsortedconfigs;
 	}
-	
+
 	@Override
 	public int getBufferSize() {
 		return allconfigs.size() + configurations.size();
 	}
-	
+
 	private HashMap<String, Double> getconfigsDistanceMap(List<List<String>> allConfig, IMonitor monitor) {
 		configsDistancesResult = new HashMap<String, Double>();
 		String mapKey;
 		for (int i = 0; i < allConfig.size(); i++) {
 			monitor.checkCancel();
 			for (int j = i + 1; j < allConfig.size(); j++) {
-				int xHashCode = allConfig.get(i).hashCode();
-				int yHashCode = allConfig.get(j).hashCode();
+				final int xHashCode = allConfig.get(i).hashCode();
+				final int yHashCode = allConfig.get(j).hashCode();
 
 				mapKey = xHashCode + EMPTY___ + yHashCode;
 
@@ -122,7 +123,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		}
 		return configsDistancesResult;
 	}
-	
+
 	private List<String> allyesconfig() {
 		// here add the first element to the allsortedconfig list
 		// and Remove the element from the original list which is already added
@@ -130,8 +131,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		int allYes = 0;
 		int index = 0;
 
-		for (List<String> x : allconfigs) {
-			int tempAllYes = x.size();
+		for (final List<String> x : allconfigs) {
+			final int tempAllYes = x.size();
 			if (tempAllYes > allYes) {
 				allYes = tempAllYes;
 				index = allconfigs.indexOf(x);
@@ -139,45 +140,41 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		}
 
 		allsortedconfigs.add(allconfigs.get(index));
-		
+
 		return allconfigs.remove(index);
 
 	}
-	
+
 	private List<String> selectConfig() {
 		double distance = 1.0;
 		int index = 0;
-		
+
 		int xHashCode = 0;
 		int yHashCode = 0;
-		
+
 		String mapKeyXY;
 		String mapKeyYX;
-		
-		for (List<String> x : allconfigs) {
+
+		for (final List<String> x : allconfigs) {
 
 			double tempDistance = 0.0;
-			for (List<String> y : allsortedconfigs) {
+			for (final List<String> y : allsortedconfigs) {
 				xHashCode = x.hashCode();
 				yHashCode = y.hashCode();
-				
+
 				mapKeyXY = xHashCode + EMPTY___ + yHashCode;
 				mapKeyYX = yHashCode + EMPTY___ + xHashCode;
 				double tempDistanceLocal = 0.0;
-				if(configsDistancesResult.get(mapKeyXY) != null)
-				{
+				if (configsDistancesResult.get(mapKeyXY) != null) {
 					tempDistanceLocal = configsDistancesResult.get(mapKeyXY);
-				}else if (configsDistancesResult.get(mapKeyYX) != null)
-				{
+				} else if (configsDistancesResult.get(mapKeyYX) != null) {
 					tempDistanceLocal = configsDistancesResult.get(mapKeyYX);
-					
-				}
-				else
-				{
+
+				} else {
 					System.out.println(WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG);
 				}
-				if(tempDistanceLocal>tempDistance){
-					tempDistance=tempDistanceLocal;
+				if (tempDistanceLocal > tempDistance) {
+					tempDistance = tempDistanceLocal;
 
 				}
 			}
@@ -186,26 +183,26 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 				index = allconfigs.indexOf(x);
 			}
 		}
-	
+
 		allsortedconfigs.add(allconfigs.get(index));
 		return allconfigs.remove(index);
 	}
 
 	private double clacDistance(List<String> x, List<String> y) {
-		Collection<String> similar = new HashSet<String>(x);
-		Collection<String> different = new HashSet<String>();
-		
+		final Collection<String> similar = new HashSet<String>(x);
+		final Collection<String> different = new HashSet<String>();
+
 		different.addAll(x);
 		different.addAll(y);
 		similar.retainAll(y);
-		
+
 		different.removeAll(similar);
-		
-		double s=similar.size();
-		double d=different.size();
-		double t=concreteFeatures.size();
-		
-		return (s+(t-(s+d)))/t;
+
+		final double s = similar.size();
+		final double d = different.size();
+		final double t = concreteFeatures.size();
+
+		return (s + (t - (s + d))) / t;
 	}
 
 }

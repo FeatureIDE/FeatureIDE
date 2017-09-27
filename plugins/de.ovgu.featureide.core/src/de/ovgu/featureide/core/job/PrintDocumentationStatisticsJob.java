@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,22 +45,23 @@ import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
-/** 
+/**
  * @author Sebastian Krieter
  */
 public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentationStatisticsJob.Arguments, Boolean> {
-	
+
 	public static class Arguments extends JobArguments {
+
 		private final String foldername;
 		private final IProject project;
-		
+
 		public Arguments(String foldername, IProject project) {
 			super(Arguments.class);
 			this.foldername = foldername;
-			this.project = project;			
+			this.project = project;
 		}
 	}
-	
+
 	protected PrintDocumentationStatisticsJob(Arguments arguments) {
 		super(BUILD_DOCUMENTATION_STATISTICS, arguments);
 	}
@@ -73,34 +74,33 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 			CorePlugin.getDefault().logWarning(arguments.project.getName() + " is no FeatureIDE Project!");
 			return false;
 		}
-		
-		IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
+
+		final IFolder folder = CorePlugin.createFolder(arguments.project, arguments.foldername);
 		try {
 			folder.delete(true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
 		CorePlugin.createFolder(arguments.project, arguments.foldername);
-		
+
 		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
 		if (projectSignatures == null) {
 			CorePlugin.getDefault().logWarning("No signatures available!");
 			return false;
 		}
-		
-		int[] featureIDs = new int[projectSignatures.getFeatureCount()];
+
+		final int[] featureIDs = new int[projectSignatures.getFeatureCount()];
 		int i = 0;
-		for (String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
+		for (final String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
 			featureIDs[i++] = projectSignatures.getFeatureID(string);
 		}
 
-		workMonitor.setRemainingWork(2 * featureIDs.length + 5);
+		workMonitor.setRemainingWork((2 * featureIDs.length) + 5);
 
-		int[] statisticDataChars = new int[5];
-		int[] statisticDataTags = new int[5];
-		
-		
+		final int[] statisticDataChars = new int[5];
+		final int[] statisticDataTags = new int[5];
+
 		// ----------------------------------- SPL ---------------------------------------------
 //		AJavaDocCommentMerger.reset();
 //		pseudoMerge(interfaceProject.getProjectSignatures().createIterator(),
@@ -122,7 +122,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //			AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
 //		};
 		workMonitor.worked();
-			
+
 		// ------------------------------- Featuremodule ------------------------------------------
 
 //		AJavaDocCommentMerger.reset();
@@ -156,17 +156,17 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //		}
 //		statisticDataChars[3] += AJavaDocCommentMerger.STAT_AFTER_CHARS;
 //		statisticDataTags[3] += AJavaDocCommentMerger.STAT_AFTER_TAGS;
-		
+
 		// -------------------------------- Variante ---------------------------------------------
 
 		statisticDataChars[1] = statisticDataChars[0];
 		statisticDataTags[1] = statisticDataTags[0];
 		workMonitor.worked();
-		
+
 		// ------------------------------------------------------------------------------------------------------------
-		
-		StringBuilder sb = new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
-		
+
+		final StringBuilder sb = new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
+
 		int sum = -statisticDataChars[0];
 		for (int j = 0; j < statisticDataChars.length; j++) {
 			sb.append(statisticDataChars[j]);
@@ -175,7 +175,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		}
 		sb.append(sum);
 		sb.append('\n');
-		
+
 		int sum2 = -statisticDataTags[0];
 		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb.append(statisticDataTags[j]);
@@ -186,61 +186,61 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		sb.append('\n');
 		try {
 			FileSystem.write(Paths.get(folder.getFile("statistics.csv").getLocationURI()), sb.toString().getBytes(Charset.forName("UTF-8")));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();
-		
-		StringBuilder sb2 = new StringBuilder();
-		
-		String[] texString = new String[]{VERFAHREN,VARIANTE,SPL,KONTEXT,FEATUREMODUL,SUMME};
+
+		final StringBuilder sb2 = new StringBuilder();
+
+		final String[] texString = new String[] { VERFAHREN, VARIANTE, SPL, KONTEXT, FEATUREMODUL, SUMME };
 		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb2.append(texString[j]);
 			sb2.append(" & ");
 			sb2.append(statisticDataChars[j]);
 			sb2.append(" & ");
-			sb2.append((int)(100 * ((double)statisticDataChars[j])/((double)statisticDataChars[0])));
+			sb2.append((int) ((100 * ((double) statisticDataChars[j])) / (statisticDataChars[0])));
 			sb2.append("\\% & ");
 			sb2.append(statisticDataTags[j]);
 			sb2.append(" & ");
-			sb2.append((int)(100 * ((double)statisticDataTags[j])/((double)statisticDataTags[0])));
+			sb2.append((int) ((100 * ((double) statisticDataTags[j])) / (statisticDataTags[0])));
 			sb2.append("\\% \\\\\n");
 		}
 		sb2.append(texString[statisticDataTags.length]);
 		sb2.append(" & ");
 		sb2.append(sum);
 		sb2.append(" & ");
-		sb2.append((int)(100 * ((double)sum)/((double)statisticDataChars[0])));
+		sb2.append((int) ((100 * ((double) sum)) / (statisticDataChars[0])));
 		sb2.append("\\% & ");
 		sb2.append(sum2);
 		sb2.append(" & ");
-		sb2.append((int)(100 * ((double)sum2)/((double)statisticDataTags[0])));
+		sb2.append((int) ((100 * ((double) sum2)) / (statisticDataTags[0])));
 		sb2.append("\\% \\\\\n");
 
 		try {
 			FileSystem.write(Paths.get(folder.getFile("latexTab.txt").getLocationURI()), sb2.toString().getBytes(Charset.forName("UTF-8")));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();
-		
-		StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
+
+		final StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
 //		for (int j = 0; j < statisticNumComments.length; j++) {
 //			sb3.append(statisticNumComments[j]);
-//			sb3.append(';');						
+//			sb3.append(';');
 //		}
 		sb3.setCharAt(sb3.length() - 1, '\n');
 		try {
 			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();
-		
+
 		CorePlugin.getDefault().logInfo(BUILT_DOCUMENTATION_STATISTICS);
 		return true;
 	}
-	
+
 //	private void pseudoMerge(SignatureIterator it, ADocumentationCommentMerger merger) {
 //		while (it.hasNext()) {
 //			merger.setSig(it.next());

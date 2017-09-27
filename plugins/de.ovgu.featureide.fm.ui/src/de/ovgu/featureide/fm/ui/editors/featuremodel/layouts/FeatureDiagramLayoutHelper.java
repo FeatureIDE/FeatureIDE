@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A helper class for the feature diagram layout.
- * 
+ *
  * @author David Halm
  * @author Patrick Sulkowski
  * @author Marcus Pinnecke
@@ -65,32 +65,31 @@ public class FeatureDiagramLayoutHelper {
 			return "Top-Down (ordered)";
 		}
 	}
-	
+
 	/**
 	 * returns label texts (e.g. for the context menu)
 	 */
-	public static String getNameTypeLabel(int layoutType){		
-		switch(layoutType){
-			case 1: 
-				return SHORT_NAMES;
-			case 0:
-			default:
-				return LONG_NAMES;
-		}	
+	public static String getNameTypeLabel(int layoutType) {
+		switch (layoutType) {
+		case 1:
+			return SHORT_NAMES;
+		case 0:
+		default:
+			return LONG_NAMES;
+		}
 	}
 
 	/**
-	 * sets initial positions for new constraints
-	 * needed for manual layout
+	 * sets initial positions for new constraints needed for manual layout
 	 */
 	public static void initializeConstraintPosition(IGraphicalFeatureModel featureModel, int index) {
 		Point newLocation = new Point(0, 0);
-		IGraphicalConstraint constraint = featureModel.getVisibleConstraints().get(index);
+		final IGraphicalConstraint constraint = featureModel.getVisibleConstraints().get(index);
 		int leftX = Integer.MAX_VALUE;
 		int rightX = Integer.MIN_VALUE;
 		final int constraintCount = featureModel.getVisibleConstraints().size();
 		if (constraintCount == 1) {
-			for (IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
+			for (final IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
 				if (feature.getLocation().y > newLocation.y) {
 					newLocation.y = feature.getLocation().y;
 				}
@@ -104,7 +103,7 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.x = (leftX + rightX) / 2;
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
-			IGraphicalConstraint lastConstraint = featureModel.getVisibleConstraints().get(constraintCount - 2);
+			final IGraphicalConstraint lastConstraint = featureModel.getVisibleConstraints().get(constraintCount - 2);
 			newLocation = lastConstraint.getLocation().getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}
@@ -112,13 +111,13 @@ public class FeatureDiagramLayoutHelper {
 	}
 
 	/**
-	 * sets initial positions for new features (above)
-	 * needed for manual layout
+	 * sets initial positions for new features (above) needed for manual layout
 	 */
-	public static void initializeCompoundFeaturePosition(IGraphicalFeatureModel featureModel, LinkedList<IGraphicalFeature> selectedFeatures, IGraphicalFeature newCompound) {
-		Point initPos = new Point(0, 0);
+	public static void initializeCompoundFeaturePosition(IGraphicalFeatureModel featureModel, LinkedList<IGraphicalFeature> selectedFeatures,
+			IGraphicalFeature newCompound) {
+		final Point initPos = new Point(0, 0);
 		int xAcc = 0;
-		for (IGraphicalFeature feature : selectedFeatures) {
+		for (final IGraphicalFeature feature : selectedFeatures) {
 			if (initPos.y < feature.getLocation().y) {
 				initPos.y = feature.getLocation().y;
 			}
@@ -137,15 +136,14 @@ public class FeatureDiagramLayoutHelper {
 	}
 
 	/**
-	 * sets initial positions for new features (below)
-	 * needed for manual layout
+	 * sets initial positions for new features (below) needed for manual layout
 	 */
 	public static void initializeLayerFeaturePosition(IGraphicalFeatureModel featureModel, IGraphicalFeature newLayer, IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
 		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
-			Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
+			final Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
 			if (feature.getObject().getStructure().getChildrenCount() > 1) {
-				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
+				final IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
 				initPos.x = lastChild.getLocation().x + lastChild.getSize().width + FMPropertyManager.getFeatureSpaceX();
 				initPos.y = lastChild.getLocation().y;
 			} else {
@@ -153,9 +151,9 @@ public class FeatureDiagramLayoutHelper {
 			}
 			newLayer.setLocation(initPos);
 		} else {
-			Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
+			final Point initPos = FeatureUIHelper.getGraphicalParent(newLayer).getLocation().getCopy();
 			if (graphicalChildren.size() > 1) {
-				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
+				final IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
 				initPos.y = lastChild.getLocation().y + lastChild.getSize().height + FMPropertyManager.getFeatureSpaceX();
 				initPos.x = lastChild.getLocation().x;
 			} else {
@@ -167,7 +165,7 @@ public class FeatureDiagramLayoutHelper {
 
 	/**
 	 * returns the layout manager for the chosen algorithm(id)
-	 * 
+	 *
 	 */
 	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, IGraphicalFeatureModel featureModel) {
 		switch (layoutAlgorithm) {

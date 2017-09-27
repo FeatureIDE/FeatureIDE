@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Handles the check boxes of the export dialog of the statistics view.
- * 
+ *
  * @author Dominik Hamann
  * @author Haese Patrick
  */
@@ -55,18 +55,17 @@ public class CheckBoxListener implements ICheckStateListener {
 
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				Object[] sources = ((TreeSelection) event.getSelection())
-						.toArray();
-				for (Object source : sources) {
+				final Object[] sources = ((TreeSelection) event.getSelection()).toArray();
+				for (final Object source : sources) {
 					if (source instanceof Parent) {
-						Parent selected = (Parent) source;
+						final Parent selected = (Parent) source;
 						if (selected.hasChildren()) {
 							if (selected instanceof LazyParent) {
 								((LazyParent) selected).getChildren();
 							}
-							boolean allChecked = allChildrenChecked(selected);
+							final boolean allChecked = allChildrenChecked(selected);
 							viewer.setChecked(selected, !allChecked);
-							for (Parent child : selected.getChildren()) {
+							for (final Parent child : selected.getChildren()) {
 								viewer.setChecked(child, !allChecked);
 							}
 							viewer.setExpandedState(selected, true);
@@ -94,16 +93,16 @@ public class CheckBoxListener implements ICheckStateListener {
 
 	@Override
 	public void checkStateChanged(CheckStateChangedEvent event) {
-		
+
 	}
-	
+
 	/**
 	 * @param element
 	 * @return
 	 */
 	private boolean allChildrenChecked(Object element) {
 		boolean allChildrenChecked = true;
-		for (Object o : ((Parent) element).getChildren()) {
+		for (final Object o : ((Parent) element).getChildren()) {
 			if (!viewer.getChecked(o)) {
 				allChildrenChecked = false;
 				break;
@@ -113,7 +112,7 @@ public class CheckBoxListener implements ICheckStateListener {
 	}
 
 	private void refreshViewer() {
-		UIJob job = new UIJob(REFRESH_EXPORT_DIALOG) {
+		final UIJob job = new UIJob(REFRESH_EXPORT_DIALOG) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

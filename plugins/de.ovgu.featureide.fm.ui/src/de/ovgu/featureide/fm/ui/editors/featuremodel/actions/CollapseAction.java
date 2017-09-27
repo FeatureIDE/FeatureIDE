@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToColl
 
 /**
  * collapse the current selected feature
- * 
+ *
  * @author Joshua Sprey
  * @author Enis Belli
  */
@@ -46,11 +46,13 @@ public class CollapseAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.collapse";
 
-	private IGraphicalFeatureModel graphicalFeatureModel;
-	
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 			if (isValidSelection(selection)) {
 				if (selection.getFirstElement() instanceof FeatureEditPart) {
@@ -78,14 +80,14 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
-		//setChecked(feature.getStructure().isCollapsed());
-		SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
+		// setChecked(feature.getStructure().isCollapsed());
+		final SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}
@@ -95,9 +97,9 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		//setChecked(feature.getStructure().isCollapsed());
+		// setChecked(feature.getStructure().isCollapsed());
 
-		IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
 	}
 
