@@ -37,18 +37,15 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
  * Class to test the collapse feature of XmlFeatureModelFormat.java
  *
  * @author Christopher Sontag
- * @author Maximilian Kühl
+ * @author Maximilian Kuehl
  */
 public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel fmOrig = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmCollapsed = Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmOrig = Commons.loadTestFeatureModelFromFile("basic.xml");
+		final IFeatureModel fmCollapsed = Commons.loadTestFeatureModelFromFile("basic_collapsed.xml");
+		final IFeatureModel fmNotCollapsed = Commons.loadTestFeatureModelFromFile("basic_not_collapsed.xml");
 
 		final IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
 		gFM.init();
