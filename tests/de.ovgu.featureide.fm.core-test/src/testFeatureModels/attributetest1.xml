@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Elevator">
+				<attribute name="Price" type="double" unit="Euro" recursive="true" configurable="false" value="6"/>
+					<feature name="Sabbath">
+						<attribute name="Price" value="6"/>
+						<attribute name="Link" type="String" recursive="false" configurable="false" value=""/>
+					</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

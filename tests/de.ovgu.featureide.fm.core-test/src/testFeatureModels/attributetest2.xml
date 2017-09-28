@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Root">
+				<feature name="A">
+					<attribute name="Price" type="double" unit="Euro" recursive="true" configurable="false" value="6"/>
+				</feature>
+				<feature name="B">
+					<attribute name="Price" type="double" unit="Dollar" recursive="true" configurable="false" value="7"/>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
