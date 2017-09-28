@@ -78,8 +78,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
-	
-	private LinkedList<AnAttribute> parentAttributeList;
 
 	@Override
 	public boolean supportsRead() {
@@ -333,7 +331,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 		}
 	}
-	
+
 	private AnAttribute parseAttribute(Element e) throws UnsupportedModelException {
 //		final LinkedList<org.prop4j.Node> nodes = new LinkedList<>();
 //		org.prop4j.Node children;
@@ -348,6 +346,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				final String attributeValue = node.getNodeValue();
 				if (nodeName.equals(NAME)) {
 					attribute.setName(attributeValue);
+
 				} else if (nodeName.equals(TYPE)) {
 					attribute.setType(attributeValue);
 				} else if (nodeName.equals(UNIT)) {
@@ -516,13 +515,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
-		
+
 		final LinkedList<AnAttribute> attributeList = new LinkedList<>();
-		LinkedList<String> attributeListRecursive = new LinkedList<>();
-		if(parent != null) {
+		LinkedList<String[]> attributeListRecursive = new LinkedList<>();
+		if (parent != null) {
 			attributeListRecursive = parent.getStructure().getattributeListRecursive();
 		}
 		
+		final LinkedList<String[]> attributeListRecClone = attributeListRecursive;
+
 		for (final Element e : getElements(nodeList)) {
 			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
@@ -536,19 +537,33 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
-			
+
 			if (nodeName.equals(ATTRIBUTE)) {
 				AnAttribute attribute = parseAttribute(e);
+	
+				if (!checkAttribute(attribute, attributeListRecursive, attributeListRecClone)) {
+					throwError("Duplicate entry for attribute " + attribute.toString(), e);
+				}
+				String attname = attribute.getName();
+				for(AnAttribute a : attributeList) {
+					if(a.getName().equals(attname)) {
+						throwError("Duplicate name for attribute in this Feature" + attribute.toString(), e);
+					}
+				}
 				attributeList.add(attribute);
 				if (attribute.getRecursive()) {
-					attributeListRecursive.add(attribute.getName());
-//					parentAttributeList.add(attribute);
-//				} else {
-//					attributeList.add(attribute);
+					String s;
+					if (attribute.getConfigurable()) {
+						s = "true";
+					} else {
+						s = "false";
+					}
+					String[] rec = {attribute.getName(), s};
+					attributeListRecursive.add(rec);
 				}
 				continue;
 			}
-			
+
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;
@@ -597,7 +612,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			if(f.getStructure().getattributeListRecursive().isEmpty()) {
+			if (f.getStructure().getattributeListRecursive().isEmpty()) {
 				f.getStructure().setattributeListRecursive(attributeListRecursive);
 			} else {
 				f.getStructure().addAttributeListRecursive(attributeListRecursive);
@@ -623,6 +638,40 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				f.getStructure().setAnd();
 			}
 		}
+	}
+
+
+
+	private boolean checkAttribute(AnAttribute attribute, LinkedList<String[]> attributeListRecursive,  LinkedList<String[]> attributeListRecClone) {
+		String att = attribute.getName().toLowerCase();
+		String[] name = new String[2];
+		
+		for(int i = 0; i < attributeListRecursive.size(); i++) {
+			name = attributeListRecursive.get(i);
+			boolean config = Boolean.parseBoolean(name[1]);
+			
+			if(name[0].toLowerCase().equals(att)) {
+				
+				for (String[] a : attributeListRecursive) {
+					if(a[0].equals(name[0])){
+						attributeListRecClone.remove(name);
+						if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
+								|| attribute.getConfigurable() != config) {
+							return false;	
+						} else {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+			
+//			if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
+//						|| attribute.getConfigurable() != config) {
+//				return false;
+//			}
+		}
+		return true;
 	}
 
 	/**

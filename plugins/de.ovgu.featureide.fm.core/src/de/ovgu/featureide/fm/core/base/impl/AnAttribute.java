@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.LinkedList;
+
 /**
  * TODO description
  * 
@@ -34,14 +36,8 @@ public class AnAttribute {
 	protected boolean configurable;
 	protected String type;
 	
-//	protected AnAttribute(AnAttribute oldAttribute, IFeatureModel featureModel) {
-//		super(oldAttribute, featureModel);
-//		this.attNode = oldAttribute.attNode;
-//	}
-
 	public  AnAttribute() {
-		recursive = false;
-		configurable = false;
+
 	}
 	
 	public void setName(String name) {
@@ -55,8 +51,7 @@ public class AnAttribute {
 
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
-		// TODO Auto-generated method stub
-		
+	
 	}
 
 	public void setValue(String value) {
@@ -79,52 +74,21 @@ public class AnAttribute {
 	public boolean getRecursive() {
 		return recursive;	
 	}
-
+	
+	public boolean getConfigurable() {
+		return configurable;
+	}
+	
+	public String getUnit() {
+		return unit;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public String getValue() {
+		return value;
+	}
+	
 }
-
-
-//@Override
-//public Node getNode() {
-//	return attNode;
-//}
-//
-//public void setNode(Node node) {
-//	this.attNode = node;
-//}
-//
-//@Override
-//public String getDisplayName() {
-//	return attNode.toString();
-//}
-
-///**
-// * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
-// */
-//@Override
-//public void setContainedFeatures() {
-//	synchronized (containedFeatureList) {
-//		containedFeatureList.clear();
-//		for (final String featureName : attNode.getContainedFeatures()) {
-//			containedFeatureList.add(featureModel.getFeature(featureName));
-//		}
-//	}
-//}
-//
-//@Override
-//public Collection<IFeature> getContainedFeatures() {
-//	synchronized (containedFeatureList) {
-//		if (containedFeatureList.isEmpty()) {
-//			setContainedFeatures();
-//		}
-//		return containedFeatureList;
-//	}
-//}
-//
-///* (non-Javadoc)
-// * @see de.ovgu.featureide.fm.core.base.IAttribute#clone(de.ovgu.featureide.fm.core.base.IFeatureModel)
-// */
-//@Override
-//public IAttribute clone(IFeatureModel newFeatureModel) {
-//	// TODO Auto-generated method stub
-//	return null;
-//}

@@ -56,7 +56,7 @@ public class FeatureStructure implements IFeatureStructure {
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 	
 	protected LinkedList<AnAttribute> attributeList = new LinkedList<>();
-	protected LinkedList<String> attributeListRecursive = new LinkedList<>();
+	protected LinkedList<String[]> attributeListRecursive = new LinkedList<>();
 
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
@@ -451,18 +451,18 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public LinkedList<String> getattributeListRecursive() {
+	public LinkedList<String[]> getattributeListRecursive() {
 		return attributeListRecursive;
 	}
 
 	@Override
-	public void setattributeListRecursive(LinkedList<String> attListRecursive) {
+	public void setattributeListRecursive(LinkedList<String[]> attListRecursive) {
 		attributeListRecursive = attListRecursive;
 		
 	}
 
 	@Override
-	public void addAttributeListRecursive(LinkedList<String> attListRecursive) {
+	public void addAttributeListRecursive(LinkedList<String[]> attListRecursive) {
 		attributeListRecursive.addAll(attListRecursive);
 		
 	}

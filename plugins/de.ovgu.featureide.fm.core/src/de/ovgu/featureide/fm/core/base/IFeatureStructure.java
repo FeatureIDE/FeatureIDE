@@ -50,7 +50,7 @@ public interface IFeatureStructure {
 
 	List<IFeatureStructure> getChildren();	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 	
-	LinkedList<String> getattributeListRecursive();
+	LinkedList<String[]> getattributeListRecursive();
 
 	int getChildrenCount();
 
@@ -124,9 +124,9 @@ public interface IFeatureStructure {
 
 	void setParent(IFeatureStructure newParent);
 	
-	void setattributeListRecursive(LinkedList<String> attListRecursive);
+	void setattributeListRecursive(LinkedList<String[]> attListRecursive);
 	
-	void addAttributeListRecursive(LinkedList<String> attListRecursive);
+	void addAttributeListRecursive(LinkedList<String[]> attListRecursive);
 
 	void setRelevantConstraints();
 
