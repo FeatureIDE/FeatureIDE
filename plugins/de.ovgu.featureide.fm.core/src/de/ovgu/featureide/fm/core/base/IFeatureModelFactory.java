@@ -38,7 +38,7 @@ public interface IFeatureModelFactory extends IExtension {
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
-
+	
 	IFeatureModel createFeatureModel();
 
 }

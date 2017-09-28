@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
+import de.ovgu.featureide.fm.core.base.impl.AnAttribute;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -77,6 +78,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
+	
+	private LinkedList<AnAttribute> parentAttributeList;
 
 	@Override
 	public boolean supportsRead() {
@@ -330,6 +333,39 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 		}
 	}
+	
+	private AnAttribute parseAttribute(Element e) throws UnsupportedModelException {
+//		final LinkedList<org.prop4j.Node> nodes = new LinkedList<>();
+//		org.prop4j.Node children;
+
+		AnAttribute attribute = new AnAttribute();
+
+		if (e.hasAttributes()) {
+			final NamedNodeMap nodeMap = e.getAttributes();
+			for (int i = 0; i < nodeMap.getLength(); i++) {
+				final org.w3c.dom.Node node = nodeMap.item(i);
+				final String nodeName = node.getNodeName();
+				final String attributeValue = node.getNodeValue();
+				if (nodeName.equals(NAME)) {
+					attribute.setName(attributeValue);
+				} else if (nodeName.equals(TYPE)) {
+					attribute.setType(attributeValue);
+				} else if (nodeName.equals(UNIT)) {
+					attribute.setUnit(attributeValue);
+				} else if (nodeName.equals(RECURSIVE)) {
+					attribute.setRecursive(attributeValue.equals(TRUE));
+				} else if (nodeName.equals(CONFIGURABLE)) {
+					attribute.setConfigurable(attributeValue.equals(TRUE));
+				} else if (nodeName.equals(VALUE)) {
+					attribute.setValue(attributeValue);
+				} else {
+					throwError("Unknown attribute: " + nodeName, e);
+				}
+
+			}
+		}
+		return attribute;
+	}
 
 	/**
 	 * Parses the calculations.
@@ -480,6 +516,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
+		
+		final LinkedList<AnAttribute> attributeList = new LinkedList<>();
+		LinkedList<String> attributeListRecursive = new LinkedList<>();
+		attributeListRecursive = parent.getStructure().getattributeListRecursive();
+		
 		for (final Element e : getElements(nodeList)) {
 			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
@@ -493,6 +534,18 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
+			
+			if (nodeName.equals(ATTRIBUTE)) {
+				AnAttribute attribute = parseAttribute(e);
+				if (attribute.getRecursive()) {
+					attributeListRecursive.add(attribute.getName());
+					parentAttributeList.add(attribute);
+				} else {
+					attributeList.add(attribute);
+				}
+				continue;
+			}
+			
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;

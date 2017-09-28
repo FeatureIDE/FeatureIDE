@@ -1303,16 +1303,23 @@ public final class FeatureUtils {
 	public static void setRelevantConstraints(IFeature bone) {
 		requireNonNull(bone);
 
-		final List<IConstraint> constraintList = new LinkedList<>();
+		final List<Constraint> constraintList = new LinkedList<Constraint>();
 		for (final IConstraint constraint : bone.getFeatureModel().getConstraints()) {
 			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
-					constraintList.add(constraint.clone(bone.getFeatureModel()));
+					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
 					break;
 				}
 			}
 		}
-		bone.getStructure().setRelevantConstraints(constraintList);
+		bone.getStructure().setRelevantConstraints(Functional.toList(Functional.map(constraintList, new IFunction<Constraint, IConstraint>() {
+
+			@Override
+			public IConstraint invoke(Constraint t) {
+				return t;
+			}
+
+		})));
 	}
 
 	public static final void setRoot(IFeatureModel featureModel, IFeature root) {
