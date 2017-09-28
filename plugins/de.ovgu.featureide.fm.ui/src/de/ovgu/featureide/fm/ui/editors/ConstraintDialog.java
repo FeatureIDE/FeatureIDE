@@ -98,6 +98,7 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
+import org.eclipse.swt.custom.SashForm;
 
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -385,7 +386,10 @@ public class ConstraintDialog implements GUIDefaults {
 
 	private String initialConstraint;
 	private Group featureGroup;
+	private Group descriptionGroup;
 	private StyledText searchFeatureText;
+	private SashForm sashForm;
+	private Text constraintDescriptionText;
 
 	private Table featureTable;
 	private Group buttonGroup;
@@ -523,14 +527,17 @@ public class ConstraintDialog implements GUIDefaults {
 	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
 		this.constraint = constraint;
 		featureModel = featuremodel;
+		String constraintDescriptionText;
 
 		if (constraint == null) {
+			constraintDescriptionText = "";
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
 			initialConstraint = "";
 			mode = Mode.CREATE;
 
 		} else {
+			constraintDescriptionText = constraint.getDescription();
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
@@ -541,8 +548,12 @@ public class ConstraintDialog implements GUIDefaults {
 
 		initShell();
 		initHead();
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		sashForm = new SashForm(shell, SWT.HORIZONTAL);
+		sashForm.setLayoutData(gridData);
 
 		initFeatureGroup(featuremodel);
+		initConstraintDescriptionText(constraintDescriptionText);
 		initButtonGroup();
 		initConstraintText();
 		initBottom(featuremodel, constraint);
@@ -582,12 +593,13 @@ public class ConstraintDialog implements GUIDefaults {
 		final NodeReader nodeReader = new NodeReader();
 		final String input = constraintText.getText().trim();
 		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
+		final String constraintDescription = constraintDescriptionText.getText().trim();
 
 		AbstractOperation op = null;
 		if ((constraint != null) && featureModel.getConstraints().contains(constraint)) {
 			for (final IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new EditConstraintOperation(featureModel, c, propNode);
+					op = new EditConstraintOperation(featureModel, c, propNode, constraintDescription);
 					break;
 				}
 			}
@@ -618,7 +630,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		final FormLayout lastCompositeLayout = new FormLayout();
 		lastCompositeLayout.marginHeight = 5;
-		lastCompositeLayout.marginTop = 85;
+		lastCompositeLayout.marginTop = 5;
 		lastCompositeLayout.marginWidth = 5;
 		lastComposite.setLayout(lastCompositeLayout);
 		final ToolBar helpButtonBar = new ToolBar(lastComposite, SWT.FLAT);
@@ -640,19 +652,19 @@ public class ConstraintDialog implements GUIDefaults {
 		final FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
 		formDataCancel.right = new FormAttachment(100, -5);
-		formDataCancel.bottom = new FormAttachment(100, -5);
+		formDataCancel.bottom = new FormAttachment(100, 5);
 
 		okButton = new Button(lastComposite, SWT.NONE);
 		autoSetOkButtonText();
 		final FormData formDataOk = new FormData();
-		formDataOk.width = 120;
+		formDataOk.width = 130;
 		formDataOk.right = new FormAttachment(cancelButton, -5);
-		formDataOk.bottom = new FormAttachment(100, -5);
+		formDataOk.bottom = new FormAttachment(100, 5);
 		okButton.setLayoutData(formDataOk);
 
 		cancelButton.setLayoutData(formDataCancel);
 
-		shell.setTabList(new Control[] { featureGroup, buttonGroup, constraintTextComposite, lastComposite });
+		shell.setTabList(new Control[] { sashForm, buttonGroup, constraintTextComposite, lastComposite });
 
 		cancelButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 
@@ -744,6 +756,26 @@ public class ConstraintDialog implements GUIDefaults {
 		});
 
 	}
+	/**
+	 * Initializes the text containing the descriptions.
+	 */
+	private void initConstraintDescriptionText(String description) {
+		descriptionGroup = new Group(sashForm, SWT.NONE);
+		descriptionGroup.setText("Description");
+		GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		descriptionGroup.setLayoutData(gridData);
+		final GridLayout featureGroupLayout = new GridLayout();
+		featureGroupLayout.numColumns = 1;
+		descriptionGroup.setLayout(featureGroupLayout);
+
+		constraintDescriptionText = new Text(descriptionGroup, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		constraintDescriptionText.setLayoutData(gridData);
+		constraintDescriptionText.setText(description);
+	}
+
+	/**
 
 	/**
 	 * Initializes the group containing the searchText and featureTable.
@@ -751,7 +783,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 */
 	private void initFeatureGroup(final IFeatureModel featuremodel) {
-		featureGroup = new Group(shell, SWT.NONE);
+		featureGroup = new Group(sashForm, SWT.NONE);
 		featureGroup.setText("Features");
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.grabExcessHorizontalSpace = true;
@@ -764,7 +796,7 @@ public class ConstraintDialog implements GUIDefaults {
 		searchFeatureText = new StyledText(featureGroup, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		searchFeatureText.setText(FILTERTEXT);
 		searchFeatureText.setMargins(3, 5, 3, 5);
-		searchFeatureText.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		searchFeatureText.setLayoutData(gridData);
 
@@ -827,7 +859,7 @@ public class ConstraintDialog implements GUIDefaults {
 			public void handleEvent(Event event) {
 				if (searchFeatureText.getText().isEmpty()) {
 					searchFeatureText.setText(FILTERTEXT);
-					searchFeatureText.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+					searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
 				}
 
@@ -840,7 +872,7 @@ public class ConstraintDialog implements GUIDefaults {
 				if (FILTERTEXT.equals(searchFeatureText.getText())) {
 					searchFeatureText.setText("");
 				}
-				searchFeatureText.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				searchFeatureText.setForeground(sashForm.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			}
 
 		});

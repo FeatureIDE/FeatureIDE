@@ -168,6 +168,12 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		default:
 			break;
 		}
+		
+		final String description = constraint.getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			toolTipContent.add(new Label("Description:"));
+			toolTipContent.add(new Label("\u2022 " + description));
+		}
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
