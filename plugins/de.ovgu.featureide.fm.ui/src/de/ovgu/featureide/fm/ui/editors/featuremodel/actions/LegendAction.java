@@ -45,12 +45,8 @@ public class LegendAction extends Action {
 	public LegendAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		if (!featureModel.isLegendHidden()) {
-			setText(HIDE_LEGEND);
-		} else {
-			setText(SHOW_LEGEND);
-		}
-
+		setText(SHOW_LEGEND);
+		setChecked(!featureModel.isLegendHidden());
 	}
 
 	@Override
@@ -65,10 +61,6 @@ public class LegendAction extends Action {
 	}
 
 	public void refresh() {
-		if (!featureModel.isLegendHidden()) {
-			setText(HIDE_LEGEND);
-		} else {
-			setText(SHOW_LEGEND);
-		}
+		setChecked(!featureModel.isLegendHidden());
 	}
 }

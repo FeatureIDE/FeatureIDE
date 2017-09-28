@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_WITH;
 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -76,8 +77,9 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 * @param featureName
 	 */
 	protected void updateConstraintActionText(String featureName) {
-		selectedFeature = featureName;
-		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " starting with \"" + featureName + "\""));
+		selectedFeature =	featureName;
+		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH	+ " \""	+ featureName + "\""));
+
 	}
 
 	/*
