@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 

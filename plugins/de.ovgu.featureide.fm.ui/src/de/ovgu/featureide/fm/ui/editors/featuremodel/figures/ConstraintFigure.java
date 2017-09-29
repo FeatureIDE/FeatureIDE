@@ -173,7 +173,11 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		if ((description != null) && !description.trim().isEmpty()) {
 			toolTipContent.add(new Label("Description:"));
 			toolTipContent.add(new Label(description));
+		} else {
+			toolTipContent.add(new Label("No Description"));
 		}
+		
+		
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
