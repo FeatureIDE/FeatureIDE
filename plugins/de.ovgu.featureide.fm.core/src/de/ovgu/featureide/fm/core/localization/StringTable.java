@@ -509,6 +509,7 @@ public class StringTable {
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
 	public static final String SET_FEATURE_CONCRETE = "Set Feature Concrete";
+	public static final String ABSTRACT_OPERATION = "Abstract Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
 	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";

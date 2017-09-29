@@ -187,7 +187,7 @@ public class FmOutlinePageContextMenu {
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		// collapseAction = new CollapseAction(viewer, fInput);
-		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
+		aAction = new AbstractAction(viewer, fInput); //TODO: Hier könnten ganz viele schlimme Dinge passieren...
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_OPERATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT_OPERATION;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -33,19 +33,19 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  * @author Chico Sundermann
  * @author Paul Westphal
  */
-public class HideFeatureOperation extends AbstractFeatureModelOperation {
+public class AbstractFeatureOperation extends AbstractFeatureModelOperation {
 	
 	private final IFeature feature;
 
-	public HideFeatureOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, HIDE_OPERATION);
+	public AbstractFeatureOperation(IFeature feature, IFeatureModel featureModel) {
+		super(featureModel, ABSTRACT_OPERATION);
 		this.feature = feature;
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		feature.getStructure().setHidden(!feature.getStructure().isHidden());
-		return new FeatureIDEEvent(feature, EventType.HIDDEN_CHANGED);
+		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
+		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
 	}
 
 	@Override

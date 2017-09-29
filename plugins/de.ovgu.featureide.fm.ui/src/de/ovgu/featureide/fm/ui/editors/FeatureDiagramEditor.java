@@ -496,7 +496,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
 		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); // icon for expand added
-		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
+		abstractAction = new AbstractAction(this, featureModel); // Schlimme Dinge könnten passieren...
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
 		orAction = new OrAction(this, featureModel);
