@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.AnAttribute;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.AnAttribute.Types;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -168,6 +169,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (final String featureName : featureOrderList) {
 				final Element feature = doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
+
 				order.appendChild(feature);
 			}
 		}
@@ -267,6 +269,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod = doc.createElement(FEATURE);
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
+//		    writeRealAttribute(fnod, feat);
+
+			
 		} else {
 			if (feat.getStructure().isAnd()) {
 				fnod = doc.createElement(AND);
@@ -280,7 +285,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
-
+//			writeRealAttribute(fnod, feat);
+			
 			for (final IFeature feature : children) {
 				createXmlDocRec(doc, fnod, feature);
 			}
@@ -288,6 +294,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 	}
+
+	/**
+	 * @param fnod
+	 * @param att
+	 * @param fe
+	 */
+//	private void writeRealAttribute(Element fnod, IFeature feat) {
+//			final Element att;
+//			for (AnAttribute a : feat.getStructure().getattributeList()) {
+//				att = doc.createElement(ATTRIBUTE);
+//				att.setAttribute(NAME, att.getName());
+//				if ()) {
+//					att.setAttribute();
+//				}
+//			}	
+//			fnod.appendChild(att);
+//	}
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
 		final String description = feat.getProperty().getDescription();
@@ -333,8 +356,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private AnAttribute parseAttribute(Element e) throws UnsupportedModelException {
-//		final LinkedList<org.prop4j.Node> nodes = new LinkedList<>();
-//		org.prop4j.Node children;
 
 		AnAttribute attribute = new AnAttribute();
 
@@ -343,12 +364,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (int i = 0; i < nodeMap.getLength(); i++) {
 				final org.w3c.dom.Node node = nodeMap.item(i);
 				final String nodeName = node.getNodeName();
-				final String attributeValue = node.getNodeValue();
+				final String attributeValue = node.getNodeValue().trim();
 				if (nodeName.equals(NAME)) {
 					attribute.setName(attributeValue);
-
 				} else if (nodeName.equals(TYPE)) {
+					
+					if (attributeValue.isEmpty()) {
+						throwError("Type empty in attribute: " + attribute.toString(), e);
+					}
 					attribute.setType(attributeValue);
+					if(attribute.getType() == null) {
+						throwError("Wrong type for attribute : " + attribute.toString(), e);
+					}
+//					String type = attributeValue.toUpperCase();
+//					if (!(type.equals(Types.STRING.toString()) || type.equals(Types.BOOLEAN.toString()) || type.equals(Types.DOUBLE.toString()) 
+//							|| type.equals(Types.FLOAT.toString()) || type.equals(Types.INT.toString()) || type.equals(Types.LONG.toString()))) {
+//						throwError("Wrong type. Should be one of String, Int, etc" + nodeName, e);
+//						}
 				} else if (nodeName.equals(UNIT)) {
 					attribute.setUnit(attributeValue);
 				} else if (nodeName.equals(RECURSIVE)) {
@@ -537,25 +569,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 
 			if (nodeName.equals(ATTRIBUTE)) {
-				AnAttribute attribute = parseAttribute(e);
-				
-				if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
-					throwError("Duplicate name for attribute in this Feature" + attribute.toString(), e);
-				}
-				
-				switch(checkRecursiveList(attribute, attributeListRecursive)) {
-				case 1 :
-					throwError("Wrong Format for this Recursive Attribute" + attribute.toString(), e);
-					break;
-				case 2 :
-					throwError("Wrong Type" + attribute.toString(), e);
-					break;
-				}
-
-				attributeList.add(attribute);
-				if (attribute.getRecursive()) {
-					attributeListRecursive.add(attribute);
-				}
+				addAttributesToLists(attributeList, attributeListRecursive, e);
 				continue;
 			}
 
@@ -612,6 +626,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
+			
+			f.getStructure().setAttributeList(attributeList);
 
 			object.addFeature(f);
 			if (parent == null) {
@@ -629,6 +645,37 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
 				f.getStructure().setAnd();
 			}
+		}
+	}
+
+	/**
+	 * @param attributeList
+	 * @param attributeListRecursive
+	 * @param e
+	 * @throws UnsupportedModelException
+	 */
+	private void addAttributesToLists(final LinkedList<AnAttribute> attributeList, LinkedList<AnAttribute> attributeListRecursive, final Element e)
+			throws UnsupportedModelException {
+		AnAttribute attribute = parseAttribute(e);
+		
+		if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
+			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
+		}
+		
+		switch(checkRecursiveList(attribute, attributeListRecursive)) {
+		case 1 :
+			throwError("There should only be the name and value for attribute: " + attribute.toString(), e);
+			break;
+		case 2 :
+			throwError("No Type defined in " + attribute.toString(), e);
+			break;
+		case 3 :
+			throwError("Wrong type. Should be one of String, Int, etc" + attribute.toString(), e);
+			break;
+		}
+		attributeList.add(attribute);
+		if (attribute.getRecursive()) {
+			attributeListRecursive.add(attribute);
 		}
 	}
 
@@ -659,6 +706,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 		if (attribute.getType() == null) {
 			return 2;
+		}
+		if (attribute.getType() != null) {
+			String type = attribute.getType().toString().toUpperCase();
+			if (!(type.equals(Types.STRING.toString()) || type.equals(Types.BOOLEAN.toString()) || type.equals(Types.DOUBLE.toString()) 
+					|| type.equals(Types.FLOAT.toString()) || type.equals(Types.INT.toString()) || type.equals(Types.LONG.toString()))) {
+				return 3;
+			}
 		}
 		return 0;
 	}
