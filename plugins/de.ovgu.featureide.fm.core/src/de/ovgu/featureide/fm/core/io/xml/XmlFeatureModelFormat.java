@@ -607,11 +607,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			if (f.getStructure().getattributeListRecursive().isEmpty()) {
-				f.getStructure().setattributeListRecursive(attributeListRecursive);
-			} else {
-				f.getStructure().addAttributeListRecursive(attributeListRecursive);
-			}
+			f.getStructure().addAttributeListRecursive(attributeListRecursive);
+			
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
