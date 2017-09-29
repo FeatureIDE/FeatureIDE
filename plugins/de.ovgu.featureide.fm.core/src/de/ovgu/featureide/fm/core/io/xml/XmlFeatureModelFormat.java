@@ -517,9 +517,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
 
 		final LinkedList<AnAttribute> attributeList = new LinkedList<>();
-		LinkedList<String[]> attributeListRecursive = new LinkedList<>();
+		LinkedList<AnAttribute> attributeListRecursive = new LinkedList<>();
 		if (parent != null) {
-			attributeListRecursive = parent.getStructure().getattributeListRecursive();
+			attributeListRecursive.addAll(parent.getStructure().getattributeListRecursive());
 		}
 
 		for (final Element e : getElements(nodeList)) {
@@ -538,24 +538,23 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			if (nodeName.equals(ATTRIBUTE)) {
 				AnAttribute attribute = parseAttribute(e);
-	
-				if (!checkAttribute(attribute, attributeListRecursive)) {
-					throwError("Duplicate entry for attribute " + attribute.toString(), e);
-				}
-
-				if (checkAttributeInList(attributeList, attribute.getName().toLowerCase())) {
+				
+				if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
 					throwError("Duplicate name for attribute in this Feature" + attribute.toString(), e);
 				}
+				
+				switch(checkRecursiveList(attribute, attributeListRecursive)) {
+				case 1 :
+					throwError("Wrong Format for this Recursive Attribute" + attribute.toString(), e);
+					break;
+				case 2 :
+					throwError("Wrong Type" + attribute.toString(), e);
+					break;
+				}
+
 				attributeList.add(attribute);
 				if (attribute.getRecursive()) {
-					String s;
-					if (attribute.getConfigurable()) {
-						s = "true";
-					} else {
-						s = "false";
-					}
-					String[] rec = {attribute.getName(), s};
-					attributeListRecursive.add(rec);
+					attributeListRecursive.add(attribute);
 				}
 				continue;
 			}
@@ -637,36 +636,42 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 
-
-	private boolean checkAttribute(AnAttribute attribute, LinkedList<String[]> attributeListRecursive) {
+	/**
+	 * 
+	 * @param attribute an attribute
+	 * @param attributeListRecursive List of Recursive Elements
+	 * @return 1, if the Attribute is in the recursiveList and has the correct parameters;
+	 * 			0, if everythings fine;
+	 * 			2, if the Attribute is not in the recursiveList and has a wrong Type;
+	 */
+	private int checkRecursiveList(AnAttribute attribute, LinkedList<AnAttribute> attributeListRecursive) {
 		String att = attribute.getName().toLowerCase();
 
-		for (String[] a : attributeListRecursive) {
+		for (AnAttribute a : attributeListRecursive) {
 
-			boolean config = Boolean.parseBoolean(a[1]);
 			
-			if(a[0].toLowerCase().equals(att)) {
+			if(a.getName().toLowerCase().equals(att)) {
 			
 					if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
-							|| attribute.getConfigurable() != config) {
-						return false;	
+							|| attribute.getConfigurable() != a.getConfigurable()) {
+						return 1;	
 					} else {
-						return true;
+						return 0;
 					}
 			}
 		}
 		if (attribute.getType() == null) {
-			return false;
+			return 2;
 		}
-		return true;
+		return 0;
 	}
 	
 	/**
 	 * @param attributeList
 	 * @param listElementName
-	 * @return
+	 * @return true if an attributeName is already in the list
 	 */
-	private boolean checkAttributeInList(LinkedList<AnAttribute> attributeList, String attributeName) {
+	private boolean checkAttributeList(LinkedList<AnAttribute> attributeList, String attributeName) {
 		
 		for(int i = 0; i < attributeList.size(); i++) {
 			
