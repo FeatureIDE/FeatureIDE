@@ -611,7 +611,7 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		}
 		if (op == null) {
-			op = new CreateConstraintOperation(propNode, featureModel);
+			op = new CreateConstraintOperation(propNode, featureModel, constraintDescription);
 		}
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
