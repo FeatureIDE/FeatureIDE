@@ -122,6 +122,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOp
  * @author David Broneske
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class ConstraintDialog implements GUIDefaults {
 
@@ -229,7 +231,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			detailsLabel = new Text(headComposite, SWT.WRAP | SWT.V_SCROLL);
 			gridData = new GridData(GridData.FILL_BOTH);
-			gridData.heightHint = 50;
+			gridData.heightHint = 70;
 			detailsLabel.setLayoutData(gridData);
 			detailsLabel.setEditable(false);
 			detailsLabel.setBackground(panelBackgroundColor);
@@ -551,7 +553,7 @@ public class ConstraintDialog implements GUIDefaults {
 		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		sashForm = new SashForm(shell, SWT.HORIZONTAL);
 		sashForm.setLayoutData(gridData);
-
+		
 		initFeatureGroup(featuremodel);
 		initConstraintDescriptionText(constraintDescriptionText);
 		initButtonGroup();
@@ -736,7 +738,6 @@ public class ConstraintDialog implements GUIDefaults {
 		final FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
-		// formDataConstraintText.height = 50;
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);

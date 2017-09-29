@@ -69,6 +69,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 

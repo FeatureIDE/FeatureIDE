@@ -49,6 +49,8 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
  *
  * @author Christopher Sontag
  * @author Maximilian Kühl
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski 
  */
 public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 
