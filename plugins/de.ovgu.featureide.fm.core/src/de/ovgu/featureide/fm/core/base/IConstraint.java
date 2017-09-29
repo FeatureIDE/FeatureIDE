@@ -314,4 +314,18 @@ public interface IConstraint extends IFeatureModelElement {
 	 */
 	void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
 
+	/**
+	 * Set the description
+	 * @param description
+	 */
+	void setDescription(CharSequence description);
+	
+	/**
+	 * Returns the description
+	 * @return
+	 */
+	String getDescription();
+
 }
+
+
