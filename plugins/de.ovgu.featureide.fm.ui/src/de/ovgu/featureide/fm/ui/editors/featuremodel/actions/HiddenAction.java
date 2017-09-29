@@ -20,17 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
 
 /**
@@ -58,8 +53,8 @@ public class HiddenAction extends MultipleSelectionAction {
 	}
 	
 	private boolean isEveryFeatureHidden() {
-		for (Object obj : featureArray) {
-			if (!((IFeature)obj).getStructure().isHidden()) {
+		for (IFeature tempFeature : featureArray) {
+			if (!(tempFeature.getStructure().isHidden())) {
 				return false;
 			}
 		}
@@ -67,8 +62,8 @@ public class HiddenAction extends MultipleSelectionAction {
 	}
 	
 	private void changeHiddenStatus(boolean allHidden) {
-		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(viewer, featureModel,
-				allHidden, getSelectedFeatures());
+		final SetFeatureToHiddenOperation op = 
+				new SetFeatureToHiddenOperation(featureModel, allHidden, getSelectedFeatures());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

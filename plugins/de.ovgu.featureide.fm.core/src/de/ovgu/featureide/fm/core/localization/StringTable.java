@@ -513,6 +513,7 @@ public class StringTable {
 	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
+	public static final String MANDATORY_OPERATION = "Mandatory Operation";
 	public static final String SET_FEATURE_MANDATORY = "Set Feature Mandatory";
 	public static final String SET_FEATURE_OPTIONAL = "Set Feature Optional";
 	public static final String SET = "Set ";
