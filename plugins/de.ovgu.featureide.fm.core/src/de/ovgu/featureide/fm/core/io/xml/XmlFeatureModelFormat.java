@@ -521,8 +521,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if (parent != null) {
 			attributeListRecursive = parent.getStructure().getattributeListRecursive();
 		}
-		
-		final LinkedList<String[]> attributeListRecClone = attributeListRecursive;
 
 		for (final Element e : getElements(nodeList)) {
 			final String nodeName = e.getNodeName();
@@ -541,14 +539,12 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(ATTRIBUTE)) {
 				AnAttribute attribute = parseAttribute(e);
 	
-				if (!checkAttribute(attribute, attributeListRecursive, attributeListRecClone)) {
+				if (!checkAttribute(attribute, attributeListRecursive)) {
 					throwError("Duplicate entry for attribute " + attribute.toString(), e);
 				}
-				String attname = attribute.getName();
-				for(AnAttribute a : attributeList) {
-					if(a.getName().equals(attname)) {
-						throwError("Duplicate name for attribute in this Feature" + attribute.toString(), e);
-					}
+
+				if (checkAttributeInList(attributeList, attribute.getName().toLowerCase())) {
+					throwError("Duplicate name for attribute in this Feature" + attribute.toString(), e);
 				}
 				attributeList.add(attribute);
 				if (attribute.getRecursive()) {
@@ -642,7 +638,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 
 
-	private boolean checkAttribute(AnAttribute attribute, LinkedList<String[]> attributeListRecursive,  LinkedList<String[]> attributeListRecClone) {
+	private boolean checkAttribute(AnAttribute attribute, LinkedList<String[]> attributeListRecursive) {
 		String att = attribute.getName().toLowerCase();
 		String[] name = new String[2];
 		
@@ -654,7 +650,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				
 				for (String[] a : attributeListRecursive) {
 					if(a[0].equals(name[0])){
-						attributeListRecClone.remove(name);
 						if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
 								|| attribute.getConfigurable() != config) {
 							return false;	
@@ -665,13 +660,28 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				}
 				return false;
 			}
-			
-//			if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
-//						|| attribute.getConfigurable() != config) {
-//				return false;
-//			}
+		}
+		if (attribute.getType() == null) {
+			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * @param attributeList
+	 * @param listElementName
+	 * @return
+	 */
+	private boolean checkAttributeInList(LinkedList<AnAttribute> attributeList, String attributeName) {
+		
+		for(int i = 0; i < attributeList.size(); i++) {
+			
+			if(attributeList.get(i).getName().toLowerCase().equals(attributeName)) {
+			
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

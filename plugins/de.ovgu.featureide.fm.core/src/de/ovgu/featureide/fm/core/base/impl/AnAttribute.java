@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.util.LinkedList;
-
 /**
  * TODO description
  * 
