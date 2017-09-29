@@ -640,25 +640,19 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	private boolean checkAttribute(AnAttribute attribute, LinkedList<String[]> attributeListRecursive) {
 		String att = attribute.getName().toLowerCase();
-		String[] name = new String[2];
-		
-		for(int i = 0; i < attributeListRecursive.size(); i++) {
-			name = attributeListRecursive.get(i);
-			boolean config = Boolean.parseBoolean(name[1]);
+
+		for (String[] a : attributeListRecursive) {
+
+			boolean config = Boolean.parseBoolean(a[1]);
 			
-			if(name[0].toLowerCase().equals(att)) {
-				
-				for (String[] a : attributeListRecursive) {
-					if(a[0].equals(name[0])){
-						if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
-								|| attribute.getConfigurable() != config) {
-							return false;	
-						} else {
-							return true;
-						}
+			if(a[0].toLowerCase().equals(att)) {
+			
+					if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
+							|| attribute.getConfigurable() != config) {
+						return false;	
+					} else {
+						return true;
 					}
-				}
-				return false;
 			}
 		}
 		if (attribute.getType() == null) {
