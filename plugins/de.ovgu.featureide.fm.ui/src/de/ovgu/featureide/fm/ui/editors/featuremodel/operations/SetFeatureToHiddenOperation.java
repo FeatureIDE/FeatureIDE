@@ -31,7 +31,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
@@ -48,12 +47,14 @@ public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
 	private final Object viewer;
 	private final boolean allHidden;
-	private boolean connectionSelected;
+	private final IFeature[] featureArray;
 
-	public SetFeatureToHiddenOperation(Object viewer, IFeatureModel featureModel, boolean allHidden) {
+	public SetFeatureToHiddenOperation(Object viewer, IFeatureModel featureModel,
+			boolean allHidden, IFeature[] featureArray) {
 		super(featureModel, HIDE_OPERATION);
 		this.viewer = viewer;
 		this.allHidden = allHidden;
+		this.featureArray = featureArray;
 	}
 
 	private IStructuredSelection getSelection() {
@@ -93,38 +94,17 @@ public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 		return features.toArray(new IFeature[features.size()]);
 	}*/
 	
-	public IFeature getSelectedFeatures() {
-		IStructuredSelection selection;
-		if (viewer instanceof TreeViewer) {
-			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
-			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) {
-				return ((FmOutlineGroupStateStorage) selection.getFirstElement()).getFeature();
-			} else {
-				return (IFeature) selection.getFirstElement();
-			}
-		} else {
-			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
-		}
-
-		final Object part = selection.getFirstElement();
-		connectionSelected = part instanceof ConnectionEditPart;
-		if (connectionSelected) {
-			return ((ConnectionEditPart) part).getModel().getTarget().getObject();
-		}
-		return ((FeatureEditPart) part).getModel().getObject();
-	}
+	
 	
 
 	@Override
 	protected void createSingleOperations() {
 		// TODO UNTERSCHEIDEN ZWISCHEN FEATUREEDITPART UND FEATURE
-		for (Object obj : getSelection().toArray()) {
-			IFeature tempFeature = ((FeatureEditPart) obj).getModel().getObject();
+		for (IFeature tempFeature : featureArray) {
 			if(allHidden || !tempFeature.getStructure().isHidden()) {
 				final HideFeatureOperation op = new HideFeatureOperation(tempFeature, featureModel);
 				operations.add(op);
 			}
 		}		
 	}
-
 }

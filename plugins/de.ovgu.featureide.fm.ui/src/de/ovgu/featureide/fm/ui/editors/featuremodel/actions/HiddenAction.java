@@ -67,7 +67,8 @@ public class HiddenAction extends MultipleSelectionAction {
 	}
 	
 	private void changeHiddenStatus(boolean allHidden) {
-		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(viewer, featureModel, allHidden);
+		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(viewer, featureModel,
+				allHidden, getSelectedFeatures());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
