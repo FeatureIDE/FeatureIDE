@@ -172,7 +172,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		final String description = constraint.getDescription();
 		if ((description != null) && !description.trim().isEmpty()) {
 			toolTipContent.add(new Label("Description:"));
-			toolTipContent.add(new Label("\u2022 " + description));
+			toolTipContent.add(new Label(description));
 		}
 
 		if (getActiveReason() != null) {

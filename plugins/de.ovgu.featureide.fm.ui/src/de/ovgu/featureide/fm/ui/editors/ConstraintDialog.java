@@ -786,12 +786,14 @@ public class ConstraintDialog implements GUIDefaults {
 	private void initFeatureGroup(final IFeatureModel featuremodel) {
 		featureGroup = new Group(sashForm, SWT.NONE);
 		featureGroup.setText("Features");
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gridData = new GridData(GridData.FILL);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		featureGroup.setLayoutData(gridData);
 		final GridLayout featureGroupLayout = new GridLayout();
+		
 		featureGroupLayout.numColumns = 1;
+		
 		featureGroup.setLayout(featureGroupLayout);
 
 		searchFeatureText = new StyledText(featureGroup, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -802,13 +804,14 @@ public class ConstraintDialog implements GUIDefaults {
 		searchFeatureText.setLayoutData(gridData);
 
 		final Composite tableComposite = new Composite(featureGroup, SWT.NONE);
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
+		gridData = new GridData(SWT.FILL, 200, true, false);
+//		gridData.grabExcessHorizontalSpace = true;
+//		gridData.grabExcessVerticalSpace = true;
 		tableComposite.setLayoutData(gridData);
 
-		final TableViewer featureTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TableViewer featureTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL );
 		featureTable = featureTableViewer.getTable();
+		
 		featureTableViewer.setContentProvider(new ArrayContentProvider());
 		final TableViewerColumn viewerNameColumn = new TableViewerColumn(featureTableViewer, SWT.NONE);
 		final TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -927,6 +930,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setMinimumSize(280, 575);
 
 		final GridLayout shellLayout = new GridLayout();
+		
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
 		shell.setLayout(shellLayout);
