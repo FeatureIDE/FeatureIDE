@@ -78,7 +78,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
 					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
-						createError("Invalid feature name: " + featureName, feature, warnings);
+						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
 					}
 				} else {
