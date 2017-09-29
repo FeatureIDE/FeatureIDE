@@ -657,7 +657,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		// connection line is selected
 
 		// if one or more features are selected
-		else if ((createLayerAction.isEnabled()	|| createCompoundAction.isEnabled()) && !connectionSelected) {
+		else if ((hiddenAction.isEnabled()) && !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintWithAction);

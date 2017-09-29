@@ -20,19 +20,27 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
 
 /**
  * Action to mark a feature as hidden.
  *
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Chico Sundermann
+ * @author Paul Westphal
  */
-public class HiddenAction extends SingleSelectionAction {
+public class HiddenAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.hidden";
 
@@ -45,21 +53,33 @@ public class HiddenAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		setChecked(feature.getStructure().isHidden());
-		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
-
+		changeHiddenStatus(isEveryFeatureHidden());
+		setChecked(isEveryFeatureHidden());
+	}
+	
+	private boolean isEveryFeatureHidden() {
+		for (Object obj : featureArray) {
+			if (!((IFeature)obj).getStructure().isHidden()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private void changeHiddenStatus(boolean allHidden) {
+		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(viewer, featureModel, allHidden);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 	}
 
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(feature.getStructure().isHidden());
+		// A selection of features is considered hidden iff every feature is hidden.
+		setChecked(isEveryFeatureHidden());
 	}
 
 }

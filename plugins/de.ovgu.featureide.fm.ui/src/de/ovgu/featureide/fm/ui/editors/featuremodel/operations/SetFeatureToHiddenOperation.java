@@ -20,48 +20,111 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_OPERATION;
+
+import java.util.ArrayList;
+
+import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
- * Operation with functionality to set a Feature hidden. Enables undo/redo functionality.
+ * Operation with functionality to set Features hidden. Enables undo/redo functionality.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Paul Westphal
+ * @author Chico Sundermann
  */
-public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
-	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
-	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
-	private final IFeature feature;
+	private final Object viewer;
+	private final boolean allHidden;
+	private boolean connectionSelected;
 
-	public SetFeatureToHiddenOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
-		this.feature = feature;
+	public SetFeatureToHiddenOperation(Object viewer, IFeatureModel featureModel, boolean allHidden) {
+		super(featureModel, HIDE_OPERATION);
+		this.viewer = viewer;
+		this.allHidden = allHidden;
 	}
 
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isHidden()) {
-			return LABEL_NOT_HIDDEN;
+	private IStructuredSelection getSelection() {
+		if (viewer instanceof GraphicalViewerImpl) {
+			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
 		} else {
-			return LABEL_HIDDEN;
+			return (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 		}
 	}
+	
+	/*private IFeature[] getSelectedFeatures() {
+		ArrayList<IFeature> features = new ArrayList<>();
+		IStructuredSelection selection;
+		
+		if (viewer instanceof GraphicalViewerImpl) {
+			selection = (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
+			for (Object obj : selection.toArray()) {
+				if (obj instanceof FeatureEditPart) {
+					features.add(((FeatureEditPart) obj).getModel().getObject());
+				}
+			}
+		} if (viewer instanceof TreeViewer) {
+			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+			Feature tempf = null;
+			for (Object obj : selection.toArray()) {
+				if (obj instanceof Feature) {
+					tempf = (Feature)obj;
+					break;
+				}
+			}
+			if (tempf != null) {
+				for (Object obj : tempf.getFeatureModel().getFeatures()) {
+					features.add((IFeature)obj);
+				}
+			}
+		}
+		return features.toArray(new IFeature[features.size()]);
+	}*/
+	
+	public IFeature getSelectedFeatures() {
+		IStructuredSelection selection;
+		if (viewer instanceof TreeViewer) {
+			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
+			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) {
+				return ((FmOutlineGroupStateStorage) selection.getFirstElement()).getFeature();
+			} else {
+				return (IFeature) selection.getFirstElement();
+			}
+		} else {
+			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
+		}
 
-	@Override
-	protected FeatureIDEEvent operation() {
-		feature.getStructure().setHidden(!feature.getStructure().isHidden());
-		return new FeatureIDEEvent(feature, EventType.HIDDEN_CHANGED);
+		final Object part = selection.getFirstElement();
+		connectionSelected = part instanceof ConnectionEditPart;
+		if (connectionSelected) {
+			return ((ConnectionEditPart) part).getModel().getTarget().getObject();
+		}
+		return ((FeatureEditPart) part).getModel().getObject();
 	}
+	
 
 	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
+	protected void createSingleOperations() {
+		// TODO UNTERSCHEIDEN ZWISCHEN FEATUREEDITPART UND FEATURE
+		for (Object obj : getSelection().toArray()) {
+			IFeature tempFeature = ((FeatureEditPart) obj).getModel().getObject();
+			if(allHidden || !tempFeature.getStructure().isHidden()) {
+				final HideFeatureOperation op = new HideFeatureOperation(tempFeature, featureModel);
+				operations.add(op);
+			}
+		}		
 	}
 
 }
