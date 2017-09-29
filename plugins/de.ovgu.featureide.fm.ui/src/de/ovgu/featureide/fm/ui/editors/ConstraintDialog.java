@@ -771,7 +771,7 @@ public class ConstraintDialog implements GUIDefaults {
 		featureGroupLayout.numColumns = 1;
 		descriptionGroup.setLayout(featureGroupLayout);
 
-		constraintDescriptionText = new Text(descriptionGroup, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		constraintDescriptionText = new Text(descriptionGroup, SWT.WRAP | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		constraintDescriptionText.setLayoutData(gridData);
 		constraintDescriptionText.setText(description);
 	}
@@ -924,6 +924,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setText(DEFAULT_DIALOG_TITLE);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(500, 585);
+		shell.setMinimumSize(280, 575);
 
 		final GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
