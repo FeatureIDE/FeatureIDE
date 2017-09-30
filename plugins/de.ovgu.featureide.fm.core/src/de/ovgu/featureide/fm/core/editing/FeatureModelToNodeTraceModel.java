@@ -27,7 +27,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -226,7 +225,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 			case CHILD_DOWN:
 				return new Implies(getLiteral(), new Or(getLiterals()));
 			case CHILD_HORIZONTAL:
-				return new Not(new And(getLiterals()));
+				return new Not(new Or(getLiterals()));
 			case ROOT:
 				return getLiteral();
 			case CONSTRAINT:
