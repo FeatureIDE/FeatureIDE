@@ -47,7 +47,7 @@ import org.sat4j.specs.TimeoutException;
  *
  * @author Timo G&uuml;nther
  */
-public class Sat4jSatSolver extends AbstractSatSolver {
+public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 
 	/** Maps clauses to constraints (handles to the clauses in the oracle). */
 	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
@@ -63,11 +63,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	@Override
 	protected ISolver createOracle() {
 		return SolverFactory.newDefault();
-	}
-
-	@Override
-	public ISolver getOracle() {
-		return (ISolver) super.getOracle();
 	}
 
 	@Override
