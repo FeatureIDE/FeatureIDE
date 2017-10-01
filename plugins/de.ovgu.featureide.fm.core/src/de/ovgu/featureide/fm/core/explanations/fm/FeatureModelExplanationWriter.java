@@ -29,23 +29,23 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
  * {@link ExplanationWriter} for instances of {@link FeatureModelExplanation}.
  *
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class FeatureModelExplanationWriter extends ExplanationWriter {
+public abstract class FeatureModelExplanationWriter<E extends FeatureModelExplanation<?>> extends ExplanationWriter<E> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param explanation explanation to be transformed; not null
 	 */
-	public FeatureModelExplanationWriter(Explanation explanation) {
+	public FeatureModelExplanationWriter(E explanation) {
 		super(explanation);
 	}
 

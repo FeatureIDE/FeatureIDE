@@ -29,12 +29,12 @@ package de.ovgu.featureide.fm.core.explanations;
 public abstract class Reason implements Cloneable {
 
 	/** The containing explanation. */
-	private Explanation explanation;
+	private Explanation<?> explanation;
 
 	/**
 	 * Constructs a new instance of this class.
 	 */
-	public Reason() {}
+	protected Reason() {}
 
 	/**
 	 * Constructs a new instance of this class.
@@ -50,7 +50,7 @@ public abstract class Reason implements Cloneable {
 	 *
 	 * @return the containing explanation; not null
 	 */
-	public Explanation getExplanation() {
+	public Explanation<?> getExplanation() {
 		return explanation;
 	}
 
@@ -59,7 +59,7 @@ public abstract class Reason implements Cloneable {
 	 *
 	 * @param explanation the containing explanation; not null
 	 */
-	protected void setExplanation(Explanation explanation) {
+	protected void setExplanation(Explanation<?> explanation) {
 		this.explanation = explanation;
 	}
 

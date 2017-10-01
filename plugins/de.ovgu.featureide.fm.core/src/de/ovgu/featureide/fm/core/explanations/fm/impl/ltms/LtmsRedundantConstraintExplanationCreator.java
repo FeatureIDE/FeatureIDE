@@ -20,12 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Node;
@@ -33,7 +31,6 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -44,7 +41,7 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
-public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
+public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation> implements RedundantConstraintExplanationCreator {
 
 	/** The CNF with all constraints but the redundant one. */
 	private Node cnfWithoutRedundantConstraint;
@@ -52,17 +49,9 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	private int constraintClauseCount = 0;
 
 	@Override
-	public IConstraint getSubject() {
-		return (IConstraint) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IConstraint)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
+	public void setSubject(IConstraint subject) throws IllegalArgumentException {
 		super.setSubject(subject);
-		resetOracle();
+		setOracle(null);
 	}
 
 	/**
@@ -124,7 +113,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		final Ltms ltms = getOracle();
 		for (final Map<Object, Boolean> assignment : getSubject().getNode().getContradictingAssignments()) {
 			ltms.setPremises(assignment);
-			final Explanation explanation = getExplanation(ltms.getExplanations());
+			final RedundantConstraintExplanation explanation = getExplanation(ltms.getExplanations());
 			if (explanation == null) {
 				continue;
 			}
@@ -134,11 +123,6 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 			return null;
 		}
 		return cumulatedExplanation;
-	}
-
-	@Override
-	protected RedundantConstraintExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

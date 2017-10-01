@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -34,20 +32,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  *
  * @author Timo G&uuml;nther
  */
-public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
+public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation>
+		implements DeadFeatureExplanationCreator {
 
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
@@ -61,11 +47,6 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected DeadFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

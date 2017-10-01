@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  *
  * @author Timo G&uuml;nther
  */
-public class FalseOptionalFeatureExplanation extends FeatureModelExplanation {
+public class FalseOptionalFeatureExplanation extends FeatureModelExplanation<IFeature> {
 
 	/**
 	 * Constructs a new instance of this class
@@ -36,11 +36,6 @@ public class FalseOptionalFeatureExplanation extends FeatureModelExplanation {
 	 */
 	public FalseOptionalFeatureExplanation(IFeature subject) {
 		super(subject);
-	}
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
 	}
 
 	@Override

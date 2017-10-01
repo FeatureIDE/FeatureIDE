@@ -31,8 +31,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeDeadFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<DeadFeatureExplanationCreator>
-		implements DeadFeatureExplanationCreator {
+public class CompositeDeadFeatureExplanationCreator extends
+		CompositeFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation, DeadFeatureExplanationCreator> implements DeadFeatureExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -41,15 +41,5 @@ public class CompositeDeadFeatureExplanationCreator extends CompositeFeatureMode
 	 */
 	public CompositeDeadFeatureExplanationCreator(Collection<DeadFeatureExplanationCreator> composites) {
 		super(composites);
-	}
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		return (DeadFeatureExplanation) super.getExplanation();
 	}
 }

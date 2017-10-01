@@ -27,7 +27,7 @@ import org.prop4j.Node;
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantPresenceConditionExplanation extends PreprocessorExplanation {
+public class InvariantPresenceConditionExplanation extends PreprocessorExplanation<Node> {
 
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
@@ -57,11 +57,6 @@ public class InvariantPresenceConditionExplanation extends PreprocessorExplanati
 	 */
 	public void setTautology(boolean tautology) {
 		this.tautology = tautology;
-	}
-
-	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
 	}
 
 	@Override

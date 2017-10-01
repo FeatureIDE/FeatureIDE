@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
@@ -39,25 +38,13 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
  *
  * @author Timo G&uuml;nther
  */
-public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator implements AutomaticSelectionExplanationCreator {
+public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator<SelectableFeature, AutomaticSelectionExplanation>
+		implements AutomaticSelectionExplanationCreator {
 
 	/**
 	 * The features that have been added to the oracle. Stored for performance reasons.
 	 */
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
-
-	@Override
-	public SelectableFeature getSubject() {
-		return (SelectableFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof SelectableFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
 
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
@@ -105,11 +92,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected AutomaticSelectionExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (AutomaticSelectionExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

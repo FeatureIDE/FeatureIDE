@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import java.util.Collection;
-import java.util.Set;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
@@ -35,20 +32,8 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
-public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
+public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation>
+		implements DeadFeatureExplanationCreator {
 
 	/**
 	 * {@inheritDoc}
@@ -61,11 +46,6 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 		ltms.clearPremises();
 		ltms.addPremise(NodeCreator.getVariable(getSubject()), true);
 		return getExplanation(ltms.getExplanations());
-	}
-
-	@Override
-	protected DeadFeatureExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

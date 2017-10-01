@@ -27,14 +27,19 @@ import java.util.Deque;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 
 /**
  * Abstract implementation of {@link PreprocessorExplanationCreator}.
  *
+ * @param S subject
+ * @param E explanation
+ * @param O oracle
  * @author Timo G&uuml;nther
  */
-public abstract class AbstractPreprocessorExplanationCreator extends AbstractFeatureModelExplanationCreator implements PreprocessorExplanationCreator {
+public abstract class AbstractPreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>, O> extends AbstractFeatureModelExplanationCreator<S, E, O>
+		implements PreprocessorExplanationCreator<S, E> {
 
 	/** The expression stack. */
 	private Deque<Node> expressionStack;

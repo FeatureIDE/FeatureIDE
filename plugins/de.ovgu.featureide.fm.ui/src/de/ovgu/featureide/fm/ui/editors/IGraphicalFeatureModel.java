@@ -63,9 +63,9 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	Collection<IGraphicalFeature> getAllFeatures();
 
-	void setActiveExplanation(Explanation exp);
+	void setActiveExplanation(Explanation<?> exp);
 
-	Explanation getActiveExplanation();
+	Explanation<?> getActiveExplanation();
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 

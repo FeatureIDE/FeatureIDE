@@ -35,19 +35,22 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * if some instances fail to consistently generate explanations but are otherwise preferable. For example, {@link Ltms LTMS} is fast but incomplete. If it
  * fails, one might try again with a slower but complete {@link MusExtractor MUS extractor}.
  * 
+ * @param S subject
+ * @param E explanation
+ * @param C composite
  * @author Timo G&uuml;nther
  */
-public abstract class CompositeExplanationCreator<T extends ExplanationCreator> implements ExplanationCreator {
+public abstract class CompositeExplanationCreator<S, E extends Explanation<S>, C extends ExplanationCreator<S, E>> implements ExplanationCreator<S, E> {
 
 	/** The explanation creators this composes. */
-	private final List<T> composites;
+	private final List<C> composites;
 
 	/**
 	 * Constructs a new instance of this class.
 	 * 
 	 * @param composites the explanation creators to compose
 	 */
-	public CompositeExplanationCreator(Collection<T> composites) {
+	public CompositeExplanationCreator(Collection<C> composites) {
 		this.composites = new ArrayList<>(composites);
 	}
 
@@ -56,29 +59,29 @@ public abstract class CompositeExplanationCreator<T extends ExplanationCreator> 
 	 * 
 	 * @return the explanation creators this composes
 	 */
-	public List<T> getComposites() {
+	public List<C> getComposites() {
 		return composites;
 	}
 
 	@Override
-	public Object getSubject() {
-		for (final T composite : getComposites()) {
+	public S getSubject() {
+		for (final C composite : getComposites()) {
 			return composite.getSubject();
 		}
 		return null;
 	}
 
 	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		for (final T composite : getComposites()) {
+	public void setSubject(S subject) {
+		for (final C composite : getComposites()) {
 			composite.setSubject(subject);
 		}
 	}
 
 	@Override
-	public Explanation getExplanation() throws IllegalStateException {
-		for (final T composite : getComposites()) {
-			final Explanation explanation = composite.getExplanation();
+	public E getExplanation() throws IllegalStateException {
+		for (final C composite : getComposites()) {
+			final E explanation = composite.getExplanation();
 			if (explanation != null) {
 				return explanation;
 			}

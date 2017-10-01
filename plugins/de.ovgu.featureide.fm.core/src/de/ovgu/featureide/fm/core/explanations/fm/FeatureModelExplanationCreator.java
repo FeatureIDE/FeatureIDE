@@ -26,12 +26,14 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 /**
  * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
  * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features
  * @see {@link RedundantConstraintExplanationCreator} for explaining redundant constraints
  */
-public interface FeatureModelExplanationCreator extends ExplanationCreator {
+public interface FeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends ExplanationCreator<S, E> {
 
 	/**
 	 * Returns the feature model context.

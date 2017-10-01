@@ -244,7 +244,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
-	private Explanation activeExplanation;
+	private Explanation<?> activeExplanation;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -438,7 +438,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return;
 		}
 		final IFeatureModelElement primaryModel = primary.getModel().getObject();
-		final Explanation activeExplanation;
+		final Explanation<?> activeExplanation;
 		if (getFeatureModel().getAnalyser().valid()) {
 			activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
 		} else {
@@ -452,8 +452,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 *
 	 * @param activeExplanation the new active explanation
 	 */
-	public void setActiveExplanation(Explanation activeExplanation) {
-		final Explanation oldActiveExplanation = this.activeExplanation;
+	public void setActiveExplanation(Explanation<?> activeExplanation) {
+		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);
 		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
@@ -464,7 +464,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 *
 	 * @return the currently active explanation.
 	 */
-	public Explanation getActiveExplanation() {
+	public Explanation<?> getActiveExplanation() {
 		return activeExplanation;
 	}
 
@@ -1339,7 +1339,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			// Deactivate the old active explanation.
-			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
+			final FeatureModelExplanation<?> oldActiveExplanation = (FeatureModelExplanation<?>) event.getOldValue();
 			if (oldActiveExplanation != null) {
 				// Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
@@ -1354,7 +1354,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 
 			// Activate the new active explanation.
-			final FeatureModelExplanation newActiveExplanation = (FeatureModelExplanation) event.getNewValue();
+			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
 				// Notify each element affected by the new active explanation of its new active reasons.
 				for (final Reason reason : newActiveExplanation.getReasons()) {

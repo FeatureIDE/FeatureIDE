@@ -21,20 +21,18 @@
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
 
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.AbstractPreprocessorExplanationCreator;
 
 /**
  * Abstract implementation of {@link PreprocessorExplanationCreator} using an {@link Ltms LTMS}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class LtmsPreprocessorExplanationCreator extends AbstractPreprocessorExplanationCreator {
-
-	@Override
-	protected Ltms getOracle() {
-		return (Ltms) super.getOracle();
-	}
+public abstract class LtmsPreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>> extends AbstractPreprocessorExplanationCreator<S, E, Ltms> {
 
 	@Override
 	protected Ltms createOracle() {

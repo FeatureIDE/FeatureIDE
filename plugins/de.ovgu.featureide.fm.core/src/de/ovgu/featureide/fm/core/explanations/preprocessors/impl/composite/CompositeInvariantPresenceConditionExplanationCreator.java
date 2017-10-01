@@ -12,7 +12,8 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceCo
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeInvariantPresenceConditionExplanationCreator extends CompositePreprocessorExplanationCreator<InvariantPresenceConditionExplanationCreator>
+public class CompositeInvariantPresenceConditionExplanationCreator
+		extends CompositePreprocessorExplanationCreator<Node, InvariantPresenceConditionExplanation, InvariantPresenceConditionExplanationCreator>
 		implements InvariantPresenceConditionExplanationCreator {
 
 	/**
@@ -20,13 +21,8 @@ public class CompositeInvariantPresenceConditionExplanationCreator extends Compo
 	 * 
 	 * @param composites the explanation creators to compose
 	 */
-	public CompositeInvariantPresenceConditionExplanationCreator(Collection<InvariantPresenceConditionExplanationCreator> composites) {
+	protected CompositeInvariantPresenceConditionExplanationCreator(Collection<InvariantPresenceConditionExplanationCreator> composites) {
 		super(composites);
-	}
-
-	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
 	}
 
 	@Override

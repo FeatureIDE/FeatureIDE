@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeFalseOptionalFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<FalseOptionalFeatureExplanationCreator>
+public class CompositeFalseOptionalFeatureExplanationCreator extends CompositeFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation, FalseOptionalFeatureExplanationCreator>
 		implements FalseOptionalFeatureExplanationCreator {
 
 	/**
@@ -41,15 +41,5 @@ public class CompositeFalseOptionalFeatureExplanationCreator extends CompositeFe
 	 */
 	public CompositeFalseOptionalFeatureExplanationCreator(Collection<FalseOptionalFeatureExplanationCreator> composites) {
 		super(composites);
-	}
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
-		return (FalseOptionalFeatureExplanation) super.getExplanation();
 	}
 }

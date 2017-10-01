@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 
@@ -37,23 +35,11 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  *
  * @author Timo G&uuml;nther
  */
-public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
+public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation>
+		implements RedundantConstraintExplanationCreator {
 
 	/** The amount of clauses added to the oracle to account for the redundant constraint. */
 	private int redundantConstraintClauseCount;
-
-	@Override
-	public IConstraint getSubject() {
-		return (IConstraint) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IConstraint)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -118,11 +104,6 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			getTraceModel().removeTraces(constraintClauseCount);
 		}
 		return explanation;
-	}
-
-	@Override
-	protected RedundantConstraintExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

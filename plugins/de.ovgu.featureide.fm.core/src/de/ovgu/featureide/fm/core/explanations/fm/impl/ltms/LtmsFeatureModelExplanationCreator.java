@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -27,15 +28,12 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using an {@link Ltms LTMS}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
-public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
-
-	@Override
-	protected Ltms getOracle() {
-		return (Ltms) super.getOracle();
-	}
+public abstract class LtmsFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>> extends AbstractFeatureModelExplanationCreator<S, E, Ltms> {
 
 	@Override
 	protected Ltms createOracle() {

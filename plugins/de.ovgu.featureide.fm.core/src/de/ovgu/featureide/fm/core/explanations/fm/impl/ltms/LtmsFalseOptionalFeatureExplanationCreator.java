@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import java.util.Collection;
-import java.util.Set;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -36,20 +33,8 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
-public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
+public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation>
+		implements FalseOptionalFeatureExplanationCreator {
 
 	/**
 	 * {@inheritDoc}
@@ -64,11 +49,6 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 		ltms.addPremise(NodeCreator.getVariable(getSubject()), false);
 		ltms.addPremise(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
 		return getExplanation(ltms.getExplanations());
-	}
-
-	@Override
-	protected FalseOptionalFeatureExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		return (FalseOptionalFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

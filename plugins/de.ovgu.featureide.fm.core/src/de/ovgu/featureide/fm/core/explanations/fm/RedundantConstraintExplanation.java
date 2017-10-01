@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  *
  * @author Timo G&uuml;nther
  */
-public class RedundantConstraintExplanation extends FeatureModelExplanation {
+public class RedundantConstraintExplanation extends FeatureModelExplanation<IConstraint> {
 
 	/** True if this explanation is for an implicit constraint. */
 	private boolean implicit;
@@ -39,11 +39,6 @@ public class RedundantConstraintExplanation extends FeatureModelExplanation {
 	 */
 	public RedundantConstraintExplanation(IConstraint subject) {
 		super(subject);
-	}
-
-	@Override
-	public IConstraint getSubject() {
-		return (IConstraint) super.getSubject();
 	}
 
 	/**

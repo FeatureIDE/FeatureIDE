@@ -674,7 +674,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createExplanationEntry() {
-		final Explanation explanation = graphicalFeatureModel.getActiveExplanation();
+		final Explanation<?> explanation = graphicalFeatureModel.getActiveExplanation();
 
 		final XYLayout layout = new XYLayout();
 		final Figure explanationFigure = new Figure();

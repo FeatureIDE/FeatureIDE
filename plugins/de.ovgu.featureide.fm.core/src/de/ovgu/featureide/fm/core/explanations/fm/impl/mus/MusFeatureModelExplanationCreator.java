@@ -23,20 +23,19 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class MusFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
-
-	@Override
-	protected MusExtractor getOracle() {
-		return (MusExtractor) super.getOracle();
-	}
+public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>>
+		extends AbstractFeatureModelExplanationCreator<S, E, MusExtractor> {
 
 	@Override
 	protected MusExtractor createOracle() {

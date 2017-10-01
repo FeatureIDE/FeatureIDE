@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -39,10 +38,11 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorReason;
  *
  * @author Timo G&uuml;nther
  */
-public class MusInvariantPresenceConditionExplanationCreator extends MusPreprocessorExplanationCreator implements InvariantPresenceConditionExplanationCreator {
+public class MusInvariantPresenceConditionExplanationCreator extends MusPreprocessorExplanationCreator<Node, InvariantPresenceConditionExplanation>
+		implements InvariantPresenceConditionExplanationCreator {
 
 	/** Keeps track of the clause indexes of the expressions added to the solver. */
-	private final List<Node> addedExpressions = new LinkedList<>();
+	private final List<Node> addedExpressions = new ArrayList<>();
 	/** The amount of clauses added to the solver for the invariant expression. */
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
@@ -62,19 +62,6 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 	public void setExpressionStack(Collection<Node> expressionStack) {
 		super.setExpressionStack(expressionStack);
 		setSubject(getExpressionStack().peek());
-	}
-
-	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof Node)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
 	}
 
 	@Override
@@ -103,11 +90,6 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected InvariantPresenceConditionExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (InvariantPresenceConditionExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

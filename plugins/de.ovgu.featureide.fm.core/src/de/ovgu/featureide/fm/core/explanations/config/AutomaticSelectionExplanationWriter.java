@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  *
  * @author Timo G&uuml;nther
  */
-public class AutomaticSelectionExplanationWriter extends ConfigurationExplanationWriter {
+public class AutomaticSelectionExplanationWriter extends ConfigurationExplanationWriter<AutomaticSelectionExplanation> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -36,11 +36,6 @@ public class AutomaticSelectionExplanationWriter extends ConfigurationExplanatio
 	 */
 	public AutomaticSelectionExplanationWriter(AutomaticSelectionExplanation explanation) {
 		super(explanation);
-	}
-
-	@Override
-	protected AutomaticSelectionExplanation getExplanation() {
-		return (AutomaticSelectionExplanation) super.getExplanation();
 	}
 
 	@Override

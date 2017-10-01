@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  *
  * @author Timo G&uuml;nther
  */
-public class DeadFeatureExplanation extends FeatureModelExplanation {
+public class DeadFeatureExplanation extends FeatureModelExplanation<IFeature> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -38,11 +38,6 @@ public class DeadFeatureExplanation extends FeatureModelExplanation {
 	 */
 	public DeadFeatureExplanation(IFeature subject) {
 		super(subject);
-	}
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
 	}
 
 	/**

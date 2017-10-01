@@ -23,15 +23,16 @@ package de.ovgu.featureide.fm.core.explanations;
 import org.prop4j.NodeWriter;
 
 /**
- * Transforms instances of {@link Explanation} into user-friendly strings in natural language.
+ * Transforms {@link Explanation explanations} into user-friendly strings in natural language.
  *
+ * @param E explanation
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
-public abstract class ExplanationWriter {
+public abstract class ExplanationWriter<E extends Explanation<?>> {
 
 	/** The explanation to be transformed. */
-	private final Explanation explanation;
+	private final E explanation;
 	/**
 	 * Whether to include the reason count versus explanation count when writing a reason. This acts as an explanation for the reason's confidence.
 	 */
@@ -44,7 +45,7 @@ public abstract class ExplanationWriter {
 	 *
 	 * @param explanation explanation to be transformed
 	 */
-	public ExplanationWriter(Explanation explanation) {
+	protected ExplanationWriter(E explanation) {
 		this.explanation = explanation;
 	}
 
@@ -53,7 +54,7 @@ public abstract class ExplanationWriter {
 	 *
 	 * @return the explanation to be transformed
 	 */
-	protected Explanation getExplanation() {
+	protected E getExplanation() {
 		return explanation;
 	}
 
@@ -174,9 +175,8 @@ public abstract class ExplanationWriter {
 	 */
 	public String getReasonString(Reason reason) throws IllegalArgumentException {
 		String s = getConcreteReasonString(reason);
-		final Explanation explanation = reason.getExplanation();
-		final int reasonCount = explanation.getReasonCounts().get(reason);
-		final int explanationCount = explanation.getExplanationCount();
+		final int reasonCount = getExplanation().getReasonCounts().get(reason);
+		final int explanationCount = getExplanation().getExplanationCount();
 		if (isWritingReasonCounts() && (reasonCount > 1) && (explanationCount > 1)) {
 			s = String.format("%s (%d/%d)", s, reasonCount, explanationCount);
 		}

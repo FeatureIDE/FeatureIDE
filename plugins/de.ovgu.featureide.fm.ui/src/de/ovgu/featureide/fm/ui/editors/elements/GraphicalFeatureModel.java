@@ -63,7 +63,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	/**
 	 * The currently active explanation that is shown in the FeatureDiagrammEditor if any defect element is selected.
 	 */
-	public Explanation currentlyActiveExplanation = null;
+	public Explanation<?> currentlyActiveExplanation = null;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
@@ -294,7 +294,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#setActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
 	 */
 	@Override
-	public void setActiveExplanation(Explanation exp) {
+	public void setActiveExplanation(Explanation<?> exp) {
 		currentlyActiveExplanation = exp;
 
 	}
@@ -304,7 +304,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel#getActiveExplanation(de.ovgu.featureide.fm.core.explanations.Explanation)
 	 */
 	@Override
-	public Explanation getActiveExplanation() {
+	public Explanation<?> getActiveExplanation() {
 		// TODO Auto-generated method stub
 		return currentlyActiveExplanation;
 	}

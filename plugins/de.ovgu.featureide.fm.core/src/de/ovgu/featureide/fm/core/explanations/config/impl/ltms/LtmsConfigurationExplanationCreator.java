@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -27,14 +28,12 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator} using an {@link Ltms LTMS}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class LtmsConfigurationExplanationCreator extends AbstractConfigurationExplanationCreator implements ConfigurationExplanationCreator {
-
-	@Override
-	protected Ltms getOracle() {
-		return (Ltms) super.getOracle();
-	}
+public abstract class LtmsConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>> extends AbstractConfigurationExplanationCreator<S, E, Ltms>
+		implements ConfigurationExplanationCreator<S, E> {
 
 	@Override
 	protected Ltms createOracle() {

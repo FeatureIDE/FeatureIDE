@@ -26,9 +26,11 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
 /**
  * Generates explanations for circumstances involving {@link Configuration configurations}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public interface ConfigurationExplanationCreator extends FeatureModelExplanationCreator {
+public interface ConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>> extends FeatureModelExplanationCreator<S, E> {
 
 	/**
 	 * Returns the configuration.

@@ -23,29 +23,33 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.composite;
 import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.composite.CompositeExplanationCreator;
 
 /**
  * Implements {@link FeatureModelExplanationCreator} through composition.
  * 
+ * @param S subject
+ * @param E explanation
+ * @param C composite
  * @author Timo G&uuml;nther
  */
-public abstract class CompositeFeatureModelExplanationCreator<T extends FeatureModelExplanationCreator> extends CompositeExplanationCreator<T>
-		implements FeatureModelExplanationCreator {
+public abstract class CompositeFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>, C extends FeatureModelExplanationCreator<S, E>>
+		extends CompositeExplanationCreator<S, E, C> implements FeatureModelExplanationCreator<S, E> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 * 
 	 * @param composites the explanation creators to compose
 	 */
-	public CompositeFeatureModelExplanationCreator(Collection<T> composites) {
+	public CompositeFeatureModelExplanationCreator(Collection<C> composites) {
 		super(composites);
 	}
 
 	@Override
 	public IFeatureModel getFeatureModel() {
-		for (final T composite : getComposites()) {
+		for (final C composite : getComposites()) {
 			return composite.getFeatureModel();
 		}
 		return null;
@@ -53,7 +57,7 @@ public abstract class CompositeFeatureModelExplanationCreator<T extends FeatureM
 
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
-		for (final T composite : getComposites()) {
+		for (final C composite : getComposites()) {
 			composite.setFeatureModel(fm);
 		}
 	}

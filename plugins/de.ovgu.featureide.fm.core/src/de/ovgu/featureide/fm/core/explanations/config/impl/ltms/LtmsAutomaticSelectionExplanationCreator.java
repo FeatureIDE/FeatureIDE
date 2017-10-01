@@ -20,11 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -44,27 +42,13 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  *
  * @author Timo G&uuml;nther
  */
-public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationExplanationCreator implements AutomaticSelectionExplanationCreator {
+public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationExplanationCreator<SelectableFeature, AutomaticSelectionExplanation>
+		implements AutomaticSelectionExplanationCreator {
 
 	/**
 	 * The features that have been added to the oracle. Stored for performance reasons.
 	 */
-	private final List<SelectableFeature> selectedFeatures =
-		new LinkedList<>();
-
-	@Override
-	public SelectableFeature getSubject() {
-		return (SelectableFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null)
-			&& !(subject instanceof SelectableFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
+	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
 	@Override
 	protected Node createCnf() {
@@ -72,20 +56,17 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 		Collections.addAll(clauses, super.createCnf().getChildren());
 		selectedFeatures.clear();
 		for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
-			final Object var =
-				NodeCreator.getVariable(featureSelection.getFeature());
+			final Object var = NodeCreator.getVariable(featureSelection.getFeature());
 			final boolean value;
 			if (featureSelection == getSubject()) {
 				continue;
 			} else {
 				switch (featureSelection.getManual()) {
 				case SELECTED:
-					value =
-						true;
+					value = true;
 					break;
 				case UNSELECTED:
-					value =
-						false;
+					value = false;
 					break;
 				case UNDEFINED:
 					continue;
@@ -106,12 +87,10 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 		final boolean value;
 		switch (getSubject().getAutomatic()) {
 		case SELECTED:
-			value =
-				false;
+			value = false;
 			break;
 		case UNSELECTED:
-			value =
-				true;
+			value = true;
 			break;
 		case UNDEFINED:
 			throw new IllegalStateException("Feature not automatically selected or unselected");
@@ -123,15 +102,8 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	}
 
 	@Override
-	protected AutomaticSelectionExplanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		return (AutomaticSelectionExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
 	protected Reason getReason(int clauseIndex) {
-		final int selectionIndex =
-			clauseIndex
-				- getTraceModel().getTraceCount();
+		final int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (selectionIndex >= 0) {
 			return new ConfigurationReason(selectedFeatures.get(selectionIndex));
 		}

@@ -31,7 +31,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  * 
  * @author Timo G&uuml;nther
  */
-public class CompositeRedundantConstraintExplanationCreator extends CompositeFeatureModelExplanationCreator<RedundantConstraintExplanationCreator>
+public class CompositeRedundantConstraintExplanationCreator
+		extends CompositeFeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation, RedundantConstraintExplanationCreator>
 		implements RedundantConstraintExplanationCreator {
 
 	/**
@@ -41,15 +42,5 @@ public class CompositeRedundantConstraintExplanationCreator extends CompositeFea
 	 */
 	public CompositeRedundantConstraintExplanationCreator(Collection<RedundantConstraintExplanationCreator> composites) {
 		super(composites);
-	}
-
-	@Override
-	public IConstraint getSubject() {
-		return (IConstraint) super.getSubject();
-	}
-
-	@Override
-	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
-		return (RedundantConstraintExplanation) super.getExplanation();
 	}
 }

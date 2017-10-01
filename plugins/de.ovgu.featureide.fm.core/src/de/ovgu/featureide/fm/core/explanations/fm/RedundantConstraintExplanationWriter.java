@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  *
  * @author Timo G&uuml;nther
  */
-public class RedundantConstraintExplanationWriter extends FeatureModelExplanationWriter {
+public class RedundantConstraintExplanationWriter extends FeatureModelExplanationWriter<RedundantConstraintExplanation> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -36,11 +36,6 @@ public class RedundantConstraintExplanationWriter extends FeatureModelExplanatio
 	 */
 	public RedundantConstraintExplanationWriter(RedundantConstraintExplanation explanation) {
 		super(explanation);
-	}
-
-	@Override
-	protected RedundantConstraintExplanation getExplanation() {
-		return (RedundantConstraintExplanation) super.getExplanation();
 	}
 
 	@Override

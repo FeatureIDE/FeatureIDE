@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -35,20 +33,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  *
  * @author Timo G&uuml;nther
  */
-public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
+public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation>
+		implements FalseOptionalFeatureExplanationCreator {
 
 	@Override
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
@@ -63,11 +49,6 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected FalseOptionalFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (FalseOptionalFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

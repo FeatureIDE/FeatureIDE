@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantPresenceConditionExplanationWriter extends PreprocessorExplanationWriter {
+public class InvariantPresenceConditionExplanationWriter extends PreprocessorExplanationWriter<InvariantPresenceConditionExplanation> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -36,11 +36,6 @@ public class InvariantPresenceConditionExplanationWriter extends PreprocessorExp
 	 */
 	public InvariantPresenceConditionExplanationWriter(InvariantPresenceConditionExplanation explanation) {
 		super(explanation);
-	}
-
-	@Override
-	protected InvariantPresenceConditionExplanation getExplanation() {
-		return (InvariantPresenceConditionExplanation) super.getExplanation();
 	}
 
 	@Override

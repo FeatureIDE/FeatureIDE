@@ -27,7 +27,7 @@ import org.prop4j.Node;
  *
  * @author Timo G&uuml;nther
  */
-public interface InvariantPresenceConditionExplanationCreator extends PreprocessorExplanationCreator {
+public interface InvariantPresenceConditionExplanationCreator extends PreprocessorExplanationCreator<Node, InvariantPresenceConditionExplanation> {
 
 	/**
 	 * Returns true if the expression is a tautology or false if it is a contradiction.
@@ -50,15 +50,6 @@ public interface InvariantPresenceConditionExplanationCreator extends Preprocess
 	 */
 	@Override
 	public Node getSubject();
-
-	/**
-	 * Sets the invariant expression to explain
-	 *
-	 * @param subject the invariant expression to explain
-	 * @throws IllegalArgumentException if the subject is not an instance of {@link Node}
-	 */
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException;
 
 	/**
 	 * Returns an explanation why the expression is a contradiction or a tautology.
