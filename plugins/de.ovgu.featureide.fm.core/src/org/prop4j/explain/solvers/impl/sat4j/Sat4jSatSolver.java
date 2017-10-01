@@ -20,7 +20,10 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -163,7 +166,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @param clauses clauses to transform; not null
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
-	public IVec<IVecInt> getVectorFromClauses(List<Node> clauses) {
+	public IVec<IVecInt> getVectorFromClauses(Collection<Node> clauses) {
 		final IVec<IVecInt> vector = new Vec<>(clauses.size());
 		for (final Node clause : clauses) {
 			vector.push(getVectorFromClause(clause));
@@ -296,5 +299,33 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	public int getClauseIndexFromIndex(int index) {
 		return index - 1;
+	}
+
+	/**
+	 * Returns the clause sets for the given clause index sets.
+	 *
+	 * @param indexSets clause index sets
+	 * @return the clause sets for the given clause index sets
+	 */
+	public List<Set<Node>> getClauseSetsFromIndexSets(Collection<Set<Integer>> indexSets) {
+		final List<Set<Node>> clauseSets = new ArrayList<>(indexSets.size());
+		for (final Set<Integer> indexSet : indexSets) {
+			clauseSets.add(getClauseSetFromIndexSet(indexSet));
+		}
+		return clauseSets;
+	}
+
+	/**
+	 * Returns the clause set for the given clause index set.
+	 *
+	 * @param indexSet clause index set
+	 * @return the clause set for the given clause index set
+	 */
+	public Set<Node> getClauseSetFromIndexSet(Set<Integer> indexSet) {
+		final Set<Node> clauseSet = new LinkedHashSet<>(indexSet.size());
+		for (final int index : indexSet) {
+			clauseSet.add(getClause(index));
+		}
+		return clauseSet;
 	}
 }
