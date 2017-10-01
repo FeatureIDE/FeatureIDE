@@ -20,6 +20,7 @@
  */
 package org.prop4j.explain.solvers;
 
+import java.util.List;
 import java.util.Set;
 
 import org.prop4j.Node;
@@ -47,7 +48,23 @@ public interface MusExtractor extends MutableSatSolver {
 	 * Returns any minimal unsatisfiable subset (MUS) of the problem. Each clause is referenced by its index instead of object.
 	 *
 	 * @return any minimal unsatisfiable subset; not null
-	 * @throws IllegalStateException
+	 * @throws IllegalStateException if the formula in this solver is satisfiable
 	 */
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException;
+
+	/**
+	 * Returns all minimal unsatisfiable subsets of the problem.
+	 *
+	 * @return all minimal unsatisfiable subsets of the problem
+	 * @throws IllegalStateException if the formula in this solver is satisfiable
+	 */
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException;
+
+	/**
+	 * Returns all minimal unsatisfiable subsets of the problem referenced by index.
+	 *
+	 * @return all minimal unsatisfiable subsets of the problem referenced by index.
+	 * @throws IllegalStateException if the formula in this solver is satisfiable
+	 */
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException;
 }

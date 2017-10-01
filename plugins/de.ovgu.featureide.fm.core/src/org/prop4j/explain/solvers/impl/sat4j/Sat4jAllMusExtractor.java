@@ -20,33 +20,32 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ISolver;
-import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.xplain.Xplain;
+import org.sat4j.specs.IVecInt;
+import org.sat4j.tools.AllMUSes;
 
 /**
- * A MUS extractor using a Sat4J oracle.
+ * A MUS extractor using a Sat4J oracle for all MUSes.
  *
  * @author Timo G&uuml;nther
  */
-public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
+public class Sat4jAllMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
+
+	/** The oracle used to extract all MUSes. */
+	private AllMUSes allMusExtractor;
 
 	@Override
-	protected Xplain<ISolver> createOracle() {
-		return new Xplain<ISolver>(super.createOracle());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Xplain<ISolver> getOracle() {
-		return (Xplain<ISolver>) super.getOracle();
+	protected ISolver createOracle() {
+		allMusExtractor = new AllMUSes(SolverFactory.instance());
+		return allMusExtractor.getSolverInstance();
 	}
 
 	@Override
@@ -56,29 +55,29 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	@Override
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		if (isSatisfiable()) {
-			throw new IllegalStateException("Problem is satisfiable");
-		}
-		final int[] indexes;
-		try {
-			indexes = getOracle().minimalExplanation();
-		} catch (final TimeoutException e) {
-			throw new IllegalStateException(e);
-		}
-		final Set<Integer> set = new TreeSet<>();
-		for (final int index : indexes) {
-			set.add(getClauseIndexFromIndex(index));
-		}
-		return set;
+		return getAllMinimalUnsatisfiableSubsetIndexes().get(0);
 	}
 
 	@Override
 	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubset());
+		return getClauseSetsFromIndexSets(getAllMinimalUnsatisfiableSubsetIndexes());
 	}
 
 	@Override
 	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
+		if (isSatisfiable()) {
+			throw new IllegalStateException("Problem is satisfiable");
+		}
+		final List<IVecInt> allIndexes = allMusExtractor.computeAllMUSes();
+		final List<Set<Integer>> allMuses = new ArrayList<>(allIndexes.size());
+		for (final IVecInt indexes : allIndexes) {
+			final Set<Integer> mus = new TreeSet<Integer>();
+			for (int i = 0; i < indexes.size(); i++) {
+				final int index = indexes.get(i);
+				mus.add(this.getClauseIndexFromIndex(index));
+			}
+			allMuses.add(mus);
+		}
+		return allMuses;
 	}
 }
