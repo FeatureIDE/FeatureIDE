@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite;
 
 import java.util.Arrays;
 
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms.LtmsInvariantExpressionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusInvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms.LtmsInvariantPresenceConditionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusInvariantPresenceConditionExplanationCreator;
 
 /**
  * Provides instances of {@link PreprocessorExplanationCreator} using composition.
@@ -36,9 +36,9 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusInvaria
 public class CompositePreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
 	@Override
-	public InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator() {
-		return new CompositeInvariantExpressionExplanationCreator(Arrays.<InvariantExpressionExplanationCreator>asList(
-				new LtmsInvariantExpressionExplanationCreator(),
-				new MusInvariantExpressionExplanationCreator()));
+	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
+		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.<InvariantPresenceConditionExplanationCreator>asList(
+				new LtmsInvariantPresenceConditionExplanationCreator(),
+				new MusInvariantPresenceConditionExplanationCreator()));
 	}
 }

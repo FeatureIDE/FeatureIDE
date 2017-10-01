@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
 
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
 public class LtmsPreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
 	@Override
-	public InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator() {
-		return new LtmsInvariantExpressionExplanationCreator();
+	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
+		return new LtmsInvariantPresenceConditionExplanationCreator();
 	}
 }

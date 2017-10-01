@@ -56,8 +56,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanation;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -83,8 +83,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 
 	/** Creates explanations for expressions that are contradictions or tautologies. */
-	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator =
-		PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
+	private final InvariantPresenceConditionExplanationCreator invariantExpressionExplanationCreator =
+		PreprocessorExplanationCreatorFactory.getDefault().getInvariantPresenceConditionExplanationCreator();
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
@@ -253,7 +253,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 		String message = pluginName;
 		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
-		final InvariantExpressionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
+		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
 		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 			message += String.format("%n%s", explanation);
 		}
@@ -266,7 +266,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param tautology true if the expression to explain is a tautology; false if it is a contradiction
 	 * @return an explanation
 	 */
-	private InvariantExpressionExplanation getInvariantExpressionExplanation(boolean tautology) {
+	private InvariantPresenceConditionExplanation getInvariantExpressionExplanation(boolean tautology) {
 		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
 		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
 		Collections.reverse(reverseExpressionStack); // Iteration order of Stack is from bottom to top instead of top to bottom.

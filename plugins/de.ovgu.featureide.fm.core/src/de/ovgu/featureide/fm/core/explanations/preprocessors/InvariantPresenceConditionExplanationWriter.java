@@ -20,52 +20,36 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
-import org.prop4j.Node;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 
 /**
- * An explanation for a contradiction or a tautology in an expression of a preprocessor directive.
+ * {@link ExplanationWriter} for {@link InvariantPresenceConditionExplanation}.
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantExpressionExplanation extends PreprocessorExplanation {
-
-	/** True if the expression is a tautology or false if it is a contradiction. */
-	private boolean tautology;
+public class InvariantPresenceConditionExplanationWriter extends PreprocessorExplanationWriter {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param subject the subject to be explained
+	 * @param explanation explanation to transform
 	 */
-	public InvariantExpressionExplanation(Node subject) {
-		super(subject);
-	}
-
-	/**
-	 * Returns true if the expression is a tautology or false if it is a contradiction.
-	 *
-	 * @return true if the expression is a tautology or false if it is a contradiction
-	 */
-	public boolean isTautology() {
-		return tautology;
-	}
-
-	/**
-	 * Sets the tautology flag.
-	 *
-	 * @param tautology true if the expression is a tautology or false if it is a contradiction
-	 */
-	public void setTautology(boolean tautology) {
-		this.tautology = tautology;
+	public InvariantPresenceConditionExplanationWriter(InvariantPresenceConditionExplanation explanation) {
+		super(explanation);
 	}
 
 	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
+	protected InvariantPresenceConditionExplanation getExplanation() {
+		return (InvariantPresenceConditionExplanation) super.getExplanation();
 	}
 
 	@Override
-	public InvariantExpressionExplanationWriter getWriter() {
-		return new InvariantExpressionExplanationWriter(this);
+	protected String getSubjectString() {
+		return String.format("expression %s", getExplanation().getSubject().toString(getSymbols()));
+	}
+
+	@Override
+	protected String getAttributeString() {
+		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
 	}
 }

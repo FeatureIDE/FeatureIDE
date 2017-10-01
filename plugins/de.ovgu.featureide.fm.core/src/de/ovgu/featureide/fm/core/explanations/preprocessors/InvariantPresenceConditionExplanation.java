@@ -20,36 +20,52 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import org.prop4j.Node;
 
 /**
- * {@link ExplanationWriter} for {@link InvariantExpressionExplanation}.
+ * An explanation for a contradiction or a tautology in the presence condition of a preprocessor directive.
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantExpressionExplanationWriter extends PreprocessorExplanationWriter {
+public class InvariantPresenceConditionExplanation extends PreprocessorExplanation {
+
+	/** True if the expression is a tautology or false if it is a contradiction. */
+	private boolean tautology;
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param explanation explanation to transform
+	 * @param subject the subject to be explained
 	 */
-	public InvariantExpressionExplanationWriter(InvariantExpressionExplanation explanation) {
-		super(explanation);
+	public InvariantPresenceConditionExplanation(Node subject) {
+		super(subject);
+	}
+
+	/**
+	 * Returns true if the expression is a tautology or false if it is a contradiction.
+	 *
+	 * @return true if the expression is a tautology or false if it is a contradiction
+	 */
+	public boolean isTautology() {
+		return tautology;
+	}
+
+	/**
+	 * Sets the tautology flag.
+	 *
+	 * @param tautology true if the expression is a tautology or false if it is a contradiction
+	 */
+	public void setTautology(boolean tautology) {
+		this.tautology = tautology;
 	}
 
 	@Override
-	protected InvariantExpressionExplanation getExplanation() {
-		return (InvariantExpressionExplanation) super.getExplanation();
+	public Node getSubject() {
+		return (Node) super.getSubject();
 	}
 
 	@Override
-	protected String getSubjectString() {
-		return String.format("expression %s", getExplanation().getSubject().toString(getSymbols()));
-	}
-
-	@Override
-	protected String getAttributeString() {
-		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
+	public InvariantPresenceConditionExplanationWriter getWriter() {
+		return new InvariantPresenceConditionExplanationWriter(this);
 	}
 }

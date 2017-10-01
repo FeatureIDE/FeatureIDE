@@ -23,11 +23,11 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors;
 import org.prop4j.Node;
 
 /**
- * Generates explanations for invariant expressions in preprocessor directives.
+ * Generates explanations for invariant presence conditions in preprocessor directives.
  *
  * @author Timo G&uuml;nther
  */
-public interface InvariantExpressionExplanationCreator extends PreprocessorExplanationCreator {
+public interface InvariantPresenceConditionExplanationCreator extends PreprocessorExplanationCreator {
 
 	/**
 	 * Returns true if the expression is a tautology or false if it is a contradiction.
@@ -64,5 +64,5 @@ public interface InvariantExpressionExplanationCreator extends PreprocessorExpla
 	 * Returns an explanation why the expression is a contradiction or a tautology.
 	 */
 	@Override
-	public InvariantExpressionExplanation getExplanation() throws IllegalStateException;
+	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException;
 }
