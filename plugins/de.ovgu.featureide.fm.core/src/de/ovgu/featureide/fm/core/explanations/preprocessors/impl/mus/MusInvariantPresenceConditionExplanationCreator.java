@@ -85,7 +85,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 				}
 				first = false;
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}

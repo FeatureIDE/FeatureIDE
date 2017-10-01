@@ -98,7 +98,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			constraintClauseCount += redundantConstraintClauseCount;
 
 			// Get the explanation.
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);

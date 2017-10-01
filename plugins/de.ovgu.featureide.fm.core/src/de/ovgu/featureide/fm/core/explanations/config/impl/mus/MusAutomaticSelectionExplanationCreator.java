@@ -87,7 +87,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					selectedFeatures.add(featureSelection);
 				}
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}

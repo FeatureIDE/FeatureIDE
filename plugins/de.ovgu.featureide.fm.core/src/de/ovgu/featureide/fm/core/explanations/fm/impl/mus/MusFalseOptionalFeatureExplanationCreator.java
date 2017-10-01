@@ -44,7 +44,7 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		try {
 			oracle.addAssumption(NodeCreator.getVariable(getSubject()), false);
 			oracle.addAssumption(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
