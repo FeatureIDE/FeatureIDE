@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -40,6 +41,22 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 
 	/** The amount of clauses added to the oracle to account for the redundant constraint. */
 	private int redundantConstraintClauseCount;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusRedundantConstraintExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusRedundantConstraintExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	/**
 	 * {@inheritDoc}

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -34,6 +35,22 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  */
 public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation>
 		implements DeadFeatureExplanationCreator {
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusDeadFeatureExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusDeadFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {

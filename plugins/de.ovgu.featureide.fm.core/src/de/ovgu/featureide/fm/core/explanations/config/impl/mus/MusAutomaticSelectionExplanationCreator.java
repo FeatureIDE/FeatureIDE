@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -40,6 +41,22 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
  */
 public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator<SelectableFeature, AutomaticSelectionExplanation>
 		implements AutomaticSelectionExplanationCreator {
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusAutomaticSelectionExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusAutomaticSelectionExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	/**
 	 * The features that have been added to the oracle. Stored for performance reasons.

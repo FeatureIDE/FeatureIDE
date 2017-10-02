@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -35,6 +36,22 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  */
 public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation>
 		implements FalseOptionalFeatureExplanationCreator {
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusFalseOptionalFeatureExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusFalseOptionalFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	@Override
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {

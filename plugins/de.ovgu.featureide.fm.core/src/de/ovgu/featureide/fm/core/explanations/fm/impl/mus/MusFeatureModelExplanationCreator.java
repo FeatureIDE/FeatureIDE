@@ -37,9 +37,32 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
 public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>>
 		extends AbstractFeatureModelExplanationCreator<S, E, MusExtractor> {
 
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	protected MusFeatureModelExplanationCreator(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
+	}
+
+	/**
+	 * Returns the solver factory used to create the oracle
+	 * @return the solver factory
+	 */
+	public SatSolverFactory getSatSolverFactory() {
+		return solverFactory;
+	}
+
 	@Override
 	protected MusExtractor createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle = getSatSolverFactory().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}

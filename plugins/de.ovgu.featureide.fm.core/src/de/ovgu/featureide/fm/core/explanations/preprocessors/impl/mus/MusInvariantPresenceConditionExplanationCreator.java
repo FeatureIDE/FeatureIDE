@@ -27,6 +27,7 @@ import java.util.List;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
@@ -47,6 +48,22 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusInvariantPresenceConditionExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusInvariantPresenceConditionExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	@Override
 	public boolean isTautology() {

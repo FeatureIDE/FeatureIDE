@@ -37,9 +37,32 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfiguration
 public abstract class MusConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>>
 		extends AbstractConfigurationExplanationCreator<S, E, MusExtractor> {
 
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	protected MusConfigurationExplanationCreator(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
+	}
+
+	/**
+	 * Returns the solver factory used to create the oracle
+	 * @return the solver factory
+	 */
+	public SatSolverFactory getSatSolverFactory() {
+		return solverFactory;
+	}
+
 	@Override
 	protected MusExtractor createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle = getSatSolverFactory().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}
