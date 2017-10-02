@@ -23,10 +23,12 @@ package org.prop4j.explain.solvers.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
@@ -39,9 +41,9 @@ import org.prop4j.explain.solvers.SatProblem;
 public abstract class AbstractSatProblem implements SatProblem {
 
 	/** The clauses added to this problem. */
-	private final List<Node> clauses = new ArrayList<>();
+	private final SortedMap<Integer, Node> clauses = new TreeMap<>(); //map instead of list in case of sparse indexes in subclasses
 	/** The assumptions added to this problem. */
-	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+	private final Map<Object, Boolean> assumptions = new HashMap<>();
 
 	@Override
 	public int addFormulas(Node... formulas) {
@@ -91,13 +93,29 @@ public abstract class AbstractSatProblem implements SatProblem {
 		if (clause.getChildren().length == 0) {
 			throw new IllegalArgumentException("Empty clause");
 		}
-		clauses.add(clause);
+		clauses.put(getClauseCount(), clause);
 		return true;
+	}
+
+	/**
+	 * Returns the next free index to store a new clause at.
+	 * @return the next free index to store a new clause at
+	 */
+	protected int getNextClauseIndex() {
+		return getClauseCount();
+	}
+
+	/**
+	 * Returns the clauses by index.
+	 * @return the clauses by index
+	 */
+	protected SortedMap<Integer, Node> getClauseIndexes() {
+		return clauses;
 	}
 
 	@Override
 	public List<Node> getClauses() {
-		return clauses;
+		return new ArrayList<>(clauses.values());
 	}
 
 	@Override
@@ -112,7 +130,7 @@ public abstract class AbstractSatProblem implements SatProblem {
 
 	@Override
 	public boolean containsClause(Node clause) {
-		return clauses.contains(clause);
+		return clauses.containsValue(clause);
 	}
 
 	@Override

@@ -20,7 +20,6 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -56,6 +55,11 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 			scopeClauseCount++;
 		}
 		return changed;
+	}
+
+	@Override
+	protected int getNextClauseIndex() {
+		return getOracle().nConstraints();
 	}
 
 	@Override
@@ -109,81 +113,13 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	protected Node removeClause() {
 		scopeClauseCount--;
 
-		/*
-		 * When a constraint is removed from a Sat4J oracle, its index is not freed up. To still be able to keep track of the constraint indexes, do not remove
-		 * the corresponding clause from the local list but just set it to null.
-		 */
-		final List<Node> clauses = super.getClauses();
-		Node clause = null;
-		for (int i = clauses.size() - 1; i >= 0; i--) {
-			clause = clauses.get(i);
-			if (clause != null) {
-				clauses.set(i, null);
-				break;
-			}
-		}
+		final Node clause = getClauseIndexes().remove(getClauseIndexes().lastKey());
 
 		final IConstr constraint = clauseConstraints.remove(clause);
 		if (constraint != null) {
-			getOracle().removeSubsumedConstr(constraint);
+			getOracle().removeConstr(constraint);
 		}
 		return clause;
-	}
-
-	@Override
-	public List<Node> getClauses() {
-		/*
-		 * Sat4J does not free up a constraint's index when it is removed. In the local clause list, the resulting gaps in the index range are modeled using
-		 * null values. As such, return a copy without these null values to fulfill the interface's contract.
-		 */
-		final List<Node> clauses = super.getClauses();
-		final List<Node> clausesWithoutNull = new ArrayList<>(getClauseCount());
-		for (final Node clause : clauses) {
-			if (clause != null) {
-				clausesWithoutNull.add(clause);
-			}
-		}
-		return clausesWithoutNull;
-	}
-
-	@Override
-	public Node getClause(int index) throws IndexOutOfBoundsException {
-		/*
-		 * For performance reasons, do not generate the entire null-free list of clauses.
-		 */
-		int i = 0;
-		for (final Node clause : super.getClauses()) {
-			if ((clause != null) && (i++ == index)) {
-				return clause;
-			}
-		}
-		throw new IndexOutOfBoundsException();
-	}
-
-	@Override
-	public int getClauseCount() {
-		/*
-		 * For performance reasons, do not generate the entire null-free list of clauses.
-		 */
-		int total = scopeClauseCount;
-		for (final int previousScopeClauseCount : previousScopeClauseCounts) {
-			total += previousScopeClauseCount;
-		}
-		return total;
-	}
-
-	@Override
-	public int getClauseIndexFromIndex(int index) {
-		index = super.getClauseIndexFromIndex(index);
-		int i = 0;
-		for (final Node clause : super.getClauses()) {
-			if (clause == null) {
-				index--;
-			} else if (i++ == index) {
-				return index;
-			}
-		}
-		throw new IndexOutOfBoundsException();
 	}
 
 	@Override
