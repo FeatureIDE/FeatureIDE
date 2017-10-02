@@ -41,14 +41,29 @@ public class Commons {
 
 	private static final String TRAVIS_REMOTE_PATH = "/home/travis/build/FeatureIDE/FeatureIDE/tests/";
 
+	private static final String TRAVIS_REMOTE_PATH_FORK1 = "/home/travis/build/DawidSA2017/FeatureIDE/tests/";
+
+	private static final String TRAVIS_REMOTE_PATH_FORK2 = "/home/travis/build/Henningson/FeatureIDETeam2/tests/";
+
+	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
+
 	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.core-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
 		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
 		if (!folder.canRead()) {
-			folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
+			folder = new File(TRAVIS_REMOTE_PATH_FORK1 + PLUGIN_PATH + path);
 			if (!folder.canRead()) {
-				folder = new File(ClassLoader.getSystemResource(path).getPath());
+				folder = new File(TRAVIS_REMOTE_PATH_FORK2 + PLUGIN_PATH + path);
+				if (!folder.canRead()) {
+					folder = new File(TRAVIS_REMOTE_PATH_FORK3 + PLUGIN_PATH + path);
+					if (!folder.canRead()) {
+						folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
+						if (!folder.canRead()) {
+							folder = new File(ClassLoader.getSystemResource(path).getPath());
+						}
+					}
+				}
 			}
 		}
 		return folder;
