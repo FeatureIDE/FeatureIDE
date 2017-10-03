@@ -255,7 +255,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
 		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
 		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-			message += String.format("%n%s", explanation);
+			message += String.format("%n%s", explanation.getWriter().getString());
 		}
 		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
 	}
