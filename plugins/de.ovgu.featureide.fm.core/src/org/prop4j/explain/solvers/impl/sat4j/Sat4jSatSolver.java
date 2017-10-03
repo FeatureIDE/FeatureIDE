@@ -22,6 +22,7 @@ package org.prop4j.explain.solvers.impl.sat4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -49,13 +50,10 @@ import org.sat4j.specs.TimeoutException;
  */
 public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 
-	/** Maps clauses to constraints (handles to the clauses in the oracle). */
-	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
-
 	/** Maps variables to Sat4J indexes. */
-	private final Map<Object, Integer> variableIndexes = new LinkedHashMap<>();
+	private final Map<Object, Integer> variableIndexes = new HashMap<>();
 	/** Maps Sat4J indexes to variables. */
-	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
+	private final Map<Integer, Object> indexVariables = new HashMap<>();
 
 	/** Whether an immediate contradiction occurred while adding the clauses. */
 	private boolean contradiction = false;
@@ -72,22 +70,28 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	}
 
 	@Override
-	public boolean addClause(Node clause) {
-		if (containsClause(clause)) {
-			return false;
-		}
+	protected void addClause(Node clause) {
+		super.addClause(clause);
 		addVariables(clause.getUniqueVariables());
+		IConstr constraint = null;
 		try {
-			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
-			if (constraint != null) {
-				clauseConstraints.put(clause, constraint);
-			}
+			constraint = getOracle().addClause(getVectorFromClause(clause));
 		} catch (final ContradictionException e) {
 			setContradiction(true);
 		}
-		super.addClause(clause);
-		return true;
+		if (constraint != null) {
+			final int clauseIndex = getClauseCount() - 1;
+			onClauseConstraintAdded(clauseIndex, constraint);
+		}
 	}
+
+	/**
+	 * Called when a clause constraint is added to the oracle.
+	 *
+	 * @param clauseIndex clause index
+	 * @param constraint clause constraint; not null
+	 */
+	protected void onClauseConstraintAdded(int clauseIndex, IConstr constraint) {}
 
 	/**
 	 * Adds the given variables to the solver and oracle. Ignores any that have already been added.

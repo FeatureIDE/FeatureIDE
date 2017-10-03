@@ -170,6 +170,8 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
 		expected.add(new Or("A", "B"));
+		expected.add(new Or("B", "A"));
+		expected.add(new Or("A", "B"));
 		expected.add(new Or("B", "C"));
 		expected.add(new Or(new Literal("C", false)));
 		final List<Node> actual = instance.getClauses();
@@ -188,6 +190,8 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
 		instance.addFormula(new And(new Or("B", "A"), new Or("A", "B")));
+		expected.add(new Or("B", "A"));
+		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
 		instance.addFormula(new Or("B", "C"));
 		expected.add(new Or("B", "C"));
