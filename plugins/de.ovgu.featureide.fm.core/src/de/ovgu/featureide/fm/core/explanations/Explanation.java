@@ -198,6 +198,12 @@ public abstract class Explanation<S> {
 
 	@Override
 	public String toString() {
-		return getWriter().getString();
+		final ExplanationWriter<?> writer = getWriter();
+		writer.setWritingReasonCounts(true);
+		String s = writer.getIntroductionString();
+		for (final Reason reason : getReasons()) {
+			s += " " + writer.getReasonString(reason);
+		}
+		return s;
 	}
 }
