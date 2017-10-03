@@ -107,7 +107,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 		if ((explanation == null) || (explanation.getReasons() == null) || explanation.getReasons().isEmpty()) {
 			return s;
 		}
-		for (final Reason reason : explanation.getReasons()) {
+		for (final Reason<?> reason : explanation.getReasons()) {
 			s += String.format("%n\u2022 %s", getReasonString(reason));
 		}
 		return s;
@@ -173,7 +173,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 	 * @return a user-friendly representation of the given reason
 	 * @throws IllegalStateException if the reason's source attribute is unknown
 	 */
-	public String getReasonString(Reason reason) throws IllegalArgumentException {
+	public String getReasonString(Reason<?> reason) throws IllegalArgumentException {
 		String s = getConcreteReasonString(reason);
 		final int reasonCount = getExplanation().getReasonCounts().get(reason);
 		final int explanationCount = getExplanation().getExplanationCount();
@@ -189,5 +189,5 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 	 * @param reason concrete reason to transform
 	 * @return a user-friendly representation of the given concrete reason
 	 */
-	protected abstract String getConcreteReasonString(Reason reason);
+	protected abstract String getConcreteReasonString(Reason<?> reason);
 }

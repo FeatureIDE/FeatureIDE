@@ -141,7 +141,7 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	}
 
 	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		return new FeatureModelReason(getTraceModel().getTrace(clauseIndex));
 	}
 }

@@ -1343,8 +1343,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			if (oldActiveExplanation != null) {
 				// Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
-				for (final Reason reason : oldActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : oldActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						if (updatedElements.add(element)) {
 							element.update(event);
@@ -1357,8 +1357,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
 				// Notify each element affected by the new active explanation of its new active reasons.
-				for (final Reason reason : newActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
 					}

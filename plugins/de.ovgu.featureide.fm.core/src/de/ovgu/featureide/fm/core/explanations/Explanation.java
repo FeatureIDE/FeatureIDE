@@ -39,7 +39,7 @@ public abstract class Explanation<S> {
 	/** The subject to be explained. */
 	private final S subject;
 	/** The reasons this explanation is composed of mapped to how often the respective reason has been generated. */
-	private final Map<Reason, Integer> reasonCounts = new LinkedHashMap<>();
+	private final Map<Reason<?>, Integer> reasonCounts = new LinkedHashMap<>();
 	/** How many explanations have been generated and rolled into one for this explanation. */
 	private int explanationCount = 1;
 
@@ -84,7 +84,7 @@ public abstract class Explanation<S> {
 	 *
 	 * @return the reasons this explanation is composed of
 	 */
-	public Set<Reason> getReasons() {
+	public Set<Reason<?>> getReasons() {
 		return reasonCounts.keySet();
 	}
 
@@ -102,7 +102,7 @@ public abstract class Explanation<S> {
 	 *
 	 * @return the reasons this explanation is composed of mapped to how often the respective reason has been generated
 	 */
-	public Map<Reason, Integer> getReasonCounts() {
+	public Map<Reason<?>, Integer> getReasonCounts() {
 		return reasonCounts;
 	}
 
@@ -111,8 +111,8 @@ public abstract class Explanation<S> {
 	 *
 	 * @param reasons reasons to add
 	 */
-	public void addReasons(Collection<Reason> reasons) {
-		for (final Reason reason : reasons) {
+	public void addReasons(Collection<Reason<?>> reasons) {
+		for (final Reason<?> reason : reasons) {
 			addReason(reason);
 		}
 	}
@@ -122,7 +122,7 @@ public abstract class Explanation<S> {
 	 *
 	 * @param reason reason to add
 	 */
-	public void addReason(Reason reason) {
+	public void addReason(Reason<?> reason) {
 		addReason(reason, 1);
 	}
 
@@ -132,9 +132,8 @@ public abstract class Explanation<S> {
 	 * @param reason reason to add
 	 * @param count how often to add the given reason
 	 */
-	protected void addReason(Reason reason, int count) {
-		reason = reason.clone();
-		reason.setExplanation(this);
+	protected void addReason(Reason<?> reason, int count) {
+		reason = reason.clone(this);
 		final Integer reasonCount = reasonCounts.get(reason);
 		reasonCounts.put(reason, (reasonCount == null ? 0 : reasonCount) + count);
 	}
@@ -144,8 +143,8 @@ public abstract class Explanation<S> {
 	 *
 	 * @param reasons reasons to add
 	 */
-	public void addUniqueReasons(Collection<Reason> reasons) {
-		for (final Reason reason : reasons) {
+	public void addUniqueReasons(Collection<Reason<?>> reasons) {
+		for (final Reason<?> reason : reasons) {
 			addUniqueReason(reason);
 		}
 	}
@@ -155,11 +154,10 @@ public abstract class Explanation<S> {
 	 *
 	 * @param reason reason to add
 	 */
-	public void addUniqueReason(Reason reason) {
+	public void addUniqueReason(Reason<?> reason) {
 		final Integer value = reasonCounts.get(reason);
 		if (value == null) {
-			reason = reason.clone();
-			reason.setExplanation(this);
+			reason = reason.clone(this);
 			reasonCounts.put(reason, 1);
 		}
 	}
@@ -170,7 +168,7 @@ public abstract class Explanation<S> {
 	 * @param explanation explanation to add to this one
 	 */
 	public void addExplanation(Explanation<? extends S> explanation) {
-		for (final Entry<Reason, Integer> reasonCount : explanation.reasonCounts.entrySet()) {
+		for (final Entry<Reason<?>, Integer> reasonCount : explanation.reasonCounts.entrySet()) {
 			addReason(reasonCount.getKey(), reasonCount.getValue());
 		}
 		explanationCount += explanation.explanationCount;
@@ -183,7 +181,7 @@ public abstract class Explanation<S> {
 	 * @param explanation explanation with reason and explanation counts to copy
 	 */
 	public void setCounts(Explanation<? extends S> explanation) {
-		for (final Entry<Reason, Integer> reasonCount : reasonCounts.entrySet()) {
+		for (final Entry<Reason<?>, Integer> reasonCount : reasonCounts.entrySet()) {
 			reasonCount.setValue(explanation.reasonCounts.get(reasonCount.getKey()));
 		}
 		explanationCount = explanation.explanationCount;
@@ -201,7 +199,7 @@ public abstract class Explanation<S> {
 		final ExplanationWriter<?> writer = getWriter();
 		writer.setWritingReasonCounts(true);
 		String s = writer.getIntroductionString();
-		for (final Reason reason : getReasons()) {
+		for (final Reason<?> reason : getReasons()) {
 			s += " " + writer.getReasonString(reason);
 		}
 		return s;

@@ -44,11 +44,11 @@ public abstract class PreprocessorExplanationWriter<E extends PreprocessorExplan
 	}
 
 	@Override
-	protected String getConcreteReasonString(Reason reason) {
+	protected String getConcreteReasonString(Reason<?> reason) {
 		if (!(reason instanceof PreprocessorReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final Node expression = ((PreprocessorReason) reason).getExpression();
+		final Node expression = ((PreprocessorReason) reason).getSubject();
 		return String.format("%s is a parent expression.", expression.toString(getSymbols()));
 	}
 }

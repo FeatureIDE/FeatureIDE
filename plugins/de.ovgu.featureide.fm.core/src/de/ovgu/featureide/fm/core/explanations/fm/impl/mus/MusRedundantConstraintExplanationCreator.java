@@ -129,7 +129,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	}
 
 	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		if (clauseIndex >= (getTraceModel().getTraceCount() - redundantConstraintClauseCount)) {
 			return null; // Ignore the redundant constraint clauses.
 		}

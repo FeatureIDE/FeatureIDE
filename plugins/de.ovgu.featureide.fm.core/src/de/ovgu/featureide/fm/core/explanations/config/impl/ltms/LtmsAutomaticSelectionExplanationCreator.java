@@ -102,7 +102,7 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	}
 
 	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		final int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (selectionIndex >= 0) {
 			return new ConfigurationReason(selectedFeatures.get(selectionIndex));

@@ -1316,7 +1316,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 				final ExplanationWriter<?> wr = explanation.getWriter();
 				sb.append(wr.getHeaderString());
-				for (final Reason reason : explanation.getReasons()) {
+				for (final Reason<?> reason : explanation.getReasons()) {
 					sb.append(System.lineSeparator());
 					sb.append("\u2022 ");
 					sb.append(wr.getReasonString(reason));

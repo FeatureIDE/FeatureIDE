@@ -110,7 +110,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 	}
 
 	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		final int expressionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (expressionIndex >= 0) {
 			if (expressionIndex < invariantExpressionClauseCount) {

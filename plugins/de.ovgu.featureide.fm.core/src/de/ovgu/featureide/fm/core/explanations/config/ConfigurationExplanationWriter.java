@@ -43,11 +43,11 @@ public abstract class ConfigurationExplanationWriter<E extends ConfigurationExpl
 	}
 
 	@Override
-	protected String getConcreteReasonString(Reason reason) {
+	protected String getConcreteReasonString(Reason<?> reason) {
 		if (!(reason instanceof ConfigurationReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final SelectableFeature selection = ((ConfigurationReason) reason).getFeatureSelection();
+		final SelectableFeature selection = ((ConfigurationReason) reason).getSubject();
 		String selectionString;
 		switch (selection.getSelection()) {
 		case SELECTED:

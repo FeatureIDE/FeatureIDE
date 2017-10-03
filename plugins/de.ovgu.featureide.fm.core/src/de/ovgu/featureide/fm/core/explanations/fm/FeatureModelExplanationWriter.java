@@ -74,11 +74,11 @@ public abstract class FeatureModelExplanationWriter<E extends FeatureModelExplan
 	}
 
 	@Override
-	protected String getConcreteReasonString(Reason reason) throws IllegalArgumentException {
+	protected String getConcreteReasonString(Reason<?> reason) throws IllegalArgumentException {
 		if (!(reason instanceof FeatureModelReason)) {
 			return null;
 		}
-		final FeatureModelElementTrace trace = ((FeatureModelReason) reason).getTrace();
+		final FeatureModelElementTrace trace = ((FeatureModelReason) reason).getSubject();
 		final Set<IFeatureModelElement> sourceElements = trace.getElements();
 		final String joinedSourceElements = joinElements(sourceElements);
 		final IFeature parent;

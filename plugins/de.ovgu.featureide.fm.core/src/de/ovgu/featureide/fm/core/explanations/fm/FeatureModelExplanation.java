@@ -54,11 +54,11 @@ public abstract class FeatureModelExplanation<S> extends Explanation<S> {
 	 */
 	public Set<IFeatureModelElement> getAffectedElements() {
 		final Set<IFeatureModelElement> affectedElements = new LinkedHashSet<>();
-		for (final Reason reason : getReasons()) {
+		for (final Reason<?> reason : getReasons()) {
 			if (!(reason instanceof FeatureModelReason)) {
 				continue;
 			}
-			affectedElements.addAll(((FeatureModelReason) reason).getTrace().getElements());
+			affectedElements.addAll(((FeatureModelReason) reason).getSubject().getElements());
 		}
 		if (getSubject() instanceof IFeatureModelElement) {
 			affectedElements.add((IFeatureModelElement) getSubject());

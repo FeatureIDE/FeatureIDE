@@ -91,7 +91,7 @@ public abstract class AbstractExplanationCreator<S, E extends Explanation<S>, O>
 	protected E getExplanation(Set<Integer> clauseIndexes) {
 		final E explanation = getConcreteExplanation();
 		for (final Integer clauseIndex : clauseIndexes) {
-			final Reason reason = getReason(clauseIndex);
+			final Reason<?> reason = getReason(clauseIndex);
 			if (reason == null) {
 				continue;
 			}
@@ -133,7 +133,7 @@ public abstract class AbstractExplanationCreator<S, E extends Explanation<S>, O>
 	 * @param clauseIndex index of the clause
 	 * @return the reason for the given clause index
 	 */
-	protected abstract Reason getReason(int clauseIndex);
+	protected abstract Reason<?> getReason(int clauseIndex);
 
 	/**
 	 * Returns a new concrete explanation.
