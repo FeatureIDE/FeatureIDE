@@ -261,7 +261,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			}
 
 			if (getActiveReason() != null) {
-				final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 				toolTip.append("\n\nThis feature is involved in the selected defect:");
 				for (final FeatureModelReason activeReason : activeReasons) {
 					toolTip.append("\n\u2022 ");
