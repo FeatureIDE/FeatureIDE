@@ -366,7 +366,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			activeReasonDown = null;
 			return;
 		}
-		switch (activeReason.getTrace().getOrigin()) {
+		switch (activeReason.getSubject().getOrigin()) {
 		case CHILD_UP:
 			activeReasonUp = activeReason;
 			break;
