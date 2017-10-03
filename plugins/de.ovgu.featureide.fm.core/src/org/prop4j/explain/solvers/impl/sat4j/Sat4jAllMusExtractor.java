@@ -49,6 +49,17 @@ public class Sat4jAllMusExtractor extends Sat4jMutableSatSolver implements MusEx
 	}
 
 	@Override
+	public List<Node> pop() throws UnsupportedOperationException {
+		/*
+		 * AllMUSes throws exceptions when clauses are removed. Specifically, when calling ISolver#removeSubsumedConstraint(IConstr), it throws an
+		 * IllegalArgumentException (with the message "Can only remove latest added constraint!!!"). When calling ISolver#removeConstraint(IConstr) instead, an
+		 * ArrayIndexOutOfBoundsException is thrown later while extracting the MUSes because it assumes the clause exists even though it was already removed.
+		 * Tested on Sat4J version 2.3.5.v20130525.
+		 */
+		throw new UnsupportedOperationException("Sat4J's AllMUSes does not support clause removal");
+	}
+
+	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
 		return getClauseSetFromIndexSet(getMinimalUnsatisfiableSubsetIndexes());
 	}
