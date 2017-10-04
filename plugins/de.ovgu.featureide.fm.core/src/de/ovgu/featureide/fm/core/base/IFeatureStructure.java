@@ -136,4 +136,6 @@ public interface IFeatureStructure {
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
+
+	LinkedList<FeatureAttribute> getRecursiveList();
 }

@@ -485,5 +485,15 @@ public class FeatureStructure implements IFeatureStructure {
 		// TODO Auto-generated method stub
 		
 	}
+	
+ 	@Override
+ 	public LinkedList<FeatureAttribute> getRecursiveList() {
+		final LinkedList<FeatureAttribute> rekList = new LinkedList<>();
+ 		for(FeatureAttribute att : attributeList)
+ 			if(att.getRecursive() == true) {
+				rekList.addLast(att);
+ 			}
+ 		return rekList;
+ 	}
 
 }
