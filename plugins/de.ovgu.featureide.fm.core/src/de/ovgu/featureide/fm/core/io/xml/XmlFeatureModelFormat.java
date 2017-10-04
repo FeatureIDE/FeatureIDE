@@ -241,6 +241,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 		return false;
 	}
+	
+	private boolean checkIsInInheritedList(LinkedList<FeatureAttribute> inheritedList, String attributeName) {
+		for (FeatureAttribute fai : inheritedList) {
+			if(fai.getName().toLowerCase().equals(attributeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
 		final Element result = doc.createElement(FEATURE);
@@ -474,6 +483,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					}
 	
 				}
+				
+				if (checkIsInInheritedList(recursiveList, attribute.getName().toLowerCase())) {
+					throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
+				}
+				
 				if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
 					throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
 				} else {
@@ -645,7 +659,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		LinkedList<FeatureAttribute> attributeListRecursive = new LinkedList<FeatureAttribute>();
 		
 		if (parent != null) {
-			attributeListRecursive.addAll(parentList);
+			for(FeatureAttribute fa : parentList) {
+				attributeListRecursive.addLast(fa);
+			}
 		}
 
 		for (final Element e : getElements(nodeList)) {
