@@ -57,6 +57,7 @@ public class FeatureStructure implements IFeatureStructure {
 	
 	protected LinkedList<AnAttribute> attributeList = new LinkedList<>();
 	protected LinkedList<AnAttribute> attributeListRecursive = new LinkedList<>();
+	protected LinkedList<AnAttribute> attributeListInherited = new LinkedList<>();
 
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
