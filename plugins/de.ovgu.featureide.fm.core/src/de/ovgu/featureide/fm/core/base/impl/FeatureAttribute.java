@@ -25,7 +25,7 @@ package de.ovgu.featureide.fm.core.base.impl;
  * 
  * @author "Werner Jan"
  */
-public class AnAttribute {
+public class FeatureAttribute {
 	
 	public enum Types {
 		STRING, INT, DOUBLE, LONG, BOOLEAN, FLOAT 
@@ -39,7 +39,7 @@ public class AnAttribute {
 	protected boolean configurable;
 	protected Types type;
 	
-	public  AnAttribute() {
+	public  FeatureAttribute() {
 		type = null;
 	}
 	
@@ -61,32 +61,17 @@ public class AnAttribute {
 		this.value = value;
 	}
 	
-	public void setType(String type) {
-		if (type == null) {
-			this.type = null;
-		} else {
-			switch (type.toUpperCase()) {
-				case "STRING":
-					this.type = Types.STRING;
-					break;
-				case "INT":
-					this.type = Types.INT;
-					break;
-				case "DOUBLE":
-					this.type = Types.DOUBLE;
-					break;
-				case "LONG":
-					this.type = Types.LONG;
-					break;
-				case "BOOLEAN":
-					this.type = Types.BOOLEAN;
-					break;
-				case "FLOAT":
-					this.type = Types.FLOAT;
-					break;
-				default: this.type = null;			
-				}
+	public void setTypeFromString(String type) {
+		type = type.toUpperCase();
+		for (Types typeNames : Types.values()) {
+			if (typeNames.toString().equals(type)) {
+				this.type = typeNames;
+			}
 		}
+	}
+	
+	public void setType(Types type) {
+		this.type = type;
 	}
 
 	public void setConfigurable(boolean configurable) {

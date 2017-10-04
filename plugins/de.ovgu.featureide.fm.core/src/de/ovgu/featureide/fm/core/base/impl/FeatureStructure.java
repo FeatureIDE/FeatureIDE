@@ -55,9 +55,8 @@ public class FeatureStructure implements IFeatureStructure {
 	protected IFeatureStructure parent = null;
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 	
-	protected LinkedList<AnAttribute> attributeList = new LinkedList<>();
-	protected LinkedList<AnAttribute> attributeListRecursive = new LinkedList<>();
-	protected LinkedList<AnAttribute> attributeListInherited = new LinkedList<>();
+	protected LinkedList<FeatureAttribute> attributeList = new LinkedList<>();
+	protected LinkedList<FeatureAttributeInherited> inheritedList = new LinkedList<>();
 
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
@@ -73,6 +72,9 @@ public class FeatureStructure implements IFeatureStructure {
 		multiple = oldStructure.multiple;
 		hidden = oldStructure.hidden;
 
+		attributeList = oldStructure.attributeList;
+		inheritedList = oldStructure.inheritedList;
+		
 		for (final IFeatureStructure child : oldStructure.children) {
 			addNewChild(child.cloneSubtree(newFeatureModel));
 		}
@@ -451,32 +453,36 @@ public class FeatureStructure implements IFeatureStructure {
 		return sb.toString();
 	}
 
-	@Override
-	public LinkedList<AnAttribute> getattributeListRecursive() {
-		return attributeListRecursive;
-	}
 
 	@Override
-	public void setattributeListRecursive(LinkedList<AnAttribute> attListRecursive) {
-		attributeListRecursive = attListRecursive;
-		
-	}
-
-	@Override
-	public void addAttributeListRecursive(LinkedList<AnAttribute> attListRecursive) {
-		attributeListRecursive.addAll(attListRecursive);
-		
-	}
-
-	@Override
-	public LinkedList<AnAttribute> getattributeList() {
+	public LinkedList<FeatureAttribute> getattributeList() {
 		return attributeList;
 	}
 
 
 	@Override
-	public void setAttributeList(LinkedList<AnAttribute> attList) {
+	public void setAttributeList(LinkedList<FeatureAttribute> attList) {
 		attributeList = attList;
+		
+	}
+
+	@Override
+	public LinkedList<FeatureAttributeInherited> getattributeListInherited() {
+		return inheritedList;
+	}
+
+	@Override
+	public void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
+		this.inheritedList = attListRecursive;
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#addAttributeListInherited(java.util.LinkedList)
+	 */
+	@Override
+	public void addAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
+		// TODO Auto-generated method stub
 		
 	}
 

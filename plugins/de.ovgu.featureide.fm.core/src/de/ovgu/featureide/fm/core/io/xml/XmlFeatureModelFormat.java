@@ -57,9 +57,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
-import de.ovgu.featureide.fm.core.base.impl.AnAttribute;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.AnAttribute.Types;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute.Types;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -184,72 +185,71 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
-	/**
-	 * @param attributeList
-	 * @param attributeListRecursive
-	 * @param e
-	 * @throws UnsupportedModelException
-	 */
-	private void addAttributesToLists(final LinkedList<AnAttribute> attributeList, LinkedList<AnAttribute> attributeListRecursive, final Element e)
-			throws UnsupportedModelException {
-		AnAttribute attribute = parseAttribute(e);
-		
-		if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
-			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
-		}
-		
-		switch(checkRecursiveList(attribute, attributeListRecursive)) {
-		case 1 :
-			throwError("There should only be the name and value for attribute: " + attribute.toString(), e);
-			break;
-		case 2 :
-			throwError("No Type defined in " + attribute.toString(), e);
-			break;
-		case 3 :
-			throwError("Wrong type. Should be one of String, Int, etc" + attribute.toString(), e);
-			break;
-		}
-		attributeList.add(attribute);
-		if (attribute.getRecursive()) {
-			attributeListRecursive.add(attribute);
-		}
-	}
+//	/**
+//	 * @param attributeList
+//	 * @param attributeListRecursive
+//	 * @param e
+//	 * @throws UnsupportedModelException
+//	 */
+//	private void addAttributesToLists(final LinkedList<FeatureAttribute> attributeList, 
+//			LinkedList<FeatureAttribute> attributeListRecursive, 
+//			LinkedList<FeatureAttributeInherited> attributeListInherited,final Element e) throws UnsupportedModelException {
+//		
+//		FeatureAttribute attribute = parseAttribute(e, attributeList, attributeListRecursive, attributeListInherited);
+//			
+//		switch(checkRecursiveList(attribute, attributeListRecursive, attributeListInherited)) {
+//			case 0 :
+//				throwError("There should only be the name and value for attribute: " + attribute.toString(), e);
+//				break;
+//			case 1 :
+//				attributeList.add(attribute);
+//				break;
+//		}
+//		if (attribute.getType() == null ) {
+//			throwError("No type for attribute: " + attribute.toString(), e);
+//		}
+//		attributeList.add(attribute);
+//		if (attribute.getRecursive()) {
+//			attributeListRecursive.add(attribute);
+//		}
+//	}
 
 	/**
 	 * 
 	 * @param attribute an attribute
 	 * @param attributeListRecursive List of Recursive Elements
-	 * @return 1, if the Attribute is in the recursiveList and has the correct parameters;
-	 * 			0, if everythings fine;
-	 * 			2, if the Attribute is not in the recursiveList and has a wrong Type;
+	 * @return 0, if the attribute is in Recursive but has too many parameters;
+	 * 			1, if the attribute is in recursive and has no parameters;
+	 * 			2, if the Attribute is not in the recursiveList;
 	 */
-	private int checkRecursiveList(AnAttribute attribute, LinkedList<AnAttribute> attributeListRecursive) {
-		String att = attribute.getName().toLowerCase();
+
 	
-		for (AnAttribute a : attributeListRecursive) {
-	
-			
-			if(a.getName().toLowerCase().equals(att)) {
-			
-					if(attribute.getRecursive() != false || attribute.getUnit() != null || attribute.getType() != null
-							|| attribute.getConfigurable() != a.getConfigurable()) {
-						return 1;	
-					} else {
-						return 0;
-					}
-			}
+	private void addToInheritedList(Element e, LinkedList<FeatureAttribute> attributeListRecursive,
+				LinkedList<FeatureAttributeInherited> inheritedList) throws UnsupportedModelException{
+		
+		FeatureAttributeInherited inherited = new FeatureAttributeInherited();
+		
+		final NamedNodeMap nodeMap = e.getAttributes();
+			for (int i = 0; i < nodeMap.getLength(); i++) {
+				final org.w3c.dom.Node node = nodeMap.item(i);
+				final String nodeName = node.getNodeName();
+				final String attributeValue = node.getNodeValue().trim();
+				
+				if (nodeName.equals(NAME)) {
+					for (FeatureAttribute fa : attributeListRecursive) {
+						if(fa.getName().toLowerCase().equals(attributeValue)) {
+							inherited.setParent(fa);
+							} 
+					} 
+				} else if(nodeName.equals(VALUE)) {
+						inherited.setValue(attributeValue);
+				} else {
+					throwError("Wrong parameters in: " + inherited , e);
+				}
 		}
-		if (attribute.getType() == null) {
-			return 2;
+		if (inherited.getName() != null || inherited.getValue() == null) {
+			throwError("No reference for attribute: " + inherited , e);
 		}
-		if (attribute.getType() != null) {
-			String type = attribute.getType().toString().toUpperCase();
-			if (!(type.equals(Types.STRING.toString()) || type.equals(Types.BOOLEAN.toString()) || type.equals(Types.DOUBLE.toString()) 
-					|| type.equals(Types.FLOAT.toString()) || type.equals(Types.INT.toString()) || type.equals(Types.LONG.toString()))) {
-				return 3;
-			}
-		}
-		return 0;
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param listElementName
 	 * @return true if an attributeName is already in the list
 	 */
-	private boolean checkAttributeList(LinkedList<AnAttribute> attributeList, String attributeName) {
+	private boolean checkAttributeList(LinkedList<FeatureAttribute> attributeList, String attributeName) {
 		
 		for(int i = 0; i < attributeList.size(); i++) {
 			
@@ -395,7 +395,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param fe
 	 */
 	private void writeRealAttribute(Document doc, Element fnod, IFeature feat) {
-			for (AnAttribute a : feat.getStructure().getattributeList()) {
+			for (FeatureAttribute a : feat.getStructure().getattributeList()) {
 				final Element att;
 				att = doc.createElement(ATTRIBUTE);
 				att.setAttribute(NAME, a.getName());
@@ -444,47 +444,55 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
-	private AnAttribute parseAttribute(Element e) throws UnsupportedModelException {
+	private void parseAttribute(Element e, LinkedList<FeatureAttribute> attributeList,
+			LinkedList<FeatureAttribute> recursiveList, 
+			LinkedList<FeatureAttributeInherited> inheritedList) throws UnsupportedModelException {
 
-		AnAttribute attribute = new AnAttribute();
+
 
 		if (e.hasAttributes()) {
 			final NamedNodeMap nodeMap = e.getAttributes();
-			for (int i = 0; i < nodeMap.getLength(); i++) {
-				final org.w3c.dom.Node node = nodeMap.item(i);
-				final String nodeName = node.getNodeName();
-				final String attributeValue = node.getNodeValue().trim();
-				if (nodeName.equals(NAME)) {
-					attribute.setName(attributeValue);
-				} else if (nodeName.equals(TYPE)) {
-					
-					if (attributeValue.isEmpty()) {
-						throwError("Type empty in attribute: " + attribute.toString(), e);
+			if (nodeMap.getLength() > 2) {
+				FeatureAttribute attribute = new FeatureAttribute();
+				for (int i = 0; i < nodeMap.getLength(); i++) {
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String nodeName = node.getNodeName();
+					final String attributeValue = node.getNodeValue().trim();
+					if (nodeName.equals(NAME)) {
+						attribute.setName(attributeValue);
+					} else if (nodeName.equals(TYPE)) {
+						if (attributeValue.isEmpty()) {
+							throwError("Type empty in attribute: " + attribute.toString(), e);
+						}
+						attribute.setTypeFromString(attributeValue);
+						if(attribute.getType() == null) {
+							throwError("Wrong type for attribute : " + attribute.toString(), e);
+						}
+					} else if (nodeName.equals(UNIT)) {
+						attribute.setUnit(attributeValue);
+					} else if (nodeName.equals(RECURSIVE)) {
+						attribute.setRecursive(attributeValue.equals(TRUE));
+					} else if (nodeName.equals(CONFIGURABLE)) {
+						attribute.setConfigurable(attributeValue.equals(TRUE));
+					} else if (nodeName.equals(VALUE)) {
+						attribute.setValue(attributeValue);
+					} else {
+						throwError("Unknown attribute: " + nodeName, e);
 					}
-					attribute.setType(attributeValue);
-					if(attribute.getType() == null) {
-						throwError("Wrong type for attribute : " + attribute.toString(), e);
-					}
-//					String type = attributeValue.toUpperCase();
-//					if (!(type.equals(Types.STRING.toString()) || type.equals(Types.BOOLEAN.toString()) || type.equals(Types.DOUBLE.toString()) 
-//							|| type.equals(Types.FLOAT.toString()) || type.equals(Types.INT.toString()) || type.equals(Types.LONG.toString()))) {
-//						throwError("Wrong type. Should be one of String, Int, etc" + nodeName, e);
-//						}
-				} else if (nodeName.equals(UNIT)) {
-					attribute.setUnit(attributeValue);
-				} else if (nodeName.equals(RECURSIVE)) {
-					attribute.setRecursive(attributeValue.equals(TRUE));
-				} else if (nodeName.equals(CONFIGURABLE)) {
-					attribute.setConfigurable(attributeValue.equals(TRUE));
-				} else if (nodeName.equals(VALUE)) {
-					attribute.setValue(attributeValue);
-				} else {
-					throwError("Unknown attribute: " + nodeName, e);
+	
 				}
-
+				if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
+					throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
+				} else {
+					attributeList.add(attribute);
+					if (attribute.getRecursive() == true) {
+						recursiveList.add(attribute);
+					}
+				}
+			} else {
+				addToInheritedList(e, recursiveList, inheritedList);
 			}
 		}
-		return attribute;
 	}
 
 	/**
@@ -635,12 +643,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
-	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
+	private void parseFeatures(NodeList nodeList, IFeature parent, 
+			LinkedList<FeatureAttribute> parentList) throws UnsupportedModelException {
 
-		final LinkedList<AnAttribute> attributeList = new LinkedList<>();
-		LinkedList<AnAttribute> attributeListRecursive = new LinkedList<>();
+		final LinkedList<FeatureAttribute> attributeList = new LinkedList<>();
+		final LinkedList<FeatureAttributeInherited> inheritedList = new LinkedList<>();
+		
+		LinkedList<FeatureAttribute> attributeListRecursive = new LinkedList<FeatureAttribute>();
+		
 		if (parent != null) {
-			attributeListRecursive.addAll(parent.getStructure().getattributeListRecursive());
+			attributeListRecursive.addAll(parentList);
 		}
 
 		for (final Element e : getElements(nodeList)) {
@@ -658,7 +670,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 
 			if (nodeName.equals(ATTRIBUTE)) {
-				addAttributesToLists(attributeList, attributeListRecursive, e);
+				parseAttribute(e, attributeList, attributeListRecursive, inheritedList);
+				parent.getStructure().setAttributeList(attributeList);
+				parent.getStructure().setAttributeListInherited(inheritedList);
 				continue;
 			}
 
@@ -710,13 +724,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			f.getStructure().addAttributeListRecursive(attributeListRecursive);
+			f.getStructure().setAttributeListInherited(inheritedList);
 			
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
 			
 			f.getStructure().setAttributeList(attributeList);
+			f.getStructure().setAttributeListInherited(inheritedList);
 
 			object.addFeature(f);
 			if (parent == null) {
@@ -725,7 +740,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parent.getStructure().addChild(f.getStructure());
 			}
 			if (e.hasChildNodes()) {
-				parseFeatures(e.getChildNodes(), f);
+				parseFeatures(e.getChildNodes(), f, attributeListRecursive);
 			}
 		}
 
@@ -742,7 +757,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 */
 	private void parseStruct(NodeList struct) throws UnsupportedModelException {
 		for (final Element e : getElements(struct)) {
-			parseFeatures(e.getChildNodes(), null);
+			parseFeatures(e.getChildNodes(), null, null);
 		}
 	}
 
