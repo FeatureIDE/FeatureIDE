@@ -1,4 +1,4 @@
-.featureide/model.xml/model.xml.xml
+c.featureide/model.xml/model.xml.xml
 .project
 configs/1000.config
 configs/1001.config
@@ -5750,6 +5750,7 @@ configs/9978.config
 configs/9982.config
 configs/9988.config
 data/configurations.csv
+data/E-Agribusiness.xml
 data/features.csv
 data/README.txt
 model.xml
