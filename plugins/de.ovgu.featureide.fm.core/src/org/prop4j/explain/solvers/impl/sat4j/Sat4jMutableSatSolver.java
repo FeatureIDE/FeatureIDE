@@ -20,6 +20,7 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -58,9 +59,10 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	private int nextClauseIndex = 1;
 
 	@Override
-	public void addClause(Node clause) {
-		super.addClause(clause);
-		scopeClauseCount++;
+	public int addClauses(Collection<? extends Node> clauses) {
+		final int clauseCount = super.addClauses(clauses);
+		scopeClauseCount += clauseCount;
+		return clauseCount;
 	}
 
 	@Override
