@@ -234,7 +234,8 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 		if (variable == null) {
 			throw new NullPointerException();
 		}
-		final int index = getOracle().nextFreeVarId(true);
+		final int index = getOracle().nextFreeVarId(false);
+		getOracle().newVar(index);
 		variableIndexes.put(variable, index);
 		indexVariables.put(index, variable);
 		return index;
