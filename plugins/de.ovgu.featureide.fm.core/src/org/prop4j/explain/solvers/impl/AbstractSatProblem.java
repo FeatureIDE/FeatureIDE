@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
 
@@ -45,16 +46,12 @@ public abstract class AbstractSatProblem implements SatProblem {
 
 	@Override
 	public int addFormulas(Node... formulas) {
-		return addFormulas(Arrays.asList(formulas));
+		return addFormula(new And(formulas));
 	}
 
 	@Override
 	public int addFormulas(Collection<Node> formulas) {
-		int added = 0;
-		for (final Node formula : formulas) {
-			added += addFormula(formula);
-		}
-		return added;
+		return addFormulas(formulas.toArray(new Node[formulas.size()]));
 	}
 
 	@Override
