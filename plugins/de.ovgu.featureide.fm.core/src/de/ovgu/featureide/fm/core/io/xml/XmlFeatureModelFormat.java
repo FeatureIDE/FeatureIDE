@@ -415,7 +415,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 				if ((description != null) && !description.isEmpty()) {
 					description = description.replace("\t", "");
-					description = description.substring(1, description.length() - 1);
 					description = description.trim();
 				}
 
