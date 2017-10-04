@@ -12,9 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core,
  de.ovgu.featureide.ui,
  de.ovgu.featureide.fm.ui,
- org.eclipse.core.expressions,
- org.eclipse.ui.workbench,
- org.eclipse.ui.ide
+ org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
@@ -25,5 +23,3 @@ Export-Package: de.ovgu.featureide.munge,
  de.ovgu.featureide.munge.ui.handlers,
  de.ovgu.featureide.munge.ui.handlers.toggle,
  org.sonatype.plugins.munge
-Import-Package: org.eclipse.jface.text,
- org.eclipse.ui.texteditor
