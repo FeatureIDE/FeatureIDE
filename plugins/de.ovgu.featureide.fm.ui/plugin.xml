@@ -787,10 +787,18 @@
  <extension
        point="org.eclipse.ui.newWizards">
     <wizard
+          canFinishEarly="false"
+          category="de.ovgu.featureide.fm.ui.category"
           class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
-          icon="icons/FeatureIcon.ico"
+          hasPages="true"
+          icon="icons/featuretree.ico"
           id="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
-          name="New Feature Model">
+          name="Feature Model"
+          project="false">
     </wizard>
+    <category
+          id="de.ovgu.featureide.fm.ui.category"
+          name="FeatureIDE">
+    </category>
  </extension>
 </plugin>
