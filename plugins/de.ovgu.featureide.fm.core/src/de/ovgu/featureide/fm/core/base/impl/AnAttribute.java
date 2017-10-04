@@ -26,16 +26,21 @@ package de.ovgu.featureide.fm.core.base.impl;
  * @author "Werner Jan"
  */
 public class AnAttribute {
+	
+	public enum Types {
+		STRING, INT, DOUBLE, LONG, BOOLEAN, FLOAT 
+	}
+
 
 	protected String name;
 	protected String value;
 	protected String unit;
 	protected boolean recursive;
 	protected boolean configurable;
-	protected String type;
+	protected Types type;
 	
 	public  AnAttribute() {
-
+		type = null;
 	}
 	
 	public void setName(String name) {
@@ -57,7 +62,31 @@ public class AnAttribute {
 	}
 	
 	public void setType(String type) {
-		this.type = type;
+		if (type == null) {
+			this.type = null;
+		} else {
+			switch (type.toUpperCase()) {
+				case "STRING":
+					this.type = Types.STRING;
+					break;
+				case "INT":
+					this.type = Types.INT;
+					break;
+				case "DOUBLE":
+					this.type = Types.DOUBLE;
+					break;
+				case "LONG":
+					this.type = Types.LONG;
+					break;
+				case "BOOLEAN":
+					this.type = Types.BOOLEAN;
+					break;
+				case "FLOAT":
+					this.type = Types.FLOAT;
+					break;
+				default: this.type = null;			
+				}
+		}
 	}
 
 	public void setConfigurable(boolean configurable) {
@@ -81,12 +110,15 @@ public class AnAttribute {
 		return unit;
 	}
 	
-	public String getType() {
+	public Types getType() {
 		return type;
 	}
 	
 	public String getValue() {
 		return value;
 	}
-	
+
+	public String toString() {
+		return (getName());
+	}
 }

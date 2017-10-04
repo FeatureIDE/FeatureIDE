@@ -468,4 +468,16 @@ public class FeatureStructure implements IFeatureStructure {
 		
 	}
 
+	@Override
+	public LinkedList<AnAttribute> getattributeList() {
+		return attributeList;
+	}
+
+
+	@Override
+	public void setAttributeList(LinkedList<AnAttribute> attList) {
+		attributeList = attList;
+		
+	}
+
 }
