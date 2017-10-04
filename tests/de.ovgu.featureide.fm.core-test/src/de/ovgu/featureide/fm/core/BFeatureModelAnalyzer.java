@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**

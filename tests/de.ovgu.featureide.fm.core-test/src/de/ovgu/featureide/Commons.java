@@ -1,13 +1,3 @@
-package de.ovgu.featureide.common;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.util.List;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -28,6 +18,15 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
+package de.ovgu.featureide;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * A class containing numerous methods that are needed for many tests, especially those assessing files.

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.experimental;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.runtimetest.RuntimeTest;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.Constraint;

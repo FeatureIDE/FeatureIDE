@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 
 /**
  * Test case to verify that the analyzer recognizes false optional feature in 'and', 'or' and 'alternative' groups.
