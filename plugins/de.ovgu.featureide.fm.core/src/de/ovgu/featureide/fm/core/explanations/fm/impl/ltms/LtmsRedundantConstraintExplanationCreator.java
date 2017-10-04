@@ -52,6 +52,9 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	public void setSubject(IConstraint subject) throws IllegalArgumentException {
 		super.setSubject(subject);
 		setOracle(null);
+		cnfWithoutRedundantConstraint = null;
+		getTraceModel().removeTraces(constraintClauseCount);
+		constraintClauseCount = 0;
 	}
 
 	/**
@@ -68,16 +71,13 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	}
 
 	protected Node getCnfWithoutRedundantConstraint() {
-		if ((cnfWithoutRedundantConstraint == null) && (getFeatureModel() != null)) {
+		if (cnfWithoutRedundantConstraint == null) {
 			cnfWithoutRedundantConstraint = createCnfWithoutRedundantConstraint();
 		}
 		return cnfWithoutRedundantConstraint;
 	}
 
 	protected Node createCnfWithoutRedundantConstraint() {
-		getTraceModel().removeTraces(constraintClauseCount);
-		constraintClauseCount = 0;
-
 		final List<Node> clauses = new LinkedList<>();
 		Collections.addAll(clauses, getCnf().getChildren());
 		final AdvancedNodeCreator nc = getNodeCreator();
