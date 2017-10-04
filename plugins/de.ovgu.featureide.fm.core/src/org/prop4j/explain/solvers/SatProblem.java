@@ -62,7 +62,7 @@ public interface SatProblem {
 	 * @param formulas formulas to add; not null
 	 * @return the amount of clauses added
 	 */
-	public int addFormulas(Collection<Node> formulas);
+	public int addFormulas(Collection<? extends Node> formulas);
 
 	/**
 	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,

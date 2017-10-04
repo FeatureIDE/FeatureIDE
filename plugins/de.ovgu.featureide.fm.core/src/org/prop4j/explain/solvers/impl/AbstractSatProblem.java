@@ -50,7 +50,7 @@ public abstract class AbstractSatProblem implements SatProblem {
 	}
 
 	@Override
-	public int addFormulas(Collection<Node> formulas) {
+	public int addFormulas(Collection<? extends Node> formulas) {
 		return addFormulas(formulas.toArray(new Node[formulas.size()]));
 	}
 
@@ -67,7 +67,7 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 * @param clauses clauses to add; not null
 	 * @return the amount of clauses added
 	 */
-	protected int addClauses(List<Node> clauses) {
+	protected int addClauses(Collection<? extends Node> clauses) {
 		for (final Node clause : clauses) {
 			addClause(clause);
 		}
