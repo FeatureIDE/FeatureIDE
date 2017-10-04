@@ -301,16 +301,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 	
 	protected void addDescription(Document doc, IConstraint constraint, Element fnod) {
-		// Team1 Story1
-		final String description =
-			constraint.getDescription(); 
-		if ((description != null) 
-			&& !description.trim().isEmpty()) {
-			final Element descr =
-				doc.createElement(DESCRIPTION);
-			descr.setTextContent("\n"
-				+ description.replace("\r", "")
-				+ "\n");
+		final String description = constraint.getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
 
 			fnod.appendChild(descr);
 		}
@@ -480,6 +474,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
 			} else if (nodeName.equals(DESCRIPTION)) {
+				// The method should return without adding any nodes, 
+				// and traverse deeper into the tree, because description, has no children
+				// just return the current list. 
+				// The actual readout of the description happens at a different point.
 			} else {
 				throwError("Unknown constraint type: " + nodeName, e);
 			}
