@@ -487,7 +487,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		mandatoryAction = new MandatoryAction(this, featureModel);
 		hiddenAction = new HiddenAction(this, featureModel);
 
-		collapseAction = new CollapseAction(this, graphicalFeatureModel);
+		collapseAction = new CollapseAction(this, graphicalFeatureModel, featureModel);
 		collapseFeaturesAction = new CollapseSiblingsAction(this, graphicalFeatureModel);
 		collapseAllAction = new CollapseAllAction(this, graphicalFeatureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); // icon for collapse added

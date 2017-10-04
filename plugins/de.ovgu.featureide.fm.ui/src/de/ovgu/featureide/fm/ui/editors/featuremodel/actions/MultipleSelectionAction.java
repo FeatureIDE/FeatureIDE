@@ -57,7 +57,7 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 	};
 	
 	Object viewer;
-	private boolean connectionSelected;
+	protected boolean connectionSelected;
 	protected IFeature[] featureArray;
 
 	public MultipleSelectionAction(String text, Object viewer2) {
