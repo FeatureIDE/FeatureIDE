@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
+package de.ovgu.featureide.fm.ui.editors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
