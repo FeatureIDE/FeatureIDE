@@ -33,8 +33,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+
+
+
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
 /**
  * A default implementation for actions that only allow one feature to be selected.
@@ -56,6 +63,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	Object viewer;
 
 	protected IFeature feature;
+
 
 	protected boolean connectionSelected;
 
