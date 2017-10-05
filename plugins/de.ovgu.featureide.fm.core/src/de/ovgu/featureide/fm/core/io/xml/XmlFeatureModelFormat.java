@@ -469,11 +469,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 						}
 					} else if (nodeName.equals(TYPE)) {
 						if (attributeValue.isEmpty()) {
-							throwError("Type empty in attribute: " + attribute.toString(), e);
+							throwError("Type empty. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
 						}
 						attribute.setTypeFromString(attributeValue);
 						if (attribute.getType() == null) {
-							throwError("Wrong type for attribute : " + attribute.toString(), e);
+							throwError("Wrong type. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
 						}
 					} else if (nodeName.equals(UNIT)) {
 						attribute.setUnit(attributeValue);

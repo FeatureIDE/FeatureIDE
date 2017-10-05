@@ -109,4 +109,15 @@ public class FeatureAttribute {
 	public String toString() {
 		return (getName());
 	}
+	
+	public String getTypeNames() {
+		StringBuilder sb = new StringBuilder();
+		String types = "";
+		for (final Types typeNames: Types.values()) {
+			sb.append(types);
+			types = ", ";
+			sb.append(typeNames.toString().toLowerCase());
+		}
+		return sb.toString();
+	}
 }
