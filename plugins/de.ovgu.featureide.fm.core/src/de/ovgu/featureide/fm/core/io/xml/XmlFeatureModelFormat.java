@@ -170,8 +170,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (final String featureName : featureOrderList) {
 				final Element feature = doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
-
 				order.appendChild(feature);
+				writeRealAttribute(doc, feature, object.getFeature(featureName));
 			}
 		}
 	}
@@ -190,8 +190,10 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param attribute an attribute
 	 * @param attributeListRecursive List of Recursive Elements
 	 * 
-	 * If an Attribute is inherited from another Feature, it is added to the inheritedAttributeList.
-	 * If there is no corresponding Attribute or there is another parameter than "value" an error occurs.
+	 * If an Attribute has less than 3 parameters, this method will check if it is an inherited attribute.
+	 * If there is no corresponding Attribute, the name is empty, there already is an inherited attribute with that name,
+	 * or there is another parameter than "name" or "value" an error will be shown.
+	 * Otherwise the attribute will be added to the list.
 	 * 
 	 */
 
@@ -208,19 +210,27 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				final String attributeValue = node.getNodeValue().trim();
 				
 				if (nodeName.equals(NAME)) {
-					for (FeatureAttribute fa : attributeListRecursive) {
-						if(fa.getName().toLowerCase().equals(attributeValue)) {
-							inherited.setParent(fa);
-							} 
-					} 
+					if (attributeValue.isEmpty()) {
+						throwError("Empty Name " + nodeMap.item(0) , e);
+					} else {
+						if(!isNameInInheretedList(inheritedAttributeList, attributeValue)) {
+							for (FeatureAttribute fa : attributeListRecursive) {
+								if(fa.getName().toLowerCase().equals(attributeValue)) {
+									inherited.setParent(fa);
+								} 
+							}
+						} else {
+							throwError("Attribute already defined: " + nodeMap.item(0) , e);
+						}
+					}
 				} else if(nodeName.equals(VALUE)) {
 						inherited.setValue(attributeValue);
 				} else {
 					throwError("Wrong parameters in: " + inherited , e);
 				}
 		}
-		if (inherited.getName() == null) {
-			throwError("No reference for attribute: " + inherited , e);
+		if (inherited.getParent() == null) {
+			throwError("No type for attribute: " + nodeMap.item(0) , e);
 		}
 		inheritedAttributeList.add(inherited);
 	}
@@ -230,7 +240,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param listElementName
 	 * @return true if an attributeName is already in the list
 	 */
-	private boolean checkAttributeList(LinkedList<FeatureAttribute> attributeList, String attributeName) {
+	private boolean checkAttributeList(String attributeName, LinkedList<FeatureAttribute> attributeList) {
 		
 		for(int i = 0; i < attributeList.size(); i++) {
 			
@@ -242,15 +252,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		return false;
 	}
 	
-	private boolean checkIsInInheritedList(LinkedList<FeatureAttribute> inheritedList, String attributeName) {
-		for (FeatureAttribute fai : inheritedList) {
-			if(fai.getName().toLowerCase().equals(attributeName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
 		final Element result = doc.createElement(FEATURE);
 		result.setAttribute(NAME, featureName);
@@ -371,41 +372,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	}
 
-	/**
-	 * @param fnod
-	 * @param att
-	 * @param fe
-	 */
-	private void writeRealAttribute(Document doc, Element fnod, IFeature feat) {
-					
-			LinkedList<FeatureAttribute> recursiveList = feat.getStructure().getRecursiveList();
-			
-			for (FeatureAttribute featureAtt : feat.getStructure().getattributeList()) {
-				if(recursiveList.contains(featureAtt)== true); {
-					recursiveList.remove(featureAtt);
-				}
-				final Element attribute;
-				attribute = doc.createElement(ATTRIBUTE);
-				attribute.setAttribute(NAME, featureAtt.getName());
-				attribute.setAttribute(VALUE, featureAtt.getValue());
-				attribute.setAttribute(TYPE, featureAtt.getType().toString());
-				attribute.setAttribute(UNIT, featureAtt.getUnit());
-				attribute.setAttribute(RECURSIVE, String.valueOf(featureAtt.getRecursive()));
-				attribute.setAttribute(CONFIGURABLE, String.valueOf(featureAtt.getConfigurable()));
-				fnod.appendChild(attribute);
-			}	
-			if(!(recursiveList.isEmpty())) {
-			for (FeatureAttribute a : recursiveList) {
-				final Element element;
-				element = doc.createElement(ATTRIBUTE);
-				element.setAttribute(NAME, a.getName());
-				element.setAttribute(VALUE, a.getValue());
-				fnod.appendChild(element);
-			}
-		}
-
-	}
-
 	private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
 
 		if ((featureModel == null) || (propertiesNode == null)) {
@@ -441,6 +407,49 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * @param fa
+	 * @param inherited
+	 * @return true if Attribute is already in InheritedList
+	 */
+	private boolean isAttributeInInheritedList(FeatureAttribute fa, LinkedList<FeatureAttributeInherited>inherited) {
+		for (FeatureAttributeInherited fai : inherited) {
+			if (fai.getParent().equals(fa)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param attributeList
+	 * @param attributeName
+	 * @return true if Name is already in AttributeList
+	 */
+	private boolean isNameInAttributeList(LinkedList<FeatureAttribute> attributeList, String attributeName) {
+		for (FeatureAttribute fai : attributeList) {
+			if(fai.getName().toLowerCase().equals(attributeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param attributeValue
+	 * @param inheritedAttributeList
+	 * @return
+	 */
+	private boolean isNameInInheretedList(LinkedList<FeatureAttributeInherited> inheritedAttributeList, String attributeValue) {
+		attributeValue = attributeValue.toLowerCase();
+		for (FeatureAttributeInherited fai : inheritedAttributeList) {
+			if (fai.getName().toLowerCase().equals(attributeValue)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * @param e 
 	 * @param attributeList
 	 * @param recursiveList
@@ -461,7 +470,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					final String nodeName = node.getNodeName();
 					final String attributeValue = node.getNodeValue().trim();
 					if (nodeName.equals(NAME)) {
-						attribute.setName(attributeValue);
+						if(!attributeValue.isEmpty()) {
+							attribute.setName(attributeValue);
+						} else {
+							throwError("No Name for attribute: " + attribute.toString(), e);
+						}
 					} else if (nodeName.equals(TYPE)) {
 						if (attributeValue.isEmpty()) {
 							throwError("Type empty in attribute: " + attribute.toString(), e);
@@ -484,11 +497,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	
 				}
 				
-				if (checkIsInInheritedList(recursiveList, attribute.getName().toLowerCase())) {
+				if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
 					throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
 				}
 				
-				if (checkAttributeList(attributeList, attribute.getName().toLowerCase())) {
+				if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
 					throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
 				} else {
 					attributeList.add(attribute);
@@ -738,9 +751,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
-			
-			f.getStructure().setAttributeList(attributeList);
-			f.getStructure().setAttributeListInherited(inheritedList);
 
 			object.addFeature(f);
 			if (parent == null) {
@@ -803,6 +813,71 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		node.appendChild(fnod);
+	}
+	
+	
+	/**
+	 * @param fnod Current feature node
+	 * @param doc xml document
+	 * @param feat IFeature
+	 * 
+	 * Write the XML file from FeatureModel. Checks if parent has Attributes that must be inherited. 
+	 * Optional parameters won't be written if empty or false.
+	 * 
+	 */
+	
+	private void writeRealAttribute(Document doc, Element fnod, IFeature feat) {
+					
+			LinkedList<FeatureAttributeInherited> inheritedList = feat.getStructure().getattributeListInherited();
+			LinkedList<FeatureAttribute> attributeList = feat.getStructure().getattributeList();
+			
+			for (FeatureAttribute fa : attributeList) {
+				final Element attribute;
+				attribute = doc.createElement(ATTRIBUTE);
+				attribute.setAttribute(NAME, fa.getName());
+				attribute.setAttribute(TYPE, fa.getType().toString());
+				if (!fa.getValue().isEmpty()) {
+					attribute.setAttribute(VALUE, fa.getValue());
+				}
+				if (!fa.getUnit().isEmpty()) {
+					attribute.setAttribute(UNIT, fa.getUnit());
+				}
+				if(fa.getRecursive()) {
+					attribute.setAttribute(RECURSIVE, String.valueOf(fa.getRecursive()));
+				}
+				if (fa.getConfigurable()) {
+					attribute.setAttribute(CONFIGURABLE, String.valueOf(fa.getConfigurable()));
+				}
+				fnod.appendChild(attribute);
+			}
+		
+			if (feat.getStructure().getParent() != null) {
+				for (FeatureAttribute fa : feat.getStructure().getParent().getFeature().getStructure().getattributeList()) {
+					if (fa.getRecursive()) {
+						if(!isAttributeInInheritedList(fa, inheritedList)) {
+							FeatureAttributeInherited fai = new FeatureAttributeInherited(fa);
+							inheritedList.add(fai);
+						}
+					}
+				}
+				for (FeatureAttributeInherited fai : feat.getStructure().getParent().getFeature().getStructure().getattributeListInherited()) {
+					if(!isAttributeInInheritedList(fai.getParent(), inheritedList)) {
+						FeatureAttributeInherited featureInherited = new FeatureAttributeInherited();
+						featureInherited.setParent(fai.getParent());
+						inheritedList.add(featureInherited);
+					}
+				}
+			}
+			
+			for (FeatureAttributeInherited fai : inheritedList) {
+				final Element element;
+				element = doc.createElement(ATTRIBUTE);
+				element.setAttribute(NAME, fai.getName());
+				element.setAttribute(VALUE, fai.getValue());
+				if (!element.getAttribute(VALUE).isEmpty()) {
+					fnod.appendChild(element);
+				}
+			}
 	}
 
 	@Override

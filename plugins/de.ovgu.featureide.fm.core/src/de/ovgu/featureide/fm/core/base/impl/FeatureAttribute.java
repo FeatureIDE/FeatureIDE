@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 /**
- * TODO description
+ * Attributes for Features.
  * 
  * @author "Werner Jan"
  */
@@ -32,17 +32,45 @@ public class FeatureAttribute {
 	}
 
 
+	protected boolean configurable;
 	protected String name;
 	protected String value;
 	protected String unit;
 	protected boolean recursive;
-	protected boolean configurable;
 	protected Types type;
 	
 	public  FeatureAttribute() {
 		type = null;
+		recursive = false;
+		value = "";
+		unit = "";
+		configurable = false;
 	}
 	
+	public String getName() {
+		return name;	
+	}
+
+	public boolean getRecursive() {
+		return recursive;	
+	}
+
+	public boolean getConfigurable() {
+		return configurable;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public Types getType() {
+		return type;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -77,30 +105,6 @@ public class FeatureAttribute {
 	public void setConfigurable(boolean configurable) {
 		this.configurable = configurable;
 		
-	}
-
-	public String getName() {
-		return name;	
-	}
-	
-	public boolean getRecursive() {
-		return recursive;	
-	}
-	
-	public boolean getConfigurable() {
-		return configurable;
-	}
-	
-	public String getUnit() {
-		return unit;
-	}
-	
-	public Types getType() {
-		return type;
-	}
-	
-	public String getValue() {
-		return value;
 	}
 
 	public String toString() {
