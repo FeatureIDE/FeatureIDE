@@ -91,5 +91,10 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 		final ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
 		dialog.setInputText(selectedFeature);
 	}
+	
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		return selection.size() == 1;
+	}
 
 }

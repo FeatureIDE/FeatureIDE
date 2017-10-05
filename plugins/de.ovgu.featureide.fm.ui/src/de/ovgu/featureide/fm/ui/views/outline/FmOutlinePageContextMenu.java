@@ -186,8 +186,7 @@ public class FmOutlinePageContextMenu {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
-		// collapseAction = new CollapseAction(viewer, fInput);
-		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
+		aAction = new AbstractAction(viewer, fInput);
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);

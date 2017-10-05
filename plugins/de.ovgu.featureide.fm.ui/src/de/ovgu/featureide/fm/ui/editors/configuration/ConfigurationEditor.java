@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -290,7 +291,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private IFeatureGraph loadFeatureGraph(Path filePath) {
 		final IFeatureGraph featureGraph = new MatrixFeatureGraph();
 		final FeatureGraphFormat format = new FeatureGraphFormat();
-		if (SimpleFileHandler.load(filePath, featureGraph, format).containsError()) {
+		if (!FileSystem.exists(filePath) || SimpleFileHandler.load(filePath, featureGraph, format).containsError()) {
 			return null;
 		} else {
 			return featureGraph;
