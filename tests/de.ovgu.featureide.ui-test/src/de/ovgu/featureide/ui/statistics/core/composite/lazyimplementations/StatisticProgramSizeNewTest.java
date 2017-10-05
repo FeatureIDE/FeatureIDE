@@ -30,12 +30,13 @@ import java.io.StringReader;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
+
 public class StatisticProgramSizeNewTest {
 
 	private final static String getContent(final String name) {
 		final StringBuilder content = new StringBuilder();
-		final File fileFolder = getFolder();
-		for (final File f : fileFolder.listFiles()) {
+		for (final File f : Commons.getStatisticsFolder().listFiles()) {
 			if (f.getName().equals(name)) {
 				String s;
 				try (FileReader fr = new FileReader(f.getPath().toString()); BufferedReader br = new BufferedReader(fr)) {
@@ -50,15 +51,6 @@ public class StatisticProgramSizeNewTest {
 			}
 		}
 		return content.toString();
-	}
-
-	private static File getFolder() {
-		File folderTeamcity = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
-		File folder = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("statisticsfiles").getPath());
-		}
-		return folder;
 	}
 
 	@Test
