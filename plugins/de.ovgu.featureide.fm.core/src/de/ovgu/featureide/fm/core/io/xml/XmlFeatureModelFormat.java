@@ -305,7 +305,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if ((description != null) && !description.trim().isEmpty()) {
 			final Element descr = doc.createElement(DESCRIPTION);
 			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-
 			fnod.appendChild(descr);
 		}
 	}

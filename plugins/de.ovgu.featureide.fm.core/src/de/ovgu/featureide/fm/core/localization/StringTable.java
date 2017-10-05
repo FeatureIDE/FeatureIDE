@@ -458,6 +458,7 @@ public class StringTable {
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
 	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
+	public static final String STARTING_WITH = "Starting with";
 	public static final String EXPAND_CONSTRAINT = "Show contained features";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
 	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
@@ -1066,8 +1067,8 @@ public class StringTable {
 	public static final String SELECT_COLOR_SCHEME = "Select color scheme";
 	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
 	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
-	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
-	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	public static final String COLLAPSE_SIBLINGS = "Collapse Siblings";
+	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust Model to Editor Size";
 	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
 	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";

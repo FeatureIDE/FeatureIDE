@@ -66,7 +66,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTest.xml");
-
 		assertEquals(1, fm.getConstraints().size());
 
 		for (IConstraint constraint : fm.getConstraints()) {
@@ -81,7 +80,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml");
-
 		assertEquals(2, fm.getConstraints().size());
 		int i = 1;
 		for (IConstraint constraint : fm.getConstraints()) {
@@ -152,7 +150,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("basic.xml");
-
 		assertEquals(1, fm.getConstraints().size());
 
 		for (IConstraint constraint : fm.getConstraints()) {
