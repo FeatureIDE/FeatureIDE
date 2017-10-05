@@ -46,7 +46,7 @@ public class Commons {
 
 	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
 
-	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.core-test/src/";
+	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.ui-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
 		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
