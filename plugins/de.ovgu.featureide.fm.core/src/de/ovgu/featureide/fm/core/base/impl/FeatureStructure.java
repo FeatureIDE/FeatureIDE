@@ -454,7 +454,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public LinkedList<FeatureAttribute> getattributeList() {
+	public LinkedList<FeatureAttribute> getAttributeList() {
 		return attributeList;
 	}
 
@@ -465,23 +465,13 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public LinkedList<FeatureAttributeInherited> getattributeListInherited() {
+	public LinkedList<FeatureAttributeInherited> getAttributeListInherited() {
 		return inheritedList;
 	}
 
 	@Override
 	public void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
 		inheritedList = attListRecursive;
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#addAttributeListInherited(java.util.LinkedList)
-	 */
-	@Override
-	public void addAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
-		// TODO Auto-generated method stub
 
 	}
 

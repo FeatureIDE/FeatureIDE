@@ -211,9 +211,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					throwError("Empty Name " + nodeMap.item(0), e);
 				} else {
 					if (!isNameInInheretedList(inheritedAttributeList, attributeValue)) {
-						final String attributename = attributeValue.toLowerCase();
+						final String attributeName = attributeValue.toLowerCase();
 						for (final FeatureAttribute fa : attributeListRecursive) {
-							if (fa.getName().toLowerCase().equals(attributename)) {
+							if (fa.getName().toLowerCase().equals(attributeName)) {
 								inherited.setParent(fa);
 							}
 						}
@@ -239,11 +239,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @return true if an attributeName is already in the list
 	 */
 	private boolean checkAttributeList(String attributeName, LinkedList<FeatureAttribute> attributeList) {
-
 		for (int i = 0; i < attributeList.size(); i++) {
-
 			if (attributeList.get(i).getName().toLowerCase().equals(attributeName)) {
-
 				return true;
 			}
 		}
@@ -821,8 +818,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	private void writeRealAttribute(Document doc, Element fnod, IFeature feat) {
 
-		final LinkedList<FeatureAttributeInherited> inheritedList = feat.getStructure().getattributeListInherited();
-		final LinkedList<FeatureAttribute> attributeList = feat.getStructure().getattributeList();
+		final LinkedList<FeatureAttributeInherited> inheritedList = feat.getStructure().getAttributeListInherited();
+		final LinkedList<FeatureAttribute> attributeList = feat.getStructure().getAttributeList();
 
 		for (final FeatureAttribute fa : attributeList) {
 			final Element attribute;
@@ -845,7 +842,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		if (feat.getStructure().getParent() != null) {
-			for (final FeatureAttribute fa : feat.getStructure().getParent().getFeature().getStructure().getattributeList()) {
+			for (final FeatureAttribute fa : feat.getStructure().getParent().getFeature().getStructure().getAttributeList()) {
 				if (fa.getRecursive()) {
 					if (!isAttributeInInheritedList(fa, inheritedList)) {
 						final FeatureAttributeInherited fai = new FeatureAttributeInherited(fa);
@@ -853,7 +850,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					}
 				}
 			}
-			for (final FeatureAttributeInherited fai : feat.getStructure().getParent().getFeature().getStructure().getattributeListInherited()) {
+			for (final FeatureAttributeInherited fai : feat.getStructure().getParent().getFeature().getStructure().getAttributeListInherited()) {
 				if (!isAttributeInInheritedList(fai.getParent(), inheritedList)) {
 					final FeatureAttributeInherited featureInherited = new FeatureAttributeInherited();
 					featureInherited.setParent(fai.getParent());
