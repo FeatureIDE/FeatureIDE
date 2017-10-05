@@ -60,7 +60,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionDecoratio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -155,7 +154,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 						((CircleDecoration) child).translateToRelative(requestLocation);
 						if (decoratorBounds.contains(requestLocation)) {
 							final IFeatureModel featureModel = feature.getFeatureModel();
-							final MandatoryFeatureOperation op = new MandatoryFeatureOperation(feature, featureModel);
+							final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
 							try {
 								PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 							} catch (final ExecutionException e) {

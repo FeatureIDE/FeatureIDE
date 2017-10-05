@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_LEGEND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_LEGEND;
 
 import org.eclipse.core.commands.ExecutionException;

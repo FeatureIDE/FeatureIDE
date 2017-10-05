@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
@@ -32,10 +31,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHidd
  * Action to mark a feature as hidden.
  *
  * @author Marcus Pinnecke (Feature Interface)
- * @author Chico Sundermann
- * @author Paul Westphal
  */
-public class HiddenAction extends MultipleSelectionAction {
+public class HiddenAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.hidden";
 
@@ -48,34 +45,21 @@ public class HiddenAction extends MultipleSelectionAction {
 
 	@Override
 	public void run() {
-		changeHiddenStatus(isEveryFeatureHidden());
-		setChecked(isEveryFeatureHidden());
-	}
-	
-	private boolean isEveryFeatureHidden() {
-		for (IFeature tempFeature : featureArray) {
-			if (!(tempFeature.getStructure().isHidden())) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private void changeHiddenStatus(boolean allHidden) {
-		final SetFeatureToHiddenOperation op = 
-				new SetFeatureToHiddenOperation(featureModel, allHidden, getSelectedFeatures());
+		setChecked(feature.getStructure().isHidden());
+		final SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
+
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
+
 		}
 	}
 
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		// A selection of features is considered hidden iff every feature is hidden.
-		setChecked(isEveryFeatureHidden());
+		setChecked(feature.getStructure().isHidden());
 	}
 
 }
