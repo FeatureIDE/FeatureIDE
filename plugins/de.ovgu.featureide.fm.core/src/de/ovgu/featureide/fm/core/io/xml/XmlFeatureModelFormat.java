@@ -214,8 +214,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 						throwError("Empty Name " + nodeMap.item(0) , e);
 					} else {
 						if(!isNameInInheretedList(inheritedAttributeList, attributeValue)) {
+							final String attributename = attributeValue.toLowerCase();
 							for (FeatureAttribute fa : attributeListRecursive) {
-								if(fa.getName().toLowerCase().equals(attributeValue)) {
+								if(fa.getName().toLowerCase().equals(attributename)) {
 									inherited.setParent(fa);
 								} 
 							}
