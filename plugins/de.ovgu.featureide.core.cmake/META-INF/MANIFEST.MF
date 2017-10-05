@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureIDE Plug-In for CMake
+Bundle-SymbolicName: de.ovgu.featureide.core.cmake;singleton:=true
+Bundle-Version: 3.3.2.qualifier
+Bundle-Activator: de.ovgu.featureide.cmake.CMakeCorePlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: University of Magdeburg
+Export-Package: de.ovgu.featureide.cmake,
+ de.ovgu.featureide.cmake.wrapper
+Import-Package: de.ovgu.featureide.core.runtime.activator,
+ org.eclipse.cdt.core,
+ org.eclipse.cdt.core.cdtvariables,
+ org.eclipse.cdt.core.envvar,
+ org.eclipse.cdt.core.model,
+ org.eclipse.cdt.core.resources,
+ org.eclipse.cdt.core.settings.model,
+ org.eclipse.ui.console

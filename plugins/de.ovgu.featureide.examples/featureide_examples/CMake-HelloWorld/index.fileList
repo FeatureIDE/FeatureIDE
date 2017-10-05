@@ -1,0 +1,12 @@
+.cproject
+.featureide/model.xml/model.xml.xml
+.project
+.settings/language.settings.xml
+configs/hello_b_world.config
+configs/hello_world.config
+model.xml
+readme.txt
+src/CMakeLists.txt
+src/main.c
+src/printHelloBeautifulWorld.c
+src/printHelloWorld.c
