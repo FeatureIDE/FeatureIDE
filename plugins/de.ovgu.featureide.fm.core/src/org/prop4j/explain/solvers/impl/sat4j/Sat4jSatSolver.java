@@ -107,12 +107,22 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	/**
 	 * Adds the given variable to the solver and oracle if it has not already been added.
 	 *
-	 * @param variable variable to add
+	 * @param variable variable to add; not null
+	 * @return the index of the variable
+	 * @throws NullPointerException if the given variable is null
 	 */
-	protected void addVariable(Object variable) {
-		if (getIndexFromVariable(variable) == 0) {
-			addIndexFromVariable(variable);
+	protected int addVariable(Object variable) throws NullPointerException {
+		if (variable == null) {
+			throw new NullPointerException();
 		}
+		int index = getIndexFromVariable(variable);
+		if (index == 0) {
+			index = getOracle().nextFreeVarId(false);
+			getOracle().newVar(index);
+			variableIndexes.put(variable, index);
+			indexVariables.put(index, variable);
+		}
+		return index;
 	}
 
 	@Override
@@ -222,23 +232,6 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	public int getIndexFromVariable(Object variable) {
 		final Integer index = variableIndexes.get(variable);
 		return index == null ? 0 : index;
-	}
-
-	/**
-	 * Adds a new Sat4J index for the given variable.
-	 *
-	 * @param variable variable to transform; not null
-	 * @return a Sat4J index
-	 */
-	protected int addIndexFromVariable(Object variable) {
-		if (variable == null) {
-			throw new NullPointerException();
-		}
-		final int index = getOracle().nextFreeVarId(false);
-		getOracle().newVar(index);
-		variableIndexes.put(variable, index);
-		indexVariables.put(index, variable);
-		return index;
 	}
 
 	/**
