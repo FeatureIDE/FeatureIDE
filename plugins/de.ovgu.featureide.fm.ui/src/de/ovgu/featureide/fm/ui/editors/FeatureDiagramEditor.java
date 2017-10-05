@@ -722,20 +722,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
-			// if there are hidden features and nothing is selected
-		boolean isEmpty = true;
-		for (Object obj : ((StructuredSelection) getSelection()).toArray()) {
-			if (obj instanceof FeatureEditPart || obj instanceof IFeature) {
-				isEmpty = false;
-			}
-		}
-		if (!isEmpty) {
-			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);
-		}
-
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(exportFeatureModelAction);
 		}
