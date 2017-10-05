@@ -53,6 +53,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -260,6 +262,16 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if ((description != null) && !description.trim().isEmpty()) {
 				toolTip.append("\n\nDescription:\n");
 				toolTip.append(description);
+			}
+			
+			toolTip.append("\n\nAttributes:");
+			for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
+				toolTip.append("\n" + fa.toString());
+			}
+			
+			toolTip.append("\n\nInherited Attributes:");
+			for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
+				toolTip.append("\n" + fai.toString());
 			}
 
 			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);

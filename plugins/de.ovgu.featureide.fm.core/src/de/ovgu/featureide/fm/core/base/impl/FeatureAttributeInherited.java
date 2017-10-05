@@ -60,7 +60,12 @@ public class FeatureAttributeInherited {
 
 	@Override
 	public String toString() {
-		return parent.getName();
+		StringBuilder sb = new StringBuilder();
+		sb.append(parent.getName() + ": ");
+		if (!value.isEmpty()) {
+			sb.append(value);
+		}
+		return sb.toString();
 	}
 
 }

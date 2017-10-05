@@ -107,7 +107,21 @@ public class FeatureAttribute {
 
 	@Override
 	public String toString() {
-		return (getName());
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + ": \n");
+		if (!value.isEmpty()) {
+			sb.append(" -" + "value: " + value);
+		}
+		if (!unit.isEmpty()) {
+			sb.append(" -" + "unit: " + unit);
+		}
+		if (recursive) {
+			sb.append(" -" + "recursive: true");
+		}
+		if (configurable) {
+			sb.append(" -" + "configurable: true");
+		}
+		return sb.toString();
 	}
 	
 	public String getTypeNames() {

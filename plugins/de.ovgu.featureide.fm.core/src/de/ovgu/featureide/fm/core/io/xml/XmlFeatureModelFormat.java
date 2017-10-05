@@ -486,7 +486,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					} else {
 						throwError("Unknown attribute: " + nodeName, e);
 					}
-
 				}
 
 				if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
