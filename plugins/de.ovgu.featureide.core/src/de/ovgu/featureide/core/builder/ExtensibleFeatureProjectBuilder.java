@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -168,6 +169,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			cleanBuild = true;
 			clean(monitor);
+		} catch (ResourceException e) {
+			CorePlugin.getDefault().logWarning(e.getMessage());
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
