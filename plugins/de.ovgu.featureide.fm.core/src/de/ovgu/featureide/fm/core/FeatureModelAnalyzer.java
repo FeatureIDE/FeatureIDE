@@ -875,7 +875,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final IConstraint constraint = (IConstraint) modelElement;
 			switch (constraint.getConstraintAttribute()) {
 			case REDUNDANT:
-			case TAUTOLOGY:
 			case IMPLICIT:
 				explanation = getRedundantConstraintExplanation(fm, constraint);
 				break;
