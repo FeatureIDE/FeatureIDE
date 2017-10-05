@@ -72,7 +72,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	}
 
 	/**
-	 * Adds the given constraint to the oracle. Makes sure that the trace model properly ignores clauses that were ignored by the solver for being duplicates.
+	 * Adds the given constraint to the oracle.
 	 *
 	 * @param constraint constraint to add
 	 * @param negated whether the constraint should be negated before being added
@@ -80,19 +80,8 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	private int addConstraint(IConstraint constraint, boolean negated) {
 		final AdvancedNodeCreator nc = getNodeCreator();
-		int i = getTraceModel().getTraceCount();
 		final Node constraintNode = nc.createConstraintNode(constraint, negated);
-		int clauseCount = 0;
-		for (final Node clause : constraintNode.getChildren()) {
-			final int added = getOracle().addFormula(clause);
-			if (added > 0) {
-				clauseCount += added;
-				i++;
-			} else {
-				getTraceModel().removeTrace(i);
-			}
-		}
-		return clauseCount;
+		return getOracle().addFormula(constraintNode);
 	}
 
 	@Override
