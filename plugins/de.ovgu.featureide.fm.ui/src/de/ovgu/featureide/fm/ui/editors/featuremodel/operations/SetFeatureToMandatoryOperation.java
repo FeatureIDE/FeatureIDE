@@ -21,12 +21,9 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY_OPERATION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OPTIONAL;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set Features mandatory/concrete. Enables undo/redo functionality.

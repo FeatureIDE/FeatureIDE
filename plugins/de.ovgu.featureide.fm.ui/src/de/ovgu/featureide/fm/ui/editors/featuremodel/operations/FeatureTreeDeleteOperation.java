@@ -44,6 +44,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
+ * @author Paul Westphal
+ * @author Chico Sundermann
  */
 public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 

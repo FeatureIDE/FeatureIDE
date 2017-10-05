@@ -60,6 +60,11 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 	protected boolean connectionSelected;
 	protected IFeature[] featureArray;
 
+	/**
+	 * Default constructor
+	 * @param text of the action in context menu
+	 * @param viewer2
+	 */
 	public MultipleSelectionAction(String text, Object viewer2) {
 		super(text);
 		viewer = viewer2;
@@ -71,6 +76,10 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 		}
 	}
 	
+	/**
+	 * returns the selected features as IFeatures
+	 * @return selected IFeature array
+	 */
 	protected IFeature[] getSelectedFeatures() {
 		ArrayList<IFeature> features = new ArrayList<>();
 		
@@ -107,6 +116,10 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 		return features.toArray(new IFeature[features.size()]);
 	}
 	
+	/**
+	 * Is called whenever the selection changes
+	 * @param validSelection
+	 */
 	protected void selectionElementChanged(boolean validSelection) {
 		if (featureArray != null) {
 			for (Object obj : featureArray) {
@@ -127,7 +140,11 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 	
 	protected abstract void updateProperties();
 	
-	// Checks whether selection only contains features 
+	/**
+	 * Checks whether selection only contains features 
+	 * @param selection
+	 * @return boolean indicating whether there are only features selected
+	 */
 	protected boolean isValidSelection(IStructuredSelection selection) {
 		for (final Object obj : selection.toArray()) {
 			if (!((obj instanceof FeatureEditPart) || (obj instanceof IFeature) || (obj instanceof Feature))) {

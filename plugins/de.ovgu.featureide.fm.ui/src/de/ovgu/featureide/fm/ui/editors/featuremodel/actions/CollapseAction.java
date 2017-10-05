@@ -58,13 +58,9 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorag
 public class CollapseAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.collapse";
-
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final IFeatureModel featureModel;
-	
 	private IFeature[] featureArray;
 	private IGraphicalFeature[] graphicalFeatureArray;
-
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
 
 		@Override
@@ -86,7 +82,6 @@ public class CollapseAction extends MultipleSelectionAction {
 	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, IFeatureModel featureModel) {
 		super(COLLAPSE_FEATURE, viewer);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.featureModel = featureModel;
 		
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
