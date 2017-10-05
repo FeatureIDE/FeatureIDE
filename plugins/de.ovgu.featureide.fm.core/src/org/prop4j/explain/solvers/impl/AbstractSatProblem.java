@@ -69,12 +69,22 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 */
 	protected int addClauses(Collection<? extends Node> clauses) {
 		for (final Node clause : clauses) {
-			if (clause.getChildren().length == 0) {
-				throw new IllegalArgumentException("Empty clause");
-			}
-			this.clauses.add(clause);
+			addClause(clause);
 		}
 		return clauses.size();
+	}
+
+	/**
+	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals.
+	 *
+	 * @param clause clause to add; not null
+	 * @throws IllegalArgumentException if the clause is empty
+	 */
+	protected void addClause(Node clause) throws IllegalArgumentException {
+		if (clause.getChildren().length == 0) {
+			throw new IllegalArgumentException("Empty clause");
+		}
+		clauses.add(clause);
 	}
 
 	@Override
