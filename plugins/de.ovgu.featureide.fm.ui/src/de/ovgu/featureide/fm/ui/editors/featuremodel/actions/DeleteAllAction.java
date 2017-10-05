@@ -40,6 +40,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDelet
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Chico Sundermann
+ * @author Paul Westphal
  */
 public class DeleteAllAction extends MultipleSelectionAction {
 
@@ -97,7 +99,7 @@ public class DeleteAllAction extends MultipleSelectionAction {
 	
 	private boolean hasParentsInTheSubTree(IFeature feature) {
 		for (IFeature temp : featureArray) {
-			if (temp.getStructure().isAncestorOf(feature.getStructure())) {
+			if (feature.getStructure().isAncestorOf(temp.getStructure())) {
 				return true;
 			} 
 		}
