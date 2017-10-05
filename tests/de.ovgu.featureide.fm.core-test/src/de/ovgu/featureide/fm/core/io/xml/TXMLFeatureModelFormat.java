@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -40,9 +40,6 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 
 /**
  * Class to test the collapse feature of XmlFeatureModelFormat.java
@@ -65,63 +62,10 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	}
 
 	@Test
-	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel fmOrig = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmCollapsed = Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-
-		final IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
-		gFM.init();
-
-		final IGraphicalFeatureModel gfmCollapsed = new GraphicalFeatureModel(fmCollapsed);
-		gfmCollapsed.init();
-		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
-			if (feature.getObject().getName().equals("Root")) {
-				feature.setCollapsed(true);
-			}
-		}
-
-		final IGraphicalFeatureModel gfmNotCollapsed = new GraphicalFeatureModel(fmNotCollapsed);
-		gfmNotCollapsed.init();
-		gfmCollapsed.init();
-		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
-			feature.setCollapsed(false);
-		}
-
-		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getFeatures().size());
-
-		int notVisible = 0;
-		for (final IGraphicalFeature feature : gfmCollapsed.getFeatures()) {
-			if (feature.hasCollapsedParent()) {
-				notVisible++;
-			}
-		}
-
-		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size() + notVisible);
-
-		assertEquals(gFM.getVisibleFeatures().size(), gfmNotCollapsed.getVisibleFeatures().size());
-		//
-		// for (IFeature origF : fmOrig.getFeatures()) {
-		// IFeature newF = fmNotCollapsed.getFeature(origF.getName());
-		//
-		// if (newF == null) {
-		// fail();
-		// } else {
-		// assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(),
-		// fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
-		// }
-		// }
-	}
-	
-	@Test
 	public void testConstraintDescription() throws FileNotFoundException, UnsupportedModelException {
 		String constraintdescriptionFromXml = "";
 
-		final IFeatureModel fm = Commons.loadFeatureModelFromFile("constraintDescriptionTest.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTest.xml");
 
 		assertEquals(1, fm.getConstraints().size());
 
@@ -136,8 +80,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	public void testConstraintDescriptionTwoRules() throws FileNotFoundException, UnsupportedModelException {
 		String constraintdescriptionFromXml = "";
 
-		final IFeatureModel fm = Commons.loadFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml");
 
 		assertEquals(2, fm.getConstraints().size());
 		int i = 1;
@@ -205,35 +148,10 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	}
 
 	@Test
-	public final void writeAndReadModel() throws UnsupportedModelException {
-		String featureModelFile = "constraintDescriptionWriteReadTest.xml";
-		Path fmPath = Paths.get("bin/" + Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH + "/" + featureModelFile);
-
-		IFeatureModel newFm = this.prepareFeatureModel();
-		boolean result = FeatureModelManager.save(newFm, fmPath);
-		assertEquals(true, result);
-
-		final IFeatureModel loadedFm = Commons.loadFeatureModelFromFile(featureModelFile, Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-
-		assertEquals(2, loadedFm.getConstraints().size());
-		String constraintdescriptionFromXml = "";
-		int i = 1;
-		for (IConstraint constraint : loadedFm.getConstraints()) {
-			constraintdescriptionFromXml = constraint.getDescription();
-			assertEquals(constraintdescriptionFromXml, "Test Write Description " + i);
-			i++;
-
-		}
-
-	}
-	
-	@Test
 	public void testConstraintWithoutDescription() throws FileNotFoundException, UnsupportedModelException {
 		String constraintdescriptionFromXml = "";
 
-		final IFeatureModel fm = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("basic.xml");
 
 		assertEquals(1, fm.getConstraints().size());
 

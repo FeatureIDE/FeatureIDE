@@ -198,7 +198,8 @@ Library.
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.core.expressions"/>
-      <import plugin="de.ovgu.featureide.core"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
    </requires>
 
    <plugin
