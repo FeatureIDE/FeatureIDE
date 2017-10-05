@@ -264,14 +264,18 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				toolTip.append(description);
 			}
 			
-			toolTip.append("\n\nAttributes:");
-			for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
-				toolTip.append("\n" + fa.toString());
+			if (!feature.getStructure().getAttributeList().isEmpty()) {
+				toolTip.append("\n\nAttributes:");
+				for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
+					toolTip.append("\n" + fa.toString());
+				}
 			}
 			
-			toolTip.append("\n\nInherited Attributes:");
-			for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
-				toolTip.append("\n" + fai.toString());
+			if (!feature.getStructure().getAttributeListInherited().isEmpty()) {
+				toolTip.append("\n\nInherited Attributes:");
+				for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
+					toolTip.append("\n" + fai.toString());
+				}
 			}
 
 			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
