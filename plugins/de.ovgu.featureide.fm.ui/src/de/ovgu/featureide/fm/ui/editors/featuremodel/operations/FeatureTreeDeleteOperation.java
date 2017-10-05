@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_;
 
@@ -58,7 +59,7 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 	private LinkedList<IFeature> alternativeList;
 
 	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature[] parents) {
-		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
+		super(featureModel, DELETE);
 		featureArray = parents;
 	}
 
