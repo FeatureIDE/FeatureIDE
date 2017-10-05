@@ -747,6 +747,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(this.exportFeatureModelAction);
+		}
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
