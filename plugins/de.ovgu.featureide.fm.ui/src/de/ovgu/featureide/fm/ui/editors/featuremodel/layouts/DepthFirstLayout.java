@@ -51,8 +51,8 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
-		Rectangle rootBounds = getBounds( root );
-		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds );
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {

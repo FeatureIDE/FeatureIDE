@@ -126,25 +126,25 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
- 	void layoutConstraints(int yoffset, List<IGraphicalConstraint> constraints, Rectangle rootBounds) {
+	void layoutConstraints(int yoffset, List<IGraphicalConstraint> constraints, Rectangle rootBounds) {
 		// added 2 times getConstraintSpace to prevent intersecting with the collapsed decorator
 		int y = yoffset + FMPropertyManager.getConstraintSpace() * 2;
 		boolean depthFirst = this instanceof DepthFirstLayout || this instanceof VerticalLayout;
 		for (IGraphicalConstraint constraint : constraints) {
 			final Dimension size = constraint.getSize();
 			int x;
-			if ( depthFirst ) {
+			if (depthFirst) {
 				x = 2 * FMPropertyManager.getFeatureSpaceX();
 			} else {
-				final int rootCenter = rootBounds.x + ( rootBounds.width / 2 );
-				x = rootCenter - ( size.width / 2 );
+				final int rootCenter = rootBounds.x + (rootBounds.width / 2);
+				x = rootCenter - (size.width / 2);
 			}
 			constraint.setLocation(new Point(x, y));
-			
+
 			y += size.height;
 		}
 	}
-	
+
 	/**
 	 * sets the position of the legend
 	 */

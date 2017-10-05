@@ -51,15 +51,15 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature( featureModel );
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 
 		heightStep = root.getSize().height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
-		calculateLevelWidth( root );
-		centerOther( root , 0);
-		Rectangle rootBounds = getBounds( root );
-		layoutConstraints(height, featureModel.getVisibleConstraints(), rootBounds );
+		calculateLevelWidth(root);
+		centerOther(root, 0);
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(height, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	/**
