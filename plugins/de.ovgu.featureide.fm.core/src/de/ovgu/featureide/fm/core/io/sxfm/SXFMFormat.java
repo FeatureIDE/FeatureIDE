@@ -866,4 +866,9 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
+	@Override
+	public String getName() {
+		return "SXFM";
+	}
+
 }

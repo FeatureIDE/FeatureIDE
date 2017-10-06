@@ -280,4 +280,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE";
+	}
+
 }

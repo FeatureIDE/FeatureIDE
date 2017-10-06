@@ -29,8 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERR
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,6 +51,11 @@ import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import jampack.Jampack;
 import mixin.Mixin;
 
@@ -165,12 +168,13 @@ public class ComposerWrapper {
 		allFeatureFolders.clear();
 		featureFolders.clear();
 
-		configFile = (configFile == null) ? featureProject.getCurrentConfiguration() : configFile;
-		if (configFile != null) {
-			final List<String> lines = Files.readAllLines(Paths.get(configFile.getLocationURI()), Charset.forName("UTF-8"));
-			for (String line : lines) {
-				if (!line.startsWith("#")) {
-					final IFolder f = featureProject.getSourceFolder().getFolder(line);
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+		final ProblemList load = FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		if (!load.containsError()) {
+			final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
+			for (IFeature feature : selectedFeatures) {
+				if (feature.getStructure().isConcrete()) {
+					final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
 					if (f != null) {
 						featureFolders.add(f);
 					}

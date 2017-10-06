@@ -429,4 +429,9 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "SPL Conquerer";
+	}
+
 }

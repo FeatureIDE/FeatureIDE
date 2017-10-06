@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.handlers.base;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.resources.IFile;
@@ -28,13 +27,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 public abstract class AbstractExportHandler extends AFileHandler {
@@ -44,26 +39,17 @@ public abstract class AbstractExportHandler extends AFileHandler {
 		// Ask for file name
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		configureFileDialog(fileDialog);
+
 		final String filepath = fileDialog.open();
 		if (filepath == null) {
 			return;
 		}
 
-		final Path path = Paths.get(modelFile.getLocationURI());
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(modelFile.getName());
-		IFeatureModelFactory factory;
-		try {
-			factory = FMFactoryManager.getFactory(path.toString(), format);
-		} catch (final NoSuchExtensionException e) {
-			Logger.logError(e);
-			factory = FMFactoryManager.getDefaultFactory();
+		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(Paths.get(modelFile.getLocationURI()));
+		if (!fileHandler.getLastProblems().containsError()) {
+			final IFeatureModel fm = fileHandler.getObject();
+			FileHandler.save(Paths.get(filepath), fm, getFormat());
 		}
-		final IFeatureModel fm = factory.createFeatureModel();
-
-		final FileHandler<IFeatureModel> handler = new FileHandler<>(fm);
-		// Read model
-		handler.read(path, format);
-		handler.write(Paths.get(filepath), getFormat());
 	}
 
 	/**

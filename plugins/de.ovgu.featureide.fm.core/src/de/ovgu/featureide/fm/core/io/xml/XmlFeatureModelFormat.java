@@ -623,4 +623,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE";
+	}
+
 }

@@ -1,13 +1,3 @@
-package de.ovgu.featureide.common;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.util.List;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -28,77 +18,75 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
+package de.ovgu.featureide;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
+ * A class containing numerous methods that are needed for many tests, especially those assessing files.
+ * 
  * @author Marcus Pinnecke
+ * @author Thomas Thuem
  */
 public class Commons {
 
-	/**
-	 * File filter that accepts files which extension is equal to the extension.
-	 *
-	 * @author Marcus Pinnecke
-	 */
-	public static class FileFilterByExtension implements FileFilter {
+	private static final String TEAMCITY_REMOTE_PATH = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/";
 
-		final String fileExtension;
+	private static final String TRAVIS_REMOTE_PATH = "/home/travis/build/FeatureIDE/FeatureIDE/tests/";
 
-		/**
-		 * File filter that accepts files which extension is equal to the given extension.
-		 *
-		 * @param fileExtension file extension that should be accepted (e.g., "xml")
-		 */
-		public FileFilterByExtension(final String fileExtension) {
-			assert ((fileExtension != null) && !fileExtension.isEmpty());
+	private static final String TRAVIS_REMOTE_PATH_FORK1 = "/home/travis/build/DawidSA2017/FeatureIDE/tests/";
 
-			this.fileExtension = fileExtension;
+	private static final String TRAVIS_REMOTE_PATH_FORK2 = "/home/travis/build/Henningson/FeatureIDETeam2/tests/";
+
+	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
+
+	private static final String PLUGIN_PATH = "de.ovgu.featureide.core.ahead-test/src/";
+
+	public static File getRemoteOrLocalFolder(String path) {
+		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
+		if (!folder.canRead()) {
+			folder = new File(TRAVIS_REMOTE_PATH_FORK1 + PLUGIN_PATH + path);
+			if (!folder.canRead()) {
+				folder = new File(TRAVIS_REMOTE_PATH_FORK2 + PLUGIN_PATH + path);
+				if (!folder.canRead()) {
+					folder = new File(TRAVIS_REMOTE_PATH_FORK3 + PLUGIN_PATH + path);
+					if (!folder.canRead()) {
+						folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
+						if (!folder.canRead()) {
+							folder = new File(ClassLoader.getSystemResource(path).getPath());
+						}
+					}
+				}
+			}
 		}
-
-		@Override
-		public boolean accept(final File pathname) {
-			return pathname.getName().endsWith("." + fileExtension);
-		}
-	};
-
-	public static final String FEATURE_MODEL_BENCHMARK_PATH_TEAMCITY =
-			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
-	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE =
-			"/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
-	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH = "benchmarkFeatureModels";
-
-	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_TEAMCITY =
-			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
-	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE =
-			"/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/";
-	public static final String FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH = "testFeatureModels";
-
-	/**
-	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or the file reference to <code>localClassPath</code>
-	 * which should be inside the class path. The return value could be <code>null</code> if no such file exists on both places.
-	 *
-	 * @param remotePath Path to desired file on TeamCity
-	 * @param localClassPath Path to desired file on class path
-	 * @return File instance to that file
-	 */
-	public static final File getFile(final String remotePath, final String localClassPath) {
-		final File folder = new File(remotePath);
-		return folder.canRead() ? folder : new File(ClassLoader.getSystemResource(localClassPath).getPath());
+		return folder;
 	}
 
+	private static final String TEST_CASE_PATH = "testcases/";
+
+	public static File getTestCaseFolder() {
+		return getRemoteOrLocalFolder(TEST_CASE_PATH);
+	}
+		
 	/**
 	 * Loads a feature model from the file <code>featureModelXmlFilename</code> from a given <code>remotePath</code>, or if <code>remotePath</code> is not
 	 * available, from <code>localClassPath</code>. The search for the file excludes files that don't have the same file extension as
 	 * <code>featureModelXmlFilename</code>.
 	 *
-	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
+	 * @param filename Feature model file, e.g., "model.xml"
 	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
 	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
 	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
-		return loadFeatureModelFromFile(featureModelXmlFilename, new FileFilterByExtension(extractFileExtension(featureModelXmlFilename)), remotePath,
-				localClassPath);
+	public final static IFeatureModel loadFeatureModelFromFile(final String filename, final File modelFolder) {
+		return loadFeatureModelFromFile(filename, new FileFilterByExtension(extractFileExtension(filename)), modelFolder);
 	}
 
 	/**
@@ -129,15 +117,8 @@ public class Commons {
 	 *        instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
-			final String localClassPath) {
-		final File modelFileFolder = getFile(remotePath, localClassPath);
-		assert modelFileFolder != null;
-
-		final File[] files = modelFileFolder.listFiles(filter);
-		assert files != null;
-
-		for (final File f : files) {
+	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final File modelFolder) {
+		for (final File f : modelFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {
 				return FeatureModelManager.load(f.toPath()).getObject();
 			}
@@ -157,4 +138,31 @@ public class Commons {
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * File filter that accepts files which extension is equal to the extension.
+	 *
+	 * @author Marcus Pinnecke
+	 */
+	public static class FileFilterByExtension implements FileFilter {
+
+		final String fileExtension;
+
+		/**
+		 * File filter that accepts files which extension is equal to the given extension.
+		 *
+		 * @param fileExtension file extension that should be accepted (e.g., "xml")
+		 */
+		public FileFilterByExtension(final String fileExtension) {
+			assert ((fileExtension != null) && !fileExtension.isEmpty());
+
+			this.fileExtension = fileExtension;
+		}
+
+		@Override
+		public boolean accept(final File pathname) {
+			return pathname.getName().endsWith("." + fileExtension);
+		}
+	};
+
 }
