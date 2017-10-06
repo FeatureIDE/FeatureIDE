@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -65,11 +66,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
 
-	protected static File MODEL_FILE_FOLDER_TEAMCITY =
-			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
-
-	protected static File MODEL_FILE_FOLDER =
-			new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("testFeatureModels/");
 
 	static boolean online = false;
 	protected IFeatureModel origFm;

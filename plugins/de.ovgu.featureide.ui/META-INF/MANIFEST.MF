@@ -14,9 +14,7 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
- org.eclipse.core.expressions,
- org.eclipse.ui.navigator,
- org.eclipse.jface
+ org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
