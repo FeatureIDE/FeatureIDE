@@ -1,0 +1,35 @@
+concept HelloWorld {
+	mandatory feature Hello {
+		mandatory feature Hello1 {
+			int cost = 50;
+		}
+		mandatory feature Hello2 {
+			int cost = 50;
+		}
+	}
+	abstract feature Feature {
+		oneOf {
+			feature Beautiful {
+				mandatory feature Beautiful1 {
+					int cost = 50;
+				}
+				feature Beautiful2 {
+					int cost = 50;
+				}
+			}
+			feature Wonderful {
+				int cost = 50;
+			}
+		}
+	}
+	feature World {
+		int cost = 50;
+		feature World1 {
+			int cost = 50;
+		}
+		feature World2 {
+			int cost = 50;
+		}
+	}
+	constraint !Hello;
+}
