@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
+package de.ovgu.featureide.fm.ui.editors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -37,18 +37,15 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
  * Class to test the collapse feature of XmlFeatureModelFormat.java
  *
  * @author Christopher Sontag
- * @author Maximilian Kühl
+ * @author Maximilian Kuehl
  */
 public class TXMLFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureCollapsed() throws FileNotFoundException, UnsupportedModelException {
-		final IFeatureModel fmOrig = Commons.loadFeatureModelFromFile("basic.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmCollapsed = Commons.loadFeatureModelFromFile("basic_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmNotCollapsed = Commons.loadFeatureModelFromFile("basic_not_collapsed.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fmOrig = Commons.loadTestFeatureModelFromFile("basic.xml");
+		final IFeatureModel fmCollapsed = Commons.loadTestFeatureModelFromFile("basic_collapsed.xml");
+		final IFeatureModel fmNotCollapsed = Commons.loadTestFeatureModelFromFile("basic_not_collapsed.xml");
 
 		final IGraphicalFeatureModel gFM = new GraphicalFeatureModel(fmOrig);
 		gFM.init();
@@ -80,17 +77,6 @@ public class TXMLFeatureModelReaderWriter {
 		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size() + notVisible);
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmNotCollapsed.getVisibleFeatures().size());
-		//
-		// for (IFeature origF : fmOrig.getFeatures()) {
-		// IFeature newF = fmNotCollapsed.getFeature(origF.getName());
-		//
-		// if (newF == null) {
-		// fail();
-		// } else {
-		// assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(),
-		// fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
-		// }
-		// }
 	}
 
 }

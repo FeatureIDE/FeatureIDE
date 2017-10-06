@@ -195,6 +195,7 @@ Library.
       <import plugin="de.ovgu.featureide.fm.core"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="de.ovgu.featureide.core.munge"/>
+      <import plugin="de.ovgu.featureide.core.munge.android"/>
    </requires>
 
    <plugin
