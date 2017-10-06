@@ -82,8 +82,9 @@ public class CollapseAction extends SingleSelectionAction {
 
 		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
-		// setChecked(feature.getStructure().isCollapsed());
+
 		final SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(feature, graphicalFeatureModel);
+
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -97,8 +98,6 @@ public class CollapseAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		// setChecked(feature.getStructure().isCollapsed());
-
 		final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 		setChecked(graphicalFeature.isCollapsed());
 	}
