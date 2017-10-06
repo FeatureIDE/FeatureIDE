@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.core.io.xml;
 import static org.junit.Assert.assertEquals;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.prop4j.Node;
@@ -39,13 +37,14 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Class to test the collapse feature of XmlFeatureModelFormat.java
  *
  * @author Christopher Sontag
  * @author Maximilian Kühl
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 

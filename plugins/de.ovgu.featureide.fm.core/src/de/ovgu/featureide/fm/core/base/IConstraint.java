@@ -64,6 +64,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public interface IConstraint extends IFeatureModelElement {
 
@@ -318,7 +320,7 @@ public interface IConstraint extends IFeatureModelElement {
 	 * Set the description
 	 * @param description
 	 */
-	void setDescription(CharSequence description);
+	void setDescription(String description);
 	
 	/**
 	 * Returns the description
