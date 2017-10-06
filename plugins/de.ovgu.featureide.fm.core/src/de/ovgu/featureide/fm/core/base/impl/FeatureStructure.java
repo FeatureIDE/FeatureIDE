@@ -55,6 +55,9 @@ public class FeatureStructure implements IFeatureStructure {
 	protected IFeatureStructure parent = null;
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
 
+	protected LinkedList<FeatureAttribute> attributeList = new LinkedList<>();
+	protected LinkedList<FeatureAttributeInherited> inheritedList = new LinkedList<>();
+
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
 			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
@@ -68,6 +71,9 @@ public class FeatureStructure implements IFeatureStructure {
 		and = oldStructure.and;
 		multiple = oldStructure.multiple;
 		hidden = oldStructure.hidden;
+
+		attributeList = oldStructure.attributeList;
+		inheritedList = oldStructure.inheritedList;
 
 		for (final IFeatureStructure child : oldStructure.children) {
 			addNewChild(child.cloneSubtree(newFeatureModel));
@@ -445,6 +451,39 @@ public class FeatureStructure implements IFeatureStructure {
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public LinkedList<FeatureAttribute> getAttributeList() {
+		return attributeList;
+	}
+
+	@Override
+	public void setAttributeList(LinkedList<FeatureAttribute> attList) {
+		attributeList = attList;
+
+	}
+
+	@Override
+	public LinkedList<FeatureAttributeInherited> getAttributeListInherited() {
+		return inheritedList;
+	}
+
+	@Override
+	public void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
+		inheritedList = attListRecursive;
+
+	}
+
+	@Override
+	public LinkedList<FeatureAttribute> getRecursiveList() {
+		final LinkedList<FeatureAttribute> rekList = new LinkedList<>();
+		for (final FeatureAttribute att : attributeList) {
+			if (att.getRecursive() == true) {
+				rekList.addLast(att);
+			}
+		}
+		return rekList;
 	}
 
 }

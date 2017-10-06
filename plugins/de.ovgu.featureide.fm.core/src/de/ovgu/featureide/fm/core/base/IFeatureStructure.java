@@ -21,7 +21,11 @@
 package de.ovgu.featureide.fm.core.base;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
 
 /**
  * Manages all structural information of a feature.</br> Intended for tree structures (features are represented by tree nodes).
@@ -46,6 +50,10 @@ public interface IFeatureStructure {
 	int getChildIndex(IFeatureStructure feature);
 
 	List<IFeatureStructure> getChildren();	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
+
+	LinkedList<FeatureAttributeInherited> getAttributeListInherited();
+
+	LinkedList<FeatureAttribute> getAttributeList();
 
 	int getChildrenCount();
 
@@ -119,7 +127,13 @@ public interface IFeatureStructure {
 
 	void setParent(IFeatureStructure newParent);
 
+	void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive);
+
+	void setAttributeList(LinkedList<FeatureAttribute> attList);
+
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<IConstraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
+
+	LinkedList<FeatureAttribute> getRecursiveList();
 }
