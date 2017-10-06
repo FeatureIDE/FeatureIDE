@@ -516,7 +516,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		if (e.hasAttributes()) {
 			final NamedNodeMap nodeMap = e.getAttributes();
-			if ((nodeMap.getLength() < 3)) {
+			if ((nodeMap.getLength() < 3) && !(nodeMap.item(0).getNodeName().equals(TYPE) || nodeMap.item(1).getNodeName().equals(TYPE))) {
 				addAttributeToInheritedList(e, recursiveList, inheritedList);
 			} else {
 				addAttributeToAttributeList(e, attributeList, recursiveList, nodeMap);

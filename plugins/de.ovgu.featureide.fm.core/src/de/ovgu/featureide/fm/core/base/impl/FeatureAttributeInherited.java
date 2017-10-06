@@ -46,26 +46,16 @@ public class FeatureAttributeInherited {
 		return value;
 	}
 
+	public FeatureAttribute getParent() {
+		return parent;
+	}
+
 	public void setParent(FeatureAttribute p) {
 		parent = p;
 	}
 
 	public void setValue(String v) {
 		value = v;
-	}
-
-	public FeatureAttribute getParent() {
-		return parent;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(parent.getName() + ": ");
-		if (!value.isEmpty()) {
-			sb.append(value);
-		}
-		return sb.toString();
 	}
 
 }
