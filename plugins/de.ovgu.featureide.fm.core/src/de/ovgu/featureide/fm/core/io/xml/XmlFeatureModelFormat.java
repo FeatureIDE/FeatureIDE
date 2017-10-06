@@ -296,6 +296,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if (inherited.getParent() == null) {
 			throwError("No type for attribute: " + nodeMap.item(0), e);
 		}
+		if (!inherited.checkValue()) {
+			throwError("Value doesn't match Type." , e);
+		}
 		inheritedAttributeList.add(inherited);
 	}
 

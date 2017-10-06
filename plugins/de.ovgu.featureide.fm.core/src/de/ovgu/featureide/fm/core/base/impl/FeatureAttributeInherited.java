@@ -57,5 +57,9 @@ public class FeatureAttributeInherited {
 	public void setValue(String v) {
 		value = v;
 	}
+	
+	public boolean checkValue() {
+		return parent.checkValue(value);
+	}
 
 }

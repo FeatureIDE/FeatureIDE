@@ -36,11 +36,11 @@ public class FeatureAttribute {
 	protected String value;
 	protected String unit;
 	protected boolean recursive;
-	protected Types type;
+	protected Types v;
 
 	public FeatureAttribute() {
 		name = "";
-		type = null;
+		v = null;
 		recursive = false;
 		value = "";
 		unit = "";
@@ -64,11 +64,11 @@ public class FeatureAttribute {
 	}
 
 	public Types getType() {
-		return type;
+		return v;
 	}
 	
 	public String getTypeString() {
-		return type.toString().toLowerCase();
+		return v.toString().toLowerCase();
 	}
 
 	public String getTypeNames() {
@@ -104,13 +104,13 @@ public class FeatureAttribute {
 		type = type.toUpperCase();
 		for (final Types typeNames : Types.values()) {
 			if (typeNames.toString().equals(type)) {
-				this.type = typeNames;
+				this.v = typeNames;
 			}
 		}
 	}
 
 	public void setType(Types type) {
-		this.type = type;
+		this.v = type;
 	}
 
 	public void setUnit(String unit) {
@@ -141,22 +141,45 @@ public class FeatureAttribute {
 	}
 	
 	public boolean checkValue() {
-		if (type.toString().equals("LONG")) {
+		if (v.toString().equals("LONG")) {
 			try {
 				Long.parseLong(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (v.toString().equals("DOUBLE")) {
 			try {
 				Double.parseDouble(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("BOOLEAN")) {
+		if (v.toString().equals("BOOLEAN")) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	public boolean checkValue(String v) {
+		if (v.toString().equals("LONG")) {
+			try {
+				Long.parseLong(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (v.toString().equals("DOUBLE")) {
+			try {
+				Double.parseDouble(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (v.toString().equals("BOOLEAN")) {
+			if (v.toLowerCase().equals("true") || v.toLowerCase().equals("false")) {
 				return true;
 			}
 		}
