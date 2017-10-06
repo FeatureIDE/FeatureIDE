@@ -70,13 +70,13 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 	@Override
 	public void setSubject(Node subject) {
 		super.setSubject(subject);
-		setFeatureModel(getFeatureModel()); // reset CNF
+		setOracle(null);
 	}
 
 	@Override
-	protected Node createCnf() {
+	protected Ltms createOracle() {
 		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, super.createCnf().getChildren());
+		Collections.addAll(clauses, getCnf());
 		addedExpressions.clear();
 		boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 		for (Node expression : getExpressionStack()) {
@@ -94,7 +94,8 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 			}
 			first = false;
 		}
-		return new And(clauses.toArray(new Node[clauses.size()]));
+		final Node cnf = new And(clauses.toArray(new Node[clauses.size()]));
+		return new Ltms(cnf);
 	}
 
 	@Override

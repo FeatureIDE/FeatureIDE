@@ -53,11 +53,11 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	@Override
 	public void setSubject(SelectableFeature subject) {
 		super.setSubject(subject);
-		setFeatureModel(getFeatureModel()); // reset CNF
+		setOracle(null);
 	}
 
 	@Override
-	protected Node createCnf() {
+	protected Ltms createOracle() {
 		final List<Node> clauses = new LinkedList<>();
 		Collections.addAll(clauses, super.createCnf().getChildren());
 		selectedFeatures.clear();
@@ -83,7 +83,8 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 				selectedFeatures.add(featureSelection);
 			}
 		}
-		return new And(clauses.toArray(new Node[clauses.size()]));
+		final Node cnf = new And(clauses.toArray(new Node[clauses.size()]));
+		return new Ltms(cnf);
 	}
 
 	@Override
