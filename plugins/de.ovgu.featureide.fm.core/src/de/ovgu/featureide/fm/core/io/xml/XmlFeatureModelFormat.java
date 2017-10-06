@@ -185,6 +185,67 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * @param e
+	 * @param attributeList
+	 * @param recursiveList
+	 * @param nodeMap
+	 * @throws UnsupportedModelException
+	 *
+	 *         Checks if the element with name attribute has the correct parameters to add it to the attributelist.
+	 *
+	 */
+	private void addAttributeToAttributeList(Element e, LinkedList<FeatureAttribute> attributeList, LinkedList<FeatureAttribute> recursiveList,
+			final NamedNodeMap nodeMap) throws UnsupportedModelException {
+		final FeatureAttribute attribute = new FeatureAttribute();
+		for (int i = 0; i < nodeMap.getLength(); i++) {
+			final org.w3c.dom.Node node = nodeMap.item(i);
+			final String nodeName = node.getNodeName();
+			final String attributeValue = node.getNodeValue().trim();
+			if (nodeName.equals(NAME)) {
+				if (!attributeValue.isEmpty()) {
+					attribute.setName(attributeValue);
+				} else {
+					throwError("No Name for attribute: " + attribute.toString(), e);
+				}
+			} else if (nodeName.equals(TYPE)) {
+				if (attributeValue.isEmpty()) {
+					throwError("Type empty. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
+				}
+				attribute.setTypeFromString(attributeValue);
+				if (attribute.getType() == null) {
+					throwError("Wrong type. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
+				}
+			} else if (nodeName.equals(UNIT)) {
+				attribute.setUnit(attributeValue);
+			} else if (nodeName.equals(RECURSIVE)) {
+				attribute.setRecursive(attributeValue.equals(TRUE));
+			} else if (nodeName.equals(CONFIGURABLE)) {
+				attribute.setConfigurable(attributeValue.equals(TRUE));
+			} else if (nodeName.equals(VALUE)) {
+				attribute.setValue(attributeValue);
+			} else {
+				throwError("Unknown attribute: " + nodeName, e);
+			}
+		}
+		if (attribute.getName().isEmpty()) {
+			throwError("This attribute needs a name.", e);
+		}
+
+		if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
+			throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
+		}
+
+		if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
+			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
+		} else {
+			attributeList.add(attribute);
+			if (attribute.getRecursive() == true) {
+				recursiveList.add(attribute);
+			}
+		}
+	}
+
+	/**
 	 *
 	 * @param attribute an attribute
 	 * @param attributeListRecursive List of Recursive Elements
@@ -195,7 +256,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 *
 	 */
 
-	private void addToInheritedList(Element e, LinkedList<FeatureAttribute> attributeListRecursive,
+	private void addAttributeToInheritedList(Element e, LinkedList<FeatureAttribute> attributeListRecursive,
 			LinkedList<FeatureAttributeInherited> inheritedAttributeList) throws UnsupportedModelException {
 
 		final FeatureAttributeInherited inherited = new FeatureAttributeInherited();
@@ -455,57 +516,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		if (e.hasAttributes()) {
 			final NamedNodeMap nodeMap = e.getAttributes();
-			if (nodeMap.getLength() > 2 || (nodeMap.item(0).getNodeName().equals(TYPE) || 
-					nodeMap.item(1).getNodeName().equals(TYPE))) {
-				final FeatureAttribute attribute = new FeatureAttribute();
-				for (int i = 0; i < nodeMap.getLength(); i++) {
-					final org.w3c.dom.Node node = nodeMap.item(i);
-					final String nodeName = node.getNodeName();
-					final String attributeValue = node.getNodeValue().trim();
-					if (nodeName.equals(NAME)) {
-						if (!attributeValue.isEmpty()) {
-							attribute.setName(attributeValue);
-						} else {
-							throwError("No Name for attribute: " + attribute.toString(), e);
-						}
-					} else if (nodeName.equals(TYPE)) {
-						if (attributeValue.isEmpty()) {
-							throwError("Type empty. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
-						}
-						attribute.setTypeFromString(attributeValue);
-						if (attribute.getType() == null) {
-							throwError("Wrong type. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
-						}
-					} else if (nodeName.equals(UNIT)) {
-						attribute.setUnit(attributeValue);
-					} else if (nodeName.equals(RECURSIVE)) {
-						attribute.setRecursive(attributeValue.equals(TRUE));
-					} else if (nodeName.equals(CONFIGURABLE)) {
-						attribute.setConfigurable(attributeValue.equals(TRUE));
-					} else if (nodeName.equals(VALUE)) {
-						attribute.setValue(attributeValue);
-					} else {
-						throwError("Unknown attribute: " + nodeName, e);
-					}
-				}
-				if (attribute.getName().isEmpty()) {
-					throwError("This attribute needs a name.", e);
-				}
+			if ((nodeMap.getLength() < 3) && !(nodeMap.item(0).getNodeName().equals(TYPE) || nodeMap.item(1).getNodeName().equals(TYPE))) {
+				addAttributeToInheritedList(e, recursiveList, inheritedList);
 
-				if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
-					throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
-				}
-
-				if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
-					throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
-				} else {
-					attributeList.add(attribute);
-					if (attribute.getRecursive() == true) {
-						recursiveList.add(attribute);
-					}
-				}
 			} else {
-				addToInheritedList(e, recursiveList, inheritedList);
+				addAttributeToAttributeList(e, attributeList, recursiveList, nodeMap);
 			}
 		}
 	}
@@ -828,7 +843,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final Element attribute;
 			attribute = doc.createElement(ATTRIBUTE);
 			attribute.setAttribute(NAME, fa.getName());
-			attribute.setAttribute(TYPE, fa.getType().toString());
+			attribute.setAttribute(TYPE, fa.getTypeString());
 			if (!fa.getValue().isEmpty()) {
 				attribute.setAttribute(VALUE, fa.getValue());
 			}

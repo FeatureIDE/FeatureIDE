@@ -268,16 +268,19 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				toolTip.append("\n\nAttributes:");
 				for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
 					toolTip.append("\n -" + fa.getName());
+					if (!fa.getValue().isEmpty()) {
+						toolTip.append(": " + fa.getValue());
+					}
 				}
 			}
 			
 			if (!feature.getStructure().getAttributeListInherited().isEmpty()) {
-				toolTip.append("\n\nInherited Attributes:\n");
-				String space = " ";
+				toolTip.append("\n\nInherited Attributes:");
 				for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
-					toolTip.append(space);
-					toolTip.append(fai.getName());
-					space = ", ";
+					toolTip.append("\n -" + fai.getName());
+					if (!fai.getValue().isEmpty()) {
+						toolTip.append(": " + fai.getValue());
+					}
 				}
 			}
 

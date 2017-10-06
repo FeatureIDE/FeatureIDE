@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 public class FeatureAttribute {
 
 	public enum Types {
-		STRING, INT, INTEGER, DOUBLE, LONG, BOOLEAN, FLOAT
+		STRING, DOUBLE, LONG, BOOLEAN
 	}
 
 	protected boolean configurable;
@@ -47,16 +47,16 @@ public class FeatureAttribute {
 		configurable = false;
 	}
 
+	public boolean getConfigurable() {
+		return configurable;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public boolean getRecursive() {
 		return recursive;
-	}
-
-	public boolean getConfigurable() {
-		return configurable;
 	}
 
 	public String getUnit() {
@@ -66,26 +66,38 @@ public class FeatureAttribute {
 	public Types getType() {
 		return type;
 	}
+	
+	public String getTypeString() {
+		return type.toString().toLowerCase();
+	}
+
+	public String getTypeNames() {
+		StringBuilder sb = new StringBuilder();
+		String types = "";
+		for (final Types typeNames: Types.values()) {
+			sb.append(types);
+			types = ", ";
+			sb.append(typeNames.toString().toLowerCase());
+		}
+		return sb.toString();
+	}
 
 	public String getValue() {
 		return value;
+	}
+
+	public void setConfigurable(boolean configurable) {
+		this.configurable = configurable;
+	
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
 
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 	public void setTypeFromString(String type) {
@@ -101,9 +113,12 @@ public class FeatureAttribute {
 		this.type = type;
 	}
 
-	public void setConfigurable(boolean configurable) {
-		this.configurable = configurable;
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Override
@@ -121,17 +136,6 @@ public class FeatureAttribute {
 		}
 		if (configurable) {
 			sb.append(" -" + "configurable: true");
-		}
-		return sb.toString();
-	}
-	
-	public String getTypeNames() {
-		StringBuilder sb = new StringBuilder();
-		String types = "";
-		for (final Types typeNames: Types.values()) {
-			sb.append(types);
-			types = ", ";
-			sb.append(typeNames.toString().toLowerCase());
 		}
 		return sb.toString();
 	}
