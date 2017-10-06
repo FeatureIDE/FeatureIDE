@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 public class FeatureAttribute {
 
 	public enum Types {
-		STRING, INT, DOUBLE, LONG, BOOLEAN, FLOAT
+		STRING, INT, INTEGER, DOUBLE, LONG, BOOLEAN, FLOAT
 	}
 
 	protected boolean configurable;
@@ -39,6 +39,7 @@ public class FeatureAttribute {
 	protected Types type;
 
 	public FeatureAttribute() {
+		name = "";
 		type = null;
 		recursive = false;
 		value = "";

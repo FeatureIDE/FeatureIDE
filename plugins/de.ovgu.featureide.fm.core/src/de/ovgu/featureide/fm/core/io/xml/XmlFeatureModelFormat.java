@@ -224,7 +224,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (nodeName.equals(VALUE)) {
 				inherited.setValue(attributeValue);
 			} else {
-				throwError("Wrong parameters in: " + inherited, e);
+				throwError("Wrong parameters or too few parameters in: " + nodeMap.item(0), e);
 			}
 		}
 		if (inherited.getParent() == null) {
@@ -455,7 +455,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		if (e.hasAttributes()) {
 			final NamedNodeMap nodeMap = e.getAttributes();
-			if (nodeMap.getLength() > 2) {
+			if (nodeMap.getLength() > 2 || (nodeMap.item(0).getNodeName().equals(TYPE) || 
+					nodeMap.item(1).getNodeName().equals(TYPE))) {
 				final FeatureAttribute attribute = new FeatureAttribute();
 				for (int i = 0; i < nodeMap.getLength(); i++) {
 					final org.w3c.dom.Node node = nodeMap.item(i);
@@ -486,6 +487,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					} else {
 						throwError("Unknown attribute: " + nodeName, e);
 					}
+				}
+				if (attribute.getName().isEmpty()) {
+					throwError("This attribute needs a name.", e);
 				}
 
 				if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
