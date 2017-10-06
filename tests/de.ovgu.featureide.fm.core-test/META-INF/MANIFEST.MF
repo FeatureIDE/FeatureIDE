@@ -13,7 +13,3 @@ Bundle-ClassPath: .,
  lib/log4j-api-2.2.jar,
  lib/log4j-core-2.2.jar,
  lib/commons-math3-3.4.1.jar
-Import-Package: de.ovgu.featureide.fm.core.base,
- de.ovgu.featureide.fm.core.io,
- de.ovgu.featureide.fm.ui.editors,
- de.ovgu.featureide.fm.ui.editors.elements

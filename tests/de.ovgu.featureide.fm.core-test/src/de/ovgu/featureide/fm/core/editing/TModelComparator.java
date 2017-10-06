@@ -32,7 +32,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -285,10 +285,8 @@ public class TModelComparator {
 	 *
 	 */
 	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
-		final IFeatureModel fm = Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
-				Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
-		final IFeatureModel fmGen = Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE,
-				Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel fm = Commons.loadBenchmarkFeatureModelFromFile("issue_264_model_optional.xml");
+		final IFeatureModel fmGen = Commons.loadBenchmarkFeatureModelFromFile("issue_264_model_alternative.xml");
 		final ModelComparator comparator = new ModelComparator(1000000);
 		final Comparison comparison = comparator.compare(fm, fmGen);
 
