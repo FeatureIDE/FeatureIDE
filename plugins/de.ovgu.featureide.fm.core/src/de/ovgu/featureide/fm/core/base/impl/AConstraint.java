@@ -198,7 +198,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	public void setDescription(@Nonnull final String description) {
-		this.description = description.toString();
+		this.description = description;
 	}
 
 	/**
