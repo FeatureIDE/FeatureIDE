@@ -53,6 +53,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -260,6 +262,26 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if ((description != null) && !description.trim().isEmpty()) {
 				toolTip.append("\n\nDescription:\n");
 				toolTip.append(description);
+			}
+			
+			if (!feature.getStructure().getAttributeList().isEmpty()) {
+				toolTip.append("\n\nAttributes:");
+				for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
+					toolTip.append("\n -" + fa.getName());
+					if (!fa.getValue().isEmpty()) {
+						toolTip.append(": " + fa.getValue());
+					}
+				}
+			}
+			
+			if (!feature.getStructure().getAttributeListInherited().isEmpty()) {
+				toolTip.append("\n\nInherited Attributes:");
+				for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
+					toolTip.append("\n -" + fai.getName());
+					if (!fai.getValue().isEmpty()) {
+						toolTip.append(": " + fai.getValue());
+					}
+				}
 			}
 
 			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);

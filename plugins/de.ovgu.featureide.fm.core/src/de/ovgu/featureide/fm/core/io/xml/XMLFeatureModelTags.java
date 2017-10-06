@@ -75,6 +75,6 @@ public interface XMLFeatureModelTags {
 	static final String VALUE = "value";
 	static final String RECURSIVE = "recursive";
 	static final String CONFIGURABLE = "configurable";
-	
+
 	static final String WRONG_TYPE = "wrong_type";
 }

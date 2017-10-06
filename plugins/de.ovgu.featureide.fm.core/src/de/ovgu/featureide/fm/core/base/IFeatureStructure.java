@@ -50,10 +50,10 @@ public interface IFeatureStructure {
 	int getChildIndex(IFeatureStructure feature);
 
 	List<IFeatureStructure> getChildren();	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
-	
-	LinkedList<FeatureAttributeInherited> getattributeListInherited();
-	
-	LinkedList<FeatureAttribute> getattributeList();
+
+	LinkedList<FeatureAttributeInherited> getAttributeListInherited();
+
+	LinkedList<FeatureAttribute> getAttributeList();
 
 	int getChildrenCount();
 
@@ -126,11 +126,9 @@ public interface IFeatureStructure {
 	void setOr();
 
 	void setParent(IFeatureStructure newParent);
-	
+
 	void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive);
-	
-	void addAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive);
-	
+
 	void setAttributeList(LinkedList<FeatureAttribute> attList);
 
 	void setRelevantConstraints();
