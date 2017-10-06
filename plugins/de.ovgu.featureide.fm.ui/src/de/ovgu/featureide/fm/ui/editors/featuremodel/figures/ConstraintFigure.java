@@ -168,7 +168,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		default:
 			break;
 		}
-		
+
 		final String description = constraint.getDescription();
 		if ((description != null) && !description.trim().isEmpty()) {
 			toolTipContent.add(new Label("Description:"));
@@ -176,8 +176,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		} else {
 			toolTipContent.add(new Label("No Description"));
 		}
-		
-		
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));

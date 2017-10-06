@@ -550,14 +550,14 @@ public class ConstraintDialog implements GUIDefaults {
 
 		initShell();
 		initHead();
-		
+
 		sashForm = new SashForm(shell, SWT.HORIZONTAL);
 		GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = GridData.FILL;
 		layoutData.verticalAlignment = GridData.FILL;
 		layoutData.grabExcessVerticalSpace = true;
 		sashForm.setLayoutData(layoutData);
-		
+
 		initFeatureGroup(featuremodel);
 		initConstraintDescriptionText(constraintDescriptionText);
 		initButtonGroup();
@@ -761,6 +761,7 @@ public class ConstraintDialog implements GUIDefaults {
 		});
 
 	}
+
 	/**
 	 * Initializes the text containing the descriptions.
 	 */
@@ -781,8 +782,6 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	/**
-
-	/**
 	 * Initializes the group containing the searchText and featureTable.
 	 *
 	 * @param featuremodel
@@ -795,9 +794,9 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData.grabExcessVerticalSpace = true;
 		featureGroup.setLayoutData(gridData);
 		final GridLayout featureGroupLayout = new GridLayout();
-		
+
 		featureGroupLayout.numColumns = 1;
-		
+
 		featureGroup.setLayout(featureGroupLayout);
 
 		searchFeatureText = new StyledText(featureGroup, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -811,9 +810,9 @@ public class ConstraintDialog implements GUIDefaults {
 		gridData = new GridData(SWT.FILL, 200, true, true);
 		tableComposite.setLayoutData(gridData);
 
-		final TableViewer featureTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL );
+		final TableViewer featureTableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		featureTable = featureTableViewer.getTable();
-		
+
 		featureTableViewer.setContentProvider(new ArrayContentProvider());
 		final TableViewerColumn viewerNameColumn = new TableViewerColumn(featureTableViewer, SWT.NONE);
 		final TableColumnLayout tableColumnLayout = new TableColumnLayout();
