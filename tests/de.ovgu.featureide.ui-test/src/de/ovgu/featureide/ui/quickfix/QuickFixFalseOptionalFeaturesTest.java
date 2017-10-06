@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -55,9 +56,6 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	QuickFixFalseOptionalFeatures quickFix = new QuickFixFalseOptionalFeatures(null);
 
-	protected static File MODEL_FILE_FOLDER_TEAMCITY = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
-	protected static File MODEL_FILE_FOLDER = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.ui-test/src/models/");
-
 	protected String failureMessage;
 
 	private final IFeatureModel fm;
@@ -70,12 +68,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	@Parameters
 	public static Collection<Object[]> getModels() throws FileNotFoundException, UnsupportedModelException {
-		// first tries the location on build server, if this fails tries to use local location
-		if (!MODEL_FILE_FOLDER.canRead()) {
-			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("models").getPath());
-		}
 		final Collection<Object[]> params = new ArrayList<>();
-		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
+		for (final File f : Commons.getFeatureModelFolder().listFiles(getFileFilter(".xml"))) {
 			final Object[] models = new Object[2];
 
 			final IFeatureModel fm = DefaultFeatureModelFactory.getInstance().createFeatureModel();
