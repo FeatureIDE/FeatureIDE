@@ -74,7 +74,7 @@ public class AbstractAction extends MultipleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		// A selection of features is considered abstract iff every feature is abstract.
+		// A selection of features is considered abstract if every feature is abstract.
 		setChecked(isEveryFeatureAbstract());
 	}
 

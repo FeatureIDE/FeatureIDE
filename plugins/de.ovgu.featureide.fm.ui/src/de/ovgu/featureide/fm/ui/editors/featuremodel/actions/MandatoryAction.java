@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
- * Turns a features in an And-group into a mandatory feature.
+ * Turns features in an And-group into mandatory features.
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke

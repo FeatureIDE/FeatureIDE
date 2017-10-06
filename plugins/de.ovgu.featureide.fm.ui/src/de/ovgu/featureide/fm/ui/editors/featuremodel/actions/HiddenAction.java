@@ -74,7 +74,7 @@ public class HiddenAction extends MultipleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		// A selection of features is considered hidden iff every feature is hidden.
+		// A selection of features is considered hidden if every feature is hidden.
 		setChecked(isEveryFeatureHidden());
 	}
 

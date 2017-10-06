@@ -60,7 +60,6 @@ public class CollapseFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		if (feature.getStructure().hasChildren()) {
-
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
 			targetConnections = graphicalFeature.getTargetConnections();

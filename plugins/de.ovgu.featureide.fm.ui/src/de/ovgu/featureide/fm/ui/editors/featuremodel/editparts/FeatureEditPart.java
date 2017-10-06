@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERATION;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.gef.EditPolicy;
@@ -50,7 +51,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCe
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseFeatureOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToCollapseOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -123,7 +123,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			final CollapseFeatureOperation op = new CollapseFeatureOperation(feature, featureModel, "Collapse Operation"); //TODO: PLATZHALTER
+			final CollapseFeatureOperation op = new CollapseFeatureOperation(feature, featureModel, COLLAPSE_OPERATION);
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (final ExecutionException e) {

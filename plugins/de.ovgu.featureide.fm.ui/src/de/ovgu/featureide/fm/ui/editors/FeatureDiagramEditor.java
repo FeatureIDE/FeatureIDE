@@ -683,10 +683,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(calculateDependencyAction);
 			menu.add(new Separator());
-
-      // if a constraint is selected
-		} else if (editConstraintAction.isEnabled()	&& !connectionSelected) {
-
+			// if a constraint is selected
+		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
@@ -696,7 +694,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				menu.add(new Separator());
 				menu.add(collapseAllButExplanationAction);
 			}
-
 			// if the legend is selected
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
