@@ -51,6 +51,12 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
 	@Override
+	public void setSubject(SelectableFeature subject) {
+		super.setSubject(subject);
+		setFeatureModel(getFeatureModel()); // reset CNF
+	}
+
+	@Override
 	protected Node createCnf() {
 		final List<Node> clauses = new LinkedList<>();
 		Collections.addAll(clauses, super.createCnf().getChildren());

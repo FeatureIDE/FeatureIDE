@@ -68,6 +68,12 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 	}
 
 	@Override
+	public void setSubject(Node subject) {
+		super.setSubject(subject);
+		setFeatureModel(getFeatureModel()); // reset CNF
+	}
+
+	@Override
 	protected Node createCnf() {
 		final List<Node> clauses = new LinkedList<>();
 		Collections.addAll(clauses, super.createCnf().getChildren());
