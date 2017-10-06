@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import org.junit.Assert;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -38,12 +39,8 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 //@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
-	protected static File MODEL_FILE_FOLDER_TEAMCITY =
-			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
-	protected static File MODEL_FILE_FOLDER =
-			new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
-	private static File DESTINATION_TEAMCITY = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
-	private static File DESTINATION = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("splotmodels/");
+	private static File DESTINATION = Commons.getRemoteOrLocalFolder("splotmodels_new/");
 
 	private final File modelFile;
 
