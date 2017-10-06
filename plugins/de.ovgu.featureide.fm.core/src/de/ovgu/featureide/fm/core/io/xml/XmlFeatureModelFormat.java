@@ -238,6 +238,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
 			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
 		} else {
+			if(!attribute.getValue().isEmpty()) {
+				if (!attribute.checkValue()) {
+					throwError("Value doesn't match Type." , e);
+				}
+			}
 			attributeList.add(attribute);
 			if (attribute.getRecursive() == true) {
 				recursiveList.add(attribute);

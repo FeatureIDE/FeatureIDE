@@ -139,4 +139,28 @@ public class FeatureAttribute {
 		}
 		return sb.toString();
 	}
+	
+	public boolean checkValue() {
+		if (type.toString().equals("LONG")) {
+			try {
+				Long.parseLong(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("DOUBLE")) {
+			try {
+				Double.parseDouble(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("BOOLEAN")) {
+			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+	
 }
