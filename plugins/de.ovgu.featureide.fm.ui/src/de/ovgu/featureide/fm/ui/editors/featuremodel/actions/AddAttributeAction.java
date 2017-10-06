@@ -45,6 +45,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -53,6 +57,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
@@ -67,6 +72,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -89,15 +95,25 @@ public class AddAttributeAction extends Action  {
 
 	@Override
 	public void run() {
-		Shell shell = new Shell(Display.getCurrent());
-		shell.setLayout(new FillLayout());
-		new AddAttributeDialog(shell);
-		shell.open();
-		
-		while (!shell.isDisposed()) {
-			if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+//		Shell shell = new Shell(Display.getCurrent());
+//		shell.setLayout(new FillLayout());
+//		new AddAttributeDialog(shell, featureModel);
+//		shell.open();
+//		
+//		while (!shell.isDisposed()) {
+//			if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
+//		}
+		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		final AddAttributeDialog addAttributeDialog = new AddAttributeDialog(shell, featureModel);
+		// inform ui to update
+		if (addAttributeDialog.open() == Window.OK) {
+			final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
+			try {
+				project.touch(null);
+				project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+			} catch (final CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 		}
-		Display.getCurrent().dispose();
 	}
-
 }

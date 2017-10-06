@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.window.*;
 import org.eclipse.swt.SWT;
@@ -28,10 +29,12 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
+import java.awt.Insets;
 import java.io.File;
 import java.net.URL;
 
 import javax.annotation.PostConstruct;
+import javax.swing.text.TableView;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -53,7 +56,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
@@ -82,177 +89,187 @@ import org.eclipse.swt.widgets.Shell;
  * A simple editor to change description of a particular feature diagram.
  *
  */
-public class AddAttributeDialog {
+public class AddAttributeDialog extends Dialog  {
 	
-	public AddAttributeDialog(final Shell shell) {
-				Button b = new Button(shell, SWT.PUSH);
-				b.setText("Remove column");
-				final TreeViewer v = new TreeViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
-				v.getTree().setLinesVisible(true);
-				v.getTree().setHeaderVisible(true);
-				b.addSelectionListener(new SelectionListener() {
-		
-					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
-		
-					}
-		
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						v.getTree().getColumn(1).dispose();
-					}
-		
-				});
-		
-				TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(v, new FocusCellOwnerDrawHighlighter(v));
-				ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
-		
-					@Override
-					protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-						return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-							|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-							|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-							|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-					}
-				};
-		
-				int feature = ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-					| ColumnViewerEditor.KEYBOARD_ACTIVATION;
-		
-				TreeViewerEditor.create(v, focusCellManager, actSupport, feature);
-				final TextCellEditor textCellEditor = new TextCellEditor(v.getTree());
-		
-				String[] columLabels = { "Column 1", "Column 2", "Column 3" };
-				String[] labelPrefix = { "Column 1 => ", "Column 2 => ", "Column 3 => " };
-		
-				for (int i = 0; i < columLabels.length; i++) {
-					TreeViewerColumn column = new TreeViewerColumn(v, SWT.NONE);
-					column.getColumn().setWidth(200);
-					column.getColumn().setMoveable(true);
-					column.getColumn().setText(columLabels[i]);
-					column.setLabelProvider(createColumnLabelProvider(labelPrefix[i]));
-					column.setEditingSupport(createEditingSupportFor(v, textCellEditor));
-				}
-				v.setContentProvider(new MyContentProvider());
-				v.setInput(createModel());
-			}
-		
-			private ColumnLabelProvider createColumnLabelProvider(final String prefix) {
-				return new ColumnLabelProvider() {
-		
-					@Override
-					public String getText(Object element) {
-						return prefix + element.toString();
-					}
-		
-				};
-			}
-		
-			private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
-				return new EditingSupport(viewer) {
-		
-					@Override
-					protected boolean canEdit(Object element) {
-						return false;
-					}
-		
-					@Override
-					protected CellEditor getCellEditor(Object element) {
-						return textCellEditor;
-					}
-		
-					@Override
-					protected Object getValue(Object element) {
-						return ((MyModel) element).counter + "";
-					}
-		
-					@Override
-					protected void setValue(Object element, Object value) {
-						((MyModel) element).counter = Integer.parseInt(value.toString());
-						viewer.update(element, null);
-					}
-				};
-			}
-		
-			private MyModel createModel() {
-				MyModel root = new MyModel(0, null);
-				root.counter = 0;
-		
-				MyModel tmp;
-				MyModel subItem;
-				for (int i = 1; i < 10; i++) {
-					tmp = new MyModel(i, root);
-					root.child.add(tmp);
-					for (int j = 1; j < i; j++) {
-						subItem = new MyModel(j, tmp);
-						subItem.child.add(new MyModel(j * 100, subItem));
-						tmp.child.add(subItem);
-					}
-				}
-				return root;
-			}
-		
-			
-		
-			private class MyContentProvider implements ITreeContentProvider {
-		
-				@Override
-				public Object[] getElements(Object inputElement) {
-					return ((MyModel) inputElement).child.toArray();
-				}
-		
-				@Override
-		 	public void dispose() {}
-		
-				@Override
-				public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-		
-				@Override
-				public Object[] getChildren(Object parentElement) {
-					return getElements(parentElement);
-				}
-		
-				@Override
-				public Object getParent(Object element) {
-					if (element == null) {
-						return null;
-				}
-					return ((MyModel) element).parent;
-				}
-		
-				@Override
-				public boolean hasChildren(Object element) {
-					return ((MyModel) element).child.size() > 0;
-				}
-		
-			}
-		
-			
-		
-			public class MyModel {
-		
-				public MyModel parent;
-				public List<MyModel> child = new ArrayList<>();
-				public int counter;
-		
-				public MyModel(int counter, MyModel parent) {
-					this.parent = parent;
-					this.counter = counter;
-				}
-		
-				@Override
-				public String toString() {
-					String rv = "Item ";
-					if (parent != null) {
-						rv = parent.toString() + ".";
-					}
-					rv += counter;
-		
-					return rv;
-				}
-			}
-		
-		}
+	private IFeatureModel featureModel;
+	
+	public AddAttributeDialog(final Shell parentShell, IFeatureModel featureModel) {
+		super(parentShell);
+		featureModel = featureModel;
+		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
+	}
+//				LinkedList<IFeature> featureList = new LinkedList<>();
+//				List<String> featureNameList = featureModel.getFeatureOrderList();
+//				for(int i = 0; i < featureNameList.size(); i++) {
+//					featureList.add(featureModel.getFeature(featureNameList.get(i)));
+//				}
 
+//				Button b = new Button(shell, SWT.PUSH);
+//				b.setText("Remove column");
+//				final TreeViewer v = new TreeViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
+//				v.getTree().setLinesVisible(true);
+//				v.getTree().setHeaderVisible(true);
+//				b.addSelectionListener(new SelectionListener() {
+//		
+//					@Override
+//					public void widgetDefaultSelected(SelectionEvent e) {
+//		
+//					}
+//		
+//					@Override
+//					public void widgetSelected(SelectionEvent e) {
+//						v.getTree().getColumn(1).dispose();
+//					}
+//		
+//				});
+//		
+//				TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(v, new FocusCellOwnerDrawHighlighter(v));
+//				ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
+//		
+//					@Override
+//					protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+//						return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+//							|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+//							|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+//							|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+//					}
+//				};
+//		
+//				int feature = ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
+//					| ColumnViewerEditor.KEYBOARD_ACTIVATION;
+//		
+//				TreeViewerEditor.create(v, focusCellManager, actSupport, feature);
+//				final TextCellEditor textCellEditor = new TextCellEditor(v.getTree());
+//		
+//				String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive"};
+//				String[] labelPrefix = { "", "", "","","","","" };
+//
+//				for (int i = 0; i < columLabels.length; i++) {
+//					TreeViewerColumn column = new TreeViewerColumn(v, SWT.NONE);
+//					column.getColumn().setWidth(200);
+//					column.getColumn().setMoveable(true);
+//					column.getColumn().setText(columLabels[i]);
+//					column.setLabelProvider(createColumnLabelProvider(labelPrefix[i]));
+//					column.setEditingSupport(createEditingSupportFor(v, textCellEditor));
+//				}
+//				v.setContentProvider(new MyContentProvider());
+//				v.setInput();
+//			}
+//
+//			private ColumnLabelProvider createColumnLabelProvider(final String prefix) {
+//				return new ColumnLabelProvider() {
+//		
+//					@Override
+//					public String getText(Object element) {
+//						return prefix + element.toString();
+//					}
+//		
+//				};
+//			}
+//		
+//			private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
+//				return new EditingSupport(viewer) {
+//		
+//					@Override
+//					protected boolean canEdit(Object element) {
+//						return false;
+//					}
+//		
+//					@Override
+//					protected CellEditor getCellEditor(Object element) {
+//						return textCellEditor;
+//					}
+//		
+//					@Override
+//					protected Object getValue(Object element) {
+//						return ((MyModel) element).counter + "";
+//					}
+//		
+//					@Override
+//					protected void setValue(Object element, Object value) {
+//						((MyModel) element).counter = Integer.parseInt(value.toString());
+//						viewer.update(element, null);
+//					}
+//				};
+//			}
+//		
+//			private MyModel createModel() {
+//				MyModel root = new MyModel(0, null);
+//				root.counter = 0;
+//		
+//				MyModel tmp;
+//				MyModel subItem;
+//				for (int i = 1; i < 10; i++) {
+//					tmp = new MyModel(i, root);
+//					root.child.add(tmp);
+//					for (int j = 1; j < i; j++) {
+//						subItem = new MyModel(j, tmp);
+//						subItem.child.add(new MyModel(j * 100, subItem));
+//						tmp.child.add(subItem);
+//					}
+//				}
+//				return root;
+//			}
+//		
+//			
+//		
+//			private class MyContentProvider implements ITreeContentProvider {
+//		
+//				@Override
+//				public Object[] getElements(Object inputElement) {
+//					return ((MyModel) inputElement).child.toArray();
+//				}
+//		
+//				@Override
+//		 	public void dispose() {}
+//		
+//				@Override
+//				public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+//		
+//				@Override
+//				public Object[] getChildren(Object parentElement) {
+//					return getElements(parentElement);
+//				}
+//		
+//				@Override
+//				public Object getParent(Object element) {
+//					if (element == null) {
+//						return null;
+//				}
+//					return ((MyModel) element).parent;
+//				}
+//		
+//				@Override
+//				public boolean hasChildren(Object element) {
+//					return ((MyModel) element).child.size() > 0;
+//				}
+//		
+//			}
+//		
+//			
+//		
+//			public class MyModel {
+//		
+//				public MyModel parent;
+//				public List<MyModel> child = new ArrayList<>();
+//				public int counter;
+//		
+//				public MyModel(int counter, MyModel parent) {
+//					this.parent = parent;
+//					this.counter = counter;
+//				}
+//		
+//				@Override
+//				public String toString() {
+//					String rv = "Item ";
+//					if (parent != null) {
+//						rv = parent.toString() + ".";
+//					}
+//					rv += counter;
+//		
+//					return rv;
+//				}
+//			}
+}
 
 
