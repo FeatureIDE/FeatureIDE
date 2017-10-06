@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.window.*;
@@ -29,8 +31,14 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
+
 import java.awt.Insets;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 import javax.annotation.PostConstruct;
@@ -38,7 +46,6 @@ import javax.swing.text.TableView;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -51,17 +58,23 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.graphics.Point;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
+import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -70,6 +83,8 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -80,10 +95,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * A simple editor to change description of a particular feature diagram.
@@ -92,18 +103,208 @@ import org.eclipse.swt.widgets.Shell;
 public class AddAttributeDialog extends Dialog  {
 	
 	private IFeatureModel featureModel;
+	private static final Color WHITE = new Color(null, 255, 255, 255);
+	private String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive"};
 	
 	public AddAttributeDialog(final Shell parentShell, IFeatureModel featureModel) {
 		super(parentShell);
-		featureModel = featureModel;
-		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
+		this.featureModel = featureModel;
 	}
-//				LinkedList<IFeature> featureList = new LinkedList<>();
-//				List<String> featureNameList = featureModel.getFeatureOrderList();
-//				for(int i = 0; i < featureNameList.size(); i++) {
-//					featureList.add(featureModel.getFeature(featureNameList.get(i)));
-//				}
+	
+	/**
+	 * Sets the minimal size and the text in the title of the dialog.
+	 *
+	 * @param newshell
+	 */
+	@Override
+	protected void configureShell(Shell newShell) {
+		newShell.setMinimumSize(new Point(500, 500));
+		super.configureShell(newShell);
+		newShell.setText(MANAGE_ATTRIBUTE);
+	}
 
+	@Override
+	protected Point getInitialSize() {
+		return new Point(1300, 1000);
+	}
+	
+	/**
+	 * Creates the general layout of the dialog.
+	 *
+	 * @param parent
+	 */
+	@Override
+	protected Control createDialogArea(Composite parent) {
+		final Composite container = (Composite) super.createDialogArea(parent);
+		container.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
+		final GridLayout gridLayout = (GridLayout) container.getLayout();
+		gridLayout.numColumns = 2;
+
+		GridData gridData = new GridData();
+		gridData.verticalAlignment = GridData.FILL_BOTH;
+		gridData.horizontalAlignment = GridData.FILL;
+		
+		final TreeViewer viewer = new TreeViewer(container);
+		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+		viewer.setContentProvider(new MyContentProvider());
+//		viewer.setLabelProvider(new FileTreeLabelProvider());
+		viewer.getTree().setHeaderVisible(true);
+		viewer.getTree().setLinesVisible(true);
+		
+		
+		for (int i = 0; i < columLabels.length; i++) {
+			TreeViewerColumn column = new TreeViewerColumn(viewer, SWT.NONE);
+			column.getColumn().setWidth(110);
+			column.getColumn().setMoveable(true);
+			column.getColumn().setText(columLabels[i]);
+			column.setLabelProvider(createColumnLabelProvider());
+		}
+		
+
+		final Label featureLabel = new Label(container, SWT.NONE);
+		featureLabel.setLayoutData(gridData);
+		featureLabel.setBackground(WHITE);
+		featureLabel.setText(featureModel.getFeature("HelloWorld").getName());
+		//System.out.println(featureModel.getFeature("HelloWorld").getName());
+		//
+		viewer.setInput(featureModel);
+
+    	return parent;
+	
+	}
+	
+	private ColumnLabelProvider createColumnLabelProvider() {
+		return new ColumnLabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				return  element.toString();
+			}
+
+		};
+	}
+	
+	private LinkedList<IFeature> getFeatureList(IFeatureModel featureModel){
+		LinkedList<IFeature> featureList = new LinkedList<>();
+		List<String> featureNameList = featureModel.getFeatureOrderList();
+		for(int i = 0; i < featureNameList.size(); i++) {
+			featureList.add(featureModel.getFeature(featureNameList.get(i)));
+		}
+		return featureList;
+	}
+	
+	
+	private class MyContentProvider implements ITreeContentProvider {
+		
+		@Override
+		public Object[] getElements(Object inputElement) {
+			IFeatureModel fm = (IFeatureModel) inputElement;
+			ArrayList<IFeature> feature = new ArrayList();
+			IFeature name = fm.getStructure().getRoot().getFeature();
+			feature.add(name);
+//			feature.add(fm.getFeature(name.get(3).toString()));
+//			for(String name : fm.getFeatureOrderList()) {
+//				feature.add(fm.getFeature(name));
+//			}
+		    if (fm.getNumberOfFeatures() == 0) {
+		    	return new Object[0];
+		    }       
+		    return feature.toArray();
+		}
+
+		@Override
+		public void dispose() {}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+
+		@Override
+		public Object[] getChildren(Object parentElement) {
+			if(hasChildren(parentElement)) {
+				IFeature f = (IFeature) parentElement;
+				ArrayList<IFeature> feature = new ArrayList();
+				for(int i = 0; i < f.getStructure().getChildrenCount(); i++) {
+					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
+					feature.add(cf);
+				}
+				return feature.toArray();
+			}
+			return null;
+		}
+
+		@Override
+		public Object getParent(Object element) {
+			if (element instanceof IFeature) {
+				return ((IFeature) element).getStructure().getParent().getFeature();
+		    }  
+			    return null;
+	    }
+
+		@Override
+		public boolean hasChildren(Object element) {
+			if (element instanceof IFeature) {
+		         IFeature f = (IFeature) element;
+		         return f.getStructure().hasChildren();
+		    }
+		    return false;
+		}
+	}
+		
+}
+	
+
+//		class FileTreeLabelProvider implements ILabelProvider {
+//		  private List listeners;
+//
+//		  private Image file;
+//
+//		  private Image dir;
+//
+//		  public FileTreeLabelProvider() {
+//		    listeners = new ArrayList();
+//
+//		    try {
+//		      file = new Image(null, new FileInputStream("images/file.gif"));
+//		      dir = new Image(null, new FileInputStream("images/directory.gif"));
+//		    } catch (FileNotFoundException e) {
+//		    }
+//		  }
+//
+//		  public Image getImage(Object arg0) {
+//		    return ((File) arg0).isDirectory() ? dir : file;
+//		  }
+//
+//		  public String getText(Object arg0) {
+//		    String text = ((File) arg0).getName();
+//
+//		    if (((File) arg0).getName().length() == 0) {
+//		      text = ((File) arg0).getPath();
+//		    }
+//		    return text;
+//		  }
+//
+//		  public void addListener(ILabelProviderListener arg0) {
+//		    listeners.add(arg0);
+//		  }
+//
+//		  public void dispose() {
+//		    // Dispose the images
+//		    if (dir != null)
+//		      dir.dispose();
+//		    if (file != null)
+//		      file.dispose();
+//		  }
+//
+//		  public boolean isLabelProperty(Object arg0, String arg1) {
+//		    return false;
+//		  }
+//
+//		  public void removeListener(ILabelProviderListener arg0) {
+//		    listeners.remove(arg0);
+//		  }
+
+	
+	
 //				Button b = new Button(shell, SWT.PUSH);
 //				b.setText("Remove column");
 //				final TreeViewer v = new TreeViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
@@ -270,6 +471,6 @@ public class AddAttributeDialog extends Dialog  {
 //					return rv;
 //				}
 //			}
-}
+
 
 

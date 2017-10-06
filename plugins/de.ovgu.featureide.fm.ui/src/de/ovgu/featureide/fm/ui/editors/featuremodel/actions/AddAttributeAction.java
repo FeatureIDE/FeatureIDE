@@ -59,6 +59,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -87,7 +88,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDelet
 public class AddAttributeAction extends Action  {
 	
 	private IFeatureModel featureModel;
-
+	
 	public AddAttributeAction(IFeatureModel featureMod) {
 		super(MANAGE_ATTRIBUTE);
 		this.featureModel = featureMod;
@@ -95,14 +96,6 @@ public class AddAttributeAction extends Action  {
 
 	@Override
 	public void run() {
-//		Shell shell = new Shell(Display.getCurrent());
-//		shell.setLayout(new FillLayout());
-//		new AddAttributeDialog(shell, featureModel);
-//		shell.open();
-//		
-//		while (!shell.isDisposed()) {
-//			if (!Display.getCurrent().readAndDispatch()) Display.getCurrent().sleep();
-//		}
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		final AddAttributeDialog addAttributeDialog = new AddAttributeDialog(shell, featureModel);
 		// inform ui to update
