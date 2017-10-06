@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -44,7 +45,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class TFeatureModelAnalyzer {
 
-	protected static File MODEL_FILE_FOLDER = getFolder();
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("analyzefeaturemodels/");
 
 	private static final FileFilter filter = new FileFilter() {
 
@@ -97,18 +98,6 @@ public class TFeatureModelAnalyzer {
 	private final IFeature FM8_F1 = FM_test_8.getFeature("B");
 	private final IFeature FM8_F2 = FM_test_8.getFeature("C");
 	private final HashMap<Object, Object> FM8_DATA = FM_test_8.getAnalyser().analyzeFeatureModel(null);
-
-	/**
-	 * @return
-	 */
-	private static File getFolder() {
-		File folderTeamcity = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
-		File folder = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
-		}
-		return folder;
-	}
 
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm = null;

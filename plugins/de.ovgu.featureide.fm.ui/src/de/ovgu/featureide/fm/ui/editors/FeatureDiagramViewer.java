@@ -151,8 +151,9 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	}
 
 	/**
-	 * Checks if the combined width including the spaces between features fits the editor's size. Based on the selected layout algorithm.
-	 *
+	 * Checks if the combined width including the spaces between features fits the editor's size.
+	 * Based on the selected layout algorithm.
+	 * 
 	 * @param list all features from a single level.
 	 * @return true if the level fits in the editor.
 	 */

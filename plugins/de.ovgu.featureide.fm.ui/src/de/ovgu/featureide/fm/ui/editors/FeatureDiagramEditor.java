@@ -92,11 +92,10 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -171,7 +170,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	private FeatureDiagramViewer viewer;
-	
+
 	private Label infoLabel;
 
 	private CalculateDependencyAction calculateDependencyAction;
@@ -239,7 +238,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
-	 *
+	 * 
 	 * @param featureModelEditor the FeatureModelEditor
 	 * @param container Composite which contains the feature model
 	 * @param fm The feature model
@@ -249,9 +248,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		super(fmManager);
 
 		graphicalFeatureModel = getGrapicalFeatureModel(getFeatureModel());
-		extraPath = AFileManager.constructExtraPath(fmManager.getPath(), format);
-		if (FileSystem.exists(extraPath)) {
-			SimpleFileHandler.load(extraPath, graphicalFeatureModel, format);
+
+		// 1. Check if the fmManager exists and is not a VirtualFileManager instance (path returns null)
+		// 2. read-only feature model is currently only a view on the editable feature model and not persistent
+		if (fmManager != null && fmManager.getPath() != null) {
+			extraPath = AFileManager.constructExtraPath(fmManager.getPath(), format);
+			FileHandler.load(extraPath, graphicalFeatureModel, format);
+			fmManager.addListener(this);
+		} else {
+			extraPath = null;
 		}
 
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
@@ -465,7 +470,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Sets the currently active explanation. Notifies the listeners of the change.
-	 *
+	 * 
 	 * @param activeExplanation the new active explanation
 	 */
 	public void setActiveExplanation(Explanation activeExplanation) {
@@ -477,11 +482,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Returns the currently active explanation.
-	 *
+	 * 
 	 * @return the currently active explanation.
 	 */
 	public Explanation getActiveExplanation() {
-		return activeExplanation;
+		return this.activeExplanation;
 	}
 
 	public void analyzeFeatureModel() {
@@ -705,7 +710,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			viewer.reload();
 			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			break;
 		case MANDATORY_CHANGED:
@@ -763,7 +768,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case MODEL_DATA_OVERRIDDEN:
 			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			Display.getDefault().syncExec(new Runnable() {
 
@@ -772,7 +777,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.deregisterEditParts();
 					graphicalFeatureModel.init();
 					if (extraPath != null) {
-						SimpleFileHandler.load(extraPath, graphicalFeatureModel, format);
+						FileHandler.load(extraPath, graphicalFeatureModel, format);
 					}
 
 					viewer.setContents(graphicalFeatureModel);
@@ -786,12 +791,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			viewer.deregisterEditParts();
 			graphicalFeatureModel.init();
 			if (extraPath != null) {
-				SimpleFileHandler.load(extraPath, graphicalFeatureModel, format);
+				FileHandler.load(extraPath, graphicalFeatureModel, format);
 			}
 			viewer.setContents(graphicalFeatureModel);
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
@@ -829,7 +834,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		case MODEL_LAYOUT_CHANGED:
 			viewer.reload();
 			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			break;
 		case REDRAW_DIAGRAM:
@@ -1029,8 +1034,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
-		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
-		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
+		handler.put(KeyStroke.getPressed((char) ('d' - 'a' + 1), 'd', SWT.CTRL), deleteAllAction);
+		handler.put(KeyStroke.getPressed((char) ('c' - 'a' + 1), 'c', SWT.CTRL), collapseAction);
 
 		handler.put(KeyStroke.getPressed(SWT.ARROW_UP, SWT.CTRL), moveUpAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL), moveRightAction);
@@ -1198,34 +1203,24 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (primaryElement instanceof FeatureEditPart) {
 			collapseAction.setEnabled(((FeatureEditPart) primaryElement).getModel().getObject().getStructure().hasChildren());
 		}
-
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
 		if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
-			final boolean connectionSelected = alternativeAction.isConnectionSelected();
+			boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
 				andAction.setText(AND);
-				if (connectionSelected) {
-					orAction.setText("Or (Double Click)");
-				} else {
-					orAction.setText(OR);
-				}
+				if (connectionSelected) orAction.setText("Or (Double Click)");
+				else orAction.setText(OR);
 				alternativeAction.setText(ALTERNATIVE);
 			} else if (orAction.isChecked()) {
 				andAction.setText(AND);
 				orAction.setText(OR);
-				if (connectionSelected) {
-					alternativeAction.setText("Alternative (Double Click)");
-				} else {
-					alternativeAction.setText(ALTERNATIVE);
-				}
+				if (connectionSelected) alternativeAction.setText("Alternative (Double Click)");
+				else alternativeAction.setText(ALTERNATIVE);
 			} else if (alternativeAction.isChecked()) {
-				if (connectionSelected) {
-					andAction.setText("And (Double Click)");
-				} else {
-					andAction.setText(AND);
-				}
+				if (connectionSelected) andAction.setText("And (Double Click)");
+				else andAction.setText(AND);
 				orAction.setText(OR);
 				alternativeAction.setText(ALTERNATIVE);
 			}
@@ -1251,7 +1246,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	public void doSave(IProgressMonitor monitor) {
 		if (isDirty()) {
 			if (extraPath != null) {
-				SimpleFileHandler.save(extraPath, graphicalFeatureModel, format);
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			super.doSave(monitor);
 		}
