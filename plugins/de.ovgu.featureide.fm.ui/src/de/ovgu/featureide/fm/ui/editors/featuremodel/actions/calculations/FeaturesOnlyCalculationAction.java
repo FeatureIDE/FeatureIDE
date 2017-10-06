@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeaturesOnlyCalculationAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.featuresonlycalculations";
+
 	private final IFeatureModel featureModel;
 
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
@@ -42,6 +44,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 		this.featureModel = featureModel;
 		setToolTipText("Test");
 		setChecked(featureModel.getAnalyser().calculateFeatures);
+		setId(ID);
 	}
 
 	@Override

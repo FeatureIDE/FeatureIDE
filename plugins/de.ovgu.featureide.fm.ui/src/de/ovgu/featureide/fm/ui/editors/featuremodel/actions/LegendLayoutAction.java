@@ -39,6 +39,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class LegendLayoutAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.legendlayout";
+
 	private final IGraphicalFeatureModel featureModel;
 
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
@@ -53,6 +55,7 @@ public class LegendLayoutAction extends Action {
 	public LegendLayoutAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
 		featureModel = featuremodel;
+		setId(ID);
 		setEnabled(false);
 		setChecked(true);
 		viewer.addSelectionChangedListener(listener);

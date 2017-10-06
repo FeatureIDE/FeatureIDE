@@ -59,10 +59,11 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		}
 	};
 
-	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname) {
+	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname, String id) {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
+		setId(id);
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		} else {

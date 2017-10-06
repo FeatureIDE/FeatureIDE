@@ -40,12 +40,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedCon
  */
 public class ShowCollapsedConstraintsAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.collapseconstraints";
+
 	private final IGraphicalFeatureModel featureModel;
 
 	public ShowCollapsedConstraintsAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_COLLAPSED_CONSTRAINTS);
 		this.featureModel = featureModel;
-
+		setId(ID);
 	}
 
 	@Override

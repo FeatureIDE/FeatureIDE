@@ -37,11 +37,14 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class RunManualCalculationsAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.runmanualcalculations";
+
 	private final IFeatureModel featureModel;
 
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
 		this.featureModel = featureModel;
+		setId(ID);
 	}
 
 	@Override

@@ -28,43 +28,42 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 
 /**
  * Basic class with some default methods for feature model editor pages.
  *
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
+	protected final IFileManager<IFeatureModel> fmManager;
+
 	private int index;
-
-	protected FeatureModelEditor featureModelEditor;
-
-	protected boolean dirty = false;
+	private boolean dirty;
 
 	protected IEditorInput input;
-
 	protected IEditorSite site;
 
-	/**
-	 * @param featureModelEditor the featureModelEditor to set
-	 */
-	@Override
-	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+	public FeatureModelEditorPage(IFileManager<IFeatureModel> fmManager) {
+		super();
+		this.fmManager = fmManager;
+	}
+
+	public IFeatureModel getFeatureModel() {
+		return fmManager.editObject();
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		dirty = false;
-		firePropertyChange(PROP_DIRTY);
+		setDirty(false);
 	}
 
 	@Override
-	public void doSaveAs() {
-
-	}
+	public void doSaveAs() {}
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -77,20 +76,21 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 		return dirty;
 	}
 
+	protected void setDirty(boolean dirty) {
+		this.dirty = dirty;
+		firePropertyChange(PROP_DIRTY);
+	}
+
 	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
-
-	}
+	public void createPartControl(Composite parent) {}
 
 	@Override
-	public void setFocus() {
-
-	}
+	public void setFocus() {}
 
 	@Override
 	public int getIndex() {
@@ -121,9 +121,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-
-	}
+	public void propertyChange(FeatureIDEEvent event) {}
 
 	@Override
 	public boolean allowPageChange(int newPage) {
@@ -131,12 +129,9 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void pageChangeFrom(int newPage) {
-
-	}
+	public void pageChangeFrom(int newPage) {}
 
 	@Override
-	public void pageChangeTo(int oldPage) {
+	public void pageChangeTo(int oldPage) {}
 
-	}
 }

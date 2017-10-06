@@ -73,6 +73,7 @@ public class DeleteAction extends Action {
 		super("Delete (Del)", deleteImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
+		setId(ID);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);

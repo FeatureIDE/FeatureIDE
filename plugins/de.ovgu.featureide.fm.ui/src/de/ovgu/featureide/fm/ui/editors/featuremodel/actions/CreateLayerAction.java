@@ -44,7 +44,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
-		super("Create Feature Below (Ins)", viewer);
+		super("Create Feature Below (Ins)", viewer, ID);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
 	}

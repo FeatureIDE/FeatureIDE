@@ -44,12 +44,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
  */
 public class AutoLayoutConstraintAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.autolayoutconstraint";
+
 	private final IGraphicalFeatureModel featureModel;
 	private final LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
 	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
+		setId(ID);
 	}
 
 	@Override

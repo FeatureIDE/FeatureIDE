@@ -26,6 +26,7 @@ import java.util.Map;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -35,7 +36,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -56,7 +56,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	private final IGraphicalFeatureModel featureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
-	private final FeatureDiagramEditor viewer;
+	private final ScrollingGraphicalViewer viewer;
 
 	private final ArrayList<String> featureList = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 	/**
 	 * alternativeKeyHandler handles the KeyEvents, if the GraphicalViewerKeyHandler is active for auto-layout
 	 */
-	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, IGraphicalFeatureModel featureModel) {
+	public FeatureDiagramEditorKeyHandler(ScrollingGraphicalViewer view, IGraphicalFeatureModel featureModel) {
 		super();
 
 		this.featureModel = featureModel;

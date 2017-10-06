@@ -39,6 +39,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -50,7 +51,6 @@ import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
@@ -62,7 +62,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
-	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor) {
+	public static boolean exportAs(IFeatureModel featureModel, ScrollingGraphicalViewer diagramEditor) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);

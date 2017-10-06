@@ -33,12 +33,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class ConstrainsCalculationsAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.constraintscalculations";
+
 	private final IFeatureModel featureModel;
 
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_CONSTRAINT_ERRORS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateConstraints);
+		setId(ID);
 	}
 
 	@Override

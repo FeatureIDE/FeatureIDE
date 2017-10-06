@@ -41,12 +41,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeatur
  */
 public class ShowHiddenFeaturesAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.showhiddenfeatures";
+
 	private final IGraphicalFeatureModel featureModel;
 
 	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_HIDDEN_FEATURES);
 		this.featureModel = featureModel;
-
+		setId(ID);
 	}
 
 	@Override

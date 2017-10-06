@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
@@ -27,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 
 /**
  * collapses/expand all features in the given feature model
@@ -39,17 +42,17 @@ public class CollapseAllAction extends Action {
 	public static final String ID = "de.ovgu.featureide.collapseall";
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private final boolean collapse;
 
-	public CollapseAllAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, boolean collapse, String title) {
-		super(title);
+	public CollapseAllAction(IGraphicalFeatureModel graphicalFeatureModel) {
+		super(COLLAPSE_ALL);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.collapse = collapse;
+		setId(ID);
+		setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE);
 	}
 
 	@Override
 	public void run() {
-		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, collapse);
+		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, true);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

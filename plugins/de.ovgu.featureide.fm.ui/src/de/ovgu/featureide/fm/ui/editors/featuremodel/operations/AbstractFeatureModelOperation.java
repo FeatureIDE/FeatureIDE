@@ -74,6 +74,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		try {
 			redo();
 		} catch (final Exception e) {
+			e.printStackTrace();
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
 		}

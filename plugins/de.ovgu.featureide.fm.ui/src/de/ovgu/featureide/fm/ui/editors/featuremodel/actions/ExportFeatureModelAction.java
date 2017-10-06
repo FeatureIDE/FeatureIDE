@@ -24,7 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
 
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
  *
@@ -35,16 +36,19 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  */
 public class ExportFeatureModelAction extends Action {
 
-	private final FeatureModelEditor featureModelEditor;
+	public static final String ID = "de.ovgu.featureide.exportfeaturemodel";
 
-	public ExportFeatureModelAction(FeatureModelEditor featureModelEditor) {
+	private final FeatureDiagramEditor featureModelEditor;
+
+	public ExportFeatureModelAction(FeatureDiagramEditor featureModelEditor) {
 		super(EXPORT_AS);
 		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
+		setId(ID);
 	}
 
 	@Override
 	public void run() {
-		featureModelEditor.doSaveAs();
+		GraphicsExporter.exportAs(featureModelEditor.getFeatureModel(), featureModelEditor.getViewer());
 	}
 }

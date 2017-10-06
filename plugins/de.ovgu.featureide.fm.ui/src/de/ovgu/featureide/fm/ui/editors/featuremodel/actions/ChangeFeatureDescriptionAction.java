@@ -35,9 +35,11 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
+	
+	public static final String ID = "de.ovgu.featureide.changefeaturedescription";
 
 	public ChangeFeatureDescriptionAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
-		super(CHANGE_DESCRIPTION, viewer);
+		super(CHANGE_DESCRIPTION, viewer, ID);
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class AlternativeAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public AlternativeAction(Object viewer, IFeatureModel featureModel) {
-		super(ALTERNATIVE, viewer);
+		super(ALTERNATIVE, viewer, ID);
 		this.featureModel = featureModel;
 	}
 
@@ -56,9 +56,7 @@ public class AlternativeAction extends SingleSelectionAction {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
-
 	}
 
 	@Override
