@@ -38,6 +38,8 @@ public abstract class LtmsConfigurationExplanationCreator<S, E extends Configura
 
 	@Override
 	protected Ltms createOracle() {
-		return new Ltms(getCnf());
+		final Ltms oracle = new Ltms();
+		oracle.addFormula(getCnf());
+		return oracle;
 	}
 }

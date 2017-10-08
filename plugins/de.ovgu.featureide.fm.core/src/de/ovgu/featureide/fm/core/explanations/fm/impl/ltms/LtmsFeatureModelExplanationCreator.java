@@ -38,6 +38,8 @@ public abstract class LtmsFeatureModelExplanationCreator<S, E extends FeatureMod
 
 	@Override
 	protected Ltms createOracle() {
-		return new Ltms(getCnf());
+		final Ltms oracle = new Ltms();
+		oracle.addFormula(getCnf());
+		return oracle;
 	}
 }

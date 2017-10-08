@@ -64,7 +64,7 @@ public class Ltms implements MusExtractor {
 	/**
 	 * Clauses mapped to the literals they contain.
 	 */
-	private final List<Set<Literal>> clauseLiterals;
+	private final List<Set<Literal>> clauseLiterals = new ArrayList<>();
 	/**
 	 * Variables mapped to the clauses they are contained in. Redundant map for the sake of performance.
 	 */
@@ -104,16 +104,6 @@ public class Ltms implements MusExtractor {
 	 * The amount of clauses added since the last push.
 	 */
 	private int scopeClauseCount;
-
-	/**
-	 * Constructs a new instance of this class.
-	 *
-	 * @param cnf the conjunctive normal form of the feature model
-	 */
-	public Ltms(Node cnf) {
-		this.clauseLiterals = new ArrayList<>(cnf.getChildren().length);
-		addFormula(cnf);
-	}
 
 	@Override
 	public void push() {

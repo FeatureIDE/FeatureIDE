@@ -37,6 +37,8 @@ public abstract class LtmsPreprocessorExplanationCreator<S, E extends Preprocess
 
 	@Override
 	protected Ltms createOracle() {
-		return new Ltms(getCnf());
+		final Ltms oracle = new Ltms();
+		oracle.addFormula(getCnf());
+		return oracle;
 	}
 }
