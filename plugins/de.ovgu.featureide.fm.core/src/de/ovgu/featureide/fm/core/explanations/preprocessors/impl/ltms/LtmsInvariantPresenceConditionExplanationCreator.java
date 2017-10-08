@@ -76,7 +76,7 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 	@Override
 	protected Ltms createOracle() {
 		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, getCnf());
+		Collections.addAll(clauses, getCnf().getChildren());
 		addedExpressions.clear();
 		boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 		for (Node expression : getExpressionStack()) {
