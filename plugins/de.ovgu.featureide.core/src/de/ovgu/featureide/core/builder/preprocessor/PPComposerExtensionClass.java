@@ -78,11 +78,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	public enum AnnotationStatus {
 		/** The annotation is satisfiable but not a tautology. */
-		SAT_NONE,
+		NORMAL,
 		/** The annotation is a contradiction. */
-		SAT_CONTRADICTION,
+		CONTRADICTION,
 		/** The annotation is a tautology. */
-		SAT_TAUTOLOGY,
+		TAUTOLOGY,
 	}
 
 	protected static final String MESSAGE_DEAD_CODE = "This annotation causes a dead code block.";
@@ -221,7 +221,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
-			return AnnotationStatus.SAT_NONE;
+			return AnnotationStatus.NORMAL;
 		}
 	}
 
@@ -235,7 +235,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
 		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
-			return AnnotationStatus.SAT_CONTRADICTION;
+			return AnnotationStatus.CONTRADICTION;
 		}
 
 		/*
@@ -243,10 +243,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
 		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
-			return AnnotationStatus.SAT_TAUTOLOGY;
+			return AnnotationStatus.TAUTOLOGY;
 		}
 
-		return AnnotationStatus.SAT_NONE;
+		return AnnotationStatus.NORMAL;
 	}
 
 	/**
@@ -257,11 +257,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res file path
 	 */
 	protected void setMarkersOnContradictionOrTautology(AnnotationStatus status, int lineNumber, IFile res) {
-		if ((status != AnnotationStatus.SAT_CONTRADICTION) && (status != AnnotationStatus.SAT_TAUTOLOGY)) {
+		if ((status != AnnotationStatus.CONTRADICTION) && (status != AnnotationStatus.TAUTOLOGY)) {
 			return;
 		}
-		String message = status == AnnotationStatus.SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
-		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == AnnotationStatus.SAT_TAUTOLOGY);
+		String message = status == AnnotationStatus.CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
+		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == AnnotationStatus.TAUTOLOGY);
 		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 			message += String.format("%n%s", explanation.getWriter().getString());
 		}
