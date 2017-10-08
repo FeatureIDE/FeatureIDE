@@ -49,6 +49,6 @@ public abstract class PreprocessorExplanationWriter<E extends PreprocessorExplan
 			return super.getConcreteReasonString(reason);
 		}
 		final Node expression = ((PreprocessorReason) reason).getSubject();
-		return String.format("%s is a parent expression.", expression.toString(getSymbols()));
+		return String.format("The expression is nested within a block annotated with %s.", expression.toString(getSymbols()));
 	}
 }
