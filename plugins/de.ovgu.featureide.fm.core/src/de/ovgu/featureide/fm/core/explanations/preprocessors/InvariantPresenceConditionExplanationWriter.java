@@ -40,7 +40,7 @@ public class InvariantPresenceConditionExplanationWriter extends PreprocessorExp
 
 	@Override
 	protected String getSubjectString() {
-		return String.format("expression %s", getExplanation().getSubject().toString(getSymbols()));
+		return String.format("presence condition of %s", getExplanation().getSubject().toString(getSymbols()));
 	}
 
 	@Override
