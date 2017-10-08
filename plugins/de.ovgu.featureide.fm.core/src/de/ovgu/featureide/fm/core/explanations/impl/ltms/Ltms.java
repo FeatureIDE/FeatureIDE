@@ -111,6 +111,9 @@ public class Ltms {
 	 * @return the amount of clauses added
 	 */
 	public int addFormula(Node cnf) {
+		if (!cnf.isClausalNormalForm()) {
+			cnf = cnf.toRegularCNF();
+		}
 		final Node[] clauses = cnf.getChildren();
 		for (int i = 0; i < clauses.length; i++) {
 			final Node clause = clauses[i];
