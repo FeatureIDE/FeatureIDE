@@ -43,7 +43,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 		implements InvariantPresenceConditionExplanationCreator {
 
 	/** Keeps track of the clause indexes of the expressions added to the solver. */
-	private final List<Node> addedExpressions = new ArrayList<>();
+	private final List<Node> expressionClauses = new ArrayList<>();
 	/** The amount of clauses added to the solver for the invariant expression. */
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
@@ -87,7 +87,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 		final InvariantPresenceConditionExplanation explanation;
 		oracle.push();
 		try {
-			addedExpressions.clear();
+			expressionClauses.clear();
 			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 			for (Node expression : getExpressionStack()) {
 				if (first && isTautology()) {
@@ -95,7 +95,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 				}
 				final int expressionClauseCount = oracle.addFormula(expression);
 				for (int i = 0; i < expressionClauseCount; i++) {
-					addedExpressions.add(expression);
+					expressionClauses.add(expression);
 				}
 				if (first) {
 					invariantExpressionClauseCount = expressionClauseCount;
@@ -116,7 +116,7 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 			if (expressionIndex < invariantExpressionClauseCount) {
 				return null; // Ignore clauses from the subject itself.
 			}
-			return new PreprocessorReason(addedExpressions.get(expressionIndex));
+			return new PreprocessorReason(expressionClauses.get(expressionIndex));
 		}
 		return super.getReason(clauseIndex);
 	}
