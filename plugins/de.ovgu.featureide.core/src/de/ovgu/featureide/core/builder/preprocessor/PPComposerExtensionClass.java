@@ -89,8 +89,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		TAUTOLOGY,
 	}
 
-	protected static final String MESSAGE_DEAD_CODE = "This annotation causes a dead code block.";
-	protected static final String MESSAGE_ALWAYS_TRUE = "This annotation is superfluous.";
+	protected static final String MESSAGE_DEAD = "This annotation causes a dead code block.";
+	protected static final String MESSAGE_SUPERFLUOUS = "This annotation is superfluous.";
+	protected static final String MESSAGE_CONTRADICTION = "This expression is a contradiction and causes a dead code block.";
+	protected static final String MESSAGE_TAUTOLOGY = "This expression is a tautology, making the annotation superfluous.";
 	protected static final String MESSAGE_ABSTRACT =
 		IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
@@ -280,12 +282,16 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		case NORMAL:
 			return;
 		case CONTRADICTION:
+			message = MESSAGE_CONTRADICTION;
+			break;
 		case DEAD:
-			message = MESSAGE_DEAD_CODE;
+			message = MESSAGE_DEAD;
 			break;
 		case TAUTOLOGY:
+			message = MESSAGE_TAUTOLOGY;
+			break;
 		case SUPERFLUOUS:
-			message = MESSAGE_ALWAYS_TRUE;
+			message = MESSAGE_SUPERFLUOUS;
 			break;
 		default:
 			throw new IllegalStateException("Unknown annotation status");
@@ -431,8 +437,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	private boolean isPreprocessorAnotationMarker(IMarker marker) throws CoreException {
 		final String message = marker.getAttribute(IMarker.MESSAGE, "");
-		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE)
-			|| message.contains(MESSAGE_NOT_DEFINED)) {
+		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_SUPERFLUOUS) || message.contains(MESSAGE_DEAD) || message.contains(MESSAGE_TAUTOLOGY)
+			|| message.contains(MESSAGE_CONTRADICTION) || message.contains(MESSAGE_NOT_DEFINED)) {
 			return true;
 		}
 		return false;
