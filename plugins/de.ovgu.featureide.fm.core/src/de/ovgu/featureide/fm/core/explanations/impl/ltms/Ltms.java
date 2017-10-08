@@ -194,6 +194,26 @@ public class Ltms {
 	}
 
 	/**
+	 * Removes the given variable from the premises.
+	 *
+	 * @param variable variable to remove
+	 */
+	public void removePremise(Object variable) {
+		premises.remove(variable);
+	}
+
+	/**
+	 * Removes the given variables from the premises.
+	 *
+	 * @param variables variables to remove
+	 */
+	public void removePremises(Collection<?> variables) {
+		for (final Object variable : variables) {
+			removePremise(variable);
+		}
+	}
+
+	/**
 	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values until
 	 * a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of which
 	 * might be shorter than others.
