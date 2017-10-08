@@ -701,10 +701,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelExplanation.setFont(DEFAULT_FONT);
-		labelExplanation.setSize(getSize().width, ROW_HEIGHT + 2);
+		labelExplanation.setSize(getSize().width, 2 * ROW_HEIGHT + 2);
 
 		labelExplanation.setLocation(new Point(x_SymbolStart, y_Entry));
-		y_Entry += ROW_HEIGHT + 5;
+		y_Entry += 2 * ROW_HEIGHT;
 
 		// Add Red to dark red Gradient
 		final TwoColorGradientLine redToBlack =
