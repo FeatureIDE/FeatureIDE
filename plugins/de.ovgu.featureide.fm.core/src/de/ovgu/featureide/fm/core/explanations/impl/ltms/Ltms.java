@@ -152,7 +152,7 @@ public class Ltms {
 	public void removeClause(int clause) {
 		for (final Literal literal : clauseLiterals.get(clause)) {
 			final Set<Integer> clauses = variableClauses.get(literal.var);
-			if (clauses.remove(literal.var) && clauses.isEmpty()) {
+			if (clauses.remove(clause) && clauses.isEmpty()) {
 				variableClauses.remove(literal.var);
 			}
 		}
