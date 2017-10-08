@@ -70,12 +70,21 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
-	/** The expression is satisfiable but not a tautology. */
-	static final int SAT_NONE = 0;
-	/** The expression is a contradiction. */
-	static final int SAT_CONTRADICTION = 1;
-	/** The expression is a tautology. */
-	static final int SAT_TAUTOLOGY = 2;
+	/**
+	 * The satisfiability status of the annotation.
+	 * 
+	 * @author Christoph Giesel
+	 * @author Timo G&uuml;nther
+	 */
+	public enum AnnotationStatus {
+		/** The annotation is satisfiable but not a tautology. */
+		SAT_NONE,
+		/** The annotation is a contradiction. */
+		SAT_CONTRADICTION,
+		/** The annotation is a tautology. */
+		SAT_TAUTOLOGY,
+	}
+
 	protected static final String MESSAGE_DEAD_CODE = "This annotation causes a dead code block.";
 	protected static final String MESSAGE_ALWAYS_TRUE = "This annotation is superfluous.";
 	protected static final String MESSAGE_ABSTRACT =
@@ -196,9 +205,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/**
 	 * Checks the expression on top of the expression stack for a contradiction or a tautology. Does not set any markers.
 	 *
-	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
+	 * @return the status of the annotation
 	 */
-	protected int isContradictionOrTautology() {
+	protected AnnotationStatus isContradictionOrTautology() {
 		final Node expression = expressionStack.peek();
 
 		Node nestedExpressions = null;
@@ -212,11 +221,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
-			return SAT_NONE;
+			return AnnotationStatus.SAT_NONE;
 		}
 	}
 
-	private int isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
 		Node context = featureModel;
 		if (nestedExpressions != null) {
 			context = new And(context, nestedExpressions);
@@ -226,7 +235,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
 		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
-			return SAT_CONTRADICTION;
+			return AnnotationStatus.SAT_CONTRADICTION;
 		}
 
 		/*
@@ -234,25 +243,25 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
 		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
-			return SAT_TAUTOLOGY;
+			return AnnotationStatus.SAT_TAUTOLOGY;
 		}
 
-		return SAT_NONE;
+		return AnnotationStatus.SAT_NONE;
 	}
 
 	/**
 	 * Set marker for tautology or contradiction on given line in given file.
 	 *
-	 * @param status expects {@link #SAT_CONTRADICTION} or {@link #SAT_TAUTOLOGY}.
+	 * @param status the status of the annotation
 	 * @param lineNumber number of line
 	 * @param res file path
 	 */
-	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
-		if ((status != SAT_CONTRADICTION) && (status != SAT_TAUTOLOGY)) {
+	protected void setMarkersOnContradictionOrTautology(AnnotationStatus status, int lineNumber, IFile res) {
+		if ((status != AnnotationStatus.SAT_CONTRADICTION) && (status != AnnotationStatus.SAT_TAUTOLOGY)) {
 			return;
 		}
-		String message = status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
-		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
+		String message = status == AnnotationStatus.SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
+		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == AnnotationStatus.SAT_TAUTOLOGY);
 		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 			message += String.format("%n%s", explanation.getWriter().getString());
 		}
@@ -284,7 +293,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	protected void checkContradictionOrTautology(int lineNumber, IFile res) {
 		findLiterals(expressionStack.peek());
-		final int status = isContradictionOrTautology();
+		final AnnotationStatus status = isContradictionOrTautology();
 		setMarkersOnContradictionOrTautology(status, lineNumber, res);
 	}
 
