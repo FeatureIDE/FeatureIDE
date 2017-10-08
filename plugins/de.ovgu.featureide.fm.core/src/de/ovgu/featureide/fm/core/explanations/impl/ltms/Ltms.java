@@ -33,11 +33,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.explain.solvers.MusExtractor;
 
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 
@@ -47,12 +50,16 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
  * </p>
  *
  * <p> Clauses are referenced by their index in the CNF. </p>
+ * 
+ * <p> Note that this implementation does not fulfill the entire contract of {@link MusExtractor}. Instances of this class never return instances of
+ * {@link Node}. Methods that do so will either return null or throw an exception. Additionally, {@link #push()} and {@link #pop()} only work for a single
+ * scope. {@link #pop()} also always clears the assumptions. </p>
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
  */
-public class Ltms {
+public class Ltms implements MusExtractor {
 
 	/**
 	 * Clauses mapped to the literals they contain.
@@ -93,6 +100,10 @@ public class Ltms {
 	 * The literal whose truth value was derived during the most recent propagation.
 	 */
 	private Literal derivedLiteral;
+	/**
+	 * The amount of clauses added since the last push.
+	 */
+	private int scopeClauseCount;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -104,17 +115,50 @@ public class Ltms {
 		addFormula(cnf);
 	}
 
-	/**
-	 * Adds the given formula in CNF to the LTMS.
-	 *
-	 * @param cnf formula in CNF
-	 * @return the amount of clauses added
-	 */
-	public int addFormula(Node cnf) {
-		if (!cnf.isClausalNormalForm()) {
-			cnf = cnf.toRegularCNF();
+	@Override
+	public void push() {
+		scopeClauseCount = 0;
+	}
+
+	@Override
+	public List<Node> pop() throws NoSuchElementException {
+		removeClauses(scopeClauseCount);
+		scopeClauseCount = 0;
+		premises.clear();
+		return null;
+	}
+
+	@Override
+	public Ltms getOracle() {
+		return this;
+	}
+
+	@Override
+	public boolean isSatisfiable() {
+		return !getAllMinimalUnsatisfiableSubsets().isEmpty();
+	}
+
+	@Override
+	public Map<Object, Boolean> getModel() throws IllegalStateException {
+		return variableValues;
+	}
+
+	@Override
+	public int addFormulas(Node... formulas) {
+		return addFormula(new And(formulas));
+	}
+
+	@Override
+	public int addFormulas(Collection<? extends Node> formulas) {
+		return addFormulas(formulas.toArray(new Node[formulas.size()]));
+	}
+
+	@Override
+	public int addFormula(Node formula) {
+		if (!formula.isClausalNormalForm()) {
+			formula = formula.toRegularCNF();
 		}
-		final Node[] clauses = cnf.getChildren();
+		final Node[] clauses = formula.getChildren();
 		for (int i = 0; i < clauses.length; i++) {
 			final Node clause = clauses[i];
 			final Node[] literals = clause.getChildren();
@@ -129,103 +173,86 @@ public class Ltms {
 					clauseSet = new HashSet<>();
 					variableClauses.put(literal.var, clauseSet);
 				}
-				clauseSet.add(clauseLiterals.size());
+				clauseSet.add(getClauseCount());
+				scopeClauseCount++;
 			}
 			clauseLiterals.add(literalSet);
 		}
 		return clauses.length;
 	}
 
-	/**
-	 * Removes the given amount of clauses from the end of this LTMS.
-	 *
-	 * @param clauses amount of clauses to remove
-	 */
-	public void removeClauses(int clauses) {
-		while (clauses-- > 0) {
-			removeClause(clauseLiterals.size() - 1);
-		}
+	@Override
+	public List<Node> getClauses() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Removes the given clause from this LTMS.
-	 *
-	 * @param clause clause to remove
-	 */
-	public void removeClause(int clause) {
-		for (final Literal literal : clauseLiterals.get(clause)) {
-			final Set<Integer> clauses = variableClauses.get(literal.var);
-			if (clauses.remove(clause) && clauses.isEmpty()) {
-				variableClauses.remove(literal.var);
-			}
-		}
-		clauseLiterals.remove(clause);
+	@Override
+	public Node getClause(int index) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Sets the premises to the given ones.
-	 *
-	 * @param premises premises to set
-	 */
-	public void setPremises(Map<Object, Boolean> premises) {
-		clearPremises();
-		addPremises(premises);
+	@Override
+	public int getClauseCount() {
+		return clauseLiterals.size();
 	}
 
-	/**
-	 * Removes all premises.
-	 */
-	public void clearPremises() {
-		premises.clear();
+	@Override
+	public boolean containsClause(Node clause) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Adds the given variable as a premise with the given truth value. This premise is used later to arrive at the contradiction.
-	 *
-	 * @param variable variable to be added as a premise
-	 * @param value truth value of the variable
-	 */
-	public void addPremise(Object variable, boolean value) {
-		premises.put(variable, value);
-	}
-
-	/**
-	 * Adds all the given premises.
-	 *
-	 * @param premises premises to add
-	 */
-	public void addPremises(Map<Object, Boolean> premises) {
+	@Override
+	public void addAssumptions(Map<Object, Boolean> assumptions) {
 		this.premises.putAll(premises);
 	}
 
-	/**
-	 * Removes the given variable from the premises.
-	 *
-	 * @param variable variable to remove
-	 */
-	public void removePremise(Object variable) {
-		premises.remove(variable);
+	@Override
+	public void addAssumption(Object variable, boolean value) {
+		premises.put(variable, value);
 	}
 
-	/**
-	 * Removes the given variables from the premises.
-	 *
-	 * @param variables variables to remove
-	 */
-	public void removePremises(Collection<?> variables) {
-		for (final Object variable : variables) {
-			removePremise(variable);
+	@Override
+	public Map<Object, Boolean> getAssumptions() {
+		return premises;
+	}
+
+	@Override
+	public Boolean getAssumption(Object variable) {
+		return premises.get(variable);
+	}
+
+	@Override
+	public Set<Node> getMinimalUnsatisfiableSubset() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		Set<Integer> smallest = null;
+		for (final Set<Integer> mus : getAllMinimalUnsatisfiableSubsetIndexes()) {
+			if (smallest == null) {
+				smallest = mus;
+			} else if (mus.size() < smallest.size()) {
+				smallest = mus;
+			}
 		}
+		return smallest;
+	}
+
+	@Override
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values until
-	 * a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of which
-	 * might be shorter than others.
-	 *
-	 * @return multiple explanations why the premises lead to a contradiction in the conjunctive normal form
+	 * {@inheritDoc}
+	 * 
+	 * <p> Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values
+	 * until a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of
+	 * which might be shorter than others. </p>
 	 */
-	public List<Set<Integer>> getExplanations() {
+	@Override
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		reset();
 		final List<Set<Integer>> explanations = new LinkedList<>();
 		if (isContradicted()) { // If the initial truth values already lead to a contradiction...
@@ -252,6 +279,32 @@ public class Ltms {
 			}
 		}
 		return explanations;
+	}
+
+	/**
+	 * Removes the given amount of clauses from the end of this LTMS.
+	 *
+	 * @param clauses amount of clauses to remove
+	 */
+	private void removeClauses(int clauses) {
+		while (clauses-- > 0) {
+			removeClause(getClauseCount() - 1);
+		}
+	}
+
+	/**
+	 * Removes the given clause from this LTMS.
+	 *
+	 * @param clause clause to remove
+	 */
+	private void removeClause(int clause) {
+		for (final Literal literal : clauseLiterals.get(clause)) {
+			final Set<Integer> clauses = variableClauses.get(literal.var);
+			if (clauses.remove(clause) && clauses.isEmpty()) {
+				variableClauses.remove(literal.var);
+			}
+		}
+		clauseLiterals.remove(clause);
 	}
 
 	/**
@@ -344,7 +397,7 @@ public class Ltms {
 	 */
 	private Collection<Integer> getDirtyClauses() {
 		if (derivedLiteral == null) {
-			final int size = clauseLiterals.size();
+			final int size = getClauseCount();
 			return new AbstractList<Integer>() {
 
 				@Override

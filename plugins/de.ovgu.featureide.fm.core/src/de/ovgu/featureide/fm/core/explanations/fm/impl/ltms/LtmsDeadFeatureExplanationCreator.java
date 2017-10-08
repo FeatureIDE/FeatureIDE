@@ -42,10 +42,14 @@ public class LtmsDeadFeatureExplanationCreator extends LtmsFeatureModelExplanati
 	 */
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getOracle();
-		ltms.clearPremises();
-		ltms.addPremise(NodeCreator.getVariable(getSubject()), true);
-		return getExplanation(ltms.getExplanations());
+		final Ltms oracle = getOracle();
+		oracle.push();
+		try {
+			oracle.addAssumption(NodeCreator.getVariable(getSubject()), true);
+			return getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
+		} finally {
+			oracle.pop();
+		}
 	}
 
 	@Override

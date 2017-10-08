@@ -50,7 +50,7 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
 		final Ltms oracle = getOracle();
 		final AutomaticSelectionExplanation explanation;
-		oracle.clearPremises();
+		oracle.push();
 		try {
 			selectedFeatures.clear();
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
@@ -69,7 +69,7 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 					default:
 						throw new IllegalStateException("Unknown feature selection state");
 					}
-					oracle.addPremise(var, value); // Assumptions do not show up in the explanation.
+					oracle.addAssumption(var, value); // Assumptions do not show up in the explanation.
 				} else {
 					switch (featureSelection.getManual()) {
 					case SELECTED:
@@ -87,9 +87,9 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 					selectedFeatures.add(featureSelection);
 				}
 			}
-			explanation = getExplanation(oracle.getExplanations());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
-			oracle.removeClauses(selectedFeatures.size());
+			oracle.pop();
 		}
 		return explanation;
 	}

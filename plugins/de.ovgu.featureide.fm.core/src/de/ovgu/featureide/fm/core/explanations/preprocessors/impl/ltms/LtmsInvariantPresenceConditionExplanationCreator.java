@@ -74,6 +74,7 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException {
 		final Ltms oracle = getOracle();
 		final InvariantPresenceConditionExplanation explanation;
+		oracle.push();
 		try {
 			expressionClauses.clear();
 			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
@@ -90,9 +91,9 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 				}
 				first = false;
 			}
-			explanation = getExplanation(oracle.getExplanations());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
-			oracle.removeClauses(expressionClauses.size());
+			oracle.pop();
 		}
 		return explanation;
 	}

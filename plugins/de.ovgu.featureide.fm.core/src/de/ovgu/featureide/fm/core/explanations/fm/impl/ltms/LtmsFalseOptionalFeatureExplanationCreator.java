@@ -44,11 +44,15 @@ public class LtmsFalseOptionalFeatureExplanationCreator extends LtmsFeatureModel
 	 */
 	@Override
 	public FalseOptionalFeatureExplanation getExplanation() throws IllegalStateException {
-		final Ltms ltms = getOracle();
-		ltms.clearPremises();
-		ltms.addPremise(NodeCreator.getVariable(getSubject()), false);
-		ltms.addPremise(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
-		return getExplanation(ltms.getExplanations());
+		final Ltms oracle = getOracle();
+		oracle.push();
+		try {
+			oracle.addAssumption(NodeCreator.getVariable(getSubject()), false);
+			oracle.addAssumption(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
+			return getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
+		} finally {
+			oracle.pop();
+		}
 	}
 
 	@Override

@@ -79,6 +79,7 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
 		final RedundantConstraintExplanation explanation;
 		final Ltms oracle = getOracle();
+		oracle.push();
 		int constraintClauseCount = 0;
 		try {
 			// Add each constraint but the redundant one.
@@ -94,9 +95,9 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 			constraintClauseCount += redundantConstraintClauseCount;
 
 			// Get the explanation.
-			explanation = getExplanation(oracle.getExplanations());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
-			getOracle().removeClauses(constraintClauseCount);
+			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);
 		}
 		return explanation;
