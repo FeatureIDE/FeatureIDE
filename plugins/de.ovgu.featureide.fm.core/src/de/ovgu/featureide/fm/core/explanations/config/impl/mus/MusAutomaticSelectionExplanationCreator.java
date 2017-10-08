@@ -43,6 +43,11 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 		implements AutomaticSelectionExplanationCreator {
 
 	/**
+	 * The features that have been added to the oracle. Stored for performance reasons.
+	 */
+	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
+
+	/**
 	 * Constructs a new instance of this class.
 	 */
 	public MusAutomaticSelectionExplanationCreator() {
@@ -57,11 +62,6 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	public MusAutomaticSelectionExplanationCreator(SatSolverFactory solverFactory) {
 		super(solverFactory);
 	}
-
-	/**
-	 * The features that have been added to the oracle. Stored for performance reasons.
-	 */
-	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
