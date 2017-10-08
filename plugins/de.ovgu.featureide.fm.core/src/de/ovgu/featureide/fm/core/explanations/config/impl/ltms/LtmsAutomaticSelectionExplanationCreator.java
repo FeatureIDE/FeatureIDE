@@ -59,7 +59,7 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	@Override
 	protected Ltms createOracle() {
 		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, super.createCnf().getChildren());
+		Collections.addAll(clauses, getCnf().getChildren());
 		selectedFeatures.clear();
 		for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
 			final Object var = NodeCreator.getVariable(featureSelection.getFeature());
