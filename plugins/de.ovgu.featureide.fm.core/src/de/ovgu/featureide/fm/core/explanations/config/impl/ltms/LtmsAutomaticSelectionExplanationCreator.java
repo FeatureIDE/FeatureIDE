@@ -20,14 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -51,61 +47,51 @@ public class LtmsAutomaticSelectionExplanationCreator extends LtmsConfigurationE
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
 	@Override
-	public void setSubject(SelectableFeature subject) {
-		super.setSubject(subject);
-		setOracle(null);
-	}
-
-	@Override
-	protected Ltms createOracle() {
-		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, getCnf().getChildren());
-		selectedFeatures.clear();
-		for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
-			final Object var = NodeCreator.getVariable(featureSelection.getFeature());
-			final boolean value;
-			if (featureSelection == getSubject()) {
-				continue;
-			} else {
-				switch (featureSelection.getManual()) {
-				case SELECTED:
-					value = true;
-					break;
-				case UNSELECTED:
-					value = false;
-					break;
-				case UNDEFINED:
-					continue;
-				default:
-					throw new IllegalStateException("Unknown feature selection state");
-				}
-				clauses.add(new Or(new Literal(var, value)));
-				selectedFeatures.add(featureSelection);
-			}
-		}
-		final Node cnf = new And(clauses.toArray(new Node[clauses.size()]));
-		return new Ltms(cnf);
-	}
-
-	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
 		final Ltms oracle = getOracle();
-		final Object var = NodeCreator.getVariable(getSubject().getFeature());
-		final boolean value;
-		switch (getSubject().getAutomatic()) {
-		case SELECTED:
-			value = false;
-			break;
-		case UNSELECTED:
-			value = true;
-			break;
-		case UNDEFINED:
-			throw new IllegalStateException("Feature not automatically selected or unselected");
-		default:
-			throw new IllegalStateException("Unknown feature selection state");
+		final AutomaticSelectionExplanation explanation;
+		oracle.clearPremises();
+		try {
+			selectedFeatures.clear();
+			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
+				final Object var = NodeCreator.getVariable(featureSelection.getFeature());
+				final boolean value;
+				if (featureSelection == getSubject()) {
+					switch (featureSelection.getAutomatic()) {
+					case SELECTED:
+						value = false;
+						break;
+					case UNSELECTED:
+						value = true;
+						break;
+					case UNDEFINED:
+						throw new IllegalStateException("Feature not automatically selected or unselected");
+					default:
+						throw new IllegalStateException("Unknown feature selection state");
+					}
+					oracle.addPremise(var, value); // Assumptions do not show up in the explanation.
+				} else {
+					switch (featureSelection.getManual()) {
+					case SELECTED:
+						value = true;
+						break;
+					case UNSELECTED:
+						value = false;
+						break;
+					case UNDEFINED:
+						continue;
+					default:
+						throw new IllegalStateException("Unknown feature selection state");
+					}
+					oracle.addFormula(new Literal(var, value));
+					selectedFeatures.add(featureSelection);
+				}
+			}
+			explanation = getExplanation(oracle.getExplanations());
+		} finally {
+			oracle.removeClauses(selectedFeatures.size());
 		}
-		oracle.addPremise(var, value); // Assumptions do not show up in the explanation.
-		return getExplanation(getOracle().getExplanations());
+		return explanation;
 	}
 
 	@Override

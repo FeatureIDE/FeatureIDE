@@ -20,17 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.prop4j.And;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
@@ -43,19 +38,8 @@ import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
  */
 public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation> implements RedundantConstraintExplanationCreator {
 
-	/** The CNF with all constraints but the redundant one. */
-	private Node cnfWithoutRedundantConstraint;
-	/** The amount of clauses added to the CNF that originate from a constraint. */
-	private int constraintClauseCount = 0;
-
-	@Override
-	public void setSubject(IConstraint subject) throws IllegalArgumentException {
-		super.setSubject(subject);
-		setOracle(null);
-		cnfWithoutRedundantConstraint = null;
-		getTraceModel().removeTraces(constraintClauseCount);
-		constraintClauseCount = 0;
-	}
+	/** The amount of clauses added to the oracle to account for the redundant constraint. */
+	private int redundantConstraintClauseCount;
 
 	/**
 	 * {@inheritDoc}
@@ -70,32 +54,17 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 		return nc;
 	}
 
-	protected Node getCnfWithoutRedundantConstraint() {
-		if (cnfWithoutRedundantConstraint == null) {
-			cnfWithoutRedundantConstraint = createCnfWithoutRedundantConstraint();
-		}
-		return cnfWithoutRedundantConstraint;
-	}
-
-	protected Node createCnfWithoutRedundantConstraint() {
-		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, getCnf().getChildren());
+	/**
+	 * Adds the given constraint to the oracle.
+	 *
+	 * @param constraint constraint to add
+	 * @param negated whether the constraint should be negated before being added
+	 * @return amount of clauses added
+	 */
+	private int addConstraint(IConstraint constraint, boolean negated) {
 		final AdvancedNodeCreator nc = getNodeCreator();
-		for (final IConstraint constraint : getFeatureModel().getConstraints()) {
-			if (constraint == getSubject()) {
-				continue;
-			}
-			final Node constraintNode = nc.createConstraintNode(constraint);
-			final Node[] constraintClauses = constraintNode.getChildren();
-			constraintClauseCount += constraintClauses.length;
-			Collections.addAll(clauses, constraintClauses);
-		}
-		return new And(clauses.toArray(new Node[clauses.size()]));
-	}
-
-	@Override
-	protected Ltms createOracle() {
-		return new Ltms(getCnfWithoutRedundantConstraint());
+		final Node constraintNode = nc.createConstraintNode(constraint, negated);
+		return getOracle().addFormula(constraintNode);
 	}
 
 	/**
@@ -108,25 +77,41 @@ public class LtmsRedundantConstraintExplanationCreator extends LtmsFeatureModelE
 	 */
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
-		final RedundantConstraintExplanation cumulatedExplanation = getConcreteExplanation();
-		cumulatedExplanation.setExplanationCount(0);
-		final Ltms ltms = getOracle();
-		for (final Map<Object, Boolean> assignment : getSubject().getNode().getContradictingAssignments()) {
-			ltms.setPremises(assignment);
-			final RedundantConstraintExplanation explanation = getExplanation(ltms.getExplanations());
-			if (explanation == null) {
-				continue;
+		final RedundantConstraintExplanation explanation;
+		final Ltms oracle = getOracle();
+		int constraintClauseCount = 0;
+		try {
+			// Add each constraint but the redundant one.
+			for (final IConstraint constraint : getFeatureModel().getConstraints()) {
+				if (constraint == getSubject()) {
+					continue;
+				}
+				constraintClauseCount += addConstraint(constraint, true);
 			}
-			cumulatedExplanation.addExplanation(explanation);
+
+			// Add the negated redundant constraint.
+			redundantConstraintClauseCount = addConstraint(getSubject(), false);
+			constraintClauseCount += redundantConstraintClauseCount;
+
+			// Get the explanation.
+			explanation = getExplanation(oracle.getExplanations());
+		} finally {
+			getOracle().removeClauses(constraintClauseCount);
+			getTraceModel().removeTraces(constraintClauseCount);
 		}
-		if (cumulatedExplanation.getExplanationCount() == 0) {
-			return null;
-		}
-		return cumulatedExplanation;
+		return explanation;
 	}
 
 	@Override
 	protected RedundantConstraintExplanation getConcreteExplanation() {
 		return new RedundantConstraintExplanation(getSubject());
+	}
+
+	@Override
+	protected Reason<?> getReason(int clauseIndex) {
+		if (clauseIndex >= (getTraceModel().getTraceCount() - redundantConstraintClauseCount)) {
+			return null; // Ignore the redundant constraint clauses.
+		}
+		return super.getReason(clauseIndex);
 	}
 }

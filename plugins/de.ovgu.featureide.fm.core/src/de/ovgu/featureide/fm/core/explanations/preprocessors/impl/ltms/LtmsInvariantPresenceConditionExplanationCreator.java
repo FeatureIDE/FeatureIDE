@@ -22,11 +22,8 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
 
@@ -45,7 +42,7 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 		implements InvariantPresenceConditionExplanationCreator {
 
 	/** Keeps track of the clause indexes of the expressions added to the solver. */
-	private final List<Node> addedExpressions = new ArrayList<>();
+	private final List<Node> expressionClauses = new ArrayList<>();
 	/** The amount of clauses added to the solver for the invariant expression. */
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
@@ -74,33 +71,30 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 	}
 
 	@Override
-	protected Ltms createOracle() {
-		final List<Node> clauses = new LinkedList<>();
-		Collections.addAll(clauses, getCnf().getChildren());
-		addedExpressions.clear();
-		boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
-		for (Node expression : getExpressionStack()) {
-			if (first && isTautology()) {
-				expression = new Not(expression);
-			}
-			final Node[] expressionClauses = expression.toRegularCNF().getChildren();
-			final int expressionClauseCount = expressionClauses.length;
-			Collections.addAll(clauses, expressionClauses);
-			for (int i = 0; i < expressionClauseCount; i++) {
-				addedExpressions.add(expression);
-			}
-			if (first) {
-				invariantExpressionClauseCount = expressionClauseCount;
-			}
-			first = false;
-		}
-		final Node cnf = new And(clauses.toArray(new Node[clauses.size()]));
-		return new Ltms(cnf);
-	}
-
-	@Override
 	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException {
-		return getExplanation(getOracle().getExplanations());
+		final Ltms oracle = getOracle();
+		final InvariantPresenceConditionExplanation explanation;
+		try {
+			expressionClauses.clear();
+			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
+			for (Node expression : getExpressionStack()) {
+				if (first && isTautology()) {
+					expression = new Not(expression);
+				}
+				final int expressionClauseCount = oracle.addFormula(expression);
+				for (int i = 0; i < expressionClauseCount; i++) {
+					expressionClauses.add(expression);
+				}
+				if (first) {
+					invariantExpressionClauseCount = expressionClauseCount;
+				}
+				first = false;
+			}
+			explanation = getExplanation(oracle.getExplanations());
+		} finally {
+			oracle.removeClauses(expressionClauses.size());
+		}
+		return explanation;
 	}
 
 	@Override
@@ -110,7 +104,7 @@ public class LtmsInvariantPresenceConditionExplanationCreator extends LtmsPrepro
 			if (expressionIndex < invariantExpressionClauseCount) {
 				return null; // Ignore clauses from the subject itself.
 			}
-			return new PreprocessorReason(addedExpressions.get(expressionIndex));
+			return new PreprocessorReason(expressionClauses.get(expressionIndex));
 		}
 		return super.getReason(clauseIndex);
 	}
