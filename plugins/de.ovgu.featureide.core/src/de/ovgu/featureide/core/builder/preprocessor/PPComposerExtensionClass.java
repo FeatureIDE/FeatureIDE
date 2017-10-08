@@ -71,17 +71,21 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
-	 * The satisfiability status of the annotation.
+	 * The satisfiability status of an annotation.
 	 * 
 	 * @author Christoph Giesel
 	 * @author Timo G&uuml;nther
 	 */
 	public enum AnnotationStatus {
-		/** The annotation is satisfiable but not a tautology. */
+		/** The presence condition is satisfiable but not a tautology. */
 		NORMAL,
-		/** The annotation is a contradiction. */
+		/** The presence condition is a contradiction, causing a dead code block. */
+		DEAD,
+		/** The presence condition is a tautology, making the annotation superfluous. */
+		SUPERFLUOUS,
+		/** The expression in and of itself is a contradiction, causing a dead code block. */
 		CONTRADICTION,
-		/** The annotation is a tautology. */
+		/** The expression in and of itself is a tautology, making the annotation superfluous. */
 		TAUTOLOGY,
 	}
 
@@ -226,6 +230,20 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+		/*
+		 * -SAT(expression)
+		 */
+		if (!new SatSolver(expression, 1000).isSatisfiable()) {
+			return AnnotationStatus.CONTRADICTION;
+		}
+
+		/*
+		 * -SAT(-expression)
+		 */
+		if (!new SatSolver(new Not(expression), 1000).isSatisfiable()) {
+			return AnnotationStatus.TAUTOLOGY;
+		}
+
 		Node context = featureModel;
 		if (nestedExpressions != null) {
 			context = new And(context, nestedExpressions);
@@ -235,7 +253,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
 		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
-			return AnnotationStatus.CONTRADICTION;
+			return AnnotationStatus.DEAD;
 		}
 
 		/*
@@ -243,7 +261,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
 		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
-			return AnnotationStatus.TAUTOLOGY;
+			return AnnotationStatus.SUPERFLUOUS;
 		}
 
 		return AnnotationStatus.NORMAL;
@@ -257,14 +275,37 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res file path
 	 */
 	protected void setMarkersOnContradictionOrTautology(AnnotationStatus status, int lineNumber, IFile res) {
-		if ((status != AnnotationStatus.CONTRADICTION) && (status != AnnotationStatus.TAUTOLOGY)) {
+		String message;
+		switch (status) {
+		case NORMAL:
 			return;
+		case CONTRADICTION:
+		case DEAD:
+			message = MESSAGE_DEAD_CODE;
+			break;
+		case TAUTOLOGY:
+		case SUPERFLUOUS:
+			message = MESSAGE_ALWAYS_TRUE;
+			break;
+		default:
+			throw new IllegalStateException("Unknown annotation status");
 		}
-		String message = status == AnnotationStatus.CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
-		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == AnnotationStatus.TAUTOLOGY);
-		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-			message += String.format("%n%s", explanation.getWriter().getString());
+
+		boolean positive = false;
+		switch (status) {
+		case SUPERFLUOUS:
+			positive = true;
+		case DEAD:
+			final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(positive);
+			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
+				message += System.lineSeparator();
+				message += explanation.getWriter().getString();
+			}
+			break;
+		default:
+			break;
 		}
+
 		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
 	}
 
