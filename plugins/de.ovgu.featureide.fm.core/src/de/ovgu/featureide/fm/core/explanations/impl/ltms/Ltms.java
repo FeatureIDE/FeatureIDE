@@ -20,10 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.ltms;
 
-import java.util.Arrays;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,6 +46,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
  * for managing logical implications. BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
  * </p>
  *
+ * <p> Clauses are referenced by their index in the CNF. </p>
+ *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
@@ -50,44 +55,40 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
 public class Ltms {
 
 	/**
-	 * A feature model transformed into a propositional formula in conjunctive normal form for easier reasoning.
+	 * Clauses mapped to the literals they contain.
 	 */
-	private final Node cnf;
-	/**
-	 * Nodes mapped to the literals they contain. Redundant map for the sake of performance.
-	 */
-	private final Map<Node, Set<Literal>> clauseLiterals = new LinkedHashMap<>();
+	private final List<Set<Literal>> clauseLiterals;
 	/**
 	 * Variables mapped to the clauses they are contained in. Redundant map for the sake of performance.
 	 */
-	private final Map<Object, Set<Node>> variableClauses = new LinkedHashMap<>();
+	private final Map<Object, Set<Integer>> variableClauses = new HashMap<>();
 	/**
 	 * The truth value assignments that are initially set and not derived.
 	 */
-	private final Map<Object, Boolean> premises = new LinkedHashMap<>();
+	private final Map<Object, Boolean> premises = new HashMap<>();
 	/**
 	 * The truth value assignments of the variables. If the truth value is true, all positive literals containing the variable evaluate to true and negated ones
 	 * to false. If the truth value is false, all positive literals containing the variable evaluate to false and negated ones to true. If the variable is not
 	 * contained in this map, its truth value is considered unknown.
 	 */
-	private final Map<Object, Boolean> variableValues = new LinkedHashMap<>();
+	private final Map<Object, Boolean> variableValues = new HashMap<>();
 	/**
-	 * The reason for a derived truth value, represented by a node (which is clause in CNF). The literals of this clause are the antecedents of the variable.
-	 * The antecedents are the literals whose values were referenced when deriving a new truth value.
+	 * The reason for a derived truth value, represented by a clause. The literals of this clause are the antecedents of the variable. The antecedents are the
+	 * literals whose values were referenced when deriving a new truth value.
 	 */
-	private final Map<Object, Node> reasons = new LinkedHashMap<>();
+	private final Map<Object, Integer> reasons = new HashMap<>();
 	/**
 	 * The stack to collect unit-open clauses.
 	 */
-	private final Deque<Node> unitOpenClauses = new LinkedList<>();
+	private final Deque<Integer> unitOpenClauses = new LinkedList<>();
 	/**
 	 * The clause that was violated during the most recent contradiction check.
 	 */
-	private Node violatedClause;
+	private Integer violatedClause;
 	/**
 	 * The clause containing the derived literal.
 	 */
-	private Node derivedClause;
+	private Integer derivedClause;
 	/**
 	 * The literal whose truth value was derived during the most recent propagation.
 	 */
@@ -99,33 +100,34 @@ public class Ltms {
 	 * @param cnf the conjunctive normal form of the feature model
 	 */
 	public Ltms(Node cnf) {
-		this.cnf = cnf;
-		setClauseLiterals();
-		setVariableClauses();
+		this.clauseLiterals = new ArrayList<>(cnf.getChildren().length);
+		addFormula(cnf);
 	}
 
 	/**
-	 * Sets the map from CNF clauses to the literals they contain.
+	 * Adds the given formula in CNF to the LTMS.
+	 *
+	 * @param cnf formula in CNF
 	 */
-	private void setClauseLiterals() {
-		for (final Node cnfClause : cnf.getChildren()) {
-			clauseLiterals.put(cnfClause, cnfClause.getUniqueLiterals());
-		}
-	}
-
-	/**
-	 * Sets the map from variables to the CNF clauses containing them.
-	 */
-	private void setVariableClauses() {
-		for (final Node cnfClause : cnf.getChildren()) {
-			for (final Literal literal : clauseLiterals.get(cnfClause)) {
-				Set<Node> clauses = variableClauses.get(literal.var);
-				if (clauses == null) {
-					clauses = new LinkedHashSet<>();
-					variableClauses.put(literal.var, clauses);
+	public void addFormula(Node cnf) {
+		final Node[] clauses = cnf.getChildren();
+		for (int i = 0; i < clauses.length; i++) {
+			final Node clause = clauses[i];
+			final Node[] literals = clause.getChildren();
+			final Set<Literal> literalSet = new HashSet<>();
+			for (int j = 0; j < literals.length; j++) {
+				final Literal literal = (Literal) literals[j];
+				if (!literalSet.add(literal)) {
+					continue;
 				}
-				clauses.add(cnfClause);
+				Set<Integer> clauseSet = variableClauses.get(literal.var);
+				if (clauseSet == null) {
+					clauseSet = new HashSet<>();
+					variableClauses.put(literal.var, clauseSet);
+				}
+				clauseSet.add(clauseLiterals.size());
 			}
+			clauseLiterals.add(literalSet);
 		}
 	}
 
@@ -223,12 +225,11 @@ public class Ltms {
 	 *
 	 * @return the unit-open clauses
 	 */
-	private Set<Node> getUnitOpenClauses() {
-		final Collection<Node> dirtyClauses = derivedLiteral == null ? Arrays.asList(cnf.getChildren()) : variableClauses.get(derivedLiteral.var);
-		final Set<Node> unitOpenClauses = new LinkedHashSet<>();
-		for (final Node dirtyClause : dirtyClauses) {
-			if (isUnitOpenClause(dirtyClause)) {
-				unitOpenClauses.add(dirtyClause);
+	private Set<Integer> getUnitOpenClauses() {
+		final Set<Integer> unitOpenClauses = new LinkedHashSet<>(); // linked to maintain order and determinism during iteration later
+		for (final int clause : getDirtyClauses()) {
+			if (isUnitOpenClause(clause)) {
+				unitOpenClauses.add(clause);
 			}
 		}
 		return unitOpenClauses;
@@ -237,23 +238,23 @@ public class Ltms {
 	/**
 	 * Returns true iff the given clause is unit-open. A CNF clause is unit-open iff one of the contained literals evaluates to unknown and all others to false.
 	 *
-	 * @param cnfClause clause in conjunctive normal form
+	 * @param clause clause in conjunctive normal form
 	 * @return true iff the given clause is unit-open
 	 */
-	private boolean isUnitOpenClause(Node cnfClause) {
-		return getUnboundLiteral(cnfClause) != null;
+	private boolean isUnitOpenClause(int clause) {
+		return getUnboundLiteral(clause) != null;
 	}
 
 	/**
 	 * Returns the unbound literal in the given clause or null if no such literal exists. A literal is unbound iff it evaluates to unknown while all other
 	 * literals in the same CNF clause evaluate to false. Such a literal is critical for the satisfiability of the clause and as such the entire CNF.
 	 *
-	 * @param cnfClause clause in conjunctive normal form
+	 * @param clause clause in conjunctive normal form
 	 * @return the unbound literal in the given clause or null if no such literal exists
 	 */
-	private Literal getUnboundLiteral(Node cnfClause) {
+	private Literal getUnboundLiteral(int clause) {
 		Literal unboundLiteral = null;
-		for (final Literal literal : clauseLiterals.get(cnfClause)) {
+		for (final Literal literal : clauseLiterals.get(clause)) {
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				if (unboundLiteral == null) {
 					unboundLiteral = literal;
@@ -275,10 +276,9 @@ public class Ltms {
 	 * @return true iff the conjunctive normal form evaluates to false
 	 */
 	private boolean isContradicted() {
-		final Collection<Node> dirtyClauses = derivedLiteral == null ? Arrays.asList(cnf.getChildren()) : variableClauses.get(derivedLiteral.var);
-		for (final Node dirtyClause : dirtyClauses) {
-			if (isViolatedClause(dirtyClause)) {
-				violatedClause = dirtyClause;
+		for (final int clause : getDirtyClauses()) {
+			if (isViolatedClause(clause)) {
+				violatedClause = clause;
 				return true;
 			}
 		}
@@ -286,13 +286,38 @@ public class Ltms {
 	}
 
 	/**
+	 * Returns the dirty clauses. A clause is dirty if it needs to be checked for a possible change in its truth value. At the beginning of the algorithm, all
+	 * clauses are dirty. After propagating, only the clauses containing the variable of the derived literal are dirty.
+	 *
+	 * @return the dirty clauses
+	 */
+	private Collection<Integer> getDirtyClauses() {
+		if (derivedLiteral == null) {
+			final int size = clauseLiterals.size();
+			return new AbstractList<Integer>() {
+
+				@Override
+				public Integer get(int index) {
+					return index;
+				}
+
+				@Override
+				public int size() {
+					return size;
+				}
+			};
+		}
+		return variableClauses.get(derivedLiteral.var);
+	}
+
+	/**
 	 * Returns true iff the given CNF clause evaluates to false. A CNF clause evaluates to false iff all of its literals evaluate to false.
 	 *
-	 * @param cnfClause clause in conjunctive normal form
+	 * @param clause clause in conjunctive normal form
 	 * @return true iff the given CNF clause evaluates to false
 	 */
-	private boolean isViolatedClause(Node cnfClause) {
-		for (final Literal literal : clauseLiterals.get(cnfClause)) {
+	private boolean isViolatedClause(int clause) {
+		for (final Literal literal : clauseLiterals.get(clause)) {
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				return false;
 			} else if (literal.getValue(variableValues)) { // true value
@@ -326,7 +351,7 @@ public class Ltms {
 	 * @param variable variable to set
 	 * @param cnfClause clause containing the literal
 	 */
-	private void justify(Object variable, Node cnfClause) {
+	private void justify(Object variable, int cnfClause) {
 		reasons.put(variable, cnfClause);
 	}
 
@@ -339,31 +364,31 @@ public class Ltms {
 		final Set<Integer> explanation = new TreeSet<>();
 
 		// Include literals from the violated clause so it shows up in the explanation.
-		explanation.add(getClauseIndex(violatedClause));
+		explanation.add(violatedClause);
 
 		// Get all antecedents of the derived literal.
 		if (derivedLiteral == null) { // immediate contradiction, thus no propagations, thus no antecedents
 			return explanation;
 		}
-		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
 		allAntecedents.put(derivedLiteral, derivedClause);
-		for (final Entry<Literal, Node> e : getAllAntecedents(derivedLiteral).entrySet()) {
-			final Node value = allAntecedents.get(e.getKey());
+		for (final Entry<Literal, Integer> e : getAllAntecedents(derivedLiteral).entrySet()) {
+			final Integer value = allAntecedents.get(e.getKey());
 			if (value == null) {
 				allAntecedents.put(e.getKey(), e.getValue());
 			}
 		}
 
 		// Explain every antecedent and its reason.
-		for (final Entry<Literal, Node> e : allAntecedents.entrySet()) {
+		for (final Entry<Literal, Integer> e : allAntecedents.entrySet()) {
 			final Literal antecedentLiteral = e.getKey();
-			final Node antecedentClause = e.getValue();
-			explanation.add(getClauseIndex(antecedentClause));
-			final Node reason = reasons.get(antecedentLiteral.var);
+			final int antecedentClause = e.getValue();
+			explanation.add(antecedentClause);
+			final Integer reason = reasons.get(antecedentLiteral.var);
 			if (reason == null) { // premise, thus no reason to explain
 				continue;
 			}
-			explanation.add(getClauseIndex(reason));
+			explanation.add(reason);
 		}
 		return explanation;
 	}
@@ -374,41 +399,24 @@ public class Ltms {
 	 * @param literal literal with possible antecedents
 	 * @return all antecedents of the given variable recursively
 	 */
-	private Map<Literal, Node> getAllAntecedents(Literal literal) {
-		final Node reason = reasons.get(literal.var);
+	private Map<Literal, Integer> getAllAntecedents(Literal literal) {
+		final Integer reason = reasons.get(literal.var);
 		if (reason == null) {
 			return Collections.emptyMap();
 		}
-		final Map<Literal, Node> allAntecedents = new LinkedHashMap<>();
+		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
 		for (final Literal antecedent : clauseLiterals.get(reason)) {
 			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
 				continue;
 			}
 			allAntecedents.put(antecedent, reason);
-			for (final Entry<Literal, Node> e : getAllAntecedents(antecedent).entrySet()) {
-				final Node value = allAntecedents.get(e.getKey());
+			for (final Entry<Literal, Integer> e : getAllAntecedents(antecedent).entrySet()) {
+				final Integer value = allAntecedents.get(e.getKey());
 				if (value == null) {
 					allAntecedents.put(e.getKey(), e.getValue());
 				}
 			}
 		}
 		return allAntecedents;
-	}
-
-	/**
-	 * Returns the index of the given CNF clause.
-	 *
-	 * @param cnfClause CNF clause to look up
-	 * @return the index of the given CNF clause
-	 * @throws IllegalStateException if the CNF clause is not contained in the CNF
-	 */
-	private int getClauseIndex(Node cnfClause) throws IllegalStateException {
-		final Node[] cnfClauses = cnf.getChildren();
-		for (int i = 0; i < cnfClauses.length; i++) {
-			if (cnfClause == cnfClauses[i]) {
-				return i;
-			}
-		}
-		throw new IllegalStateException("CNF clause not contained in CNF");
 	}
 }
