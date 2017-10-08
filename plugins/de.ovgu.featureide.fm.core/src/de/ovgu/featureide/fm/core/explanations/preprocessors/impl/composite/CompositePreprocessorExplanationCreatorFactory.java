@@ -25,8 +25,8 @@ import java.util.Arrays;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms.LtmsInvariantPresenceConditionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusInvariantPresenceConditionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms.LtmsPreprocessorExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreprocessorExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link PreprocessorExplanationCreator} using composition.
@@ -35,10 +35,15 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusInvaria
  */
 public class CompositePreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
+	/** Factory for LTMS. */
+	private final PreprocessorExplanationCreatorFactory ltms = new LtmsPreprocessorExplanationCreatorFactory();
+	/** Factory for MUS. */
+	private final PreprocessorExplanationCreatorFactory mus = new MusPreprocessorExplanationCreatorFactory();
+
 	@Override
 	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
-		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.<InvariantPresenceConditionExplanationCreator>asList(
-				new LtmsInvariantPresenceConditionExplanationCreator(),
-				new MusInvariantPresenceConditionExplanationCreator()));
+		return new CompositeInvariantPresenceConditionExplanationCreator(Arrays.asList(
+				ltms.getInvariantPresenceConditionExplanationCreator(),
+				mus.getInvariantPresenceConditionExplanationCreator()));
 	}
 }

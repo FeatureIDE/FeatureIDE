@@ -27,12 +27,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsDeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsFalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsRedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusDeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusRedundantConstraintExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsFeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
 
 
 /**
@@ -42,24 +38,29 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusRedundantConstrain
  */
 public class CompositeFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 
+	/** Factory for LTMS. */
+	private final FeatureModelExplanationCreatorFactory ltms = new LtmsFeatureModelExplanationCreatorFactory();
+	/** Factory for MUS. */
+	private final FeatureModelExplanationCreatorFactory mus = new MusFeatureModelExplanationCreatorFactory();
+
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new CompositeDeadFeatureExplanationCreator(Arrays.<DeadFeatureExplanationCreator>asList(
-				new LtmsDeadFeatureExplanationCreator(),
-				new MusDeadFeatureExplanationCreator()));
+		return new CompositeDeadFeatureExplanationCreator(Arrays.asList(
+				ltms.getDeadFeatureExplanationCreator(),
+				mus.getDeadFeatureExplanationCreator()));
 	}
 
 	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new CompositeFalseOptionalFeatureExplanationCreator(Arrays.<FalseOptionalFeatureExplanationCreator>asList(
-				new LtmsFalseOptionalFeatureExplanationCreator(),
-				new MusFalseOptionalFeatureExplanationCreator()));
+		return new CompositeFalseOptionalFeatureExplanationCreator(Arrays.asList(
+				ltms.getFalseOptionalFeatureExplanationCreator(),
+				mus.getFalseOptionalFeatureExplanationCreator()));
 	}
 
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
-		return new CompositeRedundantConstraintExplanationCreator(Arrays.<RedundantConstraintExplanationCreator>asList(
-				new LtmsRedundantConstraintExplanationCreator(),
-				new MusRedundantConstraintExplanationCreator()));
+		return new CompositeRedundantConstraintExplanationCreator(Arrays.asList(
+				ltms.getRedundantConstraintExplanationCreator(),
+				mus.getRedundantConstraintExplanationCreator()));
 	}
 }

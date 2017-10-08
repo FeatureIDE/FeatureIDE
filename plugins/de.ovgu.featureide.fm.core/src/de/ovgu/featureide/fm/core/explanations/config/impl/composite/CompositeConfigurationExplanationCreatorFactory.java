@@ -25,8 +25,8 @@ import java.util.Arrays;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.config.impl.ltms.LtmsAutomaticSelectionExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusAutomaticSelectionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.config.impl.ltms.LtmsConfigurationExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link ConfigurationExplanationCreator} using composition.
@@ -35,10 +35,15 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusAutomaticSelec
  */
 public class CompositeConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
 
+	/** Factory for LTMS. */
+	private final ConfigurationExplanationCreatorFactory ltms = new LtmsConfigurationExplanationCreatorFactory();
+	/** Factory for MUS. */
+	private final ConfigurationExplanationCreatorFactory mus = new MusConfigurationExplanationCreatorFactory();
+
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		return new CompositeAutomaticSelectionExplanationCreator(Arrays.<AutomaticSelectionExplanationCreator>asList(
-				new LtmsAutomaticSelectionExplanationCreator(),
-				new MusAutomaticSelectionExplanationCreator()));
+		return new CompositeAutomaticSelectionExplanationCreator(Arrays.asList(
+				ltms.getAutomaticSelectionExplanationCreator(),
+				mus.getAutomaticSelectionExplanationCreator()));
 	}
 }
