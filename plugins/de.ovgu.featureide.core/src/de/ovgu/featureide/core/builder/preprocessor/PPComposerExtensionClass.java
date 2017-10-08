@@ -76,8 +76,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	static final int SAT_CONTRADICTION = 1;
 	/** The expression is a tautology. */
 	static final int SAT_TAUTOLOGY = 2;
-	protected static final String MESSAGE_DEAD_CODE = ": This expression is a contradiction and causes a dead code block.";
-	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
+	protected static final String MESSAGE_DEAD_CODE = "This expression is a contradiction and causes a dead code block.";
+	protected static final String MESSAGE_ALWAYS_TRUE = "This expression is a tautology and causes a superfluous code block.";
 	protected static final String MESSAGE_ABSTRACT =
 		IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
@@ -251,8 +251,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		if ((status != SAT_CONTRADICTION) && (status != SAT_TAUTOLOGY)) {
 			return;
 		}
-		String message = pluginName;
-		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
+		String message = status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
 		final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
 		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 			message += String.format("%n%s", explanation.getWriter().getString());
@@ -317,7 +316,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 
 		if ((matcherFeature != null) && matcherFeature.matches()) {
-			featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_ABSTRACT, lineNumber, IMarker.SEVERITY_WARNING);
+			featureProject.createBuilderMarker(res, name + MESSAGE_ABSTRACT, lineNumber, IMarker.SEVERITY_WARNING);
 		} else {
 			Matcher matcherConreteFeature = null;
 			if (patternIsConcreteFeature != null) {
@@ -325,7 +324,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			}
 
 			if ((matcherConreteFeature != null) && !matcherConreteFeature.matches()) {
-				featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_NOT_DEFINED, lineNumber, IMarker.SEVERITY_WARNING);
+				featureProject.createBuilderMarker(res, name + MESSAGE_NOT_DEFINED, lineNumber, IMarker.SEVERITY_WARNING);
 				return false;
 			}
 		}
