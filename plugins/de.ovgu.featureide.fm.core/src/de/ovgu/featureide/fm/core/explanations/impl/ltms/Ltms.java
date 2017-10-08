@@ -132,6 +132,32 @@ public class Ltms {
 	}
 
 	/**
+	 * Removes the given amount of clauses from the end of this LTMS.
+	 *
+	 * @param clauses amount of clauses to remove
+	 */
+	public void removeClauses(int clauses) {
+		while (clauses-- > 0) {
+			removeClause(clauseLiterals.size() - 1);
+		}
+	}
+
+	/**
+	 * Removes the given clause from this LTMS.
+	 *
+	 * @param clause clause to remove
+	 */
+	public void removeClause(int clause) {
+		for (final Literal literal : clauseLiterals.get(clause)) {
+			final Set<Integer> clauses = variableClauses.get(literal.var);
+			if (clauses.remove(literal.var) && clauses.isEmpty()) {
+				variableClauses.remove(literal.var);
+			}
+		}
+		clauseLiterals.remove(clause);
+	}
+
+	/**
 	 * Sets the premises to the given ones.
 	 *
 	 * @param premises premises to set
