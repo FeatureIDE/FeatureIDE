@@ -42,8 +42,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 
-import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
-
 /**
  * <p> The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations. Uses BCP (boolean constraint propagation)
  * for managing logical implications. BCP expects two parameters: initial truth values (premises) and a propositional formula in CNF (conjunctive normal form).
@@ -57,7 +55,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
- * @see {@link FeatureModelExplanationCreator} for using the LTMS with feature models
  */
 public class Ltms implements MusExtractor {
 
