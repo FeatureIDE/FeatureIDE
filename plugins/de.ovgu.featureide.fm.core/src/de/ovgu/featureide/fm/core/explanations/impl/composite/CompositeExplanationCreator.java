@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
 
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implements {@link ExplanationCreator} by composing any number of other instances. Delegates to these other composite instances to do the actual work. Useful

@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using an {@link Ltms LTMS}.

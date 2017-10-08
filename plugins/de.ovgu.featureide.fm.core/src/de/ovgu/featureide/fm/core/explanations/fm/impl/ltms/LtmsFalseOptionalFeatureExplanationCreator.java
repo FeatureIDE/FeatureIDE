@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link FalseOptionalFeatureExplanationCreator} using an {@link Ltms LTMS}.

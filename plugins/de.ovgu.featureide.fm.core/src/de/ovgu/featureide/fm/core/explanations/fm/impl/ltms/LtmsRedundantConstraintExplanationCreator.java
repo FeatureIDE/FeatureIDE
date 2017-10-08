@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
 import org.prop4j.Node;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -28,7 +29,6 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link RedundantConstraintExplanationCreator} using an {@link Ltms LTMS}.

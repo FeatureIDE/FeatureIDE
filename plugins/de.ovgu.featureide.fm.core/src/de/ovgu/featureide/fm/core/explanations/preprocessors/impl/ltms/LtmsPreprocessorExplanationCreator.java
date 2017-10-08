@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
 
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.AbstractPreprocessorExplanationCreator;

@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Provides instances of {@link ConfigurationExplanationCreator} using an {@link Ltms Ltms}.

@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link DeadFeatureExplanationCreator} using an {@link Ltms LTMS}.

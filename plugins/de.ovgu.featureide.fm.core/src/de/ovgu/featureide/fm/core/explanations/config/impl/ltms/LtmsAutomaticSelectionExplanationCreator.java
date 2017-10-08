@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Literal;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -31,7 +32,6 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Implementation of {@link AutomaticSelectionExplanationCreator} using an {@link Ltms LTMS}.

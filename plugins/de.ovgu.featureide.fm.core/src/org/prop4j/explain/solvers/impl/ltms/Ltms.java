@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.impl.ltms;
+package org.prop4j.explain.solvers.impl.ltms;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

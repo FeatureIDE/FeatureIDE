@@ -26,9 +26,9 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorReason;

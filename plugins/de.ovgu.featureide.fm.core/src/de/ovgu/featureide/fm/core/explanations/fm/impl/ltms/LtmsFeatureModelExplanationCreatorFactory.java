@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
 
 /**
  * Provides instances of {@link FeatureModelExplanationCreatorFactory} using an {@link Ltms LTMS}.
