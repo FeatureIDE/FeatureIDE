@@ -108,8 +108,9 @@ public class Ltms {
 	 * Adds the given formula in CNF to the LTMS.
 	 *
 	 * @param cnf formula in CNF
+	 * @return the amount of clauses added
 	 */
-	public void addFormula(Node cnf) {
+	public int addFormula(Node cnf) {
 		final Node[] clauses = cnf.getChildren();
 		for (int i = 0; i < clauses.length; i++) {
 			final Node clause = clauses[i];
@@ -129,6 +130,7 @@ public class Ltms {
 			}
 			clauseLiterals.add(literalSet);
 		}
+		return clauses.length;
 	}
 
 	/**
