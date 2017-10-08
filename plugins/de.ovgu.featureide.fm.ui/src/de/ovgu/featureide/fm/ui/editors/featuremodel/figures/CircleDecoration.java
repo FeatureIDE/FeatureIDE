@@ -39,7 +39,12 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 	public CircleDecoration(boolean fill) {
 		final Color decoratorForegroundColor = FMPropertyManager.getDecoratorForegroundColor();
 		setForegroundColor(decoratorForegroundColor);
-		setBackgroundColor(fill ? decoratorForegroundColor : FMPropertyManager.getDecoratorBackgroundColor());
+		if (fill) {
+			setOutline(false);
+			setBackgroundColor(decoratorForegroundColor);
+		} else {
+			setBackgroundColor(FMPropertyManager.getDecoratorBackgroundColor());
+		}
 		setSize(SOURCE_ANCHOR_DIAMETER + 1, SOURCE_ANCHOR_DIAMETER + 1);
 	}
 
@@ -59,10 +64,6 @@ public class CircleDecoration extends ConnectionDecoration implements GUIDefault
 
 	@Override
 	protected void outlineShape(Graphics graphics) {
-		if (getActiveReason() != null) {
-			graphics.setForegroundColor(FMPropertyManager.getReasonColor(getActiveReason()));
-			graphics.setLineWidth(FMPropertyManager.getReasonLineWidth(getActiveReason()));
-		}
 		final Rectangle bounds = getBounds().getShrinked(1, 1);
 		graphics.drawOval(bounds);
 	}
