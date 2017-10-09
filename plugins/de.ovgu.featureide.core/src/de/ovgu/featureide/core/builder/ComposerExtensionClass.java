@@ -477,7 +477,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 
 		try {
-			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + getConfigurationExtension());
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + new DefaultFormat().getSuffix());
 			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
 			tempFile.toFile().deleteOnExit();
 			return tempFile;

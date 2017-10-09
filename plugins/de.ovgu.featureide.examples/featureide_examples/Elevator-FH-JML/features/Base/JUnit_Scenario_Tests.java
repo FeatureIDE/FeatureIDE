@@ -29,6 +29,7 @@ public  class  JUnit_Scenario_Tests {
 	/*@ \consecutive_contract
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec1.length; !env.calledAt_Spec1[i]);
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec2.length; !env.calledAt_Spec2[i]);
+	  @ assignable \nothing;
 	  @*/
 	public void testFinished(Environment env) {
 

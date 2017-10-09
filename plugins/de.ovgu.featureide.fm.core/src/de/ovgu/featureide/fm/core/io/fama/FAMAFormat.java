@@ -155,4 +155,9 @@ public class FAMAFormat implements IFeatureModelFormat {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FAMA";
+	}
+
 }

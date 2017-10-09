@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.base;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.Commons;
 
 /**
  * Test case to verify that the analyzer recognizes false optional feature in 'and', 'or' and 'alternative' groups.
@@ -34,8 +34,7 @@ public class FalseOptionalAndOrAlternativeAnalyserTest {
 
 	@Test
 	public void checkFalseOptionals() {
-		final IFeatureModel model = Commons.loadFeatureModelFromFile("false_optional_test.xml", Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_REMOTE,
-				Commons.FEATURE_MODEL_TESTFEATUREMODELS_PATH_LOCAL_CLASS_PATH);
+		final IFeatureModel model = Commons.loadTestFeatureModelFromFile("false_optional_test.xml");
 		model.getAnalyser().analyzeFeatureModel(null);
 		Assert.assertEquals(model.getAnalyser().getCachedFalseOptionalFeatures().size(), 3);
 	}

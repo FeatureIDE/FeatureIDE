@@ -70,6 +70,7 @@ public class PL_Interface_impl implements PL_Interface {
 	/*@ \consecutive_contract
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec1.length; !env.calledAt_Spec1[i]);
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec2.length; !env.calledAt_Spec2[i]);
+	  @ assignable env, isAbortedRun;
 	  @*/
 	public void test(int specification, int variation) {
 		if (variation==-1) {

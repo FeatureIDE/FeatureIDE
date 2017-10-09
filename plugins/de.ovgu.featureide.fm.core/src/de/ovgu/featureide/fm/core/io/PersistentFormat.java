@@ -48,6 +48,11 @@ public class PersistentFormat<T> implements IPersistentFormat<T> {
 	}
 
 	@Override
+	public String getName() {
+		return "";
+	}
+
+	@Override
 	public IPersistentFormat<T> getInstance() {
 		return this;
 	}

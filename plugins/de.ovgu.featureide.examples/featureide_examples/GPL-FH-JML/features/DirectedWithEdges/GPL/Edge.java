@@ -8,6 +8,7 @@ public class Edge extends Neighbor implements EdgeIfc {
     private  Vertex start;
     /*@requires the_start != null && the_end != null && the_weight != null; @*/
     /*@ensures this.start == the_start && end == this.the_end && this.weight == the_weight;@*/
+    /*@assignable start,end; @*/
     public void EdgeConstructor( Vertex the_start,
                       Vertex the_end ) {
         start = the_start;
@@ -17,7 +18,8 @@ public class Edge extends Neighbor implements EdgeIfc {
     // dja: fix compile error.
 //    public void adjustAdorns( Edge the_edge ) {}
     /*@requires the_edge!=null;@*/
-    /*@ensures true@*/;
+    /*@ensures true;@*/
+    /*@assignable \nothing; @*/
     public void adjustAdorns( EdgeIfc the_edge ) {}
 
 

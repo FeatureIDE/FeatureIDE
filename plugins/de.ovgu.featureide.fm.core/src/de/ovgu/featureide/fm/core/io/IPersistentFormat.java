@@ -35,6 +35,8 @@ public interface IPersistentFormat<T> extends IExtension {
 
 	String getSuffix();
 
+	String getName();
+
 	IPersistentFormat<T> getInstance();
 
 	boolean supportsRead();

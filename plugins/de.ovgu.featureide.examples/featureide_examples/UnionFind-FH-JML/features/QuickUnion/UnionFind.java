@@ -17,6 +17,7 @@ public class UnionFind{
 	 // are elements p and q in the same component?
 	/*@
 	 @ ensures \result == (find(p) == find(q));
+	 @ assignable \nothing;
 	 @*/
     public boolean connected(int p, int q) {
         return find(p) == find(q);

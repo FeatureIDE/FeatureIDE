@@ -37,6 +37,7 @@ public class Elevator {
 	 * My Version: While there is a request from the executive Floor the lift will not open its doors somewhere else.
 	 */
 	/*@ ensures isExecutiveFloorCalling() && areDoorsOpen() ==> isExecutiveFloor(e.getCurrentFloorID());
+	  @ assignable \nothing;
 	  @*/
 	public void timeShift() {
 		original();

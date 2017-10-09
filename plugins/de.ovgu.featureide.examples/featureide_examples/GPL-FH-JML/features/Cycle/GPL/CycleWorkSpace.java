@@ -17,6 +17,7 @@ public class CycleWorkSpace extends  WorkSpace {
     public /*@ spec_public @*/ static final int BLACK = 2;
             
     /*@ensures AnyCycles == false && counter == 0 && isDirected == UnDir;@*/
+    /*@assignable AnyCycles, counter, isDirected; @*/
     public CycleWorkSpace( boolean UnDir ) {
         AnyCycles = false;
         counter   = 0;
@@ -25,6 +26,7 @@ public class CycleWorkSpace extends  WorkSpace {
     /*@requires v != null; @*/
     /*@ensures v.VertexCycle == Integer.MAX_VALUE;@*/
     /*@ensures v.VertexColor == WHITE;@*/
+    /*@assignable \nothing; @*/
     public void init_vertex( Vertex v ) 
       {
         v.VertexCycle = Integer.MAX_VALUE;
@@ -33,6 +35,7 @@ public class CycleWorkSpace extends  WorkSpace {
 
     /*@requires v != null; @*/
     /*@ensures (v.visited != true) ==> (v.VertexCycle == \old(v.VertexCycle)+1 && v.VertexColor == GRAY);@*/
+    /*@assignable \nothing; @*/
     public void preVisitAction( Vertex v ) {
         
         // This assigns the values on the way in
@@ -46,6 +49,7 @@ public class CycleWorkSpace extends  WorkSpace {
     /*@requires v != null; @*/
     /*@ensures v.VertexColor == BLACK; @*/
     /*@ensures counter  == \old(counter)-1;@*/
+    /*@assignable counter; @*/
     public void postVisitAction( Vertex v ) 
       {
         v.VertexColor = BLACK; // we are done visiting so make it black
@@ -57,6 +61,7 @@ public class CycleWorkSpace extends  WorkSpace {
     /*@requires vsource != null && vtarget != null; @*/
     /*@ensures isDirected ==>((vsource.VertexColor == GRAY) && (vtarget.VertexColor == GRAY)==>AnyCicles == true);  @*/
     /*@ensures !isDirected ==>((vsource.VertexColor == GRAY) && (vtarget.VertexColor == GRAY && (vsource.VertexCycle != vtarget.VertexCycle+1))==>AnyCicles == true);  @*/
+    /*@assignable AnyCycles; @*/
     public void checkNeighborAction( Vertex vsource, 
                      Vertex vtarget ) 
       {

@@ -15,6 +15,7 @@ public class Vertex implements EdgeIfc, NeighborIfc
         VertexConstructor();
     }
     /*@ensures name == null && adjacentVertices != null;@*/
+    /*@assignable name, adjacentVertices; @*/
     public void VertexConstructor() {
         name      = null;
         adjacentVertices = new LinkedList();
@@ -22,7 +23,8 @@ public class Vertex implements EdgeIfc, NeighborIfc
     
     /*@ requires name != null;
     ensures this.name == name;
-    ensures \result == this; @*/
+    ensures \result == this; 
+    assignable name; @*/
     public  Vertex assignName( String name ) {
         this.name = name;
         return ( Vertex ) this;
@@ -37,6 +39,7 @@ public class Vertex implements EdgeIfc, NeighborIfc
 
     /*@requires n != null;@*/
     /*@ensures adjacentVertices.getLast()==n;@*/
+    /*@assignable adjacentVertices; @*/
     public void addAdjacent( Vertex n ) {
         adjacentVertices.add( n );
     }

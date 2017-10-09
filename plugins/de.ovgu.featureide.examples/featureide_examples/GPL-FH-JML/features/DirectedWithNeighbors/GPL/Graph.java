@@ -27,7 +27,8 @@ public class Graph {
  	return true;
  	}@*/
     /*@ requires c != null;
-    ensures isSorted(vertices); @*/
+    ensures isSorted(vertices); 
+    assignable vertices;@*/
     public void sortVertices(Comparator c) {
         Collections.sort(vertices, c);
     }
@@ -42,6 +43,7 @@ public class Graph {
     // Adds an edge without weights if Weighted layer is not present
 	/*@ requires v1 != null && v2 != null; @*/
 	/*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
+    /*@assignable \nothing; @*/
     public EdgeIfc addEdge( Vertex start,  Vertex end )
     {
 	  Neighbor e = new Neighbor( end );
@@ -81,6 +83,7 @@ public class Graph {
         return theVertex;
     }
     /*@ ensures \result != null; @*/
+    /*@ assignable \nothing; @*/
     public VertexIter getVertices( ) 
     {
         return new VertexIter( ) 

@@ -14,11 +14,13 @@ public class Vertex {
         VertexConstructor();
     }
     /*@ ensures \result == this.name; @*/
+    /*@assignable name; @*/
     public String getName( ) 
     { 
         return name; 
     }
     /*@ensures name == null && adjacentVertices != null;@*/
+    /*@assignable name, adjacentNeighbors; @*/
     public void VertexConstructor() {
         name      = null;
         adjacentNeighbors = new LinkedList();
@@ -26,7 +28,8 @@ public class Vertex {
 
     /*@ requires name != null;
     ensures this.name == name;
-    ensures \result == this; @*/
+    ensures \result == this; 
+    assignable name; @*/
     public  Vertex assignName( String name ) {
         this.name = name;
         return ( Vertex ) this;
@@ -34,6 +37,7 @@ public class Vertex {
    
     /*@ requires n != null;@*/
     /*@ ensures adjacentNeighbors.getLast()==n;@*/
+    /*@assignable adjacentNeighbors; @*/
     public void addEdge( Neighbor n ) {
         adjacentNeighbors.add( n );
     }
