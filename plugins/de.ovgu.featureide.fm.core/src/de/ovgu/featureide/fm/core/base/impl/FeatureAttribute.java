@@ -24,6 +24,7 @@ package de.ovgu.featureide.fm.core.base.impl;
  * Attributes for Features.
  *
  * @author "Werner Jan"
+ * @author "Marcel Daniel"
  */
 public class FeatureAttribute {
 
@@ -46,29 +47,28 @@ public class FeatureAttribute {
 		unit = "";
 		configurable = false;
 	}
-	
+
 	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
 		this.name = name;
 		this.value = value;
-		this.setTypeFromString(type);
+		setTypeFromString(type);
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configurable = configurable;
 	}
-	
 
 	public boolean checkValue() {
 		if (type.toString().equals("LONG")) {
 			try {
 				Long.parseLong(value);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
 		if (type.toString().equals("DOUBLE")) {
 			try {
 				Double.parseDouble(value);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
@@ -84,14 +84,14 @@ public class FeatureAttribute {
 		if (type.toString().equals("LONG")) {
 			try {
 				Long.parseLong(value);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
 		if (type.toString().equals("DOUBLE")) {
 			try {
 				Double.parseDouble(value);
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
@@ -118,11 +118,11 @@ public class FeatureAttribute {
 	public Types getType() {
 		return type;
 	}
-	
+
 	public String getTypeNames() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		String types = "";
-		for (final Types typeNames: Types.values()) {
+		for (final Types typeNames : Types.values()) {
 			sb.append(types);
 			types = ", ";
 			sb.append(typeNames.toString().toLowerCase());
@@ -145,12 +145,12 @@ public class FeatureAttribute {
 	public void setConfigurable(boolean configurable) {
 		this.configurable = configurable;
 	}
-	
+
 	public void setConfigurable(String configurableString) {
 		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
-			this.configurable = false;
-		} else if (value.toLowerCase().equals("true")){
-			this.configurable = true;
+			configurable = false;
+		} else if (value.toLowerCase().equals("true")) {
+			configurable = true;
 		}
 	}
 
@@ -186,7 +186,7 @@ public class FeatureAttribute {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append(name + ": \n");
 		if (!value.isEmpty()) {
 			sb.append(" -" + "value: " + value);
@@ -202,5 +202,5 @@ public class FeatureAttribute {
 		}
 		return sb.toString();
 	}
-	
+
 }
