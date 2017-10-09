@@ -161,9 +161,9 @@ public class Ltms implements MusExtractor {
 					variableClauses.put(literal.var, clauseSet);
 				}
 				clauseSet.add(getClauseCount());
-				scopeClauseCount++;
 			}
 			clauseLiterals.add(literalSet);
+			scopeClauseCount++;
 		}
 		return clauses.length;
 	}
