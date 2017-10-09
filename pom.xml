@@ -43,8 +43,13 @@
 		<module>tests/de.ovgu.featureide.fm.core-test</module>
 		<module>tests/de.ovgu.featureide.fm.ui-test</module>
 
+		<module>tests/de.ovgu.featureide.ui-test</module>
+
+		<module>tests/de.ovgu.featureide.core.ahead-test</module>
 		<module>tests/de.ovgu.featureide.core.antenna-test</module>
+		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
+		<module>tests/de.ovgu.featureide.core.munge-test</module>
 	</modules>
 
 	<build>
@@ -75,6 +80,20 @@
 					<jgit.ignore> pom.xml </jgit.ignore> </configuration> -->
 			</plugin>
 
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-surefire-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<useUIHarness>true</useUIHarness>
+					<includes>
+						<include>**/T*.java</include>
+						<include>**/B*.java</include>
+						<include>**/*Test.java</include>
+						<include>**/*Tests.java</include>
+					</includes>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

@@ -30,6 +30,7 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
@@ -41,13 +42,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class TConfigurationReader {
 
-	private static final String FEATUREMODEL_PATH_TEAMCITY =
-			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
-
-	private static final String FEATUREMODEL_PATH =
-			"/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/";
-
-	protected static File MODEL_FILE_FOLDER = getFolder();
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("analyzefeaturemodels/");
 
 	private static final FileFilter filter = new FileFilter() {
 
@@ -61,14 +56,6 @@ public class TConfigurationReader {
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 
 	private final IFeatureModel FM_test_1 = init("test_5.xml");
-
-	private static File getFolder() {
-		File folder = new File(FEATUREMODEL_PATH);
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
-		}
-		return folder;
-	}
 
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm = null;
