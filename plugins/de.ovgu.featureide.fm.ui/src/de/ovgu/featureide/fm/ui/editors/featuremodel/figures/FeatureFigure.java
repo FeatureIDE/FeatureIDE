@@ -270,6 +270,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 					toolTip.append("\n -" + fa.getName());
 					if (!fa.getValue().isEmpty()) {
 						toolTip.append(": " + fa.getValue());
+						if (!fa.getUnit().isEmpty()) {
+							toolTip.append(fa.getUnit());
+						}
 					}
 				}
 			}
@@ -280,6 +283,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 					toolTip.append("\n -" + fai.getName());
 					if (!fai.getValue().isEmpty()) {
 						toolTip.append(": " + fai.getValue());
+						if (!fai.getUnit().isEmpty()) {
+							toolTip.append(fai.getUnit());
+						}
 					}
 				}
 			}

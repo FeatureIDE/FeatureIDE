@@ -57,6 +57,52 @@ public class FeatureAttribute {
 	}
 	
 
+	public boolean checkValue() {
+		if (type.toString().equals("LONG")) {
+			try {
+				Long.parseLong(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("DOUBLE")) {
+			try {
+				Double.parseDouble(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("BOOLEAN")) {
+			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+
+	public boolean checkValue(String value) {
+		if (type.toString().equals("LONG")) {
+			try {
+				Long.parseLong(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("DOUBLE")) {
+			try {
+				Double.parseDouble(value);
+			} catch (NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals("BOOLEAN")) {
+			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+
 	public boolean getConfigurable() {
 		return configurable;
 	}
@@ -69,18 +115,10 @@ public class FeatureAttribute {
 		return recursive;
 	}
 
-	public String getUnit() {
-		return unit;
-	}
-
 	public Types getType() {
 		return type;
 	}
 	
-	public String getTypeString() {
-		return type.toString().toLowerCase();
-	}
-
 	public String getTypeNames() {
 		StringBuilder sb = new StringBuilder();
 		String types = "";
@@ -90,6 +128,14 @@ public class FeatureAttribute {
 			sb.append(typeNames.toString().toLowerCase());
 		}
 		return sb.toString();
+	}
+
+	public String getTypeString() {
+		return type.toString().toLowerCase();
+	}
+
+	public String getUnit() {
+		return unit;
 	}
 
 	public String getValue() {
@@ -155,52 +201,6 @@ public class FeatureAttribute {
 			sb.append(" -" + "configurable: true");
 		}
 		return sb.toString();
-	}
-	
-	public boolean checkValue() {
-		if (type.toString().equals("LONG")) {
-			try {
-				Long.parseLong(value);
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-		if (type.toString().equals("DOUBLE")) {
-			try {
-				Double.parseDouble(value);
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-		if (type.toString().equals("BOOLEAN")) {
-			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-				return true;
-			}
-		}
-		return true;
-	}
-	
-	public boolean checkValue(String value) {
-		if (type.toString().equals("LONG")) {
-			try {
-				Long.parseLong(value);
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-		if (type.toString().equals("DOUBLE")) {
-			try {
-				Double.parseDouble(value);
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-		if (type.toString().equals("BOOLEAN")) {
-			if (type.toString().toLowerCase().equals("true") || type.toString().toLowerCase().equals("false")) {
-				return true;
-			}
-		}
-		return true;
 	}
 	
 }

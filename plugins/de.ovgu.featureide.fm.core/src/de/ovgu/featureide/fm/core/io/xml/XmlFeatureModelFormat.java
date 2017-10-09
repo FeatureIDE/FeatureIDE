@@ -556,18 +556,17 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (type.isEmpty()) {
 				
 				//Check if the attribute is inherited
-				FeatureAttributeInherited fai = new FeatureAttributeInherited();
-				if (checkRecursiveList(name, inheritedList, fai)) {
+				if (checkRecursiveList(name, value, inheritedList)) {
 					if (!unit.isEmpty() || !recursive.isEmpty() || !configurable.isEmpty()) {
-						throwError("Too many parameters for inherited attribute. Only name and value allowed.", e);
+						throwError("Too many parameters for inherited attribute. Only name and value are allowed.", e);
 					} else {
-						fai.setValue(value);
-						if (!fai.checkValue()) {
-							throwError("Value doesn't match type of parent.", e);
+//						fai.setValue(value);
+//						if (!fai.checkValue()) {
+							throwError("Value doesn't match type of parent. Should be of type: ", e);
 						}
 					}
 				} else {
-					throwError("This attribute is not inherited and needs a type.", e);
+					throwError("This attribute is not inherited and therefore needs a type.", e);
 				}
 			} else {
 
@@ -603,11 +602,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param inheritedList
 	 * @return
 	 */
-	private boolean checkRecursiveList(String name, LinkedList<FeatureAttributeInherited> inheritedList, FeatureAttributeInherited fai) {
+	private boolean checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
 		name = name.toLowerCase();
 		for (FeatureAttributeInherited f : inheritedList) {
 			if (f.getName().toLowerCase().equals(name)) {
-				fai = f;
+				f.setValue(value);
+				if (!f.checkValue()) {
+					return false;
+				}
 				return true;
 			}
 		}
@@ -844,7 +846,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-//			f.getStructure().setAttributeListInherited(inheritedList);
 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);

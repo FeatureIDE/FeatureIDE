@@ -29,7 +29,6 @@ public class FeatureAttributeInherited {
 
 	private String value;
 	private FeatureAttribute parentAttribute;
-	private String parentName;
 
 	public FeatureAttributeInherited() {
 		value = "";
@@ -37,16 +36,20 @@ public class FeatureAttributeInherited {
 
 	public FeatureAttributeInherited(FeatureAttribute fa) {
 		parentAttribute = fa;
+		value = "";
 	}
 
 	public String getName() {
 		return parentAttribute.getName();
 	}
 
+	public String getUnit() {
+		return parentAttribute.getUnit();
+	}
 	public String getValue() {
 		return value;
 	}
-
+	
 	public FeatureAttribute getParent() {
 		return parentAttribute;
 	}
@@ -55,8 +58,9 @@ public class FeatureAttributeInherited {
 		parentAttribute = p;
 	}
 
-	public void setValue(String v) {
-		value = v;
+
+	public void setValue(String value) {
+			this.value = value;
 	}
 	
 	public boolean checkValue() {
@@ -65,9 +69,4 @@ public class FeatureAttributeInherited {
 		}
 		return true;
 	}
-	
-	private void setFeatureParentName(String fpn) {
-		parentName = fpn;
-	}
-
 }
