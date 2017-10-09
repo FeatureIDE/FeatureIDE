@@ -263,23 +263,37 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 				toolTip.append("\n\nDescription:\n");
 				toolTip.append(description);
 			}
-			
+
+			// Adding attributes to tooltip
 			if (!feature.getStructure().getAttributeList().isEmpty()) {
 				toolTip.append("\n\nAttributes:");
-				for (FeatureAttribute fa : feature.getStructure().getAttributeList()) {
+				for (final FeatureAttribute fa : feature.getStructure().getAttributeList()) {
 					toolTip.append("\n -" + fa.getName());
 					if (!fa.getValue().isEmpty()) {
 						toolTip.append(": " + fa.getValue());
+						if (!fa.getUnit().isEmpty()) {
+							if (fa.getUnit().length() > 2) {
+								toolTip.append(" ");
+							}
+							toolTip.append(fa.getUnit());
+						}
 					}
 				}
 			}
-			
+
+			// Adding inherited attributes to tooltip
 			if (!feature.getStructure().getAttributeListInherited().isEmpty()) {
 				toolTip.append("\n\nInherited Attributes:");
-				for (FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
+				for (final FeatureAttributeInherited fai : feature.getStructure().getAttributeListInherited()) {
 					toolTip.append("\n -" + fai.getName());
 					if (!fai.getValue().isEmpty()) {
 						toolTip.append(": " + fai.getValue());
+						if (!fai.getUnit().isEmpty()) {
+							if (fai.getUnit().length() > 2) {
+								toolTip.append(" ");
+							}
+							toolTip.append(fai.getUnit());
+						}
 					}
 				}
 			}

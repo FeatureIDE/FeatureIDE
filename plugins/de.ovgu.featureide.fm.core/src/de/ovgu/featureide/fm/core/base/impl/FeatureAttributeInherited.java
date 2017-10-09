@@ -28,44 +28,45 @@ package de.ovgu.featureide.fm.core.base.impl;
 public class FeatureAttributeInherited {
 
 	private String value;
-	private FeatureAttribute parent;
+	private FeatureAttribute parentAttribute;
 
 	public FeatureAttributeInherited() {
 		value = "";
 	}
 
 	public FeatureAttributeInherited(FeatureAttribute fa) {
-		parent = fa;
+		parentAttribute = fa;
+		value = "";
 	}
 
 	public String getName() {
-		return parent.getName();
+		return parentAttribute.getName();
+	}
+
+	public String getUnit() {
+		return parentAttribute.getUnit();
 	}
 
 	public String getValue() {
 		return value;
 	}
 
-	public void setParent(FeatureAttribute p) {
-		parent = p;
-	}
-
-	public void setValue(String v) {
-		value = v;
-	}
-
 	public FeatureAttribute getParent() {
-		return parent;
+		return parentAttribute;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(parent.getName() + ": ");
+	public void setParent(FeatureAttribute p) {
+		parentAttribute = p;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public boolean checkValue() {
 		if (!value.isEmpty()) {
-			sb.append(value);
+			return parentAttribute.checkValue(value);
 		}
-		return sb.toString();
+		return true;
 	}
-
 }
