@@ -28,18 +28,19 @@ package de.ovgu.featureide.fm.core.base.impl;
 public class FeatureAttributeInherited {
 
 	private String value;
-	private FeatureAttribute parent;
+	private FeatureAttribute parentAttribute;
+	private String parentName;
 
 	public FeatureAttributeInherited() {
 		value = "";
 	}
 
 	public FeatureAttributeInherited(FeatureAttribute fa) {
-		parent = fa;
+		parentAttribute = fa;
 	}
 
 	public String getName() {
-		return parent.getName();
+		return parentAttribute.getName();
 	}
 
 	public String getValue() {
@@ -47,11 +48,11 @@ public class FeatureAttributeInherited {
 	}
 
 	public FeatureAttribute getParent() {
-		return parent;
+		return parentAttribute;
 	}
 
 	public void setParent(FeatureAttribute p) {
-		parent = p;
+		parentAttribute = p;
 	}
 
 	public void setValue(String v) {
@@ -59,7 +60,14 @@ public class FeatureAttributeInherited {
 	}
 	
 	public boolean checkValue() {
-		return parent.checkValue(value);
+		if (!value.isEmpty()) {
+			return parentAttribute.checkValue(value);
+		}
+		return true;
+	}
+	
+	private void setFeatureParentName(String fpn) {
+		parentName = fpn;
 	}
 
 }

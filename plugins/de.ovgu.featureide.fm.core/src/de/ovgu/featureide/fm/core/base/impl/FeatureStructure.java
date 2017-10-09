@@ -89,8 +89,6 @@ public class FeatureStructure implements IFeatureStructure {
 		multiple = false;
 		hidden = false;
 
-		attributeList = new LinkedList<FeatureAttribute>();
-		inheritedList = new LinkedList<FeatureAttributeInherited>();
 		if (correspondingFeature.getStructure() != null) {
 			for (final FeatureAttribute fa : correspondingFeature.getFeatureModel().getStructure().getRoot().getAttributeList()) {
 				attributeList.add(fa);

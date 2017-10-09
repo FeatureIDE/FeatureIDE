@@ -183,124 +183,123 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod.appendChild(descr);
 		}
 	}
+//
+//	/**
+//	 * @param e
+//	 * @param attributeList
+//	 * @param recursiveList
+//	 * @param nodeMap
+//	 * @throws UnsupportedModelException
+//	 *
+//	 *         Checks if the element with name attribute has the correct parameters to add it to the attributelist.
+//	 *
+//	 */
+//	private void addAttributeLists(FeatureAttribute fa, LinkedList<FeatureAttribute> attributeList, LinkedList<FeatureAttribute> recursiveList,
+//			final NamedNodeMap nodeMap) throws UnsupportedModelException {
+//		final FeatureAttribute attribute = new FeatureAttribute();
+//		for (int i = 0; i < nodeMap.getLength(); i++) {
+//			final org.w3c.dom.Node node = nodeMap.item(i);
+//			final String nodeName = node.getNodeName();
+//			final String attributeValue = node.getNodeValue().trim();
+//			if (nodeName.equals(NAME)) {
+//				if (!attributeValue.isEmpty()) {
+//					attribute.setName(attributeValue);
+//				} else {
+//					throwError("No Name for attribute: " + attribute.toString(), e);
+//				}
+//			} else if (nodeName.equals(TYPE)) {
+//				if (attributeValue.isEmpty()) {
+//					throwError("Type empty. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
+//				}
+//				attribute.setTypeFromString(attributeValue);
+//				if (attribute.getType() == null) {
+//					throwError("Wrong type. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
+//				}
+//			} else if (nodeName.equals(UNIT)) {
+//				attribute.setUnit(attributeValue);
+//			} else if (nodeName.equals(RECURSIVE)) {
+//				attribute.setRecursive(attributeValue.equals(TRUE));
+//			} else if (nodeName.equals(CONFIGURABLE)) {
+//				attribute.setConfigurable(attributeValue.equals(TRUE));
+//			} else if (nodeName.equals(VALUE)) {
+//				attribute.setValue(attributeValue);
+//			} else {
+//				throwError("Unknown attribute: " + nodeName, e);
+//			}
+//		}
+//		if (attribute.getName().isEmpty()) {
+//			throwError("This attribute needs a name.", e);
+//		}
+//
+//		if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
+//			throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
+//		}
+//
+//		if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
+//			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
+//		} else {
+//			if(!attribute.getValue().isEmpty()) {
+//				if (!attribute.checkValue()) {
+//					throwError("Value doesn't match Type." , e);
+//				}
+//			}
+//			attributeList.add(attribute);
+//			if (attribute.getRecursive() == true) {
+//				recursiveList.add(attribute);
+//			}
+//		}
+//	}
 
-	/**
-	 * @param e
-	 * @param attributeList
-	 * @param recursiveList
-	 * @param nodeMap
-	 * @throws UnsupportedModelException
-	 *
-	 *         Checks if the element with name attribute has the correct parameters to add it to the attributelist.
-	 *
-	 */
-	private void addAttributeToAttributeList(Element e, LinkedList<FeatureAttribute> attributeList, LinkedList<FeatureAttribute> recursiveList,
-			final NamedNodeMap nodeMap) throws UnsupportedModelException {
-		final FeatureAttribute attribute = new FeatureAttribute();
-		for (int i = 0; i < nodeMap.getLength(); i++) {
-			final org.w3c.dom.Node node = nodeMap.item(i);
-			final String nodeName = node.getNodeName();
-			final String attributeValue = node.getNodeValue().trim();
-			if (nodeName.equals(NAME)) {
-				if (!attributeValue.isEmpty()) {
-					attribute.setName(attributeValue);
-				} else {
-					throwError("No Name for attribute: " + attribute.toString(), e);
-				}
-			} else if (nodeName.equals(TYPE)) {
-				if (attributeValue.isEmpty()) {
-					throwError("Type empty. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
-				}
-				attribute.setTypeFromString(attributeValue);
-				if (attribute.getType() == null) {
-					throwError("Wrong type. Attribute needs to be of type " + attribute.getTypeNames() + ". - Attribute: " + attribute.toString(), e);
-				}
-			} else if (nodeName.equals(UNIT)) {
-				attribute.setUnit(attributeValue);
-			} else if (nodeName.equals(RECURSIVE)) {
-				attribute.setRecursive(attributeValue.equals(TRUE));
-			} else if (nodeName.equals(CONFIGURABLE)) {
-				attribute.setConfigurable(attributeValue.equals(TRUE));
-			} else if (nodeName.equals(VALUE)) {
-				attribute.setValue(attributeValue);
-			} else {
-				throwError("Unknown attribute: " + nodeName, e);
-			}
-		}
-		if (attribute.getName().isEmpty()) {
-			throwError("This attribute needs a name.", e);
-		}
-
-		if (isNameInAttributeList(recursiveList, attribute.getName().toLowerCase())) {
-			throwError("Too many parameters in this inherited attribute: " + attribute.toString(), e);
-		}
-
-		if (checkAttributeList(attribute.getName().toLowerCase(), attributeList)) {
-			throwError("Duplicate name for attribute in this feature: " + attribute.toString(), e);
-		} else {
-			if(!attribute.getValue().isEmpty()) {
-				if (!attribute.checkValue()) {
-					throwError("Value doesn't match Type." , e);
-				}
-			}
-			attributeList.add(attribute);
-			if (attribute.getRecursive() == true) {
-				recursiveList.add(attribute);
-			}
-		}
-	}
-
-	/**
-	 *
-	 * @param attribute an attribute
-	 * @param attributeListRecursive List of Recursive Elements
-	 *
-	 *        If an Attribute has less than 3 parameters, this method will check if it is an inherited attribute. If there is no corresponding Attribute, the
-	 *        name is empty, there already is an inherited attribute with that name, or there is another parameter than "name" or "value" an error will be
-	 *        shown. Otherwise the attribute will be added to the list.
-	 *
-	 */
-
-	private void addAttributeToInheritedList(Element e, LinkedList<FeatureAttribute> attributeListRecursive,
-			LinkedList<FeatureAttributeInherited> inheritedAttributeList) throws UnsupportedModelException {
-
-		final FeatureAttributeInherited inherited = new FeatureAttributeInherited();
-
-		final NamedNodeMap nodeMap = e.getAttributes();
-		for (int i = 0; i < nodeMap.getLength(); i++) {
-			final org.w3c.dom.Node node = nodeMap.item(i);
-			final String nodeName = node.getNodeName();
-			final String attributeValue = node.getNodeValue().trim();
-
-			if (nodeName.equals(NAME)) {
-				if (attributeValue.isEmpty()) {
-					throwError("Empty Name " + nodeMap.item(0), e);
-				} else {
-					if (!isNameInInheretedList(inheritedAttributeList, attributeValue)) {
-						final String attributeName = attributeValue.toLowerCase();
-						for (final FeatureAttribute fa : attributeListRecursive) {
-							if (fa.getName().toLowerCase().equals(attributeName)) {
-								inherited.setParent(fa);
-							}
-						}
-					} else {
-						throwError("Attribute already defined: " + nodeMap.item(0), e);
-					}
-				}
-			} else if (nodeName.equals(VALUE)) {
-				inherited.setValue(attributeValue);
-			} else {
-				throwError("Wrong parameters or too few parameters in: " + nodeMap.item(0), e);
-			}
-		}
-		if (inherited.getParent() == null) {
-			throwError("No type for attribute: " + nodeMap.item(0), e);
-		}
-		if (!inherited.checkValue()) {
-			throwError("Value doesn't match Type." , e);
-		}
-		inheritedAttributeList.add(inherited);
-	}
+//	/**
+//	 *
+//	 * @param attribute an attribute
+//	 * @param attributeListRecursive List of Recursive Elements
+//	 *
+//	 *        If an Attribute has less than 3 parameters, this method will check if it is an inherited attribute. If there is no corresponding Attribute, the
+//	 *        name is empty, there already is an inherited attribute with that name, or there is another parameter than "name" or "value" an error will be
+//	 *        shown. Otherwise the attribute will be added to the list.
+//	 *
+//	 */
+//
+//	private void addAttributeToInheritedList(Element e, LinkedList<FeatureAttribute> attributeListRecursive,
+//			LinkedList<FeatureAttributeInherited> inheritedAttributeList, final NamedNodeMap nodeMap) throws UnsupportedModelException {
+//
+//		final FeatureAttributeInherited inherited = new FeatureAttributeInherited();
+//
+//		for (int i = 0; i < nodeMap.getLength(); i++) {
+//			final org.w3c.dom.Node node = nodeMap.item(i);
+//			final String nodeName = node.getNodeName();
+//			final String attributeValue = node.getNodeValue().trim();
+//
+//			if (nodeName.equals(NAME)) {
+//				if (attributeValue.isEmpty()) {
+//					throwError("Empty Name " + nodeMap.item(0), e);
+//				} else {
+//					if (!isNameInInheretedList(inheritedAttributeList, attributeValue)) {
+//						final String attributeName = attributeValue.toLowerCase();
+//						for (final FeatureAttribute fa : attributeListRecursive) {
+//							if (fa.getName().toLowerCase().equals(attributeName)) {
+//								inherited.setParent(fa);
+//							}
+//						}
+//					} else {
+//						throwError("Attribute already defined: " + nodeMap.item(0), e);
+//					}
+//				}
+//			} else if (nodeName.equals(VALUE)) {
+//				inherited.setValue(attributeValue);
+//			} else {
+//				throwError("Wrong parameters or too few parameters in: " + nodeMap.item(0), e);
+//			}
+//		}
+//		if (inherited.getParent() == null) {
+//			throwError("No type for attribute: " + nodeMap.item(0), e);
+//		}
+//		if (!inherited.checkValue()) {
+//			throwError("Value doesn't match Type." , e);
+//		}
+//		inheritedAttributeList.add(inherited);
+//	}
 
 	/**
 	 * @param attributeList
@@ -308,8 +307,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @return true if an attributeName is already in the list
 	 */
 	private boolean checkAttributeList(String attributeName, LinkedList<FeatureAttribute> attributeList) {
-		for (int i = 0; i < attributeList.size(); i++) {
-			if (attributeList.get(i).getName().toLowerCase().equals(attributeName)) {
+		attributeName = attributeName.toLowerCase();
+		for (FeatureAttribute fa : attributeList) {
+			if (fa.getName().toLowerCase().equals(attributeName)) {
 				return true;
 			}
 		}
@@ -482,35 +482,35 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 		return false;
 	}
-
-	/**
-	 * @param attributeList
-	 * @param attributeName
-	 * @return true if Name is already in AttributeList
-	 */
-	private boolean isNameInAttributeList(LinkedList<FeatureAttribute> attributeList, String attributeName) {
-		for (final FeatureAttribute fai : attributeList) {
-			if (fai.getName().toLowerCase().equals(attributeName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param attributeValue
-	 * @param inheritedAttributeList
-	 * @return
-	 */
-	private boolean isNameInInheretedList(LinkedList<FeatureAttributeInherited> inheritedAttributeList, String attributeValue) {
-		attributeValue = attributeValue.toLowerCase();
-		for (final FeatureAttributeInherited fai : inheritedAttributeList) {
-			if (fai.getName().toLowerCase().equals(attributeValue)) {
-				return true;
-			}
-		}
-		return false;
-	}
+//
+//	/**
+//	 * @param attributeList
+//	 * @param attributeName
+//	 * @return true if Name is already in AttributeList
+//	 */
+//	private boolean isNameInAttributeList(LinkedList<FeatureAttribute> attributeList, String attributeName) {
+//		for (final FeatureAttribute fai : attributeList) {
+//			if (fai.getName().toLowerCase().equals(attributeName)) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//
+//	/**
+//	 * @param attributeValue
+//	 * @param inheritedAttributeList
+//	 * @return
+//	 */
+//	private boolean isNameInInheretedList(LinkedList<FeatureAttributeInherited> inheritedAttributeList, String attributeValue) {
+//		attributeValue = attributeValue.toLowerCase();
+//		for (final FeatureAttributeInherited fai : inheritedAttributeList) {
+//			if (fai.getName().toLowerCase().equals(attributeValue)) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 	/**
 	 * @param e
@@ -523,13 +523,95 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			LinkedList<FeatureAttributeInherited> inheritedList) throws UnsupportedModelException {
 
 		if (e.hasAttributes()) {
+
 			final NamedNodeMap nodeMap = e.getAttributes();
-			if ((nodeMap.getLength() < 3) && !(nodeMap.item(0).getNodeName().equals(TYPE) || nodeMap.item(1).getNodeName().equals(TYPE))) {
-				addAttributeToInheritedList(e, recursiveList, inheritedList);
+
+			String name = "", value = "", type = "", unit = "", recursive = "", configurable = "";
+
+			for (int i = 0; i < nodeMap.getLength(); i++) {
+				final org.w3c.dom.Node node = nodeMap.item(i);
+				final String nodeName = node.getNodeName();
+				final String attributeValue = node.getNodeValue().trim();
+				if (nodeName.equals(NAME)) {
+					name = attributeValue;
+				} else if (nodeName.equals(VALUE)) {
+					value = attributeValue;
+				} else if (nodeName.equals(TYPE)) {
+					type = attributeValue;
+				} else if (nodeName.equals(UNIT)) {
+					unit = attributeValue;
+				} else if (nodeName.equals(RECURSIVE)) {
+					recursive = attributeValue;
+				} else if (nodeName.equals(CONFIGURABLE)) {
+					configurable = attributeValue;
+				} else {
+					throwError("Unknown parameter", e);
+				}
+			}
+			
+			if (name.isEmpty()) {
+				throwError("This attribute has needs a name.", e);
+			} else if (checkAttributeList(name, attributeList)) {
+				throwError("There already is an attribute with this name.", e);
+			} else if (type.isEmpty()) {
+				
+				//Check if the attribute is inherited
+				FeatureAttributeInherited fai = new FeatureAttributeInherited();
+				if (checkRecursiveList(name, inheritedList, fai)) {
+					if (!unit.isEmpty() || !recursive.isEmpty() || !configurable.isEmpty()) {
+						throwError("Too many parameters for inherited attribute. Only name and value allowed.", e);
+					} else {
+						fai.setValue(value);
+						if (!fai.checkValue()) {
+							throwError("Value doesn't match type of parent.", e);
+						}
+					}
+				} else {
+					throwError("This attribute is not inherited and needs a type.", e);
+				}
 			} else {
-				addAttributeToAttributeList(e, attributeList, recursiveList, nodeMap);
+
+				boolean conf = false, rec = false;
+
+				if (!configurable.isEmpty()) {
+					if (configurable.toString().toLowerCase().equals("true")) {
+						conf = true;
+					} else if (!configurable.toString().toLowerCase().equals("false")) {
+						throwError("Configurable must be empty, true or false.", e);
+					}
+				}
+				if (!recursive.isEmpty()) {
+					if (recursive.toString().toLowerCase().equals("true")) {
+						rec = true;
+					} else if (!recursive.toString().toLowerCase().equals("false")) {
+						throwError("Recursive must be empty, true or false.", e);
+					}
+				}
+				
+				FeatureAttribute fa = new FeatureAttribute(name, value, type, unit, rec, conf);
+				attributeList.add(fa);
+				if (fa.getRecursive()) {
+					recursiveList.add(fa);
+				}
 			}
 		}
+	}
+
+	/**
+	 * @param name
+	 * @param value
+	 * @param inheritedList
+	 * @return
+	 */
+	private boolean checkRecursiveList(String name, LinkedList<FeatureAttributeInherited> inheritedList, FeatureAttributeInherited fai) {
+		name = name.toLowerCase();
+		for (FeatureAttributeInherited f : inheritedList) {
+			if (f.getName().toLowerCase().equals(name)) {
+				fai = f;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -689,7 +771,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		if (parent != null) {
 			for (final FeatureAttribute fa : parentList) {
-				attributeListRecursive.addLast(fa);
+				FeatureAttributeInherited fai = new FeatureAttributeInherited(fa);
+				attributeListRecursive.add(fa);
+				inheritedList.add(fai);
 			}
 		}
 

@@ -36,16 +36,26 @@ public class FeatureAttribute {
 	protected String value;
 	protected String unit;
 	protected boolean recursive;
-	protected Types v;
+	protected Types type;
 
 	public FeatureAttribute() {
 		name = "";
-		v = null;
+		type = null;
 		recursive = false;
 		value = "";
 		unit = "";
 		configurable = false;
 	}
+	
+	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
+		this.name = name;
+		this.value = value;
+		this.setTypeFromString(type);
+		this.unit = unit;
+		this.recursive = recursive;
+		this.configurable = configurable;
+	}
+	
 
 	public boolean getConfigurable() {
 		return configurable;
@@ -64,11 +74,11 @@ public class FeatureAttribute {
 	}
 
 	public Types getType() {
-		return v;
+		return type;
 	}
 	
 	public String getTypeString() {
-		return v.toString().toLowerCase();
+		return type.toString().toLowerCase();
 	}
 
 	public String getTypeNames() {
@@ -88,7 +98,14 @@ public class FeatureAttribute {
 
 	public void setConfigurable(boolean configurable) {
 		this.configurable = configurable;
+	}
 	
+	public void setConfigurable(String configurableString) {
+		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
+			this.configurable = false;
+		} else if (value.toLowerCase().equals("true")){
+			this.configurable = true;
+		}
 	}
 
 	public void setName(String name) {
@@ -104,13 +121,13 @@ public class FeatureAttribute {
 		type = type.toUpperCase();
 		for (final Types typeNames : Types.values()) {
 			if (typeNames.toString().equals(type)) {
-				this.v = typeNames;
+				this.type = typeNames;
 			}
 		}
 	}
 
 	public void setType(Types type) {
-		this.v = type;
+		this.type = type;
 	}
 
 	public void setUnit(String unit) {
@@ -141,21 +158,21 @@ public class FeatureAttribute {
 	}
 	
 	public boolean checkValue() {
-		if (v.toString().equals("LONG")) {
+		if (type.toString().equals("LONG")) {
 			try {
 				Long.parseLong(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (v.toString().equals("DOUBLE")) {
+		if (type.toString().equals("DOUBLE")) {
 			try {
 				Double.parseDouble(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (v.toString().equals("BOOLEAN")) {
+		if (type.toString().equals("BOOLEAN")) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
 			}
@@ -163,23 +180,23 @@ public class FeatureAttribute {
 		return true;
 	}
 	
-	public boolean checkValue(String v) {
-		if (v.toString().equals("LONG")) {
+	public boolean checkValue(String value) {
+		if (type.toString().equals("LONG")) {
 			try {
 				Long.parseLong(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (v.toString().equals("DOUBLE")) {
+		if (type.toString().equals("DOUBLE")) {
 			try {
 				Double.parseDouble(value);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
-		if (v.toString().equals("BOOLEAN")) {
-			if (v.toLowerCase().equals("true") || v.toLowerCase().equals("false")) {
+		if (type.toString().equals("BOOLEAN")) {
+			if (type.toString().toLowerCase().equals("true") || type.toString().toLowerCase().equals("false")) {
 				return true;
 			}
 		}
