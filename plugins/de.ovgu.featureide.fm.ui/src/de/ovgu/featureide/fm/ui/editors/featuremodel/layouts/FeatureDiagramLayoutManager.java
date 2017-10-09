@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -51,7 +52,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Jann-Ole Henningson
  */
 abstract public class FeatureDiagramLayoutManager {
-
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
@@ -80,7 +80,9 @@ abstract public class FeatureDiagramLayoutManager {
 
 		if (!featureModel.isLegendHidden()) {
 			if (featureModel.getLayout().hasLegendAutoLayout()) {
-				newLayoutLegend(featureModel, showHidden);
+				layoutLegend(featureModel, showHidden);
+			} else {
+				intersectionTest(featureModel);	
 			}
 		}
 		newLocations.clear();
@@ -119,6 +121,50 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 	
+	public void intersectionTest(IGraphicalFeatureModel featureModel) {	
+		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();	
+		Dimension legendSize = null;
+		LegendFigure legendFigure = null;
+		// Find Legend Figure
+		for (final Object obj : editor.getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				legendFigure = ((LegendEditPart) obj).getFigure();
+				legendSize = legendFigure.getSize();
+			}
+		}
+		
+		
+		if ((legendSize == null) && (legendFigure == null)) {
+			return;
+		}
+		
+		boolean hit = false;
+		Point target = null;
+		Point source = null;
+		for (final IGraphicalFeature feature : nonHidden) {
+			//Check for intersections of the legend with the edges
+			List<FeatureConnection> targets = feature.getTargetConnections();
+			if (targets != null) {
+				for (int i = 0; i < targets.size(); i++) {
+					if (!featureModel.getLayout().verticalLayout()) {
+						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, targets.get(i).getSource().getLocation().y);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
+					} else {
+						target = new Point(targets.get(i).getSource().getLocation().x, targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
+					}
+					if (checkIntersection(source, target, featureModel.getLayout().getLegendPos(), legendSize))
+						hit = true;
+				}	
+			}
+		}
+
+		if (hit) {
+			legendFigure.setBackgroundColor(new Color(null, 255, 0, 0));
+		} else {
+			legendFigure.setBackgroundColor(new Color(null, 255, 255, 255));
+		}
+	}
 	
 	public Point[] getFeatureModelBounds(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -143,12 +189,10 @@ abstract public class FeatureDiagramLayoutManager {
 				max.y = position.bottom();
 			}
 		}
-		
-		//Since a rectangle doesn't contain its values after returning it, we do have to return an array of Points
+
 		Point[] bounds = new Point[2];
 		bounds[0] = new Point(min.x, min.y);
-		bounds[1] = new Point(max.x, max.y);
-		
+		bounds[1] = new Point(max.x, max.y);		
 		return bounds;
 	}
 	
@@ -185,7 +229,7 @@ abstract public class FeatureDiagramLayoutManager {
 	    return false;
 	}
 	
-	public Point newLayoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
+	public Point layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		if (!featureModel.getLayout().hasLegendAutoLayout())
 			return null;
 		
@@ -238,12 +282,20 @@ abstract public class FeatureDiagramLayoutManager {
 			if (topRight && topLeft && bottomLeft && bottomRight)
 				break;
 			
+			Point target = null;
+			Point source = null;
+			
 			//Check for intersections of the legend with the edges
 			List<FeatureConnection> targets = feature.getTargetConnections();
 			for (int i = 0; i < targets.size(); i++) {
 				if (targets != null) {
-					final Point source = targets.get(i).getSource().getLocation();
-					final Point target = targets.get(i).getTarget().getLocation();
+					if (!featureModel.getLayout().verticalLayout()) {
+						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, targets.get(i).getSource().getLocation().y);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
+					} else {
+						target = new Point(targets.get(i).getSource().getLocation().x, targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
+					}
 					
 					if (!topRight)
 						topRight = checkIntersection(source, target, topRightLegend.getLocation(), topRightLegend.getSize());
