@@ -54,6 +54,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -85,6 +86,10 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -144,57 +149,50 @@ public class AddAttributeDialog extends Dialog  {
 		gridData.verticalAlignment = GridData.FILL_BOTH;
 		gridData.horizontalAlignment = GridData.FILL;
 		
-		final TreeViewer viewer = new TreeViewer(container);
+		Tree featureAttributeTree= new Tree(container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TreeViewer viewer = new TreeViewer(featureAttributeTree);
 		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 		viewer.setContentProvider(new MyContentProvider());
-//		viewer.setLabelProvider(new FileTreeLabelProvider());
+		viewer.setLabelProvider(new TableLabelProvider());
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
 		
 		
 		for (int i = 0; i < columLabels.length; i++) {
-			TreeViewerColumn column = new TreeViewerColumn(viewer, SWT.NONE);
-			column.getColumn().setWidth(110);
-			column.getColumn().setMoveable(true);
-			column.getColumn().setText(columLabels[i]);
-			column.setLabelProvider(createColumnLabelProvider());
+			TreeColumn column = new TreeColumn(featureAttributeTree, SWT.NONE);
+			column.setWidth(150);
+			column.setMoveable(true);
+			column.setText(columLabels[i]);
 		}
+		Button bAdd = new Button(container, SWT.PUSH);
+		bAdd.setText("Add Attribute");
+		bAdd.addSelectionListener(new SelectionAdapter() {
+	       	
+	        // Add a task to the ExampleTaskList and refresh the view
+		    public void widgetSelected(SelectionEvent e) {
+	            FeatureAttribute.addTask();
+	        }
+	    });
+
+		Button bRemove = new Button(container, SWT.PUSH);
+		bRemove.setText("Remove Attribute");
 		
-
-		final Label featureLabel = new Label(container, SWT.NONE);
-		featureLabel.setLayoutData(gridData);
-		featureLabel.setBackground(WHITE);
-		featureLabel.setText(featureModel.getFeature("HelloWorld").getName());
-		//System.out.println(featureModel.getFeature("HelloWorld").getName());
-		//
 		viewer.setInput(featureModel);
-
+		
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			  @Override
+			  public void selectionChanged(SelectionChangedEvent event) {
+			    IStructuredSelection selection = viewer.getStructuredSelection();
+			    Object firstElement = selection.getFirstElement();
+			    // do something with it
+			  }
+			});
     	return parent;
 	
 	}
 	
-	private ColumnLabelProvider createColumnLabelProvider() {
-		return new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				return  element.toString();
-			}
-
-		};
-	}
-	
-	private LinkedList<IFeature> getFeatureList(IFeatureModel featureModel){
-		LinkedList<IFeature> featureList = new LinkedList<>();
-		List<String> featureNameList = featureModel.getFeatureOrderList();
-		for(int i = 0; i < featureNameList.size(); i++) {
-			featureList.add(featureModel.getFeature(featureNameList.get(i)));
-		}
-		return featureList;
-	}
-	
-	
-	private class MyContentProvider implements ITreeContentProvider {
+		
+	private class MyContentProvider implements ITreeContentProvider, IStructuredContentProvider {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
@@ -202,16 +200,16 @@ public class AddAttributeDialog extends Dialog  {
 			ArrayList<IFeature> feature = new ArrayList();
 			IFeature name = fm.getStructure().getRoot().getFeature();
 			feature.add(name);
-//			feature.add(fm.getFeature(name.get(3).toString()));
-//			for(String name : fm.getFeatureOrderList()) {
-//				feature.add(fm.getFeature(name));
-//			}
 		    if (fm.getNumberOfFeatures() == 0) {
 		    	return new Object[0];
 		    }       
 		    return feature.toArray();
 		}
 
+		public void addTask(Object task) {
+            viewer.add(task);
+        }
+		
 		@Override
 		public void dispose() {}
 
@@ -220,16 +218,28 @@ public class AddAttributeDialog extends Dialog  {
 
 		@Override
 		public Object[] getChildren(Object parentElement) {
-			if(hasChildren(parentElement)) {
+			ArrayList<Object> feature = new ArrayList();
+			LinkedList<FeatureAttribute> attList = new LinkedList<>();
+			LinkedList<FeatureAttributeInherited> attListInh = new LinkedList<>();
+			if(parentElement instanceof IFeature) {
 				IFeature f = (IFeature) parentElement;
-				ArrayList<IFeature> feature = new ArrayList();
+				attList = f.getStructure().getAttributeList();
+				attListInh = f.getStructure().getAttributeListInherited();
+				for(FeatureAttribute attribute : attList) {
+					feature.add(attribute);
+					
+				}
+				for(FeatureAttributeInherited attributeInh : attListInh) {
+					if(!isInList(attList, attributeInh.getParent())) {
+						feature.add(attributeInh);
+					}
+				}
 				for(int i = 0; i < f.getStructure().getChildrenCount(); i++) {
 					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
 					feature.add(cf);
 				}
-				return feature.toArray();
 			}
-			return null;
+				return feature.toArray();
 		}
 
 		@Override
@@ -244,66 +254,149 @@ public class AddAttributeDialog extends Dialog  {
 		public boolean hasChildren(Object element) {
 			if (element instanceof IFeature) {
 		         IFeature f = (IFeature) element;
-		         return f.getStructure().hasChildren();
+		         if(f.getStructure().hasChildren()) {
+		        	 return true;
+		         } else if (f.getStructure().getAttributeList() != null || f.getStructure().getAttributeListInherited() != null) {
+		        	 return true;
+		         }
 		    }
 		    return false;
 		}
+		
+		private boolean isInList(LinkedList<FeatureAttribute> attList, FeatureAttribute inhAtt) {
+			for(FeatureAttribute attribute : attList) {
+				if (attribute.equals(inhAtt)) {
+					return true;
+				}						
+		}
+			return false;
+		}
 	}
 		
+
+	
+
+		class TableLabelProvider implements ITableLabelProvider {
+
+		@Override
+		public Image getColumnImage(Object element, int columnIndex) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getColumnText(Object element, int columnIndex) { 
+			switch(columnIndex) {
+		    	  case 0:
+		    		  if (element instanceof IFeature) {
+		    			  return ((IFeature) element).getName();
+		    		  }
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return "Attribute";
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return "Inherited attribute";
+		    		  }
+		    	  case 1:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return ((FeatureAttribute) element).getName();
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return ((FeatureAttributeInherited) element).getName();
+		    		  }		    		  
+		    	  case 2:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return ((FeatureAttribute) element).getValue();
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return ((FeatureAttributeInherited) element).getValue();
+		    		  }
+		      		  
+		    	  case 3:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return ((FeatureAttribute) element).getTypeString();
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return ((FeatureAttributeInherited) element).getParent().getTypeString();
+		    		  }
+		    		  
+		    	  case 4:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return ((FeatureAttribute) element).getUnit();
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return ((FeatureAttributeInherited) element).getParent().getUnit();
+		    		  }
+		    		 
+		    	  case 5:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return String.valueOf(((FeatureAttribute) element).getConfigurable()); 
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return String.valueOf(((FeatureAttributeInherited) element).getParent().getConfigurable());
+		    		  }
+		    		  
+		    	  case 6:
+		    		  if (element instanceof FeatureAttribute) {
+		    			  return String.valueOf(((FeatureAttribute) element).getRecursive());
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  return String.valueOf(((FeatureAttributeInherited) element).getParent().getRecursive());
+		    		  }
+		    	  }
+		      return null; 
+		}
+
+		@Override
+		public void addListener(ILabelProviderListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void dispose() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean isLabelProperty(Object element, String property) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public void removeListener(ILabelProviderListener listener) {
+			// TODO Auto-generated method stub
+			
+		}
+		}
 }
-	
-
-//		class FileTreeLabelProvider implements ILabelProvider {
-//		  private List listeners;
-//
-//		  private Image file;
-//
-//		  private Image dir;
-//
-//		  public FileTreeLabelProvider() {
-//		    listeners = new ArrayList();
-//
-//		    try {
-//		      file = new Image(null, new FileInputStream("images/file.gif"));
-//		      dir = new Image(null, new FileInputStream("images/directory.gif"));
-//		    } catch (FileNotFoundException e) {
-//		    }
-//		  }
-//
-//		  public Image getImage(Object arg0) {
-//		    return ((File) arg0).isDirectory() ? dir : file;
-//		  }
-//
-//		  public String getText(Object arg0) {
-//		    String text = ((File) arg0).getName();
-//
-//		    if (((File) arg0).getName().length() == 0) {
-//		      text = ((File) arg0).getPath();
-//		    }
-//		    return text;
-//		  }
-//
-//		  public void addListener(ILabelProviderListener arg0) {
-//		    listeners.add(arg0);
-//		  }
-//
-//		  public void dispose() {
-//		    // Dispose the images
-//		    if (dir != null)
-//		      dir.dispose();
-//		    if (file != null)
-//		      file.dispose();
-//		  }
-//
-//		  public boolean isLabelProperty(Object arg0, String arg1) {
-//		    return false;
-//		  }
-//
-//		  public void removeListener(ILabelProviderListener arg0) {
-//		    listeners.remove(arg0);
-//		  }
-
-	
+//		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
+//			return new EditingSupport(viewer) {
+//	
+//				@Override
+//				protected boolean canEdit(Object element) {
+//					return false;
+//				}
+//	
+//				@Override
+//				protected CellEditor getCellEditor(Object element) {
+//					return textCellEditor;
+//				}
+//	
+//				@Override
+//				protected Object getValue(Object element) {
+//					return ((Object) element).counter + "";
+//				}
+//	
+//				@Override
+//				protected void setValue(Object element, Object value) {
+//					((MyModel) element).counter = Integer.parseInt(value.toString());
+//					viewer.update(element, null);
+//				}
+//			};
+//		}
+//		}
 	
 //				Button b = new Button(shell, SWT.PUSH);
 //				b.setText("Remove column");
@@ -393,84 +486,7 @@ public class AddAttributeDialog extends Dialog  {
 //					}
 //				};
 //			}
-//		
-//			private MyModel createModel() {
-//				MyModel root = new MyModel(0, null);
-//				root.counter = 0;
-//		
-//				MyModel tmp;
-//				MyModel subItem;
-//				for (int i = 1; i < 10; i++) {
-//					tmp = new MyModel(i, root);
-//					root.child.add(tmp);
-//					for (int j = 1; j < i; j++) {
-//						subItem = new MyModel(j, tmp);
-//						subItem.child.add(new MyModel(j * 100, subItem));
-//						tmp.child.add(subItem);
-//					}
-//				}
-//				return root;
-//			}
-//		
 //			
-//		
-//			private class MyContentProvider implements ITreeContentProvider {
-//		
-//				@Override
-//				public Object[] getElements(Object inputElement) {
-//					return ((MyModel) inputElement).child.toArray();
-//				}
-//		
-//				@Override
-//		 	public void dispose() {}
-//		
-//				@Override
-//				public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-//		
-//				@Override
-//				public Object[] getChildren(Object parentElement) {
-//					return getElements(parentElement);
-//				}
-//		
-//				@Override
-//				public Object getParent(Object element) {
-//					if (element == null) {
-//						return null;
-//				}
-//					return ((MyModel) element).parent;
-//				}
-//		
-//				@Override
-//				public boolean hasChildren(Object element) {
-//					return ((MyModel) element).child.size() > 0;
-//				}
-//		
-//			}
-//		
-//			
-//		
-//			public class MyModel {
-//		
-//				public MyModel parent;
-//				public List<MyModel> child = new ArrayList<>();
-//				public int counter;
-//		
-//				public MyModel(int counter, MyModel parent) {
-//					this.parent = parent;
-//					this.counter = counter;
-//				}
-//		
-//				@Override
-//				public String toString() {
-//					String rv = "Item ";
-//					if (parent != null) {
-//						rv = parent.toString() + ".";
-//					}
-//					rv += counter;
-//		
-//					return rv;
-//				}
-//			}
 
 
 
