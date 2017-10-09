@@ -81,8 +81,6 @@ abstract public class FeatureDiagramLayoutManager {
 		if (!featureModel.isLegendHidden()) {
 			if (featureModel.getLayout().hasLegendAutoLayout()) {
 				layoutLegend(featureModel, showHidden);
-			} else {
-				intersectionTest(featureModel);	
 			}
 		}
 		newLocations.clear();
@@ -118,51 +116,6 @@ abstract public class FeatureDiagramLayoutManager {
 			final int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
 			constraint.setLocation(new Point(x, y));
 			y += size.height;
-		}
-	}
-	
-	public void intersectionTest(IGraphicalFeatureModel featureModel) {	
-		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();	
-		Dimension legendSize = null;
-		LegendFigure legendFigure = null;
-		// Find Legend Figure
-		for (final Object obj : editor.getEditPartRegistry().values()) {
-			if (obj instanceof LegendEditPart) {
-				legendFigure = ((LegendEditPart) obj).getFigure();
-				legendSize = legendFigure.getSize();
-			}
-		}
-		
-		
-		if ((legendSize == null) && (legendFigure == null)) {
-			return;
-		}
-		
-		boolean hit = false;
-		Point target = null;
-		Point source = null;
-		for (final IGraphicalFeature feature : nonHidden) {
-			//Check for intersections of the legend with the edges
-			List<FeatureConnection> targets = feature.getTargetConnections();
-			if (targets != null) {
-				for (int i = 0; i < targets.size(); i++) {
-					if (!featureModel.getLayout().verticalLayout()) {
-						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, targets.get(i).getSource().getLocation().y);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
-					} else {
-						target = new Point(targets.get(i).getSource().getLocation().x, targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
-					}
-					if (checkIntersection(source, target, featureModel.getLayout().getLegendPos(), legendSize))
-						hit = true;
-				}	
-			}
-		}
-
-		if (hit) {
-			legendFigure.setBackgroundColor(new Color(null, 255, 0, 0));
-		} else {
-			legendFigure.setBackgroundColor(new Color(null, 255, 255, 255));
 		}
 	}
 	
@@ -285,16 +238,21 @@ abstract public class FeatureDiagramLayoutManager {
 			Point target = null;
 			Point source = null;
 			
-			//Check for intersections of the legend with the edges
+			//Check for edge-intersections
 			List<FeatureConnection> targets = feature.getTargetConnections();
 			for (int i = 0; i < targets.size(); i++) {
 				if (targets != null) {
+					//This might seem odd, but targets are actually sources and sources are targets
 					if (!featureModel.getLayout().verticalLayout()) {
-						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, targets.get(i).getSource().getLocation().y);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
+						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, 
+										   targets.get(i).getSource().getLocation().y);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, 
+										   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
 					} else {
-						target = new Point(targets.get(i).getSource().getLocation().x, targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
+						target = new Point(targets.get(i).getSource().getLocation().x, 
+										   targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
+						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, 
+										   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
 					}
 					
 					if (!topRight)
@@ -341,7 +299,6 @@ abstract public class FeatureDiagramLayoutManager {
 		/*
 		 * set the legend position
 		 */
-
 		if (!topRight) {
 			featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
 			return featureModel.getLayout().getLegendPos();
