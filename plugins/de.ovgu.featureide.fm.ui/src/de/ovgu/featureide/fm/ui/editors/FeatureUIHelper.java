@@ -172,20 +172,12 @@ public class FeatureUIHelper {
 		featureModel.getLayout().showCollapsedConstraints(show);
 	}
 
-	public static Rectangle getBounds(IGraphicalFeature feature) {
-		if ((feature.getLocation() == null) || (feature.getSize() == null)) {
+	public static Rectangle getBounds(IGraphicalElement  element) {
+		if ((element.getLocation() == null) || (element.getSize() == null)) {
 			// UIHelper not set up correctly, refresh the feature model
-			feature.getObject().getFeatureModel().handleModelDataChanged();
+			element.getObject().getFeatureModel().handleModelDataChanged();
 		}
-		return new Rectangle(feature.getLocation(), feature.getSize());
-	}
-
-	public static Rectangle getBounds(IGraphicalConstraint constraint) {
-		if ((constraint.getLocation() == null) || (constraint.getSize() == null)) {
-			// UIHelper not set up correctly, refresh the feature model
-			constraint.getObject().getFeatureModel().handleModelDataChanged();
-		}
-		return new Rectangle(constraint.getLocation(), constraint.getSize());
+		return new Rectangle(element.getLocation(), element.getSize());
 	}
 
 	/**

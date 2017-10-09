@@ -153,34 +153,34 @@ abstract public class FeatureDiagramLayoutManager {
 		return bounds;
 	}
 	
-	public boolean checkConnectionIntersection(Point source, Point target, Point legendPos, Dimension legendSize) {
-		int legendWidth = legendPos.x + legendSize.width;
-		int legendHeight = legendPos.y + legendSize.height;
+	public boolean checkConnectionIntersection(Point source, Point target, Rectangle legendBounds) {
+		Point topLeft = legendBounds.getTopLeft();
+		Point bottomRight = legendBounds.getBottomRight();
 		
 		//Edge is definitely not inside the legend
-		if ((source.x < legendPos.x && target.x < legendPos.x) ||
-		    (source.y < legendPos.y && target.y < legendPos.y) ||
-		    (source.x > legendWidth && target.x > legendWidth) ||
-		    (source.y > legendHeight && target.y > legendHeight))
+		if ((source.x < topLeft.x && target.x < topLeft.x) ||
+		    (source.y < topLeft.y && target.y < topLeft.y) ||
+		    (source.x > bottomRight.x && target.x > bottomRight.x) ||
+		    (source.y > bottomRight.y && target.y > bottomRight.y))
 			return false;
 		
 		//Check every side of the legend for an intersection
 		float m = (float)(target.y - source.y) / (float)(target.x - source.x);
-		float y = m * (float)(legendPos.x - source.x) + (float)source.y;
+		float y = m * (float)(topLeft.x - source.x) + (float)source.y;
 		
-	    if (y >= legendPos.y && y <= legendHeight)
+	    if (y >= topLeft.y && y <= bottomRight.y)
 	    	return true;
 
-	    y = m * (float)(legendWidth - source.x) + (float)source.y;
-	    if (y >= legendPos.y && y <= legendHeight)
+	    y = m * (float)(bottomRight.x - source.x) + (float)source.y;
+	    if (y >= topLeft.y && y <= bottomRight.y)
 	    	return true;
 
-	    float x = (float)(legendPos.y - source.y) / m + (float)source.x;
-	    if (x >= legendPos.x && x <= legendWidth)
+	    float x = (float)(topLeft.y - source.y) / m + (float)source.x;
+	    if (x >= topLeft.x && x <= bottomRight.x)
 	    	return true;
 
-	    x = (float)(legendHeight - source.y) / m + (float)source.x;
-	    if (x >= legendPos.x && x <= legendWidth)
+	    x = (float)(bottomRight.y - source.y) / m + (float)source.x;
+	    if (x >= topLeft.x && x <= bottomRight.x)
 	    	return true;
 	    
 	    return false;
@@ -192,7 +192,7 @@ abstract public class FeatureDiagramLayoutManager {
 			Rectangle rect = iter.next();
 			
 			for (final IGraphicalElement element : elements) {
-				Rectangle elementRect = new Rectangle(element.getLocation(), element.getSize());
+				Rectangle elementRect = new Rectangle(FeatureUIHelper.getBounds(element));
 				if (elementRect.intersects(rect)) {
 					iter.remove();
 					break;
@@ -224,7 +224,7 @@ abstract public class FeatureDiagramLayoutManager {
 				source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, 
 					   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
 			}
-			if (checkConnectionIntersection(source, target, rect.getLocation(), rect.getSize()))
+			if (checkConnectionIntersection(source, target, rect))
 				return true;
 		}
 		return false;
