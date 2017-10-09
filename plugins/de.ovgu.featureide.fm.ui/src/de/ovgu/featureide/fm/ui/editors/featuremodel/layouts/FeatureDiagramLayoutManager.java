@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,6 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
@@ -48,6 +51,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
+ * @author Edgard Schmidt
  * @author Stefanie Schober
  * @author Jann-Ole Henningson
  */
@@ -149,7 +153,7 @@ abstract public class FeatureDiagramLayoutManager {
 		return bounds;
 	}
 	
-	public boolean checkIntersection(Point source, Point target, Point legendPos, Dimension legendSize) {
+	public boolean checkConnectionIntersection(Point source, Point target, Point legendPos, Dimension legendSize) {
 		int legendWidth = legendPos.x + legendSize.width;
 		int legendHeight = legendPos.y + legendSize.height;
 		
@@ -182,6 +186,50 @@ abstract public class FeatureDiagramLayoutManager {
 	    return false;
 	}
 	
+	public void checkIntersections(List<? extends IGraphicalElement> elements, List<Rectangle> rects, boolean verticalLayout) {
+		ListIterator<Rectangle> iter = rects.listIterator();
+		while(iter.hasNext()) {
+			Rectangle rect = iter.next();
+			
+			for (final IGraphicalElement element : elements) {
+				Rectangle elementRect = new Rectangle(element.getLocation(), element.getSize());
+				if (elementRect.intersects(rect)) {
+					iter.remove();
+					break;
+				}
+				
+				if (element instanceof IGraphicalFeature) {
+					List<FeatureConnection> targets = ((IGraphicalFeature) element).getTargetConnections();
+					if (checkConnectionIntersections(targets, rect, verticalLayout)) {
+						iter.remove();
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	public boolean checkConnectionIntersections(List<FeatureConnection> targets, Rectangle rect, boolean verticalLayout) {
+		for (int i = 0; i < targets.size(); i++) {
+			Point target = null;
+			Point source = null;
+			if (verticalLayout) {
+				target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, 
+					   targets.get(i).getSource().getLocation().y);
+				source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, 
+					   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
+			} else {
+				target = new Point(targets.get(i).getSource().getLocation().x, 
+					   targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
+				source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, 
+					   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
+			}
+			if (checkConnectionIntersection(source, target, rect.getLocation(), rect.getSize()))
+				return true;
+		}
+		return false;
+	}
+	
 	public Point layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		if (!featureModel.getLayout().hasLegendAutoLayout())
 			return null;
@@ -204,117 +252,22 @@ abstract public class FeatureDiagramLayoutManager {
 		if ((legendSize == null) && (legendFigure == null))
 			return null;
 		
-		boolean topRight = false;
-		boolean topLeft = false;
-		boolean bottomLeft = false;
-		boolean bottomRight = false;
-
-		Rectangle topRightLegend = new Rectangle(new Point(max.x - legendSize.width, min.y), legendSize);
-		Rectangle topLeftLegend = new Rectangle(min, legendSize);
-		Rectangle bottomLeftLegend = new Rectangle(new Point(min.x, max.y - legendSize.height()), legendSize);
-		Rectangle bottomRightLegend = new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize);
+		ArrayList<Rectangle> rects = new ArrayList<Rectangle>();
+		rects.add(new Rectangle(new Point(max.x - legendSize.width, min.y), legendSize));
+		rects.add(new Rectangle(min, legendSize));
+		rects.add(new Rectangle(new Point(min.x, max.y - legendSize.height()), legendSize));
+		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 		
-		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
-		for (final IGraphicalFeature feature : nonHidden) {
-			
-			//Check for overlap on each side of the feature Model
-			Rectangle featureRect = new Rectangle(feature.getLocation().x, feature.getLocation().y,
-												feature.getSize().width(), feature.getSize().height());
-			if (!topRight)
-				topRight = featureRect.intersects(topRightLegend);
-
-			if (!topLeft)
-				topLeft = featureRect.intersects(topLeftLegend);
-			
-			if (!bottomLeft)
-				bottomLeft = featureRect.intersects(bottomLeftLegend);
-			
-			if (!bottomRight)
-				bottomRight = featureRect.intersects(bottomRightLegend);
-			
-			if (topRight && topLeft && bottomLeft && bottomRight)
-				break;
-			
-			Point target = null;
-			Point source = null;
-			
-			//Check for edge-intersections
-			List<FeatureConnection> targets = feature.getTargetConnections();
-			for (int i = 0; i < targets.size(); i++) {
-				if (targets != null) {
-					//This might seem odd, but targets are actually sources and sources are targets
-					if (!featureModel.getLayout().verticalLayout()) {
-						target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width/2, 
-										   targets.get(i).getSource().getLocation().y);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width/2, 
-										   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height);
-					} else {
-						target = new Point(targets.get(i).getSource().getLocation().x, 
-										   targets.get(i).getSource().getLocation().y + targets.get(i).getSource().getSize().height/2);
-						source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width, 
-										   targets.get(i).getTarget().getLocation().y + targets.get(i).getTarget().getSize().height/2);
-					}
-					
-					if (!topRight)
-						topRight = checkIntersection(source, target, topRightLegend.getLocation(), topRightLegend.getSize());
-	
-					if (!topLeft)
-						topLeft = checkIntersection(source, target, topLeftLegend.getLocation(), topLeftLegend.getSize());
-					
-					if (!bottomLeft)
-						bottomLeft = checkIntersection(source, target, bottomLeftLegend.getLocation(), bottomLeftLegend.getSize());
-					
-					if (!bottomRight)
-						bottomRight = checkIntersection(source, target, bottomRightLegend.getLocation(), bottomRightLegend.getSize());
-					
-					if (topRight && topLeft && bottomLeft && bottomRight)
-						break;
-				}
-			}
+		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().verticalLayout());
+		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().verticalLayout());
+		
+		if(rects.size() > 0) {
+			featureModel.getLayout().setLegendPos(rects.get(0).getLocation().x, rects.get(0).getLocation().y);
+			return featureModel.getLayout().getLegendPos();
 		}
 		
-		//We don't need to check if we can't find any empty space
-		if (!(topRight && topLeft && bottomLeft && bottomRight)) {
-			for (final IGraphicalConstraint constraint : featureModel.getVisibleConstraints()) {
-				//Check for overlap with the constraints
-				Rectangle constraintRect = new Rectangle(constraint.getLocation().x, constraint.getLocation().y,
-													constraint.getSize().width(), constraint.getSize().height());
-				if (!topRight)
-					topRight = constraintRect.intersects(topRightLegend);
-				
-				if (!topLeft)
-					topLeft = constraintRect.intersects(topLeftLegend);
-				
-				if (!bottomLeft)
-					bottomLeft = constraintRect.intersects(bottomLeftLegend);
-				
-				if (!bottomRight)
-					bottomRight = constraintRect.intersects(bottomRightLegend);
-				
-				if (topRight && topLeft && bottomLeft && bottomRight)
-					break;
-			}
-		}
-		
-		/*
-		 * set the legend position
-		 */
-		if (!topRight) {
-			featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
-			return featureModel.getLayout().getLegendPos();
-		} else if (!topLeft) {
-			featureModel.getLayout().setLegendPos(min.x, min.y);
-			return featureModel.getLayout().getLegendPos();
-		} else if (!bottomLeft) {
-			featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
-			return featureModel.getLayout().getLegendPos();
-		} else if (!bottomRight) {
-			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
-			return featureModel.getLayout().getLegendPos();
-		} else {
-			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
-			return featureModel.getLayout().getLegendPos();
-		}
+		featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		return featureModel.getLayout().getLegendPos();
 	}
 
 	/**
