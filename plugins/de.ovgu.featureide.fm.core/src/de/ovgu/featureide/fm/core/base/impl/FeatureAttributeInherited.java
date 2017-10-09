@@ -46,10 +46,11 @@ public class FeatureAttributeInherited {
 	public String getUnit() {
 		return parentAttribute.getUnit();
 	}
+
 	public String getValue() {
 		return value;
 	}
-	
+
 	public FeatureAttribute getParent() {
 		return parentAttribute;
 	}
@@ -58,11 +59,10 @@ public class FeatureAttributeInherited {
 		parentAttribute = p;
 	}
 
-
 	public void setValue(String value) {
-			this.value = value;
+		this.value = value;
 	}
-	
+
 	public boolean checkValue() {
 		if (!value.isEmpty()) {
 			return parentAttribute.checkValue(value);
