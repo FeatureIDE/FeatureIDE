@@ -766,7 +766,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 		final LinkedList<FeatureAttribute> attributeList = new LinkedList<>();
 		final LinkedList<FeatureAttributeInherited> inheritedList = new LinkedList<>();
-
 		final LinkedList<FeatureAttribute> attributeListRecursive = new LinkedList<FeatureAttribute>();
 
 		if (parent != null) {
@@ -822,7 +821,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					} else {
 						throwError("Unknown feature attribute: " + attributeName, e);
 					}
-
 				}
 			}
 
@@ -846,7 +844,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			f.getStructure().setAttributeListInherited(inheritedList);
+//			f.getStructure().setAttributeListInherited(inheritedList);
 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
