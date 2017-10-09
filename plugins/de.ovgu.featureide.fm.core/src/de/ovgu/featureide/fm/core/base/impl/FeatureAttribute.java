@@ -103,6 +103,25 @@ public class FeatureAttribute {
 		return true;
 	}
 
+	// returns an object of the correct type of the attribute
+	public Object getValueObject() {
+		if (type.toString().equals("LONG")) {
+			return Long.parseLong(value);
+		}
+		if (type.toString().equals("DOUBLE")) {
+			return Double.parseDouble(value);
+		}
+		if (type.toString().equals("BOOLEAN")) {
+			if (value.toLowerCase().equals("true")) {
+				return true;
+			}
+			if (value.toLowerCase().equals("false")) {
+				return false;
+			}
+		}
+		return value;
+	}
+
 	public boolean getConfigurable() {
 		return configurable;
 	}
