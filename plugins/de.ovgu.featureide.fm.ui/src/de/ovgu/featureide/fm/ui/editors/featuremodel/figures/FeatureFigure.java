@@ -284,6 +284,9 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 					if (!fai.getValue().isEmpty()) {
 						toolTip.append(": " + fai.getValue());
 						if (!fai.getUnit().isEmpty()) {
+							if(fai.getUnit().length() > 2) {
+								toolTip.append(" ");
+							}
 							toolTip.append(fai.getUnit());
 						}
 					}

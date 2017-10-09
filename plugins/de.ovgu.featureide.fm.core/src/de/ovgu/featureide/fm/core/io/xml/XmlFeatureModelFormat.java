@@ -556,17 +556,18 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else if (type.isEmpty()) {
 				
 				//Check if the attribute is inherited
-				if (checkRecursiveList(name, value, inheritedList)) {
-					if (!unit.isEmpty() || !recursive.isEmpty() || !configurable.isEmpty()) {
-						throwError("Too many parameters for inherited attribute. Only name and value are allowed.", e);
-					} else {
-//						fai.setValue(value);
-//						if (!fai.checkValue()) {
-							throwError("Value doesn't match type of parent. Should be of type: ", e);
+				switch (checkRecursiveList(name, value, inheritedList)) {
+					case 0:					
+						if (!unit.isEmpty() || !recursive.isEmpty() || !configurable.isEmpty()) {
+							throwError("Too many parameters for inherited attribute. Only name and value are allowed.", e);
 						}
-					}
-				} else {
-					throwError("This attribute is not inherited and therefore needs a type.", e);
+						break;
+					case 1:
+						throwError("The value of this attribute doesn't match the type of its parent.", e);
+						break;
+					case 2:
+						throwError("This attribute is not inherited and therefore needs a type.", e);
+						break;
 				}
 			} else {
 
@@ -600,20 +601,22 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 * @param name
 	 * @param value
 	 * @param inheritedList
-	 * @return
-	 */
-	private boolean checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
+	 * @return 0 if attribute was added to recursive list
+	 * 			1 if value has wrong type
+	 * 			2 if attribute was not inherited
+	 */	
+	private int checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
 		name = name.toLowerCase();
 		for (FeatureAttributeInherited f : inheritedList) {
 			if (f.getName().toLowerCase().equals(name)) {
 				f.setValue(value);
 				if (!f.checkValue()) {
-					return false;
+					return 1;
 				}
-				return true;
+				return 0;
 			}
 		}
-		return false;
+		return 2;
 	}
 
 	/**
