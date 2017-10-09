@@ -46,7 +46,7 @@ public class Commons {
 
 	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
 
-	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.ui-test/src/";
+	private static final String PLUGIN_PATH = "de.ovgu.featureide.ui-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
 		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
@@ -68,16 +68,20 @@ public class Commons {
 		return folder;
 	}
 
-	private static final String BENCHMARK_FEATURE_MODEL_PATH = "benchmarkFeatureModels/";
+	private static final String FEATURE_MODEL_PATH = "models/";
 
-	private static final String TEST_FEATURE_MODEL_PATH = "testFeatureModels/";
+	private static final String STATISTICS_PATH = "statisticsfiles/";
 
-	public final static IFeatureModel loadBenchmarkFeatureModelFromFile(final String filename) {
-		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(BENCHMARK_FEATURE_MODEL_PATH));
+	public final static File getFeatureModelFolder() {
+		return getRemoteOrLocalFolder(FEATURE_MODEL_PATH);
 	}
 
-	public final static IFeatureModel loadTestFeatureModelFromFile(final String filename) {
-		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(TEST_FEATURE_MODEL_PATH));
+	public final static File getStatisticsFolder() {
+		return getRemoteOrLocalFolder(STATISTICS_PATH);
+	}
+
+	public final static IFeatureModel loadFeatureModelFromFile(final String filename) {
+		return loadFeatureModelFromFile(filename, getFeatureModelFolder());
 	}
 
 	/**

@@ -2,6 +2,13 @@ sudo: false
 
 language: java
 
+env:  
+  global:
+    - DISPLAY=:99.0
+
+before_install:
+  - sh -e /etc/init.d/xvfb start - sleep 10
+
 jdk: oraclejdk8
 
 cache:
@@ -14,4 +21,4 @@ script:
 - mvn clean verify
 
 after_failure:
-- cat target/surefire-reports/*.txt
+- find -name "*.txt" | grep -F 'surefire-reports' | xargs cat

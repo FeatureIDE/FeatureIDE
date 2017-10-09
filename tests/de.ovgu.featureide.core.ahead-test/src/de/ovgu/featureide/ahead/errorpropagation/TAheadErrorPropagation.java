@@ -27,6 +27,7 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.core.CorePlugin;
 
@@ -44,9 +45,6 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public class TAheadErrorPropagation {
 
-	protected static File FILE_FOLDER_TEAMCITY = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
-	protected static File FILE_FOLDER = new File("/home/travis/build/FeatureIDE/FeatureIDE/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
-
 	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
 
 	private String project;
@@ -60,12 +58,7 @@ public class TAheadErrorPropagation {
 	}
 
 	public File getFile(String name) {
-		// first tries the location on build server, if this fails tries to use
-		// local location
-		if (!FILE_FOLDER.canRead()) {
-			FILE_FOLDER = new File(ClassLoader.getSystemResource("testcases").getPath());
-		}
-		final File folder = FILE_FOLDER.listFiles(getFileFilter(project))[0];
+		final File folder = Commons.getTestCaseFolder().listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
 	}
 
