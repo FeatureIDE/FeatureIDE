@@ -102,7 +102,6 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void addChild(IFeatureStructure newChild) {
 		addNewChild(newChild);
-		fireChildrenChanged();
 	}
 
 	@Override
@@ -483,16 +482,4 @@ public class FeatureStructure implements IFeatureStructure {
 		inheritedList = attListRecursive;
 
 	}
-
-	@Override
-	public LinkedList<FeatureAttribute> getRecursiveList() {
-		final LinkedList<FeatureAttribute> rekList = new LinkedList<>();
-		for (final FeatureAttribute att : attributeList) {
-			if (att.getRecursive() == true) {
-				rekList.addLast(att);
-			}
-		}
-		return rekList;
-	}
-
 }

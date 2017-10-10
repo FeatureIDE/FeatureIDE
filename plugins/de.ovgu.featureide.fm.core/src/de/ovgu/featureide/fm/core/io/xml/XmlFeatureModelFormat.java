@@ -170,7 +170,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				final Element feature = doc.createElement(FEATURE);
 				feature.setAttribute(NAME, featureName);
 				order.appendChild(feature);
-				writeRealAttribute(doc, feature, object.getFeature(featureName));
+				writeFeatureAttribute(doc, feature, object.getFeature(featureName));
 			}
 		}
 	}
@@ -201,7 +201,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	/**
 	 * Values that checkRecursiveList can return.
-	 * 
+	 *
 	 * @author "Werner Jan"
 	 */
 	public enum checkRecursiveListReturnValues {
@@ -322,7 +322,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod = doc.createElement(FEATURE);
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
-			writeRealAttribute(doc, fnod, feat);
+			writeFeatureAttribute(doc, fnod, feat);
 
 		} else {
 			if (feat.getStructure().isAnd()) {
@@ -337,7 +337,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
-			writeRealAttribute(doc, fnod, feat);
+			writeFeatureAttribute(doc, fnod, feat);
 
 			for (final IFeature feature : children) {
 				createXmlDocRec(doc, fnod, feature);
@@ -714,7 +714,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			f.getStructure().setAttributeListInherited(inheritedList);
 			f.getStructure().setAttributeList(attributeList);
-			
+
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
@@ -783,16 +783,17 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 *
+	 * Write the XML file from FeatureModel. Checks if parent has Attributes that must be inherited. Optional parameters won't be written if empty or false.
+	 *
 	 * @param fnod Current feature node
 	 * @param doc xml document
 	 * @param feat IFeature
 	 *
-	 *        Write the XML file from FeatureModel. Checks if parent has Attributes that must be inherited. Optional parameters won't be written if empty or
-	 *        false.
 	 *
 	 */
 
-	private void writeRealAttribute(Document doc, Element fnod, IFeature feat) {
+	private void writeFeatureAttribute(Document doc, Element fnod, IFeature feat) {
 
 		final LinkedList<FeatureAttributeInherited> inheritedList = feat.getStructure().getAttributeListInherited();
 		final LinkedList<FeatureAttribute> attributeList = feat.getStructure().getAttributeList();
