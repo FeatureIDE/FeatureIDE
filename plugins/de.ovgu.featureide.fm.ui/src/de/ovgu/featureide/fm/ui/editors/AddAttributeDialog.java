@@ -21,81 +21,32 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.window.*;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
-
-import java.awt.Insets;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.URL;
-
-import javax.annotation.PostConstruct;
-import javax.swing.JPanel;
-import javax.swing.text.TableView;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.resource.ResourceManager;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerColumn;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.w3c.dom.Element;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
-import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationListener;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
@@ -104,6 +55,24 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeItem;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.core.base.impl.FeatureAttributeInherited;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
  * A simple editor to change description of a particular feature diagram.
@@ -111,7 +80,9 @@ import org.eclipse.swt.events.SelectionListener;
  */
 public class AddAttributeDialog extends Dialog  {
 	
+	private FeatureModelEditor featureModelEditor;
 	private IFeatureModel featureModel;
+	private int activeColumn = -1;
 	private static final Color WHITE = new Color(null, 255, 255, 255);
 	private String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive"};
 	
@@ -175,25 +146,68 @@ public class AddAttributeDialog extends Dialog  {
 			| ColumnViewerEditor.KEYBOARD_ACTIVATION;
 
 		TreeViewerEditor.create(viewer, focusCellManager, actSupport, feature);
-		final TextCellEditor textCellEditor = new TextCellEditor(viewer.getTree());
+		final CellEditor textCellEditor = new TextCellEditor(viewer.getTree());
 		
-		for (int i = 0; i < columLabels.length; i++) {
-			TreeViewerColumn column = new TreeViewerColumn(viewer, SWT.NONE);
-			column.getColumn().setWidth(150);
-			column.getColumn().setMoveable(true);
-			column.getColumn().setText(columLabels[i]);
-			column.setLabelProvider(createColumnLabelProvider());
-			column.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
-		}
+		TreeViewerColumn column0 = new TreeViewerColumn(viewer, SWT.NONE);
+		column0.getColumn().setWidth(150);
+		column0.getColumn().setMoveable(true);
+		column0.getColumn().setText(columLabels[0]);
+		column0.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
+
+		TreeViewerColumn column1 = new TreeViewerColumn(viewer, SWT.NONE);
+		column1.getColumn().setWidth(150);
+		column1.getColumn().setMoveable(true);
+		column1.getColumn().setText(columLabels[1]);
+		column1.setEditingSupport(new GivenNameEditing(viewer));
 		
+		TreeViewerColumn column2 = new TreeViewerColumn(viewer, SWT.NONE);
+		column2.getColumn().setWidth(150);
+		column2.getColumn().setMoveable(true);
+		column2.getColumn().setText(columLabels[2]);
+		column2.setEditingSupport(new GivenValueEditing(viewer));
+		
+		TreeViewerColumn column3 = new TreeViewerColumn(viewer, SWT.NONE);
+		column3.getColumn().setWidth(150);
+		column3.getColumn().setMoveable(true);
+		column3.getColumn().setText(columLabels[3]);
+		column3.setEditingSupport(new GivenTypeEditing(viewer));
+		
+		TreeViewerColumn column4 = new TreeViewerColumn(viewer, SWT.NONE);
+		column4.getColumn().setWidth(150);
+		column4.getColumn().setMoveable(true);
+		column4.getColumn().setText(columLabels[4]);
+		column4.setEditingSupport(new GivenUnitEditing(viewer));
+		
+		TreeViewerColumn column5 = new TreeViewerColumn(viewer, SWT.NONE);
+		column5.getColumn().setWidth(150);
+		column5.getColumn().setMoveable(true);
+		column5.getColumn().setText(columLabels[5]);
+		column5.setEditingSupport(new GivenConfigurableEditing(viewer));
+		
+		TreeViewerColumn column6 = new TreeViewerColumn(viewer, SWT.NONE);
+		column6.getColumn().setWidth(150);
+		column6.getColumn().setMoveable(true);
+		column6.getColumn().setText(columLabels[6]);
+		column6.setEditingSupport(new GivenRecursiveEditing(viewer));
 		
 		viewer.setContentProvider(new MyContentProvider());
 		viewer.setLabelProvider(new TableLabelProvider());
 		
 		Button bAdd = new Button(container, SWT.PUSH);
 		bAdd.setText("Add Attribute");
-		
+		bAdd.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
 
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+			}
+
+		});
+		
 		Button bRemove = new Button(container, SWT.PUSH);
 		bRemove.setText("Remove Attribute");
 		bRemove.addSelectionListener(new SelectionListener() {
@@ -205,7 +219,25 @@ public class AddAttributeDialog extends Dialog  {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				viewer.getTree().getSelection();
+				ITreeSelection selection = viewer.getStructuredSelection();
+				Object selceted = selection.getFirstElement();
+				if(selceted instanceof FeatureAttribute) {
+					List<String> featureNameList = featureModel.getFeatureOrderList();
+					for(int i = 0; i < featureNameList.size(); i++) {
+						IFeature feature = featureModel.getFeature(featureNameList.get(i));
+						LinkedList<FeatureAttribute> featureAttributeList = feature.getStructure().getAttributeList();
+						LinkedList<FeatureAttributeInherited> featureAttributeListInherited = feature.getStructure().getAttributeListInherited();
+						for(FeatureAttribute featureAttribute : featureAttributeList) {
+							if(featureAttribute.equals(selceted)) {
+								featureAttributeList.remove(selceted);
+								viewer.setInput(featureModel);
+								viewer.expandAll();
+								viewer.refresh();
+
+							}
+						}
+					}
+				}
 			}
 
 		});
@@ -218,24 +250,13 @@ public class AddAttributeDialog extends Dialog  {
     	return parent;
 	
 	}
-	
-	private ColumnLabelProvider createColumnLabelProvider() {
-		return new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				return  element.toString();
-			}
-
-		};
-	}
 		
 	private class MyContentProvider implements ITreeContentProvider {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
 			IFeatureModel fm = (IFeatureModel) inputElement;
-			ArrayList<IFeature> feature = new ArrayList();
+			ArrayList<IFeature> feature = new ArrayList<IFeature>();
 			IFeature name = fm.getStructure().getRoot().getFeature();
 			feature.add(name);
 		    if (fm.getNumberOfFeatures() == 0) {
@@ -254,7 +275,7 @@ public class AddAttributeDialog extends Dialog  {
 
 		@Override
 		public Object[] getChildren(Object parentElement) {
-			ArrayList<Object> feature = new ArrayList();
+			ArrayList<Object> feature = new ArrayList<Object>();
 			LinkedList<FeatureAttribute> attList = new LinkedList<>();
 			LinkedList<FeatureAttributeInherited> attListInh = new LinkedList<>();
 			if(parentElement instanceof IFeature) {
@@ -270,7 +291,6 @@ public class AddAttributeDialog extends Dialog  {
 						feature.add(attributeInh);
 					}
 				}
-
 				for(int i = 0; i < f.getStructure().getChildrenCount(); i++) {
 					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
 					feature.add(cf);
@@ -408,7 +428,7 @@ public class AddAttributeDialog extends Dialog  {
 		}
 		}
 
-		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
+		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final CellEditor textCellEditor) {
 			return new EditingSupport(viewer) {
 	
 				@Override
@@ -418,45 +438,218 @@ public class AddAttributeDialog extends Dialog  {
 	
 				@Override
 				protected CellEditor getCellEditor(Object element) {
-					return textCellEditor;
+					return  textCellEditor;
 				}
 	
 				@Override
 				protected Object getValue(Object element) {
-			    		  if (element instanceof IFeature) {
-			    			  return ((IFeature) element).getName();
-			    		  }
-			    		  if (element instanceof FeatureAttribute) {
-			    			  return "Attribute";
-			    		  }
-			    		  if (element instanceof FeatureAttributeInherited) {
-			    			  return "Inherited attribute";
-			    		  }
-			    		  return null;
+					return null;
 				}
 	
 				@Override
 				protected void setValue(Object element, Object value) {
-					if (element instanceof IFeature) {
-						  ((IFeature) element).setName(value.toString());
-						  viewer.update(element, null);
-		    		  }
-		    		  if (element instanceof FeatureAttribute) {
-		    			  
-		    			  ((FeatureAttribute) element).setName(value.toString());
-		    			  ((FeatureAttribute) element).setValue(value.toString());
-		    			  viewer.update(element, null);
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  ((FeatureAttributeInherited) element).getParent().setName(value.toString());
-		    			  viewer.update(element, null);
-		    		  }
-
 					viewer.update(element, null);
 				}
 			};
 		}
+		
+		
+		
+		private class GivenNameEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenNameEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return ((FeatureAttribute) element).getName();
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				((FeatureAttribute) element).setName(value.toString());
+				getViewer().update(element, null);
+				getViewer().refresh();
+			}
 		}
+		
+		private class GivenValueEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenValueEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return ((FeatureAttribute) element).getValue();
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				((FeatureAttribute) element).setValue(value.toString());
+				getViewer().update(element, null);
+			}
+		}
+		
+		private class GivenTypeEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenTypeEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return ((FeatureAttribute) element).getTypeNames();
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				((FeatureAttribute) element).setTypeFromString(value.toString());
+				getViewer().update(element, null);
+			}
+		}
+		
+		private class GivenUnitEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenUnitEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return ((FeatureAttribute) element).getUnit();
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				((FeatureAttribute) element).setUnit(value.toString());
+				getViewer().update(element, null);
+				getViewer().refresh();
+			}
+		}
+		
+		private class GivenConfigurableEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenConfigurableEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return String.valueOf(((FeatureAttribute) element).getConfigurable());
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				((FeatureAttribute) element).setConfigurable((value.toString()));
+				getViewer().update(element, null);
+				getViewer().refresh();
+			}
+		}
+		
+		private class GivenRecursiveEditing extends EditingSupport {
+			private TextCellEditor cellEditor;
+
+			public GivenRecursiveEditing(TreeViewer viewer) {
+				super(viewer);
+				cellEditor = new TextCellEditor(viewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return cellEditor;
+			}
+
+			@Override
+			protected Object getValue(Object element) {
+				return String.valueOf(((FeatureAttribute) element).getRecursive());
+			}
+
+			@Override
+			protected void setValue(Object element, Object value) {
+				if (value.toString().toLowerCase().equals("true")) {
+					((FeatureAttribute) element).setRecursive(true);
+				} else if (value.toString().toLowerCase().equals("false")) {
+					((FeatureAttribute) element).setRecursive(false);
+				} else {
+					try {
+						Boolean.parseBoolean((String) value);
+					} catch (Exception e) {
+						
+					}
+				}
+
+				getViewer().update(element, null);
+				getViewer().refresh();
+			}
+		}
+}
 
 	
 //				Button b = new Button(shell, SWT.PUSH);
