@@ -499,8 +499,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 
 		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
-		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); //icon for expand added
-		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
+		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); // icon for expand added
+		abstractAction = new AbstractAction(this, featureModel);
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
 		orAction = new OrAction(this, featureModel);
@@ -657,11 +657,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 		// don't show menu to change group type of a feature in case a
 		// connection line is selected
-		else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !connectionSelected) {
+
+		// if one or more features are selected
+		else if ((hiddenAction.isEnabled()) && !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintWithAction);
 			menu.add(renameAction);
+			menu.add(changeFeatureDescriptionAction);
 			menu.add(deleteAction);
 			menu.add(deleteAllAction);
 			menu.add(new Separator());
@@ -669,39 +672,46 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(mandatoryAction);
 			menu.add(abstractAction);
 			menu.add(hiddenAction);
+			menu.add(colorSelectedFeatureAction);
+			menu.add(new Separator());
 			menu.add(collapseAction);
 			menu.add(collapseFeaturesAction);
 			if (getActiveExplanation() != null) {
 				menu.add(collapseAllButExplanationAction);
 			}
-			menu.add(changeFeatureDescriptionAction);
-			menu.add(new Separator());
-			menu.add(subMenuLayout);
-			menu.add(subMenuCalculations);
+
 			menu.add(new Separator());
 			menu.add(calculateDependencyAction);
-			menu.add(reverseOrderAction);
-			menu.add(legendAction);
 			menu.add(new Separator());
+			// if a constraint is selected
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
-			menu.add(expandConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
+			menu.add(new Separator());
+			menu.add(expandConstraintAction);
 			if (getActiveExplanation() != null) {
 				menu.add(new Separator());
 				menu.add(collapseAllButExplanationAction);
 			}
+			// if the legend is selected
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
 			menu.add(legendAction);
+
+			// if a connection is selected
 		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
+
 			connectionEntrys(menu);
+
+			// if nothing is selected
 		} else {
 			menu.add(createConstraintAction);
 			menu.add(new Separator());
 			menu.add(collapseAllAction);
 			menu.add(expandAllAction);
+			menu.add(showHiddenFeaturesAction);
+			menu.add(showCollapsedConstraintsAction);
 			menu.add(adjustModelToEditorSizeAction);
 			menu.add(new Separator());
 			menu.add(subMenuLayout);
@@ -709,36 +719,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
-		}
-
-		boolean isEmpty = true;
-		for (Object obj : ((StructuredSelection) getSelection()).toArray()) {
-			if (obj instanceof FeatureEditPart || obj instanceof IFeature) {
-				isEmpty = false;
-			}
-		}
-		if (!isEmpty) {
-			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);
-		}
-
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			menu.add(showHiddenFeaturesAction);
+			menu.add(exportFeatureModelAction);
 		}
-		menu.add(showCollapsedConstraintsAction);
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
 		// call of the FeatureDiagramExtensions (for features only)
 		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !connectionSelected) {
 			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 				extension.extendContextMenu(menu, this);
 			}
 		}
-
-		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menu.add(this.exportFeatureModelAction);
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
