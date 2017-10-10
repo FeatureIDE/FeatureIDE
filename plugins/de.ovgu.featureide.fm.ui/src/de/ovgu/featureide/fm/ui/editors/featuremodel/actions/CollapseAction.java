@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -79,7 +78,7 @@ public class CollapseAction extends MultipleSelectionAction {
 		}
 	};
 
-	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, IFeatureModel featureModel) {
+	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer);
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		

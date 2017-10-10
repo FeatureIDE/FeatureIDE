@@ -138,6 +138,9 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 		}
 	}
 	
+	/**
+	 * For enabling/disabling the menu entry and the checkbox
+	 */
 	protected abstract void updateProperties();
 	
 	/**
