@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -66,20 +65,13 @@ public class CollapseAction extends MultipleSelectionAction {
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-			if (isValidSelection(selection)) {
-				if (selection.getFirstElement() instanceof FeatureEditPart) {
-					setEnabled(true);
-				} else {
-					setEnabled(false);
-				}
-			} else {
+			if (!isValidSelection(selection)) {
 				setEnabled(false);
 			}
 		}
 	};
 
-	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, IFeatureModel featureModel) {
+	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer);
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		
@@ -118,7 +110,7 @@ public class CollapseAction extends MultipleSelectionAction {
 				((IFeature)obj).removeListener(this);
 			}
 		}
-		if (validSelection) {			
+		if (validSelection) {
 			featureArray =  getSelectedFeatures();
 			refreshGraphicalFeatures();
 			for (IFeature tempFeature : featureArray) {
@@ -167,7 +159,12 @@ public class CollapseAction extends MultipleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(isThereAtLeastOneFeatureThatHasChildren());
-		setChecked(isEveryFeatureCollapsed());
+		// Box is not checked if the action is disabled
+		if (!isThereAtLeastOneFeatureThatHasChildren()) {
+			setChecked(false);
+		} else {
+			setChecked(isEveryFeatureCollapsed());
+		}
 	}
 	
 	private boolean isThereAtLeastOneFeatureThatHasChildren() {
