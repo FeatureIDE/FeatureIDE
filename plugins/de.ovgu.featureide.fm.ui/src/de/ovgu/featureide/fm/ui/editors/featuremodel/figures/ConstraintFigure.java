@@ -186,25 +186,12 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 	private void setText(String newText) {
 		label.setText(newText);
-		final Dimension labelSize = label.getPreferredSize();
-
-		if (labelSize.equals(label.getSize())) {
-			return;
-		}
+		final Dimension labelSize = new Dimension(label.getPreferredSize());
 		label.setSize(labelSize);
 
-		final Rectangle bounds = getBounds();
 		final int w = CONSTRAINT_INSETS.getWidth();
 		final int h = CONSTRAINT_INSETS.getHeight();
-		bounds.setSize(labelSize.expand(w, h));
-
-		final Dimension oldSize = getSize();
-		if (!oldSize.equals(0, 0)) {
-			final int dx = (oldSize.width - bounds.width) / 2;
-			bounds.x += dx;
-		}
-
-		setBounds(bounds);
+		setSize(labelSize.expand(w, h));
 	}
 
 	public Rectangle getLabelBounds() {

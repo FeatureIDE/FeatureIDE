@@ -113,12 +113,10 @@ public class ConstraintEditPart extends ModelElementEditPart {
 			getFigure().setLocation(getModel().getLocation());
 			break;
 		case CONSTRAINT_MODIFY:
-			getFigure().setConstraintProperties();
-			getModel().setSize(getFigure().getSize());
-			break;
 		case ATTRIBUTE_CHANGED:
 		case CONSTRAINT_SELECTED:
 			getFigure().setConstraintProperties();
+			getModel().setSize(getFigure().getSize());
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			setActiveReason(null); // reset

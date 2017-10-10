@@ -126,14 +126,21 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
-	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
+	void layoutConstraints(int yoffset, List<IGraphicalConstraint> constraints, Rectangle rootBounds) {
 		// added 2 times getConstraintSpace to prevent intersecting with the collapsed decorator
-		int y = yoffset + (FMPropertyManager.getConstraintSpace() * 2);
-		final boolean depthFirst = (this instanceof DepthFirstLayout) || (this instanceof VerticalLayout);
-		for (final IGraphicalConstraint constraint : constraints) {
+		int y = yoffset + FMPropertyManager.getConstraintSpace() * 2;
+		boolean depthFirst = this instanceof DepthFirstLayout || this instanceof VerticalLayout;
+		for (IGraphicalConstraint constraint : constraints) {
 			final Dimension size = constraint.getSize();
-			final int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
+			int x;
+			if (depthFirst) {
+				x = 2 * FMPropertyManager.getFeatureSpaceX();
+			} else {
+				final int rootCenter = rootBounds.x + (rootBounds.width / 2);
+				x = rootCenter - (size.width / 2);
+			}
 			constraint.setLocation(new Point(x, y));
+
 			y += size.height;
 		}
 	}

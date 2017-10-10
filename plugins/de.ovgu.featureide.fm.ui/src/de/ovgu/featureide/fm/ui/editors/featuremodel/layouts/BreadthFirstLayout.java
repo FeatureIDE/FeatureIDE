@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -51,7 +52,9 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		yoffset = 0;
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
-		layout(yoffset, featureModel.getVisibleConstraints());
+
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	private void layout(IGraphicalFeature root) {
