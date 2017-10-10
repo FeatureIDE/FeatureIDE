@@ -77,17 +77,6 @@ public class TXMLFeatureModelReaderWriter {
 		assertEquals(gFM.getVisibleFeatures().size(), gfmCollapsed.getVisibleFeatures().size() + notVisible);
 
 		assertEquals(gFM.getVisibleFeatures().size(), gfmNotCollapsed.getVisibleFeatures().size());
-		//
-		// for (IFeature origF : fmOrig.getFeatures()) {
-		// IFeature newF = fmNotCollapsed.getFeature(origF.getName());
-		//
-		// if (newF == null) {
-		// fail();
-		// } else {
-		// assertEquals("Feature: " + origF.getName(), origF.getStructure().isCollapsed(),
-		// fmNotCollapsed.getFeature(origF.getName()).getStructure().isCollapsed());
-		// }
-		// }
 	}
 
 }

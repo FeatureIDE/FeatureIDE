@@ -46,7 +46,7 @@ public class Commons {
 
 	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
 
-	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.ui-test/src/";
+	private static final String PLUGIN_PATH = "de.ovgu.featureide.core.ahead-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
 		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
@@ -68,18 +68,12 @@ public class Commons {
 		return folder;
 	}
 
-	private static final String BENCHMARK_FEATURE_MODEL_PATH = "benchmarkFeatureModels/";
+	private static final String TEST_CASE_PATH = "testcases/";
 
-	private static final String TEST_FEATURE_MODEL_PATH = "testFeatureModels/";
-
-	public final static IFeatureModel loadBenchmarkFeatureModelFromFile(final String filename) {
-		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(BENCHMARK_FEATURE_MODEL_PATH));
+	public static File getTestCaseFolder() {
+		return getRemoteOrLocalFolder(TEST_CASE_PATH);
 	}
-
-	public final static IFeatureModel loadTestFeatureModelFromFile(final String filename) {
-		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(TEST_FEATURE_MODEL_PATH));
-	}
-
+		
 	/**
 	 * Loads a feature model from the file <code>featureModelXmlFilename</code> from a given <code>remotePath</code>, or if <code>remotePath</code> is not
 	 * available, from <code>localClassPath</code>. The search for the file excludes files that don't have the same file extension as
