@@ -200,23 +200,32 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * Values that checkRecursiveList can return.
+	 * 
+	 * @author "Werner Jan"
+	 */
+	public enum checkRecursiveListReturnValues {
+		FEATURE_INHERITED, FEATURE_NOT_INHERITED, WRONG_TYPE
+	}
+
+	/**
 	 * @param name
 	 * @param value
 	 * @param inheritedList
 	 * @return
 	 */
-	private String checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
+	private checkRecursiveListReturnValues checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
 		name = name.toLowerCase();
 		for (final FeatureAttributeInherited f : inheritedList) {
 			if (f.getName().toLowerCase().equals(name)) {
 				f.setValue(value);
 				if (!f.checkValue()) {
-					return WRONG_TYPE;
+					return checkRecursiveListReturnValues.WRONG_TYPE;
 				}
-				return FEATURE_INHERITED;
+				return checkRecursiveListReturnValues.FEATURE_INHERITED;
 			}
 		}
-		return FEATURE_NOT_INHERITED;
+		return checkRecursiveListReturnValues.FEATURE_NOT_INHERITED;
 	}
 
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
