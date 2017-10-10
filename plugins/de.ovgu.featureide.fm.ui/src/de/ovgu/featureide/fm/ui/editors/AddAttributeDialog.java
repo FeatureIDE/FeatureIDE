@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 
 import javax.annotation.PostConstruct;
+import javax.swing.JPanel;
 import javax.swing.text.TableView;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -58,6 +59,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -81,7 +83,9 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationListener;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -149,50 +153,84 @@ public class AddAttributeDialog extends Dialog  {
 		gridData.verticalAlignment = GridData.FILL_BOTH;
 		gridData.horizontalAlignment = GridData.FILL;
 		
-		Tree featureAttributeTree= new Tree(container, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		final TreeViewer viewer = new TreeViewer(featureAttributeTree);
+		final TreeViewer viewer = new TreeViewer(container);
 		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-		viewer.setContentProvider(new MyContentProvider());
-		viewer.setLabelProvider(new TableLabelProvider());
+
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
 		
+		TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(viewer));
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+
+			@Override
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+					|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+					|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+					|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
+			}
+		};
+
+		int feature = ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
+			| ColumnViewerEditor.KEYBOARD_ACTIVATION;
+
+		TreeViewerEditor.create(viewer, focusCellManager, actSupport, feature);
+		final TextCellEditor textCellEditor = new TextCellEditor(viewer.getTree());
 		
 		for (int i = 0; i < columLabels.length; i++) {
-			TreeColumn column = new TreeColumn(featureAttributeTree, SWT.NONE);
-			column.setWidth(150);
-			column.setMoveable(true);
-			column.setText(columLabels[i]);
+			TreeViewerColumn column = new TreeViewerColumn(viewer, SWT.NONE);
+			column.getColumn().setWidth(150);
+			column.getColumn().setMoveable(true);
+			column.getColumn().setText(columLabels[i]);
+			column.setLabelProvider(createColumnLabelProvider());
+			column.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
 		}
+		
+		
+		viewer.setContentProvider(new MyContentProvider());
+		viewer.setLabelProvider(new TableLabelProvider());
+		
 		Button bAdd = new Button(container, SWT.PUSH);
 		bAdd.setText("Add Attribute");
-		bAdd.addSelectionListener(new SelectionAdapter() {
-	       	
-	        // Add a task to the ExampleTaskList and refresh the view
-		    public void widgetSelected(SelectionEvent e) {
-	            FeatureAttribute.addTask();
-	        }
-	    });
+		
 
 		Button bRemove = new Button(container, SWT.PUSH);
 		bRemove.setText("Remove Attribute");
+		bRemove.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				viewer.getTree().getSelection();
+			}
+
+		});
+
+		
 		
 		viewer.setInput(featureModel);
 		
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			  @Override
-			  public void selectionChanged(SelectionChangedEvent event) {
-			    IStructuredSelection selection = viewer.getStructuredSelection();
-			    Object firstElement = selection.getFirstElement();
-			    // do something with it
-			  }
-			});
+
     	return parent;
 	
 	}
 	
+	private ColumnLabelProvider createColumnLabelProvider() {
+		return new ColumnLabelProvider() {
+
+			@Override
+			public String getText(Object element) {
+				return  element.toString();
+			}
+
+		};
+	}
 		
-	private class MyContentProvider implements ITreeContentProvider, IStructuredContentProvider {
+	private class MyContentProvider implements ITreeContentProvider {
 		
 		@Override
 		public Object[] getElements(Object inputElement) {
@@ -206,9 +244,7 @@ public class AddAttributeDialog extends Dialog  {
 		    return feature.toArray();
 		}
 
-		public void addTask(Object task) {
-            viewer.add(task);
-        }
+
 		
 		@Override
 		public void dispose() {}
@@ -234,6 +270,7 @@ public class AddAttributeDialog extends Dialog  {
 						feature.add(attributeInh);
 					}
 				}
+
 				for(int i = 0; i < f.getStructure().getChildrenCount(); i++) {
 					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
 					feature.add(cf);
@@ -370,33 +407,57 @@ public class AddAttributeDialog extends Dialog  {
 			
 		}
 		}
-}
-//		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
-//			return new EditingSupport(viewer) {
-//	
-//				@Override
-//				protected boolean canEdit(Object element) {
-//					return false;
-//				}
-//	
-//				@Override
-//				protected CellEditor getCellEditor(Object element) {
-//					return textCellEditor;
-//				}
-//	
-//				@Override
-//				protected Object getValue(Object element) {
-//					return ((Object) element).counter + "";
-//				}
-//	
-//				@Override
-//				protected void setValue(Object element, Object value) {
-//					((MyModel) element).counter = Integer.parseInt(value.toString());
-//					viewer.update(element, null);
-//				}
-//			};
-//		}
-//		}
+
+		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
+			return new EditingSupport(viewer) {
+	
+				@Override
+				protected boolean canEdit(Object element) {
+					return true;
+				}
+	
+				@Override
+				protected CellEditor getCellEditor(Object element) {
+					return textCellEditor;
+				}
+	
+				@Override
+				protected Object getValue(Object element) {
+			    		  if (element instanceof IFeature) {
+			    			  return ((IFeature) element).getName();
+			    		  }
+			    		  if (element instanceof FeatureAttribute) {
+			    			  return "Attribute";
+			    		  }
+			    		  if (element instanceof FeatureAttributeInherited) {
+			    			  return "Inherited attribute";
+			    		  }
+			    		  return null;
+				}
+	
+				@Override
+				protected void setValue(Object element, Object value) {
+					if (element instanceof IFeature) {
+						  ((IFeature) element).setName(value.toString());
+						  viewer.update(element, null);
+		    		  }
+		    		  if (element instanceof FeatureAttribute) {
+		    			  
+		    			  ((FeatureAttribute) element).setName(value.toString());
+		    			  ((FeatureAttribute) element).setValue(value.toString());
+		    			  viewer.update(element, null);
+		    		  }
+		    		  if (element instanceof FeatureAttributeInherited) {
+		    			  ((FeatureAttributeInherited) element).getParent().setName(value.toString());
+		    			  viewer.update(element, null);
+		    		  }
+
+					viewer.update(element, null);
+				}
+			};
+		}
+		}
+
 	
 //				Button b = new Button(shell, SWT.PUSH);
 //				b.setText("Remove column");
