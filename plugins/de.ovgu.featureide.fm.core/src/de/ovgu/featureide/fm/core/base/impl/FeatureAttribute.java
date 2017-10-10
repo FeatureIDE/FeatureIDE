@@ -27,7 +27,7 @@ package de.ovgu.featureide.fm.core.base.impl;
  * @author "Marcel Daniel"
  */
 public class FeatureAttribute {
-	
+
 	static final String STRING = "string";
 	static final String DOUBLE = "double";
 	static final String LONG = "long";
