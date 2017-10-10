@@ -259,7 +259,7 @@ abstract public class FeatureDiagramLayoutManager {
 		for (int i = 0; i < targets.size(); i++) {
 			Point target = null;
 			Point source = null;
-			if (verticalLayout) {
+			if (!verticalLayout) {
 				target = new Point(targets.get(i).getSource().getLocation().x + targets.get(i).getSource().getSize().width / 2,
 						targets.get(i).getSource().getLocation().y);
 				source = new Point(targets.get(i).getTarget().getLocation().x + targets.get(i).getTarget().getSize().width / 2,
