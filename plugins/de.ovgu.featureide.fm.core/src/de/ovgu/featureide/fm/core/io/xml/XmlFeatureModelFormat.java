@@ -192,11 +192,29 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private boolean checkAttributeList(String attributeName, LinkedList<FeatureAttribute> attributeList) {
 		attributeName = attributeName.toLowerCase();
 		for (final FeatureAttribute fa : attributeList) {
-			if (fa.getName().toLowerCase().equals(attributeName)) {
-				return true;
-			}
+			return (fa.getName().toLowerCase().equals(attributeName));
 		}
 		return false;
+	}
+
+	/**
+	 * @param name
+	 * @param value
+	 * @param inheritedList
+	 * @return
+	 */
+	private String checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
+		name = name.toLowerCase();
+		for (final FeatureAttributeInherited f : inheritedList) {
+			if (f.getName().toLowerCase().equals(name)) {
+				f.setValue(value);
+				if (!f.checkValue()) {
+					return WRONG_TYPE;
+				}
+				return FEATURE_INHERITED;
+			}
+		}
+		return FEATURE_NOT_INHERITED;
 	}
 
 	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
@@ -377,7 +395,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			LinkedList<FeatureAttributeInherited> inheritedList) throws UnsupportedModelException {
 
 		if (e.hasAttributes()) {
-
 			final NamedNodeMap nodeMap = e.getAttributes();
 
 			String name = "", value = "", type = "", unit = "", recursive = "", configurable = "";
@@ -404,22 +421,22 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 
 			if (name.isEmpty()) {
-				throwError("This attribute has needs a name.", e);
+				throwError("This attribute needs a name.", e);
 			} else if (checkAttributeList(name, attributeList)) {
 				throwError("There already is an attribute with this name.", e);
 			} else if (type.isEmpty()) {
 
 				// Check if the attribute is inherited
 				switch (checkRecursiveList(name, value, inheritedList)) {
-				case 0:
+				case FEATURE_INHERITED:
 					if (!unit.isEmpty() || !recursive.isEmpty() || !configurable.isEmpty()) {
 						throwError("Too many parameters for inherited attribute. Only name and value are allowed.", e);
 					}
 					break;
-				case 1:
+				case WRONG_TYPE:
 					throwError("The value of this attribute doesn't match the type of its parent.", e);
 					break;
-				case 2:
+				case FEATURE_NOT_INHERITED:
 					throwError("This attribute is not inherited and therefore needs a type.", e);
 					break;
 				}
@@ -450,26 +467,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param name
-	 * @param value
-	 * @param inheritedList
-	 * @return 0 if attribute was added to recursive list 1 if value has wrong type 2 if attribute was not inherited
-	 */
-	private int checkRecursiveList(String name, String value, LinkedList<FeatureAttributeInherited> inheritedList) {
-		name = name.toLowerCase();
-		for (final FeatureAttributeInherited f : inheritedList) {
-			if (f.getName().toLowerCase().equals(name)) {
-				f.setValue(value);
-				if (!f.checkValue()) {
-					return 1;
-				}
-				return 0;
-			}
-		}
-		return 2;
 	}
 
 	/**

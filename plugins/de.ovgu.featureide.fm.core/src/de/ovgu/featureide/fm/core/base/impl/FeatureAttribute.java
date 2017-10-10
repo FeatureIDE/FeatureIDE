@@ -27,17 +27,22 @@ package de.ovgu.featureide.fm.core.base.impl;
  * @author "Marcel Daniel"
  */
 public class FeatureAttribute {
+	
+	static final String STRING = "string";
+	static final String DOUBLE = "double";
+	static final String LONG = "long";
+	static final String BOOLEAN = "boolean";
 
 	public enum Types {
 		STRING, DOUBLE, LONG, BOOLEAN
 	}
 
-	protected boolean configurable;
-	protected String name;
-	protected String value;
-	protected String unit;
-	protected boolean recursive;
-	protected Types type;
+	private boolean configurable;
+	private String name;
+	private String value;
+	private String unit;
+	private boolean recursive;
+	private Types type;
 
 	public FeatureAttribute() {
 		name = "";
@@ -58,21 +63,21 @@ public class FeatureAttribute {
 	}
 
 	public boolean checkValue() {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("BOOLEAN")) {
+		if (type.toString().equals(BOOLEAN)) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
 			}
@@ -81,21 +86,21 @@ public class FeatureAttribute {
 	}
 
 	public boolean checkValue(String value) {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("BOOLEAN")) {
+		if (type.toString().equals(BOOLEAN)) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
 			}
@@ -105,19 +110,14 @@ public class FeatureAttribute {
 
 	// returns an object of the correct type of the attribute
 	public Object getValueObject() {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			return Long.parseLong(value);
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			return Double.parseDouble(value);
 		}
-		if (type.toString().equals("BOOLEAN")) {
-			if (value.toLowerCase().equals("true")) {
-				return true;
-			}
-			if (value.toLowerCase().equals("false")) {
-				return false;
-			}
+		if (type.toString().equals(BOOLEAN)) {
+			return value.toLowerCase().equals("true");
 		}
 		return value;
 	}
