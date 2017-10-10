@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Elevator">
+				<attribute name="Price" type="double" unit="Euro" recursive="true" configurable="false" value="6"/>
+					<alt abstract="true" mandatory="true" name="Modes">
+						<attribute name="Price" value="6"/>
+						<attribute name="Link" type="String" unit="URL" recursive="true" configurable="false" value="http"/>
+						<feature name="Sabbath">
+							<attribute name="Price" value="6"/>
+							<attribute name="Link" value="http1"/>
+						</feature>
+						<feature name="FIFO">
+							<attribute name="Price" value="6"/>
+							<attribute name="Link" value="http2"/>
+						</feature>
+					</alt>
+				<feature name="Service">
+					<attribute name="Price" value="34"/>
+					<attribute name="inTime" type="boolean" recursive="true" configurable="true" value="true"/>
+				</feature>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and name="root" abstract="true" mandatory="true" >
+				<attribute name="price" type="long" value="4" recursive="true"/>
+				<attribute name="amount" type="double" value="2"/>
+					<and name="A">
+						<attribute name="price" value="20"/>
+						<attribute name="amount" type="long" value="2"/>
+						<feature name="AA">
+							<attribute name="price" value="30"/>
+						</feature>
+						<feature name="AB">
+							<attribute name="price" value="40"/>
+						</feature>
+					</and>
+					<and name="B">
+						<attribute name="price" value="10"/>
+						<feature name="BA">
+							<attribute name="price" value="110"/>
+						</feature>
+						<feature name="BB">
+							<attribute name="price" value="220"/>
+						</feature>
+					</and>
+			</and>		
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
