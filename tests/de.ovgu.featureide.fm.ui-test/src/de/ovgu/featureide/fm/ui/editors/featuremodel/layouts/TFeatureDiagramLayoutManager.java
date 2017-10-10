@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 /**
  * Tests the checkIntersection method in FeatureDiagramLayoutManager.java
@@ -50,12 +51,12 @@ public class TFeatureDiagramLayoutManager {
 		Point target = new Point(5,0);
 		Point legendPos = new Point (5,0);
 		Dimension legendSize = new Dimension(10, 10);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 		
 		//Edge is intersecting rectangle
 		legendPos = new Point(-3,-1);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 		
 		//Edge and rectangle are non-existent, i.e. too small
@@ -63,7 +64,7 @@ public class TFeatureDiagramLayoutManager {
 		target = new Point(0,0);
 		legendPos = new Point(0,0);
 		legendSize = new Dimension(0,0);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(!check);
 		
 		legendPos = new Point(-1, -1);
@@ -72,27 +73,27 @@ public class TFeatureDiagramLayoutManager {
 
 		//Hitting rectangle from left side
 		source = new Point(-2,0);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 
 		//Hitting rectangle from upper side
 		source = new Point(0,-2);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 
 		//Hitting rectangle from right side
 		source = new Point(2,0);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 
 		//Hitting rectangle from lower side
 		source = new Point(0,2);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 
 		//Intersecting rectangle at top-left corner
 		source = new Point(-4,-4);
-		check = fdlm.checkConnectionIntersection(source, target, legendPos, legendSize);
+		check = fdlm.rectangleConnectionIntersection(source, target, new Rectangle(legendPos, legendSize));
 		assertTrue(check);
 	}
 }
