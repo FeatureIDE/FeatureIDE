@@ -1080,6 +1080,5 @@ public class StringTable {
 	public static final String PUBLIC_INTERFACE = "public interface";
 	
 	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
-	public static final String STARTING_WITH = "Starting With";
 	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
 }
