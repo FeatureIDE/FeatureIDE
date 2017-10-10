@@ -661,8 +661,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			if (nodeName.equals(ATTRIBUTE)) {
 				parseAttribute(e, attributeList, attributeListRecursive, inheritedList);
-				parent.getStructure().setAttributeList(attributeList);
-				parent.getStructure().setAttributeListInherited(inheritedList);
 				continue;
 			}
 
@@ -714,6 +712,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				throwError("Unknown feature type: " + nodeName, e);
 			}
 
+			f.getStructure().setAttributeListInherited(inheritedList);
+			f.getStructure().setAttributeList(attributeList);
+			
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
