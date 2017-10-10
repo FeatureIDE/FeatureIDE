@@ -192,7 +192,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private boolean checkAttributeList(String attributeName, LinkedList<FeatureAttribute> attributeList) {
 		attributeName = attributeName.toLowerCase();
 		for (final FeatureAttribute fa : attributeList) {
-			return (fa.getName().toLowerCase().equals(attributeName));
+			if (fa.getName().toLowerCase().equals(attributeName)) {
+				return true;
+			}
 		}
 		return false;
 	}
