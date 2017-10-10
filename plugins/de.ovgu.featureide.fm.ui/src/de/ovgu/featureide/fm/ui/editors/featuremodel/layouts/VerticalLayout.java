@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -50,13 +51,15 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 
-		heightStep = FeatureUIHelper.getGraphicalRootFeature(featureModel).getSize().height + featureSpaceY;
+		heightStep = root.getSize().height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
-		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
-		centerOther(FeatureUIHelper.getGraphicalRootFeature(featureModel), 0);
-		layout(height, featureModel.getVisibleConstraints());
+		calculateLevelWidth(root);
+		centerOther(root, 0);
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(height, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	/**

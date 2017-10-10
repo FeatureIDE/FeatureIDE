@@ -111,14 +111,45 @@ abstract public class FeatureDiagramLayoutManager {
 		controlHeight = height;
 	}
 
-	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
+	/**
+	 * method to center the layout on the screen (horizontal only)
+	 */
+	@Deprecated
+	void centerLayoutX(IGraphicalFeatureModel featureModel) {
+		int mostRightFeatureX = Integer.MIN_VALUE;
+		int mostLeftFeatureX = Integer.MAX_VALUE;
+		for (final IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
+			final int tempX = feature.getLocation().x;
+			final int tempXOffset = feature.getSize().width;
+			if (mostRightFeatureX < (tempX + tempXOffset)) {
+				mostRightFeatureX = tempX + tempXOffset;
+			}
+			if (mostLeftFeatureX > tempX) {
+				mostLeftFeatureX = tempX;
+			}
+		}
+		final int width = mostRightFeatureX - mostLeftFeatureX;
+		final int offset = mostRightFeatureX - ((controlWidth - width) / 2);
+		for (final IGraphicalFeature feature : featureModel.getVisibleFeatures()) {
+			setLocation(feature, new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
+		}
+	}
+
+	void layoutConstraints(int yoffset, List<IGraphicalConstraint> constraints, Rectangle rootBounds) {
 		// added 2 times getConstraintSpace to prevent intersecting with the collapsed decorator
-		int y = yoffset + (FMPropertyManager.getConstraintSpace() * 2);
-		final boolean depthFirst = (this instanceof DepthFirstLayout) || (this instanceof VerticalLayout);
-		for (final IGraphicalConstraint constraint : constraints) {
+		int y = yoffset + FMPropertyManager.getConstraintSpace() * 2;
+		boolean depthFirst = this instanceof DepthFirstLayout || this instanceof VerticalLayout;
+		for (IGraphicalConstraint constraint : constraints) {
 			final Dimension size = constraint.getSize();
-			final int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
+			int x;
+			if (depthFirst) {
+				x = 2 * FMPropertyManager.getFeatureSpaceX();
+			} else {
+				final int rootCenter = rootBounds.x + (rootBounds.width / 2);
+				x = rootCenter - (size.width / 2);
+			}
 			constraint.setLocation(new Point(x, y));
+
 			y += size.height;
 		}
 	}
