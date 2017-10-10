@@ -461,6 +461,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				}
 
 				final FeatureAttribute fa = new FeatureAttribute(name, value, type, unit, rec, conf);
+				if (fa.getType() == null) {
+					throwError("An attribute needs to be of type: " + fa.getTypeNames() + ".", e);
+				}
 				attributeList.add(fa);
 				if (fa.getRecursive()) {
 					recursiveList.add(fa);
