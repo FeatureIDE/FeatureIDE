@@ -24,26 +24,106 @@ package de.ovgu.featureide.fm.core.base.impl;
  * Attributes for Features.
  *
  * @author "Werner Jan"
+ * @author "Marcel Daniel"
  */
 public class FeatureAttribute {
 
+	static final String STRING = "string";
+	static final String DOUBLE = "double";
+	static final String LONG = "long";
+	static final String BOOLEAN = "boolean";
+
 	public enum Types {
-		STRING, INT, DOUBLE, LONG, BOOLEAN, FLOAT
+		STRING, DOUBLE, LONG, BOOLEAN
 	}
 
-	protected boolean configurable;
-	protected String name;
-	protected String value;
-	protected String unit;
-	protected boolean recursive;
-	protected Types type;
+	private boolean configurable;
+	private String name;
+	private String value;
+	private String unit;
+	private boolean recursive;
+	private Types type;
 
 	public FeatureAttribute() {
+		name = "";
 		type = null;
 		recursive = false;
 		value = "";
 		unit = "";
 		configurable = false;
+	}
+
+	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
+		this.name = name;
+		this.value = value;
+		setTypeFromString(type);
+		this.unit = unit;
+		this.recursive = recursive;
+		this.configurable = configurable;
+	}
+
+	public boolean checkValue() {
+		if (type.toString().equals(LONG)) {
+			try {
+				Long.parseLong(value);
+			} catch (final NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals(DOUBLE)) {
+			try {
+				Double.parseDouble(value);
+			} catch (final NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals(BOOLEAN)) {
+			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+
+	public boolean checkValue(String value) {
+		if (type.toString().equals(LONG)) {
+			try {
+				Long.parseLong(value);
+			} catch (final NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals(DOUBLE)) {
+			try {
+				Double.parseDouble(value);
+			} catch (final NumberFormatException e) {
+				return false;
+			}
+		}
+		if (type.toString().equals(BOOLEAN)) {
+			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+				return true;
+			}
+		}
+		return true;
+	}
+
+	// returns an object of the correct type of the attribute
+	public Object getValueObject() {
+		if (type.toString().equals(LONG)) {
+			return Long.parseLong(value);
+		}
+		if (type.toString().equals(DOUBLE)) {
+			return Double.parseDouble(value);
+		}
+		if (type.toString().equals(BOOLEAN)) {
+			return value.toLowerCase().equals("true");
+		}
+		return value;
+	}
+
+	public boolean getConfigurable() {
+		return configurable;
 	}
 
 	public String getName() {
@@ -54,37 +134,52 @@ public class FeatureAttribute {
 		return recursive;
 	}
 
-	public boolean getConfigurable() {
-		return configurable;
+	public Types getType() {
+		return type;
+	}
+
+	public String getTypeNames() {
+		final StringBuilder sb = new StringBuilder();
+		String types = "";
+		for (final Types typeNames : Types.values()) {
+			sb.append(types);
+			types = ", ";
+			sb.append(typeNames.toString().toLowerCase());
+		}
+		return sb.toString();
+	}
+
+	public String getTypeString() {
+		return type.toString().toLowerCase();
 	}
 
 	public String getUnit() {
 		return unit;
 	}
 
-	public Types getType() {
-		return type;
-	}
-
 	public String getValue() {
 		return value;
+	}
+
+	public void setConfigurable(boolean configurable) {
+		this.configurable = configurable;
+	}
+
+	public void setConfigurable(String configurableString) {
+		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
+			configurable = false;
+		} else if (value.toLowerCase().equals("true")) {
+			configurable = true;
+		}
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
 
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 	public void setTypeFromString(String type) {
@@ -100,24 +195,31 @@ public class FeatureAttribute {
 		this.type = type;
 	}
 
-	public void setConfigurable(boolean configurable) {
-		this.configurable = configurable;
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
 
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return (getName());
-	}
-	
-	public String getTypeNames() {
-		StringBuilder sb = new StringBuilder();
-		String types = "";
-		for (final Types typeNames: Types.values()) {
-			sb.append(types);
-			types = ", ";
-			sb.append(typeNames.toString().toLowerCase());
+		final StringBuilder sb = new StringBuilder();
+		sb.append(name + ": \n");
+		if (!value.isEmpty()) {
+			sb.append(" -" + "value: " + value);
+		}
+		if (!unit.isEmpty()) {
+			sb.append(" -" + "unit: " + unit);
+		}
+		if (recursive) {
+			sb.append(" -" + "recursive: true");
+		}
+		if (configurable) {
+			sb.append(" -" + "configurable: true");
 		}
 		return sb.toString();
 	}
+
 }

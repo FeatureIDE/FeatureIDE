@@ -3,11 +3,11 @@
 		<properties/>
 		<struct>
 			<and name="root" abstract="true" mandatory="true" >
-				<attribute name="price" type="short" value="4" recursive="true"/>
+				<attribute name="price" type="long" value="4" recursive="true"/>
 				<attribute name="amount" type="double" value="2"/>
 					<and name="A">
 						<attribute name="price" value="20"/>
-						<attribute name="amount" type="short" value="2"/>
+						<attribute name="amount" type="long" value="2"/>
 						<feature name="AA">
 							<attribute name="price" value="30"/>
 						</feature>
