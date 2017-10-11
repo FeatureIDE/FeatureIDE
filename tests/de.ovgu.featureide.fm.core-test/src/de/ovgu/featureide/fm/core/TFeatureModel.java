@@ -118,8 +118,6 @@ public class TFeatureModel {
 		constraint.setDescription(originalDescription);
 		fm.addConstraint(constraint);
 		
-		//System.out.println(fm.toString());
-		
 		final IFeatureModel clonedModel = fm.clone(null);
 
 		for (IConstraint constraintClone : clonedModel.getConstraints()) {
