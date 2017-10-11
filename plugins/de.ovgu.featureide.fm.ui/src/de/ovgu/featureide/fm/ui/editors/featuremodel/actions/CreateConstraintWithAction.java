@@ -79,7 +79,6 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	protected void updateConstraintActionText(String featureName) {
 		selectedFeature = featureName;
 		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH + " \"" + featureName + "\""));
-
 	}
 
 	/*
