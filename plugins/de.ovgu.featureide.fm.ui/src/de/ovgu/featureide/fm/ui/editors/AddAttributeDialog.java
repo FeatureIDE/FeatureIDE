@@ -23,11 +23,14 @@ package de.ovgu.featureide.fm.ui.editors;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -35,9 +38,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -165,7 +171,7 @@ public class AddAttributeDialog extends Dialog {
 		final CellEditor textCellEditor = new TextCellEditor(viewer.getTree());
 
 		TreeViewerColumn column0 = new TreeViewerColumn(viewer, SWT.NONE);
-		column0.getColumn().setWidth(100);
+		column0.getColumn().setWidth(120);
 		column0.getColumn().setMoveable(true);
 		column0.getColumn().setText(columLabels[0]);
 		column0.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
@@ -227,24 +233,112 @@ public class AddAttributeDialog extends Dialog {
 					final JDialog dialog = new JDialog();
 					dialog.setTitle("Add Attribute");
 					createDialog(dialog, ((IFeature) f));
-					dialog.addWindowListener(new WindowAdapter() {
-						public void windowsClosing(WindowEvent e) {
-							e.getWindow().dispose();							
-						}
-					});;
-					
+					dialog.setModal(true);
+					viewer.setInput(featureModel);
 				}
+				
 			}
 
-			private void createDialog(final JDialog dialog,IFeature feature) {
+			private void createDialog(final JDialog dialog,final IFeature feature) {
 				
-				Container cp = dialog.getContentPane();
-				cp.setLayout(new GridBagLayout());
-				JLabel jLabel = new JLabel("Selected attribute: " + feature.getName() );
-				cp.add(jLabel);
 				
-				JButton bChanel = new JButton("Chanel");
-				bChanel.addActionListener(new ActionListener() {
+				dialog.setLayout(new GridBagLayout());
+				dialog.setResizable(false);
+				JLabel jLabel = new JLabel("Selected Feature: " + feature.getName());
+				
+				GridBagConstraints gbc = new GridBagConstraints();
+				
+				gbc.insets = new Insets(5, 0, 5, 0);
+				
+				gbc.gridx = 0;
+				gbc.gridy = 0;
+				
+				dialog.add(jLabel, gbc);
+				
+				gbc.gridy++;
+
+								
+				JPanel jPanel= new JPanel();
+				JLabel jName = new JLabel("Name: ");
+				jPanel.add(jName);
+				final JTextField textFieldName = new JTextField(20);
+				jPanel.add(textFieldName, gbc);
+				dialog.add(jPanel, gbc);
+				gbc.gridy++;
+				
+				JPanel jPanelValue= new JPanel();
+				JLabel jLabelValue = new JLabel("Value: ");
+				final JTextField textFieldValue = new JTextField(20);
+				jPanelValue.add(jLabelValue);
+				jPanelValue.add(textFieldValue);
+				dialog.add(jPanelValue, gbc);
+				
+				gbc.gridy++;
+				
+				JPanel jPanelUnit= new JPanel();
+				JLabel jLabelUnit = new JLabel("Unit: ");
+				final JTextField textFieldUnit = new JTextField(20);
+				jPanelUnit.add(jLabelUnit);
+				jPanelUnit.add(textFieldUnit);
+				dialog.add(jPanelUnit, gbc);
+				gbc.gridy++;
+
+				String[] Types = {"String", "Long","Double",  "Boolean"};
+				JPanel jPanelType= new JPanel();
+				JLabel jLabelType = new JLabel("Type: ");
+				final JComboBox typeBox = new JComboBox(Types);
+				typeBox.setSelectedIndex(0);
+				typeBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JComboBox typeBox = (JComboBox) e.getSource();
+						String typeName = (String)typeBox.getSelectedItem();
+					}
+				});
+				
+				jPanelType.add(jLabelType);
+				jPanelType.add(typeBox);
+				dialog.add(jPanelType, gbc);
+				
+				gbc.gridy++;
+				
+				
+				String[] bools = {"true", "false"};
+				JPanel jPanelRecursive= new JPanel();
+				JLabel jLabelRecursive = new JLabel("Recursive: ");
+				final JComboBox<String> recursiveBox = new JComboBox(bools);
+				typeBox.setSelectedIndex(1);
+				typeBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JComboBox typeBox = (JComboBox) e.getSource();
+						String typeName = (String)typeBox.getSelectedItem();
+					}
+				});
+				
+				jPanelRecursive.add(jLabelRecursive);
+				jPanelRecursive.add(recursiveBox);
+				dialog.add(jPanelRecursive, gbc);
+				
+				gbc.gridy++;
+				
+				JPanel jPanelConfigurable= new JPanel();
+				JLabel jLabelConfigurable = new JLabel("Configurable: ");
+				final JComboBox configurableBox = new JComboBox(bools);
+				typeBox.setSelectedIndex(1);
+				typeBox.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JComboBox configurableBox = (JComboBox) e.getSource();
+						String typeName = (String)configurableBox.getSelectedItem();
+					}
+				});
+				
+				jPanelConfigurable.add(jLabelConfigurable);
+				jPanelConfigurable.add(configurableBox);
+				dialog.add(jPanelConfigurable, gbc);
+				
+				gbc.gridy++;
+								
+				JButton bCancel = new JButton("Cancel");
+				bCancel.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dialog.dispose();
 					}
@@ -252,15 +346,29 @@ public class AddAttributeDialog extends Dialog {
 				JButton bAdd = new JButton("Add");
 				bAdd.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
+						String name = textFieldName.getText().trim();
+						String value = textFieldValue.getText().trim();
+						String type = typeBox.getSelectedItem().toString().trim();
+						String unit = textFieldUnit.getText().trim();
+						String recursive = recursiveBox.getSelectedItem().toString().trim();
+						String configurable = configurableBox.getSelectedItem().toString().trim();
+						boolean rec = false, conf = false;
+						rec = recursive.equals("true");
+						conf = configurable.equals("true");
+						
+						FeatureAttribute attribute = new FeatureAttribute(name, value, type, unit, rec, conf);
+						feature.getStructure().getAttributeList().add(attribute);
 						dialog.dispose();
 					}
 				});
+				
 				JPanel jpButton = new JPanel();
-				jpButton.add(bChanel);
+				jpButton.add(bCancel);
 				jpButton.add(bAdd);
-				cp.add(jpButton);
+				dialog.add(jpButton,gbc);
+				
 				dialog.pack();
-				dialog.setSize(600, dialog.getHeight());
+				dialog.setSize(350, 400);
 				dialog.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getWidth()) /2,
 						(Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getHeight()) / 2);
 				dialog.setVisible(true);
