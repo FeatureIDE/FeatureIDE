@@ -329,3 +329,5 @@ public interface IConstraint extends IFeatureModelElement {
 	String getDescription();
 
 }
+
+
