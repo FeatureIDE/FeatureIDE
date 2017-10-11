@@ -99,6 +99,11 @@ public class FullViewportAutoexposeHelper extends ViewportAutoexposeHelper {
 		return true;
 	}
 
+	/**
+	 * check if the pointer is in an area which is sensitive to DND
+	 * @param point
+	 * @return true when the pointer is in such an area
+	 */
 	private boolean shouldScroll(Point point) {
 		return !getInnerBounds().contains(point);
 	}
