@@ -179,5 +179,9 @@ public interface GUIDefaults {
 	public static final Image ERROR_IMAGE_TSK = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 
 	public static final Image IMAGE_EMPTY = FMUIPlugin.getImage("empty.png");
+	
+	public static final Image FM_ERROR = FMUIPlugin.getImage("fmerror.png");
+	public static final Image FM_WARNING = FMUIPlugin.getImage("fmwarning.png");
+	public static final Image FM_INFO = FMUIPlugin.getImage("fminfo.png");
 
 }

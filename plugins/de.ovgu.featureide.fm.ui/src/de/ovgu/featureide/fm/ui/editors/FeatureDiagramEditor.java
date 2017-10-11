@@ -939,6 +939,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 					}
 				}
+				internRefresh(true);
 				setActiveExplanation();
 				getContents().refresh();
 				return Status.OK_STATUS;
@@ -1090,7 +1091,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-			
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
@@ -1105,7 +1105,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			legendLayoutAction.refresh();
-			internRefresh(false);
+			internRefresh(false); 
 			break;
 		case LOCATION_CHANGED:
 			internRefresh(true);
@@ -1126,6 +1126,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			reload();
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
@@ -1351,6 +1352,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 				}
 			}
+			
+			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
+				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+			}
+			
+			reload();
 			break;
 		case DEFAULT:
 			break;

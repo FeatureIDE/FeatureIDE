@@ -154,7 +154,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-			ERROR, WARNING, NONE
+			ERROR, WARNING, INFO,  NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -289,6 +289,9 @@ public class ConstraintDialog implements GUIDefaults {
 				break;
 			case WARNING:
 				headerDescriptionImageLabel.setImage(GUIDefaults.WARNING_IMAGE);
+				break;
+			case INFO:
+				headerDescriptionImageLabel.setImage(GUIDefaults.FM_INFO);
 				break;
 			default:
 				headerDescriptionImageLabel.setImage(GUIDefaults.IMAGE_EMPTY);
@@ -476,7 +479,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails(StringTable.CONSTRAINT_REDUNDANCE, HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(StringTable.CONSTRAINT_REDUNDANCE, HeaderPanel.HeaderDescriptionImage.INFO);
 			}
 		}
 	};
