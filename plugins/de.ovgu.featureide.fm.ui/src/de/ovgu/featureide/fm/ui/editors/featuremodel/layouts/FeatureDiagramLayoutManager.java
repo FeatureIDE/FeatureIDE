@@ -321,12 +321,12 @@ abstract public class FeatureDiagramLayoutManager {
 			return featureModel.getLayout().getLegendPos();
 		}
 		
-		// It was not possible to find any empty space, position the legend next to the feature model and mind the constraints
-		ArrayList<IGraphicalElement> graphicalElements = new ArrayList<IGraphicalElement>();
-		graphicalElements.addAll(featureModel.getVisibleConstraints());
-		graphicalElements.addAll(featureModel.getVisibleConstraints());
+		// It was not possible to find any empty space, probably there is an intersection with a constraint.
+		// So we position the legend next to the feature model and mind the constraints
+		Rectangle boundsOfEverything = getFeatureModelBounds(featureModel.getVisibleConstraints());
+		boundsOfEverything.union(featureModelBounds);
 		
-		featureModel.getLayout().setLegendPos(getFeatureModelBounds(graphicalElements).getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		return featureModel.getLayout().getLegendPos();
 	}
 
