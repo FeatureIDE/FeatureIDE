@@ -52,4 +52,8 @@ public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 		instance.setExtensionLoaderInternal(extensionLoader);
 	}
 
+	public static IFeatureModelFormat getDefaultFormat() {
+		return new XmlFeatureModelFormat();
+	}
+
 }
