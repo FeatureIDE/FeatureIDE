@@ -77,9 +77,8 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 * @param featureName
 	 */
 	protected void updateConstraintActionText(String featureName) {
-		selectedFeature =	featureName;
-		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH	+ " \""	+ featureName + "\""));
-
+		selectedFeature = featureName;
+		setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " " + STARTING_WITH + " \"" + featureName + "\""));
 	}
 
 	/*
@@ -90,6 +89,11 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	public void run() {
 		final ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
 		dialog.setInputText(selectedFeature);
+	}
+	
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		return selection.size() == 1;
 	}
 
 }

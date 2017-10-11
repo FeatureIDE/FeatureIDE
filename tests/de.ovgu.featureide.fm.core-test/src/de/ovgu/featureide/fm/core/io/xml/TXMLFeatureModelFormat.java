@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
@@ -165,6 +166,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	@Override
 	protected IFeatureModelFormat getFormat() {
 		return new XmlFeatureModelFormat();
-}
+  }
 
 }

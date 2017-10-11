@@ -197,8 +197,8 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		return "AConstraint [propNode=" + propNode + "]";
 	}
 
-	public void setDescription(@Nonnull final CharSequence description) {
-		this.description = description.toString();
+	public void setDescription(@Nonnull final String description) {
+		this.description = description;
 	}
 
 	/**

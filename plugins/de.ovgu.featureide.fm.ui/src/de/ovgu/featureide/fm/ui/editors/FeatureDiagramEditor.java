@@ -496,7 +496,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
 		expandAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND); // icon for expand added
-		abstractAction = new AbstractAction(this, featureModel, (ObjectUndoContext) featureModel.getUndoContext());
+		abstractAction = new AbstractAction(this, featureModel);
 		changeFeatureDescriptionAction = new ChangeFeatureDescriptionAction(this, featureModel, null);
 		andAction = new AndAction(this, featureModel);
 		orAction = new OrAction(this, featureModel);
@@ -657,7 +657,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		// connection line is selected
 
 		// if one or more features are selected
-		else if ((createLayerAction.isEnabled()	|| createCompoundAction.isEnabled()) && !connectionSelected) {
+		else if ((hiddenAction.isEnabled()) && !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintWithAction);
@@ -681,10 +681,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(calculateDependencyAction);
 			menu.add(new Separator());
-
-      // if a constraint is selected
-		} else if (editConstraintAction.isEnabled()	&& !connectionSelected) {
-
+			// if a constraint is selected
+		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
@@ -694,7 +692,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				menu.add(new Separator());
 				menu.add(collapseAllButExplanationAction);
 			}
-
 			// if the legend is selected
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
@@ -723,7 +720,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(exportFeatureModelAction);
 		}
-		
 		// call of the FeatureDiagramExtensions (for features only)
 		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !connectionSelected) {
 			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {

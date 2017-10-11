@@ -509,9 +509,13 @@ public class StringTable {
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
 	public static final String SET_FEATURE_CONCRETE = "Set Feature Concrete";
+	public static final String ABSTRACT_OPERATION = "Abstract Operation";
+	public static final String COLLAPSE_OPERATION = "Collapse Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
+	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
+	public static final String MANDATORY_OPERATION = "Mandatory Operation";
 	public static final String SET_FEATURE_MANDATORY = "Set Feature Mandatory";
 	public static final String SET_FEATURE_OPTIONAL = "Set Feature Optional";
 	public static final String SET = "Set ";
@@ -1067,6 +1071,8 @@ public class StringTable {
 	public static final String SELECT_COLOR_SCHEME = "Select color scheme";
 	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
 	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
+	public static final String SET_FEATURES_COLLAPSED = "Set Features Collapsed";
+	public static final String SET_FEATURES_EXPANDED = "Set Features Expanded";
 	public static final String COLLAPSE_SIBLINGS = "Collapse Siblings";
 	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust Model to Editor Size";
 	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
