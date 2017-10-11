@@ -454,6 +454,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			} else {
 
+				if (checkAttributeList(name, recursiveList)) {
+					throwError("There already is an inherited FeatureAttribute with that name." , e);
+				}
 				boolean conf = false, rec = false;
 
 				if (!configurable.isEmpty()) {
@@ -661,6 +664,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			if (nodeName.equals(ATTRIBUTE)) {
 				parseAttribute(e, attributeList, attributeListRecursive, inheritedList);
+				parent.getStructure().setAttributeList(attributeList);
+				parent.getStructure().setAttributeListInherited(inheritedList);
 				continue;
 			}
 
@@ -711,9 +716,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-
-			f.getStructure().setAttributeListInherited(inheritedList);
-			f.getStructure().setAttributeList(attributeList);
 
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
