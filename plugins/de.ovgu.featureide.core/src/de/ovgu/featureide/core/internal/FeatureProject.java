@@ -108,6 +108,7 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -549,14 +550,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configurationUpdate = true;
 					configFolder.accept(new IResourceVisitor() {
 
-						private final String suffix = "." + composer.getConfigurationExtension();
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
-							final String name = resource.getName();
-							if ((resource instanceof IFile) && name.endsWith(suffix)) {
-								ConfigurationManager.load(Paths.get(resource.getLocationURI()), config).write();
+							if (resource instanceof IFile && resource.isAccessible()) {
+								final FileHandler<Configuration> fileHandler = ConfigurationManager.load(Paths.get(resource.getLocationURI()), config);
+								if (!fileHandler.getLastProblems().containsError()) {
+									fileHandler.write();
+								}
 							}
 							return true;
 						}
