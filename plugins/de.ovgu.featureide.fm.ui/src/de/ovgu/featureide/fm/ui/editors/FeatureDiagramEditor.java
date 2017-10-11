@@ -533,7 +533,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 		
-		addAttributeAction = new AddAttributeAction(getFeatureModel());
+		addAttributeAction = new AddAttributeAction(this, getFeatureModel());
 
 		setLayoutActions = new ArrayList<LayoutSelectionAction>(5);
 		for (int i = 0; i < 5; i++) {

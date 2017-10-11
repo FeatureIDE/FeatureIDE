@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_ATTRIBUTE;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -31,6 +31,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.TextField;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -80,6 +83,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -105,11 +109,12 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 public class AddAttributeDialog extends Dialog {
 
 	private IFeatureModel featureModel;
-	private String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive" };
+	private IFeature feature;
 
-	public AddAttributeDialog(final Shell parentShell, IFeatureModel featureModel) {
+	public AddAttributeDialog(final Shell parentShell, IFeatureModel featureModel, IFeature feature) {
 		super(parentShell);
 		this.featureModel = featureModel;
+		this.feature = feature;
 	}
 
 	/**
@@ -120,12 +125,12 @@ public class AddAttributeDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText(MANAGE_ATTRIBUTE);
+		newShell.setText(ADD_ATTRIBUTE);
 	}
 
 	@Override
 	protected Point getInitialSize() {
-		return new Point(1300, 1000);
+		return new Point(350, 400);
 	}
 
 	/**
@@ -135,865 +140,140 @@ public class AddAttributeDialog extends Dialog {
 	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final Composite container = (Composite) super.createDialogArea(parent);
-		container.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
-		final GridLayout gridLayout = new GridLayout();
-		gridLayout.numColumns = 2;
-		container.setLayout(gridLayout);
 
-		final TreeViewer viewer = new TreeViewer(container, SWT.BORDER | SWT.MULTI);
-		GridData gridData = new GridData();
-		gridData.horizontalSpan = 2;
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = SWT.FILL;
-		gridData.grabExcessVerticalSpace = true;
-		viewer.getTree().setLayoutData(gridData);
-		viewer.getTree().setHeaderVisible(true);
-		viewer.getTree().setLinesVisible(true);
-
-		TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(viewer));
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
-
-			@Override
-			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-					|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-					|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-					|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-			}
-		};
-
-		int feature = ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-			| ColumnViewerEditor.KEYBOARD_ACTIVATION;
-
-		TreeViewerEditor.create(viewer, focusCellManager, actSupport, feature);
-		final CellEditor textCellEditor = new TextCellEditor(viewer.getTree());
-
-		TreeViewerColumn column0 = new TreeViewerColumn(viewer, SWT.NONE);
-		column0.getColumn().setWidth(120);
-		column0.getColumn().setMoveable(true);
-		column0.getColumn().setText(columLabels[0]);
-		column0.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
-
-		TreeViewerColumn column1 = new TreeViewerColumn(viewer, SWT.NONE);
-		column1.getColumn().setWidth(150);
-		column1.getColumn().setMoveable(true);
-		column1.getColumn().setText(columLabels[1]);
-		column1.setEditingSupport(new GivenNameEditing(viewer));
-
-		TreeViewerColumn column2 = new TreeViewerColumn(viewer, SWT.NONE);
-		column2.getColumn().setWidth(150);
-		column2.getColumn().setMoveable(true);
-		column2.getColumn().setText(columLabels[2]);
-		column2.setEditingSupport(new GivenValueEditing(viewer));
-
-		TreeViewerColumn column3 = new TreeViewerColumn(viewer, SWT.NONE);
-		column3.getColumn().setWidth(150);
-		column3.getColumn().setMoveable(true);
-		column3.getColumn().setText(columLabels[3]);
-		column3.setEditingSupport(new GivenTypeEditing(viewer));
-
-		TreeViewerColumn column4 = new TreeViewerColumn(viewer, SWT.NONE);
-		column4.getColumn().setWidth(150);
-		column4.getColumn().setMoveable(true);
-		column4.getColumn().setText(columLabels[4]);
-		column4.setEditingSupport(new GivenUnitEditing(viewer));
-
-		TreeViewerColumn column5 = new TreeViewerColumn(viewer, SWT.NONE);
-		column5.getColumn().setWidth(150);
-		column5.getColumn().setMoveable(true);
-		column5.getColumn().setText(columLabels[5]);
-		column5.setEditingSupport(new GivenConfigurableEditing(viewer));
-
-		TreeViewerColumn column6 = new TreeViewerColumn(viewer, SWT.NONE);
-		column6.getColumn().setWidth(150);
-		column6.getColumn().setMoveable(true);
-		column6.getColumn().setText(columLabels[6]);
-		column6.setEditingSupport(new GivenRecursiveEditing(viewer));
-
-		viewer.setContentProvider(new MyContentProvider());
-		viewer.setLabelProvider(new TableLabelProvider());
-
-		Button bAdd = new Button(container, SWT.NONE);
-		bAdd.setText("Add Attribute");
-		bAdd.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ITreeSelection selection = viewer.getStructuredSelection();
-				TreePath[] selceted = selection.getPaths();
-				Object f = selceted[0].getSegment(0);
-				if (f instanceof IFeature) {
-					final JDialog dialog = new JDialog();
-					dialog.setTitle("Add Attribute");
-					createDialog(dialog, ((IFeature) f));
-					dialog.setModal(true);
-					viewer.setInput(featureModel);
-				}
-				
-			}
-
-			private void createDialog(final JDialog dialog,final IFeature feature) {
-				
-				
-				dialog.setLayout(new GridBagLayout());
-				dialog.setResizable(false);
-				JLabel jLabel = new JLabel("Selected Feature: " + feature.getName());
-				
-				GridBagConstraints gbc = new GridBagConstraints();
-				
-				gbc.insets = new Insets(5, 0, 5, 0);
-				
-				gbc.gridx = 0;
-				gbc.gridy = 0;
-				
-				dialog.add(jLabel, gbc);
-				
-				gbc.gridy++;
-
-								
-				JPanel jPanel= new JPanel();
-				JLabel jName = new JLabel("Name: ");
-				jPanel.add(jName);
-				final JTextField textFieldName = new JTextField(20);
-				jPanel.add(textFieldName, gbc);
-				dialog.add(jPanel, gbc);
-				gbc.gridy++;
-				
-				JPanel jPanelValue= new JPanel();
-				JLabel jLabelValue = new JLabel("Value: ");
-				final JTextField textFieldValue = new JTextField(20);
-				jPanelValue.add(jLabelValue);
-				jPanelValue.add(textFieldValue);
-				dialog.add(jPanelValue, gbc);
-				
-				gbc.gridy++;
-				
-				JPanel jPanelUnit= new JPanel();
-				JLabel jLabelUnit = new JLabel("Unit: ");
-				final JTextField textFieldUnit = new JTextField(20);
-				jPanelUnit.add(jLabelUnit);
-				jPanelUnit.add(textFieldUnit);
-				dialog.add(jPanelUnit, gbc);
-				gbc.gridy++;
-
-				String[] Types = {"String", "Long","Double",  "Boolean"};
-				JPanel jPanelType= new JPanel();
-				JLabel jLabelType = new JLabel("Type: ");
-				final JComboBox typeBox = new JComboBox(Types);
-				typeBox.setSelectedIndex(0);
-				typeBox.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						JComboBox typeBox = (JComboBox) e.getSource();
-						String typeName = (String)typeBox.getSelectedItem();
-					}
-				});
-				
-				jPanelType.add(jLabelType);
-				jPanelType.add(typeBox);
-				dialog.add(jPanelType, gbc);
-				
-				gbc.gridy++;
-				
-				
-				String[] bools = {"true", "false"};
-				JPanel jPanelRecursive= new JPanel();
-				JLabel jLabelRecursive = new JLabel("Recursive: ");
-				final JComboBox<String> recursiveBox = new JComboBox(bools);
-				typeBox.setSelectedIndex(1);
-				typeBox.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						JComboBox typeBox = (JComboBox) e.getSource();
-						String typeName = (String)typeBox.getSelectedItem();
-					}
-				});
-				
-				jPanelRecursive.add(jLabelRecursive);
-				jPanelRecursive.add(recursiveBox);
-				dialog.add(jPanelRecursive, gbc);
-				
-				gbc.gridy++;
-				
-				JPanel jPanelConfigurable= new JPanel();
-				JLabel jLabelConfigurable = new JLabel("Configurable: ");
-				final JComboBox configurableBox = new JComboBox(bools);
-				typeBox.setSelectedIndex(1);
-				typeBox.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						JComboBox configurableBox = (JComboBox) e.getSource();
-						String typeName = (String)configurableBox.getSelectedItem();
-					}
-				});
-				
-				jPanelConfigurable.add(jLabelConfigurable);
-				jPanelConfigurable.add(configurableBox);
-				dialog.add(jPanelConfigurable, gbc);
-				
-				gbc.gridy++;
-								
-				JButton bCancel = new JButton("Cancel");
-				bCancel.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						dialog.dispose();
-					}
-				});
-				JButton bAdd = new JButton("Add");
-				bAdd.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						String name = textFieldName.getText().trim();
-						String value = textFieldValue.getText().trim();
-						String type = typeBox.getSelectedItem().toString().trim();
-						String unit = textFieldUnit.getText().trim();
-						String recursive = recursiveBox.getSelectedItem().toString().trim();
-						String configurable = configurableBox.getSelectedItem().toString().trim();
-						boolean rec = false, conf = false;
-						rec = recursive.equals("true");
-						conf = configurable.equals("true");
-						
-						FeatureAttribute attribute = new FeatureAttribute(name, value, type, unit, rec, conf);
-						feature.getStructure().getAttributeList().add(attribute);
-						dialog.dispose();
-					}
-				});
-				
-				JPanel jpButton = new JPanel();
-				jpButton.add(bCancel);
-				jpButton.add(bAdd);
-				dialog.add(jpButton,gbc);
-				
-				dialog.pack();
-				dialog.setSize(350, 400);
-				dialog.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getWidth()) /2,
-						(Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getHeight()) / 2);
-				dialog.setVisible(true);
-			}
-
-		});
-
-		Button bRemove = new Button(container, SWT.NONE);
-		gridData = new GridData();
-		bRemove.setLayoutData(gridData);
-		bRemove.setText("Remove Attribute");
-		bRemove.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-
-			}
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ITreeSelection selection = viewer.getStructuredSelection();
-				Object selceted = selection.getFirstElement();
-				if (selceted instanceof FeatureAttribute) {
-					List<String> featureNameList = featureModel.getFeatureOrderList();
-					for (int i = 0; i < featureNameList.size(); i++) {
-						IFeature feature = featureModel.getFeature(featureNameList.get(i));
-						LinkedList<FeatureAttribute> featureAttributeList = feature.getStructure().getAttributeList();
-						LinkedList<FeatureAttributeInherited> featureAttributeInheritedList = feature.getStructure().getAttributeListInherited();
-						for (FeatureAttributeInherited featureAttributeInherited : featureAttributeInheritedList) {
-							if (featureAttributeInherited.getParent().equals(selceted)) {
-								featureAttributeInheritedList.remove(featureAttributeInherited);
-							}
-						}
-						for (FeatureAttribute featureAttribute : featureAttributeList) {
-							if (featureAttribute.equals(selceted)) {
-								featureAttributeList.remove(selceted);
-							}
-						}
-					}
-					viewer.setInput(featureModel);
-					viewer.expandAll();
-					viewer.refresh();
-				}
-			}
-
-		});
-
-		viewer.setInput(featureModel);
-
-		/**
-		 * Dynamically growing columns
-		 */
-		viewer.getControl();
-		Listener listener = new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				TreeItem treeItem = (TreeItem) event.item;
-				final TreeColumn[] treeColumns = treeItem.getParent().getColumns();
-				Display.getCurrent().asyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						// for (TreeColumn treeColumn : treeColumns)
-						treeColumns[0].pack();
-					}
-				});
-			}
-		};
-		viewer.getTree().addListener(SWT.Expand, listener);
+		final Composite dialog = (Composite) super.createDialogArea(parent);
+		dialog.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
+//		final GridLayout gbc = new GridLayout();
+//		gbc.numColumns = 2;
+//		dialog.setLayout(gridLayout);
+		
+//		dialog.setLayoutData(new GridBagLayout());
+//		JLabel jLabel = new JLabel("Selected Feature: " + feature.getName());
+//
+//		GridBagConstraints gbc = new GridBagConstraints();
+//
+//		gbc.insets = new Insets(5, 0, 5, 0);
+//
+//		gbc.gridx = 0;
+//		gbc.gridy = 0;
+//
+//				dialog.add(jLabel, gbc);
+//
+//		gbc.gridy++;
+//
+//		Panel jPanel = new Panel();
+//		Label jName = new Label("Name: ");
+//		jPanel.add(jName);
+//		final TextField textFieldName = new TextField(20);
+//		jPanel.add(textFieldName, gbc);
+//				dialog.add(jPanel, gbc);
+//		gbc.gridy++;
+//
+//		Panel jPanelValue = new Panel();
+//		Label jLabelValue = new Label("Value: ");
+//		final TextField textFieldValue = new TextField(20);
+//		jPanelValue.add(jLabelValue);
+//		jPanelValue.add(textFieldValue);
+//				dialog.add(jPanelValue, gbc);
+//
+//		gbc.gridy++;
+//
+//		Panel jPanelUnit = new Panel();
+//		JLabel jLabelUnit = new JLabel("Unit: ");
+//		final JTextField textFieldUnit = new JTextField(20);
+//		jPanelUnit.add(jLabelUnit);
+//		jPanelUnit.add(textFieldUnit);
+//				dialog.add(jPanelUnit, gbc);
+//		gbc.gridy++;
+//
+//		String[] Types = { "String", "Long", "Double", "Boolean" };
+//		Panel jPanelType = new Panel();
+//		Label jLabelType = new Label("Type: ");
+//		final Combo typeBox = new Combo(dialog, SWT.READ_ONLY);
+//		typeBox.setItems(Types);
+//				typeBox.addActionListener(new ActionListener() {
+//
+//					public void actionPerformed(ActionEvent e) {
+//						JComboBox typeBox = (JComboBox) e.getSource();
+//						String typeName = (String) typeBox.getSelectedItem();
+//					}
+//				});
+//
+//		jPanelType.add(jLabelType);
+//				jPanelType.add(typeBox);
+//				dialog.add(jPanelType, gbc);
+//
+//		gbc.gridy++;
+//
+//		String[] bools = { "true", "false" };
+//		Panel jPanelRecursive = new Panel();
+//		Label jLabelRecursive = new Label("Recursive: ");
+//		final Combo recursiveBox = new Combo(dialog, SWT.READ_ONLY);
+//		recursiveBox.setItems(bools);
+//				typeBox.addActionListener(new ActionListener() {
+//
+//					public void actionPerformed(ActionEvent e) {
+//						JComboBox<String> typeBox = (JComboBox) e.getSource();
+//						String typeName = (String) typeBox.getSelectedItem();
+//					}
+//				});
+//
+//		jPanelRecursive.add(jLabelRecursive);
+//				jPanelRecursive.add(recursiveBox);
+//				dialog.add(jPanelRecursive, gbc);
+//
+//		gbc.gridy++;
+//
+//		Panel jPanelConfigurable = new Panel();
+//		Label jLabelConfigurable = new Label("Configurable: ");
+//		final Combo configurableBox = new Combo(dialog, SWT.READ_ONLY);
+//		configurableBox.setItems(bools);
+//				typeBox.addActionListener(new ActionListener() {
+//
+//					public void actionPerformed(ActionEvent e) {
+//						JComboBox<String> configurableBox = (JComboBox) e.getSource();
+//						String typeName = (String) configurableBox.getSelectedItem();
+//					}
+//				});
+//
+//		jPanelConfigurable.add(jLabelConfigurable);
+//				jPanelConfigurable.add(configurableBox);
+//				dialog.add(jPanelConfigurable, gbc);
+//
+//		gbc.gridy++;
+//
+//		Button bCancel = new Button("Cancel");
+//		bCancel.addActionListener(new ActionListener() {
+//
+//			public void actionPerformed(ActionEvent e) {
+//				dialog.dispose();
+//			}
+//		});
+//		Button bAdd = new Button("Add");
+//		bAdd.addActionListener(new ActionListener() {
+//
+//			public void actionPerformed(ActionEvent e) {
+//				String name = textFieldName.getText().trim();
+//				String value = textFieldValue.getText().trim();
+				// String type = typeBox.getSelectedItem().toString().trim();
+//				String unit = textFieldUnit.getText().trim();
+				// String recursive = recursiveBox.getSelectedItem().toString().trim();
+				// String configurable = configurableBox.getSelectedItem().toString().trim();
+//						boolean rec = false, conf = false;
+//						rec = recursive.equals("true");
+//						conf = configurable.equals("true");
+//
+//						FeatureAttribute attribute = new FeatureAttribute(name, value, type, unit, rec, conf);
+//						feature.getStructure().getAttributeList().add(attribute);
+//				dialog.dispose();
+//			}
+//		});
+//
+//		Panel jpButton = new Panel();
+//		jpButton.add(bCancel);
+//		jpButton.add(bAdd);
+//				dialog.add(jpButton, gbc);
 
 		return parent;
-
-	}
-
-	private class MyContentProvider implements ITreeContentProvider {
-
-		@Override
-		public Object[] getElements(Object inputElement) {
-			IFeatureModel fm = (IFeatureModel) inputElement;
-			ArrayList<IFeature> feature = new ArrayList<IFeature>();
-			IFeature name = fm.getStructure().getRoot().getFeature();
-			feature.add(name);
-			if (fm.getNumberOfFeatures() == 0) {
-				return new Object[0];
-			}
-			return feature.toArray();
-		}
-
-		@Override
-		public void dispose() {}
-
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-
-		@Override
-		public Object[] getChildren(Object parentElement) {
-			ArrayList<Object> feature = new ArrayList<Object>();
-			LinkedList<FeatureAttribute> attList = new LinkedList<>();
-			LinkedList<FeatureAttributeInherited> attListInh = new LinkedList<>();
-			if (parentElement instanceof IFeature) {
-				IFeature f = (IFeature) parentElement;
-				attList = f.getStructure().getAttributeList();
-				attListInh = f.getStructure().getAttributeListInherited();
-				for (FeatureAttribute attribute : attList) {
-					feature.add(attribute);
-
-				}
-				for (FeatureAttributeInherited attributeInh : attListInh) {
-					if (!isInList(attList, attributeInh.getParent())) {
-						feature.add(attributeInh);
-					}
-				}
-				for (int i = 0; i < f.getStructure().getChildrenCount(); i++) {
-					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
-					feature.add(cf);
-				}
-			}
-			return feature.toArray();
-		}
-
-		@Override
-		public Object getParent(Object element) {
-			if (element instanceof IFeature) {
-				return ((IFeature) element).getStructure().getParent().getFeature();
-			}
-			return null;
-		}
-
-		@Override
-		public boolean hasChildren(Object element) {
-			if (element instanceof IFeature) {
-				IFeature f = (IFeature) element;
-				if (f.getStructure().hasChildren()) {
-					return true;
-				} else if (f.getStructure().getAttributeList() != null || f.getStructure().getAttributeListInherited() != null) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean isInList(LinkedList<FeatureAttribute> attList, FeatureAttribute inhAtt) {
-			for (FeatureAttribute attribute : attList) {
-				if (attribute.equals(inhAtt)) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
-
-	class TableLabelProvider implements ITableLabelProvider {
-
-		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getColumnText(Object element, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				if (element instanceof IFeature) {
-					return ((IFeature) element).getName();
-				}
-				if (element instanceof FeatureAttribute) {
-					return "Attribute";
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return "Inherited attribute";
-				}
-			case 1:
-				if (element instanceof FeatureAttribute) {
-					return ((FeatureAttribute) element).getName();
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return ((FeatureAttributeInherited) element).getName();
-				}
-			case 2:
-				if (element instanceof FeatureAttribute) {
-					return ((FeatureAttribute) element).getValue();
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return ((FeatureAttributeInherited) element).getValue();
-				}
-
-			case 3:
-				if (element instanceof FeatureAttribute) {
-					return ((FeatureAttribute) element).getTypeString();
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return ((FeatureAttributeInherited) element).getParent().getTypeString();
-				}
-
-			case 4:
-				if (element instanceof FeatureAttribute) {
-					return ((FeatureAttribute) element).getUnit();
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return ((FeatureAttributeInherited) element).getParent().getUnit();
-				}
-
-			case 5:
-				if (element instanceof FeatureAttribute) {
-					return String.valueOf(((FeatureAttribute) element).getConfigurable());
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return String.valueOf(((FeatureAttributeInherited) element).getParent().getConfigurable());
-				}
-
-			case 6:
-				if (element instanceof FeatureAttribute) {
-					return String.valueOf(((FeatureAttribute) element).getRecursive());
-				}
-				if (element instanceof FeatureAttributeInherited) {
-					return String.valueOf(((FeatureAttributeInherited) element).getParent().getRecursive());
-				}
-			}
-			return null;
-		}
-
-		@Override
-		public void addListener(ILabelProviderListener listener) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void dispose() {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public boolean isLabelProperty(Object element, String property) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		public void removeListener(ILabelProviderListener listener) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
-	private EditingSupport createEditingSupportFor(final TreeViewer viewer, final CellEditor textCellEditor) {
-		return new EditingSupport(viewer) {
-
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return textCellEditor;
-			}
-
-			@Override
-			protected Object getValue(Object element) {
-				return null;
-			}
-
-			@Override
-			protected void setValue(Object element, Object value) {
-				viewer.update(element, null);
-			}
-		};
-	}
-
-	private class GivenNameEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenNameEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return ((FeatureAttribute) element).getName();
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((FeatureAttribute) element).setName(value.toString());
-			getViewer().update(element, null);
-			getViewer().refresh();
-		}
-	}
-
-	private class GivenValueEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenValueEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			if (element instanceof FeatureAttribute) {
-				return ((FeatureAttribute) element).getValue();
-			}
-			if (element instanceof FeatureAttributeInherited) {
-				return ((FeatureAttributeInherited) element).getValue();
-			}
-			return null;
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			if (element instanceof FeatureAttribute) {
-				((FeatureAttribute) element).setValue(value.toString());
-				getViewer().update(element, null);
-			}
-			if (element instanceof FeatureAttributeInherited) {
-				((FeatureAttributeInherited) element).setValue(value.toString());
-				getViewer().update(element, null);
-			}
-		}
-	}
-
-	private class GivenTypeEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenTypeEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return ((FeatureAttribute) element).getTypeNames();
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((FeatureAttribute) element).setTypeFromString(value.toString());
-			getViewer().update(element, null);
-		}
-	}
-
-	private class GivenUnitEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenUnitEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return ((FeatureAttribute) element).getUnit();
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((FeatureAttribute) element).setUnit(value.toString());
-			getViewer().update(element, null);
-			getViewer().refresh();
-		}
-	}
-
-	private class GivenConfigurableEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenConfigurableEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return String.valueOf(((FeatureAttribute) element).getConfigurable());
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((FeatureAttribute) element).setConfigurable((value.toString()));
-			getViewer().update(element, null);
-			getViewer().refresh();
-		}
-	}
-
-	private class GivenRecursiveEditing extends EditingSupport {
-
-		private TextCellEditor cellEditor;
-
-		public GivenRecursiveEditing(TreeViewer viewer) {
-			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTree());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return cellEditor;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return String.valueOf(((FeatureAttribute) element).getRecursive());
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			if (value.toString().toLowerCase().equals("true")) {
-				((FeatureAttribute) element).setRecursive(true);
-			} else if (value.toString().toLowerCase().equals("false")) {
-				((FeatureAttribute) element).setRecursive(false);
-			} else {
-				try {
-					Boolean.parseBoolean((String) value);
-				} catch (Exception e) {
-
-				}
-			}
-
-			getViewer().update(element, null);
-			getViewer().refresh();
-		}
 	}
 }
-
-//				Button b = new Button(shell, SWT.PUSH);
-//				b.setText("Remove column");
-//				final TreeViewer v = new TreeViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
-//				v.getTree().setLinesVisible(true);
-//				v.getTree().setHeaderVisible(true);
-//				b.addSelectionListener(new SelectionListener() {
-//		
-//					@Override
-//					public void widgetDefaultSelected(SelectionEvent e) {
-//		
-//					}
-//		
-//					@Override
-//					public void widgetSelected(SelectionEvent e) {
-//						v.getTree().getColumn(1).dispose();
-//					}
-//		
-//				});
-//		
-//				TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(v, new FocusCellOwnerDrawHighlighter(v));
-//				ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
-//		
-//					@Override
-//					protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-//						return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
-//							|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-//							|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
-//							|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
-//					}
-//				};
-//		
-//				int feature = ColumnViewerEditor.TABBING_HORIZONTAL | ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL
-//					| ColumnViewerEditor.KEYBOARD_ACTIVATION;
-//		
-//				TreeViewerEditor.create(v, focusCellManager, actSupport, feature);
-//				final TextCellEditor textCellEditor = new TextCellEditor(v.getTree());
-//		
-//				String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive"};
-//				String[] labelPrefix = { "", "", "","","","","" };
-//
-//				for (int i = 0; i < columLabels.length; i++) {
-//					TreeViewerColumn column = new TreeViewerColumn(v, SWT.NONE);
-//					column.getColumn().setWidth(200);
-//					column.getColumn().setMoveable(true);
-//					column.getColumn().setText(columLabels[i]);
-//					column.setLabelProvider(createColumnLabelProvider(labelPrefix[i]));
-//					column.setEditingSupport(createEditingSupportFor(v, textCellEditor));
-//				}
-//				v.setContentProvider(new MyContentProvider());
-//				v.setInput();
-//			}
-//
-//			private ColumnLabelProvider createColumnLabelProvider(final String prefix) {
-//				return new ColumnLabelProvider() {
-//		
-//					@Override
-//					public String getText(Object element) {
-//						return prefix + element.toString();
-//					}
-//		
-//				};
-//			}
-//		
-//			private EditingSupport createEditingSupportFor(final TreeViewer viewer, final TextCellEditor textCellEditor) {
-//				return new EditingSupport(viewer) {
-//		
-//					@Override
-//					protected boolean canEdit(Object element) {
-//						return false;
-//					}
-//		
-//					@Override
-//					protected CellEditor getCellEditor(Object element) {
-//						return textCellEditor;
-//					}
-//		
-//					@Override
-//					protected Object getValue(Object element) {
-//						return ((MyModel) element).counter + "";
-//					}
-//		
-//					@Override
-//					protected void setValue(Object element, Object value) {
-//						((MyModel) element).counter = Integer.parseInt(value.toString());
-//						viewer.update(element, null);
-//					}
-//				};
-//			}
-
-//container.setLayout(gridLayout);
-//
-//final TreeViewer viewer = new TreeViewer(container, SWT.BORDER | SWT.MULTI);
-//GridData gridData = new GridData();
-//gridData.horizontalSpan = 2;
-//gridData.horizontalAlignment = GridData.FILL;
-//gridData.grabExcessHorizontalSpace = true;
-//gridData.verticalAlignment = SWT.FILL;
-//gridData.grabExcessVerticalSpace = true;
-//viewer.getTree().setLayoutData(gridData);
-//viewer.getTree().setHeaderVisible(true);
-//viewer.getTree().setLinesVisible(true);
-//
-//Button bAdd = new Button(container, SWT.NONE);
-//bAdd.setText("Add Attribute");
-//
-//Button bRemove = new Button(container, SWT.NONE);
-//gridData = new GridData();
-//bRemove.setLayoutData(gridData);
-//bRemove.setText("Remove Attribute");
-//bRemove.addSelectionListener(new SelectionListener() {
-//
-//@Override
-//public void widgetDefaultSelected(SelectionEvent e) {}
-//
-//@Override
-//public void widgetSelected(SelectionEvent e) {
-//viewer.getTree().getSelection();
-//}
-//});
-//
-///**
-//* Dynamically growing columns
-//*/
-//viewer.getControl();
-//Listener listener = new Listener() {
-//
-//@Override
-//public void handleEvent(Event event) {
-//TreeItem treeItem = (TreeItem) event.item;
-//final TreeColumn[] treeColumns = treeItem.getParent().getColumns();
-//Display.getCurrent().asyncExec(new Runnable() {
-//
-//@Override
-//public void run() {
-//for (TreeColumn treeColumn : treeColumns)
-//treeColumn.pack();
-//}
-//});
-//}
-//};
-//viewer.getTree().addListener(SWT.Expand, listener);
-//			

@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.ManageAttributesDialog;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_ATTRIBUTES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
@@ -45,6 +46,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -57,6 +59,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -81,25 +84,51 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 import de.ovgu.featureide.fm.ui.editors.AddAttributeDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 
-public class AddAttributeAction extends Action  {
+public class AddAttributeAction extends SingleSelectionAction  {
 	
 	private IFeatureModel featureModel;
+
 	
-	public AddAttributeAction(IFeatureModel featureMod) {
-		super(MANAGE_ATTRIBUTE);
+	public AddAttributeAction(Object viewer, IFeatureModel featureMod) {
+		super(MANAGE_ATTRIBUTE, viewer);
 		this.featureModel = featureMod;
 	}
+	
+	
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction#isValidSelection(org.eclipse.jface.viewers.IStructuredSelection)
+	 */
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		return true;
+	}
+
+	
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#isEnabled()
+	 */
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+
+
 
 	@Override
 	public void run() {
+
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		final AddAttributeDialog addAttributeDialog = new AddAttributeDialog(shell, featureModel);
+		final ManageAttributesDialog manageAttributesDialog = new ManageAttributesDialog(shell, featureModel);
 		// inform ui to update
-		if (addAttributeDialog.open() == Window.OK) {
+		if (manageAttributesDialog.open() == Window.OK) {
 			final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
 			try {
 				project.touch(null);
@@ -108,5 +137,11 @@ public class AddAttributeAction extends Action  {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
+	}
+
+	@Override
+	protected void updateProperties() {
+		// TODO Auto-generated method stub
+		
 	}
 }
