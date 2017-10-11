@@ -261,6 +261,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
 			getFigure().setProperties();
+			getModel().setSize(getFigure().getSize());
 			break;
 		case COLLAPSED_ALL_CHANGED:
 		case COLLAPSED_CHANGED:
