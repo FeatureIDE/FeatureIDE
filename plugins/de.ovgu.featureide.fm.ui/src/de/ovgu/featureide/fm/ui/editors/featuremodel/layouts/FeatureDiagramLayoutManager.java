@@ -154,16 +154,16 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 	}
 
-	public Rectangle getFeatureModelBounds(IGraphicalFeatureModel featureModel) {
+	public Rectangle getFeatureModelBounds(List<? extends IGraphicalElement> elements) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
 		/*
-		 * update lowest, highest, most left, most right coordinates for features
+		 * update lowest, highest, most left, most right coordinates for elements
 		 */
-		final Iterable<IGraphicalFeature> nonHidden = featureModel.getVisibleFeatures();
-		for (final IGraphicalFeature feature : nonHidden) {
-			final Rectangle position = FeatureUIHelper.getBounds(feature);
+		
+		for (final IGraphicalElement element : elements) {
+			final Rectangle position = FeatureUIHelper.getBounds(element);
 			if (position.x < min.x) {
 				min.x = position.x;
 			}
@@ -177,7 +177,7 @@ abstract public class FeatureDiagramLayoutManager {
 				max.y = position.bottom();
 			}
 		}
-
+		
 		return new Rectangle(min, max);
 	}
 
@@ -284,7 +284,7 @@ abstract public class FeatureDiagramLayoutManager {
 	public Point layoutLegend(IGraphicalFeatureModel featureModel) {
 		if (!featureModel.getLayout().hasLegendAutoLayout()) return null;
 
-		Rectangle featureModelBounds = getFeatureModelBounds(featureModel);
+		Rectangle featureModelBounds = getFeatureModelBounds(featureModel.getVisibleFeatures());
 		final Point min = featureModelBounds.getTopLeft();
 		final Point max = featureModelBounds.getBottomRight();
 
@@ -308,7 +308,11 @@ abstract public class FeatureDiagramLayoutManager {
 		rects.add(new Rectangle(new Point(min.x, max.y - legendSize.height()), legendSize));
 		rects.add(new Rectangle(new Point(max.x - legendSize.width(), max.y - legendSize.height()), legendSize));
 
+		//Check the first four positions for intersections with the features
 		checkIntersections(featureModel.getVisibleFeatures(), rects, featureModel.getLayout().verticalLayout());
+		
+		//Add the position next to the featureModel and check for hits with the constraints
+		rects.add(new Rectangle(new Point(max.x + FMPropertyManager.getFeatureSpaceX(), min.y), legendSize));
 		checkIntersections(featureModel.getVisibleConstraints(), rects, featureModel.getLayout().verticalLayout());
 
 		if (rects.size() > 0) {
@@ -316,9 +320,13 @@ abstract public class FeatureDiagramLayoutManager {
 			featureModel.getLayout().setLegendPos(rects.get(0).getLocation().x, rects.get(0).getLocation().y);
 			return featureModel.getLayout().getLegendPos();
 		}
-
-		// It was not possible to find any empty space, position the legend next to the feature Model
-		featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+		
+		// It was not possible to find any empty space, probably there is an intersection with a constraint.
+		// So we position the legend next to the feature model and mind the constraints
+		Rectangle boundsOfEverything = getFeatureModelBounds(featureModel.getVisibleConstraints());
+		boundsOfEverything.union(featureModelBounds);
+		
+		featureModel.getLayout().setLegendPos(boundsOfEverything.getTopRight().x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		return featureModel.getLayout().getLegendPos();
 	}
 
