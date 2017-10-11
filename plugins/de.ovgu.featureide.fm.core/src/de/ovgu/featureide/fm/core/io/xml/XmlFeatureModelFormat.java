@@ -478,6 +478,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				if (fa.getType() == null) {
 					throwError("An attribute needs to be of type: " + fa.getTypeNames() + ".", e);
 				}
+				if (!fa.checkValue()) {
+					throwError("The value doesn't match the type." , e);
+				}
 				attributeList.add(fa);
 				if (fa.getRecursive()) {
 					recursiveList.add(fa);

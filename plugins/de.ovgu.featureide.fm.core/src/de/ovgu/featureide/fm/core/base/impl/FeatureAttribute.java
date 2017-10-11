@@ -28,17 +28,17 @@ package de.ovgu.featureide.fm.core.base.impl;
  */
 public class FeatureAttribute {
 
-	static final String STRING = "string";
-	static final String DOUBLE = "double";
-	static final String LONG = "long";
-	static final String BOOLEAN = "boolean";
+	static final String STRING = "STRING";
+	static final String DOUBLE = "DOUBLE";
+	static final String LONG = "LONG";
+	static final String BOOLEAN = "BOOLEAN";
 
 	/**
 	 * Allowed types for FeatureAttributes.
 	 *
 	 * @author "Werner Jan"
 	 */
-	public enum Types {
+	private enum Types {
 		STRING, DOUBLE, LONG, BOOLEAN
 	}
 
@@ -85,6 +85,7 @@ public class FeatureAttribute {
 		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
+				return true;
 			} catch (final NumberFormatException e) {
 				return false;
 			}
@@ -92,6 +93,7 @@ public class FeatureAttribute {
 		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
+				return true;
 			} catch (final NumberFormatException e) {
 				return false;
 			}
@@ -112,6 +114,7 @@ public class FeatureAttribute {
 		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
+				return true;
 			} catch (final NumberFormatException e) {
 				return false;
 			}
@@ -119,6 +122,7 @@ public class FeatureAttribute {
 		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
+				return true;
 			} catch (final NumberFormatException e) {
 				return false;
 			}
@@ -126,6 +130,8 @@ public class FeatureAttribute {
 		if (type.toString().equals(BOOLEAN)) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
+			} else {
+				return false;
 			}
 		}
 		return true;
