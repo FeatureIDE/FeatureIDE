@@ -35,6 +35,8 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 
@@ -45,9 +47,10 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 * @param node the node representing the constraint to be added
 	 * @param featureModel model that will be used to add the constraint
 	 */
-	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
+	public CreateConstraintOperation(Node node, IFeatureModel featureModel, String description) {
 		super(featureModel, CREATE_CONSTRAINT);
 		constraint = FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, node);
+		constraint.setDescription(description);
 		this.featureModel = featureModel;
 	}
 
