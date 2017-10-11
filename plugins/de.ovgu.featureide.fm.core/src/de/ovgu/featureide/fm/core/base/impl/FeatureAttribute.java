@@ -23,22 +23,35 @@ package de.ovgu.featureide.fm.core.base.impl;
 /**
  * Attributes for Features.
  *
+ * @author "Daniel Marcel"
  * @author "Werner Jan"
- * @author "Marcel Daniel"
  */
 public class FeatureAttribute {
 
+	static final String STRING = "string";
+	static final String DOUBLE = "double";
+	static final String LONG = "long";
+	static final String BOOLEAN = "boolean";
+
+	/**
+	 * Allowed types for FeatureAttributes.
+	 *
+	 * @author "Werner Jan"
+	 */
 	public enum Types {
 		STRING, DOUBLE, LONG, BOOLEAN
 	}
 
-	protected boolean configurable;
-	protected String name;
-	protected String value;
-	protected String unit;
-	protected boolean recursive;
-	protected Types type;
+	private boolean configurable;
+	private String name;
+	private String value;
+	private String unit;
+	private boolean recursive;
+	private Types type;
 
+	/**
+	 * Create empty FeatureAttribute.
+	 */
 	public FeatureAttribute() {
 		name = "";
 		type = null;
@@ -48,6 +61,14 @@ public class FeatureAttribute {
 		configurable = false;
 	}
 
+	/**
+	 * @param name Name
+	 * @param value Value
+	 * @param type Type
+	 * @param unit Unit
+	 * @param recursive recursive
+	 * @param configurable configurable
+	 */
 	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
 		this.name = name;
 		this.value = value;
@@ -57,22 +78,25 @@ public class FeatureAttribute {
 		this.configurable = configurable;
 	}
 
+	/**
+	 * @return True, if the value of this FeatureAttribute matches its type. Else false.
+	 */
 	public boolean checkValue() {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("BOOLEAN")) {
+		if (type.toString().equals(BOOLEAN)) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
 			}
@@ -80,22 +104,26 @@ public class FeatureAttribute {
 		return true;
 	}
 
+	/**
+	 * @param Check if the String value matches the defined type.
+	 * @return true if match, else false.
+	 */
 	public boolean checkValue(String value) {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			try {
 				Long.parseLong(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			try {
 				Double.parseDouble(value);
 			} catch (final NumberFormatException e) {
 				return false;
 			}
 		}
-		if (type.toString().equals("BOOLEAN")) {
+		if (type.toString().equals(BOOLEAN)) {
 			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
 				return true;
 			}
@@ -103,41 +131,53 @@ public class FeatureAttribute {
 		return true;
 	}
 
-	// returns an object of the correct type of the attribute
+	/**
+	 * @return Object of the defined type.
+	 */
 	public Object getValueObject() {
-		if (type.toString().equals("LONG")) {
+		if (type.toString().equals(LONG)) {
 			return Long.parseLong(value);
 		}
-		if (type.toString().equals("DOUBLE")) {
+		if (type.toString().equals(DOUBLE)) {
 			return Double.parseDouble(value);
 		}
-		if (type.toString().equals("BOOLEAN")) {
-			if (value.toLowerCase().equals("true")) {
-				return true;
-			}
-			if (value.toLowerCase().equals("false")) {
-				return false;
-			}
+		if (type.toString().equals(BOOLEAN)) {
+			return value.toLowerCase().equals("true");
 		}
 		return value;
 	}
 
+	/**
+	 * @return boolean value of configurable.
+	 */
 	public boolean getConfigurable() {
 		return configurable;
 	}
 
+	/**
+	 * @return String value of name.
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * @return boolean value of recursive.
+	 */
 	public boolean getRecursive() {
 		return recursive;
 	}
 
+	/**
+	 * @return type enum.
+	 */
 	public Types getType() {
 		return type;
 	}
 
+	/**
+	 * @return Concatenation of the allowed Types. Separated through comma.
+	 */
 	public String getTypeNames() {
 		final StringBuilder sb = new StringBuilder();
 		String types = "";
@@ -149,22 +189,37 @@ public class FeatureAttribute {
 		return sb.toString();
 	}
 
+	/**
+	 * @return Type as string in lower case.
+	 */
 	public String getTypeString() {
 		return type.toString().toLowerCase();
 	}
 
+	/**
+	 * @return Unit.
+	 */
 	public String getUnit() {
 		return unit;
 	}
 
+	/**
+	 * @return Value.
+	 */
 	public String getValue() {
 		return value;
 	}
 
+	/**
+	 * @param Set configurable with a boolean value.
+	 */
 	public void setConfigurable(boolean configurable) {
 		this.configurable = configurable;
 	}
 
+	/**
+	 * @param Setting boolean value of configurable if the string is true or false.
+	 */
 	public void setConfigurable(String configurableString) {
 		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
 			configurable = false;
@@ -173,15 +228,24 @@ public class FeatureAttribute {
 		}
 	}
 
+	/**
+	 * @param Setting name from string.
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @param Set recursive from boolean.
+	 */
 	public void setRecursive(boolean recursive) {
 		this.recursive = recursive;
 
 	}
 
+	/**
+	 * @param Setting the type from a string, if the String is in the allowed.
+	 */
 	public void setTypeFromString(String type) {
 		type = type.toUpperCase();
 		for (final Types typeNames : Types.values()) {
@@ -191,14 +255,23 @@ public class FeatureAttribute {
 		}
 	}
 
+	/**
+	 * @param type set Type from given type.
+	 */
 	public void setType(Types type) {
 		this.type = type;
 	}
 
+	/**
+	 * @param Set unit from String.
+	 */
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 
+	/**
+	 * @param Set value from String.
+	 */
 	public void setValue(String value) {
 		this.value = value;
 	}
