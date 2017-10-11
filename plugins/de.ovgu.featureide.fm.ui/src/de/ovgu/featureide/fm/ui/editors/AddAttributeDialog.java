@@ -22,11 +22,22 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
 
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -52,19 +63,26 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -78,19 +96,16 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
  * A simple editor to change description of a particular feature diagram.
  *
  */
-public class AddAttributeDialog extends Dialog  {
-	
-	private FeatureModelEditor featureModelEditor;
+public class AddAttributeDialog extends Dialog {
+
 	private IFeatureModel featureModel;
-	private int activeColumn = -1;
-	private static final Color WHITE = new Color(null, 255, 255, 255);
-	private String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive"};
-	
+	private String[] columLabels = { "Feature", "Attributename", "Value", "Type", "Unit", "Configurable", "Recursive" };
+
 	public AddAttributeDialog(final Shell parentShell, IFeatureModel featureModel) {
 		super(parentShell);
 		this.featureModel = featureModel;
 	}
-	
+
 	/**
 	 * Sets the minimal size and the text in the title of the dialog.
 	 *
@@ -98,7 +113,6 @@ public class AddAttributeDialog extends Dialog  {
 	 */
 	@Override
 	protected void configureShell(Shell newShell) {
-		newShell.setMinimumSize(new Point(500, 500));
 		super.configureShell(newShell);
 		newShell.setText(MANAGE_ATTRIBUTE);
 	}
@@ -107,7 +121,7 @@ public class AddAttributeDialog extends Dialog  {
 	protected Point getInitialSize() {
 		return new Point(1300, 1000);
 	}
-	
+
 	/**
 	 * Creates the general layout of the dialog.
 	 *
@@ -117,19 +131,21 @@ public class AddAttributeDialog extends Dialog  {
 	protected Control createDialogArea(Composite parent) {
 		final Composite container = (Composite) super.createDialogArea(parent);
 		container.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
-		final GridLayout gridLayout = (GridLayout) container.getLayout();
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
+		container.setLayout(gridLayout);
 
+		final TreeViewer viewer = new TreeViewer(container, SWT.BORDER | SWT.MULTI);
 		GridData gridData = new GridData();
-		gridData.verticalAlignment = GridData.FILL_BOTH;
+		gridData.horizontalSpan = 2;
 		gridData.horizontalAlignment = GridData.FILL;
-		
-		final TreeViewer viewer = new TreeViewer(container);
-		viewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.verticalAlignment = SWT.FILL;
+		gridData.grabExcessVerticalSpace = true;
+		viewer.getTree().setLayoutData(gridData);
 		viewer.getTree().setHeaderVisible(true);
 		viewer.getTree().setLinesVisible(true);
-		
+
 		TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(viewer, new FocusCellOwnerDrawHighlighter(viewer));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(viewer) {
 
@@ -147,9 +163,9 @@ public class AddAttributeDialog extends Dialog  {
 
 		TreeViewerEditor.create(viewer, focusCellManager, actSupport, feature);
 		final CellEditor textCellEditor = new TextCellEditor(viewer.getTree());
-		
+
 		TreeViewerColumn column0 = new TreeViewerColumn(viewer, SWT.NONE);
-		column0.getColumn().setWidth(150);
+		column0.getColumn().setWidth(100);
 		column0.getColumn().setMoveable(true);
 		column0.getColumn().setText(columLabels[0]);
 		column0.setEditingSupport(createEditingSupportFor(viewer, textCellEditor));
@@ -159,44 +175,44 @@ public class AddAttributeDialog extends Dialog  {
 		column1.getColumn().setMoveable(true);
 		column1.getColumn().setText(columLabels[1]);
 		column1.setEditingSupport(new GivenNameEditing(viewer));
-		
+
 		TreeViewerColumn column2 = new TreeViewerColumn(viewer, SWT.NONE);
 		column2.getColumn().setWidth(150);
 		column2.getColumn().setMoveable(true);
 		column2.getColumn().setText(columLabels[2]);
 		column2.setEditingSupport(new GivenValueEditing(viewer));
-		
+
 		TreeViewerColumn column3 = new TreeViewerColumn(viewer, SWT.NONE);
 		column3.getColumn().setWidth(150);
 		column3.getColumn().setMoveable(true);
 		column3.getColumn().setText(columLabels[3]);
 		column3.setEditingSupport(new GivenTypeEditing(viewer));
-		
+
 		TreeViewerColumn column4 = new TreeViewerColumn(viewer, SWT.NONE);
 		column4.getColumn().setWidth(150);
 		column4.getColumn().setMoveable(true);
 		column4.getColumn().setText(columLabels[4]);
 		column4.setEditingSupport(new GivenUnitEditing(viewer));
-		
+
 		TreeViewerColumn column5 = new TreeViewerColumn(viewer, SWT.NONE);
 		column5.getColumn().setWidth(150);
 		column5.getColumn().setMoveable(true);
 		column5.getColumn().setText(columLabels[5]);
 		column5.setEditingSupport(new GivenConfigurableEditing(viewer));
-		
+
 		TreeViewerColumn column6 = new TreeViewerColumn(viewer, SWT.NONE);
 		column6.getColumn().setWidth(150);
 		column6.getColumn().setMoveable(true);
 		column6.getColumn().setText(columLabels[6]);
 		column6.setEditingSupport(new GivenRecursiveEditing(viewer));
-		
+
 		viewer.setContentProvider(new MyContentProvider());
 		viewer.setLabelProvider(new TableLabelProvider());
-		
-		Button bAdd = new Button(container, SWT.PUSH);
+
+		Button bAdd = new Button(container, SWT.NONE);
 		bAdd.setText("Add Attribute");
 		bAdd.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
@@ -204,14 +220,60 @@ public class AddAttributeDialog extends Dialog  {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				ITreeSelection selection = viewer.getStructuredSelection();
+				TreePath[] selceted = selection.getPaths();
+				Object f = selceted[0].getSegment(0);
+				if (f instanceof IFeature) {
+					final JDialog dialog = new JDialog();
+					dialog.setTitle("Add Attribute");
+					createDialog(dialog, ((IFeature) f));
+					dialog.addWindowListener(new WindowAdapter() {
+						public void windowsClosing(WindowEvent e) {
+							e.getWindow().dispose();							
+						}
+					});;
+					
+				}
+			}
+
+			private void createDialog(final JDialog dialog,IFeature feature) {
+				
+				Container cp = dialog.getContentPane();
+				cp.setLayout(new GridBagLayout());
+				JLabel jLabel = new JLabel("Selected attribute: " + feature.getName() );
+				cp.add(jLabel);
+				
+				JButton bChanel = new JButton("Chanel");
+				bChanel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dialog.dispose();
+					}
+				});
+				JButton bAdd = new JButton("Add");
+				bAdd.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dialog.dispose();
+					}
+				});
+				JPanel jpButton = new JPanel();
+				jpButton.add(bChanel);
+				jpButton.add(bAdd);
+				cp.add(jpButton);
+				dialog.pack();
+				dialog.setSize(600, dialog.getHeight());
+				dialog.setLocation((Toolkit.getDefaultToolkit().getScreenSize().width - dialog.getWidth()) /2,
+						(Toolkit.getDefaultToolkit().getScreenSize().height - dialog.getHeight()) / 2);
+				dialog.setVisible(true);
 			}
 
 		});
-		
-		Button bRemove = new Button(container, SWT.PUSH);
+
+		Button bRemove = new Button(container, SWT.NONE);
+		gridData = new GridData();
+		bRemove.setLayoutData(gridData);
 		bRemove.setText("Remove Attribute");
 		bRemove.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
@@ -221,52 +283,73 @@ public class AddAttributeDialog extends Dialog  {
 			public void widgetSelected(SelectionEvent e) {
 				ITreeSelection selection = viewer.getStructuredSelection();
 				Object selceted = selection.getFirstElement();
-				if(selceted instanceof FeatureAttribute) {
+				if (selceted instanceof FeatureAttribute) {
 					List<String> featureNameList = featureModel.getFeatureOrderList();
-					for(int i = 0; i < featureNameList.size(); i++) {
+					for (int i = 0; i < featureNameList.size(); i++) {
 						IFeature feature = featureModel.getFeature(featureNameList.get(i));
 						LinkedList<FeatureAttribute> featureAttributeList = feature.getStructure().getAttributeList();
-						LinkedList<FeatureAttributeInherited> featureAttributeListInherited = feature.getStructure().getAttributeListInherited();
-						for(FeatureAttribute featureAttribute : featureAttributeList) {
-							if(featureAttribute.equals(selceted)) {
+						LinkedList<FeatureAttributeInherited> featureAttributeInheritedList = feature.getStructure().getAttributeListInherited();
+						for (FeatureAttributeInherited featureAttributeInherited : featureAttributeInheritedList) {
+							if (featureAttributeInherited.getParent().equals(selceted)) {
+								featureAttributeInheritedList.remove(featureAttributeInherited);
+							}
+						}
+						for (FeatureAttribute featureAttribute : featureAttributeList) {
+							if (featureAttribute.equals(selceted)) {
 								featureAttributeList.remove(selceted);
-								viewer.setInput(featureModel);
-								viewer.expandAll();
-								viewer.refresh();
-
 							}
 						}
 					}
+					viewer.setInput(featureModel);
+					viewer.expandAll();
+					viewer.refresh();
 				}
 			}
 
 		});
 
-		
-		
 		viewer.setInput(featureModel);
-		
 
-    	return parent;
-	
+		/**
+		 * Dynamically growing columns
+		 */
+		viewer.getControl();
+		Listener listener = new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				TreeItem treeItem = (TreeItem) event.item;
+				final TreeColumn[] treeColumns = treeItem.getParent().getColumns();
+				Display.getCurrent().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						// for (TreeColumn treeColumn : treeColumns)
+						treeColumns[0].pack();
+					}
+				});
+			}
+		};
+		viewer.getTree().addListener(SWT.Expand, listener);
+
+		return parent;
+
 	}
-		
+
 	private class MyContentProvider implements ITreeContentProvider {
-		
+
 		@Override
 		public Object[] getElements(Object inputElement) {
 			IFeatureModel fm = (IFeatureModel) inputElement;
 			ArrayList<IFeature> feature = new ArrayList<IFeature>();
 			IFeature name = fm.getStructure().getRoot().getFeature();
 			feature.add(name);
-		    if (fm.getNumberOfFeatures() == 0) {
-		    	return new Object[0];
-		    }       
-		    return feature.toArray();
+			if (fm.getNumberOfFeatures() == 0) {
+				return new Object[0];
+			}
+			return feature.toArray();
 		}
 
-
-		
 		@Override
 		public void dispose() {}
 
@@ -278,62 +361,59 @@ public class AddAttributeDialog extends Dialog  {
 			ArrayList<Object> feature = new ArrayList<Object>();
 			LinkedList<FeatureAttribute> attList = new LinkedList<>();
 			LinkedList<FeatureAttributeInherited> attListInh = new LinkedList<>();
-			if(parentElement instanceof IFeature) {
+			if (parentElement instanceof IFeature) {
 				IFeature f = (IFeature) parentElement;
 				attList = f.getStructure().getAttributeList();
 				attListInh = f.getStructure().getAttributeListInherited();
-				for(FeatureAttribute attribute : attList) {
+				for (FeatureAttribute attribute : attList) {
 					feature.add(attribute);
-					
+
 				}
-				for(FeatureAttributeInherited attributeInh : attListInh) {
-					if(!isInList(attList, attributeInh.getParent())) {
+				for (FeatureAttributeInherited attributeInh : attListInh) {
+					if (!isInList(attList, attributeInh.getParent())) {
 						feature.add(attributeInh);
 					}
 				}
-				for(int i = 0; i < f.getStructure().getChildrenCount(); i++) {
+				for (int i = 0; i < f.getStructure().getChildrenCount(); i++) {
 					IFeature cf = f.getStructure().getChildren().get(i).getFeature();
 					feature.add(cf);
 				}
 			}
-				return feature.toArray();
+			return feature.toArray();
 		}
 
 		@Override
 		public Object getParent(Object element) {
 			if (element instanceof IFeature) {
 				return ((IFeature) element).getStructure().getParent().getFeature();
-		    }  
-			    return null;
-	    }
+			}
+			return null;
+		}
 
 		@Override
 		public boolean hasChildren(Object element) {
 			if (element instanceof IFeature) {
-		         IFeature f = (IFeature) element;
-		         if(f.getStructure().hasChildren()) {
-		        	 return true;
-		         } else if (f.getStructure().getAttributeList() != null || f.getStructure().getAttributeListInherited() != null) {
-		        	 return true;
-		         }
-		    }
-		    return false;
+				IFeature f = (IFeature) element;
+				if (f.getStructure().hasChildren()) {
+					return true;
+				} else if (f.getStructure().getAttributeList() != null || f.getStructure().getAttributeListInherited() != null) {
+					return true;
+				}
+			}
+			return false;
 		}
-		
+
 		private boolean isInList(LinkedList<FeatureAttribute> attList, FeatureAttribute inhAtt) {
-			for(FeatureAttribute attribute : attList) {
+			for (FeatureAttribute attribute : attList) {
 				if (attribute.equals(inhAtt)) {
 					return true;
-				}						
-		}
+				}
+			}
 			return false;
 		}
 	}
-		
 
-	
-
-		class TableLabelProvider implements ITableLabelProvider {
+	class TableLabelProvider implements ITableLabelProvider {
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -342,78 +422,78 @@ public class AddAttributeDialog extends Dialog  {
 		}
 
 		@Override
-		public String getColumnText(Object element, int columnIndex) { 
-			switch(columnIndex) {
-		    	  case 0:
-		    		  if (element instanceof IFeature) {
-		    			  return ((IFeature) element).getName();
-		    		  }
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return "Attribute";
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return "Inherited attribute";
-		    		  }
-		    	  case 1:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return ((FeatureAttribute) element).getName();
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return ((FeatureAttributeInherited) element).getName();
-		    		  }		    		  
-		    	  case 2:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return ((FeatureAttribute) element).getValue();
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return ((FeatureAttributeInherited) element).getValue();
-		    		  }
-		      		  
-		    	  case 3:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return ((FeatureAttribute) element).getTypeString();
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return ((FeatureAttributeInherited) element).getParent().getTypeString();
-		    		  }
-		    		  
-		    	  case 4:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return ((FeatureAttribute) element).getUnit();
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return ((FeatureAttributeInherited) element).getParent().getUnit();
-		    		  }
-		    		 
-		    	  case 5:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return String.valueOf(((FeatureAttribute) element).getConfigurable()); 
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return String.valueOf(((FeatureAttributeInherited) element).getParent().getConfigurable());
-		    		  }
-		    		  
-		    	  case 6:
-		    		  if (element instanceof FeatureAttribute) {
-		    			  return String.valueOf(((FeatureAttribute) element).getRecursive());
-		    		  }
-		    		  if (element instanceof FeatureAttributeInherited) {
-		    			  return String.valueOf(((FeatureAttributeInherited) element).getParent().getRecursive());
-		    		  }
-		    	  }
-		      return null; 
+		public String getColumnText(Object element, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				if (element instanceof IFeature) {
+					return ((IFeature) element).getName();
+				}
+				if (element instanceof FeatureAttribute) {
+					return "Attribute";
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return "Inherited attribute";
+				}
+			case 1:
+				if (element instanceof FeatureAttribute) {
+					return ((FeatureAttribute) element).getName();
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return ((FeatureAttributeInherited) element).getName();
+				}
+			case 2:
+				if (element instanceof FeatureAttribute) {
+					return ((FeatureAttribute) element).getValue();
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return ((FeatureAttributeInherited) element).getValue();
+				}
+
+			case 3:
+				if (element instanceof FeatureAttribute) {
+					return ((FeatureAttribute) element).getTypeString();
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return ((FeatureAttributeInherited) element).getParent().getTypeString();
+				}
+
+			case 4:
+				if (element instanceof FeatureAttribute) {
+					return ((FeatureAttribute) element).getUnit();
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return ((FeatureAttributeInherited) element).getParent().getUnit();
+				}
+
+			case 5:
+				if (element instanceof FeatureAttribute) {
+					return String.valueOf(((FeatureAttribute) element).getConfigurable());
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return String.valueOf(((FeatureAttributeInherited) element).getParent().getConfigurable());
+				}
+
+			case 6:
+				if (element instanceof FeatureAttribute) {
+					return String.valueOf(((FeatureAttribute) element).getRecursive());
+				}
+				if (element instanceof FeatureAttributeInherited) {
+					return String.valueOf(((FeatureAttributeInherited) element).getParent().getRecursive());
+				}
+			}
+			return null;
 		}
 
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void dispose() {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -424,44 +504,12 @@ public class AddAttributeDialog extends Dialog  {
 
 		public void removeListener(ILabelProviderListener listener) {
 			// TODO Auto-generated method stub
-			
-		}
-		}
 
-		private EditingSupport createEditingSupportFor(final TreeViewer viewer, final CellEditor textCellEditor) {
-			return new EditingSupport(viewer) {
-	
-				@Override
-				protected boolean canEdit(Object element) {
-					return true;
-				}
-	
-				@Override
-				protected CellEditor getCellEditor(Object element) {
-					return  textCellEditor;
-				}
-	
-				@Override
-				protected Object getValue(Object element) {
-					return null;
-				}
-	
-				@Override
-				protected void setValue(Object element, Object value) {
-					viewer.update(element, null);
-				}
-			};
 		}
-		
-		
-		
-		private class GivenNameEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
+	}
 
-			public GivenNameEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
+	private EditingSupport createEditingSupportFor(final TreeViewer viewer, final CellEditor textCellEditor) {
+		return new EditingSupport(viewer) {
 
 			@Override
 			protected boolean canEdit(Object element) {
@@ -470,188 +518,235 @@ public class AddAttributeDialog extends Dialog  {
 
 			@Override
 			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
+				return textCellEditor;
 			}
 
 			@Override
 			protected Object getValue(Object element) {
-				return ((FeatureAttribute) element).getName();
+				return null;
 			}
 
 			@Override
 			protected void setValue(Object element, Object value) {
-				((FeatureAttribute) element).setName(value.toString());
-				getViewer().update(element, null);
-				getViewer().refresh();
+				viewer.update(element, null);
 			}
+		};
+	}
+
+	private class GivenNameEditing extends EditingSupport {
+
+		private TextCellEditor cellEditor;
+
+		public GivenNameEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
 		}
-		
-		private class GivenValueEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
 
-			public GivenValueEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
 
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
 
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
-			}
+		@Override
+		protected Object getValue(Object element) {
+			return ((FeatureAttribute) element).getName();
+		}
 
-			@Override
-			protected Object getValue(Object element) {
+		@Override
+		protected void setValue(Object element, Object value) {
+			((FeatureAttribute) element).setName(value.toString());
+			getViewer().update(element, null);
+			getViewer().refresh();
+		}
+	}
+
+	private class GivenValueEditing extends EditingSupport {
+
+		private TextCellEditor cellEditor;
+
+		public GivenValueEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			if (element instanceof FeatureAttribute) {
 				return ((FeatureAttribute) element).getValue();
 			}
+			if (element instanceof FeatureAttributeInherited) {
+				return ((FeatureAttributeInherited) element).getValue();
+			}
+			return null;
+		}
 
-			@Override
-			protected void setValue(Object element, Object value) {
+		@Override
+		protected void setValue(Object element, Object value) {
+			if (element instanceof FeatureAttribute) {
 				((FeatureAttribute) element).setValue(value.toString());
 				getViewer().update(element, null);
 			}
-		}
-		
-		private class GivenTypeEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
-
-			public GivenTypeEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
-
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
-			}
-
-			@Override
-			protected Object getValue(Object element) {
-				return ((FeatureAttribute) element).getTypeNames();
-			}
-
-			@Override
-			protected void setValue(Object element, Object value) {
-				((FeatureAttribute) element).setTypeFromString(value.toString());
+			if (element instanceof FeatureAttributeInherited) {
+				((FeatureAttributeInherited) element).setValue(value.toString());
 				getViewer().update(element, null);
 			}
 		}
-		
-		private class GivenUnitEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
+	}
 
-			public GivenUnitEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
+	private class GivenTypeEditing extends EditingSupport {
 
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
+		private TextCellEditor cellEditor;
 
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
-			}
-
-			@Override
-			protected Object getValue(Object element) {
-				return ((FeatureAttribute) element).getUnit();
-			}
-
-			@Override
-			protected void setValue(Object element, Object value) {
-				((FeatureAttribute) element).setUnit(value.toString());
-				getViewer().update(element, null);
-				getViewer().refresh();
-			}
+		public GivenTypeEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
 		}
-		
-		private class GivenConfigurableEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
 
-			public GivenConfigurableEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
-
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
-			}
-
-			@Override
-			protected Object getValue(Object element) {
-				return String.valueOf(((FeatureAttribute) element).getConfigurable());
-			}
-
-			@Override
-			protected void setValue(Object element, Object value) {
-				((FeatureAttribute) element).setConfigurable((value.toString()));
-				getViewer().update(element, null);
-				getViewer().refresh();
-			}
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
 		}
-		
-		private class GivenRecursiveEditing extends EditingSupport {
-			private TextCellEditor cellEditor;
 
-			public GivenRecursiveEditing(TreeViewer viewer) {
-				super(viewer);
-				cellEditor = new TextCellEditor(viewer.getTree());
-			}
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
 
-			@Override
-			protected boolean canEdit(Object element) {
-				return true;
-			}
+		@Override
+		protected Object getValue(Object element) {
+			return ((FeatureAttribute) element).getTypeNames();
+		}
 
-			@Override
-			protected CellEditor getCellEditor(Object element) {
-				return cellEditor;
-			}
+		@Override
+		protected void setValue(Object element, Object value) {
+			((FeatureAttribute) element).setTypeFromString(value.toString());
+			getViewer().update(element, null);
+		}
+	}
 
-			@Override
-			protected Object getValue(Object element) {
-				return String.valueOf(((FeatureAttribute) element).getRecursive());
-			}
+	private class GivenUnitEditing extends EditingSupport {
 
-			@Override
-			protected void setValue(Object element, Object value) {
-				if (value.toString().toLowerCase().equals("true")) {
-					((FeatureAttribute) element).setRecursive(true);
-				} else if (value.toString().toLowerCase().equals("false")) {
-					((FeatureAttribute) element).setRecursive(false);
-				} else {
-					try {
-						Boolean.parseBoolean((String) value);
-					} catch (Exception e) {
-						
-					}
+		private TextCellEditor cellEditor;
+
+		public GivenUnitEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			return ((FeatureAttribute) element).getUnit();
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			((FeatureAttribute) element).setUnit(value.toString());
+			getViewer().update(element, null);
+			getViewer().refresh();
+		}
+	}
+
+	private class GivenConfigurableEditing extends EditingSupport {
+
+		private TextCellEditor cellEditor;
+
+		public GivenConfigurableEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			return String.valueOf(((FeatureAttribute) element).getConfigurable());
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			((FeatureAttribute) element).setConfigurable((value.toString()));
+			getViewer().update(element, null);
+			getViewer().refresh();
+		}
+	}
+
+	private class GivenRecursiveEditing extends EditingSupport {
+
+		private TextCellEditor cellEditor;
+
+		public GivenRecursiveEditing(TreeViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTree());
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return cellEditor;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			return String.valueOf(((FeatureAttribute) element).getRecursive());
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			if (value.toString().toLowerCase().equals("true")) {
+				((FeatureAttribute) element).setRecursive(true);
+			} else if (value.toString().toLowerCase().equals("false")) {
+				((FeatureAttribute) element).setRecursive(false);
+			} else {
+				try {
+					Boolean.parseBoolean((String) value);
+				} catch (Exception e) {
+
 				}
-
-				getViewer().update(element, null);
-				getViewer().refresh();
 			}
+
+			getViewer().update(element, null);
+			getViewer().refresh();
 		}
+	}
 }
 
-	
 //				Button b = new Button(shell, SWT.PUSH);
 //				b.setText("Remove column");
 //				final TreeViewer v = new TreeViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
@@ -740,7 +835,57 @@ public class AddAttributeDialog extends Dialog  {
 //					}
 //				};
 //			}
+
+//container.setLayout(gridLayout);
+//
+//final TreeViewer viewer = new TreeViewer(container, SWT.BORDER | SWT.MULTI);
+//GridData gridData = new GridData();
+//gridData.horizontalSpan = 2;
+//gridData.horizontalAlignment = GridData.FILL;
+//gridData.grabExcessHorizontalSpace = true;
+//gridData.verticalAlignment = SWT.FILL;
+//gridData.grabExcessVerticalSpace = true;
+//viewer.getTree().setLayoutData(gridData);
+//viewer.getTree().setHeaderVisible(true);
+//viewer.getTree().setLinesVisible(true);
+//
+//Button bAdd = new Button(container, SWT.NONE);
+//bAdd.setText("Add Attribute");
+//
+//Button bRemove = new Button(container, SWT.NONE);
+//gridData = new GridData();
+//bRemove.setLayoutData(gridData);
+//bRemove.setText("Remove Attribute");
+//bRemove.addSelectionListener(new SelectionListener() {
+//
+//@Override
+//public void widgetDefaultSelected(SelectionEvent e) {}
+//
+//@Override
+//public void widgetSelected(SelectionEvent e) {
+//viewer.getTree().getSelection();
+//}
+//});
+//
+///**
+//* Dynamically growing columns
+//*/
+//viewer.getControl();
+//Listener listener = new Listener() {
+//
+//@Override
+//public void handleEvent(Event event) {
+//TreeItem treeItem = (TreeItem) event.item;
+//final TreeColumn[] treeColumns = treeItem.getParent().getColumns();
+//Display.getCurrent().asyncExec(new Runnable() {
+//
+//@Override
+//public void run() {
+//for (TreeColumn treeColumn : treeColumns)
+//treeColumn.pack();
+//}
+//});
+//}
+//};
+//viewer.getTree().addListener(SWT.Expand, listener);
 //			
-
-
-
