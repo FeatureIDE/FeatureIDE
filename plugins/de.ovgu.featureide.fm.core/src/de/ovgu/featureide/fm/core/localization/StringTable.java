@@ -479,9 +479,9 @@ public class StringTable {
 	public static final String INVALID_NAME = "Invalid Name";
 	public static final String CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_ = " Constraint makes the feature model void. ";
 	public static final String CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_ =
-		" Constraint is not satisfiable and makes the feature model void. ";
-	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = " Constraint is a tautology and should be removed. ";
-	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = " Constraint is redundant and could be removed. ";
+		"Constraint is not satisfiable and makes the feature model void. ";
+	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = "Constraint is a tautology and should be removed. ";
+	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = "Constraint is redundant and could be removed. ";
 	public static final String CONCRETE = " Concrete";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
 	public static final String IS_DEAD = "is dead ";
@@ -1084,5 +1084,7 @@ public class StringTable {
 
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";
-
+	
+	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
+	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
 }

@@ -28,7 +28,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * This class is required to set a feature to mandatory
+ * The operation method() returns the operation used to set a single feature to mandatory
  * 
  * @author Chico Sundermann
  * @author Paul Westphal
