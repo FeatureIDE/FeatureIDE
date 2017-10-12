@@ -60,20 +60,25 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
+ * 
+ * @author Holger Fenske (replace swt.widgets.List with swt.widgets.Table)
+ * @author Edgar Schmidt (replace swt.widgets.List with swt.widgets.Table)
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
 
 	private static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	
 	private static final String CONFIGS_ARGUMENT = "equations";
+	
 	private static final String DEFAULT_CONFIGS_PATH = "equations";
 
 	private static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
 
 	private static final String PAGE_TEXT = FEATURE_ORDER;
 
-	private org.eclipse.swt.widgets.List featurelist = null;
+	private FeatureOrderTable featureOrderTable;
 
 	private Button up = null;
 	private Button down = null;
@@ -88,7 +93,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	private boolean hasFeatureOrder = true;
 
-	private Composite comp;
+	public Composite comp;
 
 	private GridData gridData;
 
@@ -105,8 +110,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			updateOrderEditor();
 
 			if (hasFeatureOrder) {
-				writeToOrderFile(); // save the feature order also in .order if file
-									 // exists
+				writeToOrderFile(); // save the feature order also in .order if file exists
 			}
 
 			if (featureModelEditor.getFeatureModel().getFeatureOrderList().isEmpty()) {
@@ -137,16 +141,16 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	@Override
 	public void initEditor() {
+
 		if (hasFeatureOrder) {
 			if (featureModelEditor.getFeatureModel().getFeatureOrderList().isEmpty()) {
 				defaultFeatureList();
 			} else {
-				featurelist.removeAll();
+				featureOrderTable.removeAll();
 				for (final String str : featureModelEditor.getFeatureModel().getFeatureOrderList()) {
-					featurelist.add(str);
+					featureOrderTable.addItem(str);
 				}
 			}
-
 			activate.setSelection(featureModelEditor.getFeatureModel().isFeatureOrderUserDefined());
 			enableUI(featureModelEditor.getFeatureModel().isFeatureOrderUserDefined());
 		}
@@ -169,7 +173,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 	}
 
-	private void setDirty() {
+	public void setDirty() {
 		dirty = true;
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -186,8 +190,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
 			label.setText(FMComposerManager.getFMComposerExtension(project).getOrderPageMessage());
-			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-			featurelist.setVisible(false);
+			featureOrderTable = new FeatureOrderTable(this);
+			featureOrderTable.setVisible(true);
 		} else {
 			layout.numColumns = 3;
 			label.setText(USER_DEFINED_FEATURE_ORDER);
@@ -211,14 +215,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				final boolean selection = activate.getSelection();
 				enableUI(selection);
-
 				updateFeatureOrderList();
-
 				setDirty();
 			}
 		});
-
-		featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+		featureOrderTable = new FeatureOrderTable(this);
 	}
 
 	private void createGridData() {
@@ -227,9 +228,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalSpan = 4;
 		gridData.grabExcessVerticalSpace = true;
-		featurelist.setLayoutData(gridData);
-		featurelist.setEnabled(false);
-
+		featureOrderTable.setGridData(gridData);
+		featureOrderTable.setEnabled(false);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 	}
@@ -246,21 +246,18 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				final LinkedList<String> items = getSelectedItems();
 
 				for (int i = 0; i < items.size(); i++) {
-					final int focus = featurelist.indexOf(items.get(i));
+					final int focus = featureOrderTable.getIndex(items.get(i));
 
 					if (focus != 0) { // First Element is selected, no change
-						final String temp = featurelist.getItem(focus - 1);
+						final String temp = featureOrderTable.getItem(focus - 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus - 1, featurelist.getItem(focus));
-							featurelist.setItem(focus, temp);
-
+							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus - 1);
+							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
-
 							setDirty();
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -278,21 +275,18 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				final LinkedList<String> items = getSelectedItems();
 
 				for (int i = items.size() - 1; i >= 0; i--) {
-					final int focus = featurelist.indexOf(items.get(i));
+					final int focus = featureOrderTable.getIndex(items.get(i));
 
-					if (focus != (featurelist.getItemCount() - 1)) {
-						final String temp = featurelist.getItem(focus + 1);
+					if (focus != (featureOrderTable.getList().size() - 1)) {
+						final String temp = featureOrderTable.getItem(focus + 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus + 1, featurelist.getItem(focus));
-							featurelist.setItem(focus, temp);
-
+							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus + 1);
+							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
-
 							setDirty();
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -304,13 +298,12 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @return selected items
 	 */
 	private LinkedList<String> getSelectedItems() {
-		final int[] focuses = featurelist.getSelectionIndices();
+		final int[] focuses = featureOrderTable.getSelectionsIndices();
 		Arrays.sort(focuses);
 		final LinkedList<String> items = new LinkedList<String>();
 		for (final int focus : focuses) {
-			items.add(featurelist.getItem(focus));
+			items.add(featureOrderTable.getItem(focus));
 		}
-
 		return items;
 	}
 
@@ -323,10 +316,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		final int[] newindizies = new int[items.size()];
 
 		for (int i = 0; i < items.size(); i++) {
-			newindizies[i] = featurelist.indexOf(items.get(i));
+			newindizies[i] = featureOrderTable.getIndex(items.get(i));
 		}
-
-		featurelist.setSelection(newindizies);
+		featureOrderTable.setSelectionsIndices(newindizies);
 	}
 
 	/**
@@ -342,49 +334,47 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				defaultFeatureList();
-
 				updateFeatureOrderList();
-
 				setDirty();
 			}
 		});
 	}
 
 	private void defaultFeatureList() {
-		featurelist.removeAll();
+		featureOrderTable.removeAll();
 
 		if (featureModelEditor.getFeatureModel().getStructure().getRoot() != null) {
 			featureModelEditor.getFeatureModel().setFeatureOrderList(Collections.<String> emptyList());
 			for (final String featureName : featureModelEditor.getFeatureModel().getFeatureOrderList()) {
-				featurelist.add(featureName);
+				featureOrderTable.addItem(featureName);
 			}
 		}
 	}
 
 	/**
-	 * Applies changes of the feature model to the feature order list.
+	 * Applies changes of the feature model to the feature order table.
 	 *
-	 * @return true if feature order list has changed and was not empty before
+	 * @return true if feature order table has changed and was not empty before
 	 */
 	private boolean updateFeatureList() {
 		boolean changed = false;
 		if (featureModelEditor.getFeatureModel().getStructure().getRoot() != null) {
 			final HashSet<String> featureSet = new HashSet<String>(featureModelEditor.getFeatureModel().getFeatureOrderList());
 
-			int itemcount = featurelist.getItemCount();
+			int itemcount = featureOrderTable.getList().size();
 			for (int i = 0; i < itemcount; i++) {
-				if (!featureSet.remove(featurelist.getItem(i))) {
+				if (!featureSet.remove(featureOrderTable.getItem(i))) {
 					changed = true;
-					if (featureSet.remove(featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)))) {
-						featurelist.setItem(i, featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)));
+					if (featureSet.remove(featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featureOrderTable.getItem(i)))) {
+						featureOrderTable.setItem(featureModelEditor.getFeatureModel().getRenamingsManager().getNewName(featureOrderTable.getItem(i)), i);
 					} else {
-						featurelist.remove(i--);
+						featureOrderTable.removeItem(i--);
 						itemcount--;
 					}
 				}
 			}
 			for (final String newFeatureName : featureSet) {
-				featurelist.add(newFeatureName);
+				featureOrderTable.addItem(newFeatureName);
 			}
 		}
 		return changed;
@@ -422,9 +412,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			Collection<String> list = featureModelEditor.getFeatureModel().getFeatureOrderList();
 			if (list.isEmpty()) {
-				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set
-				// default
-				// values
+				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set default values
 			}
 
 			for (final String featureName : list) {
@@ -454,8 +442,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			if (featureModelEditor.getFeatureModel().isFeatureOrderUserDefined()) {
 				final LinkedList<String> newFeatureOrderlist = new LinkedList<String>();
-				for (int i = 0; i < featurelist.getItemCount(); i++) {
-					newFeatureOrderlist.add(featurelist.getItem(i));
+				for (int i = 0; i < featureOrderTable.getList().size(); i++) {
+					newFeatureOrderlist.add(featureOrderTable.getItem(i));
 				}
 				FeatureUtils.setFeatureOrderList(featureModelEditor.getFeatureModel(), newFeatureOrderlist);
 			}
@@ -510,7 +498,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 //	}
 
 	private void enableUI(boolean selection) {
-		featurelist.setEnabled(selection);
+		featureOrderTable.setEnabled(selection);
 		up.setEnabled(selection);
 		down.setEnabled(selection);
 		defaultButton.setEnabled(selection);

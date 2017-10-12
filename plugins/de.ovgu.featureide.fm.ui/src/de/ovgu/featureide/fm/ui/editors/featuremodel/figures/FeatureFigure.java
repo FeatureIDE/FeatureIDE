@@ -48,6 +48,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -143,11 +144,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		final IFeature feature = this.feature.getObject();
+		IFeature feature = this.feature.getObject();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 
 		// First draw custom color
-		final FeatureColor color = FeatureColorManager.getColor(feature);
+		FeatureColor color = FeatureColorManager.getColor(feature);
 		if (color != FeatureColor.NO_COLOR) {
 			setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 		} else if (!feature.getStructure().isConcrete()) {
@@ -159,26 +160,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 		}
 
-		switch (feature.getProperty().getFeatureStatus()) {
-		case DEAD:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		case FALSE_OPTIONAL:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		case INDETERMINATE_HIDDEN:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		default:
-			break;
-		}
+		setLabelIcon(feature.getProperty().getFeatureStatus());
 
 		if (!analyser.valid()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			setLabelIcon(FeatureStatus.DEAD);
 		}
 
 		if (feature instanceof ExtendedFeature) {
@@ -201,10 +186,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 
-		final Panel panel = new Panel();
+		Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
 		toolTipFigure = null;
+
 	}
 
 	/**
@@ -337,14 +323,35 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		return targetAnchor;
 	}
 
-	public void setName(String newName) {
-		if (label.getText().equals(newName)) {
-			return;
+	/**
+	 * 
+	 * @param {@link FeatureStatus}
+	 */
+	private void setLabelIcon(FeatureStatus featureStatus) {
+		switch (featureStatus) {
+		case NORMAL:
+			label.setIcon(null);
+			break;
+		case DEAD:
+			label.setIcon(FM_ERROR);
+			break;
+		case FALSE_OPTIONAL:
+			label.setIcon(FM_WARNING);
+			break;
+		case INDETERMINATE_HIDDEN:
+			label.setIcon(WARNING_IMAGE);
+			break;
+		default:
+			break;
 		}
+		setName(label.getText());
+	}
+
+	public void setName(String newName) {
 		label.setText(newName);
 
 		final Dimension labelSize = label.getPreferredSize();
-		minSize = labelSize;
+		this.minSize = labelSize;
 
 		if (!labelSize.equals(label.getSize())) {
 			label.setSize(labelSize);
@@ -356,7 +363,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (!oldSize.equals(0, 0)) {
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
-
 			setBounds(bounds);
 		}
 	}
