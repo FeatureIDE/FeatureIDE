@@ -50,18 +50,6 @@ public class FeatureAttribute {
 	private Types type;
 
 	/**
-	 * Create empty FeatureAttribute.
-	 */
-	public FeatureAttribute() {
-		name = "";
-		type = null;
-		recursive = false;
-		value = "";
-		unit = "";
-		configurable = false;
-	}
-
-	/**
 	 * @param name Name
 	 * @param value Value
 	 * @param type Type
@@ -72,10 +60,18 @@ public class FeatureAttribute {
 	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
 		this.name = name;
 		this.value = value;
-		setTypeFromString(type);
+
+		type = type.toUpperCase();
+		for (final Types typeNames : Types.values()) {
+			if (typeNames.toString().equals(type)) {
+				this.type = typeNames;
+			}
+		}
+
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configurable = configurable;
+
 	}
 
 	/**
@@ -86,7 +82,6 @@ public class FeatureAttribute {
 			if (type.toString().equals(LONG)) {
 				try {
 					Long.parseLong(value);
-					return true;
 				} catch (final NumberFormatException e) {
 					return false;
 				}
@@ -94,7 +89,6 @@ public class FeatureAttribute {
 			if (type.toString().equals(DOUBLE)) {
 				try {
 					Double.parseDouble(value);
-					return true;
 				} catch (final NumberFormatException e) {
 					return false;
 				}
@@ -113,26 +107,25 @@ public class FeatureAttribute {
 	 * @return true if match, else false.
 	 */
 	public boolean checkValue(String value) {
-		if (value.isEmpty()) {
+		if (!value.isEmpty()) {
 			if (type.toString().equals(LONG)) {
 				try {
 					Long.parseLong(value);
-					return true;
 				} catch (final NumberFormatException e) {
 					return false;
 				}
+				return true;
 			}
 			if (type.toString().equals(DOUBLE)) {
 				try {
 					Double.parseDouble(value);
-					return true;
 				} catch (final NumberFormatException e) {
 					return false;
 				}
+				return true;
 			}
 			if (type.toString().equals(BOOLEAN)) {
 				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-					return true;
 				} else {
 					return false;
 				}
@@ -231,10 +224,12 @@ public class FeatureAttribute {
 	 * @param Setting boolean value of configurable if the string is true or false.
 	 */
 	public void setConfigurable(String configurableString) {
-		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
-			configurable = false;
-		} else if (value.toLowerCase().equals("true")) {
-			configurable = true;
+		if (configurable) {
+			if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
+				configurable = false;
+			} else if (value.toLowerCase().equals("true")) {
+				configurable = true;
+			}
 		}
 	}
 
@@ -242,14 +237,18 @@ public class FeatureAttribute {
 	 * @param Setting name from string.
 	 */
 	public void setName(String name) {
-		this.name = name;
+		if (configurable) {
+			this.name = name;
+		}
 	}
 
 	/**
 	 * @param Set recursive from boolean.
 	 */
 	public void setRecursive(boolean recursive) {
-		this.recursive = recursive;
+		if (configurable) {
+			this.recursive = recursive;
+		}
 
 	}
 
@@ -257,34 +256,33 @@ public class FeatureAttribute {
 	 * @param Setting the type from a string, if the String is in the allowed.
 	 */
 	public void setTypeFromString(String type) {
-		type = type.toUpperCase();
-		for (final Types typeNames : Types.values()) {
-			if (typeNames.toString().equals(type)) {
-				this.type = typeNames;
+		if (configurable) {
+			type = type.toUpperCase();
+			for (final Types typeNames : Types.values()) {
+				if (typeNames.toString().equals(type)) {
+					this.type = typeNames;
+				}
 			}
 		}
-	}
-
-	/**
-	 * @param type set Type from given type.
-	 */
-	public void setType(Types type) {
-		this.type = type;
 	}
 
 	/**
 	 * @param Set unit from String.
 	 */
 	public void setUnit(String unit) {
-		this.unit = unit;
+		if (configurable) {
+			this.unit = unit;
+		}
 	}
 
 	/**
 	 * @param Set value from String.
 	 */
 	public void setValue(String value) {
-		if (checkValue(value)) {
-			this.value = value;
+		if (configurable || value.isEmpty()) {
+			if (checkValue(value)) {
+				this.value = value;
+			}
 		}
 	}
 
