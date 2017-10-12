@@ -279,7 +279,7 @@ public class FeatureAttribute {
 	 * @param Set value from String.
 	 */
 	public void setValue(String value) {
-		if (configurable || value.isEmpty()) {
+		if (configurable || this.value.isEmpty()) {
 			if (checkValue(value)) {
 				this.value = value;
 			}
