@@ -4763,7 +4763,7 @@
 								<alt mandatory="true" name="F_90B697FCB82D">
 									<feature name="F_A802DE3319FC"/>
 									<and name="F_6034232DFF72">
-										<or mandatory="true" name="F_3E48586141DB">
+										<and mandatory="true" name="F_3E48586141DB">
 											<and name="F_3F2CF6642E28">
 												<alt name="F_9784FF7CD92B">
 													<feature name="F_975807CC3902"/>
@@ -4772,7 +4772,7 @@
 												<feature name="F_12D384D9D875"/>
 											</and>
 											<feature name="F_B3F568CC5872"/>
-										</or>
+										</and>
 										<feature name="F_1C93454DFF35"/>
 										<feature name="F_F86F666C9213"/>
 									</and>
@@ -29239,7 +29239,7 @@
 				</imp>
 			</rule>
 		</constraints>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="false"/>
 	</featureModel>

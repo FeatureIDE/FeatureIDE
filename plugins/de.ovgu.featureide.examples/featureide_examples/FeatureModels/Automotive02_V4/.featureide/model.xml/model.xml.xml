@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<layout chosenLayoutAlgorithm="1" horizontalLayout="true">
+	<layout chosenLayoutAlgorithm="4" horizontalLayout="false" showCollapsedConstraints="false">
 		<struct>
 			<feature collapsed="true" name="F_1D3E881D325D"/>
 			<feature collapsed="true" name="I_2912729762__F_9E3109CA00E4"/>
@@ -58,7 +58,6 @@
 			<feature collapsed="true" name="I_1778592304__F_DFB025A3A209"/>
 			<feature collapsed="true" name="I_2438896432__F_68F28E4E8759"/>
 			<feature collapsed="true" name="I_2720534568__F_AB914750DFD1"/>
-			<feature collapsed="true" name="N_1503296467__F_CB24154D8F34"/>
 			<feature collapsed="true" name="F_97970B630BC3"/>
 			<feature collapsed="true" name="I_3070170500__F_1AB77ECAB39D"/>
 			<feature collapsed="true" name="I_10425688__F_ADFCB957D44C"/>
@@ -210,8 +209,8 @@
 			<feature collapsed="true" name="I_3395655703__F_5B4CF991E4B1"/>
 			<feature collapsed="true" name="F_57E33FFA09AB"/>
 			<feature collapsed="true" name="F_8F588DE4FFF3"/>
-			<feature collapsed="true" name="F_36ACE2999489"/>
 			<feature collapsed="true" name="F_BDB08D3C2B11"/>
+			<feature collapsed="true" name="F_36ACE2999489"/>
 			<feature collapsed="true" name="F_982FF6D84806"/>
 			<feature collapsed="true" name="I_3927145093__F_BD044BC25840"/>
 			<feature collapsed="true" name="I_76036794__F_218829687B1C"/>
@@ -225,7 +224,6 @@
 			<feature collapsed="true" name="F_2B60D4AC2832"/>
 			<feature collapsed="true" name="F_DCF6DADC5B47"/>
 			<feature collapsed="true" name="F_5327E5EFAAE0"/>
-			<feature collapsed="true" name="F_656327585305"/>
 			<feature collapsed="true" name="I_3165445592__F_5290D467963E"/>
 			<feature collapsed="true" name="F_36F89A3D7AD5"/>
 			<feature collapsed="true" name="I_2266435353__F_14C9D7A030E4"/>
@@ -325,7 +323,6 @@
 			<feature collapsed="true" name="F_6C577E28F313"/>
 			<feature collapsed="true" name="F_413140D0229E"/>
 			<feature collapsed="true" name="F_BCC01ECA7B45"/>
-			<feature collapsed="true" name="N_379925076__F_1F9577C2C134"/>
 			<feature collapsed="true" name="F_46EA5B725E65"/>
 			<feature collapsed="true" name="I_971250568__F_2587A808CCF8"/>
 			<feature collapsed="true" name="I_8117405__F_249A6468E3D1"/>
@@ -476,7 +473,6 @@
 			<feature collapsed="true" name="I_3736316035__F_DAEA47CD3689"/>
 			<feature collapsed="true" name="F_87DD8E8C2B99"/>
 			<feature collapsed="true" name="I_381486884__F_49BEB107434A"/>
-			<feature collapsed="true" name="N_379925076__F_F6634D01F935"/>
 			<feature collapsed="true" name="F_854AD5A8CB4D"/>
 			<feature collapsed="true" name="F_F2912C70C79C"/>
 			<feature collapsed="true" name="F_8C3FC288DD03"/>
@@ -507,7 +503,6 @@
 			<feature collapsed="true" name="I_10425688__F_BFAE89D04FCF"/>
 			<feature collapsed="true" name="I_447879168__F_1F286F10CA46"/>
 			<feature collapsed="true" name="I_2929702251__F_453EBA06DA15"/>
-			<feature collapsed="true" name="F_3850D3424659"/>
 			<feature collapsed="true" name="I_2080288455__F_698F5659E213"/>
 			<feature collapsed="true" name="F_A687C7AC76A3"/>
 			<feature collapsed="true" name="F_206983698E83"/>
@@ -676,7 +671,6 @@
 			<feature collapsed="true" name="I_4180683566__F_6B7D8D49D1AC"/>
 			<feature collapsed="true" name="F_C244100A107A"/>
 			<feature collapsed="true" name="F_CB7A77652930"/>
-			<feature collapsed="true" name="N_3002962336__F_E13047DD28FA"/>
 			<feature collapsed="true" name="I_323285826__F_ED4F876DEDF7"/>
 			<feature collapsed="true" name="F_AE24D4F7E07A"/>
 			<feature collapsed="true" name="I_3663818816__F_CEBC0F97391E"/>
@@ -750,7 +744,6 @@
 			<feature collapsed="true" name="F_6E21F39CB860"/>
 			<feature collapsed="true" name="F_5F188ACD5914"/>
 			<feature collapsed="true" name="N_3567789813__F_688C5B88219C"/>
-			<feature collapsed="true" name="F_1D185851F626"/>
 			<feature collapsed="true" name="I_2945777336__F_9579F7A757C6"/>
 			<feature collapsed="true" name="F_65CAC0B149E5"/>
 			<feature collapsed="true" name="I_3890840877__F_8E30BF7F9539"/>
@@ -966,8 +959,8 @@
 			<feature collapsed="true" name="F_E6796B7FB9CA"/>
 			<feature collapsed="true" name="I_3852990939__F_A4CB0550263B"/>
 			<feature collapsed="true" name="I_1184598099__F_B1CDECCF595E"/>
-			<feature collapsed="true" name="I_3838956801__F_D162DE8F3057"/>
 			<feature collapsed="true" name="F_30FC0C4B0A36"/>
+			<feature collapsed="true" name="I_3838956801__F_D162DE8F3057"/>
 			<feature collapsed="true" name="F_9B36F5B4B4A7"/>
 			<feature collapsed="true" name="F_BCFE9B767607"/>
 			<feature collapsed="true" name="I_2676068368__F_E4A51595ECF9"/>
@@ -1331,8 +1324,8 @@
 			<feature collapsed="true" name="F_CFE7FD2C186F"/>
 			<feature collapsed="true" name="F_C7C73A7859DF"/>
 			<feature collapsed="true" name="I_400939561__F_A6F88BFA908C"/>
-			<feature collapsed="true" name="F_7AE7220A385F"/>
 			<feature collapsed="true" name="F_F2C4D089D798"/>
+			<feature collapsed="true" name="F_7AE7220A385F"/>
 			<feature collapsed="true" name="F_925454E8393E"/>
 			<feature collapsed="true" name="F_FBFC87325974"/>
 			<feature collapsed="true" name="I_4208708576__F_C035228ECC40"/>
@@ -1380,7 +1373,6 @@
 			<feature collapsed="true" name="F_2B7FD7228DDE"/>
 			<feature collapsed="true" name="I_3925651565__F_DA4C03050286"/>
 			<feature collapsed="true" name="F_236C665107E7"/>
-			<feature collapsed="true" name="F_4459AF8EF5C3"/>
 			<feature collapsed="true" name="F_E5B53E4B007C"/>
 			<feature collapsed="true" name="F_3304F73393F3"/>
 			<feature collapsed="true" name="F_03AEAF0ACA61"/>
@@ -1691,7 +1683,6 @@
 			<feature collapsed="true" name="N_2056103036__F_360D6496FCD3"/>
 			<feature collapsed="true" name="F_53E0E77243FE"/>
 			<feature collapsed="true" name="F_7C5CEC09D8EC"/>
-			<feature collapsed="true" name="F_D829C2301A68"/>
 			<feature collapsed="true" name="I_3122515028__F_7A996DFF966A"/>
 			<feature collapsed="true" name="I_2762686038__F_D6E1EEDBEAFE"/>
 			<feature collapsed="true" name="I_3073274292__F_1AA797891277"/>

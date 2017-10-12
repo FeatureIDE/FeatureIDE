@@ -71,11 +71,14 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
+		return load(new SimpleFileHandler<>(path, object, null), formatManager);
+	}
+
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		final String content = fileHandler.getContent();
 
 		if (content != null) {
-			final String fileName = path.getFileName().toString();
+			final String fileName = fileHandler.getPath().getFileName().toString();
 			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
 			if (format == null) {
 				fileHandler.getLastProblems().add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
