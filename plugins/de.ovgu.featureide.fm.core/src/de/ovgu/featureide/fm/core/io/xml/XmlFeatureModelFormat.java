@@ -69,6 +69,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
@@ -303,7 +305,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if ((description != null) && !description.trim().isEmpty()) {
 			final Element descr = doc.createElement(DESCRIPTION);
 			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
-
 			fnod.appendChild(descr);
 		}
 	}
@@ -406,7 +407,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 				if ((description != null) && !description.isEmpty()) {
 					description = description.replace("\t", "");
-					description = description.substring(1, description.length() - 1);
 					description = description.trim();
 				}
 
@@ -471,7 +471,12 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				} else {
 					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
-			} else if (nodeName.equals(DESCRIPTION)) {} else {
+			} else if (nodeName.equals(DESCRIPTION)) {
+				/**
+				 * The method should return without adding any nodes, and traverse deeper into the tree, because description, has no children just return the
+				 * current list. The actual readout of the description happens at a different point.
+				 */
+			} else {
 				throwError("Unknown constraint type: " + nodeName, e);
 			}
 		}

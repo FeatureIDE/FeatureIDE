@@ -27,8 +27,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.junit.Test;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -38,6 +42,8 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * Tests for the {@link IFeatureModel}.
  *
  * @author Jens Meinicke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class TFeatureModel {
 
@@ -89,6 +95,34 @@ public class TFeatureModel {
 		expectedOrder.add(C.getName());
 		actualOrder = fm.getFeatureOrderList();
 		assertEquals(expectedOrder, actualOrder);
+	}
+
+	/**
+	 * After adding new fields to the IConstraint implementation, you should test it in a test similar to this.
+	 */
+	@Test
+	public void cloneFeatureModelTestDescription() {
+		final IFeatureModel fm = factory.createFeatureModel();
+		final IFeature feature = factory.createFeature(fm, "test_root_original");
+		final IFeature feature2 = factory.createFeature(fm, "test_root_original2");
+		fm.addFeature(feature);
+		fm.addFeature(feature2);
+		fm.getStructure().setRoot(feature.getStructure());
+		final IFeature root = fm.getFeature("test_root_original");
+		assertSame(root.getStructure(), fm.getStructure().getRoot());
+
+		Node constraintNode = new Implies(new Literal("test_root_original"), new Literal("test_root_original2"));
+		IConstraint constraint = factory.createConstraint(fm, constraintNode);
+		String originalDescription = "Constraint Description Test";
+		constraint.setDescription(originalDescription);
+		fm.addConstraint(constraint);
+
+		final IFeatureModel clonedModel = fm.clone(null);
+
+		for (IConstraint constraintClone : clonedModel.getConstraints()) {
+			String descriptionCopy = constraintClone.getDescription();
+			assertEquals(originalDescription, descriptionCopy);
+		}
 	}
 
 }

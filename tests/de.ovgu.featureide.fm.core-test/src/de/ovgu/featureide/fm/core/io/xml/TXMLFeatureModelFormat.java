@@ -52,7 +52,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	 * @param file
 	 * @throws UnsupportedModelException
 	 */
-	
+
 	public TXMLFeatureModelFormat(IFeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm, s);
 
@@ -63,7 +63,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTest.xml");
-
 		assertEquals(1, fm.getConstraints().size());
 
 		for (IConstraint constraint : fm.getConstraints()) {
@@ -78,7 +77,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml");
-
 		assertEquals(2, fm.getConstraints().size());
 		int i = 1;
 		for (IConstraint constraint : fm.getConstraints()) {
@@ -126,7 +124,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		c2.setDescription("Test Write Description 2");
 		newFm.addConstraint(c1);
 		newFm.addConstraint(c2);
-		
+
 		return newFm;
 	}
 
@@ -149,7 +147,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		String constraintdescriptionFromXml = "";
 
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("basic.xml");
-
 		assertEquals(1, fm.getConstraints().size());
 
 		for (IConstraint constraint : fm.getConstraints()) {
@@ -165,6 +162,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 	@Override
 	protected IFeatureModelFormat getFormat() {
 		return new XmlFeatureModelFormat();
-}
+	}
 
 }
