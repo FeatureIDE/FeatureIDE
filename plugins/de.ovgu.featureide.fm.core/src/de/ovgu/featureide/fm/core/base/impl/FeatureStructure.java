@@ -90,10 +90,10 @@ public class FeatureStructure implements IFeatureStructure {
 		hidden = false;
 
 		if (correspondingFeature.getStructure() != null) {
-			for (final FeatureAttribute fa : correspondingFeature.getFeatureModel().getStructure().getRoot().getAttributeList()) {
+			for (final FeatureAttribute fa : correspondingFeature.getStructure().getAttributeList()) {
 				attributeList.add(fa);
 			}
-			for (final FeatureAttributeInherited fai : correspondingFeature.getFeatureModel().getStructure().getRoot().getAttributeListInherited()) {
+			for (final FeatureAttributeInherited fai : correspondingFeature.getStructure().getAttributeListInherited()){
 				inheritedList.add(fai);
 			}
 		}
