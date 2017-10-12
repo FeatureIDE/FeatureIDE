@@ -93,7 +93,7 @@ public class FeatureStructure implements IFeatureStructure {
 			for (final FeatureAttribute fa : correspondingFeature.getStructure().getAttributeList()) {
 				attributeList.add(fa);
 			}
-			for (final FeatureAttributeInherited fai : correspondingFeature.getStructure().getAttributeListInherited()){
+			for (final FeatureAttributeInherited fai : correspondingFeature.getStructure().getAttributeListInherited()) {
 				inheritedList.add(fai);
 			}
 		}
@@ -480,6 +480,16 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void setAttributeListInherited(LinkedList<FeatureAttributeInherited> attListRecursive) {
 		inheritedList = attListRecursive;
+
+	}
+
+	@Override
+	public void upDateInherited(FeatureAttribute attribute) {
+		final FeatureAttributeInherited fai = new FeatureAttributeInherited(attribute);
+		getAttributeListInherited().add(fai);
+		for (final IFeatureStructure IFeature : getChildren()) {
+			IFeature.upDateInherited(attribute);
+		}
 
 	}
 }

@@ -110,6 +110,7 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManageAttributesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
@@ -215,6 +216,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
+	
+	private ManageAttributesAction addAttributeAction;
 
 	ExportFeatureModelAction exportFeatureModelAction;
 	// legend action replaced with property page
@@ -529,6 +532,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
+		
+		addAttributeAction = new ManageAttributesAction(this, getFeatureModel());
 
 		setLayoutActions = new ArrayList<LayoutSelectionAction>(5);
 		for (int i = 0; i < 5; i++) {
@@ -699,6 +704,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			connectionEntrys(menu);
 		} else {
 			menu.add(createConstraintAction);
+			menu.add(new Separator());
+			menu.add(addAttributeAction);
 			menu.add(new Separator());
 			menu.add(collapseAllAction);
 			menu.add(expandAllAction);
@@ -1351,6 +1358,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 				}
 			}
+			break;
+			
+		case FEATURE_ATTRIBUTE_ADDED:
+			featureModelEditor.setPageModified(true);
 			break;
 		case DEFAULT:
 			break;

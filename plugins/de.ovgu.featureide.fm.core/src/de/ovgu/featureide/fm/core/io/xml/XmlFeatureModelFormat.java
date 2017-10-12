@@ -455,7 +455,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 
 				if (checkAttributeList(name, recursiveList)) {
-					throwError("There already is an inherited FeatureAttribute with that name." , e);
+					throwError("There is already an inherited FeatureAttribute with that name.", e);
 				}
 				boolean conf = false, rec = false;
 
@@ -479,7 +479,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					throwError("An attribute needs to be of type: " + fa.getTypeNames() + ".", e);
 				}
 				if (!fa.checkValue()) {
-					throwError("The value doesn't match the type." , e);
+					throwError("The value doesn't match the type.", e);
 				}
 				attributeList.add(fa);
 				if (fa.getRecursive()) {
