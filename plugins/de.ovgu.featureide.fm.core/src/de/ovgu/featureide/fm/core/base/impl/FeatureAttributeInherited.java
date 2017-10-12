@@ -84,7 +84,9 @@ public class FeatureAttributeInherited {
 	 * @param value set the value as String value.
 	 */
 	public void setValue(String value) {
-		this.value = value;
+		if (parentAttribute.checkValue(value)) {
+			this.value = value;
+		}
 	}
 
 	/**

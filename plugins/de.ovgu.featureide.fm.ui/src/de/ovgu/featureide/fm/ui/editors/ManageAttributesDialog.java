@@ -319,7 +319,6 @@ public class ManageAttributesDialog extends Dialog {
 				final JPanel jPanelConfigurable = new JPanel();
 				final JLabel jLabelConfigurable = new JLabel("Configurable: ");
 				final JComboBox<String> configurableBox = new JComboBox<String>(bools);
-				typeBox.setSelectedIndex(1);
 
 				jPanelConfigurable.add(jLabelConfigurable);
 				jPanelConfigurable.add(configurableBox);

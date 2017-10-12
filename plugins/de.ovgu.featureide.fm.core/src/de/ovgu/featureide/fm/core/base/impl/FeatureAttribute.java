@@ -113,27 +113,29 @@ public class FeatureAttribute {
 	 * @return true if match, else false.
 	 */
 	public boolean checkValue(String value) {
-		if (type.toString().equals(LONG)) {
-			try {
-				Long.parseLong(value);
-				return true;
-			} catch (final NumberFormatException e) {
-				return false;
+		if (value.isEmpty()) {
+			if (type.toString().equals(LONG)) {
+				try {
+					Long.parseLong(value);
+					return true;
+				} catch (final NumberFormatException e) {
+					return false;
+				}
 			}
-		}
-		if (type.toString().equals(DOUBLE)) {
-			try {
-				Double.parseDouble(value);
-				return true;
-			} catch (final NumberFormatException e) {
-				return false;
+			if (type.toString().equals(DOUBLE)) {
+				try {
+					Double.parseDouble(value);
+					return true;
+				} catch (final NumberFormatException e) {
+					return false;
+				}
 			}
-		}
-		if (type.toString().equals(BOOLEAN)) {
-			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-				return true;
-			} else {
-				return false;
+			if (type.toString().equals(BOOLEAN)) {
+				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 		return true;
@@ -281,7 +283,9 @@ public class FeatureAttribute {
 	 * @param Set value from String.
 	 */
 	public void setValue(String value) {
-		this.value = value;
+		if (checkValue(value)) {
+			this.value = value;
+		}
 	}
 
 	@Override
