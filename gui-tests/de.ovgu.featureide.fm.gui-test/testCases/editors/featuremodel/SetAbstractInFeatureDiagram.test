@@ -1,0 +1,83 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: SetAbstractInFeatureDiagram
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _fuJvIKqUEeerMLtK5JRlxw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/9/17 9:12 AM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA,_v5dgIKqUEeerMLtK5JRlxw
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Checks if the following actions work as intended:
+- Setting a single feature to abstract
+- Setting two features that are siblings to abstract
+- Setting a parent and a child feature to abstract
+- Undoing abstract operation
+The test fails if there is an entry in the error log or the XML file of the diagram is different than expected.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart | get-edit-part -text Sabbath] {
+        mouse-move 30 14 button3 -height 19 -width 59
+        mouse-press 30 14 button3 -height 19 -width 59
+    }
+    get-menu Abstract | click
+    with [get-edit-part -className ModelEditPart | get-edit-part -text FIFO] {
+        mouse-move 13 10 button1 CTRL -height 19 -width 36
+        mouse-press 13 10 button1 CTRL -height 19 -width 36
+        mouse-release 13 10 button1 786432 -height 19 -width 36
+        mouse-hover 13 10 -mask CTRL -height 19 -width 36
+        mouse-press 13 10 button3 -height 19 -width 36
+    }
+    get-menu Abstract | click
+    mouse-hover 260 415 -height 730 -width 1094
+    with [get-edit-part -className ModelEditPart] {
+        with [get-edit-part -text Priorities] {
+            mouse-hover 14 10 -height 19 -width 63
+            mouse-move 14 10 button1 -height 19 -width 63
+            mouse-press 14 10 button1 -height 19 -width 63
+            mouse-release 14 10 button1 524288 -height 19 -width 63
+        }
+        with [get-edit-part -text ShortestPath] {
+            mouse-move 34 12 button1 CTRL -height 19 -width 86
+            mouse-press 34 12 button1 CTRL -height 19 -width 86
+            mouse-release 34 12 button1 786432 -height 19 -width 86
+            mouse-hover 42 13 -height 19 -width 86
+            mouse-move 42 13 button3 -height 19 -width 86
+            mouse-press 42 13 button3 -height 19 -width 86
+        }
+    }
+    get-menu Abstract | click
+    mouse-hover 565 495 -height 730 -width 1094
+    with [get-edit-part -className ModelEditPart] {
+        with [get-edit-part -text DirectedCall] {
+            mouse-move 44 11 button1 -height 19 -width 80
+            mouse-press 44 11 button1 -height 19 -width 80
+            mouse-hover 44 11 -mask 524288 -height 19 -width 80
+            mouse-release 44 11 button1 524288 -height 19 -width 80
+        }
+        with [get-edit-part -text FloorPermission] {
+            mouse-move 46 9 button1 CTRL -height 19 -width 104
+            mouse-press 46 9 button1 CTRL -height 19 -width 104
+            mouse-release 46 9 button1 786432 -height 19 -width 104
+            mouse-hover 35 6 -height 19 -width 104
+            mouse-move 35 6 button3 -height 19 -width 104
+            mouse-press 35 6 button3 -height 19 -width 104
+        }
+    }
+    get-menu Abstract | click
+}
+get-menu "Edit/Undo Abstract Operation" | click
+get-editor "Elevator-FeatureModeling Model" | get-tab-folder | get-tab-item Source | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

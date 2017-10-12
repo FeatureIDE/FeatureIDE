@@ -7,9 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sk1CgKoSEeeF3P5ISwke7w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/5/17 11:24 PM
+Save-Time: 10/9/17 9:34 AM
 Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Checks if you can select a defect feature to show anomalies in the diagram.
+The test fails if there is an entry in the error log.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
