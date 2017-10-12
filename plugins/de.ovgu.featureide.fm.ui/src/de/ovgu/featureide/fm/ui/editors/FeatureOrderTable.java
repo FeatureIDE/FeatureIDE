@@ -24,17 +24,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+
 /**
- * TODO description
+ * This class handles the actions for the TableList at the FeatureOrderEditor.
+ * The primary task of FeatureOrderTable is to enable DragAndDrop.
  * 
- * @author gruppe10
+ * @author Holger Fenske
+ * @author Edgar Schmidt
  */
 public class FeatureOrderTable {
 
@@ -42,10 +53,121 @@ public class FeatureOrderTable {
 
 	private TableColumn column;
 
-	public FeatureOrderTable(Composite composite) {
-		this.table = new Table(composite, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+	private FeatureOrderEditor featureOrderEditor;
 
+	public FeatureOrderTable(FeatureOrderEditor featureOrderEditor) {
+		this.featureOrderEditor = featureOrderEditor;
+		this.table = new Table(featureOrderEditor.comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.LAST_LINE_SELECTION);
 		column = new TableColumn(table, SWT.NONE);
+		initTable();
+	}
+
+	private void initTable() {
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		DragSource source = new DragSource(table, DND.DROP_MOVE | DND.DROP_COPY);
+		source.setTransfer(types);
+
+		source.addDragListener(new DragSourceAdapter() {
+
+			public void dragSetData(DragSourceEvent event) {
+
+				// Get the selected items in the drag source
+				DragSource ds = (DragSource) event.widget;
+				Table table = (Table) ds.getControl();
+				TableItem[] selection = table.getSelection();
+
+				StringBuffer buff = new StringBuffer();
+				for (int i = 0, n = selection.length; i < n; i++) {
+					buff.append(selection[i].getText());
+				}
+				event.data = buff.toString();
+			}
+		});
+
+		// Create the drop target
+		DropTarget target = new DropTarget(table, DND.DROP_MOVE | DND.DROP_TARGET_MOVE | DND.DROP_DEFAULT);
+		target.setTransfer(types);
+		target.addDropListener(new DropTargetAdapter() {
+
+			public void dragEnter(DropTargetEvent event) {
+				if (event.detail != DND.DROP_DEFAULT) {
+					event.detail = (event.operations & DND.DROP_COPY) != 0 ? DND.DROP_COPY : DND.DROP_NONE;
+				}
+				for (int i = 0, n = event.dataTypes.length; i < n; i++) {
+					if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i])) {
+						event.currentDataType = event.dataTypes[i];
+					}
+				}
+			}
+
+			public void dragOver(DropTargetEvent event) {
+				event.feedback = DND.FEEDBACK_SCROLL | DND.FEEDBACK_INSERT_BEFORE;
+			}
+
+			public void drop(DropTargetEvent event) {
+				Point pt = event.display.map(null, table, event.x, event.y);
+				if (table.getItem(pt) != null) {
+					updateTableOrder(table.getItem(pt).getText());
+				} else {
+					updateTableOrder();
+				}
+				featureOrderEditor.updateFeatureOrderList();
+				featureOrderEditor.setDirty();
+			}
+		});
+	}
+
+	/**
+	 * Changes the order of the table after drag&drop
+	 * 
+	 * @param target
+	 */
+	private void updateTableOrder(String target) {
+
+		int[] indices = getSelectionsIndices();
+		List<String> names = new ArrayList<String>();
+		int targetTableIndex;
+
+		for (int temp : indices) {
+			names.add(getItem(temp));
+		}
+
+		targetTableIndex = getIndex(target);
+		while (names.contains(target) && targetTableIndex < getSize()) {
+			target = getItem(targetTableIndex);
+			targetTableIndex++;
+			if (targetTableIndex == getSize()) {
+				updateTableOrder();
+				return;
+			}
+		}
+
+		removeItem(indices);
+		targetTableIndex = getIndex(target);
+		int temp = names.size() - 1;
+		while (temp >= 0) {
+			addItem(names.get(temp), targetTableIndex);
+			temp--;
+		}
+	}
+
+	/**
+	 * Append the selected items at the end of the itemlist in the table
+	 */
+	private void updateTableOrder() {
+		int[] indices = getSelectionsIndices();
+		List<String> names = new ArrayList<String>();
+
+		for (int temp : indices) {
+			names.add(getItem(temp));
+		}
+		removeItem(indices);
+		int tableEnd = table.getItemCount();
+
+		for (String name : names) {
+			addItem(name, tableEnd);
+			tableEnd++;
+		}
 	}
 
 	public void setGridData(GridData gridData) {
@@ -64,6 +186,7 @@ public class FeatureOrderTable {
 		TableItem item = new TableItem(table, SWT.NONE);
 		item.setText(name.toString());
 		column.pack();
+
 	}
 
 	public void addItem(String name, int index) {
@@ -73,6 +196,10 @@ public class FeatureOrderTable {
 
 	public void removeItem(int index) {
 		table.remove(index);
+	}
+
+	public void removeItem(int[] indices) {
+		table.remove(indices);
 	}
 
 	public void removeAll() {
@@ -89,6 +216,10 @@ public class FeatureOrderTable {
 
 	public int getIndex(String name) {
 		return getList().indexOf(name);
+	}
+
+	public int getSize() {
+		return table.getItemCount();
 	}
 
 	public void setEnabled(boolean status) {

@@ -60,20 +60,23 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
+ * 
+ * @author Holger Fenske (replace swt.widgets.List with swt.widgets.Table)
+ * @author Edgar Schmidt (replace swt.widgets.List with swt.widgets.Table)
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
 
 	private static final QualifiedName configFolderConfigID = new QualifiedName("featureproject.configs", "equations");
+	
 	private static final String CONFIGS_ARGUMENT = "equations";
+	
 	private static final String DEFAULT_CONFIGS_PATH = "equations";
 
 	private static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
 
 	private static final String PAGE_TEXT = FEATURE_ORDER;
-
-	// private org.eclipse.swt.widgets.List featurelist = null;
 
 	private FeatureOrderTable featureOrderTable;
 
@@ -90,7 +93,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	private boolean hasFeatureOrder = true;
 
-	private Composite comp;
+	public Composite comp;
 
 	private GridData gridData;
 
@@ -107,8 +110,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			updateOrderEditor();
 
 			if (hasFeatureOrder) {
-				writeToOrderFile(); // save the feature order also in .order if file
-									 // exists
+				writeToOrderFile(); // save the feature order also in .order if file exists
 			}
 
 			if (featureModelEditor.getFeatureModel().getFeatureOrderList().isEmpty()) {
@@ -149,7 +151,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 					featureOrderTable.addItem(str);
 				}
 			}
-
 			activate.setSelection(featureModelEditor.getFeatureModel().isFeatureOrderUserDefined());
 			enableUI(featureModelEditor.getFeatureModel().isFeatureOrderUserDefined());
 		}
@@ -172,7 +173,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 	}
 
-	private void setDirty() {
+	public void setDirty() {
 		dirty = true;
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -189,7 +190,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
 			label.setText(FMComposerManager.getFMComposerExtension(project).getOrderPageMessage());
-			featureOrderTable = new FeatureOrderTable(comp);
+			featureOrderTable = new FeatureOrderTable(this);
 			featureOrderTable.setVisible(true);
 		} else {
 			layout.numColumns = 3;
@@ -214,14 +215,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				final boolean selection = activate.getSelection();
 				enableUI(selection);
-
 				updateFeatureOrderList();
-
 				setDirty();
 			}
 		});
-
-		featureOrderTable = new FeatureOrderTable(comp);
+		featureOrderTable = new FeatureOrderTable(this);
 	}
 
 	private void createGridData() {
@@ -232,7 +230,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		gridData.grabExcessVerticalSpace = true;
 		featureOrderTable.setGridData(gridData);
 		featureOrderTable.setEnabled(false);
-
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 	}
@@ -256,14 +253,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 						if (!items.contains(temp)) {
 							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus - 1);
 							featureOrderTable.setItem(temp, focus);
-
 							updateFeatureOrderList();
-
 							setDirty();
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -288,14 +282,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 						if (!items.contains(temp)) {
 							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus + 1);
 							featureOrderTable.setItem(temp, focus);
-
 							updateFeatureOrderList();
-
 							setDirty();
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -313,7 +304,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		for (final int focus : focuses) {
 			items.add(featureOrderTable.getItem(focus));
 		}
-
 		return items;
 	}
 
@@ -328,7 +318,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		for (int i = 0; i < items.size(); i++) {
 			newindizies[i] = featureOrderTable.getIndex(items.get(i));
 		}
-
 		featureOrderTable.setSelectionsIndices(newindizies);
 	}
 
@@ -345,9 +334,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			@Override
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				defaultFeatureList();
-
 				updateFeatureOrderList();
-
 				setDirty();
 			}
 		});
@@ -365,9 +352,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * Applies changes of the feature model to the feature order list.
+	 * Applies changes of the feature model to the feature order table.
 	 *
-	 * @return true if feature order list has changed and was not empty before
+	 * @return true if feature order table has changed and was not empty before
 	 */
 	private boolean updateFeatureList() {
 		boolean changed = false;
@@ -425,9 +412,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			Collection<String> list = featureModelEditor.getFeatureModel().getFeatureOrderList();
 			if (list.isEmpty()) {
-				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set
-				// default
-				// values
+				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.getFeatureModel()); // set default values
 			}
 
 			for (final String featureName : list) {
