@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTES;
 
 import org.eclipse.core.resources.IProject;
@@ -37,20 +36,22 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ManageAttributesDialog;
 
+/**
+ * Starts the Dialog to manage attributes.
+ *
+ * @author "Werner Jan"
+ */
+public class ManageAttributesAction extends SingleSelectionAction {
 
-public class AddAttributeAction extends SingleSelectionAction  {
-	
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	
-	public AddAttributeAction(Object viewer, IFeatureModel featureMod) {
+	public ManageAttributesAction(Object viewer, IFeatureModel featureMod) {
 		super(MANAGE_ATTRIBUTES, viewer);
-		this.featureModel = featureMod;
+		featureModel = featureMod;
 	}
-	
-	
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction#isValidSelection(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
 	@Override
@@ -58,18 +59,14 @@ public class AddAttributeAction extends SingleSelectionAction  {
 		return true;
 	}
 
-	
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.action.Action#isEnabled()
 	 */
 	@Override
 	public boolean isEnabled() {
 		return true;
 	}
-
-
 
 	@Override
 	public void run() {
@@ -89,8 +86,5 @@ public class AddAttributeAction extends SingleSelectionAction  {
 	}
 
 	@Override
-	protected void updateProperties() {
-		// TODO Auto-generated method stub
-		
-	}
+	protected void updateProperties() {}
 }

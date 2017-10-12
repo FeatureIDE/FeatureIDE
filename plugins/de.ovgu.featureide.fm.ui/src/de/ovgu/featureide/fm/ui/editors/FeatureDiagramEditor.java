@@ -110,7 +110,7 @@ import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AddAttributeAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ManageAttributesAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
@@ -217,7 +217,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
 	
-	private AddAttributeAction addAttributeAction;
+	private ManageAttributesAction addAttributeAction;
 
 	ExportFeatureModelAction exportFeatureModelAction;
 	// legend action replaced with property page
@@ -533,7 +533,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 		
-		addAttributeAction = new AddAttributeAction(this, getFeatureModel());
+		addAttributeAction = new ManageAttributesAction(this, getFeatureModel());
 
 		setLayoutActions = new ArrayList<LayoutSelectionAction>(5);
 		for (int i = 0; i < 5; i++) {

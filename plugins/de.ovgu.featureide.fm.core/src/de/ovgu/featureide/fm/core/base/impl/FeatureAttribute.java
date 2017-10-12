@@ -125,8 +125,7 @@ public class FeatureAttribute {
 				return true;
 			}
 			if (type.toString().equals(BOOLEAN)) {
-				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-				} else {
+				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {} else {
 					return false;
 				}
 			}
@@ -217,7 +216,9 @@ public class FeatureAttribute {
 	 * @param Set configurable with a boolean value.
 	 */
 	public void setConfigurable(boolean configurable) {
-		this.configurable = configurable;
+		if (configurable) {
+			this.configurable = configurable;
+		}
 	}
 
 	/**
@@ -279,7 +280,7 @@ public class FeatureAttribute {
 	 * @param Set value from String.
 	 */
 	public void setValue(String value) {
-		if (configurable || this.value.isEmpty()) {
+		if (configurable) {
 			if (checkValue(value)) {
 				this.value = value;
 			}
