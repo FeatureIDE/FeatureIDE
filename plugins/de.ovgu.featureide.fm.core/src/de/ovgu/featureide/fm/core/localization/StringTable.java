@@ -454,7 +454,7 @@ public class StringTable {
 	public static final String RUN_MANUAL_CALCULATIONS = "Run Manual Calculations";
 	public static final String CALCULATE_TAUTOLOGY_CONSTRAINTS = "Calculate Tautology Constraints";
 	public static final String CHANGE_DESCRIPTION = "Change Description";
-	public static final String MANAGE_ATTRIBUTE = "Manage Attribute";
+	public static final String MANAGE_ATTRIBUTES = "Manage Attributes";
 	public static final String ADD_ATTRIBUTE = "Add Attribute";
 	public static final String FEATURE_DESCRIPTION = "Feature Description";
 	public static final String ADD_ATTRIBUTES = "Add Attributes";
