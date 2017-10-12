@@ -85,7 +85,7 @@ public class FeatureIDEEvent {
 		/**
 		 * A FeatureAttribute was deleted.
 		 */
-		FEATURE_ATTROBITE_DELETED,
+		FEATURE_ATTRIBUTE_DELETED,
 		/**
 		 * A FeatureAttribute was changed.
 		 */

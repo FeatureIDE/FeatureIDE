@@ -23,70 +23,19 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
 
-import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
-import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.ManageAttributesDialog;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_ATTRIBUTES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.HERE_YOU_CAN_ADD_ATTRIBUTES;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.ActionFactory;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 import de.ovgu.featureide.fm.ui.editors.AddAttributeDialog;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 
 public class AddAttributeAction extends SingleSelectionAction  {
@@ -126,7 +75,7 @@ public class AddAttributeAction extends SingleSelectionAction  {
 	public void run() {
 
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		final ManageAttributesDialog manageAttributesDialog = new ManageAttributesDialog(shell, featureModel);
+		final AddAttributeDialog manageAttributesDialog = new AddAttributeDialog(shell, featureModel);
 		// inform ui to update
 		if (manageAttributesDialog.open() == Window.OK) {
 			final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();

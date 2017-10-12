@@ -1359,6 +1359,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				}
 			}
 			break;
+			
+		case FEATURE_ATTRIBUTE_ADDED:
+			featureModelEditor.setPageModified(true);
+			break;
 		case DEFAULT:
 			break;
 		default:
