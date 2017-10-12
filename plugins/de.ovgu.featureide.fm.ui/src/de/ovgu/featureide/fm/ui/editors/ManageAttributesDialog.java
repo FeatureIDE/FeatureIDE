@@ -343,6 +343,10 @@ public class ManageAttributesDialog extends Dialog {
 						textFieldName.setBackground(java.awt.Color.white);
 						textFieldValue.setBackground(java.awt.Color.white);
 						textFieldUnit.setBackground(java.awt.Color.white);
+						
+						textFieldName.setToolTipText(null);
+						textFieldValue.setToolTipText(null);
+						textFieldUnit.setToolTipText(null);
 
 						final String name = textFieldName.getText().trim();
 						String value = textFieldValue.getText().trim();
@@ -401,7 +405,7 @@ public class ManageAttributesDialog extends Dialog {
 						if (allGood) {
 							featureModel.getFeature(feature.getName()).getStructure().getAttributeList().add(attribute);
 							if (rec) {
-								feature.getStructure().upDateInherited(attribute);
+								feature.getStructure().updateFeatureAttributeInherited(attribute);
 							}
 							featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.FEATURE_ATTRIBUTE_ADDED));
 

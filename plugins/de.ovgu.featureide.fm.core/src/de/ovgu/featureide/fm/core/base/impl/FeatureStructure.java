@@ -484,11 +484,11 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public void upDateInherited(FeatureAttribute attribute) {
+	public void updateFeatureAttributeInherited(FeatureAttribute attribute) {
 		final FeatureAttributeInherited fai = new FeatureAttributeInherited(attribute);
 		getAttributeListInherited().add(fai);
 		for (final IFeatureStructure IFeature : getChildren()) {
-			IFeature.upDateInherited(attribute);
+			IFeature.updateFeatureAttributeInherited(attribute);
 		}
 
 	}

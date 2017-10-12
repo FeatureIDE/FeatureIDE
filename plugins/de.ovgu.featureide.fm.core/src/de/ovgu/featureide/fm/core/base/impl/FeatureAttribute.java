@@ -60,14 +60,7 @@ public class FeatureAttribute {
 	public FeatureAttribute(String name, String value, String type, String unit, boolean recursive, boolean configurable) {
 		this.name = name;
 		this.value = value;
-
-		type = type.toUpperCase();
-		for (final Types typeNames : Types.values()) {
-			if (typeNames.toString().equals(type)) {
-				this.type = typeNames;
-			}
-		}
-
+		setTypeFromString(type);
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configurable = configurable;
@@ -94,8 +87,8 @@ public class FeatureAttribute {
 				}
 			}
 			if (type.toString().equals(BOOLEAN)) {
-				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-					return true;
+				if (!value.toLowerCase().equals("true") && !value.toLowerCase().equals("false")) {
+					return false;
 				}
 			}
 		}
@@ -114,7 +107,6 @@ public class FeatureAttribute {
 				} catch (final NumberFormatException e) {
 					return false;
 				}
-				return true;
 			}
 			if (type.toString().equals(DOUBLE)) {
 				try {
@@ -122,10 +114,9 @@ public class FeatureAttribute {
 				} catch (final NumberFormatException e) {
 					return false;
 				}
-				return true;
 			}
 			if (type.toString().equals(BOOLEAN)) {
-				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {} else {
+				if (!value.toLowerCase().equals("true") && !value.toLowerCase().equals("false")) {
 					return false;
 				}
 			}
@@ -216,21 +207,17 @@ public class FeatureAttribute {
 	 * @param Set configurable with a boolean value.
 	 */
 	public void setConfigurable(boolean configurable) {
-		if (configurable) {
-			this.configurable = configurable;
-		}
+		this.configurable = configurable;
 	}
 
 	/**
 	 * @param Setting boolean value of configurable if the string is true or false.
 	 */
 	public void setConfigurable(String configurableString) {
-		if (configurable) {
-			if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
-				configurable = false;
-			} else if (value.toLowerCase().equals("true")) {
-				configurable = true;
-			}
+		if (configurableString.isEmpty() || configurableString.toLowerCase().equals("false")) {
+			configurable = false;
+		} else if (value.toLowerCase().equals("true")) {
+			configurable = true;
 		}
 	}
 
@@ -238,31 +225,24 @@ public class FeatureAttribute {
 	 * @param Setting name from string.
 	 */
 	public void setName(String name) {
-		if (configurable) {
-			this.name = name;
-		}
+		this.name = name;
 	}
 
 	/**
 	 * @param Set recursive from boolean.
 	 */
 	public void setRecursive(boolean recursive) {
-		if (configurable) {
-			this.recursive = recursive;
-		}
-
+		this.recursive = recursive;
 	}
 
 	/**
 	 * @param Setting the type from a string, if the String is in the allowed.
 	 */
 	public void setTypeFromString(String type) {
-		if (configurable) {
-			type = type.toUpperCase();
-			for (final Types typeNames : Types.values()) {
-				if (typeNames.toString().equals(type)) {
-					this.type = typeNames;
-				}
+		type = type.toUpperCase();
+		for (final Types typeNames : Types.values()) {
+			if (typeNames.toString().equals(type)) {
+				this.type = typeNames;
 			}
 		}
 	}
@@ -271,19 +251,15 @@ public class FeatureAttribute {
 	 * @param Set unit from String.
 	 */
 	public void setUnit(String unit) {
-		if (configurable) {
-			this.unit = unit;
-		}
+		this.unit = unit;
 	}
 
 	/**
 	 * @param Set value from String.
 	 */
 	public void setValue(String value) {
-		if (configurable) {
-			if (checkValue(value)) {
-				this.value = value;
-			}
+		if (checkValue(value)) {
+			this.value = value;
 		}
 	}
 

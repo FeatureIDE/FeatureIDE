@@ -304,7 +304,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 *
 	 * @author Marcus Pinnecke
 	 */
-	
+
 	public enum Mode {
 		UPDATE, CREATE
 	}
