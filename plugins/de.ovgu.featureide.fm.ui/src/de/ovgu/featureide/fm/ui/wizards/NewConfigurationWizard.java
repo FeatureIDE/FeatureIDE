@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 
 import java.nio.file.Files;
@@ -33,14 +33,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.Logger;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.manager.ConfigFileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**
  * A Wizard to create a new Feature Model file.
@@ -50,34 +47,31 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * @author Marlen Bernier
  * @author Dawid Szczepanski
  */
-public class NewFeatureModelWizard extends AbstractNewFileWizard<IFeatureModelFormat> implements INewWizard {
+public class NewConfigurationWizard extends AbstractNewFileWizard<IConfigurationFormat> implements INewWizard {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewFeatureModelWizard";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewConfigurationWizard";
 
-	public NewFeatureModelWizard() {
-		setWindowTitle(NEW_FEATURE_MODEL);
+	private String configFolder;
+
+	public NewConfigurationWizard() {
+		setWindowTitle(NEW_CONFIGURATION);
 	}
 
 	@Override
 	public boolean performFinish() {
-		final IFeatureModelFormat format = ((NewFeatureModelFileFormatPage) formatPage).getFormat();
-		final Path fmPath = getNewFilePath(format);
-		IFeatureModel featureModel;
-		try {
-			featureModel = FMFactoryManager.getFactory(fmPath.toString(), format).createFeatureModel();
-		} catch (NoSuchExtensionException e) {
-			Logger.logError(e);
-			featureModel = FMFactoryManager.getEmptyFeatureModel();
-		}
-		featureModel.createDefaultValues("");
-		FileHandler.save(fmPath, featureModel, format);
-		String fileName = locationPage.getFileName();
-		IFile modelFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationPage.getContainerFullPath().append(fileName + "." + format.getSuffix()));
+		this.initConfigFolder();
+		final IConfigurationFormat format = ((NewConfigurationFileFormatPage) formatPage).getFormat();
+		final Path configPath = getNewFilePath(format);
 
-		assert (Files.exists(fmPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+		assert (Files.exists(configPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+		String fileName = locationPage.getFileName() + "." + format.getSuffix();
+
+		IFile configFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationPage.getContainerFullPath().append(configFolder).append(fileName));
+		ConfigFileHandler.saveConfig(configPath, new Configuration(defaultFeatureModel()), format);
+		
 		try {
 			// open editor
-			FMUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, modelFile);
+			FMUIPlugin.getDefault().openEditor(ConfigurationEditor.ID, configFile);
 		} catch (final Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -85,17 +79,32 @@ public class NewFeatureModelWizard extends AbstractNewFileWizard<IFeatureModelFo
 	}
 
 	@Override
-	public Path getNewFilePath(IFeatureModelFormat format) {
+	public Path getNewFilePath(IConfigurationFormat format) {
 		String fileName = locationPage.getFileName();
+
 		if (!fileName.matches(".+\\." + Pattern.quote(format.getSuffix()))) {
 			fileName += "." + format.getSuffix();
+			fileName = configFolder + fileName;
 		}
 		return getFullPath(fileName);
 	}
 
+	/**
+	 * Initializes the configuration folder, if it exists use the configuration folder otherwise use none
+	 * 
+	 * @param configFolderName
+	 */
+	private void initConfigFolder() {
+		if (Files.exists(getFullPath("configs"))) {
+			configFolder = "configs/";
+		} else {
+			configFolder = ""; // configuration folder does not exist, use no sub folder
+		}
+	}
+
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		formatPage = new NewFeatureModelFileFormatPage();
-		locationPage = new NewFeatureModelFileLocationPage("location", selection);
+		formatPage = new NewConfigurationFileFormatPage();
+		locationPage = new NewConfigurationFileLocationPage("location", selection);
 	}
 }

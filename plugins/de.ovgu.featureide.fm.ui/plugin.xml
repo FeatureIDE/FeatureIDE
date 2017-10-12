@@ -8,6 +8,7 @@
 	<extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline" schema="schema/de.ovgu.featureide.fm.ui.Outline.exsd"/>
+ 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationWizard" name="ConfigurationWizard" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationWizard.exsd"/>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
@@ -784,4 +785,29 @@
 				OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
 		</Outline>
 	</extension>
+ <extension
+       point="org.eclipse.ui.newWizards">
+    <wizard
+          canFinishEarly="false"
+          category="de.ovgu.featureide.fm.ui.category"
+          class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
+          hasPages="true"
+          icon="icons/featuretree.ico"
+          id="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
+          name="Feature Model"
+          project="false">
+    </wizard>
+    <category
+          id="de.ovgu.featureide.fm.ui.category"
+          name="FeatureIDE">
+    </category>
+    <wizard
+          category="de.ovgu.featureide.fm.ui.category"
+          class="de.ovgu.featureide.fm.ui.wizards.NewConfigurationWizard"
+          icon="icons/NewConfigurationIcon.png"
+          id="de.ovgu.featureide.fm.ui.wizards.NewConfigurationWizard"
+          name="Configuration File"
+          project="false">
+    </wizard>
+ </extension>
 </plugin>

@@ -39,6 +39,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * Extended configuration format for FeatureIDE projects in XML structure.
  *
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
@@ -78,7 +80,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
 					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
-						createWarning("Invalid feature name: " + featureName, feature, warnings);
+						createError("Invalid feature name: " + featureName, feature, warnings);
 						continue;
 					}
 				} else {
@@ -188,7 +190,20 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	public String getName() {
-		return "XML";
+		return "FeatureIDE Configuration Format";
+	}
+
+	/**
+	 * An empty config represented
+	 */
+	@Override
+	public String writeEmptyConfig() {
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" + 
+			"	<configuration>\n" + 
+			"	</configuration>");
+		
+		return buffer.toString();
 	}
 
 }

@@ -41,6 +41,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * Extended configuration format for FeatureIDE projects.</br> Lists all features and indicates the manual and automatic selection.
  *
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class FeatureIDEFormat implements IConfigurationFormat {
 
@@ -192,4 +194,11 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		return "FeatureIDE-Internal";
 	}
 
+	@Override
+	public String writeEmptyConfig() {
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append("");
+
+		return buffer.toString();
+	}
 }

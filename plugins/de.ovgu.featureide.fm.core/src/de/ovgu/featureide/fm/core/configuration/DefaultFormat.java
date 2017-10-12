@@ -49,6 +49,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * Simple configuration format.<br/> Lists all selected features in the user-defined order (if specified).
  *
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class DefaultFormat implements IConfigurationFormat {
 
@@ -200,4 +202,14 @@ public class DefaultFormat implements IConfigurationFormat {
 		return "FeatureList";
 	}
 
+	/**
+	 * For the default format an empty config consists out of an emtpy text file
+	 */
+	@Override
+	public String writeEmptyConfig() {
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append("");
+
+		return buffer.toString();
+	}
 }

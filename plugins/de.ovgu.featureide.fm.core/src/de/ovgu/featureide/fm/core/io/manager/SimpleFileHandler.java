@@ -44,19 +44,19 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class SimpleFileHandler<T> {
 
-	private static final Charset DEFAULT_CHARSET;
+	protected static final Charset DEFAULT_CHARSET;
 	static {
 		final Charset utf8 = Charset.forName("UTF-8");
 		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
 	}
 
-	private IPersistentFormat<T> format;
+	protected IPersistentFormat<T> format;
 
-	private final ProblemList problemList = new ProblemList();
+	protected final ProblemList problemList = new ProblemList();
 
 	private T object;
 
-	private Path path;
+	protected Path path;
 
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
@@ -71,11 +71,14 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
+		return load(new SimpleFileHandler<>(path, object, null), formatManager);
+	}
+
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		final String content = fileHandler.getContent();
 
 		if (content != null) {
-			final String fileName = path.getFileName().toString();
+			final String fileName = fileHandler.getPath().getFileName().toString();
 			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
 			if (format == null) {
 				fileHandler.getLastProblems().add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));

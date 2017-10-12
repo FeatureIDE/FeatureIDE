@@ -27,7 +27,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
+import de.ovgu.featureide.fm.ui.wizards.NewConfigurationWizard;
 
 /**
  * Starts the configuration file wizard for the selected configuration file at the context menu.
@@ -47,7 +47,7 @@ public class StartConfigurationFileWizard implements IWorkbenchWindowActionDeleg
 	@Override
 	public void run(IAction action) {
 
-		final NewConfigurationFileWizard wizard = new NewConfigurationFileWizard();
+		final NewConfigurationWizard wizard = new NewConfigurationWizard();
 		final ISelection selection = window.getSelectionService().getSelection();
 
 		if (selection instanceof IStructuredSelection) {
