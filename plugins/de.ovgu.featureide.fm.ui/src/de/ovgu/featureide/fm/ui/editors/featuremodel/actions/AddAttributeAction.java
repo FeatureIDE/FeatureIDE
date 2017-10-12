@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANAGE_ATTRIBUTES;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.AddAttributeDialog;
+import de.ovgu.featureide.fm.ui.editors.ManageAttributesDialog;
 
 
 public class AddAttributeAction extends SingleSelectionAction  {
@@ -44,7 +44,7 @@ public class AddAttributeAction extends SingleSelectionAction  {
 
 	
 	public AddAttributeAction(Object viewer, IFeatureModel featureMod) {
-		super(MANAGE_ATTRIBUTE, viewer);
+		super(MANAGE_ATTRIBUTES, viewer);
 		this.featureModel = featureMod;
 	}
 	
@@ -75,7 +75,7 @@ public class AddAttributeAction extends SingleSelectionAction  {
 	public void run() {
 
 		final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		final AddAttributeDialog manageAttributesDialog = new AddAttributeDialog(shell, featureModel);
+		final ManageAttributesDialog manageAttributesDialog = new ManageAttributesDialog(shell, featureModel);
 		// inform ui to update
 		if (manageAttributesDialog.open() == Window.OK) {
 			final IProject project = EclipseFileSystem.getResource(featureModel.getSourceFile()).getProject();
