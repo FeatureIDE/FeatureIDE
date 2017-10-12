@@ -90,10 +90,10 @@ public class FeatureStructure implements IFeatureStructure {
 		hidden = false;
 
 		if (correspondingFeature.getStructure() != null) {
-			for (final FeatureAttribute fa : correspondingFeature.getFeatureModel().getStructure().getRoot().getAttributeList()) {
+			for (final FeatureAttribute fa : correspondingFeature.getStructure().getAttributeList()) {
 				attributeList.add(fa);
 			}
-			for (final FeatureAttributeInherited fai : correspondingFeature.getFeatureModel().getStructure().getRoot().getAttributeListInherited()) {
+			for (final FeatureAttributeInherited fai : correspondingFeature.getStructure().getAttributeListInherited()) {
 				inheritedList.add(fai);
 			}
 		}
@@ -102,7 +102,6 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void addChild(IFeatureStructure newChild) {
 		addNewChild(newChild);
-		fireChildrenChanged();
 	}
 
 	@Override
@@ -485,14 +484,12 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public LinkedList<FeatureAttribute> getRecursiveList() {
-		final LinkedList<FeatureAttribute> rekList = new LinkedList<>();
-		for (final FeatureAttribute att : attributeList) {
-			if (att.getRecursive() == true) {
-				rekList.addLast(att);
-			}
+	public void upDateInherited(FeatureAttribute attribute) {
+		final FeatureAttributeInherited fai = new FeatureAttributeInherited(attribute);
+		getAttributeListInherited().add(fai);
+		for (final IFeatureStructure IFeature : getChildren()) {
+			IFeature.upDateInherited(attribute);
 		}
-		return rekList;
-	}
 
+	}
 }

@@ -37,6 +37,7 @@ public class FeatureIDEEvent {
 	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
+
 		/**
 		 * The constraint was moved.
 		 */
@@ -77,6 +78,18 @@ public class FeatureIDEEvent {
 		 * A feature's name was changed.
 		 */
 		FEATURE_NAME_CHANGED,
+		/**
+		 * A FeatureAttribute was added.
+		 */
+		FEATURE_ATTRIBUTE_ADDED,
+		/**
+		 * A FeatureAttribute was deleted.
+		 */
+		FEATURE_ATTRIBUTE_DELETED,
+		/**
+		 * A FeatureAttribute was changed.
+		 */
+		FEATURE_ATTRIBUTE_CHANGED,
 		/**
 		 * All features changed their name representation.
 		 */

@@ -30,39 +30,68 @@ public class FeatureAttributeInherited {
 	private String value;
 	private FeatureAttribute parentAttribute;
 
+	/**
+	 * Create empty FeatureAttributeInherited.
+	 */
 	public FeatureAttributeInherited() {
 		value = "";
 	}
 
+	/**
+	 * @param fa Create a FreatureAttributeInherited with a parent.
+	 */
 	public FeatureAttributeInherited(FeatureAttribute fa) {
 		parentAttribute = fa;
 		value = "";
 	}
 
+	/**
+	 * @return the Name of the parent attribute.
+	 */
 	public String getName() {
 		return parentAttribute.getName();
 	}
 
+	/**
+	 * @return the Unit of the parent attribute.
+	 */
 	public String getUnit() {
 		return parentAttribute.getUnit();
 	}
 
+	/**
+	 * @return the value of the inherited FeatureAttribute.
+	 */
 	public String getValue() {
 		return value;
 	}
 
+	/**
+	 * @return the parent FeatureAttribute of the inherited FeatureAttribute.
+	 */
 	public FeatureAttribute getParent() {
 		return parentAttribute;
 	}
 
+	/**
+	 * @param p Set the parentAttribute from a FeatureAttribute p.
+	 */
 	public void setParent(FeatureAttribute p) {
 		parentAttribute = p;
 	}
 
+	/**
+	 * @param value set the value as String value.
+	 */
 	public void setValue(String value) {
-		this.value = value;
+		if (parentAttribute.checkValue(value) && parentAttribute.getConfigurable()) {
+			this.value = value;
+		}
 	}
 
+	/**
+	 * @return Check if the value of the inherited FeatureAttribute matches the parents type.
+	 */
 	public boolean checkValue() {
 		if (!value.isEmpty()) {
 			return parentAttribute.checkValue(value);
