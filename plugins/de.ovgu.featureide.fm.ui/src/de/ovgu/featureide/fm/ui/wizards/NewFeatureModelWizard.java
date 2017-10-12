@@ -74,8 +74,12 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		featureModel.createDefaultValues("");
 		FileHandler.save(fmPath, featureModel, format);
 		String fileName = locationpage.getFileName();
-		IFile modelFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName + "." + format.getSuffix()));
-
+		
+		if(!fileName.contains("." + format.getSuffix())) {
+			fileName = fileName + "." + format.getSuffix();
+		}
+		
+		IFile modelFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName));
 		assert (Files.exists(fmPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 		try {
 			// open editor
