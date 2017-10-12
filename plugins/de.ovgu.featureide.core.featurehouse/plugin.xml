@@ -166,4 +166,13 @@
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMComposer">
+    <fmComposer
+          class="de.ovgu.featureide.featurehouse.FeatureHouseFMComposerExtension"
+          composer="de.ovgu.featureide.composer.featurehouse"
+          id="de.ovgu.featureide.core.featurehouse.fmComposer"
+          name="de.ovgu.featureide.core.featurehouse.fmComposer">
+    </fmComposer>
+ </extension>
 </plugin>
