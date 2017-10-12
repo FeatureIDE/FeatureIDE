@@ -82,25 +82,27 @@ public class FeatureAttribute {
 	 * @return True, if the value of this FeatureAttribute matches its type. Else false.
 	 */
 	public boolean checkValue() {
-		if (type.toString().equals(LONG)) {
-			try {
-				Long.parseLong(value);
-				return true;
-			} catch (final NumberFormatException e) {
-				return false;
+		if (!value.isEmpty()) {
+			if (type.toString().equals(LONG)) {
+				try {
+					Long.parseLong(value);
+					return true;
+				} catch (final NumberFormatException e) {
+					return false;
+				}
 			}
-		}
-		if (type.toString().equals(DOUBLE)) {
-			try {
-				Double.parseDouble(value);
-				return true;
-			} catch (final NumberFormatException e) {
-				return false;
+			if (type.toString().equals(DOUBLE)) {
+				try {
+					Double.parseDouble(value);
+					return true;
+				} catch (final NumberFormatException e) {
+					return false;
+				}
 			}
-		}
-		if (type.toString().equals(BOOLEAN)) {
-			if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
-				return true;
+			if (type.toString().equals(BOOLEAN)) {
+				if (value.toLowerCase().equals("true") || value.toLowerCase().equals("false")) {
+					return true;
+				}
 			}
 		}
 		return true;

@@ -39,6 +39,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -74,9 +77,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FeatureAttribute;
@@ -232,9 +237,6 @@ public class ManageAttributesDialog extends Dialog {
 					final JDialog dialog = new JDialog();
 					dialog.setTitle("Add new Attribute");
 					createDialog(dialog, ((IFeature) f), featureModel);
-					dialog.setModal(true);
-					viewer.setInput(featureModel);
-					viewer.refresh();
 				}
 
 			}
@@ -344,11 +346,17 @@ public class ManageAttributesDialog extends Dialog {
 						textFieldUnit.setBackground(java.awt.Color.white);
 
 						final String name = textFieldName.getText().trim();
-						final String value = textFieldValue.getText().trim();
+						String value = textFieldValue.getText().trim();
+						if (value == null) {
+							value = "";
+						}
 						final String type = typeBox.getSelectedItem().toString().trim();
 						final String unit = textFieldUnit.getText().trim();
 						final String recursive = recursiveBox.getSelectedItem().toString().trim();
 						final String configurable = configurableBox.getSelectedItem().toString().trim();
+
+						final boolean rec = recursive.equals("true");
+						final boolean conf = configurable.equals("true");
 
 						boolean allGood = true;
 
@@ -372,10 +380,17 @@ public class ManageAttributesDialog extends Dialog {
 									textFieldName.setToolTipText("There already is an attribute with that name.");
 								}
 							}
+							if (rec) {
+								for (final IFeatureStructure iFeature : feature.getStructure().getChildren()) {
+									for (final FeatureAttribute fa : iFeature.getAttributeList()) {
+										if (fa.getName().toLowerCase().equals(nameLowerCase)) {
+											allGood = false;
+											textFieldName.setToolTipText("There is an attribute in a child with that name, can't create recursive attribute.");
+										}
+									}
+								}
+							}
 						}
-
-						final boolean rec = recursive.equals("true");
-						final boolean conf = configurable.equals("true");
 
 						final FeatureAttribute attribute = new FeatureAttribute(name, value, type, unit, rec, conf);
 
@@ -383,11 +398,23 @@ public class ManageAttributesDialog extends Dialog {
 							textFieldValue.setBackground(java.awt.Color.red);
 							textFieldValue.setToolTipText("The value doesn't match the type.");
 							allGood = false;
-						} else if (allGood) {
-//							feature.getStructure().getAttributeList().add(attribute);
+						}
+						if (allGood) {
 							featureModel.getFeature(feature.getName()).getStructure().getAttributeList().add(attribute);
+							if (rec) {
+								feature.getStructure().upDateInherited(attribute);
+							}
 							featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.FEATURE_ATTRIBUTE_ADDED));
 
+							final UIJob job = new UIJob("New Attribute Added") {
+
+								@Override
+								public IStatus runInUIThread(IProgressMonitor monitor) {
+									viewer.setInput(featureModel);
+									return Status.OK_STATUS;
+								}
+							};
+							job.schedule();
 							dialog.dispose();
 						}
 					}
@@ -421,33 +448,30 @@ public class ManageAttributesDialog extends Dialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final ITreeSelection selection = viewer.getStructuredSelection();
-				final Object selceted = selection.getFirstElement();
-				if (selceted instanceof FeatureAttribute) {
+				final Object selectedFeatureAttribute = selection.getFirstElement();
+				if (selectedFeatureAttribute instanceof FeatureAttribute) {
+
 					final List<String> featureNameList = featureModel.getFeatureOrderList();
 					for (int i = 0; i < featureNameList.size(); i++) {
 						final IFeature feature = featureModel.getFeature(featureNameList.get(i));
 						final LinkedList<FeatureAttribute> featureAttributeList = feature.getStructure().getAttributeList();
 						final LinkedList<FeatureAttributeInherited> featureAttributeInheritedList = feature.getStructure().getAttributeListInherited();
 						for (final FeatureAttributeInherited featureAttributeInherited : featureAttributeInheritedList) {
-							if (featureAttributeInherited.getParent().equals(selceted)) {
+							if (featureAttributeInherited.getParent().equals(selectedFeatureAttribute)) {
 								featureAttributeInheritedList.remove(featureAttributeInherited);
 							}
 						}
 						for (final FeatureAttribute featureAttribute : featureAttributeList) {
-							if (featureAttribute.equals(selceted)) {
-								featureAttributeList.remove(selceted);
+							if (featureAttribute.equals(selectedFeatureAttribute)) {
+								featureAttributeList.remove(selectedFeatureAttribute);
 							}
 						}
 					}
-					viewer.setInput(featureModel);
-					viewer.expandAll();
 					viewer.refresh();
 				}
 			}
 
 		});
-
-		viewer.setInput(featureModel);
 
 		/**
 		 * Dynamically growing columns
@@ -470,9 +494,8 @@ public class ManageAttributesDialog extends Dialog {
 			}
 		};
 		viewer.getTree().addListener(SWT.Expand, listener);
-
+		viewer.setInput(featureModel);
 		viewer.expandToLevel(3);
-
 		return parent;
 
 	}
@@ -555,6 +578,10 @@ public class ManageAttributesDialog extends Dialog {
 	}
 
 	class TableLabelProvider implements ITableLabelProvider {
+
+		/**
+		 * Dynamically growing columns
+		 */
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
