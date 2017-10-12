@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -222,6 +223,7 @@ public class AddAttributeDialog extends Dialog {
 				}
 				
 				if (f instanceof IFeature) {
+					final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 					final JDialog dialog = new JDialog();
 					dialog.setTitle("Add Attribute");
 					createDialog(dialog, ((IFeature) f), featureModel);
@@ -370,6 +372,7 @@ public class AddAttributeDialog extends Dialog {
 //							feature.getStructure().getAttributeList().add(attribute);
 							featureModel.getFeature(feature.getName()).getStructure().getAttributeList().add(attribute);
 							featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.FEATURE_ATTRIBUTE_ADDED));
+
 							dialog.dispose();
 						}
 					}
