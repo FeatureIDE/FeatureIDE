@@ -1077,5 +1077,5 @@ public class StringTable {
 
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";
-
+	public static final String THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME = "A '.' is not allowed in the filename";
 }
