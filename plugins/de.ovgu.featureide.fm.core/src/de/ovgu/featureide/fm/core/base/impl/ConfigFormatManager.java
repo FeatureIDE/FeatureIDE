@@ -51,4 +51,8 @@ public final class ConfigFormatManager extends FormatManager<IConfigurationForma
 		instance.setExtensionLoaderInternal(extensionLoader);
 	}
 
+	public static IConfigurationFormat getDefaultFormat() {
+		return new XMLConfFormat();
+	}
+
 }

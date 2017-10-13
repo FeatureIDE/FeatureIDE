@@ -23,17 +23,20 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
- * Turns a feature in an And-group into a mandatory feature.
+ * Turns features in an And-group into mandatory features.
  *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
+ * @author Chico Sundermann
+ * @author Paul Westphal
  */
-public class MandatoryAction extends SingleSelectionAction {
+public class MandatoryAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
@@ -46,22 +49,43 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		setChecked(feature.getStructure().isMandatory());
-		final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
+		changeMandatoryStatus(isEveryFeatureMandatory());
+		setChecked(isEveryFeatureMandatory());
+	}
+	
+	private boolean selectionContainsOptionalFeature() {
+		for (IFeature tempFeature : featureArray) {
+			if (!tempFeature.getStructure().isRoot() && tempFeature.getStructure().getParent().isAnd()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isEveryFeatureMandatory() {
+		for (IFeature tempFeature : featureArray) {
+			if (!(tempFeature.getStructure().isMandatory())) {
+				return false;
+			}
+		}
+		return true;
+	}
 
+	private void changeMandatoryStatus(boolean allMandatory) {
+		final SetFeatureToMandatoryOperation op = 
+				new SetFeatureToMandatoryOperation(featureModel, allMandatory, getSelectedFeatures());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}
-
 	}
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().getParent().isAnd());
-		setChecked(feature.getStructure().isMandatory());
+		setEnabled(selectionContainsOptionalFeature());
+		setChecked(isEveryFeatureMandatory());
 	}
 
 }

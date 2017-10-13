@@ -458,6 +458,7 @@ public class StringTable {
 	public static final String CREATE_FEATURE_ABOVE = "Create Feature Above";
 	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
+	public static final String STARTING_WITH = "Starting with";
 	public static final String EXPAND_CONSTRAINT = "Show contained features";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
 	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
@@ -478,9 +479,9 @@ public class StringTable {
 	public static final String INVALID_NAME = "Invalid Name";
 	public static final String CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_ = " Constraint makes the feature model void. ";
 	public static final String CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_ =
-		" Constraint is not satisfiable and makes the feature model void. ";
-	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = " Constraint is a tautology and should be removed. ";
-	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = " Constraint is redundant and could be removed. ";
+		"Constraint is not satisfiable and makes the feature model void. ";
+	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = "Constraint is a tautology and should be removed. ";
+	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = "Constraint is redundant and could be removed. ";
 	public static final String CONCRETE = " Concrete";
 	public static final String INHERITED_HIDDEN = " inherited hidden";
 	public static final String IS_DEAD = "is dead ";
@@ -508,9 +509,13 @@ public class StringTable {
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
 	public static final String SET_FEATURE_CONCRETE = "Set Feature Concrete";
+	public static final String ABSTRACT_OPERATION = "Abstract Operation";
+	public static final String COLLAPSE_OPERATION = "Collapse Operation";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
+	public static final String HIDE_OPERATION = "Hide Operation";
 	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
+	public static final String MANDATORY_OPERATION = "Mandatory Operation";
 	public static final String SET_FEATURE_MANDATORY = "Set Feature Mandatory";
 	public static final String SET_FEATURE_OPTIONAL = "Set Feature Optional";
 	public static final String SET = "Set ";
@@ -1066,16 +1071,19 @@ public class StringTable {
 	public static final String SELECT_COLOR_SCHEME = "Select color scheme";
 	public static final String SET_FEATURE_COLLAPSED = "Set Feature Collapsed";
 	public static final String SET_FEATURE_EXPANDED = "Set Feature Expanded";
-	public static final String COLLAPSE_SIBLINGS = "Collapse siblings";
-	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust model to editor size";
+	public static final String SET_FEATURES_COLLAPSED = "Set Features Collapsed";
+	public static final String SET_FEATURES_EXPANDED = "Set Features Expanded";
+	public static final String COLLAPSE_SIBLINGS = "Collapse Siblings";
+	public static final String ADJUST_MODEL_TO_EDITOR = "Adjust Model to Editor Size";
 	public static final String CALCULATE_VOID_FEATURES = "Calculate Void Features";
 	public static final String CALCULATE_FALSE_OPTIONAL_FEATURES = "Calculate False Optional Features";
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
 	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED = "No color scheme is selected";
 	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG =
 		"There is currently no color scheme selected. To color features please use the color scheme wizard and select a color scheme.";
-
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";
-	public static final String THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME = "A '.' is not allowed in the filename";
+	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
+	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
+ 	public static final String THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME = "A '.' is not allowed in the filename";
 }

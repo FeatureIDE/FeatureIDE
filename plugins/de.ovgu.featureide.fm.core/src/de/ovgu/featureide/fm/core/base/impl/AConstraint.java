@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
 
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
@@ -45,6 +46,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 
@@ -58,12 +61,14 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	protected Node propNode;
 	boolean featureSelected;
 	boolean isImplicit;
+	protected String description;
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		propNode = oldConstraint.propNode;
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
+		description = oldConstraint.description;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
@@ -71,6 +76,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		this.propNode = propNode;
 		featureSelected = false;
 		isImplicit = false;
+		description = "";
 	}
 
 	@Override
@@ -189,6 +195,19 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public String toString() {
 		return "AConstraint [propNode=" + propNode + "]";
+	}
+
+	public void setDescription(@Nonnull final String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Returns the description
+	 * 
+	 * @return
+	 */
+	public String getDescription() {
+		return description;
 	}
 
 }

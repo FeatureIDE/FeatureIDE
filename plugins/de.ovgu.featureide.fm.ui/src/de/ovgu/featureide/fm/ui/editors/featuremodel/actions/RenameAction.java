@@ -54,7 +54,6 @@ public class RenameAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
-		setChecked(false);
 		setEnabled(true);
 	}
 

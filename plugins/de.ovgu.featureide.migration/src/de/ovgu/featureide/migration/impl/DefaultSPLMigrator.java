@@ -101,9 +101,9 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		migrateProjects();
 
-		adjustFeatureModel();
+		final IFeatureModel featureModel = adjustFeatureModel();
 
-		createConfigurationFiles();
+		createConfigurationFiles(featureModel);
 	}
 
 	/**
@@ -279,10 +279,10 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * child features.<br> <br> The result is written to {@code /model.xml}. <br> <br> Can be overwritten by extending classes to accomodate
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
-	protected void adjustFeatureModel() {
+	protected IFeatureModel adjustFeatureModel() {
 		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
-
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
+		return featureModelOfVariants;
 	}
 
 	private IFeatureModel generateFeatureModelOfVariants() {
@@ -312,10 +312,10 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 *
 	 * @see SPLMigrationDialogSettingsPage#getConfigPath()
 	 */
-	protected void createConfigurationFiles() {
+	protected void createConfigurationFiles(IFeatureModel featureModel) {
 		for (final IProject project : projects) {
 			try {
-				SPLMigrationUtils.createConfigFile(newProject, configurationData.configPath, project.getName());
+				SPLMigrationUtils.createConfigFile(featureModel, newProject, configurationData.configPath, project.getName());
 			} catch (final UnsupportedEncodingException e) {
 				CorePlugin.getDefault().logError(e);
 				e.printStackTrace();
