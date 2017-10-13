@@ -56,7 +56,7 @@ public class NewConfigurationFileFormatPage extends WizardPage {
 	private final List<IConfigurationFormat> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
 
 	private Combo formatCombo;
-	
+
 	String description;
 
 	/**
@@ -96,9 +96,9 @@ public class NewConfigurationFileFormatPage extends WizardPage {
 	private void addListeners() {
 		formatCombo.addModifyListener(new ModifyListener() {
 
-			public void modifyText(ModifyEvent e) {				
-				String suffix= getFormat().getSuffix();
-				if(!suffix.equals("xml")) {
+			public void modifyText(ModifyEvent e) {
+				String suffix = getFormat().getSuffix();
+				if (!suffix.equals("xml")) {
 					description = "This configuration format does not suppport selection of abstract features and deselection of features.";
 				} else {
 					description = "Select a format for the new configuration file.";
