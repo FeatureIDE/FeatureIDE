@@ -20,12 +20,25 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
+ * @author Christopher Sontag
  */
 public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
 
@@ -33,6 +46,38 @@ public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
 		super(pageName, selection);
 		setTitle("Choose Location");
 		setDescription("Select a path to the new feature model file.");
+
 	}
 
+	public void handleEvent(Event event) {
+		checkPathAndFileName(this.getContainerFullPath(), this.getFileName());
+	}
+
+	protected void checkPathAndFileName(IPath path, String fileName) {
+		if (fileName.isEmpty()) {
+			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
+			return;
+		}
+		if (fileName.contains(".")) {
+			updateStatus(THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME);
+			return;
+		}
+
+		if (this.getContainerFullPath() != null) {
+			for (IFeatureModelFormat ext : FMFormatManager.getInstance().getExtensions()) {
+				IFile file = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0)).getFile(fileName + "." + ext.getSuffix());
+				if (file != null && file.exists()) {
+					updateStatus(SELECTED_FILE_ALREADY_EXISTS_);
+					return;
+				}
+			}
+		}
+
+		updateStatus(null);
+	}
+
+	private void updateStatus(String message) {
+		setErrorMessage(message);
+		setPageComplete(message == null);
+	}
 }

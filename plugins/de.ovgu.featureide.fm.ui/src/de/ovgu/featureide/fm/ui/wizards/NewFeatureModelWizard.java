@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -41,12 +42,15 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * A Wizard to create a new Feature Model file.
  *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 // TOOD add copy of an other model file
 public class NewFeatureModelWizard extends Wizard implements INewWizard {
@@ -69,8 +73,20 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		}
 		featureModel.createDefaultValues("");
 		FileHandler.save(fmPath, featureModel, format);
-
+		String fileName = locationpage.getFileName();
+		
+		if(!fileName.contains("." + format.getSuffix())) {
+			fileName = fileName + "." + format.getSuffix();
+		}
+		
+		IFile modelFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName));
 		assert (Files.exists(fmPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+		try {
+			// open editor
+			FMUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, modelFile);
+		} catch (final Exception e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
 		return true;
 	}
 

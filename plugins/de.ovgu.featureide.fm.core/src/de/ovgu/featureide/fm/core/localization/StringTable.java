@@ -1085,4 +1085,5 @@ public class StringTable {
 	public static final String PUBLIC_INTERFACE = "public interface";
 	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
 	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
+ 	public static final String THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME = "A '.' is not allowed in the filename";
 }

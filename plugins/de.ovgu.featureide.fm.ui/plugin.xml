@@ -784,4 +784,21 @@
 				OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
 		</Outline>
 	</extension>
+ <extension
+       point="org.eclipse.ui.newWizards">
+    <wizard
+          canFinishEarly="false"
+          category="de.ovgu.featureide.fm.ui.category"
+          class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
+          hasPages="true"
+          icon="icons/featuretree.ico"
+          id="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
+          name="Feature Model"
+          project="false">
+    </wizard>
+    <category
+          id="de.ovgu.featureide.fm.ui.category"
+          name="FeatureIDE">
+    </category>
+ </extension>
 </plugin>
