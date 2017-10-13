@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -64,5 +67,34 @@ public class NewConfigurationFileLocationPage extends WizardNewFileCreationPage 
 			}
 
 		}
+		//		IFolder path = ResourcesPlugin.getWorkspace().getRoot().getFolder(this.getContainerFullPath());
+//		IFile file =  path.getFile(this.getFileName());
+		checkFileName(this.getFileName());
+	}
+	
+	protected void checkFileName(String fileName) {
+
+		if (fileName.isEmpty()) {
+			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
+			return;
+		}
+		if (fileName.contains(".")) {
+			updateStatus(THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME);
+			return;
+		}
+		
+
+//		if(file.exists()) {
+//			updateStatus(SELECTED_FILE_ALREADY_EXISTS_);
+//			return;
+//		}
+		
+		updateStatus(null);
+	}
+	
+
+	private void updateStatus(String message) {
+		setErrorMessage(message);
+		setPageComplete(message == null);
 	}
 }

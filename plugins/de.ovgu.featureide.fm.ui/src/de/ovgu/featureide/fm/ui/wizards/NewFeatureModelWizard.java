@@ -20,8 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MODEL_FILE_MUST_HAVE_FILE_EXTENSION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -98,4 +102,6 @@ public class NewFeatureModelWizard extends AbstractNewFileWizard<IFeatureModelFo
 		formatPage = new NewFeatureModelFileFormatPage();
 		locationPage = new NewFeatureModelFileLocationPage("location", selection);
 	}
+	
+
 }

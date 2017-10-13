@@ -652,7 +652,7 @@ public class StringTable {
 	public static final String CREATE_A_NEW_FEATURE_MODEL_FILE_ = "Create a new feature model file.";
 	public static final String BROWSE___ = "     Browse...     ";
 	public static final String FILE_NAME_MUST_BE_SPECIFIED_ = "File name must be specified.";
-	public static final String NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_ = "New model file must have xml as file extension.";
+	public static final String NEW_MODEL_FILE_MUST_HAVE_FILE_EXTENSION_ = "New model file must not have file extension.";
 	public static final String SELECTED_FILE_ALREADY_EXISTS_ = "Selected file already exists.";
 	public static final String NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION = "No projects were selected for migration";
 	public static final String INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL = "Assertion failed: Project referrence is null.";
@@ -1085,4 +1085,5 @@ public class StringTable {
 	public static final String PUBLIC_INTERFACE = "public interface";
 	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
 	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
+	public static final String THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME = "There shoudl be '.' in the filename";
 }

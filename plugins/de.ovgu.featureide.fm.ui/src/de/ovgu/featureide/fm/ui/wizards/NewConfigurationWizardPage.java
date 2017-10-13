@@ -21,9 +21,8 @@
 package de.ovgu.featureide.fm.ui.wizards;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.BROWSE___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_A_NEW_FEATURE_MODEL_FILE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MODEL_FILE_MUST_HAVE_FILE_EXTENSION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
 
@@ -50,16 +49,16 @@ import org.eclipse.swt.widgets.Text;
  *
  * @author Jens Meinicke
  */
-public class NewFeatureModelWizardPage extends WizardPage {
+public class NewConfigurationWizardPage extends WizardPage {
 
 	@CheckForNull
 	private final IProject project;
 	Text fileName;
 
-	public NewFeatureModelWizardPage(String project, IProject projectRes) {
+	public NewConfigurationWizardPage(String project, IProject projectRes) {
 		super(project);
 		this.project = projectRes;
-		setDescription(CREATE_A_NEW_FEATURE_MODEL_FILE_);
+		setDescription(NEW_CONFIGURATION);
 	}
 
 	@Override
@@ -139,7 +138,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 
 	private String openFileDialog() {
 		final FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
-		dialog.setText(NEW_FEATURE_MODEL);
+		dialog.setText(NEW_CONFIGURATION);
 		dialog.setFilterExtensions(new String[] { "*.xml" });
 		dialog.setFilterNames(new String[] { "XML *.xml" });
 		dialog.setFileName("model.xml");

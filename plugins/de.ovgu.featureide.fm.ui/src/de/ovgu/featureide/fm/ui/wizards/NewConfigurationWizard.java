@@ -63,12 +63,11 @@ public class NewConfigurationWizard extends AbstractNewFileWizard<IConfiguration
 		final IConfigurationFormat format = ((NewConfigurationFileFormatPage) formatPage).getFormat();
 		final Path configPath = getNewFilePath(format);
 
-		assert (Files.exists(configPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 		String fileName = locationPage.getFileName() + "." + format.getSuffix();
 
 		IFile configFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationPage.getContainerFullPath().append(configFolder).append(fileName));
 		ConfigFileHandler.saveConfig(configPath, new Configuration(defaultFeatureModel()), format);
-		
+		assert (Files.exists(configPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 		try {
 			// open editor
 			FMUIPlugin.getDefault().openEditor(ConfigurationEditor.ID, configFile);
