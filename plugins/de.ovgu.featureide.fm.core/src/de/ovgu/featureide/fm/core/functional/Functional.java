@@ -117,6 +117,10 @@ public abstract class Functional {
 		void invoke(T t);
 	}
 
+	public static interface ICriticalConsumer<T> {
+		void invoke(T t) throws Exception;
+	}
+
 	/**
 	 * Represents an operation that takes no arguments but produces a result of type <b>T</b>.
 	 * <br/>

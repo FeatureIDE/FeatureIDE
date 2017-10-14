@@ -107,7 +107,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		eventManager.fireEvent(event);
 	}
 
-	// TODO !!!
+	// TODO !!! setfeaturemodel method for configuration
 	@Override
 	public void setObject(T object) {
 		synchronized (this) {

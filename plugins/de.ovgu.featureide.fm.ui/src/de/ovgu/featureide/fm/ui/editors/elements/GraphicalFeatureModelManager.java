@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -81,7 +82,7 @@ public class GraphicalFeatureModelManager extends FileManager<IGraphicalFeatureM
 	}
 
 	@Override
-	public boolean externalSave(Runnable externalSaveMethod) {
+	public boolean externalSave(ICriticalConsumer<IGraphicalFeatureModel> externalSaveMethod) {
 		return true;
 	}
 

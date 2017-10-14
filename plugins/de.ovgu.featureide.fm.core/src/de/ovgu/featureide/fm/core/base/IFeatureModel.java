@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base;
  
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -950,5 +952,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param constraint constraint to be stored at the specified position
 	 */
 	void setConstraint(int index, IConstraint constraint);
+	
+	ArrayList<IEventListener> getListenerList();
 
 }

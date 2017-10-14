@@ -83,6 +83,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -193,9 +194,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (getActivePage() == textEditor.getIndex()) {
 			textEditor.executeSaveOperation();
 			// textEditor.updateDiagram();
-			fmManager.externalSave(new Runnable() {
+			fmManager.externalSave(new ICriticalConsumer<IFeatureModel>() {
 				@Override
-				public void run() {
+				public void invoke(IFeatureModel t) throws Exception {
 					textEditor.doSave(monitor);
 				}
 			});

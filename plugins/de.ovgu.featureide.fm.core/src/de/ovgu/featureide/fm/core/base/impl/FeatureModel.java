@@ -174,6 +174,10 @@ public class FeatureModel implements IFeatureModel {
 		}
 	}
 
+	public ArrayList<IEventListener> getListenerList() {
+		return listenerList;
+	}
+
 	@Override
 	public IFeatureModel clone(IFeature newRoot) {
 		return new FeatureModel(this, newRoot);

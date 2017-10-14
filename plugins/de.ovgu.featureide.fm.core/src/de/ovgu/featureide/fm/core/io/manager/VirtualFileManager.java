@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
 
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -32,7 +33,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class VirtualFileManager<T> extends AFileManager<T> {
 
-	private static class ObjectCreator<T> extends AFileManager.ObjectCreator<T> {
+	public static class ObjectCreator<T> extends AFileManager.ObjectCreator<T> {
 
 		private T object;
 
@@ -68,7 +69,7 @@ public class VirtualFileManager<T> extends AFileManager<T> {
 	}
 
 	@Override
-	public boolean externalSave(Runnable externalSaveMethod) {
+	public boolean externalSave(ICriticalConsumer<T> externalSaveMethod) {
 		return true;
 	}
 

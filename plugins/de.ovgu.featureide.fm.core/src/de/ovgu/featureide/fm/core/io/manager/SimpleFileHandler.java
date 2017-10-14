@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.io.manager;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -29,11 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager.ObjectCreator;
 
 /**
  * Capable of reading and writing a file in a certain format.
@@ -71,21 +74,38 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
-		final String content = fileHandler.getContent();
+		return getFileHandler(path, object, formatManager).getLastProblems();
+	}
 
-		if (content != null) {
-			final String fileName = path.getFileName().toString();
-			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
-			if (format == null) {
-				fileHandler.getLastProblems()
-						.add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
-			} else {
-				fileHandler.setFormat(format);
-				fileHandler.parse(content);
-			}
+	public static final <T> FileHandler<T> getFileHandler(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
+		return getFileHandler(path, new VirtualFileManager.ObjectCreator<T>(object), formatManager);
+	}
+
+	protected static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator,
+			FormatManager<? extends IPersistentFormat<T>> formatManager) {
+		final FileHandler<T> fileHandler = new FileHandler<>(path, null, null);
+		try {
+			final String content = setFormat(path, formatManager, fileHandler);
+			objectCreator.setPath(path, fileHandler.getFormat());
+			fileHandler.setObject(objectCreator.createObject());
+			fileHandler.parse(content);
+		} catch (Exception e) {
+			fileHandler.getLastProblems().add(new Problem(e));
 		}
-		return fileHandler.getLastProblems();
+		return fileHandler;
+	}
+
+	protected static <T> String setFormat(Path path, FormatManager<? extends IPersistentFormat<T>> formatManager, final FileHandler<T> fileHandler)
+			throws IOException, NoSuchExtensionException {
+		final String content = fileHandler.readContent();
+		final String fileName = path.getFileName().toString();
+		final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
+		if (format == null) {
+			throw new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!");
+		} else {
+			fileHandler.setFormat(format);
+		}
+		return content;
 	}
 
 	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {
@@ -159,17 +179,19 @@ public class SimpleFileHandler<T> {
 	}
 
 	String getContent() {
-		if (!Files.exists(path)) {
-			problemList.add(new Problem(new FileNotFoundException(path.toString())));
-			return null;
-		}
-
 		try {
-			return new String(FileSystem.read(path), DEFAULT_CHARSET);
+			return readContent();
 		} catch (final Exception e) {
 			problemList.add(new Problem(e));
 			return null;
 		}
+	}
+
+	String readContent() throws IOException {
+		if (!Files.exists(path)) {
+			throw new FileNotFoundException(path.toString());
+		}
+		return new String(FileSystem.read(path), DEFAULT_CHARSET);
 	}
 
 	private String getContent(InputStream inputStream) {

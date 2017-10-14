@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.io.manager;
 import java.nio.file.Path;
 
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -80,7 +81,7 @@ public interface IFileManager<T> extends IEventManager {
 
 	IPersistentFormat<T> getFormat();
 
-	boolean externalSave(Runnable externalSaveMethod);
+	boolean externalSave(ICriticalConsumer<T> externalSaveMethod);
 
 	void dispose();
 

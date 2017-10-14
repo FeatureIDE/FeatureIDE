@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzerVar;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -228,9 +229,12 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 	}
 
 	@Override
-	public void override() {
+	protected void copyPropertiesOnOverride() {
+		for (IEventListener listener : variableObject.getListenerList()) {
+			lastReadObject.addListener(listener);
+		}
+		lastReadObject.setUndoContext(variableObject.getUndoContext());
 		persistentObject.getObject().setUndoContext(variableObject.getUndoContext());
-		super.override();
 	}
 
 	@Override
@@ -243,9 +247,8 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 		return (FeatureModelSnapshot) super.getSnapshot();
 	}
 
-	@Deprecated
-	public FeatureModelAnalyzer getVarAnalyzer() {
-		return new FeatureModelAnalyzer(new FeatureModelFormula(editObject()));
+	public FeatureModelAnalyzerVar getVarAnalyzer() {
+		return new FeatureModelAnalyzerVar(new FeatureModelFormula(editObject()));
 	}
 
 	@Deprecated

@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -436,13 +437,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					currentPage.doSave(monitor);
 				} else {
 					textEditorPage.updateConfiguration();
-					configurationManager.externalSave(new Runnable() {
+					configurationManager.externalSave(new ICriticalConsumer<Configuration>() {
 						@Override
-						public void run() {
+						public void invoke(Configuration t) throws Exception {
 							for (IConfigurationEditorPage internalPage : allPages) {
 								if (internalPage != currentPage) {
 									internalPage
-											.propertyChange(new FeatureIDEEvent(configurationManager.editObject(), FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
+											.propertyChange(new FeatureIDEEvent(t, FeatureIDEEvent.EventType.MODEL_DATA_SAVED));
 								}
 							}
 							currentPage.doSave(monitor);
