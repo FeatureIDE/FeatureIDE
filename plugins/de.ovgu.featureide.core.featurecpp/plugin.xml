@@ -11,5 +11,14 @@
             nature="FeatureIDE_Core.featureCPPNature">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.featurecpp.FeatureCppFMComposerExtension"
+            composer="de.ovgu.featureide.composer.featurecpp"
+            id="de.ovgu.featureide.core.featurecpp.fmComposer"
+            name="de.ovgu.featureide.core.featurecpp.fmComposer">
+      </fmComposer>
+   </extension>
 
 </plugin>
