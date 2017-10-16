@@ -118,6 +118,14 @@
         name="Configuration Map"
         restorable="true">
   </view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.ui.views.modGen.ModGenResultsView"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.ui.modelResults"
+        name="Model Generation Results"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">
@@ -1171,6 +1179,14 @@
          </reference>
       </visibleWhen>
    </dynamic>
+   <command
+         commandId="de.ovgu.featureide.ui.commands.ModelGenerator"
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.ui.action.ModelGenerator&#x0A;            checkEnabled=&quot;false&quot;&gt;&#x0A;      &lt;/visibleWhen&gt;"
+         label="Model Generator"
+         style="push"
+         tooltip="Generate Model based in the source code.">
+   </command>
 		</menuContribution>
 
 		<menuContribution
@@ -1312,6 +1328,11 @@
         id="de.ovgu.featureide.ui.visualization.command.featurerelations"
         name="Feature Relations Graph">
   </command>
+  <command
+        defaultHandler="de.ovgu.featureide.ui.handlers.ModelGeneratorHandler"
+        id="de.ovgu.featureide.ui.commands.ModelGenerator"
+        name="Model Generator">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1347,6 +1368,10 @@
 	        class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
 	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 	  </handler>
+   <handler
+         class="de.ovgu.featureide.ui.handlers.ModelGeneratorHandler"
+         commandId="de.ovgu.featureide.ui.commands.ModelGenerator">
+   </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">
