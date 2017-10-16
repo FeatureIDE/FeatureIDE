@@ -35,7 +35,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
-import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
+import de.ovgu.featureide.fm.ui.wizards.NewConfigurationWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard;
 
@@ -57,7 +57,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
-		layout.addNewWizardShortcut(NewConfigurationFileWizard.ID);
+		layout.addNewWizardShortcut(NewConfigurationWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureModelWizard.ID);
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");

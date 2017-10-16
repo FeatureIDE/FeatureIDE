@@ -44,19 +44,19 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public class SimpleFileHandler<T> {
 
-	private static final Charset DEFAULT_CHARSET;
+	protected static final Charset DEFAULT_CHARSET;
 	static {
 		final Charset utf8 = Charset.forName("UTF-8");
 		DEFAULT_CHARSET = utf8 != null ? utf8 : Charset.defaultCharset();
 	}
 
-	private IPersistentFormat<T> format;
+	protected IPersistentFormat<T> format;
 
-	private final ProblemList problemList = new ProblemList();
+	protected final ProblemList problemList = new ProblemList();
 
 	private T object;
 
-	private Path path;
+	protected Path path;
 
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);

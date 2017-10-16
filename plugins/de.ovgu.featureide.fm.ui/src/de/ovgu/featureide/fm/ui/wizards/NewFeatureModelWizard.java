@@ -20,17 +20,20 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MODEL_FILE_MUST_HAVE_FILE_EXTENSION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -41,24 +44,27 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * A Wizard to create a new Feature Model file.
  *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
-// TOOD add copy of an other model file
-public class NewFeatureModelWizard extends Wizard implements INewWizard {
+public class NewFeatureModelWizard extends AbstractNewFileWizard<IFeatureModelFormat> implements INewWizard {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewFeatureModelWizard";
 
-	private NewFeatureModelFileLocationPage locationpage;
-	private NewFeatureModelFileFormatPage formatPage;
+	public NewFeatureModelWizard() {
+		setWindowTitle(NEW_FEATURE_MODEL);
+	}
 
 	@Override
 	public boolean performFinish() {
-		final IFeatureModelFormat format = formatPage.getFormat();
+		final IFeatureModelFormat format = ((NewFeatureModelFileFormatPage) formatPage).getFormat();
 		final Path fmPath = getNewFilePath(format);
 		IFeatureModel featureModel;
 		try {
@@ -69,30 +75,33 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		}
 		featureModel.createDefaultValues("");
 		FileHandler.save(fmPath, featureModel, format);
+		String fileName = locationPage.getFileName();
+		IFile modelFile = ResourcesPlugin.getWorkspace().getRoot().getFile(locationPage.getContainerFullPath().append(fileName + "." + format.getSuffix()));
 
 		assert (Files.exists(fmPath)) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+		try {
+			// open editor
+			FMUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, modelFile);
+		} catch (final Exception e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
 		return true;
 	}
 
+	@Override
 	public Path getNewFilePath(IFeatureModelFormat format) {
-		String fileName = locationpage.getFileName();
+		String fileName = locationPage.getFileName();
 		if (!fileName.matches(".+\\." + Pattern.quote(format.getSuffix()))) {
 			fileName += "." + format.getSuffix();
 		}
-		return Paths.get(ResourcesPlugin.getWorkspace().getRoot().getFile(locationpage.getContainerFullPath().append(fileName)).getLocationURI());
-	}
-
-	@Override
-	public void addPages() {
-		setWindowTitle(NEW_FEATURE_MODEL);
-		addPage(locationpage);
-		addPage(formatPage);
+		return getFullPath(fileName);
 	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		formatPage = new NewFeatureModelFileFormatPage();
-		locationpage = new NewFeatureModelFileLocationPage("location", selection);
+		locationPage = new NewFeatureModelFileLocationPage("location", selection);
 	}
+	
 
 }

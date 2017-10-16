@@ -25,35 +25,57 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THERE_SHOULD_BE_NO_DOT_IN_THE_FILENAME;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
+ * 
  * @author Sebastian Krieter
  * @author Marlen Bernier
  * @author Dawid Szczepanski
- * @author Christopher Sontag
  */
-public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
+public class NewConfigurationFileLocationPage extends WizardNewFileCreationPage {
 
-	public NewFeatureModelFileLocationPage(String pageName, IStructuredSelection selection) {
+	public NewConfigurationFileLocationPage(String pageName, IStructuredSelection selection) {
 		super(pageName, selection);
 		setTitle("Choose Location");
-		setDescription("Select a path to the new feature model file.");
+		setDescription("Select a path to the new configuration file.");
 
 	}
 
+	@Override
 	public void handleEvent(Event event) {
+		super.handleEvent(event);
+		if (!FMUIPlugin.getDefault().isOnlyFeatureModelingInstalled()) {
+
+			/**
+			 * The following should only happen when the user chooses a FeatureIDE project and if not only feature modeling is installed
+			 */
+			if (this.getContainerFullPath() != null && this.getContainerFullPath().segmentCount() >= 1) {
+				IResource res = ResourcesPlugin.getWorkspace().getRoot().getProject(this.getContainerFullPath().segment(0).toString());
+				IPath chosenPath = this.getContainerFullPath();
+
+				FMUIPlugin.getDefault().setProjectResource(res, chosenPath);
+				setMessage(FMUIPlugin.getDefault().getExtensionWarningMessage(), 1);
+				if (FMUIPlugin.getDefault().getExtensionWarningMessage().equals("")) {
+					setMessage(FMUIPlugin.getDefault().getExtensionWarningMessage(), 0);
+				}
+			}
+
+		}
 		checkPathAndFileName(this.getContainerFullPath(), this.getFileName());
 	}
 
 	protected void checkPathAndFileName(IPath path, String fileName) {
+
 		if (fileName.isEmpty()) {
 			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
 			return;
@@ -64,7 +86,7 @@ public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
 		}
 
 		if (this.getContainerFullPath() != null) {
-			for (IFeatureModelFormat ext : FMFormatManager.getInstance().getExtensions()) {
+			for (IConfigurationFormat ext : ConfigFormatManager.getInstance().getExtensions()) {
 				IFile file = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0)).getFile(fileName + "." + ext.getSuffix());
 				if (file != null && file.exists()) {
 					updateStatus(SELECTED_FILE_ALREADY_EXISTS_);
@@ -72,7 +94,6 @@ public class NewFeatureModelFileLocationPage extends WizardNewFileCreationPage {
 				}
 			}
 		}
-
 		updateStatus(null);
 	}
 

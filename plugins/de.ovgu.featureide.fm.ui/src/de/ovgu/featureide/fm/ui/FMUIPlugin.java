@@ -20,8 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
@@ -33,12 +40,19 @@ import de.ovgu.featureide.fm.ui.editors.EclipseExternalChangeListener;
  *
  * @author Christian Kaestner
  * @author Thomas Thuem
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class FMUIPlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.ui";
 
 	private static FMUIPlugin plugin;
+
+	protected boolean isOnlyFeatureModelingInstalled;
+
+	IResource projectResource;
+	ConfigurationWizard extension;
 
 	@Override
 	public String getID() {
@@ -52,6 +66,7 @@ public class FMUIPlugin extends AbstractUIPlugin {
 		final EclipseExternalChangeListener eclipseExternalChangeListener = new EclipseExternalChangeListener();
 		ExternalChangeListener.listener = eclipseExternalChangeListener;
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(eclipseExternalChangeListener);
+		isOnlyFeatureModelingInstalled = this.checkExistenceOfExtension("de.ovgu.featureide.fm.ui.ConfigurationWizard");
 	}
 
 	@Override
@@ -70,6 +85,54 @@ public class FMUIPlugin extends AbstractUIPlugin {
 
 	public static Image getImage(String name) {
 		return getDefault().getImageDescriptor("icons/" + name).createImage();
+	}
+
+	/**
+	 * @return the isOnlyFeatureModelingInstalled
+	 */
+	public boolean isOnlyFeatureModelingInstalled() {
+		return isOnlyFeatureModelingInstalled;
+	}
+
+	public boolean setProjectResource(IResource res, IPath chosenPath) {
+		projectResource = res;
+		return extension.setWarningMessage(res, chosenPath);
+	}
+
+	public String getExtensionWarningMessage() {
+		return extension.getMessage();
+	}
+
+	/**
+	 * If there is no extension (core plugin project is closed, or not installed) then this means, that the user has chosen to only install or use FeatureIDE
+	 * with only "Feature Modeling" installed, under this circumstances there is no possibility to use the "New FeatureIDE Project" wizard and other features
+	 * which are provided by the not installed plugins.
+	 *
+	 * 
+	 * @param extensionPointId
+	 * @return true if only feature modeling is installed, false if the extension of the core plugin exists (i.e. everything is installed, or at least the core
+	 *         plugin)
+	 * @throws CoreException
+	 */
+	protected boolean checkExistenceOfExtension(String extensionPointId) throws CoreException {
+		IExtensionRegistry reg = Platform.getExtensionRegistry();
+		IExtensionPoint ep = reg.getExtensionPoint(extensionPointId);
+		org.eclipse.core.runtime.IExtension[] extensions = ep.getExtensions();
+
+		if (1 == extensions.length) {
+			IConfigurationElement[] ce = extensions[0].getConfigurationElements();
+			for (int i = 0; i < ce.length; i++) {
+				Object obj = ce[i].createExecutableExtension("class");
+				if (obj instanceof ConfigurationWizard) {
+					//save the reference for later use
+					extension = ((ConfigurationWizard) obj);
+				}
+			}
+			return false;
+		} else {
+			// Core plugin is not available, FeatureIDE project wizard will not show up
+			return true;
+		}
 	}
 
 }

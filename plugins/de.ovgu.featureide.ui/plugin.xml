@@ -6,7 +6,7 @@
 			point="org.eclipse.ui.newWizards">
 		<wizard
 				canFinishEarly="false"
-				category="de.ovgu.featureide.ui.category"
+				category="de.ovgu.featureide.fm.ui.category"
 				class="de.ovgu.featureide.ui.wizards.NewFeatureProjectWizard"
 				hasPages="true"
 				icon="icons/NewFeatureProjectIcon.png"
@@ -15,7 +15,7 @@
 				project="true"/>
 		<wizard
 				canFinishEarly="false"
-				category="de.ovgu.featureide.ui.category"
+				category="de.ovgu.featureide.fm.ui.category"
 				class="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard"
 				hasPages="true"
 				icon="icons/NewFeatureProjectIcon.png"
@@ -23,27 +23,6 @@
 				name="FeatureIDE Source File"
 				project="false">
 		</wizard>
-		<wizard
-				category="de.ovgu.featureide.ui.category"
-				class="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
-				icon="icons/NewConfigurationIcon.png"
-				id="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard"
-				name="Configuration File"
-				project="false"/>
-		<wizard
-				canFinishEarly="false"
-				category="de.ovgu.featureide.ui.category"
-				class="de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard"
-				hasPages="true"
-				icon="icons/featuretree.ico"
-				id="de.ovgu.featureide.fm.ui.wizard.NewFeatureModelWizard"
-				name="Feature Model"
-				project="false">
-		</wizard>
-		<category
-				id="de.ovgu.featureide.ui.category"
-				name="FeatureIDE">
-		</category>
 	</extension>
 	<extension
 			point="org.eclipse.ui.decorators">
@@ -1489,6 +1468,12 @@
 				</with></enablement>
 		</commonWizard>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.ui.ConfigurationWizard">
+    <ConfigurationWizard
+          class="de.ovgu.featureide.ui.ConfigurationWizardWarningMessageExtension">
+    </ConfigurationWizard>
+ </extension>
 	<extension
 			point="de.ovgu.featureide.fm.ui.Outline">
 		<Outline
