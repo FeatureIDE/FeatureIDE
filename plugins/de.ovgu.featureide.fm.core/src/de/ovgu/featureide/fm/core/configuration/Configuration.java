@@ -38,11 +38,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class Configuration implements Cloneable {
 
-	final ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
-	final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
+	ArrayList<SelectableFeature> features = new ArrayList<>();
+	Hashtable<String, SelectableFeature> table = new Hashtable<>();
 
-	protected final IFeatureModel featureModel;
-	private final SelectableFeature root;
+	private IFeatureModel featureModel;
+	private SelectableFeature root;
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -62,25 +62,41 @@ public class Configuration implements Cloneable {
 	/**
 	 * Copy constructor. Copies the status of a given configuration.
 	 * 
-	 * @param configuration
-	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
-	 * @param propagate
+	 * @param configuration the old configuration.
+	 * @param featureModel the underlying feature model. The model can be different from the model of the old configuration.
 	 */
-	public Configuration(Configuration configuration, IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-		this.root = initRoot();
-
-		for (SelectableFeature oldFeature : configuration.features) {
-			final SelectableFeature newFeature = table.get(oldFeature.getName());
-			if (newFeature != null) {
-				newFeature.setManual(oldFeature.getManual());
-			}
-		}
-	}
+//	public Configuration(Configuration configuration, IFeatureModel featureModel) {
+//		this.featureModel = featureModel;
+//		this.root = initRoot();
+//
+//		for (SelectableFeature oldFeature : configuration.features) {
+//			final SelectableFeature newFeature = table.get(oldFeature.getName());
+//			if (newFeature != null) {
+//				newFeature.setManual(oldFeature.getManual());
+//			}
+//		}
+//	}
 
 	public Configuration(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		this.root = initRoot();
+	}
+
+	public void setFeatureModel(IFeatureModel featureModel) {
+		ArrayList<SelectableFeature> oldFeatures = features;
+		features = new ArrayList<>(oldFeatures.size());
+		table.clear();
+
+		this.featureModel = featureModel;
+		this.root = initRoot();
+
+		for (SelectableFeature oldFeature : oldFeatures) {
+			final SelectableFeature newFeature = table.get(oldFeature.getName());
+			if (newFeature != null) {
+				newFeature.setManual(oldFeature.getManual());
+				newFeature.setAutomatic(oldFeature.getAutomatic());
+			}
+		}
 	}
 
 	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
@@ -109,7 +125,7 @@ public class Configuration implements Cloneable {
 
 		return root;
 	}
-	
+
 	void resetAutomaticValues() {
 		for (SelectableFeature feature : features) {
 			feature.setAutomatic(Selection.UNDEFINED);
@@ -165,34 +181,24 @@ public class Configuration implements Cloneable {
 	}
 
 	public List<IFeature> getSelectedFeatures() {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED) {
-				result.add(feature.getFeature());
-			}
-		}
-		return result;
+		return getFeatures(Selection.SELECTED);
 	}
 
 	public List<IFeature> getUnSelectedFeatures() {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.UNSELECTED) {
-				result.add(feature.getFeature());
-			}
-		}
-
-		return result;
+		return getFeatures(Selection.UNSELECTED);
 	}
 
 	public List<IFeature> getUndefinedSelectedFeatures() {
+		return getFeatures(Selection.UNDEFINED);
+	}
+
+	private List<IFeature> getFeatures(final Selection selection) {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.UNDEFINED) {
+			if (feature.getSelection() == selection) {
 				result.add(feature.getFeature());
 			}
 		}
-
 		return result;
 	}
 

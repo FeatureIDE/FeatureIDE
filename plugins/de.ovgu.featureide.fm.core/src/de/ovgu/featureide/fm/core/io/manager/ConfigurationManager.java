@@ -88,9 +88,6 @@ public class ConfigurationManager extends FileManager<Configuration> {
 		public void propertyChange(FeatureIDEEvent evt) {
 			final EventType eventType = evt.getEventType();
 			switch (eventType) {
-			case FEATURE_ORDER_CHANGED:
-				// TODO !!! react on feature order - should be superfluous with temp configuration file
-				break;
 			case FEATURE_NAME_CHANGED:
 				// TODO !!! react on feature name change
 				//				String oldName = (String) evt.getOldValue();
@@ -99,7 +96,7 @@ public class ConfigurationManager extends FileManager<Configuration> {
 				break;
 			case MODEL_DATA_OVERRIDDEN:
 				// TODO !!! check correctness
-				setObject(new Configuration(getObject(), featureModelManager.getObject()));
+				editObject().setFeatureModel(featureModelManager.getObject());
 			default:
 				break;
 			}

@@ -321,8 +321,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		case MODEL_DATA_OVERRIDDEN:
 		case COLOR_CHANGED:
 			if (evt.getSource() instanceof IFeatureModel) {
-				final Configuration configuration = new Configuration(configurationManager.getObject(), featureModelManager.getObject());
-				configurationManager.setObject(configuration);
+				configurationManager.editObject().setFeatureModel(featureModelManager.getObject());
 				setContainsError(false);
 
 				// Reinitialize the pages
