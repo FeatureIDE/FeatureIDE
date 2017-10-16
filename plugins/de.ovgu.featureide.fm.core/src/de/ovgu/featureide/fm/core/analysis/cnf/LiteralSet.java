@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,9 +27,8 @@ import java.util.TreeSet;
 import javax.annotation.CheckForNull;
 
 /**
- * A sorted list of literals.
- * Can be used as a clause of a CNF or DNF.
- * 
+ * A sorted list of literals. Can be used as a clause of a CNF or DNF.
+ *
  * @author Sebastian Krieter
  */
 public class LiteralSet implements Cloneable, Serializable {
@@ -39,48 +38,40 @@ public class LiteralSet implements Cloneable, Serializable {
 	protected final int[] literals;
 
 	private final int hashCode;
-	
+
 	/**
-	 * Constructs a new clause from the given literals.
-	 * Negates the given literals.
-	 * <br/>
-	 * <b>Does not modify the given literal array.</b>
-	 * 
+	 * Constructs a new clause from the given literals. Negates the given literals. <br/> <b>Does not modify the given literal array.</b>
+	 *
 	 * @param literals literals of the clause
 	 * @return A newly constructed clause from the given literals (negated).
 	 */
 	public static LiteralSet getBlockingClause(int... literals) {
 		return new LiteralSet(SatUtils.negateSolution(literals));
 	}
-	
+
 	/**
-	 * Constructs a new clause from the given literals.
-	 * <br/>
-	 * <b>Does not modify the given literal array.</b>
-	 * 
+	 * Constructs a new clause from the given literals. <br/> <b>Does not modify the given literal array.</b>
+	 *
 	 * @param literals literals of the clause
 	 * @return A newly constructed clause from the given literals.
 	 */
 	public static LiteralSet getClause(int... literals) {
 		return new LiteralSet(SatUtils.negateSolution(literals));
 	}
-	
+
 	/**
 	 * Constructs a deep copy of the given clause.
-	 * 
+	 *
 	 * @param clause the old clause
 	 */
 	public LiteralSet(LiteralSet clause) {
-		this.literals = Arrays.copyOf(clause.literals, clause.literals.length);
+		literals = Arrays.copyOf(clause.literals, clause.literals.length);
 		hashCode = clause.hashCode;
 	}
-	
+
 	/**
-	 * Constructs a new clause from the given literals.
-	 * <br/>
-	 * <b>The resulting clause is backed by the given literal array.
-	 * The array will be sorted.</b>
-	 * 
+	 * Constructs a new clause from the given literals. <br/> <b>The resulting clause is backed by the given literal array. The array will be sorted.</b>
+	 *
 	 * @param literals literals of the clause
 	 */
 	public LiteralSet(int... literals) {
@@ -108,7 +99,7 @@ public class LiteralSet implements Cloneable, Serializable {
 
 	// TODO exploit that both sets are sorted
 	public boolean containsAll(LiteralSet otherLiteralSet) {
-		for (int otherLiteral : otherLiteralSet.getLiterals()) {
+		for (final int otherLiteral : otherLiteralSet.getLiterals()) {
 			if (Arrays.binarySearch(literals, otherLiteral) < 0) {
 				return false;
 			}
@@ -117,7 +108,7 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	public boolean contains(int variable) {
-		for (int curLiteral : literals) {
+		for (final int curLiteral : literals) {
 			if (Math.abs(curLiteral) == variable) {
 				return true;
 			}
@@ -154,7 +145,7 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	public LiteralSet getVariables() {
-		int[] absoluteLiterals = Arrays.copyOf(literals, literals.length);
+		final int[] absoluteLiterals = Arrays.copyOf(literals, literals.length);
 		for (int i = 0; i < absoluteLiterals.length; i++) {
 			absoluteLiterals[i] = Math.abs(absoluteLiterals[i]);
 		}
@@ -204,7 +195,7 @@ public class LiteralSet implements Cloneable, Serializable {
 		}
 		return count;
 	}
-	
+
 	public int countDuplicates(LiteralSet variables) {
 		final int[] otherLiterals = variables.getLiterals();
 		int count = 0;
@@ -218,6 +209,7 @@ public class LiteralSet implements Cloneable, Serializable {
 		}
 		return count;
 	}
+
 	public int countConflicts(LiteralSet variables) {
 		final int[] otherLiterals = variables.getLiterals();
 		int count = 0;
@@ -251,20 +243,19 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	/**
-	 * Constructs a new {@link LiteralSet} that contains no duplicates and unwanted literals.
-	 * Also checks whether the set contains a literal and its negation.
-	 * 
+	 * Constructs a new {@link LiteralSet} that contains no duplicates and unwanted literals. Also checks whether the set contains a literal and its negation.
+	 *
 	 * @param literalSet The initial literal set.
 	 * @param unwantedVariables An array of variables that should be removed.
 	 * @return A new literal set or {@code null}, if the initial set contained a literal and its negation.
-	 * 
+	 *
 	 * @see #cleanLiteralArray(int[], int...)
 	 */
 	@CheckForNull
 	public LiteralSet clean(int... unwantedVariables) {
 		final TreeSet<Integer> newLiteralSet = new TreeSet<>();
 
-		for (int literal : literals) {
+		for (final int literal : literals) {
 			if (newLiteralSet.contains(-literal)) {
 				return null;
 			} else {
@@ -278,9 +269,9 @@ public class LiteralSet implements Cloneable, Serializable {
 			newLiteralSet.remove(-unwantedVariable);
 		}
 
-		int[] uniqueVarArray = new int[newLiteralSet.size()];
+		final int[] uniqueVarArray = new int[newLiteralSet.size()];
 		int i = 0;
-		for (int lit : newLiteralSet) {
+		for (final int lit : newLiteralSet) {
 			uniqueVarArray[i++] = lit;
 		}
 		return new LiteralSet(uniqueVarArray, false);
@@ -293,10 +284,12 @@ public class LiteralSet implements Cloneable, Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
+		}
 		return Arrays.equals(literals, ((LiteralSet) obj).literals);
 	}
 

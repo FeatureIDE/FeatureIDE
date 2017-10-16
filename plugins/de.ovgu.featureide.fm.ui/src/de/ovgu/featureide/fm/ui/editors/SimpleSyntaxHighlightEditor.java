@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,14 +39,14 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Simple syntax highlighted editor
- * 
+ *
  * @author Marcus Pinnecke
  */
 public class SimpleSyntaxHighlightEditor extends StyledText {
 
-	private String[] keywords;
-	private Set<String> possibleWords = new HashSet<String>();
-	private Set<String> unknownWords = new HashSet<String>();
+	private final String[] keywords;
+	private final Set<String> possibleWords = new HashSet<String>();
+	private final Set<String> unknownWords = new HashSet<String>();
 
 	/**
 	 * @param parent
@@ -56,10 +56,10 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super(parent, style);
 		this.keywords = keywords;
 
-		this.keywordColor = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
-		this.wrongWordColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
-		this.normalColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-		this.setFont(JFaceResources.getTextFont());
+		keywordColor = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+		wrongWordColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
+		normalColor = Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+		setFont(JFaceResources.getTextFont());
 
 		super.addModifyListener(new ModifyListener() {
 
@@ -70,9 +70,9 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		});
 	}
 
-	private Color keywordColor;
-	private Color wrongWordColor;
-	private Color normalColor;
+	private final Color keywordColor;
+	private final Color wrongWordColor;
+	private final Color normalColor;
 	private boolean underlineEverything;
 
 	public Set<String> getUnknownWords() {
@@ -82,7 +82,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	public void setPossibleWords(Set<String> words) {
 		possibleWords.clear();
 
-		for (String word : words) {
+		for (final String word : words) {
 			possibleWords.add(word);
 			possibleWords.add("\"" + word + "\"");
 		}
@@ -97,7 +97,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		if (!underlineEverything) {
 			final String text = super.getText();
 
-			StyleRange resetStyleRange = new StyleRange();
+			final StyleRange resetStyleRange = new StyleRange();
 			resetStyleRange.start = 0;
 			resetStyleRange.length = text.length();
 			resetStyleRange.fontStyle = SWT.NORMAL;
@@ -123,29 +123,30 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		String safeCopy = new String(text);
 		safeCopy = safeCopy.replace("(", " ").replace(")", " ");
 
-		StringBuilder safeCopySb = new StringBuilder(safeCopy);
+		final StringBuilder safeCopySb = new StringBuilder(safeCopy);
 
 		final char ILLEGAL_FEATURE_NAME_CHAR = '\u0000';
 		// avoid splitting feature names with containing spaces by replace spaces inside brackets with a char
 		// that could never be inside a feature name and recode this later
 		boolean insideFeatureNameWithWhitespace = false;
 		for (int i = 0; i < safeCopy.length(); i++) {
-			if (safeCopy.charAt(i) == '\"')
+			if (safeCopy.charAt(i) == '\"') {
 				insideFeatureNameWithWhitespace = !insideFeatureNameWithWhitespace;
-			if (insideFeatureNameWithWhitespace && safeCopy.charAt(i) == ' ') {
+			}
+			if (insideFeatureNameWithWhitespace && (safeCopy.charAt(i) == ' ')) {
 				safeCopySb.replace(i, i + 1, String.valueOf(ILLEGAL_FEATURE_NAME_CHAR));
 			}
 		}
 
-		String[] tokens = safeCopySb.toString().split(" ");
+		final String[] tokens = safeCopySb.toString().split(" ");
 		int start = 0;
 		for (int i = 0; i < tokens.length; i++) {
-			String token = tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
+			final String token = tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
 
 			if (!token.isEmpty() && !possibleWords.contains(token) && !possibleWords.contains(token.toLowerCase())) {
 				unknownWords.add(token);
 
-				StyleRange styleRange = new StyleRange();
+				final StyleRange styleRange = new StyleRange();
 				styleRange.start = start;
 				styleRange.length = token.length();
 				styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
@@ -160,7 +161,8 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	}
 
 	private static class Match {
-		private int start, end;
+
+		private final int start, end;
 
 		public Match(int start, int end) {
 			this.start = start;
@@ -174,7 +176,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		final List<Match> keywordPositions = new ArrayList<>();
 
 		final StringBuilder sb = new StringBuilder("(");
-		for (String keyword : keywords) {
+		for (final String keyword : keywords) {
 			sb.append(Pattern.quote(keyword.toLowerCase()));
 			sb.append('|');
 		}
@@ -188,24 +190,24 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
 		}
 		while (operatorMatcher.find()) {
-			int start = operatorMatcher.start();
-			int end = operatorMatcher.end();
+			final int start = operatorMatcher.start();
+			final int end = operatorMatcher.end();
 
-			while (nonOperatorMatch != null && start > nonOperatorMatch.end) {
+			while ((nonOperatorMatch != null) && (start > nonOperatorMatch.end)) {
 				if (nonOperatorMatcher.find()) {
 					nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
 				} else {
 					nonOperatorMatch = null;
 				}
 			}
-			if (nonOperatorMatch == null || !(start < nonOperatorMatch.end && end > nonOperatorMatch.start)) {
+			if ((nonOperatorMatch == null) || !((start < nonOperatorMatch.end) && (end > nonOperatorMatch.start))) {
 				keywordPositions.add(new Match(start, end));
 			}
 		}
 
 		// highlight keywords in text
-		for (Match match : keywordPositions) {
-			StyleRange styleRange = new StyleRange();
+		for (final Match match : keywordPositions) {
+			final StyleRange styleRange = new StyleRange();
 			styleRange.start = match.start;
 			styleRange.length = match.end - match.start;
 			styleRange.fontStyle = SWT.BOLD;
@@ -216,20 +218,21 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	}
 
 	public void copyIn(final String textToInsert) {
-		StringBuilder temp = new StringBuilder(super.getText());
+		final StringBuilder temp = new StringBuilder(super.getText());
 
-		int selStart = super.getSelectionRanges()[0];
-		int selLen = super.getSelectionRanges()[1];
+		final int selStart = super.getSelectionRanges()[0];
+		final int selLen = super.getSelectionRanges()[1];
 
 		if (selLen != 0) {
 			temp.delete(selStart, selStart + selLen);
 		}
 
 		String prefix = "";
-		if (selStart - 1 > 0)
+		if ((selStart - 1) > 0) {
 			prefix += temp.charAt(selStart - 1) == ' ' ? "" : " ";
+		}
 		String suffix = "";
-		int lastIndex = selStart + prefix.length() + textToInsert.length();
+		final int lastIndex = selStart + prefix.length() + textToInsert.length();
 		suffix += lastIndex >= temp.length() ? " " : (temp.charAt(lastIndex) == ' ' ? "" : " ");
 
 		temp.insert(selStart, prefix + textToInsert + suffix);
@@ -241,7 +244,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	public void underlineEverything(boolean b) {
 		underlineEverything = b;
 		if (underlineEverything) {
-			StyleRange styleRange = new StyleRange();
+			final StyleRange styleRange = new StyleRange();
 			styleRange.start = 0;
 			styleRange.length = this.getText().length();
 			styleRange.fontStyle = SWT.NORMAL;

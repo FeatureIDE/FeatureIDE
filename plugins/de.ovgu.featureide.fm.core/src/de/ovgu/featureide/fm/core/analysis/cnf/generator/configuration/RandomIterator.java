@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -25,7 +25,7 @@ import java.util.Random;
 
 /**
  * TODO description
- * 
+ *
  * @author Sebastian Krieter
  */
 public class RandomIterator implements Iterator<int[]> {
@@ -40,8 +40,8 @@ public class RandomIterator implements Iterator<int[]> {
 	public RandomIterator(int t, int length) {
 		this.length = length;
 		this.t = t;
-		this.maxNumber = (long) Math.pow(length, t);
-		if (maxNumber <= 0 || maxNumber > Long.MAX_VALUE) {
+		maxNumber = (long) Math.pow(length, t);
+		if ((maxNumber <= 0) || (maxNumber > Long.MAX_VALUE)) {
 			throw new IllegalArgumentException(Long.toString(maxNumber));
 		}
 		m = (int) Math.pow(2, Math.ceil(Math.log(maxNumber) / Math.log(2)));
@@ -61,11 +61,11 @@ public class RandomIterator implements Iterator<int[]> {
 	public int[] next() {
 		mainLoop: do {
 			do {
-				next = (a * next + c) % m;
+				next = ((a * next) + c) % m;
 			} while (next >= maxNumber);
 
 			long temp = next;
-			int[] c = new int[t];
+			final int[] c = new int[t];
 			for (int i = 0; i < t; i++) {
 				c[i] = (int) (temp % length);
 				temp /= length;

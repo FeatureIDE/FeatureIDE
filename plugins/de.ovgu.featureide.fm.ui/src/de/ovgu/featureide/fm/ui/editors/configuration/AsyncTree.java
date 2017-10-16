@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,13 +35,14 @@ import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 
 /**
  * Builds and traverses a {@link Tree} recursively with single asynchronous UI calls for each item.
- * 
+ *
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
  */
 public class AsyncTree extends Thread {
 
 	private class Builder implements Runnable {
+
 		private final TreeItem parent;
 		private final TreeElement[] children;
 
@@ -62,8 +63,8 @@ public class AsyncTree extends Thread {
 						// This try for the case that the parent item is already disposed.
 						try {
 							childNode = new TreeItem(parent, 0);
-						} catch (Exception e) {
-							AsyncTree.this.interrupt();
+						} catch (final Exception e) {
+							interrupt();
 							return;
 						}
 						childNode.setText(currentFeature.getFeature().getProperty().getDisplayName());
@@ -81,8 +82,8 @@ public class AsyncTree extends Thread {
 			}
 			try {
 				parent.setExpanded(true);
-			} catch (Exception e) {
-				AsyncTree.this.interrupt();
+			} catch (final Exception e) {
+				interrupt();
 				return;
 			}
 			dec();
@@ -91,6 +92,7 @@ public class AsyncTree extends Thread {
 	}
 
 	private class Traverser implements Runnable {
+
 		private final TreeItem item;
 		private final IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction;
 
@@ -145,30 +147,28 @@ public class AsyncTree extends Thread {
 			while (true) {
 				currentDisplay.syncExec(runnableList.take());
 			}
-		} catch (InterruptedException e) {
-		}
+		} catch (final InterruptedException e) {}
 	}
 
 	private AsyncTree(HashMap<SelectableFeature, TreeItem> itemMap, final Functional.IFunction<Void, Void> callbackIfDone) {
 		this.itemMap = itemMap;
-		this.currentDisplay = Display.getCurrent();
+		currentDisplay = Display.getCurrent();
 		this.callbackIfDone = callbackIfDone;
 	}
 
 	public static void build(HashMap<SelectableFeature, TreeItem> itemMap, final TreeItem node, final TreeElement[] children,
 			final Functional.IFunction<Void, Void> callbackIfDone) {
 		final AsyncTree curInstance = new AsyncTree(itemMap, callbackIfDone);
-		if (curInstance.currentDisplay != null && !node.isDisposed()) {
+		if ((curInstance.currentDisplay != null) && !node.isDisposed()) {
 			curInstance.runnableList.add(curInstance.new Builder(node, children));
 			curInstance.start();
 		}
 	}
 
 	public static void traverse(HashMap<SelectableFeature, TreeItem> itemMap, final TreeItem node,
-			final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
-			final Functional.IFunction<Void, Void> callbackIfDone) {
+			final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction, final Functional.IFunction<Void, Void> callbackIfDone) {
 		final AsyncTree curInstance = new AsyncTree(itemMap, callbackIfDone);
-		if (curInstance.currentDisplay != null && !node.isDisposed()) {
+		if ((curInstance.currentDisplay != null) && !node.isDisposed()) {
 			curInstance.runnableList.add(curInstance.new Traverser(node, perNodeFunction));
 			curInstance.start();
 		}

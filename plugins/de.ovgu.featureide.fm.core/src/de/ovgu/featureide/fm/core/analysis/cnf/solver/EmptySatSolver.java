@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,23 +34,23 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Sat solver with advanced support.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class EmptySatSolver implements ISatSolver {
 
-	private CNF satInstance;
+	private final CNF satInstance;
 	protected final VecInt assignment;
 
 	public EmptySatSolver(CNF satInstance) throws RuntimeContradictionException {
 		this.satInstance = satInstance;
-		this.assignment = new VecInt(satInstance.getVariables().size());
+		assignment = new VecInt(satInstance.getVariables().size());
 	}
 
 	protected EmptySatSolver(EmptySatSolver oldSolver) {
-		this.satInstance = oldSolver.satInstance;
-		this.assignment = new VecInt(0);
-		oldSolver.assignment.copyTo(this.assignment);
+		satInstance = oldSolver.satInstance;
+		assignment = new VecInt(0);
+		oldSolver.assignment.copyTo(assignment);
 	}
 
 	@Override
@@ -163,32 +163,25 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void setOrder(int[] order) {
-	}
+	public void setOrder(int[] order) {}
 
 	@Override
-	public void setOrderFix() {
-	}
+	public void setOrderFix() {}
 
 	@Override
-	public void shuffleOrder() {
-	}
+	public void shuffleOrder() {}
 
 	@Override
-	public void shuffleOrder(Random rnd) {
-	}
+	public void shuffleOrder(Random rnd) {}
 
 	@Override
-	public void setSelectionStrategy(SelectionStrategy strategy) {
-	}
+	public void setSelectionStrategy(SelectionStrategy strategy) {}
 
 	@Override
-	public void setSelectionStrategy(int[] model, boolean min) {
-	}
+	public void setSelectionStrategy(int[] model, boolean min) {}
 
 	@Override
-	public void useSolutionList(int size) {
-	}
+	public void useSolutionList(int size) {}
 
 	@Override
 	public boolean isGlobalTimeout() {
@@ -196,8 +189,7 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void setGlobalTimeout(boolean globalTimeout) {
-	}
+	public void setGlobalTimeout(boolean globalTimeout) {}
 
 	@Override
 	public IConstr addClause(LiteralSet mainClause) throws RuntimeContradictionException {
@@ -220,16 +212,13 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void removeClause(IConstr constr) {
-	}
+	public void removeClause(IConstr constr) {}
 
 	@Override
-	public void removeLastClause() {
-	}
+	public void removeLastClause() {}
 
 	@Override
-	public void removeLastClauses(int numberOfClauses) {
-	}
+	public void removeLastClauses(int numberOfClauses) {}
 
 	@Override
 	public int[] getSolution() {
@@ -242,8 +231,7 @@ public class EmptySatSolver implements ISatSolver {
 	}
 
 	@Override
-	public void reset() {
-	}
+	public void reset() {}
 
 	@Override
 	public void setTimeout(int timeout) {

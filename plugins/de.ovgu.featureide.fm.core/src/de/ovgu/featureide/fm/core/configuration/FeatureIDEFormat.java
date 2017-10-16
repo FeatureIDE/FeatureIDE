@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,9 +37,8 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects.</br>
- * Lists all features and indicates the manual and automatic selection.
- * 
+ * Extended configuration format for FeatureIDE projects.</br> Lists all features and indicates the manual and automatic selection.
+ *
  * @author Sebastian Krieter
  */
 public class FeatureIDEFormat implements IConfigurationFormat {
@@ -94,7 +93,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 							warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber));
 							break;
 						}
-					} catch (NumberFormatException e) {
+					} catch (final NumberFormatException e) {
 						warnings.add(new Problem(WRONG_CONFIGURATION_FORMAT, lineNumber, e));
 					}
 
@@ -107,17 +106,16 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 						try {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
-						} catch (SelectionNotPossibleException e) {
+						} catch (final SelectionNotPossibleException e) {
 							warnings.add(new Problem(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber, e));
 						}
 					}
 				}
 				lineNumber++;
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			warnings.add(new Problem(e));
-		} finally {
-		}
+		} finally {}
 		return warnings;
 	}
 
@@ -129,7 +127,7 @@ public class FeatureIDEFormat implements IConfigurationFormat {
 		buffer.append("# 0 = deselected, 1 = selected, 2 = undefined");
 		buffer.append(NEWLINE);
 
-		for (SelectableFeature feature : configuration.getFeatures()) {
+		for (final SelectableFeature feature : configuration.getFeatures()) {
 			buffer.append(Integer.toString(getSelectionCode(feature.getManual())));
 			// buffer.append(',');
 			buffer.append(Integer.toString(getSelectionCode(feature.getAutomatic())));

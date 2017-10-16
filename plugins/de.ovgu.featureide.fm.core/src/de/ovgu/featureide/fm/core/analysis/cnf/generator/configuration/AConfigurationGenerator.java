@@ -45,7 +45,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[
 	public AConfigurationGenerator(CNF cnf) {
 		this(cnf, Integer.MAX_VALUE, false);
 	}
-	
+
 	public AConfigurationGenerator(ISatSolver solver) {
 		this(solver, Integer.MAX_VALUE, false);
 	}
@@ -85,7 +85,7 @@ public abstract class AConfigurationGenerator extends AbstractAnalysis<List<int[
 		if (resultQueue != null) {
 			try {
 				resultQueue.put(result);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				Logger.logError(e);
 			}
 		}

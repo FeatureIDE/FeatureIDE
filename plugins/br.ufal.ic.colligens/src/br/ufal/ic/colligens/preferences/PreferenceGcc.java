@@ -10,8 +10,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import br.ufal.ic.colligens.activator.Colligens;
 
-public class PreferenceGcc extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage {
+public class PreferenceGcc extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
 	public static final String ID = Colligens.PLUGIN_ID + ".preferences.PreferenceGcc";
 
 	public PreferenceGcc() {
@@ -23,15 +23,12 @@ public class PreferenceGcc extends FieldEditorPreferencePage implements
 	public void createFieldEditors() {
 
 		addField(new StringFieldEditor("GCC", "Command:", getFieldEditorParent()));
-		
-		addField(new DirectoryFieldEditor("SystemRoot", "&System Root:",
-				getFieldEditorParent()));
 
-		addField(new DirectoryFieldEditor("SystemIncludes",
-				"&System Includes:", getFieldEditorParent()));
+		addField(new DirectoryFieldEditor("SystemRoot", "&System Root:", getFieldEditorParent()));
 
-		addField(new StringFieldEditor("LIBS", "Libs (gcc):",
-				getFieldEditorParent()));
+		addField(new DirectoryFieldEditor("SystemIncludes", "&System Includes:", getFieldEditorParent()));
+
+		addField(new StringFieldEditor("LIBS", "Libs (gcc):", getFieldEditorParent()));
 
 	}
 

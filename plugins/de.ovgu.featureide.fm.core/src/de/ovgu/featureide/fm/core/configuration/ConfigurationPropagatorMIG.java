@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Updates a configuration.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
@@ -61,14 +61,14 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 
 			final CNF rootNode = formula.getCNF();
 			final ArrayList<Integer> manualLiterals = new ArrayList<>();
-			for (SelectableFeature feature : featureOrder) {
-				if (feature.getManual() != Selection.UNDEFINED && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+			for (final SelectableFeature feature : featureOrder) {
+				if ((feature.getManual() != Selection.UNDEFINED) && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					manualLiterals.add(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
 				}
 			}
 			final HashSet<Integer> manualLiteralSet = new HashSet<>(manualLiterals);
-			for (SelectableFeature feature : configuration.features) {
-				if (feature.getManual() != Selection.UNDEFINED && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+			for (final SelectableFeature feature : configuration.features) {
+				if ((feature.getManual() != Selection.UNDEFINED) && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					final Integer l = rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
 					if (manualLiteralSet.add(l)) {
 						manualLiterals.add(l);
@@ -92,14 +92,14 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 				return false;
 			}
 
-			for (int i : impliedFeatures.getLiterals()) {
+			for (final int i : impliedFeatures.getLiterals()) {
 				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
 				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
 				workMonitor.invoke(feature);
 				manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
 			}
 			// only for update of configuration editor
-			for (SelectableFeature feature : configuration.features) {
+			for (final SelectableFeature feature : configuration.features) {
 				if (!manualLiteralSet
 						.contains(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED))) {
 					workMonitor.invoke(feature);
@@ -111,7 +111,7 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 				if (solver == null) {
 					return false;
 				}
-				for (int feature : intLiterals) {
+				for (final int feature : intLiterals) {
 					solver.assignmentPush(feature);
 				}
 
@@ -153,12 +153,12 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagatorMIG}
-	 * 
+	 *
 	 * @param configuration The new configuration object
 	 */
 	ConfigurationPropagatorMIG(ConfigurationPropagatorMIG oldPropagator, Configuration configuration) {
 		super(oldPropagator, configuration);
-		this.graph = oldPropagator.graph;
+		graph = oldPropagator.graph;
 	}
 
 	public ConfigurationPropagatorMIG(FeatureModelFormula formula, ModalImplicationGraph graph, Configuration configuration) {
@@ -180,6 +180,7 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 		return update(false, null);
 	}
 
+	@Override
 	protected ConfigurationPropagatorMIG clone(Configuration configuration) {
 		return new ConfigurationPropagatorMIG(this, configuration);
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 
 /**
  * Represents a propositional constraint below the feature diagram.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ConstraintProperties {
@@ -82,7 +82,7 @@ public class ConstraintProperties {
 	}
 
 	public boolean hasStatus(ConstraintFalseSatisfiabilityStatus constraintFalseSatisfiabilityStatus) {
-		return this.constraintSatisfiabilityStatus == constraintFalseSatisfiabilityStatus;
+		return constraintSatisfiabilityStatus == constraintFalseSatisfiabilityStatus;
 	}
 
 	public Collection<IFeature> getDeadFeatures() {
@@ -142,14 +142,14 @@ public class ConstraintProperties {
 	}
 
 	public void setConstraintSatisfiabilityStatus(ConstraintFalseSatisfiabilityStatus constraintFalseSatisfiabilityStatus) {
-		this.constraintSatisfiabilityStatus = constraintFalseSatisfiabilityStatus;
+		constraintSatisfiabilityStatus = constraintFalseSatisfiabilityStatus;
 	}
 
 	public void resetStatus() {
-		this.constraintRedundancyStatus = ConstraintRedundancyStatus.UNKNOWN;
-		this.constraintDeadStatus = ConstraintDeadStatus.UNKNOWN;
-		this.constraintFalseOptionalStatus = ConstraintFalseOptionalStatus.UNKNOWN;
-		this.constraintSatisfiabilityStatus = ConstraintFalseSatisfiabilityStatus.UNKNOWN;
+		constraintRedundancyStatus = ConstraintRedundancyStatus.UNKNOWN;
+		constraintDeadStatus = ConstraintDeadStatus.UNKNOWN;
+		constraintFalseOptionalStatus = ConstraintFalseOptionalStatus.UNKNOWN;
+		constraintSatisfiabilityStatus = ConstraintFalseSatisfiabilityStatus.UNKNOWN;
 	}
 
 }

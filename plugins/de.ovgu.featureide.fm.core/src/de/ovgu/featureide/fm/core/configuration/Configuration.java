@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,14 +46,14 @@ public class Configuration implements Cloneable {
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
-	 * 
+	 *
 	 * @param configuration The configuration to clone
 	 */
 	protected Configuration(Configuration configuration) {
-		this.featureModel = configuration.featureModel;
-		this.root = initRoot();
+		featureModel = configuration.featureModel;
+		root = initRoot();
 
-		for (SelectableFeature f : configuration.features) {
+		for (final SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
 		}
@@ -61,36 +61,36 @@ public class Configuration implements Cloneable {
 
 	/**
 	 * Copy constructor. Copies the status of a given configuration.
-	 * 
+	 *
 	 * @param configuration the old configuration.
 	 * @param featureModel the underlying feature model. The model can be different from the model of the old configuration.
 	 */
-//	public Configuration(Configuration configuration, IFeatureModel featureModel) {
-//		this.featureModel = featureModel;
-//		this.root = initRoot();
-//
-//		for (SelectableFeature oldFeature : configuration.features) {
-//			final SelectableFeature newFeature = table.get(oldFeature.getName());
-//			if (newFeature != null) {
-//				newFeature.setManual(oldFeature.getManual());
-//			}
-//		}
-//	}
+	// public Configuration(Configuration configuration, IFeatureModel featureModel) {
+	// this.featureModel = featureModel;
+	// this.root = initRoot();
+	//
+	// for (SelectableFeature oldFeature : configuration.features) {
+	// final SelectableFeature newFeature = table.get(oldFeature.getName());
+	// if (newFeature != null) {
+	// newFeature.setManual(oldFeature.getManual());
+	// }
+	// }
+	// }
 
 	public Configuration(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		this.root = initRoot();
+		root = initRoot();
 	}
 
 	public void setFeatureModel(IFeatureModel featureModel) {
-		ArrayList<SelectableFeature> oldFeatures = features;
+		final ArrayList<SelectableFeature> oldFeatures = features;
 		features = new ArrayList<>(oldFeatures.size());
 		table.clear();
 
 		this.featureModel = featureModel;
-		this.root = initRoot();
+		root = initRoot();
 
-		for (SelectableFeature oldFeature : oldFeatures) {
+		for (final SelectableFeature oldFeature : oldFeatures) {
 			final SelectableFeature newFeature = table.get(oldFeature.getName());
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
@@ -100,12 +100,12 @@ public class Configuration implements Cloneable {
 	}
 
 	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
-		if (sFeature != null && sFeature.getName() != null) {
+		if ((sFeature != null) && (sFeature.getName() != null)) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
 
-			for (IFeatureStructure child : feature.getStructure().getChildren()) {
-				SelectableFeature sChild = new SelectableFeature(child.getFeature());
+			for (final IFeatureStructure child : feature.getStructure().getChildren()) {
+				final SelectableFeature sChild = new SelectableFeature(child.getFeature());
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child.getFeature());
 			}
@@ -127,7 +127,7 @@ public class Configuration implements Cloneable {
 	}
 
 	void resetAutomaticValues() {
-		for (SelectableFeature feature : features) {
+		for (final SelectableFeature feature : features) {
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
 	}
@@ -137,7 +137,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void setAutomatic(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
+		final SelectableFeature feature = table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
@@ -154,8 +154,8 @@ public class Configuration implements Cloneable {
 
 	public List<SelectableFeature> getManualFeatures() {
 		final List<SelectableFeature> featureList = new ArrayList<>();
-		for (SelectableFeature selectableFeature : features) {
-			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
+		for (final SelectableFeature selectableFeature : features) {
+			if ((selectableFeature.getAutomatic() == Selection.UNDEFINED) && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
 			}
 		}
@@ -171,8 +171,8 @@ public class Configuration implements Cloneable {
 	}
 
 	public Set<String> getSelectedFeatureNames() {
-		final Set<String> result = new HashSet<String>();
-		for (SelectableFeature feature : features) {
+		final Set<String> result = new HashSet<>();
+		for (final SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getName());
 			}
@@ -193,8 +193,8 @@ public class Configuration implements Cloneable {
 	}
 
 	private List<IFeature> getFeatures(final Selection selection) {
-		final List<IFeature> result = new ArrayList<IFeature>();
-		for (SelectableFeature feature : features) {
+		final List<IFeature> result = new ArrayList<>();
+		for (final SelectableFeature feature : features) {
 			if (feature.getSelection() == selection) {
 				result.add(feature.getFeature());
 			}
@@ -204,15 +204,15 @@ public class Configuration implements Cloneable {
 
 	/**
 	 * Turns all automatic into manual values
-	 * 
+	 *
 	 * @param discardDeselected if {@code true} all automatic deselected features get undefined instead of manual deselected
 	 */
 	public void makeManual(boolean discardDeselected) {
-		for (SelectableFeature feature : features) {
+		for (final SelectableFeature feature : features) {
 			final Selection autoSelection = feature.getAutomatic();
 			if (autoSelection != Selection.UNDEFINED) {
 				feature.setAutomatic(Selection.UNDEFINED);
-				if (!discardDeselected || autoSelection == Selection.SELECTED) {
+				if (!discardDeselected || (autoSelection == Selection.SELECTED)) {
 					feature.setManual(autoSelection);
 				}
 			}
@@ -220,7 +220,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void resetValues() {
-		for (SelectableFeature feature : features) {
+		for (final SelectableFeature feature : features) {
 			feature.setManual(Selection.UNDEFINED);
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
@@ -231,7 +231,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void setManual(String name, Selection selection) {
-		SelectableFeature feature = table.get(name);
+		final SelectableFeature feature = table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
 		}
@@ -240,9 +240,9 @@ public class Configuration implements Cloneable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().getStructure().isConcrete()) {
+		final StringBuilder builder = new StringBuilder();
+		for (final SelectableFeature feature : features) {
+			if ((feature.getSelection() == Selection.SELECTED) && feature.getFeature().getStructure().isConcrete()) {
 				builder.append(feature.getFeature().getName());
 				builder.append("\n");
 			}
@@ -255,7 +255,7 @@ public class Configuration implements Cloneable {
 		if (!this.getClass().equals(Configuration.class)) {
 			try {
 				return (Configuration) super.clone();
-			} catch (CloneNotSupportedException e) {
+			} catch (final CloneNotSupportedException e) {
 				Logger.logError(e);
 				throw new RuntimeException("Cloning is not supported for " + this.getClass());
 			}

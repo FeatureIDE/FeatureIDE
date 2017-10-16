@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * Light version of a sat solver with reduced functionality.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class SimpleSatSolver implements ISimpleSatSolver {
@@ -51,14 +51,14 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	public SimpleSatSolver(CNF satInstance) throws RuntimeContradictionException {
 		this.satInstance = satInstance;
-		this.internalMapping = satInstance.getInternalVariables();
-		this.solver = newSolver();
+		internalMapping = satInstance.getInternalVariables();
+		solver = newSolver();
 	}
 
 	protected SimpleSatSolver(SimpleSatSolver oldSolver) {
-		this.satInstance = oldSolver.satInstance;
-		this.internalMapping = oldSolver.internalMapping;
-		this.solver = newSolver();
+		satInstance = oldSolver.satInstance;
+		internalMapping = oldSolver.internalMapping;
+		solver = newSolver();
 	}
 
 	@Override
@@ -75,18 +75,18 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 		try {
 			assert checkClauseValidity(literals);
 			return solver.addClause(new VecInt(Arrays.copyOfRange(literals, 0, literals.length)));
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			throw new RuntimeContradictionException(e);
 		}
 	}
 
-	//	protected IConstr addClauseInternal(Solver<?> solver, VecInt vec) throws RuntimeContradictionException {
-	//		try {
-	//			return solver.addClause(vec);
-	//		} catch (ContradictionException e) {
-	//			throw new RuntimeContradictionException(e);
-	//		}
-	//	}
+	// protected IConstr addClauseInternal(Solver<?> solver, VecInt vec) throws RuntimeContradictionException {
+	// try {
+	// return solver.addClause(vec);
+	// } catch (ContradictionException e) {
+	// throw new RuntimeContradictionException(e);
+	// }
+	// }
 
 	@Override
 	public List<IConstr> addClauses(Iterable<? extends LiteralSet> clauses) throws RuntimeContradictionException {
@@ -100,7 +100,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 
 	protected List<IConstr> addClauses(Solver<?> solver, Iterable<? extends LiteralSet> clauses, boolean internal) throws RuntimeContradictionException {
 		final ArrayList<IConstr> constrList = new ArrayList<>();
-		for (LiteralSet clause : clauses) {
+		for (final LiteralSet clause : clauses) {
 			constrList.add(addClause(solver, internal ? clause.getLiterals() : internalMapping.convertToInternal(clause.getLiterals())));
 		}
 		return constrList;
@@ -138,7 +138,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
@@ -155,7 +155,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
@@ -184,7 +184,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	private boolean checkClauseValidity(final int[] literals) {
 		for (int i = 0; i < literals.length; i++) {
 			final int l = literals[i];
-			if (l == 0 || Math.abs(l) > satInstance.getVariables().maxVariableID()) {
+			if ((l == 0) || (Math.abs(l) > satInstance.getVariables().maxVariableID())) {
 				return false;
 			}
 		}
@@ -215,8 +215,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 	}
 
 	/**
-	 * Add clauses to the solver.
-	 * Initializes the order instance.
+	 * Add clauses to the solver. Initializes the order instance.
 	 */
 	protected void initSolver(Solver<?> solver) throws RuntimeContradictionException {
 		final int size = satInstance.getVariables().size();
@@ -233,7 +232,7 @@ public class SimpleSatSolver implements ISimpleSatSolver {
 			pseudoClause.push(-1);
 			try {
 				solver.addClause(pseudoClause);
-			} catch (ContradictionException e) {
+			} catch (final ContradictionException e) {
 				throw new RuntimeContradictionException(e);
 			}
 		}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,10 +26,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Thread to run an arbitrary function at a regular time interval.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MonitorThread extends Thread {
+
 	private final Lock lock = new ReentrantLock();
 	private final Condition condition = lock.newCondition();
 	private final Runnable function;
@@ -59,7 +60,7 @@ public class MonitorThread extends Thread {
 				condition.awaitNanos(updateTime);
 				function.run();
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		} finally {
 			lock.unlock();
@@ -77,7 +78,7 @@ public class MonitorThread extends Thread {
 				lock.unlock();
 			}
 			join();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 	}

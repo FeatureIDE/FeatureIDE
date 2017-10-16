@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,20 +33,20 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
  * Abstract class to generater configurations.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class AConfigurationGenerator implements LongRunningMethod<Void> {
+
 	protected IFeatureModel featureModel;
-	
+
 	protected ConfigurationBuilder builder;
-	
+
 	/**
-	 * This is the configuration where the {@link ConfigurationReader} saves the
-	 * read configuration.
+	 * This is the configuration where the {@link ConfigurationReader} saves the read configuration.
 	 */
 	protected Configuration configuration;
-	
+
 	/**
 	 * The count of found configurations.
 	 */
@@ -55,21 +55,21 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 	protected final IFeatureProject featureProject;
 	protected final ConfigurationPropagator configurationPropagator;
 	protected final CNF cnf;
-	
+
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
 		final FeatureModelSnapshot snapshot = featureProject.getFeatureModelManager().getSnapshot();
 		this.builder = builder;
-		this.featureModel = snapshot.getObject();
+		featureModel = snapshot.getObject();
 		this.featureProject = featureProject;
 		configuration = new Configuration(featureModel);
 		configurationPropagator = snapshot.getPropagator(configuration);
 		cnf = snapshot.getFormula().getElement(new NoAbstractCNFCreator());
 	}
-	
+
 	protected void cancelGenerationJobs() {
 		builder.cancelGenerationJobs();
 	}
-	
+
 	protected int maxConfigs() {
 		return (int) builder.configurationNumber;
 	}

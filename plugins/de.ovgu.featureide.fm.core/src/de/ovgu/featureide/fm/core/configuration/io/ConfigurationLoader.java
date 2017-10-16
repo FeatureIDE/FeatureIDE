@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,17 +33,18 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * This class loads all configurations of a given IFeatureModel.
- * 
+ *
  * @author Paul Maximilian Bittner
  * @author Antje Moench
  * @author Sebastian Krieter
  */
 public class ConfigurationLoader {
-	private IConfigurationLoaderCallback callback;
+
+	private final IConfigurationLoaderCallback callback;
 
 	public ConfigurationLoader() {
 		this(null);
@@ -72,31 +73,36 @@ public class ConfigurationLoader {
 	private List<Configuration> loadConfigurations(IFeatureModel featureModel, Path path, Filter<? super Path> filter) {
 		final List<Configuration> configs = new ArrayList<>();
 
-		if (callback != null)
+		if (callback != null) {
 			callback.onLoadingStarted();
-
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
-			for (Path configPath : directoryStream) {
-				Configuration currentConfiguration = new Configuration(featureModel);
-
-				FileHandler.load(configPath, currentConfiguration, ConfigFormatManager.getInstance());
-				configs.add(currentConfiguration);
-				if (callback != null)
-					callback.onConfigurationLoaded(currentConfiguration, configPath);
-			}
-		} catch (IOException e) {
-			Logger.logError(e);
-			if (callback != null)
-				callback.onLoadingError(e);
 		}
 
-		if (callback != null)
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
+			for (final Path configPath : directoryStream) {
+				final Configuration currentConfiguration = new Configuration(featureModel);
+
+				SimpleFileHandler.load(configPath, currentConfiguration, ConfigFormatManager.getInstance());
+				configs.add(currentConfiguration);
+				if (callback != null) {
+					callback.onConfigurationLoaded(currentConfiguration, configPath);
+				}
+			}
+		} catch (final IOException e) {
+			Logger.logError(e);
+			if (callback != null) {
+				callback.onLoadingError(e);
+			}
+		}
+
+		if (callback != null) {
 			callback.onLoadingFinished();
+		}
 
 		return configs;
 	}
 
 	private static final class ConfigFileFilter implements Filter<Path> {
+
 		private final String excludeFile;
 
 		public ConfigFileFilter() {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,20 +39,19 @@ import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
- * Responsible to load and save all information from / to a file.<br/>
- * To get an instance use the {@link FileManagerMap}.
- * 
+ * Responsible to load and save all information from / to a file.<br/> To get an instance use the {@link FileManagerMap}.
+ *
  * @author Sebastian Krieter
  */
 public class FileManager<T> extends AFileManager<T> {
 
 	/**
 	 * Constructs a path for a given file to store additional information.
-	 * 
+	 *
 	 * @param path The path pointing to the file.
 	 * @param format The format for the extra information file.
 	 * @return The path to the extra information file.
-	 * 
+	 *
 	 * @throws IllegalArgumentException If path is empty.
 	 */
 	public static final Path constructExtraPath(Path path, IPersistentFormat<?> format) throws IllegalArgumentException {
@@ -62,13 +61,13 @@ public class FileManager<T> extends AFileManager<T> {
 			final String mainFileNameString = mainFileNamePath.toString();
 			final Path subpath = mainPath.subpath(0, mainPath.getNameCount() - 1);
 			final Path root = mainPath.getRoot();
-			if (subpath != null && root != null) {
+			if ((subpath != null) && (root != null)) {
 				final Path extraFolder = root.resolve(subpath.resolve(".featureide").resolve(mainFileNameString));
 
 				if (!FileSystem.exists(extraFolder)) {
 					try {
 						FileSystem.mkDir(extraFolder);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						Logger.logError(e);
 					}
 				}
@@ -154,7 +153,7 @@ public class FileManager<T> extends AFileManager<T> {
 					lastProblems.addAll(problemList);
 				}
 				changed = !objectCreator.compareObjects(lastReadObject, persistentObject.getObject());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			}
@@ -190,6 +189,7 @@ public class FileManager<T> extends AFileManager<T> {
 	@Override
 	public boolean save() {
 		return externalSave(new ICriticalConsumer<T>() {
+
 			@Override
 			public void invoke(T t) throws IOException {
 				FileSystem.write(path, format.getInstance().write(t).getBytes(SimpleFileHandler.DEFAULT_CHARSET));
@@ -210,7 +210,7 @@ public class FileManager<T> extends AFileManager<T> {
 				final Snapshot<T> tempObject = objectCreator.createSnapshot(variableObject);
 				externalSaveMethod.invoke(tempObject.getObject());
 				persistentObject = tempObject;
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			} finally {

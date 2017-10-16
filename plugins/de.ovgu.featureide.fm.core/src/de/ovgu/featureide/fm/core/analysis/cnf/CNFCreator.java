@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CNFCreator implements LongRunningMethod<CNF> {
@@ -71,7 +71,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 	public CNFCreator(IFeatureModel featureModel, ModelType modelType, boolean useOldNames, boolean optionalRoot) {
 		this.modelType = modelType;
 		this.useOldNames = useOldNames;
-		this.setOptionalRoot(optionalRoot);
+		setOptionalRoot(optionalRoot);
 		this.featureModel = featureModel;
 	}
 
@@ -85,7 +85,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 
 	public CNF createNodes(IMonitor monitor) {
 		if (featureModel == null) {
-			return new CNF(new Variables(Collections.<String> emptyList()));
+			return new CNF(new Variables(Collections.<String>emptyList()));
 		}
 
 		final CNF cnf = new FeatureModelCNF(featureModel, useOldNames);
@@ -164,7 +164,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 
 	private List<LiteralSet> createConstraintNodes(IVariables s) {
 		final List<LiteralSet> clauses = new ArrayList<>(featureModel.getConstraints().size());
-		for (IConstraint constraint : featureModel.getConstraints()) {
+		for (final IConstraint constraint : featureModel.getConstraints()) {
 			final Node node = constraint.getNode();
 			getClauseFromNode(s, clauses, node);
 		}
@@ -175,7 +175,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		final Node cnfNode = Node.buildCNF(node);
 		// final Node cnfNode = node.toCNF();
 		if (cnfNode instanceof And) {
-			for (Node andChild : cnfNode.getChildren()) {
+			for (final Node andChild : cnfNode.getChildren()) {
 				clauses.add(getClause(s, andChild));
 			}
 		} else {
@@ -191,14 +191,14 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 			clauses.add(new LiteralSet(s.getVariable(root.getName())));
 
 			final Iterable<IFeature> features = featureModel.getFeatures();
-			for (IFeature feature : features) {
-				for (IFeatureStructure child : feature.getStructure().getChildren()) {
+			for (final IFeature feature : features) {
+				for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 					clauses.add(new LiteralSet(-s.getVariable(child.getFeature().getName()), s.getVariable(feature.getName())));
 				}
 
 				if (feature.getStructure().hasChildren()) {
 					if (feature.getStructure().isAnd()) {
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							if (child.isMandatory()) {
 								clauses.add(new LiteralSet(s.getVariable(child.getFeature().getName()), -s.getVariable(feature.getName())));
 							}
@@ -206,7 +206,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 					} else if (feature.getStructure().isOr()) {
 						final int[] orLiterals = new int[feature.getStructure().getChildrenCount() + 1];
 						int i = 0;
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							orLiterals[i++] = s.getVariable(child.getFeature().getName());
 						}
 						orLiterals[i] = -s.getVariable(feature.getName());
@@ -214,17 +214,17 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 					} else if (feature.getStructure().isAlternative()) {
 						final int[] alternativeLiterals = new int[feature.getStructure().getChildrenCount() + 1];
 						int i = 0;
-						for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						for (final IFeatureStructure child : feature.getStructure().getChildren()) {
 							alternativeLiterals[i++] = s.getVariable(child.getFeature().getName());
 						}
 						alternativeLiterals[i] = -s.getVariable(feature.getName());
 						clauses.add(new LiteralSet(alternativeLiterals));
 
-						for (ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
+						for (final ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();) {
 							final IFeatureStructure fs = it1.next();
-							for (ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-								clauses.add(new LiteralSet(-s.getVariable(fs.getFeature().getName()),
-										-s.getVariable(((IFeatureStructure) it2.next()).getFeature().getName())));
+							for (final ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2
+									.hasNext();) {
+								clauses.add(new LiteralSet(-s.getVariable(fs.getFeature().getName()), -s.getVariable(it2.next().getFeature().getName())));
 							}
 						}
 					}
@@ -268,7 +268,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 			if (children.length == absoluteValueCount) {
 				throw new RuntimeException("Model is void!");
 			}
-			int[] newChildren = new int[children.length - absoluteValueCount];
+			final int[] newChildren = new int[children.length - absoluteValueCount];
 			int k = 0;
 			for (int j = 0; j < children.length; j++) {
 				final Literal literal = children[j];

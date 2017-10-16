@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,12 +27,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
- * This is a benchmark for analyzes at the {@link IFeatureModel}.
- * The test cases do not analyze the validity of the analyses.
- * 
- * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
- * to avoid that the tests fail for slower computers.
- * 
+ * This is a benchmark for analyzes at the {@link IFeatureModel}. The test cases do not analyze the validity of the analyses.
+ *
+ * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz) to avoid that the tests fail for slower computers.
+ *
  * @author Jens Meinicke
  */
 public class BFeatureModelAnalyzer {
@@ -105,10 +103,10 @@ public class BFeatureModelAnalyzer {
 		analyze(500);
 	}
 
-	//	@Test (timeout=300000) // 75.904s @ i5(3,3GHz)
-	//	public void BAnalyzeFeatureModel1000() {
-	//		analyze(1000);
-	//	}
+	// @Test (timeout=300000) // 75.904s @ i5(3,3GHz)
+	// public void BAnalyzeFeatureModel1000() {
+	// analyze(1000);
+	// }
 
 	/************************************************************
 	 * Analyzes constraints only
@@ -167,7 +165,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateConstraints(500);
 	}
 
-	//	@Test (timeout=140000) //  @ i5(3,3GHz)
+	// @Test (timeout=140000) // @ i5(3,3GHz)
 	public final void BUpdateConstraints1000() {
 		BUpdateConstraints(1000);
 	}

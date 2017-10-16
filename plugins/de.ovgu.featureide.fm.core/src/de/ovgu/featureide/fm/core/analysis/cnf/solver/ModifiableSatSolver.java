@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
  * {@link AdvancedSatSolver} version that supports removing clauses.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ModifiableSatSolver extends AdvancedSatSolver {
@@ -49,10 +49,10 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 		final ArrayList<IConstr> newConstrs = new ArrayList<>();
 
 		try {
-			for (LiteralSet clause : clauses) {
+			for (final LiteralSet clause : clauses) {
 				newConstrs.add(addClause(solver, internal ? clause.getLiterals() : internalMapping.convertToInternal(clause.getLiterals())));
 			}
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			removeLastClauses(newConstrs.size());
 			throw e;
 		}
@@ -72,12 +72,13 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 		if (constr != null) {
 			try {
 				solver.removeConstr(constr);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new RuntimeContradictionException(e);
 			}
 		}
 	}
 
+	@Override
 	public void removeLastClauses(int numberOfClauses) {
 		try {
 			for (int i = 0; i < numberOfClauses; i++) {
@@ -87,11 +88,12 @@ public class ModifiableSatSolver extends AdvancedSatSolver {
 				}
 			}
 			solver.clearLearntClauses();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new RuntimeContradictionException(e);
 		}
 	}
 
+	@Override
 	protected void configureSolver(Solver<?> solver) {
 		solver.setTimeoutMs(1000);
 		solver.setDBSimplificationAllowed(false);

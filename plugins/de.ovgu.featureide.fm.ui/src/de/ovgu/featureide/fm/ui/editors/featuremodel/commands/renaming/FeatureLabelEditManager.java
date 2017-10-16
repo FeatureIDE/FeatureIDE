@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,9 +40,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * Initializes the cell editor for feature renamings and adds a listener to show
- * a tooltip if the current name is not allowed.
- * 
+ * Initializes the cell editor for feature renamings and adds a listener to show a tooltip if the current name is not allowed.
+ *
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -50,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 
-	private IFeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, IFeatureModel featureModel) {
 		super(editpart, editorType, locator);
@@ -67,11 +66,13 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 		cellEditor.setValue(oldValue);
 
 		cellEditor.addListener(new ICellEditorListener() {
+
 			private ToolTip tooltip;
 
+			@Override
 			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
 				closeTooltip();
-				String value = (String) cellEditor.getValue();
+				final String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue)) {
 						createTooltip(IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME + oldValue + " to " + value + ".",
@@ -88,10 +89,12 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 				}
 			}
 
+			@Override
 			public void cancelEditor() {
 				closeTooltip();
 			}
 
+			@Override
 			public void applyEditorValue() {
 				closeTooltip();
 			}

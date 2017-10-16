@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph.V
 
 /**
  * Adjacency list implementation for a feature graph.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class Traverser {
@@ -51,11 +51,11 @@ public class Traverser {
 
 	public Traverser(ModalImplicationGraph graph) {
 		this.graph = graph;
-		this.computationMark = new byte[graph.adjList.size()];
+		computationMark = new byte[graph.adjList.size()];
 	}
 
 	public LiteralSet getStronglyConnected(int... model) {
-		ArrayDeque<Integer> changed = pureStronglyConnected(model);
+		final ArrayDeque<Integer> changed = pureStronglyConnected(model);
 
 		while (!changed.isEmpty()) {
 			traverseWeakNonRec(changed.pop(), changed);
@@ -75,7 +75,7 @@ public class Traverser {
 	}
 
 	public LiteralSet getWeaklyConnected(int... model) {
-		ArrayDeque<Integer> changed = pureStronglyConnected(model);
+		final ArrayDeque<Integer> changed = pureStronglyConnected(model);
 
 		while (!changed.isEmpty()) {
 			traverseWeak(changed.pop(), changed);
@@ -95,7 +95,7 @@ public class Traverser {
 	}
 
 	public LiteralSet getConnected(int... model) {
-		ArrayDeque<Integer> changed = pureStronglyConnected(model);
+		final ArrayDeque<Integer> changed = pureStronglyConnected(model);
 
 		while (!changed.isEmpty()) {
 			traverseWeak(changed.pop(), changed);
@@ -116,7 +116,7 @@ public class Traverser {
 
 	protected ArrayDeque<Integer> pureStronglyConnected(int... model) {
 		Arrays.fill(computationMark, (byte) 0);
-		ArrayDeque<Integer> changed = new ArrayDeque<>();
+		final ArrayDeque<Integer> changed = new ArrayDeque<>();
 		for (int i = 0; i < model.length; i++) {
 			final int var = model[i];
 			if (var != 0) {
@@ -171,11 +171,11 @@ public class Traverser {
 				computationMark[Math.abs(var) - 1] |= var > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT;
 			}
 
-			ArrayDeque<Integer> changed = new ArrayDeque<>();
-			for (int var : definedVars.getLiterals()) {
+			final ArrayDeque<Integer> changed = new ArrayDeque<>();
+			for (final int var : definedVars.getLiterals()) {
 				changed.push(var);
 			}
-			for (int var : definedVars.getLiterals()) {
+			for (final int var : definedVars.getLiterals()) {
 				traverseStrong(var, changed);
 			}
 
@@ -185,7 +185,7 @@ public class Traverser {
 		}
 
 		if (undefinedVars != null) {
-			for (int var : undefinedVars.getLiterals()) {
+			for (final int var : undefinedVars.getLiterals()) {
 				traverseWeakRec(var);
 			}
 		}
@@ -241,7 +241,7 @@ public class Traverser {
 				markStrong(literal, changed);
 				traverseStrong(literal, changed);
 			} else {
-				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+				for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 					traverseWeakRec(iterator.next());
 				}
 			}
@@ -324,9 +324,9 @@ public class Traverser {
 
 	private void traverseWeakRec(int curVar) {
 		final int curIndex = Math.abs(curVar) - 1;
-//		if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
-//			return;
-//		}
+		// if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
+		// return;
+		// }
 
 		final int[] strongEdges;
 		final int[] complexClauses;
@@ -393,7 +393,7 @@ public class Traverser {
 				}
 			}
 
-			for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+			for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 				traverseWeakRec(iterator.next());
 			}
 		}

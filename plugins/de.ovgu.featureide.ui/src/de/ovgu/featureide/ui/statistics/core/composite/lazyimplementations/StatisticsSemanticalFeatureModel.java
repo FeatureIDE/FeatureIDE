@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,7 +39,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
 
 /**
  * Parent for the actual {@link ConfigNode}s.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
@@ -48,7 +48,8 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	private final IFeatureModel model;
 
 	public static class ConfigNode extends Parent {
-		private IFeatureModel innerModel;
+
+		private final IFeatureModel innerModel;
 
 		public ConfigNode(String description, IFeatureModel innerModel) {
 			super(description, "(double-click to calculate)");
@@ -56,21 +57,17 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 		}
 
 		/**
-		 * calculates the number of configurations/variants depending on
-		 * ignoreAbstract. This method should be called by
-		 * {@link TreeClickListener}.
-		 * 
-		 * @param timeout
-		 *            defines how long the SAT-Solver may take to accomplish the
-		 *            task.
-		 * @param priority
-		 *            for the job.
+		 * calculates the number of configurations/variants depending on ignoreAbstract. This method should be called by {@link TreeClickListener}.
+		 *
+		 * @param timeout defines how long the SAT-Solver may take to accomplish the task.
+		 * @param priority for the job.
 		 */
 		public void calculate(final int timeout, final int priority) {
-			LongRunningMethod<Boolean> job = new TreeJob(this) {
+			final LongRunningMethod<Boolean> job = new TreeJob(this) {
+
 				private String calculateConfigs() {
-					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-					if (!ignoreAbstract && FeatureUtils.getConcreteFeatures(innerModel).size() == 0) {
+					final boolean ignoreAbstract = description.equals(DESC_CONFIGS);
+					if (!ignoreAbstract && (FeatureUtils.getConcreteFeatures(innerModel).size() == 0)) {
 						// case: there is no concrete feature so there is only one program variant,
 						// without this the calculation least much to long
 						return "1";
@@ -93,9 +90,9 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 					return false;
 				}
 			};
-			LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + this.description, job);
+			final LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATING + description, job);
 			runner.setPriority(priority);
-			JobDoneListener listener = JobDoneListener.getInstance();
+			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
 				runner.addJobChangeListener(listener);
 			}
@@ -111,7 +108,7 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 	@Override
 	protected void initChildren() {
 
-		Boolean isValid = FeatureModelManager.getAnalyzer(model).isValid();
+		final Boolean isValid = FeatureModelManager.getAnalyzer(model).isValid();
 
 		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
 

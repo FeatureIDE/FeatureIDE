@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,19 +37,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * Allows to move the legend. Also shows feedback if the moving operation is possible or not
- * 
+ *
  * @author Joshua Sprey
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
-	
+
 	private boolean isValidPosition = true;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editpolicies.NonResizableEditPolicy#createDragSourceFeedbackFigure()
 	 */
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-		RectangleFigure r = new RectangleFigure();
+		final RectangleFigure r = new RectangleFigure();
 		r.setLineStyle(Graphics.LINE_DASH);
 		r.setForegroundColor(ColorConstants.black);
 		r.setLineWidth(GUIDefaults.LEGEND_MOVING_FEEDBACK_BORDER_WIDTH);
@@ -65,35 +66,36 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 		return r;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.gef.editpolicies.NonResizableEditPolicy#showChangeBoundsFeedback(org.eclipse.gef.requests.ChangeBoundsRequest)
 	 */
 
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
-		//Get the position where the the user wants to move the legend to
-		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
+		// Get the position where the the user wants to move the legend to
+		final PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
-		//Check that no figure intersects with the new position of the legend 
-		Rectangle newFeedback = new Rectangle(rect.getLocation(), rect.getSize());
+		// Check that no figure intersects with the new position of the legend
+		final Rectangle newFeedback = new Rectangle(rect.getLocation(), rect.getSize());
 		getHostFigure().translateToRelative(newFeedback);
-		List<?> children = getHostFigure().getParent().getChildren();
-		for (Object f : children) {
-			if (f instanceof Figure && !(f instanceof LegendFigure)) {
-				Figure fFigure = (Figure) f;
+		final List<?> children = getHostFigure().getParent().getChildren();
+		for (final Object f : children) {
+			if ((f instanceof Figure) && !(f instanceof LegendFigure)) {
+				final Figure fFigure = (Figure) f;
 				if (newFeedback.intersects(fFigure.getBounds())) {
 					isValidPosition = false;
 				}
 			}
 		}
 
-		//Create new feedback
-		IFigure feedback = getDragSourceFeedbackFigure();
+		// Create new feedback
+		final IFigure feedback = getDragSourceFeedbackFigure();
 		if (feedback instanceof RectangleFigure) {
-			RectangleFigure r = (RectangleFigure) feedback;
+			final RectangleFigure r = (RectangleFigure) feedback;
 			if (isValidPosition) {
 				r.setBackgroundColor(GUIDefaults.LEGEND_MOVING_FEEDBACK_VALID);
 				r.setAlpha(GUIDefaults.LEGEND_MOVING_FEEDBACK_ALPHA);

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,13 +32,12 @@ import org.prop4j.Or;
 
 /**
  * Several methods concerning {@link Node} framework.
- * 
+ *
  * @author Sebastian Krieter
  */
 public final class Nodes {
 
-	private Nodes() {
-	}
+	private Nodes() {}
 
 	public static List<LiteralSet> convert(IVariables satInstance, Node node) {
 		final ArrayList<LiteralSet> clauses = new ArrayList<>();
@@ -49,7 +48,7 @@ public final class Nodes {
 	public static CNF convert(Node node) {
 		final Set<Object> distinctVariableObjects = getDistinctVariableObjects(node);
 		final ArrayList<String> variableList = new ArrayList<>(distinctVariableObjects.size());
-		for (Object varObject : distinctVariableObjects) {
+		for (final Object varObject : distinctVariableObjects) {
 			if (varObject instanceof String) {
 				variableList.add((String) varObject);
 			}
@@ -63,7 +62,7 @@ public final class Nodes {
 		final List<LiteralSet> clauses = satInstance.getClauses();
 		final Or[] nodeClauses = new Or[clauses.size()];
 		int index = 0;
-		for (LiteralSet clause : clauses) {
+		for (final LiteralSet clause : clauses) {
 			nodeClauses[index++] = convert(satInstance.getVariables(), clause);
 		}
 		return new And(nodeClauses);
@@ -81,7 +80,7 @@ public final class Nodes {
 
 	public static Set<Object> getDistinctVariableObjects(Node cnf) {
 		final HashSet<Object> result = new HashSet<>();
-		for (Node clause : cnf.getChildren()) {
+		for (final Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
 			for (int i = 0; i < literals.length; i++) {
 				result.add(((Literal) literals[i]).var);

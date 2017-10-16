@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,14 +38,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * A Wizard Page to select the features from a feature model.
- * 
+ *
  * @author Christoph Giesel
  * @author Sebastian Krieter
  */
 public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	private Tree featuresTree;
-	private HashSet<String> featureNames = new HashSet<String>();
+	private final HashSet<String> featureNames = new HashSet<String>();
 
 	public SelectFeaturesWizardPage() {
 		super("Select Features");
@@ -55,9 +55,9 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
 
-		GridLayout layout = new GridLayout();
+		final GridLayout layout = new GridLayout();
 		container.setLayout(layout);
 		setControl(container);
 
@@ -68,7 +68,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
-					TreeItem item = (TreeItem) e.item;
+					final TreeItem item = (TreeItem) e.item;
 					if (item.getChecked()) {
 						featureNames.add(item.getText());
 					} else {
@@ -84,43 +84,43 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			}
 		});
 
-		Composite buttonGroup = new Composite(container, 0);
+		final Composite buttonGroup = new Composite(container, 0);
 		buttonGroup.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
-		GridLayout gridLayout = new GridLayout();
+		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		buttonGroup.setLayout(gridLayout);
 
-		Button selectAllButton = new Button(buttonGroup, SWT.PUSH);
+		final Button selectAllButton = new Button(buttonGroup, SWT.PUSH);
 		selectAllButton.setText("Select All");
 		selectAllButton.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				checkItems(true);
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
-		Button deselectAllButton = new Button(buttonGroup, SWT.PUSH);
+		final Button deselectAllButton = new Button(buttonGroup, SWT.PUSH);
 		deselectAllButton.setText("Deselect All");
 		deselectAllButton.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				checkItems(false);
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
 		setPageComplete(false);
 	}
 
 	private void checkItems(boolean checkStatus) {
-		TreeItem[] items = featuresTree.getItems();
+		final TreeItem[] items = featuresTree.getItems();
 		for (int i = 0; i < items.length; i++) {
 			check(items[i], checkStatus);
 		}
@@ -134,7 +134,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		} else {
 			featureNames.remove(parent.getText());
 		}
-		TreeItem[] items = parent.getItems();
+		final TreeItem[] items = parent.getItems();
 		for (int i = 0; i < items.length; i++) {
 			check(items[i], checkStatus);
 		}
@@ -145,7 +145,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		if (visible) {
 			featuresTree.setItemCount(0);
 			featureNames.clear();
-			Object featureModel = abstractWizard.getData(WizardConstants.KEY_IN_FEATUREMODEL);
+			final Object featureModel = abstractWizard.getData(WizardConstants.KEY_IN_FEATUREMODEL);
 			if (featureModel != null) {
 				addFeaturesToTree(((IFeatureModel) featureModel).getStructure().getRoot().getFeature());
 			} else {
@@ -158,16 +158,15 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	/**
 	 * Add the feature name as an item to the tree.
-	 * 
-	 * @param root
-	 *            the feature to add
+	 *
+	 * @param root the feature to add
 	 */
 	private void addFeaturesToTree(IFeature root) {
-		TreeItem item = new TreeItem(featuresTree, SWT.NORMAL);
+		final TreeItem item = new TreeItem(featuresTree, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 
-		for (IFeatureStructure feature : root.getStructure().getChildren()) {
+		for (final IFeatureStructure feature : root.getStructure().getChildren()) {
 			addFeaturesToTree(feature.getFeature(), item);
 		}
 		item.setExpanded(true);
@@ -175,20 +174,19 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 
 	/**
 	 * Add the feature name as an item to the tree.
-	 * 
-	 * @param root
-	 *            the feature to add
-	 * @param parent
-	 *            the parent item to add the feature as a child
+	 *
+	 * @param root the feature to add
+	 * @param parent the parent item to add the feature as a child
 	 */
 	private void addFeaturesToTree(IFeature root, TreeItem parent) {
-		TreeItem item = new TreeItem(parent, SWT.NORMAL);
+		final TreeItem item = new TreeItem(parent, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 		item.setExpanded(true);
 
-		for (IFeatureStructure feature : root.getStructure().getChildren())
+		for (final IFeatureStructure feature : root.getStructure().getChildren()) {
 			addFeaturesToTree(feature.getFeature(), item);
+		}
 
 		item.setExpanded(true);
 	}

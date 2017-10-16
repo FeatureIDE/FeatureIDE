@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,14 +31,14 @@ import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
+import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ModifiableSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
-import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds redundancies by removing single constraints.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class RedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
@@ -65,11 +65,12 @@ public class RedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 	protected ISatSolver initSolver(CNF satInstance) {
 		try {
 			return new ModifiableSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
 
+	@Override
 	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
@@ -86,7 +87,7 @@ public class RedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 		}
 
 		final List<IConstr> constrs = new ArrayList<>(clauseList.size());
-		for (LiteralSet clause : clauseList) {
+		for (final LiteralSet clause : clauseList) {
 			constrs.add(solver.addClause(clause));
 		}
 
@@ -94,7 +95,7 @@ public class RedundancyAnalysis extends AClauseAnalysis<List<LiteralSet>> {
 
 		int endIndex = 0;
 		for (int i = 0; i < clauseGroupSize.length; i++) {
-			int startIndex = endIndex;
+			final int startIndex = endIndex;
 			endIndex += clauseGroupSize[i];
 			boolean completelyRedundant = true;
 			boolean removedAtLeastOne = false;

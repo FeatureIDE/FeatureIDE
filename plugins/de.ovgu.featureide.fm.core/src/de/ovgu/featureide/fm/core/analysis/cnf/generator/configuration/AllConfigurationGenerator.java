@@ -64,7 +64,7 @@ public class AllConfigurationGenerator extends AConfigurationGenerator {
 			addResult(solution);
 			try {
 				solver.addClause(new LiteralSet(SatUtils.negateSolution(solution)));
-			} catch (RuntimeContradictionException e) {
+			} catch (final RuntimeContradictionException e) {
 				break;
 			}
 		}

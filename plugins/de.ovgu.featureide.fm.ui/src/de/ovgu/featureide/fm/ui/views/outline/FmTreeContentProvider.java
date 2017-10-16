@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,10 +35,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * This class is part of the outline. It provides the content that should be
- * displayed. Therefore it maps the information provided by the fmProject to the
+ * This class is part of the outline. It provides the content that should be displayed. Therefore it maps the information provided by the fmProject to the
  * methods of the ITreeContentProvider interface.
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
@@ -49,24 +48,24 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null && newInput instanceof IFeatureModel)
+		if ((newInput != null) && (newInput instanceof IFeatureModel)) {
 			fModel = ((IFeatureModel) newInput);
+		}
 
 	}
-	
+
 	public IFeatureModel getFeatureModel() {
 		return fModel;
 	}
-	
+
 	public IGraphicalFeatureModel getGraphicalFeatureModel() {
 		return graphicalFeatureModel;
 	}
-	
+
 	public void setGraphicalFeatureModel(IGraphicalFeatureModel gfm) {
 		graphicalFeatureModel = gfm;
 	}
@@ -74,7 +73,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if (fModel != null && fModel.getStructure().getRoot() != null) {
+		if ((fModel != null) && (fModel.getStructure().getRoot() != null)) {
 			elements = new Object[2];
 			elements[0] = fModel.getStructure().getRoot().getFeature();
 			elements[1] = CONSTRAINTS;
@@ -86,13 +85,14 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement == null)
+		if (parentElement == null) {
 			return null;
+		}
 
 		// we have a String as parent of constraints
-		if (parentElement instanceof String && CONSTRAINTS.equals(parentElement)) {
-			Object[] elements = new Object[fModel.getConstraintCount()];
-			List<IConstraint> cList = fModel.getConstraints();
+		if ((parentElement instanceof String) && CONSTRAINTS.equals(parentElement)) {
+			final Object[] elements = new Object[fModel.getConstraintCount()];
+			final List<IConstraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
 				elements[i] = cList.get(i);
 			}
@@ -102,27 +102,29 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		// we store the group stage into an extra object in order to be able to
 		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
-			
-			return featureListToArray(FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
+
+			return featureListToArray(
+					FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 
-		if (!(parentElement instanceof IFeature))
+		if (!(parentElement instanceof IFeature)) {
 			return null;
-		if (!((IFeature) parentElement).getStructure().hasChildren())
+		}
+		if (!((IFeature) parentElement).getStructure().hasChildren()) {
 			return null;
+		}
 
 		return featureListToArray(FeatureUtils.convertToFeatureList(((IFeature) parentElement).getStructure().getChildren()));
 	}
 
 	/**
 	 * converts a list of Features into an Array
-	 * 
-	 * @param f
-	 *            FeatureList
+	 *
+	 * @param f FeatureList
 	 * @return Array of Features
 	 */
 	private IFeature[] featureListToArray(List<IFeature> f) {
-		IFeature[] fArray = new IFeature[f.size()];
+		final IFeature[] fArray = new IFeature[f.size()];
 		for (int i = 0; i < f.size(); i++) {
 			fArray[i] = f.get(i);
 		}
@@ -131,25 +133,28 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object getParent(Object element) {
-		if (element instanceof IFeature)
+		if (element instanceof IFeature) {
 			return ((IFeature) element).getStructure().getParent();
-		else if (element instanceof IConstraint)
+		} else if (element instanceof IConstraint) {
 			return CONSTRAINTS;
-		else if (element instanceof FmOutlineGroupStateStorage)
+		} else if (element instanceof FmOutlineGroupStateStorage) {
 			return ((FmOutlineGroupStateStorage) element).getFeature();
+		}
 
 		return null;
 	}
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof IFeature)
+		if (element instanceof IFeature) {
 			return ((IFeature) element).getStructure().hasChildren();
-		else if (element instanceof FmOutlineGroupStateStorage)
+		} else if (element instanceof FmOutlineGroupStateStorage) {
 			return true;
-		else if (element instanceof String)
-			if (CONSTRAINTS.equals(element))
+		} else if (element instanceof String) {
+			if (CONSTRAINTS.equals(element)) {
 				return fModel.getConstraintCount() > 0;
+			}
+		}
 
 		return false;
 	}

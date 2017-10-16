@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,11 +35,12 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * Filter to sort the entries in the collaboration outline by their orrurence in the file.
- * 
+ *
  * @author Dominic Labsch
  * @author Daniel P�sche
  */
 public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
+
 	private IFile file;
 	private boolean enabled = false;
 
@@ -53,8 +54,9 @@ public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
+		if ((obj.length > 0) && (obj[0] instanceof RoleElement)) {
 			Arrays.sort(obj, new Comparator<Object>() {
+
 				@Override
 				public int compare(Object o1, Object o2) {
 					final boolean c1 = isNotInCurrentFeature((IRoleElement) o1);
@@ -69,14 +71,13 @@ public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
 		return obj;
 	}
 
-	//check if element is in the current feature
+	// check if element is in the current feature
 	public boolean isNotInCurrentFeature(IRoleElement element) {
-		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
-			if (role.getFile().equals(file)
-					&& ((element instanceof FSTMethod && role.getAllMethods().contains(element))
-							|| (element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element))
-							|| (element instanceof FSTField && role.getAllFields().contains(element)) || (element instanceof FSTClassFragment && role
-							.getAllInnerClasses().contains(element)))) {
+		for (final FSTRole role : element.getRole().getFSTClass().getRoles()) {
+			if (role.getFile().equals(file) && (((element instanceof FSTMethod) && role.getAllMethods().contains(element))
+					|| ((element instanceof FSTInvariant) && role.getClassFragment().getInvariants().contains(element))
+					|| ((element instanceof FSTField) && role.getAllFields().contains(element))
+					|| ((element instanceof FSTClassFragment) && role.getAllInnerClasses().contains(element)))) {
 
 				return false;
 			}

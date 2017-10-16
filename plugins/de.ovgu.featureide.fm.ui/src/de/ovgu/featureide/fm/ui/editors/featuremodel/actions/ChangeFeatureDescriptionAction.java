@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
 /**
  * Opens dialog to change the description of a feature
- * 
+ *
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
@@ -47,10 +47,10 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			description = feature.getProperty().getDescription();
 			description = description.trim();
 		}
-		ChangeFeatureDescriptionDialog dialog = new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_
-				+ feature.getName() + "'", description);
+		final ChangeFeatureDescriptionDialog dialog =
+				new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_ + feature.getName() + "'", description);
 		dialog.open();
-		String descriptemp = dialog.getValue();
+		final String descriptemp = dialog.getValue();
 
 		if (!description.equals(descriptemp.trim())) {
 			feature.getProperty().setDescription(descriptemp);

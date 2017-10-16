@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -38,7 +38,7 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
  * Generates all current configurations in the config folder.
- * 
+ *
  * @author Jens Meinicke
  */
 public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
@@ -56,13 +56,13 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IMonitor monitor) {
 		try {
-			for (IResource configuration : featureProject.getConfigFolder().members()) {
+			for (final IResource configuration : featureProject.getConfigFolder().members()) {
 				if (confs >= maxConfigs()) {
 					break;
 				}
 				try {
 					monitor.checkCancel();
-				} catch (MethodCancelException e) {
+				} catch (final MethodCancelException e) {
 					builder.finish();
 					return;
 				}
@@ -71,49 +71,45 @@ public class CurrentConfigurationsGenerator extends AConfigurationGenerator {
 					confs++;
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
-	 * Builds the given configuration file into the folder for current
-	 * configurations.
-	 * 
-	 * @param configuration
-	 *            The configuration file
+	 * Builds the given configuration file into the folder for current configurations.
+	 *
+	 * @param configuration The configuration file
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IMonitor monitor) {
-		FileHandler.load(Paths.get(configuration.getLocationURI()), this.configuration, ConfigFormatManager.getInstance());
+		SimpleFileHandler.load(Paths.get(configuration.getLocationURI()), this.configuration, ConfigFormatManager.getInstance());
 		builder.addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
 	}
 
 	/**
-	 * @param res
-	 *            A file.
+	 * @param res A file.
 	 * @return <code>true</code> if the given file is a configuration file
 	 */
 	private boolean isConfiguration(IResource res) {
-		return res instanceof IFile && ConfigFormatManager.getInstance().hasFormat(res.getName());
+		return (res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(res.getName());
 	}
 
 	/**
 	 * Counts the configurations at the given folder.
-	 * 
-	 * @param configFolder
-	 *            The folder
+	 *
+	 * @param configFolder The folder
 	 * @return Number of configuration files
 	 */
 	private int countConfigurations(IFolder configFolder) {
 		int i = 0;
 		try {
-			for (IResource res : configFolder.members()) {
+			for (final IResource res : configFolder.members()) {
 				if (isConfiguration(res)) {
 					i++;
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 		return i;

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,34 +33,32 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
- * An instance of this class represents the graphical representation of the 
- * Class with in the Collaboration Diagram.
- * 
+ * An instance of this class represents the graphical representation of the Class with in the Collaboration Diagram.
+ *
  * @author Constanze Adler
  */
 public class ClassFigure extends Figure implements GUIDefaults {
-	
+
 	private final Label label = new Label();
-	private int height;
+	private final int height;
 
-	
 	public ClassFigure(FSTClass c, int height) {
-		
-		super();
-		
-		this.setLayoutManager(new FreeformLayout());
 
-		IFile editorFile = CollaborationModelBuilder.editorFile;
-		
-		if (editorFile != null && c.getName().equals(editorFile.getName())) {
+		super();
+
+		setLayoutManager(new FreeformLayout());
+
+		final IFile editorFile = CollaborationModelBuilder.editorFile;
+
+		if ((editorFile != null) && c.getName().equals(editorFile.getName())) {
 			setBackgroundColor(OPEN_CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER_SELECTED);
 		} else {
 			setBackgroundColor(CLASS_BACKGROUND);
 			setBorder(CLASS_BORDER);
-	
+
 		}
-		
+
 		label.setForegroundColor(FOREGROUND);
 		label.setFont(DEFAULT_FONT);
 		label.setLocation(new Point(CLASS_INSETS.left, CLASS_INSETS.top));
@@ -68,35 +66,37 @@ public class ClassFigure extends Figure implements GUIDefaults {
 
 		String name = c.getName();
 		if (name.contains("/")) {
-			name = name.substring(name.lastIndexOf("/")+1,name.length());
+			name = name.substring(name.lastIndexOf("/") + 1, name.length());
 		}
-		this.setName(name);
-		
+		setName(name);
+
 		this.add(label);
-		this.setOpaque(false);
-			
+		setOpaque(false);
+
 	}
-	
-	private void setName(String name){
+
+	private void setName(String name) {
 		label.setText(name);
-		Dimension labelSize = label.getPreferredSize();
-		
-		if (labelSize.width < DEFAULT_CLASS_WIDTH)
+		final Dimension labelSize = label.getPreferredSize();
+
+		if (labelSize.width < DEFAULT_CLASS_WIDTH) {
 			labelSize.width = DEFAULT_CLASS_WIDTH;
-		
-		if (labelSize.equals(label.getSize()))
+		}
+
+		if (labelSize.equals(label.getSize())) {
 			return;
-		
+		}
+
 		label.setSize(labelSize);
 
-		Rectangle bounds = getBounds();
-		int w = CLASS_INSETS.getWidth();
-		
+		final Rectangle bounds = getBounds();
+		final int w = CLASS_INSETS.getWidth();
+
 		bounds.setSize(labelSize.expand(w, height));
 
-		Dimension oldSize = getSize();
+		final Dimension oldSize = getSize();
 		if (!oldSize.equals(0, 0)) {
-			int dx = (oldSize.width - bounds.width) / 2;
+			final int dx = (oldSize.width - bounds.width) / 2;
 			bounds.x += dx;
 		}
 		setBounds(bounds);

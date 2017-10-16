@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,12 +43,13 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds certain solutions of propositional formulas.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<LiteralSet>> {
 
 	public static class Configuration {
+
 		private static final double minBackJumpingDelta = 0.0;
 
 		private IConstr blockingClauseConstraint = null;
@@ -176,7 +177,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 	public PairWiseConfigurationGenerator(CNF satInstance, int maxNumber) {
 		super(satInstance);
 		this.maxNumber = maxNumber;
-		this.numVariables = this.solver.getSatInstance().getVariables().size();
+		numVariables = solver.getSatInstance().getVariables().size();
 	}
 
 	@Override
@@ -235,7 +236,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 
 			countLoops = featureIndexArray.length;
 			int prio = 0;
-			for (FeatureIndex featureIndex : featureIndexArray) {
+			for (final FeatureIndex featureIndex : featureIndexArray) {
 				featureIndex.setPriority(prio++);
 			}
 			Arrays.sort(featureIndexArray);
@@ -249,9 +250,9 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 				bLoop: for (int y = 0; y < x; y++) {
 					final FeatureIndex featureIndexB = featureIndexArray[y];
 					final int b = featureIndexB.getIndex();
-					final int index = a * numVariables + b;
+					final int index = (a * numVariables) + b;
 					final byte curCombo = (combinations2[index]);
-					if (curCombo == 15 || featuresUsed[b]) {
+					if ((curCombo == 15) || featuresUsed[b]) {
 						continue;
 					}
 
@@ -295,7 +296,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 	public List<LiteralSet> getConfigurations() {
 		clearTempConfigurations();
 		final ArrayList<LiteralSet> ret = new ArrayList<>(finalConfigurationList.size());
-		for (Configuration model : finalConfigurationList) {
+		for (final Configuration model : finalConfigurationList) {
 			ret.add(new LiteralSet(model.getModel()));
 		}
 		return ret;
@@ -423,8 +424,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 
 		final int indexX = Math.abs(mx0) - 1;
 		final int indexY = Math.abs(my0) - 1;
-		final int combinationIndexXY = indexX * numVariables + indexY;
-		final int combinationIndexYX = indexY * numVariables + indexX;
+		final int combinationIndexXY = (indexX * numVariables) + indexY;
+		final int combinationIndexYX = (indexY * numVariables) + indexX;
 
 		if (mx0 > 0) {
 			if (my0 > 0) {
@@ -451,8 +452,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 		if (indexX == indexY) {
 			return false;
 		}
-		final int combinationIndexXY = indexX * numVariables + indexY;
-		final int combinationIndexYX = indexY * numVariables + indexX;
+		final int combinationIndexXY = (indexX * numVariables) + indexY;
+		final int combinationIndexYX = (indexY * numVariables) + indexX;
 
 		final byte oldXY = combinations[combinationIndexXY];
 		final byte oldYX = combinations[combinationIndexYX];
@@ -475,7 +476,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 			}
 		}
 
-		return oldXY != combinations[combinationIndexXY] || oldYX != combinations[combinationIndexYX];
+		return (oldXY != combinations[combinationIndexXY]) || (oldYX != combinations[combinationIndexYX]);
 	}
 
 	protected void clearTempConfigurations() {
@@ -572,7 +573,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 			combinations = new byte[numVariables * numVariables];
 			combinations2 = new byte[numVariables * numVariables];
 
-			outer: for (LiteralSet clause : solver.getSatInstance().getClauses()) {
+			outer: for (final LiteralSet clause : solver.getSatInstance().getClauses()) {
 				final int[] literals = clause.getLiterals();
 				int childrenCount = literals.length;
 				for (int i = 0; i < literals.length; i++) {
@@ -603,8 +604,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 						final int x = Math.abs(var) - 1;
 						for (int j = i + 1; j < childrenCount; j++) {
 							final int y = Math.abs(literals[j]) - 1;
-							combinations[x * numVariables + y] |= BIT_CHECK;
-							combinations[y * numVariables + x] |= BIT_CHECK;
+							combinations[(x * numVariables) + y] |= BIT_CHECK;
+							combinations[(y * numVariables) + x] |= BIT_CHECK;
 						}
 					}
 				}
@@ -616,12 +617,12 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 				incomplete = false;
 				for (int x1 = 0; x1 < model1Copy.length; x1++) {
 					for (int y1 = 0; y1 < model1Copy.length; y1++) {
-						final int combinationIndexX1Y1 = x1 * numVariables + y1;
+						final int combinationIndexX1Y1 = (x1 * numVariables) + y1;
 						if ((combinations[combinationIndexX1Y1] & BIT_CHECK) != 0) {
 							for (int x2 = 0; x2 < model1Copy.length; x2++) {
-								final int combinationIndexY1X2 = y1 * numVariables + x2;
+								final int combinationIndexY1X2 = (y1 * numVariables) + x2;
 								if ((combinations[combinationIndexY1X2] & BIT_CHECK) != 0) {
-									final int combinationIndexX1X2 = x1 * numVariables + x2;
+									final int combinationIndexX1X2 = (x1 * numVariables) + x2;
 									if ((combinations[combinationIndexX1X2] & BIT_CHECK) == 0) {
 										combinations[combinationIndexX1X2] |= BIT_CHECK;
 										incomplete = true;
@@ -796,12 +797,12 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 
 		try {
 			solver.addClause(new LiteralSet(curModel).negate());
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return true;
 		}
 
 		// Statistic numbers
-		int absUncovered = printStatisticNumbers(config);
+		final int absUncovered = printStatisticNumbers(config);
 
 		finalCount = Math.max(finalCount, count - maxBackJumping);
 		if (absUncovered <= 0) {
@@ -812,13 +813,13 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 
 	@SuppressWarnings("unused")
 	protected void printCount() {
-		if (VERBOSE && --countLoops % 100 == 0) {
+		if (VERBOSE && ((--countLoops % 100) == 0)) {
 			System.out.println("\t" + (countLoops / 100));
 		}
 	}
 
 	protected int printStatisticNumbers(final Configuration config) {
-		int absUncovered = combinationCount - config.getTotalCoverage();
+		final int absUncovered = combinationCount - config.getTotalCoverage();
 		double relDelta = (double) (config.getDeltaCoverage()) / combinationCount;
 		double relTotal = (double) (config.getTotalCoverage()) / combinationCount;
 		relDelta = Math.floor(relDelta * 100000.0) / 1000.0;
@@ -837,8 +838,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 		final int sigA = (int) Math.signum(sa);
 		final int sigB = (int) Math.signum(sb);
 
-		if (varStatus[0] != -sigA && varStatus[1] != -sigB) {
-			if (varStatus[0] == sigA && varStatus[1] == sigB) {
+		if ((varStatus[0] != -sigA) && (varStatus[1] != -sigB)) {
+			if ((varStatus[0] == sigA) && (varStatus[1] == sigB)) {
 				fix(featuresUsed, a, b);
 				return true;
 			}
@@ -898,11 +899,11 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 		final boolean positive = mx1 > 0;
 		final byte compareB = (byte) (positive ? 1 : 2);
 
-		if (core[i] == 0 && (recArray[i] & compareB) == 0) {
+		if ((core[i] == 0) && ((recArray[i] & compareB) == 0)) {
 			recArray[i] |= compareB;
 
 			int[] xModel1 = null;
-			for (int[] solution : solver.getSolutionList()) {
+			for (final int[] solution : solver.getSolutionList()) {
 				if (mx1 == solution[i]) {
 					xModel1 = solution;
 					break;
@@ -919,10 +920,11 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
 				final byte b = combinations[rowIndex + j];
-				if (core[j] == 0 && (b & BIT_CHECK) != 0 && ((positive && (b & BITS_POSITIVE_IMPLY) == 0) || (!positive && (b & BITS_NEGATIVE_IMPLY) == 0))) {
+				if ((core[j] == 0) && ((b & BIT_CHECK) != 0)
+						&& ((positive && ((b & BITS_POSITIVE_IMPLY) == 0)) || (!positive && ((b & BITS_NEGATIVE_IMPLY) == 0)))) {
 
 					final int my1 = xModel1[j];
-					for (int[] solution : solver.getSolutionList()) {
+					for (final int[] solution : solver.getSolutionList()) {
 						final int mxI = solution[i];
 						final int myI = solution[j];
 						if ((mx1 == mxI) && (my1 != myI)) {
@@ -931,11 +933,11 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 					}
 
 					solver.assignmentPush(-my1);
-					solver.setSelectionStrategy((c++ % 2 != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
+					solver.setSelectionStrategy(((c++ % 2) != 0) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE);
 
 					switch (solver.hasSolution()) {
 					case FALSE:
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							addRelation(mx0, my1);
 						}
 						parentStack.push(my1);
@@ -966,13 +968,13 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 		final boolean positive = mx1 > 0;
 		final byte compareB = (byte) (positive ? 1 : 2);
 
-		if (core[i] == 0 && (recArray[i] & compareB) == 0) {
+		if ((core[i] == 0) && ((recArray[i] & compareB) == 0)) {
 			recArray[i] |= compareB;
 
 			final int rowIndex = i * numVariables;
 
 			for (int j = 0; j < numVariables; j++) {
-				if (i != j && core[j] == 0) {
+				if ((i != j) && (core[j] == 0)) {
 					final byte b = combinations[rowIndex + j];
 					int my1 = 0;
 					if (positive) {
@@ -989,7 +991,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 						}
 					}
 					if (my1 != 0) {
-						for (int mx0 : parentStack) {
+						for (final int mx0 : parentStack) {
 							if (addRelation2(mx0, my1)) {
 								changed = true;
 							}

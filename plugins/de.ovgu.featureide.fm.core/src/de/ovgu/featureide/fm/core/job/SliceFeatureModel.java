@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Create mpl interfaces.
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -61,7 +61,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	private final Collection<String> featureNames;
 
 	public SliceFeatureModel(IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
-		this.formula = FeatureModelManager.getInstance(featuremodel).getSnapshot().getFormula();
+		formula = FeatureModelManager.getInstance(featuremodel).getSnapshot().getFormula();
 		this.featureNames = featureNames;
 		this.considerConstraints = considerConstraints;
 	}
@@ -93,19 +93,19 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		monitor.setRemainingWork(2);
 		final IFeatureModel m = orgFeatureModel.clone();
 		// mark features
-		for (IFeature feat : m.getFeatures()) {
+		for (final IFeature feat : m.getFeatures()) {
 			if (!selectedFeatureNames.contains(feat.getName())) {
 				feat.setName(MARK1);
 			}
 		}
 
-		IFeature root = m.getStructure().getRoot().getFeature();
+		final IFeature root = m.getStructure().getRoot().getFeature();
 
 		m.getStructure().setRoot(null);
 		m.reset();
 
 		// set new abstract root
-		IFeature nroot = factory.createFeature(m, "__root__");
+		final IFeature nroot = factory.createFeature(m, "__root__");
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -120,12 +120,12 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		monitor.step();
 
 		int count = 0;
-		Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
-		LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
+		final Hashtable<String, IFeature> featureTable = new Hashtable<>();
+		final LinkedList<IFeature> featureStack = new LinkedList<>();
 		featureStack.push(nroot);
 		while (!featureStack.isEmpty()) {
-			IFeature curFeature = featureStack.pop();
-			for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
+			final IFeature curFeature = featureStack.pop();
+			for (final IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
@@ -139,10 +139,10 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 		if (considerConstraints) {
 			final ArrayList<IConstraint> innerConstraintList = new ArrayList<>();
-			for (IConstraint constaint : orgFeatureModel.getConstraints()) {
+			for (final IConstraint constaint : orgFeatureModel.getConstraints()) {
 				final Collection<IFeature> containedFeatures = constaint.getContainedFeatures();
 				boolean containsAllfeatures = !containedFeatures.isEmpty();
-				for (IFeature feature : containedFeatures) {
+				for (final IFeature feature : containedFeatures) {
 					if (!selectedFeatureNames.contains(feature.getName())) {
 						containsAllfeatures = false;
 						break;
@@ -152,7 +152,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 					innerConstraintList.add(constaint);
 				}
 			}
-			for (IConstraint constraint : innerConstraintList) {
+			for (final IConstraint constraint : innerConstraintList) {
 				m.addConstraint(constraint.clone(m));
 			}
 		}
@@ -163,30 +163,30 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 
 	private boolean cut(final IFeature curFeature) {
 		final IFeatureStructure structure = curFeature.getStructure();
-		boolean notSelected = curFeature.getName().equals(MARK1);
+		final boolean notSelected = curFeature.getName().equals(MARK1);
 
-		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
+		final List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
 		if (list.isEmpty()) {
 			return notSelected;
 		} else {
-			boolean[] remove = new boolean[list.size()];
+			final boolean[] remove = new boolean[list.size()];
 			int removeCount = 0;
 
 			int i = 0;
-			for (IFeature child : list) {
+			for (final IFeature child : list) {
 				remove[i++] = cut(child);
 			}
 
 			// remove children
-			Iterator<IFeature> it = list.iterator();
+			final Iterator<IFeature> it = list.iterator();
 			for (i = 0; i < remove.length; i++) {
-				IFeature feat = it.next();
+				final IFeature feat = it.next();
 				if (remove[i]) {
 					it.remove();
 					feat.getStructure().getParent().removeChild(feat.getStructure());
 					feat.getStructure().setParent(null);
 					removeCount++;
-					//    				changed = true;
+					// changed = true;
 				}
 			}
 			if (list.isEmpty()) {
@@ -197,12 +197,12 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				case GROUP_OR:
 					if (removeCount > 0) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(false);
 						}
 					} else if (list.size() == 1) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(true);
 						}
 					}
@@ -211,15 +211,15 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 					if (removeCount > 0) {
 						if (list.size() == 1) {
 							structure.setAnd();
-							for (IFeature child : list) {
+							for (final IFeature child : list) {
 								child.getStructure().setMandatory(false);
 							}
 						} else {
 							final IFeatureModel featureModel = curFeature.getFeatureModel();
-							IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
+							final IFeature pseudoAlternative = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, MARK2);
 							pseudoAlternative.getStructure().setMandatory(false);
 							pseudoAlternative.getStructure().setAlternative();
-							for (IFeature child : list) {
+							for (final IFeature child : list) {
 								pseudoAlternative.getStructure().addChild(child.getStructure());
 								structure.removeChild(child.getStructure());
 							}
@@ -229,7 +229,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 						}
 					} else if (list.size() == 1) {
 						structure.setAnd();
-						for (IFeature child : list) {
+						for (final IFeature child : list) {
 							child.getStructure().setMandatory(true);
 						}
 					}
@@ -241,11 +241,11 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 	}
 
 	private void deleteFeature(IFeatureStructure curFeature) {
-		IFeatureStructure parent = curFeature.getParent();
-		List<IFeatureStructure> children = curFeature.getChildren();
+		final IFeatureStructure parent = curFeature.getParent();
+		final List<IFeatureStructure> children = curFeature.getChildren();
 		parent.removeChild(curFeature);
 		changed = true;
-		for (IFeatureStructure child : children) {
+		for (final IFeatureStructure child : children) {
 			parent.addChild(child);
 		}
 		children.clear();// XXX code smell
@@ -272,7 +272,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 		final SimpleSatSolver s = new SimpleSatSolver(CNFCreator.createNodes(m));
 		monitor.step();
 
-		for (LiteralSet clause : children) {
+		for (final LiteralSet clause : children) {
 			switch (s.hasSolution(clause.negate().getLiterals())) {
 			case FALSE:
 				break;
@@ -292,20 +292,20 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 			return;
 		}
 		int curFeatureGroup = getGroup(curFeature);
-		LinkedList<IFeatureStructure> list = new LinkedList<>(curFeature.getChildren());
+		final LinkedList<IFeatureStructure> list = new LinkedList<>(curFeature.getChildren());
 		try {
-			for (IFeatureStructure child : list) {
+			for (final IFeatureStructure child : list) {
 				merge(child, curFeatureGroup);
 				curFeatureGroup = getGroup(curFeature);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 
 		if (curFeature.getFeature().getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
-				if (parentGroup == GROUP_AND && !curFeature.isMandatory()) {
-					for (IFeatureStructure feature : curFeature.getChildren()) {
+				if ((parentGroup == GROUP_AND) && !curFeature.isMandatory()) {
+					for (final IFeatureStructure feature : curFeature.getChildren()) {
 						feature.setMandatory(false);
 					}
 				}
@@ -313,7 +313,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					IFeatureStructure parent = curFeature.getParent();
+					final IFeatureStructure parent = curFeature.getParent();
 					if (parent.getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
 						case GROUP_OR:
@@ -329,7 +329,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 				case GROUP_OR:
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional = true;
-						for (IFeatureStructure child : list) {
+						for (final IFeatureStructure child : list) {
 							if (child.isMandatory()) {
 								allOptional = false;
 								break;
@@ -341,7 +341,7 @@ public class SliceFeatureModel implements LongRunningMethod<IFeatureModel> {
 					}
 					break;
 				case GROUP_ALT:
-					if (curFeatureGroup == GROUP_AND && list.size() == 1) {
+					if ((curFeatureGroup == GROUP_AND) && (list.size() == 1)) {
 						deleteFeature(curFeature);
 					}
 					break;

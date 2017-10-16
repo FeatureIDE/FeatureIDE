@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,18 +37,15 @@ import org.junit.runners.Parameterized.Parameters;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Creates configurations where false optional features are unused.
- * 
+ *
  * @author Jens Meinicke
  */
 @RunWith(Parameterized.class)
@@ -64,19 +61,19 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
-		this.failureMessage = "(" + s + ")";
+		failureMessage = "(" + s + ")";
 
 	}
 
 	@Parameters
 	public static Collection<Object[]> getModels() throws FileNotFoundException, UnsupportedModelException {
-		//first tries the location on build server, if this fails tries to use local location
+		// first tries the location on build server, if this fails tries to use local location
 		if (!MODEL_FILE_FOLDER.canRead()) {
 			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("models").getPath());
 		}
-		Collection<Object[]> params = new ArrayList<>();
+		final Collection<Object[]> params = new ArrayList<>();
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
-			Object[] models = new Object[2];
+			final Object[] models = new Object[2];
 
 			final IFeatureModel fm = FeatureModelManager.load(f.toPath());
 			models[0] = fm;
@@ -88,7 +85,8 @@ public class QuickFixFalseOptionalFeaturesTest {
 	}
 
 	private final static FileFilter getFileFilter(final String s) {
-		FileFilter filter = new FileFilter() {
+		final FileFilter filter = new FileFilter() {
+
 			@Override
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(s);
@@ -103,7 +101,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		final Collection<IFeature> core = FeatureModelManager.getAnalyzer(fm).getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 
-		for (IFeature feature : concrete) {
+		for (final IFeature feature : concrete) {
 			if (!core.contains(feature)) {
 				falseOptionalFeatures.add(feature.getName());
 			}
@@ -113,7 +111,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
 		for (final Configuration conf : confs) {
 			for (final SelectableFeature feature : conf.getFeatures()) {
-				if (feature.getSelection() == Selection.UNDEFINED || feature.getSelection() == Selection.UNSELECTED) {
+				if ((feature.getSelection() == Selection.UNDEFINED) || (feature.getSelection() == Selection.UNSELECTED)) {
 					falseOptionalFeaturesTest.remove(feature.getName());
 				}
 			}

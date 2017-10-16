@@ -73,7 +73,7 @@ public class RandomConfigurationGenerator extends AConfigurationGenerator {
 			if (!allowDuplicates) {
 				try {
 					solver.addClause(new LiteralSet(SatUtils.negateSolution(solution)));
-				} catch (RuntimeContradictionException e) {
+				} catch (final RuntimeContradictionException e) {
 					break;
 				}
 			}

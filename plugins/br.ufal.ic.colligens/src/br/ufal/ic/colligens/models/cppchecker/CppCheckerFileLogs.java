@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 
 public class CppCheckerFileLogs {
+
 	private final IFile file;
 	private final Collection<CppCheckerLog> logs;
 

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -53,14 +53,14 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
 /**
  * A Wizard to create a new Feature Model file.
- * 
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */
@@ -72,12 +72,13 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 	private NewFeatureModelWizardPage page;
 	private IProject project = null;
 
+	@Override
 	public boolean performFinish() {
 		final IPath fullFilePath = new Path(page.fileName.getText());
 
-		if (project == null || !createRelativeFile(fullFilePath, project)) {
+		if ((project == null) || !createRelativeFile(fullFilePath, project)) {
 			boolean foundParent = false;
-			for (IProject otherProject : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+			for (final IProject otherProject : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 				if (createRelativeFile(fullFilePath, otherProject)) {
 					foundParent = true;
 					break;
@@ -89,12 +90,12 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				final String filePathString = fullFilePath.toOSString();
 				try {
 					featureModel = FMFactoryManager.getFactory(filePathString, format).createFeatureModel();
-				} catch (NoSuchExtensionException e) {
+				} catch (final NoSuchExtensionException e) {
 					Logger.logError(e);
 					featureModel = FMFactoryManager.getEmptyFeatureModel();
 				}
 				featureModel.createDefaultValues("");
-				FileHandler.save(Paths.get(filePathString), featureModel, format);
+				SimpleFileHandler.save(Paths.get(filePathString), featureModel, format);
 			}
 		}
 		assert (fullFilePath.toFile().exists()) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
@@ -102,12 +103,12 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 	}
 
 	private void open(IFile file) {
-		IWorkbenchWindow dw = FMUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage page = dw.getActivePage();
+		final IWorkbenchWindow dw = FMUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
+		final IWorkbenchPage page = dw.getActivePage();
 		if (page != null) {
 			IContentType contentType = null;
 			try {
-				IContentDescription description = file.getContentDescription();
+				final IContentDescription description = file.getContentDescription();
 				if (description != null) {
 					contentType = description.getContentType();
 				}
@@ -120,7 +121,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				if (desc != null) {
 					page.openEditor(new FileEditorInput(file), desc.getId());
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
@@ -136,14 +137,14 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 			IFeatureModelFactory factory;
 			try {
 				factory = FMFactoryManager.getFactory(path.toString(), format);
-			} catch (NoSuchExtensionException e) {
+			} catch (final NoSuchExtensionException e) {
 				Logger.logError(e);
 				factory = FMFactoryManager.getDefaultFactory();
 			}
 			final IFeatureModel featureModel = factory.createFeatureModel();
 			featureModel.createDefaultValues("");
 			FMComposerManager.getFMComposerExtension(file.getProject());
-			
+
 			FeatureModelManager.save(featureModel, path);
 
 			open(file);

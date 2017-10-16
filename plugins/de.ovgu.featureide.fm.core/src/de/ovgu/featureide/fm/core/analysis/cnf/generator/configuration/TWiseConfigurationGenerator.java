@@ -80,6 +80,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 	private int dpNumber, acNumber;
 
 	protected final MonitorThread monitorThread = new MonitorThread(new Runnable() {
+
 		@Override
 		public void run() {
 			final double percent = 1 - (((double) count) / numberOfCombinations);
@@ -128,7 +129,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 
 	protected Iterator<int[]> getIterator(int t) {
 		return new LexicographicIterator(t, nodeArray.length);
-		//				return new ChaseIterator(t, nodeArray.length);
+		// return new ChaseIterator(t, nodeArray.length);
 	}
 
 	protected void init() {
@@ -147,14 +148,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 			if (!coreDeadFeature.isEmpty()) {
 				final ArrayList<LiteralSet> newNodeList = new ArrayList<>();
 				for (final LiteralSet literalSet : nodeArray) {
-					if (literalSet.countConflicts(coreDeadFeature) == 0 && !coreDeadFeature.containsAll(literalSet)) {
+					if ((literalSet.countConflicts(coreDeadFeature) == 0) && !coreDeadFeature.containsAll(literalSet)) {
 						newNodeList.add(literalSet);
 					}
 				}
 				nodeArray = newNodeList.toArray(new LiteralSet[0]);
 			}
 			solver.setSelectionStrategy(SelectionStrategy.RANDOM);
-			//			solver.assignmentPushAll(coreDeadFeature.getLiterals());
+			// solver.assignmentPushAll(coreDeadFeature.getLiterals());
 
 			dpNumber = (int) (0.6 * nodeArray.length);
 			acNumber = (int) (0.1 * nodeArray.length);
@@ -178,8 +179,8 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 			final Traverser traverser = new Traverser(mig);
 			weakHull = new LiteralSet[nodeArray.length];
 			strongHull = new LiteralSet[nodeArray.length];
-			ArrayList<Double> edgeCount = new ArrayList<>();
-			final double length = (double) nodeArray.length;
+			final ArrayList<Double> edgeCount = new ArrayList<>();
+			final double length = nodeArray.length;
 			for (int j = 0; j < nodeArray.length; j++) {
 				final LiteralSet literalSet = nodeArray[j];
 				if (literalSet.size() == 1) {
@@ -189,13 +190,14 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 					edgeCount.add(0.0);
 				}
 			}
-			Integer[] index = Functional.getSortedIndex(edgeCount, new Comparator<Double>() {
+			final Integer[] index = Functional.getSortedIndex(edgeCount, new Comparator<Double>() {
+
 				@Override
 				public int compare(Double o1, Double o2) {
 					return (int) Math.signum(o2 - o1);
 				}
 			});
-			LiteralSet[] newNodeArray = new LiteralSet[nodeArray.length];
+			final LiteralSet[] newNodeArray = new LiteralSet[nodeArray.length];
 			for (int i = 0; i < nodeArray.length; i++) {
 				newNodeArray[i] = nodeArray[index[i]];
 			}
@@ -229,7 +231,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 
 	@SuppressWarnings("unused")
 	protected void coverCombinations() {
-		//		final BitSet covered = new BitSet(Math.toIntExact(numberOfCombinations));
+		// final BitSet covered = new BitSet(Math.toIntExact(numberOfCombinations));
 		final BitSet invalid = new BitSet(Math.toIntExact(numberOfCombinations));
 		try {
 			monitorThread.start();
@@ -267,7 +269,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 						}
 						continue comboLoop;
 					}
-					//Collections.sort(incompleteSolutionList);
+					// Collections.sort(incompleteSolutionList);
 
 					final boolean[] selectionPossible = new boolean[incompleteSolutionList.size()];
 
@@ -291,7 +293,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 						}
 					}
 
-					if (possible == null && !testCombinationValiditySAT(indexArray)) {
+					if ((possible == null) && !testCombinationValiditySAT(indexArray)) {
 						invalid.set((int) count);
 						continue comboLoop;
 					}
@@ -333,7 +335,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 			}
 
 			{
-				for (TWiseConfiguration tWiseConfiguration : incompleteSolutionList) {
+				for (final TWiseConfiguration tWiseConfiguration : incompleteSolutionList) {
 					dp(tWiseConfiguration);
 				}
 			}
@@ -395,7 +397,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 						}
 					}
 
-					if (possible == null && !testCombinationValiditySAT(indexArray)) {
+					if ((possible == null) && !testCombinationValiditySAT(indexArray)) {
 						invalid.set((int) count);
 						continue comboLoop;
 					}
@@ -437,7 +439,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 			}
 
 			{
-				for (TWiseConfiguration tWiseConfiguration : incompleteSolutionList) {
+				for (final TWiseConfiguration tWiseConfiguration : incompleteSolutionList) {
 					dp(tWiseConfiguration);
 				}
 			}
@@ -492,7 +494,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 							if (!configuration.isComplete() && selectionPossibleWithinSolution(configuration, indexArray)) {
 								if (selectionPossibleWithinSolverSolution(configuration, indexArray)) {
 									select(configuration, indexArray);
-									if (USE_AC && configuration.countLiterals < acNumber) {
+									if (USE_AC && (configuration.countLiterals < acNumber)) {
 										configuration.autoComplete(localSolver);
 									}
 									if (configuration.isComplete()) {
@@ -522,7 +524,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 							if (selectionPossible[i++]) {
 								if (selectionPossibleWithinSolverSolution(configuration, indexArray)) {
 									select(configuration, indexArray);
-									if (USE_AC && configuration.countLiterals < acNumber) {
+									if (USE_AC && (configuration.countLiterals < acNumber)) {
 										configuration.autoComplete(localSolver);
 									}
 									if (configuration.isComplete()) {
@@ -650,7 +652,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 
 				select(solution, indexArray);
 
-				if (USE_DP && solution.solution.length - solution.countLiterals > dpNumber && model1 != null) {
+				if (USE_DP && ((solution.solution.length - solution.countLiterals) > dpNumber) && (model1 != null)) {
 					localSolver.assignmentClear(0);
 					for (final int literal : solution.getSolution()) {
 						if (literal != 0) {
@@ -659,7 +661,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 					}
 
 					// localSolver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-					int[] model2 = localSolver.findSolution();
+					final int[] model2 = localSolver.findSolution();
 
 					for (int i = 0; i < localSolver.getAssignmentSize(); i++) {
 						model2[Math.abs(localSolver.assignmentGet(i)) - 1] = 0;
@@ -714,7 +716,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 				if (satResult == SatResult.TRUE) {
 					final int[] model1 = localSolver.getInternalSolution();
 					solution.addSolverSolution(model1);
-					int[] model2 = localSolver.findSolution();
+					final int[] model2 = localSolver.findSolution();
 
 					for (int i = 0; i < localSolver.getAssignmentSize(); i++) {
 						model2[Math.abs(localSolver.assignmentGet(i)) - 1] = 0;
@@ -880,7 +882,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 				}
 				return true;
 			}
-			//TODO necessary with mig?
+			// TODO necessary with mig?
 			solverSolutionLoop: for (final int[] s : solverSolutions) {
 				for (final int i : indexArray) {
 					for (final int literal : nodeArray[i].getLiterals()) {

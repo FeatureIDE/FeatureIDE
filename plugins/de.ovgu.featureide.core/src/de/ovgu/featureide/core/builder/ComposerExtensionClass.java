@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -65,11 +65,11 @@ import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.JavaFileSystem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
- * 
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -88,14 +88,17 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	private boolean initialized = false;
 	private IComposerExtension composerExtensionProxy;
 
+	@Override
 	public String getName() {
 		return composerExtensionProxy.getName();
 	}
 
+	@Override
 	public String getDescription() {
 		return composerExtensionProxy.getDescription();
 	}
 
+	@Override
 	public String getId() {
 		return composerExtensionProxy.getId();
 	}
@@ -115,29 +118,32 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		this.featureProject = featureProject;
 	}
 
+	@Override
 	public boolean isInitialized() {
 		return initialized;
 	}
 
+	@Override
 	public boolean clean() {
 		return true;
 	}
 
+	@Override
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
-		List<IFeature> selectedFeatures = c.getSelectedFeatures();
+		final List<IFeature> selectedFeatures = c.getSelectedFeatures();
 		if (selectedFeatures != null) {
 			if (destination == null) {
 				destination = featureProject.getBuildFolder();
 			}
 
-			for (IFeature feature : selectedFeatures) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
+			for (final IFeature feature : selectedFeatures) {
+				final IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
 				try {
 					if (!destination.exists()) {
 						destination.create(false, true, null);
 					}
 					copy(folder, destination);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
 			}
@@ -149,16 +155,16 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			return;
 		}
 
-		for (IResource res : featureFolder.members()) {
+		for (final IResource res : featureFolder.members()) {
 			if (res instanceof IFolder) {
-				IFolder folder = buildFolder.getFolder(res.getName());
+				final IFolder folder = buildFolder.getFolder(res.getName());
 				if (!folder.exists()) {
 					folder.create(false, true, null);
 				}
 				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
 				if (!extensions().contains(res.getFileExtension())) {
-					IFile file = buildFolder.getFile(res.getName());
+					final IFile file = buildFolder.getFile(res.getName());
 					if (!file.exists()) {
 						res.copy(file.getFullPath(), true, null);
 					}
@@ -167,14 +173,17 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 
+	@Override
 	public LinkedHashSet<String> extensions() {
 		return new LinkedHashSet<String>(0);
 	}
 
+	@Override
 	public boolean postAddNature(IFolder source, IFolder destination) {
 		return false;
 	}
 
+	@Override
 	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
 		addNature(project);
 		addClasspathFile(project, buildPath);
@@ -182,13 +191,13 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	private void addClasspathFile(IProject project, String buildPath) {
 		try {
-			JavaProject javaProject = new JavaProject(project, null);
-			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+			final JavaProject javaProject = new JavaProject(project, null);
+			final IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
 			boolean sourceAdded = false;
 			boolean containerAdded = false;
 			/** check if entries already exist **/
 			for (int i = 0; i < oldEntries.length; i++) {
-				if (!sourceAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+				if (!sourceAdded && (oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE)) {
 					/** correct the source entry **/
 					// XXX the source entry should be equivalent to the build
 					// path,
@@ -201,7 +210,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 					}
 					/** find source entry **/
 					sourceAdded = true;
-				} else if (!containerAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
+				} else if (!containerAdded && (oldEntries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER)) {
 					/** check the container entries **/
 					if (oldEntries[i].getPath().equals(JRE_CONTAINER)) {
 						containerAdded = true;
@@ -215,30 +224,28 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 
 			/** add the new entries **/
-			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
+			final IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
 
 			if (!sourceAdded) {
 				entries[oldEntries.length] = getSourceEntry(buildPath);
 			}
 			if (!containerAdded) {
-				int position = (sourceAdded ? 0 : 1) + oldEntries.length;
+				final int position = (sourceAdded ? 0 : 1) + oldEntries.length;
 				entries[position] = getContainerEntry();
 			}
 
 			javaProject.setRawClasspath(entries, null);
-		} catch (JavaModelException e) {
+		} catch (final JavaModelException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Set the source path of the given <code>ClasspathEntry</code>
-	 * 
-	 * @param buildPath
-	 *            The new build path
-	 * @param e
-	 *            The entry to set
+	 *
+	 * @param buildPath The new build path
+	 * @param e The entry to set
 	 * @return The entry with the new source path
 	 */
 	public IClasspathEntry setSourceEntry(String buildPath, IClasspathEntry e) {
@@ -256,8 +263,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	/**
-	 * @param path
-	 *            The source path
+	 * @param path The source path
 	 * @return A default source entry with the given path
 	 */
 	public IClasspathEntry getSourceEntry(String path) {
@@ -267,30 +273,34 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	private void addNature(IProject project) {
 		try {
-			if (!project.isAccessible() || project.hasNature(JAVA_NATURE))
+			if (!project.isAccessible() || project.hasNature(JAVA_NATURE)) {
 				return;
+			}
 
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
+			final IProjectDescription description = project.getDescription();
+			final String[] natures = description.getNatureIds();
+			final String[] newNatures = new String[natures.length + 1];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
 			newNatures[natures.length] = JAVA_NATURE;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
 
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
+	@Override
 	public void buildFSTModel() {
 
 	}
 
+	@Override
 	public ArrayList<String[]> getTemplates() {
 		return new ArrayList<>(0);
 	}
 
+	@Override
 	public String replaceSourceContentMarker(String fileContent, boolean refines, String packageName) {
 		if (packageName.isEmpty()) {
 			return fileContent.replace(PACKAGE_PATTERN, "");
@@ -299,102 +309,122 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 
+	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 		try {
 			buildFile.setDerived(true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
+	@Override
 	public int getDefaultTemplateIndex() {
 		return 0;
 	}
 
+	@Override
 	public boolean refines() {
 		return false;
 	}
 
+	@Override
 	public void postModelChanged() {
 
 	}
 
+	@Override
 	public boolean hasFeatureFolder() {
 		return true;
 	}
 
+	@Override
 	public boolean hasCustomFilename() {
 		return false;
 	}
 
+	@Override
 	public String getConfigurationExtension() {
 		return ConfigFormatManager.getInstance().getExtensions().get(0).getSuffix();
 	}
 
+	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
 				folder.create(true, true, null);
 			}
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
-			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			final IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
+			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
+	@Override
 	public boolean preBuildConfiguration() {
 		return true;
 	}
 
+	@Override
 	public boolean hasSourceFolder() {
 		return true;
 	}
 
+	@Override
 	public boolean hasSource() {
 		return true;
 	}
-	
+
+	@Override
 	public boolean hasBuildFolder() {
 		return true;
 	}
 
+	@Override
 	public boolean canGeneratInParallelJobs() {
 		return true;
 	}
 
+	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return null;
 	}
 
+	@Override
 	public boolean needColor() {
 		return false;
 	}
 
+	@Override
 	public boolean hasContractComposition() {
 		return false;
 	}
 
+	@Override
 	public boolean hasMetaProductGeneration() {
 		return false;
 	}
 
+	@Override
 	public String[] getCompositionMechanisms() {
 		return new String[0];
 	}
 
+	@Override
 	public boolean createFolderForFeatures() {
 		return true;
 	}
 
+	@Override
 	public boolean supportsAndroid() {
 		return false;
 	}
 
 	protected boolean isPluginInstalled(String ID) {
-		for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+		for (final Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 			if (b.getSymbolicName().startsWith(ID)) {
 				return true;
 			}
@@ -403,7 +433,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	protected void generateWarning(String Warning) {
-		this.featureProject.createBuilderMarker(featureProject.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
+		featureProject.createBuilderMarker(featureProject.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
 	}
 
 	/**
@@ -426,7 +456,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	/**
 	 * Creates a temporary configuration that can be used by the composition tool with the old configuration format.
-	 * 
+	 *
 	 * @param config The configuration file to read from.
 	 * @return The temporary configuration file.
 	 */
@@ -440,7 +470,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		final ProblemList problems = FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		final ProblemList problems = SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		if (problems.containsError()) {
 			CorePlugin.getDefault().logWarning("failed to read " + config);
 			return null;
@@ -451,7 +481,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
 			tempFile.toFile().deleteOnExit();
 			return tempFile;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 

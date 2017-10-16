@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,22 +30,24 @@ import de.ovgu.featureide.fm.core.conversion.NNFConverter;
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander
  */
-public class EliminateConstraintsWizard extends AbstractWizard implements INewWizard {	
+public class EliminateConstraintsWizard extends AbstractWizard implements INewWizard {
+
 	protected static enum ConversionMethod {
-		NNF, CNF, /*TSEITIN,*/ COMBINED;
+		NNF, CNF, /* TSEITIN, */ COMBINED;
 	}
 
 	private EliminateConstraintsPage page;
 	private ConversionMethod method;
-	private IFile inputModelFile;
+	private final IFile inputModelFile;
 	private String path;
-	private boolean trivial;
-	private int pseudocomplex;
-	private int strictcomplex;
-	private String fileExtension;
+	private final boolean trivial;
+	private final int pseudocomplex;
+	private final int strictcomplex;
+	private final String fileExtension;
+
 	/**
 	 * @param title
 	 */
@@ -58,26 +60,25 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 		this.strictcomplex = strictcomplex;
 		this.fileExtension = fileExtension;
 	}
-	
+
 	@Override
 	public void addPages() {
 		setWindowTitle("Export Product-Equivalent Model Without Complex Constraints");
 		page = new EliminateConstraintsPage(inputModelFile, "Complex constraints elimination", trivial, fileExtension);
-		
-		if(strictcomplex == 0) {
+
+		if (strictcomplex == 0) {
 			page.setTitle("No Strict-Complex Constraints found");
 			page.setDescription("Number of pseudo-complex constraints: " + pseudocomplex);
 		} else {
 			page.setTitle("Strict-Complex Constraints found");
-			page.setDescription("Number of strict-complex constraints: " + strictcomplex + "\n"
-					+ "Number of pseudo-complex constraints: " + pseudocomplex);
+			page.setDescription("Number of strict-complex constraints: " + strictcomplex + "\n" + "Number of pseudo-complex constraints: " + pseudocomplex);
 		}
-		
+
 		addPage(page);
 	}
-	
+
 	public IConverterStrategy getStrategy() {
-		switch(page.selectedMethod) {
+		switch (page.selectedMethod) {
 		case CNF:
 			return new CNFConverter();
 		case NNF:
@@ -86,15 +87,15 @@ public class EliminateConstraintsWizard extends AbstractWizard implements INewWi
 			return new CombinedConverter();
 		}
 	}
-	
+
 	public String getPath() {
 		return page.path;
 	}
-	
+
 	public boolean preserveConfigurations() {
 		return page.preserveConfigurations;
 	}
-	
+
 	public boolean removeRedundancy() {
 		return page.removeRedundancy;
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * A simple multi product line builder.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MSPLBuilder extends IncrementalProjectBuilder {
@@ -63,28 +63,30 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		super();
 	}
 
+	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		// TODO: prevent automatic build
-		//		IProject project = getProject();
-		//		if (project != null) {
-		//			cleanProject(CorePlugin.getFeatureProject(project), monitor);
-		//		} else {
-		//			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
-		//		}
+		// IProject project = getProject();
+		// if (project != null) {
+		// cleanProject(CorePlugin.getFeatureProject(project), monitor);
+		// } else {
+		// MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
+		// }
 	}
 
-	//	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
-	//		final IFolder buildFolder = featureProject.getBuildFolder();
-	//		try {
-	//			for (IResource member : buildFolder.members()) {
-	//				member.delete(true, monitor);
-	//			}
-	//		} catch (CoreException e) {
-	//			MPLPlugin.getDefault().logError(e);
-	//			return false;
-	//		}
-	//		return true;
-	//	}
+	// private boolean cleanProject(IFeatureProject featureProject,
+	// IProgressMonitor monitor) {
+	// final IFolder buildFolder = featureProject.getBuildFolder();
+	// try {
+	// for (IResource member : buildFolder.members()) {
+	// member.delete(true, monitor);
+	// }
+	// } catch (CoreException e) {
+	// MPLPlugin.getDefault().logError(e);
+	// return false;
+	// }
+	// return true;
+	// }
 
 	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
@@ -94,7 +96,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		final IProject project = getProject();
 		if (project != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-			if (featureProject == null || !featureProject.buildRelevantChanges()) {
+			if ((featureProject == null) || !featureProject.buildRelevantChanges()) {
 				return null;
 			}
 
@@ -115,13 +117,13 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				final Configuration config = new Configuration(featureProject.getFeatureModel());
 
 				final IFile configFile = featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());
+				SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), config, ConfigFormatManager.getInstance());
 
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();
 				final LongRunningMethod<?> job = new MPLBuildProjectJob(featureProject, featureProject, buildFolder, config, null);
 
-				String tempConfigName = featureProject.getCurrentConfiguration().getName();
+				final String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
 				final int splitIndex = tempConfigName.lastIndexOf('.');
 				if (splitIndex > -1) {
@@ -130,11 +132,12 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 					configName = tempConfigName;
 				}
 
-				JobSequence buildSequence = new JobSequence();
+				final JobSequence buildSequence = new JobSequence();
 				buildSequence.setIgnorePreviousJobFail(false);
 				buildSequence.addJob(job);
 				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(buildSequence, StringTable.BUILD_EXTERNAL_PROJECT);
 				runner.addJobFinishedListener(new JobFinishListener() {
+
 					@Override
 					public void jobFinished(IJob finishedJob) {
 						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
@@ -145,7 +148,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 					}
 				});
 				runner.schedule();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				MPLPlugin.getDefault().logError(e);
 				synchronized (buildMap) {
 					buildMap.put(project.getName(), false);

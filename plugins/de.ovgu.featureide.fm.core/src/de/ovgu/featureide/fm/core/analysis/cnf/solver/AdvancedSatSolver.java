@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
  * Sat solver with advanced support.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
@@ -47,25 +47,25 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	protected RingList<int[]> solutionList = RingList.empytRingList();
 	protected SelectionStrategy strategy = SelectionStrategy.ORG;
-	
+
 	protected boolean globalTimeout = false;
 
 	public AdvancedSatSolver(CNF satInstance) throws RuntimeContradictionException {
 		super(satInstance);
-		this.strategy = SelectionStrategy.ORG;
+		strategy = SelectionStrategy.ORG;
 
-		this.assignment = new VecInt(satInstance.getVariables().size());
-		this.order = new int[satInstance.getVariables().size()];
+		assignment = new VecInt(satInstance.getVariables().size());
+		order = new int[satInstance.getVariables().size()];
 		setOrderFix();
 	}
 
 	protected AdvancedSatSolver(AdvancedSatSolver oldSolver) {
 		super(oldSolver);
-		this.strategy = oldSolver.strategy;
+		strategy = oldSolver.strategy;
 
-		this.order = Arrays.copyOf(oldSolver.order, oldSolver.order.length);
-		this.assignment = new VecInt(0);
-		oldSolver.assignment.copyTo(this.assignment);
+		order = Arrays.copyOf(oldSolver.order, oldSolver.order.length);
+		assignment = new VecInt(0);
+		oldSolver.assignment.copyTo(assignment);
 	}
 
 	@Override
@@ -166,21 +166,19 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 	public SatResult hasSolution() {
 		try {
 			if (solver.isSatisfiable(assignment, globalTimeout)) {
-//				solutionList.add(solver.model());
+				// solutionList.add(solver.model());
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}
 
 	/**
-	 * {@inheritDoc}<br/>
-	 * <br/>
-	 * Does only consider the given {@code assignment} and <b>not</b> the global assignment variable of the solver.
+	 * {@inheritDoc}<br/> <br/> Does only consider the given {@code assignment} and <b>not</b> the global assignment variable of the solver.
 	 */
 	@Override
 	public SatResult hasSolution(int... assignment) {
@@ -188,15 +186,15 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 		System.arraycopy(internalMapping.convertToInternal(assignment), 0, unitClauses, 0, unitClauses.length);
 
 		try {
-			//TODO why is this necessary?
+			// TODO why is this necessary?
 			solver.setKeepSolverHot(true);
 			if (solver.isSatisfiable(new VecInt(unitClauses), globalTimeout)) {
-//				solutionList.add(solver.model());
+				// solutionList.add(solver.model());
 				return SatResult.TRUE;
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
@@ -264,7 +262,7 @@ public class AdvancedSatSolver extends SimpleSatSolver implements ISatSolver {
 
 	@Override
 	public void setSelectionStrategy(int[] model, boolean min) {
-		this.strategy = SelectionStrategy.FIXED;
+		strategy = SelectionStrategy.FIXED;
 		solver.setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model, min), order));
 		solver.getOrder().init();
 	}

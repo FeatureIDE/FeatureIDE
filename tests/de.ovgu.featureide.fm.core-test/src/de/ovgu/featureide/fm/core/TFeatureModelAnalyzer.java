@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Tests for {@link FeatureModelAnalyzer}
- * 
+ *
  * @author Jens Meinicke
  * @author Stefan Krueger
  * @author Florian Proksch
@@ -55,6 +55,7 @@ public class TFeatureModelAnalyzer {
 	protected static File MODEL_FILE_FOLDER = getFolder();
 
 	private static final FileFilter filter = new FileFilter() {
+
 		@Override
 		public boolean accept(File pathname) {
 			return pathname.getName().endsWith(".xml");
@@ -118,7 +119,7 @@ public class TFeatureModelAnalyzer {
 
 	private static final IFeatureModel init(String name) {
 		IFeatureModel fm = null;
-		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
+		for (final File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				fm = FeatureModelManager.load(f.toPath());
 				if (fm != null) {

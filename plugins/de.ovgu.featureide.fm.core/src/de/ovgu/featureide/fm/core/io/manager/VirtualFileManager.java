@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,14 +28,14 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Holds a virtual object.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class VirtualFileManager<T> extends AFileManager<T> {
 
 	public static class ObjectCreator<T> extends AFileManager.ObjectCreator<T> {
 
-		private T object;
+		private final T object;
 
 		public ObjectCreator(T object) {
 			this.object = object;
@@ -48,7 +48,7 @@ public class VirtualFileManager<T> extends AFileManager<T> {
 
 		@Override
 		protected Snapshot<T> createSnapshot(T object) {
-			return new Snapshot<T>(object);
+			return new Snapshot<>(object);
 		}
 
 	}
@@ -57,13 +57,15 @@ public class VirtualFileManager<T> extends AFileManager<T> {
 		super(format, VirtualFileManager.class.getName() + object.hashCode(), object, new ObjectCreator<>(object));
 	}
 
+	@Override
 	public boolean read() {
 		return true;
 	}
 
-	public void override() {
-	}
+	@Override
+	public void override() {}
 
+	@Override
 	public boolean save() {
 		return true;
 	}
@@ -73,6 +75,7 @@ public class VirtualFileManager<T> extends AFileManager<T> {
 		return true;
 	}
 
+	@Override
 	public Path getPath() {
 		return null;
 	}

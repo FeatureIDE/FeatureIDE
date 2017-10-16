@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Removes features from a model while retaining dependencies of all other feature.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CNFSlicer extends AbstractManipulator {
@@ -80,16 +80,17 @@ public class CNFSlicer extends AbstractManipulator {
 
 	public CNFSlicer(CNF orgCNF, List<String> dirtyFeatures) {
 		super(orgCNF);
-		this.dirtyLiterals = orgCNF.getVariables().convertToVariables(dirtyFeatures);
-		this.cnfCopy = new CNF(orgCNF, false);
+		dirtyLiterals = orgCNF.getVariables().convertToVariables(dirtyFeatures);
+		cnfCopy = new CNF(orgCNF, false);
 	}
-	
+
 	public CNFSlicer(CNF orgCNF, LiteralSet dirtyLiterals) {
 		super(orgCNF);
 		this.dirtyLiterals = dirtyLiterals;
-		this.cnfCopy = new CNF(orgCNF, false);
+		cnfCopy = new CNF(orgCNF, false);
 	}
 
+	@Override
 	protected CNF manipulate(IMonitor workMonitor) throws TimeoutException {
 		// Collect all features in the prop node and remove TRUE and FALSE
 		init();
@@ -98,7 +99,7 @@ public class CNFSlicer extends AbstractManipulator {
 		final String[] variableObjects = Arrays.copyOf(names, names.length);
 		map = new DeprecatedFeature[orgCNF.getVariables().maxVariableID() + 1];
 		numberOfDirtyFeatures = 0;
-		for (int curFeature : dirtyLiterals.getLiterals()) {
+		for (final int curFeature : dirtyLiterals.getLiterals()) {
 			map[curFeature] = new DeprecatedFeature(curFeature);
 			variableObjects[curFeature] = null;
 			numberOfDirtyFeatures++;
@@ -106,12 +107,12 @@ public class CNFSlicer extends AbstractManipulator {
 		helper = new int[map.length];
 
 		final ArrayList<String> slicedFeatureList = new ArrayList<>(variableObjects.length - numberOfDirtyFeatures);
-		for (String object : variableObjects) {
+		for (final String object : variableObjects) {
 			if (object != null) {
 				slicedFeatureList.add(object);
 			}
 		}
-		SlicedVariables mapping = new SlicedVariables((Variables) orgCNF.getVariables(), slicedFeatureList);
+		final SlicedVariables mapping = new SlicedVariables((Variables) orgCNF.getVariables(), slicedFeatureList);
 
 		// Initialize lists and sets
 		createClauseLists();
@@ -177,12 +178,12 @@ public class CNFSlicer extends AbstractManipulator {
 	}
 
 	private void createClauseLists() {
-		for (LiteralSet clause : orgCNF.getClauses()) {
+		for (final LiteralSet clause : orgCNF.getClauses()) {
 			addNewClause(new DeprecatedClause(clause.getLiterals()));
 		}
 
 		cleanClauseList.ensureCapacity(cleanClauseList.size() + newCleanClauseList.size());
-		for (DeprecatedClause deprecatedClause : newCleanClauseList) {
+		for (final DeprecatedClause deprecatedClause : newCleanClauseList) {
 			cleanClauseList.add(new LiteralSet(deprecatedClause));
 		}
 		dirtyClauseList.addAll(newDirtyClauseList);
@@ -203,7 +204,7 @@ public class CNFSlicer extends AbstractManipulator {
 		if (dirtyListPosIndex < dirtyClauseList.size()) {
 			final List<DeprecatedClause> subList = dirtyClauseList.subList(dirtyListPosIndex, dirtyClauseList.size());
 			dirtyClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 			subList.clear();
@@ -214,7 +215,7 @@ public class CNFSlicer extends AbstractManipulator {
 		if (newDirtyListDelIndex < newDirtyClauseList.size()) {
 			final List<DeprecatedClause> subList = newDirtyClauseList.subList(newDirtyListDelIndex, newDirtyClauseList.size());
 			dirtyClauseSet.removeAll(subList);
-			for (DeprecatedClause deprecatedClause : subList) {
+			for (final DeprecatedClause deprecatedClause : subList) {
 				deleteClause(deprecatedClause);
 			}
 		}
@@ -246,7 +247,7 @@ public class CNFSlicer extends AbstractManipulator {
 		final int curFeatureID = nextFeature.getId();
 		for (int i = 0; i < dirtyListNegIndex; i++) {
 			final LiteralSet clause = dirtyClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == -curFeatureID) {
 					Collections.swap(dirtyClauseList, i--, --dirtyListNegIndex);
 					break;
@@ -256,7 +257,7 @@ public class CNFSlicer extends AbstractManipulator {
 		dirtyListPosIndex = dirtyListNegIndex;
 		for (int i = 0; i < dirtyListPosIndex; i++) {
 			final LiteralSet clause = dirtyClauseList.get(i);
-			for (int literal : clause.getLiterals()) {
+			for (final int literal : clause.getLiterals()) {
 				if (literal == curFeatureID) {
 					Collections.swap(dirtyClauseList, i--, --dirtyListPosIndex);
 					break;
@@ -334,7 +335,7 @@ public class CNFSlicer extends AbstractManipulator {
 	}
 
 	protected void firstRedundancyCheck(DeprecatedFeature nextFeature) {
-		if (first && nextFeature.getClauseCount() > 0) {
+		if (first && (nextFeature.getClauseCount() > 0)) {
 			first = false;
 			Collections.sort(dirtyClauseList, lengthComparator);
 
@@ -364,8 +365,8 @@ public class CNFSlicer extends AbstractManipulator {
 		first = true;
 		try {
 			newSolver = new SimpleSatSolver(cnfCopy);
-			//		newSolver.addClauses(cleanClauseList);
-		} catch (RuntimeContradictionException e) {
+			// newSolver.addClauses(cleanClauseList);
+		} catch (final RuntimeContradictionException e) {
 			return false;
 		}
 		return newSolver.hasSolution() == SatResult.TRUE;

@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Handler to properly write / read objects.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class FormatHandler<T> {
@@ -46,7 +46,7 @@ public class FormatHandler<T> {
 	}
 
 	public List<Problem> getLastWarnings() {
-		return lastWarnings != null ? lastWarnings : Collections.<Problem> emptyList();
+		return lastWarnings != null ? lastWarnings : Collections.<Problem>emptyList();
 	}
 
 	public T getObject() {
@@ -68,7 +68,7 @@ public class FormatHandler<T> {
 	protected IPersistentFormat<T> createFormat() {
 		return format.getInstance();
 	}
-	
+
 	public IPersistentFormat<T> getFormat() {
 		return format;
 	}

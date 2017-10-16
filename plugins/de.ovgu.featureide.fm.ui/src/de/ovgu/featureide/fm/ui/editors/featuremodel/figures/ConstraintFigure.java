@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A figure to view a cross-tree constraint below the feature diagram.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -76,11 +76,11 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 	private final Label label = new Label();
 
-	private IGraphicalConstraint graphicalConstraint;
+	private final IGraphicalConstraint graphicalConstraint;
 
 	public ConstraintFigure(IGraphicalConstraint constraint) {
 		super();
-		this.graphicalConstraint = constraint;
+		graphicalConstraint = constraint;
 		setLayoutManager(new FreeformLayout());
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
@@ -94,8 +94,9 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		add(label);
 		setOpaque(true);
 
-		if (constraint.getLocation() != null)
+		if (constraint.getLocation() != null) {
 			setLocation(constraint.getLocation());
+		}
 
 		init();
 	}
@@ -114,7 +115,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public void setConstraintProperties() {
 		init();
 
-		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(this.graphicalConstraint.getObject());
+		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(graphicalConstraint.getObject());
 		final StringBuilder toolTip = new StringBuilder();
 
 		final IFigure toolTipContent = new Figure();
@@ -157,7 +158,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				String s = DEAD_FEATURE;
-				for (String dead : deadFeatures) {
+				for (final String dead : deadFeatures) {
 					s += "\n\u2022 " + dead;
 				}
 				toolTipContent.add(new Label(s));
@@ -171,12 +172,12 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			break;
 		case FALSE_OPTIONAL:
 			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-				final List<String> falseOptionalFeatures = Functional.mapToList(constraintProperties.getFalseOptionalFeatures(),
-						new Functional.ToStringFunction<IFeature>());
+				final List<String> falseOptionalFeatures =
+						Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
 				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				String s = FALSE_OPTIONAL;
-				for (String feature : falseOptionalFeatures) {
+				for (final String feature : falseOptionalFeatures) {
 					s += "\n\u2022 " + feature;
 				}
 				toolTipContent.add(new Label(s));
@@ -203,20 +204,21 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 	private void setText(String newText) {
 		label.setText(newText);
-		Dimension labelSize = label.getPreferredSize();
+		final Dimension labelSize = label.getPreferredSize();
 
-		if (labelSize.equals(label.getSize()))
+		if (labelSize.equals(label.getSize())) {
 			return;
+		}
 		label.setSize(labelSize);
 
-		Rectangle bounds = getBounds();
-		int w = CONSTRAINT_INSETS.getWidth();
-		int h = CONSTRAINT_INSETS.getHeight();
+		final Rectangle bounds = getBounds();
+		final int w = CONSTRAINT_INSETS.getWidth();
+		final int h = CONSTRAINT_INSETS.getHeight();
 		bounds.setSize(labelSize.expand(w, h));
 
-		Dimension oldSize = getSize();
+		final Dimension oldSize = getSize();
 		if (!oldSize.equals(0, 0)) {
-			int dx = (oldSize.width - bounds.width) / 2;
+			final int dx = (oldSize.width - bounds.width) / 2;
 			bounds.x += dx;
 		}
 

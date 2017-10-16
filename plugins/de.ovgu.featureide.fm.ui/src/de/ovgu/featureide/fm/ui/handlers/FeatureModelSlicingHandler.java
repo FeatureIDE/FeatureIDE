@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -52,18 +52,19 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 		if (featureModel != null) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
-			if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
+			if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 				final Collection<String> selectedFeatures = (Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES);
 				final LongRunningMethod<IFeatureModel> method = new SliceFeatureModel(featureModel, selectedFeatures, true);
 
 				final IRunner<IFeatureModel> runner = LongRunningWrapper.getRunner(method, "Slicing Feature Model");
 				runner.addJobFinishedListener(new JobFinishListener<IFeatureModel>() {
+
 					@Override
 					public void jobFinished(IJob<IFeatureModel> finishedJob) {
 						final Path modelFile = Paths.get(file.getLocationURI());
 						final Path filePath = modelFile.getFileName();
 						final Path root = modelFile.getRoot();
-						if (filePath != null && root != null) {
+						if ((filePath != null) && (root != null)) {
 							String fileName = filePath.toString();
 							final int extIndex = fileName.lastIndexOf('.');
 							fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
@@ -47,16 +47,16 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 	protected IncrementalTraverser traverser;
 
 	public TWiseConfiguration(int numVariables, int numExpressions, ModalImplicationGraph mig) {
-		this.solution = new int[numVariables];
-		this.countLiterals = numVariables;
-		this.selection = new byte[numExpressions];
+		solution = new int[numVariables];
+		countLiterals = numVariables;
+		selection = new byte[numExpressions];
 		traverser = mig != null ? new IncrementalTraverser(mig) : null;
 	}
 
 	public TWiseConfiguration(int[] solution) {
 		this.solution = Arrays.copyOf(solution, solution.length);
-		this.countLiterals = 0;
-		this.selection = null;
+		countLiterals = 0;
+		selection = null;
 		traverser = null;
 	}
 
@@ -72,8 +72,8 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 				if (solution[i] == 0) {
 					solution[i] = literal;
 					countLiterals--;
-					for (Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
-						int[] is = iterator.next();
+					for (final Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
+						final int[] is = iterator.next();
 						if (is[i] == -literal) {
 							iterator.remove();
 						}
@@ -84,7 +84,7 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 	}
 
 	public void setLiteral(int... literals) {
-		for (int literal : literals) {
+		for (final int literal : literals) {
 			final int i = Math.abs(literal) - 1;
 			if (solution[i] == 0) {
 				if (traverser != null) {
@@ -97,43 +97,43 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 		}
 	}
 
-	//	public void strong() {
-	//		traverser.changed.clear();
-	//		ArrayDeque<Integer> stronglyConnected = null;
-	//		for (int literal : literals) {
-	//			final int i = Math.abs(literal) - 1;
-	//			if (solution[i] == 0) {
-	//				solution[i] = literal;
-	//				countLiterals--;
-	//				if (traverser != null) {
-	//					traverser.selectVariables(literal);
-	//					stronglyConnected = traverser.getStronglyConnected(literal);
-	//					for (Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
-	//						int[] is = iterator.next();
-	//						if (is[i] == -literal) {
-	//							iterator.remove();
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//		if (stronglyConnected != null) {
-	//			while (!stronglyConnected.isEmpty()) {
-	//				final int literal = stronglyConnected.pop();
-	//				final int i = Math.abs(literal) - 1;
-	//				if (solution[i] == 0) {
-	//					solution[i] = literal;
-	//					countLiterals--;
-	//					for (Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
-	//						int[] is = iterator.next();
-	//						if (is[i] == -literal) {
-	//							iterator.remove();
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
+	// public void strong() {
+	// traverser.changed.clear();
+	// ArrayDeque<Integer> stronglyConnected = null;
+	// for (int literal : literals) {
+	// final int i = Math.abs(literal) - 1;
+	// if (solution[i] == 0) {
+	// solution[i] = literal;
+	// countLiterals--;
+	// if (traverser != null) {
+	// traverser.selectVariables(literal);
+	// stronglyConnected = traverser.getStronglyConnected(literal);
+	// for (Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
+	// int[] is = iterator.next();
+	// if (is[i] == -literal) {
+	// iterator.remove();
+	// }
+	// }
+	// }
+	// }
+	// }
+	// if (stronglyConnected != null) {
+	// while (!stronglyConnected.isEmpty()) {
+	// final int literal = stronglyConnected.pop();
+	// final int i = Math.abs(literal) - 1;
+	// if (solution[i] == 0) {
+	// solution[i] = literal;
+	// countLiterals--;
+	// for (Iterator<int[]> iterator = solverSolutions.iterator(); iterator.hasNext();) {
+	// int[] is = iterator.next();
+	// if (is[i] == -literal) {
+	// iterator.remove();
+	// }
+	// }
+	// }
+	// }
+	// }
+	// }
 
 	public void clear() {
 		traverser = null;
@@ -182,7 +182,7 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 				} else {
 					final int orgAssignmentSize = solver.getAssignmentSize();
 					try {
-						for (int literal : solution) {
+						for (final int literal : solution) {
 							if (literal != 0) {
 								solver.assignmentPush(literal);
 							}
@@ -204,7 +204,7 @@ public class TWiseConfiguration implements Comparable<TWiseConfiguration> {
 	}
 
 	int rank = 0;
-	
+
 	public void setRank(int rank) {
 		this.rank = rank;
 	}

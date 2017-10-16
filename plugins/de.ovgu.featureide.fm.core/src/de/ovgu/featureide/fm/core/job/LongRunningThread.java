@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,11 +31,12 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Job that wraps the functionality of a {@link LongRunningMethod}.
- * 
+ *
  * @author Sebastian Krieter
  */
 // TODO Implement prioritization
 public class LongRunningThread<T> extends Thread implements IRunner<T> {
+
 	protected final List<JobFinishListener<T>> listenerList = new LinkedList<>();
 
 	private final LongRunningMethod<T> method;
@@ -70,16 +71,18 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 		for (final JobFinishListener<T> listener : listenerList) {
 			try {
 				listener.jobFinished(this);
-			} catch (Throwable e) {
+			} catch (final Throwable e) {
 				Logger.logError(e);
 			}
 		}
 	}
 
+	@Override
 	public int getCancelingTimeout() {
 		return cancelingTimeout;
 	}
 
+	@Override
 	public T getResults() {
 		return methodResult;
 	}
@@ -94,6 +97,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 		return status;
 	}
 
+	@Override
 	public boolean isStoppable() {
 		return stoppable;
 	}
@@ -110,7 +114,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 			final Executer<T> executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
 			methodResult = executer.execute(monitor);
 			status = JobStatus.OK;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Logger.logError(e);
 			status = JobStatus.FAILED;
 		} finally {
@@ -118,7 +122,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 			for (final JobFinishListener<T> listener : listenerList) {
 				try {
 					listener.jobFinished(this);
-				} catch (Throwable e) {
+				} catch (final Throwable e) {
 					Logger.logError(e);
 				}
 			}
@@ -130,6 +134,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 		start();
 	}
 
+	@Override
 	public void setCancelingTimeout(int cancelingTimeout) {
 		this.cancelingTimeout = cancelingTimeout;
 	}
@@ -139,6 +144,7 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 		monitor.setIntermediateFunction(intermediateFunction);
 	}
 
+	@Override
 	public void setStoppable(boolean stoppable) {
 		this.stoppable = stoppable;
 	}

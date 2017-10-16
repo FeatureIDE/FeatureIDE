@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,10 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents an instance of a satisfiability problem in CNF.<br/>
- * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()}
- * method to get a {@link BasicSolver solver} for this problem.
- * 
+ * Represents an instance of a satisfiability problem in CNF.<br/> Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()} method to get a
+ * {@link BasicSolver solver} for this problem.
+ *
  * @author Sebastian Krieter
  */
 public class Variables implements Serializable, IVariables, IInternalVariables {
@@ -44,16 +43,16 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	protected final Map<String, Integer> varToInt;
 
 	public Variables() {
-		this.intToVar = new String[0];
-		this.varToInt = Collections.emptyMap();
+		intToVar = new String[0];
+		varToInt = Collections.emptyMap();
 	}
 
 	public Variables(Collection<String> varNameList) {
-		this.intToVar = new String[varNameList.size() + 1];
-		this.varToInt = new HashMap<>((int) (1.5 * varNameList.size()));
+		intToVar = new String[varNameList.size() + 1];
+		varToInt = new HashMap<>((int) (1.5 * varNameList.size()));
 
 		int index = 0;
-		for (String feature : varNameList) {
+		for (final String feature : varNameList) {
 			final String name = feature.toString();
 			if (name == null) {
 				throw new RuntimeException();
@@ -64,8 +63,8 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	protected Variables(Variables oldSatMapping) {
-		this.intToVar = Arrays.copyOf(oldSatMapping.intToVar, oldSatMapping.intToVar.length);
-		this.varToInt = new HashMap<>(oldSatMapping.varToInt);
+		intToVar = Arrays.copyOf(oldSatMapping.intToVar, oldSatMapping.intToVar.length);
+		varToInt = new HashMap<>(oldSatMapping.varToInt);
 	}
 
 	@Override
@@ -77,6 +76,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative) {
 		return convertToString(literals, includePositive, includeNegative, true);
 	}
+
 	@Override
 	public List<String> convertToString(LiteralSet model) {
 		return convertToString(model, true, false);
@@ -91,11 +91,11 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	public List<String> convertToString(LiteralSet literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
 		return convertToString(literals.getLiterals(), includePositive, includeNegative, markNegative);
 	}
-	
+
 	@Override
 	public List<String> convertToString(int[] literals, boolean includePositive, boolean includeNegative, boolean markNegative) {
 		final List<String> resultList = new ArrayList<>();
-		for (int var : literals) {
+		for (final int var : literals) {
 			if (var > 0) {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)]);
@@ -117,7 +117,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	public LiteralSet convertToVariables(List<String> variableNames) {
 		final int[] literals = new int[variableNames.size()];
 		int i = 0;
-		for (String varName : variableNames) {
+		for (final String varName : variableNames) {
 			literals[i++] = varToInt.get(varName);
 		}
 		return new LiteralSet(literals);
@@ -127,7 +127,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	public LiteralSet convertToVariables(List<String> variableNames, boolean sign) {
 		final int[] literals = new int[variableNames.size()];
 		int i = 0;
-		for (String varName : variableNames) {
+		for (final String varName : variableNames) {
 			literals[i++] = sign ? varToInt.get(varName) : -varToInt.get(varName);
 		}
 		return new LiteralSet(literals);
@@ -173,43 +173,52 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(intToVar);
+		result = (prime * result) + Arrays.hashCode(intToVar);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
+		}
 		return Arrays.equals(intToVar, ((Variables) obj).intToVar);
 	}
 
+	@Override
 	public boolean checkClause(LiteralSet orgClause) {
 		return true;
 	}
 
+	@Override
 	public LiteralSet convertToInternal(LiteralSet orgClause) {
 		return orgClause;
 	}
 
+	@Override
 	public int[] convertToInternal(int[] orgLiterals) {
 		return orgLiterals;
 	}
 
+	@Override
 	public int convertToInternal(int orgLiteral) {
 		return orgLiteral;
 	}
 
+	@Override
 	public LiteralSet convertToOriginal(LiteralSet internalClause) {
 		return internalClause;
 	}
 
+	@Override
 	public int[] convertToOriginal(int[] internalLiterals) {
 		return internalLiterals;
 	}
 
+	@Override
 	public int convertToOriginal(int internalLiteral) {
 		return internalLiteral;
 	}

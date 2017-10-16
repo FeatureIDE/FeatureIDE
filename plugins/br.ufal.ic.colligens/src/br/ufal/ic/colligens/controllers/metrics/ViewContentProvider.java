@@ -8,17 +8,16 @@ import org.eclipse.jface.viewers.Viewer;
 class ViewContentProvider implements IStructuredContentProvider {
 
 	@Override
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	}
+	public void inputChanged(Viewer v, Object oldInput, Object newInput) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public Object[] getElements(Object parent) {
-		if (parent instanceof List)
+		if (parent instanceof List) {
 			return ((List<?>) parent).toArray();
+		}
 		return new Object[0];
 	}
 }

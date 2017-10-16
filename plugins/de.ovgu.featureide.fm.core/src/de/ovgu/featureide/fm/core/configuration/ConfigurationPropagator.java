@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,17 +48,18 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Updates a configuration.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
+
 		private final boolean deselectUndefinedFeatures;
 		private final boolean includeHiddenFeatures;
 
 		public IsValidMethod(boolean includeUndefinedFeatures, boolean includeHiddenFeatures) {
-			this.deselectUndefinedFeatures = includeUndefinedFeatures;
+			deselectUndefinedFeatures = includeUndefinedFeatures;
 			this.includeHiddenFeatures = includeHiddenFeatures;
 		}
 
@@ -86,6 +87,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public class Resolve implements LongRunningMethod<Void> {
+
 		@Override
 		public Void execute(IMonitor workMonitor) throws Exception {
 			if (formula == null) {
@@ -105,7 +107,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			case FALSE:
 			case TIMEOUT:
 				final int[] contradictoryAssignment = solver.getContradictoryAssignment();
-				for (int i : contradictoryAssignment) {
+				for (final int i : contradictoryAssignment) {
 					configuration.setManual(solver.getSatInstance().getVariables().getName(i), Selection.UNDEFINED);
 				}
 			case TRUE:
@@ -141,7 +143,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			solver.setSelectionStrategy(selectionStrategy);
 			final int[] solution = solver.findSolution();
 			if (solution != null) {
-				for (int i : solution) {
+				for (final int i : solution) {
 					configuration.setManual(solver.getSatInstance().getVariables().getName(i), i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
 				}
 				return true;
@@ -152,6 +154,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public class CountSolutionsMethod implements LongRunningMethod<Long> {
+
 		private final int timeout;
 
 		public CountSolutionsMethod(int timeout) {
@@ -175,12 +178,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class FindOpenClauses implements LongRunningMethod<List<LiteralSet>> {
 
-		private List<SelectableFeature> featureList;
+		private final List<SelectableFeature> featureList;
 
 		public FindOpenClauses(List<SelectableFeature> featureList) {
 			this.featureList = featureList;
 		}
 
+		@Override
 		public List<LiteralSet> execute(IMonitor workMonitor) {
 			if (formula == null) {
 				return Collections.emptyList();
@@ -189,7 +193,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			final boolean[] results = new boolean[clausesWithoutHidden.getVariables().maxVariableID() + 1];
 			final List<LiteralSet> openClauses = new ArrayList<>();
 
-			for (SelectableFeature selectableFeature : featureList) {
+			for (final SelectableFeature selectableFeature : featureList) {
 				selectableFeature.setRecommended(Selection.UNDEFINED);
 				selectableFeature.clearOpenClauses();
 			}
@@ -197,7 +201,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			final List<LiteralSet> clauses = clausesWithoutHidden.getClauses();
 			workMonitor.setRemainingWork(clauses.size());
 
-			loop: for (LiteralSet clause : clauses) {
+			loop: for (final LiteralSet clause : clauses) {
 				workMonitor.step();
 				final int[] orLiterals = clause.getLiterals();
 				for (int j = 0; j < orLiterals.length; j++) {
@@ -258,6 +262,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public class GetSolutionsMethod implements LongRunningMethod<List<List<String>>> {
+
 		private final int max;
 
 		public GetSolutionsMethod(int max) {
@@ -276,7 +281,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				return resultList;
 			}
 			final List<int[]> result = new AllConfigurationGenerator(solver, max, false).analyze(monitor);
-			for (int[] is : result) {
+			for (final int[] is : result) {
 				resultList.add(solver.getSatInstance().getVariables().convertToString(is));
 			}
 
@@ -286,11 +291,12 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	/**
 	 * Creates solutions to cover the given features.
-	 * 
+	 *
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
 	public class CoverFeatures implements LongRunningMethod<List<List<String>>> {
+
 		private final Collection<String> features;
 		private final boolean selection;
 
@@ -310,12 +316,12 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			} else {
 				clausesWithoutHidden = formula.getElement(new NoAbstractNoHiddenCNFCreator());
 			}
-			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator = new OneWiseConfigurationGenerator(
-					getSolverForCurrentConfiguration(false, false));
+			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator =
+					new OneWiseConfigurationGenerator(getSolverForCurrentConfiguration(false, false));
 			oneWiseConfigurationGenerator.setCoverMode(selection ? 1 : 0);
-			int[] featureArray = new int[features.size()];
+			final int[] featureArray = new int[features.size()];
 			int index = 0;
-			for (String feature : features) {
+			for (final String feature : features) {
 				featureArray[index++] = clausesWithoutHidden.getVariables().getVariable(feature);
 			}
 			oneWiseConfigurationGenerator.setFeatures(featureArray);
@@ -325,7 +331,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			if (solutions == null) {
 				return solutionList;
 			}
-			for (LiteralSet is : solutions) {
+			for (final LiteralSet is : solutions) {
 				solutionList.add(clausesWithoutHidden.getVariables().convertToString(is, true, false));
 			}
 
@@ -335,6 +341,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	public class UpdateMethod implements LongRunningMethod<Boolean> {
+
 		protected final boolean redundantManual;
 		protected final List<SelectableFeature> featureOrder;
 
@@ -344,7 +351,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 		public UpdateMethod(boolean redundantManual, List<SelectableFeature> featureOrder) {
 			this.redundantManual = redundantManual;
-			this.featureOrder = featureOrder != null ? featureOrder : Collections.<SelectableFeature> emptyList();
+			this.featureOrder = featureOrder != null ? featureOrder : Collections.<SelectableFeature>emptyList();
 		}
 
 		@Override
@@ -356,14 +363,14 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			final CNF rootNode = formula.getCNF();
 			final ArrayList<Integer> manualLiterals = new ArrayList<>();
-			for (SelectableFeature feature : featureOrder) {
-				if (feature.getManual() != Selection.UNDEFINED && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+			for (final SelectableFeature feature : featureOrder) {
+				if ((feature.getManual() != Selection.UNDEFINED) && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					manualLiterals.add(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
 				}
 			}
 			final HashSet<Integer> manualLiteralSet = new HashSet<>(manualLiterals);
-			for (SelectableFeature feature : configuration.features) {
-				if (feature.getManual() != Selection.UNDEFINED && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+			for (final SelectableFeature feature : configuration.features) {
+				if ((feature.getManual() != Selection.UNDEFINED) && (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 					final Integer l = rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
 					if (manualLiteralSet.add(l)) {
 						manualLiterals.add(l);
@@ -387,14 +394,14 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				return false;
 			}
 
-			for (int i : impliedFeatures.getLiterals()) {
+			for (final int i : impliedFeatures.getLiterals()) {
 				final SelectableFeature feature = configuration.getSelectableFeature(rootNode.getVariables().getName(i));
 				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
 				workMonitor.invoke(feature);
 				manualLiteralSet.add(feature.getManual() == Selection.SELECTED ? i : -i);
 			}
 			// only for update of configuration editor
-			for (SelectableFeature feature : configuration.features) {
+			for (final SelectableFeature feature : configuration.features) {
 				if (!manualLiteralSet
 						.contains(rootNode.getVariables().getVariable(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED))) {
 					workMonitor.invoke(feature);
@@ -406,7 +413,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				if (solver == null) {
 					return false;
 				}
-				for (int feature : intLiterals) {
+				for (final int feature : intLiterals) {
 					solver.assignmentPush(feature);
 				}
 
@@ -453,13 +460,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
-	 * 
+	 *
 	 * @param configuration The new configuration object
 	 */
 	protected ConfigurationPropagator(ConfigurationPropagator oldPropagator, Configuration configuration) {
-		this.formula = oldPropagator.formula;
+		formula = oldPropagator.formula;
 		this.configuration = configuration;
-		this.includeAbstractFeatures = oldPropagator.includeAbstractFeatures;
+		includeAbstractFeatures = oldPropagator.includeAbstractFeatures;
 	}
 
 	public ConfigurationPropagator(FeatureModelFormula formula, Configuration configuration) {
@@ -499,8 +506,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		if (solver == null) {
 			return null;
 		}
-		for (SelectableFeature feature : configuration.features) {
-			if ((deselectUndefinedFeatures || feature.getSelection() != Selection.UNDEFINED)
+		for (final SelectableFeature feature : configuration.features) {
+			if ((deselectUndefinedFeatures || (feature.getSelection() != Selection.UNDEFINED))
 					&& (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())
 					&& (includeHiddenFeatures || !feature.getFeature().getStructure().hasHiddenParent())) {
 				solver.assignmentPush(
@@ -527,7 +534,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 		try {
 			return new AdvancedSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
@@ -544,7 +551,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	/**
 	 * Creates solutions to cover the given features.
-	 * 
+	 *
 	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 * @throws Exception
@@ -553,6 +560,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		return new CoverFeatures(features, selection);
 	}
 
+	@Override
 	public FindOpenClauses findOpenClauses(List<SelectableFeature> featureList) {
 		return new FindOpenClauses(featureList);
 	}
@@ -568,19 +576,19 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 	}
 
 	/**
-	 * Ignores hidden features.
-	 * Use this, when propgate is disabled (hidden features are not updated).
+	 * Ignores hidden features. Use this, when propgate is disabled (hidden features are not updated).
 	 */
+	@Override
 	public IsValidMethod isValidNoHidden() {
 		return new IsValidMethod(true, false);
 	}
 
 	/**
 	 * Counts the number of possible solutions.
-	 * 
+	 *
 	 * @param timeout The timeout in milliseconds.
-	 * @return A positive value equal to the number of solutions (if the method terminated in time)</br>
-	 *         or a negative value (if a timeout occurred) that indicates that there are more solutions than the absolute value
+	 * @return A positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
+	 *         indicates that there are more solutions than the absolute value
 	 */
 	@Override
 	public CountSolutionsMethod number(int timeout) {

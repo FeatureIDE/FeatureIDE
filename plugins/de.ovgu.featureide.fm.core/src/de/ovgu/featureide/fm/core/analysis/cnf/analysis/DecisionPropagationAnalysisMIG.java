@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet> {
@@ -47,23 +47,24 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 
 	public DecisionPropagationAnalysisMIG(ISatSolver solver, ModalImplicationGraph featureGraph) {
 		super(solver);
-		this.traverser = new Traverser(featureGraph);
+		traverser = new Traverser(featureGraph);
 	}
 
 	public DecisionPropagationAnalysisMIG(CNF satInstance, ModalImplicationGraph featureGraph) {
 		super(satInstance);
-		this.traverser = new Traverser(featureGraph);
+		traverser = new Traverser(featureGraph);
 	}
 
+	@Override
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
 		if (changedVars == null) {
 			traverser.markFeatures(assumptions, null);
 		} else {
-			VecInt defined = new VecInt();
-			VecInt undefined = new VecInt();
+			final VecInt defined = new VecInt();
+			final VecInt undefined = new VecInt();
 			outer: for (int i = 0; i < changedVars.length; i++) {
 				final int changedVar = changedVars[i];
-				for (int assumption : assumptions.getLiterals()) {
+				for (final int assumption : assumptions.getLiterals()) {
 					if (Math.abs(assumption) == changedVar) {
 						defined.push(assumption);
 						continue outer;
@@ -77,7 +78,7 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 		final VecInt selectedVars = traverser.getVariablesMarkedForSelection();
 		final VecInt calculationVars = traverser.getVariablesMarkedForCalculation();
 
-		for (IteratorInt it = selectedVars.iterator(); it.hasNext();) {
+		for (final IteratorInt it = selectedVars.iterator(); it.hasNext();) {
 			solver.assignmentPush(it.next());
 		}
 
@@ -90,7 +91,7 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 				final int[] model2 = solver.findSolution();
 
 				SatUtils.updateSolution(model1, model2);
-				for (IteratorInt it = selectedVars.iterator(); it.hasNext();) {
+				for (final IteratorInt it = selectedVars.iterator(); it.hasNext();) {
 					model1[Math.abs(it.next()) - 1] = 0;
 				}
 
@@ -113,7 +114,7 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 					solver.assignmentReplaceLast(varX);
 					model1[i] = 0;
 					final int[] stronglyConnected = traverser.getStronglyConnected(varX).getLiterals();
-					for (int literal : stronglyConnected) {
+					for (final int literal : stronglyConnected) {
 						final int j = Math.abs(literal) - 1;
 						if (model1[j] != 0) {
 							model1[j] = 0;
@@ -139,7 +140,7 @@ public class DecisionPropagationAnalysisMIG extends AbstractAnalysis<LiteralSet>
 	}
 
 	public void setChanged(int... changed) {
-		this.changedVars = changed;
+		changedVars = changed;
 	}
 
 }

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOpe
 
 /**
  * Displays the source.
- * 
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -83,13 +83,12 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	/**
-	 * Reads the current content of the model.xml file. (Removes dirty state for
-	 * the page)
+	 * Reads the current content of the model.xml file. (Removes dirty state for the page)
 	 */
 	public void resetTextEditor() {
 		try {
 			getDocumentProvider().resetDocument(getEditorInput());
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
@@ -150,15 +149,15 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
 			final IFeatureModel fm = featureModelEditor.getFeatureModel();
-			
-			//TODO _interfaces replace text with DocumentEvent (delta)
-			SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
+
+			// TODO _interfaces replace text with DocumentEvent (delta)
+			final SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
 
 			op.addContext((IUndoContext) fm.getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 				oldText = newText;
-			} catch (ExecutionException e) {
+			} catch (final ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}

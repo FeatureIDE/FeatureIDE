@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds contradictions.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class IndependentContradictionAnalysis extends AClauseAnalysis<List<LiteralSet>> {
@@ -48,10 +48,11 @@ public class IndependentContradictionAnalysis extends AClauseAnalysis<List<Liter
 		super(solver);
 	}
 
+	@Override
 	protected ISatSolver initSolver(CNF satInstance) {
 		try {
 			return new ModifiableSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
@@ -66,6 +67,7 @@ public class IndependentContradictionAnalysis extends AClauseAnalysis<List<Liter
 		this.clauseList = clauseList;
 	}
 
+	@Override
 	public List<LiteralSet> analyze(IMonitor monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
@@ -90,7 +92,7 @@ public class IndependentContradictionAnalysis extends AClauseAnalysis<List<Liter
 
 			try {
 				solver.addClauses(subList);
-			} catch (RuntimeContradictionException e) {
+			} catch (final RuntimeContradictionException e) {
 				resultList.set(i, clauseList.get(startIndex));
 				monitor.step();
 				continue;

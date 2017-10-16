@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,9 +43,8 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics;
 
 /**
- * Configuration generator that creates all configurations of the feature model.<br> 
- * Exploits the structure of the feature model.
- * 
+ * Configuration generator that creates all configurations of the feature model.<br> Exploits the structure of the feature model.
+ *
  * @author Jens Meinicke
  */
 public class AllConfigrationsGenerator extends AConfigurationGenerator {
@@ -59,6 +58,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, IFeatureProject featureProject) {
 		super(builder, featureProject);
 		numberJob = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
+
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
 				final Long number = LongRunningWrapper.runMethod(configurationPropagator.number(1_000_000));
@@ -73,16 +73,15 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		numberJob.setPriority(Job.LONG);
 		numberJob.schedule();
 	}
-		
+
 	private Node rootNode;
 	private LinkedList<Node> children;
-	
 
 	/**
 	 * The max size of <code>>configurations</code>
 	 */
-	private int maxBufferSize = 5000;
-	
+	private final int maxBufferSize = 5000;
+
 	@Override
 	public Void execute(IMonitor monitor) throws Exception {
 		try {
@@ -92,21 +91,17 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Builds all possible valid configurations for the feature project.<br>
-	 * Iterates through the structure of the feature model and ignores
-	 * constraints, to get a linear expenditure.<br>
-	 * After collecting a configurations the satsolver tests its validity.<br>
-	 * Then the found configuration will be build into the folder for all valid
-	 * products.
-	 * 
-	 * @param root
-	 *            The root feature of the feature model
+	 * Builds all possible valid configurations for the feature project.<br> Iterates through the structure of the feature model and ignores constraints, to get
+	 * a linear expenditure.<br> After collecting a configurations the satsolver tests its validity.<br> Then the found configuration will be build into the
+	 * folder for all valid products.
+	 *
+	 * @param root The root feature of the feature model
 	 * @param monitor
 	 */
 	private void buildAll(IFeature root, IMonitor monitor) {
-		LinkedList<IFeature> selectedFeatures2 = new LinkedList<>();
+		final LinkedList<IFeature> selectedFeatures2 = new LinkedList<>();
 		selectedFeatures2.add(root);
 
 		children = new LinkedList<>();
@@ -116,7 +111,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IMonitor monitor) {
 		try {
 			monitor.checkCancel();
-		} catch (MethodCancelException e) {
+		} catch (final MethodCancelException e) {
 			numberJob.cancel();
 			cancelGenerationJobs();
 			return;
@@ -127,14 +122,14 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 		if (featureModel.getConstraintCount() > 0) {
 			children.clear();
-			for (String feature : selected.split("\"")) {
+			for (final String feature : selected.split("\"")) {
 				children.add(new Literal(feature, true));
 			}
 			try {
 				if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).hasSolution()) {
 					return;
 				}
-			} catch (org.sat4j.specs.TimeoutException e) {
+			} catch (final org.sat4j.specs.TimeoutException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
@@ -149,20 +144,20 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 			}
 			if (LongRunningWrapper.runMethod(configurationPropagator.update())) {
-				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("\"")) {
+				final LinkedList<String> selectedFeatures3 = new LinkedList<String>();
+				for (final String f : selected.split("\"")) {
 					if (!"".equals(f)) {
 						selectedFeatures3.add(f);
 					}
 				}
-				for (IFeature f : configuration.getSelectedFeatures()) {
+				for (final IFeature f : configuration.getSelectedFeatures()) {
 					if (isSelectable(f)) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
 					}
 				}
-				for (String f : selectedFeatures3) {
+				for (final String f : selectedFeatures3) {
 					if (configuration.getSelectableFeature(f).getSelection() != Selection.SELECTED) {
 						return;
 					}
@@ -175,13 +170,13 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 						while (builder.sorter.getBufferSize() >= maxBufferSize) {
 							try {
 								monitor.checkCancel();
-							} catch (MethodCancelException e) {
+							} catch (final MethodCancelException e) {
 								numberJob.cancel();
 								return;
 							}
 							try {
 								wait(1000);
-							} catch (InterruptedException e) {
+							} catch (final InterruptedException e) {
 								UIPlugin.getDefault().logError(e);
 							}
 						}
@@ -255,7 +250,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			int k2 = i2;
 			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < children2.size(); j++) {
-				if (k2 % 2 != 0) {
+				if ((k2 % 2) != 0) {
 					selectedFeatures3.add(children2.get(j));
 				}
 				k2 = k2 / 2;
@@ -286,8 +281,8 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			return;
 		}
 		int k2;
-		LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
-		for (IFeature f : getChildren(currentFeature)) {
+		final LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
+		for (final IFeature f : getChildren(currentFeature)) {
 			if (f.getStructure().isMandatory()) {
 				selectedFeatures2.add(f);
 			} else {
@@ -299,7 +294,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 			k2 = i2;
 			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < optionalFeatures.size(); j++) {
-				if (k2 % 2 != 0) {
+				if ((k2 % 2) != 0) {
 					selectedFeatures3.add(optionalFeatures.get(j));
 				}
 				k2 = k2 / 2;
@@ -311,17 +306,15 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * Returns all children of a feature if it is a layer or if it has a child
-	 * that is concrete.
-	 * 
-	 * @param currentFeature
-	 *            The feature
+	 * Returns all children of a feature if it is a layer or if it has a child that is concrete.
+	 *
+	 * @param currentFeature The feature
 	 * @return The children
 	 */
 	private LinkedList<IFeature> getChildren(IFeature currentFeature) {
-		LinkedList<IFeature> children = new LinkedList<IFeature>();
-		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
-			IFeature child = childStructure.getFeature();
+		final LinkedList<IFeature> children = new LinkedList<IFeature>();
+		for (final IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
+			final IFeature child = childStructure.getFeature();
 			if (isSelectable(child) || hasLayerChild(child)) {
 				children.add(child);
 			}
@@ -330,15 +323,13 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * @param feature
-	 *            The feature
-	 * @return <code>true</code> if the feature is a layer or if it has a child
-	 *         that is a concrete
+	 * @param feature The feature
+	 * @return <code>true</code> if the feature is a layer or if it has a child that is a concrete
 	 */
 	private boolean hasLayerChild(IFeature feature) {
 		if (feature.getStructure().hasChildren()) {
-			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
-				IFeature child = childStructure.getFeature();
+			for (final IFeatureStructure childStructure : feature.getStructure().getChildren()) {
+				final IFeature child = childStructure.getFeature();
 				if (isSelectable(child) || hasLayerChild(child)) {
 					return true;
 				}
@@ -348,12 +339,12 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 	}
 
 	/**
-	 * Checks whether the concrete feature can be selected manually. 
+	 * Checks whether the concrete feature can be selected manually.
 	 */
 	private boolean isSelectable(final IFeature child) {
 		final IFeatureStructure structure = child.getStructure();
-		boolean concrete = structure.isConcrete();
+		final boolean concrete = structure.isConcrete();
 		return concrete && !structure.isHidden();
 	}
-	
+
 }

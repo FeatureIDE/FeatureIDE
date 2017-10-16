@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Determines whether a sat instance is satisfiable and returns the found model.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class SolutionGenerator extends AbstractAnalysis<List<LiteralSet>> {
@@ -55,12 +55,12 @@ public class SolutionGenerator extends AbstractAnalysis<List<LiteralSet>> {
 		final ArrayList<LiteralSet> solutionList = new ArrayList<>();
 		solver.setGlobalTimeout(true);
 		SatResult hasSolution = solver.hasSolution();
-		while (max > solutionList.size() && hasSolution == SatResult.TRUE) {
+		while ((max > solutionList.size()) && (hasSolution == SatResult.TRUE)) {
 			final int[] solution = solver.getSolution();
 			solutionList.add(new LiteralSet(solution));
 			try {
 				solver.addClause(new LiteralSet(solution).negate());
-			} catch (RuntimeContradictionException e) {
+			} catch (final RuntimeContradictionException e) {
 				break;
 			}
 			hasSolution = solver.hasSolution();

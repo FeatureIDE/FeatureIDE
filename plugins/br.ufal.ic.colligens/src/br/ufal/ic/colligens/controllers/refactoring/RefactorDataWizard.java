@@ -5,8 +5,7 @@ import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 
 public class RefactorDataWizard extends RefactoringWizard {
 
-	public RefactorDataWizard(Refactoring refactoring,
-			String pageTitle) {
+	public RefactorDataWizard(Refactoring refactoring, String pageTitle) {
 		super(refactoring, PREVIEW_EXPAND_FIRST_NODE);
 		setDefaultPageTitle(pageTitle);
 		setForcePreviousAndNextButtons(true);
@@ -14,7 +13,8 @@ public class RefactorDataWizard extends RefactoringWizard {
 
 	@Override
 	protected void addUserInputPages() {
-//		addPage(new RefactoringDataInputPage("IntroduceIndirectionInputPage"));
+		// addPage(new
+		// RefactoringDataInputPage("IntroduceIndirectionInputPage"));
 	}
 
 }

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -58,7 +58,7 @@ import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 
 /**
  * EditPart for Roles.
- * 
+ *
  * @author Constanze Adler
  */
 public class RoleEditPart extends AbstractGraphicalEditPart {
@@ -78,35 +78,36 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	}
 
 	@Override
-	protected void createEditPolicies() {
-	}
+	protected void createEditPolicies() {}
 
 	/**
 	 * {@Link ModelEditPart#refreshVisuals()}
 	 */
 	@Override
-	protected void refreshVisuals() {
-	}
+	protected void refreshVisuals() {}
 
 	/**
 	 * opens the fields/methods/file of the role with its default editor.
 	 */
+	@Override
 	public void performRequest(Request request) {
 		if (REQ_OPEN.equals(request.getType())) {
-			IFile file = this.getRoleModel().getFile();
-			if (file == null)
+			final IFile file = getRoleModel().getFile();
+			if (file == null) {
 				return;
+			}
 
-			IWorkbenchPage page = getActivePage();
+			final IWorkbenchPage page = getActivePage();
 			if (page != null) {
 				try {
 
-					RoleFigure roleFigure = (RoleFigure) this.getFigure();
+					final RoleFigure roleFigure = (RoleFigure) getFigure();
 					if (roleFigure.isFieldMethodFilterActive() || !CorePlugin.getFeatureProject(file).getComposer().showContextFieldsAndMethods()) {
 						openElement(roleFigure, file);
-					} else
+					} else {
 						openEditor(file);
-				} catch (CoreException e) {
+					}
+				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
@@ -120,7 +121,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType = null;
-		IContentDescription description = file.getContentDescription();
+		final IContentDescription description = file.getContentDescription();
 		if (description != null) {
 			contentType = description.getContentType();
 		}
@@ -132,11 +133,12 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	}
 
 	private ITextEditor openEditor(IFile file) throws CoreException {
-		IWorkbenchPage page = getActivePage();
-		if (page == null)
+		final IWorkbenchPage page = getActivePage();
+		if (page == null) {
 			return null;
+		}
 
-		IEditorDescriptor desc = getDescriptor(file);
+		final IEditorDescriptor desc = getDescriptor(file);
 
 		if (desc != null) {
 			return (ITextEditor) page.openEditor(new FileEditorInput(file), desc.getId());
@@ -150,22 +152,22 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	 * search clicked element of current cursor position and open element in editor
 	 */
 	private void openElement(RoleFigure roleFigure, IFile file) throws CoreException {
-		Point point = getCursorPosition();
-		List<?> panelList = roleFigure.getChildren();
+		final Point point = getCursorPosition();
+		final List<?> panelList = roleFigure.getChildren();
 		ITextEditor editor;
 
-		for (Object o : panelList) {
-			Panel panel = (Panel) o;
-			List<?> labelList = panel.getChildren();
+		for (final Object o : panelList) {
+			final Panel panel = (Panel) o;
+			final List<?> labelList = panel.getChildren();
 
-			for (Object child : labelList) {
-				RoleFigureLabel label = (RoleFigureLabel) child;
-				Rectangle rect = label.getBounds();
-				int y = rect.y;
-				if (point.y >= y && point.y <= (y + rect.height)) {
+			for (final Object child : labelList) {
+				final RoleFigureLabel label = (RoleFigureLabel) child;
+				final Rectangle rect = label.getBounds();
+				final int y = rect.y;
+				if ((point.y >= y) && (point.y <= (y + rect.height))) {
 
-					TreeSet<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
-					for (FSTInvariant invariant : invariants) {
+					final TreeSet<FSTInvariant> invariants = getRoleModel().getClassFragment().getInvariants();
+					for (final FSTInvariant invariant : invariants) {
 						if (invariant.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
@@ -175,9 +177,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 
 					}
-					Collection<FSTField> fields = this.getRoleModel().getAllFields();
-					
-					for (FSTField fstField : fields) {
+					final Collection<FSTField> fields = getRoleModel().getAllFields();
+
+					for (final FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
@@ -187,19 +189,19 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					Collection<FSTClassFragment> innerClasses = this.getRoleModel().getAllInnerClasses();
-					for (FSTClassFragment fstInnerClass : innerClasses) {
+					final Collection<FSTClassFragment> innerClasses = getRoleModel().getAllInnerClasses();
+					for (final FSTClassFragment fstInnerClass : innerClasses) {
 						if (fstInnerClass.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor,fstInnerClass.getLine());
+								Outline.scrollToLine(editor, fstInnerClass.getLine());
 							}
 							return;
 						}
 					}
-					Collection<FSTMethod> methods = this.getRoleModel().getAllMethods();
-					
-					for (FSTMethod fstMethod : methods) {
+					final Collection<FSTMethod> methods = getRoleModel().getAllMethods();
+
+					for (final FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
@@ -209,9 +211,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					TreeSet<FSTDirective> directives = this.getRoleModel().getDirectives();
-					for (FSTDirective fstDirective : directives) {
-						RoleElement<?> roleElement = label.getRoleElement();
+					final TreeSet<FSTDirective> directives = getRoleModel().getDirectives();
+					for (final FSTDirective fstDirective : directives) {
+						final RoleElement<?> roleElement = label.getRoleElement();
 						if (fstDirective.equals(roleElement)) {
 							editor = openEditor(file);
 							if (editor != null) {
@@ -224,26 +226,28 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				}
 			}
 		}
-		//if no element found, open file in editor
+		// if no element found, open file in editor
 		openEditor(file);
 		getViewer().getContents().refresh();
 	}
 
 	private Point getCursorPosition() {
-		Display display = Display.getDefault();
-		FigureCanvas figureCanvas = (FigureCanvas) this.getViewer().getControl();
-		Point point = figureCanvas.toControl(display.getCursorLocation());
+		final Display display = Display.getDefault();
+		final FigureCanvas figureCanvas = (FigureCanvas) getViewer().getControl();
+		final Point point = figureCanvas.toControl(display.getCursorLocation());
 
-		Viewport viewport = figureCanvas.getViewport();
-		org.eclipse.draw2d.geometry.Point location = viewport.getViewLocation();
+		final Viewport viewport = figureCanvas.getViewport();
+		final org.eclipse.draw2d.geometry.Point location = viewport.getViewLocation();
 
 		int x = point.x + location.x;
 		int y = point.y + location.y;
-		Rectangle bounds = viewport.getBounds();
-		if (point.x < 0)
+		final Rectangle bounds = viewport.getBounds();
+		if (point.x < 0) {
 			x += bounds.width;
-		if (point.y < 0)
+		}
+		if (point.y < 0) {
 			y += bounds.height;
+		}
 
 		return new Point(x, y);
 	}

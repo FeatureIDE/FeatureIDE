@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,9 +30,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Holds certain {@link ACreator elements} that can be derived from a feature model.
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  * @see #getElement(ACreator)
  */
 public class FeatureModelFormula {
@@ -40,9 +40,9 @@ public class FeatureModelFormula {
 	private final HashMap<ACreator<?>, ACreator<?>> map = new HashMap<>();
 
 	/**
-	 * Get an arbitrary element that can be derived from the associated feature model.<br/>
-	 * This methods first checks whether there is a cached instance and only computes the requested object otherwise.
-	 * 
+	 * Get an arbitrary element that can be derived from the associated feature model.<br/> This methods first checks whether there is a cached instance and
+	 * only computes the requested object otherwise.
+	 *
 	 * @return a {@link Node} instance.
 	 */
 	@SuppressWarnings("unchecked")
@@ -74,9 +74,8 @@ public class FeatureModelFormula {
 	}
 
 	/**
-	 * Get the CNF for the associated feature model.<br/>
-	 * Convenience method, fully equivalent to {@code getElement(new CNFFormula())}.
-	 * 
+	 * Get the CNF for the associated feature model.<br/> Convenience method, fully equivalent to {@code getElement(new CNFFormula())}.
+	 *
 	 * @return a {@link CNF} instance.
 	 */
 	public CNF getCNF() {
@@ -84,9 +83,8 @@ public class FeatureModelFormula {
 	}
 
 	/**
-	 * Get the Node in CNF for the associated feature model.<br/>
-	 * Convenience method, fully equivalent to {@code getElement(new CNFNode())}.
-	 * 
+	 * Get the Node in CNF for the associated feature model.<br/> Convenience method, fully equivalent to {@code getElement(new CNFNode())}.
+	 *
 	 * @return a {@link Node} instance.
 	 */
 	public Node getCNFNode() {

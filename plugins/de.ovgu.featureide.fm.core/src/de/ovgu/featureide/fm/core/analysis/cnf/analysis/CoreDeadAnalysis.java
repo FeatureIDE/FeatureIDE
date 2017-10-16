@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
@@ -59,6 +59,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 		this.variables = variables;
 	}
 
+	@Override
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
 		return analyze2(monitor);
 	}
@@ -67,7 +68,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 	protected ISatSolver initSolver(CNF satInstance) {
 		try {
 			return new ModifiableSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
@@ -79,7 +80,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 = solver.findSolution();
+			final int[] model2 = solver.findSolution();
 
 			if (variables != null) {
 				final int[] model3 = new int[model1.length];
@@ -131,11 +132,11 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 				switch (solver.hasSolution()) {
 				case FALSE:
 					foundVariables(model, vars);
-					//				solver.removeLastClause();
+					// solver.removeLastClause();
 					break;
 				case TIMEOUT:
 					reportTimeout();
-					//				solver.removeLastClause();
+					// solver.removeLastClause();
 					break;
 				case TRUE:
 					SatUtils.updateSolution(model, solver.getSolution());
@@ -149,7 +150,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 					break;
 				}
 				solver.removeLastClause();
-			} catch (RuntimeContradictionException e) {
+			} catch (final RuntimeContradictionException e) {
 				foundVariables(model, vars);
 			}
 			break;
@@ -177,7 +178,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 	}
 
 	private void foundVariables(int[] model, VecInt vars) {
-		for (IteratorInt iterator = vars.iterator(); iterator.hasNext();) {
+		for (final IteratorInt iterator = vars.iterator(); iterator.hasNext();) {
 			final int var = iterator.next();
 			solver.assignmentPush(-var);
 			model[Math.abs(var) - 1] = 0;
@@ -191,7 +192,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			int[] model2 = solver.findSolution();
+			final int[] model2 = solver.findSolution();
 
 			if (variables != null) {
 				final int[] model3 = new int[model1.length];

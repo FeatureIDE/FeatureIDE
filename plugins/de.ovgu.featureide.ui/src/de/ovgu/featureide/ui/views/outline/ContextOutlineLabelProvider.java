@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -61,18 +61,16 @@ import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
 
 /**
  * Provides labels and images for Collaboration outline
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -80,8 +78,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	@Override
 	public Image getImage(Object element) {
@@ -126,7 +123,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				final StringBuilder sb = new StringBuilder();
 				sb.append(method.getName());
 				sb.append('(');
-				for (String parameterType : method.getParameterTypes()) {
+				for (final String parameterType : method.getParameterTypes()) {
 					sb.append(parameterType);
 					sb.append(", ");
 				}
@@ -152,8 +149,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	@Override
-	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-	}
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {}
 
 	@Override
 	public void setForeground(TreeItem item, IFile file) {
@@ -181,7 +177,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
-		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+		if (!(editorPart instanceof ITextEditor) || (lineNumber <= 0)) {
 			return;
 		}
 		final ITextEditor editor = (ITextEditor) editorPart;
@@ -190,19 +186,19 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 			IRegion lineInfo = null;
 			try {
 				lineInfo = document.getLineInformation(lineNumber - 1);
-			} catch (BadLocationException e) {
-			}
+			} catch (final BadLocationException e) {}
 			if (lineInfo != null) {
 				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
 			}
 		}
 	}
 
-	private ISelectionChangedListener sListner = new ISelectionChangedListener() {
+	private final ISelectionChangedListener sListner = new ISelectionChangedListener() {
+
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
-				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				final Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 				if (!(viewer.getInput() instanceof IResource)) {
 					return;
 				}
@@ -230,7 +226,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 		private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
 			final FSTModel model = featureProject.getFSTModel();
 			final ProjectSignatures signatures = featureProject.getProjectSignatures();
-			if (model != null && signatures != null) {
+			if ((model != null) && (signatures != null)) {
 				AbstractSignature parent = sig;
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
@@ -245,8 +241,8 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 					final IWorkbench workbench = PlatformUI.getWorkbench();
 					try {
 						final IContentDescription description = iFile.getContentDescription();
-						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-								(description != null) ? description.getContentType() : null);
+						final IEditorDescriptor desc =
+								workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), (description != null) ? description.getContentType() : null);
 						final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
 						IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
 						if (editorPart == null) {
@@ -254,7 +250,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 						}
 						final int dataIndex = sig.hasFeature(featureID);
 						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getStartLineNumber() : 1);
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						UIPlugin.getDefault().logError(e);
 					}
 				}

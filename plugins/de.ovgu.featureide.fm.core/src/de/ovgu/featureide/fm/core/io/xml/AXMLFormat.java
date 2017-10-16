@@ -57,7 +57,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Prints a feature model in XML format.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
@@ -92,7 +92,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	/**
 	 * Inserts indentations into the text
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -148,11 +148,11 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
-		} catch (SAXParseException e) {
+		} catch (final SAXParseException e) {
 			lastWarnings.add(new Problem(e, e.getLineNumber()));
-		} catch (UnsupportedModelException e) {
+		} catch (final UnsupportedModelException e) {
 			lastWarnings.add(new Problem(e, e.lineNumber));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			lastWarnings.add(new Problem(e));
 		}
 
@@ -162,7 +162,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	@Override
 	public String write(T object) {
 		this.object = object;
-		//Create Empty DOM Document
+		// Create Empty DOM Document
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
@@ -176,10 +176,10 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 			Logger.logError(pce);
 		}
 		final Document doc = db.newDocument();
-		//Create the XML Representation
+		// Create the XML Representation
 		writeDocument(doc);
 
-		//Transform the XML Representation into a String
+		// Transform the XML Representation into a String
 		Transformer transfo = null;
 		try {
 			transfo = TransformerFactory.newInstance().newTransformer();
@@ -204,7 +204,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	/**
 	 * Reads an XML-Document.
-	 * 
+	 *
 	 * @param doc document to read
 	 * @param warnings list of warnings / errors that occur during read
 	 */
@@ -212,7 +212,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	/**
 	 * Writes an XML-Document.
-	 * 
+	 *
 	 * @param doc document to write
 	 */
 	protected abstract void writeDocument(Document doc);

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,9 +30,8 @@ import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * Responsible to load and save all information from / to a file.<br/>
- * To get an instance use the {@link FileManagerMap}.
- * 
+ * Responsible to load and save all information from / to a file.<br/> To get an instance use the {@link FileManagerMap}.
+ *
  * @author Sebastian Krieter
  */
 public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
@@ -52,9 +51,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		protected abstract Snapshot<T> createSnapshot(T object);
 
 		/**
-		 * Compares two object for equality.<br/>
-		 * Subclasses should override (implement) this method.
-		 * 
+		 * Compares two object for equality.<br/> Subclasses should override (implement) this method.
+		 *
 		 * @param o1 First object.
 		 * @param o2 Second object.
 		 * @return {@code true} if objects are considered equal, {@code false} otherwise.
@@ -126,6 +124,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return variableObject;
 	}
 
+	@Override
 	public Snapshot<T> getSnapshot() {
 		return persistentObject;
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph.Vertex;
 
 /**
- * 
+ *
  * @author Sebastian Krieter
  */
 public class IncrementalTraverser {
@@ -53,10 +53,10 @@ public class IncrementalTraverser {
 
 	public IncrementalTraverser(ModalImplicationGraph graph) {
 		this.graph = graph;
-		this.computationMark = new byte[graph.getAdjList().size()];
-		this.complexClauseSatisfiability = new boolean[graph.getComplexClauses().size()];
+		computationMark = new byte[graph.getAdjList().size()];
+		complexClauseSatisfiability = new boolean[graph.getComplexClauses().size()];
 	}
-	
+
 	public void selectVariable(int literal) {
 		markStrong(literal, changed);
 		traverseStrong(literal, changed);
@@ -73,25 +73,25 @@ public class IncrementalTraverser {
 
 	final ArrayDeque<Integer> changed = new ArrayDeque<>();
 
-	//	public byte[] markConnected(int literal) {
-	//		for (int i = 0; i < computationMark.length; i++) {
-	//			computationMark[i] &= MARK_AUTO_SELECTION;
-	//		}
-	//		final byte[] copy = Arrays.copyOf(computationMark, computationMark.length);
-	//		final boolean[] copy2 = Arrays.copyOf(complexClauseSatisfiability, complexClauseSatisfiability.length);
+	// public byte[] markConnected(int literal) {
+	// for (int i = 0; i < computationMark.length; i++) {
+	// computationMark[i] &= MARK_AUTO_SELECTION;
+	// }
+	// final byte[] copy = Arrays.copyOf(computationMark, computationMark.length);
+	// final boolean[] copy2 = Arrays.copyOf(complexClauseSatisfiability, complexClauseSatisfiability.length);
 	//
-	//		changed.clear();
-	//		changed.push(literal);
-	//		traverseStrong(literal, changed);
+	// changed.clear();
+	// changed.push(literal);
+	// traverseStrong(literal, changed);
 	//
-	//		while (!changed.isEmpty()) {
-	//			traverseWeak(changed.pop(), changed);
-	//		}
-	//		complexClauseSatisfiability = copy2;
-	//		final byte[] temp = computationMark;
-	//		computationMark = copy;
-	//		return temp;
-	//	}
+	// while (!changed.isEmpty()) {
+	// traverseWeak(changed.pop(), changed);
+	// }
+	// complexClauseSatisfiability = copy2;
+	// final byte[] temp = computationMark;
+	// computationMark = copy;
+	// return temp;
+	// }
 
 	public byte[] markConnected(int... literals) {
 		for (int i = 0; i < computationMark.length; i++) {
@@ -101,7 +101,7 @@ public class IncrementalTraverser {
 		final boolean[] copy2 = Arrays.copyOf(complexClauseSatisfiability, complexClauseSatisfiability.length);
 
 		changed.clear();
-		for (int literal : literals) {
+		for (final int literal : literals) {
 			changed.push(literal);
 			traverseStrong(literal, changed);
 		}
@@ -111,7 +111,7 @@ public class IncrementalTraverser {
 			while (!changed.isEmpty()) {
 				traverseWeak(changed.pop(), changed);
 			}
-		} catch (EmptyClauseException e) {
+		} catch (final EmptyClauseException e) {
 			return null;
 		} finally {
 			complexClauseSatisfiability = copy2;
@@ -119,7 +119,7 @@ public class IncrementalTraverser {
 		}
 		return temp;
 	}
-	
+
 	public byte[] markConnected2(int... literals) {
 		for (int i = 0; i < computationMark.length; i++) {
 			computationMark[i] &= MARK_AUTO_SELECTION;
@@ -129,10 +129,10 @@ public class IncrementalTraverser {
 
 		final byte[] temp = computationMark;
 		try {
-			for (int b : literals) {
+			for (final int b : literals) {
 				traverseWeak2(b);
 			}
-		} catch (EmptyClauseException e) {
+		} catch (final EmptyClauseException e) {
 			return null;
 		} finally {
 			complexClauseSatisfiability = copy2;
@@ -162,11 +162,11 @@ public class IncrementalTraverser {
 		final int index = Math.abs(literal) - 1;
 		final byte mark = computationMark[index];
 		assert ((mark | (literal > 0 ? MARK_AUTO_SELECT : MARK_AUTO_DESELECT)) & MARK_AUTO_SELECTION) != MARK_AUTO_SELECTION;
-		if (literal > 0 && (mark & MARK_AUTO_SELECT) == 0) {
+		if ((literal > 0) && ((mark & MARK_AUTO_SELECT) == 0)) {
 			changed.push(literal);
 			selectVariable(literal, index);
 		}
-		if (literal < 0 && (mark & MARK_AUTO_DESELECT) == 0) {
+		if ((literal < 0) && ((mark & MARK_AUTO_DESELECT) == 0)) {
 			changed.push(literal);
 			selectVariable(literal, index);
 		}
@@ -175,12 +175,12 @@ public class IncrementalTraverser {
 	protected void selectVariable(final int literal, final int index) {
 		if (literal > 0) {
 			computationMark[index] |= MARK_AUTO_SELECT;
-			for (int i : graph.getAdjList().get(index).negComplexClauses) {
+			for (final int i : graph.getAdjList().get(index).negComplexClauses) {
 				complexClauseSatisfiability[i] = true;
 			}
 		} else {
 			computationMark[index] |= MARK_AUTO_DESELECT;
-			for (int i : graph.getAdjList().get(index).posComplexClauses) {
+			for (final int i : graph.getAdjList().get(index).posComplexClauses) {
 				complexClauseSatisfiability[i] = true;
 			}
 		}
@@ -211,13 +211,13 @@ public class IncrementalTraverser {
 
 		// Weak Edges
 		final VecInt v = new VecInt();
-		for (int complexClause : complexClauses) {
+		for (final int complexClause : complexClauses) {
 			final LiteralSet clause = getComplexClause(complexClause);
 			if (clause != null) {
 				v.clear();
-				for (int literal : clause.getLiterals()) {
+				for (final int literal : clause.getLiterals()) {
 					final int index = Math.abs(literal) - 1;
-					if (index != curIndex && (computationMark[index] & MARK_AUTO_SELECTION) == 0) {
+					if ((index != curIndex) && ((computationMark[index] & MARK_AUTO_SELECTION) == 0)) {
 						v.push(literal);
 					}
 				}
@@ -230,14 +230,14 @@ public class IncrementalTraverser {
 					markStrong(literal, changed);
 					traverseStrong(literal, changed);
 				} else {
-					for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+					for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 						traverseWeakRec(iterator.next());
 					}
 				}
 			}
 		}
 	}
-	
+
 	private void traverseWeak2(int curVar) throws EmptyClauseException {
 		final int curIndex = Math.abs(curVar) - 1;
 		final Vertex vertex = graph.getAdjList().get(curIndex);
@@ -251,13 +251,13 @@ public class IncrementalTraverser {
 
 		// Weak Edges
 		final VecInt v = new VecInt();
-		for (int complexClause : complexClauses) {
+		for (final int complexClause : complexClauses) {
 			final LiteralSet clause = getComplexClause(complexClause);
 			if (clause != null) {
 				v.clear();
-				for (int literal : clause.getLiterals()) {
+				for (final int literal : clause.getLiterals()) {
 					final int index = Math.abs(literal) - 1;
-					if (index != curIndex && (computationMark[index] & MARK_AUTO_SELECTION) == 0) {
+					if ((index != curIndex) && ((computationMark[index] & MARK_AUTO_SELECTION) == 0)) {
 						v.push(literal);
 					}
 				}
@@ -270,7 +270,7 @@ public class IncrementalTraverser {
 					markStrong(literal, changed);
 					traverseStrong(literal, changed);
 				} else {
-					for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+					for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 						traverseWeakRec(iterator.next());
 					}
 				}
@@ -303,27 +303,27 @@ public class IncrementalTraverser {
 		}
 
 		// TODO is this if statement correct?
-		//		if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
+		// if ((computationMark[curIndex] & MARK_AUTO_SELECTION) != 0) {
 		// Strong Edges
 		for (int i = 0; i < strongEdges.length; i++) {
 			traverseWeakRec(strongEdges[i]);
 		}
-		//		}
+		// }
 
 		// Weak Edges
 		final VecInt v = new VecInt();
-		for (int complexClause : complexClauses) {
+		for (final int complexClause : complexClauses) {
 			final LiteralSet clause = getComplexClause(complexClause);
 			if (clause != null) {
 				v.clear();
-				for (int literal : clause.getLiterals()) {
+				for (final int literal : clause.getLiterals()) {
 					final int index = Math.abs(literal) - 1;
-					if (index != curIndex && (computationMark[index] & MARK_AUTO_SELECTION) == 0) {
+					if ((index != curIndex) && ((computationMark[index] & MARK_AUTO_SELECTION) == 0)) {
 						v.push(literal);
 					}
 				}
 
-				for (IteratorInt iterator = v.iterator(); iterator.hasNext();) {
+				for (final IteratorInt iterator = v.iterator(); iterator.hasNext();) {
 					traverseWeakRec(iterator.next());
 				}
 			}

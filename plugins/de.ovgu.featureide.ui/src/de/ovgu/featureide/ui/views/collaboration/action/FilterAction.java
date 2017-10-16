@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,29 +35,30 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 
 /**
  * Filters the collaboration model
- * 
+ *
  * @author Jens Meinicke
  */
 public class FilterAction extends Action {
 
 	private final GraphicalViewerImpl viewer;
 	private final CollaborationView collaborationView;
-	
-	private final Set<String> classFilter = new HashSet<String>(); 
+
+	private final Set<String> classFilter = new HashSet<String>();
 	private final Set<String> featureFilter = new HashSet<String>();
-	
+
 	public FilterAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
 		super(text);
 		this.collaborationView = collaborationView;
 		viewer = view;
 	}
 
+	@Override
 	public void setEnabled(boolean enabled) {
-		IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 		super.setEnabled(false);
-		
-		for (Object part : selection.toList()) {
-			if (part instanceof RoleEditPart) { 
+
+		for (final Object part : selection.toList()) {
+			if (part instanceof RoleEditPart) {
 				classFilter.add(((RoleEditPart) part).getRoleModel().getClassFragment().getName());
 				super.setEnabled(true);
 			} else if (part instanceof ClassEditPart) {
@@ -68,16 +69,16 @@ public class FilterAction extends Action {
 				super.setEnabled(true);
 			}
 		}
-		boolean filterDefined = CollaborationModelBuilder.isFilterDefined();
+		final boolean filterDefined = CollaborationModelBuilder.isFilterDefined();
 		setChecked(filterDefined);
 		if (filterDefined) {
 			super.setEnabled(true);
 		}
 	}
-	
+
+	@Override
 	public void run() {
-		if ((!classFilter.isEmpty() || !featureFilter.isEmpty()) &&
-				!CollaborationModelBuilder.isFilterDefined()) {
+		if ((!classFilter.isEmpty() || !featureFilter.isEmpty()) && !CollaborationModelBuilder.isFilterDefined()) {
 			setChecked(true);
 			CollaborationModelBuilder.setClassFilter(new HashSet<String>(classFilter));
 			CollaborationModelBuilder.setFeatureFilter(new HashSet<String>(featureFilter));

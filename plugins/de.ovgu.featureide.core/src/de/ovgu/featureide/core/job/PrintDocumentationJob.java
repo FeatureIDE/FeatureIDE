@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -61,14 +62,13 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.FileSystem;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * This job generates Javadoc from the feature-aware comments in a selected location.
- * Subsequently it uses the Javadoc parser to generate the documentation.
- * 
+ * This job generates Javadoc from the feature-aware comments in a selected location. Subsequently it uses the Javadoc parser to generate the documentation.
+ *
  * @author Sebastian Krieter
  */
 public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
@@ -115,8 +115,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			final Configuration conf = new Configuration(featureProject.getFeatureModel());
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
-			} catch (Exception e) {
+				SimpleFileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigFormatManager.getInstance());
+			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
 			}
@@ -124,7 +124,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 
 			final int[] tempFeatureList = new int[featureNames.size()];
 			int count = 0;
-			for (String featureName : featureNames) {
+			for (final String featureName : featureNames) {
 				final int id = projectSignatures.getFeatureID(featureName);
 				if (id >= 0) {
 					tempFeatureList[count++] = id;
@@ -135,7 +135,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			// sort feature list
 			int c = 0;
 			for (int j = 0; j < count; j++) {
-				int curId = tempFeatureList[j];
+				final int curId = tempFeatureList[j];
 				for (int k = 0; k < featureIDs.length; k++) {
 					if (curId == featureIDs[k]) {
 						validFeatureIDs[c++] = curId;
@@ -147,8 +147,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
 			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
 			int i = 1;
-			for (SelectableFeature feature : conf.getFeatures()) {
-				Selection selection = feature.getSelection();
+			for (final SelectableFeature feature : conf.getFeatures()) {
+				final Selection selection = feature.getSelection();
 				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
 						: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
@@ -176,9 +176,10 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 				commentFilters.add(new ConstraintFilter(nodes));
 
 				commentFilters.add(new IFilter<BlockTag>() {
+
 					@Override
 					public boolean isValid(BlockTag object) {
-						for (String featureName : object.getConstraint().getContainedFeatures()) {
+						for (final String featureName : object.getConstraint().getContainedFeatures()) {
 							if (featureName.equals(featureName)) {
 								return true;
 							}
@@ -209,7 +210,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 
 		try {
 			folder.delete(true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
@@ -229,10 +230,10 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 
 		workMonitor.setRemainingWork(structure.getClasses().size() + 2);
 
-		for (AbstractClassFragment javaClass : structure.getClasses()) {
-			String packagename = javaClass.getSignature().getPackage();
+		for (final AbstractClassFragment javaClass : structure.getClasses()) {
+			final String packagename = javaClass.getSignature().getPackage();
 
-			String path = extFoldername + packagename.replace('.', '/');
+			final String path = extFoldername + packagename.replace('.', '/');
 
 			if (packagename.isEmpty()) {
 				classList.add(srcOutput + javaClass.getSignature().getName() + ".java");
@@ -241,10 +242,10 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			}
 
 			final IFolder folder = FMCorePlugin.createFolder(project, path);
-			IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
+			final IFile file = folder.getFile(javaClass.getSignature().getName() + ".java");
 			try {
 				FileSystem.write(Paths.get(file.getLocationURI()), javaClass.toString().getBytes(Charset.forName("UTF-8")));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				CorePlugin.getDefault().logError(e);
 			}
 			workMonitor.worked();
@@ -272,7 +273,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		}
 
 		final String[] javadocargs;
-		if (options != null && options.length > 0 && !options[0].isEmpty()) {
+		if ((options != null) && (options.length > 0) && !options[0].isEmpty()) {
 			javadocargs = new String[numDefaultArguments + options.length];
 			System.arraycopy(options, 0, javadocargs, numDefaultArguments, options.length);
 		} else {
@@ -297,8 +298,8 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 		workMonitor.worked();
 
 		try {
-			folder.refreshLocal(IFolder.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+			folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		workMonitor.worked();

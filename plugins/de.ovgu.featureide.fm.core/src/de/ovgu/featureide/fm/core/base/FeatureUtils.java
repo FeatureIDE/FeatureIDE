@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Several convenience methods for handling feature models, features and constraints.
- * 
+ *
  * @author Marcus Pinnecke
  */
 public final class FeatureUtils {
@@ -102,6 +102,7 @@ public final class FeatureUtils {
 	};
 
 	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
+
 		@Override
 		public String invoke(IFeature t) {
 			return t.getName();
@@ -109,6 +110,7 @@ public final class FeatureUtils {
 	};
 
 	public static final IFunction<IFeature, String> GET_OLD_FEATURE_NAME = new IFunction<IFeature, String>() {
+
 		@Override
 		public String invoke(IFeature t) {
 			return t.getFeatureModel().getRenamingsManager().getOldName(t.getName());
@@ -175,15 +177,15 @@ public final class FeatureUtils {
 	}
 
 	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
-		//		constraint.addListener(listener);
+		// constraint.addListener(listener);
 	}
 
 	public static final void addListener(IFeature feature, PropertyChangeListener listener) {
-		//		feature.addListener(listener);
+		// feature.addListener(listener);
 	}
 
 	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-		//		featureModel.addListener(listener);
+		// featureModel.addListener(listener);
 	}
 
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
@@ -201,7 +203,7 @@ public final class FeatureUtils {
 	}
 
 	public static final void addTargetConnection(IFeature feature, FeatureConnection connection) {
-		//		feature.getStructure().addTargetConnection(connection);
+		// feature.getStructure().addTargetConnection(connection);
 	}
 
 	public static final void changeToAlternative(IFeature feature) {
@@ -297,7 +299,7 @@ public final class FeatureUtils {
 
 	/**
 	 * Extracts all concrete features from a feature model by calling {@link #extractConcreteFeatures(Iterable)} on <code>model.getFeatures()</code>.
-	 * 
+	 *
 	 * @since 3.0
 	 * @param model A feature model
 	 * @author Marcus Pinnecke
@@ -317,15 +319,12 @@ public final class FeatureUtils {
 
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
-	 * object that
-	 * yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy filtering
-	 * without
-	 * modification of <b>features</b>.
-	 * 
-	 * <br/>
-	 * <br/>
-	 * The extraction is done via {@link de.ovgu.featureide.fm.core.base.util.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
-	 * 
+	 * object that yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy
+	 * filtering without modification of <b>features</b>.
+	 *
+	 * <br/> <br/> The extraction is done via
+	 * {@link de.ovgu.featureide.fm.core.base.util.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 *
 	 * @since 3.0
 	 * @param features An iterable object providing features
 	 * @author Marcus Pinnecke
@@ -347,7 +346,7 @@ public final class FeatureUtils {
 	 * Extracts all concrete features from a feature model as a list of strings by calling
 	 * {@link de.ovgu.featureide.fm.core.base.util.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
 	 * <code>model.getFeatures()</code>.
-	 * 
+	 *
 	 * @since 3.0
 	 * @param model A feature model
 	 * @author Marcus Pinnecke
@@ -356,7 +355,7 @@ public final class FeatureUtils {
 	public static List<String> extractConcreteFeaturesAsStringList(IFeatureModel model) {
 		requireNonNull(model);
 
-		return new ArrayList<String>(Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures())));
+		return new ArrayList<>(Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures())));
 	}
 
 	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
@@ -372,14 +371,14 @@ public final class FeatureUtils {
 	}
 
 	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
-		//		constraint.fireEvent(event);
+		// constraint.fireEvent(event);
 	}
 
 	public static final void fire(IFeature feature, PropertyChangeEvent event) {
 		requireNonNull(feature);
 		requireNonNull(event);
 
-		//		feature.fireEvent(event);
+		// feature.fireEvent(event);
 	}
 
 	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
@@ -414,12 +413,12 @@ public final class FeatureUtils {
 	}
 
 	public static final ColorList getColorList(IFeature feature) {
-		//		return feature.getGraphicRepresenation().getColorList();
+		// return feature.getGraphicRepresenation().getColorList();
 		return null;
 	}
 
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
-		//		return featureModel.getGraphicRepresenation().getColorschemeTable();
+		// return featureModel.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
@@ -474,9 +473,11 @@ public final class FeatureUtils {
 		requireNonNull(constraint);
 
 		final List<IConstraint> constraints = featureModel.getConstraints();
-		for (int i = 0; i < constraints.size(); i++)
-			if (constraints.get(i).equals(constraint))
+		for (int i = 0; i < constraints.size(); i++) {
+			if (constraints.get(i).equals(constraint)) {
 				return i;
+			}
+		}
 		throw new NoSuchElementException();
 	}
 
@@ -511,11 +512,11 @@ public final class FeatureUtils {
 			fm.handleModelDataChanged();
 		}
 
-		final Collection<IFeature> deadFeaturesAfter = new LinkedList<IFeature>();
+		final Collection<IFeature> deadFeaturesAfter = new LinkedList<>();
 		for (final IFeature f : fmDeadFeatures) {
 			final IFeature feature = fm.getFeature(f.getName());
 			// XXX why can the given feature not be found?
-			if (feature != null && !deadFeaturesBefore.contains(feature)) {
+			if ((feature != null) && !deadFeaturesBefore.contains(feature)) {
 				deadFeaturesAfter.add(f);
 			}
 		}
@@ -629,17 +630,17 @@ public final class FeatureUtils {
 	}
 
 	public static final GraphicItem getItemType(IConstraint constraint) {
-		//		return constraint.getGraphicRepresenation().getItemType();
+		// return constraint.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
 	public static final GraphicItem getItemType(IFeature feature) {
-		//		return feature.getGraphicRepresenation().getItemType();
+		// return feature.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
 	public static final GraphicItem getItemType(IFeatureModel featureModel) {
-		//		return featureModel.getGraphicRepresenation().getItemType();
+		// return featureModel.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
@@ -650,7 +651,7 @@ public final class FeatureUtils {
 	}
 
 	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
-		//		return featureModel.getLayout();
+		// return featureModel.getLayout();
 		return null;
 	}
 
@@ -675,7 +676,7 @@ public final class FeatureUtils {
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
-			IFeatureStructure parent = feature.getStructure().getParent();
+			final IFeatureStructure parent = feature.getStructure().getParent();
 			if (parent != null) {
 				return parent.getFeature();
 			}
@@ -711,10 +712,10 @@ public final class FeatureUtils {
 		requireNonNull(feature);
 		requireNonNull(constraints);
 
-		StringBuilder relevant = new StringBuilder();
-		for (IConstraint constraint : constraints) {
-			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f != null && f.getName().equals(feature.getName())) {
+		final StringBuilder relevant = new StringBuilder();
+		for (final IConstraint constraint : constraints) {
+			for (final IFeature f : constraint.getContainedFeatures()) {
+				if ((f != null) && f.getName().equals(feature.getName())) {
 					relevant.append((relevant.length() == 0 ? "" : "\n") + "\u2022 " + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}
@@ -732,7 +733,7 @@ public final class FeatureUtils {
 	public static final IFeature getRoot(IFeatureModel featureModel) {
 		requireNonNull(featureModel);
 
-		IFeatureStructure root = featureModel.getStructure().getRoot();
+		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			return root.getFeature();
 		}
@@ -740,17 +741,17 @@ public final class FeatureUtils {
 	}
 
 	public static final Iterable<FeatureConnection> getSourceConnections(IFeature feature) {
-		//		return feature.getStructure().getSourceConnections();
+		// return feature.getStructure().getSourceConnections();
 		return null;
 	}
 
 	public static final Iterable<FeatureConnection> getTargetConnections(IFeature feature) {
-		//		return feature.getStructure().getTargetConnections();
+		// return feature.getStructure().getTargetConnections();
 		return null;
 	}
 
 	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
-		//		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
+		// featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
 	}
 
 	public static final void handleModelDataChanged(IFeatureModel featureModel) {
@@ -759,14 +760,14 @@ public final class FeatureUtils {
 		featureModel.handleModelDataChanged();
 	}
 
-//	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
-//		requireNonNull(featureModel);
-//
-//		featureModel.handleModelDataLoaded();
-//	}
+	// public static final void handleModelDataLoaded(IFeatureModel featureModel) {
+	// requireNonNull(featureModel);
+	//
+	// featureModel.handleModelDataLoaded();
+	// }
 
 	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
-		//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
+		// featureModel.getGraphicRepresenation().handleModelLayoutChanged();
 	}
 
 	public static final boolean hasAbstract(IFeatureModel featureModel) {
@@ -943,9 +944,11 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(featureName);
 
-		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
-			if (feature.getName().equals(featureName))
+		for (final IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel)) {
+			if (feature.getName().equals(featureName)) {
 				return true;
+			}
+		}
 		return false;
 	}
 
@@ -1023,15 +1026,16 @@ public final class FeatureUtils {
 		string.append(feature.getName());
 		string.append(", mandatory=" + FeatureUtils.isMandatory(feature));
 		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
-		boolean isLeaf = struct.isEmpty();
+		final boolean isLeaf = struct.isEmpty();
 		if (!isLeaf) {
 			final String prop = FeatureUtils.isOr(feature) ? " or" : FeatureUtils.isAlternative(feature) ? " alt" : " and";
 			string.append(" " + prop);
 			string.append("[");
 			for (int i = 0; i < struct.size(); i++) {
 				print(struct.get(i).getFeature(), string);
-				if (i + 1 < struct.size())
+				if ((i + 1) < struct.size()) {
 					string.append(", ");
+				}
 			}
 			string.append("]");
 		}
@@ -1045,11 +1049,11 @@ public final class FeatureUtils {
 	}
 
 	public static final void redrawDiagram(IFeatureModel featureModel) {
-		//		featureModel.getGraphicRepresenation().redrawDiagram();
+		// featureModel.getGraphicRepresenation().redrawDiagram();
 	}
 
 	public static final void refreshContextMenu(IFeatureModel featureModel) {
-		//		featureModel.getGraphicRepresenation().refreshContextMenu();
+		// featureModel.getGraphicRepresenation().refreshContextMenu();
 	}
 
 	public static final void removeChild(IFeature feature, IFeature child) {
@@ -1063,8 +1067,8 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraint);
 
-		List<IConstraint> constraints = featureModel.getConstraints();
-		int index = getConstraintIndex(featureModel, constraint);
+		final List<IConstraint> constraints = featureModel.getConstraints();
+		final int index = getConstraintIndex(featureModel, constraint);
 		tryRemoveConstraint(featureModel, constraints, index);
 	}
 
@@ -1081,22 +1085,22 @@ public final class FeatureUtils {
 	}
 
 	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
-		//		constraint.removeListener(listener);
+		// constraint.removeListener(listener);
 	}
 
 	public static final void removeListener(IFeature feature, PropertyChangeListener listener) {
-		//		feature.removeListener(listener);
+		// feature.removeListener(listener);
 	}
 
 	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-		//		featureModel.removeListener(listener);
+		// featureModel.removeListener(listener);
 	}
 
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
 		requireNonNull(featureModel);
 		requireNonNull(node);
 
-		List<IConstraint> constraints = featureModel.getConstraints();
+		final List<IConstraint> constraints = featureModel.getConstraints();
 		int index = -1;
 		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).getNode().equals(node)) {
@@ -1108,7 +1112,7 @@ public final class FeatureUtils {
 	}
 
 	public static final boolean removeTargetConnection(IFeature feature, FeatureConnection connection) {
-		//		return feature.getStructure().removeTargetConnection(connection);
+		// return feature.getStructure().removeTargetConnection(connection);
 		return false;
 	}
 
@@ -1137,7 +1141,7 @@ public final class FeatureUtils {
 	public static final void requireNonNull(Object object) {
 		// TODO check unnecessary null checks, may cuase defect itself
 		// or move to constructors
-		//		java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
+		// java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
 	}
 
 	public static final void reset(IFeatureModel featureModel) {
@@ -1158,13 +1162,13 @@ public final class FeatureUtils {
 		feature.getStructure().setAlternative();
 	}
 
-	//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-	//		featureModel.getUndoContext(undoContext);
-	//	}
+	// public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
+	// featureModel.getUndoContext(undoContext);
+	// }
 	//
-	//	public static final Object getUndoContext(IFeatureModel featureModel) {
-	//		return featureModel.getUndoContext();
-	//	}
+	// public static final Object getUndoContext(IFeatureModel featureModel) {
+	// return featureModel.getUndoContext();
+	// }
 
 	public static final void setAnd(IFeature feature) {
 		requireNonNull(feature);
@@ -1190,13 +1194,13 @@ public final class FeatureUtils {
 		feature.getStructure().setChildren(Functional.toList(Functional.map(children, FEATURE_TO_STRUCTURE)));
 	}
 
-	//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-	//		return featureModel.isFeatureOrderInXML();
-	//	}
+	// public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
+	// return featureModel.isFeatureOrderInXML();
+	// }
 	//
-	//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-	//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
-	//	}
+	// public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+	// featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
+	// }
 
 	@Deprecated
 	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
@@ -1246,7 +1250,7 @@ public final class FeatureUtils {
 		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
 		clonedModel.removeConstraint(constraint);
 		final Collection<IFeature> foFeatures = FeatureModelManager.getAnalyzer(clonedModel).getFalseOptionalFeatures();
-		for (IFeature feature : FeatureModelManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
+		for (final IFeature feature : FeatureModelManager.getAnalyzer(featureModel).getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;
@@ -1330,9 +1334,9 @@ public final class FeatureUtils {
 	public static void setRelevantConstraints(IFeature bone) {
 		requireNonNull(bone);
 
-		List<Constraint> constraintList = new LinkedList<Constraint>();
-		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
-			for (IFeature f : constraint.getContainedFeatures()) {
+		final List<Constraint> constraintList = new LinkedList<>();
+		for (final IConstraint constraint : bone.getFeatureModel().getConstraints()) {
+			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
 					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
 					break;
@@ -1392,21 +1396,20 @@ public final class FeatureUtils {
 		requireNonNull(featureModel);
 		requireNonNull(constraints);
 
-		if (index == -1 || index >= constraints.size())
+		if ((index == -1) || (index >= constraints.size())) {
 			throw new NoSuchElementException();
-		else {
+		} else {
 			constraints.remove(index);
 			featureModel.setConstraints(constraints);
 		}
 	}
 
-	private FeatureUtils() {
-	}
+	private FeatureUtils() {}
 
 	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {
 		requireNonNull(s);
 
-		StringBuilder stringBuilder = new StringBuilder();
+		final StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
 		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierStart(s.charAt(i))) {

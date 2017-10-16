@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,9 +32,9 @@ import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
 
 /**
  * Creates random configurations.
- * 
+ *
  * @see RandomConfigurationGenerator
- * 
+ *
  * @author Jens Meinicke
  */
 public class RandConfigurationGenerator extends AConfigurationGenerator {
@@ -48,9 +48,10 @@ public class RandConfigurationGenerator extends AConfigurationGenerator {
 		exec(cnf, new RandomConfigurationGenerator(cnf, (int) builder.configurationNumber, true), monitor);
 		return null;
 	}
-	
+
 	protected void exec(final CNF satInstance, final RandomConfigurationGenerator as, IMonitor monitor) {
 		final Thread consumer = new Thread() {
+
 			@Override
 			public void run() {
 				int foundConfigurations = 0;
@@ -58,13 +59,13 @@ public class RandConfigurationGenerator extends AConfigurationGenerator {
 					try {
 						generateConfiguration(satInstance.getVariables().convertToString(as.getResultQueue().take()));
 						foundConfigurations++;
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						break;
 					}
 				}
 				foundConfigurations += as.getResultQueue().size();
 				builder.configurationNumber = foundConfigurations;
-				for (int[] c : as.getResultQueue()) {
+				for (final int[] c : as.getResultQueue()) {
 					generateConfiguration(satInstance.getVariables().convertToString(c));
 				}
 			}
@@ -83,4 +84,3 @@ public class RandConfigurationGenerator extends AConfigurationGenerator {
 	}
 
 }
-

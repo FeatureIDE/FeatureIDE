@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Represents an instance of a satisfiability problem in CNF.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CNF implements Serializable {
@@ -39,39 +39,37 @@ public class CNF implements Serializable {
 	protected final Variables variables;
 
 	public CNF(Variables mapping, List<LiteralSet> clauses) {
-		this.variables = mapping;
+		variables = mapping;
 		this.clauses = new ClauseList(clauses);
 	}
 
 	public CNF(Variables mapping) {
-		this.variables = mapping;
-		this.clauses = new ClauseList();
+		variables = mapping;
+		clauses = new ClauseList();
 	}
 
 	public CNF(List<LiteralSet> clauses) {
-		this.variables = new Variables();
+		variables = new Variables();
 		this.clauses = new ClauseList(clauses);
 	}
 
 	/**
-	 * Copy constructor. <br/>
-	 * Also copies clause list (no deep copy).
+	 * Copy constructor. <br/> Also copies clause list (no deep copy).
 	 */
 	public CNF(CNF oldSatInstance) {
 		this(oldSatInstance, true);
 	}
 
 	/**
-	 * Copy constructor. <br/>
-	 * Can either copy or neglect old clauses (no deep copy).
+	 * Copy constructor. <br/> Can either copy or neglect old clauses (no deep copy).
 	 */
 	public CNF(CNF oldSatInstance, boolean copyClauses) {
-		this.variables = oldSatInstance.variables.clone();
-		this.clauses = copyClauses ? new ClauseList(oldSatInstance.clauses) : new ClauseList();
+		variables = oldSatInstance.variables.clone();
+		clauses = copyClauses ? new ClauseList(oldSatInstance.clauses) : new ClauseList();
 	}
 
 	public void addClause(LiteralSet clause) {
-		this.clauses.add(clause);
+		clauses.add(clause);
 	}
 
 	public void addClauses(Collection<LiteralSet> clauses) {
@@ -85,28 +83,27 @@ public class CNF implements Serializable {
 	public IInternalVariables getInternalVariables() {
 		return variables;
 	}
-	
+
 	/**
 	 * @return whether this CNF was sliced by an instance of {@code CNFSlicer}.
 	 */
 	public boolean isSliced() {
 		return variables instanceof SlicedVariables;
 	}
-	
+
 	/**
-	 * If the CNF was sliced, the old variable IDs are kept for compatibility reasons.
-	 * This method changes the the variable IDs in the variables object and the clause list, as if the CNF was not sliced.
-	 * 
-	 * @return A new instance with a proper clause list and variables object, is this CNF was sliced.
-	 * Returns {@code this}, otherwise.
-	 * 
+	 * If the CNF was sliced, the old variable IDs are kept for compatibility reasons. This method changes the the variable IDs in the variables object and the
+	 * clause list, as if the CNF was not sliced.
+	 *
+	 * @return A new instance with a proper clause list and variables object, is this CNF was sliced. Returns {@code this}, otherwise.
+	 *
 	 * @see #isSliced()
 	 */
 	public CNF normalize() {
 		if (isSliced()) {
 			final SlicedVariables slicedVariables = (SlicedVariables) variables;
 			final ClauseList newClauses = new ClauseList(clauses.size());
-			for (LiteralSet literalSet : clauses) {
+			for (final LiteralSet literalSet : clauses) {
 				newClauses.add(variables.convertToInternal(literalSet));
 			}
 			final ArrayList<String> names = new ArrayList<>(variables.size());
@@ -134,28 +131,34 @@ public class CNF implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((clauses == null) ? 0 : clauses.hashCode());
-		result = prime * result + ((variables == null) ? 0 : variables.hashCode());
+		result = (prime * result) + ((clauses == null) ? 0 : clauses.hashCode());
+		result = (prime * result) + ((variables == null) ? 0 : variables.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		CNF other = (CNF) obj;
+		}
+		final CNF other = (CNF) obj;
 		if (clauses == null) {
-			if (other.clauses != null)
+			if (other.clauses != null) {
 				return false;
-		} else if (!clauses.equals(other.clauses))
+			}
+		} else if (!clauses.equals(other.clauses)) {
 			return false;
+		}
 		if (variables == null) {
-			if (other.variables != null)
+			if (other.variables != null) {
 				return false;
-		} else if (!variables.equals(other.variables))
+			}
+		} else if (!variables.equals(other.variables)) {
 			return false;
+		}
 		return true;
 	}
 

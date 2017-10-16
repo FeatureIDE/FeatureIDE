@@ -8,29 +8,29 @@ import java.util.List;
 public class ProjectConfigurationErrorLogger {
 
 	private static ProjectConfigurationErrorLogger INSTANCE;
-	private List<String> projectsName;
+	private final List<String> projectsName;
+
 	private ProjectConfigurationErrorLogger() {
 		projectsName = new LinkedList<String>();
 	}
-	
-	public void clearLogList(){
+
+	public void clearLogList() {
 		System.out.println(CLEAR_LOG_LIST);
 		projectsName.clear();
 	}
-	
-	public List<String> getProjectsList(){
+
+	public List<String> getProjectsList() {
 		return new LinkedList<String>(projectsName);
 	}
-	
-	public void addConfigurationWithError(String projectName){
-		if(!projectsName.contains(projectName)){
+
+	public void addConfigurationWithError(String projectName) {
+		if (!projectsName.contains(projectName)) {
 			projectsName.add(projectName);
 		}
 	}
-	
-	
-	public static ProjectConfigurationErrorLogger getInstance(){
-		if(INSTANCE == null){
+
+	public static ProjectConfigurationErrorLogger getInstance() {
+		if (INSTANCE == null) {
 			INSTANCE = new ProjectConfigurationErrorLogger();
 		}
 		return INSTANCE;

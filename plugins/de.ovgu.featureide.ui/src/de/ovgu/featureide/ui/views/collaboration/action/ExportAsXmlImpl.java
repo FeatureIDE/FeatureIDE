@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,11 +48,11 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
 /**
  * This export implementation is responsible for XML exporting.
- * 
+ *
  * @author Christopher Kruczek
  */
 public class ExportAsXmlImpl extends AbstractExportAsAction {
-	
+
 	public ExportAsXmlImpl(String text, GraphicalViewerImpl view) {
 		super(text, view);
 	}
@@ -63,17 +63,16 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 		if (file == null) {
 			return;
 		}
-		
+
 		try {
-			XMLStreamWriter sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
-					new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			final XMLStreamWriter sw = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			sw.writeStartDocument("utf-8", "1.0");
 			sw.writeStartElement("configuration");
-			ModelEditPart mep = (ModelEditPart) viewer.getContents();
-			for (Object child : mep.getChildren()) {
+			final ModelEditPart mep = (ModelEditPart) viewer.getContents();
+			for (final Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
-					CollaborationEditPart cep = (CollaborationEditPart) child;
-					FSTFeature feature = cep.getCollaborationModel();
+					final CollaborationEditPart cep = (CollaborationEditPart) child;
+					final FSTFeature feature = cep.getCollaborationModel();
 					if (!(feature instanceof FSTConfiguration)) {
 						writeElement(sw, feature);
 					} else {
@@ -91,7 +90,7 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 	}
 
 	private FileDialog createXmlSaveDialog() {
-		FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
+		final FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
 		dlg.setFilterExtensions(new String[] { "*.xml" });
 		dlg.setOverwrite(true);
 		return dlg;
@@ -101,11 +100,11 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 		try {
 			writer.writeStartElement("feature");
 			writer.writeAttribute("name", feature.getName());
-			for (FSTRole role : feature.getRoles()) {
+			for (final FSTRole role : feature.getRoles()) {
 				writeElement(writer, role.getClassFragment());
 			}
 			writer.writeEndElement();
-		} catch (XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
@@ -116,18 +115,18 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 			writer.writeAttribute("name", fstClass.getName());
 
 			writer.writeStartElement("attributes");
-			for (FSTField field : fstClass.getFields()) {
+			for (final FSTField field : fstClass.getFields()) {
 				writeElement(writer, field);
 			}
 			writer.writeEndElement();
 			writer.writeStartElement("methods");
-			for (FSTMethod method : fstClass.getMethods()) {
+			for (final FSTMethod method : fstClass.getMethods()) {
 				writeElement(writer, method);
 			}
 			writer.writeEndElement();
 			writer.writeEndElement();
 
-		} catch (XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
@@ -139,7 +138,7 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 			writer.writeAttribute("visibility", method.getModifiers());
 			writer.writeCharacters(method.getName());
 			writer.writeEndElement();
-		} catch (XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}
@@ -151,7 +150,7 @@ public class ExportAsXmlImpl extends AbstractExportAsAction {
 			writer.writeAttribute("visibility", field.getModifiers());
 			writer.writeCharacters(field.getName());
 			writer.writeEndElement();
-		} catch (XMLStreamException e) {
+		} catch (final XMLStreamException e) {
 			UIPlugin.getDefault().logError(e);
 		}
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds clauses responsible for core and dead features.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>> {
@@ -52,9 +52,9 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 
 		public void setDeadVariables(LiteralSet variables) {
 			if (variables == null) {
-				this.deadVariables = new LiteralSet();
+				deadVariables = new LiteralSet();
 			} else {
-				this.deadVariables = variables;
+				deadVariables = variables;
 			}
 		}
 
@@ -76,7 +76,7 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 	protected ISatSolver initSolver(CNF satInstance) {
 		try {
 			return new ModifiableSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
@@ -99,6 +99,7 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 		this.anomalies = anomalies;
 	}
 
+	@Override
 	public List<Anomalies> analyze(IMonitor monitor) throws Exception {
 		if (clauseList == null) {
 			return Collections.emptyList();
@@ -117,11 +118,12 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 		monitor.setRemainingWork(clauseList.size() + 3);
 
 		LiteralSet remainingVariables = anomalies.deadVariables.getVariables();
-		List<LiteralSet> remainingClauses = new ArrayList<>(anomalies.redundantClauses);
+		final List<LiteralSet> remainingClauses = new ArrayList<>(anomalies.redundantClauses);
 		monitor.step();
 
 		if (!remainingClauses.isEmpty()) {
-			List<LiteralSet> newClauseList = Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
+			final List<LiteralSet> newClauseList =
+					Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
 			remainingClauses.removeAll(newClauseList);
 		}
 		monitor.step();
@@ -133,7 +135,7 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 
 		int endIndex = 0;
 		for (int i = 0; i < clauseGroupSize.length; i++) {
-			if (remainingVariables.getLiterals().length == 0 && remainingClauses.isEmpty()) {
+			if ((remainingVariables.getLiterals().length == 0) && remainingClauses.isEmpty()) {
 				break;
 			}
 
@@ -150,8 +152,8 @@ public class CauseAnalysis extends AClauseAnalysis<List<CauseAnalysis.Anomalies>
 			}
 
 			if (!remainingClauses.isEmpty()) {
-				List<LiteralSet> newClauseList = Functional
-						.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
+				final List<LiteralSet> newClauseList =
+						Functional.removeNull(LongRunningWrapper.runMethod(new IndependentRedundancyAnalysis(solver, remainingClauses)));
 				if (!newClauseList.isEmpty()) {
 					getAnomalies(resultList, i).setRedundantClauses(newClauseList);
 					remainingClauses.removeAll(newClauseList);

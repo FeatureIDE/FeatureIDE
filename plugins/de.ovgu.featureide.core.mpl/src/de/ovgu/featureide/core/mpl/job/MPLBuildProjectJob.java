@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -71,7 +71,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			String varName) {
 		this.rootFeatureProject = rootFeatureProject;
 		this.externalFeatureProject = externalFeatureProject;
-		this.buildF = buildFolder;
+		buildF = buildFolder;
 		this.configuration = configuration;
 		this.varName = varName;
 	}
@@ -91,7 +91,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 					return false;
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
@@ -100,7 +100,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 	}
 
 	private void buildExternalProject(String projectName, Configuration config, String configName) {
-		
+
 		final JobSequence curJobSequence = JobSequence.getSequenceForJob(this);
 		if (curJobSequence != null) {
 			final IProject externalProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -109,12 +109,10 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			final ArrayList<LongRunningMethod<?>> jobList = new ArrayList<>(3);
 
 			// build
-			jobList.add(new MPLBuildProjectJob(rootFeatureProject, externalFeatureProject, internTempBuildFolder, config,
-					configName));
+			jobList.add(new MPLBuildProjectJob(rootFeatureProject, externalFeatureProject, internTempBuildFolder, config, configName));
 
 			// rename
-			jobList.add(new MPLRenameExternalJob(externalFeatureProject.getProject(), configName, internTempBuildFolder
-					.getFullPath()));
+			jobList.add(new MPLRenameExternalJob(externalFeatureProject.getProject(), configName, internTempBuildFolder.getFullPath()));
 
 			// copy
 			jobList.add(new MPLCopyExternalJob(internTempBuildFolder, rootBuildFolder));
@@ -137,8 +135,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				varName = varName.substring(0, splitIndex);
 			}
 			rootBuildFolder = buildF.getFolder(varName);
-			internTempBuildFolder = buildF.getFolder(EMPTY___
-				+ varName);
+			internTempBuildFolder = buildF.getFolder(EMPTY___ + varName);
 		} else {
 			rootBuildFolder = buildF;
 			internTempBuildFolder = externalFeatureProject.getBuildFolder();
@@ -148,13 +145,14 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 			if (!rootBuildFolder.exists()) {
 				rootBuildFolder.create(true, true, null);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
 
 		// build own project
-		// featureProject.deleteBuilderMarkers(featureProject.getProject(), IResource.DEPTH_INFINITE);
+		// featureProject.deleteBuilderMarkers(featureProject.getProject(),
+		// IResource.DEPTH_INFINITE);
 		if (!buildFeatureProject(varName, rootBuildFolder)) {
 			return false;
 		}
@@ -164,7 +162,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				internTempBuildFolder.delete(true, null);
 			}
 			internTempBuildFolder.create(true, true, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
@@ -179,15 +177,14 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				mappingFileName = "default.config";
 				externalFeatureProject.getProject().setPersistentProperty(MPLPlugin.mappingConfigID, mappingFileName);
 			}
-			IFile mappingFile = externalFeatureProject.getProject().getFile("InterfaceMapping/"
-				+ mappingFileName);
+			final IFile mappingFile = externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
 			if (mappingFile == null) {
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
 			final IFile configFile = externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
-			FileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigFormatManager.getInstance());
-		} catch (Exception e) {
+			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigFormatManager.getInstance());
+		} catch (final Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
@@ -209,7 +206,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 		}
 
 		// build instances
-		for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+		for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 			if (usedModel.getType() == ExtendedFeature.TYPE_INSTANCE) {
 				final String projectName = usedModel.getModelName();
 				final String configName = usedModel.getVarName();
@@ -231,11 +228,11 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 		// Delete all files in the build folder
 		try {
 			externalFeatureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
-			for (IResource member : buildFolder.members()) {
+			for (final IResource member : buildFolder.members()) {
 				member.delete(true, null);
 			}
 			buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
@@ -243,20 +240,19 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 		if (varName != null) {
 			// Get partial configs
 			// TODO MPL: config for other MPL projects may not working
-			IFeatureModel fm = rootFeatureProject.getFeatureModel();
+			final IFeatureModel fm = rootFeatureProject.getFeatureModel();
 			if (fm instanceof ExtendedFeatureModel) {
-				ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
-				UsedModel usedModel = efm.getExternalModel(varName);
-				String prefix = usedModel.getPrefix()
-					+ ".";
+				final ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
+				final UsedModel usedModel = efm.getExternalModel(varName);
+				final String prefix = usedModel.getPrefix() + ".";
 
 				final FeatureModelSnapshot snapshot = externalFeatureProject.getFeatureModelManager().getSnapshot();
 				final Configuration newConfiguration = new Configuration(snapshot.getObject());
 				final ConfigurationPropagator propagator = snapshot.getPropagator(newConfiguration);
 
-				for (SelectableFeature feature : configuration.getFeatures()) {
+				for (final SelectableFeature feature : configuration.getFeatures()) {
 					if (feature.getName().startsWith(prefix)) {
-						String featureName = feature.getName().substring(prefix.length());
+						final String featureName = feature.getName().substring(prefix.length());
 						newConfiguration.setManual(featureName, feature.getSelection());
 					}
 				}
@@ -280,7 +276,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 
 		try {
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}

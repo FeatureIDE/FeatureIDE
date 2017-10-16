@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Abstract analysis.
- * 
+ *
  * @author Sebastian Krieter
  */
 public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
@@ -51,7 +51,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 	protected ISatSolver initSolver(CNF satInstance) {
 		try {
 			return new AdvancedSatSolver(satInstance);
-		} catch (RuntimeContradictionException e) {
+		} catch (final RuntimeContradictionException e) {
 			return null;
 		}
 	}
@@ -75,7 +75,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		try {
 			result = analyze(monitor);
 			return result;
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			throw e;
 		} finally {
 			solver.assignmentClear(0);
@@ -91,10 +91,12 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		}
 	}
 
+	@Override
 	public final LiteralSet getAssumptions() {
 		return assumptions;
 	}
 
+	@Override
 	public final void setAssumptions(LiteralSet assumptions) {
 		this.assumptions = assumptions;
 	}
@@ -111,6 +113,7 @@ public abstract class AbstractAnalysis<T> implements IAnalysis<T> {
 		return timeoutOccured;
 	}
 
+	@Override
 	public final AnalysisResult<T> getResult() {
 		return new AnalysisResult<>(this.getClass().getName(), assumptions, result);
 	}

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract documentation builder.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class DocumentationBuilder {
@@ -39,7 +39,7 @@ public class DocumentationBuilder {
 
 	public DocumentationBuilder(IFeatureProject featureProject) {
 		this.featureProject = featureProject;
-		this.parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
+		parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
 	}
 
 	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<?>> filters) {
@@ -48,11 +48,11 @@ public class DocumentationBuilder {
 			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();
 			if (projectSignatures != null) {
 				if (parser.addExtraFilters()) {
-					for (IFilter<?> filter : filters) {
+					for (final IFilter<?> filter : filters) {
 						merger.addFilter(filter);
 					}
 				}
-				for (SignatureCommentPair pair : DocumentationCommentCollector.collect(projectSignatures)) {
+				for (final SignatureCommentPair pair : DocumentationCommentCollector.collect(projectSignatures)) {
 					// parse
 					parser.parse(projectSignatures, pair.getComment());
 					// merge

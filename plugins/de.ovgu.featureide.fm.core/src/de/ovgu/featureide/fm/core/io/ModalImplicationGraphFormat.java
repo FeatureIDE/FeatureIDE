@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 
 /**
  * Reads / Writes a feature graph.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat {
@@ -42,7 +42,7 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 
 	@Override
 	public ProblemList read(ModalImplicationGraph object, CharSequence source) {
-		ProblemList problems = new ProblemList();
+		final ProblemList problems = new ProblemList();
 		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
 			final ModalImplicationGraph adjList = (ModalImplicationGraph) in.readObject();
 			object.copyValues(adjList);
@@ -59,7 +59,7 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {
 			out.writeObject(object);
 			ret = byteArrayOutputStream.toString("UTF-8");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Logger.logError(e);
 		}
 		return ret;
