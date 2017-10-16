@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PropertyUsage
-Bundle-SymbolicName: de.ovgu.featureide.oscar.propertyusage;singleton:=true
+Bundle-Name: de.ovgu.featureide.oscar.propertyusage
+Bundle-SymbolicName: de.ovgu.featureide.core.oscar.propertyusage;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0",

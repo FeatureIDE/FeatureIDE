@@ -21,42 +21,5 @@
             class="propertyusage.handlers.PropertyUsage">
       </handler>
    </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="PropertyUsage.commands.findUsageCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+6"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               label="Find Property"
-               mnemonic="M"
-               id="PropertyUsage.menus.findUsageMenu">
-            <command
-                  commandId="PropertyUsage.commands.findUsageCommand"
-                  mnemonic="S"
-                  id="PropertyUsage.menus.findUsageCommand">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="PropertyUsage.toolbars.findUsageToolbar">
-            <command
-                  commandId="PropertyUsage.commands.findUsageCommand"
-                  icon="icons/findUsage.gif"
-                  tooltip="Find Oscar Property Usage"
-                  id="PropertyUsage.toolbars.findUsageCommand">
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
 
 </plugin>

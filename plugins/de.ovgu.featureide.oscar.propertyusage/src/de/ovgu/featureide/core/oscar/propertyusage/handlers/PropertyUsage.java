@@ -1,4 +1,4 @@
-package de.ovgu.featureide.oscar.propertyusage.handlers;
+package de.ovgu.featureide.core.oscar.propertyusage.handlers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
