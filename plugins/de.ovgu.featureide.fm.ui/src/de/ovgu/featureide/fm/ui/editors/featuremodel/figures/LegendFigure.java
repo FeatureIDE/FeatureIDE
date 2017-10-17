@@ -35,14 +35,17 @@ import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -133,6 +136,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INTERFACED = 10;
 	private static final int IMPLICIT = 11;
 	private static final int EXPLANATION = 12;
+	private static final int VOID_MODEL = 14;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -154,6 +158,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean tautologyConst;
 	private boolean redundantConst;
 	private boolean explanations;
+	private boolean void_model;
 	private boolean imported = false;
 	private boolean inherited = false;
 	private boolean interfaced = false;
@@ -207,6 +212,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			falseoptional = fmStructure.hasFalseOptionalFeatures();
 		}
 		indetHidden = fmStructure.hasIndetHidden();
+
+		void_model = !analyser.valid();
 
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
@@ -292,6 +299,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
 		}
+		if (void_model) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getVoidModelConst());
+		}
 		if (implicitConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
@@ -371,6 +382,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (implicitConst) {
 			createRowImplicitConst(row++);
 		}
+		if (void_model) {
+			createHasVoidModel(row++);
+		}
 		if (explanations) {
 			// Explanation should be created at last
 			createExplanationEntry();
@@ -380,6 +394,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	/**
 	 * @param i
 	 */
+	private void createHasVoidModel(int row) {
+		createSymbol(row, VOID_MODEL, true, MODEL_CONST_TOOLTIP);
+		Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
+		add(labelIndetHidden);
+	}
 
 	private void createRowRedundantConst(int row) {
 		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
@@ -617,7 +636,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (ABSTRACT):
 			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
 			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-
 			break;
 		case (CONCRETE):
 			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
@@ -626,6 +644,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (HIDDEN):
 			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());
 			break;
+		case (VOID_MODEL):
 		case (DEAD):
 			if (feature) {
 				rect.setBorder(FMPropertyManager.getDeadFeatureBorder(false));
