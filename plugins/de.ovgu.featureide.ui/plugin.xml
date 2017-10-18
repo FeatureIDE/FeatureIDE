@@ -118,14 +118,6 @@
         name="Configuration Map"
         restorable="true">
   </view>
-  <view
-        category="FeatureIDE"
-        class="de.ovgu.featureide.ui.views.modGen.ModGenResultsView"
-        icon="icons/FeatureIconSmall.ico"
-        id="de.ovgu.featureide.ui.modelResults"
-        name="Model Generation Results"
-        restorable="true">
-  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">

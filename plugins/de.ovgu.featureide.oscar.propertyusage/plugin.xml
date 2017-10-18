@@ -18,14 +18,14 @@
          point="org.eclipse.ui.handlers">
       <handler
             commandId="de.ovgu.featureide.core.oscar.propertyusage.commands.findUsageCommand"
-            class="de.ovgu.featureide.core.oscar.propertyusage.handlers.PropertyUsage">
+            class="de.ovgu.featureide.oscar.propertyusage.handlers.PropertyUsage">
       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
          <command
                commandId="de.ovgu.featureide.core.oscar.propertyusage.commands.findUsageCommand"
                icon="icons/FeatureIconSmall.ico"

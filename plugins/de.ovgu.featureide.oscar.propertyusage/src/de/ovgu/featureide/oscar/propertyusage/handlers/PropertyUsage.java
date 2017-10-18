@@ -1,4 +1,4 @@
-package de.ovgu.featureide.core.oscar.propertyusage.handlers;
+package de.ovgu.featureide.oscar.propertyusage.handlers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import de.ovgu.featureide.oscar.IO.Console;
 import oscar.OscarProperties;
 import oscar.Startup;
 
@@ -50,6 +51,9 @@ public class PropertyUsage extends AbstractHandler {
 
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
 	private static final Boolean DEBUG = false;
+	
+	//Create the Console to log the results
+	private final Console console = new Console();
 
 	// Load all key/value pairs from Oscar property file. Expects a copy of
 	// oscar_mcmaster.properties in src/resources/. Commented out
@@ -72,6 +76,8 @@ public class PropertyUsage extends AbstractHandler {
 
 	// Used to store {<key, [number of usages, number of boolean usages]>}.
 	final private Map<String, Integer[]> allPropMap = initializePropertyMap();
+	
+	
 
 	private String varName = null;
 	private Boolean isOscarPropertiesVariable = null;
@@ -92,7 +98,7 @@ public class PropertyUsage extends AbstractHandler {
 		for (String key : op.stringPropertyNames()) {
 			propMap.put(key, init_val);
 		}
-		System.out.println("Oscar Property map count:" + propMap.size());
+		console.writeln("Oscar Property map count:" + propMap.size());
 		return propMap;
 	}
 
@@ -142,13 +148,13 @@ public class PropertyUsage extends AbstractHandler {
 			// the 'getProperty' method is inherited from Properties so not
 			// specified in OscarProperties
 			if (!s.equals("getProperty") && !discoveredSet.contains(s)) {
-				System.out.println("Property not found in discovered set: " + s);
+				console.writeln("Property not found in discovered set: " + s);
 				return false;
 			}
 		}
 		for (String s : discoveredSet) {
 			if (!s.equals("OscarProperties") && !hardCodedSet.contains(s)) {
-				System.out.println("Property not found in hardcoded set: " + s);
+				console.writeln("Property not found in hardcoded set: " + s);
 				return false;
 			}
 		}
@@ -156,21 +162,20 @@ public class PropertyUsage extends AbstractHandler {
 	}
 
 	public void reportResults() {
-		System.out.println("Method count: " + oscarPropertyMethods.size());
-		System.out.println("Method nodes found: " + astOscarPropertyNodes.size());
+		console.writeln("Method count: " + oscarPropertyMethods.size() );
+		console.writeln("Method nodes found: " + astOscarPropertyNodes.size());
 		if (DEBUG) {
-			System.out.println("Discovered OscarProperties Methods:");
+			console.writeln("Discovered OscarProperties Methods:");
 			for (String methodName : oscarPropertyMethods) {
-				System.out.println(methodName);
+				console.writeln(methodName);
 			}
 		}
 		if (!compareOscarPropertiesMethods(oscarPropertyMethods, oscarPropertyMethodsCheck)) {
-			System.out.println(
-					"Hard-coded OscarProperties methods no longer match methods discovered in OscarProperies.java");
+			console.writeln("Hard-coded OscarProperties methods no longer match methods discovered in OscarProperies.java");
 		} else {
-			System.out.println("No new OscarProperties methods found");
+			console.writeln("No new OscarProperties methods found");
 		}
-		System.out.println("Property, Num Usages, Num Boolean Usages, %Boolean, Known Property, Is Set");
+		console.writeln("Property, Num Usages, Num Boolean Usages, %Boolean, Known Property, Is Set");
 		for (String s : allPropMap.keySet()) {
 			Boolean knownProperty = false;
 			Boolean isSet = false;
@@ -178,23 +183,23 @@ public class PropertyUsage extends AbstractHandler {
 				knownProperty = true;
 				isSet = op.isPropertyActive(s);
 			}
-			System.out.print("" + s + "," + allPropMap.get(s)[0] + "," + allPropMap.get(s)[1]);
+			console.write("" + s + "," + allPropMap.get(s)[0] + "," + allPropMap.get(s)[1]);
 			if (allPropMap.get(s)[0] > 0) {
-				System.out.print("," + 100 * allPropMap.get(s)[1] / (allPropMap.get(s)[0]));
+				console.write("," + 100 * allPropMap.get(s)[1] / (allPropMap.get(s)[0]));
 			} else {
-				System.out.print(",");
+				console.write(",");
 			}
 			if (knownProperty) {
-				System.out.println("," + knownProperty + "," + isSet);
+				console.writeln("," + knownProperty + "," + isSet);
 			} else {
-				System.out.println("," + knownProperty + ",");
+				console.writeln("," + knownProperty + ",");
 			}
 
 		}
 
-		System.out.println("Nodes found: " + astNodes.size());
-		System.out.println("Number properties expected: " + op.size());
-		System.out.println("Number properties found: " + allPropMap.size());
+		console.writeln("Nodes found: " + astNodes.size());
+		console.writeln("Number properties expected: " + op.size());
+		console.writeln("Number properties found: " + allPropMap.size());
 	}
 
 	@Override
@@ -209,14 +214,14 @@ public class PropertyUsage extends AbstractHandler {
 
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
-		System.out.println("root " + root.getLocation().toOSString());
+		console.writeln("root " + root.getLocation().toOSString());
 		// Get all projects in the workspace
 		IProject[] projects = root.getProjects();
 		// Loop over all projects
 		for (IProject project : projects) {
 			try {
 				if (project.isOpen() && project.isNatureEnabled(JDT_NATURE)) {
-					System.out.println("Project [" + project.getName() + "] has Java nature");
+					console.writeln("Project [" + project.getName() + "] has Java nature");
 					analyseMethods(project);
 				}
 			} catch (CoreException e) {
@@ -226,22 +231,25 @@ public class PropertyUsage extends AbstractHandler {
 	}
 
 	private void analyseMethods(IProject project) throws JavaModelException {
+		
 		IPackageFragment[] packages = JavaCore.create(project).getPackageFragments();
 		// parse(JavaCore.create(project));
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
-		System.out.println(dateFormat.format(date)); // 2016/11/16 12:08:43
+		console.writeln(dateFormat.format(date)); // 2016/11/16 12:08:43
 		for (IPackageFragment mypackage : packages) {
 			if (mypackage.getKind() == IPackageFragmentRoot.K_SOURCE) {
 				createAST(mypackage);
 			}
 		}
 		reportResults();
-		System.out.println(dateFormat.format(new Date()));
+		console.writeln(dateFormat.format(new Date()));
+
 
 	}
 
 	private void createAST(IPackageFragment mypackage) throws JavaModelException {
+		
 
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
 
@@ -259,7 +267,7 @@ public class PropertyUsage extends AbstractHandler {
 						Collections.addAll(oscarPropertyMethodsCheck, node.getName().toString());
 						Boolean r = astOscarPropertyNodes.add(node);
 						if (!r) {
-							System.out.println("Unxpected presence of node " + node.getName().toString());
+							console.writeln("Unxpected presence of node " + node.getName().toString());
 						}
 					}
 					return true;
@@ -274,7 +282,7 @@ public class PropertyUsage extends AbstractHandler {
 								StringLiteral stringLiteral = (StringLiteral) node.arguments().get(0);
 								Boolean r = astNodes.add(node);
 								if (!r) {
-									System.out.println("Unexpected presence of node " + node.getName().toString());
+									console.writeln("Unexpected presence of node " + node.getName().toString());
 								}
 								Boolean b = isBoolean((StringLiteral) node.arguments().get(0));
 								if (DEBUG)
@@ -290,7 +298,7 @@ public class PropertyUsage extends AbstractHandler {
 								StringLiteral stringLiteral = (StringLiteral) node.arguments().get(0);
 								Boolean r = astNodes.add(node);
 								if (!r) {
-									System.out.println("Unexpected presence of node " + node.getName().toString());
+									console.writeln("Unexpected presence of node " + node.getName().toString());
 								}
 								Boolean b = isBoolean(stringLiteral);
 								if (DEBUG)
@@ -306,7 +314,7 @@ public class PropertyUsage extends AbstractHandler {
 										|| node.toString().contains(".setReverse(\"" + key + "\")"))) {
 									Boolean r = astNodes.add(node);
 									if (!r) {
-										System.out.println("Unexpected presence of node " + node.getName().toString());
+										console.writeln("Unexpected presence of node " + node.getName().toString());
 									}
 									Boolean b = true;
 									if (DEBUG)
@@ -319,7 +327,7 @@ public class PropertyUsage extends AbstractHandler {
 								StringLiteral stringLiteral = ((StringLiteral) node.arguments().get(0));
 								Boolean r = astNodes.add(node);
 								if (!r) {
-									System.out.println("Unexpected presence of node " + node.getName().toString());
+									console.writeln("Unexpected presence of node " + node.getName().toString());
 								}
 								Boolean b = true;
 								if (DEBUG)
@@ -333,7 +341,7 @@ public class PropertyUsage extends AbstractHandler {
 								if (node.toString().contains(".setModuleName(\"" + key + "\")")) {
 									Boolean r = astNodes.add(node);
 									if (!r) {
-										System.out.println("Unexpected presence of node " + node.getName().toString());
+										console.writeln("Unexpected presence of node " + node.getName().toString());
 									}
 									Boolean b = true;
 									if (DEBUG)
@@ -342,7 +350,7 @@ public class PropertyUsage extends AbstractHandler {
 								}
 							}
 						} else if (type != null && type.getName().toString().equals("Properties")) {
-							//if (node.getName().toString().equals("load")) System.out.println(getPackageAndFilename(cu));
+							//if (node.getName().toString().equals("load")) console.writeln(getPackageAndFilename(cu));
 							if (!node.arguments().isEmpty() && node.arguments().get(0) instanceof StringLiteral) {
 								StringLiteral stringLiteral = (StringLiteral) node.arguments().get(0);
 								String key = stringLiteral.getLiteralValue();
@@ -350,7 +358,7 @@ public class PropertyUsage extends AbstractHandler {
 										&& cu.getJavaElement().getElementName().equals("OscarProperties.java")) {
 									Boolean r = astNodes.add(node);
 									if (!r) {
-										System.out.println("Unexpected presence of node " + node.getName().toString());
+										console.writeln("Unexpected presence of node " + node.getName().toString());
 									}
 									Boolean b = isBoolean((StringLiteral) node.arguments().get(0));
 									if (DEBUG)
@@ -385,7 +393,7 @@ public class PropertyUsage extends AbstractHandler {
 										if (isOscarPropertiesVariable) {
 											Boolean r = astNodes.add(node);
 											if (!r) {
-												System.out.println(
+												console.writeln(
 														"Unexpected presence of node " + node.getName().toString());
 											}
 											Boolean b = isBoolean((StringLiteral) node.arguments().get(0));
@@ -424,20 +432,20 @@ public class PropertyUsage extends AbstractHandler {
 	private void printDebugInfo(CompilationUnit cu, ASTNode node, ITypeBinding type, StringLiteral stringLiteral, Boolean b, Boolean verbose) {
 		printDebugInfo(cu, node, type, stringLiteral, b);
 		if (verbose) {
-			System.out.println("  in parent statement: " + getParentStatement(stringLiteral).toString());
+			console.writeln("  in parent statement: " + getParentStatement(stringLiteral).toString());
 		}
 	}
 
 	private void printDebugInfo(CompilationUnit cu, ASTNode node, ITypeBinding type, StringLiteral stringLiteral, Boolean b) {
-		System.out.println("Found: " + stringLiteral + " in " + getPackageAndFilename(cu));
-		System.out.println("  Node: " + node.toString());
+		console.writeln("Found: " + stringLiteral + " in " + getPackageAndFilename(cu));
+		console.writeln("  Node: " + node.toString());
 		if (type != null) {
-			System.out.println("  of type: " +type.getName());
+			console.writeln("  of type: " +type.getName());
 		} else {
-			System.out.println("  of type: null");
+			console.writeln("  of type: null");
 		}
-		System.out.println("  present in expression: " + getFullExpression(stringLiteral));
-		System.out.println("  is Boolean: " + b);
+		console.writeln("  present in expression: " + getFullExpression(stringLiteral));
+		console.writeln("  is Boolean: " + b);
 	}
 
 
