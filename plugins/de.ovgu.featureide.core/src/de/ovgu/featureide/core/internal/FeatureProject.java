@@ -41,6 +41,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -97,6 +98,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -109,7 +111,10 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -158,7 +163,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * the model representation of the model file
 	 */
-	private final FeatureModelManager featureModelManager;
+	private final IFileManager<IFeatureModel> featureModelManager;
 
 	private FSTModel fstModel;
 
@@ -323,7 +328,13 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
 		}
 
-		featureModelManager = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
+		final FeatureModelManager instance = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
+		if (instance != null) {
+			featureModelManager = instance;
+		} else {
+			featureModelManager = new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
+			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
+		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
 		featureModelManager.read();
 
@@ -1518,7 +1529,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	@Override
-	public FeatureModelManager getFeatureModelManager() {
+	public IFileManager<IFeatureModel> getFeatureModelManager() {
 		return featureModelManager;
 	}
 
