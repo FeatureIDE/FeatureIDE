@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID_;
+
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -111,6 +113,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		"Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
+	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 
@@ -127,6 +130,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INTERFACED = 10;
 	private static final int IMPLICIT = 11;
 	private static final int EXPLANATION = 12;
+	private static final int VOID_MODEL = 14;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -148,6 +152,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private boolean tautologyConst;
 	private boolean redundantConst;
 	private boolean explanations;
+	private boolean void_model;
 	private boolean imported = false;
 	private boolean inherited = false;
 	private boolean interfaced = false;
@@ -194,13 +199,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		concrete = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new ConcreteGraphicalFeatureFilter())).size() > 0;
 		hidden = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new HiddenGraphicalFeatureFilter())).size() > 0;
 
-		mandatory = fmStructure.hasMandatoryFeatures();
-		optional = fmStructure.hasOptionalFeatures();
-		alternative = fmStructure.hasAlternativeGroup();
-		or = fmStructure.hasOrGroup();
-		_abstract = fmStructure.hasAbstract();
-		concrete = fmStructure.hasConcrete();
-		hidden = fmStructure.hasHidden();
+		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
+		if (analyser.isCalculateDeadConstraints()) {
+			dead = analyser.getFeatureModelProperties().hasDeadFeatures();
+		}
+		if (analyser.isCalculateFOConstraints()) {
+			falseoptional = analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
+		}
+		indetHidden = analyser.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
+
+		void_model = !analyser.isValid();
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
 		dead = analyser.isCalculateDeadConstraints() && analyser.getFeatureModelProperties().hasDeadFeatures();
@@ -291,6 +299,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
 		}
+		if (void_model) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getVoidModelConst());
+		}
 		if (implicitConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
@@ -370,6 +382,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (implicitConst) {
 			createRowImplicitConst(row++);
 		}
+		if (void_model) {
+			createHasVoidModel(row++);
+		}
 		if (explanations) {
 			// Explanation should be created at last
 			createExplanationEntry();
@@ -379,6 +394,11 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	/**
 	 * @param i
 	 */
+	private void createHasVoidModel(int row) {
+		createSymbol(row, VOID_MODEL, true, MODEL_CONST_TOOLTIP);
+		final Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
+		add(labelIndetHidden);
+	}
 
 	private void createRowRedundantConst(int row) {
 		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
@@ -616,7 +636,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (ABSTRACT):
 			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
 			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-
 			break;
 		case (CONCRETE):
 			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
@@ -625,6 +644,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (HIDDEN):
 			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());
 			break;
+		case (VOID_MODEL):
 		case (DEAD):
 			if (feature) {
 				rect.setBorder(FMPropertyManager.getDeadFeatureBorder(false));

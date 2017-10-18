@@ -14,8 +14,8 @@
    <extension
          point="de.ovgu.featureide.fm.core.FMComposer">
       <fmComposer
-            class="de.ovgu.featureide.munge_android.MungeAndroidFMComposerExtension"
-            composer="de.ovgu.featureide.preprocessor.munge"
+            class="de.ovgu.featureide.munge.MungeFMComposerExtension"
+            composer="de.ovgu.featureide.preprocessor.munge-android"
             id="de.ovgu.featureide.core.munge-android.fmcomposer"
             name="MungeFMComposer">
       </fmComposer>

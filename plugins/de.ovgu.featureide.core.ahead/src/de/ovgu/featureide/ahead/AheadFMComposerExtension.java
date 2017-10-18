@@ -1,8 +1,8 @@
-package de.ovgu.featureide.featurehouse;
+package de.ovgu.featureide.ahead;
 
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
-public class FeatureHouseFMComposerExtension extends FMComposerExtension {
+public class AheadFMComposerExtension extends FMComposerExtension {
 
 	/**
 	 * Check for valid java identifier
