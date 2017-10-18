@@ -74,7 +74,7 @@ import de.ovgu.featureide.fm.core.Features;
 //import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
+import de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutlineLabelProvider;
 
 /**
  * Wizard page for pull up refactoring wizards which allows to specify the
@@ -131,7 +131,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	
 	private static class PullUpMemberLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		private final ILabelProvider fLabelProvider= new ContextOutlineLabelProvider();
+		private ILabelProvider fLabelProvider= new CollaborationOutlineLabelProvider();
 
 		@Override
 		public void dispose() {

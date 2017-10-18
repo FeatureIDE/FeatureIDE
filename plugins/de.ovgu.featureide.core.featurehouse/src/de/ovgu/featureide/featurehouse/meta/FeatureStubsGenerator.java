@@ -288,6 +288,7 @@ public class FeatureStubsGenerator {
 	private void checkForMissingTypes(final FSTFeature feature, FSTRole role, String className) {
 		if (featureStubFolder.getFolder(role.getFeature().getName()).getFile(className + ".java").exists()) {
 			return;
+		}
 		File missingTypeFile = new File(PATH + feature.getName() + File.separator + className + ".java");
 		try {
 			if (missingTypeFile.createNewFile()) {
