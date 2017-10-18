@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,33 +33,33 @@ import de.ovgu.featureide.core.signature.base.IConstrainedObject;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ConstraintFilter implements IFilter<IConstrainedObject> {
-	
+
 	private final SatSolver solver;
-	
+
 	private final boolean includeNullConstraint;
 
 	public ConstraintFilter(Node... constraints) {
 		this(true, constraints);
 	}
-	
+
 	public ConstraintFilter(boolean includeNullConstraint, Node... constraints) {
 		solver = new SatSolver(new And(constraints), 2000);
 		this.includeNullConstraint = includeNullConstraint;
 	}
-	
+
 	@Override
 	public boolean isValid(IConstrainedObject object) {
 		Node constraint = object.getConstraint();
-		
+
 		if (constraint == null) {
 			return includeNullConstraint;
 		}
-		
+
 		constraint = new Not(constraint).toCNF();
-		
+
 		try {
 			if ((constraint instanceof Literal)) {
-				return !solver.isSatisfiable(new Node[]{constraint});
+				return !solver.isSatisfiable(new Node[] { constraint });
 			} else if (constraint instanceof Or) {
 				return checkOr(constraint);
 			} else {
@@ -78,15 +78,15 @@ public class ConstraintFilter implements IFilter<IConstrainedObject> {
 				}
 				return false;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 			return false;
 		}
-		
+
 	}
-	
+
 	private boolean checkOr(Node or) throws TimeoutException {
-		for (Node orChild : or.getChildren()) {
+		for (final Node orChild : or.getChildren()) {
 			if (!solver.isSatisfiable(orChild)) {
 				return true;
 			}

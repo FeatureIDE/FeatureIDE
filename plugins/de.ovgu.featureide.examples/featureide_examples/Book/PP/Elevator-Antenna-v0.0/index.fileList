@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/default.config
+configs/default.xml
 guiVersions/FIFO/FloorComposite.java
 guiVersions/FIFO/MainWindow.java
 guiVersions/Service/MainWindow.java

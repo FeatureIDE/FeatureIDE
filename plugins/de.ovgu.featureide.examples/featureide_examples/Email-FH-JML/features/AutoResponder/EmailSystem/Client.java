@@ -12,6 +12,7 @@ public class Client {
 
 	/*@
 	  @ requires !msg.isReadable();
+	  @ assignable \nothing;
 	  @*/
 	static void autoRespond(Client client, Email msg) {
 		Util.prompt("sending autoresponse\n");

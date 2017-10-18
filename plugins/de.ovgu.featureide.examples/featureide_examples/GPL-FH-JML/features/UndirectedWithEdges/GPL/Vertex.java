@@ -15,6 +15,7 @@ public class Vertex
         VertexConstructor( );
     }
     /*@ensures name == null && adjacentNeighbors != null;@*/
+    /*@assignable name, neighbors; @*/
     public void VertexConstructor( ) 
     {
         name      = null;
@@ -23,19 +24,22 @@ public class Vertex
 
     /*@ requires name != null;
     ensures this.name == name;
-    ensures \result == this; @*/
+    ensures \result == this; 
+    assignable name; @*/
     public  Vertex assignName( String name ) 
     {
         this.name = name;
         return ( Vertex ) this;
     }
     /*@ ensures \result == this.name; @*/
+    /*@assignable \nothing; @*/
     public String getName( )
     {
         return this.name;
     }
 
     /*@ ensures \result == this.neighbors;@*/
+    /*@assignable \nothing; @*/
     public LinkedList getNeighborsObj( )
     {
  	  return neighbors;
@@ -75,6 +79,7 @@ public class Vertex
 
     /*@requires n != null;@*/
     /*@ensures neighbors.getLast()==n;@*/
+    /*@assignable neighbors; @*/
     public void addNeighbor( Neighbor n ) 
     {
         neighbors.add( n );

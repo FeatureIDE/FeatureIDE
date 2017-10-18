@@ -203,7 +203,6 @@ Library.
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.cdt"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.jface.text"/>
@@ -215,7 +214,6 @@ Library.
       <import plugin="org.eclipse.cdt.core"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.ltk.ui.refactoring"/>
-      <import plugin="org.eclipse.cdt.ui"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
    </requires>
 

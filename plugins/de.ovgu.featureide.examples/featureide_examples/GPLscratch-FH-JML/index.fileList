@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/default.config
+configs/default.xml
 features/Base/Edge.java
 features/Base/Graph.java
 features/Base/Node.java

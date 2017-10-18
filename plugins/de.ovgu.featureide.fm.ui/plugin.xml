@@ -7,28 +7,29 @@
 	<extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
 	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
+	<extension-point id="de.ovgu.featureide.fm.ui.Outline" name="FeatureIDE Outline" schema="schema/de.ovgu.featureide.fm.ui.Outline.exsd"/>
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
-        base-type="org.eclipse.core.runtime.text"
-        file-extensions="conf,config,equation,expression"
-        id="de.ovgu.featureide.contenttype.conf"
-        name="Configuration (for FeatureIDE projects)"
-        priority="high"/>
-	<content-type
-        base-type="org.eclipse.core.runtime.xml"
-        file-extensions="xml"
-        id="de.ovgu.featureide.contenttype.confXML"
-        name="XML Configuration (for FeatureIDE projects)"
-        priority="high">
-	     <describer
-	           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-	        <parameter
-	              name="element"
-	              value="configuration">
-	        </parameter>
-	     </describer>
-  	</content-type>
+				base-type="org.eclipse.core.runtime.text"
+				file-extensions="conf,config,equation,expression"
+				id="de.ovgu.featureide.contenttype.conf"
+				name="Configuration (for FeatureIDE projects)"
+				priority="high"/>
+		<content-type
+				base-type="org.eclipse.core.runtime.xml"
+				file-extensions="xml"
+				id="de.ovgu.featureide.contenttype.confXML"
+				name="XML Configuration (for FeatureIDE projects)"
+				priority="high">
+			<describer
+					class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+				<parameter
+						name="element"
+						value="configuration">
+				</parameter>
+			</describer>
+		</content-type>
 		<content-type
 				base-type="org.eclipse.core.runtime.text"
 				file-extensions="config"
@@ -50,41 +51,41 @@
 				name="Expression (for non-FeatureIDE projects)"
 				priority="low">
 		</content-type>
-  <content-type
-        base-type="org.eclipse.core.runtime.xml"
-        file-extensions="xml"
-        id="de.ovgu.featureide.fm.ui.featureModel"
-        name="Feature Model"
-        priority="high">
-     <describer
-           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-        <parameter
-              name="element"
-              value="featureModel">
-        </parameter>
-     </describer>
-  </content-type>
-  <content-type
-        base-type="org.eclipse.core.runtime.xml"
-        file-extensions="xml"
-        id="de.ovgu.featureide.fm.ui.featureModel.sxfm"
-        name="SXFM Feature Model"
-        priority="high">
-     <describer
-           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-        <parameter
-              name="element"
-              value="feature_model">
-        </parameter>
-     </describer>
-  </content-type>
-  <content-type
-        base-type="org.eclipse.core.runtime.text"
-        file-extensions="velvet"
-        id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
-        name="Extended Feature Model"
-        priority="high">
-  </content-type>
+		<content-type
+				base-type="org.eclipse.core.runtime.xml"
+				file-extensions="xml"
+				id="de.ovgu.featureide.fm.ui.featureModel"
+				name="Feature Model"
+				priority="high">
+			<describer
+					class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+				<parameter
+						name="element"
+						value="featureModel">
+				</parameter>
+			</describer>
+		</content-type>
+		<content-type
+				base-type="org.eclipse.core.runtime.xml"
+				file-extensions="xml"
+				id="de.ovgu.featureide.fm.ui.featureModel.sxfm"
+				name="SXFM Feature Model"
+				priority="high">
+			<describer
+					class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+				<parameter
+						name="element"
+						value="feature_model">
+				</parameter>
+			</describer>
+		</content-type>
+		<content-type
+				base-type="org.eclipse.core.runtime.text"
+				file-extensions="velvet"
+				id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
+				name="Extended Feature Model"
+				priority="high">
+		</content-type>
 	</extension>
 
 	<extension
@@ -114,35 +115,35 @@
 	<extension
 			point="org.eclipse.ui.editors">
 		<editor
-        class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-        contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
-        default="true"
-        icon="icons/featuretree.ico"
-        id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-        name="Feature Model Editor">
+				class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+				contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
+				default="true"
+				icon="icons/featuretree.ico"
+				id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+				name="Feature Model Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
 			</contentTypeBinding>
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
 			</contentTypeBinding>
-   <contentTypeBinding
-         contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
-   </contentTypeBinding>
+			<contentTypeBinding
+					contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
+			</contentTypeBinding>
 		</editor>
 		<editor
-        class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-        default="true"
-        extensions="conf,config,equation,expression"
-        icon="icons/ConfigurationIcon.png"
-        id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-        name="Configuration Editor">
+				class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+				default="true"
+				extensions="conf,config,equation,expression"
+				icon="icons/ConfigurationIcon.png"
+				id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+				name="Configuration Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.contenttype.conf">
 			</contentTypeBinding>
-   <contentTypeBinding
-         contentTypeId="de.ovgu.featureide.contenttype.confXML">
-   </contentTypeBinding>
+			<contentTypeBinding
+					contentTypeId="de.ovgu.featureide.contenttype.confXML">
+			</contentTypeBinding>
 		</editor>
 	</extension>
 
@@ -157,6 +158,14 @@
 				icon="icons/FeatureIconSmall.ico"
 				id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
 				name="Feature Model Edits"/>
+		<view
+				category="FeatureIDE"
+				class="de.ovgu.featureide.fm.ui.views.outline.custom.Outline"
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
+				name="FeatureIDE Outline"
+				restorable="true">
+		</view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.propertyPages">
@@ -196,17 +205,17 @@
 						<iterate
 								ifEmpty="false"
 								operator="or">
-       <or>
-          <test
-                args="de.ovgu.featureide.core.featureProjectNature"
-                property="de.ovgu.featureide.fm.ui.properties.nature"
-                value="true">
-          </test>
-          <test
-                property="de.ovgu.featureide.fm.ui.properties.featuremodel"
-                value="true">
-          </test>
-       </or>
+							<or>
+								<test
+										args="de.ovgu.featureide.core.featureProjectNature"
+										property="de.ovgu.featureide.fm.ui.properties.nature"
+										value="true">
+								</test>
+								<test
+										property="de.ovgu.featureide.fm.ui.properties.featuremodel"
+										value="true">
+								</test>
+							</or>
 						</iterate>
 					</with>
 				</visibleWhen>
@@ -228,7 +237,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -241,7 +250,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -255,7 +264,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -272,7 +281,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -285,7 +294,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -302,7 +311,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -315,14 +324,14 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
-   <separator
-         name="de.ovgu.featureide.fm.ui.separator5"
-         visible="true">
-   </separator>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator5"
+					visible="true">
+			</separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
 					icon="icons/export_wiz.gif"
@@ -332,7 +341,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -345,7 +354,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -359,10 +368,10 @@
 					id="de.ovgu.featureide.fm.ui.actions.ExportFAMA"
 					label="Export model to FaMa format"
 					style="push">
-					<visibleWhen
+				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -383,29 +392,29 @@
 					</reference>
 				</visibleWhen>
 			</command>
-   <command
-         commandId="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
-         icon="icons/featuretree.ico"
-         id="de.ovgu.featureide.fm.ui.actions.FeatureModelSicing"
-         label="Slice Feature Model"
-         style="push">
-		<visibleWhen
-				checkEnabled="false">
-			<reference
-					definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
-			</reference>
-		</visibleWhen>
-   </command>
-   			<command
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
+					icon="icons/featuretree.ico"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureModelSicing"
+					label="Slice Feature Model"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
 					icon="icons/featuretree.ico"
 					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
 					label="Product-equivalent model with simple constraints"
 					style="push">
-					<visibleWhen
+				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -422,7 +431,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -435,7 +444,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -448,22 +457,22 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
-   <command
-         commandId="de.ovgu.featureide.fm.ui.commands.Convert"
-         id="de.ovgu.featureide.fm.ui.actions.Convert"
-         label="Convert Feature Models"
-         style="push">
-      <visibleWhen
-            checkEnabled="false">
-         <reference
-               definitionId="de.ovgu.featureide.fm.ui.expressions.isFolder">
-         </reference>
-      </visibleWhen>
-   </command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.Convert"
+					id="de.ovgu.featureide.fm.ui.actions.Convert"
+					label="Convert Feature Models"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFolder">
+					</reference>
+				</visibleWhen>
+			</command>
 		</menuContribution>
 	</extension>
 	<extension
@@ -524,10 +533,10 @@
 				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
 				name="Open with GUIDSL">
 		</command>
-  <command
-        id="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
-        name="Feature Model Slicing">
-  </command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
+				name="Feature Model Slicing">
+		</command>
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
 				name="Eliminate complex constraints">
@@ -611,30 +620,115 @@
 	<extension
 			point="org.eclipse.core.expressions.definitions">
 		<definition
-				id="de.ovgu.featureide.fm.ui.expressions.containsXml">
+				id="de.ovgu.featureide.ui.expressions.containsResource">
 			<with
 					variable="activeMenuSelection">
 				<iterate
 						ifEmpty="false"
 						operator="or">
 					<test
-							args=".xml"
-							property="de.ovgu.featureide.fm.ui.properties.file">
+							property="de.ovgu.featureide.fm.ui.properties.class"
+							value="org.eclipse.core.resources.IResource">
 					</test>
 				</iterate>
 			</with>
 		</definition>
 		<definition
-				id="de.ovgu.featureide.fm.ui.expressions.isFolder">
+				id="de.ovgu.featureide.fm.ui.expressions.containsFolder">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="or">
+					<test
+							property="de.ovgu.featureide.fm.ui.properties.class"
+							value="org.eclipse.core.resources.IContainer">
+					</test>
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.isFeatureModel">
+			<adapt type="org.eclipse.core.resources.IResource">
+				<or>
+					<test 
+							property="org.eclipse.core.resources.contentTypeId" 
+							value="de.ovgu.featureide.fm.ui.featureModel" />
+					<test 
+							property="org.eclipse.core.resources.contentTypeId" 
+							value="de.ovgu.featureide.fm.ui.featureModel.sxfm" />
+					<test 
+							property="org.eclipse.core.resources.contentTypeId" 
+							value="de.ovgu.featureide.fm.ui.extendedfeatureModel" />
+				</or>
+			</adapt>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.isConfiguration">
+			<adapt type="org.eclipse.core.resources.IResource">
+				<or>
+					<test 
+							property="org.eclipse.core.resources.contentTypeId" 
+							value="de.ovgu.featureide.contenttype.conf" />
+					<test 
+							property="org.eclipse.core.resources.contentTypeId" 
+							value="de.ovgu.featureide.contenttype.confXML" />
+				</or>
+			</adapt>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsConfiguration">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="or">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.isConfiguration">
+					</reference>
+
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="or">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.isFeatureModel">
+					</reference>
+
+				</iterate>
+			</with>
+		</definition>
+				<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
 			<with
 					variable="activeMenuSelection">
 				<iterate
 						ifEmpty="false"
 						operator="and">
-     <test
-           property="de.ovgu.featureide.fm.ui.properties.class"
-           value="org.eclipse.core.resources.IContainer">
-     </test>
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.isConfiguration">
+					</reference>
+
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsOnlyFeatureModel">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="and">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.isFeatureModel">
+					</reference>
+
 				</iterate>
 			</with>
 		</definition>
@@ -676,12 +770,18 @@
 				properties="nature"
 				type="java.lang.Object">
 		</propertyTester>
-  <propertyTester
-        class="de.ovgu.featureide.fm.ui.properties.FeatureModelTester"
-        id="de.ovgu.featureide.fm.ui.propertytester.featuremodel"
-        namespace="de.ovgu.featureide.fm.ui.properties"
-        properties="featuremodel"
-        type="java.lang.Object">
-  </propertyTester>
+		<propertyTester
+				class="de.ovgu.featureide.fm.ui.properties.FeatureModelTester"
+				id="de.ovgu.featureide.fm.ui.propertytester.featuremodel"
+				namespace="de.ovgu.featureide.fm.ui.properties"
+				properties="featuremodel"
+				type="java.lang.Object">
+		</propertyTester>
+	</extension>
+	<extension
+			point="de.ovgu.featureide.fm.ui.Outline">
+		<Outline
+				OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
+		</Outline>
 	</extension>
 </plugin>

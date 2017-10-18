@@ -6,7 +6,6 @@ Bundle-Version: 1.1.4.qualifier
 Bundle-Activator: br.ufal.ic.colligens.activator.Colligens
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.cdt,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.jface.text,
@@ -18,13 +17,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.cdt.core,
  org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.ui.refactoring,
- org.eclipse.cdt.ui,
  org.eclipse.ui.workbench.texteditor
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.cdt.core.model,
- org.eclipse.cdt.internal.core.model,
- org.eclipse.cdt.ui
+ org.eclipse.cdt.internal.core.model
 Bundle-ClassPath: .,
  lib/TypeChef-0.3.6.jar,
  lib/jdom-2.0.4.jar,
@@ -86,4 +83,22 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
  br.ufal.ic.colligens.util;uses:="org.eclipse.jface.text,br.ufal.ic.colligens.models,org.eclipse.core.resources",
  br.ufal.ic.colligens.util.metrics;uses:="br.ufal.ic.colligens.controllers.core",
  br.ufal.ic.colligens.views;uses:="org.eclipse.ui.part,org.eclipse.swt.widgets",
- de.fosd.typechef;uses:="br.ufal.ic.colligens.models,de.fosd.typechef.parser"
+ de.fosd.typechef;uses:="br.ufal.ic.colligens.models,de.fosd.typechef.parser",
+ de.fosd.typechef.conditional,
+ de.fosd.typechef.crewrite,
+ de.fosd.typechef.error,
+ de.fosd.typechef.featureexpr,
+ de.fosd.typechef.featureexpr.bdd,
+ de.fosd.typechef.featureexpr.sat,
+ de.fosd.typechef.featureexprUtil,
+ de.fosd.typechef.lexer.macrotable,
+ de.fosd.typechef.lexer.options,
+ de.fosd.typechef.multipatch,
+ de.fosd.typechef.options,
+ de.fosd.typechef.parser,
+ de.fosd.typechef.parser.c,
+ de.fosd.typechef.parser.java15,
+ de.fosd.typechef.parser.java15.lexer,
+ de.fosd.typechef.typesystem,
+ de.fosd.typechef.typesystem.linker,
+ de.fosd.typechef.xtclexer

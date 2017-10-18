@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -51,10 +51,10 @@ import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
  * Handles meta data of a project that is represented in the ExmampleWizard.
- * 
+ *
  * @author Reimar Schroeter
  */
-public class ProjectRecord {
+public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
 	public static final String INDEX_FILENAME = "index.fileList";
@@ -76,7 +76,7 @@ public class ProjectRecord {
 
 	/**
 	 * Create a record for a project based on the info given in the file.
-	 * 
+	 *
 	 * @param file
 	 */
 	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
@@ -87,7 +87,7 @@ public class ProjectRecord {
 
 	/**
 	 * Deserialization
-	 * 
+	 *
 	 * @param in
 	 * @throws ClassNotFoundException
 	 * @throws IOException
@@ -110,7 +110,8 @@ public class ProjectRecord {
 	}
 
 	public class TreeItem {
-		private IContentProvider contProv;
+
+		private final IContentProvider contProv;
 
 		public TreeItem(IContentProvider contProv) {
 			this.contProv = contProv;
@@ -144,8 +145,8 @@ public class ProjectRecord {
 	}
 
 	public boolean init() {
-		try (InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection()
-				.getInputStream()) {
+		try (InputStream inputStream =
+			new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			ExamplePlugin.getDefault().logError(e);
@@ -158,7 +159,7 @@ public class ProjectRecord {
 			performAlreadyExistsCheck();
 			performRequirementCheck();
 
-			for (ProjectRecord projectRecord : getSubProjects()) {
+			for (final ProjectRecord projectRecord : getSubProjects()) {
 				if (!projectRecord.init()) {
 					return false;
 				}
@@ -181,10 +182,10 @@ public class ProjectRecord {
 	private void performRequirementCheck() {
 		hasWarnings = false;
 		warning = "";
-		String[] natures = projectDescription.getNatureIds();
+		final String[] natures = projectDescription.getNatureIds();
 		IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(natures);
 
-		if (natures.length == 1 && natures[0].equals("org.eclipse.jdt.core.javanature")) {
+		if ((natures.length == 1) && natures[0].equals("org.eclipse.jdt.core.javanature")) {
 			needsComposer = false;
 		}
 
@@ -195,10 +196,10 @@ public class ProjectRecord {
 		if (!status.isOK()) {
 			warning = status.getMessage();
 			if (status instanceof MultiStatus) {
-				MultiStatus multi = (MultiStatus) status;
+				final MultiStatus multi = (MultiStatus) status;
 				if (multi.getChildren().length > 0) {
 					warning += " (";
-					for (int j = 0; j < multi.getChildren().length - 1; j++) {
+					for (int j = 0; j < (multi.getChildren().length - 1); j++) {
 						warning += multi.getChildren()[j].getMessage() + " ;";
 					}
 					warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
@@ -216,7 +217,7 @@ public class ProjectRecord {
 	}
 
 	public boolean hasSubProjects() {
-		return !(subProjects == null || subProjects.isEmpty());
+		return !((subProjects == null) || subProjects.isEmpty());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -226,7 +227,7 @@ public class ProjectRecord {
 
 	/**
 	 * Get the name of the project
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getProjectName() {
@@ -235,7 +236,7 @@ public class ProjectRecord {
 
 	/**
 	 * Get the description of the project
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getDescription() {
@@ -263,9 +264,8 @@ public class ProjectRecord {
 	}
 
 	/**
-	 * Gets the label to be used when rendering this project record in the
-	 * UI.
-	 * 
+	 * Gets the label to be used when rendering this project record in the UI.
+	 *
 	 * @return String the label
 	 * @since 3.4
 	 */
@@ -277,36 +277,42 @@ public class ProjectRecord {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + projectDescriptionRelativePath.hashCode();
-		result = prime * result + projectName.hashCode();
+		result = (prime * result) + projectDescriptionRelativePath.hashCode();
+		result = (prime * result) + projectName.hashCode();
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final ProjectRecord other = (ProjectRecord) obj;
 		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
 	}
 
+	@Override
+	public int compareTo(ProjectRecord o) {
+		return projectDescriptionRelativePath.compareTo(o.projectDescriptionRelativePath);
+	}
+
 	/**
 	 * Determine if the project with the given name is in the current workspace.
-	 * 
-	 * @param projectName
-	 *            String the project name to check
-	 * @return boolean true if the project with the given name is in this
-	 *         workspace
+	 *
+	 * @param projectName String the project name to check
+	 * @return boolean true if the project with the given name is in this workspace
 	 */
 	protected static boolean isProjectInWorkspace(String projectName) {
 		if (projectName == null) {
 			return false;
 		}
-		IProject[] workspaceProjects = getProjectsInWorkspace();
+		final IProject[] workspaceProjects = getProjectsInWorkspace();
 		for (int i = 0; i < workspaceProjects.length; i++) {
 			if (projectName.equals(workspaceProjects[i].getName())) {
 				return true;
@@ -317,7 +323,7 @@ public class ProjectRecord {
 
 	/**
 	 * Retrieve all the projects in the current workspace.
-	 * 
+	 *
 	 * @return IProject[] array of IProject in the current workspace
 	 */
 	private static IProject[] getProjectsInWorkspace() {
@@ -344,9 +350,10 @@ public class ProjectRecord {
 	public Document getInformationDocument() {
 		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		try {
-			InputStream inputStream = new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(inputStream);
+			final InputStream inputStream =
+				new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
+			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			final Document doc = dBuilder.parse(inputStream);
 			return doc;
 		} catch (IOException | ParserConfigurationException | SAXException e) {
 			e.printStackTrace();

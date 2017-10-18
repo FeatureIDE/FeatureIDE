@@ -13,11 +13,13 @@ public class Neighbor implements EdgeIfc, NeighborIfc
     // This constructor has to be present here so that the default one
     // Called on Weighted can call it, i.e. it is not longer implicit
     /*@ensures  neighbor == null;@*/
+    /*@assignable neighbor; @*/
     public Neighbor()  {
         neighbor = null;
     }
     
     /*@ensures this.neighbor == theNeighbor;@*/ 
+    /*@assignable neighbor; @*/
     public Neighbor( Vertex theNeighbor )
    {
         NeighborConstructor( theNeighbor );

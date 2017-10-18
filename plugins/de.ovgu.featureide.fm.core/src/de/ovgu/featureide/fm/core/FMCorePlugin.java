@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
@@ -61,7 +62,7 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * The activator class controls the plug-in life cycle.
- * 
+ *
  * @author Thomas Thuem
  */
 public class FMCorePlugin extends AbstractCorePlugin {
@@ -73,16 +74,20 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		return PluginID.PLUGIN_ID;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		
+
 		FileSystem.INSTANCE = new EclipseFileSystem();
 		LongRunningWrapper.INSTANCE = new LongRunningEclipse();
-		
-		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID, IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
-		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID, IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
-		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID, IConfigurationFormat.extensionID, IConfigurationFormat.class));
+
+		FMFactoryManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFactory.extensionPointID,
+				IFeatureModelFactory.extensionID, IFeatureModelFactory.class));
+		FMFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IFeatureModelFormat.extensionPointID,
+				IFeatureModelFormat.extensionID, IFeatureModelFormat.class));
+		ConfigFormatManager.setExtensionLoader(new EclipseExtensionLoader<>(PluginID.PLUGIN_ID, IConfigurationFormat.extensionPointID,
+				IConfigurationFormat.extensionID, IConfigurationFormat.class));
 
 //		ConfigFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new DefaultFormat(), new FeatureIDEFormat(), new EquationFormat(), new ExpressionFormat()));
 //		FMFormatManager.setExtensionLoader(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(), new SXFMFormat(), new GuidslFormat()));
@@ -96,6 +101,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		}
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		FMFactoryManager.factoryWorkspaceProvider.save();
 		plugin = null;
@@ -108,12 +114,11 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * Creates a {@link IProjectJob} for every project with the given arguments.
-	 * 
+	 *
 	 * @param projects the list of projects
 	 * @param arguments the arguments for the job
 	 * @param autostart if {@code true} the jobs is started automatically.
-	 * @return the created job or a {@link JobSequence} if more than one project is given.
-	 *         Returns {@code null} if {@code projects} is empty.
+	 * @return the created job or a {@link JobSequence} if more than one project is given. Returns {@code null} if {@code projects} is empty.
 	 */
 	public LongRunningMethod<?> startJobs(List<JobArguments> projects, boolean autostart) {
 		LongRunningMethod<?> ret;
@@ -121,14 +126,14 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		case 0:
 			return null;
 		case 1:
-			LongRunningMethod<?> newJob = projects.get(0).createJob();
+			final LongRunningMethod<?> newJob = projects.get(0).createJob();
 			ret = newJob;
 			break;
 		default:
 			final JobSequence jobSequence = new JobSequence();
 			jobSequence.setIgnorePreviousJobFail(true);
-			for (JobArguments p : projects) {
-				LongRunningMethod<?> newSequenceJob = p.createJob();
+			for (final JobArguments p : projects) {
+				final LongRunningMethod<?> newSequenceJob = p.createJob();
 				jobSequence.addJob(newSequenceJob);
 			}
 			ret = jobSequence;
@@ -142,17 +147,17 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public void analyzeModel(IFile file) {
 		logInfo(READING_MODEL_FILE___);
 		final IContainer outputDir = file.getParent();
-		if (outputDir == null || !(outputDir instanceof IFolder)) {
+		if ((outputDir == null) || !(outputDir instanceof IFolder)) {
 			return;
 		}
 
 		final Path path = file.getLocation().toFile().toPath();
-		if (FeatureModelManager.hasInstance(path)) {
+		if (AFileManager.hasInstance(path)) {
 			final FeatureModelManager instance = FeatureModelManager.getInstance(path);
 			if (instance != null) {
 				final IFeatureModel fm = instance.getObject();
 				try {
-					FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
+					final FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
 					fma.analyzeFeatureModel(null);
 
 					final StringBuilder sb = new StringBuilder();
@@ -163,10 +168,10 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					sb.append(")\n");
 
 					if (fm instanceof ExtendedFeatureModel) {
-						ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+						final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
 						int countInherited = 0;
 						int countInstances = 0;
-						for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+						for (final UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 							switch (usedModel.getType()) {
 							case ExtendedFeature.TYPE_INHERITED:
 								countInherited++;
@@ -190,7 +195,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					sb.append("Core Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
-					for (IFeature coreFeature : analyzedFeatures) {
+					for (final IFeature coreFeature : analyzedFeatures) {
 						sb.append(coreFeature.getName());
 						sb.append(", ");
 					}
@@ -198,7 +203,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					sb.append("\nDead Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
-					for (IFeature deadFeature : analyzedFeatures) {
+					for (final IFeature deadFeature : analyzedFeatures) {
 						sb.append(deadFeature.getName());
 						sb.append(", ");
 					}
@@ -206,7 +211,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 					sb.append("\nFO Features (");
 					sb.append(analyzedFeatures.size());
 					sb.append("): ");
-					for (IFeature foFeature : analyzedFeatures) {
+					for (final IFeature foFeature : analyzedFeatures) {
 						sb.append(foFeature.getName());
 						sb.append(", ");
 					}
@@ -220,7 +225,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 						outputFile.create(inputStream, true, null);
 					}
 					logInfo(PRINTED_OUTPUT_FILE_);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logError(e);
 				}
 			}

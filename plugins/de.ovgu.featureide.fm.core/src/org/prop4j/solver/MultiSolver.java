@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Finds certain solutions of propositional formulas.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MultiSolver extends BasicSolver {
@@ -95,26 +95,25 @@ public class MultiSolver extends BasicSolver {
 					}
 					backbone.push(var);
 					try {
-						if (this.solver.isSatisfiable(backbone, false)) {
+						if (solver.isSatisfiable(backbone, false)) {
 							synchronized (solutionList) {
 								solutionList.add(solver.model());
 							}
 							shuffleOrder();
-							//								handleTrue();
+							// handleTrue();
 						} else {
 							assignmentPush(-var);
-							//								handleFalse();
+							// handleFalse();
 						}
 					} catch (final TimeoutException e) {
 						e.printStackTrace();
-						//							handleTimeout();
+						// handleTimeout();
 					} finally {
 						backbone.pop();
 					}
 					semaphore.release();
 				}
-			} catch (final InterruptedException e) {
-			}
+			} catch (final InterruptedException e) {}
 		}
 
 		public void stopComsumer() {
@@ -196,28 +195,33 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
+	@Override
 	public void assignmentClear(int fromIndex) {
 		synchronized (assignment) {
 			assignment.shrinkTo(fromIndex);
 		}
 	}
 
+	@Override
 	public void assignmentPop() {
 		synchronized (assignment) {
 			assignment.pop();
 		}
 	}
 
+	@Override
 	public void assignmentPush(int x) {
 		synchronized (assignment) {
 			assignment.push(x);
 		}
 	}
 
+	@Override
 	public MultiSolver clone() {
 		return new MultiSolver(this);
 	}
 
+	@Override
 	public void fixOrder() {
 		synchronized (order) {
 			for (int i = 0; i < order.length; i++) {
@@ -226,6 +230,7 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
+	@Override
 	public SatResult isSatisfiable() {
 		try {
 			if (solver.isSatisfiable(assignment, false)) {
@@ -236,16 +241,17 @@ public class MultiSolver extends BasicSolver {
 			} else {
 				return SatResult.FALSE;
 			}
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}
 
+	@Override
 	public void setOrder(List<IFeature> orderList) {
 		int i = -1;
 		synchronized (orderLock) {
-			for (IFeature feature : orderList) {
+			for (final IFeature feature : orderList) {
 				order[++i] = satInstance.varToInt.get(feature.getName());
 			}
 		}
@@ -253,6 +259,7 @@ public class MultiSolver extends BasicSolver {
 
 	private SelectionStrategy curSelectionStrategy = SelectionStrategy.ORG;
 
+	@Override
 	public void setSelectionStrategy(SelectionStrategy strategy) {
 		super.setSelectionStrategy(strategy);
 
@@ -261,6 +268,7 @@ public class MultiSolver extends BasicSolver {
 		}
 	}
 
+	@Override
 	public void shuffleOrder() {
 		final Random rnd = new Random();
 		synchronized (orderLock) {

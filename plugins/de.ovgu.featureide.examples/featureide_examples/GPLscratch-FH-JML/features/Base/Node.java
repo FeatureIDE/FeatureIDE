@@ -7,6 +7,7 @@ public class Node implements Comparable<Node>{
 	/*@ \final_method
 	 @ 	requires name != null;
 	 @ 	ensures this.name = name;
+	 @  assignable name;
 	 @*/
 	public Node(String name) {
 		this.name = name;
@@ -43,6 +44,7 @@ public class Node implements Comparable<Node>{
 	/*@ \final_method
 	 @ requires name != null;
 	 @ ensures \result > 17;
+	 @ assignable \nothing;
 	 @*/
 	@Override
 	public int hashCode() {

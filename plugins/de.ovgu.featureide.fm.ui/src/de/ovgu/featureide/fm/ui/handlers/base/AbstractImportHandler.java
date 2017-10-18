@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -48,14 +48,13 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Abstract class with core functionality to import FeatureModels.</br>
- * Implementing classes mainly provide a specific FeatureModelReader.
- * 
+ * Abstract class with core functionality to import FeatureModels.</br> Implementing classes mainly provide a specific FeatureModelReader.
+ *
  * @author Fabian Benduhn
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
@@ -85,14 +84,14 @@ public abstract class AbstractImportHandler extends AFileHandler {
 		IFeatureModel fm = null;
 		try {
 			fm = FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		if (fm != null) {
-			final ProblemList errors = FileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
+			final ProblemList errors = SimpleFileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
 			if (!errors.isEmpty()) {
 				final StringBuilder sb = new StringBuilder("Error while loading file: \n");
-				for (Problem problem : errors) {
+				for (final Problem problem : errors) {
 					sb.append("Line ");
 					sb.append(problem.getLine());
 					sb.append(": ");
@@ -101,10 +100,10 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				}
 				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
 			} else {
-				FileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
+				SimpleFileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
 				try {
 					openFileInEditor(outputFile);
-				} catch (PartInitException e) {
+				} catch (final PartInitException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			}
@@ -117,9 +116,8 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	/**
-	 * Opens the imported model in a new editor. If it is already open, the
-	 * editor will be closed first.
-	 * 
+	 * Opens the imported model in a new editor. If it is already open, the editor will be closed first.
+	 *
 	 * @throws PartInitException
 	 */
 	private void openFileInEditor(IFile outputFile) throws PartInitException {

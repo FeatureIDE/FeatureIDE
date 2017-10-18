@@ -1,6 +1,6 @@
 .cproject
 .project
-configs/LibSSH.config
+configs/LibSSH.xml
 model.xml
 readme.txt
 src/dh.c

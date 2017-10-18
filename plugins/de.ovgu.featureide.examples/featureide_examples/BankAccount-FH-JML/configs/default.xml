@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="BankAccount"/>
+		<feature automatic="undefined" manual="undefined" name="DailyLimit"/>
+		<feature automatic="undefined" manual="undefined" name="Interest"/>
+		<feature automatic="undefined" manual="undefined" name="InterestEstimation"/>
+		<feature automatic="undefined" manual="undefined" name="Overdraft"/>
+		<feature automatic="undefined" manual="undefined" name="CreditWorthiness"/>
+		<feature automatic="undefined" manual="undefined" name="Lock"/>
+		<feature automatic="undefined" manual="undefined" name="Transaction"/>
+	</configuration>

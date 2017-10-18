@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -71,21 +71,21 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * Feature} also implements
  * the <code>IFeature</code> interface. Developers should neither use nor extend this obsolete class since it is deprecated and will be removed in one of the
  * next versions.
- * 
+ *
  * @see de.ovgu.featureide.fm.core.base.impl.AFeature Default implementation of <code>IFeature</code> (as starting point for custom implementations)
- * 
+ *
  * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
  * @see IFeatureModel Interface for feature models (<code>IFeatureModel</code>)
  * @see IFeatureProperty Interface for feature properties (<code>IFeatureProperty</code>)
- * @see IFeatureStructure Interface for a feature's structure  (<code>IFeatureStructure</code>)
- * 
+ * @see IFeatureStructure Interface for a feature's structure (<code>IFeatureStructure</code>)
+ *
  * @see de.ovgu.featureide.fm.core.base.impl.AConstraint Default implementation for feature constraints (<code>AConstraint</code>)
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureModel Default implementation for feature models (<code>FeatureModel</code>)
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureProperty Default implementation for feature properties (<code>FeatureProperty</code>)
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureStructure Default implementation for a feature's structure (<code>FeatureStructure</code>)
- * 
+ *
  * @since 3.0
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
@@ -94,57 +94,50 @@ public interface IFeature extends IFeatureModelElement {
 	/**
 	 * Creates a new instance (new reference) of this feature with the same feature name and internal id, optionally change the features feature model and/or
 	 * structure.
-	 * 
+	 *
 	 * @since 3.0
-	 * 
+	 *
 	 * @param newFeatureModel A new feature model in which the feature should be part of. If this parameter is <code>null</code>, the cloned feature's new
-	 *            feature model have to
-	 *            be the originals feature's feature model.
+	 *        feature model have to be the originals feature's feature model.
 	 * @param newStructure A new structure in which the feature should life. If this parameter is <code>null</code>, the cloned feature's new structure have to
-	 *            be the originals feature's structure.
-	 * 
+	 *        be the originals feature's structure.
+	 *
 	 * @since 3.0
-	 * 
+	 *
 	 * @return New instance <code>f'</code> of this feature <code>f</code> such that <code>f != f'</code> but <code>f.equals(f')</code> holds.
 	 */
 	IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure);
 
 	/**
 	 * Returns the feature's properties. These properties depend on the {@link IFeatureProperty} implementation, but contain at least getters and setters for
-	 * <ul>
-	 * <li>a custom-defined description of the feature</li>
-	 * <li>a string-representation of the feature which is intended for display purposes</li>
-	 * <li>information about the feature status (dead, false-optional,...)</li>
-	 * <li>the state of the feature's selection in the GUI</li>
-	 * </ul>
-	 * For user-defined properties, the {@link IFeatureProperty} implementation must be changed, or the method {@link #getCustomProperties()} can be used.
-	 * 
+	 * <ul> <li>a custom-defined description of the feature</li> <li>a string-representation of the feature which is intended for display purposes</li>
+	 * <li>information about the feature status (dead, false-optional,...)</li> <li>the state of the feature's selection in the GUI</li> </ul> For user-defined
+	 * properties, the {@link IFeatureProperty} implementation must be changed, or the method {@link #getCustomProperties()} can be used.
+	 *
 	 * @since 3.0
-	 * 
+	 *
 	 * @return Implementation-specific feature properties.
 	 */
 	IFeatureProperty getProperty();
 
 	/**
 	 * Returns the feature's custom-defined properties. These properties can be get and set without changes to the code base, or the need for a custom
-	 * {@link IFeatureProperty} implementation (see {@link #getProperty()}). Custom-Properties do map a Java primitive value to a string key and can
-	 * stored to the file system.
-	 * 
+	 * {@link IFeatureProperty} implementation (see {@link #getProperty()}). Custom-Properties do map a Java primitive value to a string key and can stored to
+	 * the file system.
+	 *
 	 * @since 3.0
-	 * 
+	 *
 	 * @return Implementation-independent custom feature properties.
 	 */
 	IPropertyContainer getCustomProperties();
 
 	/**
 	 * Returns the feature structure, in which this feature lives in. The structure gives information about (and setter to) the children and the parent of this
-	 * feature, and statement-related properties such as if this feature is part of an alternative group, or if it is abstract or hidden.
-	 * <br/>
-	 * <br/>
+	 * feature, and statement-related properties such as if this feature is part of an alternative group, or if it is abstract or hidden. <br/> <br/>
 	 * <b>Note</b>: The returned object have to be non-null.
-	 * 
+	 *
 	 * @since 3.0
-	 * 
+	 *
 	 * @return The features structure properties.
 	 */
 	@Nonnull

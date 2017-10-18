@@ -14,12 +14,12 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
  * The activator class controls the plug-in life cycle
  */
 /**
- * 
- * 
+ *
+ *
  * @author Dalton
- * 
- * 
- * 
+ *
+ *
+ *
  **/
 
 public class Colligens extends AbstractUIPlugin {
@@ -33,30 +33,24 @@ public class Colligens extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 
-		Start inicialize = new Start();
+		final Start inicialize = new Start();
 		inicialize.SystemClear();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		Start inicialize = new Start();
+		final Start inicialize = new Start();
 		inicialize.SystemClear();
 
 		plugin = null;
@@ -65,7 +59,7 @@ public class Colligens extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance
-	 * 
+	 *
 	 * @return the shared instance
 	 */
 	public static Colligens getDefault() {
@@ -73,11 +67,9 @@ public class Colligens extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
+	 * Returns an image descriptor for the image file at the given plug-in relative path
+	 *
+	 * @param path the path
 	 * @return the image descriptor
 	 */
 	@Override
@@ -92,16 +84,16 @@ public class Colligens extends AbstractUIPlugin {
 
 	/**
 	 * Returns the configuration directory
-	 * 
-	 * 
+	 *
+	 *
 	 * @return directory configuration
 	 */
 	public File getConfigDir() {
-		Location location = Platform.getConfigurationLocation();
+		final Location location = Platform.getConfigurationLocation();
 		File file = null;
 		if (location != null) {
-			URL configURL = location.getURL();
-			if (configURL != null && configURL.getProtocol().startsWith("file")) {
+			final URL configURL = location.getURL();
+			if ((configURL != null) && configURL.getProtocol().startsWith("file")) {
 				file = new File(configURL.getFile(), PLUGIN_ID);
 				file.mkdirs();
 				return file;

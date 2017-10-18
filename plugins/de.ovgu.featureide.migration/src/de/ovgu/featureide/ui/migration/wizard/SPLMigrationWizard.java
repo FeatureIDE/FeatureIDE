@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,38 +35,32 @@ import de.ovgu.featureide.ui.migration.plugin.SPLMigrationCommandHandler;
 import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
 
 /**
- * This class implements most of the {@link SPLMigrationPlugin}s functionality.
- * It is invoked by the {@link SPLMigrationCommandHandler}. The
- * {@link WizardDialog} consists of two pages:
- * {@link SPLMigrationDialogNamePage} and {@link SPLMigrationDialogSettingsPage}
- * .
- * 
+ * This class implements most of the {@link SPLMigrationPlugin}s functionality. It is invoked by the {@link SPLMigrationCommandHandler}. The
+ * {@link WizardDialog} consists of two pages: {@link SPLMigrationDialogNamePage} and {@link SPLMigrationDialogSettingsPage} .
+ *
  * @see {@link #performFinish()}
- * 
+ *
  * @author Konstantin Tonscheidt
- * 
+ *
  */
-public class SPLMigrationWizard extends Wizard implements INewWizard
-{
+public class SPLMigrationWizard extends Wizard implements INewWizard {
+
 	private SPLMigrationDialogNamePage namePage;
 	private SPLMigrationDialogSettingsPage projectPage;
 
-	private ISPLMigrator migrator;
+	private final ISPLMigrator migrator;
 
-	public SPLMigrationWizard(ISPLMigrator migrator)
-	{
+	public SPLMigrationWizard(ISPLMigrator migrator) {
 		this.migrator = migrator;
 	}
-	
+
 	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection)
-	{
-		//not necessary
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		// not necessary
 	}
 
 	@Override
-	public void addPages()
-	{
+	public void addPages() {
 		setWindowTitle(IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE);
 
 		namePage = new SPLMigrationDialogNamePage();
@@ -77,17 +71,13 @@ public class SPLMigrationWizard extends Wizard implements INewWizard
 	}
 
 	/**
-	 * Delegates the actual creation of the SPL from the {@link IProject}s
-	 * contained in {@code projects}
+	 * Delegates the actual creation of the SPL from the {@link IProject}s contained in {@code projects}
 	 */
 	@Override
-	public boolean performFinish()
-	{
-		MigrationConfigurationData configurationData = new MigrationConfigurationData(
-				namePage.getProjectName(), projectPage.getCompositionTool(),
-				projectPage.getSourcePath(), projectPage.getConfigPath(),
-				projectPage.getBuildPath());
-		
+	public boolean performFinish() {
+		final MigrationConfigurationData configurationData = new MigrationConfigurationData(namePage.getProjectName(), projectPage.getCompositionTool(),
+				projectPage.getSourcePath(), projectPage.getConfigPath(), projectPage.getBuildPath());
+
 		migrator.migrate(configurationData);
 
 		return true;

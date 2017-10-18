@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="PokerSPL"/>
+		<feature automatic="selected" manual="selected" name="Player"/>
+		<feature automatic="selected" manual="selected" name="Table"/>
+		<feature automatic="selected" manual="selected" name="Cards"/>
+		<feature automatic="unselected" manual="undefined" name="MaxPlayerCardsTwo"/>
+		<feature automatic="undefined" manual="selected" name="MaxPlayerCardsFive"/>
+		<feature automatic="unselected" manual="undefined" name="MaxPlayerCardsSeven"/>
+		<feature automatic="undefined" manual="undefined" name="Wager"/>
+		<feature automatic="undefined" manual="undefined" name="Blinds"/>
+		<feature automatic="undefined" manual="undefined" name="IncreasingBlinds"/>
+		<feature automatic="undefined" manual="undefined" name="Pot_Limit"/>
+	</configuration>

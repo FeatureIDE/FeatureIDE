@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/default.config
+configs/default.xml
 features/Base/Clock.asm
 features/Seconds/Clock.asm
 model.xml

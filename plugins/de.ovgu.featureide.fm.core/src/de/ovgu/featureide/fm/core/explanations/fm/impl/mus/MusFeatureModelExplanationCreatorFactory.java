@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
@@ -31,36 +31,45 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 
 /**
  * Provides instances of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
+
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusFeatureModelExplanationCreatorFactory() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusFeatureModelExplanationCreatorFactory(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
+	}
+
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new MusDeadFeatureExplanationCreator();
+		return new MusDeadFeatureExplanationCreator(solverFactory);
 	}
-	
+
 	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusDeadFeatureExplanationCreator(fm);
-	}
-	
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new MusFalseOptionalFeatureExplanationCreator();
+		return new MusFalseOptionalFeatureExplanationCreator(solverFactory);
 	}
-	
-	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusFalseOptionalFeatureExplanationCreator(fm);
-	}
-	
+
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
-		return new MusRedundantConstraintExplanationCreator();
-	}
-	
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		return new MusRedundantConstraintExplanationCreator(fm);
+		return new MusRedundantConstraintExplanationCreator(solverFactory);
 	}
 }

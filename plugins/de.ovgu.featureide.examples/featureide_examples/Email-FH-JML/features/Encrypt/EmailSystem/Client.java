@@ -44,6 +44,7 @@ public class Client {
 	  @ requires encryptedMails.contains(msg) ==> msg.isEncrypted();
 	  @ ensures msg.isEncrypted() ==> encryptedMails.contains(msg);
 	  @ ensures !msg.isEncrypted() ==> unEncryptedMails.contains(msg);
+	  @ assignable \nothing;
 	  @*/
 	static void mail(Client client, Email msg) {
 		//TODO add to encryptedMails if msg.isEncrypted(), else to unEncryptedMails
@@ -52,6 +53,7 @@ public class Client {
 	
 	/*@
 	  @ ensures msg.isEncrypted() ==> encryptedMails.contains(msg);
+	  @ assignable \nothing;
 	  @*/
 	static void incoming(Client client, Email msg) {
 		//TODO add to encryptedMails if msg.isEncrypted()

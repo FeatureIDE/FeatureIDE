@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -46,7 +46,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 
 /**
  * Context Completion
- * 
+ *
  * @author Reimar Schr�ter
  */
 @SuppressWarnings("restriction")
@@ -74,8 +74,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 	}
 
 	@Override
-	public void sessionStarted() {
-	}
+	public void sessionStarted() {}
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
@@ -85,45 +84,46 @@ public class Completion implements IJavaCompletionProposalComputer {
 			context = (JavaContentAssistInvocationContext) arg0;
 		}
 
-		final IFile file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+		final IFile file =
+			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
-		if (context == null || featureProject == null || featureProject.getProjectSignatures() == null) {
+		if ((context == null) || (featureProject == null) || (featureProject.getProjectSignatures() == null)) {
 			return Collections.emptyList();
 		}
 
-		String featureName = featureProject.getFeatureName(file);
+		final String featureName = featureProject.getFeatureName(file);
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		String prefix = "";
 		try {
 			prefix = ((JavaContentAssistInvocationContext) arg0).computeIdentifierPrefix().toString();
-		} catch (BadLocationException e1) {
+		} catch (final BadLocationException e1) {
 			e1.printStackTrace();
 		}
 
-		List<CompletionProposal> completionProp = CorePlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
+		final List<CompletionProposal> completionProp = CorePlugin.getDefault().extendedModules_getCompl(featureProject, featureName);
 
-		for (CompletionProposal curProp : completionProp) {
+		for (final CompletionProposal curProp : completionProp) {
 			curProp.setReplaceRange(context.getInvocationOffset() - context.getCoreContext().getToken().length, context.getInvocationOffset());
 
 			if (curProp.getKind() == CompletionProposal.TYPE_REF) {
-				LazyJavaCompletionProposal prsss = new LazyJavaCompletionProposal(curProp, context);
+				final LazyJavaCompletionProposal prsss = new LazyJavaCompletionProposal(curProp, context);
 
 				prsss.setStyledDisplayString(new StyledString(new String(curProp.getCompletion())));
 				prsss.setReplacementString(new String(curProp.getCompletion()));
-				if (prefix.length() >= 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if ((prefix.length() >= 0) && new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(prsss);
 				}
 			} else if (curProp.getKind() == CompletionProposal.METHOD_REF) {
-				LazyJavaCompletionProposal meth = new LazyJavaCompletionProposal(curProp, context);
+				final LazyJavaCompletionProposal meth = new LazyJavaCompletionProposal(curProp, context);
 
 				String displayString = new String(curProp.getCompletion());
 				displayString = displayString.concat("(");
 				int paramNr = 0;
 				try {
 					paramNr = Signature.getParameterCount(curProp.getSignature());
-				} catch (IllegalArgumentException e) {
+				} catch (final IllegalArgumentException e) {
 					e.printStackTrace();
 				}
 
@@ -131,7 +131,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 					String paramName = new String(Signature.getParameterTypes(curProp.getSignature())[i]);
 					paramName = normalize(paramName);
 					displayString = displayString.concat(paramName + " arg" + i);
-					if (i + 1 < paramNr) {
+					if ((i + 1) < paramNr) {
 						displayString = displayString.concat(", ");
 					}
 				}
@@ -139,33 +139,36 @@ public class Completion implements IJavaCompletionProposalComputer {
 
 				displayString = displayString.concat(normalize(new String(Signature.getReturnType(curProp.getSignature()))));
 
-				StyledString methString = new StyledString(displayString);
-				Styler styler = StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+				final StyledString methString = new StyledString(displayString);
+				final Styler styler =
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
 				// TextStyle style = new
 				// TextStyle(JFaceResources.getDefaultFont(),JFaceResources.getResources().createColor(new
 				// RGB(10, 10,
 				// 10)),JFaceResources.getResources().createColor(new
 				// RGB(0,0,0)));
 				// styler.applyStyles(style);
-				StyledString infoString = new StyledString(new String(" - " + normalize(new String(curProp.getDeclarationSignature())) + " " + featureName), styler);
+				final StyledString infoString =
+					new StyledString(new String(" - " + normalize(new String(curProp.getDeclarationSignature())) + " " + featureName), styler);
 				methString.append(infoString);
 				meth.setStyledDisplayString(methString);
 
 				meth.setReplacementString(new String(curProp.getCompletion()));
 
-				if (prefix.length() >= 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if ((prefix.length() >= 0) && new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(meth);
 				}
 			} else if (curProp.getKind() == CompletionProposal.FIELD_REF) {
-				LazyJavaCompletionProposal field = new LazyJavaCompletionProposal(curProp, context);
-				StyledString fieldString = new StyledString(new String(curProp.getCompletion()));
-				Styler styler = StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
-				StyledString infoString = new StyledString(new String(" - " + new String(curProp.getName()) + " " + featureName), styler);
+				final LazyJavaCompletionProposal field = new LazyJavaCompletionProposal(curProp, context);
+				final StyledString fieldString = new StyledString(new String(curProp.getCompletion()));
+				final Styler styler =
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+				final StyledString infoString = new StyledString(new String(" - " + new String(curProp.getName()) + " " + featureName), styler);
 				fieldString.append(infoString);
 				field.setStyledDisplayString(fieldString);
 
 				field.setReplacementString(new String(curProp.getCompletion()));
-				if (prefix.length() > 0 && new String(curProp.getCompletion()).startsWith(prefix)) {
+				if ((prefix.length() > 0) && new String(curProp.getCompletion()).startsWith(prefix)) {
 					list.add(field);
 				}
 			}

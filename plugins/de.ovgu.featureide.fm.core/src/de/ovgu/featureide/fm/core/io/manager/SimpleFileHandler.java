@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Capable of reading and writing a file in a certain format.
- * 
+ *
  * @see AFileManager
- * 
+ *
  * @author Sebastian Krieter
  */
 public class SimpleFileHandler<T> {
@@ -71,15 +71,17 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, null);
+		return load(new SimpleFileHandler<>(path, object, null), formatManager);
+	}
+
+	public static <T> ProblemList load(SimpleFileHandler<T> fileHandler, FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		final String content = fileHandler.getContent();
 
 		if (content != null) {
-			final String fileName = path.getFileName().toString();
+			final String fileName = fileHandler.getPath().getFileName().toString();
 			final IPersistentFormat<T> format = formatManager.getFormatByContent(content, fileName);
 			if (format == null) {
-				fileHandler.getLastProblems()
-						.add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
+				fileHandler.getLastProblems().add(new Problem(new FormatManager.NoSuchExtensionException("No format found for file \"" + fileName + "\"!")));
 			} else {
 				fileHandler.setFormat(format);
 				fileHandler.parse(content);
@@ -96,7 +98,7 @@ public class SimpleFileHandler<T> {
 
 	public static <T> ProblemList convert(Path inPath, Path outPath, T object, IPersistentFormat<T> inFormat, IPersistentFormat<T> outFormat) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(inPath, object, inFormat);
-		ProblemList pl = new ProblemList();
+		final ProblemList pl = new ProblemList();
 		fileHandler.read();
 		pl.addAll(fileHandler.getLastProblems());
 		fileHandler.setPath(outPath);

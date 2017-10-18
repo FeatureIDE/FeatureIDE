@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,9 +24,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INVARIANT;
 
 /**
  * Contains node types of the <code>FeatureHouse</code> internal FSTModel.
+ *
  * @author Jens Meinicke
  */
 public interface FHNodeTypes {
+
 	static final String NODE_TYPE_FEATURE = "Feature";
 	static final String NODE_TYPE_CLASS = "EOF Marker";
 	static final String NODE_COMPILATIONUNIT = "CompilationUnit";
@@ -48,12 +50,12 @@ public interface FHNodeTypes {
 	static final String JAVA_NODE_IMPLEMENTATIONLIST = "ImplementsList";
 	static final String JAVA_NODE_EXTENDSLIST = "ExtendsList";
 	static final String JAVA_NODE_METHOD_SPEC = "MethodDeclarationWithSpec";
-	
-	//JML specific node types
+
+	// JML specific node types
 	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
 	static final String JML_INVARIANT = INVARIANT;
-	
-	//AsmetaL specific node types
+
+	// AsmetaL specific node types
 	static final String ASMETAL_DOMAIN = "Domain";
 	static final String ASMETAL_MODULE_DECLARATION = "ModuleDeclaration";
 	static final String ASMETAL_RULE = "RuleDeclaration";
@@ -72,7 +74,7 @@ public interface FHNodeTypes {
 	static final String C_NODE_STRUCTDEC = "StructDec";
 //	static final Object C_NODE_TYPEDEF = "TypeDef_";
 	static final String C_NODE_STMTL = "StmtTL";
-	
+
 	// C# specific node types
 	static final String CSHARP_NODE_CLASS_MEMBER_DECLARATION = "class_member_declaration";
 	static final String CSHARP_NODE_CLAASS_MEMBER_DECLARATION_END = "class_member_declarationEnd6";

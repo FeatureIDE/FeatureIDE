@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="SpaceWar"/>
+		<feature automatic="undefined" manual="undefined" name="coordination_Coordinator"/>
+		<feature automatic="undefined" manual="undefined" name="spacewar_EnsureShipIsAlive"/>
+		<feature automatic="undefined" manual="undefined" name="spacewar_GameSynchronization"/>
+		<feature automatic="undefined" manual="undefined" name="spacewar_RegistrySynchronization"/>
+		<feature automatic="undefined" manual="undefined" name="spacewar_Debug"/>
+		<feature automatic="selected" manual="selected" name="spacewar_Registry"/>
+		<feature automatic="selected" manual="undefined" name="Display"/>
+		<feature automatic="selected" manual="selected" name="spacewar_Display"/>
+		<feature automatic="selected" manual="selected" name="spacewar_Display1"/>
+		<feature automatic="selected" manual="selected" name="spacewar_Display2"/>
+		<feature automatic="selected" manual="selected" name="spacewar_Ship"/>
+	</configuration>

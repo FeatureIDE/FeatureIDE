@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Reads and writes feature models in the DIMACS CNF format.
- * 
+ *
  * @author Sebastian Krieter
  * @author Timo G&uuml;nther
  */
@@ -58,47 +58,48 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
-		
-		//Transform the input into a propositional node.
+
+		// Transform the input into a propositional node.
 		final DimacsReader r = new DimacsReader(source.toString());
 		r.setReadingVariableDirectory(true);
 		final Node read;
 		try {
 			read = r.read();
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			problemList.add(new Problem(e));
 			return problemList;
 		}
-		
-		//Add the propositional node to the feature model.
+
+		// Add the propositional node to the feature model.
 		addNodeToFeatureModel(featureModel, read);
-		
+
 		return problemList;
 	}
 
 	/**
-	 * Adds the given propositional node to the given feature model.
-	 * The current implementation is naive in that it does not attempt to interpret any constraint as {@link IFeatureStructure structure}.
+	 * Adds the given propositional node to the given feature model. The current implementation is naive in that it does not attempt to interpret any constraint
+	 * as {@link IFeatureStructure structure}.
+	 *
 	 * @param featureModel feature model to edit
 	 * @param node propositional node to add
 	 */
 	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
-		//Add a dummy feature as root.
+		// Add a dummy feature as root.
 		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
 		featureModel.getStructure().setRoot(rootFeature.getStructure());
-		
-		//Add a feature for each variable.
+
+		// Add a feature for each variable.
 		final Set<String> variables = new LinkedHashSet<>(node.getContainedFeatures());
 		for (final String variable : variables) {
 			final IFeature feature = factory.createFeature(featureModel, variable);
 			featureModel.addFeature(feature);
 			rootFeature.getStructure().addChild(feature.getStructure());
 		}
-		
-		//Add a constraint for each conjunctive clause.
+
+		// Add a constraint for each conjunctive clause.
 		final List<Node> clauses = node instanceof And ? Arrays.asList(node.getChildren()) : Collections.singletonList(node);
 		for (final Node clause : clauses) {
 			final IConstraint constraint = factory.createConstraint(featureModel, clause);
@@ -142,6 +143,11 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	@Override
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead();
+	}
+
+	@Override
+	public String getName() {
+		return "DIMACS";
 	}
 
 }

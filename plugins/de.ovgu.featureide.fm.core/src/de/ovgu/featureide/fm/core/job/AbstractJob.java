@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,15 +38,16 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Abstract eclipse job with support for {@link JobFinishListener}.
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	private class JobFL extends JobChangeAdapter {
+
 		@SuppressWarnings("rawtypes")
-		private JobFinishListener listener;
+		private final JobFinishListener listener;
 
 		public JobFL(@SuppressWarnings("rawtypes") JobFinishListener listener) {
 			this.listener = listener;
@@ -61,10 +62,12 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
+			if (this == obj) {
 				return true;
-			if (obj == null || getClass() != obj.getClass())
+			}
+			if ((obj == null) || (getClass() != obj.getClass())) {
 				return false;
+			}
 			return listener.equals(((JobFL) obj).listener);
 		}
 
@@ -117,13 +120,13 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		try {
 			methodResult = work(workMonitor);
 			status = JobStatus.OK;
-		} catch (MethodCancelException e) {
+		} catch (final MethodCancelException e) {
 			status = JobStatus.FAILED;
 			throw new OperationCanceledException();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			status = JobStatus.FAILED;
 			Logger.logError(e);
-			return new Status(Status.ERROR, PluginID.PLUGIN_ID, "FAILED", e);
+			return new Status(IStatus.ERROR, PluginID.PLUGIN_ID, "FAILED", e);
 		} finally {
 			finalWork();
 			workMonitor.done();
@@ -137,25 +140,22 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		this.intermediateFunction = intermediateFunction;
 	}
 
+	@Override
 	public Class<?> getImplementationClass() {
 		return getClass();
 	}
 
 	/**
-	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not.
-	 * The default method is empty.
-	 * 
+	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not. The default method is empty.
+	 *
 	 * @param success {@code true} if the execution of {@link #work()} was complete and successful, {@code false} otherwise
 	 */
-	protected void finalWork() {
-	}
+	protected void finalWork() {}
 
 	/**
-	 * In this method all the work of the job is done.</br>
-	 * Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.</br>
-	 * </br>
-	 * Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
-	 * 
+	 * In this method all the work of the job is done.</br> Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.</br>
+	 * </br> Implementing jobs should continuously call {@link IMonitor#checkCancel()}.
+	 *
 	 * @return {@code true} if no error occurred during the process
 	 * @throws Exception any exception (will be catched by the parent class)
 	 */

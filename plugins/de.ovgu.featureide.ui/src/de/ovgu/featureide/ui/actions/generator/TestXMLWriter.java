@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -55,35 +55,36 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 /**
- * 
+ *
  * Generates the xml input file for the JUnit view.
- * 
+ *
  * @author Jens Meinicke
  */
 public class TestXMLWriter implements XMLCoverage {
 
-	private TestResults testResults;
+	private final TestResults testResults;
 
 	public TestXMLWriter(TestResults testResults) {
 		this.testResults = testResults;
 	}
 
 	public String write() throws ParserConfigurationException, TransformerException {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(true);
 		dbf.setExpandEntityReferences(true);
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document doc = db.newDocument();
+		final DocumentBuilder db = dbf.newDocumentBuilder();
+		final Document doc = db.newDocument();
 		// Create the Xml Representation
 		return createXMLDocument(doc);
 	}
 
 	private String createXMLDocument(Document doc) throws TransformerException {
-		Element root = doc.createElement(TESTRUN);
+		final Element root = doc.createElement(TESTRUN);
 		root.setAttribute(IGNORED, Integer.valueOf(testResults.ignored).toString());
 		root.setAttribute(ERRORS, Integer.valueOf(testResults.errors).toString());
 		root.setAttribute(STARTED, Integer.valueOf(testResults.started).toString());
@@ -91,16 +92,16 @@ public class TestXMLWriter implements XMLCoverage {
 		root.setAttribute("project", testResults.project);
 		root.setAttribute("name", testResults.name);
 
-		for (Entry<String, Map<String, Set<Test>>> result : testResults.testResults.entrySet()) {
-			Element suite = doc.createElement(TESTSUITE);
+		for (final Entry<String, Map<String, Set<Test>>> result : testResults.testResults.entrySet()) {
+			final Element suite = doc.createElement(TESTSUITE);
 			suite.setAttribute("name", result.getKey());
 			float suiteTime = 0;
-			for (Entry<String, Set<Test>> configTest : result.getValue().entrySet()) {
-				Element config1 = doc.createElement(TESTSUITE);
+			for (final Entry<String, Set<Test>> configTest : result.getValue().entrySet()) {
+				final Element config1 = doc.createElement(TESTSUITE);
 				config1.setAttribute("name", configTest.getKey());
 				float configTime = 0;
-				for (Test test : configTest.getValue()) {
-					Element testCase = doc.createElement(TESTCASE);
+				for (final Test test : configTest.getValue()) {
+					final Element testCase = doc.createElement(TESTCASE);
 					testCase.setAttribute("name", test.name);
 					testCase.setAttribute(CLASSNAME, test.classname);
 					testCase.setAttribute(TIME, test.time + "");
@@ -127,11 +128,11 @@ public class TestXMLWriter implements XMLCoverage {
 		doc.appendChild(root);
 
 		// Transform the Xml Representation into a String
-		Transformer transfo = TransformerFactory.newInstance().newTransformer();
+		final Transformer transfo = TransformerFactory.newInstance().newTransformer();
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
 		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(doc);
+		final StreamResult result = new StreamResult(new StringWriter());
+		final DOMSource source = new DOMSource(doc);
 		transfo.transform(source, result);
 		return prettyPrint(result.getWriter().toString());
 	}
@@ -143,22 +144,22 @@ public class TestXMLWriter implements XMLCoverage {
 			}
 			output.write(write().getBytes(Charset.availableCharsets().get("UTF-8")));
 			output.flush();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Inserts indentations into the text
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
 	private String prettyPrint(String text) {
-		StringBuilder result = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 		String line;
 		int indentLevel = 0;
-		BufferedReader reader = new BufferedReader(new StringReader(text));
+		final BufferedReader reader = new BufferedReader(new StringReader(text));
 		try {
 			line = reader.readLine();
 			while (line != null) {
@@ -187,7 +188,7 @@ public class TestXMLWriter implements XMLCoverage {
 				}
 				line = reader.readLine();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return result.toString();

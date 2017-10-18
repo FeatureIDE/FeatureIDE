@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -22,15 +22,15 @@ package de.ovgu.featureide.fm.core.editing.evaluation;
 
 /**
  * A class to evaluate the performance of the comparison of feature models.
- * 
+ *
  * @deprecated Seems to be outdated.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
 @Deprecated
 public class Evaluation {
-	
+
 ////	final static int[] sizes = new int[] {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000};
 ////	final static int[] edites = new int[] {10};
 ////	final static int[] edites2 = new int[] {0, 1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
@@ -55,7 +55,7 @@ public class Evaluation {
 //			PrintWriter out = new PrintWriter(outFile);
 //			System.out.println("########## Evaluation Begin");
 //			out.flush();
-//			
+//
 ////			generateModels(project, out, id, id + count - 1);
 //
 ////			calculationTime(project, out);
@@ -63,7 +63,7 @@ public class Evaluation {
 ////			out.println(FEATURES_FMID_VALID);
 ////			for (int i = 1; i <= 5; i++)
 ////				checkModels(project, out, i*100, i*100+39);
-//			
+//
 //			long dur = System.nanoTime() - start;
 //			System.out.println("########## Evaluation End (" + Generator.getTimeString(dur) + ")");
 //			out.close();
@@ -84,11 +84,11 @@ public class Evaluation {
 //				int start = i*100;
 //				int end = i*100 + 39;
 //				for (int id = start; id <= end; id++) {
-//					
+//
 //					//20-210, 18-400, 20-428
 //					if (sizes[k] < 20) continue;
 //					if (sizes[k] == 20 && id <= 429) continue;
-//					
+//
 //					try {
 //						//open or generate feature model
 //						int size = sizes[k];
@@ -113,7 +113,7 @@ public class Evaluation {
 //						for (int l = 0; l < edites.length; l++) {
 //							int edits = edites[l];
 //							int seed = id*10;
-//							
+//
 //							Comparison[] editName = new Comparison[] {Comparison.REFACTORING, Comparison.GENERALIZATION, Comparison.ARBITRARY};
 //							for (int m = 2; m < 3; m++) {
 //								try {
@@ -141,7 +141,7 @@ public class Evaluation {
 //										handler.setObject(fm2);
 //										handler.write(file2);
 //									}
-//									
+//
 //									//measure calculation time
 //									Comparison c = null;
 //									long[] time = new long[comparator.length];
@@ -174,7 +174,7 @@ public class Evaluation {
 //				}
 //			}
 //	}
-//	
+//
 //	static void generateModels(IProject project, PrintWriter out, int start, int end) {
 //			for (int id = start; id <= end; id++)
 //				for (int i = 0; i < sizes.length; i++){
@@ -185,7 +185,7 @@ public class Evaluation {
 //						System.out.println(file + " skipped");
 //						continue;
 //					}
-//					
+//
 //					IFeatureModel fm = Generator.generateFeatureModel(id, size);
 //					//IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
 //					FeatureModelWriterIFileWrapper writer = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
@@ -194,7 +194,7 @@ public class Evaluation {
 //						if (!folder.exists())
 //							folder.create(false, true, null);
 //						writer.writeToFile(file);
-//						
+//
 //						IFeatureModel fmout = FMFactoryManager.getFactory().createFeatureModel();
 //						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
 //						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));

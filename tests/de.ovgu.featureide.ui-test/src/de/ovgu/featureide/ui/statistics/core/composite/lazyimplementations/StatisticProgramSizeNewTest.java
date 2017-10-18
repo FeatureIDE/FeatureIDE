@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,19 +30,20 @@ import java.io.StringReader;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
+
 public class StatisticProgramSizeNewTest {
 
 	private final static String getContent(final String name) {
-		StringBuilder content = new StringBuilder();
-		File fileFolder = getFolder();
-		for (File f : fileFolder.listFiles()) {
+		final StringBuilder content = new StringBuilder();
+		for (final File f : Commons.getStatisticsFolder().listFiles()) {
 			if (f.getName().equals(name)) {
 				String s;
-				try (FileReader fr = new FileReader(f.getPath().toString());BufferedReader br = new BufferedReader(fr)) {
+				try (FileReader fr = new FileReader(f.getPath().toString()); BufferedReader br = new BufferedReader(fr)) {
 					while ((s = br.readLine()) != null) {
 						content.append(s + "\n");
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 
@@ -52,25 +53,16 @@ public class StatisticProgramSizeNewTest {
 		return content.toString();
 	}
 
-	private static File getFolder() {
-		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/statisticsfiles/");
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("statisticsfiles").getPath());
-		}
-		return folder;
+	@Test
+	public void testGraph() throws Exception {
+		final BufferedReader br = new BufferedReader(new StringReader(getContent("Graph.jak")));
+		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}
 
 	@Test
-	public void testGraph() throws Exception {
-		BufferedReader br = new BufferedReader(new StringReader(getContent("Graph.jak")));
-		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
-	}
-	
-	@Test
 	public void testDaily() throws Exception {
-		BufferedReader br = new BufferedReader(new StringReader(getContent("Daily.jak")));
+		final BufferedReader br = new BufferedReader(new StringReader(getContent("Daily.jak")));
 		assertEquals(34, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
 	}
-	
 
 }

@@ -21,6 +21,7 @@ public class Client {
 
 	/*@
 	  @ requires encryptedMails.contains(msg) ==> Client.isKeyPairValid(msg.getEmailEncryptionKey(), client.getPrivateKey());
+	  @ assignable \nothing;
 	  @*/
 	static void incoming(Client client, Email msg) {
 		original(client, msg);

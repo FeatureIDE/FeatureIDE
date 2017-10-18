@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
  * Allows features to be moved onto the feature model diagram.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -84,23 +84,23 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 	protected Command getMoveChildrenCommand(Request request) {
 		cmd = null;
 		if (request instanceof ChangeBoundsRequest) {
-			ChangeBoundsRequest r = (ChangeBoundsRequest) request;
+			final ChangeBoundsRequest r = (ChangeBoundsRequest) request;
 			if (r.getEditParts().size() != 1) {
 				return null;
 			}
-			
-			Object editPart = r.getEditParts().get(0);
+
+			final Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
-				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				IGraphicalFeature feature = featureEditPart.getModel();
+				final FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
+				final IGraphicalFeature feature = featureEditPart.getModel();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
+				final IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
-					Point point = r.getLocation().getCopy();
+					final Point point = r.getLocation().getCopy();
 					getHostFigure().translateToRelative(point);
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, point);
 				} else {

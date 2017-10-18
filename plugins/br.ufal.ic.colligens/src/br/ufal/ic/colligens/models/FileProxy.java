@@ -19,38 +19,37 @@ import br.ufal.ic.colligens.util.Log;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class FileProxy {
+
 	private String path;
 	// temporary path defined by the user.
 	private String newFilepath = null;
-	private IResource iResource;
-	private List<Log> logs;
+	private final IResource iResource;
+	private final List<Log> logs;
 
 	public FileProxy(IResource iResource) {
 		this.iResource = iResource;
 
-		path = getFullPath().substring(0,
-				getFullPath().length() - getFileName().length());
+		path = getFullPath().substring(0, getFullPath().length() - getFileName().length());
 		// Windows
 		if (System.getProperty("file.separator").equals("\\")) {
 			path = path.replace("/", "\\");
 		}
 
-		if (!Colligens.getDefault().getPreferenceStore()
-				.getBoolean("USE_INCLUDES")) {
+		if (!Colligens.getDefault().getPreferenceStore().getBoolean("USE_INCLUDES")) {
 			try {
 				// Create temporary file.
-				this.generate();
-			} catch (IOException e) {
+				generate();
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		this.logs = new LinkedList<Log>();
+		logs = new LinkedList<Log>();
 
-		this.deleteMarkers();
+		deleteMarkers();
 	}
 
 	public String getFileName() {
@@ -85,24 +84,19 @@ public class FileProxy {
 			return newFilepath;
 		}
 
-		if (Colligens.getDefault().getPreferenceStore()
-				.getBoolean("USE_INCLUDES")) {
+		if (Colligens.getDefault().getPreferenceStore().getBoolean("USE_INCLUDES")) {
 			return getFileReal();
 		}
 
-		return Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects" + path
-				+ getFileName();
+		return Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + path + getFileName();
 	}
 
 	public String getNoIncludeFile() throws IOException {
 		if (newFilepath != null) {
 			return newFilepath;
 		}
-		newFilepath = Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects" + path
-				+ getFileName();
-		this.generate();
+		newFilepath = Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + path + getFileName();
+		generate();
 		return newFilepath;
 	}
 
@@ -115,36 +109,27 @@ public class FileProxy {
 	 */
 	private void generate() throws IOException {
 
-		File filePath = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects" + getPath());
+		final File filePath = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + getPath());
 
 		filePath.mkdirs();
 
-		File temp = new File(Colligens.getDefault().getConfigDir()
-				.getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator") + "temp.c");
+		final File temp = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
+			+ System.getProperty("file.separator") + "temp.c");
 		temp.createNewFile();
 
-		FileWriter fstreamout = new FileWriter(Colligens.getDefault()
-				.getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator")
-				+ "projects"
-				+ System.getProperty("file.separator") + "temp.c");
-		BufferedWriter out = new BufferedWriter(fstreamout);
+		final FileWriter fstreamout = new FileWriter(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
+			+ System.getProperty("file.separator") + "temp.c");
+		final BufferedWriter out = new BufferedWriter(fstreamout);
 
-		FileInputStream fstream = new FileInputStream(getFileReal());
+		final FileInputStream fstream = new FileInputStream(getFileReal());
 		// Get the object of DataInputStream
-		DataInputStream in = new DataInputStream(fstream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		final DataInputStream in = new DataInputStream(fstream);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		String strLine;
 		// Read File Line By Line
 		while ((strLine = br.readLine()) != null) {
 
-			if ((strLine.contains("include") && strLine.contains("#") && strLine
-					.startsWith("#"))) {
+			if ((strLine.contains("include") && strLine.contains("#") && strLine.startsWith("#"))) {
 				out.write("//" + strLine + "\n");
 			} else {
 				out.write(strLine + "\n");
@@ -155,9 +140,8 @@ public class FileProxy {
 		in.close();
 		out.close();
 
-		File tempFile = new File(Colligens.getDefault().getConfigDir().getAbsolutePath()
-				+ System.getProperty("file.separator") + "projects" + path
-				+ getFileName());
+		final File tempFile =
+			new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + path + getFileName());
 
 		tempFile.deleteOnExit();
 
@@ -167,16 +151,15 @@ public class FileProxy {
 		}
 		temp.renameTo(tempFile);
 
-		this.deleteMarkers();
+		deleteMarkers();
 
 	}
 
 	public void deleteMarkers() {
 		// remove markers
 		try {
-			this.getResource().deleteMarkers(Log.MARKER_TYPE, false,
-					IResource.DEPTH_ZERO);
-		} catch (CoreException e) {
+			getResource().deleteMarkers(Log.MARKER_TYPE, false, IResource.DEPTH_ZERO);
+		} catch (final CoreException e) {
 			// nothing
 		}
 	}

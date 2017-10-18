@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Extended configuration format for FeatureIDE projects in XML structure.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
@@ -72,13 +72,13 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			return;
 		}
 		if (root.getNodeName().equals("configuration")) {
-			for (Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
+			for (final Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
 					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
-						createError("Invalid feature name: " + featureName, feature, warnings);
+						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
 					}
 				} else {
@@ -165,10 +165,10 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void writeDocument(Document doc) {
-		Element root = doc.createElement("configuration");
+		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
-		for (SelectableFeature feature : object.getFeatures()) {
-			Element featureNode = doc.createElement(NODE_FEATURE);
+		for (final SelectableFeature feature : object.getFeatures()) {
+			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
 			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
 			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));

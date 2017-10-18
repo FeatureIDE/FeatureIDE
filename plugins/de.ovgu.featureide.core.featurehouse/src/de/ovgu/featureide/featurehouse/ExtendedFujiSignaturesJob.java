@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -91,7 +91,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Loads the signatures from Fuji.
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
@@ -134,6 +134,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //	}
 
 	public static final class SignatureMethodAccess {
+
 		private final int featureID;
 		private final AbstractSignature absSig;
 
@@ -153,8 +154,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 			if (!(arg0 instanceof SignatureMethodAccess)) {
 				return false;
 			}
-			SignatureMethodAccess comp = (SignatureMethodAccess) arg0;
-			if (this.featureID != comp.featureID || !this.absSig.equals(comp.absSig)) {
+			final SignatureMethodAccess comp = (SignatureMethodAccess) arg0;
+			if ((featureID != comp.featureID) || !absSig.equals(comp.absSig)) {
 				return false;
 			}
 			return true;
@@ -162,14 +163,14 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 
 		@Override
 		public int hashCode() {
-			int hashCode = this.featureID;
-			hashCode = 37 * hashCode + this.absSig.hashCode();
+			int hashCode = featureID;
+			hashCode = (37 * hashCode) + absSig.hashCode();
 			return hashCode;
 		}
 
 		@Override
 		public String toString() {
-			return this.featureID + "; " + this.absSig.toString();
+			return featureID + "; " + absSig.toString();
 		}
 
 		public SignatureMethodAccess(int featureID, AbstractSignature absSig) {
@@ -218,7 +219,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			signatureSet.put(sig, sigRef);
 //			signatureTable.put(sig.getFullName(), sig);
 //		}
-//		
+//
 //		SignaturePosition position = getSignaturePosition(start, end, identifierStart, identifierEnd);
 //		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, position));
 //		sigRef.setAbsoluteFilePath(featureID, absoluteFilePath);
@@ -264,7 +265,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 	public ProjectSignatures execute(IMonitor monitor) throws Exception {
 		throw new UnsupportedOperationException("Fuji is currently not supported.");
 	}
-	
+
 //	protected boolean work() {
 //		FeatureModel fm = featureProject.getFeatureModel();
 //		fm.getAnalyser().setDependencies();
@@ -280,10 +281,10 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
 //			Composition composition = fuji.getComposition(fuji);
 //			ast = composition.composeAST();
-//			
+//
 ////			if (checkTypeAst)
 //				fuji.typecheckAST(ast);
-//			
+//
 //			spl = fuji.getSPLStructure();
 //			featureModulePathnames = spl.getFeatureModulePathnames();
 //		} catch (RuntimeException e) {
@@ -292,7 +293,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			FeatureHouseCorePlugin.getDefault().logError(e);
 //			return false;
 //		}
-//		
+//
 //		createSignatures(featureProject, ast);
 //
 //		FeatureHouseCorePlugin.getDefault().logInfo(FUJI_SIGNATURES_LOADED_);
@@ -312,7 +313,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //
 //		LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
 //		LinkedList<AbstractClassSignature> roleStack = new LinkedList<AbstractClassSignature>();
-//		
+//
 //		unitIter = ast.compilationUnitIterator();
 //		while (unitIter.hasNext()) {
 //			CompilationUnit unit = unitIter.next();
@@ -342,7 +343,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //					} else if (typeDecl instanceof InterfaceDecl) {
 //						typeString = AbstractClassSignature.TYPE_INTERFACE;
 //					}
-//						
+//
 //					AbstractClassSignature parent = null;
 //					if (!roleStack.isEmpty()) {
 //						parent = roleStack.pop();
@@ -358,22 +359,22 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //						curClassSig.addImport(importDecl.toString());
 //						findClassAccess(importDecl, curClassSig, featureID, absoluteFilePath);
 //					}
-//					
+//
 //					if (typeDecl instanceof ClassDecl) {
 //						ClassDecl classDecl = (ClassDecl) typeDecl;
 //						ClassDecl superClass = classDecl.superclass();
-//						if (!superClass.fullName().equals("java.lang.Object")) 
+//						if (!superClass.fullName().equals("java.lang.Object"))
 //							findClassAccess(classDecl.getSuperClassAccess(), curClassSig, featureID, absoluteFilePath);
 //						for (Access access : classDecl.getImplementsList()) {
-//							findClassAccess(access, curClassSig, featureID, absoluteFilePath);	
-//						} 
+//							findClassAccess(access, curClassSig, featureID, absoluteFilePath);
+//						}
 //					}
 //					else if (typeDecl instanceof InterfaceDecl) {
 //						for (Access access : ((InterfaceDecl) typeDecl).getSuperInterfaceIdList()) {
-//							findClassAccess(access, curClassSig, featureID, absoluteFilePath);	
-//						} 
+//							findClassAccess(access, curClassSig, featureID, absoluteFilePath);
+//						}
 //					}
-//					
+//
 //					classes.put(typeDecl.fullName(), curClassSig);
 //
 //					if (parent != null) {
@@ -384,7 +385,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //						typeDecl.getModifiers();
 //						if (bodyDecl instanceof MethodDecl) {
 //							MethodDecl method = (MethodDecl) bodyDecl;
-//							
+//
 //							modifierString = method.getModifiers().toString();
 //							name = method.name();
 //							TypeDecl type = method.type();
@@ -463,12 +464,12 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			if (unit.featureID() < 0) {
 //				continue;
 //			}
-//			
+//
 //			List<TypeDecl> typeDeclList = unit.getTypeDeclList();
 //			String pckg = unit.getPackageDecl();
 //
 //			List<ImportDecl> importList = unit.getImportDeclList();
-//			
+//
 //			for (TypeDecl rootTypeDecl : typeDeclList) {
 //				stack.push(rootTypeDecl);
 //				do {
@@ -489,7 +490,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //					}
 //					FujiClassSignature curClassSig = (FujiClassSignature) signatureSet.get(new FujiClassSignature(parent, name, modifierString, typeString,
 //							pckg, typeDecl, importList)).sig;
-//					
+//
 //					java.util.List<ExtendedSignature> accessingSignatures = bodyMap.remove(typeDecl);
 //					if (accessingSignatures != null) {
 //						for (ExtendedSignature absSig : accessingSignatures) {
@@ -539,7 +540,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 ////								for (int j = 0; j < featureData.length; j++) {
 ////									for (ExtendedSignature absSig : accessingSignatures) {
 ////										SignaturePosition position = new SignaturePosition(
-////												Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()), 
+////												Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()),
 ////												Symbol.getColumn(constructor.IDstart), Symbol.getColumn(constructor.IDend));
 ////										featureData[j].addInvokedSignature(absSig.sig, position);
 ////									}
@@ -634,13 +635,13 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //		{
 //			fp.getComposer().buildFSTModel();
 //			FSTModel fst = fp.getFSTModel();
-//	
+//
 //			if (fst == null) {
 //				FeatureHouseCorePlugin.getDefault().logInfo(NO_FSTMODEL_PROVIDED_);
 //			} else {
 //				for (FSTFeature fstFeature : fst.getFeatures()) {
 //					final int id = projectSignatures.getFeatureID(fstFeature.getName());
-//	
+//
 //					for (FSTRole fstRole : fstFeature.getRoles()) {
 //						FSTClassFragment classFragment = fstRole.getClassFragment();
 //						String fullName = (classFragment.getPackage() == null ? "" : classFragment.getPackage()) + "." + classFragment.getName();
@@ -655,18 +656,18 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //		projectSignatures.setSignatureArray(sigArray);
 //		featureProject.getFSTModel().setProjectSignatures(projectSignatures);
 //	}
-	
+
 //	private void findClassAccess(ASTNode<?> stmt, AbstractSignature methAbs, int featureID, String absoluteFilePath)
 //	{
-//		if (stmt == null) 
+//		if (stmt == null)
 //			return;
-//		
+//
 //		if (stmt instanceof TypeAccess) {
 //			TypeAccess typeAccess = (TypeAccess) stmt;
 //			TypeDecl typeDecl = typeAccess.type();
-//			
+//
 //			if (typeDecl.featureID() == -1) return;
-//			
+//
 //			String featurename = getFeatureName(typeDecl);
 //			int typeDeclFeatureID = projectSignatures.getFeatureID(featurename);
 //			if (typeDeclFeatureID > 0)
@@ -688,9 +689,9 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			}
 //		}
 //	}
-	
+
 	private void findFieldAccess(ASTNode<?> stmt, AbstractSignature methAbs, int featureID, String absoluteFilePath) {
-		if (stmt == null) 
+		if (stmt == null)
 			return;
 
 	}
@@ -708,7 +709,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			} else {
 //				putAccess(((MethodAccess) stmt).decl(), methAbs, featureID, methodAccess.getStart(), methodAccess.getEnd(), methodAccess.IDstart, methodAccess.IDend);
 //			}
-//			
+//
 //			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 //				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID, absoluteFilePath);
 //			}
@@ -720,7 +721,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			}
 //		} else if (stmt instanceof ConstructorDecl) {
 //			ConstructorDecl conDecl = (ConstructorDecl) stmt;
-//			putAccess(conDecl, methAbs, featureID, conDecl.getStart(), conDecl.getEnd(), conDecl.IDstart, conDecl.IDend);	
+//			putAccess(conDecl, methAbs, featureID, conDecl.getStart(), conDecl.getEnd(), conDecl.IDstart, conDecl.IDend);
 //			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 //				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID, absoluteFilePath);
 //			}
@@ -745,14 +746,14 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //					ParameterDeclaration varDecl = (ParameterDeclaration) varAcess;
 //					SignatureReference sigRef = signatureSet.get(new FujiLocalVariableSignature(methAbs.getParent(), (AbstractMethodSignature) methAbs, varDecl.name(), varDecl.getModifiers()
 //							.toString(), varDecl.type()));
-//					
+//
 //					if (sigRef != null)
 //					{
 //						SignaturePosition position = getSignaturePosition(varDecl.getStart(), varDecl.getEnd(), varDecl.IDstart, varDecl.IDend);
 //						sigRef.sig.addInvocationSignature(new ExtendedSignature(methAbs, featureID, position));
 //					}
 //				}
-//				
+//
 //				for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 //					findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID, absoluteFilePath);
 //				}
@@ -791,25 +792,25 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //					putAccess(typeDecl, methAbs, featureID2, typeAccess.getStart(), typeAccess.getEnd(), typeAccess.IDstart, typeAccess.IDend);
 //				}
 //			}
-//			
+//
 //			Iterator<?> iterator = typeAccess.decls().iterator();
 //			while (iterator.hasNext()) {
 //				Object cur = iterator.next();
 //				if (cur instanceof ClassDecl) {
 //					ClassDecl classDecl = (ClassDecl) cur;
-//					if (classDecl.fullName().equals("java.lang.Object")) 
+//					if (classDecl.fullName().equals("java.lang.Object"))
 //						continue;
-//						
+//
 //					SignaturePosition position = getSignaturePosition(typeAccess.getStart(), typeAccess.getEnd(), typeAccess.IDstart, typeAccess.IDend);
 //					nonPrimitveTypesTable.put(new ExtendedSignature(methAbs, featureID, position), classDecl);
 //					break;
 //				}
 //			}
-//			
+//
 //			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 //				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID, absoluteFilePath);
 //			}
-//			
+//
 //		} else {
 //			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 //				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID, absoluteFilePath);
@@ -829,7 +830,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //			bodyMap.put(typeDecl, signatureList);
 //		}
 //		SignaturePosition position = getSignaturePosition(start, end, identifierStart, identifierEnd);
-//		
+//
 //		signatureList.add(new ExtendedSignature(methAbs, featureID, position));
 //	}
 

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,13 +34,13 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import de.ovgu.featureide.examples.ExamplePlugin;
 
 /**
- * Simple StructureProvider used by the class {@link ImportOperation} 
- * 
+ * Simple StructureProvider used by the class {@link ImportOperation}
+ *
  * @author Reimar Schroeter
  */
 public class SimpleStructureProvider implements IImportStructureProvider {
 
-	private String project;
+	private final String project;
 
 	public SimpleStructureProvider(String project) {
 		super();
@@ -54,11 +54,11 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public InputStream getContents(Object element) {
-		IPath p = new Path((String) element);
+		final IPath p = new Path((String) element);
 		try {
 			return new URL("platform:/plugin/de.ovgu.featureide.examples/featureide_examples/" + project + "/" + p.toString()).openConnection()
 					.getInputStream();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			ExamplePlugin.getDefault().logError(e);
 		}
 		return null;
@@ -71,7 +71,7 @@ public class SimpleStructureProvider implements IImportStructureProvider {
 
 	@Override
 	public String getLabel(Object element) {
-		IPath path = new Path((String) element);
+		final IPath path = new Path((String) element);
 		return path.lastSegment();
 	}
 

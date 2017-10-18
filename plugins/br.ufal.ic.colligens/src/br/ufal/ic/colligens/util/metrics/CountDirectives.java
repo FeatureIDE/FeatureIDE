@@ -26,19 +26,19 @@ public class CountDirectives {
 
 	public void listFile(File file) throws Exception {
 		if (file.isDirectory()) {
-			this.listFiles(file);
+			listFiles(file);
 		} else {
-			this.getDirectives(file);
+			getDirectives(file);
 		}
 	}
 
 	public void listFiles(File path) throws Exception {
-		File[] files = path.listFiles();
-		for (File file : files) {
+		final File[] files = path.listFiles();
+		for (final File file : files) {
 			if (file.isDirectory()) {
-				this.listFiles(file);
+				listFiles(file);
 			} else {
-				this.getDirectives(file);
+				getDirectives(file);
 			}
 		}
 	}
@@ -46,9 +46,9 @@ public class CountDirectives {
 	public Set<String> getDirectives(File file) throws Exception {
 		// Set<String> directives = new HashSet<String>();
 
-		FileInputStream fstream = new FileInputStream(file);
-		DataInputStream in = new DataInputStream(fstream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		final FileInputStream fstream = new FileInputStream(file);
+		final DataInputStream in = new DataInputStream(fstream);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		String strLine;
 
 		while ((strLine = br.readLine()) != null) {
@@ -86,21 +86,14 @@ public class CountDirectives {
 
 			if (strLine.startsWith("#if") || strLine.startsWith("#elif")) {
 
-				String directive = strLine.replace("#ifdef", "")
-						.replace("#ifndef", "").replace("#if", "");
-				directive = directive.replace("defined", "").replace("(", "")
-						.replace(")", "");
-				directive = directive.replace("||", "").replace("&&", "")
-						.replace("!", "").replace("<", "").replace(">", "")
-						.replace("=", "");
+				String directive = strLine.replace("#ifdef", "").replace("#ifndef", "").replace("#if", "");
+				directive = directive.replace("defined", "").replace("(", "").replace(")", "");
+				directive = directive.replace("||", "").replace("&&", "").replace("!", "").replace("<", "").replace(">", "").replace("=", "");
 
-				String[] directivesStr = directive.split(" ");
+				final String[] directivesStr = directive.split(" ");
 
 				for (int i = 0; i < directivesStr.length; i++) {
-					if (!directivesStr[i].trim().equals("")
-							&& ProductGenerator
-									.isValidJavaIdentifier(directivesStr[i]
-											.trim())) {
+					if (!directivesStr[i].trim().equals("") && ProductGenerator.isValidJavaIdentifier(directivesStr[i].trim())) {
 						directives.add(directivesStr[i].trim());
 					}
 				}

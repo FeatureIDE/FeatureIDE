@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_
 import java.nio.file.Paths;
 import java.util.Map;
 
+import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -41,13 +42,12 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * A general builder used to build every <code>FeatureProject</code>. Using an
- * extension point the real composition algorithm is given, that builds the
- * compiled files.
- * 
+ * A general builder used to build every <code>FeatureProject</code>. Using an extension point the real composition algorithm is given, that builds the compiled
+ * files.
+ *
  * @author Tom Brosch
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
@@ -61,8 +61,9 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	private IComposerExtensionClass composerExtension;
 
 	private boolean featureProjectLoaded() {
-		if (featureProject != null && composerExtension != null)
+		if ((featureProject != null) && (composerExtension != null)) {
 			return true;
+		}
 
 		if (getProject() == null) {
 			CorePlugin.getDefault().logWarning(UNABLE_TO_GET_PROJECT_);
@@ -75,8 +76,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 
 		final IStatus status = CorePlugin.getDefault().isComposable(getProject());
-		
-		if (!status.isOK() || (composerExtension = featureProject.getComposer()) == null) {
+
+		if (!status.isOK() || ((composerExtension = featureProject.getComposer()) == null)) {
 			CorePlugin.getDefault().logWarning(NO_COMPOSITION_TOOL_FOUND_);
 			featureProject.createBuilderMarker(featureProject.getProject(), status.getMessage(), 0, IMarker.SEVERITY_ERROR);
 			return false;
@@ -88,12 +89,14 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 	private boolean cleaned = false;
 
+	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		if (!featureProjectLoaded())
+		if (!featureProjectLoaded()) {
 			return;
+		}
 
 		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(), IResource.DEPTH_INFINITE);
-		IProject project = featureProject.getProject();
+		final IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;
 
@@ -101,23 +104,23 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return;
 		}
 		boolean hasOtherNature = true;
-		if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
+		if ((project.getDescription().getNatureIds().length == 1) && project.hasNature(FeatureProjectNature.NATURE_ID)) {
 			hasOtherNature = false;
 		}
 
-		IFolder buildFolder = featureProject.getBuildFolder();
+		final IFolder buildFolder = featureProject.getBuildFolder();
 		if (buildFolder != null) {
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
-		IFolder binFolder = featureProject.getBinFolder();
+		final IFolder binFolder = featureProject.getBinFolder();
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists()) {
+			if ((binFolder != null) && binFolder.exists()) {
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 		}
 
 		if (cleanBuild) {
-			IFile configFile = featureProject.getCurrentConfiguration();
+			final IFile configFile = featureProject.getCurrentConfiguration();
 			if (configFile == null) {
 				return;
 			}
@@ -125,18 +128,21 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			cleaned = true;
 		}
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists())
-				for (IResource member : binFolder.members())
+			if ((binFolder != null) && binFolder.exists()) {
+				for (final IResource member : binFolder.members()) {
 					member.delete(true, monitor);
+				}
+			}
 		}
-		for (IResource member : buildFolder.members()) {
+		for (final IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
 		}
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			if (binFolder != null && binFolder.exists())
+			if ((binFolder != null) && binFolder.exists()) {
 				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			}
 		}
 		cleanBuild = false;
 	}
@@ -144,31 +150,36 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) {
-		if (!featureProjectLoaded())
+		if (!featureProjectLoaded()) {
 			return null;
+		}
 
-		if (!featureProject.buildRelevantChanges() && !cleaned && kind == AUTO_BUILD)
+		if (!featureProject.buildRelevantChanges() && !cleaned && (kind == AUTO_BUILD)) {
 			return null;
+		}
 
 		cleaned = false;
-		IFile configFile = featureProject.getCurrentConfiguration();
+		final IFile configFile = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
 
 		try {
-			for (IResource res : featureProject.getConfigFolder().members())
+			for (final IResource res : featureProject.getConfigFolder().members()) {
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
+			}
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			cleanBuild = true;
 			clean(monitor);
-		} catch (CoreException e) {
+		} catch (ResourceException e) {
+			CorePlugin.getDefault().logWarning(e.getMessage());
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 
 		if (configFile == null) {
 			return null;
 		}
-		IFeatureModel featureModel = featureProject.getFeatureModel();
-		if (featureModel == null || featureModel.getStructure().getRoot() == null) {
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
+		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null)) {
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
@@ -177,15 +188,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			CorePlugin.getDefault().fireBuildUpdated(featureProject);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
-		Configuration c = new Configuration(featureModel);
-		FileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
+		final Configuration c = new Configuration(featureModel);
+		SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), c, ConfigFormatManager.getInstance());
 		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 		return null;

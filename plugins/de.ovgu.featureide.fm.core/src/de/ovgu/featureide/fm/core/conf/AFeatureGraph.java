@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,22 +26,21 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final byte EDGE_NONE = 0b00000000, //0x00;
-			EDGE_00Q = 			0b00000001, //0x01,
-			EDGE_00 = 			0b00000010, //0x02,
-			EDGE_01Q = 			0b00000100, //0x04,
-			EDGE_01 = 			0b00001000, //0x08,
-			EDGE_10Q = 			0b00010000, //0x10,
-			EDGE_10 = 			0b00100000, //0x20,
-			EDGE_11Q = 			0b01000000, //0x40,
-			EDGE_11 = (byte) 	0b10000000, //0x80,
+	public static final byte EDGE_NONE = 0b00000000, // 0x00;
+			EDGE_00Q = 0b00000001, // 0x01,
+			EDGE_00 = 0b00000010, // 0x02,
+			EDGE_01Q = 0b00000100, // 0x04,
+			EDGE_01 = 0b00001000, // 0x08,
+			EDGE_10Q = 0b00010000, // 0x10,
+			EDGE_10 = 0b00100000, // 0x20,
+			EDGE_11Q = 0b01000000, // 0x40,
+			EDGE_11 = (byte) 0b10000000, // 0x80,
 
 			VALUE_NONE = EDGE_NONE, VALUE_0Q = EDGE_00Q, VALUE_0 = EDGE_00, VALUE_1Q = EDGE_01Q, VALUE_1 = EDGE_01, VALUE_10Q = EDGE_00Q | EDGE_01Q;
 
-	public static final byte
-		MASK_0_CLEAR = (byte) 0b11110000, //0xf3,
-		MASK_1_CLEAR = (byte) 0b00001111, //0xf3,
-		MASK_Q_CLEAR = (byte) 0b10101010; //0xf3,
+	public static final byte MASK_0_CLEAR = (byte) 0b11110000, // 0xf3,
+			MASK_1_CLEAR = (byte) 0b00001111, // 0xf3,
+			MASK_Q_CLEAR = (byte) 0b10101010; // 0xf3,
 
 	protected transient SatInstance satInstance;
 
@@ -67,35 +66,39 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 				count++;
 			}
 		}
-		this.size = count;
+		size = count;
 
 		this.satInstance = satInstance;
 		this.index = index;
 	}
 
 	public AFeatureGraph() {
-		this.satInstance = null;
-		this.index = null;
+		satInstance = null;
+		index = null;
 	}
 
+	@Override
 	public void copyValues(IFeatureGraph otherGraph) {
 		final AFeatureGraph anotherAGraph = (AFeatureGraph) otherGraph;
-		this.size = anotherAGraph.size;
-		this.index = anotherAGraph.index;
+		size = anotherAGraph.size;
+		index = anotherAGraph.index;
 	}
 
 	public void setSatInstance(SatInstance satInstance) {
 		this.satInstance = satInstance;
 	}
 
+	@Override
 	public int getSize() {
 		return size;
 	}
 
+	@Override
 	public SatInstance getSatInstance() {
 		return satInstance;
 	}
 
+	@Override
 	public int[] getIndex() {
 		return index;
 	}

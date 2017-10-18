@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,11 +44,12 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * Handles feature renamings.
- * 
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class RenamingsManager implements IEventManager {
+
 	/**
 	 * a list containing all renamings since the last save
 	 */
@@ -57,11 +58,9 @@ public class RenamingsManager implements IEventManager {
 
 	private final DefaultEventManager eventManager = new DefaultEventManager();
 
-	/* *****************************************************************
-	 * 
-	 * Renaming
-	 * 
-	 *#*****************************************************************/
+	/*
+	 * ***************************************************************** Renaming #
+	 *****************************************************************/
 
 	public RenamingsManager(IFeatureModel model) {
 		this.model = model;
@@ -78,7 +77,7 @@ public class RenamingsManager implements IEventManager {
 		feature.setName(newName);
 		model.addFeature(feature);
 		renamings.add(new Renaming(oldName, newName));
-		for (IConstraint c : constraints) {
+		for (final IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 
@@ -101,8 +100,8 @@ public class RenamingsManager implements IEventManager {
 
 	public void performRenamings() {
 		final List<IConstraint> constraints = model.getConstraints();
-		for (Renaming renaming : renamings) {
-			for (IConstraint c : constraints) {
+		for (final Renaming renaming : renamings) {
+			for (final IConstraint c : constraints) {
 				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
 			}
 		}
@@ -119,8 +118,8 @@ public class RenamingsManager implements IEventManager {
 			return;
 		}
 		final IFeatureModel projectModel = instance.getObject();
-		for (Renaming renaming : renamings) {
-			// TODO check weather all these events are necessary 
+		for (final Renaming renaming : renamings) {
+			// TODO check weather all these events are necessary
 			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
@@ -132,24 +131,25 @@ public class RenamingsManager implements IEventManager {
 
 	private void renameVariables(Node node, String oldName, String newName) {
 		if (node instanceof Literal) {
-			if (oldName.equals(((Literal) node).var))
+			if (oldName.equals(((Literal) node).var)) {
 				((Literal) node).var = newName;
+			}
 			return;
 		}
 
-		for (Node child : node.getChildren())
+		for (final Node child : node.getChildren()) {
 			renameVariables(child, oldName, newName);
+		}
 	}
 
 	/**
 	 * Returns the current name of a feature given its name at the last save.
-	 * 
-	 * @param name
-	 *            name when last saved
+	 *
+	 * @param name name when last saved
 	 * @return current name of this feature
 	 */
 	public String getNewName(String name) {
-		for (Renaming renaming : renamings) {
+		for (final Renaming renaming : renamings) {
 			if (renaming.oldName.equals(name)) {
 				return renaming.newName;
 			}
@@ -158,15 +158,13 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	/**
-	 * Returns the name of a feature at the time of the last save given its
-	 * current name.
-	 * 
-	 * @param name
-	 *            current name of a feature
+	 * Returns the name of a feature at the time of the last save given its current name.
+	 *
+	 * @param name current name of a feature
 	 * @return name when last saved
 	 */
 	public String getOldName(String name) {
-		for (Renaming renaming : renamings) {
+		for (final Renaming renaming : renamings) {
 			if (renaming.newName.equals(name)) {
 				return renaming.oldName;
 			}
@@ -175,8 +173,8 @@ public class RenamingsManager implements IEventManager {
 	}
 
 	public Set<String> getOldFeatureNames() {
-		HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
-		for (Renaming renaming : renamings) {
+		final HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
+		for (final Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);
 		}

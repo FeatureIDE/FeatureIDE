@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,28 +36,28 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Operation to move the Legend. Provides undo/redo functionality.
- * 
+ *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
 public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private static final String LABEL = MOVE_LEGEND;
-	private Point newLocation;
-	private Point oldLocation;
+	private final Point newLocation;
+	private final Point oldLocation;
 	private boolean wasAutoLayout;
-	private LegendFigure legendFigure;
+	private final LegendFigure legendFigure;
 
 	public LegendMoveOperation(IGraphicalFeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
 		super(featureModel, LABEL);
 		this.newLocation = newLocation;
-		this.oldLocation = legendFigure.getLocation();
+		oldLocation = legendFigure.getLocation();
 		this.legendFigure = legendFigure;
 	}
 
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		this.wasAutoLayout = graphicalFeatureModel.getLayout().hasLegendAutoLayout();
+		wasAutoLayout = graphicalFeatureModel.getLayout().hasLegendAutoLayout();
 		return redo(monitor, info);
 	}
 

@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/Arith.config
+configs/Arith.xml
 features/Base/Arith.hs
 features/Base/CLI.hs
 features/BinOp/Arith.hs

@@ -8,6 +8,7 @@ public class NumberWorkSpace extends  WorkSpace
 
     
     /*@ensures vertexCounter == 0;@*/
+	/*@assignable vertexCounter; @*/
     public NumberWorkSpace( ) 
     {
         vertexCounter = 0;
@@ -15,6 +16,7 @@ public class NumberWorkSpace extends  WorkSpace
 
     /*@requires v != null;@*/
     /*@ensures (v.visited() == true) ==> (v.vertexNumber == vertexCounter+1);@*/
+    /*@assignable vertexCounter; @*/
     public void preVisitAction( Vertex v )
     {
         // This assigns the values on the way in

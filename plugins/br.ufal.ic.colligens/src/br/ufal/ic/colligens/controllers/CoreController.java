@@ -25,6 +25,7 @@ import br.ufal.ic.colligens.views.InvalidConfigurationsView;
  * @author Thiago Emmanuel
  */
 public class CoreController {
+
 	private final ProjectExplorerController projectExplorerController;
 	private TypeChef typeChef;
 	private static IWorkbenchWindow window;
@@ -49,30 +50,30 @@ public class CoreController {
 
 		typeChef = new TypeChef();
 
-		Job job = new Job(ANALYZING_FILES) {
+		final Job job = new Job(ANALYZING_FILES) {
+
 			/*
 			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime
-			 * .IProgressMonitor)
+			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime .IProgressMonitor)
 			 */
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 
 				typeChef.setMonitor(monitor);
 
-				if (monitor.isCanceled())
+				if (monitor.isCanceled()) {
 					return Status.CANCEL_STATUS;
+				}
 
 				try {
 					// checks files in ProjectExplorer or PackageExplorer
 					projectExplorerController.run();
 
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
+					}
 
-					List<IResource> list = projectExplorerController.getList();
+					final List<IResource> list = projectExplorerController.getList();
 
 					// get files to analyze e run;
 					typeChef.run(list);
@@ -80,13 +81,14 @@ public class CoreController {
 					// returns the result to view
 					syncWithPluginView();
 
-					if (monitor.isCanceled())
+					if (monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
+					}
 
-				} catch (TypeChefException e) {
+				} catch (final TypeChefException e) {
 					e.printStackTrace();
 					return Status.CANCEL_STATUS;
-				} catch (ProjectExplorerException e) {
+				} catch (final ProjectExplorerException e) {
 					e.printStackTrace();
 					return Status.CANCEL_STATUS;
 				} finally {
@@ -109,11 +111,11 @@ public class CoreController {
 	 */
 	private void syncWithPluginView() {
 		Display.getDefault().asyncExec(new Runnable() {
+
 			@Override
 			public void run() {
 
-				IViewPart view = window.getActivePage().findView(
-						InvalidConfigurationsView.ID);
+				final IViewPart view = window.getActivePage().findView(InvalidConfigurationsView.ID);
 				if (view instanceof InvalidConfigurationsView) {
 					final InvalidConfigurationsView analyzerView = (InvalidConfigurationsView) view;
 
@@ -126,9 +128,7 @@ public class CoreController {
 						analyzerView.setInput(logs);
 						//
 						if (logs.isEmpty()) {
-							MessageDialog.openInformation(window.getShell(),
-									Colligens.PLUGIN_NAME,
-									"This file was successfully verified!");
+							MessageDialog.openInformation(window.getShell(), Colligens.PLUGIN_NAME, "This file was successfully verified!");
 						}
 					}
 				}

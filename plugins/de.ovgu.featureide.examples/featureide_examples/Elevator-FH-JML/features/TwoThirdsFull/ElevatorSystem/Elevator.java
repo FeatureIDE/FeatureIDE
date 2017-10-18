@@ -33,6 +33,7 @@ public class Elevator {
 	  @ 	 existInLiftCallsInDirection(Direction.up) && 
 	  @ 	 !existInLiftCallsInDirection(Direction.down) ==>
 	  @ 	 getCurrentDirection() != Direction.down);
+	  @ assignable currentHeading;
 	  @*/
 	private void continueInDirection(Direction dir) {
 		original(dir);

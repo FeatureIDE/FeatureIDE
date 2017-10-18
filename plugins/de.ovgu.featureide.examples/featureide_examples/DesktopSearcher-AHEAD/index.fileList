@@ -2,8 +2,8 @@
 .order
 .project
 .settings/org.eclipse.jdt.core.prefs
-configs/config.config
-configs/search_engine_features.config
+configs/config.xml
+configs/search_engine_features.xml
 features/Base/ContentHandler.jak
 features/Base/Indexer.jak
 features/Base/IndexerException.jak

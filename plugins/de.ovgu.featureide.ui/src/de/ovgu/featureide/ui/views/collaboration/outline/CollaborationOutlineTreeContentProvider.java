@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -24,15 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -48,10 +45,11 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Provides the content for the collaboration outline.
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Stefan Kr�ger
@@ -59,29 +57,28 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Dominic Labsch
  * @author Daniel P�sche
  */
-public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
+public class CollaborationOutlineTreeContentProvider extends OutlineTreeContentProvider {
 
 	protected FSTModel model;
 
-	public CollaborationOutlineTreeContentProvider() {
-	}
+	public CollaborationOutlineTreeContentProvider() {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null && (newInput instanceof IFile)) {
-			IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
-			if (featureProject != null)
+		if ((newInput != null) && (newInput instanceof IFile)) {
+			final IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
+			if (featureProject != null) {
 				model = featureProject.getFSTModel();// builder.buildCollaborationModel(featureProject);
+			}
 		}
 	}
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement == null || !(inputElement instanceof IFile)) {
+		if ((inputElement == null) || !(inputElement instanceof IFile)) {
 			return new String[] { NO_FILE_FOUND };
 		}
 
@@ -92,8 +89,8 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			model = featureProject.getFSTModel();
 
 			if (model != null) {
-				FSTClass c = model.getClass(model.getAbsoluteClassName(file));
-				
+				final FSTClass c = model.getClass(model.getAbsoluteClassName(file));
+
 				if (c != null) {
 					return new Object[] { c };
 				}
@@ -113,12 +110,12 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
 			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
 
-			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
+			for (final FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getMethods());
 				fields.addAll(role.getFields());
-				TreeSet<FSTDirective> roleDirectives = role.getDirectives();
-				for (FSTDirective directive : roleDirectives) {
+				final TreeSet<FSTDirective> roleDirectives = role.getDirectives();
+				for (final FSTDirective directive : roleDirectives) {
 					if (directive.getParent() == null) {
 						directives.add(directive);
 					}
@@ -137,10 +134,10 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return filter(obj);
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
-			List<FSTRole> roleList = new LinkedList<FSTRole>();
+			final List<FSTRole> roleList = new LinkedList<FSTRole>();
 
-			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTMethod m : role.getAllMethods()) {
+			for (final FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
+				for (final FSTMethod m : role.getAllMethods()) {
 					if (// m.isOwn(role.file) &&
 						// ((FSTMethod)parentElement).isOwn(role.file) &&
 					m.getFullName().equals(((FSTMethod) parentElement).getFullName())) {
@@ -154,7 +151,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 
-			IFeatureProject project = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
+			final IFeatureProject project = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile());
 			List<String> featureOrder = new ArrayList<>();
 			if (project != null) {
 				featureOrder = Functional.toList(project.getFeatureModel().getFeatureOrderList());
@@ -162,10 +159,10 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 			obj = new FSTRole[roleList.size()];
 			int index = 0;
-			for (String featureName : featureOrder) {
+			for (final String featureName : featureOrder) {
 
-				for (Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
-					FSTRole next = it.next();
+				for (final Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
+					final FSTRole next = it.next();
 					if (next.getFeature().getName().equals(featureName)) {
 						obj[index++] = next;
 						it.remove();
@@ -176,9 +173,9 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			}
 		} else if (parentElement instanceof FSTInvariant) {
 			// get all the roles that belong to an invariant
-			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
-			for (FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTInvariant i : role.getClassFragment().getInvariants()) {
+			final LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
+			for (final FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) {
+				for (final FSTInvariant i : role.getClassFragment().getInvariants()) {
 					if (((FSTInvariant) parentElement).getFullName().equals(i.getFullName())) {
 						roleList.add(role);
 						break;
@@ -189,9 +186,9 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTField) {
 			// get all the roles that belong to a field
-			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
-			for (FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTField f : role.getAllFields()) {
+			final LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
+			for (final FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
+				for (final FSTField f : role.getAllFields()) {
 					if (f.getFullName().equals(((FSTField) parentElement).getFullName())) {
 						roleList.add(role);
 						break;
@@ -200,7 +197,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			}
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTDirective) {
-			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
+			final FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
 			return filter(directiveArray);
 		} else if (parentElement instanceof FSTClassFragment) {
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
@@ -208,11 +205,11 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
 			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 
-			FSTClassFragment innerClassCast = (FSTClassFragment) parentElement;
+			final FSTClassFragment innerClassCast = (FSTClassFragment) parentElement;
 
 			invariants.addAll(innerClassCast.getInvariants());
-			LinkedList<FSTClassFragment> allFragments = innerClassCast.getRole().getAllEqualFSTFragments(innerClassCast);
-			for (FSTClassFragment fstClassFragment : allFragments) {
+			final LinkedList<FSTClassFragment> allFragments = innerClassCast.getRole().getAllEqualFSTFragments(innerClassCast);
+			for (final FSTClassFragment fstClassFragment : allFragments) {
 				methods.addAll(fstClassFragment.getMethods());
 				fields.addAll(fstClassFragment.getFields());
 			}
@@ -230,26 +227,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		return filter(obj);
 	}
 
-	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
-
-	//add filter to filter set
-	public void addFilter(ICollaborationOutlineFilter filter) {
-		filters.add(filter);
-	}
-
-	//remove filter from filter set
-	public void removeFilter(ICollaborationOutlineFilter filter) {
-		filters.remove(filter);
-	}
-
-	//apply all filters from filter set
-	private Object[] filter(Object[] obj) {
-		for (ICollaborationOutlineFilter filter : filters) {
-			obj = filter.filter(obj);
-		}
-		return obj;
-	}
-
 	@Override
 	public Object getParent(Object element) {
 		return null;
@@ -258,31 +235,33 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof FSTClass) {
-			for (FSTRole role : ((FSTClass) element).getRoles()) {
+			for (final FSTRole role : ((FSTClass) element).getRoles()) {
 				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty() || !role.getDirectives().isEmpty()
-						|| !role.getInnerClasses().isEmpty()) {
+					|| !role.getInnerClasses().isEmpty()) {
 					return true;
 				}
 			}
 			return false;
 		}
 
-		if (element instanceof FSTMethod)
+		if (element instanceof FSTMethod) {
 			return true;
+		}
 
-		if (element instanceof FSTField)
+		if (element instanceof FSTField) {
 			return true;
+		}
 
-		if (element instanceof FSTInvariant)
-
+		if (element instanceof FSTInvariant) {
 			return true;
+		}
 
 		if (element instanceof FSTDirective) {
 			return ((FSTDirective) element).getChildren().length != 0;
 
 		}
 		if (element instanceof FSTClassFragment) {
-			FSTClassFragment innerClass = (FSTClassFragment) element;
+			final FSTClassFragment innerClass = (FSTClassFragment) element;
 			if (!innerClass.getMethods().isEmpty() || !innerClass.getFields().isEmpty() || !innerClass.getInnerClasses().isEmpty()) {
 				return true;
 			}

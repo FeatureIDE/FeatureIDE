@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,49 +40,50 @@ import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
 
 /**
  * A dialog page for the {@link ChangeViewTagWizard}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ChangeViewTagPage extends AbstractWizardPage {
 
 	private Text viewNameText, viewLevelText;
 	private Label viewNameLabel, viewLevelLabel;
-	
+
 	public ChangeViewTagPage() {
 		super("");
 		setTitle(SELECT_A_COMPOSER);
 		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
+	@Override
 	public void createControl(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);
+		final Composite container = new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
 		container.setLayout(gridLayout);
 		setControl(container);
-		
-		GridLayout projGridLayout = new GridLayout();
+
+		final GridLayout projGridLayout = new GridLayout();
 		projGridLayout.numColumns = 2;
-		
-		Group configGroup = new Group(container, SWT.NONE);
+
+		final Group configGroup = new Group(container, SWT.NONE);
 		configGroup.setText(SCALE_UP_VIEW_TAG);
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.verticalSpan = 2;
-		
+
 		configGroup.setLayoutData(gridData);
 		configGroup.setLayout(projGridLayout);
-		
-		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
+
+		final GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
 		gridData2.horizontalSpan = 1;
 		gridData2.verticalSpan = 1;
-		
+
 		viewNameLabel = new Label(configGroup, 0);
 		viewNameLabel.setText("View Name: ");
 		viewNameText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
 		viewNameText.setText("view1");
 		viewNameText.setLayoutData(gridData2);
-		
+
 		viewLevelLabel = new Label(configGroup, 0);
 		viewLevelLabel.setText("View Level: ");
 		viewLevelText = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
@@ -91,16 +92,16 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 
 		viewNameText.addKeyListener(new KeyPressedListener());
 		viewLevelText.addKeyListener(new KeyPressedListener());
-		
+
 		updatePage();
 	}
-	
+
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWNAME, viewNameText.getText());
 		abstractWizard.putData(WizardConstants.KEY_OUT_VIEWLEVEL, Integer.valueOf(viewLevelText.getText()));
 	}
-	
+
 	@Override
 	protected String checkPage() {
 		if (viewNameText.getText().isEmpty()) {
@@ -108,9 +109,9 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		}
 		try {
 			Integer.valueOf(viewLevelText.getText());
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return ENTER_A_NUMBER;
 		}
 		return null;
-	}	
+	}
 }

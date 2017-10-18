@@ -11,7 +11,9 @@ public class Client {
 	/** checks for a valid signature and replaces it by a flag signaling a
 	 * verified signature 
 	 */
-	/*@ requires !msg.isReadable(); @*/
+	/*@ requires !msg.isReadable(); 
+	  @ assignable \nothing;
+	  @*/
 	static void verify(Client client, Email msg) {
 		int pubkey = client.getKeyringPublicKeyByClient(msg.getEmailFrom());
 		if (pubkey != 0 && isKeyPairValid(msg.getEmailSignKey(), pubkey)) {
@@ -19,7 +21,9 @@ public class Client {
 		}
 	}
 	
-	/*@ requires !msg.isSignatureVerified(); @*/
+	/*@ requires !msg.isSignatureVerified(); 
+	  @ assignable \nothing;
+	  @*/
 	static void mail(Client client, Email msg) {
 		original(client, msg);
 	}

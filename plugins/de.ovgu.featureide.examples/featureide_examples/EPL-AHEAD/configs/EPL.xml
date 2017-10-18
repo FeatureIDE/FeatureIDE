@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="ExpressionProductLine"/>
+		<feature automatic="selected" manual="undefined" name="Operations"/>
+		<feature automatic="selected" manual="selected" name="Kore"/>
+		<feature automatic="undefined" manual="selected" name="Print"/>
+		<feature automatic="undefined" manual="selected" name="Eval"/>
+		<feature automatic="selected" manual="undefined" name="Structs"/>
+		<feature automatic="selected" manual="selected" name="Core"/>
+		<feature automatic="selected" manual="selected" name="Num"/>
+		<feature automatic="undefined" manual="selected" name="Neg"/>
+		<feature automatic="undefined" manual="selected" name="Plus"/>
+		<feature automatic="selected" manual="undefined" name="Derivatives"/>
+		<feature automatic="selected" manual="undefined" name="CK"/>
+		<feature automatic="selected" manual="undefined" name="CE"/>
+		<feature automatic="selected" manual="undefined" name="CP"/>
+		<feature automatic="selected" manual="undefined" name="BK"/>
+		<feature automatic="selected" manual="undefined" name="BE"/>
+		<feature automatic="selected" manual="undefined" name="BP"/>
+		<feature automatic="selected" manual="undefined" name="NK"/>
+		<feature automatic="selected" manual="undefined" name="NE"/>
+		<feature automatic="selected" manual="undefined" name="NP"/>
+		<feature automatic="selected" manual="undefined" name="PK"/>
+		<feature automatic="selected" manual="undefined" name="PE"/>
+		<feature automatic="selected" manual="undefined" name="PP"/>
+	</configuration>

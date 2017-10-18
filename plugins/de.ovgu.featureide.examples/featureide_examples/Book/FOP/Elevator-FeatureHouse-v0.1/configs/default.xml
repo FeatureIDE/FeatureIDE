@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Elevator"/>
+		<feature automatic="undefined" manual="undefined" name="Sabbath"/>
+		<feature automatic="undefined" manual="undefined" name="Service"/>
+	</configuration>

@@ -334,7 +334,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -352,7 +352,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -371,7 +371,7 @@
 							</count>
 						</with>
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.containsConfiguration">
+								definitionId="de.ovgu.featureide.fm.ui.expressions.containsConfiguration">
 						</reference>
 					</and>
 				</visibleWhen>
@@ -385,7 +385,7 @@
 						checkEnabled="false">
 					<and>
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 						<test
 								args="de.ovgu.featureide.core.mpl.MPLExperimentalNature"

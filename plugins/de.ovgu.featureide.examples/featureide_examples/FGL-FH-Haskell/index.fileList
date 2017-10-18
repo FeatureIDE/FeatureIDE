@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/FGL.config
+configs/FGL.xml
 features/ArticulationPoint/Data/Graph/Inductive/Query/ArtPoint.hs
 features/Base/Data/Graph/Inductive/Basic.hs
 features/Base/Data/Graph/Inductive/Example.hs

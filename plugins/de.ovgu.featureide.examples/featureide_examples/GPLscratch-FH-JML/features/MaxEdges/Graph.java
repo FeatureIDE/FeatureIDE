@@ -11,6 +11,7 @@ public class Graph {
 	/*@ \final_method
 	 @ requires \original && MAXEDGES != null;
 	 @ ensures \old(countEdges()) < MAXEDGES ==> \original;
+	 @ assignable \nothing;
 	 @*/
 	public void addEdge(Edge edge) {
 		if(countEdges() < MAXEDGES)

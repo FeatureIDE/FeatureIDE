@@ -9,6 +9,7 @@ class Account {
 	 @
 	 @ ensures (!\result ==> withdraw == \old(withdraw)) 
 	 @   && (\result ==> withdraw <= \old(withdraw));
+	 @ assignable withdraw;
 	 @*/
 	boolean update(int x) {
 		int newWithdraw = withdraw;
@@ -27,6 +28,7 @@ class Account {
 	 @
 	 @ ensures (!\result ==> withdraw == \old(withdraw)) 
 	 @   && (\result ==> withdraw >= \old(withdraw));
+	 @ assignable withdraw;
 	 @*/
 	boolean undoUpdate(int x) {
 		int newWithdraw = withdraw;

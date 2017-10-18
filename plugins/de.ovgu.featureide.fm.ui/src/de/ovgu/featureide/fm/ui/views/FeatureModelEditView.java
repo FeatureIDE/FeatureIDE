@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -55,9 +55,8 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
 
 /**
- * A view to calculate the category an edit. Given an open feature model editor
- * the current editing version is compared to the last saved model.
- * 
+ * A view to calculate the category an edit. Given an open feature model editor the current editing version is compared to the last saved model.
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -67,8 +66,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	public static final Image REFESH_TAB_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
 
-	private static final QualifiedName ACTIVATOR_KEY = new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID
-			+ ".EditViewActivator");
+	private static final QualifiedName ACTIVATOR_KEY =
+		new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
 
 	private static final String ACTIVATOR_ACTION_TEXT = DISABLE_AUTOMATIC_CALCULATIONS;
 	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;
@@ -84,13 +83,17 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	/**
 	 * Button to start manual calculations.
 	 */
-	private Action manualAction = new Action() {
+	private final Action manualAction = new Action() {
+
+		@Override
 		public void run() {
-			Job job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+			final Job job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+
+				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					if (featureModelEditor == null)
+					if (featureModelEditor == null) {
 						contentProvider.defaultContent();
-					else {
+					} else {
 						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
 					}
 					return Status.OK_STATUS;
@@ -104,9 +107,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	/**
 	 * Button to enable/disable automatic calculations.
 	 */
-	private Action activatorAction = new Action() {
+	private final Action activatorAction = new Action() {
+
+		@Override
 		public void run() {
-			Job job = new Job("") {
+			final Job job = new Job("") {
+
+				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					activatorAction.setChecked(activatorAction.isChecked());
 					manualAction.setEnabled(activatorAction.isChecked());
@@ -120,40 +127,50 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 	};
 
-	private IPartListener editorListener = new IPartListener() {
+	private final IPartListener editorListener = new IPartListener() {
 
-		public void partOpened(IWorkbenchPart part) {
-		}
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
 
-		public void partDeactivated(IWorkbenchPart part) {
-		}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
 
+		@Override
 		public void partClosed(IWorkbenchPart part) {
-			if (part == featureModelEditor)
+			if (part == featureModelEditor) {
 				setFeatureModelEditor(null);
+			}
 		}
 
+		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setFeatureModelEditor(part);
+			}
 		}
 
+		@Override
 		public void partActivated(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setFeatureModelEditor(part);
+			}
 		}
 
 	};
 
-	private IEventListener modelListener = new IEventListener() {
+	private final IEventListener modelListener = new IEventListener() {
+
+		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
+			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType())) {
 				refresh();
+			}
 		}
 	};
 
-	private ViewContentProvider contentProvider = new ViewContentProvider(this);
+	private final ViewContentProvider contentProvider = new ViewContentProvider(this);
 
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(contentProvider);
@@ -161,7 +178,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		viewer.setInput(getViewSite());
 
 		getSite().getPage().addPartListener(editorListener);
-		IWorkbenchPage page = getSite().getPage();
+		final IWorkbenchPage page = getSite().getPage();
 		setFeatureModelEditor(page.getActiveEditor());
 
 		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
@@ -188,7 +205,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private boolean isActivatorChecked() {
 		try {
 			return "true".equals(workspaceRoot.getPersistentProperty(ACTIVATOR_KEY));
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 		return true;
@@ -196,14 +213,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	/**
 	 * Sets the persistent property status of the activator action.
-	 * 
-	 * @param checked
-	 *            The new status
+	 *
+	 * @param checked The new status
 	 */
 	private void setActivatorChecked(boolean checked) {
 		try {
 			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY, checked ? "true" : "false");
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
@@ -211,8 +227,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	@Override
 	public void dispose() {
 		if (job != null) {
-			if (job.getState() == Job.RUNNING)
+			if (job.getState() == Job.RUNNING) {
 				job.cancel();
+			}
 			job = null;
 		}
 		getSite().getPage().removePartListener(editorListener);
@@ -226,13 +243,15 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
 
 	private void setFeatureModelEditor(IWorkbenchPart activeEditor) {
-		if (featureModelEditor != null && featureModelEditor == activeEditor)
+		if ((featureModelEditor != null) && (featureModelEditor == activeEditor)) {
 			return;
+		}
 
 		if (featureModelEditor != null) {
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
@@ -252,10 +271,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 
 		/*
-		 * This job waits for the calculation job to finish and starts
-		 * immediately a new one
+		 * This job waits for the calculation job to finish and starts immediately a new one
 		 */
-		Job waiter = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+		final Job waiter = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -267,11 +286,12 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						job.join();
 						contentProvider.setCanceled(false);
 					}
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 
 				job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
+
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						activatorAction.setEnabled(true);

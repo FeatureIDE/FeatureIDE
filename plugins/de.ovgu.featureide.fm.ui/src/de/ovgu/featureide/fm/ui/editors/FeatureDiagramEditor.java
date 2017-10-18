@@ -160,7 +160,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 
 /**
@@ -246,7 +245,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
-	private Explanation activeExplanation;
+	private Explanation<?> activeExplanation;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -261,8 +260,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		this.featureModelEditor = featureModelEditor;
 		graphicalFeatureModel = new GraphicalFeatureModel(fm);
 		graphicalFeatureModel.init();
-
-		if (featureModelEditor.fmManager != null) { // read-only feature model is currently only a view on the editable feature model and not persistent
+				
+		// 1. Check if the fmManager exists and is not a VirtualFileManager instance (path returns null)
+		// 2. read-only feature model is currently only a view on the editable feature model and not persistent
+		if (featureModelEditor.fmManager != null && featureModelEditor.fmManager.getPath() != null) {
 			extraPath = AFileManager.constructExtraPath(featureModelEditor.fmManager.getPath(), format);
 			FileHandler.load(extraPath, graphicalFeatureModel, format);
 			featureModelEditor.fmManager.addListener(this);
@@ -439,7 +440,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return;
 		}
 		final IFeatureModelElement primaryModel = primary.getModel().getObject();
-		final Explanation activeExplanation;
+		final Explanation<?> activeExplanation;
 		if (getFeatureModel().getAnalyser().valid()) {
 			activeExplanation = getFeatureModel().getAnalyser().getExplanation(primaryModel);
 		} else {
@@ -454,8 +455,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * 
 	 * @param activeExplanation the new active explanation
 	 */
-	public void setActiveExplanation(Explanation activeExplanation) {
-		final Explanation oldActiveExplanation = this.activeExplanation;
+	public void setActiveExplanation(Explanation<?> activeExplanation) {
+		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);
 		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
@@ -466,7 +467,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 * 
 	 * @return the currently active explanation.
 	 */
-	public Explanation getActiveExplanation() {
+	public Explanation<?> getActiveExplanation() {
 		return this.activeExplanation;
 	}
 
@@ -725,10 +726,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
 		}
-		if (graphicalFeatureModel.getVisibleConstraints().size() != graphicalFeatureModel.getConstraints().size()
-				|| graphicalFeatureModel.getLayout().showCollapsedConstraints()) {
-			menu.add(showCollapsedConstraintsAction);
-		}
+		menu.add(showCollapsedConstraintsAction);
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		// call of the FeatureDiagramExtensions (for features only)
@@ -821,12 +819,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void internRefresh(boolean onlyLayout) {
 		if (getContents() == null)
 			return;
-
-		// TODO is this necessary?
-		FmOutlinePage outline = featureModelEditor.getOutlinePage();
-		if (outline != null) {
-			outline.setInput(getFeatureModel());
-		}
 
 		// refresh size of all feature figures
 		if (!onlyLayout)
@@ -1097,6 +1089,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
+			
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
@@ -1318,12 +1311,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			//Deactivate the old active explanation.
-			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
+			final FeatureModelExplanation<?> oldActiveExplanation = (FeatureModelExplanation<?>) event.getOldValue();
 			if (oldActiveExplanation != null) {
 				//Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
-				for (final Reason reason : oldActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : oldActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						if (updatedElements.add(element)) {
 							element.update(event);
@@ -1333,11 +1326,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 
 			//Activate the new active explanation.
-			final FeatureModelExplanation newActiveExplanation = (FeatureModelExplanation) event.getNewValue();
+			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
 				//Notify each element affected by the new active explanation of its new active reasons.
-				for (final Reason reason : newActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
 					}

@@ -9,8 +9,7 @@ public class RefactorContribut extends RefactoringContribution {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public RefactoringDescriptor createDescriptor(String id, String project,
-			String description, String comment, Map arguments, int flags)
+	public RefactoringDescriptor createDescriptor(String id, String project, String description, String comment, Map arguments, int flags)
 			throws IllegalArgumentException {
 		return null;
 	}

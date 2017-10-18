@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.prop4j.NodeWriter;
@@ -50,14 +49,13 @@ import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * The model representation of the feature tree that notifies listeners of
- * changes in the tree.
- * 
+ * The model representation of the feature tree that notifies listeners of changes in the tree.
+ *
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
  * @author Marcus Pinnecke
- * 
+ *
  */
 public class FeatureModel implements IFeatureModel {
 
@@ -71,6 +69,7 @@ public class FeatureModel implements IFeatureModel {
 
 	private long nextElementId = 0;
 
+	@Override
 	public final synchronized long getNextElementId() {
 		return nextElementId++;
 	}
@@ -81,8 +80,7 @@ public class FeatureModel implements IFeatureModel {
 	protected final List<IConstraint> constraints = new ArrayList<>();
 
 	/**
-	 * A list containing the feature names in their specified order will be
-	 * initialized in XmlFeatureModelReader.
+	 * A list containing the feature names in their specified order will be initialized in XmlFeatureModelReader.
 	 */
 	protected final List<String> featureOrderList;
 	protected boolean featureOrderUserDefined;
@@ -106,7 +104,7 @@ public class FeatureModel implements IFeatureModel {
 		this.factoryID = factoryID;
 
 		id = getNextId();
-		featureOrderList = new LinkedList<String>();
+		featureOrderList = new LinkedList<>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
@@ -118,13 +116,13 @@ public class FeatureModel implements IFeatureModel {
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
 		factoryID = oldFeatureModel.factoryID;
 		id = oldFeatureModel.id;
-		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		featureOrderList = new LinkedList<>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
 
-		this.sourceFile = oldFeatureModel.sourceFile;
+		sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
@@ -142,7 +140,7 @@ public class FeatureModel implements IFeatureModel {
 				}
 			}
 		}
-		analyser = oldFeatureModel.getAnalyser()==null?createAnalyser():oldFeatureModel.getAnalyser();
+		analyser = oldFeatureModel.getAnalyser() == null ? createAnalyser() : oldFeatureModel.getAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -256,7 +254,7 @@ public class FeatureModel implements IFeatureModel {
 		for (final IEventListener listener : listenerList) {
 			try {
 				listener.propertyChange(event);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Logger.logError(e);
 			}
 		}
@@ -303,16 +301,17 @@ public class FeatureModel implements IFeatureModel {
 	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
-	
+
 	/**
 	 * Returns a list of features, which are not hidden and not collapsed
+	 *
 	 * @return
 	 */
 	@Override
 	public Collection<IFeature> getVisibleFeatures(boolean showHiddenFeatures) {
-		Collection<IFeature> features = new ArrayList<IFeature>();
-		for (IFeature f : getFeatures()) {
-			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures)){
+		final Collection<IFeature> features = new ArrayList<IFeature>();
+		for (final IFeature f : getFeatures()) {
+			if (!(f.getStructure().hasHiddenParent() && !showHiddenFeatures)) {
 				features.add(f);
 			}
 		}
@@ -399,8 +398,9 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
-		if (constraint == null)
+		if (constraint == null) {
 			throw new NullPointerException();
+		}
 		constraints.set(index, constraint);
 	}
 
@@ -425,11 +425,12 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
-		final Set<String> basicSet = Functional.mapToStringSet(Functional.filter(new FeaturePreOrderIterator(this), new ConcreteFeatureFilter()));
+		final List<String> basicSet = Functional.mapToList(new FeaturePreOrder(this), new ConcreteFeatureFilter(), FeatureUtils.GET_FEATURE_NAME);
+		// TODO optimize performance
 		basicSet.removeAll(featureOrderList);
-		featureOrderList.clear();
-		featureOrderList.addAll(featureOrderList);
-		featureOrderList.addAll(basicSet);
+		this.featureOrderList.clear();
+		this.featureOrderList.addAll(featureOrderList);
+		this.featureOrderList.addAll(basicSet);
 	}
 
 	@Override
@@ -455,14 +456,14 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-		if (!this.featureOrderList.isEmpty()) {
-			this.featureOrderList.set(i, newName);
+		if (!featureOrderList.isEmpty()) {
+			featureOrderList.set(i, newName);
 		}
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("FeatureModel(");
+		final StringBuilder sb = new StringBuilder("FeatureModel(");
 		if (getStructure().getRoot() != null) {
 			sb.append("Structure=[");
 			FeatureUtils.print(getStructure().getRoot().getFeature(), sb);
@@ -472,12 +473,13 @@ public class FeatureModel implements IFeatureModel {
 		} else {
 			sb.append("Feature model without root feature.");
 		}
-		StringBuilder features = new StringBuilder();
-		String[] feat = featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
+		final StringBuilder features = new StringBuilder();
+		final String[] feat = featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
 		for (int i = 0; i < feat.length; i++) {
 			features.append(feat[i]);
-			if (i + 1 < feat.length)
+			if ((i + 1) < feat.length) {
 				features.append(", ");
+			}
 		}
 		sb.append("Features=[" + (features.length() > 0 ? features.toString() : ""));
 		sb.append("])");
@@ -489,14 +491,15 @@ public class FeatureModel implements IFeatureModel {
 			sb.append("[");
 			sb.append(new NodeWriter(constraints.get(i).getNode()).nodeToString());
 			sb.append("]");
-			if (i + 1 < constraints.size())
+			if ((i + 1) < constraints.size()) {
 				sb.append(", ");
+			}
 		}
 	}
 
 	@Override
 	public void setSourceFile(Path file) {
-		this.sourceFile = file;
+		sourceFile = file;
 		if (file != null) {
 			id = ModelFileIdMap.getModelId(this, file);
 		}
@@ -504,7 +507,7 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public Path getSourceFile() {
-		return this.sourceFile;
+		return sourceFile;
 	}
 
 	@Override
@@ -519,11 +522,13 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		FeatureModel other = (FeatureModel) obj;
+		}
+		final FeatureModel other = (FeatureModel) obj;
 		return id == other.id;
 	}
 
@@ -532,6 +537,7 @@ public class FeatureModel implements IFeatureModel {
 		constraints.set(index, constraint);
 	}
 
+	@Override
 	public FeatureModel clone() {
 		return new FeatureModel(this, null);
 	}

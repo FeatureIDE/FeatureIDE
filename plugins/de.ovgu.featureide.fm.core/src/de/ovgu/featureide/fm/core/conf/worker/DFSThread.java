@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,12 +30,13 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public class DFSThread extends AWorkerThread<String> {
 
 	private static class SharedObjects {
+
 		private final MatrixFeatureGraph featureGraph;
 		private final boolean[] complete;
 
 		public SharedObjects(MatrixFeatureGraph featureGraph) {
 			this.featureGraph = featureGraph;
-			this.complete = new boolean[featureGraph.getSatInstance().getNumberOfVariables()];
+			complete = new boolean[featureGraph.getSatInstance().getNumberOfVariables()];
 		}
 	}
 
@@ -50,7 +51,7 @@ public class DFSThread extends AWorkerThread<String> {
 
 	private DFSThread(DFSThread oldThread) {
 		super(oldThread);
-		this.sharedObjects = oldThread.sharedObjects;
+		sharedObjects = oldThread.sharedObjects;
 		visited = new byte[oldThread.sharedObjects.featureGraph.getSatInstance().getNumberOfVariables()];
 	}
 
@@ -592,7 +593,7 @@ public class DFSThread extends AWorkerThread<String> {
 				}
 			}
 
-			if (incomplete && childSelected >= 0) {
+			if (incomplete && (childSelected >= 0)) {
 				dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
 			}
 		}

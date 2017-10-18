@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -36,12 +36,10 @@ import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
  * Munge Preprocessor adapted for usage with Android projects.
- * 
- * Compatibility with the Android Toolkit is achieved by bundling the src and
- * res folders the Android builder expects into the FeatureIDE source folder.
- * The composed files are copied to the project's root folder after every
- * FeatureIDE build. Then they can be processed by the Android builders.
- * 
+ *
+ * Compatibility with the Android Toolkit is achieved by bundling the src and res folders the Android builder expects into the FeatureIDE source folder. The
+ * composed files are copied to the project's root folder after every FeatureIDE build. Then they can be processed by the Android builders.
+ *
  * @author Lars-Christian Schulz
  * @author Eric Guimatsia
  */
@@ -52,7 +50,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 		EXTENSIONS.add("java");
 		EXTENSIONS.add("xml");
 	};
-	
+
 	public MungeAndroidPreprocessor() {
 		super();
 	}
@@ -67,18 +65,18 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 
 			final IFolder srcFolder = project.getFolder("src");
 			if (srcFolder.exists() && srcFolder.isAccessible()) {
-				for (IResource member : srcFolder.members()) {
+				for (final IResource member : srcFolder.members()) {
 					member.delete(false, null);
 				}
 			}
 
 			final IFolder resFolder = project.getFolder("res");
 			if (resFolder.exists() && resFolder.isAccessible()) {
-				for (IResource member : resFolder.members()) {
+				for (final IResource member : resFolder.members()) {
 					member.delete(false, null);
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 		return super.clean();
@@ -93,17 +91,17 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 		// Copy not composed files
 		try {
 			copy(featureProject.getSourceFolder(), featureProject.getBuildFolder());
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 
 		// Move src and res folders from FeatureIDE build path to project root
-		IFolder build = featureProject.getBuildFolder();
+		final IFolder build = featureProject.getBuildFolder();
 		final IProject project = featureProject.getProject();
 
 		final IFolder srcFolder = project.getFolder("src");
 		final IFolder resFolder = project.getFolder("res");
-		IPath dst = project.getFullPath();
+		final IPath dst = project.getFullPath();
 		try {
 			if (srcFolder.exists()) {
 				srcFolder.delete(true, null);
@@ -112,16 +110,16 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 				resFolder.delete(true, null);
 			}
 
-			build.getFolder("src").move(dst.append("/src"), IFolder.DERIVED, null);
-			build.getFolder("res").move(dst.append("/res"), IFolder.DERIVED, null);
-		} catch (CoreException e) {
+			build.getFolder("src").move(dst.append("/src"), IResource.DERIVED, null);
+			build.getFolder("res").move(dst.append("/res"), IResource.DERIVED, null);
+		} catch (final CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	@Override
 	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
-		LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
+		final LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
 		boolean added = false;
 		try {
 			createBuildFolder(buildFolder);
@@ -129,14 +127,14 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 				if (res instanceof IFolder) {
 					runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
 				} else if (res instanceof IFile) {
-					String extension = res.getFileExtension();
-					if (extension != null && (extension.equals("java") || extension.equals("xml"))) {
+					final String extension = res.getFileExtension();
+					if ((extension != null) && (extension.equals("java") || extension.equals("xml"))) {
 						added = true;
 						packageArgs.add(res.getRawLocation().toOSString());
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			MungeCorePlugin.getDefault().logError(e);
 		}
 		if (!added) {
@@ -154,7 +152,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 	public LinkedHashSet<String> extensions() {
 		return EXTENSIONS;
 	}
-	
+
 	@Override
 	public boolean supportsAndroid() {
 		return true;

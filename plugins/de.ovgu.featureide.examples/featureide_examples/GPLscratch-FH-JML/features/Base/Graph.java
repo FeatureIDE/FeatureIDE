@@ -17,6 +17,7 @@ public class Graph {
 	/*@
 	 @ requires edge != null && nodes.contains(edge.first) && nodes.contains(edge.second);
 	 @ ensures hasEdge(edge);
+	 @ assignable edges;
 	 @*/
 	public void addEdge(Edge edge) {
 		edges.add(edge);
@@ -25,6 +26,7 @@ public class Graph {
 	/*@ \final_method
 	 @ requires node != null;
 	 @ ensures nodes.contains(node);
+	 @ assignable nodes;
 	 @*/
 	public void addNode(Node node) {
 		nodes.add(node);
@@ -32,6 +34,7 @@ public class Graph {
 
 	/*@ \final_method
 	 @ requires nodes != null;
+	 @ assignable \nothing;
 	 @*/
 	public void print() {
 		System.out.println("## NODES ##");
@@ -48,6 +51,7 @@ public class Graph {
 	 @ requires nodes != null && nodes instanceof List<Node>;
 	 @ ensures (\forall int i; 0 <= i && i < \result.size()-1;
 	 @ 	\result.toArray()[i].compareTo(\result.toArray()[i+1]) <= 0 );
+	 @ assignable \nothing;
 	 @*/
 	public Collection<Node> sortNodes(Collection<Node> nodes) {
 		List<Node> list = new ArrayList<Node>(nodes);
@@ -59,6 +63,7 @@ public class Graph {
 	 @ requires edges != null && edges instanceof List<Edge>;
 	 @ ensures (\forall int i; 0 <= i && i < \result.size()-1;
 	 @ 	\result.toArray()[i].compareTo(\result.toArray()[i+1]) <= 0);
+	 @ assignable \nothing;
 	 @*/
 	public Collection<Edge> sortEdges(Collection<Edge> edges) {
 		List<Edge> list = new ArrayList<Edge>(edges);

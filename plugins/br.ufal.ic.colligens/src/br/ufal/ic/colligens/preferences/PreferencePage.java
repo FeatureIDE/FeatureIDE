@@ -11,10 +11,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import br.ufal.ic.colligens.activator.Colligens;
 
-public class PreferencePage extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage {
-	public static final String ID = Colligens.PLUGIN_ID
-			+ ".preferences.PreferencePage";
+public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+	public static final String ID = Colligens.PLUGIN_ID + ".preferences.PreferencePage";
 
 	public PreferencePage() {
 		super(GRID);
@@ -24,19 +23,14 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 	@Override
 	public void createFieldEditors() {
 
-		addField(new BooleanFieldEditor("FEATURE_MODEL", "&Feature Model",
-				getFieldEditorParent()));
+		addField(new BooleanFieldEditor("FEATURE_MODEL", "&Feature Model", getFieldEditorParent()));
 
-		addField(new BooleanFieldEditor("USE_INCLUDES",
-				"U&se #includes (slower)", getFieldEditorParent()));
+		addField(new BooleanFieldEditor("USE_INCLUDES", "U&se #includes (slower)", getFieldEditorParent()));
 
-		addField(new BooleanFieldEditor("USE_STUBS", "Us&e stubs",
-				getFieldEditorParent()));
+		addField(new BooleanFieldEditor("USE_STUBS", "Us&e stubs", getFieldEditorParent()));
 
-		addField(new RadioGroupFieldEditor("TypeChefPreference",
-				GENERAL_PROCESSING_TYPECHEF_OPTIONS, 1, new String[][] {
-						{ "&Typecheck", "--typecheck" },
-						{ "P&arse", "--parse" } }, getFieldEditorParent()));
+		addField(new RadioGroupFieldEditor("TypeChefPreference", GENERAL_PROCESSING_TYPECHEF_OPTIONS, 1,
+				new String[][] { { "&Typecheck", "--typecheck" }, { "P&arse", "--parse" } }, getFieldEditorParent()));
 
 	}
 

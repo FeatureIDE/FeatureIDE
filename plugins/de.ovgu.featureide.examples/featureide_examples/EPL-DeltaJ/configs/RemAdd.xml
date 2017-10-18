@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="EPL"/>
+		<feature automatic="selected" manual="undefined" name="Data"/>
+		<feature automatic="undefined" manual="selected" name="Lit"/>
+		<feature automatic="undefined" manual="undefined" name="Add"/>
+		<feature automatic="undefined" manual="selected" name="Neg"/>
+		<feature automatic="selected" manual="undefined" name="Operations"/>
+		<feature automatic="selected" manual="selected" name="Print"/>
+		<feature automatic="undefined" manual="selected" name="Eval"/>
+	</configuration>

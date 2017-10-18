@@ -11,6 +11,7 @@ public class Graph {
     // Executes Cycle Checking
 	/*@requires \original;
 	 ensures \original;
+	 assignable \nothing;
 	 @*/
     public void run( Vertex s )
      {

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,11 +27,13 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Starts and cancels stoppable jobs.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class JobSynchronizer {
+
 	private class JobEntry {
+
 		private final IRunner<?> currentJob;
 		private Thread starterThread;
 
@@ -42,12 +44,12 @@ public class JobSynchronizer {
 
 		@Override
 		public boolean equals(Object obj) {
-			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getImplementationClass().equals(this.currentJob.getImplementationClass());
+			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getImplementationClass().equals(currentJob.getImplementationClass());
 		}
 
 		@Override
 		public int hashCode() {
-			return this.currentJob.getImplementationClass().hashCode();
+			return currentJob.getImplementationClass().hashCode();
 		}
 	}
 
@@ -62,6 +64,7 @@ public class JobSynchronizer {
 		if (currentEntry != null) {
 			if (currentEntry.starterThread == null) {
 				newEntry.starterThread = new Thread(new Runnable() {
+
 					@Override
 					public void run() {
 						if (cancelPreviousJob) {
@@ -69,7 +72,7 @@ public class JobSynchronizer {
 						}
 						try {
 							currentEntry.currentJob.join();
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							FMUIPlugin.getDefault().logError(e);
 						}
 						job.schedule();
@@ -86,7 +89,7 @@ public class JobSynchronizer {
 	}
 
 	public synchronized void cancelAllJobs() {
-		for (JobEntry entry : jobMap.values()) {
+		for (final JobEntry entry : jobMap.values()) {
 			entry.currentJob.cancel();
 		}
 		jobMap.clear();

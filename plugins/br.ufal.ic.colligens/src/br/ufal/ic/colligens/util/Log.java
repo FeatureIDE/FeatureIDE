@@ -17,7 +17,7 @@ import br.ufal.ic.colligens.models.FileProxy;
 
 /**
  * @author Thiago Emmanuel
- * 
+ *
  */
 public class Log {
 
@@ -31,8 +31,7 @@ public class Log {
 
 	public static final String MARKER_TYPE = Colligens.PLUGIN_ID + ".problem";
 
-	public Log(FileProxy fileProxy, int line, int column, String feature, String severity,
-			String message) {
+	public Log(FileProxy fileProxy, int line, int column, String feature, String severity, String message) {
 		this.fileProxy = fileProxy;
 
 		this.line = line;
@@ -49,11 +48,11 @@ public class Log {
 		this.message = message.trim();
 
 		try {
-			IMarker marker = this.getFile().createMarker(MARKER_TYPE);
+			final IMarker marker = getFile().createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, this.message);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			// e.printStackTrace();
 		}
 	}
@@ -90,19 +89,17 @@ public class Log {
 		return fileProxy;
 	}
 
-	public ITextSelection selection() throws IOException, CoreException,
-			BadLocationException {
+	public ITextSelection selection() throws IOException, CoreException, BadLocationException {
 
 		if (iTextSelection == null) {
 
-			IDocument document = this.getDocument();
+			final IDocument document = getDocument();
 
-			int offset = document.getLineOffset(this.line - 1);
+			final int offset = document.getLineOffset(line - 1);
 
-			int length = document.getLineOffset(this.line)
-					- document.getLineOffset(this.line - 1);
+			final int length = document.getLineOffset(line) - document.getLineOffset(line - 1);
 
-			iTextSelection = new LogSelection(this.line, length - column, offset + column);
+			iTextSelection = new LogSelection(line, length - column, offset + column);
 
 		}
 		return iTextSelection;
@@ -113,11 +110,7 @@ public class Log {
 	}
 
 	private IDocument getDocument() throws CoreException {
-		ITextFileBufferManager.DEFAULT.connect(this.getFile().getFullPath(),
-				LocationKind.IFILE, null);
-		return FileBuffers
-				.getTextFileBufferManager()
-				.getTextFileBuffer(this.getFile().getFullPath(),
-						LocationKind.IFILE).getDocument();
+		ITextFileBufferManager.DEFAULT.connect(getFile().getFullPath(), LocationKind.IFILE, null);
+		return FileBuffers.getTextFileBufferManager().getTextFileBuffer(getFile().getFullPath(), LocationKind.IFILE).getDocument();
 	}
 }

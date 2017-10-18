@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="undefined" manual="undefined" name="telecom_Billing"/>
+		<feature automatic="undefined" manual="selected" name="telecom_TimerLog"/>
+		<feature automatic="undefined" manual="selected" name="telecom_Timing"/>
+	</configuration>

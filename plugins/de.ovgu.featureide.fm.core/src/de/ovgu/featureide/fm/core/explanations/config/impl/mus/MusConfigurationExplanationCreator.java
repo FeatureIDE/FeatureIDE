@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -20,73 +20,50 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
-import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfigurationExplanationCreator;
 
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator} using a {@link MusExtractor MUS extractor}.
- * 
+ *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class MusConfigurationExplanationCreator extends AbstractConfigurationExplanationCreator {
-	/**
-	 * The oracle with the CNF as input.
-	 * The oracle is created lazily when needed and reset when the CNF changes.
-	 */
-	private MusExtractor oracle;
-	
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected MusConfigurationExplanationCreator() {
-		this(null);
-	}
-	
+public abstract class MusConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>>
+		extends AbstractConfigurationExplanationCreator<S, E, MusExtractor> {
+
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
 	/**
 	 * Constructs a new instance of this class.
-	 * @param config the configuration
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	protected MusConfigurationExplanationCreator(Configuration config) {
-		setConfiguration(config);
-	}
-	
-	/**
-	 * Returns the oracle.
-	 * Creates it first if necessary.
-	 * @return the oracle; not null
-	 */
-	protected MusExtractor getOracle() {
-		if (oracle == null) {
-			setOracle();
+	protected MusConfigurationExplanationCreator(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
 		}
-		return oracle;
+		this.solverFactory = solverFactory;
 	}
-	
+
 	/**
-	 * Sets the oracle.
+	 * Returns the solver factory used to create the oracle
+	 * @return the solver factory
 	 */
-	protected void setOracle() {
-		final Node cnf = getCnf();
-		if (cnf == null) {
-			this.oracle = null;
-			return;
-		}
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
-		oracle.addFormula(cnf);
-		this.oracle = oracle;
+	public SatSolverFactory getSatSolverFactory() {
+		return solverFactory;
 	}
-	
+
 	@Override
-	protected Node setCnf() {
-		final Node cnf = super.setCnf();
-		if (cnf != null) {
-			setOracle();
-		}
-		return cnf;
+	protected MusExtractor createOracle() {
+		final MusExtractor oracle = getSatSolverFactory().getMusExtractor();
+		oracle.addFormula(getCnf());
+		return oracle;
 	}
 }

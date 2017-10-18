@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="ApoGame"/>
+		<feature automatic="selected" manual="undefined" name="src"/>
+		<feature automatic="selected" manual="undefined" name="res"/>
+		<feature automatic="selected" manual="undefined" name="Base"/>
+		<feature automatic="unselected" manual="undefined" name="ApoSnake"/>
+		<feature automatic="unselected" manual="undefined" name="MoveCounter"/>
+		<feature automatic="undefined" manual="selected" name="ApoDice"/>
+		<feature automatic="selected" manual="selected" name="DemoLevels"/>
+		<feature automatic="selected" manual="selected" name="StandardLevels"/>
+		<feature automatic="undefined" manual="selected" name="ProLevels"/>
+		<feature automatic="selected" manual="selected" name="UserLevels"/>
+		<feature automatic="selected" manual="selected" name="LevelEditor"/>
+		<feature automatic="undefined" manual="selected" name="LevelUpload"/>
+	</configuration>

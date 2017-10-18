@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -40,39 +40,40 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander Knueppel
  */
 public class TseitinConverter extends NNFConverter {
+
 	private int number = 0;
-	private Set<String> auxVariables = new HashSet<String>();
-	
+	private final Set<String> auxVariables = new HashSet<String>();
+
 	private IFeature addClause(IFeature top, String name) {
-		IFeature clause = factory.createFeature(top.getFeatureModel(), name);
+		final IFeature clause = factory.createFeature(top.getFeatureModel(), name);
 		clause.getStructure().setAbstract(true);
 		clause.getStructure().setOr();
 		clause.getStructure().setMandatory(true);
 		top.getStructure().addChild(clause.getStructure());
-		
+
 		return clause;
 	}
-	
+
 	private void addTseitinVariable(IFeature top, String name, boolean mandatory) {
-		IFeature var = factory.createFeature(top.getFeatureModel(), name);
+		final IFeature var = factory.createFeature(top.getFeatureModel(), name);
 		var.getStructure().setAbstract(true);
 		var.getStructure().setMandatory(mandatory);
 		top.getStructure().addChild(var.getStructure());
 	}
-	
+
 	@Override
-	protected void createAbstractSubtree(IFeature top, List<Node> nodes) {	
+	protected void createAbstractSubtree(IFeature top, List<Node> nodes) {
 //		int i = 0;
 //		addClause(top, "x0");
 //		for(Node node : nodes) {
 //			IFeature clause = addClause(top, "clause" + (i++));
-//			
+//
 //			//System.out.println(node);
-//			
+//
 //			for(Node child : node.getChildren()) {
 //				String name = "";
 //				if(auxVariables.contains(child.getContainedFeatures().get(0))) {
@@ -86,93 +87,93 @@ public class TseitinConverter extends NNFConverter {
 //				//System.out.println(clause + ", " + child + ", " + name);
 //			}
 //		}
-		
-		IFeature clause = addClause(top, "Tseitin");
-		
-		for(String var : auxVariables) {
+
+		final IFeature clause = addClause(top, "Tseitin");
+
+		for (final String var : auxVariables) {
 			addTseitinVariable(clause, var, (var.equals("x0")) ? true : false);
 		}
-		
+
 		super.createAbstractSubtree(top, nodes);
 	}
+
 	/**
 	 * Creates tseitin cnf and returns a list of clauses
 	 */
 	@Override
 	public List<Node> preprocess(IConstraint constraint) {
 		Node node = constraint.getNode().clone();
-		
-		String[] supported = new String[] {"!", " && ", " || ", NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol, 
-				   NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol};
+
+		final String[] supported = new String[] { "!", " && ", " || ", NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol,
+			NodeWriter.noSymbol, NodeWriter.noSymbol };
 		node = node.eliminateNotSupportedSymbols(supported);
-		
-		List<Node> result = new LinkedList<Node>();
-		
-		for(Node encoded : tseitinEncoding(constraint.getFeatureModel(), node, "x"+(number))) {
+
+		final List<Node> result = new LinkedList<Node>();
+
+		for (Node encoded : tseitinEncoding(constraint.getFeatureModel(), node, "x" + (number))) {
 			encoded = encoded.toCNF();
-			if(encoded instanceof And) {
+			if (encoded instanceof And) {
 				result.addAll(Arrays.asList(encoded.getChildren()));
 			} else {
 				result.add(encoded);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	private List<Node> tseitinEncoding(IFeatureModel fm, Node node, String var) {
-		List<Node> tseitinEncoding = new ArrayList<Node>();
-		
+		final List<Node> tseitinEncoding = new ArrayList<Node>();
+
 		// Unary node
-		if(node.getContainedFeatures().size() == 1) {
+		if (node.getContainedFeatures().size() == 1) {
 			tseitinEncoding.add(node);
 			return tseitinEncoding;
 		}
-		
+
 		auxVariables.add(var);
-		
-		if(node instanceof Not) {
-			//TODO: not correct...
-			tseitinEncoding.addAll(tseitinEncoding(fm, node.getChildren()[0], "x"+(++number)));
-			tseitinEncoding.add(new Or(var, "x"+(number)));
-			tseitinEncoding.add(new Or(new Not(var), new Not("x"+(number))));
-		} else if(node instanceof Or) {
-			List<Node> tmp = new ArrayList<Node>();
-			for(Node child : node.getChildren()) {
-				if(child.getContainedFeatures().size() == 1) {
+
+		if (node instanceof Not) {
+			// TODO: not correct...
+			tseitinEncoding.addAll(tseitinEncoding(fm, node.getChildren()[0], "x" + (++number)));
+			tseitinEncoding.add(new Or(var, "x" + (number)));
+			tseitinEncoding.add(new Or(new Not(var), new Not("x" + (number))));
+		} else if (node instanceof Or) {
+			final List<Node> tmp = new ArrayList<Node>();
+			for (final Node child : node.getChildren()) {
+				if (child.getContainedFeatures().size() == 1) {
 					tmp.add(child);
 				} else {
-					tmp.add(new Literal("x"+(++number)));
-					tseitinEncoding.addAll(tseitinEncoding(fm, child, "x"+number));
+					tmp.add(new Literal("x" + (++number)));
+					tseitinEncoding.addAll(tseitinEncoding(fm, child, "x" + number));
 				}
-				
+
 			}
 			tseitinEncoding.add(new Or(new Not(var), new Or(tmp.toArray())));
-			for(Node y : tmp) {
+			for (final Node y : tmp) {
 				tseitinEncoding.add(new Or(var, new Not(y)));
 			}
 		} else {
-			List<Node> tmp = new ArrayList<Node>();
-			for(Node child : node.getChildren()) {
-				if(child.getContainedFeatures().size() == 1) {
+			final List<Node> tmp = new ArrayList<Node>();
+			for (final Node child : node.getChildren()) {
+				if (child.getContainedFeatures().size() == 1) {
 					tmp.add(child);
 				} else {
-					tmp.add(new Literal("x"+(++number)));
-					tseitinEncoding.addAll(tseitinEncoding(fm, child, "x"+number));
+					tmp.add(new Literal("x" + (++number)));
+					tseitinEncoding.addAll(tseitinEncoding(fm, child, "x" + number));
 				}
 			}
-			List<Node> neg = new ArrayList<Node>();
-			for(Node y : tmp) {
+			final List<Node> neg = new ArrayList<Node>();
+			for (final Node y : tmp) {
 				neg.add(new Not(y));
 			}
 			tseitinEncoding.add(new Or(var, new Or(neg.toArray())));
-			for(Node y : tmp) {
+			for (final Node y : tmp) {
 				tseitinEncoding.add(new Or(new Not(var), y));
 			}
-		}	
+		}
 
 		return tseitinEncoding;
 	}
-	
-	
+
 }

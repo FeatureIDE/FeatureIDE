@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -23,9 +23,9 @@ package de.ovgu.featureide.core.signature.base;
 import org.prop4j.Node;
 
 /**
- * Stores information about a {@link AbstractSignature} in a certain feature.</br>
- * An instance of this class is stored in a signature instance for every feature that implements the signature.
- * 
+ * Stores information about a {@link AbstractSignature} in a certain feature.</br> An instance of this class is stored in a signature instance for every feature
+ * that implements the signature.
+ *
  * @author Sebastian Krieter
  */
 public abstract class AFeatureData implements IConstrainedObject {
@@ -37,11 +37,11 @@ public abstract class AFeatureData implements IConstrainedObject {
 	protected Node constraint;
 
 	protected String comment;
-	
+
 	protected String absolutePathToFile;
-	
+
 	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
-		this.startLineNumber = lineNumber;
+		startLineNumber = lineNumber;
 		this.endLineNumber = endLineNumber;
 		this.id = id;
 	}
@@ -54,6 +54,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 		return endLineNumber;
 	}
 
+	@Override
 	public Node getConstraint() {
 		return constraint;
 	}
@@ -75,7 +76,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	}
 
 	public boolean hasID(int id) {
-		return this.id == -1 || this.id == id;
+		return (this.id == -1) || (this.id == id);
 	}
 	public String getAbsoluteFilePath() {
 		return absolutePathToFile;
@@ -92,7 +93,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	public int getEndIDColumnNumber() {
 		return sigPosition.getIdentifierEnd();
 	}
-	
+
 	public SignaturePosition getSigPosition() {
 		return sigPosition;
 	}

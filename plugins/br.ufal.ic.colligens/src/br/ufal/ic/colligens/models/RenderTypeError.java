@@ -21,28 +21,21 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 	@Override
 	public Object apply(TypeChefError typeError) {
 
-		if (typeError.where().getPositionFrom().getFile()
-				.contains(fileProxy.getFileToAnalyse())) {
+		if (typeError.where().getPositionFrom().getFile().contains(fileProxy.getFileToAnalyse())) {
 			boolean isNew = true;
 			if (fileProxy.getLogs().size() > 0) {
-				for (Log log : fileProxy.getLogs()) {
-					if (log.getFeature().equals(
-							typeError.condition().toString())
-							&& log.getMessage().equals(typeError.msg())
-							&& log.getSeverity().equals(
-									typeError.severity().toString())) {
+				for (final Log log : fileProxy.getLogs()) {
+					if (log.getFeature().equals(typeError.condition().toString()) && log.getMessage().equals(typeError.msg())
+						&& log.getSeverity().equals(typeError.severity().toString())) {
 
 						isNew = false;
 					}
 				}
 			}
 
-			if (isNew || fileProxy.getLogs().size() == 0) {
-				Log newlog = new Log(fileProxy, typeError.where()
-						.getPositionFrom().getLine(),typeError.where()
-						.getPositionFrom().getColumn(), typeError.condition()
-						.toString(), typeError.severity().toString(),
-						typeError.msg());
+			if (isNew || (fileProxy.getLogs().size() == 0)) {
+				final Log newlog = new Log(fileProxy, typeError.where().getPositionFrom().getLine(), typeError.where().getPositionFrom().getColumn(),
+						typeError.condition().toString(), typeError.severity().toString(), typeError.msg());
 
 				fileProxy.getLogs().add(newlog);
 				System.out.println(TYPE_ERROR + fileProxy.getLogs().size());

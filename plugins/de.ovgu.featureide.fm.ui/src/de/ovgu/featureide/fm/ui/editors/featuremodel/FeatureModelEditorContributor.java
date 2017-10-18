@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -53,33 +53,33 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 
 /**
  * Defines the actions for the feature model editor and contributes them.
- * 
+ *
  * @author Thomas Thuem
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID, MandatoryAction.ID, AndAction.ID,
-			OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			//ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
-			//ActionFactory.PASTE.getId(),
-			ActionFactory.SELECT_ALL.getId(),
-			//ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
-	//IDEActionFactory.BOOKMARK.getId()
+	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
+		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+		// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
+		// ActionFactory.PASTE.getId(),
+		ActionFactory.SELECT_ALL.getId(),
+		// ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
+			// IDEActionFactory.BOOKMARK.getId()
 	};
 
 	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
+		ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
-		FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
+		final FeatureModelEditor editor = (FeatureModelEditor) targetEditor;
 		setActivePage(editor, editor.getActivePage());
 	}
 
 	public void setActivePage(FeatureModelEditor editor, int pageIndex) {
-		IActionBars actionBars = getActionBars();
+		final IActionBars actionBars = getActionBars();
 		if (actionBars != null) {
 			switch (pageIndex) {
 			case 0:
@@ -100,7 +100,7 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	}
 
 	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {
-		ITextEditor textEditor = editor.getSourceEditor();
+		final ITextEditor textEditor = editor.getSourceEditor();
 		for (int i = 0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
 			actionBars.setGlobalActionHandler(TEXTEDITOR_ACTION_IDS[i], textEditor.getAction(TEXTEDITOR_ACTION_IDS[i]));
 		}
@@ -110,45 +110,48 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 	public void contributeToToolBar(IToolBarManager manager) {
 		super.contributeToToolBar(manager);
 		manager.add(new Separator());
-		
-		//Fix for Issue #363
+
+		// Fix for Issue #363
 		if (org.eclipse.core.runtime.Platform.getOS().equals(org.eclipse.core.runtime.Platform.OS_WIN32)) {
-		manager.add(new ContributionItem() {
-							final Point size = new Point(0,30);
-							private ToolItem widget;
+			manager.add(new ContributionItem() {
+
+				final Point size = new Point(0, 30);
+				private ToolItem widget;
+
+				@Override
+				public void fill(ToolBar parent, int index) {
+					if ((widget == null) && (parent != null)) {
+						final int flags = SWT.PUSH;
+
+						ToolItem ti = null;
+						if (index >= 0) {
+							ti = new ToolItem(parent, flags, index);
+						} else {
+							ti = new ToolItem(parent, flags);
+						}
+						ti.setData(this);
+
+						// create an image the height of the text field
+						final Image image = new Image(Display.getCurrent(), 1, size.y);
+						final GC gc = new GC(image);
+						gc.setBackground(parent.getBackground());
+						gc.fillRectangle(image.getBounds());
+						gc.dispose();
+						ti.addDisposeListener(new DisposeListener() {
 
 							@Override
-							public void fill(ToolBar parent, int index) {
-								if (widget == null && parent != null) {
-									int flags = SWT.PUSH;
-									
-									ToolItem ti = null;
-									if (index >= 0) {
-										ti = new ToolItem(parent, flags, index);
-									} else {
-										ti = new ToolItem(parent, flags);
-									}
-									ti.setData(this);
-									
-									// create an image the height of the text field
-									final Image image = new Image(Display.getCurrent(),1,size.y);
-									GC gc = new GC(image);
-									gc.setBackground(parent.getBackground());
-									gc.fillRectangle(image.getBounds());
-									gc.dispose();
-									ti.addDisposeListener(new DisposeListener() {
-										public void widgetDisposed(DisposeEvent e) {
-											image.dispose();
-										}
-									});
-									ti.setImage(image);
-
-									widget = ti;
-								}
+							public void widgetDisposed(DisposeEvent e) {
+								image.dispose();
 							}
 						});
+						ti.setImage(image);
+
+						widget = ti;
+					}
+				}
+			});
 		}
-		
+
 		manager.add(new ZoomComboContributionItem(getPage()));
 	}
 

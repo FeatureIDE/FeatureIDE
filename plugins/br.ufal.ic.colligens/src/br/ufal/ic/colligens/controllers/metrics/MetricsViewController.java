@@ -21,7 +21,7 @@ public class MetricsViewController extends ViewController {
 
 	private TableViewer tableViewer;
 	private MetricsView view;
-	private ViewContentProvider viewContentProvider;
+	private final ViewContentProvider viewContentProvider;
 
 	private static MetricsViewController INSTANCE;
 
@@ -45,6 +45,7 @@ public class MetricsViewController extends ViewController {
 		this.tableViewer = tableViewer;
 	}
 
+	@Override
 	public MetricsView getView() {
 		return view;
 	}
@@ -64,35 +65,31 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void createPartControl(Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.FULL_SELECTION | SWT.LEFT);
+		tableViewer = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.LEFT);
 		createColumns(parent);
 		final Table table = tableViewer.getTable();
 
-		tableViewer.setContentProvider(this.viewContentProvider);
-		tableViewer.setInput(this.view.getViewSite());
+		tableViewer.setContentProvider(viewContentProvider);
+		tableViewer.setInput(view.getViewSite());
 		tableViewer.setLabelProvider(new ViewLabelProvider());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		PlatformUI.getWorkbench().getHelpSystem()
-				.setHelp(tableViewer.getControl(), "TableView.viewer");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(tableViewer.getControl(), "TableView.viewer");
 
 	}
 
 	public void createColumns(Composite parent) {
-		String[] titles = { METRICS, VALUE };
-		int[] bounds = { 300, 400 };
+		final String[] titles = { METRICS, VALUE };
+		final int[] bounds = { 300, 400 };
 
 		for (int i = 0; i < bounds.length; i++) {
 			createTableViewerColumn(titles[i], bounds[i], i);
 		}
 	}
 
-	public TableViewerColumn createTableViewerColumn(String title, int bound,
-			final int colNumber) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(
-				tableViewer, SWT.LEFT);
+	public TableViewerColumn createTableViewerColumn(String title, int bound, final int colNumber) {
+		final TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.LEFT);
 		final TableColumn column = viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);

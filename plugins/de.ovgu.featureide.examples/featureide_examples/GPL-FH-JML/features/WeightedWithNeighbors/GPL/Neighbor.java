@@ -8,12 +8,14 @@ public class Neighbor {
     public int weight;
     /*@requires theNeighbor != null;@*/
     /*@ensures  this.neighbor == theNeighbor && this.getWeight == theWeight;@*/
+    /*@assignable weight; @*/
     public Neighbor( Vertex theNeighbor, int theWeight ) {
         NeighborConstructor( theNeighbor, theWeight );
     }
     
     /*@requires theNeighbor != null;@*/
     /*@ensures  this.neighbor == theNeighbor && this.getWeight == theWeight;@*/
+    /*@assignable weight; @*/
     public void NeighborConstructor( Vertex theNeighbor, int theWeight )
     {
         NeighborConstructor( theNeighbor );
@@ -26,6 +28,7 @@ public class Neighbor {
         original();
     }
     /*@ensures this.weight == weight;@*/
+    /*@assignable weight; @*/
     public void setWeight(int weight)
     {
         this.weight = weight;

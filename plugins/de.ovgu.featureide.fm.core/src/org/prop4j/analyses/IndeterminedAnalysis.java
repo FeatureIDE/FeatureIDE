@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Finds core and dead features.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
@@ -62,6 +62,7 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 		this.variables = variables;
 	}
 
+	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
 		monitor.setRemainingWork(variables.size() + 1);
 
@@ -69,7 +70,7 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 		final ModifiableSolver modSolver = new ModifiableSolver(solver.getSatInstance());
 		final List<Clause> relevantClauses = new ArrayList<>();
 
-		varLoop: for (String varName : variables) {
+		varLoop: for (final String varName : variables) {
 			final Node[] clauses = solver.getSatInstance().getCnf().getChildren();
 			final int literal = solver.getSatInstance().getVariable(varName);
 			relevantClauses.clear();
@@ -79,7 +80,7 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 			final FeatureRemover remover = new FeatureRemover(new And(clauses), removeVar, false, true);
 			final Node newClauseList = remover.createNewClauseList(LongRunningWrapper.runMethod(remover));
 
-			for (Node clause : newClauseList.getChildren()) {
+			for (final Node clause : newClauseList.getChildren()) {
 				final Node[] literals = clause.getChildren();
 
 				final VecInt newLiterals = new VecInt();
@@ -105,7 +106,7 @@ public class IndeterminedAnalysis extends AbstractAnalysis<int[]> {
 
 			try {
 				modSolver.addCNF(relevantClauses);
-			} catch (ContradictionException e) {
+			} catch (final ContradictionException e) {
 				continue varLoop;
 			}
 
