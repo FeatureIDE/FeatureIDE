@@ -5,6 +5,7 @@ public class Account {
 	
 	/*@
 	 @ ensures this.lock;
+	 @ assignable lock;
 	 @*/
 	void lock() {
 		lock = true;
@@ -12,6 +13,7 @@ public class Account {
 	
 	/*@
 	 @ ensures !this.lock;
+	 @ assignable lock;
 	 @*/
 	void unLock() {
 		lock = false;
@@ -19,6 +21,7 @@ public class Account {
 	
 	/*@
 	 @ ensures \result == this. lock;
+	 @ assignable \nothing;
 	 @*/
 	boolean isLocked() {
 		return lock;

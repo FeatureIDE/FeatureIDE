@@ -24,15 +24,12 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -48,6 +45,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
  * Provides the content for the collaboration outline.
@@ -59,7 +57,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Dominic Labsch
  * @author Daniel P�sche
  */
-public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
+public class CollaborationOutlineTreeContentProvider extends OutlineTreeContentProvider {
 
 	protected FSTModel model;
 
@@ -229,26 +227,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		return filter(obj);
 	}
 
-	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
-
-	// add filter to filter set
-	public void addFilter(ICollaborationOutlineFilter filter) {
-		filters.add(filter);
-	}
-
-	// remove filter from filter set
-	public void removeFilter(ICollaborationOutlineFilter filter) {
-		filters.remove(filter);
-	}
-
-	// apply all filters from filter set
-	private Object[] filter(Object[] obj) {
-		for (final ICollaborationOutlineFilter filter : filters) {
-			obj = filter.filter(obj);
-		}
-		return obj;
-	}
-
 	@Override
 	public Object getParent(Object element) {
 		return null;
@@ -259,7 +237,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		if (element instanceof FSTClass) {
 			for (final FSTRole role : ((FSTClass) element).getRoles()) {
 				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty() || !role.getDirectives().isEmpty()
-						|| !role.getInnerClasses().isEmpty()) {
+					|| !role.getInnerClasses().isEmpty()) {
 					return true;
 				}
 			}

@@ -46,11 +46,11 @@ import de.ovgu.featureide.fm.core.Logger;
 public class VelvetParser extends Parser {
 
 	public static final String[] tokenNames = new String[] { "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS",
-			"ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON",
-			"COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "DESCRIPTION", "EMPTY", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEATURE", "FLOAT",
-			"GROUP", "HEX_DIGIT", "ID", "IDPath", "IMPORT", "IMPORTINSTANCE", "IMPORTINTERFACE", "INT", "MANDATORY", "MINUS", "ML_COMMENT", "OCTAL_ESC",
-			"ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SL_COMMENT", "SOMEOF", "START_C",
-			"START_R", "STRING", "UNARYOP", "UNICODE_ESC", "USE", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS" };
+		"ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON", "COMMA",
+		"CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "DESCRIPTION", "EMPTY", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEATURE", "FLOAT", "GROUP",
+		"HEX_DIGIT", "ID", "IDPath", "IMPORT", "IMPORTINSTANCE", "IMPORTINTERFACE", "INT", "MANDATORY", "MINUS", "ML_COMMENT", "OCTAL_ESC", "ONEOF", "OPERAND",
+		"OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SL_COMMENT", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP",
+		"UNICODE_ESC", "USE", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS" };
 
 	public static final int EOF = -1;
 	public static final int ABSTRACT = 4;
@@ -2401,7 +2401,7 @@ public class VelvetParser extends Parser {
 					if ((((LA20_2 >= OP_AND) && (LA20_2 <= OP_IMPLIES)) || ((LA20_2 >= OP_OR) && (LA20_2 <= OP_XOR)) || (LA20_2 == SEMI))) {
 						alt20 = 1;
 					} else if (((LA20_2 == ATTR_OP_EQUALS) || (LA20_2 == ATTR_OP_GREATER_EQ) || (LA20_2 == ATTR_OP_LESS_EQ) || (LA20_2 == MINUS)
-							|| (LA20_2 == PLUS))) {
+						|| (LA20_2 == PLUS))) {
 						alt20 = 2;
 					} else {
 						final NoViableAltException nvae = new NoViableAltException("", 20, 2, input);
@@ -3891,8 +3891,8 @@ public class VelvetParser extends Parser {
 	static final String DFA5_acceptS = "\3\uffff\1\5\5\uffff\1\1\1\4\1\uffff\1\2\1\3\4\uffff";
 	static final String DFA5_specialS = "\22\uffff}>";
 	static final String[] DFA5_transitionS =
-			{ "\1\1\1\2\21\uffff\1\3", "\1\4", "\1\5", "", "\2\6", "\2\7", "\1\10\23\uffff\1\11\21\uffff\1\12", "\1\13\22\uffff\1\14\22\uffff\1\15", "\1\16",
-					"", "", "\1\17", "", "", "\2\20", "\2\21", "\1\10\23\uffff\1\11\21\uffff\1\12", "\1\13\22\uffff\1\14\22\uffff\1\15" };
+		{ "\1\1\1\2\21\uffff\1\3", "\1\4", "\1\5", "", "\2\6", "\2\7", "\1\10\23\uffff\1\11\21\uffff\1\12", "\1\13\22\uffff\1\14\22\uffff\1\15", "\1\16", "",
+			"", "\1\17", "", "", "\2\20", "\2\21", "\1\10\23\uffff\1\11\21\uffff\1\12", "\1\13\22\uffff\1\14\22\uffff\1\15" };
 
 	static final short[] DFA5_eot = DFA.unpackEncodedString(DFA5_eotS);
 	static final short[] DFA5_eof = DFA.unpackEncodedString(DFA5_eofS);

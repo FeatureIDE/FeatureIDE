@@ -153,7 +153,7 @@ public class PPModelBuilder {
 					if (abstractSignature instanceof AbstractMethodSignature) {
 						final AbstractMethodSignature tmp = (AbstractMethodSignature) abstractSignature;
 						final FSTMethod method =
-								new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), tmp.getModifiers()[0]);
+							new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), tmp.getModifiers()[0]);
 						method.setLine(tmp.getStartLine());
 
 						for (final String featureName : fstDirective.getFeatureNames()) {
@@ -233,7 +233,7 @@ public class PPModelBuilder {
 
 								if (!added) {
 									final FSTMethod method =
-											new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), "tetw");
+										new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), "tetw");
 									method.setLine(tmp.getStartLine());
 									role.getClassFragment().add(method);
 									method.add(d);

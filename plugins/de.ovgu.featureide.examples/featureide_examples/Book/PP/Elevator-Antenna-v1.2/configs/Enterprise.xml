@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Elevator"/>
+		<feature automatic="selected" manual="selected" name="Behavior"/>
+		<feature automatic="selected" manual="selected" name="Modes"/>
+		<feature automatic="unselected" manual="undefined" name="Sabbath"/>
+		<feature automatic="unselected" manual="undefined" name="FIFO"/>
+		<feature automatic="selected" manual="selected" name="ShortestPaht"/>
+		<feature automatic="undefined" manual="selected" name="Service"/>
+		<feature automatic="undefined" manual="undefined" name="Priorities"/>
+		<feature automatic="undefined" manual="undefined" name="RushHour"/>
+		<feature automatic="undefined" manual="undefined" name="FloorPriority"/>
+		<feature automatic="undefined" manual="undefined" name="PersonPriority"/>
+		<feature automatic="undefined" manual="undefined" name="VoiceOutput"/>
+		<feature automatic="selected" manual="selected" name="CallButtons"/>
+		<feature automatic="undefined" manual="selected" name="DirectedCall"/>
+		<feature automatic="unselected" manual="undefined" name="UndirectedCall"/>
+		<feature automatic="selected" manual="selected" name="Security"/>
+		<feature automatic="selected" manual="selected" name="Permission"/>
+		<feature automatic="undefined" manual="selected" name="FloorPermission"/>
+		<feature automatic="undefined" manual="undefined" name="PermissionControl"/>
+		<feature automatic="undefined" manual="undefined" name="Safety"/>
+		<feature automatic="undefined" manual="undefined" name="Overloaded"/>
+	</configuration>

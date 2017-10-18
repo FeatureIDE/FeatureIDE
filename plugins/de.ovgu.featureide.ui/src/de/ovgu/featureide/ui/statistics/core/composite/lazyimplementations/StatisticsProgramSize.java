@@ -66,7 +66,7 @@ public class StatisticsProgramSize extends LazyParent {
 				final String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
 
 				final String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
-						: classFragment.getName();
+					: classFragment.getName();
 				final String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
 				final String qualifier = qualifiedRoleName + ".";

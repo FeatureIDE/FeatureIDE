@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import org.junit.Assert;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -34,13 +35,12 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  *
  */
 // TODO currently splot models support different attributes then featureIDE model.
-// replace System.err.println by assertions if a correct conversion is possible.
-// @RunWith(Parameterized.class)
+// 		replace System.err.println by assertions if a correct conversion is possible.
+//@RunWith(Parameterized.class)
 public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 
-	protected static File MODEL_FILE_FOLDER =
-			new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels/");
-	private static File DESTINATION = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/splotmodels_new/");
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("splotmodels/");
+	private static File DESTINATION = Commons.getRemoteOrLocalFolder("splotmodels_new/");
 
 	private final File modelFile;
 
@@ -48,7 +48,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 		this.modelFile = modelFile;
 	}
 
-	// @Parameters
+//	@Parameters
 	public static Collection<Object[]> getModels() {
 		if (!MODEL_FILE_FOLDER.canRead()) {
 			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("splotmodels").getPath());
@@ -78,7 +78,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels {
 	 *
 	 * @throws Exception
 	 */
-	// @Test
+//	@Test
 	public void convertSPLOTmodel() throws Exception {
 		final String origin = modelFile.getAbsolutePath();
 

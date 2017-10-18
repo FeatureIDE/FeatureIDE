@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.config.impl;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
@@ -29,26 +30,11 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
  *
  * @author Timo G&uuml;nther
  */
-public abstract class AbstractConfigurationExplanationCreator extends AbstractFeatureModelExplanationCreator implements ConfigurationExplanationCreator {
+public abstract class AbstractConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>, O>
+		extends AbstractFeatureModelExplanationCreator<S, E, O> implements ConfigurationExplanationCreator<S, E> {
 
 	/** The configuration containing an issue that needs explaining. */
 	private Configuration config;
-
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public AbstractConfigurationExplanationCreator() {
-		this(null);
-	}
-
-	/**
-	 * Constructs a new instance of this class.
-	 *
-	 * @param config the configuration
-	 */
-	public AbstractConfigurationExplanationCreator(Configuration config) {
-		setConfiguration(config);
-	}
 
 	@Override
 	public Configuration getConfiguration() {
@@ -67,4 +53,5 @@ public abstract class AbstractConfigurationExplanationCreator extends AbstractFe
 	protected void setFeatureModel() {
 		setFeatureModel(getConfiguration() == null ? null : getConfiguration().getFeatureModel());
 	}
+
 }

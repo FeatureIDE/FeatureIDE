@@ -86,7 +86,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		} else {
 			for (final ContentProposal proposal : getProposalList(words[LAST], features)) {
 				if ((proposal.getContent().length() > words[CURRENT].trim().length())
-						&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
+					&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
 					proposalList.add(proposal);
 				}
 			}

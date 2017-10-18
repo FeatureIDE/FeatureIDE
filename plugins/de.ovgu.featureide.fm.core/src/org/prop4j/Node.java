@@ -75,10 +75,8 @@ public abstract class Node {
 	 * literal in the expression were replaced by the corresponding boolean value in the given map. </p>
 	 *
 	 * <p> For example, for the {@link And conjunction} operation, this operations returns true iff the following formula is satisfied:
-	 *
-	 * <pre> <i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i> </pre>
-	 *
-	 * Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the node. </p>
+	 * <pre><i>c<sub>1</sub></i> &and; &hellip; &and; <i>c<sub>n</sub></i></pre> Where <i>c<sub>i</sub></i> is the <i>i</i>-th of the <i>n</i> children of the
+	 * node. </p>
 	 *
 	 * @param assignment truth value assignment from variable to true or false
 	 * @return the result of evaluation of this node

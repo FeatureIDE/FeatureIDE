@@ -35,7 +35,7 @@ public class ProgressMonitor extends ATaskMonitor {
 	private final SubMonitor monitor;
 	private final IProgressMonitor orgMonitor;
 
-	private ProgressMonitor(IProgressMonitor monitor, AMonitor parent) {
+	private ProgressMonitor(SubMonitor monitor, AMonitor parent) {
 		super(parent);
 		orgMonitor = monitor;
 		this.monitor = SubMonitor.convert(monitor, 1);
@@ -45,6 +45,7 @@ public class ProgressMonitor extends ATaskMonitor {
 		super();
 		orgMonitor = monitor;
 		this.monitor = SubMonitor.convert(monitor, taskName, 1);
+		setTaskName(name);
 	}
 
 	@Override
@@ -59,7 +60,9 @@ public class ProgressMonitor extends ATaskMonitor {
 	@Override
 	public synchronized void done() {
 		monitor.done();
-		orgMonitor.done();
+		if (orgMonitor != null) {
+			orgMonitor.done();
+		}
 	}
 
 	@Override

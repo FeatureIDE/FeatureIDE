@@ -17,6 +17,7 @@ public class Elevator {
 	  */
 	/*@ ensures weight > maximumWeight ==> areDoorsOpen();
 	  @ ensures \old(weight) > \old(maximumWeight) ==> getCurrentFloorID() == \old(getCurrentFloorID());
+	  @ assignable blocked;
 	  @*/
 	public void timeShift() {
 		if (areDoorsOpen() && weight > maximumWeight) {

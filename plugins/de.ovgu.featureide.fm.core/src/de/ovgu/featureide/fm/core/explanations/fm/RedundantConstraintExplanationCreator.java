@@ -27,25 +27,4 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  *
  * @author Timo G&uuml;nther
  */
-public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator {
-
-	/**
-	 * Returns the redundant constraint in the feature model.
-	 *
-	 * @return the redundant constraint in the feature model
-	 */
-	public IConstraint getRedundantConstraint();
-
-	/**
-	 * Sets the redundant constraint in the feature model.
-	 *
-	 * @param redundantConstraint the redundant constraint in the feature model
-	 */
-	public void setRedundantConstraint(IConstraint redundantConstraint);
-
-	/**
-	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
-	 */
-	@Override
-	public RedundantConstraintExplanation getExplanation() throws IllegalStateException;
-}
+public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation> {}

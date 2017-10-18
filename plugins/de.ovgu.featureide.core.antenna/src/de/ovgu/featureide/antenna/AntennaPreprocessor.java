@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -162,70 +161,70 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 		super.postCompile(delta, file);
 		final Job job =
-				new Job((PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
+			new Job((PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
 
-					@Override
-					public IStatus run(IProgressMonitor monitor) {
-						try {
-							final IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
-							if (marker.length != 0) {
-								for (final IMarker m : marker) {
-									final IFile sourceFile = findSourceFile(file, featureProject.getBuildFolder());
-									if (sourceFile == null) {
-										AntennaCorePlugin.getDefault()
-												.logWarning("Source file for " + file + " not found for project " + featureProject.getProjectName());
-										continue;
-									}
-									if (!hasMarker(m, sourceFile)) {
-										final IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-										newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
-										newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
-										newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
-									}
+				@Override
+				public IStatus run(IProgressMonitor monitor) {
+					try {
+						final IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+						if (marker.length != 0) {
+							for (final IMarker m : marker) {
+								final IFile sourceFile = findSourceFile(file, featureProject.getBuildFolder());
+								if (sourceFile == null) {
+									AntennaCorePlugin.getDefault()
+											.logWarning("Source file for " + file + " not found for project " + featureProject.getProjectName());
+									continue;
 								}
-							}
-						} catch (final CoreException e) {
-							AntennaCorePlugin.getDefault().logError(e);
-						}
-						return Status.OK_STATUS;
-					}
-
-					private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
-						try {
-							final IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
-							final int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
-							final String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
-							if (marker.length > 0) {
-								for (final IMarker m : marker) {
-									if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
-										if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
-											return true;
-										}
-									}
-								}
-							}
-						} catch (final CoreException e) {
-							AntennaCorePlugin.getDefault().logError(e);
-						}
-						return false;
-					}
-
-					private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
-						for (final IResource res : folder.members()) {
-							if (res instanceof IFolder) {
-								final IFile sourceFile = findSourceFile(file, (IFolder) res);
-								if (sourceFile != null) {
-									return sourceFile;
-								}
-							} else if (res instanceof IFile) {
-								if (res.getName().equals(file.getName())) {
-									return (IFile) res;
+								if (!hasMarker(m, sourceFile)) {
+									final IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+									newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+									newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+									newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
 								}
 							}
 						}
-						return null;
+					} catch (final CoreException e) {
+						AntennaCorePlugin.getDefault().logError(e);
 					}
-				};
+					return Status.OK_STATUS;
+				}
+
+				private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
+					try {
+						final IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+						final int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+						final String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
+						if (marker.length > 0) {
+							for (final IMarker m : marker) {
+								if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+									if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+										return true;
+									}
+								}
+							}
+						}
+					} catch (final CoreException e) {
+						AntennaCorePlugin.getDefault().logError(e);
+					}
+					return false;
+				}
+
+				private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
+					for (final IResource res : folder.members()) {
+						if (res instanceof IFolder) {
+							final IFile sourceFile = findSourceFile(file, (IFolder) res);
+							if (sourceFile != null) {
+								return sourceFile;
+							}
+						} else if (res instanceof IFile) {
+							if (res.getName().equals(file.getName())) {
+								return (IFile) res;
+							}
+						}
+					}
+					return null;
+				}
+			};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
@@ -393,12 +392,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
 		if (containsPreprocessorDirective(line, "else")) {
 			if (!expressionStack.isEmpty()) {
-				Node[] nestedExpressions = new Node[expressionStack.size()];
-				nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-				final And nestedExpressionsAnd = new And(nestedExpressions);
-
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				checkContradictionOrTautology(lineNumber, res);
 			}
 
 			return;
@@ -428,7 +422,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 			expressionStack.push(ppExpression);
 
-			checkExpressions(ppExpression, lineNumber, res);
+			checkContradictionOrTautology(lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
 			if (!conditionIsSet) {

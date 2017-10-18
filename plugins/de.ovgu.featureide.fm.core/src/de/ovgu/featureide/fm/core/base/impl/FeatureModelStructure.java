@@ -192,7 +192,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getVisibleFeatures(showHiddenFeatures)) {
 			if (!f.equals(rootFeature.getFeature()) && (f.getStructure().getParent() != null) && f.getStructure().getParent().isAnd()
-					&& !f.getStructure().isMandatory()) {
+				&& !f.getStructure().isMandatory()) {
 				return true;
 			}
 		}

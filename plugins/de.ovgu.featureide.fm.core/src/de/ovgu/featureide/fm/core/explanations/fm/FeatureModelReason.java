@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.fm;
 
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
@@ -28,37 +29,25 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  *
  * @author Timo G&uuml;nther
  */
-public class FeatureModelReason extends Reason {
-
-	/** The trace of this reason. */
-	private final FeatureModelElementTrace trace;
+public class FeatureModelReason extends Reason<FeatureModelElementTrace> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param trace the trace of this reason; not null
+	 * @param subject the subject of this reason
 	 */
-	public FeatureModelReason(FeatureModelElementTrace trace) {
-		this.trace = trace;
+	public FeatureModelReason(FeatureModelElementTrace subject) {
+		this(subject, null);
 	}
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason reason to clone; not null
+	 * @param subject the subject of this reason
+	 * @param explanation the containing explanation
 	 */
-	protected FeatureModelReason(FeatureModelReason reason) {
-		super(reason);
-		trace = reason.trace;
-	}
-
-	/**
-	 * Returns the trace of this reason.
-	 *
-	 * @return the trace of this reason; not null
-	 */
-	public FeatureModelElementTrace getTrace() {
-		return trace;
+	protected FeatureModelReason(FeatureModelElementTrace subject, Explanation<?> explanation) {
+		super(subject, explanation);
 	}
 
 	@Override
@@ -75,36 +64,12 @@ public class FeatureModelReason extends Reason {
 
 	@Override
 	protected FeatureModelReason clone() {
-		return new FeatureModelReason(this);
+		return clone(getExplanation());
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((trace == null) ? 0 : trace.hashCode());
-		return result;
+	protected FeatureModelReason clone(Explanation<?> explanation) {
+		return new FeatureModelReason(getSubject(), explanation);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final FeatureModelReason other = (FeatureModelReason) obj;
-		if (trace == null) {
-			if (other.trace != null) {
-				return false;
-			}
-		} else if (!trace.equals(other.trace)) {
-			return false;
-		}
-		return true;
-	}
 }

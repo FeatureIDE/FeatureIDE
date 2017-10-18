@@ -77,7 +77,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		super("Hidden Dependencies of a Submodel");
 		setTitle("Hidden Dependencies of a Submodel");
 		setDescription("If the selected submodel contains hidden dependencies (implicit constraints), "
-				+ "they are presented below the feature model in a red border.");
+			+ "they are presented below the feature model in a red border.");
 		subtreeModel = fm;
 		completeFm = completeModel;
 		subTreeAnalyzer = FeatureModelManager.getAnalyzer(subtreeModel);

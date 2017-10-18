@@ -27,13 +27,12 @@ package de.ovgu.featureide.fm.core.job.monitor;
 abstract class ATaskMonitor extends AMonitor {
 
 	protected String name = null;
-	protected String taskName = null;
 
 	public ATaskMonitor() {
 		super();
 	}
 
-	public ATaskMonitor(AMonitor parent) {
+	protected ATaskMonitor(AMonitor parent) {
 		super(parent);
 	}
 
@@ -44,10 +43,7 @@ abstract class ATaskMonitor extends AMonitor {
 
 	@Override
 	public String getTaskName() {
-		if (taskName == null) {
-			taskName = constructTaskName();
-		}
-		return taskName;
+		return constructTaskName();
 	}
 
 	protected String constructTaskName() {

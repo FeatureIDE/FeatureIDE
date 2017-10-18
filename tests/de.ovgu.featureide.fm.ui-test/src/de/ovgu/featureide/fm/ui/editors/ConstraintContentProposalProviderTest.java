@@ -162,35 +162,35 @@ public class ConstraintContentProposalProviderTest {
 		features.add("FeatureB");
 		features.add("FeatureC");
 	}
-	// @Test
-	// public void getProposalsEmptyString(){
-	// String content = "|";
-	// String[] expectedProps = PROPS_FEATURES;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
-	// @Test
-	// public void getProposalsEmptyStringWithWhitespaces(){
-	// String content = " |";
-	// String[] expectedProps = PROPS_FEATURES;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
-	// @Test
-	// public void getProposalsCursorAfterFeature(){
-	// String content = "FeatureA |";
-	// String[] expectedProps = PROPS_OPERATORS;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsEmptyString(){
+//		String content = "|";
+//		String[] expectedProps = PROPS_FEATURES;
+//		testGetProposals(content,expectedProps );
+//
+//	}
+//	@Test
+//	public void getProposalsEmptyStringWithWhitespaces(){
+//		String content = "   |";
+//		String[] expectedProps = PROPS_FEATURES;
+//		testGetProposals(content,expectedProps );
+//
+//	}
+//	@Test
+//	public void getProposalsCursorAfterFeature(){
+//		String content = "FeatureA |";
+//		String[] expectedProps = PROPS_OPERATORS;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 
-	// @Test
-	// public void getProposalsCursorAfterFeature2(){
-	// String content = "FeatureA | ";
-	// String[] expectedProps = PROPS_OPERATORS;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsCursorAfterFeature2(){
+//		String content = "FeatureA  | ";
+//		String[] expectedProps = PROPS_OPERATORS;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 	@Test
 	public void getProposalsCursorAfterFeature3() {
 		final String content = "FeatureA and FeatureB|";
@@ -198,36 +198,36 @@ public class ConstraintContentProposalProviderTest {
 		testGetProposals(content, expectedProps);
 
 	}
-	// @Test
-	// public void getProposalsCursorAfterFeature4(){
-	// String content = "FeatureA and FeatureB |";
-	// String[] expectedProps = PROPS_OPERATORS;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
-	//
-	// @Test
-	// public void getProposalsCursorAfterFeatureWithParantheses(){
-	// String content = "(FeatureA and FeatureB) | ";
-	// String[] expectedProps = PROPS_OPERATORS;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsCursorAfterFeature4(){
+//		String content = "FeatureA and FeatureB |";
+//		String[] expectedProps = PROPS_OPERATORS;
+//		testGetProposals(content,expectedProps );
+//
+//	}
+//
+//	@Test
+//	public void getProposalsCursorAfterFeatureWithParantheses(){
+//		String content = "(FeatureA and FeatureB) |  ";
+//		String[] expectedProps = PROPS_OPERATORS;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 
-	// @Test
-	// public void getProposalsCursorAfterFeatureWithParantheses2(){
-	// String content = "(FeatureA and FeatureB)| ";
-	// String[] expectedProps = PROPS_NONE;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
-	// @Test
-	// public void getProposalsCursorAfterFeatureWithParantheses3(){
-	// String content = "(FeatureA and FeatureB )| ";
-	// String[] expectedProps = PROPS_NONE;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsCursorAfterFeatureWithParantheses2(){
+//		String content = "(FeatureA and FeatureB)|  ";
+//		String[] expectedProps = PROPS_NONE;
+//		testGetProposals(content,expectedProps );
+//
+//	}
+//	@Test
+//	public void getProposalsCursorAfterFeatureWithParantheses3(){
+//		String content = "(FeatureA and FeatureB )|  ";
+//		String[] expectedProps = PROPS_NONE;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 	@Test
 	public void getProposalsCursorAfterAnd() {
 		final String content = "FeatureA and| ";
@@ -236,13 +236,13 @@ public class ConstraintContentProposalProviderTest {
 
 	}
 
-	// @Test
-	// public void getProposalsCursorAfterAnd2(){
-	// String content = "FeatureA and |";
-	// String[] expectedProps = PROPS_FEATURES;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsCursorAfterAnd2(){
+//		String content = "FeatureA and |";
+//		String[] expectedProps = PROPS_FEATURES;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 
 	@Test
 	public void getProposalsPrefixOfFeature() {
@@ -292,47 +292,47 @@ public class ConstraintContentProposalProviderTest {
 
 	}
 
-	// @Test
-	// public void getProposalsLastWordStartsWithParantheses(){
-	// String content = "(FeatureA iff FeatureB) and (FeatureA |";
-	// String[] expectedProps = PROPS_OPERATORS;
-	// testGetProposals(content,expectedProps );
-	//
-	// }
+//	@Test
+//	public void getProposalsLastWordStartsWithParantheses(){
+//		String content = "(FeatureA iff FeatureB) and (FeatureA |";
+//		String[] expectedProps = PROPS_OPERATORS;
+//		testGetProposals(content,expectedProps );
+//
+//	}
 
-	// @Test
-	// public void getProposalsOperatorNameAnd(){
-	// features.add("And");
-	// String content = "\"|";
-	// String[] expectedProps = {"\"And\""};
-	// testGetProposals(content,expectedProps);
-	// }
+//	@Test
+//	public void getProposalsOperatorNameAnd(){
+//		features.add("And");
+//		String content = "\"|";
+//		String[] expectedProps = {"\"And\""};
+//		testGetProposals(content,expectedProps);
+//	}
 
-	// @Test
-	// public void getProposalsOperatorNameOr(){
-	// features.add("Or");
-	// String content = "\"|";
-	// String[] expectedProps = {"\"Or\""};
-	// testGetProposals(content,expectedProps);
-	// }
+//	@Test
+//	public void getProposalsOperatorNameOr(){
+//		features.add("Or");
+//		String content = "\"|";
+//		String[] expectedProps = {"\"Or\""};
+//		testGetProposals(content,expectedProps);
+//	}
 
-	// @Test
-	// public void getProposalsOperatorNameNot(){
-	// features.add("Not");
-	// String content = "\"|";
-	// String[] expectedProps = {"\"Not\""};
-	// testGetProposals(content,expectedProps);
-	// }
+//	@Test
+//	public void getProposalsOperatorNameNot(){
+//		features.add("Not");
+//		String content = "\"|";
+//		String[] expectedProps = {"\"Not\""};
+//		testGetProposals(content,expectedProps);
+//	}
 
-	// @Test
-	// public void getProposalsWhiteSpace(){
-	// features.clear();
-	// features.add("Feature A");
-	// features.add("Feature B");
-	// String content = "\"|";
-	// String[] expectedProps = {"\"Feature A\"","\"Feature B\""};
-	// testGetProposals(content,expectedProps);
-	// }
+//	@Test
+//	public void getProposalsWhiteSpace(){
+//		features.clear();
+//		features.add("Feature A");
+//		features.add("Feature B");
+//		String content = "\"|";
+//		String[] expectedProps = {"\"Feature A\"","\"Feature B\""};
+//		testGetProposals(content,expectedProps);
+//	}
 
 	private void testGetProposals(String content, String[] expectedProps) {
 		final Set<String> expectedPropsSet = new HashSet<String>();

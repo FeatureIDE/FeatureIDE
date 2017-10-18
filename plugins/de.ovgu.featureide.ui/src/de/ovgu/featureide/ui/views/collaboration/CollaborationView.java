@@ -171,12 +171,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String REFRESH_TOOL_TIP_LABEL = BUILD_COLLABORATIONMODEL;
 
 	private static final String[] FIELD_METHOD_LABEL_NAMES =
-			{ FIELDS_WITH_REFINEMENTS, FIELDS_WITHOUT_REFINEMENTS, METHODS_WITH_REFINEMENTS, METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS,
-					SHOW_CLASS_INVARIANTS, SHOW_NESTED_CLASSES, HIDE_PARAMETER_TYPES, PUBLIC, PROTECTED, DEFAULT, PRIVATE, SELECT_ALL, DESELECT_ALL };
+		{ FIELDS_WITH_REFINEMENTS, FIELDS_WITHOUT_REFINEMENTS, METHODS_WITH_REFINEMENTS, METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS,
+			SHOW_CLASS_INVARIANTS, SHOW_NESTED_CLASSES, HIDE_PARAMETER_TYPES, PUBLIC, PROTECTED, DEFAULT, PRIVATE, SELECT_ALL, DESELECT_ALL };
 
 	private static final Image[] FIELD_METHOD_IMAGES = { IMAGE_FIELDS_REFINEMENTS, IMAGE_FIELDS_WITHOUT_REFINEMENTS, IMAGE_METHODS_REFINEMENTS,
-			IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT_CONTRACT, IMAGE_AT_INVARIANT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
-			IMAGE_METHODE_DEFAULT, IMAGE_METHODE_PRIVATE, IMAGE_SELECT_ALL, IMAGE_DESELECT_ALL };
+		IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT_CONTRACT, IMAGE_AT_INVARIANT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
+		IMAGE_METHODE_DEFAULT, IMAGE_METHODE_PRIVATE, IMAGE_SELECT_ALL, IMAGE_DESELECT_ALL };
 
 	private GraphicalViewerImpl viewer;
 
@@ -416,8 +416,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				final ActionContributionItem contributionItem = new ActionContributionItem(selectAll);
 				contributionItem.fill(fMenu, -1);
 
-				final ShowFieldsMethodsAction deselectAll = new ShowFieldsMethodsAction(DESELECT_ALL, IMAGE_MODIFIERS_NONE, CollaborationView.this,
-						ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS);
+				final ShowFieldsMethodsAction deselectAll =
+					new ShowFieldsMethodsAction(DESELECT_ALL, IMAGE_MODIFIERS_NONE, CollaborationView.this, ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS);
 				final ActionContributionItem deselectAllConteribution = new ActionContributionItem(deselectAll);
 				deselectAllConteribution.fill(fMenu, -1);
 
@@ -507,7 +507,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile = null;
 					if ((builder.configuration != null) && builder.configuration.equals(inputFile)
-							&& featureProject.equals(CollaborationModelBuilder.project)) {
+						&& featureProject.equals(CollaborationModelBuilder.project)) {
 						return;
 					} else {
 						builder.configuration = inputFile;
@@ -515,7 +515,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				} else {
 					// case: open editor is no configuration editor
 					if ((CollaborationModelBuilder.editorFile != null) && CollaborationModelBuilder.editorFile.getName().equals(inputFile.getName())
-							&& featureProject.getProject().equals(CollaborationModelBuilder.editorFile.getProject())) {
+						&& featureProject.getProject().equals(CollaborationModelBuilder.editorFile.getProject())) {
 						return;
 					}
 					CollaborationModelBuilder.editorFile = inputFile;
@@ -603,7 +603,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				setFieldsMethodsActions[i].setChecked(false);
 
 				if ((i == ShowFieldsMethodsAction.SHOW_NESTED_CLASSES) || (i == ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES)
-						|| (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)) {
+					|| (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)) {
 					methodsFieldsSubMenu.add(new Separator());
 				}
 			}
@@ -656,7 +656,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private boolean deselectAll() {
 		final boolean[] selectedModifiers = RoleFigure.getRoleSelections();
 		if ((selectedModifiers[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS])
-				&& (selectedModifiers[ShowFieldsMethodsAction.PROTECTED_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.DEFAULT_FIELDSMETHODS])) {
+			&& (selectedModifiers[ShowFieldsMethodsAction.PROTECTED_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.DEFAULT_FIELDSMETHODS])) {
 			return true;
 		}
 		return false;

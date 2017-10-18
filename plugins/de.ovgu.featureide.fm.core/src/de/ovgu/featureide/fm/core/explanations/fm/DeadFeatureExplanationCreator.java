@@ -27,25 +27,4 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  *
  * @author Timo G&uuml;nther
  */
-public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator {
-
-	/**
-	 * Returns the dead feature in the feature model.
-	 *
-	 * @return the dead feature in the feature model
-	 */
-	public IFeature getDeadFeature();
-
-	/**
-	 * Sets the dead feature in the feature model.
-	 *
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public void setDeadFeature(IFeature deadFeature);
-
-	/**
-	 * Returns an explanation why the specified feature of the specified feature model is dead. A dead root feature also means a void feature model.
-	 */
-	@Override
-	public DeadFeatureExplanation getExplanation() throws IllegalStateException;
-}
+public interface DeadFeatureExplanationCreator extends FeatureModelExplanationCreator<IFeature, DeadFeatureExplanation> {}

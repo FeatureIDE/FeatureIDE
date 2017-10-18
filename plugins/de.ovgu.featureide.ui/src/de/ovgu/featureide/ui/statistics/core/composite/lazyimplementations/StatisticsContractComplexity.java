@@ -71,7 +71,7 @@ public class StatisticsContractComplexity extends LazyParent {
 
 				final String packageName = (class_.getRoles().size() == 0) ? null : class_.getRoles().get(0).getClassFragment().getPackage();
 				final String fullClassName = ((packageName == null) ? "(default package)" : packageName) + "."
-						+ ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
+					+ ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
 
 				for (final FSTRole role : class_.getRoles()) {
 					for (@SuppressWarnings("unused")
@@ -108,10 +108,8 @@ public class StatisticsContractComplexity extends LazyParent {
 			}
 
 			final HashMapNode methodsNode =
-					new HashMapNode(
-							NUMBER_METHOD_METHOD_CONTRACT + SEPARATOR + classMethodMap.keySet().size() + "/" + classMethodCountMap.keySet().size() + " ("
-									+ Math.round(100 * (classMethodMap.keySet().size() / (double) classMethodCountMap.keySet().size())) + "%)",
-							null, classMethodMap);
+				new HashMapNode(NUMBER_METHOD_METHOD_CONTRACT + SEPARATOR + classMethodMap.keySet().size() + "/" + classMethodCountMap.keySet().size() + " ("
+					+ Math.round(100 * (classMethodMap.keySet().size() / (double) classMethodCountMap.keySet().size())) + "%)", null, classMethodMap);
 			methodsNode.initChildren();
 			for (final Parent p : methodsNode.getChildren()) {
 				final LinkedList<String> featureChildList = new LinkedList<String>();
@@ -120,7 +118,7 @@ public class StatisticsContractComplexity extends LazyParent {
 
 					final String packageName = (class_.getRoles().size() == 0) ? null : class_.getRoles().get(0).getClassFragment().getPackage();
 					final String fullClassName = ((packageName == null) ? "(default package)" : packageName) + "."
-							+ ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
+						+ ((class_.getName().endsWith(".java")) ? class_.getName().substring(0, class_.getName().length() - 5) : class_.getName());
 
 					for (final FSTRole role : class_.getRoles()) {
 
@@ -145,11 +143,11 @@ public class StatisticsContractComplexity extends LazyParent {
 
 			addChild(new HashMapNode(
 					NUMBER_PROJECT_INVARIANT + SEPARATOR + numInvariantsInProject + " | " + NUMBER_CLASS_INVARIANT + SEPARATOR + numClassesWithInvariants + "/"
-							+ fstModel.getClasses().size() + " (" + Math.round(100 * (numClassesWithInvariants / (double) fstModel.getClasses().size())) + "%)",
+						+ fstModel.getClasses().size() + " (" + Math.round(100 * (numClassesWithInvariants / (double) fstModel.getClasses().size())) + "%)",
 					null, classInvariantsMap));
 			addChild(new HashMapNode(
 					NUMBER_PROJECT_METHOD_CONTRACT + SEPARATOR + numInProject + " | " + NUMBER_CLASS_METHOD_CONTRACT + SEPARATOR + numClassesWithContract + "/"
-							+ fstModel.getClasses().size() + " (" + Math.round(100 * (numClassesWithContract / (double) fstModel.getClasses().size())) + "%)",
+						+ fstModel.getClasses().size() + " (" + Math.round(100 * (numClassesWithContract / (double) fstModel.getClasses().size())) + "%)",
 					null, classMethodContractMap));
 
 			addChild(methodsNode);
@@ -165,7 +163,7 @@ public class StatisticsContractComplexity extends LazyParent {
 				for (final String refinement : contractRefinementMap.keySet()) {
 					contractRefinementRealNameMap.put(PROJECT_BASED__ + contractComposition,
 							contractRefinementMap.get(refinement) + (contractRefinementRealNameMap.containsKey(PROJECT_BASED__ + contractComposition)
-									? contractRefinementRealNameMap.get(PROJECT_BASED__ + contractComposition) : 0));
+								? contractRefinementRealNameMap.get(PROJECT_BASED__ + contractComposition) : 0));
 				}
 			}
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));

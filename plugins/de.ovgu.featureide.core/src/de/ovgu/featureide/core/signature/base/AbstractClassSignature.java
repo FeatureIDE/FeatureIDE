@@ -74,49 +74,4 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		hasHashCode = false;
 	}
 
-	// @Override
-	// protected void computeHashCode() {
-	// hashCode = 1;
-	// hashCode = hashCodePrime * hashCode + fullName.hashCode();
-	// hashCode = hashCodePrime * hashCode + Arrays.hashCode(modifiers);
-	// hashCode = hashCodePrime * hashCode + type.hashCode();
-	//
-	// hashCode *= hashCodePrime;
-	// for (String extend : extendList) {
-	// hashCode += extend.hashCode();
-	// }
-	// hashCode *= hashCodePrime;
-	// for (String implement : implementList) {
-	// hashCode += implement.hashCode();
-	// }
-	// }
-
-	// @Override
-	// public boolean equals(Object obj) {
-	// if (this == obj)
-	// return true;
-	// if (obj == null || getClass() != obj.getClass())
-	// return false;
-	//
-	// AbstractClassSignature otherSig = (AbstractClassSignature) obj;
-	//
-	// if (!super.sigEquals(otherSig))
-	// return false;
-	// if (extendList.size() != otherSig.extendList.size()
-	// || implementList.size() != otherSig.implementList.size()) {
-	// return false;
-	// }
-	//
-	// for (String thisExtend : extendList) {
-	// if (!otherSig.extendList.contains(thisExtend)) {
-	// return false;
-	// }
-	// }
-	// for (String thisImplement : implementList) {
-	// if (!otherSig.implementList.contains(thisImplement)) {
-	// return false;
-	// }
-	// }
-	// return true;
-	// }
 }

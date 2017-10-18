@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/default.config
+configs/default.xml
 features/Elevator/de/ovgu/featureide/examples/elevator/core/controller/ControlUnit.java
 features/Elevator/de/ovgu/featureide/examples/elevator/core/controller/ITickListener.java
 features/Elevator/de/ovgu/featureide/examples/elevator/core/model/Elevator.java

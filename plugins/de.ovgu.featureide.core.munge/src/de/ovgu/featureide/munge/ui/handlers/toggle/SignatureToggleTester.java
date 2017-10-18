@@ -38,6 +38,7 @@ public class SignatureToggleTester extends PropertyTester {
 
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+		// Cast is necessary, don't remove
 		final State state = PlatformUI.getWorkbench().getService(ICommandService.class).getCommand((String) args[0]).getState(RegistryToggleState.STATE_ID);
 		final IProject curProject = SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
 		if (curProject != null) {

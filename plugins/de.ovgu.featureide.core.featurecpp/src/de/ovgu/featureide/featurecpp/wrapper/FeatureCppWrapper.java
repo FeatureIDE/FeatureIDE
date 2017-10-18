@@ -240,7 +240,7 @@ public class FeatureCppWrapper {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					final MessageBox d = new MessageBox(new Shell(), SWT.ICON_ERROR);
 					d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n" + SEE
-							+ (LINUX.equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" + "\t" + featureCppExecutableName);
+						+ (LINUX.equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" + "\t" + featureCppExecutableName);
 					d.setText("FeatureC++ can not be executed.");
 					d.open();
 					return Status.OK_STATUS;

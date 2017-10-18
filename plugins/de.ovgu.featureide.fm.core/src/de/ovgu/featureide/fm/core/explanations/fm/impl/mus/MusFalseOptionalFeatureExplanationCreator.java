@@ -20,13 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 
@@ -35,10 +34,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  *
  * @author Timo G&uuml;nther
  */
-public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
-
-	/** The false-optional feature in the feature model. */
-	private IFeature falseOptionalFeature;
+public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation>
+		implements FalseOptionalFeatureExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -50,31 +47,10 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param fm the feature model context
+	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-
-	/**
-	 * Constructs a new instance of this class.
-	 *
-	 * @param fm the feature model context
-	 * @param falseOptionalFeature the false-optional feature in the feature model
-	 */
-	public MusFalseOptionalFeatureExplanationCreator(IFeatureModel fm, IFeature falseOptionalFeature) {
-		super(fm);
-		setFalseOptionalFeature(falseOptionalFeature);
-	}
-
-	@Override
-	public IFeature getFalseOptionalFeature() {
-		return falseOptionalFeature;
-	}
-
-	@Override
-	public void setFalseOptionalFeature(IFeature falseOptionalFeature) {
-		this.falseOptionalFeature = falseOptionalFeature;
+	public MusFalseOptionalFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	@Override
@@ -83,9 +59,9 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		final FalseOptionalFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getFalseOptionalFeature().getName(), false);
-			oracle.addAssumption(FeatureUtils.getParent(getFalseOptionalFeature()).getName(), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			oracle.addAssumption(NodeCreator.getVariable(getSubject()), false);
+			oracle.addAssumption(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
@@ -93,12 +69,7 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 	}
 
 	@Override
-	protected FalseOptionalFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (FalseOptionalFeatureExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
 	protected FalseOptionalFeatureExplanation getConcreteExplanation() {
-		return new FalseOptionalFeatureExplanation(getFalseOptionalFeature());
+		return new FalseOptionalFeatureExplanation(getSubject());
 	}
 }

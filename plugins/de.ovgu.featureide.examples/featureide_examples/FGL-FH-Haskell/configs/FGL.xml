@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="FGL"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="undefined" manual="selected" name="DynamicGraph"/>
+		<feature automatic="undefined" manual="selected" name="StaticMonadGraph"/>
+		<feature automatic="undefined" manual="selected" name="StaticMonadGraph_UnlabeledEdges"/>
+		<feature automatic="undefined" manual="selected" name="StaticMonadGraph_UnlabeledNodes"/>
+		<feature automatic="undefined" manual="selected" name="UnlabeledEdges"/>
+		<feature automatic="undefined" manual="selected" name="UnlabeledNodes"/>
+		<feature automatic="undefined" manual="selected" name="GraphViz"/>
+		<feature automatic="undefined" manual="selected" name="ArticulationPoint"/>
+		<feature automatic="undefined" manual="selected" name="BCC"/>
+		<feature automatic="undefined" manual="selected" name="BFS"/>
+		<feature automatic="undefined" manual="selected" name="DFS"/>
+		<feature automatic="undefined" manual="selected" name="Dominators"/>
+		<feature automatic="undefined" manual="selected" name="IndependentComponents"/>
+		<feature automatic="undefined" manual="selected" name="MaxFlow"/>
+		<feature automatic="undefined" manual="selected" name="MaxFlow2"/>
+		<feature automatic="undefined" manual="selected" name="MST"/>
+		<feature automatic="undefined" manual="selected" name="ShortestPath"/>
+		<feature automatic="undefined" manual="selected" name="TransitiveClosure"/>
+		<feature automatic="undefined" manual="selected" name="Voronoi"/>
+	</configuration>

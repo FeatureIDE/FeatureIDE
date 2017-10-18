@@ -14,18 +14,21 @@ public class Vertex {
     /*@ requires \original; @*/
 	/*@ ensures \original; @*/
 	/*@ ensures weightsList!=null; @*/
+    /*@assignable weightsList; @*/
     public void VertexConstructor() {
         original();
         weightsList = new LinkedList();
     }
         
     /*@ ensures weightsList.getLast().intValue()==weight;@*/
+    /*@ assignable weightsList; @*/
     public void addWeight( int weight )
     {
         weightsList.add( new Integer( weight ) );
     }
     /*@requires \original && the_vertex != null;@*/
     /*@ensures \original && weightsList.getLast() == the_vertex.weightsList.get(index).intValue();@*/
+    /*@assignable weightsList; @*/
     public void adjustAdorns( Vertex the_vertex, int index )
     {
         int the_weight = ( ( Integer )the_vertex.weightsList.get( index ) ).intValue();

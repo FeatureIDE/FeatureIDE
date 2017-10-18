@@ -186,7 +186,7 @@ public abstract class MungeSignatureBuilder {
 					final VariableDeclarationFragment fragment = (VariableDeclarationFragment) it.next();
 
 					final MungeFieldSignature fieldSignature =
-							new MungeFieldSignature(getParent(node.getParent()), fragment.getName().getIdentifier(), node.getModifiers(), node.getType());
+						new MungeFieldSignature(getParent(node.getParent()), fragment.getName().getIdentifier(), node.getModifiers(), node.getType());
 
 					attachFeatureData(fieldSignature, node);
 				}

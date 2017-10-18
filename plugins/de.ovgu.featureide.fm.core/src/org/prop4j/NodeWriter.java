@@ -274,7 +274,7 @@ public class NodeWriter {
 				final int orderParent;
 				final int orderChild;
 				return (isEnforceBrackets() || ((orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass())))
-						|| ((orderParent == orderChild) && (orderParent == getOrder(Implies.class)))) ? "(" + s + ")" : s;
+					|| ((orderParent == orderChild) && (orderParent == getOrder(Implies.class)))) ? "(" + s + ")" : s;
 			} else {
 				return String.format("%s(%s)", operator + (((node instanceof Not) && (getSymbols() == textualSymbols)) ? " " : ""),
 						join(getSymbols()[5], operands));

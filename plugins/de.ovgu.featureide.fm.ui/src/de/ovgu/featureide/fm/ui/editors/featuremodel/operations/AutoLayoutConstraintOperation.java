@@ -69,7 +69,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 
 			// Get root because the constraints will be auto layouted depending on the root
 			final IGraphicalFeature root =
-					graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+				graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			minX = root.getLocation().x;
 			maxX = root.getLocation().x + root.getSize().width;
 			// +20 because of the collapsed decorator

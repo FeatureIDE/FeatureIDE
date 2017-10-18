@@ -89,27 +89,22 @@ import de.ovgu.featureide.munge.MungeCorePlugin;
  * source have their code contained within that comment. The format of the tags is a little verbose, so that the tags won't accidentally be used by other
  * comment readers such as javadoc. Munge tags <b>must</b> be in C-style comments; C++-style comments may be used to comment code within a comment.
  *
- * <p> To demonstrate this, our sample source has 1.1 and 1.2-specific code, with 1.1 as the default build:
- *
- * <pre> <code> public void setSystemProperty(String key, String value) { &#47;*if[JDK1.1]*&#47; Properties props = System.getProperties();
- * props.setProperty(key, value); System.setProperties(props); &#47;*end[JDK1.1]*&#47; <p> &#47;*if[JDK1.2] // Use the new System method.
- * System.setProperty(key, value); end[JDK1.2]*&#47; } </code> </pre> <p> When the above code is directly compiled, the code bracketed by the JDK1.1 tags will
- * be used. If the file is run through Munge with the JDK1.2 tag defined, the second code block will used instead. This code can also be written as:
- *
- * <pre> <code> public void setSystemProperty(String key, String value) { &#47;*if[JDK1.2] // Use the new System method. System.setProperty(key, value);
- * else[JDK1.2]*&#47; <p> Properties props = System.getProperties(); props.setProperty(key, value); System.setProperties(props); &#47;*end[JDK1.2]*&#47; }
- * </code> </pre>
+ * <p> To demonstrate this, our sample source has 1.1 and 1.2-specific code, with 1.1 as the default build: <pre><code> public void setSystemProperty(String
+ * key, String value) { &#47;*if[JDK1.1]*&#47; Properties props = System.getProperties(); props.setProperty(key, value); System.setProperties(props);
+ * &#47;*end[JDK1.1]*&#47; <p> &#47;*if[JDK1.2] // Use the new System method. System.setProperty(key, value); end[JDK1.2]*&#47; } </code></pre> <p> When the
+ * above code is directly compiled, the code bracketed by the JDK1.1 tags will be used. If the file is run through Munge with the JDK1.2 tag defined, the second
+ * code block will used instead. This code can also be written as: <pre><code> public void setSystemProperty(String key, String value) { &#47;*if[JDK1.2] // Use
+ * the new System method. System.setProperty(key, value); else[JDK1.2]*&#47; <p> Properties props = System.getProperties(); props.setProperty(key, value);
+ * System.setProperties(props); &#47;*end[JDK1.2]*&#47; } </code></pre>
  *
  * Munge also performs text substitution; the Swing build uses this to convert its package references from <code>javax.swing</code> to
  * <code>java.awt.swing</code>, for example. This substitution is has no knowledge of Java syntax, so only use it to convert strings which are unambiguous.
  * Substitutions are made in the same order as the arguments are specified, so the first substitution is made over the whole file before the second one, and so
- * on. <p> Munge's command line takes one of the following forms:
- *
- * <pre> <code> java Munge [-D&lt;symbol&gt; ...] [-s &lt;old&gt;=&lt;new&gt; ...] [&lt;in file&gt;] [&lt;out file&gt;] java Munge [-D&lt;symbol&gt; ...] [-s
- * &lt;old&gt;=&lt;new&gt; ...] &lt;file&gt; ... &lt;directory&gt; </code> </pre> <p> In the first form, if no output file is given, System.out is used. If
- * neither input nor output file are given, System.in and System.out are used. Munge can also take an <code>@&lt;cmdfile&gt;</code> argument. If one is
- * specified then the given file is read for additional command line arguments. <p> Like any preprocessor, developers must be careful not to abuse its
- * capabilities so that their code becomes unreadable. Please use it as little as possible.
+ * on. <p> Munge's command line takes one of the following forms: <pre><code> java Munge [-D&lt;symbol&gt; ...] [-s &lt;old&gt;=&lt;new&gt; ...] [&lt;in
+ * file&gt;] [&lt;out file&gt;] java Munge [-D&lt;symbol&gt; ...] [-s &lt;old&gt;=&lt;new&gt; ...] &lt;file&gt; ... &lt;directory&gt; </code></pre> <p> In the
+ * first form, if no output file is given, System.out is used. If neither input nor output file are given, System.in and System.out are used. Munge can also
+ * take an <code>@&lt;cmdfile&gt;</code> argument. If one is specified then the given file is read for additional command line arguments. <p> Like any
+ * preprocessor, developers must be careful not to abuse its capabilities so that their code becomes unreadable. Please use it as little as possible.
  *
  * @author: Thomas Ball
  * @author: Joerg Liebig (Nesting)
@@ -140,8 +135,8 @@ public class Munge {
 	static final int numCommands = 4;
 
 	static final int EOF = 0;
-	static final int COMMENT = 1; // text surrounded by /* */ delimiters
-	static final int CODE = 2; // can just be whitespace
+	static final int COMMENT = 1;     // text surrounded by /* */ delimiters
+	static final int CODE = 2;        // can just be whitespace
 
 	private IFeatureProject featureProject;
 
@@ -343,7 +338,7 @@ public class Munge {
 
 						// flush text, as command may change printing state
 						print(buffer.toString());
-						buffer.setLength(0); // reset buffer
+						buffer.setLength(0);  // reset buffer
 
 						switch (cmd) {
 						case IF:
@@ -392,7 +387,7 @@ public class Munge {
 				block = source;
 				return CODE;
 			}
-			i += 2; // include comment close
+			i += 2;  // include comment close
 			block = source.substring(0, i);
 			source = source.substring(i);
 			return COMMENT;
@@ -461,7 +456,7 @@ public class Munge {
 	 */
 	public static void usage() {
 		MungeCorePlugin.getDefault().logWarning("usage:" + "\n    java Munge [-D<symbol> ...] " + "[-s <old>=<new> ...] " + "[<in file>] [<out file>]"
-				+ "\n    java Munge [-D<symbol> ...] " + "[-s <old>=<new> ...] " + "<file> ... <directory>");
+			+ "\n    java Munge [-D<symbol> ...] " + "[-s <old>=<new> ...] " + "<file> ... <directory>");
 		// System.exit(1);
 	}
 

@@ -67,7 +67,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	public static final Image REFESH_TAB_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
 
 	private static final QualifiedName ACTIVATOR_KEY =
-			new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
+		new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
 
 	private static final String ACTIVATOR_ACTION_TEXT = DISABLE_AUTOMATIC_CALCULATIONS;
 	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;

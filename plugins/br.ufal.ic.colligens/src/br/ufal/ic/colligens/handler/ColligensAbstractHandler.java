@@ -41,11 +41,11 @@ public abstract class ColligensAbstractHandler extends AbstractHandler {
 			if (selection instanceof TextSelection) {
 				ColligensAbstractHandler.selection = selection;
 				final FileEditorInput fileEditorInput =
-						(FileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
+					(FileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
 
 				enabled = ((fileEditorInput != null)
-						&& (fileEditorInput.getFile().getFileExtension().equals("h") || fileEditorInput.getFile().getFileExtension().equals("c"))
-						&& fileEditorInput.getFile().getProject().hasNature("de.ovgu.featureide.core.featureProjectNature"));
+					&& (fileEditorInput.getFile().getFileExtension().equals("h") || fileEditorInput.getFile().getFileExtension().equals("c"))
+					&& fileEditorInput.getFile().getProject().hasNature("de.ovgu.featureide.core.featureProjectNature"));
 
 				return enabled;
 

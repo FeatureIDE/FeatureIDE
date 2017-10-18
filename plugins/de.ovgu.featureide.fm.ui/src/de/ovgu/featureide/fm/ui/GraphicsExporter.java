@@ -49,7 +49,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
@@ -67,7 +70,7 @@ public class GraphicsExporter {
 		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
 		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
-				"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
+			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		final String filePath = fileDialog.open();
@@ -75,8 +78,12 @@ public class GraphicsExporter {
 			return false;
 		}
 
-		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
-			return FeatureModelManager.save(featureModel, Paths.get(filePath));
+		if (filePath.endsWith(".m")) {
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
+		} else if (filePath.endsWith(".xml")) {
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
+		} else if (filePath.endsWith(".velvet")) {
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
 		} else {
 			final File file = new File(filePath);
 			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
@@ -127,7 +134,7 @@ public class GraphicsExporter {
 			if ((bundleExport != null) && (bundleExportSVG != null)) {
 				try {
 					final org.osgi.framework.BundleActivator act =
-							((org.osgi.framework.BundleActivator) bundleExport.loadClass(NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
+						((org.osgi.framework.BundleActivator) bundleExport.loadClass(NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
 					final Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
@@ -153,8 +160,8 @@ public class GraphicsExporter {
 				}
 			} else {
 				final String infoMessage = ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_
-						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
+					+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
+					+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
 
 				final MessageDialog dialog = new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
 						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);

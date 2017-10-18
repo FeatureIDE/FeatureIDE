@@ -48,7 +48,7 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			description = description.trim();
 		}
 		final ChangeFeatureDescriptionDialog dialog =
-				new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_ + feature.getName() + "'", description);
+			new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_ + feature.getName() + "'", description);
 		dialog.open();
 		final String descriptemp = dialog.getValue();
 

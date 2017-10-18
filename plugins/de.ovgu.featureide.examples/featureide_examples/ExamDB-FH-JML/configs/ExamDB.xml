@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="ExamDB"/>
+		<feature automatic="undefined" manual="selected" name="BonusPoints"/>
+		<feature automatic="undefined" manual="selected" name="BackOut"/>
+		<feature automatic="undefined" manual="selected" name="Statistics"/>
+	</configuration>

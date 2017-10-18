@@ -239,8 +239,8 @@ public final class TypeChefFrontend {
 				}
 				if (opt.writeInterface) {
 					stopWatch.start("interfaces");
-					final CInterface cinterface = ts.getInferredInterface(ts.getInferredInterface$default$1(), ts.getInferredInterface$default$2())
-							.and(opt.getFilePresenceCondition());
+					final CInterface cinterface =
+						ts.getInferredInterface(ts.getInferredInterface$default$1(), ts.getInferredInterface$default$2()).and(opt.getFilePresenceCondition());
 					stopWatch.start("writeInterfaces");
 					ts.writeInterface(cinterface, new File(opt.getInterfaceFilename()));
 					if (opt.writeDebugInterface) {

@@ -68,7 +68,7 @@ public class Experiment_SPLOTmodels {
 
 		// Count feature model solutions
 		// System.out.println("Feature model has "
-		// + reasoner.countValidConfigurations()
+//				+ reasoner.countValidConfigurations()
 		// + " possible configurations");
 
 		// Important:

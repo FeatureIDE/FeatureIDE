@@ -317,7 +317,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				clausesWithoutHidden = formula.getElement(new NoAbstractNoHiddenCNFCreator());
 			}
 			final OneWiseConfigurationGenerator oneWiseConfigurationGenerator =
-					new OneWiseConfigurationGenerator(getSolverForCurrentConfiguration(false, false));
+				new OneWiseConfigurationGenerator(getSolverForCurrentConfiguration(false, false));
 			oneWiseConfigurationGenerator.setCoverMode(selection ? 1 : 0);
 			final int[] featureArray = new int[features.size()];
 			int index = 0;
@@ -351,7 +351,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 		public UpdateMethod(boolean redundantManual, List<SelectableFeature> featureOrder) {
 			this.redundantManual = redundantManual;
-			this.featureOrder = featureOrder != null ? featureOrder : Collections.<SelectableFeature>emptyList();
+			this.featureOrder = featureOrder != null ? featureOrder : Collections.<SelectableFeature> emptyList();
 		}
 
 		@Override
@@ -508,8 +508,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 		for (final SelectableFeature feature : configuration.features) {
 			if ((deselectUndefinedFeatures || (feature.getSelection() != Selection.UNDEFINED))
-					&& (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())
-					&& (includeHiddenFeatures || !feature.getFeature().getStructure().hasHiddenParent())) {
+				&& (includeAbstractFeatures || feature.getFeature().getStructure().isConcrete())
+				&& (includeHiddenFeatures || !feature.getFeature().getStructure().hasHiddenParent())) {
 				solver.assignmentPush(
 						solver.getSatInstance().getVariables().getVariable(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}

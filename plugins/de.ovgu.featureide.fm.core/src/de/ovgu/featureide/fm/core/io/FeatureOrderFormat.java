@@ -93,4 +93,9 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "FeatureIDE";
+	}
+
 }

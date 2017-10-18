@@ -52,7 +52,7 @@ public class FOPFeatureData extends AFeatureData {
 	}
 
 	public List<String> getUsedNonPrimitveTypes() {
-		return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : Collections.<String>emptyList();
+		return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : Collections.<String> emptyList();
 	}
 
 	public void setUsesExternMethods(boolean usesExternMethods) {
@@ -64,7 +64,7 @@ public class FOPFeatureData extends AFeatureData {
 	}
 
 	public List<AbstractSignature> getCalledSignatures() {
-		return calledSignatures != null ? Collections.unmodifiableList(calledSignatures) : Collections.<AbstractSignature>emptyList();
+		return calledSignatures != null ? Collections.unmodifiableList(calledSignatures) : Collections.<AbstractSignature> emptyList();
 	}
 
 	public void addCalledSignature(AbstractSignature signature) {

@@ -108,7 +108,7 @@ public class ConfigDialog extends TitleAreaDialog {
 
 		setHelpAvailable(false);
 		setMessage("In this dialog you can set the options for the calculation. Be aware that\n"
-				+ YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_);
+			+ YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_);
 		setTitle(CALCULATE + titlePart);
 		container = (Composite) super.createDialogArea(parent);
 		final GridLayout gl_container = new GridLayout(2, false);
@@ -172,7 +172,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	private void createPriorityComboBox() {
 		priorityComboBox = new Combo(container, SWT.READ_ONLY);
 		priorityComboBox.setToolTipText("Priority of the calculation.\n" + "Low coresponds to Thread.MIN_PRIORITY,\n" + "Average to Thread.NORM_PRIORITY and\n"
-				+ HIGH_TO_THREAD_MAX_PRIORITY_);
+			+ HIGH_TO_THREAD_MAX_PRIORITY_);
 		priorityComboBox.setItems(new String[] { LOW, AVERAGE, HIGH });
 		final GridData gd_combo = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
 		gd_combo.heightHint = 20;

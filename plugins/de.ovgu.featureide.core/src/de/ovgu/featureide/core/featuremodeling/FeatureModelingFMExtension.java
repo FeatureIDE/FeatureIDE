@@ -43,7 +43,7 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	}
 
 	private static String ORDER_PAGE_MESSAGE =
-			"FeatureIDE projects for modelling purpose only do not\n" + NEED_AN_ORDER_COMMA__AS_THERE_IS_NO_SOURCE_CODE_TO_COMPOSE_;
+		"FeatureIDE projects for modelling purpose only do not\n" + NEED_AN_ORDER_COMMA__AS_THERE_IS_NO_SOURCE_CODE_TO_COMPOSE_;
 
 	@Override
 	public String getOrderPageMessage() {

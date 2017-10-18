@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/DiGraph.config
+configs/DiGraph.xml
 features/DiGraph/Arc.java
 features/DiGraph/ArcType.java
 features/DiGraph/Digraph.java

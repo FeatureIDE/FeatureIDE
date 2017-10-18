@@ -1,7 +1,7 @@
 .classpath
 .order
 .project
-configs/Base.config
+configs/Base.xml
 features/AbstractGenerator/generator/ClearGeneratorStrategy.java
 features/AbstractGenerator/generator/GeneratorStrategy.java
 features/AbstractGenerator/GODLModel.java

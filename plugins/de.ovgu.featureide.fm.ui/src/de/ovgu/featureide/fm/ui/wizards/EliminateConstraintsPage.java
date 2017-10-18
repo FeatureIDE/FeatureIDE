@@ -56,11 +56,11 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 
 	private static final String PRESERVE_CONFIGS_LABEL = "Preserve configurations:";
 	private static final String PRESERVE_CONFIGS_TOOLTIP =
-			"Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
+		"Whether to preserve the exact number of configurations. May result in large number of additional features and constraints.";
 
 	private static final String REDUNDANT_LABEL = "Remove redundant constraints:";
 	private static final String REDUNDANT_TOOLTIP =
-			"Whether to remove redundant and tautological constraints. Requires SAT-analysis and " + "and can therefore be time consuming.";
+		"Whether to remove redundant and tautological constraints. Requires SAT-analysis and " + "and can therefore be time consuming.";
 
 	private final IFile inputModelFile;
 	private Combo methodCombo;
@@ -246,10 +246,10 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		setPageComplete(message == null);
 	}
 
-	// private void updateStatusMessage(String message) {
-	// setMessage(message);
-	// setPageComplete(true);
-	// }
+//	private void updateStatusMessage(String message) {
+//		setMessage(message);
+//		setPageComplete(true);
+//	}
 
 	private String openFileDialog() {
 		final FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), SWT.MULTI);
@@ -261,14 +261,9 @@ public class EliminateConstraintsPage extends AbstractWizardPage {
 		return fileDialog.open();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage#putData()
-	 */
 	@Override
 	protected void putData() {
 		// TODO Auto-generated method stub
-
 	}
 
 }

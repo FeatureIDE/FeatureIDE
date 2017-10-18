@@ -81,9 +81,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	@Override
 	protected synchronized void parseInputStream(final InputStream inputStream) throws UnsupportedModelException {
 		featureModel.reset();
-		// TODO _interfaces Removed Code
-		// featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
-		// featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
+// TODO _interfaces Removed Code
+//		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+//		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
 		Document doc = null;
 		try {
 			doc = PositionalXMLReader.readXML(inputStream);
@@ -278,13 +278,13 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				final String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
 					final IConstraint c =
-							FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+						FMFactoryManager.getFactory(featureModel).createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						final NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {
 							final org.w3c.dom.Node node = nodeMap.item(i);
 							final String attributeName = node.getNodeName();
-							// String attributeValue = node.getNodeValue();
+//							String attributeValue = node.getNodeValue();
 							if (attributeName.equals(COORDINATES)) {
 								// TODO _interfaces Legacy Code
 								// String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));

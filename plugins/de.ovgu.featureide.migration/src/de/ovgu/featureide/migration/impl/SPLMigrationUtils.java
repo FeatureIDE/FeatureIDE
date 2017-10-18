@@ -31,8 +31,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 
@@ -47,6 +45,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
@@ -169,13 +170,11 @@ public class SPLMigrationUtils {
 	 * @throws CoreException
 	 * @throws UnsupportedEncodingException
 	 */
-	public static void createConfigFile(IProject project, String configPath, String projectName) throws CoreException, UnsupportedEncodingException {
-		final IFolder configFolder = project.getFolder(configPath);
-		final IFile configFile = configFolder.getFile(projectName + ".config");
-		final InputStream defaultContent = new ByteArrayInputStream(projectName.getBytes("UTF-8"));
-
-		configFile.create(defaultContent, true, null);
-
+	public static void createConfigFile(IFeatureModel featureModel, IProject project, String configPath, String projectName)
+			throws CoreException, UnsupportedEncodingException {
+		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
+		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
+		SimpleFileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel), defaultFormat);
 	}
 
 	/**

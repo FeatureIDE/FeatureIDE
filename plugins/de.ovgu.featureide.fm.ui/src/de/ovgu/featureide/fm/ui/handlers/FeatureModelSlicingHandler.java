@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -67,10 +68,10 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 						if ((filePath != null) && (root != null)) {
 							String fileName = filePath.toString();
 							final int extIndex = fileName.lastIndexOf('.');
-							fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-									: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
-
-							FeatureModelManager.save(featureModel, root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(fileName));
+							final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+							fileName = ((extIndex > 0) ? fileName.substring(0, extIndex) : fileName) + "_sliced_" + System.currentTimeMillis() + "."
+								+ format.getSuffix();
+							FeatureModelManager.save(featureModel, root.resolve(modelFile.subpath(0, modelFile.getNameCount() - 1)).resolve(fileName), format);
 						}
 					}
 				});

@@ -316,8 +316,8 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	protected boolean isInvalidPath(String path, String name) {
 		if (path.contains("*") || path.contains("?") || path.startsWith(".") || path.endsWith(".") || path.contains("//") || path.endsWith("/")
-				|| path.endsWith("/") || path.contains("/.") || path.contains("./") || path.contains("<") || path.contains(">") || path.contains("|")
-				|| path.contains("" + '"')) {
+			|| path.endsWith("/") || path.contains("/.") || path.contains("./") || path.contains("<") || path.contains(">") || path.contains("|")
+			|| path.contains("" + '"')) {
 			updateStatus(name + PATH_MUST_BE_VALID);
 			return true;
 		}

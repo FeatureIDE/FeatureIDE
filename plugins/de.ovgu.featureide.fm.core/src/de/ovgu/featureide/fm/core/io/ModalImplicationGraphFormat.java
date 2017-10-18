@@ -95,4 +95,9 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "ModalImplicationGraph";
+	}
+
 }

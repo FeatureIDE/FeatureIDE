@@ -20,47 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+import org.prop4j.explain.solvers.impl.ltms.LtmsSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link FeatureModelExplanationCreatorFactory} using an {@link Ltms LTMS}.
  *
  * @author Timo G&uuml;nther
  */
-public class LtmsFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
+public class LtmsFeatureModelExplanationCreatorFactory extends MusFeatureModelExplanationCreatorFactory {
 
-	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new LtmsDeadFeatureExplanationCreator();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public LtmsFeatureModelExplanationCreatorFactory() {
+		super(new LtmsSatSolverFactory());
 	}
 
-	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm) {
-		return new LtmsDeadFeatureExplanationCreator(fm);
-	}
-
-	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new LtmsFalseOptionalFeatureExplanationCreator();
-	}
-
-	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		return new LtmsFalseOptionalFeatureExplanationCreator(fm);
-	}
-
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
-		return new LtmsRedundantConstraintExplanationCreator();
-	}
-
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		return new LtmsRedundantConstraintExplanationCreator(fm);
-	}
 }

@@ -124,8 +124,7 @@ public class TypeChef {
 
 		paramters.add(fileProxy.getFileToAnalyse());
 
-		// this static variable was changed, private to public, the jar
-		// typechef.
+		// this static variable was changed, private to public, the jar typechef.
 		Options.maxOptionId = 0;
 
 		final FrontendOptionsWithConfigFiles frontendOptions = new FrontendOptionsWithConfigFiles();

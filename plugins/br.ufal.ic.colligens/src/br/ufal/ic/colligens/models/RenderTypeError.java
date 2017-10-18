@@ -26,7 +26,7 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 			if (fileProxy.getLogs().size() > 0) {
 				for (final Log log : fileProxy.getLogs()) {
 					if (log.getFeature().equals(typeError.condition().toString()) && log.getMessage().equals(typeError.msg())
-							&& log.getSeverity().equals(typeError.severity().toString())) {
+						&& log.getSeverity().equals(typeError.severity().toString())) {
 
 						isNew = false;
 					}

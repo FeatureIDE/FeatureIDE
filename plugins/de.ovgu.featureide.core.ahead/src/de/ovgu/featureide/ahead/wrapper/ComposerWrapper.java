@@ -29,8 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERR
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,11 +51,14 @@ import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import jampack.Jampack;
 import mixin.Mixin;
 
 /**
- *
  * The class encapsulates everything that has to do with the composing step. It composes several given jak files. for each jak file all corresponding jak files
  * according to one configuration file were searched to compose them with the help of the Mixin class
  *
@@ -166,12 +167,13 @@ public class ComposerWrapper {
 		allFeatureFolders.clear();
 		featureFolders.clear();
 
-		configFile = (configFile == null) ? featureProject.getCurrentConfiguration() : configFile;
-		if (configFile != null) {
-			final List<String> lines = Files.readAllLines(Paths.get(configFile.getLocationURI()), Charset.forName("UTF-8"));
-			for (final String line : lines) {
-				if (!line.startsWith("#")) {
-					final IFolder f = featureProject.getSourceFolder().getFolder(line);
+		final ProblemList problems = new ProblemList();
+		final Configuration configuration = ConfigurationManager.load(Paths.get(configFile.getLocationURI()), featureProject.getFeatureModel(), problems);
+		if (!problems.containsError()) {
+			final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
+			for (final IFeature feature : selectedFeatures) {
+				if (feature.getStructure().isConcrete()) {
+					final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
 					if (f != null) {
 						featureFolders.add(f);
 					}
@@ -209,7 +211,7 @@ public class ComposerWrapper {
 
 	/**
 	 * Adds a jakfile to the composition list <br> This method automaticaly searches for corresponding jakfiles in all specified feature folders
-	 *
+	 * 
 	 * @param newJakFile
 	 * @throws ComposerException
 	 */

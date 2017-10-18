@@ -5,6 +5,7 @@ public class Application {
 	/*@
 	 @ requires true;
 	 @ ensures true;
+	 @ assignable \nothing;
 	 @*/
 	void nextDay() {
 	}
@@ -12,6 +13,7 @@ public class Application {
 	/*@
 	 @ requires true;
 	 @ ensures true;
+	 @ assignable \nothing;
 	 @*/
 	void nextYear() {
 	}

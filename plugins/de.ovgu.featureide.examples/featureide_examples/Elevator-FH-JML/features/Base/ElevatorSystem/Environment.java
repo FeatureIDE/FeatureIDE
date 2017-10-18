@@ -17,6 +17,7 @@ public class Environment {
 	/*@
 	  @ ensures (\forall int i; 0 <= i && i < calledAt_Spec1.length; !calledAt_Spec1[i]);
 	  @ ensures (\forall int i; 0 <= i && i < calledAt_Spec1.length; !calledAt_Spec2[i]);
+	  @ assignable floors, floors[*];
 	  @*/
 	public Environment(int numFloors) {
 		//@ set calledAt_Spec1 = new boolean[numFloors]; 

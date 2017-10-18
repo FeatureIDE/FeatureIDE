@@ -176,12 +176,12 @@ public class NodeReader {
 				if (i == 4) {
 					node1 = null;
 					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression", constraint)
-							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				} else {
 					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side", constraint)
-							: checkExpression(leftSide, quotedFeatureNames, subExpressions);
+						: checkExpression(leftSide, quotedFeatureNames, subExpressions);
 					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side", constraint)
-							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				}
 
 				switch (i) {

@@ -409,7 +409,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 					final Character c = lineTextChars[i];
 
 					if (!(Character.isLetterOrDigit(c) || c.equals(':') || c.equals('[') || c.equals(']') || c.equals(',') || c.equals('*') || c.equals('(')
-							|| c.equals(')'))) {
+						|| c.equals(')'))) {
 						lineTextChars[i] = '_';
 					}
 				}

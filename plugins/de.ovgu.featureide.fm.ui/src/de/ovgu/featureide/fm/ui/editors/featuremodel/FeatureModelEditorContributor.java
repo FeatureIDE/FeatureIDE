@@ -59,18 +59,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
 	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, CalculateDependencyAction.ID, DeleteAction.ID,
-			MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
-			// ActionFactory.PASTE.getId(),
-			ActionFactory.SELECT_ALL.getId(),
-			// ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
+		MandatoryAction.ID, AndAction.ID, OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+		// ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
+		// ActionFactory.PASTE.getId(),
+		ActionFactory.SELECT_ALL.getId(),
+		// ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
 			// IDEActionFactory.BOOKMARK.getId()
 	};
 
 	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
-			ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
+		ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
+		ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {

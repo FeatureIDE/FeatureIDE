@@ -116,8 +116,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		init();
 
 		final ConstraintProperties constraintProperties = FeatureUtils.getConstraintProperties(graphicalConstraint.getObject());
-		final StringBuilder toolTip = new StringBuilder();
-
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 
@@ -153,7 +151,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		switch (constraintProperties.getConstraintDeadStatus()) {
 		case DEAD:
 			if (!constraintProperties.getDeadFeatures().isEmpty()) {
-				toolTip.append(DEAD_FEATURE);
 				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
 				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
@@ -173,7 +170,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		case FALSE_OPTIONAL:
 			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
 				final List<String> falseOptionalFeatures =
-						Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+					Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
 				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				String s = FALSE_OPTIONAL;
@@ -189,7 +186,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
-			final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+			final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 			toolTipContent.add(new Label("This constraint is involved in the selected defect:\n\u2022 " + w.getReasonString(getActiveReason())));
 		}
 

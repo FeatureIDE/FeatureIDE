@@ -196,7 +196,7 @@ public class PlatformHeader extends AbstractHeader {
 		// + "/platform.h";
 
 		return Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator") + super.getProject().getProject().getProject().getName() + "_platform.h";
+			+ System.getProperty("file.separator") + super.getProject().getProject().getProject().getName() + "_platform.h";
 
 	}
 

@@ -88,7 +88,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
 
 	private static final QualifiedName MODEL_PATH =
-			new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
+		new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
 	private final JobSynchronizer configJobManager = new JobSynchronizer();
 
@@ -162,6 +162,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	protected void setInput(IEditorInput input) {
+		// Cast is necessary for backward compatibility, don't remove
 		file = input.getAdapter(IFile.class);
 		markerHandler = new ModelMarkerHandler<>(file);
 

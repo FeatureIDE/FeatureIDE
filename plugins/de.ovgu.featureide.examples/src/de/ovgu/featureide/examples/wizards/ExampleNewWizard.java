@@ -270,10 +270,8 @@ public class ExampleNewWizard extends Wizard implements INewWizard, IOverwriteQu
 		}
 
 		final MessageDialog dialog =
-				new MessageDialog(
-						getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION, new String[] { IDialogConstants.YES_LABEL,
-								IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL },
-						0);
+			new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION, new String[] { IDialogConstants.YES_LABEL,
+				IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
 
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.

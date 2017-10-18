@@ -1,0 +1,19 @@
+--- RCPTT verification ---
+Format-Version: 1.0
+Element-Name: NoEntriesInErrorLog
+Element-Type: verification
+Element-Version: 2.0
+Id: _2o2TwKjoEeeuipbK_M3LHA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/5/17 10:27 PM
+Verification-Type: org.eclipse.rcptt.verifications.log
+
+------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57
+Content-Type: text/errorlog-verification
+Entry-Name: .errorlog.verification
+
+INCLUDE CONTEXTS: true
+DENIED:
+7 0 .* Message:.*
+
+------=_.errorlog.verification-3ceb5b18-8b7c-3939-9191-416e6e78eb57--

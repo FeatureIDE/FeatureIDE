@@ -203,19 +203,19 @@ public class Prop4JTest {
 		}
 	}
 
-	// commented out due to false usage of newVar method
-	// @Test
-	// public void testArrayIndexOutOfBounds2() throws ContradictionException,
-	// TimeoutException {
-	// ISolver solver = SolverFactory.newDefault();
-	// solver.newVar(3);
-	// solver.addClause(new VecInt(new int[] { 1 }));
-	// solver.addClause(new VecInt(new int[] { -1, 2 }));
-	// solver.addClause(new VecInt(new int[] { 1, -2 }));
-	// solver.addClause(new VecInt(new int[] { -3 }));
-	// solver.newVar(1);
-	// solver.isSatisfiable(new VecInt(new int[] { -4 }));
-	// }
+// commented out due to false usage of newVar method
+//	@Test
+//	public void testArrayIndexOutOfBounds2() throws ContradictionException,
+//			TimeoutException {
+//		ISolver solver = SolverFactory.newDefault();
+//		solver.newVar(3);
+//		solver.addClause(new VecInt(new int[] { 1 }));
+//		solver.addClause(new VecInt(new int[] { -1, 2 }));
+//		solver.addClause(new VecInt(new int[] { 1, -2 }));
+//		solver.addClause(new VecInt(new int[] { -3 }));
+//		solver.newVar(1);
+//		solver.isSatisfiable(new VecInt(new int[] { -4 }));
+//	}
 
 	@Test
 	public void testArrayIndexOutOfBounds3() throws ContradictionException, TimeoutException {
@@ -698,10 +698,9 @@ public class Prop4JTest {
 
 	@Test
 	public void problemAymericHervieu() {
-		final String ctr =
-				"(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) & " + "(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E "
-						+ "=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) & "
-						+ "(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) & " + "(I => E)";
+		final String ctr = "(C => A) & (E => C) & (G => C) & (D => A) & (F => C) & (C => A) & "
+			+ "(I => D) & (B => A) & (D => A) & (J => D) & (J => D) & (B => A) & (E " + "=> C) & (F => C) & (I => D) & (G => C) & A & (False | A) & (A => B) & "
+			+ "(C => E | F | G) & (E => -G) & (E => -F) & (F => -G) & (D => J | I) & " + "(I => E)";
 
 		final NodeReader nd = new NodeReader();
 		nd.activateShortSymbols();

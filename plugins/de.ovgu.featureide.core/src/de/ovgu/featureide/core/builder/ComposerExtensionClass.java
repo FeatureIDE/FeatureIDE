@@ -81,7 +81,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	protected final static String[] JAVA_TEMPLATE = new String[] { JAVA, "java", PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */"
-			+ NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" };
+		+ NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" };
 
 	protected IFeatureProject featureProject = null;
 
@@ -477,7 +477,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 
 		try {
-			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + getConfigurationExtension());
+			final java.nio.file.Path tempFile = Files.createTempFile(configName, '.' + new DefaultFormat().getSuffix());
 			new JavaFileSystem().write(tempFile, new DefaultFormat().write(configuration).getBytes(Charset.defaultCharset()));
 			tempFile.toFile().deleteOnExit();
 			return tempFile;

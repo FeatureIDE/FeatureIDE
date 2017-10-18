@@ -34,9 +34,9 @@ public class TAspectjFMComposerExtension {
 	private final AspectJFMCompserExtension fmComposerExtension = new AspectJFMCompserExtension();
 
 	private static final String CONTENT_1 =
-			"public aspect Hello{\r\n" + "before(): call(void Main.print()) {\r\n" + "	System.out.print(\"Hello\");\r\n" + "	}\r\n" + "}";
+		"public aspect Hello{\r\n" + "before(): call(void Main.print()) {\r\n" + "	System.out.print(\"Hello\");\r\n" + "	}\r\n" + "}";
 	private static final Object NEW_CONTENT_1 =
-			"public aspect NewAspect{\r\n" + "before(): call(void Main.print()) {\r\n" + "	System.out.print(\"Hello\");\r\n" + "	}\r\n" + "}";
+		"public aspect NewAspect{\r\n" + "before(): call(void Main.print()) {\r\n" + "	System.out.print(\"Hello\");\r\n" + "	}\r\n" + "}";
 
 	private static final String OLD_NAME_1_1 = "Hello";
 	private static final String NEW_NAME_1 = "NewAspect";
@@ -54,18 +54,18 @@ public class TAspectjFMComposerExtension {
 	}
 
 	private static final String CONTENT_2 = "abstract aspect AbstractLogger {\r\n" + "declare precedence: AbstractLogger, PrintLogger, SetLogger;\r\n"
-			+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
-			+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
-			+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
-			+ "aspect SetLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
-			+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
+		+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
+		+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
+		+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
+		+ "aspect SetLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
+		+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
 
 	private static final String CONTENT_2_1 = "abstract aspect ALogger {\r\n" + "declare precedence: ALogger, PrintLogger, SetLogger;\r\n"
-			+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
-			+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
-			+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends ALogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
-			+ "aspect SetLogger extends ALogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
-			+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
+		+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
+		+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
+		+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends ALogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
+		+ "aspect SetLogger extends ALogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n" + "	protected voidlog(String logStr) {\r\n"
+		+ "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
 
 	private static final String OLD_NAME_2_1 = "AbstractLogger";
 	private static final String NEW_NAME_2_1 = "ALogger";
@@ -76,11 +76,11 @@ public class TAspectjFMComposerExtension {
 	}
 
 	private static final String CONTENT_2_2 = "abstract aspect AbstractLogger {\r\n" + "declare precedence: AbstractLogger, PLogger, SetLogger;\r\n"
-			+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
-			+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
-			+ "	}\r\n" + "}\r\n" + "aspect PLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
-			+ "aspect SetLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
-			+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
+		+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
+		+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
+		+ "	}\r\n" + "}\r\n" + "aspect PLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
+		+ "aspect SetLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
+		+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
 
 	private static final String OLD_NAME_2_2 = "PrintLogger";
 	private static final String NEW_NAME_2_2 = "PLogger";
@@ -91,11 +91,11 @@ public class TAspectjFMComposerExtension {
 	}
 
 	private static final String CONTENT_2_3 = "abstract aspect AbstractLogger {\r\n" + "declare precedence: AbstractLogger, PrintLogger, SLogger;\r\n"
-			+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
-			+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
-			+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
-			+ "aspect SLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
-			+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
+		+ "	abstract pointcut loggingPointcut();\r\n" + "	PrintStream loggingTarget = System.out;\r\n" + "	protected void log(String logStr) {\r\n"
+		+ "	loggingTarget.println(logStr);\r\n" + "	}\r\n" + "	after() : loggingPointcut() {\r\n" + "	log('Join point reached ' + thisJoinPoint);\r\n"
+		+ "	}\r\n" + "}\r\n" + "aspect PrintLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* print*(..));\r\n" + "}\r\n"
+		+ "aspect SLogger extends AbstractLogger {\r\n" + "	pointcut loggingPointcut() : execution(* set*(..));\r\n"
+		+ "	protected voidlog(String logStr) {\r\n" + "	super.log('Set Method: ' + logStr);\r\n" + "	}\r\n" + "}";
 
 	private static final String OLD_NAME_2_3 = "SetLogger";
 	private static final String NEW_NAME_2_3 = "SLogger";
@@ -110,7 +110,7 @@ public class TAspectjFMComposerExtension {
 	private static final String OLD_PACKAGE_CONTENT = "/* HEADER */\r\n" + "package P;\r\n" + "public aspect OLD {\r\n" + "public Main() {\r\n" + "}\r\n" + "}";
 
 	private static final String NEW_PACKAGE_CONTENT =
-			"/* HEADER */\r\n" + "package P2;\r\n" + "public aspect NEW {\r\n" + "public Main() {\r\n" + "}\r\n" + "}";
+		"/* HEADER */\r\n" + "package P2;\r\n" + "public aspect NEW {\r\n" + "public Main() {\r\n" + "}\r\n" + "}";
 
 	private static final String OLD_NAME_PACKAGE = "OLD";
 	private static final String NEW_NAME_PACKAGE = "P2_NEW";

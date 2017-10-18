@@ -431,7 +431,7 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 
 	@Override
 	public String getName() {
-		return "ConquererFM";
+		return "SPL Conquerer";
 	}
 
 }

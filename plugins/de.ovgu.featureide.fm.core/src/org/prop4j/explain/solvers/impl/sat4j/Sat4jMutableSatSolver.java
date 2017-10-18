@@ -20,8 +20,8 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -40,6 +40,12 @@ import org.sat4j.specs.IConstr;
  */
 public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatSolver {
 
+	/** Maps clauses by index to constraints (handles to the clauses in the oracle). */
+	private final Map<Integer, IConstr> clauseConstraints = new HashMap<>();
+	/** Maps internal clause indexes to Sat4J clause indexes. */
+	private final Map<Integer, Integer> clauseIndexes = new HashMap<>();
+	/** Maps Sat4J clause indexes to internal clause indexes. */
+	private final Map<Integer, Integer> indexClauses = new HashMap<>();
 	/** The variables that were assumed in each scope except the current one. */
 	private final Deque<Map<Object, Boolean>> previousScopeAssumptions = new LinkedList<>();
 	/** The amount of clauses that were added in each scope except the current one. */
@@ -48,16 +54,21 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	private int scopeClauseCount = 0;
 	/** How often to pop until the scope containing the contradiction is reached. */
 	private int scopeContradictionDistance = 0;
-
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jMutableSatSolver() {}
+	/** The next free Sat4J clause index. Sat4J indexes start at 1. */
+	private int nextClauseIndex = 1;
 
 	@Override
 	public void addClause(Node clause) {
 		super.addClause(clause);
 		scopeClauseCount++;
+	}
+
+	@Override
+	protected void onClauseConstraintAdded(int clauseIndex, IConstr constraint) {
+		clauseConstraints.put(clauseIndex, constraint);
+		clauseIndexes.put(clauseIndex, nextClauseIndex);
+		indexClauses.put(nextClauseIndex, clauseIndex);
+		nextClauseIndex++;
 	}
 
 	@Override
@@ -110,82 +121,21 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	 */
 	protected Node removeClause() {
 		scopeClauseCount--;
-
-		/*
-		 * When a constraint is removed from a Sat4J oracle, its index is not freed up. To still be able to keep track of the constraint indexes, do not remove
-		 * the corresponding clause from the local list but just set it to null.
-		 */
-		final List<Node> clauses = super.getClauses();
-		Node clause = null;
-		for (int i = clauses.size() - 1; i >= 0; i--) {
-			clause = clauses.get(i);
-			if (clause != null) {
-				clauses.set(i, null);
-				break;
-			}
+		final int clauseIndex = getClauseCount() - 1;
+		final Node clause = getClauses().remove(clauseIndex);
+		final IConstr constraint = clauseConstraints.remove(clauseIndex);
+		if (constraint == null) {
+			return clause;
 		}
-
-		final IConstr constraint = clauseConstraints.remove(clause);
-		if (constraint != null) {
-			getOracle().removeConstr(constraint);
-		}
+		final int index = clauseIndexes.remove(clauseIndex);
+		indexClauses.remove(index);
+		getOracle().removeSubsumedConstr(constraint);
 		return clause;
 	}
 
 	@Override
-	public List<Node> getClauses() {
-		/*
-		 * Sat4J does not free up a constraint's index when it is removed. In the local clause list, the resulting gaps in the index range are modeled using
-		 * null values. As such, return a copy without these null values to fulfill the interface's contract.
-		 */
-		final List<Node> clauses = super.getClauses();
-		final List<Node> clausesWithoutNull = new ArrayList<>(getClauseCount());
-		for (final Node clause : clauses) {
-			if (clause != null) {
-				clausesWithoutNull.add(clause);
-			}
-		}
-		return clausesWithoutNull;
-	}
-
-	@Override
-	public Node getClause(int index) throws IndexOutOfBoundsException {
-		/*
-		 * For performance reasons, do not generate the entire null-free list of clauses.
-		 */
-		int i = 0;
-		for (final Node clause : super.getClauses()) {
-			if ((clause != null) && (i++ == index)) {
-				return clause;
-			}
-		}
-		throw new IndexOutOfBoundsException();
-	}
-
-	@Override
-	public int getClauseCount() {
-		/*
-		 * For performance reasons, do not generate the entire null-free list of clauses.
-		 */
-		int total = scopeClauseCount;
-		for (final int previousScopeClauseCount : previousScopeClauseCounts) {
-			total += previousScopeClauseCount;
-		}
-		return total;
-	}
-
-	@Override
 	public int getClauseIndexFromIndex(int index) {
-		index = super.getClauseIndexFromIndex(index);
-		int i = 0;
-		for (final Node clause : super.getClauses()) {
-			if (clause == null) {
-				index--;
-			} else if (i++ == index) {
-				return index;
-			}
-		}
-		throw new IndexOutOfBoundsException();
+		return indexClauses.get(index);
 	}
 
 	@Override

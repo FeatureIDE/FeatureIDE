@@ -1,0 +1,64 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_1xlsMKoHEeeF3P5ISwke7w
+Element-Name: CreateFeatureModelInJavaProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _PxsNgKoHEeeF3P5ISwke7w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/5/17 10:28 PM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select AJavaProject | get-menu "New/Feature Model" | click
+with [get-window "New Feature Model"] {
+    get-editbox -after [get-label "File name:"] | set-text myXmlModel
+    get-button "Next >" | click
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select AJavaProject | get-menu "New/Feature Model" | click
+with [get-window "New Feature Model"] {
+    get-editbox -after [get-label "File name:"] | set-text myDimacsModel
+    get-button "Next >" | click
+    get-combo -after [get-label "Format:"] | select "DIMACS (*.dimacs)"
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select AJavaProject | get-menu "New/Feature Model" | click
+with [get-window "New Feature Model"] {
+    get-editbox -after [get-label "File name:"] | set-text myGuidslModel
+    get-button "Next >" | click
+    get-combo -after [get-label "Format:"] | select "Guidsl (*.m)"
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select AJavaProject | get-menu "New/Feature Model" | click
+with [get-window "New Feature Model"] {
+    get-editbox -after [get-label "File name:"] | set-text mySxfmModel
+    get-button "Next >" | click
+    get-combo -after [get-label "Format:"] | select "SXFM (*.xml)"
+    get-button Finish | click
+}
+get-view "Package Explorer" | get-tree | select AJavaProject | get-menu "New/Feature Model" | click
+with [get-window "New Feature Model"] {
+    get-editbox -after [get-label "File name:"] | set-text myFamaModel
+    get-button "Next >" | click
+    get-combo -after [get-label "Format:"] | select "FAMA (*.fama)"
+    get-button Finish | click
+}
+
+with [get-view "Package Explorer" | get-tree] {
+    select "AJavaProject/myXmlModel.xml" | double-click
+    select "AJavaProject/mySxfmModel.xml" | double-click
+    select "AJavaProject/myGuidslModel.m" | double-click
+}
+get-window "Editors available on marketplace" | get-button Cancel | click
+with [get-view "Package Explorer" | get-tree] {
+    select "AJavaProject/myFamaModel.fama" | double-click
+    select "AJavaProject/myDimacsModel.dimacs" | double-click
+}
+get-window "Editors available on marketplace" | get-button Cancel | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

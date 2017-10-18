@@ -63,7 +63,7 @@ public class KeYWrapper {
 		try {
 			if (bundleKeYStarter != null) {
 				final org.osgi.framework.BundleActivator act =
-						((org.osgi.framework.BundleActivator) bundleKeYStarter.loadClass("org.key_project.key4eclipse.Activator").newInstance());
+					((org.osgi.framework.BundleActivator) bundleKeYStarter.loadClass("org.key_project.key4eclipse.Activator").newInstance());
 				act.start(InternalPlatform.getDefault().getBundleContext());
 
 				mainClass = bundleKeYStarter.loadClass("de.uka.ilkd.key.gui.Main");

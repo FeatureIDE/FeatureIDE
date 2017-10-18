@@ -699,8 +699,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 	protected int getLastCoverage() {
 		synchronized (tempConfigurationList) {
 			return (tempConfigurationList.isEmpty())
-					? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
-					: tempConfigurationList.getLast().getTotalCoverage();
+				? ((finalConfigurationList.isEmpty()) ? 0 : finalConfigurationList.get(finalConfigurationList.size() - 1).getTotalCoverage())
+				: tempConfigurationList.getLast().getTotalCoverage();
 		}
 	}
 
@@ -826,7 +826,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 		relTotal = Math.floor(relTotal * 1000.0) / 10.0;
 		if (VERBOSE) {
 			System.out.println(count++ + ": " + config.getTotalCoverage() + "/" + combinationCount + " | " + relTotal + "% | left = " + absUncovered
-					+ " | new = " + config.getDeltaCoverage() + " | delta = " + relDelta);
+				+ " | new = " + config.getDeltaCoverage() + " | delta = " + relDelta);
 		}
 		return absUncovered;
 	}
@@ -921,7 +921,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<Litera
 			inner1: for (int j = i + 1; j < xModel1.length; j++) {
 				final byte b = combinations[rowIndex + j];
 				if ((core[j] == 0) && ((b & BIT_CHECK) != 0)
-						&& ((positive && ((b & BITS_POSITIVE_IMPLY) == 0)) || (!positive && ((b & BITS_NEGATIVE_IMPLY) == 0)))) {
+					&& ((positive && ((b & BITS_POSITIVE_IMPLY) == 0)) || (!positive && ((b & BITS_NEGATIVE_IMPLY) == 0)))) {
 
 					final int my1 = xModel1[j];
 					for (final int[] solution : solver.getSolutionList()) {

@@ -233,7 +233,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 			return;
 		}
 		if (isPathEmpty(getSourcePath(), SOURCE) || isPathEmpty(getBuildPath(), BUILD) || isPathEmpty(getConfigPath(), EQUATIONS)
-				|| isInvalidPath(getSourcePath(), SOURCE) || isInvalidPath(getBuildPath(), BUILD) || isInvalidPath(getConfigPath(), EQUATIONS)) {
+			|| isInvalidPath(getSourcePath(), SOURCE) || isInvalidPath(getBuildPath(), BUILD) || isInvalidPath(getConfigPath(), EQUATIONS)) {
 			return;
 		}
 

@@ -171,7 +171,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 			while (allContractsMethod.size() > 0) {
 				addChild(new MethodContractNodeParent(allContractsMethod.get(0).getFullIdentifier().substring(0,
 						allContractsMethod.get(0).getFullIdentifier().lastIndexOf(allContractsMethod.get(0).getName()))
-						+ allContractsMethod.get(0).getFullName(), allContractsMethod.get(0), allContractsMethod));
+					+ allContractsMethod.get(0).getFullName(), allContractsMethod.get(0), allContractsMethod));
 				int pointer = 0;
 				final String fullI = allContractsMethod.get(0).getFullIdentifier();
 				while (pointer < allContractsMethod.size()) {

@@ -147,7 +147,7 @@ public class XmlPropertyLoader {
 		for (final Element property : getElements(properties)) {
 			if (!(property.hasAttribute(KEY) && property.hasAttribute(VALUE) && property.hasAttribute(TYPE))) {
 				throw new UnsupportedOperationException("One property of container " + propertyContainerNode.getAttribute(NAME)
-						+ " is missing one of the required attributes: " + KEY + ", " + VALUE + "," + TYPE);
+					+ " is missing one of the required attributes: " + KEY + ", " + VALUE + "," + TYPE);
 			} else {
 				final String key = property.getAttribute(KEY);
 				final Type type = Type.valueOf(property.getAttribute(TYPE));

@@ -85,7 +85,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 		}
 
 		final IFile file =
-				((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
 		if ((context == null) || (featureProject == null) || (featureProject.getProjectSignatures() == null)) {
@@ -141,7 +141,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 
 				final StyledString methString = new StyledString(displayString);
 				final Styler styler =
-						StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
 				// TextStyle style = new
 				// TextStyle(JFaceResources.getDefaultFont(),JFaceResources.getResources().createColor(new
 				// RGB(10, 10,
@@ -149,7 +149,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 				// RGB(0,0,0)));
 				// styler.applyStyles(style);
 				final StyledString infoString =
-						new StyledString(new String(" - " + normalize(new String(curProp.getDeclarationSignature())) + " " + featureName), styler);
+					new StyledString(new String(" - " + normalize(new String(curProp.getDeclarationSignature())) + " " + featureName), styler);
 				methString.append(infoString);
 				meth.setStyledDisplayString(methString);
 
@@ -162,7 +162,7 @@ public class Completion implements IJavaCompletionProposalComputer {
 				final LazyJavaCompletionProposal field = new LazyJavaCompletionProposal(curProp, context);
 				final StyledString fieldString = new StyledString(new String(curProp.getCompletion()));
 				final Styler styler =
-						StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
+					StyledString.createColorRegistryStyler(JFacePreferences.DECORATIONS_COLOR, JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
 				final StyledString infoString = new StyledString(new String(" - " + new String(curProp.getName()) + " " + featureName), styler);
 				fieldString.append(infoString);
 				field.setStyledDisplayString(fieldString);

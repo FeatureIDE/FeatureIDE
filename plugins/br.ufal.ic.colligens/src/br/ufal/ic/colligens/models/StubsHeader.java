@@ -79,7 +79,7 @@ public class StubsHeader extends AbstractHeader {
 		// return super.getProject().getProject().getLocation().toOSString()
 		// + "/stubs.h";
 		return Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator") + super.getProject().getProject().getName() + "_stubs.h";
+			+ System.getProperty("file.separator") + super.getProject().getProject().getName() + "_stubs.h";
 	}
 
 	@Override

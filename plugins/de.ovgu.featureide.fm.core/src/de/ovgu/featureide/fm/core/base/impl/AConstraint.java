@@ -133,47 +133,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		return false;
 	}
 
-	// @Override
-	// public void setConstraintAttribute(ConstraintAttribute attribute, boolean notifyListeners) {
-	// this.attribute = attribute;
-	// if (notifyListeners) {
-	// fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	// }
-	// }
-
-	// /**
-	// * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
-	// */
-	// @Override
-	// public void setContainedFeatures() {
-	// synchronized (containedFeatureList) {
-	// containedFeatureList.clear();
-	// for (final String featureName : propNode.getContainedFeatures()) {
-	// containedFeatureList.add(featureModel.getFeature(featureName));
-	// }
-	// }
-	// }
-
-	// @Override
-	// public void setDeadFeatures(Iterable<IFeature> deadFeatures) {
-	// this.deadFeatures.clear();
-	// this.deadFeatures.addAll(Functional.toList(deadFeatures));
-	// }
-	//
-	// @Override
-	// public boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection) {
-	// falseOptionalFeatures.clear();
-	// falseOptionalFeatures.addAll(ProjectManager.getAnalyzer(featureModel).getFalseOptionalFeatures(collection));
-	// collection.removeAll(falseOptionalFeatures);
-	// return !falseOptionalFeatures.isEmpty();
-	// }
-	//
-	// @Override
-	// public void setFalseOptionalFeatures(Iterable<IFeature> foFeatures) {
-	// falseOptionalFeatures.clear();
-	// this.falseOptionalFeatures.addAll(Functional.toList(foFeatures));
-	// }
-
 	@Override
 	public void setNode(Node node) {
 		propNode = node;

@@ -77,7 +77,7 @@ public final class EclipseMarkerHandler {
 				// TODO Fix cause of the null pointer or handle correctly
 				try {
 					if (marker.getAttribute(IMarker.MESSAGE).equals(message) && ((Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber)
-							&& ((Integer) marker.getAttribute(IMarker.SEVERITY) == severity)) {
+						&& ((Integer) marker.getAttribute(IMarker.SEVERITY) == severity)) {
 						marker.delete();
 					}
 				} catch (final RuntimeException e) {}

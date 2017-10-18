@@ -33,6 +33,7 @@ public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
 
 	public static String extensionID = "fmFormat";
 
+	@Override
 	String getName();
 
 }

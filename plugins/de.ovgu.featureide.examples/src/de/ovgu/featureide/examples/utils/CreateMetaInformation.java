@@ -32,6 +32,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class CreateMetaInformation {
 		private final static Pattern names;
 		static {
 			final List<String> lines =
-					new ArrayList<>(Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
+				new ArrayList<>(Arrays.asList(".svn", ".git", ".gitignore", ".metadata", ProjectRecord.INDEX_FILENAME, "bin", "projectInformation.xml"));
 			try {
 				lines.addAll(Files.readAllLines(Paths.get(".gitignore"), Charset.forName("UTF-8")));
 			} catch (final IOException e) {
@@ -147,8 +148,8 @@ public class CreateMetaInformation {
 				if (parent != null) {
 					final Path parentName = parent.getFileName();
 					if (parentName != null) {
-						final ProjectRecord newProject = new ProjectRecord(
-								pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parentName.toString());
+						final ProjectRecord newProject =
+							new ProjectRecord(pluginRoot.toUri().relativize(file.toUri()).toString().replace(SPACE_REPLACEMENT, " "), parentName.toString());
 						newProject.setUpdated(createIndex(parent));
 						projects.add(newProject);
 						lastProjects.removeLast();
@@ -204,6 +205,7 @@ public class CreateMetaInformation {
 		System.out.println("Examining Files...");
 		final ProjectRecordCollection projectFiles = new ProjectRecordCollection();
 		Files.walkFileTree(exampleDir, new ProjectWalker(projectFiles));
+		Collections.sort(projectFiles);
 
 		System.out.println("Updating Index Files...");
 		for (final ProjectRecord projectRecord : projectFiles) {
@@ -217,6 +219,7 @@ public class CreateMetaInformation {
 		final ProjectRecordCollection oldProjectFiles = new ProjectRecordCollection();
 		if (Files.exists(indexFile)) {
 			SimpleFileHandler.load(indexFile, oldProjectFiles, format);
+			Collections.sort(oldProjectFiles);
 			System.out.println("Updating Project List...");
 		} else {
 			System.out.println("Creating New Project List...");

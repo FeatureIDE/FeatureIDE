@@ -21,21 +21,36 @@
 package de.ovgu.featureide.fm.core.explanations.config;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 
 /**
  * An explanation for a circumstance involving a {@link Configuration configuration}.
  *
  * @author Timo G&uuml;nther
  */
-public abstract class ConfigurationExplanation extends Explanation {
+public abstract class ConfigurationExplanation<S> extends FeatureModelExplanation<S> {
+
+	/** The configuration. */
+	private final Configuration config;
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param subject the subject to be explained
+	 * @param config the configuration
 	 */
-	protected ConfigurationExplanation(Object subject) {
+	protected ConfigurationExplanation(S subject, Configuration config) {
 		super(subject);
+		this.config = config;
 	}
+
+	/**
+	 * Returns the configuration.
+	 *
+	 * @return the configuration
+	 */
+	public Configuration getConfiguration() {
+		return config;
+	}
+
 }

@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -77,6 +78,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	private ModelType modelType = ModelType.All;
 
+	/**
+	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.</br> Default values is {@code true} (values will
+	 * be included).
+	 */
 	private boolean includeBooleanValues = true;
 
 	private boolean useOldNames = true;
@@ -111,7 +116,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	private And createConstraintNodes() {
 		final List<Node> clauses = new LinkedList<>();
 		for (final IConstraint constraint : featureModel.getConstraints()) {
-			createConstraintNodes(constraint, clauses);
+			createConstraintNodes(constraint, clauses, true);
 		}
 		return new And(clauses.toArray(new Node[clauses.size()]));
 	}
@@ -123,7 +128,18 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * @return the transformed node
 	 */
 	public Node createConstraintNode(IConstraint constraint) {
-		final List<Node> clauses = createConstraintNodes(constraint, new LinkedList<Node>());
+		return createConstraintNode(constraint, true);
+	}
+
+	/**
+	 * Creates the node for a single constraint of the feature model.
+	 *
+	 * @param constraint constraint to transform
+	 * @param positive false to negate the node of the constraint before adding
+	 * @return the transformed node
+	 */
+	public Node createConstraintNode(IConstraint constraint, boolean positive) {
+		final List<Node> clauses = createConstraintNodes(constraint, new LinkedList<Node>(), positive);
 		if ((cnfType != CNFType.Regular) && (clauses.size() == 1)) {
 			return clauses.get(0);
 		}
@@ -135,14 +151,18 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 *
 	 * @param constraint constraint to transform
 	 * @param clauses clauses to add to; out variable
+	 * @param positive false to negate the node of the constraint before adding
 	 * @return given clauses plus new clauses
 	 */
-	private List<Node> createConstraintNodes(IConstraint constraint, List<Node> clauses) {
-		Node clause;
+	private List<Node> createConstraintNodes(IConstraint constraint, List<Node> clauses, boolean positive) {
+		Node clause = constraint.getNode();
 		boolean compact = true;
 		switch (cnfType) {
 		case None:
-			clause = constraint.getNode().clone();
+			clause = clause.clone();
+			if (!positive) {
+				clause = new Not(clause);
+			}
 			clauses.add(clause);
 			if (isRecordingTraceModel()) {
 				traceModel.addTraceConstraint(constraint);
@@ -152,7 +172,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			compact = false;
 		case Compact:
 		default:
-			final Node cnfNode = Node.buildCNF(constraint.getNode());
+			if (!positive) {
+				clause = new Not(clause);
+			}
+			final Node cnfNode = Node.buildCNF(clause);
 			if (cnfNode instanceof And) {
 				for (final Node andChild : cnfNode.getChildren()) {
 					clause = compact || (andChild instanceof Or) ? andChild : new Or(andChild);
@@ -386,6 +409,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
+		traceModel = isRecordingTraceModel() ? new FeatureModelToNodeTraceModel() : null; // Reset the trace model.
 	}
 
 	/**

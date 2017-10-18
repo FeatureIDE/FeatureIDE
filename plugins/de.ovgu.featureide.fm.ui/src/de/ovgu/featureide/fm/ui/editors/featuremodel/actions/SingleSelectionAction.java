@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * A default implementation for actions that only allow one feature to be selected.
@@ -72,8 +72,8 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 
 	private boolean isOneFeatureSelected(IStructuredSelection selection) {
 		return (selection.size() == 1)
-				&& ((selection.getFirstElement() instanceof FeatureEditPart) || (selection.getFirstElement() instanceof ConnectionEditPart)
-						|| (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) || (selection.getFirstElement() instanceof IFeature));
+			&& ((selection.getFirstElement() instanceof FeatureEditPart) || (selection.getFirstElement() instanceof ConnectionEditPart)
+				|| (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) || (selection.getFirstElement() instanceof IFeature));
 	}
 
 	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {
@@ -141,7 +141,7 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		if (EventType.GROUP_TYPE_CHANGED.equals(prop) || EventType.MANDATORY_CHANGED.equals(prop) || EventType.PARENT_CHANGED.equals(prop)
-				|| EventType.HIDDEN_CHANGED.equals(prop) || EventType.COLOR_CHANGED.equals(prop) || EventType.COLLAPSED_CHANGED.equals(prop)) {
+			|| EventType.HIDDEN_CHANGED.equals(prop) || EventType.COLOR_CHANGED.equals(prop) || EventType.COLLAPSED_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}

@@ -70,6 +70,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -106,6 +107,7 @@ public class FmOutlinePageContextMenu {
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
 	private boolean syncCollapsedFeatures = false;
+	private boolean registerContextMenu = true;
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
@@ -133,10 +135,31 @@ public class FmOutlinePageContextMenu {
 		initContextMenu();
 	}
 
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput, boolean registerContextMenu) {
+		this.site = site;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.registerContextMenu = registerContextMenu;
+		initContextMenu();
+	}
+
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures,
+			boolean registerContextMenu) {
+		this.site = site;
+		this.fTextEditor = fTextEditor;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.syncCollapsedFeatures = syncCollapsedFeatures;
+		this.registerContextMenu = registerContextMenu;
+		initContextMenu();
+	}
+
 	private void initContextMenu() {
 		initActions();
 		addListeners();
-		initMenuManager();
+		if (registerContextMenu) {
+			initMenuManager();
+		}
 	}
 
 	private void initMenuManager() {
@@ -160,7 +183,7 @@ public class FmOutlinePageContextMenu {
 	}
 
 	private void initActions() {
-		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
+		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
 		// collapseAction = new CollapseAction(viewer, fInput);
@@ -222,6 +245,7 @@ public class FmOutlinePageContextMenu {
 	 * adds all listeners to the TreeViewer
 	 */
 	private void addListeners() {
+		viewer.removeDoubleClickListener(dblClickListener);
 		viewer.addDoubleClickListener(dblClickListener);
 
 		if (fTextEditor != null) {
@@ -269,9 +293,8 @@ public class FmOutlinePageContextMenu {
 	 *
 	 * @param manager
 	 */
-	protected void fillContextMenu(IMenuManager manager) {
+	public void fillContextMenu(IMenuManager manager) {
 		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-		setFeatureColorAction.setFeatureModel(fInput);
 
 		if (sel instanceof FmOutlineGroupStateStorage) {
 			final IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();

@@ -1,10 +1,10 @@
 .classpath
 .project
-configs/notrace.config
-configs/tracelib.config
-configs/tracev1.config
-configs/tracev2.config
-configs/tracev3.config
+configs/notrace.xml
+configs/tracelib.xml
+configs/tracev1.xml
+configs/tracev2.xml
+configs/tracev3.xml
 model.xml
 src/tracing/Circle.java
 src/tracing/ExampleMain.java

@@ -56,11 +56,6 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 	public String toString() {
 		final StringBuilder methodString = new StringBuilder();
 
-		// methodString.append(super.toString());
-		// if (methodString.length() > 0) {
-		// methodString.append(LINE_SEPARATOR);
-		// }
-
 		if (mergedjavaDocComment != null) {
 			methodString.append(mergedjavaDocComment);
 		}

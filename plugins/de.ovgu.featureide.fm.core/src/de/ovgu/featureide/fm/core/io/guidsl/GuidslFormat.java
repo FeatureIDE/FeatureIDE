@@ -87,7 +87,7 @@ public class GuidslFormat implements IFeatureModelFormat {
 
 	@Override
 	public String getName() {
-		return "GUIDSL";
+		return "Guidsl";
 	}
 
 }

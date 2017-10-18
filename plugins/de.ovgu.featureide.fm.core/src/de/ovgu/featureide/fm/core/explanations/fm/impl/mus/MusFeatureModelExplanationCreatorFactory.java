@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
@@ -36,33 +36,41 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  */
 public class MusFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 
-	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new MusDeadFeatureExplanationCreator();
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusFeatureModelExplanationCreatorFactory() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusFeatureModelExplanationCreatorFactory(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
 	}
 
 	@Override
-	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusDeadFeatureExplanationCreator(fm);
+	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
+		return new MusDeadFeatureExplanationCreator(solverFactory);
 	}
 
 	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new MusFalseOptionalFeatureExplanationCreator();
-	}
-
-	@Override
-	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm) {
-		return new MusFalseOptionalFeatureExplanationCreator(fm);
+		return new MusFalseOptionalFeatureExplanationCreator(solverFactory);
 	}
 
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
-		return new MusRedundantConstraintExplanationCreator();
+		return new MusRedundantConstraintExplanationCreator(solverFactory);
 	}
 
-	@Override
-	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm) {
-		return new MusRedundantConstraintExplanationCreator(fm);
-	}
 }

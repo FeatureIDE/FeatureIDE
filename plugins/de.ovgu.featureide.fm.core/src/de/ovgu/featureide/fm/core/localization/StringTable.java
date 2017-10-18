@@ -31,7 +31,7 @@ public class StringTable {
 	public static final String DISPLAY_IS_NULL = "Display is null";
 	public static final String C_HEADER_FILE = "C Header File";
 	public static final String NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_ =
-			"need an order, as the order is given directly at the source code.";
+		"need an order, as the order is given directly at the source code.";
 	public static final String ANALYZING_FILES = "Analyzing files";
 	public static final String DESCRIPTION = "Description";
 	public static final String FEATURE_CONFIGURATION = "Feature configuration";
@@ -84,9 +84,9 @@ public class StringTable {
 	public static final String NO_COMPOSITION_TOOL_FOUND_ = "No composition tool found.";
 	public static final String FILE_FORMAT_NAME = "File format name";
 	public static final String IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_ =
-			" is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.";
+		" is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.";
 	public static final String IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE =
-			" is not defined in the feature model and, thus, always assumed to be false";
+		" is not defined in the feature model and, thus, always assumed to be false";
 	public static final String PREPROCESSOR = "Preprocessor";
 	public static final String CHANGE_OLD_NATURE_TO_ = "Change old nature to '";
 	public static final String NO_COMPOSER_FOUND_IN_DESCRIPTION_ = "No Composer Found in Description.";
@@ -113,10 +113,10 @@ public class StringTable {
 	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL = "Error while loading feature model from ";
 	public static final String ERROR_WHILE_LOADING_FEATURE_MODEL_FROM = ERROR_WHILE_LOADING_FEATURE_MODEL + " from ";
 	public static final String THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_ =
-			"This annotation is not supported yet - moved to the comment section.";
+		"This annotation is not supported yet - moved to the comment section.";
 	public static final String PERFORMING_FULL_BUILD = "Performing full build";
 	public static final String THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_ =
-			"The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
+		"The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
 	public static final String POSTPROCESS_GENERATED_FILES = "Postprocess generated files";
 	public static final String LOAD_MODEL = "Load Model";
 	public static final String CHECKING_CONFIGURATIONS = "Checking configurations";
@@ -167,7 +167,7 @@ public class StringTable {
 	public static final String REPLACE_KEYWORDS_ = "Replace keywords.";
 	public static final String COMPOSER_CONVERSION = "Composer Conversion";
 	public static final String SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_ =
-			"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.";
+		"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.";
 	public static final String LINUX = "Linux";
 	public static final String IS_NOT_AN_ABSOLUTE_PATH_ = " is not an absolute path. ";
 	public static final String IS_NO_VALID_PATH_ = " is no valid path. ";
@@ -259,7 +259,7 @@ public class StringTable {
 	public static final String COMES_BEFORE = " comes before ";
 	public static final String FEATURES_FMID_VALID = "features	fmid	valid";
 	public static final String FEATURES_EDITS_KIND_OUTPUT_FMID_EDITID_STRAT0_STRAT1_STRAT2_STRAT3 =
-			"features	edits	kind	output	fmid	editid	strat0	strat1	strat2	strat3";
+		"features	edits	kind	output	fmid	editid	strat0	strat1	strat2	strat3";
 	public static final String VOID_FEATURE_MODEL_BY_ARBITRARY_EDIT = "Void feature model by arbitrary edit	";
 	public static final String VELVET_FEATUREMODEL_IMPORTED = "Velvet feature model imported";
 	public static final String VALID = "valid";
@@ -380,17 +380,17 @@ public class StringTable {
 	public static final String MORE_THAN = "more than ";
 	public static final String POSSIBLE_CONFIGURATIONS = " possible configurations";
 	public static final String THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_ =
-			"There is no feature model corresponding to this configuration, reopen the editor and select one.";
+		"There is no feature model corresponding to this configuration, reopen the editor and select one.";
 	public static final String THE_GIVEN_FEATURE_MODEL = "The given feature model ";
 	public static final String AN_UNKNOWN_ERROR_OCCURRED_ = "An unknown error occurred.";
 	public static final String THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_ =
-			"The feature model for this project is void, i.e., there is no valid configuration. You need to correct the feature model before you can create or edit configurations.";
+		"The feature model for this project is void, i.e., there is no valid configuration. You need to correct the feature model before you can create or edit configurations.";
 	public static final String SOURCE = "Source";
 	public static final String CREATE_NEW_CONSTRAINT = "Create new constraint";
 	public static final String YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_ = "You can create or edit constraints with this dialog.";
 	public static final String EDITING = "editing";
 	public static final String BEFORE_THIS_PROCESS_HAS_ENDED =
-			"Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking \"%s\" before the process has ended.";
+		"Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking \"%s\" before the process has ended.";
 	public static final String YOUR_CONSTRAINT_VOIDS_THE_MODEL = "The constraints makes the feature model void.";
 	public static final String REDUNDANCY_OCCURRED_INSIDE_YOUR_CONSTRAINT_ = "The constraints is redundant and can be removed.";
 	public static final String YOUR_CONSTRAINT_IS_A_TAUTOLOGY_ = "The constraint is a tautology and can be removed.";
@@ -473,12 +473,12 @@ public class StringTable {
 	public static final String SHOW_COLLAPSED_CONSTRAINTS = "Show Collapsed Constraints";
 	public static final String RENAMING_FEATURE = "Renaming feature ";
 	public static final String IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME =
-			"It is not recommended to change upper and lower case. You currently try to rename ";
+		"It is not recommended to change upper and lower case. You currently try to rename ";
 	public static final String THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_ = "This name is already used for another feature.";
 	public static final String INVALID_NAME = "Invalid Name";
 	public static final String CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_ = " Constraint makes the feature model void. ";
 	public static final String CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_ =
-			" Constraint is not satisfiable and makes the feature model void. ";
+		" Constraint is not satisfiable and makes the feature model void. ";
 	public static final String CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_ = " Constraint is a tautology and should be removed. ";
 	public static final String CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_ = " Constraint is redundant and could be removed. ";
 	public static final String CONCRETE = " Concrete";
@@ -496,10 +496,10 @@ public class StringTable {
 	public static final String MOVE_CONSTRAINT = "Move Constraint";
 	public static final String DELETE_ERROR = " Delete Error ";
 	public static final String UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_ =
-			"Unable to delete this feature until all relevant constraints are removed.";
+		"Unable to delete this feature until all relevant constraints are removed.";
 	public static final String DELETE = "Delete";
 	public static final String SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_ =
-			"Select only one feature in order to replace it with an equivalent one.";
+		"Select only one feature in order to replace it with an equivalent one.";
 	public static final String IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_ = "It can not be replaced with an equivalent one.";
 	public static final String CHANGE_GROUP_TYPE = "Change Group Type";
 	public static final String CREATE_COMPOUND = "Create Compound";
@@ -522,10 +522,10 @@ public class StringTable {
 	public static final String MODEL = " Model";
 	public static final String UNKNOWN_FILE_EXTENSION_ = "Unknown file extension.";
 	public static final String THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS =
-			"The feature model is void, i.e., it contains no products";
+		"The feature model is void, i.e., it contains no products";
 	public static final String SAVE_RESOURCES = "Save Resources";
 	public static final String SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_ =
-			"Some modified resources must be saved before saving the featuremodel.";
+		"Some modified resources must be saved before saving the featuremodel.";
 	public static final String FEATURE_ORDER = "Feature Order";
 	public static final String USER_DEFINED_FEATURE_ORDER = "User-defined feature order";
 	public static final String UP = "Up";
@@ -537,7 +537,7 @@ public class StringTable {
 	public static final String PROVIDESETTINGS = "provideSettings";
 	public static final String DISABLECLIPPINGBUTTON = "disableClippingButton";
 	public static final String ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_ =
-			"Eclipse plugin for exporting diagram in SVG format is not existing.";
+		"Eclipse plugin for exporting diagram in SVG format is not existing.";
 	public static final String SVG_EXPORT_FAILED = "SVG export failed";
 	public static final String NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___ = "Nothing has been saved for diagram export...";
 	public static final String FILE = "File ";
@@ -550,11 +550,11 @@ public class StringTable {
 	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ =
-			"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
+		"The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ =
-			"The configuration editor searches for open clauses in the CNF representation of the feature model and highlights the corresponding features.";
+		"The configuration editor searches for open clauses in the CNF representation of the feature model and highlights the corresponding features.";
 	public static final String TRIES_TO_FIND_FEATURES_WHICH_LEAD_TO_A_VALID_CONFIGURATION_BY_SOLVING_A_SATISFIABILITY_PROBLEM_ =
-			"The configuration editor tries to find features which lead to a valid configuration by solving a satisfiability problem.";
+		"The configuration editor tries to find features which lead to a valid configuration by solving a satisfiability problem.";
 	public static final String FEATURE_NAME_SCHEME = "Feature name scheme";
 	public static final String USE_SHORT_FEATURE_NAMES = "Use short feature names";
 	public static final String USE_LONG_FEATURE_NAMES = "Use long feature names";
@@ -612,7 +612,7 @@ public class StringTable {
 	public static final String CONFIG_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + CONFIG_PATH + "\".";
 	public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
 	public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ =
-			"Start manual calculation or activate automatic calculation to show statistics.";
+		"Start manual calculation or activate automatic calculation to show statistics.";
 	public static final String CALCULATING___ = "Calculating...";
 	public static final String STATISTICS_ON_BEFORE_EDIT_VERSION = "Statistics on before edit version";
 	public static final String STATISTICS_ON_AFTER_EDIT_VERSION = "Statistics on after edit version";
@@ -654,7 +654,7 @@ public class StringTable {
 	public static final String DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH = "Destination folder not accessible or wrong path";
 	public static final String PROJECT = "Project ";
 	public static final String PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_ =
-			"project.properties could not be copied, because it does not exist.";
+		"project.properties could not be copied, because it does not exist.";
 	public static final String JAVA_PROJECTS_COULD_NOT_BE_CREATED = "Java projects could not be created";
 	public static final String CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL = "classpath of project to migrate is null";
 	public static final String ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY = "Only expected files and containers to copy";
@@ -669,22 +669,22 @@ public class StringTable {
 	public static final String PROJECT_NAME = "Project Name";
 	public static final String GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE = "Specify a name for the new product line";
 	public static final String A_PROJECT_WITH_THIS_NAME_ALREADY_EXISTS_IN_THE_WORKSPACE__PLEASE_CHANGE_THE_NAME_ =
-			"A project with this name already exists in the workspace. Please change the name.";
+		"A project with this name already exists in the workspace. Please change the name.";
 	public static final String IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE = "Import products into a trivial product line";
 	public static final String MIGRATION_IS_CURRENTLY_NOT_SUPPORTED_FOR_THE_SELECTED_COMPOSER__PLEASE_CHOOSE_ANOTHER_ONE =
-			"Migration is currently not supported for the selected composer. Please choose another composer.";
+		"Migration is currently not supported for the selected composer. Please choose another composer.";
 	public static final String DEFINES_THE_PRODUKT_BASED_STRATEGY_ = "Defines the product-based strategy.";
 	public static final String DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_ = "Defines the algorithm for t-wise sampling.";
 	public static final String DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_ = "Defines how the generated produkts are ordered.";
 	public static final String SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_ =
-			"Searches for test cases in the generated products and executes them.";
+		"Searches for test cases in the generated products and executes them.";
 	public static final String DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_ =
-			"Defnies whether the products are generated into separate projects or into a folder in this project.";
+		"Defnies whether the products are generated into separate projects or into a folder in this project.";
 	public static final String BUILD_PRODUCTS_FOR_PROJECT = "Build products for project ";
 	public static final String ERROR_ = "-Error-";
 	public static final String BUILD_PRODUCTS = "Build Products";
 	public static final String SATSOLVER_COMPUTATION_TIMEOUT =
-			"A timeout occurred during computation of satisfiability. Formula is too complex and cannot be solved. Try again or increase the timeout.";
+		"A timeout occurred during computation of satisfiability. Formula is too complex and cannot be solved. Try again or increase the timeout.";
 	public static final String FOR = " for ";
 	public static final String OF = " of ";
 	public static final String NOT_ = "not-";
@@ -754,7 +754,7 @@ public class StringTable {
 	public static final String VISIBLE = "visible ";
 	public static final String DOCUMENTATION_WIZARD = "Documentation Wizard";
 	public static final String CANT_SET_CONFIGURATION_AS_CURRENT_CONFIGURATION_BECAUSE_IT_DOES_NOT_BELONG_TO_A_FEATURE_PROJECT =
-			"Can't set configuration as current configuration because it does not belong to a feature project";
+		"Can't set configuration as current configuration because it does not belong to a feature project";
 	public static final String LEFT = "left";
 	public static final String RIGHT = "right";
 	public static final String CREATE_CONFIGURATIONS = "Create configurations";
@@ -834,7 +834,7 @@ public class StringTable {
 	public static final String LOW = "Low";
 	public static final String CONFIGURATION_DIALOG = "Configuration Dialog";
 	public static final String YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_ =
-			"The choosen timeout may not be enough to show the exact result.";
+		"The choosen timeout may not be enough to show the exact result.";
 	public static final String MAXIMUM_DURATION_OF_THE_CALCULATION_IN_SECONDS_ = "Maximum duration of the calculation in seconds.";
 	public static final String HIGH_TO_THREAD_MAX_PRIORITY_ = "High to Thread.MAX_PRIORITY.";
 	public static final String INVALID_SELECTION_ = "Invalid Selection.";
@@ -890,7 +890,7 @@ public class StringTable {
 	public static final String NO_FEATURE_PROJECT = "no feature project";// TODO redundant to THIS_IS_NO_FEATURE_PROJECT?
 	public static final String NO_CHILDREN = "No Children";
 	public static final String THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY =
-			"The build path is set to the Java project's source path automatically";
+		"The build path is set to the Java project's source path automatically";
 	public static final String ADDS_THE_FEATUREIDE_NATURE_TO_THE_PROJECT = "Adds the FeatureIDE nature to the project ";
 	public static final String ADD_FEATUREIDE_NATURE = "Add FeatureIDE Nature";
 	public static final String JAVADOC_OPTIONS = "JavaDoc Options";
@@ -900,7 +900,7 @@ public class StringTable {
 	public static final String NEW = "New";
 	public static final String NEW_CONFIGURATION = "New Configuration";
 	public static final String ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE =
-			"Enter the name of the configuration file. It will be placed in the configurations directory of the ";
+		"Enter the name of the configuration file. It will be placed in the configurations directory of the ";
 	public static final String NO_PROJECT_SELECTED = "No project selected";
 	public static final String SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT = "Selected project is not a FeatureIDE project";
 	public static final String FILE_NAME_MUST_BE_SPECIFIED = "File name must be specified";
@@ -942,7 +942,7 @@ public class StringTable {
 	public static final String SETS_THE_PATH_OF_SOURCE_FILES_ = "Sets the path of source files.";
 	public static final String ADD_FEATUREIDE_NATURE_TO_ANDROID_PROJECT = "Add FeatureIDE Nature to Android Project";
 	public static final String THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_ =
-			"The Android Development Tools must be installed to create an Android project.";
+		"The Android Development Tools must be installed to create an Android project.";
 	public static final String FOLDER_OF_EXTENDED_MODULES = "Folder of extended modules";
 	public static final String NEW_INTERFACES = "New Interfaces";
 	public static final String FOLDER_OF_STATISTICS = "Folder of statistics";
@@ -1041,7 +1041,7 @@ public class StringTable {
 	public static final String POSSIBILY_ILLEGITIMATELY_REDEFINED_WITH_KEYWORD = " possibily illegitimately redefined with keyword ";
 	public static final String WITH_FUJI = " with fuji";
 	public static final String FUJI_TYPECHECKER_IS_CURRENTLY_NOT_SUPPORTED_FOR_JAVA_1_8_RUNTIME_ =
-			"Fuji Typechecker is currently not supported for Java 1.8 runtime.";
+		"Fuji Typechecker is currently not supported for Java 1.8 runtime.";
 	public static final String LIGHTGREEN = "lightgreen";
 	public static final String SUMME = "Summe";
 	public static final String CYAN = "cyan";
@@ -1073,7 +1073,7 @@ public class StringTable {
 	public static final String CALCULATE_DEAD_FEATURES = "Calculate Dead Features";
 	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED = "No color scheme is selected";
 	public static final String CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG =
-			"There is currently no color scheme selected. To color features please use the color scheme wizard and select a color scheme.";
+		"There is currently no color scheme selected. To color features please use the color scheme wizard and select a color scheme.";
 
 	public static final String PUBLIC_CLASS = "public class";
 	public static final String PUBLIC_INTERFACE = "public interface";

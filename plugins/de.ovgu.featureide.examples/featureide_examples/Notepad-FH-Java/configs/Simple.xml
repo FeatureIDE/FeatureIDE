@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Notepad"/>
+		<feature automatic="undefined" manual="undefined" name="Cut"/>
+		<feature automatic="undefined" manual="undefined" name="Finder"/>
+		<feature automatic="undefined" manual="undefined" name="Undo"/>
+	</configuration>

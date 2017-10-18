@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintDeadStatus;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintFalseOptionalStatus;
@@ -52,7 +53,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class TFeatureModelAnalyzer {
 
-	protected static File MODEL_FILE_FOLDER = getFolder();
+	protected static File MODEL_FILE_FOLDER = Commons.getRemoteOrLocalFolder("analyzefeaturemodels/");
 
 	private static final FileFilter filter = new FileFilter() {
 
@@ -105,17 +106,6 @@ public class TFeatureModelAnalyzer {
 	private static IFeature FM8_F1 = FM_test_8.getFeature("B");
 	private static IFeature FM8_F2 = FM_test_8.getFeature("C");
 	private static Map<IFeatureModelElement, Object> FM8_DATA = FeatureModelManager.getAnalyzer(FM_test_8).analyzeFeatureModel(null);
-
-	/**
-	 * @return
-	 */
-	private static File getFolder() {
-		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/analyzefeaturemodels/");
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("analyzefeaturemodels").getPath());
-		}
-		return folder;
-	}
 
 	private static final IFeatureModel init(String name) {
 		IFeatureModel fm = null;

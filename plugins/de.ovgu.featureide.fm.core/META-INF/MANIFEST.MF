@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 3.3.2.qualifier
+Bundle-Version: 3.4.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
@@ -52,12 +52,21 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.explanations,
  de.ovgu.featureide.fm.core.explanations.config,
  de.ovgu.featureide.fm.core.explanations.config.impl,
+ de.ovgu.featureide.fm.core.explanations.config.impl.composite,
+ de.ovgu.featureide.fm.core.explanations.config.impl.ltms,
  de.ovgu.featureide.fm.core.explanations.config.impl.mus,
  de.ovgu.featureide.fm.core.explanations.fm,
  de.ovgu.featureide.fm.core.explanations.fm.impl,
+ de.ovgu.featureide.fm.core.explanations.fm.impl.composite,
  de.ovgu.featureide.fm.core.explanations.fm.impl.ltms,
  de.ovgu.featureide.fm.core.explanations.fm.impl.mus,
- de.ovgu.featureide.fm.core.explanations.impl.ltms,
+ de.ovgu.featureide.fm.core.explanations.impl,
+ de.ovgu.featureide.fm.core.explanations.impl.composite,
+ de.ovgu.featureide.fm.core.explanations.preprocessors,
+ de.ovgu.featureide.fm.core.explanations.preprocessors.impl,
+ de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite,
+ de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms,
+ de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus,
  de.ovgu.featureide.fm.core.filter,
  de.ovgu.featureide.fm.core.filter.base,
  de.ovgu.featureide.fm.core.functional,
@@ -100,6 +109,7 @@ Export-Package: Jakarta.DRAttributes,
  org.prop4j,
  org.prop4j.explain.solvers,
  org.prop4j.explain.solvers.impl,
+ org.prop4j.explain.solvers.impl.ltms,
  org.prop4j.explain.solvers.impl.sat4j,
  org.sat4j,
  org.sat4j.core,

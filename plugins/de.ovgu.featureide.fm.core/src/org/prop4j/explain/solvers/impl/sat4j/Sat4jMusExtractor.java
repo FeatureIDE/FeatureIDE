@@ -20,8 +20,10 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
@@ -36,11 +38,6 @@ import org.sat4j.tools.xplain.Xplain;
  */
 public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtractor {
 
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	protected Sat4jMusExtractor() {}
-
 	@Override
 	protected Xplain<ISolver> createOracle() {
 		return new Xplain<>(super.createOracle());
@@ -54,12 +51,7 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		final Set<Integer> indexes = getMinimalUnsatisfiableSubsetIndexes();
-		final Set<Node> mus = new LinkedHashSet<>(indexes.size());
-		for (final int index : indexes) {
-			mus.add(getClause(index));
-		}
-		return mus;
+		return getClauseSetFromIndexSet(getMinimalUnsatisfiableSubsetIndexes());
 	}
 
 	@Override
@@ -73,10 +65,20 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		} catch (final TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new TreeSet<>();
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}
 		return set;
+	}
+
+	@Override
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubset());
+	}
+
+	@Override
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
 	}
 }

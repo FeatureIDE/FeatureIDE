@@ -54,7 +54,7 @@ import de.ovgu.featureide.examples.ExamplePlugin;
  *
  * @author Reimar Schroeter
  */
-public class ProjectRecord {
+public class ProjectRecord implements Comparable<ProjectRecord> {
 
 	public static final String PROJECT_INFORMATION_XML = "projectInformation.xml";
 	public static final String INDEX_FILENAME = "index.fileList";
@@ -146,7 +146,7 @@ public class ProjectRecord {
 
 	public boolean init() {
 		try (InputStream inputStream =
-				new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
+			new URL("platform:/plugin/de.ovgu.featureide.examples/" + projectDescriptionRelativePath).openConnection().getInputStream()) {
 			projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(inputStream);
 		} catch (IOException | CoreException e) {
 			ExamplePlugin.getDefault().logError(e);
@@ -297,6 +297,11 @@ public class ProjectRecord {
 		return projectDescriptionRelativePath.equals(other.projectDescriptionRelativePath) && projectName.equals(other.projectName);
 	}
 
+	@Override
+	public int compareTo(ProjectRecord o) {
+		return projectDescriptionRelativePath.compareTo(o.projectDescriptionRelativePath);
+	}
+
 	/**
 	 * Determine if the project with the given name is in the current workspace.
 	 *
@@ -346,7 +351,7 @@ public class ProjectRecord {
 		final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		try {
 			final InputStream inputStream =
-					new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
+				new URL("platform:/plugin/de.ovgu.featureide.examples/" + getInformationDocumentPath()).openConnection().getInputStream();
 			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			final Document doc = dBuilder.parse(inputStream);
 			return doc;

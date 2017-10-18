@@ -239,7 +239,6 @@ public final class ConstraintTextValidator {
 		try {
 			return !satsolver.hasSolution();
 		} catch (final TimeoutException e) {
-
 			return true;
 		}
 

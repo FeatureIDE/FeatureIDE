@@ -121,4 +121,9 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "";
+	}
+
 }

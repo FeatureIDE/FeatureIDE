@@ -55,28 +55,26 @@ import de.ovgu.runtimetest.RuntimeTest.Logger.Level;
  * constraints on certain methods, a <b>@Constraint</b> annotation is required. Inside this annotation, it is required to specify a maximum sample count
  * (<b>samples</b>) and the optional minimum and maximum ranges.
  *
- * <br/> <br/> <b>Note</b>: Since JUnit invokes a starter method inside this class, the entire test will stop if at least one method under test fail by
+ * <br/><br/> <b>Note</b>: Since JUnit invokes a starter method inside this class, the entire test will stop if at least one method under test fail by
  * constraint violation or regular exceptions or assertions. An additional JUnit <code>@Test</code> annotation will lead to an additional test drive by JUnit
  * but with regular behavior.
  *
- * <br/> <br/> <b>Example</b>
+ * <br/><br/> <b>Example</b> <pre><code> import java.util.Random;
  *
- * <pre> <code> import java.util.Random;
- * 
  * public class MyTest extends RuntimeTest {
- * 
+ *
  * static { disableThisTest = false; historyLength = HistoryLength.FIVE_ENTRIES; logger = Logger.LOG_NOTHING; }
- * 
- * &#64;Annotations.WarmUp public void methodBeforeTesting() { // Add code here }
- * 
- * 
- * &#64;Annotations.CoolDown public void methodAfterTesting() { // Add code here }
- * 
- * 
- * &#64;Annotations.Constraint(samples=5,allowedPlus=3) public void foo1() throws InterruptedException { Thread.sleep(new Random().nextInt(20)); }
- * 
- * &#64;Annotations.Constraint(samples=5,allowedPlus=10,allowedMinus=1) public void foo2() throws InterruptedException { Thread.sleep(new Random().nextInt(10));
- * } } </code> </pre>
+ *
+ * @Annotations.WarmUp public void methodBeforeTesting() { // Add code here }
+ *
+ *
+ * @Annotations.CoolDown public void methodAfterTesting() { // Add code here }
+ *
+ *
+ * @Annotations.Constraint(samples=5,allowedPlus=3) public void foo1() throws InterruptedException { Thread.sleep(new Random().nextInt(20)); }
+ *
+ * @Annotations.Constraint(samples=5,allowedPlus=10,allowedMinus=1) public void foo2() throws InterruptedException { Thread.sleep(new Random().nextInt(10)); } }
+ *                                                                  </code></pre>
  *
  * @author Marcus Pinnecke (pinnecke@ovgu.de)
  *
@@ -152,8 +150,8 @@ public abstract class RuntimeTest {
 
 		public RangeException(final Annotations.Constraint constraint) {
 			super("Constraint ranges for test are out of bounds or negative. Lower bound = method runtime - " + (-constraint.allowedMinus())
-					+ ", upper bound = method runtime + " + constraint.allowedPlus()
-					+ "]. Lower bound must be less method runtime and upper bound must be greater than runtime.");
+				+ ", upper bound = method runtime + " + constraint.allowedPlus()
+				+ "]. Lower bound must be less method runtime and upper bound must be greater than runtime.");
 		}
 	}
 
@@ -523,7 +521,7 @@ public abstract class RuntimeTest {
 
 	protected void checkConstraintRanges(final Annotations.Constraint constraint) {
 		if (((constraint.allowedMinus() != Double.NEGATIVE_INFINITY) && (constraint.allowedMinus() < 0))
-				|| ((constraint.allowedPlus() != Double.POSITIVE_INFINITY) && (constraint.allowedPlus() < 0))) {
+			|| ((constraint.allowedPlus() != Double.POSITIVE_INFINITY) && (constraint.allowedPlus() < 0))) {
 			throw new RangeException(constraint);
 		}
 	}

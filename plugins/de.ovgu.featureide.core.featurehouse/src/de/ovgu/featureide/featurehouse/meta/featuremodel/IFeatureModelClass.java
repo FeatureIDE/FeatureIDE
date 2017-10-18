@@ -29,7 +29,7 @@ public interface IFeatureModelClass {
 
 	static final String IMPORT_JPF = "import gov.nasa.jpf.vm.Verify;\r\n\r\n";
 	static final String VALID =
-			"/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean valid() {\r\n\t\t";
+		"/**\r\n\t * This formula represents the validity of the current feature selection.\r\n\t */\r\n\tpublic /*@pure@*/ static boolean valid() {\r\n\t\t";
 
 	/**
 	 * @return The required imports.

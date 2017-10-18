@@ -12,6 +12,7 @@ public/* nullable_by_default */class Pot {
    */
   /*@ public normal_behavior
       requires addedValue <= size;
+      assignable \nothing;
    */
   public final void addToPotSize(final double addedValue) {
     original(addedValue);

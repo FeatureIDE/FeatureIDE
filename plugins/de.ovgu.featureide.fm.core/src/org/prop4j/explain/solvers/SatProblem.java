@@ -38,42 +38,45 @@ public interface SatProblem {
 
 	/**
 	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. </p>
+	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF: </p>
 	 *
-	 * <pre> <i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i> </pre> </p>
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></blockquote> </p>
 	 *
 	 * @param formulas formulas to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormulas(Node... formulas);
+	public int addFormulas(Node... formulas);
 
 	/**
 	 * <p> Adds all given formulas to the problem. First, each given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. </p>
+	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF: </p>
 	 *
-	 * <pre> <i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i> </pre> </p>
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></blockquote> </p>
 	 *
 	 * @param formulas formulas to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormulas(Collection<Node> formulas);
+	public int addFormulas(Collection<? extends Node> formulas);
 
 	/**
 	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
-	 * each clause of the resulting conjunction is added to the existing conjunction. </p>
+	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with the (possibly empty) given formula <i>g</i> in CNF:
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with the (possibly empty) given formula <i>g</i> in CNF: </p>
 	 *
-	 * <pre> <i>f'</i> = <i>f</i> &and; <i>g</i> </pre> </p>
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g</i></blockquote> </p>
 	 *
 	 * @param formula formula to add; not null
+	 * @return the amount of clauses added
 	 */
-	public void addFormula(Node formula);
+	public int addFormula(Node formula);
 
 	/**
 	 * Returns all clauses in this problem.
@@ -98,6 +101,14 @@ public interface SatProblem {
 	 * @return the amount of clauses in this problem
 	 */
 	public int getClauseCount();
+
+	/**
+	 * Returns true if this contains a clause that equals the given clause.
+	 *
+	 * @param clause clause to search for
+	 * @return true if this contains a clause that equals the given clause
+	 */
+	public boolean containsClause(Node clause);
 
 	/**
 	 * Adds all given assumptions to the problem.

@@ -391,8 +391,8 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			String configString = "";
 			for (final SelectableFeature f : configuration.getFeatures()) {
 				if (!f.getFeature().getStructure().isAbstract()) {
-					configString += f.getFeature().getName() + '='
-							+ (f.getSelection() == Selection.SELECTED ? Boolean.TRUE.toString() : Boolean.FALSE.toString()) + "\n";
+					configString +=
+						f.getFeature().getName() + '=' + (f.getSelection() == Selection.SELECTED ? Boolean.TRUE.toString() : Boolean.FALSE.toString()) + "\n";
 				}
 			}
 			if (configString.contains("\n")) {
@@ -509,8 +509,8 @@ public class RuntimeParameters extends ComposerExtensionClass {
 			@Override
 			public int compare(final FeatureLocation a, final FeatureLocation b) {
 				return a.getOSPath().compareTo(b.getOSPath()) == 0
-						? (a.getStartLineNum() < b.getStartLineNum() ? -1 : a.getStartLineNum() == b.getStartLineNum() ? 0 : 1)
-						: a.getOSPath().compareTo(b.getOSPath());
+					? (a.getStartLineNum() < b.getStartLineNum() ? -1 : a.getStartLineNum() == b.getStartLineNum() ? 0 : 1)
+					: a.getOSPath().compareTo(b.getOSPath());
 			}
 		});
 

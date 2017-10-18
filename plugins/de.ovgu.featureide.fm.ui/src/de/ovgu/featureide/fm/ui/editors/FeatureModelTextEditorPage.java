@@ -35,6 +35,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.functional.Functional.ICriticalConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOperation;
 
@@ -142,6 +143,13 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void pageChangeFrom(int newPage) {
 		if (newPage != getIndex()) {
 			executeSaveOperation();
+			featureModelEditor.fmManager.externalSave(new ICriticalConsumer<IFeatureModel>() {
+
+				@Override
+				public void invoke(IFeatureModel t) throws Exception {
+					doSave(null);
+				}
+			});
 		}
 	}
 

@@ -157,8 +157,8 @@ public class FujiSignaturesCreator {
 					}
 					featurename = getFeatureName(typeDecl);
 					final FujiClassSignature curClassSig =
-							(FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString, typeString, pckg, typeDecl, importList),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
+						(FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString, typeString, pckg, typeDecl, importList),
+								projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
 					for (final ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}

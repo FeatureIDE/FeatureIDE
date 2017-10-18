@@ -19,7 +19,7 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		case 0:
 			if (obj instanceof FileProxy) {
 				return ((FileProxy) obj).getFileName() + " (" + ((FileProxy) obj).getLogs().size() + ERROR
-						+ ((((FileProxy) obj).getLogs().size() == 1) ? "" : "s") + ")";
+					+ ((((FileProxy) obj).getLogs().size() == 1) ? "" : "s") + ")";
 			}
 			if (obj instanceof Log) {
 				return ((Log) obj).getMessage();

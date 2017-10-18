@@ -27,11 +27,12 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.ahead.wrapper.AheadBuildErrorEvent;
 import de.ovgu.featureide.core.CorePlugin;
 
 /**
- * Tests the class {@link AheadBuildErrorEvent}<br> <br>
+ * Tests the class {@link AheadBuildErrorEvent}<br><br>
  *
  * To generate test cases copy the files into "testcases.<code>projectname</code>"<br> java files need to be renamed into <code>filename</code>.javaX<br>
  * feature files need to be renamed into <code>feature</code>_filename.jak
@@ -43,8 +44,6 @@ import de.ovgu.featureide.core.CorePlugin;
  * changed or is created at the composition process)
  */
 public class TAheadErrorPropagation {
-
-	protected static File FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.core.ahead-test/src/testcases/");
 
 	AheadBuildErrorEvent event = new AheadBuildErrorEvent();
 
@@ -59,12 +58,7 @@ public class TAheadErrorPropagation {
 	}
 
 	public File getFile(String name) {
-		// first tries the location on build server, if this fails tries to use
-		// local location
-		if (!FILE_FOLDER.canRead()) {
-			FILE_FOLDER = new File(ClassLoader.getSystemResource("testcases").getPath());
-		}
-		final File folder = FILE_FOLDER.listFiles(getFileFilter(project))[0];
+		final File folder = Commons.getTestCaseFolder().listFiles(getFileFilter(project))[0];
 		return folder.listFiles(getFileFilter(name))[0];
 	}
 
@@ -98,7 +92,7 @@ public class TAheadErrorPropagation {
 
 		if (!event.fileName.equals("../features/" + feature + "/" + className + ".jak")) {
 			System.out.println("Wrong source files @ " + className + ".java (expected: " + "../features/" + feature + "/" + className + ".jak" + " but was: "
-					+ event.fileName + ")");
+				+ event.fileName + ")");
 		}
 
 		final int sourceLine = event.setSourceLine(composedJakLine, line, readFile(getFile(feature + "_" + className + ".jak")));

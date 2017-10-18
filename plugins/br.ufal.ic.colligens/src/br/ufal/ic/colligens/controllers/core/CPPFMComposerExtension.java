@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 public class CPPFMComposerExtension extends FMComposerExtension {
 
 	private static String ORDER_PAGE_MESSAGE =
-			"FeatureIDE projects based on preprocessors such as CPPs do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+		"FeatureIDE projects based on preprocessors such as CPPs do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 
 	@Override
 	public String getOrderPageMessage() {

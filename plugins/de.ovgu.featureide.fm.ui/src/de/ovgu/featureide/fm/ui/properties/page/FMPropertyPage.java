@@ -133,7 +133,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		}
 
 		selectorLegendBackground =
-				createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
+			createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
 		selectorLegendBorder = createSelectorEntry(group, LEGEND_BORDER_LABEL, FMPropertyManager.getLegendBorderColor().getRGB(), LEGEND_BORDER_TIP);
 	}
 
@@ -161,11 +161,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		final Group colorGroup = createGroup(composite, COLOR_GROUP_TEXT);
 
 		selectorDiagramBackground =
-				createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL, FMPropertyManager.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
+			createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL, FMPropertyManager.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
 		selectorConcreteBackground =
-				createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
+			createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
 		selectorAbstractBackground =
-				createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
+			createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
 
 		final Label label = new Label(colorGroup, SWT.NULL);
 		label.setText(HIDE_BORDER_COLOR);

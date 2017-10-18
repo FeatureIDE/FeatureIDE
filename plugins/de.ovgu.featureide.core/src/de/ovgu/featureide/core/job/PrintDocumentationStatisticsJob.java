@@ -216,10 +216,10 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 		workMonitor.worked();
 
 		final StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
-		// for (int j = 0; j < statisticNumComments.length; j++) {
-		// sb3.append(statisticNumComments[j]);
-		// sb3.append(';');
-		// }
+//		for (int j = 0; j < statisticNumComments.length; j++) {
+//			sb3.append(statisticNumComments[j]);
+//			sb3.append(';');
+//		}
 		sb3.setCharAt(sb3.length() - 1, '\n');
 		try {
 			FileSystem.write(Paths.get(folder.getFile("numComments.txt").getLocationURI()), sb3.toString().getBytes(Charset.forName("UTF-8")));
@@ -232,10 +232,10 @@ public class PrintDocumentationStatisticsJob implements LongRunningMethod<Boolea
 		return true;
 	}
 
-	// private void pseudoMerge(SignatureIterator it, ADocumentationCommentMerger merger) {
-	// while (it.hasNext()) {
-	// merger.setSig(it.next());
-	// merger..mergeComments();
-	// }
-	// }
+//	private void pseudoMerge(SignatureIterator it, ADocumentationCommentMerger merger) {
+//		while (it.hasNext()) {
+//			merger.setSig(it.next());
+//			merger..mergeComments();
+//		}
+//	}
 }

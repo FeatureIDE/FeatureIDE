@@ -50,6 +50,7 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
@@ -152,7 +153,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (extIndex > -1) {
 				final String fileExtension = className.substring(extIndex + 1);
 				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension)
-						|| "c".equals(fileExtension)) {
+					|| "c".equals(fileExtension)) {
 					return IMAGE_CLASS;
 				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_MODULE;
@@ -326,11 +327,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			final IRoleElement element = (IRoleElement) data;
 			for (final FSTRole role : element.getRole().getFSTClass().getRoles()) {
 				if (role.getFile().equals(iFile)
-						&& (((element instanceof FSTMethod) && role.getAllMethods().contains(element) && role.getClassFragment().getMethods().contains(element))
-								|| ((element instanceof FSTInvariant) && role.getClassFragment().getInvariants().contains(element))
-								|| ((element instanceof FSTField) && role.getAllFields().contains(element)
-										&& role.getClassFragment().getFields().contains(element))
-								|| ((element instanceof FSTClassFragment) && role.getAllInnerClasses().contains(element)))) {
+					&& (((element instanceof FSTMethod) && role.getAllMethods().contains(element) && role.getClassFragment().getMethods().contains(element))
+						|| ((element instanceof FSTInvariant) && role.getClassFragment().getInvariants().contains(element))
+						|| ((element instanceof FSTField) && role.getAllFields().contains(element) && role.getClassFragment().getFields().contains(element))
+						|| ((element instanceof FSTClassFragment) && role.getAllInnerClasses().contains(element)))) {
 					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 					return;
 				}

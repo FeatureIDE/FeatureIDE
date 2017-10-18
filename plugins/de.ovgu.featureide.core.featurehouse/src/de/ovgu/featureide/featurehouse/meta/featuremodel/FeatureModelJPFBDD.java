@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	private final static String HEAD =
-			"/**\r\n * Variability encoding of the feature model for JPF-BDD.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
+		"/**\r\n * Variability encoding of the feature model for JPF-BDD.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@gov.nasa.jpf.bdd.TrackWithBDD\r\n";
 	private static final String SELECTFEATURES = "\tpublic static void select_features() {\r\n";
@@ -87,10 +87,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	public String getFormula() {
 		final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureModel)));
 		nodeWriter.setSymbols(NodeWriter.javaSymbols);
-		String formula = nodeWriter.nodeToString().toLowerCase(Locale.ENGLISH);
-		if (formula.contains("  &&  true  &&  ! false")) {
-			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));
-		}
+		final String formula = nodeWriter.nodeToString().toLowerCase(Locale.ENGLISH);
 		return VALID + "return " + formula + ";" + System.lineSeparator() + "\t}" + System.lineSeparator();
 	}
 

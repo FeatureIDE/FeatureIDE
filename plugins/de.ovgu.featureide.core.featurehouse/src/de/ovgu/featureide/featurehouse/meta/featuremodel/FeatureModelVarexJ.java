@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	private final static String HEAD =
-			"/**\r\n * Variability encoding of the feature model for VarexJ.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
+		"/**\r\n * Variability encoding of the feature model for VarexJ.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@Conditional\r\n";
 
@@ -96,7 +96,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		final NodeWriter nodeWriter = new NodeWriter(Nodes.convert(CNFCreator.createNodes(featureModel)));
 		nodeWriter.setSymbols(NodeWriter.javaSymbols);
 		return VALID + "return " + nodeWriter.nodeToString().toLowerCase(Locale.ENGLISH) + ";" + System.lineSeparator() + "\t}" + System.lineSeparator()
-				+ System.lineSeparator();
+			+ System.lineSeparator();
 	}
 
 	@Override

@@ -46,7 +46,7 @@ public class FormatHandler<T> {
 	}
 
 	public List<Problem> getLastWarnings() {
-		return lastWarnings != null ? lastWarnings : Collections.<Problem>emptyList();
+		return lastWarnings != null ? lastWarnings : Collections.<Problem> emptyList();
 	}
 
 	public T getObject() {

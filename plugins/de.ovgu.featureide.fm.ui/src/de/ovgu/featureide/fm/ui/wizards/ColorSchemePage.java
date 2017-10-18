@@ -212,7 +212,7 @@ public class ColorSchemePage extends WizardPage {
 			final String oldSchemeName = selection[0];
 			final String newSchemeName = newColorSchemeText.getText();
 			if ((oldSchemeName != null) && !oldSchemeName.isEmpty() && FeatureColorManager.hasColorScheme(featureModel, oldSchemeName)
-					&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
+				&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
 				FeatureColorManager.renameColorScheme(featureModel, oldSchemeName, newSchemeName);
 				final int index = colorSchemeNames.indexOf(oldSchemeName);
 				colorSchemeNames.set(index, newSchemeName);

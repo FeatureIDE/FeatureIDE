@@ -86,7 +86,7 @@ public class TWiseConfigurationGenerator extends AConfigurationGenerator {
 			final double percent = 1 - (((double) count) / numberOfCombinations);
 			if (VERBOSE) {
 				System.out.println((((int) Math.floor(percent * 1000)) / 10.0) + " (" + completeSolutionList.size() + " | " + incompleteSolutionList.size()
-						+ " | " + count + " || " + innerSolverCount + " | " + outerSolverCount + ")");
+					+ " | " + count + " || " + innerSolverCount + " | " + outerSolverCount + ")");
 			}
 		}
 	});

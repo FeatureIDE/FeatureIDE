@@ -218,9 +218,9 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		final Font font = new Font(shell.getDisplay(), new FontData(fontData.getName(), 10, SWT.NONE));
 		capture.setFont(font);
 		capture.setText("One or more features could not be deleted, because they are contained within one or\n" + "more constraints.\n"
-				+ "To delete these features anyway you can replace their occurences in\n"
-				+ "constraints with another feature. Select one or more features on the left in order to\n"
-				+ "replace them with one of their respective semantically equivalent features shown\n" + ON_THE_RIGHT_HAND_SIDE_);
+			+ "To delete these features anyway you can replace their occurences in\n"
+			+ "constraints with another feature. Select one or more features on the left in order to\n"
+			+ "replace them with one of their respective semantically equivalent features shown\n" + ON_THE_RIGHT_HAND_SIDE_);
 		capture.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		gridData = new GridData();

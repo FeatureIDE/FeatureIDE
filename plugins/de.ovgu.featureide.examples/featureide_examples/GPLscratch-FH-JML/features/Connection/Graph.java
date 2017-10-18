@@ -50,6 +50,7 @@ public class Graph {
 	/*@ \final_contract
 	 @ 	requires source != null && target != null;
 	 @ 	ensures hasConnection(source, target) ==> isConnection(\result, source, target);
+	 @  assignable nodes;
 	 @*/
 	public ArrayList<Node> getConnection(Node source, Node target) {
 		setNodesUnvisited();
@@ -58,6 +59,7 @@ public class Graph {
 	
 	/*@ \final_method
 	 @ requires path != null && source != null && target != null;
+	 @ assignable \nothing;
 	 @*/
 	private ArrayList<Node> doDFS(ArrayList<Node> path, Node source, Node target) {
 		source.setVisited(true);
@@ -78,6 +80,7 @@ public class Graph {
 	 @ requires nodes != null;
 	 @ ensures (\forall int i; 0 <= i && i < nodes.size(); 
 	 @ 	nodes.get(i).visible = false);
+	 @ assignable nodes;
 	 @*/
 	private void setNodesUnvisited() {
 		for (Node n : nodes) {

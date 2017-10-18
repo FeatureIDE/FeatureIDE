@@ -105,7 +105,7 @@ public class ConstraintToStringTest {
 	public void testSplit1() {
 		final String constraint = "- (A  =>  \" A\"  |  - - (\"A \"  &  and  =>  \" and\"  &  \" and\"  |  \" and \"  &  \" and\"  &  - \" and\"))";
 		final String exptected =
-				"not (A implies \" A\" or not (not (\"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\")))";
+			"not (A implies \" A\" or not (not (\"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\")))";
 		final NodeReader nodeReader = new NodeReader();
 		nodeReader.activateShortSymbols();
 		final String string = nodeReader.stringToNode(constraint).toString(NodeWriter.textualSymbols);

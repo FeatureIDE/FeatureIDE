@@ -29,9 +29,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_CORRUPT__NO
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -51,6 +57,7 @@ public class DefaultFormat implements IConfigurationFormat {
 
 	@Override
 	public ProblemList read(Configuration configuration, CharSequence source) {
+		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final ProblemList warnings = new ProblemList();
 
 		String line = null;
@@ -63,6 +70,7 @@ public class DefaultFormat implements IConfigurationFormat {
 				// the string tokenizer is used to also support the expression
 				// format used by FeatureHouse
 				final StringTokenizer tokenizer = new StringTokenizer(line);
+				final List<String> hiddenFeatures = new ArrayList<>();
 				while (tokenizer.hasMoreTokens()) {
 					String name = tokenizer.nextToken(" ");
 					if (name.startsWith("\"")) {
@@ -76,8 +84,23 @@ public class DefaultFormat implements IConfigurationFormat {
 							warnings.add(new Problem(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					}
+					name = renamingsManager.getNewName(name);
+					final IFeature feature = configuration.getFeatureModel().getFeature(name);
+					if ((feature != null) && feature.getStructure().hasHiddenParent()) {
+						hiddenFeatures.add(name);
+					} else {
+						try {
+							configuration.setManual(name, Selection.SELECTED);
+						} catch (final FeatureNotFoundException e) {
+							warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
+						} catch (final SelectionNotPossibleException e) {
+							warnings.add(new Problem(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
+						}
+					}
+				}
+				for (final String name : hiddenFeatures) {
 					try {
-						configuration.setManual(name, Selection.SELECTED);
+						configuration.setAutomatic(name, Selection.SELECTED);
 					} catch (final FeatureNotFoundException e) {
 						warnings.add(new Problem(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} catch (final SelectionNotPossibleException e) {
@@ -101,8 +124,24 @@ public class DefaultFormat implements IConfigurationFormat {
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
-		writeSelectedFeatures(configuration.getRoot(), buffer);
-		return buffer.toString();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
+		if (featureModel.isFeatureOrderUserDefined()) {
+			final List<String> list = featureModel.getFeatureOrderList();
+			final Set<String> featureSet = configuration.getSelectedFeatureNames();
+			for (final String s : list) {
+				if (featureSet.contains(s)) {
+					if (s.contains(" ")) {
+						buffer.append("\"" + s + "\"" + NEWLINE);
+					} else {
+						buffer.append(s + NEWLINE);
+					}
+				}
+			}
+			return buffer.toString();
+		} else {
+			writeSelectedFeatures(configuration.getRoot(), buffer);
+			return buffer.toString();
+		}
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {

@@ -84,8 +84,8 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 				return false;
 			}
 		}
-		// else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
-		// return false;
+//		else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
+//			return false;
 		if (featureOrderInXML != other.featureOrderInXML) {
 			return false;
 		}

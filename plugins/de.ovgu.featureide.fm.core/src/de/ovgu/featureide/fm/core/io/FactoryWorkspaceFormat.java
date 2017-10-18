@@ -109,4 +109,9 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 		return supportsRead();
 	}
 
+	@Override
+	public String getName() {
+		return "";
+	}
+
 }

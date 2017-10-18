@@ -100,7 +100,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Iterated through all jak files of the source folder.<br> <br>
+	 * Iterated through all jak files of the source folder.<br><br>
 	 *
 	 * The first line of a jak file must not start with imports.<br> Removes derived layer declarations.
 	 *
@@ -120,7 +120,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Corrects the given source jak file.<br> <br>
+	 * Corrects the given source jak file.<br><br>
 	 *
 	 * The first line of a jak file must not start with imports.<br> Removes derived layer declarations.
 	 *
@@ -137,7 +137,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	/**
-	 * Corrects the given file content of the source jak file.<br> <br>
+	 * Corrects the given file content of the source jak file.<br><br>
 	 *
 	 * The first line of a jak file must not start with imports.<br> Removes derived layer declarations.
 	 *
@@ -151,7 +151,7 @@ public class AheadComposer extends ComposerExtensionClass {
 			fileContent = NEWLINE + fileContent;
 		}
 		if (!fileContent.equals(fileContent.replaceFirst("layer\\s+\\w+\\s*;", ""))
-				&& (fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf('{'))) {
+			&& (fileContent.replaceFirst("layer\\s+\\w+\\s*;", LAYER_REPLACING).indexOf(LAYER_REPLACING) < fileContent.indexOf('{'))) {
 			return fileContent.replaceFirst("layer\\s+\\w+\\s*;", "");
 		} else if (changed) {
 			return fileContent;
@@ -311,7 +311,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	private static ArrayList<String[]> createTempltes() {
 		final ArrayList<String[]> list = new ArrayList<String[]>(1);
 		list.add(new String[] { "Jak", "jak", "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public " + REFINES_PATTERN + " class "
-				+ CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" });
+			+ CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" });
 		return list;
 	}
 
@@ -386,12 +386,11 @@ public class AheadComposer extends ComposerExtensionClass {
 		final IFile settingsFile = settingsFolder.getFile("org.eclipse.jdt.core.prefs");
 		if (!settingsFile.exists()) {
 			final String text = "eclipse.preferences.version=1" + NEWLINE + "org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled" + NEWLINE
-					+ "org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve"
-					+ NEWLINE + "org.eclipse.jdt.core.compiler.compliance=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.lineNumber=generate" + NEWLINE
-					+ "org.eclipse.jdt.core.compiler.debug.localVariable=generate" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.sourceFile=generate"
-					+ NEWLINE + "org.eclipse.jdt.core.compiler.problem.assertIdentifier=error" + NEWLINE
-					+ "org.eclipse.jdt.core.compiler.problem.enumIdentifier=error" + NEWLINE + "org.eclipse.jdt.core.compiler.source=1.6" + NEWLINE
-					+ "org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
+				+ "org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.codegen.unusedLocal=preserve" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.compliance=1.6" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.lineNumber=generate" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.debug.localVariable=generate" + NEWLINE + "org.eclipse.jdt.core.compiler.debug.sourceFile=generate" + NEWLINE
+				+ "org.eclipse.jdt.core.compiler.problem.assertIdentifier=error" + NEWLINE + "org.eclipse.jdt.core.compiler.problem.enumIdentifier=error"
+				+ NEWLINE + "org.eclipse.jdt.core.compiler.source=1.6" + NEWLINE + "org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.jak";
 			final InputStream source = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
 				settingsFile.create(source, true, null);

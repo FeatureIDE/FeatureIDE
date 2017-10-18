@@ -46,6 +46,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -93,7 +94,7 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * A multi page editor to edit feature models. If the model file contains errors, markers will be created on save.
@@ -443,10 +444,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					diagramEditor.internRefresh(false);
-					// refresh root and children to prevent manual and another layout algorithm to omit connection
-					if (diagramEditor.getFeatureModel().getStructure().getRoot() != null) {
-						diagramEditor.refreshChildAll(diagramEditor.getFeatureModel().getStructure().getRoot().getFeature());
-					}
 					diagramEditor.analyzeFeatureModel();
 				}
 			});
@@ -479,6 +476,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	protected void setInput(IEditorInput input) {
+		// Cast is necessary, don't remove
 		final IFile file = input.getAdapter(IFile.class);
 		markerHandler = new ModelMarkerHandler<>(file);
 		setPartName(getModelFile().getProject().getName() + MODEL);
@@ -673,19 +671,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	private boolean saveEditors() {
 		if (getFeatureModel().getRenamingsManager().isRenamed()) {
 			final IProject project = getModelFile().getProject();
-			final ArrayList<String> dirtyEditors = new ArrayList<String>();
-			final ArrayList<IEditorPart> dirtyEditors2 = new ArrayList<IEditorPart>();
+			final ArrayList<String> dirtyEditorFileNames = new ArrayList<>();
+			final ArrayList<IEditorPart> dirtyEditors = new ArrayList<>();
 			for (final IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
 				for (final IWorkbenchPage page : window.getPages()) {
 					for (final IEditorReference editorRef : page.getEditorReferences()) {
 						if (ConfigurationEditor.ID.equals(editorRef.getId())) {
 							final IEditorPart editor = editorRef.getEditor(true);
 							if (editor.isDirty()) {
-								final IEditorInput editorInput = editor.getEditorInput();
-								final IFile editorFile = editorInput.getAdapter(IFile.class);
+								final IFile editorFile = Adapters.adapt(editor.getEditorInput(), IFile.class);
 								if (editorFile.getProject().equals(project)) {
-									dirtyEditors.add(editorFile.getName());
-									dirtyEditors2.add(editor);
+									dirtyEditorFileNames.add(editorFile.getName());
+									dirtyEditors.add(editor);
 								}
 							}
 						}
@@ -693,20 +690,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				}
 			}
 
-			if (dirtyEditors.size() != 0) {
+			if (!dirtyEditorFileNames.isEmpty()) {
 				final ListDialog dialog = new ListDialog(getSite().getWorkbenchWindow().getShell());
 				dialog.setAddCancelButton(true);
 				dialog.setContentProvider(new ArrayContentProvider());
 				dialog.setLabelProvider(new LabelProvider());
-				dialog.setInput(dirtyEditors);
-				dialog.setInitialElementSelections(dirtyEditors);
+				dialog.setInput(dirtyEditorFileNames);
+				dialog.setInitialElementSelections(dirtyEditorFileNames);
 				dialog.setTitle(SAVE_RESOURCES);
 				dialog.setHelpAvailable(false);
 				dialog.setMessage(SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_);
 				dialog.open();
 
 				if (dialog.getResult() != null) {
-					for (final IEditorPart editor : dirtyEditors2) {
+					for (final IEditorPart editor : dirtyEditors) {
 						editor.doSave(null);
 					}
 				} else {

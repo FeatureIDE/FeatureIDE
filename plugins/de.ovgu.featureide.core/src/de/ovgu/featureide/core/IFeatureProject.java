@@ -71,7 +71,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	QualifiedName javaClassPathID = new QualifiedName("featureproject.configs", "javaClassPath");
 	QualifiedName contractCompositionID =
-			new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition", IFeatureProject.class.getName() + "#ContractComposition");
+		new QualifiedName(IFeatureProject.class.getName() + "#ContractComposition", IFeatureProject.class.getName() + "#ContractComposition");
 
 	String MARKER_UNUSED = "Unused: ";
 	String MARKER_FALSE_OPTIONAL = "False optional: ";

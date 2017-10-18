@@ -185,9 +185,9 @@ public class NNFConverter implements IConverterStrategy {
 	 */
 	private void createAbstractSubtree(IFeature top, List<Node> nodes, int level) {
 		// Increment suffix for every new modeled constraint
-		// if(level == 1) {
-		// System.out.println("Next subtree: " + (++subtree));
-		// }
+//		if(level == 1) {
+//			System.out.println("Next subtree: " + (++subtree));
+//		}
 		for (final Node node : nodes) {
 			if (level == 1) {
 				suffix++;
@@ -257,7 +257,7 @@ public class NNFConverter implements IConverterStrategy {
 		Node node = constraint.getNode().clone();
 
 		final String[] supported = new String[] { "!", " && ", " || ", NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol,
-				NodeWriter.noSymbol, NodeWriter.noSymbol };
+			NodeWriter.noSymbol, NodeWriter.noSymbol };
 		node = node.eliminateNotSupportedSymbols(supported);
 
 		node = propagateNegation(node, false);

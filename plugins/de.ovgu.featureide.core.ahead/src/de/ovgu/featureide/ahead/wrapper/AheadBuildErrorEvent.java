@@ -116,7 +116,7 @@ public class AheadBuildErrorEvent {
 	 * TODO #457 fix wrong line calculation for AHEAD The first pattern causes an endless loop. The second pattern caused a wrong line calculation. see: Tests @
 	 * TAheadErrorPropagation
 	 */
-	// private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
+//	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+\\{[^{}]+\\})\\s*}");
 	private static Pattern inheritedPattern = Pattern.compile("(// inherited constructors(?:[^{}]+|\\{[^{}]+\\})+)\\}");
 
 	/**

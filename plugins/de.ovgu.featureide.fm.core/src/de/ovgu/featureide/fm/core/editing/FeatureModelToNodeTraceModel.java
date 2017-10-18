@@ -51,12 +51,9 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureStructure;
  *
  * <p> Note, however, that this is not implemented as map from target formula to source element. After all, two clauses that are equal may occur multiple times
  * in the same formula while originating from different source elements. For example, a feature model containing a parent feature <i>P</i>, a child feature
- * <i>C</i> and a constraint <i>C</i> &rArr; <i>P</i>, the target formula would be:
- *
- * <pre> (<i>C</i> &rArr; <i>P</i>) &and; (<i>C</i> &rArr; <i>P</i>) </pre>
- *
- * Both of these two clauses could stem from either the child relationship or the constraint. To differentiate these cases, the lookup is done using the index
- * of the clause in the formula. </p>
+ * <i>C</i> and a constraint <i>C</i> &rArr; <i>P</i>, the target formula would be: <pre>(<i>C</i> &rArr; <i>P</i>) &and; (<i>C</i> &rArr; <i>P</i>)</pre> Both
+ * of these two clauses could stem from either the child relationship or the constraint. To differentiate these cases, the lookup is done using the index of the
+ * clause in the formula. </p>
  *
  * @author Timo G&uuml;nther
  * @see AdvancedNodeCreator#getTraceModel()
@@ -73,22 +70,16 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		/**
 		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed upward. </p>
 		 *
-		 * <p> The upward part of the child relationship is that of the following form:
-		 *
-		 * <pre> <i>Child<sub>1</sub></i> &or; &hellip; &or; <i>Child<sub>n</sub></i> &rArr; <i>Parent</i> </pre>
-		 *
-		 * Every child relationship contains an upward part. In fact, optional child relationships consist of nothing but an upward part (with <i>n</i> = 1).
-		 * </p>
+		 * <p> The upward part of the child relationship is that of the following form: <pre><i>Child<sub>1</sub></i> &or; &hellip; &or;
+		 * <i>Child<sub>n</sub></i> &rArr; <i>Parent</i></pre> Every child relationship contains an upward part. In fact, optional child relationships consist
+		 * of nothing but an upward part (with <i>n</i> = 1). </p>
 		 */
 		CHILD_UP,
 		/**
 		 * <p> Denotes that the clause's origin is a {@link FeatureStructure#getChildren() child feature} directed downward. </p>
 		 *
-		 * <p> The upward part of the child relationship is that of the following form:
-		 *
-		 * <pre> <i>Parent</i> &rArr; <i>Child<sub>1</sub></i> &or; &hellip; &or; <i>Child<sub>n</sub></i> </pre>
-		 *
-		 * Every non-optional child relationship contains a downward part. </p>
+		 * <p> The upward part of the child relationship is that of the following form: <pre><i>Parent</i> &rArr; <i>Child<sub>1</sub></i> &or; &hellip; &or;
+		 * <i>Child<sub>n</sub></i></pre> Every non-optional child relationship contains a downward part. </p>
 		 */
 		CHILD_DOWN,
 		/**
@@ -96,9 +87,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * {@link CHILD_DOWN downward}. </p>
 		 *
 		 * <p> This is the case for {@link FeatureStructure#isAlternative() alternative groups}, which (in addition to upward and downward parts) contain the
-		 * following part:
-		 *
-		 * <pre> atmost1(<i>Child<sub>1</sub></i>, &hellip;, <i>Child<sub>n</sub></i>) </pre> </p>
+		 * following part: <pre>atmost1(<i>Child<sub>1</sub></i>, &hellip;, <i>Child<sub>n</sub></i>)</pre> </p>
 		 */
 		CHILD_HORIZONTAL,
 		/** Denotes that the literal's origin is the {@link FeatureStructure#isRoot() root feature}. */
@@ -252,9 +241,9 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 *
 		 * @return literals for the multiple source elements; not null
 		 */
-		private Literal[] getLiterals() {
+		private Node[] getLiterals() {
 			final Set<IFeatureModelElement> elements = getElements();
-			final Literal[] literals = new Literal[elements.size()];
+			final Node[] literals = new Node[elements.size()];
 			int i = 0;
 			for (final IFeatureModelElement element : elements) {
 				literals[i++] = getLiteral((IFeature) element);
@@ -278,7 +267,7 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 		 * @return a literal for the given feature; not null
 		 */
 		private Literal getLiteral(IFeature feature) {
-			return new Literal(feature.getName());
+			return new Literal(NodeCreator.getVariable(feature));
 		}
 
 		@Override
@@ -402,10 +391,19 @@ public class FeatureModelToNodeTraceModel implements Cloneable {
 	 * @param amount amount of traces to remove
 	 */
 	public void removeTraces(int amount) {
-		int size = traces.size();
+		int size = getTraceCount();
 		while (--amount >= 0) {
-			traces.remove(--size);
+			removeTrace(--size);
 		}
+	}
+
+	/**
+	 * Removes the trace for the clause with the given index.
+	 *
+	 * @param clauseIndex index of the clause to remove
+	 */
+	public void removeTrace(int clauseIndex) {
+		traces.remove(clauseIndex);
 	}
 
 	/**

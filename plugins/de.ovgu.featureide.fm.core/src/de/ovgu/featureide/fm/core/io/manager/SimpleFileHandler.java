@@ -74,14 +74,14 @@ public class SimpleFileHandler<T> {
 	}
 
 	public static <T> ProblemList load(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-		return getFileHandler(path, object, formatManager).getLastProblems();
+		return getFileHandler(path, new VirtualFileManager.ObjectCreator<>(object), formatManager).getLastProblems();
 	}
 
 	public static final <T> FileHandler<T> getFileHandler(Path path, T object, FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		return getFileHandler(path, new VirtualFileManager.ObjectCreator<>(object), formatManager);
 	}
 
-	protected static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator,
+	public static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator,
 			FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		final FileHandler<T> fileHandler = new FileHandler<>(path, null, null);
 		try {

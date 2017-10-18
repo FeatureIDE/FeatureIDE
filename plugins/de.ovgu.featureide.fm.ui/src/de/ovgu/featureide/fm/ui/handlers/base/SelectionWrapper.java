@@ -39,6 +39,7 @@ public class SelectionWrapper<T> {
 		if (element.getClass() == classType) {
 			return classType.cast(element);
 		} else if (element instanceof IAdaptable) {
+			// Cast is necessary, don't remove
 			return ((IAdaptable) element).getAdapter(classType);
 		}
 		return null;

@@ -30,7 +30,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -101,9 +100,9 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		migrateProjects();
 
-		adjustFeatureModel();
+		final IFeatureModel featureModel = adjustFeatureModel();
 
-		createConfigurationFiles();
+		createConfigurationFiles(featureModel);
 	}
 
 	/**
@@ -154,14 +153,6 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 				e.printStackTrace();
 			}
 
-			// try
-			// {
-			// if(project.hasNature(ANDROID_NATURE))
-			// copyProjectProperties(project, featureFolderPath);
-			// } catch (CoreException e)
-			// {
-			// e.printStackTrace();
-			// }
 		}
 	}
 
@@ -279,10 +270,10 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * child features.<br> <br> The result is written to {@code /model.xml}. <br> <br> Can be overwritten by extending classes to accomodate
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
-	protected void adjustFeatureModel() {
+	protected IFeatureModel adjustFeatureModel() {
 		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
-
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
+		return featureModelOfVariants;
 	}
 
 	private IFeatureModel generateFeatureModelOfVariants() {
@@ -312,16 +303,12 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 *
 	 * @see SPLMigrationDialogSettingsPage#getConfigPath()
 	 */
-	protected void createConfigurationFiles() {
+	protected void createConfigurationFiles(IFeatureModel featureModel) {
 		for (final IProject project : projects) {
 			try {
-				SPLMigrationUtils.createConfigFile(newProject, configurationData.configPath, project.getName());
-			} catch (final UnsupportedEncodingException e) {
+				SPLMigrationUtils.createConfigFile(featureModel, newProject, configurationData.configPath, project.getName());
+			} catch (final Exception e) {
 				CorePlugin.getDefault().logError(e);
-				e.printStackTrace();
-			} catch (final CoreException e) {
-				CorePlugin.getDefault().logError(e);
-				e.printStackTrace();
 			}
 		}
 	}

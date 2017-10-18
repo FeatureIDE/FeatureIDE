@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.sonatype.plugins.munge.Munge;
@@ -83,7 +82,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	public static final String COMPOSER_ID = "de.ovgu.featureide.preprocessor.munge";
 
 	private static final QualifiedName CREATE_SIGNATURE =
-			new QualifiedName(MungePreprocessor.class.getName() + "#Signature", MungePreprocessor.class.getName() + "#Signature");
+		new QualifiedName(MungePreprocessor.class.getName() + "#Signature", MungePreprocessor.class.getName() + "#Signature");
 	private static final String TRUE = "true";
 	private static final String FALSE = "false";
 
@@ -296,13 +295,6 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 							expressionStack.push(lastElement);
 						}
 
-						Node[] nestedExpressions = new Node[expressionStack.size()];
-						nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-						final And nestedExpressionsAnd = new And(nestedExpressions);
-
-						isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
-
 					} else {
 						Node ppExpression = nodereader.stringToNode(m.group(4), featureList);
 
@@ -316,8 +308,8 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
-						checkExpressions(ppExpression, lineNumber, res);
 					}
+					checkContradictionOrTautology(lineNumber, res);
 
 				} else if (singleElement.equals("end")) {
 					for (; ifelseCountStack.peek() > 0; ifelseCountStack.push(ifelseCountStack.pop() - 1)) {
@@ -370,49 +362,49 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
 		final Job job =
-				new Job((PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
+			new Job((PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) != null ? CorePlugin.getFeatureProject(file).toString() : "") {
 
-					@Override
-					public IStatus run(IProgressMonitor monitor) {
-						try {
-							final IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
-							if (marker.length != 0) {
-								for (final IMarker m : marker) {
-									final IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
-									if (!hasMarker(m, sourceFile)) {
-										final IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
-										newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
-										newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
-										newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+				@Override
+				public IStatus run(IProgressMonitor monitor) {
+					try {
+						final IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+						if (marker.length != 0) {
+							for (final IMarker m : marker) {
+								final IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
+								if (!hasMarker(m, sourceFile)) {
+									final IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+									newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+									newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+									newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+								}
+							}
+						}
+					} catch (final CoreException e) {
+						MungeCorePlugin.getDefault().logError(e);
+					}
+					return Status.OK_STATUS;
+				}
+
+				private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
+					try {
+						final IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+						final int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+						final String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
+						if (marker.length > 0) {
+							for (final IMarker m : marker) {
+								if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+									if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+										return true;
 									}
 								}
 							}
-						} catch (final CoreException e) {
-							MungeCorePlugin.getDefault().logError(e);
 						}
-						return Status.OK_STATUS;
+					} catch (final CoreException e) {
+						MungeCorePlugin.getDefault().logError(e);
 					}
-
-					private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
-						try {
-							final IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
-							final int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
-							final String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
-							if (marker.length > 0) {
-								for (final IMarker m : marker) {
-									if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
-										if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
-											return true;
-										}
-									}
-								}
-							}
-						} catch (final CoreException e) {
-							MungeCorePlugin.getDefault().logError(e);
-						}
-						return false;
-					}
-				};
+					return false;
+				}
+			};
 		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}

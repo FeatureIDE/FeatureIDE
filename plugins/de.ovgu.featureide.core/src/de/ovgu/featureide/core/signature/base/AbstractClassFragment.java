@@ -148,7 +148,7 @@ public abstract class AbstractClassFragment {
 		final AbstractClassFragment other = (AbstractClassFragment) obj;
 
 		if ((nonPrivateMemberCount != other.nonPrivateMemberCount) || (nonPrivateInnerClassCount != other.nonPrivateInnerClassCount)
-				|| !signature.equals(other.signature)) {
+			|| !signature.equals(other.signature)) {
 			return false;
 		}
 		for (final AbstractSignature member : members) {

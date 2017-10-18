@@ -67,26 +67,26 @@ public class TseitinConverter extends NNFConverter {
 
 	@Override
 	protected void createAbstractSubtree(IFeature top, List<Node> nodes) {
-		// int i = 0;
-		// addClause(top, "x0");
-		// for(Node node : nodes) {
-		// IFeature clause = addClause(top, "clause" + (i++));
-		//
-		// //System.out.println(node);
-		//
-		// for(Node child : node.getChildren()) {
-		// String name = "";
-		// if(auxVariables.contains(child.getContainedFeatures().get(0))) {
-		// //name = child.getContainedFeatures().get(0);
-		// } else {
-		// name = child.getContainedFeatures().get(0) + "_" + i;
-		// addTerminalAndConstraints(clause, child, name, preserve);
-		// }
-		// //name = child.getContainedFeatures().get(0) + "_" + i;
-		// //addTerminalAndConstraints(clause, child, name, preserve);
-		// //System.out.println(clause + ", " + child + ", " + name);
-		// }
-		// }
+//		int i = 0;
+//		addClause(top, "x0");
+//		for(Node node : nodes) {
+//			IFeature clause = addClause(top, "clause" + (i++));
+//
+//			//System.out.println(node);
+//
+//			for(Node child : node.getChildren()) {
+//				String name = "";
+//				if(auxVariables.contains(child.getContainedFeatures().get(0))) {
+//					//name = child.getContainedFeatures().get(0);
+//				} else {
+//					name = child.getContainedFeatures().get(0) + "_" + i;
+//					addTerminalAndConstraints(clause, child, name, preserve);
+//				}
+//				//name = child.getContainedFeatures().get(0) + "_" + i;
+//				//addTerminalAndConstraints(clause, child, name, preserve);
+//				//System.out.println(clause + ", " + child + ", " + name);
+//			}
+//		}
 
 		final IFeature clause = addClause(top, "Tseitin");
 
@@ -105,7 +105,7 @@ public class TseitinConverter extends NNFConverter {
 		Node node = constraint.getNode().clone();
 
 		final String[] supported = new String[] { "!", " && ", " || ", NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol, NodeWriter.noSymbol,
-				NodeWriter.noSymbol, NodeWriter.noSymbol };
+			NodeWriter.noSymbol, NodeWriter.noSymbol };
 		node = node.eliminateNotSupportedSymbols(supported);
 
 		final List<Node> result = new LinkedList<>();

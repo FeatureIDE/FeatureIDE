@@ -47,8 +47,9 @@ public abstract class AbstractExportHandler<T> extends AFileHandler {
 		final IPersistentFormat<T> format = getInputFormat(path);
 
 		final FileHandler<T> handler = new FileHandler<>(getObject(path, format));
-		handler.read(path, format);
-		handler.write(Paths.get(outputFile), getOutputFormat());
+		if (handler.read(path, format)) {
+			handler.write(Paths.get(outputFile), getOutputFormat());
+		}
 	}
 
 	protected abstract T getObject(Path path, IPersistentFormat<T> format);

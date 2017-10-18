@@ -38,10 +38,10 @@ public class TFeatureHouseToAHEADConversion {
 	private final FeatureHouseToAHEADConversion converter = new FeatureHouseToAHEADConversion(null);
 
 	private final String TEXT_1 =
-			"/r/n" + "/r/n" + "public class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  original();/r/n" + " }/r/n" + "}";
+		"/r/n" + "/r/n" + "public class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  original();/r/n" + " }/r/n" + "}";
 
 	private final String CHANGED_TEXT_1 =
-			"/r/n" + "/r/n" + "public refines class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  Super().method();/r/n" + " }/r/n" + "}";
+		"/r/n" + "/r/n" + "public refines class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  Super().method();/r/n" + " }/r/n" + "}";
 
 	@Test
 	public void changeFile_1() {
@@ -50,11 +50,11 @@ public class TFeatureHouseToAHEADConversion {
 		assertEquals(CHANGED_TEXT_1, converter.TChangeFile(TEXT_1, methodNames));
 	}
 
-	private final String TEXT_2 = "package testPackage;/r/n" + "/r/n" + "public class testClass {/r/n" + "/r/n" + " public void method() {/r/n"
-			+ "  original();/r/n" + " }/r/n" + "}";
+	private final String TEXT_2 =
+		"package testPackage;/r/n" + "/r/n" + "public class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  original();/r/n" + " }/r/n" + "}";
 
 	private final String CHANGED_TEXT_2 =
-			"/r/n" + "/r/n" + "public refines class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  Super().method();/r/n" + " }/r/n" + "}";
+		"/r/n" + "/r/n" + "public refines class testClass {/r/n" + "/r/n" + " public void method() {/r/n" + "  Super().method();/r/n" + " }/r/n" + "}";
 
 	@Test
 	public void changeFile_2() {

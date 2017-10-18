@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/default.config
+configs/default.xml
 Deviations_from_Plath&Ryan.txt
 features/Base/Actions.java
 features/Base/ElevatorSystem/Elevator.java

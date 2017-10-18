@@ -124,7 +124,7 @@ public class FeatureModelProperties {
 		for (final ConstraintProperties c : constraintProperties) {
 			final ConstraintFalseSatisfiabilityStatus constraintSatisfiabilityStatus = c.getConstraintSatisfiabilityStatus();
 			if ((constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.VOID_MODEL)
-					|| (constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE)) {
+				|| (constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE)) {
 				return true;
 			}
 		}

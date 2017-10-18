@@ -354,7 +354,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	private static final ExtendedFeatureModelFactory factory = ExtendedFeatureModelFactory.getInstance();
 
 	private static final int[] binaryOperators =
-			{ VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT };
+		{ VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT };
 	private static final String[] paths = { "%s.velvet", "%s.xml", "MPL/%s.velvet", "MPL/%s.xml" };
 
 	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<>();
@@ -1163,7 +1163,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			connectorName = targetParentFeature.getFeature().getName();
 		} else {
 			connectorName = (targetParentFeature.isRoot() && targetParentFeature.getFeature().getName().equals(sourceModelName))
-					? targetParentFeature.getFeature().getName() : targetParentFeature.getFeature().getName() + "." + sourceModelName;
+				? targetParentFeature.getFeature().getName() : targetParentFeature.getFeature().getName() + "." + sourceModelName;
 		}
 		final ExtendedFeature connector = addFeature(targetParentFeature.getFeature(), connectorName, true, true, instanceRoot.isHidden());
 		connector.setType(type);
@@ -1270,7 +1270,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 
 					for (final String projectName : possibleProjects) {
 						final IFeatureStructure projectFeature =
-								mappingModelFactory.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
+							mappingModelFactory.createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
 						projectFeature.setAbstract(false);
 						projectFeature.setMandatory(false);
 						parameterFeature.addChild(projectFeature);
@@ -1333,7 +1333,7 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
 		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
-				+ curNode.getText() + "\")");
+			+ curNode.getText() + "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {

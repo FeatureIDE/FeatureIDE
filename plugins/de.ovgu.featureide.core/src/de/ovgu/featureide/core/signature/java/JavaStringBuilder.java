@@ -153,7 +153,7 @@ public class JavaStringBuilder {
 		} else if (type.equals("boolean")) {
 			return "true;";
 		} else if (type.equals("int") || type.equals("double") || type.equals("char") || type.equals("long") || type.equals("float") || type.equals("byte")
-				|| type.equals("short")) {
+			|| type.equals("short")) {
 			return "0;";
 		} else {
 			return "null;";

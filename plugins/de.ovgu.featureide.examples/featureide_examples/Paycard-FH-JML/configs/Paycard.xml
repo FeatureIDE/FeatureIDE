@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="Paycard"/>
+		<feature automatic="selected" manual="selected" name="Logging"/>
+		<feature automatic="undefined" manual="selected" name="MaximumRecord"/>
+		<feature automatic="undefined" manual="selected" name="LockOut"/>
+	</configuration>

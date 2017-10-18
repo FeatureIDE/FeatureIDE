@@ -49,7 +49,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	private IFile aspectFile;
 
 	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on AspectJ do not need a total order as\n"
-			+ "a partial order can be defined in every aspect using the keywords\n" + BEFORE_AND_AFTER_;
+		+ "a partial order can be defined in every aspect using the keywords\n" + BEFORE_AND_AFTER_;
 
 	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
 
@@ -58,10 +58,6 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return s.matches(FEATURE_NAME_PATTERN);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
-	 */
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
@@ -203,10 +199,6 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#hasFeaureOrder()
-	 */
 	@Override
 	public boolean hasFeatureOrder() {
 		return false;

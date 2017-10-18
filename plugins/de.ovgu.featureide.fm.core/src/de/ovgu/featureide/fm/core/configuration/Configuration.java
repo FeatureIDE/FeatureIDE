@@ -126,6 +126,15 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
+//	public void loadPropagator() {
+//		LongRunningWrapper.runMethod(propagator.load());
+//		update(true, null);
+//	}
+//
+//	public IConfigurationPropagator getPropagator() {
+//		return propagator;
+//	}
+
 	void resetAutomaticValues() {
 		for (final SelectableFeature feature : features) {
 			feature.setAutomatic(Selection.UNDEFINED);

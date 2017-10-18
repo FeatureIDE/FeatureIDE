@@ -478,7 +478,7 @@ public class FrameworkModelBuilder {
 		 */
 		public List<String> getMethodSignature(IMethod m) {
 			if (!iterateOverInterface) {
-				return Collections.<String>emptyList();
+				return Collections.<String> emptyList();
 			}
 			return interfaceMethods.get(m.getElementName());
 		}

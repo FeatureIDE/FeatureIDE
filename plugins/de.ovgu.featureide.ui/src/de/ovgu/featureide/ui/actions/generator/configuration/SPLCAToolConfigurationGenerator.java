@@ -102,8 +102,8 @@ public class SPLCAToolConfigurationGenerator extends AConfigurationGenerator {
 
 				@Override
 				public void run() {
-					final String errorMessage = algorithm + " experienced an error during its execution.\n" + (casa
-							? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
+					final String errorMessage = algorithm + " experienced an error during its execution.\n"
+						+ (casa ? "Maybe some dependent libraries are missing (e.g., libgcc_s_dw2-1.dll or libstdc++-6.dll)" : "Message:\n\t" + e.getMessage());
 					new MessageDialog(display.getActiveShell(), "External Execution Error", GUIDefaults.FEATURE_SYMBOL, errorMessage, MessageDialog.ERROR,
 							new String[] { OK }, 0).open();
 				}

@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.views.configMap.filters;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
@@ -50,7 +51,8 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 		final FeatureModelSnapshot snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getSnapshot();
 		final IFeatureModel featureModel = snapshot.getObject();
 		if (featureModel != featureModelFilterIsInitializedFor) {
-			coreFeatures = snapshot.getAnalyzer().getCoreFeatures();
+			final FeatureModelAnalyzer analyser = snapshot.getAnalyzer();
+			coreFeatures = analyser.getCoreFeatures();
 			featureModelFilterIsInitializedFor = featureModel;
 		}
 	}

@@ -23,15 +23,32 @@ package de.ovgu.featureide.fm.core.explanations;
 /**
  * Generates {@link Explanation explanations}.
  *
- * @author Timo Günther
+ * @param S subject
+ * @param E explanation
+ * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public interface ExplanationCreator<S, E extends Explanation<S>> {
+
+	/**
+	 * Returns the subject with an attribute to be explained.
+	 *
+	 * @return the subject with an attribute to be explained
+	 */
+	public S getSubject();
+
+	/**
+	 * Sets the subject with an attribute to be explained.
+	 *
+	 * @param subject the subject with an attribute to be explained
+	 */
+	public void setSubject(S subject);
 
 	/**
 	 * Returns an explanation for the specified circumstance.
 	 *
 	 * @return an explanation; null if none could be generated
-	 * @throws IllegalStateException if no defect is specified
+	 * @throws IllegalStateException if the subject or its context is not set
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public E getExplanation() throws IllegalStateException;
+
 }

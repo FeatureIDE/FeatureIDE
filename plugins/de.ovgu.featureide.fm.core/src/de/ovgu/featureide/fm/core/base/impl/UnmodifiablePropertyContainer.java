@@ -31,7 +31,7 @@ public class UnmodifiablePropertyContainer implements IPropertyContainer {
 	private final IPropertyContainer container;
 
 	static UnsupportedOperationException exception =
-			new UnsupportedOperationException("Manipulation is not allowed. This is an unmodifiable property container");
+		new UnsupportedOperationException("Manipulation is not allowed. This is an unmodifiable property container");
 
 	public UnmodifiablePropertyContainer(IPropertyContainer container) {
 		this.container = container;

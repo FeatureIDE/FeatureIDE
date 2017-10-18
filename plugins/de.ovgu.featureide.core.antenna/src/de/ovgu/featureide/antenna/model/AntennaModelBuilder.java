@@ -105,7 +105,7 @@ public class AntennaModelBuilder extends PPModelBuilder {
 						while (!directivesStack.isEmpty()) {
 							final FSTDirective parent = directivesStack.pop();
 							if ((parent.getCommand() != FSTDirectiveCommand.ELIF) && (parent.getCommand() != FSTDirectiveCommand.ELIFDEF)
-									&& (parent.getCommand() != FSTDirectiveCommand.ELIFNDEF) && (parent.getCommand() != FSTDirectiveCommand.ELSE)) {
+								&& (parent.getCommand() != FSTDirectiveCommand.ELIFNDEF) && (parent.getCommand() != FSTDirectiveCommand.ELSE)) {
 								break;
 							}
 						}

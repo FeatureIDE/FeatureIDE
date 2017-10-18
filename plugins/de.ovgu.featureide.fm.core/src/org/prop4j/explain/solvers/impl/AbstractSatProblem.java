@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
 
@@ -44,33 +45,33 @@ public abstract class AbstractSatProblem implements SatProblem {
 	private final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
 
 	@Override
-	public void addFormulas(Node... formulas) {
-		addFormulas(Arrays.asList(formulas));
+	public int addFormulas(Node... formulas) {
+		return addFormula(new And(formulas));
 	}
 
 	@Override
-	public void addFormulas(Collection<Node> formulas) {
-		for (final Node formula : formulas) {
-			addFormula(formula);
-		}
+	public int addFormulas(Collection<? extends Node> formulas) {
+		return addFormulas(formulas.toArray(new Node[formulas.size()]));
 	}
 
 	@Override
-	public void addFormula(Node formula) {
+	public int addFormula(Node formula) {
 		formula = formula.toRegularCNF();
 		final List<Node> clauses = Arrays.asList(formula.getChildren());
-		addClauses(clauses);
+		return addClauses(clauses);
 	}
 
 	/**
 	 * Adds all given CNF clauses to the problem. Each one must be a non-empty disjunction of literals.
 	 *
 	 * @param clauses clauses to add; not null
+	 * @return the amount of clauses added
 	 */
-	protected void addClauses(List<Node> clauses) {
+	protected int addClauses(Collection<? extends Node> clauses) {
 		for (final Node clause : clauses) {
 			addClause(clause);
 		}
+		return clauses.size();
 	}
 
 	/**
@@ -99,6 +100,11 @@ public abstract class AbstractSatProblem implements SatProblem {
 	@Override
 	public int getClauseCount() {
 		return clauses.size();
+	}
+
+	@Override
+	public boolean containsClause(Node clause) {
+		return clauses.contains(clause);
 	}
 
 	@Override

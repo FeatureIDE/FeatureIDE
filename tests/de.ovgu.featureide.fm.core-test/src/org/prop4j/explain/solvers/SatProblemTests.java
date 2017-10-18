@@ -96,7 +96,7 @@ public abstract class SatProblemTests {
 	@Test
 	public void testAddFormulasCollection() {
 		final SatProblem instance = getInstance();
-		final Collection<Node> in = Arrays.<Node>asList(new Literal("A", false), new Or("A", "B"));
+		final Collection<Node> in = Arrays.<Node> asList(new Literal("A", false), new Or("A", "B"));
 		instance.addFormulas(in);
 		final List<Node> expected = new LinkedList<>();
 		expected.add(new Or(new Literal("A", false)));
@@ -170,8 +170,6 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A"));
 		expected.add(new Or("B"));
 		expected.add(new Or("A", "B"));
-		expected.add(new Or("B", "A"));
-		expected.add(new Or("A", "B"));
 		expected.add(new Or("B", "C"));
 		expected.add(new Or(new Literal("C", false)));
 		final List<Node> actual = instance.getClauses();
@@ -190,8 +188,6 @@ public abstract class SatProblemTests {
 		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
 		instance.addFormula(new And(new Or("B", "A"), new Or("A", "B")));
-		expected.add(new Or("B", "A"));
-		expected.add(new Or("A", "B"));
 		assertEquals(expected, instance.getClauses());
 		instance.addFormula(new Or("B", "C"));
 		expected.add(new Or("B", "C"));

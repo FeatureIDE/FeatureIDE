@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatureModelExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link FeatureModelExplanationCreator}.
@@ -37,7 +36,7 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	 * @return a default instance of this class
 	 */
 	public static FeatureModelExplanationCreatorFactory getDefault() {
-		return new MusFeatureModelExplanationCreatorFactory();
+		return new CompositeFeatureModelExplanationCreatorFactory();
 	}
 
 	/**
@@ -48,27 +47,11 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	public abstract DeadFeatureExplanationCreator getDeadFeatureExplanationCreator();
 
 	/**
-	 * Returns an instance of {@link DeadFeatureExplanationCreator}.
-	 *
-	 * @param fm the feature model context
-	 * @return an instance of {@link DeadFeatureExplanationCreator}
-	 */
-	public abstract DeadFeatureExplanationCreator getDeadFeatureExplanationCreator(IFeatureModel fm);
-
-	/**
 	 * Returns an instance of {@link FalseOptionalFeatureExplanationCreator}.
 	 *
 	 * @return an instance of {@link FalseOptionalFeatureExplanationCreator}
 	 */
 	public abstract FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator();
-
-	/**
-	 * Returns an instance of {@link FalseOptionalFeatureExplanationCreator}.
-	 *
-	 * @param fm the feature model context
-	 * @return an instance of {@link FalseOptionalFeatureExplanationCreator}
-	 */
-	public abstract FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator(IFeatureModel fm);
 
 	/**
 	 * Returns an instance of {@link RedundantConstraintExplanationCreator}.
@@ -77,11 +60,4 @@ public abstract class FeatureModelExplanationCreatorFactory implements Explanati
 	 */
 	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator();
 
-	/**
-	 * Returns an instance of {@link RedundantConstraintExplanationCreator}.
-	 *
-	 * @param fm the feature model context
-	 * @return an instance of {@link RedundantConstraintExplanationCreator}
-	 */
-	public abstract RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator(IFeatureModel fm);
 }

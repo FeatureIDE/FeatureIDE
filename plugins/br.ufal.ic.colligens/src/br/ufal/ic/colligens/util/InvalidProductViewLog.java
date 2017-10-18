@@ -26,7 +26,7 @@ public class InvalidProductViewLog {
 		final String pattern = Pattern.quote(System.getProperty("file.separator"));
 		final String[] relativePath = path.split(pattern);
 		this.relativePath = relativePath[relativePath.length - 3] + File.separator + relativePath[relativePath.length - 2] + File.separator
-				+ relativePath[relativePath.length - 1];
+			+ relativePath[relativePath.length - 1];
 		productName = relativePath[relativePath.length - 1];
 
 		try {

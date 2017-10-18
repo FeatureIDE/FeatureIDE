@@ -87,27 +87,7 @@ public class FeatureStubsGenerator {
 			featureProject.getComposer().buildFSTModel();
 		}
 
-		// String fhc = FeatureHouseComposer.getClassPaths(featureProject);
-		// String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" +
-		// fuji.Main.OptionName.COMPOSTION_STRATEGY,
-		// fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
 		// ProjectManager.getAnalyzer(featureProject.getFeatureModel()).setDependencies();
-
-		// try {
-		// fuji.Main fuji = new fuji.Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
-		// Composition composition = fuji.getComposition(fuji);
-		// Program ast = composition.composeAST();
-		// // run type check
-		// fuji.typecheckAST(ast);
-		//
-		// if (!fuji.getWarnings().isEmpty()) {
-		// FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is
-		// aborted.", null);
-		// }
-		// } catch (IllegalArgumentException | ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
-		// | SemanticErrorException | CompilerWarningException | UnsupportedModelException e1) {
-		// FeatureHouseCorePlugin.getDefault().logError(e1);
-		// }
 
 		final IRunner<ProjectSignatures> efsj = LongRunningWrapper.getRunner(new ExtendedFujiSignaturesJob(featureProject));
 		efsj.addJobFinishedListener(new JobFinishListener<ProjectSignatures>() {
@@ -156,12 +136,10 @@ public class FeatureStubsGenerator {
 								final AbstractSignature curSig = sigIterator.next();
 								for (int i = 0; i < curSig.getFeatureData().length; i++) {
 									if (((curSig.getFeatureData())[i].getID() == featureID) && curSig.getName().equals(meth.getName())
-											&& (curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine())) {
+										&& (curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine())) {
 										if (((FOPFeatureData[]) curSig.getFeatureData())[i].usesExternMethods()) {
-											FeatureHouseCorePlugin.getDefault().logError(
-													"The method\n" + curSig.getFullName()
-															+ "\nis not defined within the currently checked SPL. Therefore the process will be aborted.",
-													null);
+											FeatureHouseCorePlugin.getDefault().logError("The method\n" + curSig.getFullName()
+												+ "\nis not defined within the currently checked SPL. Therefore the process will be aborted.", null);
 											return;
 										}
 
@@ -180,7 +158,7 @@ public class FeatureStubsGenerator {
 										}
 
 										final Set<AbstractSignature> calledSignatures =
-												new HashSet<AbstractSignature>(((FOPFeatureData[]) curSig.getFeatureData())[i].getCalledSignatures());
+											new HashSet<AbstractSignature>(((FOPFeatureData[]) curSig.getFeatureData())[i].getCalledSignatures());
 										for (final AbstractSignature innerAbs : calledSignatures) {
 											if (!isInCurrentFeature(featureID, innerAbs) && alreadyUsedSigs.add(innerAbs.toString())) {
 												if (innerAbs.getParent().getName().equals(
@@ -260,7 +238,7 @@ public class FeatureStubsGenerator {
 				final String newClassFileText = new String(Files.readAllBytes(classFile.toPath()));
 				final int lastIndexInNewClassFile = newClassFileText.lastIndexOf("}");
 				newClassFileTextSB =
-						new StringBuilder(newClassFileText.substring(0, lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : newClassFileText.length()));
+					new StringBuilder(newClassFileText.substring(0, lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : newClassFileText.length()));
 			}
 		} catch (final IOException e1) {
 			FeatureHouseCorePlugin.getDefault().logError(e1);
@@ -271,7 +249,7 @@ public class FeatureStubsGenerator {
 	private void createPrototypes(StringBuilder fileTextSB, AbstractSignature innerAbs) {
 		if (innerAbs instanceof AbstractMethodSignature) {
 			fileTextSB.append("\n\n\t/*method prototype*/" + "\t/*@\n\t@ requires_abs   " + innerAbs.getName() + "R;\n\t@ ensures_abs    " + innerAbs.getName()
-					+ "E;\n\t@ assignable_abs " + innerAbs.getName() + "A;\n\t@*/\n" + innerAbs.toString() + "{" + "}\n");
+				+ "E;\n\t@ assignable_abs " + innerAbs.getName() + "A;\n\t@*/\n" + innerAbs.toString() + "{" + "}\n");
 		} else if (innerAbs instanceof AbstractFieldSignature) {
 			fileTextSB.append("/*field prototype*/\n" + innerAbs.toString() + ";\n");
 		}
@@ -297,8 +275,8 @@ public class FeatureStubsGenerator {
 			} else {
 				final String missingTypeFileText = new String(Files.readAllBytes(missingTypeFile.toPath()));
 				final int lastIndexInNewClassFile = missingTypeFileText.lastIndexOf("}");
-				final StringBuilder missingTypeFileTextSB = new StringBuilder(
-						missingTypeFileText.substring(0, lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : missingTypeFileText.length()));
+				final StringBuilder missingTypeFileTextSB =
+					new StringBuilder(missingTypeFileText.substring(0, lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : missingTypeFileText.length()));
 				writeToFile(missingTypeFile, missingTypeFileTextSB.toString());
 			}
 		} catch (final IOException e1) {
@@ -367,11 +345,11 @@ public class FeatureStubsGenerator {
 			}
 		}
 		final String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract) + "/*@\n" + "\t@ requires_abs   " + curSig.getName() + "R;\n"
-				+ ((requires.length() != 0) ? "\t@ def " + curSig.getName() + "R = " + requires.toString().replace(";", "") + ";\n" : "") + "\t@ ensures_abs "
-				+ curSig.getName() + "E;\n"
-				+ ((ensures.length() != 0) ? "\t@ def " + curSig.getName() + "E = " + ensures.toString().replace(";", "") + ";\n" : "") + "\t@ assignable_abs "
-				+ curSig.getName() + "A;\n" + ((assignable.length() != 0) ? "\t@ def " + curSig.getName() + "A = " + assignable.toString() + "\n" : "") + "\t@"
-				+ fileTextSB.substring(indexOfStartOfContract + contractBody.length());
+			+ ((requires.length() != 0) ? "\t@ def " + curSig.getName() + "R = " + requires.toString().replace(";", "") + ";\n" : "") + "\t@ ensures_abs "
+			+ curSig.getName() + "E;\n" + ((ensures.length() != 0) ? "\t@ def " + curSig.getName() + "E = " + ensures.toString().replace(";", "") + ";\n" : "")
+			+ "\t@ assignable_abs " + curSig.getName() + "A;\n"
+			+ ((assignable.length() != 0) ? "\t@ def " + curSig.getName() + "A = " + assignable.toString() + "\n" : "") + "\t@"
+			+ fileTextSB.substring(indexOfStartOfContract + contractBody.length());
 		return new StringBuilder(tmpFileText);
 	}
 
@@ -396,20 +374,20 @@ public class FeatureStubsGenerator {
 		final String methodName = absMethodName.substring(0, indexOf) + "_original_" + featureName + absMethodName.substring(indexOf);
 		fileTextSB.append(
 				"\n\n\t/*@\n\t@ requires_abs   " + curSig.getName() + "_original_" + featureName + "R;\n\t@ ensures_abs    " + curSig.getName() + "_original_"
-						+ featureName + "E;\n\t@ assignable_abs " + curSig.getName() + "_original_" + featureName + "A;\n\t@*/\n" + methodName + "{" + "}\n");
+					+ featureName + "E;\n\t@ assignable_abs " + curSig.getName() + "_original_" + featureName + "A;\n\t@*/\n" + methodName + "{" + "}\n");
 
 		final int indexOfBody = fileTextSB.indexOf(meth.getBody());
 		final int indexOfOriginal = fileTextSB.substring(indexOfBody).indexOf("original(");
 		final String methodBody = fileTextSB.substring(indexOfBody + indexOfOriginal);
 		final String tmpFileText = fileTextSB.substring(0, indexOfBody + indexOfOriginal) + curSig.getName() + "_original_" + featureName
-				+ methodBody.substring(methodBody.indexOf("("));
+			+ methodBody.substring(methodBody.indexOf("("));
 		return new StringBuilder(tmpFileText);
 	}
 
 	private void copyRolesToFeatureStubsFolder(final FSTFeature feat) {
 		for (final FSTRole role : feat.getRoles()) {
 			final String pathString =
-					featureProject.getFeaturestubPath() + File.separator + feat.getName() + File.separator + role.getClassFragment().getName();
+				featureProject.getFeaturestubPath() + File.separator + feat.getName() + File.separator + role.getClassFragment().getName();
 
 			final IPath path = new Path(pathString);
 			final IFile newRole = featureProject.getProject().getFile(path);

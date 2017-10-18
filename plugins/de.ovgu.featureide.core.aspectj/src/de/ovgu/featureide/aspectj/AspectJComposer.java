@@ -258,8 +258,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 				root.setName("Base");
 				featureModel.getStructure().setRoot(root.getStructure());
 				featureModel.getStructure().getRoot().setAbstract(false);
-				final ProblemList problems = SimpleFileHandler.save(Paths.get(project.getProject().getFile("model.xml").getLocationURI()), featureModel,
-						new XmlFeatureModelFormat());
+				final ProblemList problems =
+					SimpleFileHandler.save(Paths.get(project.getProject().getFile("model.xml").getLocationURI()), featureModel, new XmlFeatureModelFormat());
 				if (problems.containsError()) {
 					CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL + "\n" + problems.getErrors().toString(), new Exception());
 				}
@@ -336,7 +336,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 			/** add the new entries **/
 			final IClasspathEntry[] entries =
-					new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + (ajContainerAdded ? 0 : 1) + oldEntries.length];
+				new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + (ajContainerAdded ? 0 : 1) + oldEntries.length];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
 
 			if (!sourceAdded) {

@@ -87,7 +87,7 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 			final String containedFeatures = containedFeatureList.toString();
 			final MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
 					"The following features are contained in constraints:" + '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
-							+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
+						+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
 					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 			dialog.open();

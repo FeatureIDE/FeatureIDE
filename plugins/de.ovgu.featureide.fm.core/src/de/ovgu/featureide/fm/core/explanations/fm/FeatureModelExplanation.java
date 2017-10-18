@@ -32,22 +32,18 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 /**
  * An explanation created by {@link FeatureModelExplanationCreator}.
  *
+ * @param S subject
  * @author Timo G&uuml;nther
  */
-public abstract class FeatureModelExplanation extends Explanation {
+public abstract class FeatureModelExplanation<S> extends Explanation<S> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param subject the subject to be explained
 	 */
-	protected FeatureModelExplanation(IFeatureModelElement subject) {
+	protected FeatureModelExplanation(S subject) {
 		super(subject);
-	}
-
-	@Override
-	public IFeatureModelElement getSubject() {
-		return (IFeatureModelElement) super.getSubject();
 	}
 
 	/**
@@ -58,13 +54,15 @@ public abstract class FeatureModelExplanation extends Explanation {
 	 */
 	public Set<IFeatureModelElement> getAffectedElements() {
 		final Set<IFeatureModelElement> affectedElements = new LinkedHashSet<>();
-		for (final Reason reason : getReasons()) {
+		for (final Reason<?> reason : getReasons()) {
 			if (!(reason instanceof FeatureModelReason)) {
 				continue;
 			}
-			affectedElements.addAll(((FeatureModelReason) reason).getTrace().getElements());
+			affectedElements.addAll(((FeatureModelReason) reason).getSubject().getElements());
 		}
-		affectedElements.add(getSubject());
+		if (getSubject() instanceof IFeatureModelElement) {
+			affectedElements.add((IFeatureModelElement) getSubject());
+		}
 		final Set<IFeatureModelElement> constraintElements = new LinkedHashSet<>();
 		for (final IFeatureModelElement affectedElement : affectedElements) {
 			if (!(affectedElement instanceof IConstraint)) {

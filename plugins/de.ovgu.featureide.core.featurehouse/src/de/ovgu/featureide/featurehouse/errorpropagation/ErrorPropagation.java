@@ -80,7 +80,7 @@ public abstract class ErrorPropagation {
 	 * Propagates error markers for composed files to sources files.<br> Call {@link #addFile(IFile)} to propagate the markers of the given source file, to the
 	 * corresponding file at the features folder.
 	 *
-	 * @param sourceFile initial source file for determine project and language. </br> (must still be added by calling {@link #addFile(IFile)})
+	 * @param sourceFile initial source file for determine project and language. </br>(must still be added by calling {@link #addFile(IFile)})
 	 */
 	public static ErrorPropagation createErrorPropagation(IFile sourceFile) {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(sourceFile);

@@ -33,6 +33,7 @@ import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -52,7 +53,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
 
 	private final static String HEAD = "/**" + NEWLINE + " * Variability encoding of the feature model for JPF." + NEWLINE + " * Auto-generated class."
-			+ NEWLINE + " */" + NEWLINE + "public class FeatureModel {" + NEWLINE + NEWLINE;
+		+ NEWLINE + " */" + NEWLINE + "public class FeatureModel {" + NEWLINE + NEWLINE;
 
 	private final static String FIELD_MODIFIER = "\tpublic static Boolean ";
 	private StringBuilder stringBuilder;
@@ -84,10 +85,11 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 		}
 
 		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
-		coreFeatures = FeatureModelManager.getAnalyzer(featureModel).getCoreFeatures();
-		deadFeatures = FeatureModelManager.getAnalyzer(featureModel).getDeadFeatures();
+		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
+		coreFeatures = analyzer.getCoreFeatures();
+		deadFeatures = analyzer.getDeadFeatures();
 		fields.append(NEWLINE + "\t/**" + NEWLINE + "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE
-				+ "\t * All other features have unknown selection states." + NEWLINE + "\t */" + NEWLINE + "\tstatic {" + NEWLINE);
+			+ "\t * All other features have unknown selection states." + NEWLINE + "\t */" + NEWLINE + "\tstatic {" + NEWLINE);
 		for (final IFeature f : features) {
 			if (deadFeatures.contains(f)) {
 				fields.append("\t\t" + f.toString().toLowerCase(Locale.ENGLISH));
@@ -259,7 +261,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			return "";
 		}
 		return "\t\tVerify.ignoreIf(Verify.getCounter(0) != 0 || !("
-				+ new And(actualFormula.toArray()).toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH) + "));\r\n";
+			+ new And(actualFormula.toArray()).toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH) + "));\r\n";
 	}
 
 	@Override

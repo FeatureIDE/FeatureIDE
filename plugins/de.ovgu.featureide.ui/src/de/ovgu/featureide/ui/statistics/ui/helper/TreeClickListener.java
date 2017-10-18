@@ -92,7 +92,7 @@ public class TreeClickListener implements IDoubleClickListener {
 			} else if ((selected instanceof AbstractSortModeNode) && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
 				sortNode.setSortByValue(!((selected instanceof ClassNodeParent) || (selected instanceof FieldNodeParent)
-						|| (selected instanceof MethodNodeParent) || sortNode.isSortByValue()));
+					|| (selected instanceof MethodNodeParent) || sortNode.isSortByValue()));
 
 				final UIJob job = new UIJob(RESORT_NODE) {
 
@@ -124,7 +124,7 @@ public class TreeClickListener implements IDoubleClickListener {
 				final int line = ((FSTInvariant) (((Parent) selected).getValue())).getLine();
 				openEditor(iFile, line);
 			} else if ((selected instanceof Parent) && ((((Parent) selected).getParent() instanceof MethodContractNodeParent)
-					|| (((Parent) selected).getParent() instanceof ContractCountNodeParent))) {
+				|| (((Parent) selected).getParent() instanceof ContractCountNodeParent))) {
 				final IFile iFile = ((FSTMethod) (((Parent) selected).getValue())).getFile();
 				final int line = ((FSTMethod) (((Parent) selected).getValue())).getLine();
 				openEditor(iFile, line);
@@ -172,7 +172,7 @@ public class TreeClickListener implements IDoubleClickListener {
 		try {
 			description = iFile.getContentDescription();
 			final IEditorDescriptor desc =
-					workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), (description != null) ? description.getContentType() : null);
+				workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), (description != null) ? description.getContentType() : null);
 			editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
 			scrollToLine(editorPart, line);
 		} catch (final CoreException e) {

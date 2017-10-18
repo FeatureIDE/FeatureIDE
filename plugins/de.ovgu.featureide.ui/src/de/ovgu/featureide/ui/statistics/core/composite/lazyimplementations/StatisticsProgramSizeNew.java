@@ -53,7 +53,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final static String[] ignoredExtensions =
-			{ "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3", "avi", "flv", "midi" };
+		{ "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3", "avi", "flv", "midi" };
 
 	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private final FSTModel fstModel;

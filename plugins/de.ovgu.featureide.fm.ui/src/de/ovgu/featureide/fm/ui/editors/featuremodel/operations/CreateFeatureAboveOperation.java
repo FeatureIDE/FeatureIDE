@@ -102,7 +102,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation() {
 		final IFeatureStructure parent = newCompound.getStructure().getParent();
 		if (parent != null) {
-			newCompound.getStructure().setChildren(Collections.<IFeatureStructure>emptyList());
+			newCompound.getStructure().setChildren(Collections.<IFeatureStructure> emptyList());
 			featureModel.deleteFeature(newCompound);
 			for (final IFeature iFeature : children.keySet()) {
 				parent.addChildAtPosition(children.get(iFeature), iFeature.getStructure());

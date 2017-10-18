@@ -93,9 +93,9 @@ public class TComplexConstraintConverter {
 	@Test
 	public void testIsSimpleConstraint() throws UnsupportedModelException {
 		final Node[] simpleNodes = new Node[] { new Implies("f", "g"), new Or("f", new Not("g")), new Or(new Not("f"), "g"), new Or(new Not("f"), new Not("g")),
-				new Implies("f", new Not(new Not("g"))), new Implies("f", new Not("g")), new Implies("f", new Literal("g")),
-				new Implies("f", new Not(new Literal("g"))), new Implies(new Literal("f"), new Not("g")), new Implies(new Literal("f"), new Literal("g")),
-				new Implies(new Literal("f"), new Not(new Literal("g"))) };
+			new Implies("f", new Not(new Not("g"))), new Implies("f", new Not("g")), new Implies("f", new Literal("g")),
+			new Implies("f", new Not(new Literal("g"))), new Implies(new Literal("f"), new Not("g")), new Implies(new Literal("f"), new Literal("g")),
+			new Implies(new Literal("f"), new Not(new Literal("g"))) };
 
 		boolean result = true;
 		for (final Node node : simpleNodes) {
@@ -111,7 +111,7 @@ public class TComplexConstraintConverter {
 	@Test
 	public void testIsComplexConstraint() throws UnsupportedModelException {
 		final Node[] complexNodes = new Node[] { new Implies(new Not("f"), "g"), new Implies("f", new And("g", "h")), new Implies("f", new Or("g", "h")),
-				new Or("f", "g"), new And("f", "g") };
+			new Or("f", "g"), new And("f", "g") };
 
 		boolean result = true;
 		for (final Node node : complexNodes) {
@@ -124,28 +124,28 @@ public class TComplexConstraintConverter {
 	/*
 	 * Conversion should preserve semantics.
 	 */
-	// @Test
-	// public void testNNFConversion() throws UnsupportedModelException {
-	// ComplexConstraintConverter converter = new ComplexConstraintConverter();
-	// IFeatureModel resultFM = converter.convert(fm, new NNFConverter());
-	//
-	// assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));
-	// }
+//	@Test
+//	public void testNNFConversion() throws UnsupportedModelException {
+//		ComplexConstraintConverter converter = new ComplexConstraintConverter();
+//		IFeatureModel resultFM = converter.convert(fm, new NNFConverter());
+//
+//		assertEquals(Comparison.REFACTORING, comparator.compare(fm, resultFM));
+//	}
 
 	/*
 	 * Conversion should preserve semantics.
 	 */
-	// @Test
-	// public void testCNFConversion() throws UnsupportedModelException {
-	// ComplexConstraintConverter converter = new ComplexConstraintConverter();
-	// IFeatureModel resultFM = converter.convert(fm, new CNFConverter(), Option.COHERENT);
-	// comparator.compare(fm, resultFM);
-	//
-	// System.out.println(fm.getFeatureOrderList());
-	// System.out.println(resultFM.getFeatureOrderList());
-	// System.out.println(comparator.getAddedFeatures());
-	// System.out.println(comparator.getDeletedFeatures());
-	// assertEquals(Comparison.REFACTORING, comparator.getResult());
-	// }
+//	@Test
+//	public void testCNFConversion() throws UnsupportedModelException {
+//		ComplexConstraintConverter converter = new ComplexConstraintConverter();
+//		IFeatureModel resultFM = converter.convert(fm, new CNFConverter(), Option.COHERENT);
+//		comparator.compare(fm, resultFM);
+//
+//		System.out.println(fm.getFeatureOrderList());
+//		System.out.println(resultFM.getFeatureOrderList());
+//		System.out.println(comparator.getAddedFeatures());
+//		System.out.println(comparator.getDeletedFeatures());
+//		assertEquals(Comparison.REFACTORING, comparator.getResult());
+//	}
 
 }

@@ -1,7 +1,7 @@
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
-configs/EPL.config
+configs/EPL.xml
 features/BE/Num.jak
 features/BE/Test.jak
 features/BK/Num.jak

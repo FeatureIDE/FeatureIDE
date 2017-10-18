@@ -20,25 +20,28 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl;
 
-import java.util.Set;
-
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator}.
  *
+ * @param S subject
+ * @param E explanation
+ * @param O oracle
  * @author Timo G&uuml;nther
  */
-public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
+public abstract class AbstractFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>, O> extends AbstractExplanationCreator<S, E, O>
+		implements FeatureModelExplanationCreator<S, E> {
 
 	/** The feature model context. */
 	private IFeatureModel fm;
@@ -56,22 +59,6 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 */
 	private FeatureModelToNodeTraceModel traceModel;
 
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public AbstractFeatureModelExplanationCreator() {
-		this(null);
-	}
-
-	/**
-	 * Constructs a new instance of this class.
-	 *
-	 * @param fm the feature model contexts
-	 */
-	public AbstractFeatureModelExplanationCreator(IFeatureModel fm) {
-		setFeatureModel(fm);
-	}
-
 	@Override
 	public IFeatureModel getFeatureModel() {
 		return fm;
@@ -80,8 +67,10 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	@Override
 	public void setFeatureModel(IFeatureModel fm) {
 		this.fm = fm;
-		setNodeCreator();
-		setCnf();
+		nodeCreator = null;
+		cnf = null;
+		traceModel = null;
+		setOracle(null);
 	}
 
 	/**
@@ -90,24 +79,16 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the node creator
 	 */
 	protected AdvancedNodeCreator getNodeCreator() {
-		return nodeCreator;
-	}
-
-	/**
-	 * Sets the node creator.
-	 */
-	protected void setNodeCreator() {
-		if (getFeatureModel() == null) {
-			nodeCreator = null;
-			return;
+		if ((nodeCreator == null) && (getFeatureModel() != null)) {
+			nodeCreator = createNodeCreator();
 		}
-		nodeCreator = createNodeCreator();
+		return nodeCreator;
 	}
 
 	/**
 	 * Creates a new node creator.
 	 *
-	 * @return a new node creator
+	 * @return a new node creator; not null
 	 */
 	protected AdvancedNodeCreator createNodeCreator() {
 		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
@@ -120,36 +101,22 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	/**
 	 * Returns a formula representation of the feature model in CNF (conjunctive normal form). Creates it first if necessary.
 	 *
-	 * @return a formula representation of the feature model in CNF; not null
-	 * @throws IllegalStateException if the CNF could not be created
+	 * @return a formula representation of the feature model in CNF
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if (cnf == null) {
-			try {
-				setCnf();
-			} catch (final IllegalArgumentException e) {
-				throw new IllegalStateException(e);
-			}
+		if ((cnf == null) && (getFeatureModel() != null)) {
+			cnf = createCnf();
 		}
 		return cnf;
 	}
 
 	/**
-	 * Sets the formula representation of the feature model in CNF (conjunctive normal form).
+	 * Creates the formula representation of the feature model in CNF (conjunctive normal form).
 	 *
-	 * @return the CNF
+	 * @return the CNF; not null
 	 */
-	protected Node setCnf() {
-		final IFeatureModel fm = getFeatureModel();
-		if (fm == null) {
-			cnf = null;
-			traceModel = null;
-			return cnf;
-		}
-		final AdvancedNodeCreator nc = getNodeCreator();
-		cnf = nc.createNodes();
-		traceModel = nc.getTraceModel();
-		return cnf;
+	protected Node createCnf() {
+		return getNodeCreator().createNodes();
 	}
 
 	/**
@@ -158,37 +125,24 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * @return the trace model
 	 */
 	public FeatureModelToNodeTraceModel getTraceModel() {
+		if ((traceModel == null) && (getFeatureModel() != null)) {
+			traceModel = createTraceModel();
+		}
 		return traceModel;
 	}
 
 	/**
-	 * Returns an explanation for the given clauses.
+	 * Creates the trace model.
 	 *
-	 * @param clauseIndexes indexes of clauses that serve as an explanation
-	 * @return an explanation
+	 * @return the trace model; not null
 	 */
-	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final Explanation explanation = getConcreteExplanation();
-		for (final Integer clauseIndex : clauseIndexes) {
-			explanation.addReason(getReason(clauseIndex));
-		}
-		return explanation;
+	protected FeatureModelToNodeTraceModel createTraceModel() {
+		return getNodeCreator().getTraceModel();
 	}
 
-	/**
-	 * Returns the reason for the given clause index.
-	 *
-	 * @param clauseIndex index of the clause
-	 * @return the reason for the given clause index
-	 */
-	protected Reason getReason(int clauseIndex) {
+	@Override
+	protected Reason<?> getReason(int clauseIndex) {
 		return new FeatureModelReason(getTraceModel().getTrace(clauseIndex));
 	}
 
-	/**
-	 * Returns a new concrete explanation.
-	 *
-	 * @return a new concrete explanation
-	 */
-	protected abstract Explanation getConcreteExplanation();
 }

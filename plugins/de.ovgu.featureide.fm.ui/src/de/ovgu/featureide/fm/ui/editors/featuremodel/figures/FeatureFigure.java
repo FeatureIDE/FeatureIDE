@@ -151,9 +151,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		final IFeature feature = this.feature.getObject();
 		final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(feature.getFeatureModel());
 
-		if (feature.getStructure().isRoot() && !analyser.isValid()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+		// First draw custom color
+		final FeatureColor color = FeatureColorManager.getColor(feature);
+		if (color != FeatureColor.NO_COLOR) {
+			setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 		} else if (!feature.getStructure().isConcrete()) {
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 		}
@@ -177,17 +178,16 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			}
 		}
 
-		if (!analyser.isValid()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-		}
-
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
 			// only color if the active profile is not the default profile
-			final FeatureColor color = FeatureColorManager.getColor(feature);
 			if (color != FeatureColor.NO_COLOR) {
 				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			}
+		}
+
+		if (!analyser.isValid()) {
+			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
+			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 		}
 
 		if (feature instanceof ExtendedFeature) {
@@ -229,15 +229,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			final IFeature feature = this.feature.getObject();
 			final FeatureModelAnalyzer analyser = FeatureModelManager.getAnalyzer(feature.getFeatureModel());
 
-			// First draw custom color
-			if (FeatureColorManager.getColor(feature) == FeatureColor.NO_COLOR) {
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-			}
+			toolTip.append(feature.getStructure().isConcrete() ? CONCRETE : ABSTRACT);
 
 			if (feature.getStructure().hasHiddenParent()) {
 				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
@@ -275,7 +267,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			}
 
 			if (getActiveReason() != null) {
-				final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 				toolTip.append("\n\nThis feature is involved in the selected defect:");
 				for (final FeatureModelReason activeReason : activeReasons) {
 					toolTip.append("\n\u2022 ");

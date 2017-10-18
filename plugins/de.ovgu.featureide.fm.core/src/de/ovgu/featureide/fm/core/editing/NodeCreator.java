@@ -59,7 +59,7 @@ public class NodeCreator {
 	}
 
 	public static Node createNodes(IFeatureModel featureModel, boolean ignoreAbstractFeatures) {
-		return createNodes(featureModel, ignoreAbstractFeatures ? Collections.<Object, Node>emptyMap() : calculateReplacingMap(featureModel));
+		return createNodes(featureModel, ignoreAbstractFeatures ? Collections.<Object, Node> emptyMap() : calculateReplacingMap(featureModel));
 	}
 
 	public static Node createNodes(IFeatureModel featureModel, Collection<String> removeFeatures) {
@@ -613,12 +613,16 @@ public class NodeCreator {
 		return featureModel.getFeature(currentName);
 	}
 
-	public static String getVariable(String featureName, IFeatureModel featureModel) {
-		return featureModel.getRenamingsManager().getOldName(featureName);
+	public static String getVariable(IFeature feature) {
+		return getVariable(feature, feature.getFeatureModel());
 	}
 
 	public static String getVariable(IFeature feature, IFeatureModel featureModel) {
-		return featureModel.getRenamingsManager().getOldName(feature.getName());
+		return getVariable(feature.getName(), featureModel);
+	}
+
+	public static String getVariable(String featureName, IFeatureModel featureModel) {
+		return featureModel.getRenamingsManager().getOldName(featureName);
 	}
 
 }

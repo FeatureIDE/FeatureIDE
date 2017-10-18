@@ -29,7 +29,6 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
  * The MarkerHandler encapsulates creating and removing markers.
  *
  * @author Sebastian Krieter
- *
  */
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 

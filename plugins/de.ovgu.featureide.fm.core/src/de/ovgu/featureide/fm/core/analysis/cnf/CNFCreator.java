@@ -85,7 +85,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 
 	public CNF createNodes(IMonitor monitor) {
 		if (featureModel == null) {
-			return new CNF(new Variables(Collections.<String>emptyList()));
+			return new CNF(new Variables(Collections.<String> emptyList()));
 		}
 
 		final CNF cnf = new FeatureModelCNF(featureModel, useOldNames);
@@ -241,7 +241,7 @@ public class CNFCreator implements LongRunningMethod<CNF> {
 		boolean valid = true;
 
 		final Literal[] children = (andChild instanceof Or) ? Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class)
-				: new Literal[] { (Literal) andChild };
+			: new Literal[] { (Literal) andChild };
 
 		for (int j = 0; j < children.length; j++) {
 			final Literal literal = children[j];

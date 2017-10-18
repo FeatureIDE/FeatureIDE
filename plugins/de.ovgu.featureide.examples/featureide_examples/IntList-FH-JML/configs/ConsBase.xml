@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Root"/>
+		<feature automatic="selected" manual="selected" name="Base"/>
+		<feature automatic="undefined" manual="selected" name="Cons"/>
+		<feature automatic="undefined" manual="undefined" name="Snoc"/>
+		<feature automatic="undefined" manual="undefined" name="Stack"/>
+		<feature automatic="undefined" manual="undefined" name="Sorted"/>
+	</configuration>

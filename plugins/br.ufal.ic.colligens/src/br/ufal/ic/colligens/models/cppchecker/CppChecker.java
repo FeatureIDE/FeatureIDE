@@ -38,8 +38,9 @@ public class CppChecker {
 				if (file.getName().endsWith(".c") || file.getName().endsWith(".h")) {
 					try {
 
-						final Process proc = new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force",
-								file.getAbsolutePath()).redirectErrorStream(true).start();
+						final Process proc =
+							new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+									.redirectErrorStream(true).start();
 						final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 						String s = null;
@@ -82,8 +83,8 @@ public class CppChecker {
 		try {
 
 			final Process proc =
-					new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
-							.redirectErrorStream(true).start();
+				new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+						.redirectErrorStream(true).start();
 			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			String s = null;

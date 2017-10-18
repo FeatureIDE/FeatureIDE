@@ -17,6 +17,7 @@ public class Graph {
 	 @ requires edges != null && edges instanceof Set<Edge>;
 	 @ ensures (\forall int i; 0 <= i && i < \result.size() -1;
 	 @  	\result.toArray()[i].compareTo(\result.toArray()[i+1]) < 0 );
+	 @ assignable \nothing;
 	 @*/
 	public Collection<Edge> sortEdges(Collection<Edge> edges) {
 		java.util.Set<Edge> set = new HashSet<Edge>(edges);

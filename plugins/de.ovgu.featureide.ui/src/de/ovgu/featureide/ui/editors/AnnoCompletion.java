@@ -104,7 +104,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 
 		final IFile file =
-				((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
 
 		if ((context == null) || (file == null) || (featureProject == null)) {

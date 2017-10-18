@@ -246,7 +246,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			}
 		} else {
 			if (target.getStructure().isAnd()
-					&& (!source.getStructure().isHidden() || FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+				&& (!source.getStructure().isHidden() || FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 				if (!(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 					sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 				}
@@ -278,7 +278,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			if (!graphicalChildren.isEmpty()) { // Even if the target has children, it might be collapsed, leading to no graphical children.
 				final IGraphicalFeature lastChild = FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel()) ? graphicalChildren.get(0)
-						: graphicalChildren.get(graphicalChildren.size() - 1);
+					: graphicalChildren.get(graphicalChildren.size() - 1);
 				targetDecoration = new RelationDecoration(targetStructure.isMultiple(), lastChild);
 			}
 		}
@@ -314,7 +314,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		final FeatureModelReason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
 		if (activeReason != null) {
 			String explanation = "This connection is involved in the selected defect:";
-			final ExplanationWriter w = activeReason.getExplanation().getWriter();
+			final ExplanationWriter<?> w = activeReason.getExplanation().getWriter();
 			if (activeReasonUp != null) {
 				explanation += "\n\u2022 " + w.getReasonString(activeReasonUp);
 			}
@@ -366,7 +366,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			activeReasonDown = null;
 			return;
 		}
-		switch (activeReason.getTrace().getOrigin()) {
+		switch (activeReason.getSubject().getOrigin()) {
 		case CHILD_UP:
 			activeReasonUp = activeReason;
 			break;
@@ -437,6 +437,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		}
 		final IFeature target = graphicalTarget.getObject();
 		return ((source instanceof ExtendedFeature) && ((ExtendedFeature) source).isFromExtern() && (target instanceof ExtendedFeature)
-				&& ((ExtendedFeature) target).isFromExtern());
+			&& ((ExtendedFeature) target).isFromExtern());
 	}
 }

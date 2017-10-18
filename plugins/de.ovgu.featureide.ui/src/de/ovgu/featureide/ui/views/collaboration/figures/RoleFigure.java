@@ -338,7 +338,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		int fieldCount = 0;
 		for (final FSTField currentField : innerClassFragment.getFields()) {
 			if (matchFilter(currentField)
-					&& ((fieldsWithRefinements() && currentField.inRefinementGroup()) || (!currentField.inRefinementGroup() && fieldsWithoutRefinements()))) {
+				&& ((fieldsWithRefinements() && currentField.inRefinementGroup()) || (!currentField.inRefinementGroup() && fieldsWithoutRefinements()))) {
 				{
 
 					fieldCount++;
@@ -353,8 +353,8 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		int methodCount = 0;
 
 		for (final FSTMethod currentMethod : innerClassFragment.getMethods()) {
-			if (matchFilter(currentMethod) && ((methodsWithRefinements() && currentMethod.inRefinementGroup())
-					|| (!currentMethod.inRefinementGroup() && methodsWithoutRefinements()))) {
+			if (matchFilter(currentMethod)
+				&& ((methodsWithRefinements() && currentMethod.inRefinementGroup()) || (!currentMethod.inRefinementGroup() && methodsWithoutRefinements()))) {
 
 				methodCount++;
 				addLabel(createMethodLabel(currentMethod));
@@ -427,7 +427,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			final Label methodLabel = createMethodLabel(m);
 			// check for selected filters
 			if ((matchFilter(m) && m.hasContract())
-					&& ((methodsWithRefinements() && m.inRefinementGroup()) || (!m.inRefinementGroup() && methodsWithoutRefinements()))) {
+				&& ((methodsWithRefinements() && m.inRefinementGroup()) || (!m.inRefinementGroup() && methodsWithoutRefinements()))) {
 				methodFigure.add(methodLabel);
 				methodCount++;
 
@@ -617,9 +617,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	 */
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || isPrivateFieldMethodFilterActive()
-				|| isProtectedFieldMethodFilterActive())
-				&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants() || methodsWithoutRefinements()
-						|| methodsWithRefinements());
+			|| isProtectedFieldMethodFilterActive())
+			&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants() || methodsWithoutRefinements()
+				|| methodsWithRefinements());
 	}
 
 	/*
@@ -675,15 +675,15 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 	private boolean matchFilter(FSTField f) {
 		return ((f.isPrivate() && isPrivateFieldMethodFilterActive()) || (f.isProtected() && isProtectedFieldMethodFilterActive())
-				|| (f.isPublic() && isPublicFieldMethodFilterActive())
-				|| (!f.isPrivate() && !f.isProtected() && !f.isPublic() && isDefaultFieldMethodFilterActive()) || (!isFieldMethodFilterActive()));
+			|| (f.isPublic() && isPublicFieldMethodFilterActive())
+			|| (!f.isPrivate() && !f.isProtected() && !f.isPublic() && isDefaultFieldMethodFilterActive()) || (!isFieldMethodFilterActive()));
 	}
 
 	private boolean matchFilter(FSTMethod m) {
 		return ((m.isPrivate() && isPrivateFieldMethodFilterActive()) || (m.isProtected() && isProtectedFieldMethodFilterActive())
-				|| (m.isPublic() && isPublicFieldMethodFilterActive())
-				|| (!m.isPrivate() && !m.isProtected() && !m.isPublic() && isDefaultFieldMethodFilterActive()) || (!isFieldMethodFilterActive())
-				|| (m.hasContract() && showContracts()));
+			|| (m.isPublic() && isPublicFieldMethodFilterActive())
+			|| (!m.isPrivate() && !m.isProtected() && !m.isPublic() && isDefaultFieldMethodFilterActive()) || (!isFieldMethodFilterActive())
+			|| (m.hasContract() && showContracts()));
 	}
 
 	// create label for method

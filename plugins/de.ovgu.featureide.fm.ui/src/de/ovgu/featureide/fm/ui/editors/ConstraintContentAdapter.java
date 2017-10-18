@@ -40,7 +40,7 @@ public class ConstraintContentAdapter extends TextContentAdapter {
 		if (cursorPosition != 0) {
 			final String constraintText = ((Text) control).getText();
 			while ((posMarker >= 0)
-					&& ((constraintText.charAt(posMarker) != ' ') && (constraintText.charAt(posMarker) != ')') && (constraintText.charAt(posMarker) != '('))) {
+				&& ((constraintText.charAt(posMarker) != ' ') && (constraintText.charAt(posMarker) != ')') && (constraintText.charAt(posMarker) != '('))) {
 				posMarker--;
 			}
 		}

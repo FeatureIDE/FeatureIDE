@@ -150,7 +150,7 @@ public class PrintDocumentationJob implements LongRunningMethod<Boolean> {
 			for (final SelectableFeature feature : conf.getFeatures()) {
 				final Selection selection = feature.getSelection();
 				nodes[i++] = selection == Selection.UNDEFINED ? new Literal(NodeCreator.varTrue)
-						: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+					: new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));

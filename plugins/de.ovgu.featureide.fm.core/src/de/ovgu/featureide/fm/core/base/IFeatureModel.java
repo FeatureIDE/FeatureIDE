@@ -267,18 +267,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	void deleteFeatureFromTable(IFeature feature);
 
-	// /**
-	// * Returns an instance of {@link FeatureModelAnalyzer} which is bound to this feature model. Since analysis of feature models are computational expensive
-	// in
-	// * general, results for analysis are cached in the instance of a analyzer. When calling methods on the return value of this method, changes are indirectly
-	// * automatically stored in this feature model by object references.
-	// *
-	// * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
-	// *
-	// * @since 3.0
-	// */
-	// FeatureModelAnalyzer getAnalyser();
-
 	/**
 	 * @return Returns the number of constraints contained in this feature model.
 	 *
@@ -475,13 +463,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @since 3.0
 	 */
 	void handleModelDataChanged();
-
-	// /**
-	// * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_LOADED} to listeners.
-	// *
-	// * @since 3.0
-	// */
-	// void handleModelDataLoaded();
 
 	/**
 	 * @since 3.0
@@ -717,7 +698,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	/**
 	 * Set the feature models source file to <code>file</code>. By definition, the feature model's unique identifier is bidirectional mapped to the source
 	 * files. Therefore, two feature model's based on the same file must have to same unique identifier. The feature model's identifier will not be changed, if
-	 * <code>file</code> is <b>null</b>. <br/> <br/> The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that: <code> <pre>
+	 * <code>file</code> is <b>null</b>. <br/><br/> The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that: <code> <pre>
 	 * this.sourceFile = file; if (file != null) { id = ModelFileIdMap.getModelId(this, file); } </pre> </code> <b>Note</b>: The specification does not require
 	 * to reload the content of this feature model, when the source file is changes. Hence, using this method only will affect the return value of
 	 * {@link #getSourceFile()} and perhaps {@link #getId()}. However, it is not intended to notify listeners about this change.

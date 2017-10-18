@@ -29,6 +29,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -51,6 +53,7 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
 	protected FeatureDiagramEditor editor;
+	private boolean firstManualLayout = false;
 
 	public final void layout(IGraphicalFeatureModel featureModel, FeatureDiagramEditor editor) {
 		this.editor = editor;
@@ -62,6 +65,16 @@ abstract public class FeatureDiagramLayoutManager {
 		for (final Entry<IGraphicalFeature, Point> entry : newLocations.entrySet()) {
 			entry.getKey().setLocation(entry.getValue());
 		}
+		if ((featureModel.getLayout().getLayoutAlgorithm() == 0) && !firstManualLayout) {
+			for (final IGraphicalFeature entry : featureModel.getFeatures()) {
+				// Fix of #571: All feature in manual layout are loaded to their position. Because the layout
+				// does not change the position no event is performed and the connections are not drawn. So for the first
+				// start peform the location changed event to refresh the connection only in manual layout
+				entry.update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
+				firstManualLayout = true;
+			}
+		}
+
 		if (!featureModel.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
 		}
@@ -200,19 +213,19 @@ abstract public class FeatureDiagramLayoutManager {
 				final Dimension tempSize = feature.getSize();
 				if (tempSize != null) {
 					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						topRight = false;
 					}
 					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						topLeft = false;
 					}
 					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						botLeft = false;
 					}
 					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						botRight = false;
 					}
 				}
@@ -229,19 +242,19 @@ abstract public class FeatureDiagramLayoutManager {
 				}
 				final Dimension tempSize = constraint.getSize();
 				if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+					&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 					topRight = false;
 				}
 				if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+					&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 					topLeft = false;
 				}
 				if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+					&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 					botLeft = false;
 				}
 				if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+					&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 					botRight = false;
 				}
 			}
@@ -362,19 +375,19 @@ abstract public class FeatureDiagramLayoutManager {
 					final Dimension tempSize = feature.getSize();
 					if (tempSize != null) {
 						if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-								&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 							topRight = false;
 						}
 						if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-								&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 							topLeft = false;
 						}
 						if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-								&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 							botLeft = false;
 						}
 						if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-								&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 							botRight = false;
 						}
 					}
@@ -391,19 +404,19 @@ abstract public class FeatureDiagramLayoutManager {
 					}
 					final Dimension tempSize = constraint.getSize();
 					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						topRight = false;
 					}
 					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y) < (min.y + legendSize.height + (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						topLeft = false;
 					}
 					if (((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						botLeft = false;
 					}
 					if (((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX()))
-							&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
+						&& ((tempLocation.y + tempSize.height) > (max.y - legendSize.height - (FMPropertyManager.getFeatureSpaceY() / 2)))) {
 						botRight = false;
 					}
 				}

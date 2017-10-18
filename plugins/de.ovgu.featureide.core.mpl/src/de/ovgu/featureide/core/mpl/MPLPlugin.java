@@ -265,12 +265,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		}
 	}
 
-	// public void buildJavaProject(IFile featureListFile, String name) {
-	// new
-	// JavaProjectWriter(getInterfaceProject(featureListFile.getProject())).buildJavaProject(featureListFile,
-	// name);
-	// }
-
 	public void setCurrentMapping(IProject project, String name) {
 		try {
 			project.setPersistentProperty(mappingConfigID, name);

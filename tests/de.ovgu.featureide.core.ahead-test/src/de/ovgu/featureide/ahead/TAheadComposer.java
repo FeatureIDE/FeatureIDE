@@ -31,11 +31,11 @@ import org.junit.Test;
  */
 public class TAheadComposer {
 
-	public static final String SOUCE_1 = "layer test;" + AheadComposer.NEWLINE + "import import1;" + AheadComposer.NEWLINE + "public class test {"
-			+ AheadComposer.NEWLINE + "private Player player;" + "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}"
-			+ AheadComposer.NEWLINE + "}";
-	private static final String CORRECTED_1 = AheadComposer.NEWLINE + "import import1;" + AheadComposer.NEWLINE + "public class test {" + AheadComposer.NEWLINE
+	public static final String SOUCE_1 =
+		"layer test;" + AheadComposer.NEWLINE + "import import1;" + AheadComposer.NEWLINE + "public class test {" + AheadComposer.NEWLINE
 			+ "private Player player;" + "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
+	private static final String CORRECTED_1 = AheadComposer.NEWLINE + "import import1;" + AheadComposer.NEWLINE + "public class test {" + AheadComposer.NEWLINE
+		+ "private Player player;" + "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
 
 	/**
 	 * Tests layer removing.
@@ -46,9 +46,9 @@ public class TAheadComposer {
 	}
 
 	private static final String SOUCE_2 = "import import1;" + AheadComposer.NEWLINE + "public class test {" + AheadComposer.NEWLINE
-			+ "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
+		+ "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
 	private static final String CORRECTED_2 = AheadComposer.NEWLINE + "import import1;" + AheadComposer.NEWLINE + "public class test {" + AheadComposer.NEWLINE
-			+ "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
+		+ "	private void method1() {" + AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "}";
 
 	/**
 	 * Tests adding a line brake before import;
@@ -59,8 +59,8 @@ public class TAheadComposer {
 	}
 
 	private static final String SOUCE_3 =
-			AheadComposer.NEWLINE + "import player.*;" + AheadComposer.NEWLINE + "public class Player {" + AheadComposer.NEWLINE + "	private void player() {"
-					+ AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "private Player player;" + AheadComposer.NEWLINE + "}";
+		AheadComposer.NEWLINE + "import player.*;" + AheadComposer.NEWLINE + "public class Player {" + AheadComposer.NEWLINE + "	private void player() {"
+			+ AheadComposer.NEWLINE + AheadComposer.NEWLINE + "	}" + AheadComposer.NEWLINE + "private Player player;" + AheadComposer.NEWLINE + "}";
 
 	/**
 	 * Tests ignoring other layer occurrences.

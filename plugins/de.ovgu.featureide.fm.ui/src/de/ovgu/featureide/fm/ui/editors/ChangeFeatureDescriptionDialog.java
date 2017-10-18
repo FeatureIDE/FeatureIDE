@@ -125,7 +125,7 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefault
 			label = new CLabel(composite, SWT.WRAP);
 			label.setText(message);
 			final GridData data =
-					new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
+				new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
 			label.setFont(parent.getFont());

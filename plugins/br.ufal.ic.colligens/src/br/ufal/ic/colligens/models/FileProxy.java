@@ -114,11 +114,11 @@ public class FileProxy {
 		filePath.mkdirs();
 
 		final File temp = new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator") + "temp.c");
+			+ System.getProperty("file.separator") + "temp.c");
 		temp.createNewFile();
 
 		final FileWriter fstreamout = new FileWriter(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects"
-				+ System.getProperty("file.separator") + "temp.c");
+			+ System.getProperty("file.separator") + "temp.c");
 		final BufferedWriter out = new BufferedWriter(fstreamout);
 
 		final FileInputStream fstream = new FileInputStream(getFileReal());
@@ -141,7 +141,7 @@ public class FileProxy {
 		out.close();
 
 		final File tempFile =
-				new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + path + getFileName());
+			new File(Colligens.getDefault().getConfigDir().getAbsolutePath() + System.getProperty("file.separator") + "projects" + path + getFileName());
 
 		tempFile.deleteOnExit();
 

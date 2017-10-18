@@ -19,8 +19,8 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 			if (obj instanceof CppCheckerFileLogs) {
 				final IFile iFile = ((CppCheckerFileLogs) obj).getFile();
 				return iFile.getLocation().toOSString().substring(iFile.getProject().getLocation().toOSString().length(),
-						iFile.getLocation().toOSString().length()) + " (" + ((CppCheckerFileLogs) obj).getLogs().size() + ERROR
-						+ ((((CppCheckerFileLogs) obj).getLogs().size() == 1) ? "" : "s") + ")";
+						iFile.getLocation().toOSString().length())
+					+ " (" + ((CppCheckerFileLogs) obj).getLogs().size() + ERROR + ((((CppCheckerFileLogs) obj).getLogs().size() == 1) ? "" : "s") + ")";
 			}
 			if (obj instanceof CppCheckerLog) {
 				return ((CppCheckerLog) obj).getMsg();

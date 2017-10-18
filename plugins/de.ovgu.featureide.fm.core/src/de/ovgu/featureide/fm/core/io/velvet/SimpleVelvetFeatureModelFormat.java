@@ -245,7 +245,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	private static final ExtendedFeatureModelFactory factory = ExtendedFeatureModelFactory.getInstance();
 
 	private static final int[] binaryOperators =
-			{ VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT };
+		{ VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT };
 
 	private final LinkedList<Tree> atrributeConstraintNodes = new LinkedList<>();
 	private final LinkedList<IFeature> parentStack = new LinkedList<>();
@@ -741,7 +741,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	private void reportWarning(Tree curNode, String message) {
 		Logger.logWarning(message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getFileName() : "") + ": \""
-				+ curNode.getText() + "\")");
+			+ curNode.getText() + "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -785,7 +785,7 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 
 	@Override
 	public String getName() {
-		return "Velvet Light";
+		return "Simple Velevet";
 	}
 
 }

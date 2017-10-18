@@ -7,18 +7,21 @@ public class Vertex
     public /*@spec_public@*/ boolean visited;
 
     /*@ensures original && visited == false;@*/
+    /*@assignable visited; @*/
     public void VertexConstructor( ) 
     {
         original( );
         visited = false;
     }
     /*@requires w != null;@*/
+    /*@assignable visited; @*/
     public void init_vertex( WorkSpace w ) 
     {
         visited = false;
         w.init_vertex( ( Vertex ) this );
     }
     /*@requires w != null;@*/
+    /*@assignable visited; @*/
     public void nodeSearch( WorkSpace w ) 
     {
         Vertex v;

@@ -277,13 +277,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			} else {
 				fnod = doc.createElement(UNKNOWN);// Logger.logInfo("creatXMlDockRec: Unexpected error!");
 			}
+
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
 
 			for (final IFeature feature : children) {
 				createXmlDocRec(doc, fnod, feature);
 			}
+
 		}
+
 	}
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {

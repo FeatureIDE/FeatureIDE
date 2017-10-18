@@ -548,7 +548,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		final long buffer = sorter.getBufferSize();
 		return "Built configurations: " + built + "/" + (configurationNumber == Integer.MAX_VALUE ? COUNTING___ : configurationNumber) + "(" + buffer
-				+ " buffered)" + " Expected time: " + t;
+			+ " buffered)" + " Expected time: " + t;
 	}
 
 	/**

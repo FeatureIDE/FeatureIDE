@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="ComplexExplicitContracting"/>
+		<feature automatic="selected" manual="selected" name="Real"/>
+		<feature automatic="undefined" manual="undefined" name="Complex"/>
+	</configuration>

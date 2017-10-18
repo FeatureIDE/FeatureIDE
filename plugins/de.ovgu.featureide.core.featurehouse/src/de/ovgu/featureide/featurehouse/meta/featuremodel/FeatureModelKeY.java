@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 public class FeatureModelKeY implements IFeatureModelClass {
 
 	private final static String HEAD =
-			"/**\r\n * Variability encoding of the feature model for KeY.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
+		"/**\r\n * Variability encoding of the feature model for KeY.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 
 	private final IFeatureModel featureModel;

@@ -102,7 +102,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		final FeatureProperties status = FeatureUtils.getFeatureProperties(feat);
 
 		if ((status.getFeatureSelectionStatus() != FeatureSelectionStatus.DEAD)
-				&& (status.getFeatureDeterminedStatus() != FeatureDeterminedStatus.INDETERMINATE_HIDDEN)) {
+			&& (status.getFeatureDeterminedStatus() != FeatureDeterminedStatus.INDETERMINATE_HIDDEN)) {
 			attribute.add("STATUS: " + status);
 		}
 

@@ -92,7 +92,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 	private static final int SYMBOL_SIZE = ROW_HEIGHT;
 	private static final String ALTERNATIVE_TOOLTIP =
-			"Alternative group:\n\nExactly one of the features in this group must be selected,\n if the parent feature is selected.";
+		"Alternative group:\n\nExactly one of the features in this group must be selected,\n if the parent feature is selected.";
 	private static final String OR_TOOLTIP = "Or Group:\n\nAt least one of the features in this group must be selected,\n if the parent feature is selected.";
 	private static final String OPTIONAL_TOOLTIP = "Optional feature:\n\nThis feature does not have to be selected.";
 	private static final String MANDATORY_TOOLTIP = "Mandatory feature:\n\nThis feature must be selected whenever its parent is selected.";
@@ -102,13 +102,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String INTERFACED_TOOLTIP = "Interface feature:\n\nThis feature is a feature from an interface.";
 	private static final String CONCRETE_TOOLTIP = "Concrete feature:\n\nThis feature has impact at implementation level.";
 	private static final String HIDDEN_TOOLTIP =
-			"Hidden feature:\n\nThis feature will not be shown in the configuration editor.\n Non-hidden features should determine when to select the feature automatically.";
+		"Hidden feature:\n\nThis feature will not be shown in the configuration editor.\n Non-hidden features should determine when to select the feature automatically.";
 	private static final String COLLAPSED_TOOLTIP = "Collapsed feature:\n\nThe features under this parent will not be shown in the feature model editor.";
 	private static final String DEAD_TOOLTIP = "Dead feature:\n\nThis feature cannot be selected in any valid configuration.";
 	private static final String FALSE_OPT_TOOLTIP =
-			"False optional feature:\n\nThis feature is declared optional, but is always selected\n if the parent feature is selected.";
+		"False optional feature:\n\nThis feature is declared optional, but is always selected\n if the parent feature is selected.";
 	private static final String INDET_HIDDEN_TOOLTIP =
-			"Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
+		"Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
@@ -673,7 +673,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createExplanationEntry() {
-		final Explanation explanation = graphicalFeatureModel.getActiveExplanation();
+		final Explanation<?> explanation = graphicalFeatureModel.getActiveExplanation();
 
 		final XYLayout layout = new XYLayout();
 		final Figure explanationFigure = new Figure();
@@ -688,9 +688,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		// Label left
 		final Label labelExplanation = new Label();
-		final String circumstanceString = explanation.getWriter().getCircumstanceString();
-		labelExplanation.setText(String.format("%s because of the highlighted dependencies:", circumstanceString));
-		explanationFigure.setToolTip(createToolTipContent(String.format("%s%nbecause of the highlighted dependencies.", circumstanceString)));
+		labelExplanation.setText(language.getExplanation());
+		explanationFigure.setToolTip(createToolTipContent(explanation.toString()));
 		final int widthInPixels = createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width + 25;
 
 		// SetWidth depending of string
@@ -701,19 +700,19 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelExplanation.setFont(DEFAULT_FONT);
-		labelExplanation.setSize(getSize().width, ROW_HEIGHT + 2);
+		labelExplanation.setSize(getSize().width, (2 * ROW_HEIGHT) + 2);
 
 		labelExplanation.setLocation(new Point(x_SymbolStart, y_Entry));
-		y_Entry += ROW_HEIGHT + 5;
+		y_Entry += 2 * ROW_HEIGHT;
 
 		// Add Red to dark red Gradient
 		final TwoColorGradientLine redToBlack =
-				new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0), labelExplanation.getPreferredSize().width, 6);
+			new TwoColorGradientLine(new Color(null, 255, 0, 0), new Color(null, 0, 0, 0), labelExplanation.getPreferredSize().width, 6);
 		redToBlack.setLocation(new Point(x_SymbolStart, y_Entry));
 		y_Entry += redToBlack.getSize().height;
 
 		// Label left
-		final Label labelLeft = new Label("likely cause");
+		final Label labelLeft = new Label(language.getLikelyCause());
 		labelLeft.setLabelAlignment(PositionConstants.LEFT);
 		labelLeft.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelLeft.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
@@ -722,7 +721,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelLeft.setLocation(new Point(redToBlack.getLocation().x, y_Entry));
 
 		// label right
-		final Label labelRight = new Label("unlikely cause");
+		final Label labelRight = new Label(language.getUnlikelyCause());
 		labelRight.setLabelAlignment(PositionConstants.RIGHT);
 		labelRight.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelRight.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());

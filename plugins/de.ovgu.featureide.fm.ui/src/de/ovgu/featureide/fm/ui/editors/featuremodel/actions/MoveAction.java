@@ -167,7 +167,7 @@ public class MoveAction extends Action {
 			feature.setLocation(newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
 			final IGraphicalConstraint constraint =
-					element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
+				element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getModel() : (IGraphicalConstraint) element;
 			final Point newPos = constraint.getLocation().translate(deltaPos);
 			constraint.setLocation(newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure)) {

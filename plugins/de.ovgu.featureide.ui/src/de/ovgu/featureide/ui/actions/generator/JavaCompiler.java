@@ -211,8 +211,8 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 				// errorMessage = parseCannotFindSymbolMessage(scanner);
 				// }
 				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) || errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
-						|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) && !errorMessage.contains("cannot be resolved"))
-						|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+					|| (errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) && !errorMessage.contains("cannot be resolved"))
+					|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
 					continue;
 				}
 				if (!errorFiles.contains(currentFile)) {

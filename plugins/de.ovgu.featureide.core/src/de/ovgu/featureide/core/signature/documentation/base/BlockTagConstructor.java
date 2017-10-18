@@ -102,8 +102,8 @@ class BlockTagConstructor {
 				endIndex = m.end();
 			}
 			return (startIndex > -1)
-					? new BlockTag(head + " " + body.substring(0, startIndex), body.substring(endIndex), type, priority, featureID, featureNode)
-					: new BlockTag(head + " " + body, "", type, priority, featureID, featureNode);
+				? new BlockTag(head + " " + body.substring(0, startIndex), body.substring(endIndex), type, priority, featureID, featureNode)
+				: new BlockTag(head + " " + body, "", type, priority, featureID, featureNode);
 		}
 	}
 

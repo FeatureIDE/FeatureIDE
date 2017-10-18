@@ -119,7 +119,7 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 		}
 	}
 
-	private static final ObjectCreator<IFeatureModel> objectCreator = new ObjectCreator<IFeatureModel>() {
+	private static class ObjectCreator extends FileManager.ObjectCreator<IFeatureModel> {
 
 		private IFeatureModelFactory factory = null;
 
@@ -164,7 +164,7 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 	 */
 	@CheckForNull
 	public static FeatureModelManager getInstance(Path absolutePath) {
-		return (FeatureModelManager) FileManager.getInstance(absolutePath, objectCreator, FeatureModelManager.class, FMFormatManager.getInstance());
+		return (FeatureModelManager) FileManager.getInstance(absolutePath, new ObjectCreator(), FeatureModelManager.class, FMFormatManager.getInstance());
 	}
 
 	@Deprecated
@@ -177,33 +177,34 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 		return null;
 	}
 
+	public static FileHandler<IFeatureModel> getFileHandler(Path path) {
+		return SimpleFileHandler.getFileHandler(path, new ObjectCreator(), FMFormatManager.getInstance());
+	}
+
 	public static IFeatureModel load(Path path) {
-		final FeatureModelManager instance = getInstance(path);
-		return instance.getObject();
+		return getFileHandler(path).getObject();
 	}
 
 	public static IFeatureModel load(Path path, ProblemList problems) {
-		final FeatureModelManager instance = getInstance(path);
-		problems.addAll(instance.getLastProblems());
-		return instance.getObject();
+		final FileHandler<IFeatureModel> fileHandler = getFileHandler(path);
+		problems.addAll(fileHandler.getLastProblems());
+		return fileHandler.getObject();
+	}
+
+	public static boolean save(IFeatureModel featureModel, Path path, IPersistentFormat<IFeatureModel> format) {
+		return !SimpleFileHandler.save(path, featureModel, format).containsError();
 	}
 
 	public static IFeatureModelFormat getFormat(String fileName) {
 		return FMFormatManager.getInstance().getFormatByFileName(fileName);
 	}
 
-	public static boolean save(IFeatureModel featureModel, Path path) {
-		final String pathString = path.toAbsolutePath().toString();
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(pathString);
-		return !SimpleFileHandler.save(path, featureModel, format).containsError();
-	}
-
-	public static boolean convert(Path inPath, Path outPath) {
-		final IFeatureModel featureModel = load(inPath);
-		if (featureModel == null) {
-			return false;
+	public static boolean convert(Path inPath, Path outPath, IPersistentFormat<IFeatureModel> outFormat) {
+		final FileHandler<IFeatureModel> fileHandler = getFileHandler(inPath);
+		if (!fileHandler.getLastProblems().containsError()) {
+			return fileHandler.write(outPath, outFormat);
 		}
-		return save(featureModel, outPath);
+		return false;
 	}
 
 	@Deprecated
@@ -217,7 +218,7 @@ public class FeatureModelManager extends FileManager<IFeatureModel> {
 		return new ConfigurationPropagator(configuration, includeAbstractFeatures);
 	}
 
-	protected FeatureModelManager(SimpleFileHandler<IFeatureModel> fileHandler, ObjectCreator<IFeatureModel> objectCreator) {
+	protected FeatureModelManager(SimpleFileHandler<IFeatureModel> fileHandler, FileManager.ObjectCreator<IFeatureModel> objectCreator) {
 		super(fileHandler, objectCreator);
 
 		variableObject.setSourceFile(path);

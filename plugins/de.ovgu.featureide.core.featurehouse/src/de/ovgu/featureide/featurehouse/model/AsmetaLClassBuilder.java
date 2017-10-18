@@ -47,7 +47,7 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 		final String[] type = terminal.getBody().substring(terminal.getBody().indexOf("over") + 4, terminal.getBody().indexOf(":")).trim().split(",");
 
 		final boolean hasProperIdentifier =
-				terminal.getBody().substring(terminal.getBody().indexOf("invariant") + 4, terminal.getBody().indexOf("over")).contains("inv_");
+			terminal.getBody().substring(terminal.getBody().indexOf("invariant") + 4, terminal.getBody().indexOf("over")).contains("inv_");
 
 		final FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), new LinkedList<String>(Arrays.asList(type)), terminal.beginLine,
 				terminal.endLine, hasProperIdentifier, true);
@@ -64,7 +64,7 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 			final String type = "";
 
 			final FSTAsmetaLDomain field =
-					new FSTAsmetaLDomain(terminal.getName(), type, startTokens, terminal.getBody(), terminal.beginLine, terminal.endLine);
+				new FSTAsmetaLDomain(terminal.getName(), type, startTokens, terminal.getBody(), terminal.beginLine, terminal.endLine);
 			modelBuilder.getCurrentClassFragment().add(field);
 		} else if (terminal.getType().equals("Function")) {
 			final String begin = terminal.getBody().substring(0, terminal.getBody().indexOf(":"));

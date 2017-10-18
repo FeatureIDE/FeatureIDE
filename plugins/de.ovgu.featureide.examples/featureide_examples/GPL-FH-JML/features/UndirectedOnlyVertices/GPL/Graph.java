@@ -33,6 +33,7 @@ public class Graph
     // Adds an edge without weights if Weighted layer is not present
 	/*@ requires start != null && end != null; @*/
 	/*@ ensures \result.getOtherVertex(start)==v2 && \result.getOtherVertex(end)==v1; @*/
+    /*@ assignable \nothing; @*/
     public void addAnEdge( Vertex start,  Vertex end, int weight )
     {
         addEdge( start,end );
@@ -42,6 +43,7 @@ public class Graph
     // viceversa
 	/*@ requires v1 != null && v2 != null; @*/
 	/*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
+    /*@assignable \nothing; @*/
     public EdgeIfc addEdge( Vertex start,  Vertex end )
     {
         start.addAdjacent( end );
@@ -88,6 +90,7 @@ public class Graph
 	  return ( Vertex ) verticesMap.get( theName );
     }
     /*@ ensures \result != null; @*/
+    /*@ assignable \nothing; @*/
     public VertexIter getVertices( )
     {
         return new VertexIter( )

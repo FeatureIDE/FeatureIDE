@@ -36,7 +36,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
 
@@ -319,12 +318,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
 		if (line.contains("#else")) {
 			if (!expressionStack.isEmpty()) {
-				Node[] nestedExpressions = new Node[expressionStack.size()];
-				nestedExpressions = expressionStack.toArray(nestedExpressions);
-
-				final And nestedExpressionsAnd = new And(nestedExpressions);
-
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				checkContradictionOrTautology(lineNumber, res);
 			}
 
 			return;
@@ -353,7 +347,9 @@ public class CPPComposer extends PPComposerExtensionClass {
 				ppExpression = new Not(ppExpression.clone());
 			}
 
-			checkExpressions(ppExpression, lineNumber, res);
+			expressionStack.push(ppExpression);
+
+			checkContradictionOrTautology(lineNumber, res);
 
 		}
 	}
@@ -504,7 +500,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 				preProcessorInput = (LinkedList<String>) featureArgs.clone();
 				preProcessorInput.add(fullFilePath);
 				preProcessorOutput =
-						buildFolder.getLocation().toOSString() + System.getProperty("file.separator") + name[0] + "_preprocessed." + res.getFileExtension();
+					buildFolder.getLocation().toOSString() + System.getProperty("file.separator") + name[0] + "_preprocessed." + res.getFileExtension();
 
 				// CommandLine syntax:
 				// -DFEATURE1 -DFEATURE2 ... File1 outputDirectory/File1
@@ -532,7 +528,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		final ArrayList<String[]> list = new ArrayList<String[]>();
 		list.add(new String[] { "C Source File", "c", "\r\n" + "int main(int argc, char **argv)" + " {\r\n\r\n}" });
 		list.add(new String[] { C_HEADER_FILE, "h",
-				"#ifndef " + CLASS_NAME_PATTERN + "_H_\n" + "#define " + CLASS_NAME_PATTERN + "_H_\n\n\n" + "#endif /* " + CLASS_NAME_PATTERN + "_H_ */" });
+			"#ifndef " + CLASS_NAME_PATTERN + "_H_\n" + "#define " + CLASS_NAME_PATTERN + "_H_\n\n\n" + "#endif /* " + CLASS_NAME_PATTERN + "_H_ */" });
 		return list;
 	}
 

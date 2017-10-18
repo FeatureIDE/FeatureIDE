@@ -59,7 +59,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
 
 /**
  * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor} and the {@link FmOutlinePage}. Enables Undo/Redo.
@@ -102,7 +102,7 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 		if (viewer instanceof GraphicalViewerImpl) {
 			final GraphicalViewerImpl viewer2 = (GraphicalViewerImpl) viewer;
 			final IFeature parent =
-					((commonAncestorList != null) && !commonAncestorList.isEmpty()) ? commonAncestorList.get(commonAncestorList.size() - 1) : null;
+				((commonAncestorList != null) && !commonAncestorList.isEmpty()) ? commonAncestorList.get(commonAncestorList.size() - 1) : null;
 			final Object editPart = viewer2.getEditPartRegistry().get(parent != null ? parent : featureModel.getStructure().getRoot());
 			if (editPart instanceof FeatureEditPart) {
 				viewer2.setSelection(new StructuredSelection(editPart));
@@ -233,8 +233,8 @@ public class ElementDeleteOperation extends MultiFeatureModelOperation implement
 
 		final MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
 				((notDeletable.size() != 1) ? "The following features are contained in constraints:" : "The following feature is contained in constraints:")
-						+ "\n" + notDeletedFeatures + "\n" + ((notDeletable.size() != 1)
-								? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_ : IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_),
+					+ "\n" + notDeletedFeatures + "\n" + ((notDeletable.size() != 1) ? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_
+						: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_),
 				MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
 	}

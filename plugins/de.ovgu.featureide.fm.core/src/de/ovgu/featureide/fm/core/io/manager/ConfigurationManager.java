@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -63,6 +64,26 @@ public class ConfigurationManager extends FileManager<Configuration> {
 		}
 	}
 
+	private static class ObjectCreator2 extends FileManager.ObjectCreator<Configuration> {
+
+		private final IFeatureModel model;
+
+		public ObjectCreator2(IFeatureModel model) {
+			super();
+			this.model = model;
+		}
+
+		@Override
+		protected Configuration createObject() {
+			return new Configuration(model);
+		}
+
+		@Override
+		protected Snapshot<Configuration> createSnapshot(Configuration object) {
+			return new Snapshot<>(object.clone());
+		}
+	}
+
 	@Nonnull
 	public static IPersistentFormat<Configuration> getDefaultFormat() {
 		return new DefaultFormat();
@@ -73,15 +94,41 @@ public class ConfigurationManager extends FileManager<Configuration> {
 		return FileManager.getInstance(path, new ObjectCreator(modelFile), ConfigurationManager.class, ConfigFormatManager.getInstance());
 	}
 
+	@CheckForNull
+	public static ConfigurationManager getInstance(Path path, IFeatureModel model) {
+		return FileManager.getInstance(path, new ObjectCreator2(model), ConfigurationManager.class, ConfigFormatManager.getInstance());
+	}
+
+	public static FileHandler<Configuration> getFileHandler(Path configurationFile, Path modelFile) {
+		return SimpleFileHandler.getFileHandler(configurationFile, new ObjectCreator(modelFile), ConfigFormatManager.getInstance());
+	}
+
+	public static FileHandler<Configuration> getFileHandler(Path configurationFile, IFeatureModel model) {
+		return SimpleFileHandler.getFileHandler(configurationFile, new ObjectCreator2(model), ConfigFormatManager.getInstance());
+	}
+
 	public static Configuration load(Path configurationFile, Path modelFile) {
-		final ConfigurationManager instance = getInstance(configurationFile, modelFile);
-		return instance.getObject();
+		return getFileHandler(configurationFile, modelFile).getObject();
 	}
 
 	public static Configuration load(Path configurationFile, Path modelFile, ProblemList problems) {
-		final ConfigurationManager instance = getInstance(configurationFile, modelFile);
-		problems.addAll(instance.getLastProblems());
-		return instance.getObject();
+		final FileHandler<Configuration> fileHandler = getFileHandler(configurationFile, modelFile);
+		problems.addAll(fileHandler.getLastProblems());
+		return fileHandler.getObject();
+	}
+
+	public static Configuration load(Path configurationFile, IFeatureModel model) {
+		return getFileHandler(configurationFile, model).getObject();
+	}
+
+	public static Configuration load(Path configurationFile, IFeatureModel model, ProblemList problems) {
+		final FileHandler<Configuration> fileHandler = getFileHandler(configurationFile, model);
+		problems.addAll(fileHandler.getLastProblems());
+		return fileHandler.getObject();
+	}
+
+	public static boolean save(Configuration configuration, Path path, IPersistentFormat<Configuration> format) {
+		return !SimpleFileHandler.save(path, configuration, format).containsError();
 	}
 
 	// TODO !!! react on feature name change
@@ -108,7 +155,7 @@ public class ConfigurationManager extends FileManager<Configuration> {
 
 	private FeatureModelManager featureModelManager;
 
-	protected ConfigurationManager(SimpleFileHandler<Configuration> fileHandler, ObjectCreator objectCreator) {
+	protected ConfigurationManager(SimpleFileHandler<Configuration> fileHandler, FileManager.ObjectCreator<Configuration> objectCreator) {
 		super(fileHandler, objectCreator);
 
 		featureModelManager.addListener(new FeatureModelChangeListner());

@@ -20,12 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
@@ -34,10 +33,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  *
  * @author Timo G&uuml;nther
  */
-public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
-
-	/** The dead feature in the feature model. */
-	private IFeature deadFeature;
+public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation>
+		implements DeadFeatureExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -49,31 +46,10 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param fm the feature model context
+	 * @param solverFactory the solver factory used to create the oracle
 	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm) {
-		this(fm, null);
-	}
-
-	/**
-	 * Constructs a new instance of this class.
-	 *
-	 * @param fm the feature model context
-	 * @param deadFeature the dead feature in the feature model
-	 */
-	public MusDeadFeatureExplanationCreator(IFeatureModel fm, IFeature deadFeature) {
-		super(fm);
-		setDeadFeature(deadFeature);
-	}
-
-	@Override
-	public IFeature getDeadFeature() {
-		return deadFeature;
-	}
-
-	@Override
-	public void setDeadFeature(IFeature deadFeature) {
-		this.deadFeature = deadFeature;
+	public MusDeadFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	@Override
@@ -82,8 +58,8 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		final DeadFeatureExplanation explanation;
 		oracle.push();
 		try {
-			oracle.addAssumption(getDeadFeature().getName(), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			oracle.addAssumption(NodeCreator.getVariable(getSubject()), true);
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
@@ -91,12 +67,7 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 	}
 
 	@Override
-	protected DeadFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
 	protected DeadFeatureExplanation getConcreteExplanation() {
-		return new DeadFeatureExplanation(getDeadFeature());
+		return new DeadFeatureExplanation(getSubject());
 	}
 }
