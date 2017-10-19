@@ -44,6 +44,7 @@
 		<project name="Automotive02_V4" path="featureide_examples/FeatureModels/Automotive02_V4/.project"/>
 		<project name="BerkeleyDB" path="featureide_examples/FeatureModels/BerkeleyDB/.project"/>
 		<project name="Busybox_1.18.0" path="featureide_examples/FeatureModels/Busybox_1.18.0/.project"/>
+		<project name="ChatClient" path="featureide_examples/FeatureModels/ChatClient/.project"/>
 		<project name="E-Shop" path="featureide_examples/FeatureModels/E-Shop/.project"/>
 		<project name="EMBToolkit" path="featureide_examples/FeatureModels/EMBToolkit/.project"/>
 		<project name="FameDB" path="featureide_examples/FeatureModels/FameDB/.project"/>
