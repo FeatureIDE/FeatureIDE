@@ -1109,7 +1109,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * @param featureSelection a feature selection; not null
 	 * @return an explanation for the given feature selection; null if none could be found
 	 */
-	public Explanation getExplanation(SelectableFeature featureSelection) {
+	public Explanation<?> getExplanation(SelectableFeature featureSelection) {
 		switch (featureSelection.getAutomatic()) {
 		case SELECTED:
 		case UNSELECTED:
@@ -1128,7 +1128,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * @param automaticSelection an automatically selected feature; not null
 	 * @return an explanation why the given feature is automatically selected or unselected; null if none could be found
 	 */
-	public Explanation getAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+	public Explanation<?> getAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
 		// TODO Remember previously generated explanations.
 		return createAutomaticSelectionExplanation(automaticSelection);
 	}
@@ -1139,7 +1139,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * @param automaticSelection the automatic selection
 	 * @return a new explanation for the given automatic selection; null if none could be generated
 	 */
-	protected Explanation createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
+	protected Explanation<?> createAutomaticSelectionExplanation(SelectableFeature automaticSelection) {
 		final Configuration config = configurationEditor.getConfiguration();
 		if (config == null) {
 			return null;
@@ -1309,14 +1309,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 
 			// Print the explanation.
-			final Explanation explanation = getExplanation(feature);
+			final Explanation<?> explanation = getExplanation(feature);
 			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
 				if (sb.length() > 0) {
 					sb.append("\n\n");
 				}
-				final ExplanationWriter wr = explanation.getWriter();
+				final ExplanationWriter<?> wr = explanation.getWriter();
 				sb.append(wr.getHeaderString());
-				for (final Reason reason : explanation.getReasons()) {
+				for (final Reason<?> reason : explanation.getReasons()) {
 					sb.append(System.lineSeparator());
 					sb.append("\u2022 ");
 					sb.append(wr.getReasonString(reason));

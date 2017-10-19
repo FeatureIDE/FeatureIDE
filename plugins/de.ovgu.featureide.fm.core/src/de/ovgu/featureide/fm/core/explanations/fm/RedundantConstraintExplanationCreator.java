@@ -27,28 +27,4 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  *
  * @author Timo G&uuml;nther
  */
-public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator {
-
-	/**
-	 * Returns the redundant constraint in the feature model.
-	 *
-	 * @return the redundant constraint in the feature model
-	 */
-	@Override
-	public IConstraint getSubject();
-
-	/**
-	 * Sets the redundant constraint in the feature model.
-	 *
-	 * @param subject the redundant constraint in the feature model
-	 * @throws IllegalArgumentException if the subject is not an instance of {@link IConstraint}
-	 */
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException;
-
-	/**
-	 * Returns an explanation why the specified constraint of the specified feature model is redundant.
-	 */
-	@Override
-	public RedundantConstraintExplanation getExplanation() throws IllegalStateException;
-}
+public interface RedundantConstraintExplanationCreator extends FeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation> {}

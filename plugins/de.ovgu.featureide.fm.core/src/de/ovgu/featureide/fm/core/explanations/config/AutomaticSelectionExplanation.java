@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
  *
  * @author Timo G&uuml;nther
  */
-public class AutomaticSelectionExplanation extends ConfigurationExplanation {
+public class AutomaticSelectionExplanation extends ConfigurationExplanation<SelectableFeature> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -37,11 +37,6 @@ public class AutomaticSelectionExplanation extends ConfigurationExplanation {
 	 */
 	public AutomaticSelectionExplanation(SelectableFeature subject, Configuration config) {
 		super(subject, config);
-	}
-
-	@Override
-	public SelectableFeature getSubject() {
-		return (SelectableFeature) super.getSubject();
 	}
 
 	@Override

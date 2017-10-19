@@ -35,4 +35,13 @@
 			</menu>
 		</menuContribution>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMComposer">
+    <fmComposer
+          class="de.ovgu.featureide.ahead.AheadFMComposerExtension"
+          composer="de.ovgu.featureide.composer.ahead"
+          id="de.ovgu.featureide.core.ahead.fmComposer"
+          name="de.ovgu.featureide.core.ahead.fmComposer">
+    </fmComposer>
+ </extension>
 </plugin>

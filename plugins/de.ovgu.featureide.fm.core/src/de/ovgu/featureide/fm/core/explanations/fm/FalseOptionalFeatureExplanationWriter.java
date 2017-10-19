@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  *
  * @author Timo G&uuml;nther
  */
-public class FalseOptionalFeatureExplanationWriter extends FeatureModelExplanationWriter {
+public class FalseOptionalFeatureExplanationWriter extends FeatureModelExplanationWriter<FalseOptionalFeatureExplanation> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -36,11 +36,6 @@ public class FalseOptionalFeatureExplanationWriter extends FeatureModelExplanati
 	 */
 	public FalseOptionalFeatureExplanationWriter(FalseOptionalFeatureExplanation explanation) {
 		super(explanation);
-	}
-
-	@Override
-	protected FalseOptionalFeatureExplanation getExplanation() {
-		return (FalseOptionalFeatureExplanation) super.getExplanation();
 	}
 
 	@Override

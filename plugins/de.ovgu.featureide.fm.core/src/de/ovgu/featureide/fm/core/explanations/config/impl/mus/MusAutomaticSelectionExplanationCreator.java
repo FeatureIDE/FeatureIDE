@@ -22,10 +22,10 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -39,24 +39,28 @@ import de.ovgu.featureide.fm.core.explanations.config.ConfigurationReason;
  *
  * @author Timo G&uuml;nther
  */
-public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator implements AutomaticSelectionExplanationCreator {
+public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExplanationCreator<SelectableFeature, AutomaticSelectionExplanation>
+		implements AutomaticSelectionExplanationCreator {
 
 	/**
 	 * The features that have been added to the oracle. Stored for performance reasons.
 	 */
 	private final List<SelectableFeature> selectedFeatures = new LinkedList<>();
 
-	@Override
-	public SelectableFeature getSubject() {
-		return (SelectableFeature) super.getSubject();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusAutomaticSelectionExplanationCreator() {
+		this(null);
 	}
 
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof SelectableFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusAutomaticSelectionExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	@Override
@@ -100,7 +104,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					selectedFeatures.add(featureSelection);
 				}
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
@@ -108,12 +112,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 	}
 
 	@Override
-	protected AutomaticSelectionExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (AutomaticSelectionExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		final int selectionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (selectionIndex >= 0) {
 			return new ConfigurationReason(selectedFeatures.get(selectionIndex));

@@ -18,27 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.fm.impl.ltms;
+package org.prop4j.explain.solvers.impl.ltms;
 
-import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
+import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.MutableSatSolver;
+import org.prop4j.explain.solvers.SatSolver;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 /**
- * Abstract implementation of {@link FeatureModelExplanationCreator} using an {@link Ltms LTMS}.
+ * Provides instances of {@link SatSolver} using an {@link Ltms LTMS}.
  *
  * @author Timo G&uuml;nther
- * @author Sofia Ananieva
  */
-public abstract class LtmsFeatureModelExplanationCreator extends AbstractFeatureModelExplanationCreator {
+public class LtmsSatSolverFactory extends SatSolverFactory {
 
 	@Override
-	protected Ltms getOracle() {
-		return (Ltms) super.getOracle();
+	public SatSolver getSatSolver() {
+		return new Ltms();
 	}
 
 	@Override
-	protected Ltms createOracle() {
-		return new Ltms(getCnf());
+	public MutableSatSolver getMutableSatSolver() {
+		return new Ltms();
+	}
+
+	@Override
+	public MusExtractor getMusExtractor() {
+		return new Ltms();
 	}
 }

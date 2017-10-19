@@ -8,28 +8,19 @@ import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanat
 
 /**
  * Implements {@link AutomaticSelectionExplanationCreator} through composition.
- * 
+ *
  * @author Timo G&uuml;nther
  */
-public class CompositeAutomaticSelectionExplanationCreator extends CompositeConfigurationExplanationCreator<AutomaticSelectionExplanationCreator>
+public class CompositeAutomaticSelectionExplanationCreator
+		extends CompositeConfigurationExplanationCreator<SelectableFeature, AutomaticSelectionExplanation, AutomaticSelectionExplanationCreator>
 		implements AutomaticSelectionExplanationCreator {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeAutomaticSelectionExplanationCreator(Collection<AutomaticSelectionExplanationCreator> composites) {
 		super(composites);
-	}
-
-	@Override
-	public SelectableFeature getSubject() {
-		return (SelectableFeature) super.getSubject();
-	}
-
-	@Override
-	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
-		return (AutomaticSelectionExplanation) super.getExplanation();
 	}
 }

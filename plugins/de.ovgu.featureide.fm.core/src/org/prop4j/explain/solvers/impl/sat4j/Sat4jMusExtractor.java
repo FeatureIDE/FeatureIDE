@@ -20,8 +20,10 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
@@ -49,7 +51,7 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		return getClauses(getMinimalUnsatisfiableSubsetIndexes());
+		return getClauseSetFromIndexSet(getMinimalUnsatisfiableSubsetIndexes());
 	}
 
 	@Override
@@ -63,24 +65,20 @@ public class Sat4jMusExtractor extends Sat4jMutableSatSolver implements MusExtra
 		} catch (final TimeoutException e) {
 			throw new IllegalStateException(e);
 		}
-		final Set<Integer> set = new LinkedHashSet<>(indexes.length);
+		final Set<Integer> set = new TreeSet<>();
 		for (final int index : indexes) {
 			set.add(getClauseIndexFromIndex(index));
 		}
 		return set;
 	}
 
-	/**
-	 * Returns the clauses for the given clause indexes.
-	 * 
-	 * @param indexes clause indexes
-	 * @return the clauses for the given clause indexes
-	 */
-	private Set<Node> getClauses(Set<Integer> indexes) {
-		final Set<Node> clauses = new LinkedHashSet<>(indexes.size());
-		for (final int index : indexes) {
-			clauses.add(getClause(index));
-		}
-		return clauses;
+	@Override
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubset());
+	}
+
+	@Override
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
 	}
 }

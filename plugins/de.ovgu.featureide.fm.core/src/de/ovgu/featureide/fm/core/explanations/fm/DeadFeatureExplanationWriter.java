@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
  *
  * @author Timo G&uuml;nther
  */
-public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter {
+public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter<DeadFeatureExplanation> {
 
 	/**
 	 * Constructs a new instance of this class.
@@ -36,11 +36,6 @@ public class DeadFeatureExplanationWriter extends FeatureModelExplanationWriter 
 	 */
 	public DeadFeatureExplanationWriter(DeadFeatureExplanation explanation) {
 		super(explanation);
-	}
-
-	@Override
-	protected DeadFeatureExplanation getExplanation() {
-		return (DeadFeatureExplanation) super.getExplanation();
 	}
 
 	@Override

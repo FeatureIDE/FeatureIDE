@@ -20,36 +20,40 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import org.prop4j.Node;
 
 /**
- * {@link ExplanationWriter} for {@link InvariantExpressionExplanation}.
+ * Generates explanations for invariant presence conditions in preprocessor directives.
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantExpressionExplanationWriter extends PreprocessorExplanationWriter {
+public interface InvariantPresenceConditionExplanationCreator extends PreprocessorExplanationCreator<Node, InvariantPresenceConditionExplanation> {
 
 	/**
-	 * Constructs a new instance of this class.
+	 * Returns true if the expression is a tautology or false if it is a contradiction.
 	 *
-	 * @param explanation explanation to transform
+	 * @return true if the expression is a tautology or false if it is a contradiction
 	 */
-	public InvariantExpressionExplanationWriter(InvariantExpressionExplanation explanation) {
-		super(explanation);
-	}
+	public boolean isTautology();
 
-	@Override
-	protected InvariantExpressionExplanation getExplanation() {
-		return (InvariantExpressionExplanation) super.getExplanation();
-	}
+	/**
+	 * Sets the tautology flag.
+	 *
+	 * @param tautology true if the expression is a tautology or false if it is a contradiction
+	 */
+	public void setTautology(boolean tautology);
 
+	/**
+	 * Returns the invariant expression to explain.
+	 *
+	 * @return the invariant expression to explain
+	 */
 	@Override
-	protected String getSubjectString() {
-		return String.format("expression %s", getExplanation().getSubject().toString(getSymbols()));
-	}
+	public Node getSubject();
 
+	/**
+	 * Returns an explanation why the expression is a contradiction or a tautology.
+	 */
 	@Override
-	protected String getAttributeString() {
-		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
-	}
+	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException;
 }

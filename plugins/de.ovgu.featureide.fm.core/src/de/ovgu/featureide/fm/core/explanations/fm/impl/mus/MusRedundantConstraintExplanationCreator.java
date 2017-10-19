@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -37,22 +36,26 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
  *
  * @author Timo G&uuml;nther
  */
-public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator implements RedundantConstraintExplanationCreator {
+public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExplanationCreator<IConstraint, RedundantConstraintExplanation>
+		implements RedundantConstraintExplanationCreator {
 
 	/** The amount of clauses added to the oracle to account for the redundant constraint. */
 	private int redundantConstraintClauseCount;
 
-	@Override
-	public IConstraint getSubject() {
-		return (IConstraint) super.getSubject();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusRedundantConstraintExplanationCreator() {
+		this(null);
 	}
 
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IConstraint)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusRedundantConstraintExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	/**
@@ -69,7 +72,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	}
 
 	/**
-	 * Adds the given constraint to the oracle. Makes sure that the trace model properly ignores clauses that were ignored by the solver for being duplicates.
+	 * Adds the given constraint to the oracle.
 	 *
 	 * @param constraint constraint to add
 	 * @param negated whether the constraint should be negated before being added
@@ -77,19 +80,8 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	private int addConstraint(IConstraint constraint, boolean negated) {
 		final AdvancedNodeCreator nc = getNodeCreator();
-		int i = getTraceModel().getTraceCount();
 		final Node constraintNode = nc.createConstraintNode(constraint, negated);
-		int clauseCount = 0;
-		for (final Node clause : constraintNode.getChildren()) {
-			final int added = getOracle().addFormula(clause);
-			if (added > 0) {
-				clauseCount += added;
-				i++;
-			} else {
-				getTraceModel().removeTrace(i);
-			}
-		}
-		return clauseCount;
+		return getOracle().addFormula(constraintNode);
 	}
 
 	@Override
@@ -112,7 +104,7 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			constraintClauseCount += redundantConstraintClauseCount;
 
 			// Get the explanation.
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);
@@ -121,17 +113,12 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	}
 
 	@Override
-	protected RedundantConstraintExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (RedundantConstraintExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
 	protected RedundantConstraintExplanation getConcreteExplanation() {
 		return new RedundantConstraintExplanation(getSubject());
 	}
 
 	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		if (clauseIndex >= (getTraceModel().getTraceCount() - redundantConstraintClauseCount)) {
 			return null; // Ignore the redundant constraint clauses.
 		}

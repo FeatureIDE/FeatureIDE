@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * A class containing numerous methods that are needed for many tests, especially those assessing files.
- * 
+ *
  * @author Marcus Pinnecke
  * @author Thomas Thuem
  */

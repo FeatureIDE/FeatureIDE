@@ -21,8 +21,9 @@
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus;
 
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 
@@ -33,8 +34,30 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
  */
 public class MusPreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusPreprocessorExplanationCreatorFactory() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusPreprocessorExplanationCreatorFactory(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
+	}
+
 	@Override
-	public InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator() {
-		return new MusInvariantExpressionExplanationCreator();
+	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
+		return new MusInvariantPresenceConditionExplanationCreator(solverFactory);
 	}
 }

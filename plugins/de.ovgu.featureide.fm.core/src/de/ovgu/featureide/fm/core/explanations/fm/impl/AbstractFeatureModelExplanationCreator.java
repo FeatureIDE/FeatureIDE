@@ -20,31 +20,29 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
+import de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator;
 
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator}.
  *
+ * @param S subject
+ * @param E explanation
+ * @param O oracle
  * @author Timo G&uuml;nther
  */
-public abstract class AbstractFeatureModelExplanationCreator implements FeatureModelExplanationCreator {
+public abstract class AbstractFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>, O> extends AbstractExplanationCreator<S, E, O>
+		implements FeatureModelExplanationCreator<S, E> {
 
-	/** The subject with an attribute to be explained. */
-	private Object subject;
 	/** The feature model context. */
 	private IFeatureModel fm;
 	/**
@@ -60,20 +58,6 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 	 * The trace model. Created and reset together with the CNF.
 	 */
 	private FeatureModelToNodeTraceModel traceModel;
-	/**
-	 * The oracle used to reason over the circumstance to explain. Uses the CNF as input. Created lazily when needed and reset when the CNF changes.
-	 */
-	private Object oracle;
-
-	@Override
-	public Object getSubject() {
-		return subject;
-	}
-
-	@Override
-	public void setSubject(Object subject) {
-		this.subject = subject;
-	}
 
 	@Override
 	public IFeatureModel getFeatureModel() {
@@ -86,7 +70,7 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 		nodeCreator = null;
 		cnf = null;
 		traceModel = null;
-		oracle = null;
+		setOracle(null);
 	}
 
 	/**
@@ -156,91 +140,8 @@ public abstract class AbstractFeatureModelExplanationCreator implements FeatureM
 		return getNodeCreator().getTraceModel();
 	}
 
-	/**
-	 * Returns the oracle. Creates it first if necessary.
-	 *
-	 * @return the oracle; not null
-	 */
-	protected Object getOracle() {
-		if ((oracle == null) && (getFeatureModel() != null)) {
-			oracle = createOracle();
-		}
-		return oracle;
-	}
-
-	/**
-	 * Sets the oracle to null.
-	 */
-	protected void resetOracle() {
-		oracle = null;
-	}
-
-	/**
-	 * Returns a new oracle.
-	 *
-	 * @return a new oracle; not null
-	 */
-	protected abstract Object createOracle();
-
-	/**
-	 * Returns an explanation for the given clauses.
-	 *
-	 * @param clauseIndexes indexes of clauses that serve as an explanation
-	 * @return an explanation
-	 */
-	protected Explanation getExplanation(Set<Integer> clauseIndexes) {
-		final Explanation explanation = getConcreteExplanation();
-		for (final Integer clauseIndex : clauseIndexes) {
-			final Reason reason = getReason(clauseIndex);
-			if (reason == null) {
-				continue;
-			}
-			explanation.addReason(reason);
-		}
-		return explanation;
-	}
-
-	/**
-	 * Returns the shortest explanation among the given ones. Note that this may not be the shortest one possible.
-	 *
-	 * @param clauseIndexes indexes of clauses of explanations to roll into one
-	 * @return the shortest explanation among the given ones
-	 */
-	protected Explanation getExplanation(Collection<Set<Integer>> clauseIndexes) {
-		final List<Explanation> explanations = new LinkedList<>();
-		for (final Set<Integer> c : clauseIndexes) {
-			explanations.add(getExplanation(c));
-		}
-		final Explanation cumulatedExplanation = getConcreteExplanation();
-		cumulatedExplanation.setExplanationCount(0);
-		Explanation shortestExplanation = null;
-		for (final Explanation explanation : explanations) {
-			cumulatedExplanation.addExplanation(explanation); // Remember that this explanation was generated.
-			if ((shortestExplanation == null) || (explanation.getReasonCount() < shortestExplanation.getReasonCount())) {
-				shortestExplanation = explanation; // Remember the shortest explanation.
-			}
-		}
-		if (shortestExplanation == null) {
-			return null;
-		}
-		shortestExplanation.setCounts(cumulatedExplanation); // Remember the reason and explanations that were generated before.
-		return shortestExplanation;
-	}
-
-	/**
-	 * Returns the reason for the given clause index.
-	 *
-	 * @param clauseIndex index of the clause
-	 * @return the reason for the given clause index
-	 */
-	protected Reason getReason(int clauseIndex) {
+	@Override
+	protected Reason<?> getReason(int clauseIndex) {
 		return new FeatureModelReason(getTraceModel().getTrace(clauseIndex));
 	}
-
-	/**
-	 * Returns a new concrete explanation.
-	 *
-	 * @return a new concrete explanation; not null
-	 */
-	protected abstract Explanation getConcreteExplanation();
 }

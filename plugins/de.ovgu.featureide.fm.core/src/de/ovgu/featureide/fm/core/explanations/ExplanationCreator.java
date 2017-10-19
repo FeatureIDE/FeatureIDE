@@ -23,24 +23,25 @@ package de.ovgu.featureide.fm.core.explanations;
 /**
  * Generates {@link Explanation explanations}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public interface ExplanationCreator {
+public interface ExplanationCreator<S, E extends Explanation<S>> {
 
 	/**
-	 * Returns the subject with an attribute to be explained. Subclasses should override this to provide a subject of a more specific type.
+	 * Returns the subject with an attribute to be explained.
 	 *
 	 * @return the subject with an attribute to be explained
 	 */
-	public Object getSubject();
+	public S getSubject();
 
 	/**
-	 * Sets the subject with an attribute to be explained. Subclasses should override this to only allow subjects of a more specific type.
+	 * Sets the subject with an attribute to be explained.
 	 *
 	 * @param subject the subject with an attribute to be explained
-	 * @throws IllegalArgumentException if the subject is not of the type expected by the subclass
 	 */
-	public void setSubject(Object subject) throws IllegalArgumentException;
+	public void setSubject(S subject);
 
 	/**
 	 * Returns an explanation for the specified circumstance.
@@ -48,5 +49,5 @@ public interface ExplanationCreator {
 	 * @return an explanation; null if none could be generated
 	 * @throws IllegalStateException if the subject or its context is not set
 	 */
-	public Explanation getExplanation() throws IllegalStateException;
+	public E getExplanation() throws IllegalStateException;
 }

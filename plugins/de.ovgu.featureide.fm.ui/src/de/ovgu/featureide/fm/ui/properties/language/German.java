@@ -174,16 +174,16 @@ public class German implements ILanguage {
 
 	@Override
 	public String getExplanation() {
-		return "Das ausgewählte Element ist wegen der hervorgehobenen Abhängigkeiten defekt:";
+		return "Das ausgewählte Element ist defekt" + System.lineSeparator() + "wegen der hervorgehobenen Abhängigkeiten:";
 	}
 
 	@Override
 	public String getLikelyCause() {
-		return "wahrscheinliche Ursache";
+		return "wahrsch. Ursache";
 	}
 
 	@Override
 	public String getUnlikelyCause() {
-		return "unwahrscheinliche Ursache";
+		return "unwahrsch. Ursache";
 	}
 }

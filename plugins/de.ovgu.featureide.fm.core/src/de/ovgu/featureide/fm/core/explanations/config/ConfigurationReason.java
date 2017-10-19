@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.config;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
@@ -28,71 +29,34 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  *
  * @author Timo G&uuml;nther
  */
-public class ConfigurationReason extends Reason {
-
-	/** The feature that has been selected or unselected. */
-	private final SelectableFeature featureSelection;
+public class ConfigurationReason extends Reason<SelectableFeature> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param featureSelection the feature that has been selected or unselected; not null
+	 * @param subject the subject of this reason
 	 */
-	public ConfigurationReason(SelectableFeature featureSelection) {
-		this.featureSelection = featureSelection;
+	public ConfigurationReason(SelectableFeature subject) {
+		this(subject, null);
 	}
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason the reason to clone; not null
+	 * @param subject the subject of this reason
+	 * @param explanation the containing explanation
 	 */
-	protected ConfigurationReason(ConfigurationReason reason) {
-		super(reason);
-		featureSelection = reason.featureSelection;
-	}
-
-	/**
-	 * Returns the feature that has been selected or unselected.
-	 *
-	 * @return the feature that has been selected or unselected; not null
-	 */
-	public SelectableFeature getFeatureSelection() {
-		return featureSelection;
+	protected ConfigurationReason(SelectableFeature subject, Explanation<?> explanation) {
+		super(subject, explanation);
 	}
 
 	@Override
 	protected ConfigurationReason clone() {
-		return new ConfigurationReason(featureSelection);
+		return clone(getExplanation());
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((featureSelection == null) ? 0 : featureSelection.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ConfigurationReason other = (ConfigurationReason) obj;
-		if (featureSelection == null) {
-			if (other.featureSelection != null) {
-				return false;
-			}
-		} else if (!featureSelection.equals(other.featureSelection)) {
-			return false;
-		}
-		return true;
+	protected ConfigurationReason clone(Explanation<?> explanation) {
+		return new ConfigurationReason(getSubject(), getExplanation());
 	}
 }

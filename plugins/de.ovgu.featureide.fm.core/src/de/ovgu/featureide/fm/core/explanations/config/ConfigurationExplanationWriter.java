@@ -28,25 +28,26 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
 /**
  * {@link ExplanationWriter} for instances of {@link ConfigurationExplanation}.
  *
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class ConfigurationExplanationWriter extends FeatureModelExplanationWriter {
+public abstract class ConfigurationExplanationWriter<E extends ConfigurationExplanation<?>> extends FeatureModelExplanationWriter<E> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param explanation explanation to transform
 	 */
-	public ConfigurationExplanationWriter(ConfigurationExplanation explanation) {
+	public ConfigurationExplanationWriter(E explanation) {
 		super(explanation);
 	}
 
 	@Override
-	protected String getConcreteReasonString(Reason reason) {
+	protected String getConcreteReasonString(Reason<?> reason) {
 		if (!(reason instanceof ConfigurationReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final SelectableFeature selection = ((ConfigurationReason) reason).getFeatureSelection();
+		final SelectableFeature selection = ((ConfigurationReason) reason).getSubject();
 		String selectionString;
 		switch (selection.getSelection()) {
 		case SELECTED:

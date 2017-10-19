@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -34,19 +33,23 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
  *
  * @author Timo G&uuml;nther
  */
-public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements DeadFeatureExplanationCreator {
+public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, DeadFeatureExplanation>
+		implements DeadFeatureExplanationCreator {
 
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusDeadFeatureExplanationCreator() {
+		this(null);
 	}
 
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusDeadFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	@Override
@@ -56,16 +59,11 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 		oracle.push();
 		try {
 			oracle.addAssumption(NodeCreator.getVariable(getSubject()), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected DeadFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (DeadFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

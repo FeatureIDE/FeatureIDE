@@ -20,7 +20,11 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,15 +48,12 @@ import org.sat4j.specs.TimeoutException;
  *
  * @author Timo G&uuml;nther
  */
-public class Sat4jSatSolver extends AbstractSatSolver {
-
-	/** Maps clauses to constraints (handles to the clauses in the oracle). */
-	protected final Map<Node, IConstr> clauseConstraints = new LinkedHashMap<>();
+public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 
 	/** Maps variables to Sat4J indexes. */
-	private final Map<Object, Integer> variableIndexes = new LinkedHashMap<>();
+	private final Map<Object, Integer> variableIndexes = new HashMap<>();
 	/** Maps Sat4J indexes to variables. */
-	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
+	private final Map<Integer, Object> indexVariables = new HashMap<>();
 
 	/** Whether an immediate contradiction occurred while adding the clauses. */
 	private boolean contradiction = false;
@@ -63,33 +64,34 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	}
 
 	@Override
-	public ISolver getOracle() {
-		return (ISolver) super.getOracle();
-	}
-
-	@Override
 	public void addAssumption(Object variable, boolean value) {
 		addVariable(variable);
 		super.addAssumption(variable, value);
 	}
 
 	@Override
-	public boolean addClause(Node clause) {
-		if (containsClause(clause)) {
-			return false;
-		}
+	protected void addClause(Node clause) {
+		super.addClause(clause);
 		addVariables(clause.getUniqueVariables());
+		IConstr constraint = null;
 		try {
-			final IConstr constraint = getOracle().addClause(getVectorFromClause(clause));
-			if (constraint != null) {
-				clauseConstraints.put(clause, constraint);
-			}
+			constraint = getOracle().addClause(getVectorFromClause(clause));
 		} catch (final ContradictionException e) {
 			setContradiction(true);
 		}
-		super.addClause(clause);
-		return true;
+		if (constraint != null) {
+			final int clauseIndex = getClauseCount() - 1;
+			onClauseConstraintAdded(clauseIndex, constraint);
+		}
 	}
+
+	/**
+	 * Called when a clause constraint is added to the oracle.
+	 *
+	 * @param clauseIndex clause index
+	 * @param constraint clause constraint; not null
+	 */
+	protected void onClauseConstraintAdded(int clauseIndex, IConstr constraint) {}
 
 	/**
 	 * Adds the given variables to the solver and oracle. Ignores any that have already been added.
@@ -105,12 +107,22 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	/**
 	 * Adds the given variable to the solver and oracle if it has not already been added.
 	 *
-	 * @param variable variable to add
+	 * @param variable variable to add; not null
+	 * @return the index of the variable
+	 * @throws NullPointerException if the given variable is null
 	 */
-	protected void addVariable(Object variable) {
-		if (getIndexFromVariable(variable) == 0) {
-			addIndexFromVariable(variable);
+	protected int addVariable(Object variable) throws NullPointerException {
+		if (variable == null) {
+			throw new NullPointerException();
 		}
+		int index = getIndexFromVariable(variable);
+		if (index == 0) {
+			index = getOracle().nextFreeVarId(false);
+			getOracle().newVar(index);
+			variableIndexes.put(variable, index);
+			indexVariables.put(index, variable);
+		}
+		return index;
 	}
 
 	@Override
@@ -163,7 +175,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @param clauses clauses to transform; not null
 	 * @return a Sat4J vector; contains a 0 in case of an unknown variable; not null
 	 */
-	public IVec<IVecInt> getVectorFromClauses(List<Node> clauses) {
+	public IVec<IVecInt> getVectorFromClauses(Collection<Node> clauses) {
 		final IVec<IVecInt> vector = new Vec<>(clauses.size());
 		for (final Node clause : clauses) {
 			vector.push(getVectorFromClause(clause));
@@ -220,22 +232,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	public int getIndexFromVariable(Object variable) {
 		final Integer index = variableIndexes.get(variable);
 		return index == null ? 0 : index;
-	}
-
-	/**
-	 * Adds a new Sat4J index for the given variable.
-	 *
-	 * @param variable variable to transform; not null
-	 * @return a Sat4J index
-	 */
-	protected int addIndexFromVariable(Object variable) {
-		if (variable == null) {
-			throw new NullPointerException();
-		}
-		final int index = getOracle().nextFreeVarId(true);
-		variableIndexes.put(variable, index);
-		indexVariables.put(index, variable);
-		return index;
 	}
 
 	/**
@@ -296,5 +292,33 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	public int getClauseIndexFromIndex(int index) {
 		return index - 1;
+	}
+
+	/**
+	 * Returns the clause sets for the given clause index sets.
+	 *
+	 * @param indexSets clause index sets
+	 * @return the clause sets for the given clause index sets
+	 */
+	public List<Set<Node>> getClauseSetsFromIndexSets(Collection<Set<Integer>> indexSets) {
+		final List<Set<Node>> clauseSets = new ArrayList<>(indexSets.size());
+		for (final Set<Integer> indexSet : indexSets) {
+			clauseSets.add(getClauseSetFromIndexSet(indexSet));
+		}
+		return clauseSets;
+	}
+
+	/**
+	 * Returns the clause set for the given clause index set.
+	 *
+	 * @param indexSet clause index set
+	 * @return the clause set for the given clause index set
+	 */
+	public Set<Node> getClauseSetFromIndexSet(Set<Integer> indexSet) {
+		final Set<Node> clauseSet = new LinkedHashSet<>(indexSet.size());
+		for (final int index : indexSet) {
+			clauseSet.add(getClause(index));
+		}
+		return clauseSet;
 	}
 }

@@ -56,8 +56,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanation;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -70,21 +70,36 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
-	/** The expression is satisfiable but not a tautology. */
-	static final int SAT_NONE = 0;
-	/** The expression is a contradiction. */
-	static final int SAT_CONTRADICTION = 1;
-	/** The expression is a tautology. */
-	static final int SAT_TAUTOLOGY = 2;
-	protected static final String MESSAGE_DEAD_CODE = ": This expression is a contradiction and causes a dead code block.";
-	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
+	/**
+	 * The satisfiability status of an annotation.
+	 *
+	 * @author Christoph Giesel
+	 * @author Timo G&uuml;nther
+	 */
+	public enum AnnotationStatus {
+		/** The presence condition is satisfiable but not a tautology. */
+		NORMAL,
+		/** The presence condition is a contradiction, causing a dead code block. */
+		DEAD,
+		/** The presence condition is a tautology, making the annotation superfluous. */
+		SUPERFLUOUS,
+		/** The expression in and of itself is a contradiction, causing a dead code block. */
+		CONTRADICTION,
+		/** The expression in and of itself is a tautology, making the annotation superfluous. */
+		TAUTOLOGY,
+	}
+
+	protected static final String MESSAGE_DEAD = "This annotation causes a dead code block.";
+	protected static final String MESSAGE_SUPERFLUOUS = "This annotation is superfluous.";
+	protected static final String MESSAGE_CONTRADICTION = "This expression is a contradiction and causes a dead code block.";
+	protected static final String MESSAGE_TAUTOLOGY = "This expression is a tautology, making the annotation superfluous.";
 	protected static final String MESSAGE_ABSTRACT =
 		IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
 	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 
 	/** Creates explanations for expressions that are contradictions or tautologies. */
-	private final InvariantExpressionExplanationCreator invariantExpressionExplanationCreator =
-		PreprocessorExplanationCreatorFactory.getDefault().getInvariantExpressionExplanationCreator();
+	private final InvariantPresenceConditionExplanationCreator invariantExpressionExplanationCreator =
+		PreprocessorExplanationCreatorFactory.getDefault().getInvariantPresenceConditionExplanationCreator();
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
@@ -196,9 +211,9 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	/**
 	 * Checks the expression on top of the expression stack for a contradiction or a tautology. Does not set any markers.
 	 *
-	 * @return {@link #SAT_CONTRADICTION}, {@link #SAT_TAUTOLOGY}, or {@link #SAT_NONE}
+	 * @return the status of the annotation
 	 */
-	protected int isContradictionOrTautology() {
+	protected AnnotationStatus isContradictionOrTautology() {
 		final Node expression = expressionStack.peek();
 
 		Node nestedExpressions = null;
@@ -212,11 +227,25 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			return isContradictionOrTautology(expression, featureModel, nestedExpressions);
 		} catch (final TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
-			return SAT_NONE;
+			return AnnotationStatus.NORMAL;
 		}
 	}
 
-	private int isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+		/*
+		 * -SAT(expression)
+		 */
+		if (!new SatSolver(expression, 1000).isSatisfiable()) {
+			return AnnotationStatus.CONTRADICTION;
+		}
+
+		/*
+		 * -SAT(-expression)
+		 */
+		if (!new SatSolver(new Not(expression), 1000).isSatisfiable()) {
+			return AnnotationStatus.TAUTOLOGY;
+		}
+
 		Node context = featureModel;
 		if (nestedExpressions != null) {
 			context = new And(context, nestedExpressions);
@@ -226,7 +255,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(FM & nestedExpressions & expression)
 		 */
 		if (!new SatSolver(new And(context, expression), 1000).isSatisfiable()) {
-			return SAT_CONTRADICTION;
+			return AnnotationStatus.DEAD;
 		}
 
 		/*
@@ -234,29 +263,55 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		 * -SAT(-(-FM | -nestedExpressions | expression)) = -SAT(FM & nestedExpressions & -expression)
 		 */
 		if (!new SatSolver(new And(context, new Not(expression)), 1000).isSatisfiable()) {
-			return SAT_TAUTOLOGY;
+			return AnnotationStatus.SUPERFLUOUS;
 		}
 
-		return SAT_NONE;
+		return AnnotationStatus.NORMAL;
 	}
 
 	/**
 	 * Set marker for tautology or contradiction on given line in given file.
 	 *
-	 * @param status expects {@link #SAT_CONTRADICTION} or {@link #SAT_TAUTOLOGY}.
+	 * @param status the status of the annotation
 	 * @param lineNumber number of line
 	 * @param res file path
 	 */
-	protected void setMarkersOnContradictionOrTautology(int status, int lineNumber, IFile res) {
-		if ((status != SAT_CONTRADICTION) && (status != SAT_TAUTOLOGY)) {
+	protected void setMarkersOnContradictionOrTautology(AnnotationStatus status, int lineNumber, IFile res) {
+		String message;
+		switch (status) {
+		case NORMAL:
 			return;
+		case CONTRADICTION:
+			message = MESSAGE_CONTRADICTION;
+			break;
+		case DEAD:
+			message = MESSAGE_DEAD;
+			break;
+		case TAUTOLOGY:
+			message = MESSAGE_TAUTOLOGY;
+			break;
+		case SUPERFLUOUS:
+			message = MESSAGE_SUPERFLUOUS;
+			break;
+		default:
+			throw new IllegalStateException("Unknown annotation status");
 		}
-		String message = pluginName;
-		message += status == SAT_CONTRADICTION ? MESSAGE_DEAD_CODE : MESSAGE_ALWAYS_TRUE;
-		final InvariantExpressionExplanation explanation = getInvariantExpressionExplanation(status == SAT_TAUTOLOGY);
-		if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-			message += String.format("%n%s", explanation);
+
+		boolean positive = false;
+		switch (status) {
+		case SUPERFLUOUS:
+			positive = true;
+		case DEAD:
+			final InvariantPresenceConditionExplanation explanation = getInvariantExpressionExplanation(positive);
+			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
+				message += System.lineSeparator();
+				message += explanation.getWriter().getString();
+			}
+			break;
+		default:
+			break;
 		}
+
 		featureProject.createBuilderMarker(res, message, lineNumber, IMarker.SEVERITY_WARNING);
 	}
 
@@ -266,7 +321,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param tautology true if the expression to explain is a tautology; false if it is a contradiction
 	 * @return an explanation
 	 */
-	private InvariantExpressionExplanation getInvariantExpressionExplanation(boolean tautology) {
+	private InvariantPresenceConditionExplanation getInvariantExpressionExplanation(boolean tautology) {
 		invariantExpressionExplanationCreator.setFeatureModel(featureProject.getFeatureModel());
 		final List<Node> reverseExpressionStack = new ArrayList<>(expressionStack);
 		Collections.reverse(reverseExpressionStack); // Iteration order of Stack is from bottom to top instead of top to bottom.
@@ -285,7 +340,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	protected void checkContradictionOrTautology(int lineNumber, IFile res) {
 		findLiterals(expressionStack.peek());
-		final int status = isContradictionOrTautology();
+		final AnnotationStatus status = isContradictionOrTautology();
 		setMarkersOnContradictionOrTautology(status, lineNumber, res);
 	}
 
@@ -317,7 +372,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 
 		if ((matcherFeature != null) && matcherFeature.matches()) {
-			featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_ABSTRACT, lineNumber, IMarker.SEVERITY_WARNING);
+			featureProject.createBuilderMarker(res, name + MESSAGE_ABSTRACT, lineNumber, IMarker.SEVERITY_WARNING);
 		} else {
 			Matcher matcherConreteFeature = null;
 			if (patternIsConcreteFeature != null) {
@@ -325,7 +380,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			}
 
 			if ((matcherConreteFeature != null) && !matcherConreteFeature.matches()) {
-				featureProject.createBuilderMarker(res, pluginName + ": " + name + MESSAGE_NOT_DEFINED, lineNumber, IMarker.SEVERITY_WARNING);
+				featureProject.createBuilderMarker(res, name + MESSAGE_NOT_DEFINED, lineNumber, IMarker.SEVERITY_WARNING);
 				return false;
 			}
 		}
@@ -382,8 +437,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	private boolean isPreprocessorAnotationMarker(IMarker marker) throws CoreException {
 		final String message = marker.getAttribute(IMarker.MESSAGE, "");
-		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_ALWAYS_TRUE) || message.contains(MESSAGE_DEAD_CODE)
-			|| message.contains(MESSAGE_NOT_DEFINED)) {
+		if (message.contains(MESSAGE_ABSTRACT) || message.contains(MESSAGE_SUPERFLUOUS) || message.contains(MESSAGE_DEAD) || message.contains(MESSAGE_TAUTOLOGY)
+			|| message.contains(MESSAGE_CONTRADICTION) || message.contains(MESSAGE_NOT_DEFINED)) {
 			return true;
 		}
 		return false;

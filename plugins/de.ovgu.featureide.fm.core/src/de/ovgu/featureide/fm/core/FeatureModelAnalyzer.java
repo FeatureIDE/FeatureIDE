@@ -60,9 +60,12 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -83,15 +86,15 @@ public class FeatureModelAnalyzer implements IEventListener {
 	/**
 	 * Remembers explanations for dead features.
 	 */
-	private final Map<IFeature, Explanation> deadFeatureExplanations = new HashMap<>();
+	private final Map<IFeature, DeadFeatureExplanation> deadFeatureExplanations = new HashMap<>();
 	/**
 	 * Remembers explanations for false-optional features.
 	 */
-	private final Map<IFeature, Explanation> falseOptionalFeatureExplanations = new HashMap<>();
+	private final Map<IFeature, FalseOptionalFeatureExplanation> falseOptionalFeatureExplanations = new HashMap<>();
 	/**
 	 * Remembers explanations for redundant constraints.
 	 */
-	private final Map<IConstraint, Explanation> redundantConstraintExplanations = new HashMap<>();
+	private final Map<IConstraint, RedundantConstraintExplanation> redundantConstraintExplanations = new HashMap<>();
 	/**
 	 * Used for creating explanation creators.
 	 */
@@ -843,7 +846,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param modelElement potentially defect feature model element; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getExplanation(IFeatureModelElement modelElement) {
+	public Explanation<?> getExplanation(IFeatureModelElement modelElement) {
 		return getExplanation(fm, modelElement);
 	}
 
@@ -854,8 +857,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param modelElement potentially defect feature model element; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getExplanation(IFeatureModel fm, IFeatureModelElement modelElement) {
-		Explanation explanation = null;
+	public Explanation<?> getExplanation(IFeatureModel fm, IFeatureModelElement modelElement) {
+		Explanation<?> explanation = null;
 		if (modelElement instanceof IFeature) {
 			final IFeature feature = (IFeature) modelElement;
 			switch (feature.getProperty().getFeatureStatus()) {
@@ -872,7 +875,6 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final IConstraint constraint = (IConstraint) modelElement;
 			switch (constraint.getConstraintAttribute()) {
 			case REDUNDANT:
-			case TAUTOLOGY:
 			case IMPLICIT:
 				explanation = getRedundantConstraintExplanation(fm, constraint);
 				break;
@@ -888,7 +890,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 *
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getVoidFeatureModelExplanation() {
+	public DeadFeatureExplanation getVoidFeatureModelExplanation() {
 		return getVoidFeatureModelExplanation(fm);
 	}
 
@@ -898,7 +900,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param fm potentially void feature model; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getVoidFeatureModelExplanation(IFeatureModel fm) {
+	public DeadFeatureExplanation getVoidFeatureModelExplanation(IFeatureModel fm) {
 		return getDeadFeatureExplanation(fm, FeatureUtils.getRoot(fm));
 	}
 
@@ -908,7 +910,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param feature potentially dead feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getDeadFeatureExplanation(IFeature feature) {
+	public DeadFeatureExplanation getDeadFeatureExplanation(IFeature feature) {
 		return getDeadFeatureExplanation(fm, feature);
 	}
 
@@ -919,7 +921,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param feature potentially dead feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
+	public DeadFeatureExplanation getDeadFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		if (!deadFeatureExplanations.containsKey(feature)) {
 			addDeadFeatureExplanation(fm, feature);
 		}
@@ -950,7 +952,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param feature potentially false-optional feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getFalseOptionalFeatureExplanation(IFeature feature) {
+	public FalseOptionalFeatureExplanation getFalseOptionalFeatureExplanation(IFeature feature) {
 		return getFalseOptionalFeatureExplanation(fm, feature);
 	}
 
@@ -961,7 +963,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param feature potentially false-optional feature; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
+	public FalseOptionalFeatureExplanation getFalseOptionalFeatureExplanation(IFeatureModel fm, IFeature feature) {
 		if (!falseOptionalFeatureExplanations.containsKey(feature)) {
 			addFalseOptionalFeatureExplanation(fm, feature);
 		}
@@ -992,7 +994,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param constraint potentially redundant constraint; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getRedundantConstraintExplanation(IConstraint constraint) {
+	public RedundantConstraintExplanation getRedundantConstraintExplanation(IConstraint constraint) {
 		return getRedundantConstraintExplanation(fm, constraint);
 	}
 
@@ -1002,7 +1004,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 * @param constraint potentially redundant constraint; not null
 	 * @return an explanation; null if it cannot be explained
 	 */
-	public Explanation getRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
+	public RedundantConstraintExplanation getRedundantConstraintExplanation(IFeatureModel fm, IConstraint constraint) {
 		if (!redundantConstraintExplanations.containsKey(constraint)) {
 			addRedundantConstraintExplanation(fm, constraint);
 		}

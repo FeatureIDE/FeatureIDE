@@ -23,24 +23,47 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.mus;
 import org.prop4j.explain.solvers.MusExtractor;
 import org.prop4j.explain.solvers.SatSolverFactory;
 
+import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanation;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfigurationExplanationCreator;
 
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class MusConfigurationExplanationCreator extends AbstractConfigurationExplanationCreator {
+public abstract class MusConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>>
+		extends AbstractConfigurationExplanationCreator<S, E, MusExtractor> {
 
-	@Override
-	protected MusExtractor getOracle() {
-		return (MusExtractor) super.getOracle();
+	/** The solver factory used to create the oracle. */
+	private final SatSolverFactory solverFactory;
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	protected MusConfigurationExplanationCreator(SatSolverFactory solverFactory) {
+		if (solverFactory == null) {
+			solverFactory = SatSolverFactory.getDefault();
+		}
+		this.solverFactory = solverFactory;
+	}
+
+	/**
+	 * Returns the solver factory used to create the oracle
+	 * 
+	 * @return the solver factory
+	 */
+	public SatSolverFactory getSatSolverFactory() {
+		return solverFactory;
 	}
 
 	@Override
 	protected MusExtractor createOracle() {
-		final MusExtractor oracle = SatSolverFactory.getDefault().getMusExtractor();
+		final MusExtractor oracle = getSatSolverFactory().getMusExtractor();
 		oracle.addFormula(getCnf());
 		return oracle;
 	}

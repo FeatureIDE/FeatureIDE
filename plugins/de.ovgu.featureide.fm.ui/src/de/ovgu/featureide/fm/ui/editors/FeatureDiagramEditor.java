@@ -234,11 +234,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
-	private Explanation activeExplanation;
+	private Explanation<?> activeExplanation;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
-	 * 
+	 *
 	 * @param featureModelEditor the FeatureModelEditor
 	 * @param container Composite which contains the feature model
 	 * @param fm The feature model
@@ -437,7 +437,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				setActiveExplanation();
@@ -470,11 +469,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Sets the currently active explanation. Notifies the listeners of the change.
-	 * 
+	 *
 	 * @param activeExplanation the new active explanation
 	 */
-	public void setActiveExplanation(Explanation activeExplanation) {
-		final Explanation oldActiveExplanation = this.activeExplanation;
+	public void setActiveExplanation(Explanation<?> activeExplanation) {
+		final Explanation<?> oldActiveExplanation = this.activeExplanation;
 		this.activeExplanation = activeExplanation;
 		graphicalFeatureModel.setActiveExplanation(activeExplanation);
 		getFeatureModel().fireEvent(new FeatureIDEEvent(this, EventType.ACTIVE_EXPLANATION_CHANGED, oldActiveExplanation, activeExplanation));
@@ -482,11 +481,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	/**
 	 * Returns the currently active explanation.
-	 * 
+	 *
 	 * @return the currently active explanation.
 	 */
-	public Explanation getActiveExplanation() {
-		return this.activeExplanation;
+	public Explanation<?> getActiveExplanation() {
+		return activeExplanation;
 	}
 
 	public void analyzeFeatureModel() {
@@ -600,7 +599,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return adapter.cast(this);
+			return (T) adapter.cast(this);
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());
@@ -940,12 +939,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			// Deactivate the old active explanation.
-			final FeatureModelExplanation oldActiveExplanation = (FeatureModelExplanation) event.getOldValue();
+			final FeatureModelExplanation<?> oldActiveExplanation = (FeatureModelExplanation<?>) event.getOldValue();
 			if (oldActiveExplanation != null) {
 				// Reset each element affected by the old active explanation.
 				final Set<IGraphicalElement> updatedElements = new HashSet<>();
-				for (final Reason reason : oldActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : oldActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						if (updatedElements.add(element)) {
 							element.update(event);
@@ -955,11 +954,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 
 			// Activate the new active explanation.
-			final FeatureModelExplanation newActiveExplanation = (FeatureModelExplanation) event.getNewValue();
+			final FeatureModelExplanation<?> newActiveExplanation = (FeatureModelExplanation<?>) event.getNewValue();
 			if (newActiveExplanation != null) {
 				// Notify each element affected by the new active explanation of its new active reasons.
-				for (final Reason reason : newActiveExplanation.getReasons()) {
-					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getTrace().getElements()) {
+				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
+					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
 						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
 					}

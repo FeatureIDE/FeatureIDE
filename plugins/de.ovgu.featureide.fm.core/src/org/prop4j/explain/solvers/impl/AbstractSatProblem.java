@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.SatProblem;
 
@@ -45,16 +46,12 @@ public abstract class AbstractSatProblem implements SatProblem {
 
 	@Override
 	public int addFormulas(Node... formulas) {
-		return addFormulas(Arrays.asList(formulas));
+		return addFormula(new And(formulas));
 	}
 
 	@Override
-	public int addFormulas(Collection<Node> formulas) {
-		int added = 0;
-		for (final Node formula : formulas) {
-			added += addFormula(formula);
-		}
-		return added;
+	public int addFormulas(Collection<? extends Node> formulas) {
+		return addFormulas(formulas.toArray(new Node[formulas.size()]));
 	}
 
 	@Override
@@ -65,34 +62,29 @@ public abstract class AbstractSatProblem implements SatProblem {
 	}
 
 	/**
-	 * Adds all given CNF clauses to the problem. Each one must be a non-empty disjunction of literals. Ignores clauses already added.
+	 * Adds all given CNF clauses to the problem. Each one must be a non-empty disjunction of literals.
 	 *
 	 * @param clauses clauses to add; not null
-	 * @return whether the problem changed as a result of this operation
+	 * @return the amount of clauses added
 	 */
-	protected int addClauses(List<Node> clauses) {
-		int added = 0;
+	protected int addClauses(Collection<? extends Node> clauses) {
 		for (final Node clause : clauses) {
-			if (addClause(clause)) {
-				added++;
-			}
+			addClause(clause);
 		}
-		return added;
+		return clauses.size();
 	}
 
 	/**
-	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals. Ignores the clause if it is already added.
+	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals.
 	 *
 	 * @param clause clause to add; not null
-	 * @return whether the problem changed as a result of this operation
 	 * @throws IllegalArgumentException if the clause is empty
 	 */
-	protected boolean addClause(Node clause) throws IllegalArgumentException {
+	protected void addClause(Node clause) throws IllegalArgumentException {
 		if (clause.getChildren().length == 0) {
 			throw new IllegalArgumentException("Empty clause");
 		}
 		clauses.add(clause);
-		return true;
 	}
 
 	@Override

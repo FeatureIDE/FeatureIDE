@@ -314,7 +314,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		final FeatureModelReason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
 		if (activeReason != null) {
 			String explanation = "This connection is involved in the selected defect:";
-			final ExplanationWriter w = activeReason.getExplanation().getWriter();
+			final ExplanationWriter<?> w = activeReason.getExplanation().getWriter();
 			if (activeReasonUp != null) {
 				explanation += "\n\u2022 " + w.getReasonString(activeReasonUp);
 			}
@@ -366,7 +366,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			activeReasonDown = null;
 			return;
 		}
-		switch (activeReason.getTrace().getOrigin()) {
+		switch (activeReason.getSubject().getOrigin()) {
 		case CHILD_UP:
 			activeReasonUp = activeReason;
 			break;

@@ -171,7 +171,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 		if (getActiveReason() != null) {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
-			final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+			final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 			toolTipContent.add(new Label("This constraint is involved in the selected defect:\n\u2022 " + w.getReasonString(getActiveReason())));
 		}
 

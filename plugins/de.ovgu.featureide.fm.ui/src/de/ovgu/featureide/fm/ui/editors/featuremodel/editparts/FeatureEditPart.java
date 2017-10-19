@@ -314,7 +314,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 	protected void setActiveReason(FeatureModelReason activeReason) {
 		// Update the figure.
 		if ((activeReason == null // reset
-		) || (activeReason.getTrace().getOrigin() == Origin.CHILD_HORIZONTAL)) {
+		) || (activeReason.getSubject().getOrigin() == Origin.CHILD_HORIZONTAL)) {
 			final FeatureFigure figure = getFigure();
 			figure.setActiveReason(activeReason);
 			figure.setProperties();
@@ -322,7 +322,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 
 		// Update the source connection.
 		if ((activeReason == null // reset
-		) || (activeReason.getTrace().getOrigin() == Origin.CHILD_UP) || (activeReason.getTrace().getOrigin() == Origin.CHILD_DOWN)) {
+		) || (activeReason.getSubject().getOrigin() == Origin.CHILD_UP) || (activeReason.getSubject().getOrigin() == Origin.CHILD_DOWN)) {
 			final ConnectionEditPart sourceConnection = getSourceConnection();
 			sourceConnection.setActiveReason(activeReason);
 			sourceConnection.refreshVisuals();

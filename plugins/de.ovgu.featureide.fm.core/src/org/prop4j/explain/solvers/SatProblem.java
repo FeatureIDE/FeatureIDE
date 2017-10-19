@@ -41,8 +41,9 @@ public interface SatProblem {
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
-	 * <pre><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></pre> </p>
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF: </p>
+	 *
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></blockquote> </p>
 	 *
 	 * @param formulas formulas to add; not null
 	 * @return the amount of clauses added
@@ -54,21 +55,23 @@ public interface SatProblem {
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF:
-	 * <pre><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></pre> </p>
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with each of the <i>m</i> &ge; 0 (possibly empty) given formulas <i>g<sub>j</sub></i> in CNF: </p>
+	 *
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g<sub>1</sub></i> &and; &hellip; &and; <i>g<sub>m</sub></i></blockquote> </p>
 	 *
 	 * @param formulas formulas to add; not null
 	 * @return the amount of clauses added
 	 */
-	public int addFormulas(Collection<Node> formulas);
+	public int addFormulas(Collection<? extends Node> formulas);
 
 	/**
 	 * <p> Adds the given formula to the problem. First, the given formula is converted to {@link Node#isClausalNormalForm() clausal normal form (CNF)}. Then,
 	 * each clause of the resulting conjunction is added to the existing conjunction. Ignores clauses already added. </p>
 	 *
 	 * <p> More formally, let <i>f</i> denote the current (possibly empty) formula in the problem. After this operation, the problem contains the formula
-	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with the (possibly empty) given formula <i>g</i> in CNF: <pre><i>f'</i> = <i>f</i> &and;
-	 * <i>g</i></pre> </p>
+	 * <i>f'</i>. <i>f'</i> is the conjunction of <i>f</i> with the (possibly empty) given formula <i>g</i> in CNF: </p>
+	 *
+	 * <p> <blockquote><i>f'</i> = <i>f</i> &and; <i>g</i></blockquote> </p>
 	 *
 	 * @param formula formula to add; not null
 	 * @return the amount of clauses added
@@ -88,7 +91,7 @@ public interface SatProblem {
 	 * @param index index of the clause
 	 * @return the clause at the given index; not null
 	 * @ŧhrows IndexOutOfBoundsException if the index is out of range, that is negative or greater than or equal to the {@link #getClauseCount() amount of
-	 *          clauses}
+	 *         clauses}
 	 */
 	public Node getClause(int index) throws IndexOutOfBoundsException;
 

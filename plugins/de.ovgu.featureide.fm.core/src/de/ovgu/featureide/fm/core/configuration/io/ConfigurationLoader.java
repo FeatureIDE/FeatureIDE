@@ -118,7 +118,7 @@ public class ConfigurationLoader {
 					return super.visitFile(file, attrs);
 				}
 			});
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			Logger.logError(e);
 			if (callback != null) {
 				callback.onLoadingError(e);

@@ -23,62 +23,102 @@ package de.ovgu.featureide.fm.core.explanations;
 /**
  * The atomic unit an explanation is composed of.
  *
+ * @param S subject
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
-public abstract class Reason implements Cloneable {
+public abstract class Reason<S> implements Cloneable {
 
+	/** The subject of this reason. */
+	private final S subject;
 	/** The containing explanation. */
-	private Explanation explanation;
-
-	/**
-	 * Constructs a new instance of this class.
-	 */
-	public Reason() {}
+	private final Explanation<?> explanation;
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason reason to clone
+	 * @param reason the subject of this reason
+	 * @param explanation the containing explanation
 	 */
-	protected Reason(Reason reason) {
-		setExplanation(reason.getExplanation());
+	protected Reason(S subject, Explanation<?> explanation) {
+		this.subject = subject;
+		this.explanation = explanation;
+	}
+
+	/**
+	 * Returns the subject of this reason.
+	 *
+	 * @return the subject of this reason
+	 */
+	public S getSubject() {
+		return subject;
 	}
 
 	/**
 	 * Returns the containing explanation.
 	 *
-	 * @return the containing explanation; not null
+	 * @return the containing explanation
 	 */
-	public Explanation getExplanation() {
+	public Explanation<?> getExplanation() {
 		return explanation;
 	}
 
 	/**
-	 * Sets the containing explanation. Does not actually add this reason to the given explanation.
-	 *
-	 * @param explanation the containing explanation; not null
-	 */
-	protected void setExplanation(Explanation explanation) {
-		this.explanation = explanation;
-	}
-
-	/**
-	 * Returns the confidence of this reason. This is the likelihood with which this is causing the defect. Should be a value between 0 and 1.
+	 * Returns the confidence of this reason. This is the likelihood with which this is causing the defect. Must be a value between 0 and 1.
 	 *
 	 * @return the confidence of this reason
 	 */
 	public float getConfidence() {
-		float confidence = (float) explanation.getReasonCounts().get(this) / explanation.getExplanationCount();
+		float confidence = (float) getExplanation().getReasonCounts().get(this) / getExplanation().getExplanationCount();
 		confidence = Math.max(0.0f, Math.min(1.0f, confidence)); // Clamp between 0 and 1 (just in case).
 		return confidence;
 	}
 
 	@Override
-	protected abstract Reason clone();
+	protected Reason<S> clone() {
+		return clone(getExplanation());
+	}
+
+	/**
+	 * Returns a copy of this with the given explanation.
+	 *
+	 * @param explanation explanation of the clone
+	 * @return a copy of this with the given explanation
+	 */
+	protected abstract Reason<S> clone(Explanation<?> explanation);
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((subject == null) ? 0 : subject.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Reason<?> other = (Reason<?>) obj;
+		if (subject == null) {
+			if (other.subject != null) {
+				return false;
+			}
+		} else if (!subject.equals(other.subject)) {
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public String toString() {
-		return explanation.getWriter().getReasonString(this);
+		return getClass().getSimpleName() + "[" + getSubject() + "]";
 	}
 }

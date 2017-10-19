@@ -220,15 +220,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			final IFeature feature = this.feature.getObject();
 			final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 
-			// First draw custom color
-			if (FeatureColorManager.getColor(feature) == FeatureColor.NO_COLOR) {
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-			}
+			toolTip.append(feature.getStructure().isConcrete() ? CONCRETE : ABSTRACT);
 
 			if (feature.getStructure().hasHiddenParent()) {
 				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
@@ -269,7 +261,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			}
 
 			if (getActiveReason() != null) {
-				final ExplanationWriter w = getActiveReason().getExplanation().getWriter();
+				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 				toolTip.append("\n\nThis feature is involved in the selected defect:");
 				for (final FeatureModelReason activeReason : activeReasons) {
 					toolTip.append("\n\u2022 ");

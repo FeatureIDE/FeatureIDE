@@ -18,26 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
+package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.AbstractPreprocessorExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 
 /**
- * Abstract implementation of {@link PreprocessorExplanationCreator} using an {@link Ltms LTMS}.
+ * {@link ExplanationWriter} for {@link InvariantPresenceConditionExplanation}.
  *
  * @author Timo G&uuml;nther
  */
-public abstract class LtmsPreprocessorExplanationCreator extends AbstractPreprocessorExplanationCreator {
+public class InvariantPresenceConditionExplanationWriter extends PreprocessorExplanationWriter<InvariantPresenceConditionExplanation> {
 
-	@Override
-	protected Ltms getOracle() {
-		return (Ltms) super.getOracle();
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param explanation explanation to transform
+	 */
+	public InvariantPresenceConditionExplanationWriter(InvariantPresenceConditionExplanation explanation) {
+		super(explanation);
 	}
 
 	@Override
-	protected Ltms createOracle() {
-		return new Ltms(getCnf());
+	protected String getSubjectString() {
+		return String.format("presence condition of %s", getExplanation().getSubject().toString(getSymbols()));
+	}
+
+	@Override
+	protected String getAttributeString() {
+		return getExplanation().isTautology() ? "a tautology" : "a contradiction";
 	}
 }

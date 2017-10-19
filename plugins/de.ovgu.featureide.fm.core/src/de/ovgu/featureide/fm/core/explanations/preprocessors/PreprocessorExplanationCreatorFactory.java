@@ -40,9 +40,9 @@ public abstract class PreprocessorExplanationCreatorFactory implements Explanati
 	}
 
 	/**
-	 * Returns an instance of {@link InvariantExpressionExplanationCreator}.
+	 * Returns an instance of {@link InvariantPresenceConditionExplanationCreator}.
 	 *
-	 * @return an instance of {@link InvariantExpressionExplanationCreator}
+	 * @return an instance of {@link InvariantPresenceConditionExplanationCreator}
 	 */
-	public abstract InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator();
+	public abstract InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator();
 }

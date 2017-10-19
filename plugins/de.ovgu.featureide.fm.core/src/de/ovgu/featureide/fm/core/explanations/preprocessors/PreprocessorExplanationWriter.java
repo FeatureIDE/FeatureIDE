@@ -29,25 +29,26 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
 /**
  * {@link ExplanationWriter} for instances of {@link PreprocessorExplanation}.
  *
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class PreprocessorExplanationWriter extends FeatureModelExplanationWriter {
+public abstract class PreprocessorExplanationWriter<E extends PreprocessorExplanation<?>> extends FeatureModelExplanationWriter<E> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param explanation explanation to transform
 	 */
-	public PreprocessorExplanationWriter(PreprocessorExplanation explanation) {
+	protected PreprocessorExplanationWriter(E explanation) {
 		super(explanation);
 	}
 
 	@Override
-	protected String getConcreteReasonString(Reason reason) {
+	protected String getConcreteReasonString(Reason<?> reason) {
 		if (!(reason instanceof PreprocessorReason)) {
 			return super.getConcreteReasonString(reason);
 		}
-		final Node expression = ((PreprocessorReason) reason).getExpression();
-		return String.format("%s is a parent expression.", expression.toString(getSymbols()));
+		final Node expression = ((PreprocessorReason) reason).getSubject();
+		return String.format("The expression is nested within a block annotated with %s.", expression.toString(getSymbols()));
 	}
 }

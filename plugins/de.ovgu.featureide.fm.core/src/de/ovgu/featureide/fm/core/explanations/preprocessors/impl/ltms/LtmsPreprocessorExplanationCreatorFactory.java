@@ -20,20 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms;
 
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+import org.prop4j.explain.solvers.impl.ltms.LtmsSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreprocessorExplanationCreatorFactory;
 
 /**
  * Provides instances of {@link PreprocessorExplanationCreator} using an {@link Ltms LTMS}.
  *
  * @author Timo G&uuml;nther
  */
-public class LtmsPreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
+public class LtmsPreprocessorExplanationCreatorFactory extends MusPreprocessorExplanationCreatorFactory {
 
-	@Override
-	public InvariantExpressionExplanationCreator getInvariantExpressionExplanationCreator() {
-		return new LtmsInvariantExpressionExplanationCreator();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public LtmsPreprocessorExplanationCreatorFactory() {
+		super(new LtmsSatSolverFactory());
 	}
 }

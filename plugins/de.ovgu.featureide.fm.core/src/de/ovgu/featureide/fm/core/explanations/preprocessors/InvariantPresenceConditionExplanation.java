@@ -23,11 +23,11 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors;
 import org.prop4j.Node;
 
 /**
- * An explanation for a contradiction or a tautology in an expression of a preprocessor directive.
+ * An explanation for a contradiction or a tautology in the presence condition of a preprocessor directive.
  *
  * @author Timo G&uuml;nther
  */
-public class InvariantExpressionExplanation extends PreprocessorExplanation {
+public class InvariantPresenceConditionExplanation extends PreprocessorExplanation<Node> {
 
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
@@ -37,7 +37,7 @@ public class InvariantExpressionExplanation extends PreprocessorExplanation {
 	 *
 	 * @param subject the subject to be explained
 	 */
-	public InvariantExpressionExplanation(Node subject) {
+	public InvariantPresenceConditionExplanation(Node subject) {
 		super(subject);
 	}
 
@@ -60,12 +60,7 @@ public class InvariantExpressionExplanation extends PreprocessorExplanation {
 	}
 
 	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
-	}
-
-	@Override
-	public InvariantExpressionExplanationWriter getWriter() {
-		return new InvariantExpressionExplanationWriter(this);
+	public InvariantPresenceConditionExplanationWriter getWriter() {
+		return new InvariantPresenceConditionExplanationWriter(this);
 	}
 }

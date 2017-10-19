@@ -20,33 +20,50 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanation;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantExpressionExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorReason;
 
 /**
- * Implementation of {@link InvariantExpressionExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Implementation of {@link InvariantPresenceConditionExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
  * @author Timo G&uuml;nther
  */
-public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExplanationCreator implements InvariantExpressionExplanationCreator {
+public class MusInvariantPresenceConditionExplanationCreator extends MusPreprocessorExplanationCreator<Node, InvariantPresenceConditionExplanation>
+		implements InvariantPresenceConditionExplanationCreator {
 
 	/** Keeps track of the clause indexes of the expressions added to the solver. */
-	private final List<Node> addedExpressions = new LinkedList<>();
+	private final List<Node> expressionClauses = new ArrayList<>();
 	/** The amount of clauses added to the solver for the invariant expression. */
 	private int invariantExpressionClauseCount;
 	/** True if the expression is a tautology or false if it is a contradiction. */
 	private boolean tautology;
+
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusInvariantPresenceConditionExplanationCreator() {
+		this(null);
+	}
+
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusInvariantPresenceConditionExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
+	}
 
 	@Override
 	public boolean isTautology() {
@@ -65,25 +82,12 @@ public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExp
 	}
 
 	@Override
-	public Node getSubject() {
-		return (Node) super.getSubject();
-	}
-
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof Node)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
-	}
-
-	@Override
-	public InvariantExpressionExplanation getExplanation() throws IllegalStateException {
+	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException {
 		final MusExtractor oracle = getOracle();
-		final InvariantExpressionExplanation explanation;
+		final InvariantPresenceConditionExplanation explanation;
 		oracle.push();
 		try {
-			addedExpressions.clear();
+			expressionClauses.clear();
 			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 			for (Node expression : getExpressionStack()) {
 				if (first && isTautology()) {
@@ -91,14 +95,14 @@ public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExp
 				}
 				final int expressionClauseCount = oracle.addFormula(expression);
 				for (int i = 0; i < expressionClauseCount; i++) {
-					addedExpressions.add(expression);
+					expressionClauses.add(expression);
 				}
 				if (first) {
 					invariantExpressionClauseCount = expressionClauseCount;
 				}
 				first = false;
 			}
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
@@ -106,25 +110,20 @@ public class MusInvariantExpressionExplanationCreator extends MusPreprocessorExp
 	}
 
 	@Override
-	protected InvariantExpressionExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (InvariantExpressionExplanation) super.getExplanation(clauseIndexes);
-	}
-
-	@Override
-	protected Reason getReason(int clauseIndex) {
+	protected Reason<?> getReason(int clauseIndex) {
 		final int expressionIndex = clauseIndex - getTraceModel().getTraceCount();
 		if (expressionIndex >= 0) {
 			if (expressionIndex < invariantExpressionClauseCount) {
 				return null; // Ignore clauses from the subject itself.
 			}
-			return new PreprocessorReason(addedExpressions.get(expressionIndex));
+			return new PreprocessorReason(expressionClauses.get(expressionIndex));
 		}
 		return super.getReason(clauseIndex);
 	}
 
 	@Override
-	protected InvariantExpressionExplanation getConcreteExplanation() {
-		final InvariantExpressionExplanation explanation = new InvariantExpressionExplanation(getSubject());
+	protected InvariantPresenceConditionExplanation getConcreteExplanation() {
+		final InvariantPresenceConditionExplanation explanation = new InvariantPresenceConditionExplanation(getSubject());
 		explanation.setTautology(isTautology());
 		return explanation;
 	}

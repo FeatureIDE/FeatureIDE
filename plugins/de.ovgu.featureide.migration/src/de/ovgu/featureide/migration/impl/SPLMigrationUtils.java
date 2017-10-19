@@ -175,7 +175,8 @@ public class SPLMigrationUtils {
 			throws CoreException, UnsupportedEncodingException {
 		final IConfigurationFormat defaultFormat = ConfigFormatManager.getDefaultFormat();
 		final IFile configFile = project.getFolder(configPath).getFile(projectName + "." + defaultFormat.getSuffix());
-		FileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel, Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT), defaultFormat);
+		FileHandler.save(Paths.get(configFile.getLocationURI()), new Configuration(featureModel, Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT),
+				defaultFormat);
 	}
 
 	/**

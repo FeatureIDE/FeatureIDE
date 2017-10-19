@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
 /**
@@ -29,71 +30,34 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
  *
  * @author Timo G&uuml;nther
  */
-public class PreprocessorReason extends Reason {
-
-	/** An expression from the expression stack. */
-	private final Node expression;
+public class PreprocessorReason extends Reason<Node> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param expression an expression from the expression stack; not null
+	 * @param subject the subject of this reason
 	 */
-	public PreprocessorReason(Node expression) {
-		this.expression = expression;
+	public PreprocessorReason(Node subject) {
+		this(subject, null);
 	}
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
-	 * @param reason the reason to clone; not null
+	 * @param subject the subject of this reason
+	 * @param explanation the containing explanation
 	 */
-	protected PreprocessorReason(PreprocessorReason reason) {
-		super(reason);
-		expression = reason.expression;
-	}
-
-	/**
-	 * Returns the expression of this reason.
-	 *
-	 * @return the expression of this reason; not null
-	 */
-	public Node getExpression() {
-		return expression;
+	protected PreprocessorReason(Node subject, Explanation<?> explanation) {
+		super(subject, explanation);
 	}
 
 	@Override
 	protected PreprocessorReason clone() {
-		return new PreprocessorReason(expression);
+		return clone(getExplanation());
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((expression == null) ? 0 : expression.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final PreprocessorReason other = (PreprocessorReason) obj;
-		if (expression == null) {
-			if (other.expression != null) {
-				return false;
-			}
-		} else if (!expression.equals(other.expression)) {
-			return false;
-		}
-		return true;
+	protected PreprocessorReason clone(Explanation<?> explanation) {
+		return new PreprocessorReason(getSubject(), getExplanation());
 	}
 }

@@ -20,20 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config.impl.ltms;
 
-import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
+import org.prop4j.explain.solvers.impl.ltms.Ltms;
+import org.prop4j.explain.solvers.impl.ltms.LtmsSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.impl.ltms.Ltms;
+import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationExplanationCreatorFactory;
 
 /**
- * Provides instances of {@link ConfigurationExplanationCreator} using an {@link Ltms Ltms}.
+ * Provides instances of {@link ConfigurationExplanationCreator} using an {@link Ltms LTMS}.
  *
  * @author Timo G&uuml;nther
  */
-public class LtmsConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
+public class LtmsConfigurationExplanationCreatorFactory extends MusConfigurationExplanationCreatorFactory {
 
-	@Override
-	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
-		return new LtmsAutomaticSelectionExplanationCreator();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public LtmsConfigurationExplanationCreatorFactory() {
+		super(new LtmsSatSolverFactory());
 	}
 }

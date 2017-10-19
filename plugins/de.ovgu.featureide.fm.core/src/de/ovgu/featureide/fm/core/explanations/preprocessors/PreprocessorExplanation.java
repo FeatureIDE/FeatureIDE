@@ -20,21 +20,22 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 
 /**
  * An explanation for a circumstance involving a preprocessor.
  *
+ * @param S subject
  * @author Timo G&uuml;nther
  */
-public abstract class PreprocessorExplanation extends Explanation {
+public abstract class PreprocessorExplanation<S> extends FeatureModelExplanation<S> {
 
 	/**
 	 * Constructs a new instance of this class.
 	 *
 	 * @param subject the subject to be explained
 	 */
-	protected PreprocessorExplanation(Object subject) {
+	protected PreprocessorExplanation(S subject) {
 		super(subject);
 	}
 }

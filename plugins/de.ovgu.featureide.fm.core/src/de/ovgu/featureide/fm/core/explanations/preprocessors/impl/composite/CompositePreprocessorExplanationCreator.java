@@ -6,28 +6,31 @@ import java.util.Deque;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatureModelExplanationCreator;
+import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 
 /**
  * Implements {@link PreprocessorExplanationCreator} through composition.
- * 
+ *
+ * @param S subject
+ * @param E explanation
  * @author Timo G&uuml;nther
  */
-public abstract class CompositePreprocessorExplanationCreator<T extends PreprocessorExplanationCreator> extends CompositeFeatureModelExplanationCreator<T>
-		implements PreprocessorExplanationCreator {
+public abstract class CompositePreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>, C extends PreprocessorExplanationCreator<S, E>>
+		extends CompositeFeatureModelExplanationCreator<S, E, C> implements PreprocessorExplanationCreator<S, E> {
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param composites the explanation creators this composes
 	 */
-	public CompositePreprocessorExplanationCreator(Collection<T> composites) {
+	protected CompositePreprocessorExplanationCreator(Collection<C> composites) {
 		super(composites);
 	}
 
 	@Override
 	public Deque<Node> getExpressionStack() {
-		for (final T composite : getComposites()) {
+		for (final C composite : getComposites()) {
 			return composite.getExpressionStack();
 		}
 		return null;
@@ -35,7 +38,7 @@ public abstract class CompositePreprocessorExplanationCreator<T extends Preproce
 
 	@Override
 	public void setExpressionStack(Collection<Node> expressionStack) {
-		for (final T composite : getComposites()) {
+		for (final C composite : getComposites()) {
 			composite.setExpressionStack(expressionStack);
 		}
 	}

@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import java.util.Set;
-
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -35,19 +34,23 @@ import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanatio
  *
  * @author Timo G&uuml;nther
  */
-public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator implements FalseOptionalFeatureExplanationCreator {
+public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelExplanationCreator<IFeature, FalseOptionalFeatureExplanation>
+		implements FalseOptionalFeatureExplanationCreator {
 
-	@Override
-	public IFeature getSubject() {
-		return (IFeature) super.getSubject();
+	/**
+	 * Constructs a new instance of this class.
+	 */
+	public MusFalseOptionalFeatureExplanationCreator() {
+		this(null);
 	}
 
-	@Override
-	public void setSubject(Object subject) throws IllegalArgumentException {
-		if ((subject != null) && !(subject instanceof IFeature)) {
-			throw new IllegalArgumentException("Illegal subject type");
-		}
-		super.setSubject(subject);
+	/**
+	 * Constructs a new instance of this class.
+	 *
+	 * @param solverFactory the solver factory used to create the oracle
+	 */
+	public MusFalseOptionalFeatureExplanationCreator(SatSolverFactory solverFactory) {
+		super(solverFactory);
 	}
 
 	@Override
@@ -58,16 +61,11 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		try {
 			oracle.addAssumption(NodeCreator.getVariable(getSubject()), false);
 			oracle.addAssumption(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), true);
-			explanation = getExplanation(oracle.getMinimalUnsatisfiableSubsetIndexes());
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
 			oracle.pop();
 		}
 		return explanation;
-	}
-
-	@Override
-	protected FalseOptionalFeatureExplanation getExplanation(Set<Integer> clauseIndexes) {
-		return (FalseOptionalFeatureExplanation) super.getExplanation(clauseIndexes);
 	}
 
 	@Override

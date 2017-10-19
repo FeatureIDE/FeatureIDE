@@ -168,7 +168,7 @@ public class English implements ILanguage {
 
 	@Override
 	public String getExplanation() {
-		return "The selected element is defect because of the highlighted dependencies:";
+		return "The selected element is defect" + System.lineSeparator() + "because of the highlighted dependencies:";
 	}
 
 	@Override

@@ -178,21 +178,22 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@SuppressWarnings("unchecked")
 	@CheckForNull
 	public static final <T, R extends IFileManager<T>> R newInstance(Path path, ObjectCreator<T> objectCreator) {
-		final String absolutePath = constructAbsolutePath(path);
 		final SimpleFileHandler<T> fileHandler = getFileHandler(path, objectCreator);
-
-		try {
-			final Constructor<? extends IFileManager<T>> constructor =
-				objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, String.class, IPersistentFormat.class);
-			constructor.setAccessible(true);
-			final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), absolutePath, fileHandler.getFormat());
-			map.put(absolutePath, instance);
-			instance.getLastProblems().addAll(fileHandler.getLastProblems());
-			return (R) objectCreator.fileManagerClass.cast(instance);
-		} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-			Logger.logError(e);
-			return null;
+		if (fileHandler.getObject() != null) {
+			try {
+				final String absolutePath = constructAbsolutePath(path);
+				final Constructor<? extends IFileManager<T>> constructor =
+					objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, String.class, IPersistentFormat.class);
+				constructor.setAccessible(true);
+				final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), absolutePath, fileHandler.getFormat());
+				map.put(absolutePath, instance);
+				instance.getLastProblems().addAll(fileHandler.getLastProblems());
+				return (R) objectCreator.fileManagerClass.cast(instance);
+			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
+				Logger.logError(e);
+			}
 		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
