@@ -82,7 +82,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
 					} else {
-						IProject project =
+						final IProject project =
 							ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(featureModel.getSourceFile().toString())).getProject();
 						final IFMComposerExtension fmComposerExtension = FMComposerManager.getFMComposerExtension(project);
 						if ((!fmComposerExtension.isValidFeatureName(value))) {

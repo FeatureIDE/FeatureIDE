@@ -35,17 +35,14 @@ import org.eclipse.draw2d.XYLayout;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -396,7 +393,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 */
 	private void createHasVoidModel(int row) {
 		createSymbol(row, VOID_MODEL, true, MODEL_CONST_TOOLTIP);
-		Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
+		final Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
@@ -720,7 +717,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		labelExplanation.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		labelExplanation.setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		labelExplanation.setFont(DEFAULT_FONT);
-		labelExplanation.setSize(getSize().width, 2 * ROW_HEIGHT + 2);
+		labelExplanation.setSize(getSize().width, (2 * ROW_HEIGHT) + 2);
 
 		labelExplanation.setLocation(new Point(x_SymbolStart, y_Entry));
 		y_Entry += 2 * ROW_HEIGHT;

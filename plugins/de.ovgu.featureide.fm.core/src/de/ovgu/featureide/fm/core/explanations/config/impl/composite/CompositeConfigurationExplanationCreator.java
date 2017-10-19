@@ -9,7 +9,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.composite.CompositeFeatur
 
 /**
  * Implements {@link ConfigurationExplanationCreator} through composition.
- * 
+ *
  * @param S subject
  * @param E explanation
  * @param C composite
@@ -20,7 +20,7 @@ public abstract class CompositeConfigurationExplanationCreator<S, E extends Conf
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param composites the explanation creators this composes
 	 */
 	public CompositeConfigurationExplanationCreator(Collection<C> composites) {

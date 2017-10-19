@@ -58,7 +58,7 @@ public class ConfigAnalysisUtils {
 		// check that they are config files
 		final IFolder configsFolder = featureProject.getConfigFolder();
 		for (final IResource res : configsFolder.members()) {
-			if (res instanceof IFile && res.isAccessible()) {
+			if ((res instanceof IFile) && res.isAccessible()) {
 				final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 				final ProblemList problems = SimpleFileHandler.load(Paths.get(res.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 				if (!problems.containsError()) {

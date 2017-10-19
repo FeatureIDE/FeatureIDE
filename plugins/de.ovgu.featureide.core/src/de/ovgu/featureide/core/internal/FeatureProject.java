@@ -332,7 +332,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (instance != null) {
 			featureModelManager = instance;
 		} else {
-			featureModelManager = new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
+			featureModelManager =
+				new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
 			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
 		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
@@ -565,7 +566,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
-							if (resource instanceof IFile && resource.isAccessible()) {
+							if ((resource instanceof IFile) && resource.isAccessible()) {
 								final FileHandler<Configuration> fileHandler = ConfigurationManager.load(Paths.get(resource.getLocationURI()), config);
 								if (!fileHandler.getLastProblems().containsError()) {
 									fileHandler.write();

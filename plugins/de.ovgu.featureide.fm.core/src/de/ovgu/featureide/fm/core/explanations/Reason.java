@@ -30,9 +30,9 @@ package de.ovgu.featureide.fm.core.explanations;
 public abstract class Reason<S> implements Cloneable {
 
 	/** The subject of this reason. */
-	private S subject;
+	private final S subject;
 	/** The containing explanation. */
-	private Explanation<?> explanation;
+	private final Explanation<?> explanation;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -47,7 +47,7 @@ public abstract class Reason<S> implements Cloneable {
 
 	/**
 	 * Returns the subject of this reason.
-	 * 
+	 *
 	 * @return the subject of this reason
 	 */
 	public S getSubject() {
@@ -91,19 +91,29 @@ public abstract class Reason<S> implements Cloneable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
+		result = (prime * result) + ((subject == null) ? 0 : subject.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		Reason<?> other = (Reason<?>) obj;
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Reason<?> other = (Reason<?>) obj;
 		if (subject == null) {
-			if (other.subject != null) return false;
-		} else if (!subject.equals(other.subject)) return false;
+			if (other.subject != null) {
+				return false;
+			}
+		} else if (!subject.equals(other.subject)) {
+			return false;
+		}
 		return true;
 	}
 

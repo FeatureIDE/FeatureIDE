@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 
 /**
  * A class containing numerous methods that are needed for many tests, especially those assessing files.
- * 
+ *
  * @author Marcus Pinnecke
  * @author Thomas Thuem
  */
@@ -73,7 +73,7 @@ public class Commons {
 	public static File getTestCaseFolder() {
 		return getRemoteOrLocalFolder(TEST_CASE_PATH);
 	}
-		
+
 	/**
 	 * Loads a feature model from the file <code>featureModelXmlFilename</code> from a given <code>remotePath</code>, or if <code>remotePath</code> is not
 	 * available, from <code>localClassPath</code>. The search for the file excludes files that don't have the same file extension as

@@ -72,7 +72,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 	/**
 	 * The satisfiability status of an annotation.
-	 * 
+	 *
 	 * @author Christoph Giesel
 	 * @author Timo G&uuml;nther
 	 */

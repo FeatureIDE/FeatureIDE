@@ -85,7 +85,7 @@ public class Sat4jAllMusExtractor extends Sat4jMutableSatSolver implements MusEx
 			final Set<Integer> mus = new TreeSet<Integer>();
 			for (int i = 0; i < indexes.size(); i++) {
 				final int index = indexes.get(i);
-				mus.add(this.getClauseIndexFromIndex(index));
+				mus.add(getClauseIndexFromIndex(index));
 			}
 			allMuses.add(mus);
 		}

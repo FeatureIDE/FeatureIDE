@@ -54,6 +54,7 @@ public abstract class MusPreprocessorExplanationCreator<S, E extends Preprocesso
 
 	/**
 	 * Returns the solver factory used to create the oracle
+	 * 
 	 * @return the solver factory
 	 */
 	public SatSolverFactory getSatSolverFactory() {

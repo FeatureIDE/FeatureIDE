@@ -2,7 +2,6 @@ package de.ovgu.featureide.featurehouse;
 
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
-
 public class FeatureHouseFMComposerExtension extends FMComposerExtension {
 
 	/**

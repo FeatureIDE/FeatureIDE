@@ -8,7 +8,7 @@ import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanat
 
 /**
  * Implements {@link AutomaticSelectionExplanationCreator} through composition.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class CompositeAutomaticSelectionExplanationCreator
@@ -17,7 +17,7 @@ public class CompositeAutomaticSelectionExplanationCreator
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param composites the explanation creators to compose
 	 */
 	public CompositeAutomaticSelectionExplanationCreator(Collection<AutomaticSelectionExplanationCreator> composites) {

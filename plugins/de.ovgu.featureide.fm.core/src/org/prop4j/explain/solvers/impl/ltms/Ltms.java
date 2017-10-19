@@ -48,7 +48,7 @@ import org.prop4j.explain.solvers.MusExtractor;
  * </p>
  *
  * <p> Clauses are referenced by their index in the CNF. </p>
- * 
+ *
  * <p> Note that this implementation does not fulfill the entire contract of {@link MusExtractor}. Instances of this class never return instances of
  * {@link Node}. Methods that do so will either return null or throw an exception. Additionally, {@link #push()} and {@link #pop()} only work for a single
  * scope. {@link #pop()} also always clears the assumptions. </p>
@@ -190,7 +190,7 @@ public class Ltms implements MusExtractor {
 
 	@Override
 	public void addAssumptions(Map<Object, Boolean> assumptions) {
-		this.premises.putAll(premises);
+		premises.putAll(premises);
 	}
 
 	@Override
@@ -233,7 +233,7 @@ public class Ltms implements MusExtractor {
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p> Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values
 	 * until a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of
 	 * which might be shorter than others. </p>

@@ -47,7 +47,7 @@ public abstract class ConfigurationExplanation<S> extends FeatureModelExplanatio
 
 	/**
 	 * Returns the configuration.
-	 * 
+	 *
 	 * @return the configuration
 	 */
 	public Configuration getConfiguration() {

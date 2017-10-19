@@ -63,7 +63,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		IFeatureModel featureModel;
 		try {
 			featureModel = FMFactoryManager.getFactory(fmPath.toString(), format).createFeatureModel();
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			Logger.logError(e);
 			featureModel = FMFactoryManager.getEmptyFeatureModel();
 		}

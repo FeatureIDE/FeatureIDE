@@ -135,6 +135,6 @@ public interface ILanguage {
 	public String getExplanation();
 
 	public String getLikelyCause();
-	
+
 	public String getUnlikelyCause();
 }
