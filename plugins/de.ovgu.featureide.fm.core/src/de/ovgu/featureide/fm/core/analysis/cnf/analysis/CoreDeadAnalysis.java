@@ -61,7 +61,7 @@ public class CoreDeadAnalysis extends AVariableAnalysis<LiteralSet> {
 
 	@Override
 	public LiteralSet analyze(IMonitor monitor) throws Exception {
-		return analyze2(monitor);
+		return analyze1(monitor);
 	}
 
 	@Override
