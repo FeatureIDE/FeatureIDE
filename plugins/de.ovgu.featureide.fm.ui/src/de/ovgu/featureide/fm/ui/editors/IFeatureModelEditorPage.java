@@ -74,6 +74,7 @@ public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 	/**
 	 * @param monitor
 	 */
+	@Override
 	void doSave(IProgressMonitor monitor);
 
 	/**

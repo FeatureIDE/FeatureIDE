@@ -72,9 +72,8 @@ public abstract class SingleSelectionAction extends Action implements IEventList
 
 	protected final boolean isOneFeatureSelected(IStructuredSelection selection) {
 		final Object element = selection.getFirstElement();
-		return (selection.size() == 1) 
-			&& ((element instanceof FeatureEditPart) || (element instanceof ConnectionEditPart)
-				|| (element instanceof FmOutlineGroupStateStorage) || (element instanceof IFeature));
+		return (selection.size() == 1) && ((element instanceof FeatureEditPart) || (element instanceof ConnectionEditPart)
+			|| (element instanceof FmOutlineGroupStateStorage) || (element instanceof IFeature));
 	}
 
 	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {

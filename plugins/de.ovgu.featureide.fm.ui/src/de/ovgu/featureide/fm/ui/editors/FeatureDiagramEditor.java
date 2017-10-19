@@ -169,7 +169,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private final Path extraPath;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private FeatureDiagramViewer viewer;
+	private final FeatureDiagramViewer viewer;
 
 	private Label infoLabel;
 
@@ -251,7 +251,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// 1. Check if the fmManager exists and is not a VirtualFileManager instance (path returns null)
 		// 2. read-only feature model is currently only a view on the editable feature model and not persistent
-		if (fmManager != null && fmManager.getPath() != null) {
+		if ((fmManager != null) && (fmManager.getPath() != null)) {
 			extraPath = AFileManager.constructExtraPath(fmManager.getPath(), format);
 			FileHandler.load(extraPath, graphicalFeatureModel, format);
 			fmManager.addListener(this);
@@ -380,7 +380,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		gridData.horizontalAlignment = SWT.LEFT;
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
-		Label label = new Label(compositeTop, SWT.NONE);
+		final Label label = new Label(compositeTop, SWT.NONE);
 		label.setText("Model Status:");
 		label.setLayoutData(gridData);
 
@@ -1033,8 +1033,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
 		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
-		handler.put(KeyStroke.getPressed((char) ('d' - 'a' + 1), 'd', SWT.CTRL), deleteAllAction);
-		handler.put(KeyStroke.getPressed((char) ('c' - 'a' + 1), 'c', SWT.CTRL), collapseAction);
+		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
+		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
 
 		handler.put(KeyStroke.getPressed(SWT.ARROW_UP, SWT.CTRL), moveUpAction);
 		handler.put(KeyStroke.getPressed(SWT.ARROW_RIGHT, SWT.CTRL), moveRightAction);
@@ -1058,7 +1058,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				for (Action action : setLayoutActions) {
+				for (final Action action : setLayoutActions) {
 					action.setEnabled(true);
 					action.setChecked(false);
 					menuManager.add(action);
@@ -1081,7 +1081,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				for (Action action : calculationActions) {
+				for (final Action action : calculationActions) {
 					menuManager.add(action);
 				}
 				menuManager.insert(2, new Separator());
@@ -1097,7 +1097,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				for (Action action : setNameTypeActions) {
+				for (final Action action : setNameTypeActions) {
 					menuManager.add(action);
 				}
 				final Action selectedAction = setNameTypeActions.get((graphicalFeatureModel.getLayout().showShortNames()) ? 1 : 0);
@@ -1192,7 +1192,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// Get the primary selected element.
 		ModelElementEditPart primaryElement = null;
 		for (final Object selected : viewer.getSelectedEditParts()) {
-			if (selected instanceof ModelElementEditPart && primaryElement == null) {
+			if ((selected instanceof ModelElementEditPart) && (primaryElement == null)) {
 				primaryElement = (ModelElementEditPart) selected;
 			} else {
 				primaryElement = null; // multiple selected
@@ -1206,20 +1206,29 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private void connectionEntrys(IMenuManager menu) {
 		if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
-			boolean connectionSelected = alternativeAction.isConnectionSelected();
+			final boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
 				andAction.setText(AND);
-				if (connectionSelected) orAction.setText("Or (Double Click)");
-				else orAction.setText(OR);
+				if (connectionSelected) {
+					orAction.setText("Or (Double Click)");
+				} else {
+					orAction.setText(OR);
+				}
 				alternativeAction.setText(ALTERNATIVE);
 			} else if (orAction.isChecked()) {
 				andAction.setText(AND);
 				orAction.setText(OR);
-				if (connectionSelected) alternativeAction.setText("Alternative (Double Click)");
-				else alternativeAction.setText(ALTERNATIVE);
+				if (connectionSelected) {
+					alternativeAction.setText("Alternative (Double Click)");
+				} else {
+					alternativeAction.setText(ALTERNATIVE);
+				}
 			} else if (alternativeAction.isChecked()) {
-				if (connectionSelected) andAction.setText("And (Double Click)");
-				else andAction.setText(AND);
+				if (connectionSelected) {
+					andAction.setText("And (Double Click)");
+				} else {
+					andAction.setText(AND);
+				}
 				orAction.setText(OR);
 				alternativeAction.setText(ALTERNATIVE);
 			}
@@ -1259,6 +1268,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/**
 	 * Stops the analyzing job when the editor is closed.
 	 */
+	@Override
 	public void dispose() {
 		if (analyzeJob != null) {
 			analyzeJob.cancel();
@@ -1278,7 +1288,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		for (Action action : actions) {
+		for (final Action action : actions) {
 			if (action.getId().equals(workbenchActionID)) {
 				return action;
 			}

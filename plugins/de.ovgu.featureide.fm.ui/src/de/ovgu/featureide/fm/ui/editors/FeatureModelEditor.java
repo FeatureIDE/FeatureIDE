@@ -123,7 +123,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private FmOutlinePage outlinePage;
 
-	private List<Action> actions = new ArrayList<>(4);
+	private final List<Action> actions = new ArrayList<>(4);
 
 	public FeatureModelEditor() {
 		super();
@@ -213,7 +213,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		for (Action action : actions) {
+		for (final Action action : actions) {
 			if (action.getId().equals(workbenchActionID)) {
 				return action;
 			}
@@ -574,7 +574,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	 * @return The page
 	 */
 	private IFeatureModelEditorPage getPage(int index) {
-		for (IFeatureModelEditorPage page : pages) {
+		for (final IFeatureModelEditorPage page : pages) {
 			if (page.getIndex() == index) {
 				return page;
 			}

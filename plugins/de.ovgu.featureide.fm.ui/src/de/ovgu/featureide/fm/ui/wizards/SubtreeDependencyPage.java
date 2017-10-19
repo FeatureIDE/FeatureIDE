@@ -82,7 +82,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	/**
 	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to fill all available space. Inserts the subtree model into a
 	 * container within a wizard page. Enables automated analysis for the sub feature model and explains implicit constraints using the origin feature model.
-	 * 
+	 *
 	 * @param parent A composite which contains the feature model
 	 */
 	@Override
@@ -90,7 +90,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		parent.setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
 		// parent composite
-		GridLayout gridLayout = new GridLayout(1, false);
+		final GridLayout gridLayout = new GridLayout(1, false);
 		gridLayout.horizontalSpacing = 0;
 		gridLayout.verticalSpacing = 0;
 		gridLayout.marginHeight = 0;
@@ -100,7 +100,7 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		final IGraphicalFeatureModel graphicalFeatureModel = FeatureDiagramEditor.getGrapicalFeatureModel(subtreeModel);
 		final FeatureDiagramViewer viewer = new FeatureDiagramViewer(graphicalFeatureModel);
 
-		GridData gridData = new GridData();
+		final GridData gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.verticalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;

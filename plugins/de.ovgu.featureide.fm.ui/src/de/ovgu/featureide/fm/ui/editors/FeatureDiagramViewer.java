@@ -116,7 +116,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	private FeatureDiagramEditorKeyHandler editorKeyHandler;
+	private final FeatureDiagramEditorKeyHandler editorKeyHandler;
 	private FeatureDiagramLayoutManager layoutManager;
 
 	/**
@@ -130,7 +130,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		this.graphicalFeatureModel = graphicalFeatureModel;
 
 		setEditPartFactory(new GraphicalEditPartFactory());
-		ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
+		final ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 		setRootEditPart(rootEditPart);
 
@@ -151,9 +151,8 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	}
 
 	/**
-	 * Checks if the combined width including the spaces between features fits the editor's size.
-	 * Based on the selected layout algorithm.
-	 * 
+	 * Checks if the combined width including the spaces between features fits the editor's size. Based on the selected layout algorithm.
+	 *
 	 * @param list all features from a single level.
 	 * @return true if the level fits in the editor.
 	 */
