@@ -50,9 +50,8 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 * @param featureModel
 	 */
 	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
-		super(DELETE_INCLUDING_SUBFEATURES, viewer);
+		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID);
 		this.featureModel = featureModel;
-		this.viewer = viewer;
 		setImageDescriptor(deleteImage);
 	}
 

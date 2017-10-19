@@ -48,6 +48,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ExpandConstraint
  */
 public class ExpandConstraintAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.expandConstraint";
+
 	private final IGraphicalFeatureModel graphcialFeatureModel;
 	private IConstraint constraint;
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
@@ -59,14 +61,10 @@ public class ExpandConstraintAction extends Action {
 		}
 	};
 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 * @param menuname
-	 */
 	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
 		super(EXPAND_CONSTRAINT);
 		this.graphcialFeatureModel = graphcialFeatureModel;
+		setId(ID);
 		if (viewer instanceof TreeViewer) {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		} else {

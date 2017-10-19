@@ -39,13 +39,6 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	private final FeatureModelEditor featureModelEditor;
 	private final String newText, oldText;
 
-	/**
-	 * @param featureModel
-	 * @param label
-	 * @param featureModelEditor
-	 * @param newText
-	 * @param oldText
-	 */
 	public SourceChangedOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
 		super(featureModel, SOURCE_CHANGE);
 		this.featureModelEditor = featureModelEditor;

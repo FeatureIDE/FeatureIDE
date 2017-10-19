@@ -27,6 +27,8 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -35,12 +37,11 @@ import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedund
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A wizard page to show implicit constraints of a sub feature model. Enables automated analysis on the sub feature model to explain implicit (redundant)
@@ -84,45 +85,56 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 	}
 
 	/**
-	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to fill all available space.
+	 * Creates a control for the dialog page. Integrates the sub feature model and uses FillLayout to fill all available space. Inserts the subtree model into a
+	 * container within a wizard page. Enables automated analysis for the sub feature model and explains implicit constraints using the origin feature model.
 	 *
 	 * @param parent A composite which contains the feature model
 	 */
 	@Override
 	public void createControl(Composite parent) {
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayout(new FillLayout());
-		setControl(container);
-		insertFeatureModel(container);
-		setPageComplete(false);
-	}
+		parent.setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
-	/**
-	 * Inserts the subtree model into a container within a wizard page. Enables automated analysis for the sub feature model and explains implicit constraints
-	 * using the origin feature model.
-	 *
-	 * @param comp A composite which contains the sub feature model
-	 */
-	private void insertFeatureModel(Composite comp) {
+		// parent composite
+		final GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.horizontalSpacing = 0;
+		gridLayout.verticalSpacing = 0;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		parent.setLayout(gridLayout);
+
+		final IGraphicalFeatureModel graphicalFeatureModel = FeatureDiagramEditor.getGrapicalFeatureModel(subtreeModel);
+		final FeatureDiagramViewer viewer = new FeatureDiagramViewer(graphicalFeatureModel);
+
+		final GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.verticalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		final Composite compositeBottom = new Composite(parent, SWT.FILL);
+		compositeBottom.setLayout(new FillLayout());
+		compositeBottom.setLayoutData(gridData);
+
+		viewer.createControl(compositeBottom);
+		viewer.setContents(graphicalFeatureModel);
+		viewer.getControl().addControlListener(viewer.createControlListener());
+		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
+
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(subtreeModel);
+		final FeatureModelAnalyzer analyzer2 = FeatureModelManager.getAnalyzer(completeFm);
 
-		final FeatureModelEditor modeleditor = new FeatureModelEditor(new VirtualFileManager<IFeatureModel>(subtreeModel, new XmlFeatureModelFormat()));
-		final FeatureDiagramEditor diagramEditor = new FeatureDiagramEditor(modeleditor, comp, subtreeModel);
-		subtreeModel.addListener(diagramEditor);
+		analyzer.setCalculateFeatures(analyzer2.isCalculateFeatures());
+		analyzer.setCalculateConstraints(analyzer2.isCalculateConstraints());
+		analyzer.setCalculateRedundantConstraints(analyzer2.isCalculateRedundantConstraints());
+		analyzer.setCalculateTautologyConstraints(analyzer2.isCalculateTautologyConstraints());
+		analyzer.setCalculateDeadConstraints(analyzer2.isCalculateDeadConstraints());
+		analyzer.setCalculateFOConstraints(analyzer2.isCalculateFOConstraints());
 
-		analyzer.setCalculateFeatures(FeatureModelManager.getAnalyzer(completeFm).isCalculateFeatures());
-		analyzer.setCalculateConstraints(FeatureModelManager.getAnalyzer(completeFm).isCalculateConstraints());
-		analyzer.setCalculateRedundantConstraints(FeatureModelManager.getAnalyzer(completeFm).isCalculateRedundantConstraints());
-		analyzer.setCalculateTautologyConstraints(FeatureModelManager.getAnalyzer(completeFm).isCalculateTautologyConstraints());
-		analyzer.setCalculateDeadConstraints(FeatureModelManager.getAnalyzer(completeFm).isCalculateDeadConstraints());
-		analyzer.setCalculateFOConstraints(FeatureModelManager.getAnalyzer(completeFm).isCalculateFOConstraints());
+		explainImplicitConstraints(analyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
+		viewer.internRefresh(true);
+		graphicalFeatureModel.redrawDiagram();
 
-		analyzer.analyzeFeatureModel(null); // analyze the subtree model
-		explainImplicitConstraints(analyzer, diagramEditor.getGraphicalFeatureModel()); // explain implicit, i.e. redundant, constraints
-		diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
-
-		diagramEditor.internRefresh(true);
-		diagramEditor.getGraphicalFeatureModel().redrawDiagram();
+		setPageComplete(true);
+		setControl(compositeBottom);
 	}
 
 	/**

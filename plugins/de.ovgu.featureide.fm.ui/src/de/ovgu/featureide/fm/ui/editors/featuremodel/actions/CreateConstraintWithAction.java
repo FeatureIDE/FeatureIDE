@@ -40,15 +40,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class CreateConstraintWithAction extends CreateConstraintAction {
 
+	public static final String ID = "de.ovgu.featureide.createconstraintwith";
+
 	protected String selectedFeature;
 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 */
 	public CreateConstraintWithAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel);
-
+		setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		}

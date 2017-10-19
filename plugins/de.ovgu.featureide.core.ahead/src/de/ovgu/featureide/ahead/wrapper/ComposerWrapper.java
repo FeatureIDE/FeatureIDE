@@ -211,7 +211,7 @@ public class ComposerWrapper {
 
 	/**
 	 * Adds a jakfile to the composition list <br> This method automaticaly searches for corresponding jakfiles in all specified feature folders
-	 * 
+	 *
 	 * @param newJakFile
 	 * @throws ComposerException
 	 */

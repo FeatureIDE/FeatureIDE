@@ -87,7 +87,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 
 		return true;
 	}
-	
+
 	/**
 	 * Actual handling of renaming.
 	 */

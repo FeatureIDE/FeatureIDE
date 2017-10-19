@@ -48,7 +48,7 @@ public class CoreFeatureFilter extends ConfigurationMapFilter {
 
 	@Override
 	public void initialize(ConfigurationMap configurationMap) {
-		final FeatureModelSnapshot snapshot = configurationMap.getFeatureProject().getFeatureModelManager().getSnapshot();
+		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) configurationMap.getFeatureProject().getFeatureModelManager().getSnapshot();
 		final IFeatureModel featureModel = snapshot.getObject();
 		if (featureModel != featureModelFilterIsInitializedFor) {
 			final FeatureModelAnalyzer analyser = snapshot.getAnalyzer();

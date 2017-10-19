@@ -41,6 +41,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,6 +100,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -113,7 +115,9 @@ import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.VirtualFileManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -163,7 +167,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 	/**
 	 * the model representation of the model file
 	 */
-	private final FeatureModelManager featureModelManager;
+	private final IFileManager<IFeatureModel> featureModelManager;
 
 	private FSTModel fstModel;
 
@@ -307,12 +311,6 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			}
 		});
 
-	private static FeatureModelManager getFeatureModelManager(IProject project) {
-		final IFile modelFile = (project.getFile("mpl.velvet").exists()) ? project.getFile("mpl.velvet") : project.getFile("model.xml");
-
-		return FeatureModelManager.getInstance(Paths.get(modelFile.getLocationURI()));
-	}
-
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist, registering workspace listeners and initialization of the wrapper object.
 	 *
@@ -334,7 +332,14 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
 		}
 
-		featureModelManager = getFeatureModelManager(aProject);
+		final FeatureModelManager instance = FeatureModelManager.getInstance(Paths.get(modelFile.getModelFile().getLocationURI()));
+		if (instance != null) {
+			featureModelManager = instance;
+		} else {
+			featureModelManager =
+				new VirtualFileManager<IFeatureModel>(DefaultFeatureModelFactory.getInstance().createFeatureModel(), new XmlFeatureModelFormat());
+			LOGGER.logError(new IOException("File " + modelFile + " couldn't be read."));
+		}
 		featureModelManager.addListener(new FeatureModelChangeListner());
 		featureModelManager.read();
 
@@ -1064,7 +1069,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			public Boolean execute(IMonitor workMonitor) throws Exception {
 				workMonitor.setRemainingWork(2);
 
-				final FeatureModelSnapshot snapshot = featureModelManager.getSnapshot();
+				final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureModelManager.getSnapshot();
 				final Configuration config = new Configuration(snapshot.getObject());
 				try {
 					IMonitor subTask = workMonitor.subTask(1);
@@ -1227,7 +1232,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 				return path;
 			}
 
-			path = getPath(CONFIGS_ARGUMENT);
+			path = FMComposerManager.getPath(project, CONFIGS_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1245,7 +1250,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 				return path;
 			}
 
-			path = getPath(BUILD_ARGUMENT);
+			path = FMComposerManager.getPath(project, BUILD_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1263,7 +1268,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 				return path;
 			}
 
-			path = getPath(SOURCE_ARGUMENT);
+			path = FMComposerManager.getPath(project, SOURCE_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1271,24 +1276,6 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			LOGGER.logError(e);
 		}
 		return DEFAULT_SOURCE_PATH;
-	}
-
-	private String getPath(String argument) {
-		try {
-			for (final ICommand command : project.getDescription().getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
-					return command.getArguments().get(argument);
-				}
-			}
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
-		}
-		return null;
-	}
-
-	private boolean isFIDEBuilder(ICommand command) {
-		return command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)
-			|| command.getBuilderName().equals("de.ovgu.featureide.core.mpl.MSPLBuilder");
 	}
 
 	@Override
@@ -1300,7 +1287,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			}
 
 			for (final ICommand command : project.getDescription().getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
+				if (FMComposerManager.isFIDEBuilder(command)) {
 					id = command.getArguments().get(ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
 					if (id != null) {
 						return id;
@@ -1321,7 +1308,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 
 			final ICommand[] commands = description.getBuildSpec();
 			for (final ICommand command : commands) {
-				if (isFIDEBuilder(command) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
+				if (FMComposerManager.isFIDEBuilder(command) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
 					final Map<String, String> args = command.getArguments();
 					args.put(SOURCE_ARGUMENT, feature);
 					args.put(BUILD_ARGUMENT, src);
@@ -1348,7 +1335,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 			final LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
 			boolean added = false;
 			for (final ICommand command : description.getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
+				if (FMComposerManager.isFIDEBuilder(command)) {
 					if (!added) {
 						final Map<String, String> args = command.getArguments();
 						args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY, composerID);
@@ -1530,7 +1517,7 @@ public class FeatureProject implements IFeatureProject, IResourceChangeListener,
 	}
 
 	@Override
-	public FeatureModelManager getFeatureModelManager() {
+	public IFileManager<IFeatureModel> getFeatureModelManager() {
 		return featureModelManager;
 	}
 

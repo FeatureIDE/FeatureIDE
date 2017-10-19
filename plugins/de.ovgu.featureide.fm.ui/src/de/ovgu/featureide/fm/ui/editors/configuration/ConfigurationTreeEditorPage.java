@@ -348,7 +348,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			updateInfoLabel(Display.getCurrent());
 		}
 
-		new SearchField<TreeItem>(compositeTop, this);
+		new SearchField<>(compositeTop, this);
 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;

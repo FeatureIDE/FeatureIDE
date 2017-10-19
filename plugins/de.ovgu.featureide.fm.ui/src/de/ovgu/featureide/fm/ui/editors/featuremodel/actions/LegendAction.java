@@ -40,17 +40,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.HideLegendOperat
  */
 public class LegendAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.legend";
+
 	private final IGraphicalFeatureModel featureModel;
 
 	public LegendAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
+		setId(ID);
 		if (!featureModel.isLegendHidden()) {
 			setText(HIDE_LEGEND);
 		} else {
 			setText(SHOW_LEGEND);
 		}
-
 	}
 
 	@Override

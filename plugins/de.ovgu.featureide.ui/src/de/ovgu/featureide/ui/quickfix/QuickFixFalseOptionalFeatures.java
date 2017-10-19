@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -85,7 +86,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		final ConfigurationPropagator propagator;
 		if (project != null) {
-			propagator = project.getFeatureModelManager().getSnapshot().getPropagator(false);
+			propagator = ((FeatureModelSnapshot) project.getFeatureModelManager().getSnapshot()).getPropagator(false);
 		} else {
 			propagator = FeatureModelManager.getInstance(featureModel).getSnapshot().getPropagator(false);
 		}

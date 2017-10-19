@@ -123,7 +123,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 	 * @param featureCenter
 	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
-		final FeatureModelSnapshot snapshot = featureProject.getFeatureModelManager().getSnapshot();
+		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
 
 		// Get feature in the center
 		final IFeature fc = snapshot.getObject().getFeature(featureCenter);

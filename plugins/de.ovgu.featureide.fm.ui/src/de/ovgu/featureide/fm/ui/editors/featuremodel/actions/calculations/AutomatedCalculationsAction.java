@@ -39,12 +39,15 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class AutomatedCalculationsAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.automatedcalculations";
+
 	private final IFeatureModel featureModel;
 
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(AUTOMATED_CALCULATIONS);
 		this.featureModel = featureModel;
 		setChecked(FeatureModelManager.getAnalyzer(featureModel).isRunCalculationAutomatically());
+		setId(ID);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.actions.ActionFactory;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
@@ -44,7 +45,7 @@ public class FMPrintAction extends PrintAction {
 	 */
 	public FMPrintAction(IWorkbenchPart part) {
 		super(part);
-
+		setId(ActionFactory.PRINT.getId());
 	}
 
 	@Override
@@ -103,10 +104,9 @@ public class FMPrintAction extends PrintAction {
 		if (editor.getEditorSite() instanceof FeatureDiagramEditor) {
 			FMUIPlugin.getDefault().logInfo("is feature diagramm editor");
 			final FeatureDiagramEditor fdEditor = (FeatureDiagramEditor) editor.getEditorSite();
-			for (final Object obj : fdEditor.getEditPartRegistry().values()) {
+			for (final Object obj : fdEditor.getViewer().getEditPartRegistry().values()) {
 				FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
 				if (obj instanceof LegendEditPart) {
-					FMUIPlugin.getDefault().logInfo(" is legend whohoooo! ");
 					final Point legendPos = layout.getLegendPos();
 					final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
 					((LegendEditPart) obj).getFigure().setLocation(newLegendPos);

@@ -83,18 +83,21 @@ public class FileManager<T> extends AFileManager<T> {
 	private static final <T, R extends IFileManager<T>> R newInstance(Path path, ObjectCreator<T> objectCreator,
 			Class<? extends IFileManager<T>> fileManagerClass, FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		final SimpleFileHandler<T> fileHandler = SimpleFileHandler.getFileHandler(path, objectCreator, formatManager);
-
-		try {
-			final Constructor<? extends IFileManager<T>> constructor = fileManagerClass.getDeclaredConstructor(SimpleFileHandler.class, ObjectCreator.class);
-			constructor.setAccessible(true);
-			final IFileManager<?> instance = constructor.newInstance(fileHandler, objectCreator);
-			FileManagerMap.addInstance(instance);
-			instance.getLastProblems().addAll(fileHandler.getLastProblems());
-			return (R) fileManagerClass.cast(instance);
-		} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
-			Logger.logError(e);
-			return null;
+		if (fileHandler.getObject() != null) {
+			try {
+				final Constructor<? extends IFileManager<T>> constructor =
+					fileManagerClass.getDeclaredConstructor(SimpleFileHandler.class, ObjectCreator.class);
+				constructor.setAccessible(true);
+				final IFileManager<?> instance = constructor.newInstance(fileHandler, objectCreator);
+				FileManagerMap.addInstance(instance);
+				instance.getLastProblems().addAll(fileHandler.getLastProblems());
+				return (R) fileManagerClass.cast(instance);
+			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
+				Logger.logError(e);
+				return null;
+			}
 		}
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

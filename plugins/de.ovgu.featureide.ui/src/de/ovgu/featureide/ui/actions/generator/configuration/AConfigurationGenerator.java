@@ -57,7 +57,7 @@ public abstract class AConfigurationGenerator implements LongRunningMethod<Void>
 	protected final CNF cnf;
 
 	public AConfigurationGenerator(ConfigurationBuilder builder, IFeatureProject featureProject) {
-		final FeatureModelSnapshot snapshot = featureProject.getFeatureModelManager().getSnapshot();
+		final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) featureProject.getFeatureModelManager().getSnapshot();
 		this.builder = builder;
 		featureModel = snapshot.getObject();
 		this.featureProject = featureProject;

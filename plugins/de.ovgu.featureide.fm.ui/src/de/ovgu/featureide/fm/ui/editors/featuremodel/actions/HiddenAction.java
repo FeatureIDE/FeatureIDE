@@ -39,7 +39,7 @@ public class HiddenAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public HiddenAction(Object viewer, IFeatureModel featureModel) {
-		super("Hidden", viewer);
+		super("Hidden", viewer, ID);
 		this.featureModel = featureModel;
 	}
 

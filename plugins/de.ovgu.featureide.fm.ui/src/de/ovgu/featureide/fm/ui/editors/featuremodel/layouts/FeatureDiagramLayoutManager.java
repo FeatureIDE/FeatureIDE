@@ -28,11 +28,11 @@ import java.util.Map.Entry;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -52,10 +52,10 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden, showCollapsedConstraints;
-	protected FeatureDiagramEditor editor;
+	protected ScrollingGraphicalViewer editor;
 	private boolean firstManualLayout = false;
 
-	public final void layout(IGraphicalFeatureModel featureModel, FeatureDiagramEditor editor) {
+	public final void layout(IGraphicalFeatureModel featureModel, ScrollingGraphicalViewer editor) {
 		this.editor = editor;
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);

@@ -20,46 +20,45 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
+
+// import static StringTable.*;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
+import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllOperation;
+import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 
 /**
- * Action to mark a feature as abstract.
+ * collapses/expand all features in the given feature model
  *
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Joshua Sprey
+ * @author Enis Belli
  */
-public class AbstractAction extends SingleSelectionAction {
+public class ExpandAllAction extends Action {
 
-	public static final String ID = "de.ovgu.featureide.abstract";
+	public static final String ID = "de.ovgu.featureide.expandall";
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
-	public AbstractAction(Object viewer, IFeatureModel featureModel, ObjectUndoContext undoContext) {
-		super("Abstract", viewer, ID);
-		this.featureModel = featureModel;
+	public ExpandAllAction(IGraphicalFeatureModel graphicalFeatureModel) {
+		super(EXPAND_ALL);
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		setId(ID);
+		setImageDescriptor(FmOutlinePageContextMenu.IMG_EXPAND);
 	}
 
 	@Override
 	public void run() {
-		setChecked(feature.getStructure().isAbstract());
-		final SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(feature, featureModel);
-
+		final CollapseAllOperation op = new CollapseAllOperation(graphicalFeatureModel, false);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-	}
-
-	@Override
-	protected void updateProperties() {
-		setEnabled(true);
-		setChecked(feature.getStructure().isAbstract());
 	}
 
 }

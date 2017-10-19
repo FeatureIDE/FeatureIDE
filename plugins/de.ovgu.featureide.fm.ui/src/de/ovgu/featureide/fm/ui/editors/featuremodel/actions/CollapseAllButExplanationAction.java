@@ -57,6 +57,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 */
 	public CollapseAllButExplanationAction(IGraphicalFeatureModel fm) {
 		super(COLLAPSE_ALL_BUT_EXPLANATION);
+		setId(ID);
 		this.fm = fm;
 		addActiveExplanationListener();
 	}

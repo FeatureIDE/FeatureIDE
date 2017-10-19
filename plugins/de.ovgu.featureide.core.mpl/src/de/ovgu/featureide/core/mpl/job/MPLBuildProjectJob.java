@@ -246,7 +246,7 @@ public class MPLBuildProjectJob implements LongRunningMethod<Boolean> {
 				final UsedModel usedModel = efm.getExternalModel(varName);
 				final String prefix = usedModel.getPrefix() + ".";
 
-				final FeatureModelSnapshot snapshot = externalFeatureProject.getFeatureModelManager().getSnapshot();
+				final FeatureModelSnapshot snapshot = (FeatureModelSnapshot) externalFeatureProject.getFeatureModelManager().getSnapshot();
 				final Configuration newConfiguration = new Configuration(snapshot.getObject());
 				final ConfigurationPropagator propagator = snapshot.getPropagator(newConfiguration);
 

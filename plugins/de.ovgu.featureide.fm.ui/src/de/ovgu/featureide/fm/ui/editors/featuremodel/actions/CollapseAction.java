@@ -67,7 +67,7 @@ public class CollapseAction extends SingleSelectionAction {
 	};
 
 	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(COLLAPSE_FEATURE, viewer);
+		super(COLLAPSE_FEATURE, viewer, ID);
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
