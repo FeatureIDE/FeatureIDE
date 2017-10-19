@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Sorting">
+				<description>
+					
+				</description>
+				<and abstract="true" mandatory="true" name="Sorting_C">
+					<description>
+						
+					</description>
+					<or abstract="true" name="SortWP">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="MetalPlastic">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="LightDark">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+					<feature name="CountWP">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="AlarmFunction">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="DistributeWP">
+						<description>
+							
+						</description>
+					</feature>
+					<alt abstract="true" name="SeparateWP">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="HandoverMetal">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="RejectsWithCap">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="RejectsWithoutCap">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</and>
+				<and abstract="true" mandatory="true" name="Sorting_M">
+					<description>
+						
+					</description>
+					<alt abstract="true" mandatory="true" name="StationDistributing">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Transporter">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="Gripper">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<feature name="StationInspecting">
+						<description>
+							
+						</description>
+					</feature>
+					<feature name="StationSeparating">
+						<description>
+							
+						</description>
+					</feature>
+					<and abstract="true" name="StationSorting">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Chute1">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="Chute2">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="Chute3">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<feature name="StationHandling">
+						<description>
+							
+						</description>
+					</feature>
+				</and>
+				<and abstract="true" mandatory="true" name="Sorting_E">
+					<description>
+						
+					</description>
+					<or abstract="true" mandatory="true" name="Pneumatics">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Switch1">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="Switch2">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+					<and abstract="true" mandatory="true" name="EE">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="MotorOfConveyor">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<and abstract="true" mandatory="true" name="Sensors">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Lightbarrier">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="IndSensor">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="OptSensor">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+				</and>
+				<and abstract="true" mandatory="true" name="Sorting_S">
+					<description>
+						
+					</description>
+					<and abstract="true" name="CountWPS">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Processed">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<or abstract="true" mandatory="true" name="SortingWP">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="MetalPlasticS">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="LightDarkS">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>MetalPlastic</var>
+					<conj>
+						<var>Chute1</var>
+						<var>Chute2</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>MetalPlastic</var>
+					<var>Switch1</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>MetalPlastic</var>
+					<var>MotorOfConveyor</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>MetalPlastic</var>
+					<conj>
+						<var>Lightbarrier</var>
+						<var>IndSensor</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>MetalPlastic</var>
+					<var>MetalPlasticS</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LightDark</var>
+					<conj>
+						<var>Chute1</var>
+						<var>Chute3</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LightDark</var>
+					<var>Switch2</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LightDark</var>
+					<var>MotorOfConveyor</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LightDark</var>
+					<conj>
+						<var>Lightbarrier</var>
+						<var>OptSensor</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>LightDark</var>
+					<var>LightDarkS</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>CountWP</var>
+					<var>Processed</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

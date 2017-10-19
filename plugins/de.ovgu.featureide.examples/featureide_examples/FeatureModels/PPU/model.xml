@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="PPU">
+				<description>
+					
+				</description>
+				<and abstract="true" mandatory="true" name="PPUC">
+					<description>
+						
+					</description>
+					<and abstract="true" mandatory="true" name="WorkPieces">
+						<description>
+							
+						</description>
+						<or abstract="true" mandatory="true" name="Size">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Small">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Large">
+								<description>
+									
+								</description>
+							</feature>
+						</or>
+					</and>
+					<and abstract="true" mandatory="true" name="Conditions">
+						<description>
+							
+						</description>
+						<or abstract="true" mandatory="true" name="PositioningC">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Discrete">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Continuous">
+								<description>
+									
+								</description>
+							</feature>
+						</or>
+						<alt abstract="true" mandatory="true" name="Environment">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Smooth">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Rough">
+								<description>
+									
+								</description>
+							</feature>
+						</alt>
+					</and>
+					<alt abstract="true" mandatory="true" name="Platform Type">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="muC">
+							<description>
+								
+							</description>
+						</feature>
+						<alt abstract="true" mandatory="true" name="PLC">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Vendor 1">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Vendor 2">
+								<description>
+									
+								</description>
+							</feature>
+						</alt>
+					</alt>
+					<and abstract="true" name="Additional Functionalities">
+						<description>
+							
+						</description>
+						<feature name="Selfhealing">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="Diagnosis">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+				</and>
+				<or abstract="true" mandatory="true" name="PPUM">
+					<description>
+						
+					</description>
+					<alt abstract="true" mandatory="true" name="LiftingLowering">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="ChangeoverArmM">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="CylinderM">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+				</or>
+				<and abstract="true" mandatory="true" name="PPUE">
+					<description>
+						
+					</description>
+					<and abstract="true" mandatory="true" name="Pneumatics">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="VacuumGripper">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="Cylinder">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<and abstract="true" mandatory="true" name="Electrics">
+						<description>
+							
+						</description>
+						<feature name="ChangeoverArm">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<and abstract="true" mandatory="true" name="Sensors">
+						<description>
+							
+						</description>
+						<alt abstract="true" mandatory="true" name="PositioningE">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Inductive">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Micro">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Potentiometer">
+								<description>
+									
+								</description>
+							</feature>
+						</alt>
+						<and abstract="true" name="Safety">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="EmergencyStopButton">
+								<description>
+									
+								</description>
+							</feature>
+						</and>
+					</and>
+				</and>
+				<and abstract="true" mandatory="true" name="PPUS">
+					<description>
+						
+					</description>
+					<alt abstract="true" mandatory="true" name="Lifting Lowering Control">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="CylinderControl">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="ChangeoverArmControl">
+							<description>
+								
+							</description>
+						</feature>
+					</alt>
+					<or abstract="true" mandatory="true" name="Position Control">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="DiscreteS">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="ContinuousS">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+					<and abstract="true" mandatory="true" name="Mode of operation">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Automatic">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="Manual">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="Setup">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+					<and abstract="true" name="Additional FunctionalitiesS">
+						<description>
+							
+						</description>
+						<feature name="SelfhealingS">
+							<description>
+								
+							</description>
+						</feature>
+						<feature name="DiagnosisS">
+							<description>
+								
+							</description>
+						</feature>
+					</and>
+				</and>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>Small</var>
+					<var>ChangeoverArmM</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Small</var>
+					<var>VacuumGripper</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Small</var>
+					<var>ChangeoverArm</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Small</var>
+					<var>ChangeoverArmControl</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Large</var>
+					<disj>
+						<var>ChangeoverArmM</var>
+						<var>CylinderM</var>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Large</var>
+					<var>VacuumGripper</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Discrete</var>
+					<disj>
+						<var>Micro</var>
+						<disj>
+							<var>Inductive</var>
+							<var>Potentiometer</var>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Discrete</var>
+					<var>DiscreteS</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Continuous</var>
+					<var>Potentiometer</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Continuous</var>
+					<var>ContinuousS</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Smooth</var>
+					<disj>
+						<var>Micro</var>
+						<disj>
+							<var>Inductive</var>
+							<var>Potentiometer</var>
+						</disj>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Rough</var>
+					<disj>
+						<var>Inductive</var>
+						<var>Potentiometer</var>
+					</disj>
+				</imp>
+			</rule>
+			<rule>
+				<eq>
+					<var>Cylinder</var>
+					<var>CylinderControl</var>
+				</eq>
+			</rule>
+			<rule>
+				<eq>
+					<var>CylinderControl</var>
+					<var>CylinderM</var>
+				</eq>
+			</rule>
+			<rule>
+				<eq>
+					<var>CylinderM</var>
+					<var>Cylinder</var>
+				</eq>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
