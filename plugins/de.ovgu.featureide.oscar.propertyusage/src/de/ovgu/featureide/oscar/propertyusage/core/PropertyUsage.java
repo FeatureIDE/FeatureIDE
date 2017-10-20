@@ -1,4 +1,4 @@
-package de.ovgu.featureide.oscar.propertyusage.handlers;
+package de.ovgu.featureide.oscar.propertyusage.core;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,15 +9,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -42,15 +41,17 @@ import oscar.OscarProperties;
 import oscar.Startup;
 
 /**
- * Our PropertyUsage handler extends AbstractHandler, an IHandler base class.
+ * Our PropertyUsageHandler handler extends AbstractHandler, an IHandler base class.
  * 
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
  */
-public class PropertyUsage extends AbstractHandler {
+public class PropertyUsage {
 
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
-	private static final Boolean DEBUG = false;
+	private static Boolean DEBUG = false;
+	
+	private static String outputmode;
 	
 	//Create the Console to log the results
 	private final Console console = new Console();
@@ -202,16 +203,11 @@ public class PropertyUsage extends AbstractHandler {
 		console.writeln("Number properties found: " + allPropMap.size());
 	}
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
 
-		findProject();
+	public void findProject(boolean debug, IPath prjP, String prP, String of) {
 
-		return null;
-	}
-
-	public void findProject() {
-
+		DEBUG=debug;
+		outputmode=of;
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		console.writeln("root " + root.getLocation().toOSString());

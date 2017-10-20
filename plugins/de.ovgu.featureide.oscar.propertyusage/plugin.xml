@@ -18,7 +18,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             commandId="de.ovgu.featureide.core.oscar.propertyusage.commands.findUsageCommand"
-            class="de.ovgu.featureide.oscar.propertyusage.handlers.PropertyUsage">
+            class="de.ovgu.featureide.oscar.propertyusage.handlers.PropertyUsageHandler">
       </handler>
    </extension>
    <extension
@@ -41,6 +41,17 @@
             </visibleWhen>
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="de.ovgu.featureide.ui.category"
+            class="de.ovgu.featureide.oscar.propertyusage.wizard.PropertyUsageWizard"
+            finalPerspective="de.ovgu.featureide.ui.FeatureIDEperspective"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.featureide.oscar.PropertyUsageWizard"
+            name="name">
+      </wizard>
    </extension>
    <!--
    <extension

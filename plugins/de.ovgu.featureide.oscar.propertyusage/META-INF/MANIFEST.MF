@@ -5,13 +5,14 @@ Bundle-SymbolicName: de.ovgu.featureide.oscar;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0",
- org.eclipse.ui;bundle-version="3.4.2",
+ org.eclipse.ui;visibility:=reexport,
  org.eclipse.jdt.core;bundle-version="3.4.4",
  org.eclipse.core.resources;bundle-version="3.4.2",
  org.eclipse.ui.console;bundle-version="3.6.201",
- de.ovgu.featureide.ui;bundle-version="3.3.2"
+ org.eclipse.ui.ide;bundle-version="3.12.3"
 Export-Package: de.ovgu.featureide.oscar.IO,
- de.ovgu.featureide.oscar.propertyusage.handlers;uses:="oscar,org.eclipse.jdt.core.dom,org.eclipse.core.commands",
+ de.ovgu.featureide.oscar.propertyusage.core;uses:="oscar,org.eclipse.jdt.core.dom",
+ de.ovgu.featureide.oscar.propertyusage.handlers;uses:="org.eclipse.core.commands,org.eclipse.jface.wizard",
+ de.ovgu.featureide.oscar.propertyusage.wizard;uses:="org.eclipse.swt.widgets,org.eclipse.jface.wizard",
  oscar,
  resources
-Bundle-ActivationPolicy: lazy
