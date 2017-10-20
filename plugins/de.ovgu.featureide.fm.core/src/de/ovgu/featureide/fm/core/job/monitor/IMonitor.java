@@ -32,6 +32,10 @@ public interface IMonitor {
 
 	public static class MethodCancelException extends RuntimeException {
 
+		public MethodCancelException() {
+			super("Method was canceled");
+		}
+
 		private static final long serialVersionUID = 1L;
 
 	}
