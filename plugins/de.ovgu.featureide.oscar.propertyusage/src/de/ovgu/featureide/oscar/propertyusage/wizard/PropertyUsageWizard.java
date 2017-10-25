@@ -10,6 +10,7 @@ public class PropertyUsageWizard extends Wizard {
 
 	public PropertyUsageWizard() {
 		setWindowTitle("New Wizard");
+		
 	}
 
 	@Override

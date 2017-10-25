@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -35,8 +37,10 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.ui.IResourceActionFilter;
 
 import de.ovgu.featureide.oscar.IO.Console;
+import de.ovgu.featureide.oscar.IO.ExportImport;
 import oscar.OscarProperties;
 import oscar.Startup;
 
@@ -176,7 +180,10 @@ public class PropertyUsage {
 		} else {
 			console.writeln("No new OscarProperties methods found");
 		}
-		console.writeln("Property, Num Usages, Num Boolean Usages, %Boolean, Known Property, Is Set");
+
+		ExportImport.export(op,allPropMap,outputmode);
+		
+/*		console.writeln("Property, Num Usages, Num Boolean Usages, %Boolean, Known Property, Is Set");
 		for (String s : allPropMap.keySet()) {
 			Boolean knownProperty = false;
 			Boolean isSet = false;
@@ -196,7 +203,7 @@ public class PropertyUsage {
 				console.writeln("," + knownProperty + ",");
 			}
 
-		}
+		}*/
 
 		console.writeln("Nodes found: " + astNodes.size());
 		console.writeln("Number properties expected: " + op.size());
@@ -204,25 +211,20 @@ public class PropertyUsage {
 	}
 
 
-	public void findProject(boolean debug, IPath prjP, String prP, String of) {
+	public void findProject(boolean debug, IProject project, IFile prP, String of) {
 
 		DEBUG=debug;
 		outputmode=of;
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		console.writeln("root " + root.getLocation().toOSString());
-		// Get all projects in the workspace
-		IProject[] projects = root.getProjects();
-		// Loop over all projects
-		for (IProject project : projects) {
-			try {
-				if (project.isOpen() && project.isNatureEnabled(JDT_NATURE)) {
-					console.writeln("Project [" + project.getName() + "] has Java nature");
-					analyseMethods(project);
-				}
-			} catch (CoreException e) {
-				e.printStackTrace();
+		try {
+			if (project.isOpen() && project.isNatureEnabled(JDT_NATURE)) {
+				console.writeln("Project [" + project.getName() + "] has Java nature");
+				analyseMethods(project);
 			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 	}
 
