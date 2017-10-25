@@ -8,7 +8,7 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 Here, is a list of high-level enhancements.
 
 Release 3.4.1 (October 2017)
-* Hotfix containing only stability improvements over v3.3.0
+* Hotfix containing only stability improvements over v3.4.0
 * Removed dependency from feature modeling to FeatureIDE
 * Numerous fixes with respect to new configuration format
 * Improvements for feature-model editor, configuration editor, explanations, and product generation
