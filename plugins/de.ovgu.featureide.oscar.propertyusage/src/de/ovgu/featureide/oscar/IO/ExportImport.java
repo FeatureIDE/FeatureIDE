@@ -24,24 +24,8 @@ public class ExportImport {
 
 	
 	
-	public static void export(OscarProperties op, Map<String, Integer[]> allPropMap, String format){
-	    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage activePage = window.getActivePage();
-
-		IEditorPart activeEditor = activePage.getActiveEditor();
-		IProject project= null;
-
-		if (activeEditor != null) {
-		   IEditorInput input = activeEditor.getEditorInput();
-
-		   project = (IProject) input.getAdapter(IProject.class);
-		   if (project == null) {
-		      IResource resource = input.getAdapter(IResource.class);
-		      if (resource != null) {
-		         project = resource.getProject();
-		      }
-		   }
-		}
+	public static void export(OscarProperties op, Map<String, Integer[]> allPropMap, String format, IProject project){
+	    
 		
 		
 		Timestamp tsmp = new Timestamp(System.currentTimeMillis());
@@ -119,8 +103,9 @@ public class ExportImport {
 		sb.append("<struct>\r");
 		sb.append("<and abstract=\"true\" mandatory=\"true\" name=\"Base\">\r");
 		for (String s : allPropMap.keySet()) {
-				
-			sb.append("<feature name=\"" + s + "\"/>\r");
+			if (allPropMap.get(s)[1] > 0) {	
+				sb.append("<feature name=\"" + s + "\"/>\r");
+			}
 			
 		}
 		

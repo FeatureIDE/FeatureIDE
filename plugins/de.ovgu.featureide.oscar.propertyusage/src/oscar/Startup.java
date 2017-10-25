@@ -35,6 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+
+import de.ovgu.featureide.oscar.IO.Console;
+
 
 /**
  * This ContextListener is used to Initialize classes at startup - Initialize the DBConnection Pool.
@@ -42,25 +47,34 @@ import java.util.Collections;
  * @author Jay Gallagher
  */
 public class Startup {
-	private oscar.OscarProperties p = oscar.OscarProperties.getInstance();
+	
+	private Console console = new Console();
+	private oscar.OscarProperties p;
+	private IFile properties;
+	private IProject project;
+	
+	
+
+	public Startup(IFile prop,IProject proj) {
+		super();
+		this.properties=prop;
+		this.project=proj;
+		this.p = new OscarProperties(this.properties);
+	}
 
 	public void contextInitialized() {
 		try {
 
 			String contextPath = "oscar";
-			String propFileName = "";
-
-			String propName = contextPath + ".properties";
-
-			propFileName = "../../src/resources/" + propName;
-			System.out.println("looking up " + propFileName);
+			String propFileName = properties.getLocation().toOSString()+File.separator+properties.getName();
+			console.writeln("looking up " + propFileName);
 			// oscar.OscarProperties p = oscar.OscarProperties.getInstance();
 			try {
 				// This has been used to look in the users home directory that started tomcat
 				p.readFromFile(propFileName);
-				System.out.println("loading properties from " + propFileName);
+				console.writeln("loading properties from " + propFileName);
 			} catch (java.io.FileNotFoundException ex) {
-				System.out.println(propFileName + " not found");
+				console.writeln(propFileName + " not found");
 				return;
 			}
 
@@ -74,7 +88,7 @@ public class Startup {
 					Collections.sort(listUsers);
 				} else listUsers = new ArrayList<String>();
 
-				System.out.println("Sets attribute CaseMgmtUsers to " + listUsers.toString());
+				console.writeln("Sets attribute CaseMgmtUsers to " + listUsers.toString());
 
 				// Temporary Testing of new ECHART
 				// To be removed
@@ -84,27 +98,27 @@ public class Startup {
 					String[] arrnewDocs = newDocs.split(",");
 					ArrayList<String> newDocArr = new ArrayList<String>(Arrays.asList(arrnewDocs));
 					Collections.sort(newDocArr);
-					System.out.println("Sets attribute newDocArr to " + newDocArr);
+					console.writeln("Sets attribute newDocArr to " + newDocArr);
 				}
 
 				String echartSwitch = p.getProperty("USE_NEW_ECHART");
 				if (echartSwitch != null && echartSwitch.equalsIgnoreCase("yes")) {
-					System.out.println("Set attribute useNewEchart to true");
+					console.writeln("Set attribute useNewEchart to true");
 				}
 
-				System.out.println("BILLING REGION : " + p.getProperty("billregion", "NOTSET"));
-				System.out.println("DB PROPS: Username :" + p.getProperty("db_username", "NOTSET") + " db name: " + p.getProperty("db_name", "NOTSET"));
+				console.writeln("BILLING REGION : " + p.getProperty("billregion", "NOTSET"));
+				console.writeln("DB PROPS: Username :" + p.getProperty("db_username", "NOTSET") + " db name: " + p.getProperty("db_name", "NOTSET"));
 				p.setProperty("OSCAR_START_TIME", "" + System.currentTimeMillis());
 
 			} catch (Exception e) {
 				String s="Property file not found at:"+propFileName;
-				System.out.println(s + e);
+				console.writeln(s + e);
 			}
 
 			// CHECK FOR DEFAULT PROPERTIES
 			String baseDocumentDir = p.getProperty("BASE_DOCUMENT_DIR");
 			if (baseDocumentDir != null) {
-				System.out.println("Found Base Document Dir: " + baseDocumentDir);
+				console.writeln("Found Base Document Dir: " + baseDocumentDir);
 				checkAndSetProperty(baseDocumentDir, contextPath, "HOME_DIR", "/billing/download/");
 				checkAndSetProperty(baseDocumentDir, contextPath, "DOCUMENT_DIR", "/document/");
 				checkAndSetProperty(baseDocumentDir, contextPath, "eform_image", "/eform/images/");
@@ -123,9 +137,9 @@ public class Startup {
 
 			}
 			
-			System.out.println("LAST LINE IN contextInitialized");
+			console.writeln("LAST LINE IN contextInitialized");
 		} catch (Exception e) {
-			System.out.println("Unexpected error." + e);
+			console.writeln("Unexpected error." + e);
 			throw (new RuntimeException(e));
 		}
 	}
@@ -138,13 +152,13 @@ public class Startup {
 		String propertyDir = p.getProperty(propName);
 		if (propertyDir == null) {
 			propertyDir = baseDir + "/" + context + endDir;
-			System.out.println("Setting property " + propName + " with value " + propertyDir);
+			console.writeln("Setting property " + propName + " with value " + propertyDir);
 			p.setProperty(propName, propertyDir);
 			// Create directory if it does not exist
 			if (!(new File(propertyDir)).exists()) {
-//				System.out.println("Warning! Directory does not exist:  " + propertyDir + ". Creating.");
+//				console.writeln("Warning! Directory does not exist:  " + propertyDir + ". Creating.");
 //				boolean success = (new File(propertyDir)).mkdirs();
-//				if (!success) System.out.println("An error occured when creating " + propertyDir);
+//				if (!success) console.writeln("An error occured when creating " + propertyDir);
 			}
 		}
 	}

@@ -6,8 +6,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -36,7 +39,7 @@ public class PropertyUsageWizardPage extends WizardPage {
 		super("PropertyUsageWizardPage");
 		setTitle("Property Usage Wizard");
 		setDescription("Property Usage Extraction for Oscar.");
-		//setPageComplete(false);
+		setPageComplete(false);
 	}
 
 	/**
@@ -54,6 +57,17 @@ public class PropertyUsageWizardPage extends WizardPage {
 		
 		Text src_oscar_path_t = new Text(container, SWT.BORDER);
 		src_oscar_path_t.setBounds(173, 45, 274, 19);
+		src_oscar_path_t.addModifyListener(new ModifyListener(){
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (isPageComplete()){
+					setPageComplete(true);
+				}
+				
+			}
+			
+		});
 			
 		
 		Button src_file_button = new Button(container, SWT.NONE);
@@ -77,9 +91,22 @@ public class PropertyUsageWizardPage extends WizardPage {
 		Text properties_path_t = new Text(container, SWT.BORDER);
 		properties_path_t.setBounds(123, 75, 324, 19);
 		
+		properties_path_t.addModifyListener(new ModifyListener(){
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (isPageComplete()){
+					setPageComplete(true);
+				}
+				
+			}
+			
+		});
+		
 		Button prop_file_button = new Button(container, SWT.NONE);
 		prop_file_button.setText("Browse...");
 		prop_file_button.setBounds(453, 70, 94, 28);
+		
 		prop_file_button.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
             	FilteredResourcesSelectionDialog dialog = new FilteredResourcesSelectionDialog(getShell(),false, src_oscar_path ,IResource.FILE);
@@ -101,6 +128,7 @@ public class PropertyUsageWizardPage extends WizardPage {
 		output_format.select(0);
 		
 		debug = new Button(container, SWT.CHECK);
+		debug.setSelection(true);
 		debug.setBounds(31, 161, 112, 18);
 		debug.setText("Debug mode");
 		container.setTabList(new Control[]{src_oscar_path_t, lblNewLabel, properties_path_t, lblPropertiesFile, output_format});
@@ -121,6 +149,15 @@ public class PropertyUsageWizardPage extends WizardPage {
 	public String getOutput_format() {
 		return output_format.getText();
 	}
+
+	@Override
+	public boolean isPageComplete() {
+		return (src_oscar_path != null && properties_path !=null);
+	}
+	
+	
+	
+	
 
 	
 }

@@ -11,14 +11,11 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -37,7 +34,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.ui.IResourceActionFilter;
 
 import de.ovgu.featureide.oscar.IO.Console;
 import de.ovgu.featureide.oscar.IO.ExportImport;
@@ -53,9 +49,12 @@ import oscar.Startup;
 public class PropertyUsage {
 
 	private static final String JDT_NATURE = "org.eclipse.jdt.core.javanature";
-	private static Boolean DEBUG = false;
+	private Boolean DEBUG = false;
 	
-	private static String outputmode;
+	private String outputmode;
+	private IProject project;
+	private IProject reportProject;
+	private IFile properties; 
 	
 	//Create the Console to log the results
 	private final Console console = new Console();
@@ -63,10 +62,10 @@ public class PropertyUsage {
 	// Load all key/value pairs from Oscar property file. Expects a copy of
 	// oscar_mcmaster.properties in src/resources/. Commented out
 	// properties in original are uncommented in this copy.
-	private OscarProperties op = loadOscarProperties();
+	private OscarProperties op ;
 
 	// Get expected OscarProperty method names
-	final private Set<String> oscarPropertyMethods = getOscarPropertiesMethods();
+	final private Set<String> oscarPropertyMethods;
 
 	// Used to store OscarProperty method names found by visiting AST
 	// nodes. Will compare with static method names in oscarPropertyMethods.
@@ -80,17 +79,32 @@ public class PropertyUsage {
 	final private Set<ASTNode> astOscarPropertyNodes = new HashSet<ASTNode>();
 
 	// Used to store {<key, [number of usages, number of boolean usages]>}.
-	final private Map<String, Integer[]> allPropMap = initializePropertyMap();
+	final private Map<String, Integer[]> allPropMap ;
 	
 	
 
 	private String varName = null;
 	private Boolean isOscarPropertiesVariable = null;
+	
+	
+	
+
+	public PropertyUsage(boolean db, IProject pj, IFile pr, String om, IProject reportProj) {
+		super();
+		this.project = pj;
+		this.properties=pr;
+		this.outputmode=om;
+		this.DEBUG=db;
+		this.reportProject=reportProj;
+		this.op=loadOscarProperties();
+		this.oscarPropertyMethods = getOscarPropertiesMethods();
+		this.allPropMap = initializePropertyMap();
+	}
 
 	public OscarProperties loadOscarProperties() {
-		Startup start = new Startup();
+		Startup start = new Startup(this.properties,this.project);
 		start.contextInitialized();
-		OscarProperties op = OscarProperties.getInstance();
+		OscarProperties op = new OscarProperties(this.properties);
 		return op;
 	}
 
@@ -181,29 +195,8 @@ public class PropertyUsage {
 			console.writeln("No new OscarProperties methods found");
 		}
 
-		ExportImport.export(op,allPropMap,outputmode);
+		ExportImport.export(op,allPropMap,outputmode,reportProject);
 		
-/*		console.writeln("Property, Num Usages, Num Boolean Usages, %Boolean, Known Property, Is Set");
-		for (String s : allPropMap.keySet()) {
-			Boolean knownProperty = false;
-			Boolean isSet = false;
-			if (op.hasProperty(s)) {
-				knownProperty = true;
-				isSet = op.isPropertyActive(s);
-			}
-			console.write("" + s + "," + allPropMap.get(s)[0] + "," + allPropMap.get(s)[1]);
-			if (allPropMap.get(s)[0] > 0) {
-				console.write("," + 100 * allPropMap.get(s)[1] / (allPropMap.get(s)[0]));
-			} else {
-				console.write(",");
-			}
-			if (knownProperty) {
-				console.writeln("," + knownProperty + "," + isSet);
-			} else {
-				console.writeln("," + knownProperty + ",");
-			}
-
-		}*/
 
 		console.writeln("Nodes found: " + astNodes.size());
 		console.writeln("Number properties expected: " + op.size());
@@ -211,10 +204,8 @@ public class PropertyUsage {
 	}
 
 
-	public void findProject(boolean debug, IProject project, IFile prP, String of) {
+	public void findProject() {
 
-		DEBUG=debug;
-		outputmode=of;
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		console.writeln("root " + root.getLocation().toOSString());
@@ -379,8 +370,7 @@ public class PropertyUsage {
 																	varName + "=oscar.OscarProperties.getInstance()")) {
 														isOscarPropertiesVariable = true;
 														if (isOscarPropertiesVariable && DEBUG) {
-															System.out
-																	.println("Declaration of OscarProperties variable: "
+															console.writeln("Declaration of OscarProperties variable: "
 																			+ fragment.toString());
 														}
 													}

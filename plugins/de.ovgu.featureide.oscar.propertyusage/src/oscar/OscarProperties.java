@@ -39,21 +39,20 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
+
+import de.ovgu.featureide.oscar.IO.Console;
+
 
 /**
  * This class will hold OSCAR & CAISI properties. It is a singleton class. Do not instantiate it, use the method getInstance(). Every time the properties file changes, tomcat must be restarted.
  */
 public class OscarProperties extends Properties {
 	private static final long serialVersionUID = -5965807410049845132L;
-	private static OscarProperties oscarProperties = new OscarProperties();
 	private static final Set<String> activeMarkers = new HashSet<String>(Arrays.asList(new String[] { "true", "yes", "on" }));
+	private Console console = new Console();
 
-	/**
-	 * @return OscarProperties the instance of OscarProperties
-	 */
-	public static OscarProperties getInstance() {
-		return oscarProperties;
-	}
 
 	public String getProperty(String key) {
 		return super.getProperty(key);
@@ -74,19 +73,19 @@ public class OscarProperties extends Properties {
 	 */
 
 	/* Do not use this constructor. Use getInstance instead */
-	private OscarProperties() {
-		System.out.println("OSCAR PROPS CONSTRUCTOR");
+	public OscarProperties(IFile prop) {
+		console.writeln("OSCAR PROPS CONSTRUCTOR");
 
 		try {
-			readFromFile("../../src/resources/oscar_mcmaster.properties");
+			readFromFile(prop.getLocation().toOSString());
 
 			String overrideProperties = System.getProperty("oscar_override_properties");
 			if (overrideProperties != null) {
-				System.out.println("Applying override properties : "+overrideProperties);
+				console.writeln("Applying override properties : "+overrideProperties);
 				readFromFile(overrideProperties);
 			}
 		} catch (IOException e) {
-			System.out.println("Error" + e);
+			console.writeln("Error" + e);
 		}
 	}
 
@@ -231,12 +230,12 @@ public class OscarProperties extends Properties {
 		return getProperty("db_driver");
 	}
 
-	public static String getBuildDate() {
-		return oscarProperties.getProperty("buildDateTime");
+	public  String getBuildDate() {
+		return getProperty("buildDateTime");
 	}
 
-	public static String getBuildTag() {
-		return oscarProperties.getProperty("buildtag");
+	public  String getBuildTag() {
+		return getProperty("buildtag");
 	}
 
 	public boolean isOscarLearning() {
@@ -345,34 +344,34 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
-	public static String getIntakeProgramAccessServiceId() {
-		return oscarProperties.getProperty("form_intake_program_access_service_id");
+	public String getIntakeProgramAccessServiceId() {
+		return getProperty("form_intake_program_access_service_id");
 	}
 	
-	public static String getIntakeProgramCashServiceId() {
-		return oscarProperties.getProperty("form_intake_program_cash_service_id");
+	public String getIntakeProgramCashServiceId() {
+		return getProperty("form_intake_program_cash_service_id");
 	}
 	
-	public static String getIntakeProgramAccessFId() {
-		return oscarProperties.getProperty("form_intake_program_access_fid");
+	public String getIntakeProgramAccessFId() {
+		return getProperty("form_intake_program_access_fid");
 	}
 	
-	public static String getConfidentialityStatement() {
+	public String getConfidentialityStatement() {
 		String result = null;
 		int count = 1;
 		String statement = null;
-		while ((statement = oscarProperties.getProperty("confidentiality_statement.v" + count)) != null) {
+		while ((statement = getProperty("confidentiality_statement.v" + count)) != null) {
 			count++;
 			result = statement;
 		}
 		return result;
 	}
 	
-	public static String getIntakeProgramCashFId() {
-		return oscarProperties.getProperty("form_intake_program_cash_fid");
+	public String getIntakeProgramCashFId() {
+		return getProperty("form_intake_program_cash_fid");
 	}
 	
-	public static boolean isLdapAuthenticationEnabled() {
-		return Boolean.parseBoolean(oscarProperties.getProperty("ldap.enabled"));
+	public boolean isLdapAuthenticationEnabled() {
+		return Boolean.parseBoolean(getProperty("ldap.enabled"));
 	}
 }
