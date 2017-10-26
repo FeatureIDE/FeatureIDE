@@ -218,6 +218,8 @@
 		<project name="Numbers-consecutive-FH-JML" path="featureide_examples/Numbers-consecutive-FH-JML/.project"/>
 		<project name="Numbers-explicit-FH-JML" path="featureide_examples/Numbers-explicit-FH-JML/.project"/>
 		<project name="Numbers-overriding-FH-JML" path="featureide_examples/Numbers-overriding-FH-JML/.project"/>
+		<project name="PROFilE-E-Agribusiness" path="featureide_examples/PROFilE-E-Agribusiness/.project"/>
+		<project name="PROFilE-ERP-System" path="featureide_examples/PROFilE-ERP-System/.project"/>
 		<project name="Paycard-FH-JML" path="featureide_examples/Paycard-FH-JML/.project"/>
 		<project name="PokerSPL-FH-JML" path="featureide_examples/PokerSPL-FH-JML/.project"/>
 		<project name="SnakeFOP" path="featureide_examples/SnakeFOP/.project"/>
