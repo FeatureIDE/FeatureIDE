@@ -1,0 +1,2478 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Agrib">
+				<or name="D1">
+					<and name="S1">
+						<and mandatory="true" name="C21">
+							<feature mandatory="true" name="a3192"/>
+						</and>
+					</and>
+					<or name="S3">
+						<or name="C10">
+							<feature name="a7313"/>
+							<feature name="a7314"/>
+						</or>
+						<or name="C111">
+							<feature name="a7130"/>
+							<feature name="a7453"/>
+							<feature name="a7437"/>
+						</or>
+					</or>
+					<or name="S42">
+						<and name="C22">
+							<feature mandatory="true" name="a4990"/>
+						</and>
+						<or name="C131">
+							<feature name="a6716"/>
+							<feature name="a2914"/>
+							<feature name="a3464"/>
+							<feature name="a6715"/>
+							<feature name="a3484"/>
+							<feature name="a6710"/>
+							<feature name="a1287"/>
+							<feature name="a6711"/>
+							<feature name="a6708"/>
+						</or>
+						<or name="C142">
+							<feature name="a388"/>
+							<feature name="a392"/>
+							<feature name="a389"/>
+						</or>
+					</or>
+					<and name="S10016">
+						<or mandatory="true" name="C231">
+							<feature name="a7241"/>
+							<feature name="a7452"/>
+						</or>
+					</and>
+					<and name="S10017">
+						<and mandatory="true" name="C233">
+							<feature mandatory="true" name="a6101"/>
+						</and>
+					</and>
+					<or name="S10018">
+						<and name="C235">
+							<feature mandatory="true" name="a1084"/>
+						</and>
+						<or name="C236">
+							<feature name="a1301"/>
+							<feature name="a1298"/>
+							<feature name="a1283"/>
+							<feature name="a4622"/>
+							<feature name="a1300"/>
+							<feature name="a1305"/>
+						</or>
+					</or>
+					<or name="S10020">
+						<or name="C238">
+							<feature name="a7326"/>
+							<feature name="a7438"/>
+							<feature name="a7355"/>
+							<feature name="a7137"/>
+							<feature name="a7441"/>
+							<feature name="a7312"/>
+							<feature name="a7436"/>
+						</or>
+						<and name="C239">
+							<feature mandatory="true" name="a7433"/>
+						</and>
+					</or>
+					<or name="S10021">
+						<and name="C23">
+							<feature mandatory="true" name="a249"/>
+						</and>
+						<and name="C241">
+							<feature mandatory="true" name="a6977"/>
+						</and>
+					</or>
+					<or name="S10022">
+						<and name="C24">
+							<feature mandatory="true" name="a837"/>
+						</and>
+						<or name="C242">
+							<feature name="a2022"/>
+							<feature name="a1170"/>
+							<feature name="a1186"/>
+							<feature name="a7187"/>
+							<feature name="a2021"/>
+							<feature name="a1102"/>
+						</or>
+					</or>
+					<and name="S10034">
+						<or mandatory="true" name="C112">
+							<feature name="a3994"/>
+							<feature name="a4301"/>
+							<feature name="a4299"/>
+							<feature name="a4287"/>
+							<feature name="a4298"/>
+							<feature name="a4313"/>
+							<feature name="a4308"/>
+							<feature name="a4295"/>
+							<feature name="a7443"/>
+							<feature name="a4314"/>
+							<feature name="a4307"/>
+							<feature name="a7456"/>
+							<feature name="a7016"/>
+							<feature name="a4306"/>
+							<feature name="a7457"/>
+							<feature name="a4303"/>
+							<feature name="a4294"/>
+							<feature name="a2916"/>
+							<feature name="a6980"/>
+							<feature name="a4289"/>
+							<feature name="a4319"/>
+							<feature name="a4302"/>
+							<feature name="a4311"/>
+						</or>
+					</and>
+				</or>
+				<or name="D2">
+					<or name="S5">
+						<or name="C15">
+							<feature name="a1956"/>
+							<feature name="a1860"/>
+							<feature name="a1963"/>
+							<feature name="a6135"/>
+							<feature name="a2693"/>
+							<feature name="a3372"/>
+							<feature name="a1859"/>
+							<feature name="a2753"/>
+							<feature name="a6153"/>
+							<feature name="a1858"/>
+							<feature name="a3376"/>
+							<feature name="a2747"/>
+							<feature name="a1957"/>
+							<feature name="a2697"/>
+							<feature name="a6139"/>
+							<feature name="a1961"/>
+							<feature name="a1861"/>
+							<feature name="a1864"/>
+						</or>
+						<and name="C17">
+							<feature name="a3417"/>
+							<feature mandatory="true" name="a2591"/>
+						</and>
+						<and name="C18">
+							<feature mandatory="true" name="a1917"/>
+						</and>
+					</or>
+					<and name="S7">
+						<and mandatory="true" name="C281">
+							<feature mandatory="true" name="a4167"/>
+						</and>
+					</and>
+					<and name="S8">
+						<and mandatory="true" name="C33">
+							<feature mandatory="true" name="a2366"/>
+						</and>
+					</and>
+					<or name="S10035">
+						<or name="C12">
+							<feature name="a4169"/>
+							<feature name="a4164"/>
+							<feature name="a4165"/>
+							<feature name="a4162"/>
+							<feature name="a4170"/>
+							<feature name="a4171"/>
+							<feature name="a4163"/>
+							<feature name="a300"/>
+							<feature name="a297"/>
+						</or>
+						<or name="C267">
+							<feature name="a534"/>
+							<feature name="a533"/>
+						</or>
+						<and name="C2681">
+							<feature mandatory="true" name="a3789"/>
+						</and>
+					</or>
+				</or>
+				<and name="D3">
+					<and mandatory="true" name="S41">
+						<and mandatory="true" name="C282">
+							<feature mandatory="true" name="a2072"/>
+						</and>
+					</and>
+				</and>
+				<or name="D4">
+					<and name="S2">
+						<and mandatory="true" name="C7">
+							<feature mandatory="true" name="a7603"/>
+						</and>
+					</and>
+					<and name="S17">
+						<or mandatory="true" name="C68">
+							<feature name="a2551"/>
+							<feature name="a3727"/>
+							<feature name="a2219"/>
+						</or>
+					</and>
+					<and name="S18">
+						<or mandatory="true" name="C72">
+							<feature name="a3078"/>
+							<feature name="a1678"/>
+							<feature name="a1748"/>
+							<feature name="a1755"/>
+							<feature name="a1716"/>
+							<feature name="a1672"/>
+							<feature name="a3075"/>
+							<feature name="a1676"/>
+							<feature name="a3440"/>
+							<feature name="a1807"/>
+							<feature name="a1669"/>
+							<feature name="a3096"/>
+							<feature name="a1747"/>
+							<feature name="a1681"/>
+							<feature name="a1745"/>
+							<feature name="a3092"/>
+							<feature name="a1673"/>
+							<feature name="a1670"/>
+							<feature name="a1684"/>
+						</or>
+					</and>
+					<and name="S20">
+						<or mandatory="true" name="C75">
+							<feature name="a6727"/>
+							<feature name="a6726"/>
+						</or>
+					</and>
+					<and name="S10036">
+						<or mandatory="true" name="C1">
+							<feature name="a7606"/>
+							<feature name="a7706"/>
+							<feature name="a7214"/>
+						</or>
+					</and>
+					<and name="S10037">
+						<or mandatory="true" name="C25">
+							<feature name="a1130"/>
+							<feature name="a1134"/>
+							<feature name="a5902"/>
+							<feature name="a1123"/>
+							<feature name="a1063"/>
+							<feature name="a1062"/>
+						</or>
+					</and>
+					<and name="S10038">
+						<and mandatory="true" name="C3">
+							<feature mandatory="true" name="a2987"/>
+						</and>
+					</and>
+				</or>
+				<or name="D5">
+					<and name="S24">
+						<and mandatory="true" name="C80">
+							<feature mandatory="true" name="a2903"/>
+						</and>
+					</and>
+					<and name="S29">
+						<and mandatory="true" name="C90">
+							<feature mandatory="true" name="a342"/>
+						</and>
+					</and>
+					<and name="S30">
+						<or mandatory="true" name="C92">
+							<feature name="a4014"/>
+							<feature name="a4015"/>
+						</or>
+					</and>
+					<and name="S561">
+						<and mandatory="true" name="C91">
+							<feature mandatory="true" name="a1125"/>
+						</and>
+					</and>
+				</or>
+				<or name="D6">
+					<or name="S38">
+						<or name="C1021">
+							<feature name="a4774"/>
+							<feature name="a4752"/>
+						</or>
+						<or name="C1031">
+							<feature name="a4547"/>
+							<feature name="a4542"/>
+							<feature name="a4541"/>
+						</or>
+						<or name="C1061">
+							<feature name="a3133"/>
+							<feature name="a2159"/>
+							<feature name="a2165"/>
+							<feature name="a3137"/>
+						</or>
+						<and name="C109">
+							<feature mandatory="true" name="a2187"/>
+						</and>
+					</or>
+					<or name="S402">
+						<or name="C43">
+							<feature name="a1377"/>
+							<feature name="a7754"/>
+							<feature name="a65"/>
+							<feature name="a552"/>
+							<feature name="a1373"/>
+							<feature name="a7752"/>
+							<feature name="a67"/>
+							<feature name="a7274"/>
+							<feature name="a3411"/>
+							<feature name="a7247"/>
+							<feature name="a6970"/>
+							<feature name="a7725"/>
+							<feature name="a69"/>
+							<feature name="a71"/>
+							<feature name="a664"/>
+							<feature name="a1378"/>
+							<feature name="a5115"/>
+							<feature name="a1376"/>
+							<feature name="a7246"/>
+							<feature name="a7724"/>
+							<feature name="a666"/>
+							<feature name="a640"/>
+						</or>
+						<or name="C1152">
+							<feature name="a603"/>
+							<feature name="a7272"/>
+							<feature name="a863"/>
+							<feature name="a6857"/>
+							<feature name="a268"/>
+							<feature name="a1919"/>
+							<feature name="a362"/>
+						</or>
+						<and name="C116">
+							<feature mandatory="true" name="a5899"/>
+						</and>
+						<or name="C117">
+							<feature name="a2050"/>
+							<feature name="a4352"/>
+							<feature name="a4351"/>
+							<feature name="a5901"/>
+							<feature name="a5974"/>
+							<feature name="a4391"/>
+							<feature name="a4348"/>
+							<feature name="a7616"/>
+							<feature name="a5900"/>
+							<feature name="a7770"/>
+							<feature name="a616"/>
+							<feature name="a4350"/>
+							<feature name="a421"/>
+							<feature name="a4349"/>
+							<feature name="a272"/>
+							<feature name="a5898"/>
+							<feature name="a613"/>
+							<feature name="a420"/>
+						</or>
+						<or name="C1181">
+							<feature name="a1494"/>
+							<feature name="a3194"/>
+							<feature name="a3197"/>
+							<feature name="a3275"/>
+							<feature name="a5406"/>
+							<feature name="a4353"/>
+							<feature name="a3905"/>
+							<feature name="a7064"/>
+							<feature name="a7767"/>
+							<feature name="a7768"/>
+							<feature name="a1844"/>
+							<feature name="a1890"/>
+							<feature name="a1624"/>
+							<feature name="a2459"/>
+							<feature name="a2949"/>
+							<feature name="a1580"/>
+							<feature name="a4355"/>
+							<feature name="a5975"/>
+							<feature name="a7771"/>
+							<feature name="a7761"/>
+							<feature name="a7763"/>
+							<feature name="a1830"/>
+							<feature name="a1833"/>
+							<feature name="a1990"/>
+							<feature name="a1891"/>
+							<feature name="a2805"/>
+							<feature name="a2672"/>
+							<feature name="a1814"/>
+							<feature name="a3195"/>
+							<feature name="a3145"/>
+							<feature name="a4354"/>
+							<feature name="a4568"/>
+							<feature name="a7024"/>
+							<feature name="a2002"/>
+							<feature name="a2320"/>
+							<feature name="a2757"/>
+							<feature name="a2785"/>
+							<feature name="a2820"/>
+							<feature name="a5558"/>
+							<feature name="a6415"/>
+							<feature name="a7762"/>
+							<feature name="a7764"/>
+							<feature name="a7758"/>
+							<feature name="a1829"/>
+							<feature name="a1879"/>
+							<feature name="a2077"/>
+							<feature name="a3012"/>
+							<feature name="a4467"/>
+							<feature name="a4958"/>
+							<feature name="a7757"/>
+							<feature name="a1828"/>
+							<feature name="a1888"/>
+							<feature name="a3177"/>
+							<feature name="a4619"/>
+							<feature name="a245"/>
+							<feature name="a251"/>
+							<feature name="a3204"/>
+							<feature name="a4567"/>
+							<feature name="a7026"/>
+							<feature name="a7756"/>
+							<feature name="a2135"/>
+							<feature name="a1991"/>
+							<feature name="a1900"/>
+							<feature name="a2762"/>
+							<feature name="a1816"/>
+							<feature name="a5353"/>
+							<feature name="a7066"/>
+							<feature name="a2317"/>
+							<feature name="a2991"/>
+							<feature name="a3024"/>
+							<feature name="a7065"/>
+							<feature name="a5952"/>
+							<feature name="a6152"/>
+							<feature name="a2237"/>
+							<feature name="a2243"/>
+							<feature name="a1944"/>
+							<feature name="a1968"/>
+							<feature name="a1841"/>
+							<feature name="a2461"/>
+							<feature name="a5483"/>
+							<feature name="a3854"/>
+							<feature name="a4555"/>
+							<feature name="a4569"/>
+							<feature name="a6998"/>
+							<feature name="a7028"/>
+							<feature name="a6416"/>
+							<feature name="a7760"/>
+							<feature name="a7765"/>
+						</or>
+						<or name="C120">
+							<feature name="a7067"/>
+							<feature name="a2358"/>
+							<feature name="a6417"/>
+							<feature name="a4627"/>
+							<feature name="a225"/>
+							<feature name="a545"/>
+						</or>
+						<or name="C250">
+							<feature name="a601"/>
+							<feature name="a1344"/>
+							<feature name="a602"/>
+							<feature name="a1343"/>
+						</or>
+						<and name="C251">
+							<feature mandatory="true" name="a1433"/>
+						</and>
+						<or name="C2522">
+							<feature name="a1385"/>
+							<feature name="a1383"/>
+						</or>
+						<or name="C2592">
+							<feature name="a234"/>
+							<feature name="a327"/>
+						</or>
+						<and name="C2601">
+							<feature mandatory="true" name="a1493"/>
+						</and>
+						<or name="C2611">
+							<feature name="a667"/>
+							<feature name="a549"/>
+							<feature name="a1199"/>
+							<feature name="a326"/>
+							<feature name="a261"/>
+							<feature name="a1342"/>
+							<feature name="a551"/>
+							<feature name="a1386"/>
+							<feature name="a885"/>
+							<feature name="a962"/>
+							<feature name="a242"/>
+							<feature name="a1387"/>
+							<feature name="a1232"/>
+							<feature name="a1083"/>
+							<feature name="a835"/>
+							<feature name="a1230"/>
+						</or>
+						<and name="C10022">
+							<feature mandatory="true" name="a852"/>
+						</and>
+					</or>
+					<and name="S441">
+						<and mandatory="true" name="C225">
+							<feature mandatory="true" name="a3573"/>
+						</and>
+					</and>
+					<or name="S562">
+						<and name="C1032">
+							<feature mandatory="true" name="a6931"/>
+						</and>
+						<and name="C1212">
+							<feature mandatory="true" name="a6910"/>
+						</and>
+						<and name="C2591">
+							<feature mandatory="true" name="a1141"/>
+						</and>
+						<and name="C2612">
+							<feature mandatory="true" name="a4691"/>
+						</and>
+						<or name="C263">
+							<feature name="a6947"/>
+							<feature name="a6897"/>
+							<feature name="a6949"/>
+							<feature name="a6896"/>
+							<feature name="a6941"/>
+							<feature name="a6829"/>
+							<feature name="a6950"/>
+							<feature name="a6913"/>
+							<feature name="a6935"/>
+							<feature name="a6946"/>
+						</or>
+						<and name="C264">
+							<feature mandatory="true" name="a6831"/>
+						</and>
+						<or name="C265">
+							<feature name="a6880"/>
+							<feature name="a6834"/>
+							<feature name="a6851"/>
+							<feature name="a6854"/>
+							<feature name="a6856"/>
+							<feature name="a6870"/>
+							<feature name="a6944"/>
+							<feature name="a6876"/>
+							<feature name="a6830"/>
+							<feature name="a6841"/>
+							<feature name="a6936"/>
+							<feature name="a6938"/>
+							<feature name="a6865"/>
+							<feature name="a6940"/>
+							<feature name="a6878"/>
+							<feature name="a6850"/>
+							<feature name="a6942"/>
+							<feature name="a6853"/>
+							<feature name="a6860"/>
+							<feature name="a6937"/>
+							<feature name="a6871"/>
+							<feature name="a6874"/>
+							<feature name="a6877"/>
+							<feature name="a6835"/>
+							<feature name="a6837"/>
+							<feature name="a6838"/>
+							<feature name="a6843"/>
+							<feature name="a6848"/>
+							<feature name="a6873"/>
+							<feature name="a6930"/>
+							<feature name="a6861"/>
+							<feature name="a6939"/>
+							<feature name="a6875"/>
+							<feature name="a6879"/>
+							<feature name="a6902"/>
+							<feature name="a6836"/>
+							<feature name="a6839"/>
+							<feature name="a6842"/>
+							<feature name="a6929"/>
+							<feature name="a6934"/>
+							<feature name="a6858"/>
+							<feature name="a6943"/>
+							<feature name="a6863"/>
+							<feature name="a6872"/>
+						</or>
+						<or name="C266">
+							<feature name="a6925"/>
+							<feature name="a6928"/>
+							<feature name="a6926"/>
+							<feature name="a6927"/>
+						</or>
+						<or name="C2682">
+							<feature name="a2161"/>
+							<feature name="a3113"/>
+							<feature name="a2445"/>
+							<feature name="a2449"/>
+							<feature name="a6885"/>
+							<feature name="a2389"/>
+							<feature name="a6881"/>
+							<feature name="a6894"/>
+							<feature name="a6883"/>
+							<feature name="a3115"/>
+							<feature name="a6889"/>
+							<feature name="a6891"/>
+							<feature name="a2123"/>
+						</or>
+						<or name="C270">
+							<feature name="a6899"/>
+							<feature name="a6882"/>
+							<feature name="a2443"/>
+							<feature name="a6890"/>
+							<feature name="a6892"/>
+							<feature name="a6884"/>
+							<feature name="a2121"/>
+							<feature name="a6893"/>
+							<feature name="a2120"/>
+						</or>
+						<or name="C273">
+							<feature name="a6917"/>
+							<feature name="a6916"/>
+							<feature name="a6922"/>
+							<feature name="a6923"/>
+							<feature name="a6918"/>
+							<feature name="a6908"/>
+							<feature name="a6952"/>
+							<feature name="a6912"/>
+							<feature name="a6909"/>
+							<feature name="a6914"/>
+							<feature name="a6907"/>
+							<feature name="a6915"/>
+						</or>
+					</or>
+					<or name="S62">
+						<or name="C34">
+							<feature name="a6901"/>
+							<feature name="a6905"/>
+							<feature name="a1457"/>
+							<feature name="a4870"/>
+							<feature name="a703"/>
+							<feature name="a708"/>
+							<feature name="a730"/>
+							<feature name="a3399"/>
+							<feature name="a3401"/>
+							<feature name="a6933"/>
+							<feature name="a2080"/>
+							<feature name="a687"/>
+							<feature name="a4768"/>
+							<feature name="a4676"/>
+							<feature name="a6855"/>
+							<feature name="a6945"/>
+							<feature name="a6887"/>
+							<feature name="a6826"/>
+							<feature name="a6904"/>
+							<feature name="a6844"/>
+							<feature name="a6924"/>
+							<feature name="a2081"/>
+							<feature name="a3406"/>
+							<feature name="a6951"/>
+							<feature name="a3400"/>
+							<feature name="a3405"/>
+							<feature name="a3409"/>
+							<feature name="a3138"/>
+							<feature name="a6862"/>
+							<feature name="a6846"/>
+							<feature name="a3180"/>
+							<feature name="a696"/>
+							<feature name="a728"/>
+							<feature name="a729"/>
+							<feature name="a676"/>
+							<feature name="a3127"/>
+							<feature name="a6888"/>
+							<feature name="a6827"/>
+							<feature name="a6847"/>
+							<feature name="a2763"/>
+							<feature name="a4744"/>
+							<feature name="a4749"/>
+							<feature name="a4751"/>
+							<feature name="a4764"/>
+							<feature name="a679"/>
+							<feature name="a3404"/>
+							<feature name="a3407"/>
+							<feature name="a6832"/>
+							<feature name="a6911"/>
+							<feature name="a6840"/>
+							<feature name="a2079"/>
+							<feature name="a3402"/>
+							<feature name="a680"/>
+							<feature name="a673"/>
+							<feature name="a3403"/>
+							<feature name="a3408"/>
+							<feature name="a6948"/>
+							<feature name="a6833"/>
+							<feature name="a684"/>
+							<feature name="a693"/>
+							<feature name="a700"/>
+							<feature name="a648"/>
+							<feature name="a6886"/>
+						</or>
+						<and name="C1211">
+							<feature mandatory="true" name="a2341"/>
+						</and>
+					</or>
+					<and name="S100092">
+						<and mandatory="true" name="C1151">
+							<feature mandatory="true" name="a6651"/>
+						</and>
+					</and>
+					<and name="S10010">
+						<and mandatory="true" name="C246">
+							<feature mandatory="true" name="a2239"/>
+						</and>
+					</and>
+					<or name="S10012">
+						<or name="C1182">
+							<feature name="a1986"/>
+							<feature name="a1955"/>
+							<feature name="a1620"/>
+						</or>
+						<and name="C2523">
+							<feature mandatory="true" name="a7172"/>
+						</and>
+						<and name="C253">
+							<feature mandatory="true" name="a7563"/>
+						</and>
+						<and name="C254">
+							<feature mandatory="true" name="a5255"/>
+						</and>
+						<or name="C2572">
+							<feature name="a7173"/>
+							<feature name="a7174"/>
+						</or>
+						<or name="C2613">
+							<feature name="a3847"/>
+							<feature name="a4668"/>
+							<feature name="a1834"/>
+							<feature name="a3844"/>
+							<feature name="a1827"/>
+							<feature name="a4160"/>
+							<feature name="a3845"/>
+							<feature name="a4409"/>
+							<feature name="a4530"/>
+							<feature name="a1825"/>
+							<feature name="a7777"/>
+							<feature name="a3685"/>
+							<feature name="a559"/>
+							<feature name="a668"/>
+							<feature name="a3846"/>
+							<feature name="a3843"/>
+							<feature name="a1164"/>
+							<feature name="a4408"/>
+							<feature name="a6685"/>
+							<feature name="a1612"/>
+							<feature name="a4362"/>
+						</or>
+						<or name="C262">
+							<feature name="a2933"/>
+							<feature name="a6550"/>
+							<feature name="a4810"/>
+							<feature name="a6551"/>
+						</or>
+					</or>
+					<or name="S10014">
+						<or name="C1022">
+							<feature name="a2110"/>
+							<feature name="a2105"/>
+							<feature name="a2111"/>
+							<feature name="a2104"/>
+							<feature name="a2108"/>
+							<feature name="a2109"/>
+						</or>
+						<or name="C1062">
+							<feature name="a3123"/>
+							<feature name="a3120"/>
+							<feature name="a3118"/>
+							<feature name="a3116"/>
+							<feature name="a3117"/>
+							<feature name="a3121"/>
+						</or>
+					</or>
+					<and name="S10015">
+						<and mandatory="true" name="C275">
+							<feature mandatory="true" name="a7581"/>
+						</and>
+					</and>
+					<and name="S10027">
+						<or mandatory="true" name="C10032">
+							<feature name="a2953"/>
+							<feature name="a7766"/>
+							<feature name="a2951"/>
+							<feature name="a1550"/>
+							<feature name="a1765"/>
+							<feature name="a1766"/>
+							<feature name="a7293"/>
+							<feature name="a7297"/>
+							<feature name="a4366"/>
+							<feature name="a4367"/>
+							<feature name="a2950"/>
+							<feature name="a2954"/>
+							<feature name="a2241"/>
+							<feature name="a2955"/>
+							<feature name="a7294"/>
+							<feature name="a2240"/>
+							<feature name="a3627"/>
+							<feature name="a3625"/>
+							<feature name="a3628"/>
+							<feature name="a3629"/>
+							<feature name="a2952"/>
+							<feature name="a6318"/>
+							<feature name="a7295"/>
+							<feature name="a7296"/>
+							<feature name="a3626"/>
+							<feature name="a3069"/>
+							<feature name="a2948"/>
+						</or>
+					</and>
+					<and name="S10030">
+						<or mandatory="true" name="C8">
+							<feature name="a7264"/>
+							<feature name="a1545"/>
+						</or>
+					</and>
+					<and name="S10033">
+						<and mandatory="true" name="C141">
+							<feature mandatory="true" name="a351"/>
+						</and>
+					</and>
+				</or>
+				<or name="D7">
+					<or name="S43">
+						<and name="C124">
+							<feature mandatory="true" name="a1347"/>
+						</and>
+						<or name="C125">
+							<feature name="a5982"/>
+							<feature name="a7529"/>
+							<feature name="a7605"/>
+							<feature name="a7495"/>
+							<feature name="a7535"/>
+							<feature name="a7728"/>
+							<feature name="a4742"/>
+							<feature name="a7746"/>
+							<feature name="a1483"/>
+							<feature name="a5484"/>
+							<feature name="a4692"/>
+							<feature name="a6753"/>
+							<feature name="a3280"/>
+							<feature name="a3286"/>
+							<feature name="a3287"/>
+							<feature name="a4157"/>
+							<feature name="a7533"/>
+							<feature name="a7537"/>
+							<feature name="a3284"/>
+							<feature name="a3292"/>
+							<feature name="a3294"/>
+							<feature name="a7252"/>
+							<feature name="a6267"/>
+							<feature name="a6468"/>
+							<feature name="a7536"/>
+							<feature name="a35"/>
+							<feature name="a3282"/>
+							<feature name="a3285"/>
+							<feature name="a4653"/>
+							<feature name="a6122"/>
+							<feature name="a7607"/>
+							<feature name="a1177"/>
+							<feature name="a3490"/>
+							<feature name="a4734"/>
+							<feature name="a5485"/>
+							<feature name="a1181"/>
+							<feature name="a1195"/>
+							<feature name="a3279"/>
+							<feature name="a7534"/>
+							<feature name="a7751"/>
+							<feature name="a7608"/>
+							<feature name="a7455"/>
+							<feature name="a1179"/>
+							<feature name="a3278"/>
+							<feature name="a3281"/>
+							<feature name="a3806"/>
+							<feature name="a5953"/>
+							<feature name="a3501"/>
+							<feature name="a4156"/>
+							<feature name="a6270"/>
+							<feature name="a7371"/>
+							<feature name="a6754"/>
+							<feature name="a6465"/>
+							<feature name="a7530"/>
+							<feature name="a7531"/>
+							<feature name="a7730"/>
+							<feature name="a3176"/>
+							<feature name="a4743"/>
+							<feature name="a5492"/>
+							<feature name="a4158"/>
+						</or>
+						<or name="C126">
+							<feature name="a6340"/>
+							<feature name="a7610"/>
+						</or>
+					</or>
+					<or name="S442">
+						<or name="C127">
+							<feature name="a365"/>
+							<feature name="a4438"/>
+							<feature name="a7230"/>
+							<feature name="a4575"/>
+						</or>
+						<or name="C128">
+							<feature name="a780"/>
+							<feature name="a7736"/>
+							<feature name="a5601"/>
+						</or>
+						<or name="C129">
+							<feature name="a7224"/>
+							<feature name="a1053"/>
+							<feature name="a4078"/>
+							<feature name="a7223"/>
+							<feature name="a4595"/>
+							<feature name="a4757"/>
+							<feature name="a4080"/>
+						</or>
+						<or name="C1321">
+							<feature name="a97"/>
+							<feature name="a1196"/>
+							<feature name="a3290"/>
+							<feature name="a3296"/>
+							<feature name="a6332"/>
+							<feature name="a2758"/>
+							<feature name="a7612"/>
+							<feature name="a5781"/>
+							<feature name="a7218"/>
+							<feature name="a6268"/>
+							<feature name="a5603"/>
+							<feature name="a861"/>
+							<feature name="a5602"/>
+							<feature name="a3288"/>
+							<feature name="a1197"/>
+							<feature name="a223"/>
+							<feature name="a7244"/>
+							<feature name="a7613"/>
+							<feature name="a3289"/>
+						</or>
+						<or name="C134">
+							<feature name="a5108"/>
+							<feature name="a2518"/>
+							<feature name="a7484"/>
+							<feature name="a7483"/>
+							<feature name="a7753"/>
+							<feature name="a4448"/>
+							<feature name="a2867"/>
+						</or>
+						<or name="C135">
+							<feature name="a2825"/>
+							<feature name="a6470"/>
+							<feature name="a7755"/>
+							<feature name="a3026"/>
+							<feature name="a6469"/>
+							<feature name="a1622"/>
+						</or>
+					</or>
+				</or>
+				<or name="D9">
+					<or name="S48">
+						<and name="C150">
+							<feature mandatory="true" name="a279"/>
+						</and>
+						<or name="C151">
+							<feature name="a6185"/>
+							<feature name="a2127"/>
+						</or>
+						<and name="C152">
+							<feature mandatory="true" name="a3821"/>
+						</and>
+						<and name="C155">
+							<feature mandatory="true" name="a1402"/>
+						</and>
+					</or>
+					<or name="S49">
+						<and name="C156">
+							<feature mandatory="true" name="a3977"/>
+						</and>
+						<and name="C157">
+							<feature mandatory="true" name="a3320"/>
+						</and>
+					</or>
+				</or>
+				<or name="D10">
+					<and name="S51">
+						<and mandatory="true" name="C671">
+							<feature mandatory="true" name="a5024"/>
+						</and>
+					</and>
+					<or name="S63">
+						<or name="C672">
+							<feature name="a4172"/>
+							<feature name="a3870"/>
+							<feature name="a7255"/>
+							<feature name="a6262"/>
+							<feature name="a6283"/>
+							<feature name="a7524"/>
+							<feature name="a7518"/>
+							<feature name="a532"/>
+							<feature name="a517"/>
+							<feature name="a527"/>
+							<feature name="a423"/>
+							<feature name="a2687"/>
+							<feature name="a4746"/>
+							<feature name="a4479"/>
+							<feature name="a160"/>
+							<feature name="a185"/>
+							<feature name="a1896"/>
+							<feature name="a1606"/>
+							<feature name="a3502"/>
+							<feature name="a3504"/>
+							<feature name="a4712"/>
+							<feature name="a4581"/>
+							<feature name="a4003"/>
+							<feature name="a7177"/>
+							<feature name="a7250"/>
+							<feature name="a6261"/>
+							<feature name="a7521"/>
+							<feature name="a2062"/>
+							<feature name="a2751"/>
+							<feature name="a560"/>
+							<feature name="a522"/>
+							<feature name="a692"/>
+							<feature name="a920"/>
+							<feature name="a4466"/>
+							<feature name="a4634"/>
+							<feature name="a146"/>
+							<feature name="a150"/>
+							<feature name="a179"/>
+							<feature name="a195"/>
+							<feature name="a1116"/>
+							<feature name="a1820"/>
+							<feature name="a1191"/>
+							<feature name="a1698"/>
+							<feature name="a3396"/>
+							<feature name="a4664"/>
+							<feature name="a7263"/>
+							<feature name="a6263"/>
+							<feature name="a7591"/>
+							<feature name="a1311"/>
+							<feature name="a126"/>
+							<feature name="a128"/>
+							<feature name="a528"/>
+							<feature name="a1504"/>
+							<feature name="a6124"/>
+							<feature name="a7498"/>
+							<feature name="a175"/>
+							<feature name="a183"/>
+							<feature name="a190"/>
+							<feature name="a193"/>
+							<feature name="a197"/>
+							<feature name="a204"/>
+							<feature name="a1118"/>
+							<feature name="a1822"/>
+							<feature name="a1695"/>
+							<feature name="a1696"/>
+							<feature name="a1697"/>
+							<feature name="a1412"/>
+							<feature name="a5913"/>
+							<feature name="a2063"/>
+							<feature name="a2064"/>
+							<feature name="a1806"/>
+							<feature name="a116"/>
+							<feature name="a117"/>
+							<feature name="a519"/>
+							<feature name="a683"/>
+							<feature name="a694"/>
+							<feature name="a746"/>
+							<feature name="a7511"/>
+							<feature name="a153"/>
+							<feature name="a155"/>
+							<feature name="a157"/>
+							<feature name="a161"/>
+							<feature name="a167"/>
+							<feature name="a202"/>
+							<feature name="a2036"/>
+							<feature name="a2356"/>
+							<feature name="a1189"/>
+							<feature name="a1767"/>
+							<feature name="a4723"/>
+							<feature name="a4724"/>
+							<feature name="a4000"/>
+							<feature name="a3869"/>
+							<feature name="a4210"/>
+							<feature name="a7254"/>
+							<feature name="a6086"/>
+							<feature name="a2930"/>
+							<feature name="a118"/>
+							<feature name="a119"/>
+							<feature name="a561"/>
+							<feature name="a529"/>
+							<feature name="a678"/>
+							<feature name="a4748"/>
+							<feature name="a4812"/>
+							<feature name="a7509"/>
+							<feature name="a7501"/>
+							<feature name="a132"/>
+							<feature name="a152"/>
+							<feature name="a187"/>
+							<feature name="a207"/>
+							<feature name="a209"/>
+							<feature name="a2035"/>
+							<feature name="a3503"/>
+							<feature name="a3356"/>
+							<feature name="a4654"/>
+							<feature name="a4666"/>
+							<feature name="a3762"/>
+							<feature name="a7091"/>
+							<feature name="a121"/>
+							<feature name="a123"/>
+							<feature name="a526"/>
+							<feature name="a530"/>
+							<feature name="a735"/>
+							<feature name="a831"/>
+							<feature name="a5018"/>
+							<feature name="a7510"/>
+							<feature name="a162"/>
+							<feature name="a164"/>
+							<feature name="a189"/>
+							<feature name="a200"/>
+							<feature name="a213"/>
+							<feature name="a215"/>
+							<feature name="a1113"/>
+							<feature name="a3397"/>
+							<feature name="a3824"/>
+							<feature name="a7011"/>
+							<feature name="a7248"/>
+							<feature name="a6277"/>
+							<feature name="a6095"/>
+							<feature name="a7522"/>
+							<feature name="a1805"/>
+							<feature name="a2572"/>
+							<feature name="a130"/>
+							<feature name="a531"/>
+							<feature name="a508"/>
+							<feature name="a511"/>
+							<feature name="a514"/>
+							<feature name="a4941"/>
+							<feature name="a2688"/>
+							<feature name="a2852"/>
+							<feature name="a6125"/>
+							<feature name="a7512"/>
+							<feature name="a144"/>
+							<feature name="a156"/>
+							<feature name="a166"/>
+							<feature name="a172"/>
+							<feature name="a186"/>
+							<feature name="a199"/>
+							<feature name="a211"/>
+							<feature name="a1172"/>
+							<feature name="a1694"/>
+							<feature name="a1597"/>
+							<feature name="a3996"/>
+							<feature name="a4174"/>
+							<feature name="a2060"/>
+							<feature name="a114"/>
+							<feature name="a525"/>
+							<feature name="a377"/>
+							<feature name="a733"/>
+							<feature name="a1490"/>
+							<feature name="a6126"/>
+							<feature name="a6127"/>
+							<feature name="a148"/>
+							<feature name="a171"/>
+							<feature name="a194"/>
+							<feature name="a1115"/>
+							<feature name="a2034"/>
+							<feature name="a3454"/>
+						</or>
+						<or name="C160">
+							<feature name="a1489"/>
+							<feature name="a3139"/>
+							<feature name="a470"/>
+							<feature name="a502"/>
+							<feature name="a521"/>
+							<feature name="a1849"/>
+							<feature name="a1289"/>
+							<feature name="a1291"/>
+							<feature name="a513"/>
+							<feature name="a173"/>
+							<feature name="a442"/>
+							<feature name="a469"/>
+							<feature name="a487"/>
+							<feature name="a506"/>
+							<feature name="a447"/>
+							<feature name="a499"/>
+							<feature name="a503"/>
+							<feature name="a520"/>
+							<feature name="a720"/>
+							<feature name="a1507"/>
+							<feature name="a4667"/>
+							<feature name="a6212"/>
+							<feature name="a544"/>
+							<feature name="a455"/>
+							<feature name="a492"/>
+							<feature name="a1049"/>
+							<feature name="a489"/>
+							<feature name="a422"/>
+							<feature name="a2946"/>
+							<feature name="a1100"/>
+							<feature name="a259"/>
+							<feature name="a471"/>
+							<feature name="a518"/>
+							<feature name="a419"/>
+							<feature name="a1048"/>
+							<feature name="a4476"/>
+							<feature name="a473"/>
+							<feature name="a479"/>
+							<feature name="a483"/>
+							<feature name="a485"/>
+							<feature name="a510"/>
+							<feature name="a4665"/>
+							<feature name="a1050"/>
+							<feature name="a454"/>
+							<feature name="a457"/>
+							<feature name="a472"/>
+							<feature name="a486"/>
+						</or>
+					</or>
+					<and name="S642">
+						<and mandatory="true" name="C1941">
+							<feature mandatory="true" name="a3745"/>
+						</and>
+					</and>
+				</or>
+				<or name="D11">
+					<and name="S0">
+						<and mandatory="true" name="C1831">
+							<feature mandatory="true" name="a1508"/>
+						</and>
+					</and>
+					<or name="S401">
+						<or name="C1802">
+							<feature name="a3651"/>
+							<feature name="a6812"/>
+						</or>
+						<or name="C1832">
+							<feature name="a6748"/>
+							<feature name="a345"/>
+							<feature name="a3652"/>
+							<feature name="a6744"/>
+							<feature name="a6965"/>
+							<feature name="a6745"/>
+							<feature name="a2275"/>
+						</or>
+					</or>
+					<or name="S54">
+						<or name="C174">
+							<feature name="a3277"/>
+							<feature name="a7171"/>
+						</or>
+						<and name="C175">
+							<feature mandatory="true" name="a3754"/>
+						</and>
+						<or name="C1761">
+							<feature name="a941"/>
+							<feature name="a2016"/>
+						</or>
+						<or name="C1771">
+							<feature name="a6999"/>
+							<feature name="a6997"/>
+							<feature name="a4405"/>
+							<feature name="a5642"/>
+							<feature name="a6981"/>
+							<feature name="a2230"/>
+							<feature name="a6349"/>
+						</or>
+					</or>
+					<or name="S55">
+						<or name="C1322">
+							<feature name="a2983"/>
+							<feature name="a2792"/>
+							<feature name="a2000"/>
+							<feature name="a1925"/>
+						</or>
+						<and name="C1183">
+							<feature mandatory="true" name="a1328"/>
+						</and>
+						<and name="C1762">
+							<feature mandatory="true" name="a2333"/>
+						</and>
+						<or name="C1772">
+							<feature name="a731"/>
+							<feature name="a7180"/>
+							<feature name="a6964"/>
+						</or>
+						<or name="C179">
+							<feature name="a5889"/>
+							<feature name="a5887"/>
+							<feature name="a7186"/>
+							<feature name="a5200"/>
+						</or>
+						<and name="C1801">
+							<feature mandatory="true" name="a407"/>
+							<feature mandatory="true" name="a1331"/>
+							<feature mandatory="true" name="a1184"/>
+							<feature mandatory="true" name="a1529"/>
+							<feature mandatory="true" name="a7031"/>
+							<feature mandatory="true" name="a7058"/>
+							<feature mandatory="true" name="a7199"/>
+							<feature mandatory="true" name="a7120"/>
+							<feature mandatory="true" name="a7081"/>
+							<feature mandatory="true" name="a7134"/>
+							<feature mandatory="true" name="a7359"/>
+							<feature mandatory="true" name="a1143"/>
+							<feature mandatory="true" name="a1163"/>
+							<feature mandatory="true" name="a1178"/>
+							<feature mandatory="true" name="a3028"/>
+							<feature mandatory="true" name="a3010"/>
+							<feature mandatory="true" name="a3018"/>
+							<feature mandatory="true" name="a3019"/>
+							<feature mandatory="true" name="a409"/>
+							<feature mandatory="true" name="a3448"/>
+							<feature mandatory="true" name="a7286"/>
+							<feature mandatory="true" name="a56"/>
+							<feature mandatory="true" name="a535"/>
+							<feature mandatory="true" name="a4942"/>
+							<feature mandatory="true" name="a5085"/>
+							<feature mandatory="true" name="a946"/>
+							<feature mandatory="true" name="a1185"/>
+							<feature mandatory="true" name="a1193"/>
+							<feature mandatory="true" name="a1607"/>
+							<feature mandatory="true" name="a7204"/>
+							<feature mandatory="true" name="a7072"/>
+							<feature mandatory="true" name="a7075"/>
+							<feature mandatory="true" name="a6301"/>
+							<feature mandatory="true" name="a6814"/>
+							<feature mandatory="true" name="a5812"/>
+							<feature mandatory="true" name="a58"/>
+							<feature mandatory="true" name="a7480"/>
+							<feature mandatory="true" name="a7301"/>
+							<feature mandatory="true" name="a1150"/>
+							<feature mandatory="true" name="a2928"/>
+							<feature mandatory="true" name="a6486"/>
+							<feature mandatory="true" name="a7679"/>
+							<feature mandatory="true" name="a7490"/>
+							<feature mandatory="true" name="a1147"/>
+							<feature mandatory="true" name="a1935"/>
+							<feature mandatory="true" name="a1315"/>
+							<feature mandatory="true" name="a1485"/>
+							<feature mandatory="true" name="a3020"/>
+							<feature mandatory="true" name="a4119"/>
+							<feature mandatory="true" name="a4281"/>
+							<feature mandatory="true" name="a5100"/>
+							<feature mandatory="true" name="a373"/>
+							<feature mandatory="true" name="a6798"/>
+							<feature mandatory="true" name="a7525"/>
+							<feature mandatory="true" name="a7302"/>
+							<feature mandatory="true" name="a220"/>
+							<feature mandatory="true" name="a881"/>
+							<feature mandatory="true" name="a1183"/>
+							<feature mandatory="true" name="a1365"/>
+							<feature mandatory="true" name="a7122"/>
+							<feature mandatory="true" name="a7213"/>
+							<feature mandatory="true" name="a7077"/>
+							<feature mandatory="true" name="a6987"/>
+							<feature mandatory="true" name="a5811"/>
+							<feature mandatory="true" name="a6801"/>
+							<feature mandatory="true" name="a6984"/>
+							<feature mandatory="true" name="a1996"/>
+							<feature mandatory="true" name="a2053"/>
+							<feature mandatory="true" name="a1609"/>
+							<feature mandatory="true" name="a1614"/>
+							<feature mandatory="true" name="a5412"/>
+							<feature mandatory="true" name="a2793"/>
+							<feature mandatory="true" name="a3015"/>
+							<feature mandatory="true" name="a3021"/>
+							<feature mandatory="true" name="a598"/>
+							<feature mandatory="true" name="a1180"/>
+							<feature mandatory="true" name="a5227"/>
+							<feature mandatory="true" name="a3814"/>
+							<feature mandatory="true" name="a7060"/>
+							<feature mandatory="true" name="a7690"/>
+							<feature mandatory="true" name="a6345"/>
+							<feature mandatory="true" name="a6986"/>
+							<feature mandatory="true" name="a7181"/>
+							<feature mandatory="true" name="a7459"/>
+							<feature mandatory="true" name="a1994"/>
+							<feature mandatory="true" name="a1995"/>
+							<feature mandatory="true" name="a2065"/>
+							<feature mandatory="true" name="a3016"/>
+							<feature mandatory="true" name="a7460"/>
+							<feature mandatory="true" name="a554"/>
+							<feature mandatory="true" name="a368"/>
+							<feature mandatory="true" name="a1608"/>
+							<feature mandatory="true" name="a4347"/>
+							<feature mandatory="true" name="a7203"/>
+							<feature mandatory="true" name="a7287"/>
+							<feature mandatory="true" name="a6654"/>
+							<feature mandatory="true" name="a55"/>
+							<feature mandatory="true" name="a553"/>
+							<feature mandatory="true" name="a1175"/>
+							<feature mandatory="true" name="a1948"/>
+							<feature mandatory="true" name="a1982"/>
+							<feature mandatory="true" name="a1997"/>
+							<feature mandatory="true" name="a1486"/>
+							<feature mandatory="true" name="a4859"/>
+							<feature mandatory="true" name="a1333"/>
+							<feature mandatory="true" name="a3201"/>
+							<feature mandatory="true" name="a3885"/>
+							<feature mandatory="true" name="a7193"/>
+							<feature mandatory="true" name="a7285"/>
+							<feature mandatory="true" name="a7079"/>
+							<feature mandatory="true" name="a5950"/>
+							<feature mandatory="true" name="a6644"/>
+							<feature mandatory="true" name="a6704"/>
+							<feature mandatory="true" name="a7358"/>
+							<feature mandatory="true" name="a7472"/>
+							<feature mandatory="true" name="a1166"/>
+							<feature mandatory="true" name="a1950"/>
+							<feature mandatory="true" name="a2028"/>
+							<feature mandatory="true" name="a1482"/>
+							<feature mandatory="true" name="a1484"/>
+							<feature mandatory="true" name="a5822"/>
+							<feature mandatory="true" name="a344"/>
+							<feature mandatory="true" name="a352"/>
+							<feature mandatory="true" name="a896"/>
+							<feature mandatory="true" name="a880"/>
+							<feature mandatory="true" name="a7200"/>
+							<feature mandatory="true" name="a7082"/>
+							<feature mandatory="true" name="a6287"/>
+							<feature mandatory="true" name="a6985"/>
+							<feature mandatory="true" name="a7461"/>
+							<feature mandatory="true" name="a5813"/>
+						</and>
+						<or name="C181">
+							<feature name="a732"/>
+							<feature name="a597"/>
+							<feature name="a2482"/>
+							<feature name="a1770"/>
+							<feature name="a983"/>
+							<feature name="a624"/>
+							<feature name="a7098"/>
+							<feature name="a5538"/>
+							<feature name="a1047"/>
+							<feature name="a7477"/>
+							<feature name="a6020"/>
+							<feature name="a7476"/>
+							<feature name="a7099"/>
+							<feature name="a6235"/>
+							<feature name="a6234"/>
+							<feature name="a3541"/>
+							<feature name="a1471"/>
+							<feature name="a1877"/>
+							<feature name="a1771"/>
+							<feature name="a6281"/>
+						</or>
+						<or name="C182">
+							<feature name="a6603"/>
+							<feature name="a2010"/>
+							<feature name="a4114"/>
+							<feature name="a85"/>
+							<feature name="a50"/>
+							<feature name="a4394"/>
+							<feature name="a7211"/>
+							<feature name="a1992"/>
+							<feature name="a4084"/>
+							<feature name="a7084"/>
+							<feature name="a4083"/>
+							<feature name="a1360"/>
+							<feature name="a6982"/>
+							<feature name="a1361"/>
+							<feature name="a53"/>
+							<feature name="a4122"/>
+							<feature name="a1911"/>
+							<feature name="a6995"/>
+							<feature name="a6906"/>
+							<feature name="a1359"/>
+							<feature name="a48"/>
+							<feature name="a5329"/>
+							<feature name="a2006"/>
+							<feature name="a7300"/>
+							<feature name="a7299"/>
+							<feature name="a5837"/>
+							<feature name="a5471"/>
+							<feature name="a1989"/>
+							<feature name="a6903"/>
+							<feature name="a4332"/>
+							<feature name="a1574"/>
+							<feature name="a6824"/>
+							<feature name="a51"/>
+							<feature name="a4392"/>
+						</or>
+						<or name="C1833">
+							<feature name="a1406"/>
+							<feature name="a1586"/>
+							<feature name="a1605"/>
+							<feature name="a3653"/>
+							<feature name="a3825"/>
+							<feature name="a3878"/>
+							<feature name="a3925"/>
+							<feature name="a7209"/>
+							<feature name="a7201"/>
+							<feature name="a6747"/>
+							<feature name="a7778"/>
+							<feature name="a7583"/>
+							<feature name="a7585"/>
+							<feature name="a7473"/>
+							<feature name="a1110"/>
+							<feature name="a1928"/>
+							<feature name="a1942"/>
+							<feature name="a1998"/>
+							<feature name="a1477"/>
+							<feature name="a3636"/>
+							<feature name="a3034"/>
+							<feature name="a2922"/>
+							<feature name="a2849"/>
+							<feature name="a5058"/>
+							<feature name="a5608"/>
+							<feature name="a5838"/>
+							<feature name="a5828"/>
+							<feature name="a5833"/>
+							<feature name="a1581"/>
+							<feature name="a3509"/>
+							<feature name="a5323"/>
+							<feature name="a4488"/>
+							<feature name="a4439"/>
+							<feature name="a4443"/>
+							<feature name="a3901"/>
+							<feature name="a3939"/>
+							<feature name="a3792"/>
+							<feature name="a7194"/>
+							<feature name="a62"/>
+							<feature name="a111"/>
+							<feature name="a253"/>
+							<feature name="a433"/>
+							<feature name="a505"/>
+							<feature name="a631"/>
+							<feature name="a632"/>
+							<feature name="a386"/>
+							<feature name="a403"/>
+							<feature name="a324"/>
+							<feature name="a815"/>
+							<feature name="a825"/>
+							<feature name="a926"/>
+							<feature name="a1497"/>
+							<feature name="a1345"/>
+							<feature name="a7288"/>
+							<feature name="a7063"/>
+							<feature name="a7093"/>
+							<feature name="a6038"/>
+							<feature name="a5951"/>
+							<feature name="a6302"/>
+							<feature name="a6303"/>
+							<feature name="a6186"/>
+							<feature name="a6175"/>
+							<feature name="a1927"/>
+							<feature name="a1618"/>
+							<feature name="a1627"/>
+							<feature name="a1478"/>
+							<feature name="a1487"/>
+							<feature name="a3609"/>
+							<feature name="a4733"/>
+							<feature name="a2657"/>
+							<feature name="a2674"/>
+							<feature name="a3014"/>
+							<feature name="a4120"/>
+							<feature name="a5840"/>
+							<feature name="a1381"/>
+							<feature name="a1549"/>
+							<feature name="a1399"/>
+							<feature name="a1725"/>
+							<feature name="a1573"/>
+							<feature name="a1593"/>
+							<feature name="a1761"/>
+							<feature name="a3511"/>
+							<feature name="a3512"/>
+							<feature name="a3420"/>
+							<feature name="a5364"/>
+							<feature name="a5331"/>
+							<feature name="a4571"/>
+							<feature name="a4012"/>
+							<feature name="a3857"/>
+							<feature name="a3924"/>
+							<feature name="a3774"/>
+							<feature name="a7033"/>
+							<feature name="a435"/>
+							<feature name="a620"/>
+							<feature name="a636"/>
+							<feature name="a350"/>
+							<feature name="a361"/>
+							<feature name="a894"/>
+							<feature name="a912"/>
+							<feature name="a1367"/>
+							<feature name="a1525"/>
+							<feature name="a1370"/>
+							<feature name="a7080"/>
+							<feature name="a7133"/>
+							<feature name="a5915"/>
+							<feature name="a6250"/>
+							<feature name="a6088"/>
+							<feature name="a6408"/>
+							<feature name="a6605"/>
+							<feature name="a6746"/>
+							<feature name="a6481"/>
+							<feature name="a7625"/>
+							<feature name="a7588"/>
+							<feature name="a7482"/>
+							<feature name="a955"/>
+							<feature name="a1040"/>
+							<feature name="a1079"/>
+							<feature name="a1091"/>
+							<feature name="a1077"/>
+							<feature name="a1038"/>
+							<feature name="a1904"/>
+							<feature name="a1688"/>
+							<feature name="a1604"/>
+							<feature name="a4534"/>
+							<feature name="a4714"/>
+							<feature name="a4442"/>
+							<feature name="a3841"/>
+							<feature name="a3739"/>
+							<feature name="a4226"/>
+							<feature name="a7123"/>
+							<feature name="a437"/>
+							<feature name="a629"/>
+							<feature name="a424"/>
+							<feature name="a316"/>
+							<feature name="a1334"/>
+							<feature name="a1337"/>
+							<feature name="a1182"/>
+							<feature name="a1348"/>
+							<feature name="a1499"/>
+							<feature name="a1518"/>
+							<feature name="a7283"/>
+							<feature name="a6637"/>
+							<feature name="a6201"/>
+							<feature name="a6344"/>
+							<feature name="a6133"/>
+							<feature name="a6641"/>
+							<feature name="a6487"/>
+							<feature name="a6994"/>
+							<feature name="a6684"/>
+							<feature name="a7624"/>
+							<feature name="a7589"/>
+							<feature name="a7357"/>
+							<feature name="a1082"/>
+							<feature name="a1032"/>
+							<feature name="a1835"/>
+							<feature name="a1852"/>
+							<feature name="a1853"/>
+							<feature name="a1309"/>
+							<feature name="a2759"/>
+							<feature name="a2761"/>
+							<feature name="a2821"/>
+							<feature name="a2982"/>
+							<feature name="a2673"/>
+							<feature name="a5514"/>
+							<feature name="a1384"/>
+							<feature name="a1388"/>
+							<feature name="a4886"/>
+							<feature name="a3927"/>
+							<feature name="a4112"/>
+							<feature name="a99"/>
+							<feature name="a627"/>
+							<feature name="a430"/>
+							<feature name="a348"/>
+							<feature name="a829"/>
+							<feature name="a911"/>
+							<feature name="a1810"/>
+							<feature name="a1371"/>
+							<feature name="a1374"/>
+							<feature name="a6075"/>
+							<feature name="a6353"/>
+							<feature name="a7481"/>
+							<feature name="a1089"/>
+							<feature name="a1099"/>
+							<feature name="a1159"/>
+							<feature name="a1940"/>
+							<feature name="a1824"/>
+							<feature name="a1836"/>
+							<feature name="a1837"/>
+							<feature name="a2345"/>
+							<feature name="a1921"/>
+							<feature name="a1475"/>
+							<feature name="a3344"/>
+							<feature name="a2770"/>
+							<feature name="a2671"/>
+							<feature name="a2676"/>
+							<feature name="a5040"/>
+							<feature name="a5012"/>
+							<feature name="a247"/>
+							<feature name="a252"/>
+							<feature name="a606"/>
+							<feature name="a742"/>
+							<feature name="a868"/>
+							<feature name="a1492"/>
+							<feature name="a1511"/>
+							<feature name="a1517"/>
+							<feature name="a7289"/>
+							<feature name="a7125"/>
+							<feature name="a7108"/>
+							<feature name="a7086"/>
+							<feature name="a6066"/>
+							<feature name="a6067"/>
+							<feature name="a6068"/>
+							<feature name="a6597"/>
+							<feature name="a6474"/>
+							<feature name="a6983"/>
+							<feature name="a6607"/>
+							<feature name="a6743"/>
+							<feature name="a6762"/>
+							<feature name="a7448"/>
+							<feature name="a971"/>
+							<feature name="a1076"/>
+							<feature name="a1142"/>
+							<feature name="a1153"/>
+							<feature name="a1941"/>
+							<feature name="a1981"/>
+							<feature name="a1999"/>
+							<feature name="a2011"/>
+							<feature name="a2038"/>
+							<feature name="a2046"/>
+							<feature name="a1892"/>
+							<feature name="a1893"/>
+							<feature name="a1924"/>
+							<feature name="a1454"/>
+							<feature name="a1615"/>
+							<feature name="a1472"/>
+							<feature name="a3608"/>
+							<feature name="a2612"/>
+							<feature name="a2989"/>
+							<feature name="a4938"/>
+							<feature name="a4970"/>
+							<feature name="a5468"/>
+							<feature name="a1413"/>
+							<feature name="a1415"/>
+							<feature name="a3508"/>
+							<feature name="a4159"/>
+							<feature name="a7044"/>
+							<feature name="a7210"/>
+							<feature name="a7050"/>
+							<feature name="a83"/>
+							<feature name="a622"/>
+							<feature name="a875"/>
+							<feature name="a917"/>
+							<feature name="a1353"/>
+							<feature name="a1372"/>
+							<feature name="a7284"/>
+							<feature name="a7097"/>
+							<feature name="a7085"/>
+							<feature name="a6062"/>
+							<feature name="a6009"/>
+							<feature name="a6082"/>
+							<feature name="a5981"/>
+							<feature name="a6166"/>
+							<feature name="a6642"/>
+							<feature name="a6646"/>
+							<feature name="a6750"/>
+							<feature name="a7584"/>
+							<feature name="a7450"/>
+							<feature name="a7446"/>
+							<feature name="a7447"/>
+							<feature name="a979"/>
+							<feature name="a1042"/>
+							<feature name="a1043"/>
+							<feature name="a1832"/>
+							<feature name="a1838"/>
+							<feature name="a1854"/>
+							<feature name="a1878"/>
+							<feature name="a2047"/>
+							<feature name="a1902"/>
+							<feature name="a2059"/>
+							<feature name="a1625"/>
+							<feature name="a3037"/>
+							<feature name="a2675"/>
+							<feature name="a3013"/>
+							<feature name="a3025"/>
+							<feature name="a5691"/>
+							<feature name="a1380"/>
+							<feature name="a1393"/>
+							<feature name="a1569"/>
+							<feature name="a1603"/>
+							<feature name="a5224"/>
+							<feature name="a7045"/>
+							<feature name="a7046"/>
+							<feature name="a7015"/>
+							<feature name="a7059"/>
+							<feature name="a7100"/>
+							<feature name="a7290"/>
+							<feature name="a7074"/>
+							<feature name="a6976"/>
+							<feature name="a6482"/>
+							<feature name="a6761"/>
+							<feature name="a7798"/>
+							<feature name="a7586"/>
+							<feature name="a7722"/>
+							<feature name="a1023"/>
+							<feature name="a969"/>
+							<feature name="a1136"/>
+							<feature name="a2126"/>
+							<feature name="a1855"/>
+							<feature name="a2318"/>
+							<feature name="a1872"/>
+							<feature name="a2067"/>
+							<feature name="a1926"/>
+							<feature name="a1455"/>
+							<feature name="a1613"/>
+							<feature name="a1616"/>
+							<feature name="a1619"/>
+							<feature name="a1470"/>
+							<feature name="a1476"/>
+							<feature name="a1321"/>
+							<feature name="a5377"/>
+							<feature name="a2606"/>
+							<feature name="a2919"/>
+							<feature name="a2920"/>
+							<feature name="a2921"/>
+							<feature name="a2669"/>
+							<feature name="a4477"/>
+							<feature name="a3965"/>
+							<feature name="a5120"/>
+							<feature name="a1401"/>
+							<feature name="a1723"/>
+							<feature name="a1575"/>
+							<feature name="a1432"/>
+							<feature name="a3419"/>
+							<feature name="a4730"/>
+							<feature name="a3828"/>
+							<feature name="a4005"/>
+							<feature name="a7043"/>
+							<feature name="a438"/>
+							<feature name="a76"/>
+							<feature name="a78"/>
+							<feature name="a255"/>
+							<feature name="a305"/>
+							<feature name="a323"/>
+							<feature name="a850"/>
+							<feature name="a802"/>
+							<feature name="a1339"/>
+							<feature name="a1509"/>
+							<feature name="a1363"/>
+							<feature name="a1369"/>
+							<feature name="a7282"/>
+							<feature name="a2760"/>
+							<feature name="a2923"/>
+							<feature name="a2460"/>
+							<feature name="a2784"/>
+							<feature name="a2822"/>
+							<feature name="a4786"/>
+							<feature name="a236"/>
+							<feature name="a239"/>
+							<feature name="a512"/>
+							<feature name="a385"/>
+							<feature name="a429"/>
+							<feature name="a848"/>
+							<feature name="a871"/>
+							<feature name="a810"/>
+							<feature name="a918"/>
+							<feature name="a1330"/>
+							<feature name="a1335"/>
+							<feature name="a1510"/>
+							<feature name="a1527"/>
+							<feature name="a7124"/>
+							<feature name="a6064"/>
+							<feature name="a6313"/>
+							<feature name="a6123"/>
+							<feature name="a6960"/>
+							<feature name="a6645"/>
+							<feature name="a6647"/>
+							<feature name="a6489"/>
+							<feature name="a6749"/>
+							<feature name="a6680"/>
+							<feature name="a6792"/>
+							<feature name="a7623"/>
+							<feature name="a7479"/>
+							<feature name="a970"/>
+							<feature name="a976"/>
+							<feature name="a1092"/>
+							<feature name="a1033"/>
+							<feature name="a1993"/>
+							<feature name="a2040"/>
+							<feature name="a1907"/>
+							<feature name="a1914"/>
+							<feature name="a1456"/>
+							<feature name="a1610"/>
+							<feature name="a1611"/>
+							<feature name="a1312"/>
+							<feature name="a1802"/>
+						</or>
+						<or name="C184">
+							<feature name="a6776"/>
+							<feature name="a6167"/>
+							<feature name="a2553"/>
+							<feature name="a4149"/>
+							<feature name="a5802"/>
+							<feature name="a6449"/>
+							<feature name="a7779"/>
+							<feature name="a2026"/>
+							<feature name="a2027"/>
+							<feature name="a2057"/>
+							<feature name="a6131"/>
+							<feature name="a6823"/>
+							<feature name="a7731"/>
+							<feature name="a1868"/>
+							<feature name="a1870"/>
+							<feature name="a1903"/>
+							<feature name="a5524"/>
+							<feature name="a1874"/>
+							<feature name="a1899"/>
+							<feature name="a6471"/>
+							<feature name="a7681"/>
+							<feature name="a4625"/>
+							<feature name="a4626"/>
+							<feature name="a4048"/>
+							<feature name="a1871"/>
+						</or>
+						<and name="C201">
+							<feature mandatory="true" name="a5841"/>
+						</and>
+						<and name="C220">
+							<feature mandatory="true" name="a3455"/>
+						</and>
+						<or name="C221">
+							<feature name="a5819"/>
+							<feature name="a5808"/>
+							<feature name="a5803"/>
+							<feature name="a5807"/>
+							<feature name="a5848"/>
+							<feature name="a5805"/>
+							<feature name="a5821"/>
+							<feature name="a5850"/>
+							<feature name="a6272"/>
+							<feature name="a5849"/>
+							<feature name="a5834"/>
+							<feature name="a5804"/>
+							<feature name="a5820"/>
+						</or>
+						<and name="C2521">
+							<feature mandatory="true" name="a5667"/>
+						</and>
+						<or name="C2571">
+							<feature name="a1325"/>
+							<feature name="a757"/>
+							<feature name="a755"/>
+							<feature name="a763"/>
+							<feature name="a765"/>
+							<feature name="a1336"/>
+							<feature name="a6248"/>
+						</or>
+						<or name="C2602">
+							<feature name="a1551"/>
+							<feature name="a6473"/>
+							<feature name="a7083"/>
+							<feature name="a7001"/>
+						</or>
+						<or name="C2614">
+							<feature name="a965"/>
+							<feature name="a4420"/>
+							<feature name="a1341"/>
+							<feature name="a1075"/>
+							<feature name="a4422"/>
+							<feature name="a4413"/>
+							<feature name="a238"/>
+							<feature name="a7032"/>
+							<feature name="a1775"/>
+							<feature name="a2009"/>
+							<feature name="a6070"/>
+							<feature name="a4416"/>
+							<feature name="a4414"/>
+							<feature name="a1776"/>
+							<feature name="a4415"/>
+							<feature name="a4412"/>
+							<feature name="a857"/>
+							<feature name="a6859"/>
+							<feature name="a4417"/>
+							<feature name="a1074"/>
+						</or>
+						<and name="C100041">
+							<feature mandatory="true" name="a7601"/>
+						</and>
+						<and name="C10023">
+							<feature mandatory="true" name="a1390"/>
+						</and>
+						<or name="C10035">
+							<feature name="a1848"/>
+							<feature name="a2994"/>
+							<feature name="a677"/>
+							<feature name="a7061"/>
+							<feature name="a7206"/>
+							<feature name="a7078"/>
+							<feature name="a140"/>
+							<feature name="a1097"/>
+							<feature name="a2424"/>
+							<feature name="a1850"/>
+							<feature name="a669"/>
+							<feature name="a671"/>
+							<feature name="a674"/>
+							<feature name="a4232"/>
+							<feature name="a7034"/>
+							<feature name="a7103"/>
+							<feature name="a7071"/>
+							<feature name="a6663"/>
+							<feature name="a7596"/>
+							<feature name="a2284"/>
+							<feature name="a6343"/>
+							<feature name="a2626"/>
+							<feature name="a3101"/>
+							<feature name="a3424"/>
+							<feature name="a4402"/>
+							<feature name="a7104"/>
+							<feature name="a7052"/>
+							<feature name="a7121"/>
+							<feature name="a7070"/>
+							<feature name="a1846"/>
+							<feature name="a5830"/>
+							<feature name="a6662"/>
+							<feature name="a6705"/>
+							<feature name="a1918"/>
+							<feature name="a1920"/>
+							<feature name="a2993"/>
+							<feature name="a5832"/>
+							<feature name="a6989"/>
+							<feature name="a2766"/>
+							<feature name="a2625"/>
+							<feature name="a3008"/>
+							<feature name="a7179"/>
+							<feature name="a7597"/>
+							<feature name="a524"/>
+							<feature name="a626"/>
+							<feature name="a7035"/>
+							<feature name="a6988"/>
+							<feature name="a1843"/>
+							<feature name="a369"/>
+							<feature name="a72"/>
+							<feature name="a3079"/>
+							<feature name="a7053"/>
+							<feature name="a7054"/>
+							<feature name="a6661"/>
+							<feature name="a6706"/>
+							<feature name="a1842"/>
+							<feature name="a1851"/>
+							<feature name="a5831"/>
+							<feature name="a523"/>
+							<feature name="a6658"/>
+							<feature name="a6660"/>
+							<feature name="a1617"/>
+							<feature name="a4806"/>
+							<feature name="a5824"/>
+							<feature name="a6128"/>
+							<feature name="a7000"/>
+							<feature name="a7073"/>
+							<feature name="a7727"/>
+							<feature name="a6130"/>
+							<feature name="a3100"/>
+							<feature name="a7051"/>
+							<feature name="a6659"/>
+							<feature name="a138"/>
+							<feature name="a2607"/>
+							<feature name="a2934"/>
+						</or>
+					</or>
+					<or name="S563">
+						<and name="C186">
+							<feature mandatory="true" name="a7101"/>
+						</and>
+						<or name="C192">
+							<feature name="a231"/>
+							<feature name="a3871"/>
+						</or>
+					</or>
+					<or name="S641">
+						<or name="C63">
+							<feature name="a5063"/>
+							<feature name="a1057"/>
+						</or>
+						<or name="C1942">
+							<feature name="a3949"/>
+							<feature name="a3334"/>
+							<feature name="a3950"/>
+							<feature name="a7212"/>
+							<feature name="a3948"/>
+							<feature name="a6973"/>
+							<feature name="a3337"/>
+							<feature name="a3333"/>
+						</or>
+					</or>
+					<or name="S100091">
+						<or name="C100042">
+							<feature name="a2650"/>
+							<feature name="a914"/>
+							<feature name="a1764"/>
+							<feature name="a1763"/>
+							<feature name="a1498"/>
+							<feature name="a870"/>
+							<feature name="a5806"/>
+							<feature name="a7370"/>
+							<feature name="a1762"/>
+							<feature name="a3617"/>
+							<feature name="a6679"/>
+							<feature name="a5801"/>
+							<feature name="a5943"/>
+							<feature name="a6866"/>
+							<feature name="a4236"/>
+							<feature name="a7240"/>
+							<feature name="a4890"/>
+							<feature name="a3221"/>
+							<feature name="a5815"/>
+							<feature name="a4139"/>
+							<feature name="a4655"/>
+							<feature name="a2686"/>
+							<feature name="a6678"/>
+							<feature name="a5817"/>
+							<feature name="a7239"/>
+							<feature name="a6864"/>
+							<feature name="a7135"/>
+							<feature name="a5944"/>
+						</or>
+						<or name="C100004">
+							<feature name="a1585"/>
+							<feature name="a878"/>
+							<feature name="a874"/>
+							<feature name="a1500"/>
+							<feature name="a317"/>
+							<feature name="a1584"/>
+						</or>
+					</or>
+				</or>
+				<or name="D12">
+					<and name="S57">
+						<and mandatory="true" name="C200">
+							<feature mandatory="true" name="a6479"/>
+						</and>
+					</and>
+					<and name="S60">
+						<and mandatory="true" name="C211">
+							<feature mandatory="true" name="a7017"/>
+						</and>
+					</and>
+				</or>
+				<or name="D13">
+					<or name="S61">
+						<and name="C212">
+							<feature mandatory="true" name="a2842"/>
+							<feature mandatory="true" name="a3549"/>
+							<feature mandatory="true" name="a3339"/>
+						</and>
+						<or name="C213">
+							<feature name="a6686"/>
+							<feature name="a5914"/>
+							<feature name="a2485"/>
+							<feature name="a6602"/>
+						</or>
+						<or name="C215">
+							<feature name="a4223"/>
+							<feature name="a3565"/>
+							<feature name="a4580"/>
+							<feature name="a3819"/>
+							<feature name="a3751"/>
+							<feature name="a3753"/>
+							<feature name="a4461"/>
+							<feature name="a3954"/>
+							<feature name="a4212"/>
+							<feature name="a3213"/>
+							<feature name="a6080"/>
+							<feature name="a4044"/>
+							<feature name="a4214"/>
+							<feature name="a3752"/>
+							<feature name="a6604"/>
+							<feature name="a3611"/>
+							<feature name="a4419"/>
+							<feature name="a4368"/>
+							<feature name="a3641"/>
+							<feature name="a3889"/>
+							<feature name="a3760"/>
+							<feature name="a6895"/>
+							<feature name="a3569"/>
+							<feature name="a4008"/>
+							<feature name="a3612"/>
+							<feature name="a3623"/>
+							<feature name="a3572"/>
+							<feature name="a3577"/>
+							<feature name="a3699"/>
+							<feature name="a4020"/>
+						</or>
+						<and name="C216">
+							<feature mandatory="true" name="a2423"/>
+							<feature mandatory="true" name="a3531"/>
+						</and>
+						<and name="C217">
+							<feature mandatory="true" name="a3784"/>
+							<feature mandatory="true" name="a3552"/>
+							<feature mandatory="true" name="a2869"/>
+							<feature mandatory="true" name="a2421"/>
+							<feature mandatory="true" name="a6081"/>
+							<feature mandatory="true" name="a6996"/>
+							<feature mandatory="true" name="a4610"/>
+							<feature mandatory="true" name="a6019"/>
+							<feature mandatory="true" name="a3559"/>
+							<feature mandatory="true" name="a3793"/>
+						</and>
+						<or name="C218">
+							<feature name="a4182"/>
+							<feature name="a3877"/>
+							<feature name="a4186"/>
+							<feature name="a6693"/>
+							<feature name="a5718"/>
+							<feature name="a4177"/>
+							<feature name="a4185"/>
+							<feature name="a6692"/>
+							<feature name="a4690"/>
+							<feature name="a4184"/>
+							<feature name="a4188"/>
+							<feature name="a4183"/>
+						</or>
+						<and name="C222">
+							<feature name="a6500"/>
+							<feature name="a6514"/>
+							<feature mandatory="true" name="a6499"/>
+							<feature name="a6507"/>
+							<feature name="a6497"/>
+							<feature name="a6498"/>
+							<feature name="a6503"/>
+							<feature name="a6504"/>
+							<feature name="a6506"/>
+							<feature name="a6495"/>
+							<feature name="a6496"/>
+							<feature name="a6511"/>
+							<feature name="a6512"/>
+							<feature name="a6515"/>
+							<feature name="a6689"/>
+							<feature name="a6501"/>
+							<feature name="a6508"/>
+							<feature name="a6509"/>
+							<feature name="a6510"/>
+							<feature name="a6688"/>
+							<feature name="a6758"/>
+							<feature name="a6513"/>
+							<feature name="a6690"/>
+							<feature name="a6502"/>
+							<feature name="a6505"/>
+							<feature name="a6691"/>
+							<feature name="a6555"/>
+						</and>
+					</or>
+					<or name="S10004">
+						<and name="C104">
+							<feature name="a3570"/>
+							<feature name="a6992"/>
+							<feature name="a6557"/>
+							<feature name="a2853"/>
+							<feature name="a4803"/>
+							<feature name="a3561"/>
+							<feature name="a3567"/>
+							<feature name="a2801"/>
+							<feature name="a2486"/>
+							<feature name="a3564"/>
+							<feature name="a3532"/>
+							<feature name="a3624"/>
+							<feature name="a6424"/>
+							<feature name="a4089"/>
+							<feature name="a3527"/>
+							<feature name="a3568"/>
+							<feature name="a6425"/>
+							<feature name="a7327"/>
+							<feature name="a4280"/>
+							<feature name="a3497"/>
+							<feature name="a3553"/>
+							<feature name="a3562"/>
+							<feature mandatory="true" name="a4213"/>
+							<feature name="a3576"/>
+							<feature name="a2854"/>
+							<feature name="a31"/>
+							<feature name="a3533"/>
+							<feature name="a3536"/>
+							<feature name="a3563"/>
+							<feature name="a3530"/>
+							<feature name="a4215"/>
+						</and>
+						<and name="C105">
+							<feature name="a5896"/>
+							<feature name="a6017"/>
+							<feature mandatory="true" name="a2769"/>
+							<feature name="a3522"/>
+							<feature name="a2422"/>
+							<feature name="a3579"/>
+						</and>
+						<or name="C1063">
+							<feature name="a4218"/>
+							<feature name="a6869"/>
+							<feature name="a7783"/>
+							<feature name="a3521"/>
+							<feature name="a2857"/>
+							<feature name="a3621"/>
+							<feature name="a2863"/>
+							<feature name="a3499"/>
+							<feature name="a3547"/>
+							<feature name="a6433"/>
+							<feature name="a3543"/>
+							<feature name="a3557"/>
+							<feature name="a3758"/>
+							<feature name="a2808"/>
+							<feature name="a4363"/>
+							<feature name="a2809"/>
+						</or>
+						<and name="C107">
+							<feature mandatory="true" name="a4582"/>
+							<feature mandatory="true" name="a3538"/>
+							<feature mandatory="true" name="a3535"/>
+							<feature mandatory="true" name="a7615"/>
+							<feature mandatory="true" name="a2307"/>
+							<feature mandatory="true" name="a3876"/>
+							<feature mandatory="true" name="a3550"/>
+						</and>
+					</or>
+				</or>
+				<or name="D14">
+					<and name="S564">
+						<and mandatory="true" name="C2191">
+							<feature mandatory="true" name="a6631"/>
+						</and>
+					</and>
+					<and name="S65">
+						<or mandatory="true" name="C2192">
+							<feature name="a7435"/>
+							<feature name="a7458"/>
+							<feature name="a5612"/>
+							<feature name="a4233"/>
+							<feature name="a7089"/>
+							<feature name="a6526"/>
+							<feature name="a6695"/>
+							<feature name="a7683"/>
+							<feature name="a7684"/>
+							<feature name="a7667"/>
+							<feature name="a7669"/>
+							<feature name="a7834"/>
+							<feature name="a2641"/>
+							<feature name="a3957"/>
+							<feature name="a5775"/>
+							<feature name="a5753"/>
+							<feature name="a6161"/>
+							<feature name="a6636"/>
+							<feature name="a7618"/>
+							<feature name="a7590"/>
+							<feature name="a7449"/>
+							<feature name="a2577"/>
+							<feature name="a4909"/>
+							<feature name="a4609"/>
+							<feature name="a4623"/>
+							<feature name="a4817"/>
+							<feature name="a5739"/>
+							<feature name="a4600"/>
+							<feature name="a6958"/>
+							<feature name="a6696"/>
+							<feature name="a6532"/>
+							<feature name="a7598"/>
+							<feature name="a7680"/>
+							<feature name="a7670"/>
+							<feature name="a7564"/>
+							<feature name="a7687"/>
+							<feature name="a7562"/>
+							<feature name="a7619"/>
+							<feature name="a7444"/>
+							<feature name="a7321"/>
+							<feature name="a7471"/>
+							<feature name="a3158"/>
+							<feature name="a2794"/>
+							<feature name="a4124"/>
+							<feature name="a3969"/>
+							<feature name="a3827"/>
+							<feature name="a7620"/>
+							<feature name="a6527"/>
+							<feature name="a6972"/>
+							<feature name="a6533"/>
+							<feature name="a7672"/>
+							<feature name="a7622"/>
+							<feature name="a7469"/>
+							<feature name="a7445"/>
+							<feature name="a7434"/>
+							<feature name="a4123"/>
+							<feature name="a4145"/>
+							<feature name="a7176"/>
+							<feature name="a7090"/>
+							<feature name="a7105"/>
+							<feature name="a7183"/>
+							<feature name="a7561"/>
+							<feature name="a6993"/>
+							<feature name="a6971"/>
+							<feature name="a7686"/>
+							<feature name="a7688"/>
+							<feature name="a7668"/>
+							<feature name="a7636"/>
+							<feature name="a7785"/>
+							<feature name="a7311"/>
+							<feature name="a2574"/>
+							<feature name="a1690"/>
+							<feature name="a7184"/>
+							<feature name="a7088"/>
+							<feature name="a6159"/>
+							<feature name="a6759"/>
+							<feature name="a6485"/>
+							<feature name="a7454"/>
+							<feature name="a7594"/>
+							<feature name="a7185"/>
+							<feature name="a7238"/>
+							<feature name="a7262"/>
+							<feature name="a6760"/>
+							<feature name="a6828"/>
+							<feature name="a7793"/>
+							<feature name="a7776"/>
+							<feature name="a7685"/>
+							<feature name="a7559"/>
+							<feature name="a7560"/>
+							<feature name="a7496"/>
+							<feature name="a3956"/>
+							<feature name="a4596"/>
+							<feature name="a4175"/>
+							<feature name="a7280"/>
+							<feature name="a7197"/>
+							<feature name="a6137"/>
+							<feature name="a6628"/>
+							<feature name="a6898"/>
+							<feature name="a7701"/>
+							<feature name="a7682"/>
+							<feature name="a7464"/>
+							<feature name="a7298"/>
+						</or>
+					</and>
+					<or name="S10006">
+						<and name="C2193">
+							<feature mandatory="true" name="a6825"/>
+						</and>
+						<or name="C10002">
+							<feature name="a7014"/>
+							<feature name="a6963"/>
+							<feature name="a6962"/>
+						</or>
+						<and name="C10003">
+							<feature mandatory="true" name="a7261"/>
+						</and>
+					</or>
+				</or>
+				<and name="D102">
+					<and mandatory="true" name="S10003">
+						<or mandatory="true" name="C1002">
+							<feature name="a7462"/>
+							<feature name="a7674"/>
+							<feature name="a7413"/>
+							<feature name="a7470"/>
+							<feature name="a7774"/>
+							<feature name="a7773"/>
+							<feature name="a7414"/>
+							<feature name="a7467"/>
+							<feature name="a7429"/>
+							<feature name="a7388"/>
+							<feature name="a7353"/>
+							<feature name="a7689"/>
+							<feature name="a7678"/>
+							<feature name="a7378"/>
+							<feature name="a7381"/>
+							<feature name="a7677"/>
+							<feature name="a7320"/>
+							<feature name="a7380"/>
+							<feature name="a7421"/>
+							<feature name="a7427"/>
+							<feature name="a7428"/>
+							<feature name="a6398"/>
+							<feature name="a7775"/>
+							<feature name="a7493"/>
+							<feature name="a7350"/>
+							<feature name="a7334"/>
+							<feature name="a7308"/>
+							<feature name="a7364"/>
+							<feature name="a7673"/>
+							<feature name="a7676"/>
+							<feature name="a7675"/>
+							<feature name="a7304"/>
+							<feature name="a7527"/>
+						</or>
+					</and>
+				</and>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

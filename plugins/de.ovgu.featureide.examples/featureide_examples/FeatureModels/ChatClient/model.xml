@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="ChatClient">
+				<alt abstract="true" mandatory="true" name="UI">
+					<feature name="GUI"/>
+					<feature name="TextualUI"/>
+				</alt>
+				<or abstract="true" name="History">
+					<feature name="InputHistory"/>
+					<feature name="ChatLogs"/>
+					<feature name="ServerHistory"/>
+				</or>
+				<or abstract="true" name="MessageNotification">
+					<feature name="NativeNotification"/>
+					<feature name="HighlightedTab"/>
+					<feature name="UnreadMessageCounter"/>
+				</or>
+				<feature name="TextFormatting"/>
+				<feature name="AutoCompletion"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>HighlightedTab</var>
+					<var>GUI</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
