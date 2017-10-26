@@ -58,16 +58,15 @@ public class CollapseAllButExplanationOperation extends AbstractCollapseOperatio
 
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
-		final Set<IFeature> explanationFeatures = explanation.getAffectedFeatures();
-		final Set<IFeature> nonExplanationFeatures = new HashSet<>(graphicalFeatureModel.getFeatureModel().getFeatureTable().values());
-		nonExplanationFeatures.removeAll(getAllParentFeatures(explanationFeatures));
-		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>();
-		for (final IFeature f : nonExplanationFeatures) {
+		final Set<IFeature> expandedFeatures = getAllParentFeatures(explanation.getAffectedFeatures());
+		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModel.getNumberOfFeatures());
+		for (final IFeature f : featureModel.getFeatures()) {
 			final IGraphicalFeature feature = graphicalFeatureModel.getGraphicalFeature(f);
-			if (feature.isCollapsed()) {
+			final boolean collapse = !expandedFeatures.contains(f);
+			if (feature.isCollapsed() == collapse) { //already in the target state, therefore no change necessary
 				continue;
 			}
-			targets.put(feature, true);
+			targets.put(feature, collapse);
 		}
 		return targets;
 	}
@@ -90,7 +89,7 @@ public class CollapseAllButExplanationOperation extends AbstractCollapseOperatio
 	 * @param features features with parents
 	 * @return all parent features of the given features
 	 */
-	private static Set<IFeature> getAllParentFeatures(Collection<IFeature> features) {
+	private static Set<IFeature> getAllParentFeatures(Collection<? extends IFeature> features) {
 		final Set<IFeature> parents = new HashSet<>();
 		for (IFeature feature : features) {
 			while (true) {
