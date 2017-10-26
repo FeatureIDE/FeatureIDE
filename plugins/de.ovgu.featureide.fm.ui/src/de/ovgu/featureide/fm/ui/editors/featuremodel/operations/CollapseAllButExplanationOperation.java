@@ -43,7 +43,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	/** The graphical feature model context. */
 	private final IGraphicalFeatureModel fm;
 	/** The currently active explanation. */
-	private final FeatureModelExplanation explanation;
+	private final FeatureModelExplanation<?> explanation;
 
 	/** The features that will be collapsed during the operation. */
 	private Set<IGraphicalFeature> collapsedFeatures;
@@ -54,7 +54,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @param fm the feature model context
 	 * @param explanation the currently active explanation
 	 */
-	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation explanation) {
+	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation<?> explanation) {
 		super(fm.getFeatureModel(), COLLAPSE_ALL_BUT_EXPLANATION);
 		this.fm = fm;
 		this.explanation = explanation;
@@ -74,7 +74,7 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 *
 	 * @return the currently active explanation
 	 */
-	public FeatureModelExplanation getExplanation() {
+	public FeatureModelExplanation<?> getExplanation() {
 		return explanation;
 	}
 
