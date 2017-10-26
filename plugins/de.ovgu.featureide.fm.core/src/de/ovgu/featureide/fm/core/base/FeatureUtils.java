@@ -26,7 +26,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -635,6 +637,12 @@ public final class FeatureUtils {
 		return featureModel.getNumberOfFeatures();
 	}
 
+	/**
+	 * Returns the direct parent of the given feature.
+	 *
+	 * @param feature the feature to check
+	 * @return the direct parent; null if there is no parent
+	 */
 	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
@@ -644,6 +652,54 @@ public final class FeatureUtils {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns all parents of the given feature recursively.
+	 *
+	 * @param feature the feature to check
+	 * @return all parents; not null
+	 */
+	public static Set<IFeature> getParents(IFeature feature) {
+		if (feature == null) {
+			return Collections.emptySet();
+		}
+		return getParents(feature, new LinkedHashSet<IFeature>());
+	}
+
+	/**
+	 * Returns all parents of all the given features recursively.
+	 *
+	 * @param features the features to check
+	 * @return all parents; not null
+	 */
+	public static Set<IFeature> getParents(Collection<? extends IFeature> features) {
+		if ((features == null) || features.isEmpty()) {
+			return Collections.emptySet();
+		}
+		final Set<IFeature> parents = new LinkedHashSet<>();
+		for (final IFeature feature : features) {
+			getParents(feature, parents);
+		}
+		return parents;
+	}
+
+	/**
+	 * Returns all parents of the given feature recursively.
+	 *
+	 * @param feature the feature to check
+	 * @param parents previously found parents; out variable; not null
+	 * @return all parents; not null
+	 */
+	private static Set<IFeature> getParents(IFeature feature, Set<IFeature> parents) {
+		while (true) {
+			final IFeature parent = getParent(feature);
+			if ((parent == null) || !parents.add(parent)) { // parent missing or already found before
+				break;
+			}
+			feature = parent;
+		}
+		return parents;
 	}
 
 	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {

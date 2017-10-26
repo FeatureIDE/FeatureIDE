@@ -24,14 +24,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL_B
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -58,12 +57,12 @@ public class CollapseAllButExplanationOperation extends AbstractCollapseOperatio
 
 	@Override
 	protected Map<IGraphicalFeature, Boolean> createTargets() {
-		final Set<IFeature> expandedFeatures = getAllParentFeatures(explanation.getAffectedFeatures());
+		final Collection<? extends IGraphicalFeature> expandedFeatures =
+			FeatureUIHelper.getGraphicalFeatures(FeatureUtils.getParents(explanation.getAffectedFeatures()), graphicalFeatureModel);
 		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>(featureModel.getNumberOfFeatures());
-		for (final IFeature f : featureModel.getFeatures()) {
-			final IGraphicalFeature feature = graphicalFeatureModel.getGraphicalFeature(f);
-			final boolean collapse = !expandedFeatures.contains(f);
-			if (feature.isCollapsed() == collapse) { //already in the target state, therefore no change necessary
+		for (final IGraphicalFeature feature : graphicalFeatureModel.getAllFeatures()) {
+			final boolean collapse = !expandedFeatures.contains(feature);
+			if (feature.isCollapsed() == collapse) { // already in the target state, therefore no change necessary
 				continue;
 			}
 			targets.put(feature, collapse);
@@ -81,27 +80,5 @@ public class CollapseAllButExplanationOperation extends AbstractCollapseOperatio
 	protected FeatureIDEEvent inverseOperation() {
 		super.inverseOperation();
 		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
-	}
-
-	/**
-	 * Returns all parent features of the given features (not only the direct parents).
-	 *
-	 * @param features features with parents
-	 * @return all parent features of the given features
-	 */
-	private static Set<IFeature> getAllParentFeatures(Collection<? extends IFeature> features) {
-		final Set<IFeature> parents = new HashSet<>();
-		for (IFeature feature : features) {
-			while (true) {
-				if (feature.getStructure().getParent() == null) {
-					break;
-				}
-				feature = feature.getStructure().getParent().getFeature();
-				if (!parents.add(feature)) {
-					break;
-				}
-			}
-		}
-		return parents;
 	}
 }

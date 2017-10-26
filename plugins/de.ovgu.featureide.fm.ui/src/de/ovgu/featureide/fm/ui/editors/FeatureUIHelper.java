@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,21 @@ public class FeatureUIHelper {
 
 	public static IGraphicalFeature getGraphicalFeature(IFeature feature, IGraphicalFeatureModel model) {
 		return model.getGraphicalFeature(feature);
+	}
+
+	/**
+	 * Returns the graphical feature of each given feature.
+	 *
+	 * @param features features to check
+	 * @param model graphical feature model containing the features
+	 * @return corresponding graphical features
+	 */
+	public static List<IGraphicalFeature> getGraphicalFeatures(Collection<? extends IFeature> features, IGraphicalFeatureModel model) {
+		final List<IGraphicalFeature> graphicalFeatures = new ArrayList<>(features.size());
+		for (final IFeature feature : features) {
+			graphicalFeatures.add(getGraphicalFeature(feature, model));
+		}
+		return graphicalFeatures;
 	}
 
 	public static IGraphicalFeature getGraphicalParent(IGraphicalFeature feature) {
