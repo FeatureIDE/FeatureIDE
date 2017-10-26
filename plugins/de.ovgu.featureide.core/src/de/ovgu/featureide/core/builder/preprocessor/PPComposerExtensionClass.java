@@ -179,7 +179,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			}
 
 			// Fix for #625: Antenna has currently no implementation for .xml config files.
-			Configuration configurationFile = new Configuration(featureProject.getFeatureModel());
+			final Configuration configurationFile = new Configuration(featureProject.getFeatureModel());
 			ConfigurationManager.load(Paths.get(config.getRawLocationURI()), configurationFile);
 			// // read activated features from configuration
 			activatedFeatures = new ArrayList<String>(configurationFile.getSelectedFeatureNames());
