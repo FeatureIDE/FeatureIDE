@@ -23,7 +23,9 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL_BUT_EXPLANATION;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -38,15 +40,10 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Timo G&uuml;nther
  */
-public class CollapseAllButExplanationOperation extends AbstractFeatureModelOperation {
+public class CollapseAllButExplanationOperation extends AbstractCollapseOperation {
 
-	/** The graphical feature model context. */
-	private final IGraphicalFeatureModel fm;
 	/** The currently active explanation. */
 	private final FeatureModelExplanation<?> explanation;
-
-	/** The features that will be collapsed during the operation. */
-	private Set<IGraphicalFeature> collapsedFeatures;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -55,65 +52,36 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 	 * @param explanation the currently active explanation
 	 */
 	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation<?> explanation) {
-		super(fm.getFeatureModel(), COLLAPSE_ALL_BUT_EXPLANATION);
-		this.fm = fm;
+		super(fm, COLLAPSE_ALL_BUT_EXPLANATION);
 		this.explanation = explanation;
 	}
 
-	/**
-	 * Returns the graphical feature model context.
-	 *
-	 * @return the graphical feature model context
-	 */
-	public IGraphicalFeatureModel getGraphicalFeatureModel() {
-		return fm;
-	}
-
-	/**
-	 * Returns the currently active explanation.
-	 *
-	 * @return the currently active explanation
-	 */
-	public FeatureModelExplanation<?> getExplanation() {
-		return explanation;
-	}
-
-	/**
-	 * Returns the features that will be collapsed during the operation.
-	 *
-	 * @return the features that will be collapsed during the operation
-	 */
-	public Set<IGraphicalFeature> getCollapsedFeatures() {
-		return collapsedFeatures;
-	}
-
-	/**
-	 * Sets the features that will be collapsed during the operation.
-	 *
-	 * @param collapsedFeatures the features that will be collapsed during the operation
-	 */
-	protected void setCollapsedFeatures(Set<IGraphicalFeature> collapsedFeatures) {
-		this.collapsedFeatures = collapsedFeatures;
-	}
-
-	/**
-	 * Creates the set of features that will be collapsed during the operation.
-	 *
-	 * @return the set of features that will be collapsed during the operation
-	 */
-	protected Set<IGraphicalFeature> createCollapsedFeatures() {
-		final Set<IFeature> explanationFeatures = getExplanation().getAffectedFeatures();
-		final Set<IFeature> nonExplanationFeatures = new HashSet<>(getGraphicalFeatureModel().getFeatureModel().getFeatureTable().values());
+	@Override
+	protected Map<IGraphicalFeature, Boolean> createTargets() {
+		final Set<IFeature> explanationFeatures = explanation.getAffectedFeatures();
+		final Set<IFeature> nonExplanationFeatures = new HashSet<>(graphicalFeatureModel.getFeatureModel().getFeatureTable().values());
 		nonExplanationFeatures.removeAll(getAllParentFeatures(explanationFeatures));
-		final Set<IGraphicalFeature> collapsedFeatures = new HashSet<>();
+		final Map<IGraphicalFeature, Boolean> targets = new HashMap<>();
 		for (final IFeature f : nonExplanationFeatures) {
-			final IGraphicalFeature feature = getGraphicalFeatureModel().getGraphicalFeature(f);
+			final IGraphicalFeature feature = graphicalFeatureModel.getGraphicalFeature(f);
 			if (feature.isCollapsed()) {
 				continue;
 			}
-			collapsedFeatures.add(feature);
+			targets.put(feature, true);
 		}
-		return collapsedFeatures;
+		return targets;
+	}
+
+	@Override
+	protected FeatureIDEEvent operation() {
+		super.operation();
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
+	}
+
+	@Override
+	protected FeatureIDEEvent inverseOperation() {
+		super.inverseOperation();
+		return new FeatureIDEEvent(explanation.getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 
 	/**
@@ -136,22 +104,5 @@ public class CollapseAllButExplanationOperation extends AbstractFeatureModelOper
 			}
 		}
 		return parents;
-	}
-
-	@Override
-	protected FeatureIDEEvent operation() {
-		setCollapsedFeatures(createCollapsedFeatures());
-		for (final IGraphicalFeature collapsedFeature : getCollapsedFeatures()) {
-			collapsedFeature.setCollapsed(true);
-		}
-		return new FeatureIDEEvent(getExplanation().getSubject(), EventType.COLLAPSED_ALL_CHANGED);
-	}
-
-	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		for (final IGraphicalFeature collapsedFeature : getCollapsedFeatures()) {
-			collapsedFeature.setCollapsed(false);
-		}
-		return new FeatureIDEEvent(getExplanation().getSubject(), EventType.COLLAPSED_ALL_CHANGED);
 	}
 }
