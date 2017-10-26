@@ -189,7 +189,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		falseOptionalFeatures.clear();
 
 		// put root always in so it will be refreshed (void/non-void)
-		if (fm != null && fm.getStructure() != null && fm.getStructure().getRoot() != null && fm.getStructure().getRoot().getFeature() != null) {
+		if ((fm != null) && (fm.getStructure() != null) && (fm.getStructure().getRoot() != null) && (fm.getStructure().getRoot().getFeature() != null)) {
 			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 
 			valid = true;
