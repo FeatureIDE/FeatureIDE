@@ -188,6 +188,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 
 	/**
 	 * Returns all reasons joined together.
+	 * 
 	 * @return joined reasons
 	 */
 	public String getReasonsString() {
@@ -196,6 +197,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 
 	/**
 	 * Returns the given reasons joined together.
+	 * 
 	 * @param reasons reasons to join
 	 * @return joined reasons
 	 */
