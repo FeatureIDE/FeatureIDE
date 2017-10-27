@@ -37,27 +37,27 @@ import org.eclipse.jface.dialogs.Dialog;
 
 import org.eclipse.jdt.internal.ui.util.SWTUtil;
 
+class ComboSelectionDialog extends Dialog {
 
-class ComboSelectionDialog extends Dialog{
-
-	private String fSelection= null;
+	private String fSelection = null;
 	private final String fShellTitle;
 	private final String fLabelText;
 	private final String[] fAllowedStrings;
 	private final int fInitialSelectionIndex;
+
 	public ComboSelectionDialog(Shell parentShell, String shellTitle, String labelText, String[] comboStrings, int initialSelectionIndex) {
 		super(parentShell);
 		Assert.isNotNull(shellTitle);
 		Assert.isNotNull(labelText);
 		Assert.isTrue(comboStrings.length > 0);
 		Assert.isTrue(initialSelectionIndex >= 0 && initialSelectionIndex < comboStrings.length);
-		fShellTitle= shellTitle;
-		fLabelText= labelText;
-		fAllowedStrings= comboStrings;
-		fInitialSelectionIndex= initialSelectionIndex;
+		fShellTitle = shellTitle;
+		fLabelText = labelText;
+		fAllowedStrings = comboStrings;
+		fInitialSelectionIndex = initialSelectionIndex;
 	}
 
-	String getSelectedString(){
+	String getSelectedString() {
 		return fSelection;
 	}
 
@@ -68,31 +68,32 @@ class ComboSelectionDialog extends Dialog{
 	protected Control createDialogArea(Composite parent) {
 		getShell().setText(fShellTitle);
 
-		Composite composite = (Composite)super.createDialogArea(parent);
+		Composite composite = (Composite) super.createDialogArea(parent);
 		Composite innerComposite = new Composite(composite, SWT.NONE);
 		innerComposite.setLayoutData(new GridData());
-		GridLayout gl= new GridLayout();
-		gl.numColumns= 2;
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
 		innerComposite.setLayout(gl);
 
-		Label label= new Label(innerComposite, SWT.NONE);
+		Label label = new Label(innerComposite, SWT.NONE);
 		label.setText(fLabelText);
 		label.setLayoutData(new GridData());
 
-		final Combo combo= new Combo(innerComposite, SWT.READ_ONLY);
+		final Combo combo = new Combo(innerComposite, SWT.READ_ONLY);
 		SWTUtil.setDefaultVisibleItemCount(combo);
 		for (int i = 0; i < fAllowedStrings.length; i++) {
 			combo.add(fAllowedStrings[i]);
 		}
 		combo.select(fInitialSelectionIndex);
-		fSelection= combo.getItem(combo.getSelectionIndex());
-		GridData gd= new GridData();
-		gd.widthHint= convertWidthInCharsToPixels(getMaxStringLength());
+		fSelection = combo.getItem(combo.getSelectionIndex());
+		GridData gd = new GridData();
+		gd.widthHint = convertWidthInCharsToPixels(getMaxStringLength());
 		combo.setLayoutData(gd);
-		combo.addSelectionListener(new SelectionAdapter(){
+		combo.addSelectionListener(new SelectionAdapter() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				fSelection= combo.getItem(combo.getSelectionIndex());
+				fSelection = combo.getItem(combo.getSelectionIndex());
 			}
 		});
 		applyDialogFont(composite);
@@ -100,9 +101,9 @@ class ComboSelectionDialog extends Dialog{
 	}
 
 	private int getMaxStringLength() {
-		int max= 0;
-		for (int i= 0; i < fAllowedStrings.length; i++) {
-			max= Math.max(max, fAllowedStrings[i].length());
+		int max = 0;
+		for (int i = 0; i < fAllowedStrings.length; i++) {
+			max = Math.max(max, fAllowedStrings[i].length());
 		}
 		return max;
 	}

@@ -9,8 +9,7 @@ import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 import de.ovgu.featureide.cloneanalysis.results.Clone;
 import de.ovgu.featureide.cloneanalysis.results.CloneAnalysisResults;
 
-class CloneAnalysisContentProvider implements ITreeContentProvider
-{
+class CloneAnalysisContentProvider implements ITreeContentProvider {
 
 	/**
 	 * 
@@ -20,14 +19,12 @@ class CloneAnalysisContentProvider implements ITreeContentProvider
 	/**
 	 * @param cloneAnalysisView
 	 */
-	CloneAnalysisContentProvider(CloneAnalysisView cloneAnalysisView)
-	{
+	CloneAnalysisContentProvider(CloneAnalysisView cloneAnalysisView) {
 		this.cloneAnalysisView = cloneAnalysisView;
 	}
 
 	@Override
-	public Object[] getChildren(Object parentElement)
-	{
+	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof CloneAnalysisResults)
 			return ((CloneAnalysisResults<?>) parentElement).getClones().toArray();
 		if (parentElement instanceof Clone)
@@ -36,8 +33,7 @@ class CloneAnalysisContentProvider implements ITreeContentProvider
 	}
 
 	@Override
-	public Object getParent(Object element)
-	{
+	public Object getParent(Object element) {
 		if (element instanceof Clone)
 			return this.cloneAnalysisView.results;
 		if (element instanceof CloneOccurence)
@@ -46,28 +42,26 @@ class CloneAnalysisContentProvider implements ITreeContentProvider
 	}
 
 	@Override
-	public boolean hasChildren(Object element)
-	{
+	public boolean hasChildren(Object element) {
 		if (element instanceof List)
 			return ((List<?>) element).size() > 0;
 
-		assert (!(element instanceof Clone) || ((element instanceof Clone) && ((Clone) element)
-				.getOccurences().size() > 0)) : "Clones without occurences make no sense";
+		assert (!(element instanceof Clone) || ((element instanceof Clone)
+				&& ((Clone) element).getOccurences().size() > 0)) : "Clones without occurences make no sense";
 
 		return (element instanceof Clone);
 	}
 
 	@Override
-	public Object[] getElements(Object inputElement)
-	{
+	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
 
 	@Override
-	public void dispose()
-	{}
+	public void dispose() {
+	}
 
 	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
-	{}
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+	}
 }

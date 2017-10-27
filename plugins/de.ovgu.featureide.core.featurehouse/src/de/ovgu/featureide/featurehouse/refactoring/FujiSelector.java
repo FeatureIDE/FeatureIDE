@@ -36,62 +36,58 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
  * @author Steffen Schulze
  */
 public class FujiSelector {
-	
+
 	private final ProjectSignatures projectSignatures;
 	private final String file;
-	
-	public FujiSelector(final IFeatureProject featureProject, final String file){
+
+	public FujiSelector(final IFeatureProject featureProject, final String file) {
 		this.file = file;
 		this.projectSignatures = featureProject.getProjectSignatures();
 	}
-	
-	public AbstractSignature getSelectedSignature(int line, int column){
-		
+
+	public AbstractSignature getSelectedSignature(int line, int column) {
+
 		final SignatureIterator iter = projectSignatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			
+
 			for (FOPFeatureData featureData : (FOPFeatureData[]) signature.getFeatureData()) {
-				if (isSignatureSelected(featureData, featureData.getSigPosition(), line, column))
-					return signature;
+				if (isSignatureSelected(featureData, featureData.getSigPosition(), line, column)) return signature;
 			}
-			
+
 			for (ExtendedSignature invokedSig : signature.getInvocationSignatures()) {
 				for (AFeatureData invokedFeatureData : invokedSig.getSig().getFeatureData()) {
-					if (invokedFeatureData.getID() == invokedSig.getFeatureID() && 
-						isSignatureSelected(invokedFeatureData, invokedSig.getPosition(), line, column))
-					{
+					if (invokedFeatureData.getID() == invokedSig.getFeatureID()
+						&& isSignatureSelected(invokedFeatureData, invokedSig.getPosition(), line, column)) {
 						return signature;
 					}
-				} 
-			} 
+				}
+			}
 		}
-		
+
 		return null;
 	}
-	
-	public FujiClassSignature getSelectedClassSignature(){
-		
+
+	public FujiClassSignature getSelectedClassSignature() {
+
 		final SignatureIterator iter = projectSignatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			
+
 			if (!(signature instanceof FujiClassSignature)) continue;
-			
+
 			for (FOPFeatureData featureData : (FOPFeatureData[]) signature.getFeatureData()) {
-				if (featureData.getAbsoluteFilePath().equals(file) )
-					return (FujiClassSignature) signature;
+				if (featureData.getAbsoluteFilePath().equals(file)) return (FujiClassSignature) signature;
 			}
-			
+
 		}
-		
+
 		return null;
 	}
-	
-	private boolean isSignatureSelected(AFeatureData featureData, SignaturePosition sigPosition, int line, int column){
-		return (featureData.getAbsoluteFilePath().equals(file) &&
-				((sigPosition.getStartRow() == line) &&
-				 (sigPosition.getIdentifierStart() <= column) && (sigPosition.getIdentifierEnd() >= column)));
+
+	private boolean isSignatureSelected(AFeatureData featureData, SignaturePosition sigPosition, int line, int column) {
+		return (featureData.getAbsoluteFilePath().equals(file)
+			&& ((sigPosition.getStartRow() == line) && (sigPosition.getIdentifierStart() <= column) && (sigPosition.getIdentifierEnd() >= column)));
 	}
-	
+
 }

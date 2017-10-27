@@ -778,28 +778,13 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		throw new UnsupportedOperationException();
 	}
 
-	/*	@Override
-	public Iterator<Annotation> getAnnotationIterator() {
-		final Iterator<ColorAnnotation> origIter = annotations.iterator();
-		return new Iterator<Annotation>() {
-
-			@Override
-			public boolean hasNext() {
-				return origIter.hasNext();
-			}
-
-			@Override
-			public Annotation next() {
-				return origIter.next();
-			}
-
-			@Override
-			public void remove() {
-				origIter.remove();
-			}
-		};
-	}
-*/
+	/*
+	 * @Override public Iterator<Annotation> getAnnotationIterator() { final Iterator<ColorAnnotation> origIter = annotations.iterator(); return new
+	 * Iterator<Annotation>() {
+	 * @Override public boolean hasNext() { return origIter.hasNext(); }
+	 * @Override public Annotation next() { return origIter.next(); }
+	 * @Override public void remove() { origIter.remove(); } }; }
+	 */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override

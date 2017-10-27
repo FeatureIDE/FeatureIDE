@@ -35,8 +35,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 
 	protected final String pckg;
 
-	protected final HashSet<String>
-		importList, extendList, implementList, subClassesList;
+	protected final HashSet<String> importList, extendList, implementList, subClassesList;
 
 	protected final Set<AbstractMethodSignature> methods;
 	protected final Set<AbstractFieldSignature> fields;
@@ -123,7 +122,7 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		return memberClasses;
 	}
 
-	public boolean isInterface(){
+	public boolean isInterface() {
 		return this.type.equals(TYPE_INTERFACE);
 	}
 

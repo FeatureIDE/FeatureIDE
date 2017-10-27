@@ -33,19 +33,17 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**
- * Provides labels and images for Refactoring PullUp Hierarchy 
+ * Provides labels and images for Refactoring PullUp Hierarchy
  * 
  * @author Steffen Schulze
  */
 public class PullUpHierarchyLabelProvider implements ILabelProvider {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -53,16 +51,13 @@ public class PullUpHierarchyLabelProvider implements ILabelProvider {
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
-	
+	public void removeListener(ILabelProviderListener listener) {}
+
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof Feature) {
 			return GUIDefaults.IMAGE_FEATURE;
-		}
-		else if (element instanceof ExtendedPullUpSignature)
-		{
+		} else if (element instanceof ExtendedPullUpSignature) {
 			AbstractSignature extendSignature = ((ExtendedPullUpSignature) element).getSignature();
 			if (extendSignature instanceof AbstractMethodSignature) {
 				switch (((AbstractMethodSignature) extendSignature).getVisibilty()) {
@@ -88,9 +83,9 @@ public class PullUpHierarchyLabelProvider implements ILabelProvider {
 				}
 			} else if (extendSignature instanceof AbstractClassSignature) {
 				return GUIDefaults.IMAGE_CLASS;
-			}  
+			}
 		}
-		
+
 		return null;
 	}
 
@@ -98,9 +93,7 @@ public class PullUpHierarchyLabelProvider implements ILabelProvider {
 	public String getText(Object element) {
 		if (element instanceof Feature) {
 			return ((Feature) element).getDisplayName();
-		} 
-		else if (element instanceof ExtendedPullUpSignature)
-		{
+		} else if (element instanceof ExtendedPullUpSignature) {
 			AbstractSignature extendSignature = ((ExtendedPullUpSignature) element).getSignature();
 			if (extendSignature instanceof AbstractMethodSignature) {
 				final AbstractMethodSignature method = (AbstractMethodSignature) extendSignature;

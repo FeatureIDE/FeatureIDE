@@ -190,7 +190,6 @@ public class FujiSignaturesCreator {
 							final List<ParameterDeclaration> parameterList = method.getParameterList();
 							final List<Access> exceptionList = method.getExceptionList();
 
-
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, false, parameterList, exceptionList),
 									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
@@ -233,12 +232,10 @@ public class FujiSignaturesCreator {
 							}
 
 						} else if (bodyDecl instanceof MemberClassDecl) {
-							stack.push(((MemberClassDecl) bodyDecl)
-									.getClassDecl());
+							stack.push(((MemberClassDecl) bodyDecl).getClassDecl());
 							roleStack.push(curClassSig);
 						} else if (bodyDecl instanceof MemberInterfaceDecl) {
-							stack.push(((MemberInterfaceDecl) bodyDecl)
-									.getInterfaceDecl());
+							stack.push(((MemberInterfaceDecl) bodyDecl).getInterfaceDecl());
 							roleStack.push(curClassSig);
 						}
 

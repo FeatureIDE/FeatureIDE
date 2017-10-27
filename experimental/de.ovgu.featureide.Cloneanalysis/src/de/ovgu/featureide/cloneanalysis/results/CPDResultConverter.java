@@ -27,8 +27,7 @@ import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
  * @author Konstantin Tonscheidt
  * 
  */
-public class CPDResultConverter
-{
+public class CPDResultConverter {
 
 	/**
 	 * Creates an Instance of {@link CloneAnalysisResults} and fills it with
@@ -38,17 +37,14 @@ public class CPDResultConverter
 	 * @return
 	 */
 	public static CloneAnalysisResults<VariantAwareClone> convertMatchesToReadableResults(
-			Iterator<Match> matchesFound)
-	{
+			Iterator<Match> matchesFound) {
 		Set<VariantAwareClone> clones = new HashSet<VariantAwareClone>();
-		while (matchesFound.hasNext())
-		{
+		while (matchesFound.hasNext()) {
 			final VariantAwareClone clone = convertMatchToClone(matchesFound.next());
 			clones.add(clone);
 		}
 
-		CloneAnalysisResults<VariantAwareClone> results = new CloneAnalysisResults<VariantAwareClone>(
-				clones);
+		CloneAnalysisResults<VariantAwareClone> results = new CloneAnalysisResults<VariantAwareClone>(clones);
 
 		Set<FeatureRootLocation> relevantFeatures = CloneAnalysisUtils.getRelevantFeatures(results);
 
@@ -59,24 +55,20 @@ public class CPDResultConverter
 	}
 
 	private static IClonePercentageData calculateClonedAmountPercentage(
-			CloneAnalysisResults<VariantAwareClone> results)
-	{
+			CloneAnalysisResults<VariantAwareClone> results) {
 		ClonePercentageData clonePercentageData = new ClonePercentageData();
 		final Set<FeatureRootLocation> relevantFeatures = results.getRelevantFeatures();
 		final Map<FeatureRootLocation, Map<IFile, short[]>> featureClonedLinesPerFile = new HashMap<FeatureRootLocation, Map<IFile, short[]>>();
 
-		for (FeatureRootLocation feature : relevantFeatures)
-		{
+		for (FeatureRootLocation feature : relevantFeatures) {
 			clonePercentageData.setFeatureTotalLineCount(feature,
 					CloneAnalysisUtils.getMemberLineSum(feature.getLocation()));
 			clonePercentageData.setFeatureTotalCloneLength(feature,
 					CloneAnalysisUtils.getClonedLineCount(feature, results.getClones()));
-			featureClonedLinesPerFile.put(feature,
-					CloneAnalysisUtils.getEmptyMemberLinesMap(feature));
+			featureClonedLinesPerFile.put(feature, CloneAnalysisUtils.getEmptyMemberLinesMap(feature));
 		}
 		CloneAnalysisUtils.calculateClonedLines(featureClonedLinesPerFile, relevantFeatures, results);
 		clonePercentageData.setFeatureClonedLinesPerFile(featureClonedLinesPerFile);
-		
 
 		return clonePercentageData;
 	}
@@ -86,8 +78,7 @@ public class CPDResultConverter
 	 * 
 	 * @see #checkForIntervariance(Set)
 	 */
-	public static boolean checkForIntervariance(Clone clone)
-	{
+	public static boolean checkForIntervariance(Clone clone) {
 		return checkForIntervariance(clone.getOccurences());
 	}
 
@@ -100,8 +91,7 @@ public class CPDResultConverter
 	 *            the complete Set of the clones occurences.
 	 * @return true if the clone is intervariant, false else.
 	 */
-	public static boolean checkForIntervariance(Set<CloneOccurence> occurences)
-	{
+	public static boolean checkForIntervariance(Set<CloneOccurence> occurences) {
 		return false;
 	}
 
@@ -112,8 +102,7 @@ public class CPDResultConverter
 	 * @see Clone
 	 * @see Match
 	 */
-	public static VariantAwareClone convertMatchToClone(Match match)
-	{
+	public static VariantAwareClone convertMatchToClone(Match match) {
 		final int cloneLineCount = match.getLineCount();
 		final int tokenCount = match.getTokenCount();
 		final Set<CloneOccurence> occurences = new HashSet<CloneOccurence>();
@@ -121,10 +110,8 @@ public class CPDResultConverter
 
 		// System.out.println("Printing tokens");
 		// System.out.println(match.getSourceCodeSlice());
-		for (TokenEntry token : tokens)
-		{
-			if (token.getTokenSrcID() == null || token.getTokenSrcID().isEmpty())
-			{
+		for (TokenEntry token : tokens) {
+			if (token.getTokenSrcID() == null || token.getTokenSrcID().isEmpty()) {
 				System.out.println("empty sourceid");
 				continue;
 			}
@@ -134,8 +121,8 @@ public class CPDResultConverter
 
 		final int fileCount = countFiles(occurences);
 
-		final VariantAwareClone variantAwareClone = new VariantAwareClone(occurences,
-				cloneLineCount, tokenCount, fileCount, match.getSourceCodeSlice());
+		final VariantAwareClone variantAwareClone = new VariantAwareClone(occurences, cloneLineCount, tokenCount,
+				fileCount, match.getSourceCodeSlice());
 
 		for (CloneOccurence occurence : variantAwareClone.getOccurences())
 			occurence.setClone(variantAwareClone);
@@ -147,8 +134,7 @@ public class CPDResultConverter
 	/**
 	 * @return the number of different files in which the Snippet occurs.
 	 */
-	public static int countFiles(Set<CloneOccurence> occurences)
-	{
+	public static int countFiles(Set<CloneOccurence> occurences) {
 		Set<IPath> files = new HashSet<IPath>();
 		for (CloneOccurence snippet : occurences)
 			files.add(snippet.getFile());

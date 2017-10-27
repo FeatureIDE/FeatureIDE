@@ -61,17 +61,17 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 
 		super.checkPreConditions(matcher, refactoringStatus);
 		if (refactoringStatus.hasFatalError()) return;
-		
+
 		AbstractClassSignature parent = matcher.getSelectedSignature().getParent();
-		if (existField(parent) != null){
+		if (existField(parent) != null) {
 			refactoringStatus.addError(RefactoringCoreMessages.RenameFieldRefactoring_field_already_defined);
 			return;
 		}
-		
+
 		refactoringStatus.merge(checkEnclosingHierarchy(parent));
 		refactoringStatus.merge(checkNestedHierarchy(parent));
 	}
-	
+
 	private RefactoringStatus checkNestedHierarchy(AbstractClassSignature parent) throws CoreException {
 		RefactoringStatus result = new RefactoringStatus();
 		for (AbstractClassSignature memberClass : parent.getMemberClasses()) {
@@ -79,67 +79,64 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 			if (field != null) {
 				String msg = Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_hiding,
 						new String[] { BasicElementLabels.getJavaElementName(renamingElement.getName()), BasicElementLabels.getJavaElementName(newName),
-								BasicElementLabels.getJavaElementName(field.getName()) });
+							BasicElementLabels.getJavaElementName(field.getName()) });
 				result.addWarning(msg);
 			}
 			result.merge(checkNestedHierarchy(memberClass));
 		}
 		return result;
 	}
-	
+
 	private RefactoringStatus checkEnclosingHierarchy(AbstractClassSignature parent) {
-		if (parent == null)
-			return null;
-		RefactoringStatus result= new RefactoringStatus();
+		if (parent == null) return null;
+		RefactoringStatus result = new RefactoringStatus();
 		while (parent != null) {
 			final AbstractFieldSignature field = existField(parent);
-			if (field != null){
-				String msg = Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_hiding2,
-				 	new String[]{ BasicElementLabels.getJavaElementName(newName), BasicElementLabels.getJavaElementName(parent.getFullName()), BasicElementLabels.getJavaElementName(field.getName())});
+			if (field != null) {
+				String msg =
+					Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_hiding2, new String[] { BasicElementLabels.getJavaElementName(newName),
+						BasicElementLabels.getJavaElementName(parent.getFullName()), BasicElementLabels.getJavaElementName(field.getName()) });
 				result.addWarning(msg);
 			}
 			parent = parent.getParent();
 		}
 		return result;
 	}
-	
 
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) throws CoreException {
 		Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
-		RefactoringStatus result= Checks.checkName(newName, validateFieldName(newName));
+		RefactoringStatus result = Checks.checkName(newName, validateFieldName(newName));
 
 		if (isInstanceField() && (!Checks.startsWithLowerCase(newName)))
-			result.addWarning(Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_should_start_lowercase2, new String[] { BasicElementLabels.getJavaElementName(newName), renamingElement.getParent().getName() }));
+			result.addWarning(Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_should_start_lowercase2,
+					new String[] { BasicElementLabels.getJavaElementName(newName), renamingElement.getParent().getName() }));
 
-		if (renamingElement.getName().equals(newName))
-			result.addError(Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_another_name2, new String[] { BasicElementLabels.getJavaElementName(newName), renamingElement.getParent().getName() }));
-	
+		if (renamingElement.getName().equals(newName)) result.addError(Messages.format(RefactoringCoreMessages.RenameFieldRefactoring_another_name2,
+				new String[] { BasicElementLabels.getJavaElementName(newName), renamingElement.getParent().getName() }));
+
 		return result;
 	}
-	
+
 	private AbstractFieldSignature existField(final AbstractClassSignature parent) {
 		for (AbstractFieldSignature field : parent.getFields()) {
 			if (field.getName().equals(newName)) {
 				final FOPFeatureData[] featureData = (FOPFeatureData[]) field.getFeatureData();
 				for (int i = 0; i < featureData.length; i++) {
-					if (featureData[i].getAbsoluteFilePath().equals(file))
-						return field;
+					if (featureData[i].getAbsoluteFilePath().equals(file)) return field;
 				}
 			}
 		}
 		return null;
 	}
-	
-	private boolean isInstanceField() throws CoreException{
+
+	private boolean isInstanceField() throws CoreException {
 		AbstractClassSignature parent = renamingElement.getParent();
-		
-		if ((parent != null) && (parent.isInterface()))
-			return false;
-		else
-			return !renamingElement.isStatic();
+
+		if ((parent != null) && (parent.isInterface())) return false;
+		else return !renamingElement.isStatic();
 	}
-	
+
 	/**
 	 * @param name the name to validate
 	 * @param context an {@link IJavaElement} or <code>null</code>
@@ -148,8 +145,8 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 	 * @see JavaConventions#validateFieldName(String, String, String)
 	 */
 	private IStatus validateFieldName(String name) {
-		String[] sourceComplianceLevels= getSourceComplianceLevels();
+		String[] sourceComplianceLevels = getSourceComplianceLevels();
 		return JavaConventions.validateFieldName(name, sourceComplianceLevels[0], sourceComplianceLevels[1]);
 	}
-	
+
 }

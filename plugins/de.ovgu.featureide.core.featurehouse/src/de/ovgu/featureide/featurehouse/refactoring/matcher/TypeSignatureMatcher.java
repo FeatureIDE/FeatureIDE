@@ -45,19 +45,18 @@ public class TypeSignatureMatcher extends SignatureMatcher {
 	protected boolean hasSameType(AbstractSignature signature) {
 		return (signature instanceof FujiClassSignature);
 	}
-	
+
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
-		
+
 		if (!hasSameType(selectedSignature)) return Collections.emptySet();
 
 		final Set<AbstractSignature> result = new HashSet<>();
 		result.add(selectedSignature);
-		
+
 		FujiMethodSignature constructor = getConstructor();
-		if (constructor != null)
-			result.add(constructor);
-		
+		if (constructor != null) result.add(constructor);
+
 		return result;
 	}
 
@@ -65,11 +64,11 @@ public class TypeSignatureMatcher extends SignatureMatcher {
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			
+
 			if (!(signature instanceof FujiMethodSignature)) continue;
 			final FujiMethodSignature methodSignature = (FujiMethodSignature) signature;
-			
-			if (methodSignature.isConstructor() && methodSignature.getFullName().equals(selectedSignature.getFullName()+"." + selectedSignature.getName())) {
+
+			if (methodSignature.isConstructor() && methodSignature.getFullName().equals(selectedSignature.getFullName() + "." + selectedSignature.getName())) {
 				return methodSignature;
 			}
 		}

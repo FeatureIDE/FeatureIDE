@@ -44,49 +44,45 @@ import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
 import de.ovgu.featureide.cloneanalysis.utils.CloneAnalysisUtils;
 
 @SuppressWarnings("restriction")
-public class CloneAnalysisView extends ViewPart 
-{
+public class CloneAnalysisView extends ViewPart {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "de.ovgu.featureide.code.cloneanalysis.views.CloneAnalysisView";
 
-	public static int hiddenEntries = 0, totalEntries = 0; 
-	
+	public static int hiddenEntries = 0, totalEntries = 0;
+
 	private Tree cloneTree;
 	private TreeViewer cloneViewer;
-	
 
 	CloneAnalysisResults<VariantAwareClone> results = null;
 
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
-	
-	private HashSet<Action> filterActions;
-	
 
-	class NameSorter extends ViewerSorter
-	{}
+	private HashSet<Action> filterActions;
+
+	class NameSorter extends ViewerSorter {
+	}
 
 	/**
 	 * The constructor.
 	 */
-	public CloneAnalysisView()
-	{}
+	public CloneAnalysisView() {
+	}
 
-	public void updateAnalysis(IStructuredSelection selection)
-	{}
+	public void updateAnalysis(IStructuredSelection selection) {
+	}
 
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 */
 	@SuppressWarnings("deprecation")
-	public void createPartControl(Composite parent)
-	{
-		
+	public void createPartControl(Composite parent) {
+
 		cloneTree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		cloneViewer = new TreeViewer(cloneTree);
 		cloneViewer.setContentProvider(new CloneAnalysisContentProvider(this));
@@ -96,25 +92,22 @@ public class CloneAnalysisView extends ViewPart
 		cloneViewer.setComparator(new SizeComparator());
 
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem()
-				.setHelp(cloneViewer.getControl(), "de.ovgu.featureide.code.Cloneanalysis.viewer");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(cloneViewer.getControl(),
+				"de.ovgu.featureide.code.Cloneanalysis.viewer");
 		addColumns();
 
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
-	
-		//adding a selection service listener to the active file in the editor
+
+		// adding a selection service listener to the active file in the editor
 		ISelectionService selectionService = getSite().getWorkbenchWindow().getSelectionService();
 		selectionService.addPostSelectionListener(selectionListener);
 
-	 
-	 
 	}
 
-	private void addColumns()
-	{
+	private void addColumns() {
 		cloneTree.setLinesVisible(true);
 		cloneTree.setHeaderVisible(true);
 
@@ -129,7 +122,7 @@ public class CloneAnalysisView extends ViewPart
 		column15.setWidth(50);
 		cloneTree.setSortColumn(column15);
 		cloneTree.setSortDirection(SWT.DOWN);
-//		cloneTree.setSortDirection(SWT.UP);
+		// cloneTree.setSortDirection(SWT.UP);
 		column15.addSelectionListener(new SortTreeListener());
 
 		TreeColumn column2 = new TreeColumn(cloneTree, SWT.RIGHT);
@@ -164,14 +157,11 @@ public class CloneAnalysisView extends ViewPart
 
 	}
 
-	private void hookContextMenu()
-	{
+	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener()
-		{
-			public void menuAboutToShow(IMenuManager manager)
-			{
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
 				CloneAnalysisView.this.fillContextMenu(manager);
 			}
 		});
@@ -180,112 +170,97 @@ public class CloneAnalysisView extends ViewPart
 		getSite().registerContextMenu(menuMgr, cloneViewer);
 	}
 
-	private void contributeToActionBars()
-	{
+	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
-	private void fillLocalPullDown(IMenuManager manager)
-	{
+	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(action1);
 		manager.add(action2);
 		manager.add(new Separator());
 	}
 
-	private void fillContextMenu(IMenuManager manager)
-	{
+	private void fillContextMenu(IMenuManager manager) {
 		manager.add(action1);
 		manager.add(action2);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
-	private void fillLocalToolBar(IToolBarManager manager)
-	{
+	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(action1);
 		manager.add(action2);
 	}
 
-	private void makeActions()
-	{
-		action1 = new Action()
-		{
-			public void run()
-			{
+	private void makeActions() {
+		action1 = new Action() {
+			public void run() {
 				showMessage("Action 1 executed");
 			}
 		};
 		action1.setText("Action 1");
 		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		action1.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
-		action2 = new Action()
-		{
-			public void run()
-			{
+		action2 = new Action() {
+			public void run() {
 				showMessage("Action 2 executed");
 			}
 		};
 		action2.setText("Action 2");
 		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-//		doubleClickAction = new Action()
-//		{
-//			public void run()
-//			{
-//				// TreeItem<VariantAwareClone> selectedItem =
-//				// matchViewer.getSelectionModel().getSelectedItem();
-//				// showMessage("Double-click detected on " +
-//				// selectedItem.toString());
-//				
-//
-//				
-//			}
-//		};
+		action2.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		// doubleClickAction = new Action()
+		// {
+		// public void run()
+		// {
+		// // TreeItem<VariantAwareClone> selectedItem =
+		// // matchViewer.getSelectionModel().getSelectedItem();
+		// // showMessage("Double-click detected on " +
+		// // selectedItem.toString());
+		//
+		//
+		//
+		// }
+		// };
 	}
 
-	private void hookDoubleClickAction()
-	{
-		cloneViewer.addDoubleClickListener(new IDoubleClickListener()
-		{
-			public void doubleClick(DoubleClickEvent event)
-			{
+	private void hookDoubleClickAction() {
+		cloneViewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-				Object obj =	selection.getFirstElement();
+				Object obj = selection.getFirstElement();
 				CloneOccurence clone = (CloneOccurence) obj;
 				IPath path = clone.getFile();
-				
-					IFile fileToOpen = CloneAnalysisUtils.getFileFromPath(path);
-						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-						try {
-							IDE.openEditor( page, fileToOpen, true );
-						} catch ( PartInitException exception ) {
-							//Put your exception handler here if you wish to
-						}
+				IFile fileToOpen = CloneAnalysisUtils.getFileFromPath(path);
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+				try {
+					IDE.openEditor(page, fileToOpen, true);
+				} catch (PartInitException exception) {
+					// Put your exception handler here if you wish to
+				}
 			}
 		});
 	}
 
-	private void showMessage(String message)
-	{
+	private void showMessage(String message) {
 		MessageDialog.openInformation(cloneViewer.getControl().getShell(), "Sample View", message);
 	}
 
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
-	public void setFocus()
-	{
+	public void setFocus() {
 		cloneViewer.getControl().setFocus();
 	}
 
-	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults)
-	{
+	public void showResults(CloneAnalysisResults<VariantAwareClone> formattedResults) {
 		results = formattedResults;
 		createFilterActions();
 		cloneViewer.setInput(results);
@@ -293,13 +268,11 @@ public class CloneAnalysisView extends ViewPart
 		cloneViewer.refresh();
 	}
 
-	private void createFilterActions()
-	{
+	private void createFilterActions() {
 		clearPreviousFilters();
 		filterActions = new HashSet<Action>();
 
-		for (FeatureRootLocation feature : results.getRelevantFeatures())
-		{
+		for (FeatureRootLocation feature : results.getRelevantFeatures()) {
 			Action filterByFeatureAction = createFilterAction(feature);
 			filterActions.add(filterByFeatureAction);
 		}
@@ -307,21 +280,16 @@ public class CloneAnalysisView extends ViewPart
 		updateActionBars();
 	}
 
-	private void clearPreviousFilters()
-	{
-		for(ViewerFilter filter : cloneViewer.getFilters()) 
-		{
-			if(filter instanceof FeatureFilter)
-			{
-					cloneViewer.removeFilter(filter);
+	private void clearPreviousFilters() {
+		for (ViewerFilter filter : cloneViewer.getFilters()) {
+			if (filter instanceof FeatureFilter) {
+				cloneViewer.removeFilter(filter);
 			}
 		}
-		
-		if(filterActions!= null && !filterActions.isEmpty())
-		{
+
+		if (filterActions != null && !filterActions.isEmpty()) {
 			IActionBars bars = getViewSite().getActionBars();
-			for(Action filterAction : filterActions)
-			{
+			for (Action filterAction : filterActions) {
 				bars.getMenuManager().remove(filterAction.getId());
 				bars.getToolBarManager().remove(filterAction.getId());
 			}
@@ -331,16 +299,14 @@ public class CloneAnalysisView extends ViewPart
 	/**
 	 * 
 	 */
-	private Action createFilterAction(final FeatureRootLocation feature)
-	{
+	private Action createFilterAction(final FeatureRootLocation feature) {
 		final String name = feature.getLocation().lastSegment();
 		final String tooltipText = "Filter by Feature: " + name;
-		Action newAction = new Action()
-		{
-			public void run()
-			{
-				hiddenEntries = 0; totalEntries = 0;
-				if(toggleFeatureFilter(feature))
+		Action newAction = new Action() {
+			public void run() {
+				hiddenEntries = 0;
+				totalEntries = 0;
+				if (toggleFeatureFilter(feature))
 					showMessage("Only showing clones including feature " + name + " now");
 				else
 					showMessage("No longer filtering by feature " + name);
@@ -349,75 +315,66 @@ public class CloneAnalysisView extends ViewPart
 		};
 		newAction.setText(name);
 		newAction.setToolTipText(tooltipText);
-		newAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		newAction.setImageDescriptor(
+				PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
 		return newAction;
 	}
 
-	protected boolean toggleFeatureFilter(FeatureRootLocation feature)
-	{
-		for(ViewerFilter filter : cloneViewer.getFilters()) 
-		{
-			if(filter instanceof FeatureFilter)
-			{
-				if(((FeatureFilter)filter).getFeature().equals(feature))
-				{
+	protected boolean toggleFeatureFilter(FeatureRootLocation feature) {
+		for (ViewerFilter filter : cloneViewer.getFilters()) {
+			if (filter instanceof FeatureFilter) {
+				if (((FeatureFilter) filter).getFeature().equals(feature)) {
 					cloneViewer.removeFilter(filter);
 					return false;
 				}
 			}
 		}
-		
+
 		applyFeatureFilter(feature);
 		return true;
 	}
 
-	protected void applyFeatureFilter(FeatureRootLocation feature)
-	{
-		ViewerFilter[] filters = new ViewerFilter[cloneViewer.getFilters().length+1];
-		for(int i = 0; i<cloneViewer.getFilters().length; i++)
+	protected void applyFeatureFilter(FeatureRootLocation feature) {
+		ViewerFilter[] filters = new ViewerFilter[cloneViewer.getFilters().length + 1];
+		for (int i = 0; i < cloneViewer.getFilters().length; i++)
 			filters[i] = cloneViewer.getFilters()[i];
 
 		filters[cloneViewer.getFilters().length] = new FeatureFilter(feature);
 		cloneViewer.setFilters(filters);
 	}
 
-	private void updateActionBars()
-	{
+	private void updateActionBars() {
 		if (filterActions == null)
 			return;
 
 		IActionBars bars = getViewSite().getActionBars();
 
-		for (Action filterAction : filterActions)
-		{
+		for (Action filterAction : filterActions) {
 			bars.getMenuManager().add(filterAction);
 			bars.getToolBarManager().add(filterAction);
 		}
 	}
 
-	//action listener implementing the "Set Linking Enabled" feature on the active perspective
+	// action listener implementing the "Set Linking Enabled" feature on the
+	// active perspective
 	private ISelectionListener selectionListener = new ISelectionListener() {
-		
-        public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
-        	if(PackageExplorerPart.getFromActivePerspective() != null){
-        		PackageExplorerPart.getFromActivePerspective().setLinkingEnabled(true);
-        	}else {
-        		PackageExplorerPart.openInActivePerspective().setLinkingEnabled(true);
-        	}
-        
-      
-         
-        
-        }    
-    };
-	
-	
-		public void dispose() {
-			// important: We need do unregister our listener when the view is disposed
-			getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(selectionListener);
-			super.dispose();
+
+		public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
+			if (PackageExplorerPart.getFromActivePerspective() != null) {
+				PackageExplorerPart.getFromActivePerspective().setLinkingEnabled(true);
+			} else {
+				PackageExplorerPart.openInActivePerspective().setLinkingEnabled(true);
+			}
+
 		}
+	};
+
+	public void dispose() {
+		// important: We need do unregister our listener when the view is
+		// disposed
+		getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(selectionListener);
+		super.dispose();
+	}
 
 }

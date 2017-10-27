@@ -118,6 +118,7 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	public void setEndLine(int endLine) {
 		this.endLine = endLine;
 	}
+
 	protected void setFullName(String perfixName) {
 		fullName = perfixName + '.' + name;
 	}
@@ -191,13 +192,13 @@ public abstract class AbstractSignature implements IConstrainedObject {
 
 	public void setFeatureData(AFeatureData[] featureData) {
 		if (this.featureData == null) {
-		this.featureData = featureData;
+			this.featureData = featureData;
 		}
 	}
 
 	public void setFeatureData(AFeatureData featureData) {
 		if (this.featureData == null) {
-		this.featureData = new AFeatureData[]{featureData};
+			this.featureData = new AFeatureData[] { featureData };
 		}
 	}
 
@@ -290,12 +291,13 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		return new Or(constraints).toCNF();
 	}
 
-	public void addInvocationSignature(ExtendedSignature signature)
-	{
+	public void addInvocationSignature(ExtendedSignature signature) {
 		invocationSignatures.add(signature);
 	}
 
-	/**s
+	/**
+	 * s
+	 * 
 	 * @return the invocationSignatures
 	 */
 	public Set<ExtendedSignature> getInvocationSignatures() {

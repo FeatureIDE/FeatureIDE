@@ -43,7 +43,7 @@ public class LocalVariableSignatureMatcher extends SignatureMatcher {
 	protected boolean hasSameType(AbstractSignature signature) {
 		return (signature instanceof FujiLocalVariableSignature);
 	}
-	
+
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
 
@@ -54,5 +54,5 @@ public class LocalVariableSignatureMatcher extends SignatureMatcher {
 
 		return result;
 	}
-	
+
 }

@@ -32,7 +32,6 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 
-
 /**
  * TODO description
  * 
@@ -48,7 +47,7 @@ public abstract class SignatureMatcher {
 	protected Set<AbstractSignature> newNameMatchedSignatures;
 	private Set<AbstractSignature> matchedSignatures;
 	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
-	
+
 //	protected Set<AbstractSignature> subClasses = new HashSet<>();
 //	protected Set<AbstractSignature> superClasses = new HashSet<>();
 //	protected Set<AbstractSignature> interfaces = new HashSet<>();
@@ -58,65 +57,61 @@ public abstract class SignatureMatcher {
 		this.selectedElement = selectedElement;
 		this.newName = newName;
 	}
-	
-	public void findMatchedSignatures(){
+
+	public void findMatchedSignatures() {
 		classes = RefactoringUtil.getClasses(signatures);
 		matchedSignatures = getNamedMatchedSignatures(selectedElement.getName());
-		newNameMatchedSignatures = getNamedMatchedSignatures(newName); 
+		newNameMatchedSignatures = getNamedMatchedSignatures(newName);
 		selectedSignature = selectSignature();
 		matchedSignatures = determineMatchedSignatures();
 	}
-	
+
 	protected abstract Set<AbstractSignature> determineMatchedSignatures();
-	
+
 	private AbstractSignature selectSignature() {
-		if (selectedElement instanceof FujiLocalVariableSignature)
-			return selectedElement;
-		
+		if (selectedElement instanceof FujiLocalVariableSignature) return selectedElement;
+
 		if (matchedSignatures.size() == 1) {
 			return matchedSignatures.iterator().next();
 		} else {
 			for (AbstractSignature matchedSignature : matchedSignatures) {
-				if (matchedSignature.equals(selectedElement))
-					return matchedSignature;
+				if (matchedSignature.equals(selectedElement)) return matchedSignature;
 			}
 		}
 		return null;
 	}
-	
+
 	protected Set<AbstractSignature> getNamedMatchedSignatures(final String name) {
 		Set<AbstractSignature> matched = new HashSet<>();
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			if (checkSignature(signature, name) ) {
+			if (checkSignature(signature, name)) {
 				matched.add(signature);
 			}
 		}
 
 		return matched;
 	}
-	
+
 	protected abstract boolean hasSameType(final AbstractSignature signature);
-	
+
 	protected boolean checkSignature(final AbstractSignature signature, final String sigName) {
 		return RefactoringUtil.hasSameName(signature, sigName) && hasSameType(signature);
 	}
-	
+
 	public Set<AbstractSignature> getMatchedSignatures() {
 		return matchedSignatures;
 	}
-	
-	public AbstractSignature getSelectedSignature()
-	{
+
+	public AbstractSignature getSelectedSignature() {
 		return selectedSignature;
 	}
-	
-	public Set<AbstractSignature> getMatchedSignaturesForNewName()
-	{
+
+	public Set<AbstractSignature> getMatchedSignaturesForNewName() {
 		return newNameMatchedSignatures;
 	}
-	
+
 //	public AbstractMethodSignature findDeclaringMethod(AbstractMethodSignature overriding) throws JavaModelException {
 //		AbstractMethodSignature result= null;
 //		AbstractMethodSignature overridden= findOverriddenMethod(overriding);
@@ -307,5 +302,5 @@ public abstract class SignatureMatcher {
 ////		} finally {
 ////		}
 ////	}
-	
+
 }

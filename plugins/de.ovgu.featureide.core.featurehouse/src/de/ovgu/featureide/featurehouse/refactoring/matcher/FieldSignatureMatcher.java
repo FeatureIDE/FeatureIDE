@@ -42,13 +42,13 @@ public class FieldSignatureMatcher extends SignatureMatcher {
 	protected boolean hasSameType(AbstractSignature signature) {
 		return (signature instanceof FujiFieldSignature);
 	}
-	
+
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
 
 		final Set<AbstractSignature> result = new HashSet<>();
 		result.add(selectedSignature);
-		
+
 		return result;
 	}
 

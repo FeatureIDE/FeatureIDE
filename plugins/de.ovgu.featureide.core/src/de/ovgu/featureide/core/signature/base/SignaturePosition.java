@@ -29,14 +29,14 @@ public class SignaturePosition {
 
 	private final int startRow;
 	private final int endRow;
-	
+
 	private final int startColumn;
 	private final int endColumn;
-	
+
 	private final int identifierStart;
 	private final int identifierEnd;
-	
-	public SignaturePosition(int startRow, int endRow, int startColumn, int endColumn, int identifierStart, int identifierEnd){
+
+	public SignaturePosition(int startRow, int endRow, int startColumn, int endColumn, int identifierStart, int identifierEnd) {
 		this.startRow = startRow;
 		this.endRow = endRow;
 		this.startColumn = startColumn;
@@ -44,7 +44,7 @@ public class SignaturePosition {
 		this.identifierStart = identifierStart;
 		this.identifierEnd = identifierEnd;
 	}
-	
+
 	public int getStartRow() {
 		return startRow;
 	}
@@ -60,7 +60,7 @@ public class SignaturePosition {
 	public int getIdentifierEnd() {
 		return identifierEnd;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int hash = 7;
@@ -68,15 +68,15 @@ public class SignaturePosition {
 		hash = 31 * hash + this.getEndRow();
 		hash = 31 * hash + this.getIdentifierStart();
 		hash = 31 * hash + this.getIdentifierEnd();
-		
+
 		return hash;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		SignaturePosition position = (SignaturePosition) obj;
-		return this.startRow == position.getStartRow() && this.endRow == position.getEndRow() &&
-				this.identifierStart == position.getIdentifierStart() && this.identifierEnd == position.identifierEnd; 
+		return this.startRow == position.getStartRow() && this.endRow == position.getEndRow() && this.identifierStart == position.getIdentifierStart()
+			&& this.identifierEnd == position.identifierEnd;
 	}
 
 	public int getStartColumn() {
@@ -86,5 +86,5 @@ public class SignaturePosition {
 	public int getEndColumn() {
 		return endColumn;
 	}
-	
+
 }

@@ -65,56 +65,50 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 	protected void checkPreConditions(final SignatureMatcher matcher, final RefactoringStatus refactoringStatus) throws JavaModelException, CoreException {
 		super.checkPreConditions(matcher, refactoringStatus);
 		if (refactoringStatus.hasFatalError()) return;
-		
+
 		refactoringStatus.merge(checkTypesInCompilationUnit(matcher));
 	}
-	
-	
+
 	private RefactoringStatus checkTypesInCompilationUnit(final SignatureMatcher matcher) {
 		RefactoringStatus result = new RefactoringStatus();
-		
+
 		AbstractSignature selectedSignature = matcher.getSelectedSignature();
 		final AFeatureData selectedFeatureData = getFeatureDataForFile(selectedSignature, file);
-		
+
 		if (!(selectedSignature instanceof AbstractClassSignature)) {
 			return result;
 		}
-		
+
 		AbstractClassSignature classSignature = (AbstractClassSignature) selectedSignature;
 		// 1. member types
 		for (AbstractClassSignature memberClass : classSignature.getMemberClasses()) {
 			if (memberClass.getName().equals(newName)) {
 				final FOPFeatureData[] featureData = (FOPFeatureData[]) memberClass.getFeatureData();
 				for (int i = 0; i < featureData.length; i++) {
-					if (selectedFeatureData.getID() == featureData[i].getID())
-					{
-						result.addError(
-							Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_member_type_exists,
-									new String[] { BasicElementLabels.getJavaElementName(newName), getFullFilePath(featureData[i].getAbsoluteFilePath())}));
+					if (selectedFeatureData.getID() == featureData[i].getID()) {
+						result.addError(Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_member_type_exists,
+								new String[] { BasicElementLabels.getJavaElementName(newName), getFullFilePath(featureData[i].getAbsoluteFilePath()) }));
 					}
 				}
 			}
 		}
-		
-		
+
 		// 2. Methods
 		for (AbstractMethodSignature methodSignature : classSignature.getMethods()) {
 			if (methodSignature.getName().equals(newName)) {
 				final FOPFeatureData[] featureData = (FOPFeatureData[]) methodSignature.getFeatureData();
 				for (int i = 0; i < featureData.length; i++) {
-					if (selectedFeatureData.getID() == featureData[i].getID())
-					{
-						result.addWarning(Messages.format(
-								RefactoringCoreMessages.Checks_constructor_name,
-								new Object[] { BasicElementLabels.getJavaElementName(methodSignature.getName()), getFullFilePath(featureData[i].getAbsoluteFilePath())}));
+					if (selectedFeatureData.getID() == featureData[i].getID()) {
+						result.addWarning(Messages.format(RefactoringCoreMessages.Checks_constructor_name, new Object[] {
+							BasicElementLabels.getJavaElementName(methodSignature.getName()), getFullFilePath(featureData[i].getAbsoluteFilePath()) }));
 					}
-			
+
 				}
 			} else if (isMainMethod(methodSignature)) {
 				result.addWarning(Messages.format(RefactoringCoreMessages.Checks_has_main, selectedSignature.getFullName()));
 			}
 		}
-		
+
 		// 3. imports
 		for (String imported : classSignature.getImportList()) {
 			if (imported.endsWith(".*;")) {
@@ -122,47 +116,41 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 
 				for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
 					AbstractClassSignature parent = newMatchedSignature.getParent();
-					if ((parent != null) && (parent.equals(selectedSignature)))
-						continue;
+					if ((parent != null) && (parent.equals(selectedSignature))) continue;
 
 					if ((newMatchedSignature instanceof FujiClassSignature) && newMatchedSignature.isPublic()
-							&& packageName.equals(RefactoringUtil.getPackage(newMatchedSignature))) {
-						result.addError(Messages.format(
-								RefactoringCoreMessages.RenameTypeRefactoring_name_conflict1,
+						&& packageName.equals(RefactoringUtil.getPackage(newMatchedSignature))) {
+						result.addError(Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_name_conflict1,
 								new Object[] { newMatchedSignature.getFullName(), selectedSignature.getFullName() }));
 					}
 				}
-			}
-			else if (imported.endsWith("." + newName +";")) {
-				result.addError(Messages.format(
-						RefactoringCoreMessages.RenameTypeRefactoring_imported,
-						new Object[] { BasicElementLabels.getJavaElementName(newName),
-								BasicElementLabels.getPathLabel(RefactoringUtil.getFile(renamingElement.getFirstFeatureData().getAbsoluteFilePath()).getFullPath(), false) }));
+			} else if (imported.endsWith("." + newName + ";")) {
+				result.addError(Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_imported,
+						new Object[] { BasicElementLabels.getJavaElementName(newName), BasicElementLabels
+								.getPathLabel(RefactoringUtil.getFile(renamingElement.getFirstFeatureData().getAbsoluteFilePath()).getFullPath(), false) }));
 			}
 		}
-				
+
 		// 4. types in package
 		for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
 			AbstractClassSignature parent = newMatchedSignature.getParent();
 			if ((parent != null) && (parent.equals(selectedSignature))) continue;
-			
+
 			if ((newMatchedSignature instanceof FujiClassSignature) && RefactoringUtil.hasSamePackage(selectedSignature, newMatchedSignature)) {
 				final FOPFeatureData[] featureData = (FOPFeatureData[]) newMatchedSignature.getFeatureData();
 				for (int i = 0; i < featureData.length; i++) {
-					if (selectedFeatureData.getID() == featureData[i].getID())
-					{
-						result.addError(Messages.format(
-								RefactoringCoreMessages.RenameTypeRefactoring_exists,
-								new String[] { BasicElementLabels.getJavaElementName(newName), ((FujiClassSignature) newMatchedSignature).getPackage()}));
+					if (selectedFeatureData.getID() == featureData[i].getID()) {
+						result.addError(Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_exists,
+								new String[] { BasicElementLabels.getJavaElementName(newName), ((FujiClassSignature) newMatchedSignature).getPackage() }));
 					}
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
-	protected AFeatureData getFeatureDataForFile(final AbstractSignature signature, final String file){
+
+	protected AFeatureData getFeatureDataForFile(final AbstractSignature signature, final String file) {
 		for (AFeatureData featureData : signature.getFeatureData()) {
 			if (featureData.getAbsoluteFilePath().equals(file)) return featureData;
 		}
@@ -179,31 +167,27 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 		return false;
 	}
 
-
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) {
 		Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
 		RefactoringStatus result = checkTypeName(newName);
-		if (renamingElement.getName().equals(newName))
-			result.addFatalError(RefactoringCoreMessages.RenameTypeRefactoring_choose_another_name);
+		if (renamingElement.getName().equals(newName)) result.addFatalError(RefactoringCoreMessages.RenameTypeRefactoring_choose_another_name);
 		return result;
 	}
-	
+
 	/**
 	 * Checks if the given name is a valid Java type name.
 	 *
 	 * @param name the java method name.
 	 * @param context an {@link IJavaElement} or <code>null</code>
-	 * @return a refactoring status containing the error message if the
-	 *  name is not a valid java type name.
+	 * @return a refactoring status containing the error message if the name is not a valid java type name.
 	 */
 	private RefactoringStatus checkTypeName(String name) {
 		if (name.indexOf(".") != -1) //$NON-NLS-1$
 			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_no_dot);
-		else
-			return Checks.checkName(name, validateJavaTypeName(name));
+		else return Checks.checkName(name, validateJavaTypeName(name));
 	}
-	
+
 	/**
 	 * @param name the name to validate
 	 * @param context an {@link IJavaElement} or <code>null</code>

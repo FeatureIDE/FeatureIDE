@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>BerkeleyDB-FH-Java</name> 
+	<name>BerkeleyDB-FH-Java</name>
 	<comment>
-	[description]
-	Berkeley DB (BDB) is a computer software library that provides a high-performance embedded database for key/value data.
-	[/description]
+		[description]
+		Berkeley DB (BDB) is a computer software library that provides a
+		high-performance embedded database for key/value data.
+		[/description]
 	</comment>
 	<projects>
 	</projects>

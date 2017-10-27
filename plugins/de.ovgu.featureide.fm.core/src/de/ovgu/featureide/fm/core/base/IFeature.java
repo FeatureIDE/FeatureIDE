@@ -25,52 +25,28 @@ import javax.annotation.Nonnull;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. 
- * A feature contains both
- * <ul>
- * <li>certain fixed properties (e.g., its name) which are available by the features implementation of {@link de.ovgu.featureide.fm.core.base.IFeatureProperty
- * IFeatureProperty}, and</li>
- * <li>custom properties which can be stored and received in a key-value store like fashion without the need of modifying existing code</li>
- * </ul>
- * Each feature belongs to other features where statements between features form a <i>feature model</i>. Hence, a feature is related to a
- * <i>structure</i> which connects the feature to, e.g., it's <i>children</i>, or it's <i>parent</i> feature in terms of these statements.
- * Any feature is highly related to it's name and identified by it's internal <i>identifier</i>. The last both properties are mixed-in with the
- * {@link IFeatureModelElement} interface.
- * An instance of <code>IFeature</code> intended to be instantiated by a {@link IFeatureModelFactory}.
- * <br/>
- * <br/>
- * FeatureIDE provides an adapter implementation {@link de.ovgu.featureide.fm.core.base.impl.AFeature AFeature} which is a abstract base
- * class and which should be preferred as starting point for custom implementations. This base class contains ready-to-use implementations for both
- * <code>IFeature</code> and {@link IFeatureModelElement}.
- * <br/>
- * <br/>
- * <b>Example</b><br/>
- * The following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>IFeature</code> implementation
- * {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
+ * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. A feature contains both <ul> <li>certain fixed
+ * properties (e.g., its name) which are available by the features implementation of {@link de.ovgu.featureide.fm.core.base.IFeatureProperty IFeatureProperty},
+ * and</li> <li>custom properties which can be stored and received in a key-value store like fashion without the need of modifying existing code</li> </ul> Each
+ * feature belongs to other features where statements between features form a <i>feature model</i>. Hence, a feature is related to a <i>structure</i> which
+ * connects the feature to, e.g., it's <i>children</i>, or it's <i>parent</i> feature in terms of these statements. Any feature is highly related to it's name
+ * and identified by it's internal <i>identifier</i>. The last both properties are mixed-in with the {@link IFeatureModelElement} interface. An instance of
+ * <code>IFeature</code> intended to be instantiated by a {@link IFeatureModelFactory}. <br/> <br/> FeatureIDE provides an adapter implementation
+ * {@link de.ovgu.featureide.fm.core.base.impl.AFeature AFeature} which is a abstract base class and which should be preferred as starting point for custom
+ * implementations. This base class contains ready-to-use implementations for both <code>IFeature</code> and {@link IFeatureModelElement}. <br/> <br/>
+ * <b>Example</b><br/> The following example demonstrate the creation of a new feature called <i>FeatureA</i> using FeatureIDE's default <code>IFeature</code>
+ * implementation {@link de.ovgu.featureide.fm.core.base.impl.Feature Feature}, and the corresponding default factory
  * {@link de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory DefaultFeatureModelFactory} over the conviennent factory class
- * {@link FMFactoryManager}:
- * <code>
- * <pre>
- * IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
- * IFeature feature = FMFactoryManager.getFactory().createFeature(model, "FeatureA");
- * </pre>
- * </code>
- * A unified handling of certain <code>IFeature</code> implementations (in terms of conviennent methods) can be achieved with the use of
- * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
- * <br/>
- * <br/>
- * <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods.
- * <br/>
- * <br/>
- * <b>Notes on equals method</b>: Any implementation have to provide a {@link Object#equals(Object)} implementation when the feature implementation should be
- * fully usable in the FeatureIDE system (and therefore, have to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the
- * internal identifier of two features are the same, and otherwise <b>false</b>.
- * <br/>
- * <br/>
- * <b>Compatibility Notes</b>: To provide compatibility to earlier versions of FeatureIDE, the <i>out-dated</i> class {@link de.ovgu.featureide.fm.core.Feature
- * Feature} also implements
- * the <code>IFeature</code> interface. Developers should neither use nor extend this obsolete class since it is deprecated and will be removed in one of the
- * next versions.
+ * {@link FMFactoryManager}: <code> <pre> IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel(); IFeature feature =
+ * FMFactoryManager.getFactory().createFeature(model, "FeatureA"); </pre> </code> A unified handling of certain <code>IFeature</code> implementations (in terms
+ * of conviennent methods) can be achieved with the use of {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class. <br/> <br/> <b>API
+ * notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is available in
+ * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods. <br/> <br/> <b>Notes on equals method</b>: Any implementation have to
+ * provide a {@link Object#equals(Object)} implementation when the feature implementation should be fully usable in the FeatureIDE system (and therefore, have
+ * to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the internal identifier of two features are the same, and
+ * otherwise <b>false</b>. <br/> <br/> <b>Compatibility Notes</b>: To provide compatibility to earlier versions of FeatureIDE, the <i>out-dated</i> class
+ * {@link de.ovgu.featureide.fm.core.Feature Feature} also implements the <code>IFeature</code> interface. Developers should neither use nor extend this
+ * obsolete class since it is deprecated and will be removed in one of the next versions.
  *
  * @see de.ovgu.featureide.fm.core.base.impl.AFeature Default implementation of <code>IFeature</code> (as starting point for custom implementations)
  *

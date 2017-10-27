@@ -34,18 +34,17 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 public class FeatureSignatureHierarchy {
 
 	private final IFeature feature;
-	
-	private final int featureId;
-	
-	private final Set<ExtendedPullUpSignature> children;
 
+	private final int featureId;
+
+	private final Set<ExtendedPullUpSignature> children;
 
 	public FeatureSignatureHierarchy(final IFeature feature, final int featureId) {
 		this.feature = feature;
 		this.featureId = featureId;
 		this.children = new HashSet<>();
 	}
-	
+
 	public IFeature getFeature() {
 		return feature;
 	}
@@ -57,10 +56,9 @@ public class FeatureSignatureHierarchy {
 	public Set<ExtendedPullUpSignature> getChildren() {
 		return children;
 	}
-	
+
 	public void addChild(ExtendedPullUpSignature extendSignature) {
 		this.children.add(extendSignature);
 	}
 
-	
 }

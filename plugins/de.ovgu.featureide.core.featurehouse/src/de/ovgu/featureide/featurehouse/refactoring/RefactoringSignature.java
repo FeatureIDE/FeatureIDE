@@ -32,30 +32,31 @@ import de.ovgu.featureide.core.signature.base.SignaturePosition;
  * @author steffen
  */
 public class RefactoringSignature {
+
 	private AbstractSignature declaration;
-	
+
 	private final String absolutePath;
-	
+
 	private final Set<SignaturePosition> positions;
-	
+
 	public RefactoringSignature(final String absolutePath, final AbstractSignature declaration) {
 		this.absolutePath = absolutePath;
 		this.declaration = declaration;
 		this.positions = new HashSet<>();
 	}
-	
+
 	public String getAbsolutePathToFile() {
 		return absolutePath;
 	}
-	
+
 	public AbstractSignature getDeclaration() {
 		return declaration;
 	}
-	
+
 	public void addPosition(final SignaturePosition position) {
 		positions.add(position);
 	}
-	
+
 	public Set<SignaturePosition> getPositions() {
 		return positions;
 	}

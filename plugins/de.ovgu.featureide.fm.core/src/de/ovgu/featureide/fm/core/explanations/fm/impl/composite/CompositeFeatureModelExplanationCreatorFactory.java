@@ -30,7 +30,6 @@ import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanation
 import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsFeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
 
-
 /**
  * Provides instances of {@link FeatureModelExplanationCreator} using composition.
  * 
@@ -45,22 +44,18 @@ public class CompositeFeatureModelExplanationCreatorFactory extends FeatureModel
 
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new CompositeDeadFeatureExplanationCreator(Arrays.asList(
-				ltms.getDeadFeatureExplanationCreator(),
-				mus.getDeadFeatureExplanationCreator()));
+		return new CompositeDeadFeatureExplanationCreator(Arrays.asList(ltms.getDeadFeatureExplanationCreator(), mus.getDeadFeatureExplanationCreator()));
 	}
 
 	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
-		return new CompositeFalseOptionalFeatureExplanationCreator(Arrays.asList(
-				ltms.getFalseOptionalFeatureExplanationCreator(),
-				mus.getFalseOptionalFeatureExplanationCreator()));
+		return new CompositeFalseOptionalFeatureExplanationCreator(
+				Arrays.asList(ltms.getFalseOptionalFeatureExplanationCreator(), mus.getFalseOptionalFeatureExplanationCreator()));
 	}
 
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
-		return new CompositeRedundantConstraintExplanationCreator(Arrays.asList(
-				ltms.getRedundantConstraintExplanationCreator(),
-				mus.getRedundantConstraintExplanationCreator()));
+		return new CompositeRedundantConstraintExplanationCreator(
+				Arrays.asList(ltms.getRedundantConstraintExplanationCreator(), mus.getRedundantConstraintExplanationCreator()));
 	}
 }

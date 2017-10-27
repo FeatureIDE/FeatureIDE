@@ -39,16 +39,21 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 public final class Features {
 
 	public static final String FEATURE_SUFFIX = "(Feature)";
+
 	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
 		return getAllFeatures(features, root, true);
 	}
+
 	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
 		return getLeafFeatures(features, root, true);
 	}
+
 	public static Collection<IFeatureStructure> getCompoundFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
 		return getCompoundFeatures(features, root, true);
 	}
-	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
+
+	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
+			boolean includeRoot) {
 		if (includeRoot) {
 			features.add(root);
 		}
@@ -57,7 +62,9 @@ public final class Features {
 		}
 		return features;
 	}
-	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
+
+	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
+			boolean includeRoot) {
 		if (includeRoot && !root.hasChildren()) {
 			features.add(root);
 		}
@@ -66,6 +73,7 @@ public final class Features {
 		}
 		return features;
 	}
+
 	public static Collection<IFeatureStructure> getCompoundFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
 			boolean includeRoot) {
 		if (includeRoot && root.hasChildren()) {
@@ -87,6 +95,7 @@ public final class Features {
 		}
 		return result;
 	}
+
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
 		List<IFeature> commonAncestorList = null;
 		for (final IFeature feature : features) {
@@ -95,7 +104,7 @@ public final class Features {
 		return commonAncestorList.get(commonAncestorList.size() - 1);
 	}
 
-public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
+	public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
 		if (commonAncestorList == null) {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {

@@ -96,7 +96,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Marcus Pinnecke
  */
 @SuppressWarnings("deprecation")
-public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunningMethod<ProjectSignatures>{
+public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunningMethod<ProjectSignatures> {
 
 //	private static final class SignatureReference {
 //		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
@@ -691,8 +691,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //	}
 
 	private void findFieldAccess(ASTNode<?> stmt, AbstractSignature methAbs, int featureID, String absoluteFilePath) {
-		if (stmt == null)
-			return;
+		if (stmt == null) return;
 
 	}
 
@@ -818,7 +817,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //		}
 //	}
 
-	private SignaturePosition getSignaturePosition(final int start, final int end,  final int identifierStart, final int identifierEnd) {
+	private SignaturePosition getSignaturePosition(final int start, final int end, final int identifierStart, final int identifierEnd) {
 		return new SignaturePosition(Symbol.getLine(start), Symbol.getLine(end), Symbol.getColumn(start), Symbol.getColumn(end),
 				Symbol.getColumn(identifierStart), Symbol.getColumn(identifierEnd));
 	}
@@ -865,7 +864,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 //		}
 //	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.job.AbstractJob#work(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
 	 */
 	@Override
@@ -874,7 +874,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob implements LongRunn
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.job.AStoppableJob#work()
 	 */
 	@Override

@@ -39,7 +39,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  * 
  * @author Steffen Schulze
  */
-public class RenameMethodRefactoringTest extends RenameRefactoringTest{
+public class RenameMethodRefactoringTest extends RenameRefactoringTest {
 
 	@Test
 	public void testRenameVirtualMethod() throws Exception {
@@ -50,7 +50,7 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 		assertTrue(changedHashCodes.size() == expectedHashCodes.size());
 		assertTrue(changedHashCodes.containsAll(expectedHashCodes));
 	}
-	
+
 	@Test
 	public void testRenameVirtualMethodInPackage() throws Exception {
 		final RefactoringStatus status = new RefactoringStatus();
@@ -60,7 +60,7 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 		assertTrue(changedHashCodes.size() == expectedHashCodes.size());
 		assertTrue(changedHashCodes.containsAll(expectedHashCodes));
 	}
-	
+
 	@Test
 	public void testStaticMethod() throws Exception {
 		final RefactoringStatus status = new RefactoringStatus();
@@ -70,7 +70,7 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 		assertTrue(changedHashCodes.size() == expectedHashCodes.size());
 		assertTrue(changedHashCodes.containsAll(expectedHashCodes));
 	}
-	
+
 	@Test
 	public void testExistingMethod() throws Exception {
 		final RefactoringStatus status = new RefactoringStatus();
@@ -78,16 +78,16 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 		assertTrue(status.hasError());
 		assertTrue(changedHashCodes.size() == 0);
 	}
-	
+
 	private Set<Integer> getExpectedHashCodeStaticMethod() throws CoreException, IOException {
 		final IFile file = featureProject.getProject().getFile("features_expected/testRenameStaticMethod/Hello/Main.java");
-		final Set<Integer> expectedHashCode =  new HashSet<Integer>();
+		final Set<Integer> expectedHashCode = new HashSet<Integer>();
 		expectedHashCode.add(getHashCodeOfFile(file));
 		return expectedHashCode;
 	}
-	
+
 	private Set<Integer> getExpectedHashCodeVirtualMethod() throws CoreException, IOException {
-		final Set<Integer> expectedHashCode =  new HashSet<Integer>();
+		final Set<Integer> expectedHashCode = new HashSet<Integer>();
 		IFile file = featureProject.getProject().getFile("features_expected/testRenameVirtualMethod/Beautiful/Main.java");
 		expectedHashCode.add(getHashCodeOfFile(file));
 		file = featureProject.getProject().getFile("features_expected/testRenameVirtualMethod/Hello/Main.java");
@@ -100,9 +100,9 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 		expectedHashCode.add(getHashCodeOfFile(file));
 		return expectedHashCode;
 	}
-	
+
 	private Set<Integer> getExpectedHashCodeVirtualMethodInPackage() throws CoreException, IOException {
-		final Set<Integer> expectedHashCode =  new HashSet<Integer>();
+		final Set<Integer> expectedHashCode = new HashSet<Integer>();
 		IFile file = featureProject.getProject().getFile("features_expected/testRenameVirtualMethodInPackage/Hello/ovgu/Main.java");
 		expectedHashCode.add(getHashCodeOfFile(file));
 		file = featureProject.getProject().getFile("features_expected/testRenameVirtualMethodInPackage/Hello/ovgu/SubMain.java");

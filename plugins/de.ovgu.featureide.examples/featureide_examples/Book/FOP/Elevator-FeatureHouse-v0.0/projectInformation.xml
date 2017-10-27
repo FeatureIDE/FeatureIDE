@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <exampleWizard>
 	<contentProvider name="Book Example">
-		<path>Part IV/Chapter 14 (Developing an Elevator with Feature-Oriented Programming)</path>
+		<path>Part IV/Chapter 14 (Developing an Elevator with Feature-Oriented
+			Programming)</path>
 	</contentProvider>
 	<contentProvider name="Composer">
 		<path>FeatureHouse</path>

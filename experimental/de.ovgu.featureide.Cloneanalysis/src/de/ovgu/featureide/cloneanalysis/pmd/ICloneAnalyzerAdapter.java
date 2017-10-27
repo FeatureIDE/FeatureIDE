@@ -4,18 +4,15 @@ import java.util.Iterator;
 
 import net.sourceforge.pmd.cpd.Match;
 
+public interface ICloneAnalyzerAdapter<Tool> {
 
-
-public interface ICloneAnalyzerAdapter<Tool>
-{
-
-	/** 
+	/**
 	 * Initializes the Tool which is used by the Adapter.
 	 */
 	public abstract void initializeTool();
 
 	/**
-	 * Register the files to be analyzed with the tool. 
+	 * Register the files to be analyzed with the tool.
 	 */
 	public abstract void registerFilesForAnalysis(Object files);
 
@@ -25,7 +22,7 @@ public interface ICloneAnalyzerAdapter<Tool>
 	 * @return the analysis results, or null.
 	 */
 	public abstract Object startAnalysis();
-	
+
 	public Iterator<Match> getMatches();
-	
+
 }

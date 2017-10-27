@@ -42,9 +42,8 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
 /**
- * The NEW wizard page allows setting the container for the new file as well
- * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (.config).
+ * The NEW wizard page allows setting the container for the new file as well as the file name. The page will only accept file name without the extension OR with
+ * the extension that matches the expected one (.config).
  * 
  * @author Christian Becker
  * @author Jens Meinicke
@@ -91,6 +90,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	private void addListeners() {
 		formatCombo.addModifyListener(new ModifyListener() {
+
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}

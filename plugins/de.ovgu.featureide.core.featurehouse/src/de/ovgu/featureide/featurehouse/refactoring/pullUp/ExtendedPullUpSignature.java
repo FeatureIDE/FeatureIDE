@@ -33,13 +33,13 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 public class ExtendedPullUpSignature {
 
 	private final AbstractSignature signature;
-	
+
 	private final int featureId;
-	
+
 	private final Set<ExtendedPullUpSignature> children;
-	
+
 	private ExtendedPullUpSignature parent;
-	
+
 	public ExtendedPullUpSignature(final AbstractSignature signature, final int featureId) {
 		this.signature = signature;
 		this.featureId = featureId;
@@ -69,5 +69,5 @@ public class ExtendedPullUpSignature {
 	public int getFeatureId() {
 		return featureId;
 	}
-	
+
 }

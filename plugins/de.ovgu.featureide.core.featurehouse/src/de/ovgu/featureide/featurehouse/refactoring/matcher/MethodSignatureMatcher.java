@@ -40,11 +40,11 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 public class MethodSignatureMatcher extends SignatureMatcher {
 
 	Map<AbstractClassSignature, List<AbstractClassSignature>> typeHierarchy = new HashMap<>();
-	
+
 	public MethodSignatureMatcher(final ProjectSignatures signatures, final AbstractSignature selectedElement, final String newName) {
 		super(signatures, selectedElement, newName);
 	}
-	
+
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
 
@@ -72,37 +72,32 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 		}
 		return matched;
 	}
-	
 
 	private void filterMatchedSignatures(final Set<AbstractClassSignature> involvedClasses, final Set<AbstractSignature> matchedSignatures) {
 		for (AbstractSignature matchedSignature : new HashSet<>(matchedSignatures)) {
-			if (!(involvedClasses.contains(matchedSignature.getParent())))
-				matchedSignatures.remove(matchedSignature);
+			if (!(involvedClasses.contains(matchedSignature.getParent()))) matchedSignatures.remove(matchedSignature);
 		}
 	}
-	
+
 	private void addSubClasses(final Set<AbstractClassSignature> involvedClasses, final Set<AbstractClassSignature> matchedClasses) {
 		for (AbstractClassSignature abstractClassSignature : matchedClasses) {
 			addSubClasses(involvedClasses, abstractClassSignature);
 		}
 	}
-	
+
 	public void addSubClasses(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
-		if (classSignature == null)
-			return;
+		if (classSignature == null) return;
 
 		addSubClassesForNames(result, classSignature.getImplementList());
 		addSubClassesForNames(result, classSignature.getSubClassesList());
 	}
-	
+
 	protected void addSubClassesForNames(final Set<AbstractClassSignature> result, final Set<String> names) {
 		for (String className : names) {
-			if (!classes.containsKey(className))
-				continue;
+			if (!classes.containsKey(className)) continue;
 
 			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
+			if (classSignature == null) return;
 
 			if (!result.contains(classSignature)) {
 				result.add(classSignature);
@@ -110,15 +105,13 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 			}
 		}
 	}
-	
+
 	protected void addSuperClassesForNames(final Set<AbstractClassSignature> result, final Set<String> names) {
 		for (String className : names) {
-			if (!classes.containsKey(className))
-				continue;
+			if (!classes.containsKey(className)) continue;
 
 			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
+			if (classSignature == null) return;
 
 			if (!result.contains(classSignature)) {
 				result.add(classSignature);
@@ -126,15 +119,13 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 			}
 		}
 	}
-	
+
 	public void addSuperClasses(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
-		if (classSignature == null)
-			return;
-		
+		if (classSignature == null) return;
+
 		addSuperClassesForNames(result, classSignature.getImplementList());
 		addSuperClassesForNames(result, classSignature.getExtendList());
 	}
-
 
 	@Override
 	protected boolean hasSameType(AbstractSignature signature) {
@@ -143,9 +134,11 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 
 	@Override
 	protected boolean checkSignature(final AbstractSignature signature, final String sigName) {
-		return super.checkSignature(signature, sigName) && RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (FujiMethodSignature) selectedElement) && hasSameReturnType((FujiMethodSignature) signature);
+		return super.checkSignature(signature, sigName)
+			&& RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (FujiMethodSignature) selectedElement)
+			&& hasSameReturnType((FujiMethodSignature) signature);
 	}
-	
+
 	private void filterSuperClasses(final Set<AbstractClassSignature> involvedClasses, final Set<AbstractSignature> matchedSignatures) {
 		for (AbstractClassSignature involvedClass : new HashSet<>(involvedClasses)) {
 			AbstractSignature matchedSignature = getMatchedSignature(involvedClass, matchedSignatures);
@@ -154,7 +147,7 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 			}
 		}
 	}
-	
+
 	private AbstractSignature getMatchedSignature(final AbstractClassSignature signature, final Set<AbstractSignature> matchedSignatures) {
 		for (AbstractSignature match : matchedSignatures) {
 			if (checkSignature(match, match.getName()) && match.getParent().equals(signature)) {
@@ -163,9 +156,9 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 		}
 		return null;
 	}
-	
+
 	private boolean hasSameReturnType(final FujiMethodSignature signature) {
 		return signature.getReturnType().equals(((FujiMethodSignature) selectedElement).getReturnType());
 	}
-	
+
 }

@@ -37,9 +37,7 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 	protected TypeDecl returnType;
 	protected FieldDeclaration field;
 
-
-	public FujiFieldSignature(AbstractClassSignature parent, String name,
-			String modifiers, TypeDecl returnType, FieldDeclaration field) {
+	public FujiFieldSignature(AbstractClassSignature parent, String name, String modifiers, TypeDecl returnType, FieldDeclaration field) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
 		this.field = field;
@@ -77,7 +75,7 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		hashCode = (hashCodePrime * hashCode) + type.hashCode();
 	}
 
-	public String getFullFieldDeclaration(){
+	public String getFullFieldDeclaration() {
 		return field.toString();
 	}
 
@@ -98,8 +96,7 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		return true;
 	}
 
-	public String getFullModifiersAndReturnTypes()
-	{
+	public String getFullModifiersAndReturnTypes() {
 		String result = "";
 		for (String modifier : getModifiers()) {
 			result += modifier + " ";
@@ -113,10 +110,8 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		return result;
 	}
 
-	private void findClassAccess(ASTNode<?> stmt)
-	{
-		if (stmt == null)
-			return;
+	private void findClassAccess(ASTNode<?> stmt) {
+		if (stmt == null) return;
 
 		if (stmt instanceof BoundTypeAccess) {
 

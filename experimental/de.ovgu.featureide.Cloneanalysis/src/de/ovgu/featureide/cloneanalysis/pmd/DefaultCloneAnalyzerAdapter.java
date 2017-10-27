@@ -20,14 +20,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
-public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyzerAdapter<Tool>
-{
+public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyzerAdapter<Tool> {
 	protected Tool analysisTool;
-	
+
 	private final FilenameFilter filter;
 
-	protected DefaultCloneAnalyzerAdapter(final FilenameFilter filter)
-	{
+	protected DefaultCloneAnalyzerAdapter(final FilenameFilter filter) {
 		this.filter = filter;
 	}
 
@@ -41,20 +39,17 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	 *            folders or files to be analyzed.
 	 * @see #registerWithAnalysisTool(Set)
 	 */
-	public void addResourcesFromSelection(IStructuredSelection currentSelection)
-	{
+	public void addResourcesFromSelection(IStructuredSelection currentSelection) {
 		Set<IResource> files = new HashSet<IResource>();
 		Iterator<?> iterator = currentSelection.iterator();
-		while (iterator.hasNext())
-		{
+		while (iterator.hasNext()) {
 			Object selectedObject = iterator.next();
 			IResource file = null;
 
 			if (selectedObject instanceof IResource)
 				file = (IResource) selectedObject;
-			else
-				if (selectedObject instanceof IAdaptable)
-					file = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
+			else if (selectedObject instanceof IAdaptable)
+				file = (IResource) ((IAdaptable) selectedObject).getAdapter(IResource.class);
 
 			if (files != null)
 				files.add(file);
@@ -71,11 +66,9 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	 *            an {@link IFeatureProject}.
 	 * @throws IOException
 	 */
-	public void addProjectToAnalysis(IProject project)
-	{
+	public void addProjectToAnalysis(IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-		if (featureProject != null)
-		{
+		if (featureProject != null) {
 			registerContainerRecursively(featureProject.getSourceFolder());
 		} else
 			registerContainerRecursively(project);
@@ -91,10 +84,8 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	 * @throws IOException
 	 *             if the folder does not exist.
 	 */
-	protected void registerWithAnalysisTool(Set<IResource> resources)
-	{
-		for (IResource resource : resources)
-		{
+	protected void registerWithAnalysisTool(Set<IResource> resources) {
+		for (IResource resource : resources) {
 			if (resource instanceof IFolder)
 				registerContainerRecursively(((IFolder) resource));
 			if (resource instanceof IProject)
@@ -114,13 +105,10 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 	 * 
 	 * @return a default {@link CPDConfiguration}
 	 */
-	protected CPDConfiguration createDefaultConfiguration()
-	{
-		CPDConfiguration config = new CPDConfiguration()
-		{
+	protected CPDConfiguration createDefaultConfiguration() {
+		CPDConfiguration config = new CPDConfiguration() {
 			@Override
-			public FilenameFilter filenameFilter()
-			{
+			public FilenameFilter filenameFilter() {
 				return filter;
 			}
 		};

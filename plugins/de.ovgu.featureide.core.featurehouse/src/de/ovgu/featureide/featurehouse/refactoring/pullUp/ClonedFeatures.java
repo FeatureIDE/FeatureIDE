@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  * @author steffen
  */
 public class ClonedFeatures {
+
 	Set<Feature> features = new HashSet<>();
 
 	public Set<Feature> getFeatures() {
@@ -41,9 +42,9 @@ public class ClonedFeatures {
 	public void setFeatures(Set<Feature> features) {
 		this.features = features;
 	}
-	
-	public void addFeature(Feature feature){
+
+	public void addFeature(Feature feature) {
 		features.add(feature);
 	}
-	
+
 }

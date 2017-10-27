@@ -39,31 +39,27 @@ import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
  */
 public abstract class RefactoringHandler extends ASelectionHandler {
 
-	protected Shell getShell() 
-	{
+	protected Shell getShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window == null) return null;
 		return window.getShell();
 	}
-	
+
 	@Override
-	protected final void singleAction(Object element) 
-	{
+	protected final void singleAction(Object element) {
 		// hier passiert nichts!!!
 	}
-	
+
 	protected abstract void singleAction(Object element, String file);
-	
-	
-	protected IFeatureProject getFeatureProject()
-	{
+
+	protected IFeatureProject getFeatureProject() {
 		IEditorInput fileEditorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
 		final IFile file = ResourceUtil.getFile(fileEditorInput);
 		if (file == null) return null;
-		
+
 		return CorePlugin.getFeatureProject(file);
 	}
-	
+
 	protected void createSignatures(IFeatureProject featureProject) {
 		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject, true, false);
 		try {

@@ -2,9 +2,9 @@
 <projectDescription>
 	<name>DesktopSearcher-AHEAD</name>
 	<comment>
-	[description]
-	DesktopSearcher is a product line based on the search engine Lucene.
-	[/description]
+		[description]
+		DesktopSearcher is a product line based on the search engine Lucene.
+		[/description]
 	</comment>
 	<projects>
 	</projects>

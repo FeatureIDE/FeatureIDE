@@ -1,4 +1,5 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -26,41 +27,34 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
-
 public class RenameHandler extends RefactoringHandler {
 
 	@Override
-	protected void singleAction(Object element, String file) 
-	{
+	protected void singleAction(Object element, String file) {
 		try {
 			IFeatureProject featureProject = getFeatureProject();
-			if (featureProject == null)
-				return;
+			if (featureProject == null) return;
 
 			RenameRefactoring refactoring;
-			if (element instanceof FujiMethodSignature){
+			if (element instanceof FujiMethodSignature) {
 				FujiMethodSignature method = (FujiMethodSignature) element;
 
-				if (method.isConstructor())
-					refactoring = new RenameTypeRefactoring((FujiClassSignature)method.getParent(), featureProject, file);
-				else
-					refactoring = new RenameMethodRefactoring(method, featureProject,file);
-			} else if (element instanceof FujiClassSignature){
-				refactoring = new RenameTypeRefactoring((FujiClassSignature) element, featureProject,file);
-			} else if (element instanceof FujiFieldSignature){
-				refactoring = new RenameFieldRefactoring((FujiFieldSignature) element, featureProject,file);
-			} else if (element instanceof FujiLocalVariableSignature){
-				refactoring = new RenameLocalVariableRefactoring((FujiLocalVariableSignature) element, featureProject,file);
-			} else
-				return;
+				if (method.isConstructor()) refactoring = new RenameTypeRefactoring((FujiClassSignature) method.getParent(), featureProject, file);
+				else refactoring = new RenameMethodRefactoring(method, featureProject, file);
+			} else if (element instanceof FujiClassSignature) {
+				refactoring = new RenameTypeRefactoring((FujiClassSignature) element, featureProject, file);
+			} else if (element instanceof FujiFieldSignature) {
+				refactoring = new RenameFieldRefactoring((FujiFieldSignature) element, featureProject, file);
+			} else if (element instanceof FujiLocalVariableSignature) {
+				refactoring = new RenameLocalVariableRefactoring((FujiLocalVariableSignature) element, featureProject, file);
+			} else return;
 
 			RenameRefactoringWizard refactoringWizard = new RenameRefactoringWizard(refactoring);
 			RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
 			op.run(getShell(), "Rename-Refactoring");
-		} catch (InterruptedException e) {
-		}
+		} catch (InterruptedException e) {}
 	}
-	
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -81,16 +75,15 @@ public class RenameHandler extends RefactoringHandler {
 			int column = sel.getOffset() - lineOffset;
 
 			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
-			
+
 			IFeatureProject featureProject = getFeatureProject();
 			createSignatures(featureProject);
-			
+
 			FujiSelector selector = new FujiSelector(featureProject, file);
 			AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine() + 1, column);
-			if (signature != null)
-				singleAction(signature, file);
+			if (signature != null) singleAction(signature, file);
 		}
-		
+
 		return null;
 	}
 }

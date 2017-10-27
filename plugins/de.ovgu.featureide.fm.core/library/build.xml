@@ -2,10 +2,11 @@
 <project name="lib.fm" default="build" basedir=".">
 
 	<target name="check-external">
-	    <available file="subant_build_external.xml" property="build.external"/>
+		<available file="subant_build_external.xml" property="build.external" />
 	</target>
 
-	<target name="external_build" description="Build External Libraries" depends="check-external" if="build.external">
+	<target name="external_build" description="Build External Libraries"
+		depends="check-external" if="build.external">
 
 		<!-- Build external libraries -->
 		<subant>
@@ -14,8 +15,9 @@
 		</subant>
 
 	</target>
-	
-	<target name="external_clean_build" description="Clean and Build External Libraries" depends="check-external" if="build.external">
+
+	<target name="external_clean_build" description="Clean and Build External Libraries"
+		depends="check-external" if="build.external">
 
 		<!-- Build external libraries -->
 		<subant>
@@ -45,7 +47,8 @@
 
 	</target>
 
-	<target name="clean_build" description="Clean and Build Project" depends="external_clean_build">
+	<target name="clean_build" description="Clean and Build Project"
+		depends="external_clean_build">
 
 		<!-- Clean and build own project -->
 		<subant>

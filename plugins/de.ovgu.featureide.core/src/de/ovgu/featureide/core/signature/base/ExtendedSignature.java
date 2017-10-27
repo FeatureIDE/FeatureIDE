@@ -54,14 +54,12 @@ public class ExtendedSignature {
 		if (comp.featureID == this.featureID && comp.sig.equals(this.sig)) {
 			return true;
 		}
-		
-		if (comp.getPosition().getStartRow() == this.position.getStartRow() &&
-			comp.getPosition().getEndRow() == this.position.getEndRow() &&
-			comp.getPosition().getIdentifierStart() == this.position.getIdentifierStart() &&
-			comp.getPosition().getIdentifierEnd() == this.position.getIdentifierEnd())
-			return true;
-					
-		return false; 
+
+		if (comp.getPosition().getStartRow() == this.position.getStartRow() && comp.getPosition().getEndRow() == this.position.getEndRow()
+			&& comp.getPosition().getIdentifierStart() == this.position.getIdentifierStart()
+			&& comp.getPosition().getIdentifierEnd() == this.position.getIdentifierEnd()) return true;
+
+		return false;
 	}
 
 	@Override

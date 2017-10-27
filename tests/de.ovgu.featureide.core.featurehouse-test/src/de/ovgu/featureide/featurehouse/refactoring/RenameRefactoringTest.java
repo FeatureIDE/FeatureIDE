@@ -65,7 +65,7 @@ public abstract class RenameRefactoringTest {
 
 	protected IFeatureProject featureProject;
 	private ProjectSignatures signatures;
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -76,34 +76,36 @@ public abstract class RenameRefactoringTest {
 		final IProjectDescription desc = workspace.loadProjectDescription(new Path(path + "/HelloWorld-FH-Java-Test/.project"));
 		final IProject project = workspace.getRoot().getProject(desc.getName());
 		if (!project.exists()) project.create(null);
-		if (!project.isOpen())  project.open(null);
+		if (!project.isOpen()) project.open(null);
 		CorePlugin.getDefault().addProject(project);
 		featureProject = CorePlugin.getFeatureProjects().iterator().next();
-		
+
 		IOverwriteQuery overwriteQuery = new IOverwriteQuery() {
-	        public String queryOverwrite(String file) { return ALL; }
+
+			public String queryOverwrite(String file) {
+				return ALL;
+			}
 		};
-		
+
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
 		String baseDir = path + "/HelloWorld-FH-Java-Test";// location of files to import""
-				
-		ImportOperation importOperation = new ImportOperation(project.getFullPath(),
-		        new File(baseDir), FileSystemStructureProvider.INSTANCE, overwriteQuery);
+
+		ImportOperation importOperation = new ImportOperation(project.getFullPath(), new File(baseDir), FileSystemStructureProvider.INSTANCE, overwriteQuery);
 		importOperation.setCreateContainerStructure(false);
 		importOperation.run(new NullProgressMonitor());
-		
+
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-		
+
 		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
 		efsj.schedule();
 		efsj.join();
-		
+
 		signatures = featureProject.getFSTModel().getProjectSignatures();
 	}
 
 	protected Set<Integer> hashCodeOfChanges(final String fullOldName, final String newName, final RefactoringStatus status) throws Exception {
-		
+
 		RenameRefactoring<?> refactoring = getRefactoring(fullOldName);
 		refactoring.setNewName(newName);
 		CompositeChange undoChanges = null;
@@ -112,34 +114,30 @@ public abstract class RenameRefactoringTest {
 		try {
 //			status.merge(refactoring.checkAllConditions(monitor));
 //			if (status.hasError()) return result;
-			
+
 			PerformRefactoringOperation op = new PerformRefactoringOperation(refactoring, CheckConditionsOperation.ALL_CONDITIONS);
 			op.run(monitor);
 			undoChanges = (CompositeChange) op.getUndoChange();
 			status.merge(op.getConditionStatus());
 			if (status.hasError()) return result;
-			
+
 			CompositeChange child = (CompositeChange) undoChanges.getChildren()[0];
-			
+
 			for (Change change : child.getChildren()) {
 				if (change instanceof RenameResourceChange) {
 					RenameResourceChange resourceChange = (RenameResourceChange) change;
-					result.add(getHashCodeOfFile((IFile)resourceChange.getModifiedElement()));
-				}
-				else if (change instanceof UndoTextFileChange) {
-					UndoTextFileChange	textFileChange  = (UndoTextFileChange) change;
+					result.add(getHashCodeOfFile((IFile) resourceChange.getModifiedElement()));
+				} else if (change instanceof UndoTextFileChange) {
+					UndoTextFileChange textFileChange = (UndoTextFileChange) change;
 					final IFile modifiedElement = (IFile) textFileChange.getModifiedElement();
-					if (modifiedElement.exists())
-						result.add(getHashCodeOfFile(modifiedElement));
+					if (modifiedElement.exists()) result.add(getHashCodeOfFile(modifiedElement));
 				}
-			} 
-		}
-		finally{
+			}
+		} finally {
 			// undo-action
-			if (undoChanges != null)
-				 new PerformChangeOperation(undoChanges).run(monitor);
+			if (undoChanges != null) new PerformChangeOperation(undoChanges).run(monitor);
 		}
-		
+
 		return result;
 	}
 
@@ -149,23 +147,23 @@ public abstract class RenameRefactoringTest {
 		contents.read(contentsArray);
 		return new String(contentsArray).hashCode();
 	}
-	
-	protected AbstractSignature getNamedSignature(final String fullSigName){
+
+	protected AbstractSignature getNamedSignature(final String fullSigName) {
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
 			if (checkSignature(signature, fullSigName)) {
 				return signature;
 			}
-		}	
+		}
 		return null;
 	}
-	
+
 	protected boolean checkSignature(final AbstractSignature signature, final String fullSigName) {
-		return signature.getFullName().equals(fullSigName) && hasSameType(signature); //&&  ((FujiMethodSignature) signature).getParameterTypes().isEmpty();
+		return signature.getFullName().equals(fullSigName) && hasSameType(signature); // && ((FujiMethodSignature) signature).getParameterTypes().isEmpty();
 	}
-	
+
 	protected abstract boolean hasSameType(final AbstractSignature signature);
-	
+
 	protected abstract RenameRefactoring<?> getRefactoring(final String fullSigName);
 }

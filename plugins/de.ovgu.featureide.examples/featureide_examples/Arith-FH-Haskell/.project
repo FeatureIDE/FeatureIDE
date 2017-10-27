@@ -2,9 +2,9 @@
 <projectDescription>
 	<name>Arith-FH-Haskell</name>
 	<comment>
-	[description]
-	An arithmetic expression evaluator.
-	[/description]
+		[description]
+		An arithmetic expression evaluator.
+		[/description]
 	</comment>
 	<projects>
 	</projects>

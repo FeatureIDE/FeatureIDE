@@ -21,11 +21,11 @@
 package de.ovgu.featureide.featurehouse.refactoring;
 
 public class SearchMatch {
-	
+
 	private final int length;
 	private final int offset;
 	private final String file;
-	
+
 	public SearchMatch(final String file, final int offset, final int length) {
 		this.file = file;
 		this.length = length;
@@ -35,7 +35,7 @@ public class SearchMatch {
 	public String getFile() {
 		return file;
 	}
-	
+
 	public int getLength() {
 		return length;
 	}
@@ -43,6 +43,5 @@ public class SearchMatch {
 	public int getOffset() {
 		return offset;
 	}
-
 
 }

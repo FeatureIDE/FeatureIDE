@@ -174,8 +174,7 @@ public class German implements ILanguage {
 
 	@Override
 	public String getExplanation() {
-		return "Das ausgewählte Element ist defekt" + System.lineSeparator()
-			+ "wegen der hervorgehobenen Abhängigkeiten:";
+		return "Das ausgewählte Element ist defekt" + System.lineSeparator() + "wegen der hervorgehobenen Abhängigkeiten:";
 	}
 
 	@Override

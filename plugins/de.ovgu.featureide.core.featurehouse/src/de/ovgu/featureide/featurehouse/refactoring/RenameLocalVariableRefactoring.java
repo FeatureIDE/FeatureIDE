@@ -61,25 +61,25 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 
 		super.checkPreConditions(matcher, refactoringStatus);
 		if (refactoringStatus.hasFatalError()) return;
-		
+
 		refactoringStatus.merge(checkNameCollision(matcher));
 	}
-	
+
 	private RefactoringStatus checkNameCollision(SignatureMatcher matcher) {
-		
-		RefactoringStatus status = new RefactoringStatus();		
+
+		RefactoringStatus status = new RefactoringStatus();
 
 		final AbstractMethodSignature declaringMethod = renamingElement.getDeclaringMethod();
 		for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
-			
+
 			if (!(newMatchedSignature instanceof FujiLocalVariableSignature)) continue;
-			
+
 			for (AFeatureData featureData : newMatchedSignature.getFeatureData()) {
-				
-				if ((featureData.getAbsoluteFilePath().equals(file) || declaringMethod.isConstructor()) && 
-						declaringMethod.equals(((FujiLocalVariableSignature) newMatchedSignature).getDeclaringMethod()))
-				{
-					status.addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
+
+				if ((featureData.getAbsoluteFilePath().equals(file) || declaringMethod.isConstructor())
+					&& declaringMethod.equals(((FujiLocalVariableSignature) newMatchedSignature).getDeclaringMethod())) {
+					status.addError(
+							Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
 				}
 			}
 		}
@@ -89,14 +89,13 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) throws CoreException {
 		Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
-		RefactoringStatus result= Checks.checkName(newName, validateFieldName(newName));
+		RefactoringStatus result = Checks.checkName(newName, validateFieldName(newName));
 
-		if (!Checks.startsWithLowerCase(newName))
-			result.addWarning(RefactoringCoreMessages.RenameTempRefactoring_lowercase);
+		if (!Checks.startsWithLowerCase(newName)) result.addWarning(RefactoringCoreMessages.RenameTempRefactoring_lowercase);
 
 		return result;
 	}
-	
+
 	/**
 	 * @param name the name to validate
 	 * @param context an {@link IJavaElement} or <code>null</code>
@@ -105,8 +104,8 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 	 * @see JavaConventions#validateFieldName(String, String, String)
 	 */
 	private IStatus validateFieldName(String name) {
-		String[] sourceComplianceLevels= getSourceComplianceLevels();
+		String[] sourceComplianceLevels = getSourceComplianceLevels();
 		return JavaConventions.validateFieldName(name, sourceComplianceLevels[0], sourceComplianceLevels[1]);
 	}
-	
+
 }

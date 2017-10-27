@@ -68,7 +68,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * @author Marcus Pinnecke
  */
 public class Feature extends AFeature {
-	
 
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
@@ -85,7 +84,7 @@ public class Feature extends AFeature {
 	 *
 	 * @since 3.0
 	 */
-	
+
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel, newFeatrureStructure);
 	}
@@ -103,12 +102,11 @@ public class Feature extends AFeature {
 	public Feature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 	}
-	
 
 	private final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
-	
+
 	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	
+
 	public void fire(PropertyChangeEvent event) {
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
@@ -129,20 +127,23 @@ public class Feature extends AFeature {
 		return new Feature(this, newFeatureModel, newStructure);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#getParent()
 	 */
 //	@Override
 
 //	private IFeature parent;
 	public IFeature feature;
+
 	public IFeature getParent() {
 //		return null;
 //		return parent;
 		return FeatureUtils.getParent(feature);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.IFeature#isConcrete()
 	 */
 //	@Override
@@ -152,7 +153,7 @@ public class Feature extends AFeature {
 //		return concret;
 		return FeatureUtils.isConcrete(feature);
 	}
-	
+
 	public String getDisplayName() {
 		return FeatureUtils.getDisplayName(feature);
 	}

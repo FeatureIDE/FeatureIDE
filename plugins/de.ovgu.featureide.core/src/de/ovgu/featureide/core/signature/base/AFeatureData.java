@@ -29,6 +29,7 @@ import org.prop4j.Node;
  * @author Sebastian Krieter
  */
 public abstract class AFeatureData implements IConstrainedObject {
+
 	protected final SignaturePosition sigPosition = null;
 	protected final int startLineNumber, endLineNumber;
 
@@ -78,6 +79,7 @@ public abstract class AFeatureData implements IConstrainedObject {
 	public boolean hasID(int id) {
 		return (this.id == -1) || (this.id == id);
 	}
+
 	public String getAbsoluteFilePath() {
 		return absolutePathToFile;
 	}

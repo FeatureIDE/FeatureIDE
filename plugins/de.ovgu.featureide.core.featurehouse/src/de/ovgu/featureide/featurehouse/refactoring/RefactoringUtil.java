@@ -58,7 +58,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class RefactoringUtil {
 
-	
 	public static CompilationUnit parseUnit(final String absoluteFilePath) {
 
 		try {
@@ -84,62 +83,56 @@ public class RefactoringUtil {
 		}
 		return null;
 	}
-		
+
 	public static boolean hasSamePackage(final AbstractSignature signature1, final AbstractSignature signature2) {
-		
+
 		final String sigPackage1 = getPackage(signature1);
 		final String sigPackage2 = getPackage(signature2);
-		
+
 		return sigPackage1.equals(sigPackage2);
 	}
-	
-	public static String getPackage(final AbstractSignature signature){
-		if (signature instanceof FujiClassSignature)
-			return ((FujiClassSignature) signature).getPackage();
-		else
-			return signature.getParent().getPackage();
+
+	public static String getPackage(final AbstractSignature signature) {
+		if (signature instanceof FujiClassSignature) return ((FujiClassSignature) signature).getPackage();
+		else return signature.getParent().getPackage();
 	}
 
 	public static boolean hasSameName(final AbstractSignature signature1, final AbstractSignature signature2) {
 		return hasSameName(signature1.getName(), signature2.getName());
 	}
-	
+
 	public static boolean hasSameName(final AbstractSignature signature, final String name) {
 		return signature.getName().equals(name);
 	}
-	
+
 	private static boolean hasSameName(final String name1, final String name2) {
 		return name1.equals(name2);
 	}
-	
+
 	public static boolean hasSameParameters(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
 		List<String> parameterTypes1 = signature1.getParameterTypes();
 		List<String> parameterTypes2 = signature2.getParameterTypes();
-		
+
 		return parameterTypes1.equals(parameterTypes2);
 	}
-	
+
 	public static boolean hasSameReturnType(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
 		return signature1.getReturnType().equals(signature2.getReturnType());
 	}
-	
+
 	/**
-	 * Returns <code>true</code> if the method could be a virtual method,
-	 * i.e. if it is not a constructor, is private, or is static.
+	 * Returns <code>true</code> if the method could be a virtual method, i.e. if it is not a constructor, is private, or is static.
 	 *
 	 * @param method a method
 	 * @return <code>true</code> if the method could a virtual method
 	 */
 	public static boolean isVirtual(AbstractMethodSignature method) {
-		if (method.isConstructor())
-			return false;
-		if (method.isPrivate())
-			return false;
-		if (method.isStatic())
-			return false;
+		if (method.isConstructor()) return false;
+		if (method.isPrivate()) return false;
+		if (method.isStatic()) return false;
 		return true;
 	}
-	
+
 	public static Map<String, AbstractClassSignature> getClasses(final ProjectSignatures signatures) {
 		final Map<String, AbstractClassSignature> classes = new HashMap<>();
 
@@ -148,37 +141,33 @@ public class RefactoringUtil {
 			final AbstractSignature signature = iter.next();
 			if (signature instanceof AbstractClassSignature) {
 				String fullName = signature.getFullName();
-				if (fullName.startsWith("."))
-					fullName = fullName.substring(1);
+				if (fullName.startsWith(".")) fullName = fullName.substring(1);
 				classes.put(fullName, (AbstractClassSignature) signature);
 			}
 		}
 
 		return classes;
 	}
-	
+
 	public static IFile getFile(final String relativePath) {
 		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(relativePath));
 	}
-	
-	public static ICompilationUnit getCompilationUnit(final String relativePath)
-	{
+
+	public static ICompilationUnit getCompilationUnit(final String relativePath) {
 		final IFile file = RefactoringUtil.getFile(relativePath);
-		
-		if ((file == null) || ((file != null) && !file.isAccessible()))
-			return null;
+
+		if ((file == null) || ((file != null) && !file.isAccessible())) return null;
 
 		return JavaCore.createCompilationUnitFrom(file);
 	}
-	
-	public static IFeature getFeatureForId(ProjectSignatures projectSignatures, int featureId)
-	{
+
+	public static IFeature getFeatureForId(ProjectSignatures projectSignatures, int featureId) {
 		final String featureName = projectSignatures.getFeatureName(featureId);
 		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
-	
+
 	public static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {
-		Set<AbstractSignature> matchedSignatures  = new HashSet<>();
+		Set<AbstractSignature> matchedSignatures = new HashSet<>();
 		for (AbstractSignature signature : signatures) {
 			matchedSignatures.addAll(getMatchedSignature(signature, matchingFile));
 		}
@@ -186,24 +175,22 @@ public class RefactoringUtil {
 	}
 
 	private static Set<AbstractSignature> getMatchedSignature(AbstractSignature signature, String matchingFile) {
-		Set<AbstractSignature> matchedSignatures  = new HashSet<>();
+		Set<AbstractSignature> matchedSignatures = new HashSet<>();
 		for (AFeatureData featureData : signature.getFeatureData()) {
-			if (featureData.getAbsoluteFilePath().equals(matchingFile)) 
-			{
+			if (featureData.getAbsoluteFilePath().equals(matchingFile)) {
 				matchedSignatures.add(signature);
 				break;
 			}
 		}
 		return matchedSignatures;
 	}
-	
-	public static Set<AbstractSignature> getIncludedMatchingSignaturesForFile(AbstractClassSignature classSignature, String matchingFile)
-	{
-	    Set<AbstractSignature> matchedSignatures = getMatchedSignaturesForClass(classSignature.getMethods(), matchingFile);
+
+	public static Set<AbstractSignature> getIncludedMatchingSignaturesForFile(AbstractClassSignature classSignature, String matchingFile) {
+		Set<AbstractSignature> matchedSignatures = getMatchedSignaturesForClass(classSignature.getMethods(), matchingFile);
 		matchedSignatures.addAll(getMatchedSignaturesForClass(classSignature.getFields(), matchingFile));
 		matchedSignatures.addAll(getMatchedSignature(classSignature, matchingFile));
-		
+
 		return matchedSignatures;
 	}
- 
+
 }

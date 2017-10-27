@@ -39,7 +39,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
  * 
  * @author Steffen Schulze
  */
-public class RenameClassRefactoringTest extends RenameRefactoringTest{
+public class RenameClassRefactoringTest extends RenameRefactoringTest {
 
 	@Test
 	public void testRenameClass() throws Exception {
@@ -49,7 +49,7 @@ public class RenameClassRefactoringTest extends RenameRefactoringTest{
 		assertTrue(changedHashCodes.size() == expectedHashCodes.size());
 		assertTrue(changedHashCodes.containsAll(expectedHashCodes));
 	}
-	
+
 	@Test
 	public void testRenameClassExisting() throws Exception {
 		final RefactoringStatus status = new RefactoringStatus();
@@ -57,9 +57,9 @@ public class RenameClassRefactoringTest extends RenameRefactoringTest{
 		assertTrue(status.hasError());
 		assertTrue(changedHashCodes.size() == 0);
 	}
-	
+
 	private Set<Integer> getExpectedHashCodeVirtualMethod() throws CoreException, IOException {
-		final Set<Integer> expectedHashCode =  new HashSet<Integer>();
+		final Set<Integer> expectedHashCode = new HashSet<Integer>();
 		IFile file = featureProject.getProject().getFile("features_expected/testRenameClass/Beautiful/RenamedMain.java");
 		expectedHashCode.add(getHashCodeOfFile(file));
 		file = featureProject.getProject().getFile("features_expected/testRenameClass/Hello/RenamedMain.java");
@@ -72,7 +72,7 @@ public class RenameClassRefactoringTest extends RenameRefactoringTest{
 		expectedHashCode.add(getHashCodeOfFile(file));
 		return expectedHashCode;
 	}
-	
+
 	@Override
 	protected boolean hasSameType(AbstractSignature signature) {
 		return (signature instanceof FujiClassSignature);

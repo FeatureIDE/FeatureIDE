@@ -25,5 +25,5 @@ public abstract class AbstractLocalVariableSignature extends AbstractSignature {
 	protected AbstractLocalVariableSignature(AbstractClassSignature parent, String name, String modifiers, String type) {
 		super(parent, name, modifiers, type);
 	}
-	
+
 }

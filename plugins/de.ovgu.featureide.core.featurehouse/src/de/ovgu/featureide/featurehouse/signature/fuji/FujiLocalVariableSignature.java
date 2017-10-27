@@ -35,7 +35,8 @@ public class FujiLocalVariableSignature extends AbstractLocalVariableSignature {
 	protected final TypeDecl returnType;
 	protected final AbstractMethodSignature declaringMethod;
 
-	public FujiLocalVariableSignature(AbstractClassSignature parent, AbstractMethodSignature declaringMethod, String name, String modifiers, TypeDecl returnType) {
+	public FujiLocalVariableSignature(AbstractClassSignature parent, AbstractMethodSignature declaringMethod, String name, String modifiers,
+			TypeDecl returnType) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
 		this.declaringMethod = declaringMethod;
@@ -76,10 +77,8 @@ public class FujiLocalVariableSignature extends AbstractLocalVariableSignature {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
 
 		FujiLocalVariableSignature otherSig = (FujiLocalVariableSignature) obj;
 

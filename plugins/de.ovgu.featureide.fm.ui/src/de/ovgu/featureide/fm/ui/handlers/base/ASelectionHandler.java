@@ -55,7 +55,7 @@ public abstract class ASelectionHandler extends AbstractHandler {
 				endAction();
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -76,5 +76,5 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	protected void endAction() {
 		// do nothing.
 	}
-	
+
 }

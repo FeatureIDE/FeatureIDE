@@ -1,7 +1,6 @@
 package de.ovgu.featureide.cloneanalysis.results;
 
-public interface IClonePercentageData
-{
+public interface IClonePercentageData {
 
 	public abstract double getClonedLinePercentage(FeatureRootLocation feature);
 

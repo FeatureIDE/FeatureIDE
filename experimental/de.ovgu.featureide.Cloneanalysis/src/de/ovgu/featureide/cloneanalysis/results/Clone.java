@@ -15,8 +15,7 @@ import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.cloneanalysis.impl.CloneOccurence;
 
-public class Clone implements Comparable<Clone>
-{
+public class Clone implements Comparable<Clone> {
 	private int lineCount;
 	private int tokenCount;
 	private int fileCount;
@@ -31,12 +30,9 @@ public class Clone implements Comparable<Clone>
 	 */
 	protected Map<CloneOccurence, IFile> occurences = null;
 
-
 	protected Set<IProject> relevantProjects = null;
 
-
-	public Clone(Set<CloneOccurence> occurences, int lines, int tokens, int files, String code)
-	{
+	public Clone(Set<CloneOccurence> occurences, int lines, int tokens, int files, String code) {
 		lineCount = lines;
 		tokenCount = tokens;
 		fileCount = files;
@@ -45,35 +41,32 @@ public class Clone implements Comparable<Clone>
 	}
 
 	/**
-	 * Adds Occurences from the given {@link Set} into the Clones occurences {@link Map},
+	 * Adds Occurences from the given {@link Set} into the Clones occurences
+	 * {@link Map},
 	 * 
 	 * 
 	 * @param occurenceSet
 	 */
-	private void populateOccurences(Set<CloneOccurence> occurenceSet)
-	{
+	private void populateOccurences(Set<CloneOccurence> occurenceSet) {
 		occurences = new HashMap<CloneOccurence, IFile>();
-		for (CloneOccurence occurence : occurenceSet)
-		{
-			final IFile file = ResourcesPlugin.getWorkspace().getRoot()
-					.getFileForLocation(occurence.getFile());
+		for (CloneOccurence occurence : occurenceSet) {
+			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(occurence.getFile());
 			final IProject project = file.getProject();
 
 			assert project.exists() : "clone found in a file not associated to any existing project.";
 
-			if(relevantProjects == null)
+			if (relevantProjects == null)
 				relevantProjects = new HashSet<IProject>();
-			
-			if(!relevantProjects.contains(project))
+
+			if (!relevantProjects.contains(project))
 				relevantProjects.add(project);
 
 			occurences.put(occurence, file);
 		}
 	}
-	
+
 	@Override
-	public int compareTo(Clone other)
-	{
+	public int compareTo(Clone other) {
 		if (other == null)
 			return 1;
 		if (getNumberOfFiles() != other.getNumberOfFiles())
@@ -85,32 +78,28 @@ public class Clone implements Comparable<Clone>
 	/**
 	 * @return the occurences
 	 */
-	public Set<CloneOccurence> getOccurences()
-	{
+	public Set<CloneOccurence> getOccurences() {
 		return occurences.keySet();
 	}
 
 	/**
 	 * @return the length of the cloned code snippet in lines.
 	 */
-	public int getLineCount()
-	{
+	public int getLineCount() {
 		return lineCount;
 	}
 
 	/**
 	 * @return the tokenCount
 	 */
-	public int getTokenCount()
-	{
+	public int getTokenCount() {
 		return tokenCount;
 	}
 
 	/**
 	 * @return the fileCount
 	 */
-	public int getNumberOfFiles()
-	{
+	public int getNumberOfFiles() {
 		return fileCount;
 	}
 
@@ -121,28 +110,25 @@ public class Clone implements Comparable<Clone>
 	 * 
 	 * @return
 	 */
-	public List<IPath> getDistinctFiles()
-	{
+	public List<IPath> getDistinctFiles() {
 		Set<IPath> files = new HashSet<IPath>();
 		if (occurences != null)
-		for (CloneOccurence snippet : occurences.keySet())
-			files.add(snippet.getFile());
+			for (CloneOccurence snippet : occurences.keySet())
+				files.add(snippet.getFile());
 		return new ArrayList<IPath>(files);
 	}
 
 	/**
 	 * @return the code
 	 */
-	public String getCode()
-	{
+	public String getCode() {
 		return code;
 	}
 
 	/**
 	 * @return the relevantProjects
 	 */
-	public Set<IProject> getRelevantProjects()
-	{
+	public Set<IProject> getRelevantProjects() {
 		return relevantProjects;
 	}
 }
