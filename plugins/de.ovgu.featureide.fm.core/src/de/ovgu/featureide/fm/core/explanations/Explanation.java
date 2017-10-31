@@ -212,6 +212,14 @@ public abstract class Explanation<S> {
 		return new And(clauses);
 	}
 
+	/**
+	 * Returns the formula that is implied logically by this explanation. For example, if this is an explanation for a false-optional feature, the implication
+	 * is that the feature's parent implies the feature.
+	 *
+	 * @return the implication
+	 */
+	public abstract Node getImplication();
+
 	@Override
 	public String toString() {
 		final ExplanationWriter<?> writer = getWriter();

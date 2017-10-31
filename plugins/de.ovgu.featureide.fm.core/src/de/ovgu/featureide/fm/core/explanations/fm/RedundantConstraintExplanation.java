@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
@@ -57,6 +59,11 @@ public class RedundantConstraintExplanation extends FeatureModelExplanation<ICon
 	 */
 	public void setImplicit(boolean implicit) {
 		this.implicit = implicit;
+	}
+
+	@Override
+	public Node getImplication() {
+		return getSubject().getNode();
 	}
 
 	@Override
