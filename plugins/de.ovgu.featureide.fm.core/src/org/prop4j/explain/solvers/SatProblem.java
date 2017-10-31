@@ -86,6 +86,15 @@ public interface SatProblem {
 	public List<Node> getClauses();
 
 	/**
+	 * Returns the clauses with the given indexes.
+	 *
+	 * @param indexes clause indexes
+	 * @return the clauses with the given indexes
+	 * @throws IndexOutOfBoundsException if any index is out of range
+	 */
+	public List<Node> getClauses(Collection<Integer> indexes) throws IndexOutOfBoundsException;
+
+	/**
 	 * Returns the clause at the given index.
 	 *
 	 * @param index index of the clause

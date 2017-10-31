@@ -174,6 +174,11 @@ public class Ltms implements MusExtractor {
 	}
 
 	@Override
+	public List<Node> getClauses(Collection<Integer> indexes) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Node getClause(int index) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}

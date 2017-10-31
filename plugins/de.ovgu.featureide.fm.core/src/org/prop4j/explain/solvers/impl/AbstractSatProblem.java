@@ -93,6 +93,15 @@ public abstract class AbstractSatProblem implements SatProblem {
 	}
 
 	@Override
+	public List<Node> getClauses(Collection<Integer> indexes) {
+		final List<Node> clauses = new ArrayList<>(indexes.size());
+		for (int i = 0; i < clauses.size(); i++) {
+			clauses.add(clauses.get(i));
+		}
+		return clauses;
+	}
+
+	@Override
 	public Node getClause(int index) throws IndexOutOfBoundsException {
 		return clauses.get(index);
 	}
