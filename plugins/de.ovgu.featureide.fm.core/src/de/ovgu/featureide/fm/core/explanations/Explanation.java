@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.prop4j.And;
+import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 /**
@@ -195,6 +197,20 @@ public abstract class Explanation<S> {
 	 * @return an instance of {@link ExplanationWriter} suitable for this explanation
 	 */
 	public abstract ExplanationWriter<? extends Explanation<S>> getWriter();
+
+	/**
+	 * Returns this explanation as a propositional formula.
+	 *
+	 * @return this explanation as a propositional formula
+	 */
+	public Node toNode() {
+		final Node[] clauses = new Node[getReasonCount()];
+		int i = 0;
+		for (final Reason<?> reason : getReasons()) {
+			clauses[i++] = reason.toNode();
+		}
+		return new And(clauses);
+	}
 
 	@Override
 	public String toString() {
