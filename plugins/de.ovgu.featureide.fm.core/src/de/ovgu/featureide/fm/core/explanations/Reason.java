@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.explanations;
 /**
  * The atomic unit an explanation is composed of.
  *
- * @param S subject
+ * @param <S> subject
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */

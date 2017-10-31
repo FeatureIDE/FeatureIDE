@@ -30,9 +30,9 @@ import de.ovgu.featureide.fm.core.explanations.impl.composite.CompositeExplanati
 /**
  * Implements {@link FeatureModelExplanationCreator} through composition.
  *
- * @param S subject
- * @param E explanation
- * @param C composite
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <C> composite
  * @author Timo G&uuml;nther
  */
 public abstract class CompositeFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>, C extends FeatureModelExplanationCreator<S, E>>

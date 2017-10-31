@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.AbstractPrepro
 /**
  * Abstract implementation of {@link PreprocessorExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class MusPreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>>

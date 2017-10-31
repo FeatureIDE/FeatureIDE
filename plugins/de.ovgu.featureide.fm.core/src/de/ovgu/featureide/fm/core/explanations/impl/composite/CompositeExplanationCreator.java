@@ -35,9 +35,9 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
  * if some instances fail to consistently generate explanations but are otherwise preferable. For example, {@link Ltms LTMS} is fast but incomplete. If it
  * fails, one might try again with a slower but complete {@link MusExtractor MUS extractor}.
  *
- * @param S subject
- * @param E explanation
- * @param C composite
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <C> composite
  * @author Timo G&uuml;nther
  */
 public abstract class CompositeExplanationCreator<S, E extends Explanation<S>, C extends ExplanationCreator<S, E>> implements ExplanationCreator<S, E> {
