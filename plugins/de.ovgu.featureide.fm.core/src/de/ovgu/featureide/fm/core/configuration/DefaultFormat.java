@@ -137,11 +137,13 @@ public class DefaultFormat implements IConfigurationFormat {
 					}
 				}
 			}
-			return buffer.toString();
 		} else {
-			writeSelectedFeatures(configuration.getRoot(), buffer);
-			return buffer.toString();
+			final SelectableFeature root = configuration.getRoot();
+			if ((root != null) && (root.getFeature() != null)) {
+				writeSelectedFeatures(root, buffer);
+			}
 		}
+		return buffer.toString();
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
