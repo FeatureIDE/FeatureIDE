@@ -227,6 +227,19 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
+	public void layoutLegendOnIntersect() {
+		for (final Object obj : getEditPartRegistry().values()) {
+			if (obj instanceof LegendEditPart) {
+				final LegendFigure fig = ((LegendEditPart) obj).getFigure();
+				fig.recreateLegend();
+				final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+				if (newLegendPosition != null) {
+					fig.setLocation(newLegendPosition);
+				}
+			}
+		}
+	}
+
 	public void deregisterEditParts() {
 		final Map<?, ?> registry = getEditPartRegistry();
 		for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
