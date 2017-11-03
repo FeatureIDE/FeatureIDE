@@ -145,10 +145,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -231,7 +228,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private FeatureModelAnalyzer analyzer;
 
 	FeatureDiagramEditorKeyHandler editorKeyHandler;
-	private FeatureDiagramLayoutManager layoutManager;
 
 	/** The currently active explanation. */
 	private Explanation<?> activeExplanation;
@@ -967,16 +963,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			// Refresh the legend.
 			if (!graphicalFeatureModel.isLegendHidden()) {
-				for (final Object obj : viewer.getEditPartRegistry().values()) {
-					if (obj instanceof LegendEditPart) {
-						final LegendFigure fig = ((LegendEditPart) obj).getFigure();
-						fig.recreateLegend();
-						final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
-						if (newLegendPosition != null) {
-							fig.setLocation(newLegendPosition);
-						}
-					}
-				}
+				viewer.layoutLegendOnIntersect();
 			}
 			break;
 		case DEFAULT:
