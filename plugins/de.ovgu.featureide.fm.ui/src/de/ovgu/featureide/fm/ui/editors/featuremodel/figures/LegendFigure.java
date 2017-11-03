@@ -200,10 +200,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = Functional.toList(Functional.filter(graphicalFeatureModel.getVisibleFeatures(), new HiddenGraphicalFeatureFilter())).size() > 0;
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getFeatures().size();
-		if (analyser.isCalculateDeadConstraints()) {
+		if (analyser.getAnalysesCollection().isCalculateDeadConstraints()) {
 			dead = analyser.getFeatureModelProperties().hasDeadFeatures();
 		}
-		if (analyser.isCalculateFOConstraints()) {
+		if (analyser.getAnalysesCollection().isCalculateFOConstraints()) {
 			falseoptional = analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
 		}
 		indetHidden = analyser.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
@@ -211,12 +211,12 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		void_model = !analyser.isValid();
 
 		collapsed = graphicalFeatureModel.getVisibleFeatures().size() != graphicalFeatureModel.getAllFeatures().size();
-		dead = analyser.isCalculateDeadConstraints() && analyser.getFeatureModelProperties().hasDeadFeatures();
-		falseoptional = analyser.isCalculateFOConstraints() && analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
+		dead = analyser.getAnalysesCollection().isCalculateDeadConstraints() && analyser.getFeatureModelProperties().hasDeadFeatures();
+		falseoptional = analyser.getAnalysesCollection().isCalculateFOConstraints() && analyser.getFeatureModelProperties().hasFalseOptionalFeatures();
 		indetHidden = analyser.getFeatureModelProperties().hasIndeterminateHiddenFeatures();
 
-		tautologyConst = analyser.isCalculateTautologyConstraints() && FeatureUtils.hasTautologyConst(featureModel);
-		redundantConst = analyser.isCalculateRedundantConstraints() && FeatureUtils.hasRedundantConst(featureModel);
+		tautologyConst = analyser.getAnalysesCollection().isCalculateTautologyConstraints() && FeatureUtils.hasTautologyConst(featureModel);
+		redundantConst = analyser.getAnalysesCollection().isCalculateRedundantConstraints() && FeatureUtils.hasRedundantConst(featureModel);
 		implicitConst = isImplicit(graphicalFeatureModel);
 
 		explanations = graphicalFeatureModel.getActiveExplanation() != null ? true : false;

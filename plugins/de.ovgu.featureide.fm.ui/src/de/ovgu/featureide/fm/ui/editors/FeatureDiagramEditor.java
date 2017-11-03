@@ -74,8 +74,10 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.AnalysesCollection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -226,6 +228,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private int index;
 
 	private IRunner<Boolean> analyzeJob;
+	private FeatureModelAnalyzer varAnalyzer;
 
 	private boolean waiting = false;
 
@@ -495,8 +498,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			return;
 		}
 		waiting = true;
-		final FeatureModelAnalyzer analyzer2 = FeatureModelManager.getAnalyzer(getFeatureModel());
-		final boolean runAnalysis = analyzer2.isRunCalculationAutomatically() && analyzer2.isCalculateFeatures();
+		varAnalyzer = new FeatureModelAnalyzer(new FeatureModelFormula(getFeatureModel()));
 		/**
 		 * This extra job is necessary, else the UI will stop.
 		 */
@@ -525,15 +527,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 						if (waiting) {
 							return true;
 						}
-						final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(getFeatureModel());
-						analyzer.reset(getFeatureModel());
 						refreshGraphics(null);
 
-						if (!runAnalysis) {
+						final FeatureModelAnalyzer localAnalyzer = varAnalyzer;
+
+						localAnalyzer.reset();
+
+						final AnalysesCollection generalAnalysesCollection = FeatureModelManager.getAnalyzer(fmManager.getObject()).getAnalysesCollection();
+						final AnalysesCollection localAnalysesCollection = localAnalyzer.getAnalysesCollection();
+						localAnalysesCollection.inheritSettings(generalAnalysesCollection);
+						if (!localAnalysesCollection.isRunCalculationAutomatically() && localAnalysesCollection.isCalculateFeatures()) {
 							return true;
 						}
 
-						final Map<IFeatureModelElement, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
+						final Map<IFeatureModelElement, Object> changedAttributes = localAnalyzer.analyzeFeatureModel(monitor);
 						refreshGraphics(changedAttributes);
 						return true;
 					}

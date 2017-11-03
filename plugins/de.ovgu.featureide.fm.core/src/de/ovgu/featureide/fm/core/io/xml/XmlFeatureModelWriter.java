@@ -111,11 +111,11 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		}
 
 		root.appendChild(calculations);
-		calculations.setAttribute(CALCULATE_AUTO, "" + FeatureModelManager.getAnalyzer(object).isRunCalculationAutomatically());
-		calculations.setAttribute(CALCULATE_FEATURES, "" + FeatureModelManager.getAnalyzer(object).isCalculateFeatures());
-		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + FeatureModelManager.getAnalyzer(object).isCalculateConstraints());
-		calculations.setAttribute(CALCULATE_REDUNDANT, "" + FeatureModelManager.getAnalyzer(object).isCalculateRedundantConstraints());
-		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + FeatureModelManager.getAnalyzer(object).isCalculateTautologyConstraints());
+		calculations.setAttribute(CALCULATE_AUTO, "" + FeatureModelManager.getAnalyzer(object).getAnalysesCollection().isRunCalculationAutomatically());
+		calculations.setAttribute(CALCULATE_FEATURES, "" + FeatureModelManager.getAnalyzer(object).getAnalysesCollection().isCalculateFeatures());
+		calculations.setAttribute(CALCULATE_CONSTRAINTS, "" + FeatureModelManager.getAnalyzer(object).getAnalysesCollection().isCalculateConstraints());
+		calculations.setAttribute(CALCULATE_REDUNDANT, "" + FeatureModelManager.getAnalyzer(object).getAnalysesCollection().isCalculateRedundantConstraints());
+		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + FeatureModelManager.getAnalyzer(object).getAnalysesCollection().isCalculateTautologyConstraints());
 
 		root.appendChild(comments);
 		for (final String comment : object.getProperty().getComments()) {

@@ -44,23 +44,23 @@ public class FeaturesOnlyCalculationAction extends Action {
 		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
 		setToolTipText("Test");
-		setChecked(FeatureModelManager.getAnalyzer(featureModel).isCalculateFeatures());
+		setChecked(FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().isCalculateFeatures());
 		setId(ID);
 	}
 
 	@Override
 	public void run() {
-		if (FeatureModelManager.getAnalyzer(featureModel).isCalculateFeatures()) {
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateFeatures(false);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateConstraints(false);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateRedundantConstraints(false);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateTautologyConstraints(false);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateDeadConstraints(false);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateFOConstraints(false);
+		if (FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().isCalculateFeatures()) {
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateFeatures(false);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateConstraints(false);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateRedundantConstraints(false);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateTautologyConstraints(false);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateDeadConstraints(false);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateFOConstraints(false);
 		} else {
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateFeatures(true);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateDeadConstraints(true);
-			FeatureModelManager.getAnalyzer(featureModel).setCalculateFOConstraints(true);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateFeatures(true);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateDeadConstraints(true);
+			FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateFOConstraints(true);
 		}
 		featureModel.handleModelDataChanged();
 	}

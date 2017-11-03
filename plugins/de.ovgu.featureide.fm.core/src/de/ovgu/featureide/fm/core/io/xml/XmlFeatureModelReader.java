@@ -408,15 +408,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					final String nodeName = node.getNodeName();
 					final boolean value = node.getNodeValue().equals(TRUE);
 					if (nodeName.equals(CALCULATE_AUTO)) {
-						FeatureModelManager.getAnalyzer(featureModel).setRunCalculationAutomatically(value);
+						FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setRunCalculationAutomatically(value);
 					} else if (nodeName.equals(CALCULATE_CONSTRAINTS)) {
-						FeatureModelManager.getAnalyzer(featureModel).setCalculateConstraints(value);
+						FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateConstraints(value);
 					} else if (nodeName.equals(CALCULATE_REDUNDANT)) {
-						FeatureModelManager.getAnalyzer(featureModel).setCalculateRedundantConstraints(value);
+						FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateRedundantConstraints(value);
 					} else if (nodeName.equals(CALCULATE_FEATURES)) {
-						FeatureModelManager.getAnalyzer(featureModel).setCalculateFeatures(value);
+						FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateFeatures(value);
 					} else if (nodeName.equals(CALCULATE_TAUTOLOGY)) {
-						FeatureModelManager.getAnalyzer(featureModel).setCalculateTautologyConstraints(value);
+						FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().setCalculateTautologyConstraints(value);
 					} else {
 						throwError("Unknown calculations attribute: " + nodeName, e);
 					}

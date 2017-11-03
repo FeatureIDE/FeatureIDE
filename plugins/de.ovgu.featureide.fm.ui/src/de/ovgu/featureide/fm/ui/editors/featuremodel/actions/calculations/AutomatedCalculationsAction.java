@@ -46,23 +46,23 @@ public class AutomatedCalculationsAction extends Action {
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(AUTOMATED_CALCULATIONS);
 		this.featureModel = featureModel;
-		setChecked(FeatureModelManager.getAnalyzer(featureModel).isRunCalculationAutomatically());
+		setChecked(FeatureModelManager.getAnalyzer(featureModel).getAnalysesCollection().isRunCalculationAutomatically());
 		setId(ID);
 	}
 
 	@Override
 	public void run() {
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		if (analyzer.isRunCalculationAutomatically()) {
+		if (analyzer.getAnalysesCollection().isRunCalculationAutomatically()) {
 			for (final IFeature f : featureModel.getFeatures()) {
 				analyzer.getFeatureProperties(f).resetStatus();
 			}
 			for (final IConstraint c : featureModel.getConstraints()) {
 				analyzer.getConstraintProperties(c).resetStatus();
 			}
-			analyzer.setRunCalculationAutomatically(false);
+			analyzer.getAnalysesCollection().setRunCalculationAutomatically(false);
 		} else {
-			analyzer.setRunCalculationAutomatically(true);
+			analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
 		}
 		featureModel.handleModelDataChanged();
 	}

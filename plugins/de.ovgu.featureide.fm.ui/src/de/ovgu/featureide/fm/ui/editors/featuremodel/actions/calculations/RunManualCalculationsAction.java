@@ -52,10 +52,10 @@ public class RunManualCalculationsAction extends Action {
 	@Override
 	public void run() {
 		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(featureModel);
-		final boolean oldValue = analyzer.isRunCalculationAutomatically();
-		analyzer.setRunCalculationAutomatically(true);
+		final boolean oldValue = analyzer.getAnalysesCollection().isRunCalculationAutomatically();
+		analyzer.getAnalysesCollection().setRunCalculationAutomatically(true);
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel, EventType.REDRAW_DIAGRAM));
-		analyzer.setRunCalculationAutomatically(oldValue);
+		analyzer.getAnalysesCollection().setRunCalculationAutomatically(oldValue);
 	}
 
 }

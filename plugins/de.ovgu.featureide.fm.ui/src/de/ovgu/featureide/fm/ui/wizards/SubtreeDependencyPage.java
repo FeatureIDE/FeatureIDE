@@ -119,17 +119,9 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().addControlListener(viewer.createControlListener());
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
-		final FeatureModelAnalyzer analyzer = FeatureModelManager.getAnalyzer(subtreeModel);
-		final FeatureModelAnalyzer analyzer2 = FeatureModelManager.getAnalyzer(completeFm);
+		subTreeAnalyzer.getAnalysesCollection().inheritSettings(FeatureModelManager.getAnalyzer(completeFm).getAnalysesCollection());
 
-		analyzer.setCalculateFeatures(analyzer2.isCalculateFeatures());
-		analyzer.setCalculateConstraints(analyzer2.isCalculateConstraints());
-		analyzer.setCalculateRedundantConstraints(analyzer2.isCalculateRedundantConstraints());
-		analyzer.setCalculateTautologyConstraints(analyzer2.isCalculateTautologyConstraints());
-		analyzer.setCalculateDeadConstraints(analyzer2.isCalculateDeadConstraints());
-		analyzer.setCalculateFOConstraints(analyzer2.isCalculateFOConstraints());
-
-		explainImplicitConstraints(analyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
+		explainImplicitConstraints(subTreeAnalyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints
 		viewer.internRefresh(true);
 		graphicalFeatureModel.redrawDiagram();
 
