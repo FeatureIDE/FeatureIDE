@@ -30,7 +30,6 @@ import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedSt
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * All additional properties of an {@link IFeature}.
@@ -40,22 +39,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureModelProperties {
 
-	protected final IFeatureModel featureModel;
-
 	private final Collection<FeatureProperties> featureProperties;
 	private final Collection<ConstraintProperties> constraintProperties;
 
 	protected FeatureStatus status = FeatureStatus.NORMAL;
 
-	public FeatureModelProperties(IFeatureModel featureModel, Collection<FeatureProperties> featureProperties,
-			Collection<ConstraintProperties> constraintProperties) {
-		this.featureModel = featureModel;
+	public FeatureModelProperties(Collection<FeatureProperties> featureProperties, Collection<ConstraintProperties> constraintProperties) {
 		this.featureProperties = featureProperties;
 		this.constraintProperties = constraintProperties;
-	}
-
-	public IFeatureModel getFeatureModel() {
-		return featureModel;
 	}
 
 	public FeatureStatus getFeatureStatus() {
@@ -66,79 +57,128 @@ public class FeatureModelProperties {
 		this.status = status;
 	}
 
+	private Boolean hasFalseOptionalFeatures;
+
 	public boolean hasFalseOptionalFeatures() {
-		for (final FeatureProperties f : featureProperties) {
-			if (f.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
-				return true;
+		if (hasFalseOptionalFeatures == null) {
+			for (final FeatureProperties f : featureProperties) {
+				if (f.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
+					hasFalseOptionalFeatures = Boolean.TRUE;
+					break;
+				}
 			}
+			hasFalseOptionalFeatures = Boolean.FALSE;
 		}
-		return false;
+		return hasFalseOptionalFeatures;
 	}
+
+	private Boolean hasDeadFeatures;
 
 	public boolean hasDeadFeatures() {
-		for (final FeatureProperties f : featureProperties) {
-			if (f.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
-				return true;
+		if (hasDeadFeatures == null) {
+			for (final FeatureProperties f : featureProperties) {
+				if (f.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
+					hasDeadFeatures = Boolean.TRUE;
+					break;
+				}
 			}
+			hasDeadFeatures = Boolean.FALSE;
 		}
-		return false;
+		return hasDeadFeatures;
 	}
+
+	private Boolean hasIndeterminateHiddenFeatures;
 
 	public boolean hasIndeterminateHiddenFeatures() {
-		for (final FeatureProperties f : featureProperties) {
-			if (f.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
-				return true;
+		if (hasIndeterminateHiddenFeatures == null) {
+			for (final FeatureProperties f : featureProperties) {
+				if (f.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
+					hasIndeterminateHiddenFeatures = Boolean.TRUE;
+					break;
+				}
 			}
+			hasIndeterminateHiddenFeatures = Boolean.FALSE;
 		}
-		return false;
+		return hasIndeterminateHiddenFeatures;
 	}
+
+	private Boolean hasUnsatisfiableConstraints;
 
 	public boolean hasUnsatisfiableConstraints() {
-		for (final ConstraintProperties c : constraintProperties) {
-			if (c.getConstraintSatisfiabilityStatus() == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE) {
-				return true;
+		if (hasUnsatisfiableConstraints == null) {
+			for (final ConstraintProperties c : constraintProperties) {
+				if (c.getConstraintSatisfiabilityStatus() == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE) {
+					hasUnsatisfiableConstraints = Boolean.TRUE;
+					break;
+				}
 			}
+			hasUnsatisfiableConstraints = Boolean.FALSE;
 		}
-		return false;
+		return hasUnsatisfiableConstraints;
 	}
+
+	private Boolean hasTautologyConstraints;
 
 	public boolean hasTautologyConstraints() {
-		for (final ConstraintProperties c : constraintProperties) {
-			if (c.getConstraintRedundancyStatus() == ConstraintRedundancyStatus.TAUTOLOGY) {
-				return true;
+		if (hasTautologyConstraints == null) {
+			for (final ConstraintProperties c : constraintProperties) {
+				if (c.getConstraintRedundancyStatus() == ConstraintRedundancyStatus.TAUTOLOGY) {
+					hasTautologyConstraints = Boolean.TRUE;
+					break;
+				}
 			}
+			hasTautologyConstraints = Boolean.FALSE;
 		}
-		return false;
+		return hasTautologyConstraints;
 	}
+
+	private Boolean hasDeadConstraints;
 
 	public boolean hasDeadConstraints() {
-		for (final ConstraintProperties c : constraintProperties) {
-			if (c.getConstraintDeadStatus() == ConstraintDeadStatus.DEAD) {
-				return true;
+		if (hasDeadConstraints == null) {
+			for (final ConstraintProperties c : constraintProperties) {
+				if (c.getConstraintDeadStatus() == ConstraintDeadStatus.DEAD) {
+					hasDeadConstraints = Boolean.TRUE;
+					break;
+				}
 			}
+			hasDeadConstraints = Boolean.FALSE;
 		}
-		return false;
+		return hasDeadConstraints;
 	}
+
+	private Boolean hasVoidModelConstraints;
 
 	public boolean hasVoidModelConstraints() {
-		for (final ConstraintProperties c : constraintProperties) {
-			final ConstraintFalseSatisfiabilityStatus constraintSatisfiabilityStatus = c.getConstraintSatisfiabilityStatus();
-			if ((constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.VOID_MODEL)
-				|| (constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE)) {
-				return true;
+		if (hasVoidModelConstraints == null) {
+			for (final ConstraintProperties c : constraintProperties) {
+				final ConstraintFalseSatisfiabilityStatus constraintSatisfiabilityStatus = c.getConstraintSatisfiabilityStatus();
+				if ((constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.VOID_MODEL)
+					|| (constraintSatisfiabilityStatus == ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE)) {
+					hasVoidModelConstraints = Boolean.TRUE;
+					break;
+				}
 			}
+			hasVoidModelConstraints = Boolean.FALSE;
 		}
-		return false;
+		return hasVoidModelConstraints;
 	}
 
+	private Boolean hasRedundantConstraints;
+
 	public boolean hasRedundantConstraints() {
-		for (final ConstraintProperties c : constraintProperties) {
-			final ConstraintRedundancyStatus constraintRedundancyStatus = c.getConstraintRedundancyStatus();
-			if ((constraintRedundancyStatus == ConstraintRedundancyStatus.TAUTOLOGY) || (constraintRedundancyStatus == ConstraintRedundancyStatus.REDUNDANT)) {
-				return true;
+		if (hasRedundantConstraints == null) {
+			for (final ConstraintProperties c : constraintProperties) {
+				final ConstraintRedundancyStatus constraintRedundancyStatus = c.getConstraintRedundancyStatus();
+				if ((constraintRedundancyStatus == ConstraintRedundancyStatus.TAUTOLOGY)
+					|| (constraintRedundancyStatus == ConstraintRedundancyStatus.REDUNDANT)) {
+					hasRedundantConstraints = Boolean.TRUE;
+					break;
+				}
 			}
+			hasRedundantConstraints = Boolean.FALSE;
 		}
-		return false;
+		return hasRedundantConstraints;
 	}
 
 }
