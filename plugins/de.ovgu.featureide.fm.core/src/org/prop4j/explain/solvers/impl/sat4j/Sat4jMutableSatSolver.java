@@ -58,9 +58,10 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	private int nextClauseIndex = 1;
 
 	@Override
-	public void addClause(Node clause) {
-		super.addClause(clause);
+	public int addClause(Node clause) {
+		final int clauseIndex = super.addClause(clause);
 		scopeClauseCount++;
+		return clauseIndex;
 	}
 
 	@Override

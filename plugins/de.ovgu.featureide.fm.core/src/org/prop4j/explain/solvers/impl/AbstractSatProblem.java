@@ -78,13 +78,16 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals.
 	 *
 	 * @param clause clause to add; not null
+	 * @return the index of the newly added clause
 	 * @throws IllegalArgumentException if the clause is empty
 	 */
-	protected void addClause(Node clause) throws IllegalArgumentException {
+	protected int addClause(Node clause) throws IllegalArgumentException {
 		if (clause.getChildren().length == 0) {
 			throw new IllegalArgumentException("Empty clause");
 		}
+		final int clauseIndex = getClauseCount();
 		clauses.add(clause);
+		return clauseIndex;
 	}
 
 	@Override
