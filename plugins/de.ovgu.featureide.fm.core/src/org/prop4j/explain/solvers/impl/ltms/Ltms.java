@@ -210,9 +210,7 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		Set<Integer> smallest = null;
 		for (final Set<Integer> mus : getAllMinimalUnsatisfiableSubsetIndexes()) {
-			if (smallest == null) {
-				smallest = mus;
-			} else if (mus.size() < smallest.size()) {
+			if ((smallest == null) || (mus.size() < smallest.size())) {
 				smallest = mus;
 			}
 		}
