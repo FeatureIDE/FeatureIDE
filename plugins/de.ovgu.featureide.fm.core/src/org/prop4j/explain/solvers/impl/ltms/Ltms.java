@@ -21,7 +21,6 @@
 package org.prop4j.explain.solvers.impl.ltms;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -37,10 +36,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.MutableSatSolver;
+import org.prop4j.explain.solvers.impl.AbstractSatProblem;
 
 /**
  * <p> The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations. Uses BCP (boolean constraint propagation)
@@ -49,27 +49,18 @@ import org.prop4j.explain.solvers.MusExtractor;
  *
  * <p> Clauses are referenced by their index in the CNF. </p>
  *
- * <p> Note that this implementation does not fulfill the entire contract of {@link MusExtractor}. Instances of this class never return instances of
- * {@link Node}. Methods that do so will either return null or throw an exception. Additionally, {@link #push()} and {@link #pop()} only work for a single
+ * <p> Note that this implementation does not fulfill the entire contract of {@link MutableSatSolver}. {@link #push()} and {@link #pop()} only work for a single
  * scope. {@link #pop()} also always clears the assumptions. </p>
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
-public class Ltms implements MusExtractor {
+public class Ltms extends AbstractSatProblem implements MusExtractor {
 
-	/**
-	 * Clauses mapped to the literals they contain.
-	 */
-	private final List<Set<Literal>> clauseLiterals = new ArrayList<>();
 	/**
 	 * Variables mapped to the clauses they are contained in. Redundant map for the sake of performance.
 	 */
 	private final Map<Object, Set<Integer>> variableClauses = new HashMap<>();
-	/**
-	 * The truth value assignments that are initially set and not derived.
-	 */
-	private final Map<Object, Boolean> premises = new HashMap<>();
 	/**
 	 * The truth value assignments of the variables. If the truth value is true, all positive literals containing the variable evaluate to true and negated ones
 	 * to false. If the truth value is false, all positive literals containing the variable evaluate to false and negated ones to true. If the variable is not
@@ -103,21 +94,36 @@ public class Ltms implements MusExtractor {
 	private int scopeClauseCount;
 
 	@Override
-	public void push() {
-		scopeClauseCount = 0;
+	public Object getOracle() {
+		return this; // direct implementation
 	}
 
 	@Override
-	public List<Node> pop() throws NoSuchElementException {
-		removeClauses(scopeClauseCount);
-		scopeClauseCount = 0;
-		premises.clear();
-		return null;
+	public int addClause(Node clause) {
+		final int index = super.addClause(clause);
+		for (final Node child : clause.getChildren()) {
+			final Literal literal = (Literal) child;
+			Set<Integer> clauseSet = variableClauses.get(literal.var);
+			if (clauseSet == null) {
+				clauseSet = new HashSet<>();
+				variableClauses.put(literal.var, clauseSet);
+			}
+			clauseSet.add(index);
+		}
+		return index;
 	}
 
 	@Override
-	public Ltms getOracle() {
-		return this;
+	public Node removeClause(int index) {
+		final Node clause = super.removeClause(index);
+		for (final Node child : clause.getChildren()) {
+			final Literal literal = (Literal) child;
+			final Set<Integer> clauses = variableClauses.get(literal.var);
+			if (clauses.remove(index) && clauses.isEmpty()) {
+				variableClauses.remove(literal.var);
+			}
+		}
+		return clause;
 	}
 
 	@Override
@@ -131,86 +137,16 @@ public class Ltms implements MusExtractor {
 	}
 
 	@Override
-	public int addFormulas(Node... formulas) {
-		return addFormula(new And(formulas));
+	public void push() {
+		scopeClauseCount = 0;
 	}
 
 	@Override
-	public int addFormulas(Collection<? extends Node> formulas) {
-		return addFormulas(formulas.toArray(new Node[formulas.size()]));
-	}
-
-	@Override
-	public int addFormula(Node formula) {
-		if (!formula.isClausalNormalForm()) {
-			formula = formula.toRegularCNF();
-		}
-		final Node[] clauses = formula.getChildren();
-		for (int i = 0; i < clauses.length; i++) {
-			final Node clause = clauses[i];
-			final Node[] literals = clause.getChildren();
-			final Set<Literal> literalSet = new HashSet<>();
-			for (int j = 0; j < literals.length; j++) {
-				final Literal literal = (Literal) literals[j];
-				if (!literalSet.add(literal)) {
-					continue;
-				}
-				Set<Integer> clauseSet = variableClauses.get(literal.var);
-				if (clauseSet == null) {
-					clauseSet = new HashSet<>();
-					variableClauses.put(literal.var, clauseSet);
-				}
-				clauseSet.add(getClauseCount());
-			}
-			clauseLiterals.add(literalSet);
-			scopeClauseCount++;
-		}
-		return clauses.length;
-	}
-
-	@Override
-	public List<Node> getClauses() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public List<Node> getClauses(Collection<Integer> indexes) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Node getClause(int index) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getClauseCount() {
-		return clauseLiterals.size();
-	}
-
-	@Override
-	public boolean containsClause(Node clause) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addAssumptions(Map<Object, Boolean> assumptions) {
-		premises.putAll(premises);
-	}
-
-	@Override
-	public void addAssumption(Object variable, boolean value) {
-		premises.put(variable, value);
-	}
-
-	@Override
-	public Map<Object, Boolean> getAssumptions() {
-		return premises;
-	}
-
-	@Override
-	public Boolean getAssumption(Object variable) {
-		return premises.get(variable);
+	public List<Node> pop() throws NoSuchElementException {
+		removeClauses(scopeClauseCount);
+		scopeClauseCount = 0;
+		clearAssumptions();
+		return null;
 	}
 
 	@Override
@@ -274,39 +210,13 @@ public class Ltms implements MusExtractor {
 	}
 
 	/**
-	 * Removes the given amount of clauses from the end of this LTMS.
-	 *
-	 * @param clauses amount of clauses to remove
-	 */
-	private void removeClauses(int clauses) {
-		while (clauses-- > 0) {
-			removeClause(getClauseCount() - 1);
-		}
-	}
-
-	/**
-	 * Removes the given clause from this LTMS.
-	 *
-	 * @param clause clause to remove
-	 */
-	private void removeClause(int clause) {
-		for (final Literal literal : clauseLiterals.get(clause)) {
-			final Set<Integer> clauses = variableClauses.get(literal.var);
-			if (clauses.remove(clause) && clauses.isEmpty()) {
-				variableClauses.remove(literal.var);
-			}
-		}
-		clauseLiterals.remove(clause);
-	}
-
-	/**
 	 * Clears the internal state for a new explanation. Adds the premises to the variable values.
 	 */
 	private void reset() {
-		variableValues.clear();
-		reasons.clear();
 		derivedLiteral = null;
-		variableValues.putAll(premises);
+		reasons.clear();
+		variableValues.clear();
+		variableValues.putAll(getAssumptions());
 	}
 
 	/**
@@ -350,7 +260,8 @@ public class Ltms implements MusExtractor {
 	 */
 	private Literal getUnboundLiteral(int clause) {
 		Literal unboundLiteral = null;
-		for (final Literal literal : clauseLiterals.get(clause)) {
+		for (final Node child : getClause(clause).getChildren()) {
+			final Literal literal = (Literal) child;
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				if (unboundLiteral == null) {
 					unboundLiteral = literal;
@@ -413,7 +324,8 @@ public class Ltms implements MusExtractor {
 	 * @return true iff the given CNF clause evaluates to false
 	 */
 	private boolean isViolatedClause(int clause) {
-		for (final Literal literal : clauseLiterals.get(clause)) {
+		for (final Node child : getClause(clause).getChildren()) {
+			final Literal literal = (Literal) child;
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				return false;
 			} else if (literal.getValue(variableValues)) { // true value
@@ -501,7 +413,8 @@ public class Ltms implements MusExtractor {
 			return Collections.emptyMap();
 		}
 		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
-		for (final Literal antecedent : clauseLiterals.get(reason)) {
+		for (final Node child : getClause(reason).getChildren()) {
+			final Literal antecedent = (Literal) child;
 			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
 				continue;
 			}
