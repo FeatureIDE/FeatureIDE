@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -39,7 +40,6 @@ import java.util.TreeSet;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.MutableSatSolver;
 import org.prop4j.explain.solvers.impl.AbstractSatProblem;
 
 /**
@@ -49,8 +49,8 @@ import org.prop4j.explain.solvers.impl.AbstractSatProblem;
  *
  * <p> Clauses are referenced by their index in the CNF. </p>
  *
- * <p> Note that this implementation does not fulfill the entire contract of {@link MutableSatSolver}. {@link #push()} and {@link #pop()} only work for a single
- * scope. {@link #pop()} also always clears the assumptions. </p>
+ * <p> Note that this class does not fulfill the entire contract of each of its interfaces. This is because BCP is inherently incomplete, meaning it does not
+ * always find a result. </p>
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
@@ -88,10 +88,19 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	 * The literal whose truth value was derived during the most recent propagation.
 	 */
 	private Literal derivedLiteral;
+
 	/**
-	 * The amount of clauses added since the last push.
+	 * The variables that were assumed in each scope except the current one.
 	 */
-	private int scopeClauseCount;
+	private final Deque<Map<Object, Boolean>> previousScopeAssumptions = new LinkedList<>();
+	/**
+	 * The amount of clauses that were added in each scope except the current one.
+	 */
+	private final Deque<Integer> previousScopeClauseCounts = new LinkedList<>();
+	/**
+	 * The amount of clauses in the current scope.
+	 */
+	private int scopeClauseCount = 0;
 
 	@Override
 	public Object getOracle() {
@@ -110,6 +119,7 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 			}
 			clauseSet.add(index);
 		}
+		scopeClauseCount++;
 		return index;
 	}
 
@@ -127,6 +137,37 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	}
 
 	@Override
+	public Map<Object, Boolean> getAssumptions() {
+		/*
+		 * Merge the assumptions of all scopes. Add the newer assumptions later to override the older ones.
+		 */
+		final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+		for (final Iterator<Map<Object, Boolean>> it = previousScopeAssumptions.descendingIterator(); it.hasNext();) {
+			assumptions.putAll(it.next());
+		}
+		assumptions.putAll(super.getAssumptions());
+		return assumptions;
+	}
+
+	@Override
+	public Boolean getAssumption(Object variable) {
+		/*
+		 * For performance reasons, do not merge all assumptions.
+		 */
+		Boolean value = super.getAssumptions().get(variable);
+		if (value != null) {
+			return value;
+		}
+		for (final Map<Object, Boolean> prev : previousScopeAssumptions) {
+			value = prev.get(variable);
+			if (value != null) {
+				return value;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public boolean isSatisfiable() {
 		return !getAllMinimalUnsatisfiableSubsets().isEmpty();
 	}
@@ -138,15 +179,26 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 
 	@Override
 	public void push() {
+		// Push the clauses.
+		previousScopeClauseCounts.push(scopeClauseCount);
 		scopeClauseCount = 0;
+
+		// Push the assumptions.
+		previousScopeAssumptions.push(new LinkedHashMap<>(super.getAssumptions()));
+		clearAssumptions();
 	}
 
 	@Override
 	public List<Node> pop() throws NoSuchElementException {
-		removeClauses(scopeClauseCount);
-		scopeClauseCount = 0;
+		// Pop the clauses.
+		final List<Node> removedClauses = removeClauses(scopeClauseCount);
+		scopeClauseCount = previousScopeClauseCounts.pop();
+
+		// Pop the assumptions.
 		clearAssumptions();
-		return null;
+		addAssumptions(previousScopeAssumptions.pop());
+
+		return removedClauses;
 	}
 
 	@Override
