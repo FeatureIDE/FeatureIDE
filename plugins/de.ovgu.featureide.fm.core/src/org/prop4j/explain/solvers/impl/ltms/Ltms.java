@@ -22,7 +22,6 @@ package org.prop4j.explain.solvers.impl.ltms;
 
 import java.util.AbstractList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -263,6 +261,8 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	 * Clears the internal state for a new explanation. Adds the premises to the variable values.
 	 */
 	private void reset() {
+		violatedClause = null;
+		derivedClause = null;
 		derivedLiteral = null;
 		reasons.clear();
 		variableValues.clear();
@@ -420,62 +420,39 @@ public class Ltms extends AbstractSatProblem implements MusExtractor {
 	 */
 	private Set<Integer> getContradictionExplanation() {
 		final Set<Integer> explanation = new TreeSet<>();
-
-		// Include literals from the violated clause so it shows up in the explanation.
 		explanation.add(violatedClause);
-
-		// Get all antecedents of the derived literal.
-		if (derivedLiteral == null) { // immediate contradiction, thus no propagations, thus no antecedents
-			return explanation;
+		final Map<Object, Integer> antecedents = new LinkedHashMap<>();
+		if (derivedLiteral != null) {
+			getAntecedents(derivedLiteral.var, antecedents);
 		}
-		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
-		allAntecedents.put(derivedLiteral, derivedClause);
-		for (final Entry<Literal, Integer> e : getAllAntecedents(derivedLiteral).entrySet()) {
-			final Integer value = allAntecedents.get(e.getKey());
-			if (value == null) {
-				allAntecedents.put(e.getKey(), e.getValue());
-			}
+		for (final Node child : getClause(violatedClause).getChildren()) {
+			final Literal literal = (Literal) child;
+			getAntecedents(literal.var, antecedents);
 		}
-
-		// Explain every antecedent and its reason.
-		for (final Entry<Literal, Integer> e : allAntecedents.entrySet()) {
-			final Literal antecedentLiteral = e.getKey();
-			final int antecedentClause = e.getValue();
-			explanation.add(antecedentClause);
-			final Integer reason = reasons.get(antecedentLiteral.var);
-			if (reason == null) { // premise, thus no reason to explain
-				continue;
-			}
-			explanation.add(reason);
-		}
+		explanation.addAll(antecedents.values());
 		return explanation;
 	}
 
 	/**
-	 * Returns all antecedents of the given variable recursively.
+	 * Returns all antecedents of the given variable recursively. The antecedents explain why the variable was assigned a certain truth value.
 	 *
-	 * @param literal literal with possible antecedents
-	 * @return all antecedents of the given variable recursively
+	 * @param variable variable with possible antecedents
+	 * @param antecedents out variable; not null
+	 * @return all antecedents of the given variable recursively; not null
 	 */
-	private Map<Literal, Integer> getAllAntecedents(Literal literal) {
-		final Integer reason = reasons.get(literal.var);
-		if (reason == null) {
-			return Collections.emptyMap();
+	private Map<Object, Integer> getAntecedents(Object variable, Map<Object, Integer> antecedents) {
+		if (antecedents.containsKey(variable)) { // already explained
+			return antecedents;
 		}
-		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
+		final Integer reason = reasons.get(variable);
+		if (reason == null) { // premise
+			return antecedents;
+		}
+		antecedents.put(variable, reason);
 		for (final Node child : getClause(reason).getChildren()) {
 			final Literal antecedent = (Literal) child;
-			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
-				continue;
-			}
-			allAntecedents.put(antecedent, reason);
-			for (final Entry<Literal, Integer> e : getAllAntecedents(antecedent).entrySet()) {
-				final Integer value = allAntecedents.get(e.getKey());
-				if (value == null) {
-					allAntecedents.put(e.getKey(), e.getValue());
-				}
-			}
+			getAntecedents(antecedent.var, antecedents);
 		}
-		return allAntecedents;
+		return antecedents;
 	}
 }
