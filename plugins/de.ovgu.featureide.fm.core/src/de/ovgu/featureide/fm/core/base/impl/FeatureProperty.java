@@ -38,6 +38,8 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureProperty implements IFeatureProperty {
 
@@ -51,14 +53,20 @@ public class FeatureProperty implements IFeatureProperty {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 		description = oldProperty.description.toString();
 		status = oldProperty.status;
-		attributes = new ArrayList<IFeatureAttribute>();
+
+		// TODO ATTRIBUTE at the moment an unmodifiable list is used, from (oldProperty.getAttributes())
+		if (oldProperty.getAttributes() != null) {
+			attributes = oldProperty.getAttributes();
+		} else {
+			attributes = new ArrayList<>();
+		}
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 		description = "";
 		status = FeatureStatus.NORMAL;
-		attributes = new ArrayList<IFeatureAttribute>();
+		attributes = new ArrayList<>();
 	}
 
 	@Override

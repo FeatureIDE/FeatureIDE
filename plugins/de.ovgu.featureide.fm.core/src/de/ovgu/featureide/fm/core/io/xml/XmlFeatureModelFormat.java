@@ -255,7 +255,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	private void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
-		FMCorePlugin.getDefault().logInfo("Feature: " + feature.getName() + ", " + feature.getProperty().getAttributes().size());
 		if ((feature.getProperty().getAttributes() != null) && !feature.getProperty().getAttributes().isEmpty()) {
 			// Write FeatureAttributes into the XML
 			for (final IFeatureAttribute featureAttribute : feature.getProperty().getAttributes()) {
