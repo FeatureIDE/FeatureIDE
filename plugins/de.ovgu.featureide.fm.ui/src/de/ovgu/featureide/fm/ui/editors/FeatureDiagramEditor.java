@@ -137,6 +137,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.PrintFeatureAttributes;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
@@ -201,6 +202,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private AlternativeAction alternativeAction;
 	private RenameAction renameAction;
 	private ChangeFeatureDescriptionAction changeFeatureDescriptionAction;
+	private PrintFeatureAttributes printFeatureAttributes;
 
 	private MoveAction moveStopAction;
 	private MoveAction moveUpAction;
@@ -509,6 +511,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		moveRightAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.RIGHT);
 		moveDownAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.DOWN);
 		moveLeftAction = new MoveAction(this, graphicalFeatureModel, null, MoveAction.LEFT);
+		printFeatureAttributes = new PrintFeatureAttributes(this);
 
 		new SelectionAction(this, graphicalFeatureModel);
 
@@ -656,6 +659,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		// don't show menu to change group type of a feature in case a
 		// connection line is selected
 		else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !connectionSelected) {
+			menu.add(printFeatureAttributes);
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
 			menu.add(createConstraintWithAction);

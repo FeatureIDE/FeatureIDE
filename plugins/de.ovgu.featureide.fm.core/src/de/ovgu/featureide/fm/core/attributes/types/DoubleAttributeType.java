@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  */
 public class DoubleAttributeType extends IFeatureAttributeType {
 
-	private static final String id = "Double";
+	public static final String ID = "Double";
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +38,7 @@ public class DoubleAttributeType extends IFeatureAttributeType {
 	 */
 	@Override
 	public String getType() {
-		return id;
+		return ID;
 	}
 
 }

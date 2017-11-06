@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  */
 public class LongAttributeType extends IFeatureAttributeType {
 
-	private static final String id = "Long";
+	public static final String ID = "Long";
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +38,7 @@ public class LongAttributeType extends IFeatureAttributeType {
 	 */
 	@Override
 	public String getType() {
-		return id;
+		return ID;
 	}
 
 }

@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  */
 public class StringAttributeType extends IFeatureAttributeType {
 
-	private static final String id = "String";
+	public static final String ID = "String";
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +38,7 @@ public class StringAttributeType extends IFeatureAttributeType {
 	 */
 	@Override
 	public String getType() {
-		return id;
+		return ID;
 	}
 
 }

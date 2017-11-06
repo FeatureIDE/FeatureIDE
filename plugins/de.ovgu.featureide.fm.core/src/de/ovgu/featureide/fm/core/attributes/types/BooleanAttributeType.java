@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  */
 public class BooleanAttributeType extends IFeatureAttributeType {
 
-	private static final String id = "Boolean";
+	public static final String ID = "Boolean";
 
 	/*
 	 * (non-Javadoc)
@@ -38,7 +38,7 @@ public class BooleanAttributeType extends IFeatureAttributeType {
 	 */
 	@Override
 	public String getType() {
-		return id;
+		return ID;
 	}
 
 }
