@@ -69,4 +69,10 @@ public interface XMLFeatureModelTags {
 	static final String RULE = "rule";
 	static final String UNKNOWN = "unknown";
 	static final String ATMOST1 = "atmost1";
+	static final String ATTRIBUTE = "attribute";
+	static final String ATTRIBUTE_UNIT = "unit";
+	static final String ATTRIBUTE_TYPE = "type";
+	static final String ATTRIBUTE_VALUE = "value";
+	static final String ATTRIBUTE_RECURSIVE = "recursive";
+	static final String ATTRIBUTE_CONFIGURABLE = "configurable";
 }
