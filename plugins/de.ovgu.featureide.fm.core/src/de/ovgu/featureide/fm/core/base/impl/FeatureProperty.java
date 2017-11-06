@@ -20,9 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -36,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  */
 public class FeatureProperty implements IFeatureProperty {
 
+	protected List<IFeatureAttribute> attributes;
 	protected final IFeature correspondingFeature;
 
 	protected String description;
@@ -45,12 +51,14 @@ public class FeatureProperty implements IFeatureProperty {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 		description = oldProperty.description.toString();
 		status = oldProperty.status;
+		attributes = new ArrayList<IFeatureAttribute>();
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 		description = "";
 		status = FeatureStatus.NORMAL;
+		attributes = new ArrayList<IFeatureAttribute>();
 	}
 
 	@Override
@@ -112,6 +120,27 @@ public class FeatureProperty implements IFeatureProperty {
 	@Override
 	public boolean selectConstraint(boolean state) {
 		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public List<IFeatureAttribute> getAttributes() {
+		return Collections.unmodifiableList(attributes);
+	}
+
+	@Override
+	public void addAttribute(IFeatureAttribute attribute) {
+		attributes.add(attribute);
+
+	}
+
+	@Override
+	public void removeAttribute(IFeatureAttribute attribute) {
+		attributes.remove(attribute);
+	}
+
+	@Override
+	public void setAttributes(List<IFeatureAttribute> attributes) {
+		this.attributes = attributes;
 	}
 
 }
