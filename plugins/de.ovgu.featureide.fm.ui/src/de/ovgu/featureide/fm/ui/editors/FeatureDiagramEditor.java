@@ -56,7 +56,6 @@ import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
@@ -103,6 +102,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
@@ -177,7 +177,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private final IPersistentFormat<IGraphicalFeatureModel> format = new GraphicalFeatureModelFormat();
 	private final Path extraPath;
 
-	private ScalableFreeformRootEditPart rootEditPart;
+	private ChillScrollFreeformRootEditPart rootEditPart;
 
 	private CalculateDependencyAction calculateDependencyAction;
 	private CreateLayerAction createLayerAction;
@@ -398,7 +398,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		});
 		getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 		setEditPartFactory(new GraphicalEditPartFactory());
-		rootEditPart = new ScalableFreeformRootEditPart();
+		rootEditPart = new ChillScrollFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 		setRootEditPart(rootEditPart);
 
@@ -946,6 +946,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 					}
 				}
+				internRefresh(true);
 				setActiveExplanation();
 				getContents().refresh();
 				return Status.OK_STATUS;
@@ -1101,7 +1102,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-
 			featureModelEditor.setPageModified(true);
 			analyzeFeatureModel();
 			break;
@@ -1137,6 +1137,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
+			reload();
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
@@ -1357,13 +1358,21 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					if (obj instanceof LegendEditPart) {
 						final LegendFigure fig = ((LegendEditPart) obj).getFigure();
 						fig.recreateLegend();
-						final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+						final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegend(graphicalFeatureModel);
+
 						if (newLegendPosition != null) {
 							fig.setLocation(newLegendPosition);
 						}
 					}
 				}
 			}
+
+			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
+				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+			}
+
+			reload();
 			break;
 		case DEFAULT:
 			break;
