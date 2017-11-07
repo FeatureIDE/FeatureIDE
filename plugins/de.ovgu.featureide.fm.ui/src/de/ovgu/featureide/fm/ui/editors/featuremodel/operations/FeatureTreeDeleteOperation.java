@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_;
 
@@ -44,10 +45,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
+ * @author Paul Westphal
+ * @author Chico Sundermann
  */
 public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
-	private final IFeature feature;
+	private final IFeature[] featureArray;
 	private LinkedList<IFeature> featureList;
 	private LinkedList<IFeature> containedFeatureList;
 
@@ -55,42 +58,44 @@ public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation imple
 	private LinkedList<IFeature> orList;
 	private LinkedList<IFeature> alternativeList;
 
-	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature parent) {
-		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
-		feature = parent;
+	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature[] parents) {
+		super(featureModel, DELETE);
+		featureArray = parents;
 	}
 
 	@Override
 	protected void createSingleOperations() {
-		featureList = new LinkedList<IFeature>();
-		containedFeatureList = new LinkedList<IFeature>();
-		andList = new LinkedList<IFeature>();
-		alternativeList = new LinkedList<IFeature>();
-		orList = new LinkedList<IFeature>();
-		final LinkedList<IFeature> list = new LinkedList<IFeature>();
-		list.add(feature);
-		getFeaturesToDelete(list);
-
-		if (containedFeatureList.isEmpty()) {
-			for (final IFeature feat : featureList) {
-				if (feat.getStructure().isAnd()) {
-					andList.add(feat);
-				} else if (feat.getStructure().isOr()) {
-					orList.add(feat);
-				} else if (feat.getStructure().isAlternative()) {
-					alternativeList.add(feat);
+		for (IFeature feature : featureArray) {
+			featureList = new LinkedList<IFeature>();
+			containedFeatureList = new LinkedList<IFeature>();
+			andList = new LinkedList<IFeature>();
+			alternativeList = new LinkedList<IFeature>();
+			orList = new LinkedList<IFeature>();
+			final LinkedList<IFeature> list = new LinkedList<IFeature>();
+			list.add(feature);
+			getFeaturesToDelete(list);
+	
+			if (containedFeatureList.isEmpty()) {
+				for (final IFeature feat : featureList) {
+					if (feat.getStructure().isAnd()) {
+						andList.add(feat);
+					} else if (feat.getStructure().isOr()) {
+						orList.add(feat);
+					} else if (feat.getStructure().isAlternative()) {
+						alternativeList.add(feat);
+					}
+					final AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
+					operations.add(op);
 				}
-				final AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
-				operations.add(op);
+			} else {
+				final String containedFeatures = containedFeatureList.toString();
+				final MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
+						"The following features are contained in constraints:" + '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
+							+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
+						MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+	
+				dialog.open();
 			}
-		} else {
-			final String containedFeatures = containedFeatureList.toString();
-			final MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
-					"The following features are contained in constraints:" + '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
-						+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_,
-					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-
-			dialog.open();
 		}
 	}
 

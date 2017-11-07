@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -44,7 +46,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
-		super("Create Feature Below (Ins)", viewer);
+		super(CREATE_FEATURE_BELOW + " (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
 	}
@@ -68,7 +70,6 @@ public class CreateLayerAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(false);
 	}
 
 }
