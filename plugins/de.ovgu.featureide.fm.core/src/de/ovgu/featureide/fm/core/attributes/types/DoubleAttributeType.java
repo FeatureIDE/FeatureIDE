@@ -41,4 +41,14 @@ public class DoubleAttributeType extends IFeatureAttributeType {
 		return ID;
 	}
 
+	@Override
+	public boolean isLegitValue(String value) { // TODO ATTRIBUTES
+		try {
+			final double testDouble = Double.parseDouble(value);
+			return true;
+		} catch (final IllegalArgumentException e) {
+			return false;
+		}
+	}
+
 }

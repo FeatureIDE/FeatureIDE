@@ -41,4 +41,8 @@ public class BooleanAttributeType extends IFeatureAttributeType {
 		return ID;
 	}
 
+	@Override
+	public boolean isLegitValue(String value) {
+		return ((value == "true") || (value == "false"));
+	}
 }

@@ -41,4 +41,13 @@ public class LongAttributeType extends IFeatureAttributeType {
 		return ID;
 	}
 
+	@Override
+	public boolean isLegitValue(String value) { // TODO ATTRIBUTES
+		try {
+			final long testLong = Long.parseLong(value);
+			return true;
+		} catch (final IllegalArgumentException e) {
+			return false;
+		}
+	}
 }

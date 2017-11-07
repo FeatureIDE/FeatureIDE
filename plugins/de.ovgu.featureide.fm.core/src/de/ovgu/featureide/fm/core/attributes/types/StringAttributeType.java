@@ -41,4 +41,8 @@ public class StringAttributeType extends IFeatureAttributeType {
 		return ID;
 	}
 
+	@Override
+	public boolean isLegitValue(String value) {
+		return true;
+	}
 }

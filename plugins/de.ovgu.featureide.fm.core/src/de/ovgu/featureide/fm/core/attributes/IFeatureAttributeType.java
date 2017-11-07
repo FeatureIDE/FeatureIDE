@@ -29,4 +29,6 @@ package de.ovgu.featureide.fm.core.attributes;
 public abstract class IFeatureAttributeType {
 
 	public abstract String getType();
+
+	public abstract boolean isLegitValue(String value);
 }
