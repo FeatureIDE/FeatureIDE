@@ -166,6 +166,14 @@
 				name="FeatureIDE Outline"
 				restorable="true">
 		</view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.fm.ui.views.attributes.FeatureAttributeView"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.fm.ui.views.attributes.FeatureAttributeView"
+        name="Feature Attributes"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.propertyPages">
