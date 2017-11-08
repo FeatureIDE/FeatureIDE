@@ -38,7 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -295,7 +294,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Feature property actions
 		mandatoryAction = addAction(new MandatoryAction(viewer, featureModel));
-		abstractAction = addAction(new AbstractAction(viewer, featureModel, (ObjectUndoContext) featureModel.getUndoContext()));
+		abstractAction = addAction(new AbstractAction(viewer, featureModel));
 		hiddenAction = addAction(new HiddenAction(viewer, featureModel));
 		andAction = addAction(new AndAction(viewer, featureModel));
 		orAction = addAction(new OrAction(viewer, featureModel));

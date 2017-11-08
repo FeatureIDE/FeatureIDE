@@ -29,7 +29,6 @@ import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.swt.SWT;
@@ -40,6 +39,7 @@ import org.eclipse.ui.IEditorPart;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -130,7 +130,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		this.graphicalFeatureModel = graphicalFeatureModel;
 
 		setEditPartFactory(new GraphicalEditPartFactory());
-		final ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
+		final ChillScrollFreeformRootEditPart rootEditPart = new ChillScrollFreeformRootEditPart();
 		((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 		setRootEditPart(rootEditPart);
 
@@ -232,7 +232,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			if (obj instanceof LegendEditPart) {
 				final LegendFigure fig = ((LegendEditPart) obj).getFigure();
 				fig.recreateLegend();
-				final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegendOnIntersect(graphicalFeatureModel);
+				final org.eclipse.draw2d.geometry.Point newLegendPosition = layoutManager.layoutLegend(graphicalFeatureModel);
 				if (newLegendPosition != null) {
 					fig.setLocation(newLegendPosition);
 				}

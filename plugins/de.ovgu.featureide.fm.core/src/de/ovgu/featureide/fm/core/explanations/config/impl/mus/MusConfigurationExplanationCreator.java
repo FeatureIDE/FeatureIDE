@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.AbstractConfiguration
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class MusConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>>

@@ -25,7 +25,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 /**
  * An explanation for a circumstance involving a preprocessor.
  *
- * @param S subject
+ * @param <S> subject
  * @author Timo G&uuml;nther
  */
 public abstract class PreprocessorExplanation<S> extends FeatureModelExplanation<S> {

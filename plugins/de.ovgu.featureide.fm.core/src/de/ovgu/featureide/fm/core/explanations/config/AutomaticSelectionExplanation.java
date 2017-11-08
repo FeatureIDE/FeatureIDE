@@ -20,8 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config;
 
+import org.prop4j.Literal;
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * An explanation for an automatic selection in a configuration.
@@ -37,6 +42,11 @@ public class AutomaticSelectionExplanation extends ConfigurationExplanation<Sele
 	 */
 	public AutomaticSelectionExplanation(SelectableFeature subject, Configuration config) {
 		super(subject, config);
+	}
+
+	@Override
+	public Node getImplication() {
+		return new Literal(NodeCreator.getVariable(getSubject().getFeature()), getSubject().getAutomatic() == Selection.SELECTED);
 	}
 
 	@Override

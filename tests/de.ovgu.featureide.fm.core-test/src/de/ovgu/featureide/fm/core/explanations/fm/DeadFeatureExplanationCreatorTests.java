@@ -18,31 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
+package de.ovgu.featureide.fm.core.explanations.fm;
 
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+import de.ovgu.featureide.Commons;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * test class for XmlReader/Writer
+ * Tests for {@link DeadFeatureExplanationCreator}.
  *
- * @author Fabian Benduhn
+ * @author Timo G&uuml;nther
  */
-public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
+public class DeadFeatureExplanationCreatorTests extends FeatureModelExplanationCreatorTests<IFeature, DeadFeatureExplanation, DeadFeatureExplanationCreator> {
 
-	/**
-	 * @param file
-	 * @throws UnsupportedModelException
-	 */
-	public TXmlReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
-		super(fm, s);
+	@Test
+	public void testCar() {
+		final DeadFeatureExplanationCreator c = getInstance();
+		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("car.xml");
+		c.setFeatureModel(fm);
+		c.setSubject(fm.getFeature("Bluetooth"));
+		assertTrue(isValid(c.getExplanation()));
+		c.setSubject(fm.getFeature("Manual"));
+		assertTrue(isValid(c.getExplanation()));
 	}
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
-		return new XmlFeatureModelFormat();
+	protected DeadFeatureExplanationCreator getInstance() {
+		return FeatureModelExplanationCreatorFactory.getDefault().getDeadFeatureExplanationCreator();
 	}
-
 }

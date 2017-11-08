@@ -20,48 +20,37 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_OPERATION;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * Operation with functionality to set a Feature hidden. Enables undo/redo functionality.
+ * Operation with functionality to set Features hidden. Enables undo/redo functionality.
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Paul Westphal
+ * @author Chico Sundermann
  */
-public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToHiddenOperation extends MultiFeatureModelOperation {
 
-	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
-	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
-	private final IFeature feature;
+	private final boolean allHidden;
+	private final IFeature[] featureArray;
 
-	public SetFeatureToHiddenOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
-		this.feature = feature;
-	}
-
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isHidden()) {
-			return LABEL_NOT_HIDDEN;
-		} else {
-			return LABEL_HIDDEN;
-		}
+	public SetFeatureToHiddenOperation(IFeatureModel featureModel, boolean allHidden, IFeature[] featureArray) {
+		super(featureModel, HIDE_OPERATION);
+		this.allHidden = allHidden;
+		this.featureArray = featureArray;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		feature.getStructure().setHidden(!feature.getStructure().isHidden());
-		return new FeatureIDEEvent(feature, EventType.HIDDEN_CHANGED);
+	protected void createSingleOperations() {
+		for (IFeature tempFeature : featureArray) {
+			if(allHidden || !tempFeature.getStructure().isHidden()) {
+				final HideFeatureOperation op = new HideFeatureOperation(tempFeature, featureModel);
+				operations.add(op);
+			}
+		}		
 	}
-
-	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		return operation();
-	}
-
 }

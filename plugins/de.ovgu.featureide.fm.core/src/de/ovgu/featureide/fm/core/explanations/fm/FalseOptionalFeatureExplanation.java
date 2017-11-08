@@ -20,7 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import org.prop4j.Implies;
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * An explanation for a false-optional feature in a feature model.
@@ -36,6 +41,11 @@ public class FalseOptionalFeatureExplanation extends FeatureModelExplanation<IFe
 	 */
 	public FalseOptionalFeatureExplanation(IFeature subject) {
 		super(subject);
+	}
+
+	@Override
+	public Node getImplication() {
+		return new Implies(NodeCreator.getVariable(FeatureUtils.getParent(getSubject())), NodeCreator.getVariable(getSubject()));
 	}
 
 	@Override

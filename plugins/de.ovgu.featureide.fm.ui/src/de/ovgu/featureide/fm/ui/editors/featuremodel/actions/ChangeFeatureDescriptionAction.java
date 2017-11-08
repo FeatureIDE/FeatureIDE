@@ -58,12 +58,10 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			feature.getProperty().setDescription(descriptemp);
 			feature.getFeatureModel().fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
 		}
-		setChecked(false);
 	}
 
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(false);
 	}
 }
