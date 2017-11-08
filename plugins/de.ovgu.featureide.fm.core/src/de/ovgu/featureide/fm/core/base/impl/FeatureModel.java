@@ -281,7 +281,9 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public List<IConstraint> getConstraints() {
-		return Collections.unmodifiableList(constraints);
+		final List<IConstraint> constraintList = new ArrayList<>();
+		constraintList.addAll(constraints);
+		return Collections.unmodifiableList(constraintList);
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,11 +56,13 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 
 /**
  * Abstract class for FeatureIDE preprocessor composer extensions with predefined functions.
@@ -175,8 +178,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 				return false;
 			}
 
+			// Fix for #625: Antenna has currently no implementation for .xml config files.
+			final Configuration configurationFile = new Configuration(featureProject.getFeatureModel());
+			ConfigurationManager.load(Paths.get(config.getRawLocationURI()), configurationFile);
 			// // read activated features from configuration
-			activatedFeatures = new ArrayList<String>(loadStringsFromFile(config));
+			activatedFeatures = new ArrayList<String>(configurationFile.getSelectedFeatureNames());
 
 		}
 		// get all concrete and abstract features and generate pattern

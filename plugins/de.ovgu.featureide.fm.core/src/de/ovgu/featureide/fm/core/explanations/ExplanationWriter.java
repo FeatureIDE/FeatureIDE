@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import java.util.Collection;
+
 import org.prop4j.NodeWriter;
 
 /**
@@ -37,6 +39,8 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 	 * Whether to include the reason count versus explanation count when writing a reason. This acts as an explanation for the reason's confidence.
 	 */
 	private boolean writingReasonCounts = true;
+	/** Whether to write a line break before every reason. */
+	private boolean writingLineBreaks = true;
 	/** Symbols to use with {@link NodeWriter}. */
 	private String[] symbols = NodeWriter.logicalSymbols;
 
@@ -98,6 +102,24 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 	}
 
 	/**
+	 * Returns true iff this is writing line breaks. In that case, a line break is written before every reason.
+	 *
+	 * @return true iff this is writing line breaks
+	 */
+	public boolean isWritingLineBreaks() {
+		return writingLineBreaks;
+	}
+
+	/**
+	 * Sets whether to write line breaks.
+	 *
+	 * @param writingLineBreaks whether to write line breaks
+	 */
+	public void setWritingLineBreaks(boolean writingLineBreaks) {
+		this.writingLineBreaks = writingLineBreaks;
+	}
+
+	/**
 	 * Returns a string describing the explanation.
 	 *
 	 * @return a string describing the explanation
@@ -107,9 +129,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 		if ((explanation == null) || (explanation.getReasons() == null) || explanation.getReasons().isEmpty()) {
 			return s;
 		}
-		for (final Reason<?> reason : explanation.getReasons()) {
-			s += String.format("%n\u2022 %s", getReasonString(reason));
-		}
+		s += getReasonsString();
 		return s;
 	}
 
@@ -165,6 +185,37 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 	 * @return the attribute of the explanation
 	 */
 	protected abstract String getAttributeString();
+
+	/**
+	 * Returns all reasons joined together.
+	 * 
+	 * @return joined reasons
+	 */
+	public String getReasonsString() {
+		return getReasonsString(getExplanation().getReasons());
+	}
+
+	/**
+	 * Returns the given reasons joined together.
+	 * 
+	 * @param reasons reasons to join
+	 * @return joined reasons
+	 */
+	public String getReasonsString(Collection<? extends Reason<?>> reasons) {
+		String s = "";
+		for (final Reason<?> reason : reasons) {
+			if (isWritingLineBreaks()) {
+				s += System.lineSeparator();
+				if (getSymbols() == NodeWriter.logicalSymbols) {
+					s += "\u2022"; // Unicode bullet point
+				} else {
+					s += "-"; // simple bullet point
+				}
+			}
+			s += " " + getReasonString(reason);
+		}
+		return s;
+	}
 
 	/**
 	 * Returns a user-friendly representation of the given reason.

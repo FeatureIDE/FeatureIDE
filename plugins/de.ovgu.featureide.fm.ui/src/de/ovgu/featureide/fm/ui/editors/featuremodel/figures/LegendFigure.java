@@ -706,7 +706,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		// Label left
 		final Label labelExplanation = new Label();
 		labelExplanation.setText(language.getExplanation());
-		explanationFigure.setToolTip(createToolTipContent(explanation.toString()));
+		explanationFigure.setToolTip(createToolTipContent(explanation.getWriter().getString()));
 		final int widthInPixels = createLabel(1, labelExplanation.getText(), FMPropertyManager.getFeatureForgroundColor(), "").getPreferredSize().width + 25;
 
 		// SetWidth depending of string

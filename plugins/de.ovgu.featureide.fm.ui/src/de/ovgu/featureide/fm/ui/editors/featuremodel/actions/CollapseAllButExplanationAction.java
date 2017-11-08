@@ -48,7 +48,7 @@ public class CollapseAllButExplanationAction extends Action {
 	private final IGraphicalFeatureModel fm;
 
 	/** The currently active explanation. */
-	private FeatureModelExplanation explanation;
+	private FeatureModelExplanation<?> explanation;
 
 	/**
 	 * Constructs a new instance of this class.
@@ -73,7 +73,7 @@ public class CollapseAllButExplanationAction extends Action {
 				if (event.getEventType() != EventType.ACTIVE_EXPLANATION_CHANGED) {
 					return;
 				}
-				setExplanation((FeatureModelExplanation) event.getNewValue());
+				setExplanation((FeatureModelExplanation<?>) event.getNewValue());
 			}
 		});
 	}
@@ -92,7 +92,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 *
 	 * @return the currently active explanation.
 	 */
-	public FeatureModelExplanation getExplanation() {
+	public FeatureModelExplanation<?> getExplanation() {
 		return explanation;
 	}
 
@@ -101,7 +101,7 @@ public class CollapseAllButExplanationAction extends Action {
 	 *
 	 * @param explanation the new active explanation
 	 */
-	public void setExplanation(FeatureModelExplanation explanation) {
+	public void setExplanation(FeatureModelExplanation<?> explanation) {
 		this.explanation = explanation;
 		setEnabled(explanation != null);
 	}
