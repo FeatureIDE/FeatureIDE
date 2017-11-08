@@ -112,7 +112,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 	public void setConstraintProperties() {
 		init();
 
-		IConstraint constraint = this.graphicalConstraint.getObject();
+		final IConstraint constraint = graphicalConstraint.getObject();
 
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
@@ -131,7 +131,7 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			toolTipContent.add(new Label(UNSATISFIABLE));
 			break;
 		case TAUTOLOGY:
-			label.setIcon(FM_ERROR);
+			label.setIcon(FM_WARNING);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
 			break;
@@ -145,13 +145,13 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			if (!constraint.getDeadFeatures().isEmpty()) {
 				label.setIcon(null);
 				final List<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-				for (IFeature dead : constraint.getDeadFeatures()) {
+				for (final IFeature dead : constraint.getDeadFeatures()) {
 					deadFeatures.add(dead.toString());
 				}
 				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				String s = DEAD_FEATURE;
-				for (String dead : deadFeatures) {
+				for (final String dead : deadFeatures) {
 					s += "\n\u2022 " + dead;
 				}
 				toolTipContent.add(new Label(s));
@@ -161,13 +161,13 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			if (!constraint.getFalseOptional().isEmpty()) {
 				label.setIcon(null);
 				final List<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
-				for (IFeature feature : constraint.getFalseOptional()) {
+				for (final IFeature feature : constraint.getFalseOptional()) {
 					falseOptionalFeatures.add(feature.toString());
 				}
 				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
 
 				String s = FALSE_OPTIONAL;
-				for (String feature : falseOptionalFeatures) {
+				for (final String feature : falseOptionalFeatures) {
 					s += "\n\u2022 " + feature;
 				}
 				toolTipContent.add(new Label(s));
