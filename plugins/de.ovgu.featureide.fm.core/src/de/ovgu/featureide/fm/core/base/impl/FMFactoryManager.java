@@ -41,7 +41,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	public static IFactoryWorkspaceProvider factoryWorkspaceProvider = new CoreFactoryWorkspaceProvider();
 
 	private FMFactoryManager() {
-		setExtensionLoaderInternal(new CoreExtensionLoader<>(new DefaultFeatureModelFactory(), new ExtendedFeatureModelFactory()));
+		setExtensionLoaderInternal(new CoreExtensionLoader<IFeatureModelFactory>(DefaultFeatureModelFactory.class, ExtendedFeatureModelFactory.class));
 		factoryWorkspaceProvider.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 	}
 
