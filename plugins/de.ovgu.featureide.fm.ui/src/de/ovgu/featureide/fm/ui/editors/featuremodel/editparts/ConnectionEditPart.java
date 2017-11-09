@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -46,7 +47,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -60,6 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionDecoratio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -154,7 +156,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 						((CircleDecoration) child).translateToRelative(requestLocation);
 						if (decoratorBounds.contains(requestLocation)) {
 							final IFeatureModel featureModel = feature.getFeatureModel();
-							final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
+							final MandatoryFeatureOperation op = new MandatoryFeatureOperation(feature, featureModel);
 							try {
 								PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 							} catch (final ExecutionException e) {
@@ -311,17 +313,18 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		toolTipContent
 				.add(new Label("Connection type:\n" + (target.getStructure().isAnd() ? "And" : (target.getStructure().isMultiple() ? "Or" : "Alternative"))));
 
-		final FeatureModelReason activeReason = activeReasonUp != null ? activeReasonUp : activeReasonDown;
-		if (activeReason != null) {
-			String explanation = "This connection is involved in the selected defect:";
-			final ExplanationWriter<?> w = activeReason.getExplanation().getWriter();
-			if (activeReasonUp != null) {
-				explanation += "\n\u2022 " + w.getReasonString(activeReasonUp);
-			}
-			if (activeReasonDown != null) {
-				explanation += "\n\u2022 " + w.getReasonString(activeReasonDown);
-			}
-			toolTipContent.add(new Label(explanation));
+		// Write the active reasons.
+		final List<Reason<?>> activeReasons = new ArrayList<>(2);
+		if (activeReasonUp != null) {
+			activeReasons.add(activeReasonUp);
+		}
+		if (activeReasonDown != null) {
+			activeReasons.add(activeReasonDown);
+		}
+		if (!activeReasons.isEmpty()) {
+			String explanationString = "This connection is involved in the selected defect:";
+			explanationString += activeReasons.get(0).getExplanation().getWriter().getReasonsString(activeReasons);
+			toolTipContent.add(new Label(explanationString));
 		}
 
 		// call of the FeatureDiagramExtensions

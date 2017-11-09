@@ -44,6 +44,11 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
 	public Constraint createConstraint(IFeatureModel featureModel, Node propNode) {
 		return new Constraint(featureModel, propNode);
 	}

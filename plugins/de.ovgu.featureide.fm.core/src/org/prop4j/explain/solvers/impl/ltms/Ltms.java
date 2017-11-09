@@ -21,26 +21,24 @@
 package org.prop4j.explain.solvers.impl.ltms;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.explain.solvers.MusExtractor;
+import org.prop4j.explain.solvers.impl.AbstractSatProblem;
 
 /**
  * <p> The class LTMS (logic truth maintenance system) records proofs for implications and constructs explanations. Uses BCP (boolean constraint propagation)
@@ -48,28 +46,19 @@ import org.prop4j.explain.solvers.MusExtractor;
  * </p>
  *
  * <p> Clauses are referenced by their index in the CNF. </p>
- * 
- * <p> Note that this implementation does not fulfill the entire contract of {@link MusExtractor}. Instances of this class never return instances of
- * {@link Node}. Methods that do so will either return null or throw an exception. Additionally, {@link #push()} and {@link #pop()} only work for a single
- * scope. {@link #pop()} also always clears the assumptions. </p>
+ *
+ * <p> Note that this class does not fulfill the entire contract of each of its interfaces. This is because BCP is inherently incomplete, meaning it does not
+ * always find a result. </p>
  *
  * @author Sofia Ananieva
  * @author Timo G&uuml;nther
  */
-public class Ltms implements MusExtractor {
+public class Ltms extends AbstractSatProblem implements MusExtractor {
 
-	/**
-	 * Clauses mapped to the literals they contain.
-	 */
-	private final List<Set<Literal>> clauseLiterals = new ArrayList<>();
 	/**
 	 * Variables mapped to the clauses they are contained in. Redundant map for the sake of performance.
 	 */
 	private final Map<Object, Set<Integer>> variableClauses = new HashMap<>();
-	/**
-	 * The truth value assignments that are initially set and not derived.
-	 */
-	private final Map<Object, Boolean> premises = new HashMap<>();
 	/**
 	 * The truth value assignments of the variables. If the truth value is true, all positive literals containing the variable evaluate to true and negated ones
 	 * to false. If the truth value is false, all positive literals containing the variable evaluate to false and negated ones to true. If the variable is not
@@ -97,27 +86,83 @@ public class Ltms implements MusExtractor {
 	 * The literal whose truth value was derived during the most recent propagation.
 	 */
 	private Literal derivedLiteral;
+
 	/**
-	 * The amount of clauses added since the last push.
+	 * The variables that were assumed in each scope except the current one.
 	 */
-	private int scopeClauseCount;
+	private final Deque<Map<Object, Boolean>> previousScopeAssumptions = new LinkedList<>();
+	/**
+	 * The amount of clauses that were added in each scope except the current one.
+	 */
+	private final Deque<Integer> previousScopeClauseCounts = new LinkedList<>();
+	/**
+	 * The amount of clauses in the current scope.
+	 */
+	private int scopeClauseCount = 0;
 
 	@Override
-	public void push() {
-		scopeClauseCount = 0;
+	public Object getOracle() {
+		return this; // direct implementation
 	}
 
 	@Override
-	public List<Node> pop() throws NoSuchElementException {
-		removeClauses(scopeClauseCount);
-		scopeClauseCount = 0;
-		premises.clear();
+	public int addClause(Node clause) {
+		final int index = super.addClause(clause);
+		for (final Node child : clause.getChildren()) {
+			final Literal literal = (Literal) child;
+			Set<Integer> clauseSet = variableClauses.get(literal.var);
+			if (clauseSet == null) {
+				clauseSet = new HashSet<>();
+				variableClauses.put(literal.var, clauseSet);
+			}
+			clauseSet.add(index);
+		}
+		scopeClauseCount++;
+		return index;
+	}
+
+	@Override
+	public Node removeClause(int index) {
+		final Node clause = super.removeClause(index);
+		for (final Node child : clause.getChildren()) {
+			final Literal literal = (Literal) child;
+			final Set<Integer> clauses = variableClauses.get(literal.var);
+			if (clauses.remove(index) && clauses.isEmpty()) {
+				variableClauses.remove(literal.var);
+			}
+		}
+		return clause;
+	}
+
+	@Override
+	public Map<Object, Boolean> getAssumptions() {
+		/*
+		 * Merge the assumptions of all scopes. Add the newer assumptions later to override the older ones.
+		 */
+		final Map<Object, Boolean> assumptions = new LinkedHashMap<>();
+		for (final Iterator<Map<Object, Boolean>> it = previousScopeAssumptions.descendingIterator(); it.hasNext();) {
+			assumptions.putAll(it.next());
+		}
+		assumptions.putAll(super.getAssumptions());
+		return assumptions;
+	}
+
+	@Override
+	public Boolean getAssumption(Object variable) {
+		/*
+		 * For performance reasons, do not merge all assumptions.
+		 */
+		Boolean value = super.getAssumptions().get(variable);
+		if (value != null) {
+			return value;
+		}
+		for (final Map<Object, Boolean> prev : previousScopeAssumptions) {
+			value = prev.get(variable);
+			if (value != null) {
+				return value;
+			}
+		}
 		return null;
-	}
-
-	@Override
-	public Ltms getOracle() {
-		return this;
 	}
 
 	@Override
@@ -131,81 +176,27 @@ public class Ltms implements MusExtractor {
 	}
 
 	@Override
-	public int addFormulas(Node... formulas) {
-		return addFormula(new And(formulas));
+	public void push() {
+		// Push the clauses.
+		previousScopeClauseCounts.push(scopeClauseCount);
+		scopeClauseCount = 0;
+
+		// Push the assumptions.
+		previousScopeAssumptions.push(new LinkedHashMap<>(super.getAssumptions()));
+		clearAssumptions();
 	}
 
 	@Override
-	public int addFormulas(Collection<? extends Node> formulas) {
-		return addFormulas(formulas.toArray(new Node[formulas.size()]));
-	}
+	public List<Node> pop() throws NoSuchElementException {
+		// Pop the clauses.
+		final List<Node> removedClauses = removeClauses(scopeClauseCount);
+		scopeClauseCount = previousScopeClauseCounts.pop();
 
-	@Override
-	public int addFormula(Node formula) {
-		if (!formula.isClausalNormalForm()) {
-			formula = formula.toRegularCNF();
-		}
-		final Node[] clauses = formula.getChildren();
-		for (int i = 0; i < clauses.length; i++) {
-			final Node clause = clauses[i];
-			final Node[] literals = clause.getChildren();
-			final Set<Literal> literalSet = new HashSet<>();
-			for (int j = 0; j < literals.length; j++) {
-				final Literal literal = (Literal) literals[j];
-				if (!literalSet.add(literal)) {
-					continue;
-				}
-				Set<Integer> clauseSet = variableClauses.get(literal.var);
-				if (clauseSet == null) {
-					clauseSet = new HashSet<>();
-					variableClauses.put(literal.var, clauseSet);
-				}
-				clauseSet.add(getClauseCount());
-			}
-			clauseLiterals.add(literalSet);
-			scopeClauseCount++;
-		}
-		return clauses.length;
-	}
+		// Pop the assumptions.
+		clearAssumptions();
+		addAssumptions(previousScopeAssumptions.pop());
 
-	@Override
-	public List<Node> getClauses() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Node getClause(int index) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int getClauseCount() {
-		return clauseLiterals.size();
-	}
-
-	@Override
-	public boolean containsClause(Node clause) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addAssumptions(Map<Object, Boolean> assumptions) {
-		this.premises.putAll(premises);
-	}
-
-	@Override
-	public void addAssumption(Object variable, boolean value) {
-		premises.put(variable, value);
-	}
-
-	@Override
-	public Map<Object, Boolean> getAssumptions() {
-		return premises;
-	}
-
-	@Override
-	public Boolean getAssumption(Object variable) {
-		return premises.get(variable);
+		return removedClauses;
 	}
 
 	@Override
@@ -217,9 +208,7 @@ public class Ltms implements MusExtractor {
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		Set<Integer> smallest = null;
 		for (final Set<Integer> mus : getAllMinimalUnsatisfiableSubsetIndexes()) {
-			if (smallest == null) {
-				smallest = mus;
-			} else if (mus.size() < smallest.size()) {
+			if ((smallest == null) || (mus.size() < smallest.size())) {
 				smallest = mus;
 			}
 		}
@@ -233,7 +222,7 @@ public class Ltms implements MusExtractor {
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * <p> Returns multiple explanations why the premises lead to a contradiction in the conjunctive normal form. This is done by propagating the truth values
 	 * until a contradiction is found. Then, the proofs for the implications are recalled. This is repeated several times to find multiple explanations, some of
 	 * which might be shorter than others. </p>
@@ -269,39 +258,15 @@ public class Ltms implements MusExtractor {
 	}
 
 	/**
-	 * Removes the given amount of clauses from the end of this LTMS.
-	 *
-	 * @param clauses amount of clauses to remove
-	 */
-	private void removeClauses(int clauses) {
-		while (clauses-- > 0) {
-			removeClause(getClauseCount() - 1);
-		}
-	}
-
-	/**
-	 * Removes the given clause from this LTMS.
-	 *
-	 * @param clause clause to remove
-	 */
-	private void removeClause(int clause) {
-		for (final Literal literal : clauseLiterals.get(clause)) {
-			final Set<Integer> clauses = variableClauses.get(literal.var);
-			if (clauses.remove(clause) && clauses.isEmpty()) {
-				variableClauses.remove(literal.var);
-			}
-		}
-		clauseLiterals.remove(clause);
-	}
-
-	/**
 	 * Clears the internal state for a new explanation. Adds the premises to the variable values.
 	 */
 	private void reset() {
-		variableValues.clear();
-		reasons.clear();
+		violatedClause = null;
+		derivedClause = null;
 		derivedLiteral = null;
-		variableValues.putAll(premises);
+		reasons.clear();
+		variableValues.clear();
+		variableValues.putAll(getAssumptions());
 	}
 
 	/**
@@ -345,7 +310,8 @@ public class Ltms implements MusExtractor {
 	 */
 	private Literal getUnboundLiteral(int clause) {
 		Literal unboundLiteral = null;
-		for (final Literal literal : clauseLiterals.get(clause)) {
+		for (final Node child : getClause(clause).getChildren()) {
+			final Literal literal = (Literal) child;
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				if (unboundLiteral == null) {
 					unboundLiteral = literal;
@@ -408,7 +374,8 @@ public class Ltms implements MusExtractor {
 	 * @return true iff the given CNF clause evaluates to false
 	 */
 	private boolean isViolatedClause(int clause) {
-		for (final Literal literal : clauseLiterals.get(clause)) {
+		for (final Node child : getClause(clause).getChildren()) {
+			final Literal literal = (Literal) child;
 			if (!variableValues.containsKey(literal.var)) { // unknown value
 				return false;
 			} else if (literal.getValue(variableValues)) { // true value
@@ -453,61 +420,39 @@ public class Ltms implements MusExtractor {
 	 */
 	private Set<Integer> getContradictionExplanation() {
 		final Set<Integer> explanation = new TreeSet<>();
-
-		// Include literals from the violated clause so it shows up in the explanation.
 		explanation.add(violatedClause);
-
-		// Get all antecedents of the derived literal.
-		if (derivedLiteral == null) { // immediate contradiction, thus no propagations, thus no antecedents
-			return explanation;
+		final Map<Object, Integer> antecedents = new LinkedHashMap<>();
+		if (derivedLiteral != null) {
+			getAntecedents(derivedLiteral.var, antecedents);
 		}
-		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
-		allAntecedents.put(derivedLiteral, derivedClause);
-		for (final Entry<Literal, Integer> e : getAllAntecedents(derivedLiteral).entrySet()) {
-			final Integer value = allAntecedents.get(e.getKey());
-			if (value == null) {
-				allAntecedents.put(e.getKey(), e.getValue());
-			}
+		for (final Node child : getClause(violatedClause).getChildren()) {
+			final Literal literal = (Literal) child;
+			getAntecedents(literal.var, antecedents);
 		}
-
-		// Explain every antecedent and its reason.
-		for (final Entry<Literal, Integer> e : allAntecedents.entrySet()) {
-			final Literal antecedentLiteral = e.getKey();
-			final int antecedentClause = e.getValue();
-			explanation.add(antecedentClause);
-			final Integer reason = reasons.get(antecedentLiteral.var);
-			if (reason == null) { // premise, thus no reason to explain
-				continue;
-			}
-			explanation.add(reason);
-		}
+		explanation.addAll(antecedents.values());
 		return explanation;
 	}
 
 	/**
-	 * Returns all antecedents of the given variable recursively.
+	 * Returns all antecedents of the given variable recursively. The antecedents explain why the variable was assigned a certain truth value.
 	 *
-	 * @param literal literal with possible antecedents
-	 * @return all antecedents of the given variable recursively
+	 * @param variable variable with possible antecedents
+	 * @param antecedents out variable; not null
+	 * @return all antecedents of the given variable recursively; not null
 	 */
-	private Map<Literal, Integer> getAllAntecedents(Literal literal) {
-		final Integer reason = reasons.get(literal.var);
-		if (reason == null) {
-			return Collections.emptyMap();
+	private Map<Object, Integer> getAntecedents(Object variable, Map<Object, Integer> antecedents) {
+		if (antecedents.containsKey(variable)) { // already explained
+			return antecedents;
 		}
-		final Map<Literal, Integer> allAntecedents = new LinkedHashMap<>();
-		for (final Literal antecedent : clauseLiterals.get(reason)) {
-			if (antecedent.var.equals(literal.var) || allAntecedents.containsKey(antecedent)) {
-				continue;
-			}
-			allAntecedents.put(antecedent, reason);
-			for (final Entry<Literal, Integer> e : getAllAntecedents(antecedent).entrySet()) {
-				final Integer value = allAntecedents.get(e.getKey());
-				if (value == null) {
-					allAntecedents.put(e.getKey(), e.getValue());
-				}
-			}
+		final Integer reason = reasons.get(variable);
+		if (reason == null) { // premise
+			return antecedents;
 		}
-		return allAntecedents;
+		antecedents.put(variable, reason);
+		for (final Node child : getClause(reason).getChildren()) {
+			final Literal antecedent = (Literal) child;
+			getAntecedents(antecedent.var, antecedents);
+		}
+		return antecedents;
 	}
 }

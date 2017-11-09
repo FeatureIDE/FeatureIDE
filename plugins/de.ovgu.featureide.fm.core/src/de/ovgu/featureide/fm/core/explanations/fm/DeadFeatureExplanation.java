@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import org.prop4j.Literal;
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * An explanation for dead features in feature models. Can also be an explanation for {@link #isVoid() void feature models} in case the dead feature is the root
@@ -47,6 +51,11 @@ public class DeadFeatureExplanation extends FeatureModelExplanation<IFeature> {
 	 */
 	public boolean isVoid() {
 		return FeatureUtils.isRoot(getSubject());
+	}
+
+	@Override
+	public Node getImplication() {
+		return new Literal(NodeCreator.getVariable(getSubject()), false);
 	}
 
 	@Override

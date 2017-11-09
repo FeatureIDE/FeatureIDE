@@ -36,9 +36,6 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public class FMComposerManager implements IFMComposerExtension {
 
-	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
-	private String composerId;
-
 	// TODO duplicate entries
 	private final static String COMPOSER_KEY = "composer";
 	private final static QualifiedName COMPOSER_CONFIG_ID = new QualifiedName("featureproject.configs", "composer");
@@ -46,11 +43,13 @@ public class FMComposerManager implements IFMComposerExtension {
 	private final static String SOURCE_ARGUMENT = "source";
 	private final static String DEFAULT_SOURCE_PATH = "src";
 	private final static String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
+	private final static String MPL_BUILDER_ID = "de.ovgu.featureide.core" + ".mpl.MSPLBuilder";
+
 	private final IProject project;
 
-	/**
-	 *
-	 */
+	private IFMComposerExtension fmComposerExtension = new FMComposerExtension();
+	private String composerId;
+
 	public FMComposerManager(IProject project) {
 		this.project = project;
 		setComposerID();
@@ -81,19 +80,6 @@ public class FMComposerManager implements IFMComposerExtension {
 			Logger.logError(e);
 		}
 		return DEFAULT_SOURCE_PATH;
-	}
-
-	private String getPath(IProject project, String argument) {
-		try {
-			for (final ICommand command : project.getDescription().getBuildSpec()) {
-				if (BUILDER_ID.equals(command.getBuilderName())) {
-					return command.getArguments().get(argument);
-				}
-			}
-		} catch (final CoreException e) {
-			Logger.logError(e);
-		}
-		return null;
 	}
 
 	private void setComposerID() {
@@ -201,6 +187,24 @@ public class FMComposerManager implements IFMComposerExtension {
 			map.put(project, extension);
 		}
 		return extension;
+	}
+
+	public static String getPath(IProject project, String argument) {
+		try {
+			for (final ICommand command : project.getDescription().getBuildSpec()) {
+				if (isFIDEBuilder(command)) {
+					return command.getArguments().get(argument);
+				}
+			}
+		} catch (final CoreException e) {
+			Logger.logError(e);
+		}
+		return null;
+	}
+
+	public static boolean isFIDEBuilder(ICommand command) {
+		final String builderName = command.getBuilderName();
+		return BUILDER_ID.equals(builderName) || MPL_BUILDER_ID.equals(builderName);
 	}
 
 }

@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectio
  */
 public class NameTypeSelectionAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.nametypeselection";
+
 	private final int newNameType;
 	private final int oldNameType;
 	private final IGraphicalFeatureModel featureModel;
@@ -45,6 +47,7 @@ public class NameTypeSelectionAction extends Action {
 		this.newNameType = newNameType;
 		this.oldNameType = oldNameType;
 		this.featureModel = featureModel;
+		setId(ID);
 	}
 
 	@Override

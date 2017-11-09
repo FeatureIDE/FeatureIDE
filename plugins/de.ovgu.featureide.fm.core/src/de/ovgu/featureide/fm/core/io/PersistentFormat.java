@@ -25,21 +25,11 @@ package de.ovgu.featureide.fm.core.io;
  *
  * @author Sebastian Krieter
  */
-public class PersistentFormat<T> implements IPersistentFormat<T> {
+public class PersistentFormat<T> extends APersistentFormat<T> implements IPersistentFormat<T> {
 
 	@Override
 	public String getId() {
 		return "";
-	}
-
-	@Override
-	public ProblemList read(T object, CharSequence source) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String write(T object) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -50,26 +40,6 @@ public class PersistentFormat<T> implements IPersistentFormat<T> {
 	@Override
 	public String getName() {
 		return "";
-	}
-
-	@Override
-	public IPersistentFormat<T> getInstance() {
-		return this;
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 }

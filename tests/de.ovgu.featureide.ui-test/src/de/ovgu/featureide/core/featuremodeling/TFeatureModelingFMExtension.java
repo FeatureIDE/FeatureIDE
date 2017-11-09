@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 

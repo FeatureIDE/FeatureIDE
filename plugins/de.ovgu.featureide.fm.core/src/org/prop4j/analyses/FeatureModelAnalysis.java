@@ -189,20 +189,21 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		falseOptionalFeatures.clear();
 
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
+		if ((fm != null) && (fm.getStructure() != null) && (fm.getStructure().getRoot() != null) && (fm.getStructure().getRoot().getFeature() != null)) {
+			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 
-		valid = true;
+			valid = true;
 
-		if (calculateFeatures) {
-			monitor.checkCancel();
-			updateFeatures();
-
-			if (calculateConstraints) {
+			if (calculateFeatures) {
 				monitor.checkCancel();
-				updateConstraints();
+				updateFeatures();
+
+				if (calculateConstraints) {
+					monitor.checkCancel();
+					updateConstraints();
+				}
 			}
 		}
-
 		return changedAttributes;
 	}
 
@@ -523,6 +524,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkValidity(final SatInstance si) {
 		valid = LongRunningWrapper.runMethod(new ValidAnalysis(si)) != null;
+		if (!valid) {
+			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.DEAD);
+		}
 	}
 
 	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {

@@ -52,6 +52,11 @@ public class PreprocessorReason extends Reason<Node> {
 	}
 
 	@Override
+	public Node toNode() {
+		return getSubject();
+	}
+
+	@Override
 	protected PreprocessorReason clone() {
 		return clone(getExplanation());
 	}

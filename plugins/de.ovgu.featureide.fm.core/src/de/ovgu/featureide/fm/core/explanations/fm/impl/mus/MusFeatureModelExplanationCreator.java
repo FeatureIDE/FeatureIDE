@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>>
@@ -54,7 +54,7 @@ public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureMode
 
 	/**
 	 * Returns the solver factory used to create the oracle
-	 * 
+	 *
 	 * @return the solver factory
 	 */
 	public SatSolverFactory getSatSolverFactory() {

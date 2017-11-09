@@ -9,7 +9,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceCo
 
 /**
  * Implements {@link InvariantPresenceConditionExplanationCreator} through composition.
- * 
+ *
  * @author Timo G&uuml;nther
  */
 public class CompositeInvariantPresenceConditionExplanationCreator
@@ -18,7 +18,7 @@ public class CompositeInvariantPresenceConditionExplanationCreator
 
 	/**
 	 * Constructs a new instance of this class.
-	 * 
+	 *
 	 * @param composites the explanation creators to compose
 	 */
 	protected CompositeInvariantPresenceConditionExplanationCreator(Collection<InvariantPresenceConditionExplanationCreator> composites) {

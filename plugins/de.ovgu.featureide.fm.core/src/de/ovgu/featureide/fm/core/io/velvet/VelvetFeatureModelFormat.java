@@ -84,6 +84,7 @@ import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -98,7 +99,7 @@ import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
  * @author Matthias Strauss
  * @author Reimar Schroeter
  */
-public class VelvetFeatureModelFormat implements IFeatureModelFormat {
+public class VelvetFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static boolean IS_USED_AS_API = false;
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
@@ -1378,11 +1379,6 @@ public class VelvetFeatureModelFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

@@ -51,11 +51,28 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	private static String ORDER_PAGE_MESSAGE = "FeatureIDE projects based on AspectJ do not need a total order as\n"
 		+ "a partial order can be defined in every aspect using the keywords\n" + BEFORE_AND_AFTER_;
 
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
-
+	/**
+	 * Check for valid java identifier
+	 */
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
-		return s.matches(FEATURE_NAME_PATTERN);
+		// An empty or null string cannot be a valid identifier
+		if ((s == null) || (s.length() == 0)) {
+			return false;
+		}
+
+		final char[] c = s.toCharArray();
+		if (!Character.isJavaIdentifierStart(c[0])) {
+			return false;
+		}
+
+		for (int i = 1; i < c.length; i++) {
+			if (!Character.isJavaIdentifierPart(c[i])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/*

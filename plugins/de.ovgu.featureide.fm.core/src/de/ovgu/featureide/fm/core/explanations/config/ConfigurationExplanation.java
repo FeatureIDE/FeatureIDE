@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 /**
  * An explanation for a circumstance involving a {@link Configuration configuration}.
  *
- * @param S subject
+ * @param <S> subject
  * @author Timo G&uuml;nther
  */
 public abstract class ConfigurationExplanation<S> extends FeatureModelExplanation<S> {
@@ -47,7 +47,7 @@ public abstract class ConfigurationExplanation<S> extends FeatureModelExplanatio
 
 	/**
 	 * Returns the configuration.
-	 * 
+	 *
 	 * @return the configuration
 	 */
 	public Configuration getConfiguration() {

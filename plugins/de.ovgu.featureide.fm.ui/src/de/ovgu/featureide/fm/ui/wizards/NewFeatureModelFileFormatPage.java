@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.wizards;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -44,7 +45,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 /**
  * The NEW wizard page allows setting the container for the new file as well as the file name. The page will only accept file name without the extension OR with
  * the extension that matches the expected one (.config).
- * 
+ *
  * @author Christian Becker
  * @author Jens Meinicke
  */
@@ -56,7 +57,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 * 
+	 *
 	 * @param pageName
 	 */
 	public NewFeatureModelFileFormatPage() {
@@ -68,15 +69,16 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 	/**
 	 * @see IDialogPage#createControl(Composite)
 	 */
+	@Override
 	public void createControl(Composite parent) {
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		final Composite composite = new Composite(parent, SWT.NULL);
+		final GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
 
-		Label label = new Label(composite, SWT.NULL);
+		final Label label = new Label(composite, SWT.NULL);
 		label.setText("&Format:");
 		formatCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		formatCombo.setLayoutData(gd);
@@ -90,7 +92,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	private void addListeners() {
 		formatCombo.addModifyListener(new ModifyListener() {
-
+			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
@@ -98,12 +100,12 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 	}
 
 	private void initialize() {
-		for (IFeatureModelFormat format : formatExtensions) {
+		for (final IFeatureModelFormat format : formatExtensions) {
 			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
 		}
 		try {
 			formatCombo.select(formatExtensions.indexOf(FMFormatManager.getInstance().getExtension(XmlFeatureModelFormat.ID)));
-		} catch (NoSuchExtensionException e) {
+		} catch (final NoSuchExtensionException e) {
 			formatCombo.select(0);
 		}
 	}
@@ -123,7 +125,7 @@ public class NewFeatureModelFileFormatPage extends WizardPage {
 
 	@Override
 	public boolean isPageComplete() {
-		Path path = ((NewFeatureModelWizard) getWizard()).getNewFilePath(getFormat());
+		final Path path = ((NewFeatureModelWizard) getWizard()).getNewFilePath(getFormat());
 		final boolean fileExists = Files.exists(path);
 		if (fileExists) {
 			setErrorMessage(SELECTED_FILE_ALREADY_EXISTS_);

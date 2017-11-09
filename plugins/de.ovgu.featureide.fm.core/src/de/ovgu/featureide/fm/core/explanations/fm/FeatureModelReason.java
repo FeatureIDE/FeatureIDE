@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm;
 
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.FeatureModelElementTrace;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -60,6 +62,11 @@ public class FeatureModelReason extends Reason<FeatureModelElementTrace> {
 			return 1.0f;
 		}
 		return super.getConfidence();
+	}
+
+	@Override
+	public Node toNode() {
+		return getSubject().getNode();
 	}
 
 	@Override

@@ -44,6 +44,8 @@
 		<project name="Automotive02_V4" path="featureide_examples/FeatureModels/Automotive02_V4/.project"/>
 		<project name="BerkeleyDB" path="featureide_examples/FeatureModels/BerkeleyDB/.project"/>
 		<project name="Busybox_1.18.0" path="featureide_examples/FeatureModels/Busybox_1.18.0/.project"/>
+		<project name="Car" path="featureide_examples/FeatureModels/Car/.project"/>
+		<project name="ChatClient" path="featureide_examples/FeatureModels/ChatClient/.project"/>
 		<project name="E-Shop" path="featureide_examples/FeatureModels/E-Shop/.project"/>
 		<project name="EMBToolkit" path="featureide_examples/FeatureModels/EMBToolkit/.project"/>
 		<project name="FameDB" path="featureide_examples/FeatureModels/FameDB/.project"/>
@@ -53,7 +55,9 @@
 		<project name="GPLsmall" path="featureide_examples/FeatureModels/GPLsmall/.project"/>
 		<project name="GPLtiny" path="featureide_examples/FeatureModels/GPLtiny/.project"/>
 		<project name="Linux_2.6.33.3" path="featureide_examples/FeatureModels/Linux_2.6.33.3/.project"/>
+		<project name="PPU" path="featureide_examples/FeatureModels/PPU/.project"/>
 		<project name="SafeBali" path="featureide_examples/FeatureModels/SafeBali/.project"/>
+		<project name="SortingLine" path="featureide_examples/FeatureModels/SortingLine/.project"/>
 		<project name="TightVNC" path="featureide_examples/FeatureModels/TightVNC/.project"/>
 		<project name="DBMS-VELVET" path="featureide_examples/FeatureModels/VELVET/DBMS-VELVET/.project"/>
 		<project name="HelloWorldMPL-VELVET" path="featureide_examples/FeatureModels/VELVET/HelloWorldMPL-VELVET/.project"/>
@@ -218,6 +222,8 @@
 		<project name="Numbers-consecutive-FH-JML" path="featureide_examples/Numbers-consecutive-FH-JML/.project"/>
 		<project name="Numbers-explicit-FH-JML" path="featureide_examples/Numbers-explicit-FH-JML/.project"/>
 		<project name="Numbers-overriding-FH-JML" path="featureide_examples/Numbers-overriding-FH-JML/.project"/>
+		<project name="PROFilE-E-Agribusiness" path="featureide_examples/PROFilE-E-Agribusiness/.project"/>
+		<project name="PROFilE-ERP-System" path="featureide_examples/PROFilE-ERP-System/.project"/>
 		<project name="Paycard-FH-JML" path="featureide_examples/Paycard-FH-JML/.project"/>
 		<project name="PokerSPL-FH-JML" path="featureide_examples/PokerSPL-FH-JML/.project"/>
 		<project name="SnakeFOP" path="featureide_examples/SnakeFOP/.project"/>

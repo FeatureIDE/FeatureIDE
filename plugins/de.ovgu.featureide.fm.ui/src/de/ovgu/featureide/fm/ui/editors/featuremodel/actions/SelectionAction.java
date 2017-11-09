@@ -20,12 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTION;
-
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -43,46 +39,37 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Eric Schubert
  * @author Marcus Pinnecke
  */
-public class SelectionAction extends Action {
-
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-
-			if (isSelectionValid(selection)) {
-				for (final IGraphicalFeature feature : model.getFeatures()) {
-					if (feature.isConstraintSelected()) {
-						feature.setConstraintSelected(false);
-					}
-				}
-
-				for (final IGraphicalConstraint constraint : model.getConstraints()) {
-					if (constraint.isFeatureSelected()) {
-						constraint.setFeatureSelected(false);
-					}
-				}
-
-				if (selection.getFirstElement() instanceof ConstraintEditPart) {
-					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-				} else if (selection.getFirstElement() instanceof FeatureEditPart) {
-					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-				}
-			}
-		}
-	};
+public class SelectionAction implements ISelectionChangedListener {
 
 	private final IGraphicalFeatureModel model;
 
-	public SelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(SELECTION);
-		model = graphicalFeatureModel;
-
-		viewer.addSelectionChangedListener(listener);
+	public SelectionAction(IGraphicalFeatureModel model) {
+		this.model = model;
 	}
 
-	public boolean isSelectionValid(IStructuredSelection selection) {
-		return selection.size() == 1;
+	@Override
+	public void selectionChanged(SelectionChangedEvent event) {
+		final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+
+		if (selection.size() == 1) {
+			for (final IGraphicalFeature feature : model.getFeatures()) {
+				if (feature.isConstraintSelected()) {
+					feature.setConstraintSelected(false);
+				}
+			}
+
+			for (final IGraphicalConstraint constraint : model.getConstraints()) {
+				if (constraint.isFeatureSelected()) {
+					constraint.setFeatureSelected(false);
+				}
+			}
+
+			if (selection.getFirstElement() instanceof ConstraintEditPart) {
+				((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+			} else if (selection.getFirstElement() instanceof FeatureEditPart) {
+				((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
+			}
+		}
 	}
+
 }

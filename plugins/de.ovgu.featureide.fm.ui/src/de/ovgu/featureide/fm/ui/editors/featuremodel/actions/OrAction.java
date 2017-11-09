@@ -43,7 +43,7 @@ public class OrAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public OrAction(Object viewer, IFeatureModel featureModel) {
-		super(OR, viewer);
+		super(OR, viewer, ID);
 		this.featureModel = featureModel;
 	}
 

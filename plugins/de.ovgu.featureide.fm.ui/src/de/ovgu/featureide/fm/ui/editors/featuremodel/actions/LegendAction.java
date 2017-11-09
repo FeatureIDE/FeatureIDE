@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_LEGEND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_LEGEND;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -40,17 +39,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.HideLegendOperat
  */
 public class LegendAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.legend";
+
 	private final IGraphicalFeatureModel featureModel;
 
 	public LegendAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		if (!featureModel.isLegendHidden()) {
-			setText(HIDE_LEGEND);
-		} else {
-			setText(SHOW_LEGEND);
-		}
-
+		setId(ID);
+		setText(SHOW_LEGEND);
+		setChecked(!featureModel.isLegendHidden());
 	}
 
 	@Override
@@ -65,10 +63,6 @@ public class LegendAction extends Action {
 	}
 
 	public void refresh() {
-		if (!featureModel.isLegendHidden()) {
-			setText(HIDE_LEGEND);
-		} else {
-			setText(SHOW_LEGEND);
-		}
+		setChecked(!featureModel.isLegendHidden());
 	}
 }

@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 /**
  * An explanation created by {@link FeatureModelExplanationCreator}.
  *
- * @param S subject
+ * @param <S> subject
  * @author Timo G&uuml;nther
  */
 public abstract class FeatureModelExplanation<S> extends Explanation<S> {

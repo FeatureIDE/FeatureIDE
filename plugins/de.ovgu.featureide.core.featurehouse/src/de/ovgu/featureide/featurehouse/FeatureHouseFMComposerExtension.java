@@ -4,11 +4,28 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 public class FeatureHouseFMComposerExtension extends FMComposerExtension {
 
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z][\\w\\.\\-]*$";
-
+	/**
+	 * Check for valid java identifier
+	 */
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
-		return s.matches(FEATURE_NAME_PATTERN);
+		// An empty or null string cannot be a valid identifier
+		if ((s == null) || (s.length() == 0)) {
+			return false;
+		}
+
+		final char[] c = s.toCharArray();
+		if (!Character.isJavaIdentifierStart(c[0])) {
+			return false;
+		}
+
+		for (int i = 1; i < c.length; i++) {
+			if (!Character.isJavaIdentifierPart(c[i])) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }

@@ -169,7 +169,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			cleanBuild = true;
 			clean(monitor);
-		} catch (ResourceException e) {
+		} catch (final ResourceException e) {
 			CorePlugin.getDefault().logWarning(e.getMessage());
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);

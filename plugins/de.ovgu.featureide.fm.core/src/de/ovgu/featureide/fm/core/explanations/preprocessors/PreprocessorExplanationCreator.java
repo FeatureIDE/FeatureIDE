@@ -30,8 +30,8 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
 /**
  * Generates explanations for circumstances involving preprocessors.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public interface PreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>> extends FeatureModelExplanationCreator<S, E> {

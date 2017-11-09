@@ -4,7 +4,7 @@ Bundle-Name: Feature Model UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
 Bundle-Version: 3.4.0.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
-Require-Bundle: 
+Require-Bundle:
  org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
@@ -19,7 +19,8 @@ Require-Bundle:
  org.eclipse.core.expressions,
  de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core,
- org.eclipse.swt
+ org.eclipse.swt,
+ org.eclipse.draw2d
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors;
