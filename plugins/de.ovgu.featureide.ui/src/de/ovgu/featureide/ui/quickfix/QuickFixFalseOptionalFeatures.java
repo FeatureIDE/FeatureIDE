@@ -36,7 +36,6 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
@@ -80,7 +79,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		monitor.setTaskName("Create configurations");
 		monitor.setRemainingWork(unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
-		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
 		Configuration configuration = new Configuration(featureModel, false);
 		try {
 			final List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
