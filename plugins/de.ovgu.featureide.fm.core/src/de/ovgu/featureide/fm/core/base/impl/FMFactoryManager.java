@@ -29,7 +29,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.velvet.SimpleVelvetFeatureModelFormat;
 
 /**
  * Returns custom factories to create {@link IFeatureModel}, {@link IFeature}, and {@link IConstraint} instances.
@@ -42,7 +41,6 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 
 	private FMFactoryManager() {
 		setExtensionLoaderInternal(new CoreExtensionLoader<IFeatureModelFactory>(DefaultFeatureModelFactory.class, ExtendedFeatureModelFactory.class));
-		factoryWorkspaceProvider.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
 	}
 
 	private static FMFactoryManager instance = new FMFactoryManager();

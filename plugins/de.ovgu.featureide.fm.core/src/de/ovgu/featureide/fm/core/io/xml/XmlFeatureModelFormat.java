@@ -81,16 +81,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private IFeatureModelFactory factory;
 
 	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
-
-	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
@@ -396,7 +386,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	/**
 	 * Parses the description of a constraint
-	 * 
+	 *
 	 * @param constraint Output parameter: the constraint will have the description set
 	 * @param parentOfDescription The parent tag of the description tag
 	 */

@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
  *
  * @author Sebastian Krieter
  */
-public class FeatureGraphFormat implements IFeatureGraphFormat {
+public class FeatureGraphFormat extends APersistentFormat<IFeatureGraph> implements IFeatureGraphFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
 
@@ -71,7 +71,7 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureGraph> getInstance() {
+	public FeatureGraphFormat getInstance() {
 		return this;
 	}
 
@@ -88,11 +88,6 @@ public class FeatureGraphFormat implements IFeatureGraphFormat {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.core.io.guidsl;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  *
  * @author Sebastian Krieter
  */
-public class GuidslFormat implements IFeatureModelFormat {
+public class GuidslFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
 
@@ -61,7 +61,7 @@ public class GuidslFormat implements IFeatureModelFormat {
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureModel> getInstance() {
+	public GuidslFormat getInstance() {
 		return this;
 	}
 
@@ -78,11 +78,6 @@ public class GuidslFormat implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override
