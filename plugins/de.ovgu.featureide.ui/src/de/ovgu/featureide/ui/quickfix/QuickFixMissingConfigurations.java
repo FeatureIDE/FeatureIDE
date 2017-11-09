@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
@@ -55,6 +56,8 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	protected final IFeatureProject project;
 	protected IFeatureModel featureModel;
 	private int configurationNr = 0;
+
+	protected final IPersistentFormat<Configuration> configFormat = ConfigurationManager.getDefaultFormat();
 
 	@Override
 	public String getLabel() {
@@ -90,7 +93,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 
 	protected void writeConfigurations(final Collection<Configuration> confs) {
-		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
 		try {
 			configurationNr = 0;
 			for (final Configuration c : confs) {
@@ -104,7 +107,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 
 	private String getConfigurationName(final int number) {
-		return PREFIX + number + "." + project.getComposer().getConfigurationExtension();
+		return PREFIX + number + "." + configFormat.getSuffix();
 	}
 
 	protected String createShortMessage(Collection<String> features) {
