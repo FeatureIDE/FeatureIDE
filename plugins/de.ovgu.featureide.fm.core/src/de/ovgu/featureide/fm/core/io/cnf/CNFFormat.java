@@ -26,8 +26,8 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  *
  * @author Sebastian Krieter
  */
-public class CNFFormat implements IFeatureModelFormat {
+public class CNFFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + CNFFormat.class.getSimpleName();
 
@@ -65,7 +65,7 @@ public class CNFFormat implements IFeatureModelFormat {
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureModel> getInstance() {
+	public CNFFormat getInstance() {
 		return this;
 	}
 
@@ -75,18 +75,8 @@ public class CNFFormat implements IFeatureModelFormat {
 	}
 
 	@Override
-	public boolean supportsRead() {
-		return false;
-	}
-
-	@Override
 	public boolean supportsWrite() {
 		return true;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

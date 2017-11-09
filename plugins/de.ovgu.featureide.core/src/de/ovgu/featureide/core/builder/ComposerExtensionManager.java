@@ -31,6 +31,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.EclipseExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Manages the FeatureIDE extensions to compose features.
@@ -49,14 +50,14 @@ public class ComposerExtensionManager extends ExtensionManager<IComposerExtensio
 
 			@Override
 			protected IComposerExtension parseExtension(IConfigurationElement configurationElement) {
-				if (!IComposerExtensionBase.extensionID.equals(configurationElement.getName())) {
-					return null;
+				if (IComposerExtensionBase.extensionID.equals(configurationElement.getName())) {
+					try {
+						return new ComposerExtensionProxy(configurationElement);
+					} catch (final Exception e) {
+						Logger.logError(e);
+					}
 				}
-				try {
-					return new ComposerExtensionProxy(configurationElement);
-				} catch (final Exception e) {
-					return null;
-				}
+				return null;
 			}
 		});
 	}

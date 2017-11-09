@@ -18,49 +18,48 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
-
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+package de.ovgu.featureide.fm.core.io;
 
 /**
+ * Reads / Writes a feature order file.
  *
  * @author Sebastian Krieter
  */
-public class DefaultFeatureModelFactory implements IFeatureModelFactory {
+public abstract class APersistentFormat<T> implements IPersistentFormat<T> {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".DefaultFeatureModelFactory";
-
-	public static DefaultFeatureModelFactory getInstance() {
-		return new DefaultFeatureModelFactory();
+	@Override
+	public APersistentFormat<T> getInstance() {
+		return this;
 	}
 
 	@Override
-	public String getId() {
-		return ID;
+	public ProblemList read(T object, CharSequence source) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String write(T object) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return false;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
 	}
 
 	@Override
 	public boolean initExtension() {
 		return true;
-	}
-
-	@Override
-	public Constraint createConstraint(IFeatureModel featureModel, Node propNode) {
-		return new Constraint(featureModel, propNode);
-	}
-
-	@Override
-	public Feature createFeature(IFeatureModel featureModel, String name) {
-		return new Feature(featureModel, name);
-	}
-
-	@Override
-	public FeatureModel createFeatureModel() {
-		return new FeatureModel(ID);
 	}
 
 }

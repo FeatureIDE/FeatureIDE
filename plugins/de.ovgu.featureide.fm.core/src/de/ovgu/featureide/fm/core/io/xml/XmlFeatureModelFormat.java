@@ -79,16 +79,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private IFeatureModelFactory factory;
 
 	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
-
-	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 

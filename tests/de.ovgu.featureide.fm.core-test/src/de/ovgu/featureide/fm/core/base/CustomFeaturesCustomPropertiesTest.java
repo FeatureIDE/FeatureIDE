@@ -65,6 +65,11 @@ public class CustomFeaturesCustomPropertiesTest {
 		}
 
 		@Override
+		public boolean initExtension() {
+			return true;
+		}
+
+		@Override
 		public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
 			return new Constraint(featureModel, propNode);
 		}
