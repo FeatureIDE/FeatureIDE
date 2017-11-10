@@ -1,7 +1,7 @@
 # FeatureIDE
 An extensible framework for feature-oriented software development
 
-[![GitHub release](https://img.shields.io/github/release/FeatureIDE/FeatureIDE.svg?style=flat-square)](https://github.com/tthuem/FeatureIDE/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/FeatureIDE/FeatureIDE.svg?style=flat-square)](https://github.com/FeatureIDE/FeatureIDE/releases/latest)
 [![Build Status](https://travis-ci.org/FeatureIDE/FeatureIDE.svg?branch=master)](https://travis-ci.org/FeatureIDE/FeatureIDE)
 
 release candidate: 
