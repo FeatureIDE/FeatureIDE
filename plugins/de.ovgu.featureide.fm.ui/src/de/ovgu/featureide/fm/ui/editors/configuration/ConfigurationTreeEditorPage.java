@@ -98,8 +98,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
-import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
-import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
@@ -1311,13 +1309,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (sb.length() > 0) {
 					sb.append("\n\n");
 				}
-				final ExplanationWriter<?> wr = explanation.getWriter();
-				sb.append(wr.getHeaderString());
-				for (final Reason<?> reason : explanation.getReasons()) {
-					sb.append(System.lineSeparator());
-					sb.append("\u2022 ");
-					sb.append(wr.getReasonString(reason));
-				}
+				sb.append(explanation.getWriter().getString());
 			}
 
 			if (sb.length() > 0) {

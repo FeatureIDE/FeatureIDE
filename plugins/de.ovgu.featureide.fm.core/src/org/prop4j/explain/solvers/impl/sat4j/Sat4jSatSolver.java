@@ -70,8 +70,8 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 	}
 
 	@Override
-	protected void addClause(Node clause) {
-		super.addClause(clause);
+	protected int addClause(Node clause) {
+		final int clauseIndex = super.addClause(clause);
 		addVariables(clause.getUniqueVariables());
 		IConstr constraint = null;
 		try {
@@ -80,9 +80,9 @@ public class Sat4jSatSolver extends AbstractSatSolver<ISolver> {
 			setContradiction(true);
 		}
 		if (constraint != null) {
-			final int clauseIndex = getClauseCount() - 1;
 			onClauseConstraintAdded(clauseIndex, constraint);
 		}
+		return clauseIndex;
 	}
 
 	/**

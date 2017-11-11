@@ -58,9 +58,10 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 	private int nextClauseIndex = 1;
 
 	@Override
-	public void addClause(Node clause) {
-		super.addClause(clause);
+	public int addClause(Node clause) {
+		final int clauseIndex = super.addClause(clause);
 		scopeClauseCount++;
+		return clauseIndex;
 	}
 
 	@Override
@@ -83,18 +84,14 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		}
 
 		// Push the assumptions.
-		final Map<Object, Boolean> assumptions = super.getAssumptions();
-		previousScopeAssumptions.push(new LinkedHashMap<>(assumptions));
-		assumptions.clear();
+		previousScopeAssumptions.push(new LinkedHashMap<>(super.getAssumptions()));
+		clearAssumptions();
 	}
 
 	@Override
 	public List<Node> pop() throws NoSuchElementException {
 		// Pop the clauses.
-		final List<Node> removedClauses = new LinkedList<>();
-		while (scopeClauseCount > 0) {
-			removedClauses.add(removeClause());
-		}
+		final List<Node> removedClauses = removeClauses(scopeClauseCount);
 		scopeClauseCount = previousScopeClauseCounts.pop();
 
 		// Pop the contradiction distance.
@@ -107,27 +104,21 @@ public class Sat4jMutableSatSolver extends Sat4jSatSolver implements MutableSatS
 		}
 
 		// Pop the assumptions.
-		final Map<Object, Boolean> assumptions = super.getAssumptions();
-		assumptions.clear();
-		assumptions.putAll(previousScopeAssumptions.pop());
+		clearAssumptions();
+		addAssumptions(previousScopeAssumptions.pop());
 
 		return removedClauses;
 	}
 
-	/**
-	 * Removes the newest clause and returns it.
-	 *
-	 * @return the newest clause
-	 */
-	protected Node removeClause() {
+	@Override
+	protected Node removeClause(int index) {
+		final Node clause = super.removeClause(index);
 		scopeClauseCount--;
-		final int clauseIndex = getClauseCount() - 1;
-		final Node clause = getClauses().remove(clauseIndex);
-		final IConstr constraint = clauseConstraints.remove(clauseIndex);
+		final IConstr constraint = clauseConstraints.remove(index);
 		if (constraint == null) {
 			return clause;
 		}
-		final int index = clauseIndexes.remove(clauseIndex);
+		index = clauseIndexes.remove(index);
 		indexClauses.remove(index);
 		getOracle().removeSubsumedConstr(constraint);
 		return clause;

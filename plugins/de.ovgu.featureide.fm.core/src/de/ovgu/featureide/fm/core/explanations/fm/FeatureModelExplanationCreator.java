@@ -26,8 +26,8 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 /**
  * Generates explanations for circumstances involving {@link IFeatureModel feature models}.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  * @see {@link DeadFeatureExplanationCreator} for explaining dead features and void feature models
  * @see {@link FalseOptionalFeatureExplanationCreator} for explaining false-optional features

@@ -33,9 +33,9 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
 /**
  * Abstract implementation of {@link PreprocessorExplanationCreator}.
  *
- * @param S subject
- * @param E explanation
- * @param O oracle
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <O> oracle
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractPreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>, O> extends AbstractFeatureModelExplanationCreator<S, E, O>
