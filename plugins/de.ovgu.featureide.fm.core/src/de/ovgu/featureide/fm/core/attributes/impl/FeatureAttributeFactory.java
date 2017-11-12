@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.attributes.impl;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
@@ -37,24 +38,33 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 	 */
 	@Override
 	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData) {
-		final String unit = attributeData.getUnit();
-		final String name = attributeData.getName();
 		final Boolean configurable = Boolean.parseBoolean(attributeData.isConfigurable());
 		final Boolean recursive = Boolean.parseBoolean(attributeData.isRecursive());
 		switch (attributeData.getType()) {
 		case "boolean":
 			final Boolean valueBoolean = Boolean.parseBoolean(attributeData.getValue());
-			return (new BooleanFeatureAttribute(name, unit, valueBoolean, recursive, configurable));
+			return (new BooleanFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
 		case "Long":
-			final Long valueLong = Long.parseLong(attributeData.getValue());
-			return (new LongFeatureAttribute(name, unit, valueLong, recursive, configurable));
+			try {
+				final Long valueLong = Long.parseLong(attributeData.getValue());
+				return (new LongFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
+			} catch (final NumberFormatException nfe) {
+				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
+				return null;
+			}
 		case "double":
-			final Double valueDouble = Double.parseDouble(attributeData.getValue());
-			return (new DoubleFeatureAttribute(name, unit, valueDouble, recursive, configurable));
+			try {
+				final Double valueDouble = Double.parseDouble(attributeData.getValue());
+				return (new DoubleFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
+			} catch (final NumberFormatException nfe) {
+				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
+				return null;
+			}
 		case "String":
-			return (new StringFeatureAttribute(name, unit, attributeData.getType(), recursive, configurable));
+			return (new StringFeatureAttribute(attributeData.getName(), attributeData.getUnit(), attributeData.getType(), recursive, configurable));
 		default:
-			return null; // TODO ATTRIBUTE ERROR HANDLING
+			FMCorePlugin.getDefault().logError(new UnknownFeatureAttributeTypeException(attributeData));
+			return null;
 		}
 	}
 }

@@ -557,7 +557,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 					}
 					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
 					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute);
-					parent.getProperty().addAttribute(featureAttribute);
+					if (featureAttribute != null) {
+						parent.getProperty().addAttribute(featureAttribute);
+					}
 				}
 				continue;
 			}
