@@ -41,8 +41,8 @@ public class PrintFeatureAttributes extends SingleSelectionAction {
 
 		final StringBuilder builder = new StringBuilder();
 		for (final IFeatureAttribute fa : feature.getProperty().getAttributes()) {
-			builder.append("Name: " + fa.getName() + ", Unit: " + fa.getUnit() + ", Value: " + fa.getValue() + ", Type: " + fa.getType().getType()
-				+ ", Recursive: " + fa.isRecursive() + ", Configureable: " + fa.isConfigureable());
+			builder.append("Name: " + fa.getName() + ", Unit: " + fa.getUnit() + ", Value: " + fa.getValue() + ", Type: " + fa.getType() + ", Recursive: "
+				+ fa.isRecursive() + ", Configureable: " + fa.isConfigurable());
 		}
 
 		FMUIPlugin.getDefault().logInfo(builder.toString());

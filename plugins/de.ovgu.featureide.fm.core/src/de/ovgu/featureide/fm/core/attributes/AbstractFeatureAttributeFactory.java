@@ -18,27 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.attributes.types;
-
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
+package de.ovgu.featureide.fm.core.attributes;
 
 /**
  * TODO description
  *
- * @author Joshua Sprey
- * @author Chico Sundermann
+ * @author User
  */
-public class StringAttributeType extends IFeatureAttributeType {
+public abstract class AbstractFeatureAttributeFactory {
 
-	public static final String ID = "String";
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttributeType#getType()
-	 */
-	@Override
-	public String getType() {
-		return ID;
-	}
-
+	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData);
 }

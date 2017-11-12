@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.attributes;
+package de.ovgu.featureide.fm.core.attributes.impl;
 
 /**
  * TODO description
@@ -26,27 +26,31 @@ package de.ovgu.featureide.fm.core.attributes;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public interface IFeatureAttribute {
+public class DoubleFeatureAttribute extends FeatureAttribute {
 
-	public String getName();
+	private final Double value;
+	protected final String attributeType = "double";
 
-	public String getUnit();
+	/**
+	 * @param name
+	 * @param unit
+	 * @param value
+	 * @param recursive
+	 * @param configureable
+	 */
+	public DoubleFeatureAttribute(String name, String unit, Double value, boolean recursive, boolean configureable) {
+		super(name, unit, recursive, configureable);
+		this.value = value;
+		// TODO Auto-generated constructor stub
+	}
 
-	public Object getValue();
+	@Override
+	public Double getValue() {
+		return value;
+	}
 
-	public String getType();
-
-	public boolean isRecursive();
-
-	public boolean isConfigurable();
-
-	public void setName(String name);
-
-	public void setUnit(String unit);
-
-	public void setValue(Object value);
-
-	public void setRecursive(boolean recursive);
-
-	public void setConfigureable(boolean configureable);
+	@Override
+	public String getType() {
+		return attributeType;
+	}
 }

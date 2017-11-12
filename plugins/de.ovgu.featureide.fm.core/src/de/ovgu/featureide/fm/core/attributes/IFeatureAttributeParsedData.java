@@ -23,10 +23,18 @@ package de.ovgu.featureide.fm.core.attributes;
 /**
  * TODO description
  *
- * @author Joshua Sprey
- * @author Chico Sundermann
+ * @author User
  */
-public abstract class IFeatureAttributeType {
+public interface IFeatureAttributeParsedData {
+	public String getName();
 
-	public abstract String getType();
+	public String getType();
+
+	public String getUnit();
+
+	public String getValue();
+
+	public String isRecursive();
+
+	public String isConfigurable();
 }

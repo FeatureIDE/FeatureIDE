@@ -18,9 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.attributes.types;
-
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
+package de.ovgu.featureide.fm.core.attributes.impl;
 
 /**
  * TODO description
@@ -28,17 +26,31 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class BooleanAttributeType extends IFeatureAttributeType {
+public class StringFeatureAttribute extends FeatureAttribute {
 
-	public static final String ID = "Boolean";
+	private final String value;
+	protected final String attributeType = "string";
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttributeType#getType()
+	/**
+	 * @param name
+	 * @param unit
+	 * @param value
+	 * @param recursive
+	 * @param configureable
 	 */
-	@Override
-	public String getType() {
-		return ID;
+	public StringFeatureAttribute(String name, String unit, String value, boolean recursive, boolean configureable) {
+		super(name, unit, recursive, configureable);
+		this.value = value;
+		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public String getValue() {
+		return value;
+	}
+
+	@Override
+	public String getType() {
+		return attributeType;
+	}
 }
