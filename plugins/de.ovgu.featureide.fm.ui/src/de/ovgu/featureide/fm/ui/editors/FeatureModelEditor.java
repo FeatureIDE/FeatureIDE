@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +53,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.gef.ui.actions.SelectAllAction;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -77,11 +79,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -110,7 +110,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public FeatureOrderEditor featureOrderEditor;
 	public FeatureModelTextEditorPage textEditor;
 
-	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<>();
+	public List<IFeatureModelEditorPage> extensionPages, pages = new LinkedList<>();
 
 	private ModelMarkerHandler<IFile> markerHandler;
 	boolean isPageModified = false;
@@ -123,10 +123,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private FmOutlinePage outlinePage;
 
-	private FMPrintAction printAction;
-	private SelectAllAction selectAllAction;
-	private UndoActionHandler undoAction;
-	private RedoActionHandler redoAction;
+	private final List<Action> actions = new ArrayList<>(4);
 
 	public FeatureModelEditor() {
 		super();
@@ -135,27 +132,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public FeatureModelEditor(IFileManager<IFeatureModel> fmManager) {
 		super();
 		this.fmManager = fmManager;
-	}
-
-	public boolean checkModel(String source) {
-		IFeatureModelFactory manager;
-		try {
-			manager = FMFactoryManager.getFactory(markerHandler.getModelFile().getLocation().toString(), fmManager.getFormat());
-		} catch (final NoSuchExtensionException e) {
-			FMUIPlugin.getDefault().logError(e);
-			manager = FMFactoryManager.getDefaultFactory();
-		}
-		final IFeatureModel model = manager.createFeatureModel();
-
-		if (getEditorInput() instanceof IFileEditorInput) {
-			final IFileEditorInput input = (IFileEditorInput) getEditorInput();
-			final IFile sourceFile = input.getFile();
-			model.setSourceFile(sourceFile.getRawLocation().toFile().toPath());
-		}
-		final ProblemList warnings = fmManager.getFormat().getInstance().read(model, source);
-		createModelFileMarkers(warnings);
-
-		return !warnings.containsError();
 	}
 
 	@Override
@@ -211,18 +187,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	@Override
 	public void doSaveAs() {
-		GraphicsExporter.exportAs(getFeatureModel(), diagramEditor);
+		GraphicsExporter.exportAs(getFeatureModel(), diagramEditor.getViewer());
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IContentOutlinePage.class.equals(adapter)) {
-			if (getOutlinePage() == null) {
-				setOutlinePage(new FmOutlinePage(null, this));
-				getOutlinePage().setInput(getFeatureModel());
+			if (outlinePage == null) {
+				outlinePage = new FmOutlinePage(null, this);
+				outlinePage.setInput(getFeatureModel());
 			}
-			return getOutlinePage();
+			return outlinePage;
 		}
 		if (IGotoMarker.class.equals(adapter)) {
 			if (getActivePage() != getDiagramEditorIndex()) {
@@ -237,17 +213,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		if (ActionFactory.PRINT.getId().equals(workbenchActionID)) {
-			return printAction;
-		}
-		if (ActionFactory.SELECT_ALL.getId().equals(workbenchActionID)) {
-			return selectAllAction;
-		}
-		if (ActionFactory.UNDO.getId().equals(workbenchActionID)) {
-			return undoAction;
-		}
-		if (ActionFactory.REDO.getId().equals(workbenchActionID)) {
-			return redoAction;
+		for (final Action action : actions) {
+			if (action.getId().equals(workbenchActionID)) {
+				return action;
+			}
 		}
 		final IAction action = diagramEditor.getDiagramAction(workbenchActionID);
 		if (action != null) {
@@ -267,10 +236,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	public IFeatureModel getOriginalFeatureModel() {
 		return fmManager.getObject();
-	}
-
-	public FmOutlinePage getOutlinePage() {
-		return outlinePage;
 	}
 
 	public ITextEditor getSourceEditor() {
@@ -410,7 +375,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	public void setFocus() {
 		if (getActivePage() == getDiagramEditorIndex()) {
-			diagramEditor.getControl().setFocus();
+			diagramEditor.getViewer().getControl().setFocus();
 		} else {
 			textEditor.setFocus();
 		}
@@ -427,26 +392,114 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void createPages() {
 		createActions();
-		createDiagramPage();
-		createFeatureOrderPage();
+
+		pages.clear();
+		addPage(diagramEditor = new FeatureDiagramEditor(fmManager, true));
+		addPage(textEditor = new FeatureModelTextEditorPage(this));
 		createExtensionPages();
-		createSourcePage();
+		addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
+
+		fmManager.addListener(diagramEditor);
+		getFeatureModel().addListener(diagramEditor);
+
+		extensionPages = pages.subList(2, pages.size());
+
 		currentPageIndex = 0;
 		// if there are errors in the model file, go to source page
 		if (!checkModel(textEditor.getCurrentContent())) {
-			setActivePage(getTextEditorIndex());
+			setActivePage(textEditor.getIndex());
 		} else {
-			diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
+			diagramEditor.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
-					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
-					diagramEditor.internRefresh(false);
+					diagramEditor.getViewer().internRefresh(false);
 					diagramEditor.analyzeFeatureModel();
 				}
 			});
 		}
+	}
+
+	private void addPage(IFeatureModelEditorPage page) {
+		try {
+			page.setIndex(addPage(page, getEditorInput()));
+			setPageText(page.getIndex(), page.getPageText());
+			page.initEditor();
+		} catch (final PartInitException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+		pages.add(page);
+	}
+
+	private void createExtensionPages() {
+		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FeatureModelEditor");
+		for (final IConfigurationElement exec : config) {
+			try {
+				final Object o = exec.createExecutableExtension("class");
+				if (o instanceof IFeatureModelEditorPage) {
+					addPage(((IFeatureModelEditorPage) o));
+				}
+			} catch (final Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+	}
+
+	private void createActions() {
+		final IOperationHistory history = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+		history.addOperationHistoryListener(new IOperationHistoryListener() {
+
+			@Override
+			public void historyNotification(OperationHistoryEvent event) {
+				if (!hasFMUndoContext(event)) {
+					return;
+				}
+				if ((event.getEventType() == OperationHistoryEvent.DONE) || (event.getEventType() == OperationHistoryEvent.REDONE)) {
+					operationCounter++;
+				}
+				if (event.getEventType() == OperationHistoryEvent.UNDONE) {
+					operationCounter--;
+				}
+				if (operationCounter == 0) {
+					setPageModified(false);
+				}
+			}
+
+			/**
+			 * returns true if the event matches the FMUndoContext
+			 *
+			 * @param event
+			 * @param hasFMContext
+			 */
+			private boolean hasFMUndoContext(OperationHistoryEvent event) {
+				for (final IUndoContext c : event.getOperation().getContexts()) {
+					if (c.matches((IUndoContext) getFeatureModel().getUndoContext())) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+		});
+		final ObjectUndoContext undoContext = new ObjectUndoContext(this);
+		getFeatureModel().setUndoContext(undoContext);
+
+		actions.add(new FMPrintAction(this));
+
+		final SelectAllAction selectAllAction = new SelectAllAction(this);
+		selectAllAction.setId(ActionFactory.SELECT_ALL.getId());
+		actions.add(selectAllAction);
+
+		final IWorkbenchPartSite site = getSite();
+
+		final UndoActionHandler undoActionHandler = new UndoActionHandler(site, undoContext);
+		undoActionHandler.setId(ActionFactory.UNDO.getId());
+		actions.add(undoActionHandler);
+
+		final RedoActionHandler redoActionHandler = new RedoActionHandler(site, undoContext);
+		redoActionHandler.setId(ActionFactory.REDO.getId());
+		actions.add(redoActionHandler);
 	}
 
 	@Override
@@ -490,107 +543,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		// FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
 		// FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
 
-		getExtensions();
-
 		FMPropertyManager.registerEditor(this);
 		// featureModel.getColorschemeTable().readColorsFromFile(file.getProject());
-	}
-
-	void createDiagramPage() {
-		diagramEditor = new FeatureDiagramEditor(this, getContainer());
-		fmManager.addListener(diagramEditor);
-		getFeatureModel().addListener(diagramEditor);
-		diagramEditor.setIndex(addPage(diagramEditor.getControl()));
-		setPageText(getDiagramEditorIndex(), diagramEditor.getPageText());
-		diagramEditor.initEditor();
-	}
-
-	void createSourcePage() {
-		closeEditor = false;
-		textEditor = new FeatureModelTextEditorPage();
-		textEditor.setFeatureModelEditor(this);
-		try {
-			textEditor.setIndex(addPage(textEditor, getEditorInput()));
-			setPageText(textEditor.getIndex(), textEditor.getPageText());
-		} catch (final PartInitException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-	}
-
-	private void createActions() {
-		final IOperationHistory history = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
-		history.addOperationHistoryListener(new IOperationHistoryListener() {
-
-			@Override
-			public void historyNotification(OperationHistoryEvent event) {
-				if (!hasFMUndoContext(event)) {
-					return;
-				}
-				if ((event.getEventType() == OperationHistoryEvent.DONE) || (event.getEventType() == OperationHistoryEvent.REDONE)) {
-					operationCounter++;
-				}
-				if (event.getEventType() == OperationHistoryEvent.UNDONE) {
-					operationCounter--;
-				}
-				if (operationCounter == 0) {
-					setPageModified(false);
-				}
-			}
-
-			/**
-			 * returns true if the event matches the FMUndoContext
-			 *
-			 * @param event
-			 * @param hasFMContext
-			 */
-			private boolean hasFMUndoContext(OperationHistoryEvent event) {
-				for (final IUndoContext c : event.getOperation().getContexts()) {
-					if (c.matches((IUndoContext) getFeatureModel().getUndoContext())) {
-						return true;
-					}
-				}
-				return false;
-			}
-
-		});
-		final ObjectUndoContext undoContext = new ObjectUndoContext(this);
-		getFeatureModel().setUndoContext(undoContext);
-
-		printAction = new FMPrintAction(this);
-		selectAllAction = new SelectAllAction(this);
-
-		final IWorkbenchPartSite site = getSite();
-		undoAction = new UndoActionHandler(site, undoContext);
-		redoAction = new RedoActionHandler(site, undoContext);
-	}
-
-	private void createExtensionPages() {
-		for (IFeatureModelEditorPage page : extensionPages) {
-			try {
-				page.setFeatureModelEditor(this);
-				page = page.getPage(getContainer());
-				if (page instanceof IEditorPart) {
-					page.setIndex(addPage((IEditorPart) page, getEditorInput()));
-				} else {
-					page.setIndex(addPage(page.getControl()));
-				}
-				setPageText(page.getIndex(), page.getPageText());
-				page.initEditor();
-			} catch (final PartInitException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-		}
-	}
-
-	private void createFeatureOrderPage() {
-		featureOrderEditor = new FeatureOrderEditor(this);
-		try {
-			featureOrderEditor.setIndex(addPage(featureOrderEditor, getEditorInput()));
-			setPageText(featureOrderEditor.getIndex(), featureOrderEditor.getPageText());
-			featureOrderEditor.initEditor();
-		} catch (final PartInitException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
 	}
 
 	private void createModelFileMarkers(ProblemList warnings) {
@@ -613,24 +567,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return diagramEditor.getIndex();
 	}
 
-	private void getExtensions() {
-		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FeatureModelEditor");
-		try {
-			for (final IConfigurationElement e : config) {
-				final Object o = e.createExecutableExtension("class");
-				if (o instanceof IFeatureModelEditorPage) {
-					extensionPages.add(((IFeatureModelEditorPage) o));
-				}
-			}
-		} catch (final Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	private int getOrderEditorIndex() {
-		return featureOrderEditor.getIndex();
-	}
-
 	/**
 	 * Gets the corresponding page for the given index.
 	 *
@@ -638,36 +574,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	 * @return The page
 	 */
 	private IFeatureModelEditorPage getPage(int index) {
-		if (index == getDiagramEditorIndex()) {
-			return diagramEditor;
-		}
-		if (index == getOrderEditorIndex()) {
-			return featureOrderEditor;
-		}
-		if (index == getTextEditorIndex()) {
-			return textEditor;
-		}
-
-		for (final IFeatureModelEditorPage page : extensionPages) {
+		for (final IFeatureModelEditorPage page : pages) {
 			if (page.getIndex() == index) {
 				return page;
 			}
 		}
-
 		return null;
-	}
-
-	private int getTextEditorIndex() {
-		return textEditor.getIndex();
 	}
 
 	public void readModel(String newSource) {
 		final ProblemList warnings = fmManager.getFormat().getInstance().read(getFeatureModel(), newSource);
 		createModelFileMarkers(warnings);
-		// final AModelFormatHandler modelHandler2 = PersistentFeatureModelManager.getModelHandler(ioType);
-		// modelHandler2.setObject(fmManager.editFeatureModel());
-		// final List<Problem> warnings = modelHandler2.read(newSource);
-		// featureModel = fmManager.editFeatureModel();
 	}
 
 	private boolean saveEditors() {
@@ -717,15 +634,24 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return true;
 	}
 
-	private void setOutlinePage(FmOutlinePage fmOutlinePage) {
-		outlinePage = fmOutlinePage;
-	}
-
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		if (getActivePage() == getDiagramEditorIndex()) {
 			diagramEditor.propertyChange(event);
 		}
+	}
+
+	public boolean checkModel(String source) {
+		final IFeatureModel model = FMFactoryManager.getFactory(getFeatureModel()).createFeatureModel();
+
+		final IEditorInput input = getEditorInput();
+		if (input instanceof IFileEditorInput) {
+			model.setSourceFile(Paths.get(((IFileEditorInput) input).getFile().getLocationURI()));
+		}
+		final ProblemList warnings = fmManager.getFormat().getInstance().read(model, source);
+		createModelFileMarkers(warnings);
+
+		return !warnings.containsError();
 	}
 
 }

@@ -47,6 +47,11 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
 	public ExtendedConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
 		return new ExtendedConstraint(featureModel, propNode);
 	}

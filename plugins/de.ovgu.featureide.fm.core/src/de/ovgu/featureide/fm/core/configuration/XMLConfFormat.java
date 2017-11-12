@@ -28,7 +28,6 @@ import org.w3c.dom.NamedNodeMap;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -50,18 +49,8 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	public static final String EXTENSION = StringTable.CONF;
 
 	@Override
-	public IPersistentFormat<Configuration> getInstance() {
+	public XMLConfFormat getInstance() {
 		return this;
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
 	}
 
 	@Override
@@ -179,11 +168,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

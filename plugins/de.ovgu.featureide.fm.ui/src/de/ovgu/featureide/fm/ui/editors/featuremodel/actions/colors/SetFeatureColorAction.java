@@ -68,6 +68,8 @@ import de.ovgu.featureide.fm.ui.wizards.ColorSchemeWizard;
  */
 public class SetFeatureColorAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.setfeaturecolor";
+
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 	protected List<IFeature> featureList = new ArrayList<>();
 	private IFeatureModel featureModel;
@@ -86,34 +88,20 @@ public class SetFeatureColorAction extends Action {
 		}
 	};
 
-	/**
-	 * @param viewer
-	 */
 	public SetFeatureColorAction(ISelectionProvider viewer) {
 		this(viewer, null);
 	}
 
-	/**
-	 * @param viewer
-	 */
 	public SetFeatureColorAction(Viewer viewer) {
 		this(viewer, null);
 	}
 
-	/**
-	 * @param viewer
-	 * @param featureModel
-	 */
 	public SetFeatureColorAction(Viewer viewer, IFeatureModel featureModel) {
 		super(COLORATION);
 		viewer.addSelectionChangedListener(selectionListener);
 		init(featureModel);
 	}
 
-	/**
-	 * @param viewer
-	 * @param featureModel
-	 */
 	public SetFeatureColorAction(ISelectionProvider viewer, IFeatureModel featureModel) {
 		super(COLORATION);
 		viewer.addSelectionChangedListener(selectionListener);
@@ -128,6 +116,8 @@ public class SetFeatureColorAction extends Action {
 
 	private void init(IFeatureModel featureModel) {
 		setImageDescriptor(colorImage);
+		setEnableUndoRedo(true);
+		setId(ID);
 		this.featureModel = featureModel;
 	}
 

@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  *
  * @author Sebastian Krieter
  */
-public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
+public class FeatureOrderFormat extends APersistentFormat<IFeatureModel> implements IPersistentFormat<IFeatureModel> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FeatureOrderFormat.class.getSimpleName();
 
@@ -86,11 +86,6 @@ public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

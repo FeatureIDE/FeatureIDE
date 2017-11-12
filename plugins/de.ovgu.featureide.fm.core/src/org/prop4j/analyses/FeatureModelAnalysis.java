@@ -524,6 +524,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkValidity(final SatInstance si) {
 		valid = LongRunningWrapper.runMethod(new ValidAnalysis(si)) != null;
+		if (!valid) {
+			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.DEAD);
+		}
 	}
 
 	private void setFeatureAttribute(IFeature feature, FeatureStatus featureAttribute) {

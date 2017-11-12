@@ -22,11 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
@@ -37,8 +40,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDelet
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke (Feature Interface)
+ * @author Chico Sundermann
+ * @author Paul Westphal
  */
-public class DeleteAllAction extends SingleSelectionAction {
+public class DeleteAllAction extends MultipleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.deleteall";
 	private final IFeatureModel featureModel;
@@ -50,15 +55,14 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 * @param featureModel
 	 */
 	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
-		super(DELETE_INCLUDING_SUBFEATURES, viewer);
+		super(DELETE_INCLUDING_SUBFEATURES, viewer, ID);
 		this.featureModel = featureModel;
-		this.viewer = viewer;
 		setImageDescriptor(deleteImage);
 	}
 
 	@Override
 	public void run() {
-		final FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
+		final FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, getParentsFromSelectedFeatures());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -68,14 +72,36 @@ public class DeleteAllAction extends SingleSelectionAction {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SingleSelectionAction #updateProperties()
-	 */
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().hasChildren());
-		setChecked(false);
+		setEnabled(!selectedFeaturesContainRoot());
 	}
-
+	
+	private boolean selectedFeaturesContainRoot() {
+		for (final IFeature tempFeature : featureArray) {
+			if (tempFeature.getStructure().isRoot()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private IFeature[] getParentsFromSelectedFeatures() {
+		ArrayList<IFeature> parents = new ArrayList<>();
+		for (IFeature feature : featureArray) {
+			if (!hasParentsInTheSubTree(feature)) {
+				parents.add(feature);
+			}
+		}
+		return parents.toArray(new IFeature[parents.size()]);
+	}
+	
+	private boolean hasParentsInTheSubTree(IFeature feature) {
+		for (IFeature temp : featureArray) {
+			if (feature.getStructure().isAncestorOf(temp.getStructure())) {
+				return true;
+			} 
+		}
+		return false;
+	}
 }

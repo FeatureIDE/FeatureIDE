@@ -47,6 +47,7 @@ public class AdjustModelToEditorSizeAction extends Action {
 
 	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
 		super(title);
+		setId(ID);
 		if (viewer instanceof FeatureDiagramEditor) {
 			editor = (FeatureDiagramEditor) viewer;
 		}
@@ -65,9 +66,9 @@ public class AdjustModelToEditorSizeAction extends Action {
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		if ((editor != null) && (editor instanceof FeatureDiagramEditor)) {
+		if (editor != null) {
 			final IGraphicalFeature graphicalRoot = FeatureUIHelper.getGraphicalFeature(root, editor.getGraphicalFeatureModel());
-			editor.centerPointOnScreen(graphicalRoot.getObject());
+			editor.getViewer().centerPointOnScreen(graphicalRoot.getObject());
 		}
 	}
 

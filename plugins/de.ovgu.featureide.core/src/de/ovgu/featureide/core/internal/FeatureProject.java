@@ -1227,7 +1227,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return path;
 			}
 
-			path = getPath(CONFIGS_ARGUMENT);
+			path = FMComposerManager.getPath(project, CONFIGS_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1245,7 +1245,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return path;
 			}
 
-			path = getPath(BUILD_ARGUMENT);
+			path = FMComposerManager.getPath(project, BUILD_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1263,7 +1263,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return path;
 			}
 
-			path = getPath(SOURCE_ARGUMENT);
+			path = FMComposerManager.getPath(project, SOURCE_ARGUMENT);
 			if ((path != null) && !path.isEmpty()) {
 				return path;
 			}
@@ -1271,24 +1271,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 		return DEFAULT_SOURCE_PATH;
-	}
-
-	private String getPath(String argument) {
-		try {
-			for (final ICommand command : project.getDescription().getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
-					return command.getArguments().get(argument);
-				}
-			}
-		} catch (final CoreException e) {
-			LOGGER.logError(e);
-		}
-		return null;
-	}
-
-	private boolean isFIDEBuilder(ICommand command) {
-		return command.getBuilderName().equals(ExtensibleFeatureProjectBuilder.BUILDER_ID)
-			|| command.getBuilderName().equals("de.ovgu.featureide.core.mpl.MSPLBuilder");
 	}
 
 	@Override
@@ -1300,7 +1282,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 
 			for (final ICommand command : project.getDescription().getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
+				if (FMComposerManager.isFIDEBuilder(command)) {
 					id = command.getArguments().get(ExtensibleFeatureProjectBuilder.COMPOSER_KEY);
 					if (id != null) {
 						return id;
@@ -1321,7 +1303,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			final ICommand[] commands = description.getBuildSpec();
 			for (final ICommand command : commands) {
-				if (isFIDEBuilder(command) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
+				if (FMComposerManager.isFIDEBuilder(command) || command.getBuilderName().equals("org.eclipse.ui.externaltools.ExternalToolBuilder")) {
 					final Map<String, String> args = command.getArguments();
 					args.put(SOURCE_ARGUMENT, feature);
 					args.put(BUILD_ARGUMENT, src);
@@ -1348,7 +1330,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			final LinkedList<ICommand> newCommandList = new LinkedList<ICommand>();
 			boolean added = false;
 			for (final ICommand command : description.getBuildSpec()) {
-				if (isFIDEBuilder(command)) {
+				if (FMComposerManager.isFIDEBuilder(command)) {
 					if (!added) {
 						final Map<String, String> args = command.getArguments();
 						args.put(ExtensibleFeatureProjectBuilder.COMPOSER_KEY, composerID);

@@ -27,17 +27,24 @@ package de.ovgu.featureide.fm.core;
  */
 public class CoreExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> implements IExtensionLoader<T> {
 
-	private final T[] extensionArray;
+	private final Class<? extends T>[] extensionArray;
 
 	@SafeVarargs
-	public CoreExtensionLoader(T... extensions) {
+	public CoreExtensionLoader(Class<? extends T>... extensions) {
 		this.extensionArray = extensions;
 	}
 
 	@Override
 	public void loadProviders(ExtensionManager<T> extensionManager) {
-		for (final T extension : extensionArray) {
-			extensionManager.addExtension(extension);
+		for (final Class<? extends T> extensionClass : extensionArray) {
+			try {
+				final T newInstance = extensionClass.newInstance();
+				if (newInstance.initExtension()) {
+					extensionManager.addExtension(newInstance);
+				}
+			} catch (final Throwable e) {
+				Logger.logWarning("Extension '" + extensionClass + "' couldn't be loaded due to: " + e.getMessage());
+			}
 		}
 	}
 

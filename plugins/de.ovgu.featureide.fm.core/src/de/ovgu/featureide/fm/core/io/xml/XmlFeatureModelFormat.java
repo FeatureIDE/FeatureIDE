@@ -74,6 +74,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
@@ -84,16 +86,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private IFeatureModelFactory factory;
 
 	private AbstractFeatureAttributeFactory attributeFactory;
-
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
@@ -145,6 +137,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			rule = doc.createElement(RULE);
 
 			constraints.appendChild(rule);
+			addDescription(doc, object.getConstraints().get(i), rule);
 			createPropositionalConstraints(doc, rule, object.getConstraints().get(i).getNode());
 		}
 
@@ -328,6 +321,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
+	protected void addDescription(Document doc, IConstraint constraint, Element fnod) {
+		final String description = constraint.getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+			fnod.appendChild(descr);
+		}
+	}
+
 	private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
 
 		if ((featureModel == null) || (propertiesNode == null)) {
@@ -414,6 +416,27 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * Parses the description of a constraint
+	 *
+	 * @param constraint Output parameter: the constraint will have the description set
+	 * @param parentOfDescription The parent tag of the description tag
+	 */
+	private void parseConstraintDescription(IConstraint constraint, final Element parentOfDescription) {
+		for (final Element childOfRule : getElements(parentOfDescription.getChildNodes())) {
+			if (childOfRule.getNodeName().equals(DESCRIPTION)) {
+				String description = childOfRule.getTextContent();
+
+				if ((description != null) && !description.isEmpty()) {
+					description = description.replace("\t", "");
+					description = description.trim();
+				}
+
+				constraint.setDescription(description);
+			}
+		}
+	}
+
+	/**
 	 * Parses the constraint section.
 	 */
 	private void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
@@ -434,6 +457,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 							}
 						}
 					}
+					parseConstraintDescription(c, child);
 					object.addConstraint(c);
 				} else {
 					throwError("Unknown constraint node: " + nodeName, child);
@@ -468,6 +492,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				} else {
 					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
+			} else if (nodeName.equals(DESCRIPTION)) {
+				/**
+				 * The method should return without adding any nodes, and traverse deeper into the tree, because description, has no children just return the
+				 * current list. The actual readout of the description happens at a different point.
+				 */
 			} else {
 				throwError("Unknown constraint type: " + nodeName, e);
 			}

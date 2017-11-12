@@ -1,0 +1,94 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: SetCollapsedInFeatureDiagram
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _u-yq0KqYEeerMLtK5JRlxw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/9/17 9:12 AM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA,_61Uz8KqYEeerMLtK5JRlxw
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Checks if the following actions work as intended:
+- Collapsing a single feature
+- Collapsing two features that are siblings
+- Collapsing a parent and a child feature
+- Undoing collapse operation
+The test fails if there is an entry in the error log or the XML file of the diagram is different than expected.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+            mouse-move 20 15 button3 -height 19 -width 49
+            mouse-press 20 15 button3 -height 19 -width 49
+        }
+        get-menu "Collapse (CTRL + C)" | click
+        mouse-hover 237 405 -height 730 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Priorities] {
+            mouse-move 29 10 button1 CTRL -height 19 -width 63
+            mouse-press 29 10 button1 CTRL -height 19 -width 63
+            mouse-move 30 10 -mask 786432 -height 19 -width 63
+        }
+        mouse-drag 408 150 button1 786432 -height 730 -width 1094
+        mouse-release 408 150 button1 786432 -height 730 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Priorities] {
+            mouse-hover 28 10 -height 19 -width 63
+            mouse-move 28 10 button3 -height 19 -width 63
+            mouse-press 28 10 button3 -height 19 -width 63
+        }
+        get-menu "Collapse (CTRL + C)" | click
+        mouse-hover 307 403 -height 730 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text CallButtons] {
+            mouse-move 52 10 button1 -height 19 -width 77
+            mouse-press 52 10 button1 -height 19 -width 77
+            mouse-move 53 10 -mask 524288 -height 19 -width 77
+        }
+        mouse-drag 550 100 button1 524288 -height 730 -width 1094
+        mouse-release 550 100 button1 524288 -height 730 -width 1094
+        mouse-hover 387 441 -height 730 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text CallButtons] {
+            mouse-move 38 11 button3 -height 19 -width 77
+            mouse-press 38 11 button3 -height 19 -width 77
+        }
+        get-menu "Collapse (CTRL + C)" | click
+        with [get-edit-part -className ModelEditPart | get-edit-part -text CallButtons] {
+            mouse-move 15 12 button3 -height 19 -width 77
+            mouse-press 15 12 button3 -height 19 -width 77
+        }
+        get-menu "Collapse (CTRL + C)" | click
+    }
+    with [get-diagram] {
+        mouse-hover 468 421 -height 730 -width 1094
+        with [get-edit-part -className ModelEditPart] {
+            with [get-edit-part -text Permission] {
+                mouse-move 36 11 button1 -height 19 -width 76
+                mouse-press 36 11 button1 -height 19 -width 76
+                mouse-release 36 11 button1 524288 -height 19 -width 76
+                mouse-hover 40 14 -height 19 -width 76
+            }
+            with [get-edit-part -text Safety] {
+                mouse-move 9 10 button1 CTRL -height 19 -width 48
+                mouse-press 9 10 button1 CTRL -height 19 -width 48
+                mouse-release 9 10 button1 786432 -height 19 -width 48
+                mouse-hover 12 9 -height 19 -width 48
+                mouse-move 12 9 button3 -height 19 -width 48
+                mouse-press 12 9 button3 -height 19 -width 48
+            }
+        }
+        get-menu "Collapse (CTRL + C)" | click
+    }
+}
+get-menu "Edit/Undo Set Features Collapsed" | click
+get-editor "Elevator-FeatureModeling Model" | get-tab-folder | get-tab-item Source | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

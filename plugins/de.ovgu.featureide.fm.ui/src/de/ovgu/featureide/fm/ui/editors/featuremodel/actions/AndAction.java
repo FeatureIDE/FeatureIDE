@@ -43,7 +43,7 @@ public class AndAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public AndAction(Object viewer, IFeatureModel featureModel) {
-		super(AND, viewer);
+		super(AND, viewer, ID);
 		this.featureModel = featureModel;
 	}
 
@@ -56,7 +56,6 @@ public class AndAction extends SingleSelectionAction {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 	}
 
