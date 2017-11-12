@@ -32,21 +32,19 @@ public interface IFeatureAttribute {
 
 	public String getUnit();
 
-	public String getValue();
+	public Object getValue();
 
-	public IFeatureAttributeType getType();
+	public String getType();
 
 	public boolean isRecursive();
 
-	public boolean isConfigureable();
+	public boolean isConfigurable();
 
 	public void setName(String name);
 
 	public void setUnit(String unit);
 
-	public void setValue(String value);
-
-	public void setType(IFeatureAttributeType type);
+	public void setValue(Object value);
 
 	public void setRecursive(boolean recursive);
 

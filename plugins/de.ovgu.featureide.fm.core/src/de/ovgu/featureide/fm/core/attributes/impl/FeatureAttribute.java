@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.attributes.impl;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
 
 /**
  * TODO description
@@ -29,14 +28,18 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeType;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class FeatureAttribute implements IFeatureAttribute {
+public abstract class FeatureAttribute implements IFeatureAttribute {
+
+	public static final String DOUBLE = "double";
+	public static final String STRING = "string";
+	public static final String LONG = "long";
+	public static final String BOOLEAN = "boolean";
 
 	private String name;
 	private String unit;
-	private String value;
-	private IFeatureAttributeType type;
 	private boolean recursive;
 	private boolean configureable;
+	protected String attributeType;
 
 	/**
 	 * @param name Name of the FeatureAttribute
@@ -46,12 +49,10 @@ public class FeatureAttribute implements IFeatureAttribute {
 	 * @param recursive True, if the current Attribute should be inherited
 	 * @param configureable True, if the current FeatureAttribute needs be seting the configuration.
 	 */
-	public FeatureAttribute(String name, String unit, String value, IFeatureAttributeType type, boolean recursive, boolean configureable) {
+	protected FeatureAttribute(String name, String unit, boolean recursive, boolean configureable) {
 		super();
 		this.name = name;
 		this.unit = unit;
-		this.value = value;
-		this.type = type;
 		this.recursive = recursive;
 		this.configureable = configureable;
 	}
@@ -79,18 +80,7 @@ public class FeatureAttribute implements IFeatureAttribute {
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getValue()
 	 */
 	@Override
-	public String getValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getType()
-	 */
-	@Override
-	public IFeatureAttributeType getType() {
-		return type;
-	}
+	public abstract Object getValue();
 
 	/*
 	 * (non-Javadoc)
@@ -101,12 +91,17 @@ public class FeatureAttribute implements IFeatureAttribute {
 		return recursive;
 	}
 
+	@Override
+	public String getType() {
+		return attributeType;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#isConfigureable()
 	 */
 	@Override
-	public boolean isConfigureable() {
+	public boolean isConfigurable() {
 		return configureable;
 	}
 
@@ -134,18 +129,8 @@ public class FeatureAttribute implements IFeatureAttribute {
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setValue(java.lang.String)
 	 */
 	@Override
-	public void setValue(String value) {
-		this.value = value;
+	public void setValue(Object value) {
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setType(de.ovgu.featureide.fm.core.attribute.IFeatureAttributeType)
-	 */
-	@Override
-	public void setType(IFeatureAttributeType type) {
-		this.type = type;
 	}
 
 	/*

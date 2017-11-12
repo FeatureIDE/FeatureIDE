@@ -49,14 +49,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute;
-import de.ovgu.featureide.fm.core.attributes.types.BooleanAttributeType;
-import de.ovgu.featureide.fm.core.attributes.types.DoubleAttributeType;
-import de.ovgu.featureide.fm.core.attributes.types.LongAttributeType;
-import de.ovgu.featureide.fm.core.attributes.types.StringAttributeType;
+import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeFactory;
+import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -76,6 +74,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements IFeatureModelFormat {
 
@@ -85,21 +85,14 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	private IFeatureModelFactory factory;
 
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
+	private AbstractFeatureAttributeFactory attributeFactory;
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
 		factory = FMFactoryManager.getFactory(object);
+		attributeFactory = new FeatureAttributeFactory();
 
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
@@ -144,6 +137,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			rule = doc.createElement(RULE);
 
 			constraints.appendChild(rule);
+			addDescription(doc, object.getConstraints().get(i), rule);
 			createPropositionalConstraints(doc, rule, object.getConstraints().get(i).getNode());
 		}
 
@@ -260,13 +254,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			for (final IFeatureAttribute featureAttribute : feature.getProperty().getAttributes()) {
 				final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
 				attributeNode.setAttribute(XMLFeatureModelTags.NAME, featureAttribute.getName());
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType().getType());
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue());
+				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType());
+				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
 				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_UNIT, featureAttribute.getUnit());
 				if (featureAttribute.isRecursive()) {
 					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_RECURSIVE, XMLFeatureModelTags.TRUE);
 				}
-				if (featureAttribute.isConfigureable()) {
+				if (featureAttribute.isConfigurable()) {
 					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_CONFIGURABLE, XMLFeatureModelTags.TRUE);
 				}
 				fnode.appendChild(attributeNode);
@@ -320,6 +314,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	protected void addDescription(Document doc, IFeature feat, Element fnod) {
 		final String description = feat.getProperty().getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			final Element descr = doc.createElement(DESCRIPTION);
+			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
+			fnod.appendChild(descr);
+		}
+	}
+
+	protected void addDescription(Document doc, IConstraint constraint, Element fnod) {
+		final String description = constraint.getDescription();
 		if ((description != null) && !description.trim().isEmpty()) {
 			final Element descr = doc.createElement(DESCRIPTION);
 			descr.setTextContent("\n" + description.replace("\r", "") + "\n");
@@ -413,6 +416,27 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
+	 * Parses the description of a constraint
+	 *
+	 * @param constraint Output parameter: the constraint will have the description set
+	 * @param parentOfDescription The parent tag of the description tag
+	 */
+	private void parseConstraintDescription(IConstraint constraint, final Element parentOfDescription) {
+		for (final Element childOfRule : getElements(parentOfDescription.getChildNodes())) {
+			if (childOfRule.getNodeName().equals(DESCRIPTION)) {
+				String description = childOfRule.getTextContent();
+
+				if ((description != null) && !description.isEmpty()) {
+					description = description.replace("\t", "");
+					description = description.trim();
+				}
+
+				constraint.setDescription(description);
+			}
+		}
+	}
+
+	/**
 	 * Parses the constraint section.
 	 */
 	private void parseConstraints(NodeList nodeList) throws UnsupportedModelException {
@@ -433,6 +457,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 							}
 						}
 					}
+					parseConstraintDescription(c, child);
 					object.addConstraint(c);
 				} else {
 					throwError("Unknown constraint node: " + nodeName, child);
@@ -467,6 +492,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				} else {
 					throwError("Feature \"" + featureName + "\" does not exists", e);
 				}
+			} else if (nodeName.equals(DESCRIPTION)) {
+				/**
+				 * The method should return without adding any nodes, and traverse deeper into the tree, because description, has no children just return the
+				 * current list. The actual readout of the description happens at a different point.
+				 */
 			} else {
 				throwError("Unknown constraint type: " + nodeName, e);
 			}
@@ -527,46 +557,38 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(ATTRIBUTE)) {
 				if (e.hasAttributes()) {
 					final NamedNodeMap nodeMapFeatureAttribute = e.getAttributes();
-					final FeatureAttribute parsedAttribute = new FeatureAttribute("", "", "", null, false, false);
+					String configurable = "";
+					String recursive = "";
+					String name = "";
+					String unit = "";
+					String value = "";
+					String type = "";
 					for (int i = 0; i < nodeMapFeatureAttribute.getLength(); i++) {
 						final org.w3c.dom.Node node = nodeMapFeatureAttribute.item(i);
 						final String attributeName = node.getNodeName();
 						final String attributeValue = node.getNodeValue();
 
 						if (attributeName.equals(ATTRIBUTE_CONFIGURABLE)) {
-							parsedAttribute.setConfigureable(attributeValue.equals(TRUE));
+							configurable = attributeValue;
 						} else if (attributeName.equals(ATTRIBUTE_RECURSIVE)) {
-							parsedAttribute.setRecursive(attributeValue.equals(TRUE));
+							recursive = attributeValue;
 						} else if (attributeName.equals(NAME)) {
-							parsedAttribute.setName(attributeValue);
+							name = attributeValue;
 						} else if (attributeName.equals(ATTRIBUTE_UNIT)) {
-							parsedAttribute.setUnit(attributeValue);
+							unit = attributeValue;
 						} else if (attributeName.equals(ATTRIBUTE_VALUE)) {
-							parsedAttribute.setValue(attributeValue);
+							value = attributeValue;
 						} else if (attributeName.equals(ATTRIBUTE_TYPE)) {
-							switch (attributeValue) {
-							case LongAttributeType.ID:
-								parsedAttribute.setType(new LongAttributeType());
-								break;
-							case DoubleAttributeType.ID:
-								parsedAttribute.setType(new DoubleAttributeType());
-								break;
-							case BooleanAttributeType.ID:
-								parsedAttribute.setType(new BooleanAttributeType());
-								break;
-							case StringAttributeType.ID:
-								parsedAttribute.setType(new StringAttributeType());
-								break;
-							default:
-								FMCorePlugin.getDefault().logWarning("The feature attribute type \"" + attributeName + "\" is unknown.");
-								break;
-							}
-							// Legacy case, for backwards compatibility
+							type = attributeValue;
 						} else {
 							throwError("Unknown feature attribute: " + attributeName, e);
 						}
 					}
-					parent.getProperty().addAttribute(parsedAttribute);
+					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
+					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute);
+					if (featureAttribute != null) {
+						parent.getProperty().addAttribute(featureAttribute);
+					}
 				}
 				continue;
 			}

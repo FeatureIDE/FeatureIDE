@@ -32,12 +32,12 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	/**
 	 * The sub feature model which contains implicit constraints if there are any.
 	 */
-	IFeatureModel subFm;
+	private final IFeatureModel subFm;
 
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	IFeatureModel completeFm;
+	private final IFeatureModel completeFm;
 
 	/**
 	 * Constructor.

@@ -27,7 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -52,18 +51,8 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	@Override
-	public IPersistentFormat<ProjectRecordCollection> getInstance() {
+	public ProjectRecordFormat getInstance() {
 		return this;
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
 	}
 
 	@Override
@@ -114,11 +103,6 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 				addProjectRecords(doc, projectElement, projectRecord.getSubProjects());
 			}
 		}
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
@@ -38,21 +37,22 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionO
  */
 public class LayoutSelectionAction extends Action {
 
+	public static final String ID = "de.ovgu.featureide.layoutselectionaction";
+
 	private final IGraphicalFeatureModel featureModel;
 	private final int newSelectedLayoutAlgorithm;
-	private final int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm,
-			int oldSelectedLayoutAlgorithm) {
+	public LayoutSelectionAction(IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm) {
 		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
+		setId(ID);
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
-		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		final LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
+		final LayoutSelectionOperation op =
+			new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, featureModel.getLayout().getLayoutAlgorithm());
 		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 		try {

@@ -20,17 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_COLLAPSED;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_EXPANDED;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -39,56 +29,39 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Joshua Sprey
  * @author Enis Belli
  * @author Christopher Sontag
+ * @author Chico Sundermann
+ * @author Paul Westphal
  */
-public class SetFeatureToCollapseOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 
-	private final IFeature feature;
+	
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private List<FeatureConnection> targetConnections = new ArrayList<>();
-
+	
+	private IFeature[] featureArray;
+	private boolean allCollapsed;
+	private String operationLabel;
+	
 	/**
 	 * @param label Description of this operation to be used in the menu
 	 * @param feature feature on which this operation will be executed
 	 *
 	 */
-	public SetFeatureToCollapseOperation(IFeature feature, IGraphicalFeatureModel graphicalFeatureModel) {
-		super(graphicalFeatureModel.getFeatureModel(), getLabel(graphicalFeatureModel.getGraphicalFeature(feature)));
+	public SetFeatureToCollapseOperation(IFeature[] featureArray, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
+		super(graphicalFeatureModel.getFeatureModel(), operationLabel);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		this.feature = feature;
-	}
-
-	/**
-	 * @param feature
-	 * @return String to be used in undo/redo menu
-	 */
-	private static String getLabel(IGraphicalFeature feature) {
-		if (feature.isCollapsed()) {
-			return SET_FEATURE_COLLAPSED;
-		} else {
-			return SET_FEATURE_EXPANDED;
-		}
+		this.featureArray = featureArray;
+		this.allCollapsed = allCollapsed;
+		this.operationLabel = operationLabel;
 	}
 
 	@Override
-	protected FeatureIDEEvent operation() {
-		if (feature.getStructure().hasChildren()) {
-
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-			graphicalFeature.setCollapsed(!graphicalFeature.isCollapsed());
-			targetConnections = graphicalFeature.getTargetConnections();
-			graphicalFeature.getTargetConnections().clear();
-
-			return new FeatureIDEEvent(feature, EventType.COLLAPSED_CHANGED, null, null);
+	protected void createSingleOperations() {
+		for (IFeature tempFeature : featureArray) {
+			if(allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
+				final CollapseFeatureOperation op = new CollapseFeatureOperation(tempFeature, graphicalFeatureModel, operationLabel);
+				operations.add(op);
+			}
 		}
-		return new FeatureIDEEvent(feature, EventType.DEFAULT);
-	}
-
-	@Override
-	protected FeatureIDEEvent inverseOperation() {
-		if (feature.getStructure().hasChildren()) {
-			graphicalFeatureModel.getGraphicalFeature(feature).getTargetConnections().addAll(targetConnections);
-		}
-		return operation();
 	}
 
 }

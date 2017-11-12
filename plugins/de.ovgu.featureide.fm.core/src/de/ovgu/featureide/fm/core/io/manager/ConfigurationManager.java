@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
+import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
@@ -55,7 +55,7 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	@Nonnull
 	public static IPersistentFormat<Configuration> getDefaultFormat() {
-		return new DefaultFormat();
+		return new XMLConfFormat();
 	}
 
 	@CheckForNull

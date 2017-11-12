@@ -18,31 +18,39 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+package de.ovgu.featureide.fm.core.attributes.impl;
 
 /**
- * test class for XmlReader/Writer
+ * TODO description
  *
- * @author Fabian Benduhn
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
-public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
+public class LongFeatureAttribute extends FeatureAttribute {
+
+	private final Long value;
 
 	/**
-	 * @param file
-	 * @throws UnsupportedModelException
+	 * @param name
+	 * @param unit
+	 * @param value
+	 * @param recursive
+	 * @param configureable
 	 */
-	public TXmlReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
-		super(fm, s);
+
+	public LongFeatureAttribute(String name, String unit, Long value, boolean recursive, boolean configureable) {
+		super(name, unit, recursive, configureable);
+		this.value = value;
+		attributeType = FeatureAttribute.LONG;
 	}
 
 	@Override
-	protected IFeatureModelFormat getFormat() {
-		return new XmlFeatureModelFormat();
+	public Long getValue() {
+		return value;
 	}
 
+	@Override
+	public void setValue(Object value) {
+		// this.value = value;
+	}
 }

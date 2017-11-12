@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IEditorPart;
 
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
@@ -31,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
  *
  * @author Jens Meinicke
  */
-public interface IFeatureModelEditorPage extends IEventListener {
+public interface IFeatureModelEditorPage extends IEditorPart, IEventListener {
 
 	/**
 	 *
@@ -60,11 +61,6 @@ public interface IFeatureModelEditorPage extends IEventListener {
 	void initEditor();
 
 	/**
-	 * @param the feature model editor containing the page.
-	 */
-	void setFeatureModelEditor(FeatureModelEditor featureModelEditor);
-
-	/**
 	 * @return This page. You can also call a constructor.
 	 */
 	IFeatureModelEditorPage getPage(Composite container);
@@ -78,6 +74,7 @@ public interface IFeatureModelEditorPage extends IEventListener {
 	/**
 	 * @param monitor
 	 */
+	@Override
 	void doSave(IProgressMonitor monitor);
 
 	/**

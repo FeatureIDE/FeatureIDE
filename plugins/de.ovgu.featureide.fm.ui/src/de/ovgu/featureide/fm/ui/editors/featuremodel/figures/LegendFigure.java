@@ -133,6 +133,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INTERFACED = 10;
 	private static final int IMPLICIT = 11;
 	private static final int EXPLANATION = 12;
+	private static final int REDUNDANT = 13;
 	private static final int VOID_MODEL = 14;
 
 	private static final XYLayout layout = new XYLayout();
@@ -304,6 +305,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
 		}
+		if (void_model) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getVoidModelConst());
+		}
 		this.setSize(width, height);
 	}
 
@@ -398,7 +403,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	private void createRowRedundantConst(int row) {
-		createSymbol(row, FALSE_OPT, false, REDUNDANT_TOOLTIP);
+		createSymbol(row, REDUNDANT, false, REDUNDANT_TOOLTIP);
 		final Label labelIndetHidden = createLabel(row, language.getRedundantConst(), FMPropertyManager.getFeatureForgroundColor(), REDUNDANT_TOOLTIP);
 		add(labelIndetHidden);
 	}
@@ -546,7 +551,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		boolean decoration = true;
 		String toolTipText = "";
 		if (type == AND) {
-
 			fill = false;
 		} else if (type == OR) {
 			toolTipText = OR_TOOLTIP;
@@ -627,9 +631,21 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		final int y2 = (((ROW_HEIGHT * row) + SYMBOL_SIZE) - LIFT_2);
 		final Point p1 = new Point(x1, y1);
 
+		final Label label = new Label();
 		final Figure rect = new RectangleFigure();
 		switch (type) {
-
+		case (DEAD):
+			label.setIcon(FM_ERROR);
+			break;
+		case (FALSE_OPT):
+			label.setIcon(FM_WARNING);
+			break;
+		case (REDUNDANT):
+			label.setIcon(FM_INFO);
+			break;
+		case (VOID_MODEL):
+			label.setIcon(FM_ERROR);
+			break;
 		case (ABSTRACT):
 			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
 			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
@@ -640,23 +656,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			break;
 		case (HIDDEN):
 			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());
-			break;
-		case (VOID_MODEL):
-		case (DEAD):
-			if (feature) {
-				rect.setBorder(FMPropertyManager.getDeadFeatureBorder(false));
-			} else {
-				rect.setBorder(FMPropertyManager.getConstraintBorder(false));
-			}
-			rect.setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			break;
-		case (FALSE_OPT):
-			if (feature) {
-				rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
-			} else {
-				rect.setBorder(FMPropertyManager.getConstraintBorder(false));
-			}
-			rect.setBackgroundColor(FMPropertyManager.getWarningColor());
 			break;
 		case (IMPLICIT):
 			rect.setBorder(IMPLICIT_CONSTRAINT_BORDER);
@@ -678,7 +677,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		rect.setSize(x2 - x1, y2 - y1);
 		rect.setLocation(p1);
 		rect.setToolTip(createToolTipContent(toolTip));
-		this.add(rect);
+
+		if (label.getIcon() != null) {
+			label.setBounds(rect.getBounds());
+			add(label);
+		} else {
+			add(rect);
+		}
 	}
 
 	public void recreateLegend() {

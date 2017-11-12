@@ -69,7 +69,6 @@ public class CalculateDependencyAction extends Action {
 	 * The listener which remembers the selection and checks whether it is valid.
 	 */
 	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -86,7 +85,7 @@ public class CalculateDependencyAction extends Action {
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
 		this.featureModel = featureModel;
-
+		setId(ID);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);

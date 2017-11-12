@@ -29,10 +29,10 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class PrintFeatureAttributes extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.abstract";
+	public static final String ID = "de.ovgu.featureide.printAttributes";
 
 	public PrintFeatureAttributes(Object viewer) {
-		super("Print FeatureAttributes", viewer);
+		super("Print FeatureAttributes", viewer, ID);
 	}
 
 	@Override
@@ -41,8 +41,8 @@ public class PrintFeatureAttributes extends SingleSelectionAction {
 
 		final StringBuilder builder = new StringBuilder();
 		for (final IFeatureAttribute fa : feature.getProperty().getAttributes()) {
-			builder.append("Name: " + fa.getName() + ", Unit: " + fa.getUnit() + ", Value: " + fa.getValue() + ", Type: " + fa.getType().getType()
-				+ ", Recursive: " + fa.isRecursive() + ", Configureable: " + fa.isConfigureable());
+			builder.append("Name: " + fa.getName() + ", Unit: " + fa.getUnit() + ", Value: " + fa.getValue() + ", Type: " + fa.getType() + ", Recursive: "
+				+ fa.isRecursive() + ", Configureable: " + fa.isConfigurable() + "\n");
 		}
 
 		FMUIPlugin.getDefault().logInfo(builder.toString());

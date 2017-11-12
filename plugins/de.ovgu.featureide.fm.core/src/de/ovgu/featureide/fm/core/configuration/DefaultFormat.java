@@ -39,8 +39,8 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  *
  * @author Sebastian Krieter
  */
-public class DefaultFormat implements IConfigurationFormat {
+public class DefaultFormat extends APersistentFormat<Configuration> implements IConfigurationFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + DefaultFormat.class.getSimpleName();
 
@@ -171,7 +171,7 @@ public class DefaultFormat implements IConfigurationFormat {
 	}
 
 	@Override
-	public IPersistentFormat<Configuration> getInstance() {
+	public DefaultFormat getInstance() {
 		return this;
 	}
 
@@ -188,11 +188,6 @@ public class DefaultFormat implements IConfigurationFormat {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

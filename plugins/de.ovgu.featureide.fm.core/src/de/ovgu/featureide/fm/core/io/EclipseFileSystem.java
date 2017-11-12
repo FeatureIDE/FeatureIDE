@@ -57,15 +57,16 @@ public class EclipseFileSystem implements IFileSystem {
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.write(path, content);
-		}
-		try {
-			if (file.exists()) {
-				file.setContents(new ByteArrayInputStream(content), true, true, null);
-			} else {
-				file.create(new ByteArrayInputStream(content), true, null);
+		} else {
+			try {
+				if (file.exists()) {
+					file.setContents(new ByteArrayInputStream(content), true, true, null);
+				} else {
+					file.create(new ByteArrayInputStream(content), true, null);
+				}
+			} catch (final CoreException e) {
+				throw new IOException(e);
 			}
-		} catch (final CoreException e) {
-			throw new IOException(e);
 		}
 	}
 
@@ -74,11 +75,12 @@ public class EclipseFileSystem implements IFileSystem {
 		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(getIPath(path));
 		if (file == null) {
 			JAVA.append(path, content);
-		}
-		try {
-			file.appendContents(new ByteArrayInputStream(content), true, true, null);
-		} catch (final CoreException e) {
-			throw new IOException(e);
+		} else {
+			try {
+				file.appendContents(new ByteArrayInputStream(content), true, true, null);
+			} catch (final CoreException e) {
+				throw new IOException(e);
+			}
 		}
 	}
 
@@ -92,20 +94,21 @@ public class EclipseFileSystem implements IFileSystem {
 		IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(getIPath(path));
 		if (container == null) {
 			JAVA.mkDir(path);
-		}
-		try {
-			if (container instanceof IFolder) {
-				final LinkedList<IFolder> folders = new LinkedList<>();
-				while (!container.exists()) {
-					folders.addFirst((IFolder) container);
-					container = container.getParent();
+		} else {
+			try {
+				if (container instanceof IFolder) {
+					final LinkedList<IFolder> folders = new LinkedList<>();
+					while (!container.exists()) {
+						folders.addFirst((IFolder) container);
+						container = container.getParent();
+					}
+					for (final IFolder folder : folders) {
+						folder.create(true, true, null);
+					}
 				}
-				for (final IFolder folder : folders) {
-					folder.create(true, true, null);
-				}
+			} catch (CoreException | ClassCastException | NullPointerException e) {
+				throw new IOException(e);
 			}
-		} catch (CoreException | ClassCastException | NullPointerException e) {
-			throw new IOException(e);
 		}
 	}
 
@@ -128,8 +131,9 @@ public class EclipseFileSystem implements IFileSystem {
 		final IResource res = getResource(path);
 		if (res == null) {
 			return JAVA.exists(path);
+		} else {
+			return res.isAccessible();
 		}
-		return res.isAccessible();
 	}
 
 }

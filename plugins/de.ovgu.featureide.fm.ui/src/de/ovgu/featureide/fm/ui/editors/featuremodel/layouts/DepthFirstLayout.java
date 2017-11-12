@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -50,7 +51,8 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
-		layout(yoffset, featureModel.getVisibleConstraints());
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {

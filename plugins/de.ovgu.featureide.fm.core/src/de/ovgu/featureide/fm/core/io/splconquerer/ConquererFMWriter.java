@@ -69,9 +69,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Prints a feature model in SPLConqueror format.
@@ -81,7 +80,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class ConquererFMWriter implements IFeatureModelFormat {
+public class ConquererFMWriter extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + ConquererFMWriter.class.getSimpleName();
 
@@ -390,11 +389,6 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 	}
 
 	@Override
-	public ProblemList read(IFeatureModel object, CharSequence source) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String write(IFeatureModel object) {
 		return writeToString(object);
 	}
@@ -405,13 +399,8 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureModel> getInstance() {
+	public ConquererFMWriter getInstance() {
 		return new ConquererFMWriter();
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return false;
 	}
 
 	@Override
@@ -422,11 +411,6 @@ public class ConquererFMWriter implements IFeatureModelFormat {
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override
