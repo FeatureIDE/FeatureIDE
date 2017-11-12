@@ -34,31 +34,52 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  *
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public class EditConstraintOperation extends AbstractFeatureModelOperation {
 
 	private final IConstraint constraint;
-	private final Node newNode;
-	private final Node oldNode;
+	
+	/**
+	 * This wrapper is used to wrap both fields (node and description) of a constraint
+	 * It is needed because the FeatureIDEEvent constructor expects only one set of objects 
+	 * (oldState and newState)
+	 * This way it is possible to cache the state of two different fields. 
+	 */
+	private class Wrapper {
+		Node newNode;
+		Node oldNode;
+		String oldDescription;
+		String newDescription;	
+	}
+	
+	Wrapper newWrapper;
+	Wrapper oldWrapper;
 
-	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode) {
+	public EditConstraintOperation(IFeatureModel featureModel, IConstraint constraint, Node propNode, String description) {
 		super(featureModel, EDIT_CONSTRAINT);
-		newNode = propNode;
-		oldNode = constraint.getNode();
+		oldWrapper = new Wrapper();
+		newWrapper = new Wrapper();
 		this.constraint = constraint;
+		newWrapper.newNode = propNode;
+		oldWrapper.oldNode = constraint.getNode();
+		newWrapper.newDescription = description;
+		oldWrapper.oldDescription = constraint.getDescription();
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		constraint.setNode(newNode);
-
-		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldNode, newNode);
+		constraint.setNode(newWrapper.newNode);
+		constraint.setDescription(newWrapper.newDescription);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldWrapper, newWrapper);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		constraint.setNode(oldNode);
-		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newNode, oldNode);
+		constraint.setNode(oldWrapper.oldNode);
+		constraint.setDescription(oldWrapper.oldDescription);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newWrapper, oldWrapper);
 	}
 
 }

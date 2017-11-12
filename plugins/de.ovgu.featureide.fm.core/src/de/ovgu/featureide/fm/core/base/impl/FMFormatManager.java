@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.IExtensionLoader;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -38,8 +37,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 public final class FMFormatManager extends FormatManager<IFeatureModelFormat> {
 
 	private FMFormatManager() {
-		setExtensionLoaderInternal(new CoreExtensionLoader<>(new XmlFeatureModelFormat(), new SimpleVelvetFeatureModelFormat(), new DIMACSFormat(),
-				new SXFMFormat(), new GuidslFormat()));
+		super(XmlFeatureModelFormat.class, SimpleVelvetFeatureModelFormat.class, DIMACSFormat.class, SXFMFormat.class, GuidslFormat.class);
 	}
 
 	private static FMFormatManager instance = new FMFormatManager();

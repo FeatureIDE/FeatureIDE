@@ -36,8 +36,10 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
+	public static final String ID = "de.ovgu.featureide.changefeaturedescription";
+
 	public ChangeFeatureDescriptionAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
-		super(CHANGE_DESCRIPTION, viewer);
+		super(CHANGE_DESCRIPTION, viewer, ID);
 	}
 
 	@Override
@@ -56,12 +58,10 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			feature.getProperty().setDescription(descriptemp);
 			feature.getFeatureModel().fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
 		}
-		setChecked(false);
 	}
 
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(false);
 	}
 }

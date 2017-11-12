@@ -37,7 +37,7 @@ public class RenameAction extends SingleSelectionAction {
 	private final Object diagramEditor;
 
 	public RenameAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
-		super("Rename (F2)", viewer);
+		super("Rename (F2)", viewer, ID);
 		setAccelerator(SWT.F2);
 		diagramEditor = graphicalViewer;
 	}
@@ -54,7 +54,6 @@ public class RenameAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
-		setChecked(false);
 		setEnabled(true);
 	}
 

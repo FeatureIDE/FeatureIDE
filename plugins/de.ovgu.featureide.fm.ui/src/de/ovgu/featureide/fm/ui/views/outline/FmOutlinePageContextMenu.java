@@ -186,8 +186,7 @@ public class FmOutlinePageContextMenu {
 		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
-		// collapseAction = new CollapseAction(viewer, fInput);
-		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
+		aAction = new AbstractAction(viewer, fInput);
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
@@ -262,12 +261,12 @@ public class FmOutlinePageContextMenu {
 
 						final IFeature feat = (IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
-						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(feat);
+						part = (EditPart) fTextEditor.diagramEditor.getViewer().getEditPartRegistry().get(feat);
 					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
 
 						final IConstraint constr = (IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
-						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(constr);
+						part = (EditPart) fTextEditor.diagramEditor.getViewer().getEditPartRegistry().get(constr);
 
 					} else {
 						return;
@@ -277,7 +276,7 @@ public class FmOutlinePageContextMenu {
 					if (part == null) {
 						return;
 					}
-					((GraphicalViewerImpl) fTextEditor.diagramEditor).setSelection(new StructuredSelection(part));
+					((GraphicalViewerImpl) fTextEditor.diagramEditor.getViewer()).setSelection(new StructuredSelection(part));
 
 					final EditPartViewer view = part.getViewer();
 					if (view != null) {

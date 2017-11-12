@@ -75,6 +75,7 @@ public class CreateCompoundAction extends Action {
 		super(CREATE_FEATURE_ABOVE, createImage);
 		this.featureModel = featureModel;
 		setEnabled(false);
+		setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		} else {

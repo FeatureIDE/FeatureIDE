@@ -29,10 +29,10 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class PrintFeatureAttributes extends SingleSelectionAction {
 
-	public static final String ID = "de.ovgu.featureide.abstract";
+	public static final String ID = "de.ovgu.featureide.printAttributes";
 
 	public PrintFeatureAttributes(Object viewer) {
-		super("Print FeatureAttributes", viewer);
+		super("Print FeatureAttributes", viewer, ID);
 	}
 
 	@Override

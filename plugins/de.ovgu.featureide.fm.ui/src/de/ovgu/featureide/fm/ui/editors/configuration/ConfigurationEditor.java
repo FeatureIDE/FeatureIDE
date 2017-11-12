@@ -416,7 +416,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 		extensionPages = allPages.subList(internalPages.size(), allPages.size());
 
-		if (containsError()) {
+		if ((modelFile == null) || containsError()) {
 			setActivePage(textEditorPage.getIndex());
 		} else if (requiresAdvancedConfigurationPage()) {
 			setActivePage(internalPages.get(1).getIndex());

@@ -46,6 +46,7 @@ public class ReverseOrderAction extends Action {
 	public ReverseOrderAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(REVERSE_FEATURE_ORDER);
 		this.featureModel = featureModel;
+		setId(ID);
 	}
 
 	@Override

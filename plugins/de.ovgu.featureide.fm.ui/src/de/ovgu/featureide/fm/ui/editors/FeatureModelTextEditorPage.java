@@ -46,15 +46,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOpe
  */
 public class FeatureModelTextEditorPage extends TextEditor implements IFeatureModelEditorPage {
 
-	private int index;
-
+	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
 	private static final String PAGE_TEXT = SOURCE;
 
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
-
-	private FeatureModelEditor featureModelEditor;
+	private final FeatureModelEditor featureModelEditor;
+	private int index;
 
 	private String oldText = null;
+
+	public FeatureModelTextEditorPage(FeatureModelEditor featureModelEditor) {
+		super();
+		this.featureModelEditor = featureModelEditor;
+	}
 
 	@Override
 	public int getIndex() {
@@ -75,11 +78,15 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.getFeatureModel());
+		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(getFeatureModel());
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);
 		}
+	}
+
+	private IFeatureModel getFeatureModel() {
+		return featureModelEditor.getFeatureModel();
 	}
 
 	/**
@@ -94,9 +101,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	@Override
-	public void initEditor() {
-
-	}
+	public void initEditor() {}
 
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
@@ -113,11 +118,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	@Override
-	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
-	}
-
-	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
 		return this;
 	}
@@ -128,9 +128,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-
-	}
+	public void propertyChange(FeatureIDEEvent event) {}
 
 	@Override
 	public boolean allowPageChange(int newPage) {
@@ -155,7 +153,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final IFeatureModel fm = featureModelEditor.getFeatureModel();
+			final IFeatureModel fm = getFeatureModel();
 
 			// TODO _interfaces replace text with DocumentEvent (delta)
 			final SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);

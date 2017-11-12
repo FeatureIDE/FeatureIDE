@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  *
  * @author Sebastian Krieter
  */
-public class InternalFeatureModelFormat implements IFeatureModelFormat {
+public class InternalFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + InternalFeatureModelFormat.class.getSimpleName();
 
@@ -39,13 +39,8 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 	private final StringBuilder sb = new StringBuilder();
 
 	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
 	public boolean supportsWrite() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -122,11 +117,6 @@ public class InternalFeatureModelFormat implements IFeatureModelFormat {
 			sb.append("}");
 		}
 		sb.append(NEWLINE);
-	}
-
-	@Override
-	public ProblemList read(IFeatureModel object, CharSequence source) {
-		return null;
 	}
 
 	@Override
