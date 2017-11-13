@@ -108,7 +108,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature) {
 			final IFeature feature = (IFeature) element;
-			return feature.getStructure().hasChildren();
+			return feature.getStructure().hasChildren() || (!feature.getProperty().getAttributes().isEmpty());
 		}
 		return false;
 	}

@@ -68,7 +68,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private Tree table;
 	private TreeViewer tableViewer;
 	private GridLayout layout;
-	private final String COLUMN_FEATURE = "Feature";
+	private final String COLUMN_ELEMENT = "Element";
 	private final String COLUMN_TYPE = "Type";
 	private final String COLUMN_VALUE = "Value";
 	private final String COLUMN_UNIT = "Unit";
@@ -166,7 +166,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		// Feature
 		final TreeViewerColumn colFeature = new TreeViewerColumn(tableViewer, SWT.NONE);
 		colFeature.getColumn().setWidth(200);
-		colFeature.getColumn().setText(COLUMN_FEATURE);
+		colFeature.getColumn().setText(COLUMN_ELEMENT);
 		colFeature.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -336,10 +336,26 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		FMUIPlugin.getDefault().logInfo("" + event.getEventType());
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
-
+			if (!tableViewer.getControl().isDisposed()) {
+				tableViewer.refresh(featureModel); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		setFeatureModel(null);
+		if (currentEditor instanceof FeatureModelEditor) {
+			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
+			editor.removeEventListener(this);
+		}
+		currentEditor = null;
+		super.dispose();
 	}
 
 }

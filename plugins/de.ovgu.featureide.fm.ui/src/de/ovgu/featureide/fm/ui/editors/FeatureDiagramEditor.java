@@ -131,6 +131,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.PrintFeatureAttributes;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
@@ -213,6 +214,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private ReverseOrderAction reverseOrderAction;
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
+
+	private PrintFeatureAttributes pfa;
 
 	private List<Action> setLayoutActions, calculationActions;
 	private List<Action> setNameTypeActions;
@@ -333,6 +336,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		for (int i = 0; i < 5; i++) {
 			setLayoutActions.add(addAction(new LayoutSelectionAction(graphicalFeatureModel, i)));
 		}
+
+		pfa = addAction(new PrintFeatureAttributes(viewer));
 
 		// Other actions
 		exportFeatureModelAction = addAction(new ExportFeatureModelAction(this));
@@ -1102,6 +1107,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	private void fillContextMenu(IMenuManager menuManager) {
+		menuManager.add(pfa);
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			menuManager.add(createLayoutMenuManager());
 			menuManager.add(createNameTypeMenuManager());
