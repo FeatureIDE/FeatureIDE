@@ -666,16 +666,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	}
 
 	/**
-	 * TODO ATTRIBUTE
-	 *
-	 * @param feature
-	 * @param list
-	 */
-	private void parseFeatureAttribute(IFeature feature, NodeList list) {
-
-	}
-
-	/**
 	 * Parse the struct section to add features to the model.
 	 */
 	private void parseStruct(NodeList struct) throws UnsupportedModelException {

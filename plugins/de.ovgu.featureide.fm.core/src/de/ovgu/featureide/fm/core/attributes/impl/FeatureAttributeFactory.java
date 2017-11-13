@@ -61,7 +61,7 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				return null;
 			}
 		case FeatureAttribute.STRING:
-			return (new StringFeatureAttribute(attributeData.getName(), attributeData.getUnit(), attributeData.getType(), recursive, configurable));
+			return (new StringFeatureAttribute(attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
 		default:
 			FMCorePlugin.getDefault().logError(new UnknownFeatureAttributeTypeException(attributeData));
 			return null;

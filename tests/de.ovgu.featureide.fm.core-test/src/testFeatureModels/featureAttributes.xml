@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="HelloWorld">
+				<attribute name="DoubleAttribute" type="double" unit="Euro" value="6.0"/>
+				<alt abstract="true" name="Feature">
+					<attribute name="LongAttribute" type="long" unit="Euro" value="15"/>
+					<feature name="Beautiful">
+						<attribute name="StringAttribute" type="string" unit="Dollar" value="Hello"/>
+						<attribute name="BooleanAttribute" type="boolean" unit="Euro" value="true"/>
+					</feature>
+					<feature name="Wonderful"/>
+				</alt>
+				<feature name="World"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>Feature</var>
+					<var>World</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>
