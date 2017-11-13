@@ -1085,4 +1085,9 @@ public class StringTable {
 	public static final String PUBLIC_INTERFACE = "public interface";
 	public static final String CONSTRAINT_DESCRIPTION = "Constraint Description";
 	public static final String PLEASE_ENTER_A_DESCRIPTION_FOR_CONSTRAINT_ = "Please enter a description for constraint:";
+	public static final String ADD_STRING_ATTRIBUTE = "Add String Attribute";
+	public static final String ADD_BOOLEAN_ATTRIBUTE = "Add Boolean Attribute";
+	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
+	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
+	public static final String REMOVE_SELECTED_ATTRIBUTES = "Remove Selected Attributes";
 }

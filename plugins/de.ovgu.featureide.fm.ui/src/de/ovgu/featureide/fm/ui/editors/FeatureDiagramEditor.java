@@ -977,6 +977,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.layoutLegendOnIntersect();
 			}
 			break;
+		case FEATURE_ATTRIBUTE_CHANGED:
+			break;
 		case DEFAULT:
 			break;
 		default:
