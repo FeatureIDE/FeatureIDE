@@ -654,4 +654,18 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		return !warnings.containsError();
 	}
 
+	public void addEventListener(IEventListener listener) {
+		if (fmManager == null) {
+			return;
+		}
+		fmManager.addListener(listener);
+	}
+
+	public void removeEventListener(IEventListener listener) {
+		if (fmManager == null) {
+			return;
+		}
+		fmManager.removeListener(listener);
+	}
+
 }

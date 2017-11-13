@@ -273,6 +273,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
+
 	}
 
 	@Override
