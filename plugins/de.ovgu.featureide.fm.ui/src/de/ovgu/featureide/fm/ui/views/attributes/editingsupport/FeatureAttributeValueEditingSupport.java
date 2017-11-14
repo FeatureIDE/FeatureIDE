@@ -28,6 +28,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.views.attributes.FeatureAttributeView;
 
 /**
  * TODO description
@@ -40,8 +43,8 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeValueEditingSupport(ColumnViewer viewer, boolean enabled) {
-		super(viewer, enabled);
+	public FeatureAttributeValueEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
+		super(view, viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -54,15 +57,6 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		return new TextCellEditor((Composite) getViewer().getControl());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#canEdit(java.lang.Object)
-	 */
-	@Override
-	protected boolean canEdit(Object element) {
-		return enabled && (element instanceof IFeatureAttribute);
 	}
 
 	/*
@@ -85,15 +79,19 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
 			if (value.toString().toLowerCase().equals(TRUE_STRING)) {
 				((IFeatureAttribute) element).setValue(new Boolean(true));
+				view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} else {
 				((IFeatureAttribute) element).setValue(new Boolean(false));
+				view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			}
 		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
 			((IFeatureAttribute) element).setValue(value.toString());
+			view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
 			try {
 				final long temp = Long.parseLong(value.toString());
 				((IFeatureAttribute) element).setValue(new Long(temp));
+				view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid integer number.");
 			}
@@ -101,6 +99,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 			try {
 				final double temp = Double.parseDouble(value.toString());
 				((IFeatureAttribute) element).setValue(new Double(temp));
+				view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} catch (final NumberFormatException e) {
 				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid float number.");
 			}

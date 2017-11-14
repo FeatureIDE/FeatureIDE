@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.attributes;
 import java.util.EventObject;
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -74,7 +76,7 @@ import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttribute
  *
  * @author Joshua Sprey
  */
-public class FeatureAttributeView extends ViewPart implements IEventListener {
+public class FeatureAttributeView extends ViewPart implements IEventListener, ISaveablePart {
 
 	public FeatureAttributeView() {
 		super();
@@ -112,6 +114,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeValueEditingSupport valueEditingSupport;
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
+
+	private boolean dirty = false;
 
 	private final IPartListener editorListener = new IPartListener() {
 
@@ -226,11 +230,11 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createEditSupports() {
-		nameEditingSupport = new FeatureAttributeNameEditingSupport(treeViewer, true);
-		unitEditingSupport = new FeatureAttributeUnitEditingSupport(treeViewer, true);
-		valueEditingSupport = new FeatureAttributeValueEditingSupport(treeViewer, true);
-		recursiveEditingSupport = new FeatureAttributeRecursiveEditingSupport(treeViewer, true);
-		configureableEditingSupport = new FeatureAttributeConfigureableEditingSupport(treeViewer, true);
+		nameEditingSupport = new FeatureAttributeNameEditingSupport(this, treeViewer, true);
+		unitEditingSupport = new FeatureAttributeUnitEditingSupport(this, treeViewer, true);
+		valueEditingSupport = new FeatureAttributeValueEditingSupport(this, treeViewer, true);
+		recursiveEditingSupport = new FeatureAttributeRecursiveEditingSupport(this, treeViewer, true);
+		configureableEditingSupport = new FeatureAttributeConfigureableEditingSupport(this, treeViewer, true);
 	}
 
 	private void createContexMenu() {
@@ -479,6 +483,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.refresh(featureModel); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
+				setDirty(false);
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getSource() instanceof IFeature) {
@@ -487,6 +492,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				}
 				treeViewer.expandAll();
 			}
+			setDirty(true);
 		}
 	}
 
@@ -503,6 +509,62 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 		currentEditor = null;
 		super.dispose();
+	}
+
+	public void setDirty(boolean dirty) {
+		this.dirty = dirty;
+		firePropertyChange(PROP_DIRTY);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		// TODO ATTRIBUTE save model on you own
+		if (currentEditor instanceof FeatureModelEditor) {
+			((FeatureModelEditor) currentEditor).doSave(monitor);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
+	@Override
+	public void doSaveAs() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
+	@Override
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
+	@Override
+	public boolean isSaveAsAllowed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
+	@Override
+	public boolean isSaveOnCloseNeeded() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

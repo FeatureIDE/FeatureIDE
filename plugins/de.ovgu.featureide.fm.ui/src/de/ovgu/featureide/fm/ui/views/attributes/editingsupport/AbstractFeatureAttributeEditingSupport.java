@@ -24,6 +24,9 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 
+import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
+import de.ovgu.featureide.fm.ui.views.attributes.FeatureAttributeView;
+
 /**
  * TODO description
  *
@@ -32,12 +35,14 @@ import org.eclipse.jface.viewers.EditingSupport;
 public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupport {
 
 	public boolean enabled = false;
+	protected FeatureAttributeView view;
 
 	/**
 	 * @param viewer
 	 */
-	public AbstractFeatureAttributeEditingSupport(ColumnViewer viewer, boolean enabled) {
+	public AbstractFeatureAttributeEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(viewer);
+		this.view = view;
 		this.enabled = enabled;
 	}
 
@@ -61,7 +66,9 @@ public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupp
 	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
 	 */
 	@Override
-	protected abstract boolean canEdit(Object element);
+	protected boolean canEdit(Object element) {
+		return enabled && (element instanceof IFeatureAttribute);
+	}
 
 	/*
 	 * (non-Javadoc)

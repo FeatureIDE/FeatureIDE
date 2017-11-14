@@ -26,6 +26,9 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.views.attributes.FeatureAttributeView;
 
 /**
  * TODO description
@@ -38,8 +41,8 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeUnitEditingSupport(ColumnViewer viewer, boolean enabled) {
-		super(viewer, enabled);
+	public FeatureAttributeUnitEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
+		super(view, viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -50,15 +53,6 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected CellEditor getCellEditor(Object element) {
 		return new TextCellEditor((Composite) getViewer().getControl());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#canEdit(java.lang.Object)
-	 */
-	@Override
-	protected boolean canEdit(Object element) {
-		return enabled && (element instanceof IFeatureAttribute);
 	}
 
 	/*
@@ -78,6 +72,7 @@ public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected void setValue(Object element, Object value) {
 		((IFeatureAttribute) element).setUnit(value.toString());
+		view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		getViewer().update(element, null);
 
 	}
