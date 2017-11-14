@@ -41,8 +41,6 @@ import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
@@ -55,6 +53,8 @@ public class FeatureAttributeTest {
 
 	private static final String MODEL_NAME = "featureAttributes.xml";
 	private static final String COMPARISON_MODEL = "featureAttributesCompare.xml";
+	private static final String PATH_TO_XML = "./src/testFeatureModels/";
+	private static final String TEMP_MODEL = "featureAttributes_model_tmp.xml";
 
 	private static final String FEATURE_HELLO = "HelloWorld";
 	private static final String FEATURE_FEATURE = "Feature";
@@ -92,8 +92,6 @@ public class FeatureAttributeTest {
 	private static final String TRUE_STRING = "true";
 
 	private AbstractFeatureAttributeFactory attributeFactory;
-
-	private static final IFeatureModelFactory factory = FMFactoryManager.getDefaultFactory();
 
 	@Test
 	public void countFeatureAttributes() {
@@ -211,7 +209,7 @@ public class FeatureAttributeTest {
 
 	@Test
 	public void checkFeatureAttributeAdding() {
-		final File modelFile = new File("featureAttributes_model_tmp.xml");
+		final File modelFile = new File(TEMP_MODEL);
 		attributeFactory = new FeatureAttributeFactory();
 
 		final IFeatureModel comparisonfm = Commons.loadTestFeatureModelFromFile(COMPARISON_MODEL);
@@ -244,10 +242,8 @@ public class FeatureAttributeTest {
 			SimpleFileHandler.save(modelFile.toPath(), comparisonfm, new XmlFeatureModelFormat());
 			final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			final Document doc = dBuilder.parse("./src/testFeatureModels/" + MODEL_NAME);
+			final Document doc = dBuilder.parse(PATH_TO_XML + MODEL_NAME);
 			final Document docCompare = dBuilder.parse(modelFile);
-
-			doc.getDocumentElement().normalize();
 
 			final TransformerFactory tf = TransformerFactory.newInstance();
 			final Transformer transformer = tf.newTransformer();
