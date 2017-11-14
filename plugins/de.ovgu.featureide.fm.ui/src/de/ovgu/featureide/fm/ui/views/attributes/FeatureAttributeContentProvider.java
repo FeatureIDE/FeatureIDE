@@ -69,6 +69,9 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
+		if (featureModel == null) {
+			return null;
+		}
 		if (parentElement instanceof IFeature) {
 			final IFeature feature = (IFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
@@ -87,6 +90,9 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public Object getParent(Object element) {
+		if (featureModel == null) {
+			return null;
+		}
 		if (element instanceof IFeature) {
 			final IFeature feature = (IFeature) element;
 			return feature.getStructure().getParent().getFeature();

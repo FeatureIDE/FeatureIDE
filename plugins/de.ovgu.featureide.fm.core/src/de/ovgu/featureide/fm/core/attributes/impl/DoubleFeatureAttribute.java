@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.attributes.impl;
  */
 public class DoubleFeatureAttribute extends FeatureAttribute {
 
-	private final Double value;
+	private Double value;
 
 	/**
 	 * @param name
@@ -46,5 +46,20 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	@Override
 	public Double getValue() {
 		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
+	 */
+	@Override
+	public void setValue(Object value) {
+		if (value == null) {
+			this.value = 0d;
+			return;
+		}
+		if (value instanceof Double) {
+			this.value = (Double) value;
+		}
 	}
 }

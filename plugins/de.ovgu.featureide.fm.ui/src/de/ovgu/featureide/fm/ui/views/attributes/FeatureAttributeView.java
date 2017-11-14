@@ -20,25 +20,30 @@
  */
 package de.ovgu.featureide.fm.ui.views.attributes;
 
+import java.util.EventObject;
 import java.util.HashMap;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.TreeViewerEditor;
+import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -58,7 +63,11 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.attributes.actions.AddFeatureAttributeAction;
 import de.ovgu.featureide.fm.ui.views.attributes.actions.RemoveFeatureAttributeAction;
+import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttributeConfigureableEditingSupport;
 import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttributeNameEditingSupport;
+import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttributeRecursiveEditingSupport;
+import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttributeUnitEditingSupport;
+import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttributeValueEditingSupport;
 
 /**
  * TODO ATTRIBUTE description
@@ -73,16 +82,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		cachedImages = new HashMap<String, Image>();
 		cachedImages.put(imgFeature, FMUIPlugin.getImage(imgFeature));
 		cachedImages.put(imgAttribute, FMUIPlugin.getImage(imgAttribute));
+		cachedImages.put(imgSelected, FMUIPlugin.getImage(imgSelected));
+		cachedImages.put(imgDeSelected, FMUIPlugin.getImage(imgDeSelected));
 	}
 
 	private final static String imgFeature = "FeatureIconSmall.ico";
 	private final static String imgAttribute = "message_warning.gif";
+	private final static String imgSelected = "selected.ico";
+	private final static String imgDeSelected = "deselected.ico";
 	private final HashMap<String, Image> cachedImages;
 
 	private Tree tree;
 	private TreeViewer treeViewer;
 	private GridLayout layout;
-	private Menu menu;
+	private MenuManager menuManager;
 	private final String COLUMN_ELEMENT = "Element";
 	private final String COLUMN_TYPE = "Type";
 	private final String COLUMN_VALUE = "Value";
@@ -95,6 +108,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	// EditingSupports
 	private FeatureAttributeNameEditingSupport nameEditingSupport;
+	private FeatureAttributeUnitEditingSupport unitEditingSupport;
+	private FeatureAttributeValueEditingSupport valueEditingSupport;
+	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
+	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
 	private final IPartListener editorListener = new IPartListener() {
 
@@ -158,11 +175,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		tree = treeViewer.getTree();
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
-		final GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.minimumHeight = 500;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
+		final GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
+		gridData.horizontalSpan = 2;
 		tree.setLayoutData(gridData);
 
 		treeViewer.setContentProvider(new FeatureAttributeContentProvider());
@@ -171,55 +185,58 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			setEditorContent(null);
 		}
 
-		parent.pack();
-		tree.pack();
-
+		// create the contex menu
 		createContexMenu();
 
-		tree.addListener(SWT.MouseDown, new Listener() {
+		// create a tree viewer editor to only activate the editing supports when double clicking a cell
+		createTreeViewerEditor();
 
+		// pack all columns
+		repackAllColumns();
+	}
+
+	private void repackColumn(int index) {
+		tree.getColumn(index).pack();
+	}
+
+	private void repackAllColumns() {
+		for (final TreeColumn col : tree.getColumns()) {
+			col.pack();
+		}
+	}
+
+	private void createTreeViewerEditor() {
+		final TreeViewerFocusCellManager focusCellManager = new TreeViewerFocusCellManager(treeViewer, new FocusCellOwnerDrawHighlighter(treeViewer));
+		final ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(treeViewer) {
 			@Override
-			public void handleEvent(Event event) {
-				nameEditingSupport.enabled = false;
-			}
-
-		});
-
-		tree.addListener(SWT.MouseDoubleClick, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				nameEditingSupport.enabled = true;
-				final TreeItem[] selection = tree.getSelection();
-
-				if (selection.length != 1) {
-					return;
-				}
-
-				final TreeItem item = tree.getSelection()[0];
-
-				for (int i = 0; i < tree.getColumnCount(); i++) {
-					if (item.getBounds(i).contains(event.x, event.y)) {
-						treeViewer.editElement(treeViewer.getStructuredSelection().getFirstElement(), i);
-						nameEditingSupport.enabled = false;
-						break;
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+				// Enable editor only with mouse double click
+				if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
+					final EventObject source = event.sourceEvent;
+					if ((source instanceof MouseEvent) && (((MouseEvent) source).button == 3)) {
+						return false;
 					}
+					return true;
 				}
+				return false;
 			}
-
-		});
+		};
+		TreeViewerEditor.create(treeViewer, focusCellManager, activationSupport, ColumnViewerEditor.TABBING_HORIZONTAL
+			| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR | ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
 	private void createEditSupports() {
-
-		nameEditingSupport = new FeatureAttributeNameEditingSupport(treeViewer, false);
-
+		nameEditingSupport = new FeatureAttributeNameEditingSupport(treeViewer, true);
+		unitEditingSupport = new FeatureAttributeUnitEditingSupport(treeViewer, true);
+		valueEditingSupport = new FeatureAttributeValueEditingSupport(treeViewer, true);
+		recursiveEditingSupport = new FeatureAttributeRecursiveEditingSupport(treeViewer, true);
+		configureableEditingSupport = new FeatureAttributeConfigureableEditingSupport(treeViewer, true);
 	}
 
 	private void createContexMenu() {
-		final MenuManager mgr = new MenuManager();
-		mgr.setRemoveAllWhenShown(true);
-		mgr.addMenuListener(new IMenuListener() {
+		menuManager = new MenuManager();
+		menuManager.setRemoveAllWhenShown(true);
+		menuManager.addMenuListener(new IMenuListener() {
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
@@ -228,10 +245,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 					if ((selection.size() == 1) && (selection.getFirstElement() instanceof IFeature)) {
 						final IFeature feature = (IFeature) selection.getFirstElement();
 						// Add actions to create new attributes
-						mgr.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
-						mgr.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.BOOLEAN, StringTable.ADD_BOOLEAN_ATTRIBUTE));
-						mgr.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.LONG, StringTable.ADD_LONG_ATTRIBUTE));
-						mgr.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.DOUBLE, StringTable.ADD_DOUBLE_ATTRIBUTE));
+						menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
+						menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.BOOLEAN, StringTable.ADD_BOOLEAN_ATTRIBUTE));
+						menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.LONG, StringTable.ADD_LONG_ATTRIBUTE));
+						menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.DOUBLE, StringTable.ADD_DOUBLE_ATTRIBUTE));
 					} else {
 						final HashMap<IFeatureAttribute, IFeature> attributes = new HashMap<>();
 						// Check if all selected items are IFeatureAttributes
@@ -247,12 +264,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 								}
 							}
 						}
-						mgr.add(new RemoveFeatureAttributeAction(featureModel, attributes));
+						menuManager.add(new RemoveFeatureAttributeAction(featureModel, attributes));
 					}
 				}
 			}
 		});
-		treeViewer.getControl().setMenu(mgr.createContextMenu(treeViewer.getControl()));
+		treeViewer.getControl().setMenu(menuManager.createContextMenu(treeViewer.getControl()));
 	}
 
 	private void createColumns() {
@@ -305,6 +322,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final TreeViewerColumn colValue = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colValue.getColumn().setWidth(200);
 		colValue.getColumn().setText(COLUMN_VALUE);
+		colValue.setEditingSupport(valueEditingSupport);
 		colValue.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -322,6 +340,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final TreeViewerColumn colUnit = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colUnit.getColumn().setWidth(200);
 		colUnit.getColumn().setText(COLUMN_UNIT);
+		colUnit.setEditingSupport(unitEditingSupport);
 		colUnit.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -339,16 +358,23 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final TreeViewerColumn colRecursive = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colRecursive.getColumn().setWidth(200);
 		colRecursive.getColumn().setText(COLUMN_RECURSIVE);
+		colRecursive.setEditingSupport(recursiveEditingSupport);
 		colRecursive.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return "-";
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.isRecursive() ? "true" : "false";
+				return "";
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				if (element instanceof IFeatureAttribute) {
+					if (((IFeatureAttribute) element).isRecursive()) {
+						return cachedImages.get(imgSelected);
+					} else {
+						return cachedImages.get(imgDeSelected);
+					}
 				}
-				return "null";
+				return null;
 			}
 		});
 
@@ -356,16 +382,23 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		final TreeViewerColumn colConfigureable = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colConfigureable.getColumn().setWidth(200);
 		colConfigureable.getColumn().setText(COLUMN_CONFIGUREABLE);
+		colConfigureable.setEditingSupport(configureableEditingSupport);
 		colConfigureable.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return "-";
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.isConfigurable() ? "true" : "false";
+				return "";
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				if (element instanceof IFeatureAttribute) {
+					if (((IFeatureAttribute) element).isConfigurable()) {
+						return cachedImages.get(imgSelected);
+					} else {
+						return cachedImages.get(imgDeSelected);
+					}
 				}
-				return "null";
+				return null;
 			}
 		});
 	}
@@ -390,6 +423,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				editor.removeEventListener(this);
 			}
 			currentEditor = null;
+			repackAllColumns();
 			return;
 		}
 		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)) {
@@ -401,6 +435,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				treeViewer.setInput(featureModel);
 			}
 			treeViewer.expandAll();
+			repackAllColumns();
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
 			currentEditor = activeWorkbenchPart;
 			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
@@ -409,6 +444,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				treeViewer.setInput(featureModel);
 			}
 			treeViewer.expandAll();
+			repackAllColumns();
 		}
 	}
 

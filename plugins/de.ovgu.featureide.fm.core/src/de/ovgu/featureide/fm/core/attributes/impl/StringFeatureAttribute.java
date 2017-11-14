@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.attributes.impl;
  */
 public class StringFeatureAttribute extends FeatureAttribute {
 
-	private final String value;
+	private String value;
 
 	/**
 	 * @param name
@@ -46,5 +46,18 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	@Override
 	public String getValue() {
 		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
+	 */
+	@Override
+	public void setValue(Object value) {
+		if (value == null) {
+			this.value = "";
+			return;
+		}
+		this.value = value.toString();
 	}
 }

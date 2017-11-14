@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.attributes.impl;
  */
 public class LongFeatureAttribute extends FeatureAttribute {
 
-	private final Long value;
+	private Long value;
 
 	/**
 	 * @param name
@@ -49,8 +49,18 @@ public class LongFeatureAttribute extends FeatureAttribute {
 		return value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
+	 */
 	@Override
 	public void setValue(Object value) {
-		// this.value = value;
+		if (value == null) {
+			this.value = 0L;
+			return;
+		}
+		if (value instanceof Long) {
+			this.value = (Long) value;
+		}
 	}
 }

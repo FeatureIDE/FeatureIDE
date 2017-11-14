@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.attributes.impl;
+package de.ovgu.featureide.fm.core.attributes.impl.exceptions;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
 
@@ -27,13 +27,13 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
  *
  * @author Joshua
  */
-public class FeatureAttributeParseException extends Exception {
+public class UnknownFeatureAttributeTypeException extends Exception {
 
 	private static final long serialVersionUID = 6366719326744299124L;
 
 	IFeatureAttributeParsedData data;
 
-	public FeatureAttributeParseException(IFeatureAttributeParsedData data) {
+	public UnknownFeatureAttributeTypeException(IFeatureAttributeParsedData data) {
 		this.data = data;
 	}
 
@@ -44,12 +44,11 @@ public class FeatureAttributeParseException extends Exception {
 	@Override
 	public String getMessage() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("The value of the feature attribute \"");
-		builder.append(data.getName());
-		builder.append("\" cannot be parsed to the type \"");
+		builder.append("The type \"");
 		builder.append(data.getType());
-		builder.append("\"");
+		builder.append("\" from feature attribute \"");
+		builder.append(data.getName());
+		builder.append("\" is not a known feature attribute type.");
 		return builder.toString();
 	}
-
 }

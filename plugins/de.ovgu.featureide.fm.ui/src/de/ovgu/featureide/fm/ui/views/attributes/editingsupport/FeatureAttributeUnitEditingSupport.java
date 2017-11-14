@@ -32,13 +32,13 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
  *
  * @author Joshua
  */
-public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
+public class FeatureAttributeUnitEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
 	/**
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeNameEditingSupport(ColumnViewer viewer, boolean enabled) {
+	public FeatureAttributeUnitEditingSupport(ColumnViewer viewer, boolean enabled) {
 		super(viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
@@ -68,7 +68,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
-		return attribute.getName();
+		return attribute.getUnit();
 	}
 
 	/*
@@ -77,8 +77,9 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setName(value.toString());
+		((IFeatureAttribute) element).setUnit(value.toString());
 		getViewer().update(element, null);
 
 	}
+
 }

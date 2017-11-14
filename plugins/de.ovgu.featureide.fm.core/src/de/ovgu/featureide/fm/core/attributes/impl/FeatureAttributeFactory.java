@@ -24,6 +24,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.core.attributes.impl.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.core.attributes.impl.exceptions.UnknownFeatureAttributeTypeException;
 
 /**
  * TODO description

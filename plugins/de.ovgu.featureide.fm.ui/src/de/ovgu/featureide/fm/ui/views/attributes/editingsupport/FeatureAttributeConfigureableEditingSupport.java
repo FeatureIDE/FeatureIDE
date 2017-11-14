@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.ui.views.attributes.editingsupport;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
@@ -32,16 +32,18 @@ import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
  *
  * @author Joshua
  */
-public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
+public class FeatureAttributeConfigureableEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
 	/**
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeNameEditingSupport(ColumnViewer viewer, boolean enabled) {
+	public FeatureAttributeConfigureableEditingSupport(ColumnViewer viewer, boolean enabled) {
 		super(viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
+
+	private static final String TRUE_STRING = "true";
 
 	/*
 	 * (non-Javadoc)
@@ -49,7 +51,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new TextCellEditor((Composite) getViewer().getControl());
+		return new CheckboxCellEditor((Composite) getViewer().getControl());
 	}
 
 	/*
@@ -68,7 +70,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
-		return attribute.getName();
+		return attribute.isConfigurable();
 	}
 
 	/*
@@ -77,8 +79,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setName(value.toString());
+		((IFeatureAttribute) element).setConfigureable((Boolean) value);
 		getViewer().update(element, null);
-
 	}
 }

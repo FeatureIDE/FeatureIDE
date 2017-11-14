@@ -151,4 +151,27 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		this.configureable = configureable;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("[Name: ");
+		builder.append(name);
+		builder.append(", Type: ");
+		builder.append(attributeType);
+		builder.append(", Value: ");
+		builder.append(getValue().toString());
+		builder.append(", Unit: ");
+		builder.append(unit);
+		builder.append(", Recursive: ");
+		builder.append(recursive);
+		builder.append(", Configureable: ");
+		builder.append(configureable);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

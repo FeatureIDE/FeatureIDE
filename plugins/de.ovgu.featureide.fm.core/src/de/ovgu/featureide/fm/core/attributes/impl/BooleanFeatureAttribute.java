@@ -28,7 +28,7 @@ package de.ovgu.featureide.fm.core.attributes.impl;
  */
 public class BooleanFeatureAttribute extends FeatureAttribute {
 
-	private final Boolean value;
+	private Boolean value;
 
 	/**
 	 * @param name
@@ -46,6 +46,21 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	@Override
 	public Boolean getValue() {
 		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute#setValue(java.lang.Object)
+	 */
+	@Override
+	public void setValue(Object value) {
+		if (value == null) {
+			this.value = false;
+			return;
+		}
+		if (value instanceof Boolean) {
+			this.value = (Boolean) value;
+		}
 	}
 
 }

@@ -20,28 +20,32 @@
  */
 package de.ovgu.featureide.fm.ui.views.attributes.editingsupport;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttribute;
 
 /**
  * TODO description
  *
  * @author Joshua
  */
-public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
+public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
 	/**
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeNameEditingSupport(ColumnViewer viewer, boolean enabled) {
+	public FeatureAttributeValueEditingSupport(ColumnViewer viewer, boolean enabled) {
 		super(viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
+
+	private static final String TRUE_STRING = "true";
 
 	/*
 	 * (non-Javadoc)
@@ -68,7 +72,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
-		return attribute.getName();
+		return attribute.getValue().toString();
 	}
 
 	/*
@@ -77,8 +81,31 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setName(value.toString());
+		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
+			if (value.toString().toLowerCase().equals(TRUE_STRING)) {
+				((IFeatureAttribute) element).setValue(new Boolean(true));
+			} else {
+				((IFeatureAttribute) element).setValue(new Boolean(false));
+			}
+		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
+			((IFeatureAttribute) element).setValue(value.toString());
+		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
+			try {
+				final long temp = Long.parseLong(value.toString());
+				((IFeatureAttribute) element).setValue(new Long(temp));
+			} catch (final NumberFormatException e) {
+				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid integer number.");
+			}
+		} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
+			try {
+				final double temp = Double.parseDouble(value.toString());
+				((IFeatureAttribute) element).setValue(new Double(temp));
+			} catch (final NumberFormatException e) {
+				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid float number.");
+			}
+		}
 		getViewer().update(element, null);
-
 	}
+
 }
