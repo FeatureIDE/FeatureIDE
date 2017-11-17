@@ -274,7 +274,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAnd() {
-		return and;
+		return and || (getChildrenCount() <= 1);
 	}
 
 	@Override
