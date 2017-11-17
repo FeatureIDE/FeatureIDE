@@ -257,7 +257,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAlternative() {
-		return !and && !multiple;
+		return !and && !multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
@@ -317,12 +317,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isMultiple() {
-		return multiple;
+		return multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
 	public boolean isOr() {
-		return !and && multiple;
+		return !and && multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
