@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
@@ -99,19 +100,14 @@ public class FMPrintAction extends PrintAction {
 	}
 
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
-		final FeatureModelEditor editor = (FeatureModelEditor) getWorkbenchPart();
-		if (editor.getEditorSite() instanceof FeatureDiagramEditor) {
-			FMUIPlugin.getDefault().logInfo("is feature diagramm editor");
-			final FeatureDiagramEditor fdEditor = (FeatureDiagramEditor) editor.getEditorSite();
-			for (final Object obj : fdEditor.getEditPartRegistry().values()) {
-				FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
-				if (obj instanceof LegendEditPart) {
-					FMUIPlugin.getDefault().logInfo(" is legend whohoooo! ");
-					final Point legendPos = layout.getLegendPos();
-					final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
-					((LegendEditPart) obj).getFigure().setLocation(newLegendPos);
-					layout.setLegendPos(newLegendPos.x, newLegendPos.y);
-				}
+		final GraphicalViewer viewer = (GraphicalViewer) getWorkbenchPart().getAdapter(GraphicalViewer.class);
+		for (final Object obj : viewer.getEditPartRegistry().values()) {
+			FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
+			if (obj instanceof LegendEditPart) {
+				final Point legendPos = layout.getLegendPos();
+				final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
+				((LegendEditPart) obj).getFigure().setLocation(newLegendPos);
+				layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 			}
 		}
 	}
