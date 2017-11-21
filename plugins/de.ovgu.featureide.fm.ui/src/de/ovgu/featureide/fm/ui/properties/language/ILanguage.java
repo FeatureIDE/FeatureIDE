@@ -53,6 +53,11 @@ public interface ILanguage {
 	public String getVoidModelConst();
 
 	/**
+	 * @return The translation for: CONSTRAINT_MAKES_THE_MODEL_VOID
+	 */
+	public String getVoidModel();
+
+	/**
 	 * @return The translation for: INDETERMINATE_HIDDEN
 	 */
 	public String getIndetHidden();

@@ -144,11 +144,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		IFeature feature = this.feature.getObject();
+		final IFeature feature = this.feature.getObject();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 
 		// First draw custom color
-		FeatureColor color = FeatureColorManager.getColor(feature);
+		final FeatureColor color = FeatureColorManager.getColor(feature);
 		if (color != FeatureColor.NO_COLOR) {
 			setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 		} else if (!feature.getStructure().isConcrete()) {
@@ -186,7 +186,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 
-		Panel panel = new Panel();
+		final Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
 		toolTipFigure = null;
@@ -315,7 +315,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param {@link FeatureStatus}
 	 */
 	private void setLabelIcon(FeatureStatus featureStatus) {
@@ -342,7 +342,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		label.setText(newName);
 
 		final Dimension labelSize = label.getPreferredSize();
-		this.minSize = labelSize;
+		minSize = labelSize;
 
 		if (!labelSize.equals(label.getSize())) {
 			label.setSize(labelSize);
