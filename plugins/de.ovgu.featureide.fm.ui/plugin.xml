@@ -462,6 +462,19 @@
 				</visibleWhen>
 			</command>
 			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureObfuscator"
+					label="Export an obfuscated feature model"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.Convert"
 					id="de.ovgu.featureide.fm.ui.actions.Convert"
 					label="Convert Feature Models"
@@ -508,6 +521,10 @@
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
 				name="Export feature dependency information">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator"
+				name="Export an obfuscated feature model">
 		</command>
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.ExportCNF"
@@ -587,6 +604,10 @@
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.FeatureDependenciesHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ObfuscatorHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.ImportGUIDSLHandler"
