@@ -45,8 +45,9 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> {
 
-	private final static int lengthFactor = 8;
-	private static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	private final static int LENGTH_FACTOR = 8;
+	private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR) + 2;
 
 	private final IFeatureModel orgFeatureModel;
 	private final IFeatureModelFactory factory;
@@ -130,14 +131,14 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 	}
 
 	private String getObfuscatedFeatureName(String name) {
-		final char[] result = new char[(4 * lengthFactor) + 2];
+		final char[] result = new char[RESULT_LENGTH];
 		result[0] = 'F';
 
 		return obfuscate(name, result);
 	}
 
 	private String getObfuscatedDescription(String description) {
-		final char[] result = new char[(4 * lengthFactor) + 2];
+		final char[] result = new char[RESULT_LENGTH];
 		result[0] = 'D';
 
 		return obfuscate(description, result);
@@ -145,14 +146,13 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 
 	private String obfuscate(String string, final char[] result) {
 		result[1] = '_';
-		final int index = 2;
 
 		digest.reset();
 		digest.update(salt);
 		digest.update(string.getBytes(StandardCharsets.UTF_8));
 		final byte[] hash = digest.digest();
 
-		return encodeBase64(result, index, hash);
+		return encodeBase64(result, 2, hash);
 	}
 
 	private static String encodeBase64(final char[] result, int index, byte[] hash) {
@@ -165,7 +165,7 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 			x |= (0xff & hash[i + 1]) << 8;
 			x |= (0xff & hash[i + 2]) << 16;
 			for (int j = 0; j < 4; j++) {
-				result[index++] = alphabet.charAt(x & 0x3f);
+				result[index++] = ALPHABET.charAt(x & 0x3f);
 				x >>>= 6;
 			}
 		}
