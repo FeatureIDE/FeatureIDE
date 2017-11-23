@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
@@ -48,12 +49,17 @@ public class ObfuscatorHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile modelFile) {
 		// Ask for file name
+		final Path modelFilePath = Paths.get(modelFile.getLocationURI());
 
 		final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
 		final String[] names = new String[formatExtensions.size()];
 		final String[] extensions = new String[formatExtensions.size()];
 		int index = 0;
+		int defaultFilterIndex = -1;
 		for (final IFeatureModelFormat format : formatExtensions) {
+			if (XmlFeatureModelFormat.ID.equals(format.getId())) {
+				defaultFilterIndex = index;
+			}
 			final String extension = "*." + format.getSuffix();
 			names[index] = format.getName() + " " + extension;
 			extensions[index++] = extension;
@@ -62,15 +68,17 @@ public class ObfuscatorHandler extends AFileHandler {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		fileDialog.setFilterNames(names);
 		fileDialog.setFilterExtensions(extensions);
-		fileDialog.setFileName("obfuscated_model");
+		fileDialog.setFileName("obfuscated_" + FileHandler.getFileName(modelFilePath));
 		fileDialog.setOverwrite(true);
+		if (defaultFilterIndex > -1) {
+			fileDialog.setFilterIndex(defaultFilterIndex);
+		}
 
 		final String filepath = fileDialog.open();
 		if (filepath == null) {
 			return;
 		}
 
-		final Path modelFilePath = Paths.get(modelFile.getLocationURI());
 		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(modelFilePath);
 		if (!fileHandler.getLastProblems().containsError()) {
 			final IFeatureModel ofm = LongRunningWrapper.runMethod(new FeatureModelObfuscator(fileHandler.getObject(), getSalt(modelFilePath)));
