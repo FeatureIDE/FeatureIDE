@@ -23,6 +23,7 @@
 		<module>plugins/de.ovgu.featureide.ui</module>
 
 		<module>plugins/br.ufal.ic.colligens</module>
+		<module>plugins/de.ovgu.featureide.Cloneanalysis</module>
 		<module>plugins/de.ovgu.featureide.core.ahead</module>
 		<module>plugins/de.ovgu.featureide.core.antenna</module>
 		<module>plugins/de.ovgu.featureide.core.aspectj</module>
