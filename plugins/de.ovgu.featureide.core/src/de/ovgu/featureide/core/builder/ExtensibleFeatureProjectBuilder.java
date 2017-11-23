@@ -56,6 +56,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
 	public static final String COMPOSER_KEY = "composer";
+	private boolean resetBuildFolder = false; // how to get this value from composer
 
 	private IFeatureProject featureProject;
 	private IComposerExtensionClass composerExtension;
@@ -134,8 +135,12 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 				}
 			}
 		}
-		for (final IResource member : buildFolder.members()) {
-			member.delete(true, monitor);
+
+		if(resetBuildFolder)	
+		{
+			for (final IResource member : buildFolder.members()) {
+				member.delete(true, monitor);
+			}
 		}
 
 		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
