@@ -102,10 +102,16 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		}
 
 		obfuscatedFeatureModel.addFeature(obfuscatedFeature);
+		final IFeatureStructure obfuscatedFeatureStructure = obfuscatedFeature.getStructure();
+		obfuscatedFeatureStructure.setAbstract(orgFeatureStructure.isAbstract());
+		obfuscatedFeatureStructure.setMandatory(orgFeatureStructure.isMandatory());
+		obfuscatedFeatureStructure.setAND(orgFeatureStructure.isAnd());
+		obfuscatedFeatureStructure.setMultiple(orgFeatureStructure.isMultiple());
+		obfuscatedFeatureStructure.setHidden(orgFeatureStructure.isHidden());
 		if (parentFeature == null) {
-			obfuscatedFeatureModel.getStructure().setRoot(obfuscatedFeature.getStructure());
+			obfuscatedFeatureModel.getStructure().setRoot(obfuscatedFeatureStructure);
 		} else {
-			parentFeature.getStructure().addChild(obfuscatedFeature.getStructure());
+			parentFeature.getStructure().addChild(obfuscatedFeatureStructure);
 		}
 
 		for (final IFeatureStructure orgChildStructure : orgFeatureStructure.getChildren()) {
