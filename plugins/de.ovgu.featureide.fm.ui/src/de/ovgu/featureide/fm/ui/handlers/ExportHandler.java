@@ -20,12 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -33,16 +29,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
-public class ObfuscatorHandler extends ExportHandler {
+public class ExportHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile modelFile) {
@@ -51,8 +46,9 @@ public class ObfuscatorHandler extends ExportHandler {
 		setFilter(fileDialog, formatExtensions);
 
 		final Path modelFilePath = Paths.get(modelFile.getLocationURI());
-		fileDialog.setFileName("obfuscated_" + FileHandler.getFileName(modelFilePath));
+		fileDialog.setFileName(FileHandler.getFileName(modelFilePath));
 
+		// Ask for file name
 		final String filepath = fileDialog.open();
 		if (filepath == null) {
 			return;
@@ -60,32 +56,38 @@ public class ObfuscatorHandler extends ExportHandler {
 
 		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(modelFilePath);
 		if (!fileHandler.getLastProblems().containsError()) {
-			final IFeatureModel ofm = LongRunningWrapper.runMethod(new FeatureModelObfuscator(fileHandler.getObject(), getSalt(modelFilePath)));
-			FileHandler.save(Paths.get(filepath), ofm, formatExtensions.get(fileDialog.getFilterIndex()));
+			FileHandler.save(Paths.get(filepath), fileHandler.getObject(), formatExtensions.get(fileDialog.getFilterIndex()));
 		}
 	}
 
-	private String getSalt(Path modelFilePath) {
-		final Path saltPath = modelFilePath.getParent().resolve(modelFilePath.getFileName().toString() + ".salt");
-		if (Files.exists(saltPath)) {
-			try {
-				return new String(Files.readAllBytes(saltPath), StandardCharsets.UTF_8);
-			} catch (final IOException e) {
-				Logger.logWarning("Salt file could not be read! -> Creating new random salt.");
+	protected void setFilter(final FileDialog fileDialog, final List<IFeatureModelFormat> formatExtensions) {
+		int countWritableFormats = 0;
+		for (final IFeatureModelFormat format : formatExtensions) {
+			if (format.supportsWrite()) {
+				countWritableFormats++;
 			}
 		}
-		return getRandomSalt(saltPath);
-	}
-
-	private String getRandomSalt(final Path saltPath) {
-		try {
-			final String randomSalt = FeatureModelObfuscator.getRandomSalt();
-			Files.write(saltPath, randomSalt.getBytes(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
-			return randomSalt;
-		} catch (final Exception e) {
-			Logger.logWarning("Salt file could not be created!");
-			return null;
+		final String[] names = new String[countWritableFormats];
+		final String[] extensions = new String[countWritableFormats];
+		int index = 0;
+		int defaultFilterIndex = -1;
+		for (final IFeatureModelFormat format : formatExtensions) {
+			if (format.supportsWrite()) {
+				if (XmlFeatureModelFormat.ID.equals(format.getId())) {
+					defaultFilterIndex = index;
+				}
+				final String extension = "*." + format.getSuffix();
+				names[index] = format.getName() + " " + extension;
+				extensions[index++] = extension;
+			}
 		}
+
+		fileDialog.setFilterNames(names);
+		fileDialog.setFilterExtensions(extensions);
+		if (defaultFilterIndex > -1) {
+			fileDialog.setFilterIndex(defaultFilterIndex);
+		}
+		fileDialog.setOverwrite(true);
 	}
 
 }

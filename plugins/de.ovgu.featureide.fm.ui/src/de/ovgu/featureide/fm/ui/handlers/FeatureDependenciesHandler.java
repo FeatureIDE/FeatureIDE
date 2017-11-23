@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
+//TODO implement own feature model format
 public class FeatureDependenciesHandler extends AFileHandler {
 
 	@Override
