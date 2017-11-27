@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VOID_FEATURE_MODEL;
 
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
@@ -84,6 +85,11 @@ public class English implements ILanguage {
 	@Override
 	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
+	}
+
+	@Override
+	public String getVoidModel() {
+		return VOID_FEATURE_MODEL;
 	}
 
 	@Override

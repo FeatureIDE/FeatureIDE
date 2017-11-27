@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.impl.FactoryWorkspace;
  *
  * @author Sebastian Krieter
  */
-public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspace> {
+public class FactoryWorkspaceFormat extends APersistentFormat<FactoryWorkspace> implements IPersistentFormat<FactoryWorkspace> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FactoryWorkspaceFormat.class.getSimpleName();
 
@@ -102,11 +102,6 @@ public class FactoryWorkspaceFormat implements IPersistentFormat<FactoryWorkspac
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

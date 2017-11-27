@@ -61,6 +61,18 @@ public class SimpleFileHandler<T> {
 
 	private Path path;
 
+	/**
+	 * Retrieves the file name of a {@link Path} without its extension.
+	 *
+	 * @param path the given path
+	 * @return the file name
+	 */
+	public static String getFileName(Path path) {
+		final String fileName = path.getFileName().toString();
+		final int extensionIndex = fileName.lastIndexOf('.');
+		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
+	}
+
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.read();

@@ -20,10 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import org.prop4j.Node;
+
 /**
  * The atomic unit an explanation is composed of.
  *
- * @param S subject
+ * @param <S> subject
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
@@ -73,6 +75,13 @@ public abstract class Reason<S> implements Cloneable {
 		confidence = Math.max(0.0f, Math.min(1.0f, confidence)); // Clamp between 0 and 1 (just in case).
 		return confidence;
 	}
+
+	/**
+	 * Returns this reason as a node.
+	 *
+	 * @return this reason as a node
+	 */
+	public abstract Node toNode();
 
 	@Override
 	protected Reason<S> clone() {

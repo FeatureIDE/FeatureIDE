@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -37,18 +36,15 @@ public class FeatureProperty implements IFeatureProperty {
 	protected final IFeature correspondingFeature;
 
 	protected String description;
-	protected FeatureStatus status;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 		description = oldProperty.description.toString();
-		status = oldProperty.status;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 		description = "";
-		status = FeatureStatus.NORMAL;
 	}
 
 	@Override

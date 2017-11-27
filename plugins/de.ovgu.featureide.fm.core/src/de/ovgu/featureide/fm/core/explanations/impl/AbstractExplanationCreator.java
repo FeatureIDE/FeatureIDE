@@ -32,9 +32,9 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 /**
  * Abstract implementation of {@link ExplanationCreator}.
  *
- * @param S subject
- * @param E explanation
- * @param O oracle
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <O> oracle
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractExplanationCreator<S, E extends Explanation<S>, O> implements ExplanationCreator<S, E> {

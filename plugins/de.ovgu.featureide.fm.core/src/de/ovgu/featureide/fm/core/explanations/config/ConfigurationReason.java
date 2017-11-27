@@ -20,7 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.explanations.config;
 
+import org.prop4j.Literal;
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 
@@ -48,6 +53,11 @@ public class ConfigurationReason extends Reason<SelectableFeature> {
 	 */
 	protected ConfigurationReason(SelectableFeature subject, Explanation<?> explanation) {
 		super(subject, explanation);
+	}
+
+	@Override
+	public Node toNode() {
+		return new Literal(NodeCreator.getVariable(getSubject().getFeature()), getSubject().getSelection() == Selection.SELECTED);
 	}
 
 	@Override

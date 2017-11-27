@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.core.base.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -36,6 +38,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Florian Proksch
  * @author Stefan Krueger
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 
@@ -49,12 +53,14 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	protected Node propNode;
 	boolean featureSelected;
 	boolean isImplicit;
+	protected String description;
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		propNode = oldConstraint.propNode;
 		featureSelected = oldConstraint.featureSelected;
 		isImplicit = oldConstraint.isImplicit;
+		description = oldConstraint.description;
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
@@ -62,6 +68,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		this.propNode = propNode;
 		featureSelected = false;
 		isImplicit = false;
+		description = "";
 	}
 
 	// @Override
@@ -144,6 +151,21 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public String toString() {
 		return "AConstraint [propNode=" + propNode + "]";
+	}
+
+	@Override
+	public void setDescription(@Nonnull final String description) {
+		this.description = description;
+	}
+
+	/**
+	 * Returns the description
+	 *
+	 * @return
+	 */
+	@Override
+	public String getDescription() {
+		return description;
 	}
 
 }

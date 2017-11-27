@@ -426,7 +426,7 @@ public class AnalysesCollection {
 			constraintPropertiesMap.put(constraint, constraintProperties);
 			elementPropertiesMap.put(constraint, constraintProperties);
 		}
-		featureModelProperties = new FeatureModelProperties(formula.getFeatureModel(), featurePropertiesMap.values(), constraintPropertiesMap.values());
+		featureModelProperties = new FeatureModelProperties(featurePropertiesMap.values(), constraintPropertiesMap.values());
 
 	}
 

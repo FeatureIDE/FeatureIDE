@@ -36,8 +36,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -101,8 +100,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		final List<String> attribute = new ArrayList<>();
 		final FeatureProperties status = FeatureUtils.getFeatureProperties(feat);
 
-		if ((status.getFeatureSelectionStatus() != FeatureSelectionStatus.DEAD)
-			&& (status.getFeatureDeterminedStatus() != FeatureDeterminedStatus.INDETERMINATE_HIDDEN)) {
+		if (!status.hasStatus(FeatureStatus.DEAD) && !status.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 			attribute.add("STATUS: " + status);
 		}
 
@@ -128,7 +126,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		}
 		attribute.add(connectionType + " - connection");
 
-		if (status.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
+		if (status.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 			attribute.add(HIDDEN_BY_ANCESTOR);
 		} else if (feat.getStructure().isHidden()) {
 			attribute.add(HIDDEN);

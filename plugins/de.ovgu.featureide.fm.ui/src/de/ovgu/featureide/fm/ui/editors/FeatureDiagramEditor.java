@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -297,7 +296,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Feature property actions
 		mandatoryAction = addAction(new MandatoryAction(viewer, featureModel));
-		abstractAction = addAction(new AbstractAction(viewer, featureModel, (ObjectUndoContext) featureModel.getUndoContext()));
+		abstractAction = addAction(new AbstractAction(viewer, featureModel));
 		hiddenAction = addAction(new HiddenAction(viewer, featureModel));
 		andAction = addAction(new AndAction(viewer, featureModel));
 		orAction = addAction(new OrAction(viewer, featureModel));
@@ -354,8 +353,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		parent.setBackground(FMPropertyManager.getDiagramBackgroundColor());
 		// parent composite
 		GridLayout gridLayout = new GridLayout(1, false);
-		gridLayout.verticalSpacing = 4;
-		gridLayout.marginHeight = 2;
+		gridLayout.verticalSpacing = 0;
+		gridLayout.horizontalSpacing = 4;
+		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		parent.setLayout(gridLayout);
 
@@ -365,7 +365,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-		gridLayout = new GridLayout(4, false);
+		gridLayout = new GridLayout(3, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -373,13 +373,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		compositeTop.setLayout(gridLayout);
 		compositeTop.setLayoutData(gridData);
 
+		// TODO implement update function for info label
 		// info label
+		final Composite compositeInfoLabel = new Composite(compositeTop, SWT.NONE);
+		gridLayout = new GridLayout(2, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		compositeInfoLabel.setLayout(gridLayout);
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.LEFT;
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
-		final Label label = new Label(compositeTop, SWT.NONE);
-		label.setText("Model Status:");
+		final Label label = new Label(compositeInfoLabel, SWT.NONE);
+		label.setText("");
 		label.setLayoutData(gridData);
 
 		gridData = new GridData();
@@ -387,8 +393,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = SWT.CENTER;
 		gridData.widthHint = 100;
-		infoLabel = new Label(compositeTop, SWT.NONE);
-		infoLabel.setText("Normal");
+		infoLabel = new Label(compositeInfoLabel, SWT.NONE);
+		infoLabel.setText("");
 		infoLabel.setLayoutData(gridData);
 
 		new SearchField<>(compositeTop, viewer);
@@ -592,7 +598,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return (T) adapter.cast(this);
+			return (T) adapter.cast(getViewer());
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());

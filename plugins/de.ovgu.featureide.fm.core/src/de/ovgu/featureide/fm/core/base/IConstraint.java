@@ -62,6 +62,8 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
  *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
+ * @author Marlen Bernier
+ * @author Dawid Szczepanski
  */
 public interface IConstraint extends IFeatureModelElement {
 
@@ -312,4 +314,18 @@ public interface IConstraint extends IFeatureModelElement {
 	 */
 	// void setFalseOptionalFeatures(Iterable<IFeature> foFeatures);
 
+	/**
+	 * Set the description
+	 * @param description
+	 */
+	void setDescription(String description);
+	
+	/**
+	 * Returns the description
+	 * @return
+	 */
+	String getDescription();
+
 }
+
+

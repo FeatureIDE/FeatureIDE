@@ -53,7 +53,9 @@ public class EclipseExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtens
 			for (final IConfigurationElement configurationElement : configurationElements) {
 				final T extensionInstance = parseExtension(configurationElement);
 				if (extensionInstance != null) {
-					extensionManager.addExtension(extensionInstance);
+					if (extensionInstance.initExtension()) {
+						extensionManager.addExtension(extensionInstance);
+					}
 				}
 			}
 		}

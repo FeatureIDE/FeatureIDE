@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.analysis;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -34,26 +35,16 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
  */
 public class ConstraintProperties {
 
-	public enum ConstraintRedundancyStatus {
-		UNKNOWN, NORMAL, REDUNDANT, IMPLICIT, TAUTOLOGY
+	public enum ConstraintStatus {
+		NECESSARY, REDUNDANT, IMPLICIT, TAUTOLOGY, SATISFIABLE, VOID_MODEL, UNSATISFIABLE
 	}
 
-	public enum ConstraintDeadStatus {
-		UNKNOWN, NORMAL, DEAD
-	}
+	private static final EnumSet<ConstraintStatus> constraintRedundancyStatus =
+		EnumSet.of(ConstraintStatus.NECESSARY, ConstraintStatus.REDUNDANT, ConstraintStatus.IMPLICIT, ConstraintStatus.TAUTOLOGY);
+	private static final EnumSet<ConstraintStatus> constraintSatisfiabilityStatus =
+		EnumSet.of(ConstraintStatus.SATISFIABLE, ConstraintStatus.VOID_MODEL, ConstraintStatus.UNSATISFIABLE);
 
-	public enum ConstraintFalseOptionalStatus {
-		UNKNOWN, NORMAL, FALSE_OPTIONAL
-	}
-
-	public enum ConstraintFalseSatisfiabilityStatus {
-		UNKNOWN, SATISFIABLE, VOID_MODEL, UNSATISFIABLE
-	}
-
-	private ConstraintRedundancyStatus constraintRedundancyStatus = ConstraintRedundancyStatus.UNKNOWN;
-	private ConstraintDeadStatus constraintDeadStatus = ConstraintDeadStatus.UNKNOWN;
-	private ConstraintFalseOptionalStatus constraintFalseOptionalStatus = ConstraintFalseOptionalStatus.UNKNOWN;
-	private ConstraintFalseSatisfiabilityStatus constraintSatisfiabilityStatus = ConstraintFalseSatisfiabilityStatus.UNKNOWN;
+	private final EnumSet<ConstraintStatus> constraintStatus = EnumSet.noneOf(ConstraintStatus.class);
 
 	protected Collection<IFeature> deadFeatures = Collections.emptyList();
 	protected Collection<IFeature> falseOptionalFeatures = Collections.emptyList();
@@ -69,20 +60,17 @@ public class ConstraintProperties {
 		this.constraint = constraint;
 	}
 
-	public boolean hasStatus(ConstraintRedundancyStatus constraintRedundancyStatus) {
-		return this.constraintRedundancyStatus == constraintRedundancyStatus;
+	public boolean hasStatus(ConstraintStatus constraintStatus) {
+		return this.constraintStatus.contains(constraintStatus);
 	}
 
-	public boolean hasStatus(ConstraintDeadStatus constraintDeadStatus) {
-		return this.constraintDeadStatus == constraintDeadStatus;
-	}
-
-	public boolean hasStatus(ConstraintFalseOptionalStatus constraintFalseOptionalStatus) {
-		return this.constraintFalseOptionalStatus == constraintFalseOptionalStatus;
-	}
-
-	public boolean hasStatus(ConstraintFalseSatisfiabilityStatus constraintFalseSatisfiabilityStatus) {
-		return constraintSatisfiabilityStatus == constraintFalseSatisfiabilityStatus;
+	public void setStatus(ConstraintStatus constraintStatus) {
+		if (constraintSatisfiabilityStatus.contains(constraintStatus)) {
+			this.constraintStatus.removeAll(constraintSatisfiabilityStatus);
+		} else if (constraintRedundancyStatus.contains(constraintStatus)) {
+			this.constraintStatus.removeAll(constraintRedundancyStatus);
+		}
+		this.constraintStatus.add(constraintStatus);
 	}
 
 	public Collection<IFeature> getDeadFeatures() {
@@ -97,12 +85,12 @@ public class ConstraintProperties {
 		this.falseOptionalFeatures = falseOptionalFeatures;
 	}
 
-	public IConstraint getConstraint() {
-		return constraint;
-	}
-
 	public void setDeadFeatures(Collection<IFeature> deadFeatures) {
 		this.deadFeatures = deadFeatures;
+	}
+
+	public IConstraint getConstraint() {
+		return constraint;
 	}
 
 	public Explanation getRedundantExplanation() {
@@ -113,43 +101,8 @@ public class ConstraintProperties {
 		this.redundantExplanation = redundantExplanation;
 	}
 
-	public ConstraintRedundancyStatus getConstraintRedundancyStatus() {
-		return constraintRedundancyStatus;
-	}
-
-	public void setConstraintRedundancyStatus(ConstraintRedundancyStatus constraintRedundancyStatus) {
-		this.constraintRedundancyStatus = constraintRedundancyStatus;
-	}
-
-	public ConstraintDeadStatus getConstraintDeadStatus() {
-		return constraintDeadStatus;
-	}
-
-	public void setConstraintDeadStatus(ConstraintDeadStatus constraintDeadStatus) {
-		this.constraintDeadStatus = constraintDeadStatus;
-	}
-
-	public ConstraintFalseOptionalStatus getConstraintFalseOptionalStatus() {
-		return constraintFalseOptionalStatus;
-	}
-
-	public void setConstraintFalseOptionalStatus(ConstraintFalseOptionalStatus constraintFalseOptionalStatus) {
-		this.constraintFalseOptionalStatus = constraintFalseOptionalStatus;
-	}
-
-	public ConstraintFalseSatisfiabilityStatus getConstraintSatisfiabilityStatus() {
-		return constraintSatisfiabilityStatus;
-	}
-
-	public void setConstraintSatisfiabilityStatus(ConstraintFalseSatisfiabilityStatus constraintFalseSatisfiabilityStatus) {
-		constraintSatisfiabilityStatus = constraintFalseSatisfiabilityStatus;
-	}
-
 	public void resetStatus() {
-		constraintRedundancyStatus = ConstraintRedundancyStatus.UNKNOWN;
-		constraintDeadStatus = ConstraintDeadStatus.UNKNOWN;
-		constraintFalseOptionalStatus = ConstraintFalseOptionalStatus.UNKNOWN;
-		constraintSatisfiabilityStatus = ConstraintFalseSatisfiabilityStatus.UNKNOWN;
+		constraintStatus.clear();
 	}
 
 }

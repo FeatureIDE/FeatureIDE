@@ -99,4 +99,9 @@ public class MIGAdjListFormat implements IPersistentFormat<ModalImplicationGraph
 		return "ModalImplicationGraph Adjacency Matrix";
 	}
 
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
 }

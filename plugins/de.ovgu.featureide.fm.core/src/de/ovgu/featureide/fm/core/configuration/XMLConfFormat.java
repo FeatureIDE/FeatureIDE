@@ -54,16 +54,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	}
 
 	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
-
-	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
@@ -178,11 +168,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getId() {
 		return ID;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

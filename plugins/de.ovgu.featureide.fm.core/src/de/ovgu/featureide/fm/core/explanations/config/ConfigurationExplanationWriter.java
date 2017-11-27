@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationWriter;
 /**
  * {@link ExplanationWriter} for instances of {@link ConfigurationExplanation}.
  *
- * @param E explanation
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class ConfigurationExplanationWriter<E extends ConfigurationExplanation<?>> extends FeatureModelExplanationWriter<E> {

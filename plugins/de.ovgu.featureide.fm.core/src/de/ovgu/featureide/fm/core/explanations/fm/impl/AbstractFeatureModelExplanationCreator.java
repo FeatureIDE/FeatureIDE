@@ -35,9 +35,9 @@ import de.ovgu.featureide.fm.core.explanations.impl.AbstractExplanationCreator;
 /**
  * Abstract implementation of {@link FeatureModelExplanationCreator}.
  *
- * @param S subject
- * @param E explanation
- * @param O oracle
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <O> oracle
  * @author Timo G&uuml;nther
  */
 public abstract class AbstractFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>, O> extends AbstractExplanationCreator<S, E, O>
@@ -76,10 +76,11 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	/**
 	 * Returns the node creator. Creates it first if necessary.
 	 *
-	 * @return the node creator
+	 * @return the node creator; not null
+	 * @throws IllegalStateException if the feature model is not set
 	 */
-	protected AdvancedNodeCreator getNodeCreator() {
-		if ((nodeCreator == null) && (getFeatureModel() != null)) {
+	protected AdvancedNodeCreator getNodeCreator() throws IllegalStateException {
+		if (nodeCreator == null) {
 			nodeCreator = createNodeCreator();
 		}
 		return nodeCreator;
@@ -89,9 +90,14 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	 * Creates a new node creator.
 	 *
 	 * @return a new node creator; not null
+	 * @throws IllegalStateException if the feature model is not set
 	 */
-	protected AdvancedNodeCreator createNodeCreator() {
-		final AdvancedNodeCreator nc = new AdvancedNodeCreator(getFeatureModel());
+	protected AdvancedNodeCreator createNodeCreator() throws IllegalStateException {
+		final IFeatureModel fm = getFeatureModel();
+		if (fm == null) {
+			throw new IllegalStateException("Feature model not set");
+		}
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(fm);
 		nc.setIncludeBooleanValues(false);
 		nc.setCnfType(CNFType.Regular);
 		nc.setRecordTraceModel(true);
@@ -101,10 +107,11 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	/**
 	 * Returns a formula representation of the feature model in CNF (conjunctive normal form). Creates it first if necessary.
 	 *
-	 * @return a formula representation of the feature model in CNF
+	 * @return a formula representation of the feature model in CNF; not null
+	 * @throws IllegalStateException if the formula is not set
 	 */
 	protected Node getCnf() throws IllegalStateException {
-		if ((cnf == null) && (getFeatureModel() != null)) {
+		if (cnf == null) {
 			cnf = createCnf();
 		}
 		return cnf;
@@ -114,18 +121,20 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	 * Creates the formula representation of the feature model in CNF (conjunctive normal form).
 	 *
 	 * @return the CNF; not null
+	 * @throws IllegalStateException if the formula is not set
 	 */
-	protected Node createCnf() {
+	protected Node createCnf() throws IllegalStateException {
 		return getNodeCreator().createNodes();
 	}
 
 	/**
 	 * Returns the trace model.
 	 *
-	 * @return the trace model
+	 * @return the trace model; not null
+	 * @throws IllegalStateException if the feature model is not set
 	 */
-	public FeatureModelToNodeTraceModel getTraceModel() {
-		if ((traceModel == null) && (getFeatureModel() != null)) {
+	public FeatureModelToNodeTraceModel getTraceModel() throws IllegalStateException {
+		if (traceModel == null) {
 			traceModel = createTraceModel();
 		}
 		return traceModel;
@@ -135,8 +144,9 @@ public abstract class AbstractFeatureModelExplanationCreator<S, E extends Featur
 	 * Creates the trace model.
 	 *
 	 * @return the trace model; not null
+	 * @throws IllegalStateException if the feature model is not set
 	 */
-	protected FeatureModelToNodeTraceModel createTraceModel() {
+	protected FeatureModelToNodeTraceModel createTraceModel() throws IllegalStateException {
 		return getNodeCreator().getTraceModel();
 	}
 

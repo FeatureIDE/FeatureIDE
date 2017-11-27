@@ -78,17 +78,62 @@ public abstract class AbstractSatProblem implements SatProblem {
 	 * Adds the given CNF clause to the problem. It must be a non-empty disjunction of literals.
 	 *
 	 * @param clause clause to add; not null
+	 * @return the index of the newly added clause
 	 * @throws IllegalArgumentException if the clause is empty
 	 */
-	protected void addClause(Node clause) throws IllegalArgumentException {
+	protected int addClause(Node clause) throws IllegalArgumentException {
 		if (clause.getChildren().length == 0) {
 			throw new IllegalArgumentException("Empty clause");
 		}
+		final int clauseIndex = getClauseCount();
 		clauses.add(clause);
+		return clauseIndex;
+	}
+
+	/**
+	 * Removes the given number of clauses from the end of this problem (i.e., the most recently added ones).
+	 *
+	 * @param count the number of clauses to remove
+	 * @return the removed clauses
+	 */
+	protected List<Node> removeClauses(int count) {
+		final List<Node> removed = new ArrayList<>(count);
+		while (count-- > 0) {
+			removed.add(removeClause());
+		}
+		return removed;
+	}
+
+	/**
+	 * Removes the most recently added clause.
+	 *
+	 * @return the removed clause
+	 */
+	protected Node removeClause() {
+		return removeClause(getClauseCount() - 1);
+	}
+
+	/**
+	 * Removes the clause at the given index.
+	 *
+	 * @param index index of the clause to remove
+	 * @return the removed clause
+	 */
+	protected Node removeClause(int index) {
+		return getClauses().remove(index);
 	}
 
 	@Override
 	public List<Node> getClauses() {
+		return clauses;
+	}
+
+	@Override
+	public List<Node> getClauses(Collection<Integer> indexes) {
+		final List<Node> clauses = new ArrayList<>(indexes.size());
+		for (int i = 0; i < clauses.size(); i++) {
+			clauses.add(clauses.get(i));
+		}
 		return clauses;
 	}
 
@@ -117,6 +162,23 @@ public abstract class AbstractSatProblem implements SatProblem {
 	@Override
 	public void addAssumption(Object variable, boolean value) {
 		assumptions.put(variable, value);
+	}
+
+	/**
+	 * Removes the given assumption.
+	 *
+	 * @param variable variable of the assumption to remove
+	 * @return whether an assumption was removed
+	 */
+	protected boolean removeAssumption(Object variable) {
+		return assumptions.remove(variable);
+	}
+
+	/**
+	 * Removes all assumptions.
+	 */
+	protected void clearAssumptions() {
+		assumptions.clear();
 	}
 
 	@Override

@@ -38,8 +38,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  * @author Timo G&uuml;nther
  */
-public class DIMACSFormat implements IFeatureModelFormat {
+public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
@@ -119,7 +119,7 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureModel> getInstance() {
+	public DIMACSFormat getInstance() {
 		return this;
 	}
 
@@ -136,11 +136,6 @@ public class DIMACSFormat implements IFeatureModelFormat {
 	@Override
 	public boolean supportsWrite() {
 		return true;
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
 	}
 
 	@Override

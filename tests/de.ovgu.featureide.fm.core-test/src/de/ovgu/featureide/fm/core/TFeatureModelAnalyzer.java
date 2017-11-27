@@ -31,13 +31,9 @@ import org.junit.Test;
 
 import de.ovgu.featureide.Commons;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintDeadStatus;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintFalseOptionalStatus;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -122,17 +118,17 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM1_F1() {
-		assertTrue(((FeatureProperties) FM1_DATA.get(FM1_F1)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM1_DATA.get(FM1_F1)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM1_F2() {
-		assertTrue(((FeatureProperties) FM1_DATA.get(FM1_F2)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM1_DATA.get(FM1_F2)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM1_C1() {
-		assertTrue(((ConstraintProperties) FM1_DATA.get(FM1_C1)).hasStatus(ConstraintFalseOptionalStatus.FALSE_OPTIONAL));
+		assertFalse(((ConstraintProperties) FM1_DATA.get(FM1_C1)).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
@@ -147,22 +143,22 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM2_F1() {
-		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F1)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F1)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_F2() {
-		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F2)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F2)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_F3() {
-		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F3)).hasStatus(FeatureParentStatus.OPTIONAL));
+		assertTrue(((FeatureProperties) FM2_DATA.get(FM2_F3)).hasStatus(FeatureStatus.OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM2_C1() {
-		assertTrue(((ConstraintProperties) FM2_DATA.get(FM2_C1)).hasStatus(ConstraintFalseOptionalStatus.FALSE_OPTIONAL));
+		assertFalse(((ConstraintProperties) FM2_DATA.get(FM2_C1)).getFalseOptionalFeatures().isEmpty());
 	}
 
 	@Test
@@ -182,7 +178,7 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM2_C2() {
-		assertTrue(((ConstraintProperties) FM2_DATA.get(FM2_C2)).hasStatus(ConstraintRedundancyStatus.REDUNDANT));
+		assertTrue(((ConstraintProperties) FM2_DATA.get(FM2_C2)).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
@@ -192,7 +188,7 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM2_C3() {
-		assertTrue(((ConstraintProperties) FM2_DATA.get(FM2_C3)).hasStatus(ConstraintRedundancyStatus.REDUNDANT));
+		assertTrue(((ConstraintProperties) FM2_DATA.get(FM2_C3)).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
@@ -202,17 +198,17 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM3_F2() {
-		assertTrue(((FeatureProperties) FM3_DATA.get(FM3_F2)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM3_DATA.get(FM3_F2)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TDead_FM3_F2() {
-		assertTrue(((FeatureProperties) FM3_DATA.get(FM3_F3)).hasStatus(FeatureSelectionStatus.DEAD));
+		assertTrue(((FeatureProperties) FM3_DATA.get(FM3_F3)).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TFalseOptional_FM3_C1() {
-		assertTrue(((ConstraintProperties) FM3_DATA.get(FM3_C1)).hasStatus(ConstraintDeadStatus.DEAD));
+		assertFalse(((ConstraintProperties) FM3_DATA.get(FM3_C1)).getDeadFeatures().isEmpty());
 	}
 
 	@Test
@@ -227,72 +223,72 @@ public class TFeatureModelAnalyzer {
 
 	@Test
 	public void TFalseOptional_FM4_F1() {
-		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F10)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F10)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TFalseOptional_FM7_F1() {
-		assertTrue(((FeatureProperties) FM7_DATA.get(FM7_F1)).hasStatus(FeatureParentStatus.FALSE_OPTIONAL));
+		assertTrue(((FeatureProperties) FM7_DATA.get(FM7_F1)).hasStatus(FeatureStatus.FALSE_OPTIONAL));
 	}
 
 	@Test
 	public void TRedundantConstr_FM7_C1() {
-		assertTrue(((ConstraintProperties) FM7_DATA.get(FM7_C1)).hasStatus(ConstraintRedundancyStatus.REDUNDANT));
+		assertTrue(((ConstraintProperties) FM7_DATA.get(FM7_C1)).hasStatus(ConstraintStatus.REDUNDANT));
 	}
 
 	@Test
 	public void TDead_FM8_F1() {
-		assertTrue(((FeatureProperties) FM8_DATA.get(FM8_F1)).hasStatus(FeatureSelectionStatus.DEAD));
+		assertTrue(((FeatureProperties) FM8_DATA.get(FM8_F1)).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TDead_FM8_F2() {
-		assertTrue(((FeatureProperties) FM8_DATA.get(FM8_F2)).hasStatus(FeatureSelectionStatus.DEAD));
+		assertTrue(((FeatureProperties) FM8_DATA.get(FM8_F2)).hasStatus(FeatureStatus.DEAD));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F0() {
-		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F2)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F2)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F1() {
-		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F3)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F3)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F2() {
-		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F4)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F4)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F3() {
-		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F5)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F5)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F4() {
-		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F6)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F6)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F5() {
-		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F7)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F7)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F6() {
-		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F8)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F8)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F7() {
-		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F9)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertFalse(((FeatureProperties) FM4_DATA.get(FM4_F9)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 	@Test
 	public void TIndeterminate_Hidden_FM1_F8() {
-		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F1)).hasStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN));
+		assertTrue(((FeatureProperties) FM4_DATA.get(FM4_F1)).hasStatus(FeatureStatus.INDETERMINATE_HIDDEN));
 	}
 
 }

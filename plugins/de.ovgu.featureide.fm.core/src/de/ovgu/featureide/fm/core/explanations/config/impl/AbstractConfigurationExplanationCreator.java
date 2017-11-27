@@ -28,7 +28,10 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExpla
 /**
  * Abstract implementation of {@link ConfigurationExplanationCreator}.
  *
- * @author Timo G&uuml;nther
+ * @param <S> subject
+ * @param <E> explanation
+ * @param <O> oracle
+ * @author Timo Günther
  */
 public abstract class AbstractConfigurationExplanationCreator<S, E extends ConfigurationExplanation<S>, O>
 		extends AbstractFeatureModelExplanationCreator<S, E, O> implements ConfigurationExplanationCreator<S, E> {

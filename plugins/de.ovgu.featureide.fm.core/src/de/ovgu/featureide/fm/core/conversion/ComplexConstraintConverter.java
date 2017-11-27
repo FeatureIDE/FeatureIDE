@@ -30,7 +30,8 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -240,8 +241,8 @@ public class ComplexConstraintConverter {
 		final List<IConstraint> toRemove = new LinkedList<>();
 
 		for (final IConstraint c : fm.getConstraints()) {
-			final ConstraintRedundancyStatus redundancyStatus = analyzer.getConstraintProperties(c).getConstraintRedundancyStatus();
-			if ((redundancyStatus == ConstraintRedundancyStatus.REDUNDANT) || (redundancyStatus == ConstraintRedundancyStatus.TAUTOLOGY)) {
+			final ConstraintProperties constraintProperties = analyzer.getConstraintProperties(c);
+			if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY))) {
 				toRemove.add(c);
 			}
 		}

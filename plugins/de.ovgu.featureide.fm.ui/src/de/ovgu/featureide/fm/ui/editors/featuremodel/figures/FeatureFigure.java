@@ -49,9 +49,7 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
@@ -165,29 +163,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		}
 
 		final FeatureProperties featureProperties = FeatureUtils.getFeatureProperties(feature);
-		if (featureProperties != null) {
-			if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
-				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
-				setBackgroundColor(FMPropertyManager.getWarningColor());
-				setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-			} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
-				setBackgroundColor(FMPropertyManager.getWarningColor());
-				setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-			}
-		}
-
-		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
-			// only color if the active profile is not the default profile
-			if (color != FeatureColor.NO_COLOR) {
-				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
-			}
-		}
+		setLabelIcon(featureProperties);
 
 		if (!analyser.isValid()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+			label.setIcon(FM_ERROR);
+			setName(label.getText());
 		}
 
 		if (feature instanceof ExtendedFeature) {
@@ -214,6 +194,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		panel.setLayoutManager(new ToolbarLayout(false));
 
 		toolTipFigure = null;
+
 	}
 
 	/**
@@ -239,11 +220,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 
 			final FeatureProperties featureProperties = analyser.getFeatureProperties(feature);
 			if (featureProperties != null) {
-				if (featureProperties.getFeatureSelectionStatus() == FeatureSelectionStatus.DEAD) {
+				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 					toolTip.append(DEAD);
-				} else if (featureProperties.getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) {
+				} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 					toolTip.append(FALSE_OPTIONAL);
-				} else if (featureProperties.getFeatureDeterminedStatus() == FeatureDeterminedStatus.INDETERMINATE_HIDDEN) {
+				} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
 					toolTip.append(INDETERMINATE_HIDDEN);
 				}
 			}
@@ -334,10 +315,24 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		return targetAnchor;
 	}
 
-	public void setName(String newName) {
-		if (label.getText().equals(newName)) {
-			return;
+	/**
+	 *
+	 * @param {@link FeatureStatus}
+	 */
+	private void setLabelIcon(FeatureProperties featureProperties) {
+		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
+			label.setIcon(FM_ERROR);
+		} else if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
+			label.setIcon(FM_WARNING);
+		} else if (featureProperties.hasStatus(FeatureStatus.INDETERMINATE_HIDDEN)) {
+			label.setIcon(WARNING_IMAGE);
+		} else {
+			label.setIcon(null);
 		}
+		setName(label.getText());
+	}
+
+	public void setName(String newName) {
 		label.setText(newName);
 
 		final Dimension labelSize = label.getPreferredSize();
@@ -353,7 +348,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (!oldSize.equals(0, 0)) {
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
-
 			setBounds(bounds);
 		}
 	}

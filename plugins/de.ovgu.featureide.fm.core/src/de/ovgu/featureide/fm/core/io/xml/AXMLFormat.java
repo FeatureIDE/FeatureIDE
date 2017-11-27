@@ -50,6 +50,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -60,7 +61,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  *
  * @author Sebastian Krieter
  */
-public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
+public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
 
 	private static final String SUFFIX = "xml";
 
@@ -200,6 +201,16 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		}
 
 		return prettyPrint(result.getWriter().toString());
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
 	}
 
 	/**

@@ -12,8 +12,8 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplana
 /**
  * Implements {@link PreprocessorExplanationCreator} through composition.
  *
- * @param S subject
- * @param E explanation
+ * @param <S> subject
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class CompositePreprocessorExplanationCreator<S, E extends PreprocessorExplanation<S>, C extends PreprocessorExplanationCreator<S, E>>

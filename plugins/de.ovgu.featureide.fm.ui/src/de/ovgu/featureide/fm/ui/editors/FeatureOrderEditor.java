@@ -58,13 +58,17 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
+ *
+ * @author Holger Fenske (replace swt.widgets.List with swt.widgets.Table)
+ * @author Edgar Schmidt (replace swt.widgets.List with swt.widgets.Table)
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureOrderEditor";
+
 	private static final String PAGE_TEXT = FEATURE_ORDER;
 
-	private org.eclipse.swt.widgets.List featurelist;
+	private FeatureOrderTable featureOrderTable;
 
 	private Composite comp;
 	private GridData gridData;
@@ -92,8 +96,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			updateOrderEditor();
 
 			if (hasFeatureOrder) {
-				writeToOrderFile(); // save the feature order also in .order if file
-									 // exists
+				writeToOrderFile(); // save the feature order also in .order if file exists
 			}
 
 			if (getFeatureModel().getFeatureOrderList().isEmpty()) {
@@ -106,16 +109,16 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	@Override
 	public void initEditor() {
+
 		if (hasFeatureOrder) {
 			if (getFeatureModel().getFeatureOrderList().isEmpty()) {
 				defaultFeatureList();
 			} else {
-				featurelist.removeAll();
+				featureOrderTable.removeAll();
 				for (final String str : getFeatureModel().getFeatureOrderList()) {
-					featurelist.add(str);
+					featureOrderTable.addItem(str);
 				}
 			}
-
 			activate.setSelection(getFeatureModel().isFeatureOrderUserDefined());
 			enableUI(getFeatureModel().isFeatureOrderUserDefined());
 		}
@@ -149,37 +152,28 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (!hasFeatureOrder) {
 			layout.numColumns = 1;
 			label.setText(FMComposerManager.getFMComposerExtension(project).getOrderPageMessage());
-			featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-			featurelist.setVisible(false);
+			featureOrderTable = new FeatureOrderTable(comp, this);
+			featureOrderTable.setVisible(true);
 		} else {
 			layout.numColumns = 3;
 			label.setText(USER_DEFINED_FEATURE_ORDER);
-			createButtons();
+			activate = new Button(comp, SWT.CHECK);
+			activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+					final boolean selection = activate.getSelection();
+					enableUI(selection);
+					updateFeatureOrderList();
+					setDirty(true);
+				}
+			});
+			featureOrderTable = new FeatureOrderTable(comp, this);
+			createGridData();
+			createUpButton();
+			createDownButton();
+			createDeafaultButton();
 		}
-	}
-
-	private void createButtons() {
-		createActivateButton();
-		createGridData();
-		createUpButton();
-		createDownButton();
-		createDeafaultButton();
-	}
-
-	private void createActivateButton() {
-		activate = new Button(comp, SWT.CHECK);
-		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
-
-			@Override
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				final boolean selection = activate.getSelection();
-				enableUI(selection);
-				updateFeatureOrderList();
-				setDirty(true);
-			}
-		});
-
-		featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 	}
 
 	private void createGridData() {
@@ -188,9 +182,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalSpan = 4;
 		gridData.grabExcessVerticalSpace = true;
-		featurelist.setLayoutData(gridData);
-		featurelist.setEnabled(false);
-
+		featureOrderTable.setGridData(gridData);
+		featureOrderTable.setEnabled(false);
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 	}
@@ -207,19 +200,18 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				final List<String> items = getSelectedItems();
 
 				for (int i = 0; i < items.size(); i++) {
-					final int focus = featurelist.indexOf(items.get(i));
+					final int focus = featureOrderTable.getIndex(items.get(i));
 
 					if (focus != 0) { // First Element is selected, no change
-						final String temp = featurelist.getItem(focus - 1);
+						final String temp = featureOrderTable.getItem(focus - 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus - 1, featurelist.getItem(focus));
-							featurelist.setItem(focus, temp);
+							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus - 1);
+							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
 							setDirty(true);
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -237,19 +229,18 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				final List<String> items = getSelectedItems();
 
 				for (int i = items.size() - 1; i >= 0; i--) {
-					final int focus = featurelist.indexOf(items.get(i));
+					final int focus = featureOrderTable.getIndex(items.get(i));
 
-					if (focus != (featurelist.getItemCount() - 1)) {
-						final String temp = featurelist.getItem(focus + 1);
+					if (focus != (featureOrderTable.getList().size() - 1)) {
+						final String temp = featureOrderTable.getItem(focus + 1);
 						if (!items.contains(temp)) {
-							featurelist.setItem(focus + 1, featurelist.getItem(focus));
-							featurelist.setItem(focus, temp);
+							featureOrderTable.setItem(featureOrderTable.getItem(focus), focus + 1);
+							featureOrderTable.setItem(temp, focus);
 							updateFeatureOrderList();
 							setDirty(true);
 						}
 					}
 				}
-
 				selectItems(items);
 			}
 		});
@@ -261,11 +252,11 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @return selected items
 	 */
 	private List<String> getSelectedItems() {
-		final int[] focuses = featurelist.getSelectionIndices();
+		final int[] focuses = featureOrderTable.getSelectionsIndices();
 		Arrays.sort(focuses);
 		final List<String> items = new ArrayList<>(focuses.length);
 		for (final int focus : focuses) {
-			items.add(featurelist.getItem(focus));
+			items.add(featureOrderTable.getItem(focus));
 		}
 		return items;
 	}
@@ -279,10 +270,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		final int[] newSelection = new int[items.size()];
 
 		for (int i = 0; i < items.size(); i++) {
-			newSelection[i] = featurelist.indexOf(items.get(i));
+			newSelection[i] = featureOrderTable.getIndex(items.get(i));
 		}
-
-		featurelist.setSelection(newSelection);
+		featureOrderTable.setSelectionsIndices(newSelection);
 	}
 
 	private void createDeafaultButton() {
@@ -302,40 +292,40 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	private void defaultFeatureList() {
-		featurelist.removeAll();
+		featureOrderTable.removeAll();
 
 		if (getFeatureModel().getStructure().getRoot() != null) {
 			getFeatureModel().setFeatureOrderList(Collections.<String> emptyList());
 			for (final String featureName : getFeatureModel().getFeatureOrderList()) {
-				featurelist.add(featureName);
+				featureOrderTable.addItem(featureName);
 			}
 		}
 	}
 
 	/**
-	 * Applies changes of the feature model to the feature order list.
+	 * Applies changes of the feature model to the feature order table.
 	 *
-	 * @return true if feature order list has changed and was not empty before
+	 * @return true if feature order table has changed and was not empty before
 	 */
 	private boolean updateFeatureList() {
 		boolean changed = false;
 		if (getFeatureModel().getStructure().getRoot() != null) {
 			final HashSet<String> featureSet = new HashSet<String>(getFeatureModel().getFeatureOrderList());
 
-			int itemcount = featurelist.getItemCount();
+			int itemcount = featureOrderTable.getList().size();
 			for (int i = 0; i < itemcount; i++) {
-				if (!featureSet.remove(featurelist.getItem(i))) {
+				if (!featureSet.remove(featureOrderTable.getItem(i))) {
 					changed = true;
-					if (featureSet.remove(getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)))) {
-						featurelist.setItem(i, getFeatureModel().getRenamingsManager().getNewName(featurelist.getItem(i)));
+					if (featureSet.remove(getFeatureModel().getRenamingsManager().getNewName(featureOrderTable.getItem(i)))) {
+						featureOrderTable.setItem(getFeatureModel().getRenamingsManager().getNewName(featureOrderTable.getItem(i)), i);
 					} else {
-						featurelist.remove(i--);
+						featureOrderTable.removeItem(i--);
 						itemcount--;
 					}
 				}
 			}
 			for (final String newFeatureName : featureSet) {
-				featurelist.add(newFeatureName);
+				featureOrderTable.addItem(newFeatureName);
 			}
 		}
 		return changed;
@@ -359,7 +349,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	// TODO can be deleted if .order file is no longer used
 	public void writeToOrderFile() {
 		// Cast is necessary, don't remove
-		final IFile inputFile = (IFile) input.getAdapter(IFile.class);
+		final IFile inputFile = ((IFile) input.getAdapter(IFile.class));
 		if (inputFile != null) {
 			final IFile orderFile = inputFile.getProject().getFile(".order");
 			if (orderFile.isAccessible()) {
@@ -377,8 +367,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			if (getFeatureModel().isFeatureOrderUserDefined()) {
 				final LinkedList<String> newFeatureOrderlist = new LinkedList<String>();
-				for (int i = 0; i < featurelist.getItemCount(); i++) {
-					newFeatureOrderlist.add(featurelist.getItem(i));
+				for (int i = 0; i < featureOrderTable.getList().size(); i++) {
+					newFeatureOrderlist.add(featureOrderTable.getItem(i));
 				}
 				FeatureUtils.setFeatureOrderList(getFeatureModel(), newFeatureOrderlist);
 			}
@@ -386,7 +376,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	private void enableUI(boolean selection) {
-		featurelist.setEnabled(selection);
+		featureOrderTable.setEnabled(selection);
 		up.setEnabled(selection);
 		down.setEnabled(selection);
 		defaultButton.setEnabled(selection);

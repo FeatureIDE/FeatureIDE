@@ -27,7 +27,7 @@ import org.prop4j.NodeWriter;
 /**
  * Transforms {@link Explanation explanations} into user-friendly strings in natural language.
  *
- * @param E explanation
+ * @param <E> explanation
  * @author Timo G&uuml;nther
  * @author Sofia Ananieva
  */
@@ -188,7 +188,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 
 	/**
 	 * Returns all reasons joined together.
-	 * 
+	 *
 	 * @return joined reasons
 	 */
 	public String getReasonsString() {
@@ -197,7 +197,7 @@ public abstract class ExplanationWriter<E extends Explanation<?>> {
 
 	/**
 	 * Returns the given reasons joined together.
-	 * 
+	 *
 	 * @param reasons reasons to join
 	 * @return joined reasons
 	 */

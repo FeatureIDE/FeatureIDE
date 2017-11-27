@@ -103,6 +103,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return composerExtensionProxy.getId();
 	}
 
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
 	void setComposerExtension(IComposerExtension composerExtensionProxy) {
 		this.composerExtensionProxy = composerExtensionProxy;
 	}

@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
  */
 public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
 
-	@SuppressWarnings("unchecked")
-	public FormatManager(T... formats) {
-		setExtensionLoaderInternal(new CoreExtensionLoader<>(formats));
+	@SafeVarargs
+	public FormatManager(Class<? extends T>... formats) {
+		setExtensionLoaderInternal(new CoreExtensionLoader<T>(formats));
 	}
 
 	protected FormatManager() {}

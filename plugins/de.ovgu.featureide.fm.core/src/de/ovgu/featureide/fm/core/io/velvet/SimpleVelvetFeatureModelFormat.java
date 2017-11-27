@@ -58,12 +58,14 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -76,7 +78,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Matthias Strauss
  * @author Reimar Schroeter
  */
-public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
+public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName();
 
@@ -779,8 +781,11 @@ public class SimpleVelvetFeatureModelFormat implements IFeatureModelFormat {
 	}
 
 	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead();
+	public boolean initExtension() {
+		if (super.initExtension()) {
+			FMFactoryManager.getFactoryWorkspace().assignID(SimpleVelvetFeatureModelFormat.ID, ExtendedFeatureModelFactory.ID);
+		}
+		return false;
 	}
 
 	@Override

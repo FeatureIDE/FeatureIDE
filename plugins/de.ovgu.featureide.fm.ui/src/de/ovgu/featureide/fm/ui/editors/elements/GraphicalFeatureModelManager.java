@@ -64,7 +64,7 @@ public class GraphicalFeatureModelManager extends FileManager<IGraphicalFeatureM
 	@CheckForNull
 	public static GraphicalFeatureModelManager getInstance(Path path, IGraphicalFeatureModel model) {
 		return FileManager.getInstance(path, new ObjectCreator(model), GraphicalFeatureModelManager.class,
-				new FormatManager<GraphicalFeatureModelFormat>(new GraphicalFeatureModelFormat()));
+				new FormatManager<GraphicalFeatureModelFormat>(GraphicalFeatureModelFormat.class));
 	}
 
 	public static IGraphicalFeatureModel load(Path path, IGraphicalFeatureModel model) {

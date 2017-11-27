@@ -34,15 +34,10 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.AnalysesCollection.ConstraintAnalysisWrapper;
 import de.ovgu.featureide.fm.core.AnalysesCollection.StringToFeature;
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintDeadStatus;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintFalseOptionalStatus;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintFalseSatisfiabilityStatus;
-import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintRedundancyStatus;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.analysis.FeatureModelProperties;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureDeterminedStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureSelectionStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
@@ -318,40 +313,24 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 			// set default values for constraint properties
 			for (final IConstraint constraint : featureModel.getConstraints()) {
-				if (analysesCollection.constraintRedundancyAnalysis.isEnabled()) {
-					getConstraintProperties(constraint).setConstraintRedundancyStatus(ConstraintRedundancyStatus.NORMAL);
-				}
-				if (analysesCollection.constraintVoidAnalysis.isEnabled()) {
-					getConstraintProperties(constraint).setConstraintSatisfiabilityStatus(ConstraintFalseSatisfiabilityStatus.SATISFIABLE);
-				}
-				if (analysesCollection.constraintAnomaliesAnalysis.isEnabled()) {
-					getConstraintProperties(constraint).setConstraintFalseOptionalStatus(ConstraintFalseOptionalStatus.NORMAL);
-					getConstraintProperties(constraint).setConstraintDeadStatus(ConstraintDeadStatus.NORMAL);
-				}
+				getConstraintProperties(constraint).resetStatus();
 			}
 
 			// get constraint anomalies
 			for (final IConstraint constraint : getRedundantConstraints()) {
-				getConstraintProperties(constraint).setConstraintRedundancyStatus(ConstraintRedundancyStatus.REDUNDANT);
+				getConstraintProperties(constraint).setStatus(ConstraintStatus.REDUNDANT);
 			}
 			for (final IConstraint constraint : getTautologyConstraints()) {
-				getConstraintProperties(constraint).setConstraintRedundancyStatus(ConstraintRedundancyStatus.TAUTOLOGY);
+				getConstraintProperties(constraint).setStatus(ConstraintStatus.TAUTOLOGY);
 			}
 			for (final IConstraint constraint : getVoidConstraints()) {
-				getConstraintProperties(constraint).setConstraintSatisfiabilityStatus(ConstraintFalseSatisfiabilityStatus.VOID_MODEL);
+				getConstraintProperties(constraint).setStatus(ConstraintStatus.VOID_MODEL);
 			}
 			for (final IConstraint constraint : getContradictoryConstraints()) {
-				getConstraintProperties(constraint).setConstraintSatisfiabilityStatus(ConstraintFalseSatisfiabilityStatus.UNSATISFIABLE);
+				getConstraintProperties(constraint).setStatus(ConstraintStatus.UNSATISFIABLE);
 			}
-			for (final IConstraint constraint : getAnomalyConstraints()) {
-				final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
-				if (!constraintProperties.getDeadFeatures().isEmpty()) {
-					constraintProperties.setConstraintDeadStatus(ConstraintDeadStatus.DEAD);
-				}
-				if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-					constraintProperties.setConstraintFalseOptionalStatus(ConstraintFalseOptionalStatus.FALSE_OPTIONAL);
-				}
-			}
+			
+			getAnomalyConstraints();
 		}
 	}
 
@@ -366,35 +345,36 @@ public class FeatureModelAnalyzer implements IEventListener {
 			}
 			// set default values for feature properties
 			for (final IFeature feature : featureModel.getFeatures()) {
-				getFeatureProperties(feature).setFeatureSelectionStatus(FeatureSelectionStatus.COMMON);
-				getFeatureProperties(feature).setFeatureDeterminedStatus(FeatureDeterminedStatus.UNKNOWN);
+				final FeatureProperties featureProperties = getFeatureProperties(feature);
+				featureProperties.resetStatus();
+				featureProperties.setStatus(FeatureStatus.COMMON);
 
 				final IFeatureStructure structure = feature.getStructure();
 				final IFeatureStructure parent = structure.getParent();
 				if (parent == null) {
-					getFeatureProperties(feature).setFeatureParentStatus(FeatureParentStatus.MANDATORY);
+					featureProperties.setStatus(FeatureStatus.MANDATORY);
 				} else {
 					if (parent.isAnd()) {
 						if (structure.isMandatorySet()) {
-							getFeatureProperties(feature).setFeatureParentStatus(FeatureParentStatus.MANDATORY);
+							featureProperties.setStatus(FeatureStatus.MANDATORY);
 						} else {
-							getFeatureProperties(feature).setFeatureParentStatus(FeatureParentStatus.OPTIONAL);
+							featureProperties.setStatus(FeatureStatus.OPTIONAL);
 						}
 					} else {
-						getFeatureProperties(feature).setFeatureParentStatus(FeatureParentStatus.GROUP);
+						featureProperties.setStatus(FeatureStatus.GROUP);
 					}
 				}
 			}
 
 			// get feature anomalies
 			for (final IFeature feature : getDeadFeatures()) {
-				getFeatureProperties(feature).setFeatureSelectionStatus(FeatureSelectionStatus.DEAD);
+				getFeatureProperties(feature).setStatus(FeatureStatus.DEAD);
 			}
 			for (final IFeature feature : getFalseOptionalFeatures()) {
-				getFeatureProperties(feature).setFeatureParentStatus(FeatureParentStatus.FALSE_OPTIONAL);
+				getFeatureProperties(feature).setStatus(FeatureStatus.FALSE_OPTIONAL);
 			}
 			for (final IFeature feature : getIndeterminedHiddenFeatures()) {
-				getFeatureProperties(feature).setFeatureDeterminedStatus(FeatureDeterminedStatus.INDETERMINATE_HIDDEN);
+				getFeatureProperties(feature).setStatus(FeatureStatus.INDETERMINATE_HIDDEN);
 			}
 		}
 	}
@@ -504,20 +484,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 			final ConstraintProperties constraintProperties = getConstraintProperties(constraint);
 
 			if (constraintProperties != null) {
-				switch (constraintProperties.getConstraintRedundancyStatus()) {
-				case REDUNDANT:
-				case TAUTOLOGY:
-					break;
-				case IMPLICIT:
+				if (constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
 					explanation = constraintProperties.getRedundantExplanation();
 					if (explanation != null) {
 						// TODO use context
 						explanation = analysesCollection.createExplanation(analysesCollection.redundantConstraintExplanationCreator, constraint, context);
 						constraintProperties.setRedundantExplanation(explanation);
 					}
-					break;
-				default:
-					break;
 				}
 			}
 			return explanation;
@@ -535,27 +508,19 @@ public class FeatureModelAnalyzer implements IEventListener {
 			Explanation<?> explanation = null;
 			final FeatureProperties featureProperties = getFeatureProperties(feature);
 			if (featureProperties != null) {
-				switch (featureProperties.getFeatureSelectionStatus()) {
-				case DEAD:
+				if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 					explanation = featureProperties.getDeadExplanation();
 					if (explanation != null) {
 						explanation = analysesCollection.createExplanation(analysesCollection.deadFeatureExplanationCreator, feature, context);
 						featureProperties.setDeadExplanation(explanation);
 					}
-					break;
-				default:
-					break;
 				}
-				switch (featureProperties.getFeatureParentStatus()) {
-				case FALSE_OPTIONAL:
+				if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 					explanation = featureProperties.getFalseOptionalExplanation();
 					if (explanation != null) {
 						explanation = analysesCollection.createExplanation(analysesCollection.falseOptionalFeatureExplanationCreator, feature, context);
 						featureProperties.setFalseOptionalExplanation(explanation);
 					}
-					break;
-				default:
-					break;
 				}
 			}
 			return explanation;

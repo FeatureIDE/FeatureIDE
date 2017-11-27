@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +39,13 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.analysis.ConstraintProperties;
+import de.ovgu.featureide.fm.core.analysis.ConstraintProperties.ConstraintStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -58,7 +59,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ConstraintFigure extends ModelElementFigure implements GUIDefaults {
 
-	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
+	public final static String VOID_MODEL = StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String TAUTOLOGY = CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 	public final static String DEAD_FEATURE = "Constraint makes following features dead:";
@@ -103,14 +104,13 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 
 	private void init() {
 		setText(getConstraintText(graphicalConstraint.getObject()));
-
 		setBorder(FMPropertyManager.getConstraintBorder(graphicalConstraint.isFeatureSelected()));
 		setToolTip(null);
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
 	/**
-	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}.
+	 * Sets the properties <i>icon, border and tooltips</i> of the {@link ConstraintFigure}.
 	 */
 	public void setConstraintProperties() {
 		init();
@@ -119,72 +119,63 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		final IFigure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(new GridLayout());
 
-		switch (constraintProperties.getConstraintSatisfiabilityStatus()) {
-		case SATISFIABLE:
-			break;
-		case VOID_MODEL:
+		if (constraintProperties.hasStatus(ConstraintStatus.SATISFIABLE)) {
+			label.setIcon(null);
+		} else if (constraintProperties.hasStatus(ConstraintStatus.VOID_MODEL)) {
+			label.setIcon(null);
+			add(label);
 			toolTipContent.add(new Label(VOID_MODEL));
-			break;
-		case UNSATISFIABLE:
+		} else if (constraintProperties.hasStatus(ConstraintStatus.UNSATISFIABLE)) {
+			label.setIcon(null);
 			toolTipContent.add(new Label(UNSATISFIABLE));
-			break;
-		default:
-			break;
 		}
 
-		switch (constraintProperties.getConstraintRedundancyStatus()) {
-		case NORMAL:
-			break;
-		case TAUTOLOGY:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
+		if (constraintProperties.hasStatus(ConstraintStatus.TAUTOLOGY)) {
+			label.setIcon(null);
+			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
-			break;
-		case REDUNDANT:
-		case IMPLICIT:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
+		} else if (constraintProperties.hasStatus(ConstraintStatus.REDUNDANT) || constraintProperties.hasStatus(ConstraintStatus.IMPLICIT)) {
+			label.setIcon(FM_INFO);
+			add(label);
 			toolTipContent.add(new Label(REDUNDANCE));
-			break;
-		default:
-			break;
 		}
 
-		switch (constraintProperties.getConstraintDeadStatus()) {
-		case DEAD:
-			if (!constraintProperties.getDeadFeatures().isEmpty()) {
-				final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
-				Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
+		if (!constraintProperties.getDeadFeatures().isEmpty()) {
+			label.setIcon(null);
+			final List<String> deadFeatures = Functional.mapToList(constraintProperties.getDeadFeatures(), new Functional.ToStringFunction<IFeature>());
+			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
 
-				String s = DEAD_FEATURE;
-				for (final String dead : deadFeatures) {
-					s += "\n\u2022 " + dead;
-				}
-				toolTipContent.add(new Label(s));
+			String s = DEAD_FEATURE;
+			for (final String dead : deadFeatures) {
+				s += "\n\u2022 " + dead;
 			}
-		default:
-			break;
+			toolTipContent.add(new Label(s));
 		}
 
-		switch (constraintProperties.getConstraintFalseOptionalStatus()) {
-		case NORMAL:
-			break;
-		case FALSE_OPTIONAL:
-			if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
-				final List<String> falseOptionalFeatures =
-					Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
-				Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
+		if (!constraintProperties.getFalseOptionalFeatures().isEmpty()) {
+			label.setIcon(null);
+			final List<String> falseOptionalFeatures =
+				Functional.mapToList(constraintProperties.getFalseOptionalFeatures(), new Functional.ToStringFunction<IFeature>());
+			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
 
-				String s = FALSE_OPTIONAL;
-				for (final String feature : falseOptionalFeatures) {
-					s += "\n\u2022 " + feature;
-				}
-				toolTipContent.add(new Label(s));
+			String s = FALSE_OPTIONAL;
+			for (final String feature : falseOptionalFeatures) {
+				s += "\n\u2022 " + feature;
 			}
-			break;
-		default:
-			break;
+			toolTipContent.add(new Label(s));
+		}
+
+		final String description = graphicalConstraint.getObject().getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			toolTipContent.add(new Label("Description:"));
+			toolTipContent.add(new Label(description));
+		} else {
+			toolTipContent.add(new Label("No Description"));
 		}
 
 		if (getActiveReason() != null) {
+			add(label);
+
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 			final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
 			String explanationString = "This constraint is involved in the selected defect:";
@@ -195,33 +186,26 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		if (!toolTipContent.getChildren().isEmpty()) {
 			setToolTip(toolTipContent);
 		}
+
+		setText(label.getText());
 	}
 
 	private String getConstraintText(IConstraint constraint) {
 		return constraint.getNode().toString(symbols);
 	}
 
+	/**
+	 * Sets the <i>text</i> and the <i>size</i> of the bounds of the {@link ConstraintFigure} with respect to the text and icon
+	 */
 	private void setText(String newText) {
 		label.setText(newText);
-		final Dimension labelSize = label.getPreferredSize();
-
-		if (labelSize.equals(label.getSize())) {
-			return;
-		}
+		final Dimension labelSize = new Dimension(label.getPreferredSize());
 		label.setSize(labelSize);
 
-		final Rectangle bounds = getBounds();
 		final int w = CONSTRAINT_INSETS.getWidth();
 		final int h = CONSTRAINT_INSETS.getHeight();
-		bounds.setSize(labelSize.expand(w, h));
+		setSize(labelSize.expand(w, h));
 
-		final Dimension oldSize = getSize();
-		if (!oldSize.equals(0, 0)) {
-			final int dx = (oldSize.width - bounds.width) / 2;
-			bounds.x += dx;
-		}
-
-		setBounds(bounds);
 	}
 
 	public Rectangle getLabelBounds() {

@@ -69,6 +69,11 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "Name: " + name + "; ID: " + id;
 	}

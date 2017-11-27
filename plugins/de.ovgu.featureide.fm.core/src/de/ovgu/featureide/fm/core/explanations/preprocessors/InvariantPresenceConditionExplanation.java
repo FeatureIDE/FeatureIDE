@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations.preprocessors;
 
 import org.prop4j.Node;
+import org.prop4j.Not;
 
 /**
  * An explanation for a contradiction or a tautology in the presence condition of a preprocessor directive.
@@ -57,6 +58,11 @@ public class InvariantPresenceConditionExplanation extends PreprocessorExplanati
 	 */
 	public void setTautology(boolean tautology) {
 		this.tautology = tautology;
+	}
+
+	@Override
+	public Node getImplication() {
+		return isTautology() ? getSubject() : new Not(getSubject());
 	}
 
 	@Override

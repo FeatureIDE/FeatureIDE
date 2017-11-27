@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MO
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,8 +41,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ArmEvent;
@@ -88,6 +85,7 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.analysis.FeatureProperties;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.Nodes;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -113,7 +111,6 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
@@ -1151,21 +1148,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			return null;
 		}
 		final FeatureProperties featureProperties = FeatureModelManager.getAnalyzer(fm).getFeatureProperties(automaticSelection.getFeature());
-		switch (featureProperties.getFeatureSelectionStatus()) {
-		case DEAD:
+		if (featureProperties.hasStatus(FeatureStatus.DEAD)) {
 			deadFeatureExplanationCreator.setFeatureModel(fm);
 			deadFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 			return deadFeatureExplanationCreator.getExplanation();
-		default:
-			break;
 		}
-		switch (featureProperties.getFeatureParentStatus()) {
-		case FALSE_OPTIONAL:
+		if (featureProperties.hasStatus(FeatureStatus.FALSE_OPTIONAL)) {
 			falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
 			falseOptionalFeatureExplanationCreator.setSubject(automaticSelection.getFeature());
 			return falseOptionalFeatureExplanationCreator.getExplanation();
-		default:
-			break;
 		}
 		automaticSelectionExplanationCreator.setConfiguration(config);
 		automaticSelectionExplanationCreator.setSubject(automaticSelection);
@@ -1196,26 +1187,27 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						updateInfoLabel(currentDisplay);
 						autoExpand(currentDisplay);
 						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
-						if (configurationEditor instanceof ConfigurationEditor) {
-							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
-							// Get current configuration
-							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-							// Cast is necessary for backward compatibility, don't remove
-							final IFile document = getEditorInput().getAdapter(IFile.class);
-
-							byte[] content;
-							try {
-								content = new byte[document.getContents().available()];
-								document.getContents().read(content);
-								if (!source.equals(new String(content))) {
-									setDirty();
-								}
-							} catch (final IOException e) {
-								FMUIPlugin.getDefault().logError(e);
-							} catch (final CoreException e) {
-								FMUIPlugin.getDefault().logError(e);
-							}
-						}
+						// XXX Prevents configuration files from being deleted (read/write conflict)
+//						if (configurationEditor instanceof ConfigurationEditor) {
+//							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
+//							// Get current configuration
+//							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+//							// Cast is necessary, don't remove
+//							final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
+//
+//							byte[] content;
+//							try {
+//								content = new byte[document.getContents().available()];
+//								document.getContents().read(content);
+//								if (!source.equals(new String(content))) {
+//									setDirty();
+//								}
+//							} catch (final IOException e) {
+//								FMUIPlugin.getDefault().logError(e);
+//							} catch (final CoreException e) {
+//								FMUIPlugin.getDefault().logError(e);
+//							}
+//						}
 					}
 				}
 			});

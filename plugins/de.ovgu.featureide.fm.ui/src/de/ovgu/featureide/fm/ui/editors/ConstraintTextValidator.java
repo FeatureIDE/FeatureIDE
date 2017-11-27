@@ -43,7 +43,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureParentStatus;
+import de.ovgu.featureide.fm.core.analysis.FeatureProperties.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -157,7 +157,7 @@ public final class ConstraintTextValidator {
 
 		for (final IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
-				if ((analyzer.getFeatureProperties(feature).getFeatureParentStatus() == FeatureParentStatus.FALSE_OPTIONAL) && !list.contains(feature)) {
+				if (analyzer.getFeatureProperties(feature).hasStatus(FeatureStatus.FALSE_OPTIONAL) && !list.contains(feature)) {
 					list.add(feature);
 				}
 			}

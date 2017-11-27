@@ -71,7 +71,6 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -95,18 +94,8 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	}
 
 	@Override
-	public IPersistentFormat<IFeatureModel> getInstance() {
+	public SXFMFormat getInstance() {
 		return new SXFMFormat();
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
 	}
 
 	@Override

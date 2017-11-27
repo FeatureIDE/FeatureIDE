@@ -66,6 +66,7 @@ public class German implements ILanguage {
 	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
 	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
+	private static final String VOID_MODEL = "Unerfüllbare Produktlinie";
 
 	@Override
 	public String getRedundantConst() {
@@ -90,6 +91,11 @@ public class German implements ILanguage {
 	@Override
 	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
+	}
+
+	@Override
+	public String getVoidModel() {
+		return VOID_MODEL;
 	}
 
 	@Override

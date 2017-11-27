@@ -21,12 +21,23 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * A FeatureIDE extension with its ID.
+ * A FeatureIDE extension with its ID.<br/> <b>NOTE:</b> All extensions should provide a default/nullary constructor.
  *
  * @author Tom Brosch
+ * @author Sebastian Krieter
  */
 public interface IExtension {
 
-	public abstract String getId();
+	/**
+	 * @return the unique ID of this extension.
+	 */
+	String getId();
+
+	/**
+	 * Is called, when the extension is loaded for the first time by the {@link ExtensionManager}.
+	 *
+	 * @return {@code true} if the initialization was successful, {@code false} otherwise.
+	 */
+	boolean initExtension();
 
 }

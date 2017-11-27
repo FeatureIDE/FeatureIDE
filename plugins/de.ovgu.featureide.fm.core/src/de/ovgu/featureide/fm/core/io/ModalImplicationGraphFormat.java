@@ -100,4 +100,9 @@ public class ModalImplicationGraphFormat implements IModalImplicationGraphFormat
 		return "ModalImplicationGraph";
 	}
 
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
 }
