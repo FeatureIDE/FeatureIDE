@@ -255,7 +255,9 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
 				attributeNode.setAttribute(XMLFeatureModelTags.NAME, featureAttribute.getName());
 				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType());
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
+				if (featureAttribute.getValue() != null) {
+					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
+				}
 				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_UNIT, featureAttribute.getUnit());
 				if (featureAttribute.isRecursive()) {
 					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_RECURSIVE, XMLFeatureModelTags.TRUE);
@@ -557,12 +559,12 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (nodeName.equals(ATTRIBUTE)) {
 				if (e.hasAttributes()) {
 					final NamedNodeMap nodeMapFeatureAttribute = e.getAttributes();
-					String configurable = "";
-					String recursive = "";
-					String name = "";
-					String unit = "";
-					String value = "";
-					String type = "";
+					String configurable = null;
+					String recursive = null;
+					String name = null;
+					String unit = null;
+					String value = null;
+					String type = null;
 					for (int i = 0; i < nodeMapFeatureAttribute.getLength(); i++) {
 						final org.w3c.dom.Node node = nodeMapFeatureAttribute.item(i);
 						final String attributeName = node.getNodeName();
@@ -584,6 +586,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 							throwError("Unknown feature attribute: " + attributeName, e);
 						}
 					}
+					// TODO ATTRIBUTE Error marker for missing name and/or type
 					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
 					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute);
 					if (featureAttribute != null) {

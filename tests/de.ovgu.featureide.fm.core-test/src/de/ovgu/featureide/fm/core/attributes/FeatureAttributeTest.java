@@ -47,7 +47,8 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 /**
  * TODO description
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeTest {
 

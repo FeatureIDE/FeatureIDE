@@ -44,11 +44,17 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 		final Boolean recursive = Boolean.parseBoolean(attributeData.isRecursive());
 		switch (attributeData.getType()) {
 		case FeatureAttribute.BOOLEAN:
-			final Boolean valueBoolean = Boolean.parseBoolean(attributeData.getValue());
+			Boolean valueBoolean = null;
+			if (attributeData.getValue() != null) {
+				valueBoolean = Boolean.parseBoolean(attributeData.getValue());
+			}
 			return (new BooleanFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
 		case FeatureAttribute.LONG:
 			try {
-				final Long valueLong = Long.parseLong(attributeData.getValue());
+				Long valueLong = null;
+				if (attributeData.getValue() != null) {
+					valueLong = Long.parseLong(attributeData.getValue());
+				}
 				return (new LongFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
@@ -56,7 +62,10 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			}
 		case FeatureAttribute.DOUBLE:
 			try {
-				final Double valueDouble = Double.parseDouble(attributeData.getValue());
+				Double valueDouble = null;
+				if (attributeData.getValue() != null) {
+					valueDouble = Double.parseDouble(attributeData.getValue());
+				}
 				return (new DoubleFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));

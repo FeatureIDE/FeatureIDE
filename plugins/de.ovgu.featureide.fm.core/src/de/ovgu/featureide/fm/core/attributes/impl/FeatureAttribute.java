@@ -63,6 +63,9 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public String getName() {
+		if (name == null) {
+			return "";
+		}
 		return name;
 	}
 
@@ -72,6 +75,9 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public String getUnit() {
+		if (unit == null) {
+			return "";
+		}
 		return unit;
 	}
 

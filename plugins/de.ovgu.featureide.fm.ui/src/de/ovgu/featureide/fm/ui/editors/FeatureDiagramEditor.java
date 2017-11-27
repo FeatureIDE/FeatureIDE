@@ -978,6 +978,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
+			setDirty(true);
 			break;
 		case DEFAULT:
 			break;

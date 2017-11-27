@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.views.attributes;
 import java.util.EventObject;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -46,7 +45,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -76,7 +74,7 @@ import de.ovgu.featureide.fm.ui.views.attributes.editingsupport.FeatureAttribute
  *
  * @author Joshua Sprey
  */
-public class FeatureAttributeView extends ViewPart implements IEventListener, ISaveablePart {
+public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	public FeatureAttributeView() {
 		super();
@@ -84,14 +82,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 		cachedImages = new HashMap<String, Image>();
 		cachedImages.put(imgFeature, FMUIPlugin.getImage(imgFeature));
 		cachedImages.put(imgAttribute, FMUIPlugin.getImage(imgAttribute));
-		cachedImages.put(imgSelected, FMUIPlugin.getImage(imgSelected));
-		cachedImages.put(imgDeSelected, FMUIPlugin.getImage(imgDeSelected));
+		cachedImages.put(checkboxEnabled, FMUIPlugin.getImage(checkboxEnabled));
+		cachedImages.put(checkboxDisabled, FMUIPlugin.getImage(checkboxDisabled));
 	}
 
 	private final static String imgFeature = "FeatureIconSmall.ico";
 	private final static String imgAttribute = "message_warning.gif";
-	private final static String imgSelected = "selected.ico";
-	private final static String imgDeSelected = "deselected.ico";
+	private final static String checkboxEnabled = "icon_reg_enable.ico"; // TODO ATTRIBUTE find better icos
+	private final static String checkboxDisabled = "icon_reg_disable.ico";
 	private final HashMap<String, Image> cachedImages;
 
 	private Tree tree;
@@ -114,8 +112,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 	private FeatureAttributeValueEditingSupport valueEditingSupport;
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
-
-	private boolean dirty = false;
 
 	private final IPartListener editorListener = new IPartListener() {
 
@@ -334,7 +330,10 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 					return "-";
 				} else if (element instanceof IFeatureAttribute) {
 					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.getValue().toString();
+					if (attribute.getValue() != null) {
+						return attribute.getValue().toString();
+					}
+					return "";
 				}
 				return "null";
 			}
@@ -373,9 +372,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 			public Image getImage(Object element) {
 				if (element instanceof IFeatureAttribute) {
 					if (((IFeatureAttribute) element).isRecursive()) {
-						return cachedImages.get(imgSelected);
+						return cachedImages.get(checkboxEnabled);
 					} else {
-						return cachedImages.get(imgDeSelected);
+						return cachedImages.get(checkboxDisabled);
 					}
 				}
 				return null;
@@ -397,9 +396,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 			public Image getImage(Object element) {
 				if (element instanceof IFeatureAttribute) {
 					if (((IFeatureAttribute) element).isConfigurable()) {
-						return cachedImages.get(imgSelected);
+						return cachedImages.get(checkboxEnabled);
 					} else {
-						return cachedImages.get(imgDeSelected);
+						return cachedImages.get(checkboxDisabled);
 					}
 				}
 				return null;
@@ -483,7 +482,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 		if (event.getEventType() == EventType.MODEL_DATA_SAVED) {
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.refresh(featureModel); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
-				setDirty(false);
 			}
 		} else if (event.getEventType() == EventType.FEATURE_ATTRIBUTE_CHANGED) {
 			if (event.getSource() instanceof IFeature) {
@@ -492,7 +490,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 				}
 				treeViewer.expandAll();
 			}
-			setDirty(true);
 		}
 	}
 
@@ -509,62 +506,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener, IS
 		}
 		currentEditor = null;
 		super.dispose();
-	}
-
-	public void setDirty(boolean dirty) {
-		this.dirty = dirty;
-		firePropertyChange(PROP_DIRTY);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		// TODO ATTRIBUTE save model on you own
-		if (currentEditor instanceof FeatureModelEditor) {
-			((FeatureModelEditor) currentEditor).doSave(monitor);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
-	 */
-	@Override
-	public void doSaveAs() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#isDirty()
-	 */
-	@Override
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
-	 */
-	@Override
-	public boolean isSaveAsAllowed() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
-	 */
-	@Override
-	public boolean isSaveOnCloseNeeded() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

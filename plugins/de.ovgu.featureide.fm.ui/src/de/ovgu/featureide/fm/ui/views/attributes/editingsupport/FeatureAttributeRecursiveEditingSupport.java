@@ -74,7 +74,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	@Override
 	protected void setValue(Object element, Object value) {
 		((IFeatureAttribute) element).setRecursive((Boolean) value);
-		view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		getViewer().update(element, null);
 	}
 

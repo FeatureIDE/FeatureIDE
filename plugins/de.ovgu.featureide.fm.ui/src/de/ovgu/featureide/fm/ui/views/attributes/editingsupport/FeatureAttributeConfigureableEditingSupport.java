@@ -74,7 +74,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	@Override
 	protected void setValue(Object element, Object value) {
 		((IFeatureAttribute) element).setConfigureable((Boolean) value);
-		view.propertyChange(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		getViewer().update(element, null);
 	}
 }
