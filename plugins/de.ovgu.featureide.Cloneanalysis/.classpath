@@ -1,64 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib"
-		path="lib/jcommon-1.0.23.jar" />
-	<classpathentry exported="true" kind="lib"
-		path="lib/jfreechart-1.0.19.jar" />
-	<classpathentry kind="con"
-		path="org.eclipse.pde.core.requiredPlugins" />
-	<classpathentry kind="lib" path="lib/pmd-core-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-core-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-java-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-java-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/commons-io-2.4-sources.jar" />
-	<classpathentry kind="lib" path="lib/asm-5.0.3.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/asm-5.0.3-sources.jar" />
-	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/commons-lang3-3.3.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/javacc-5.0.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/javacc-5.0-sources.jar" />
-	<classpathentry kind="lib" path="lib/jaxen-1.1.4.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/jaxen-1.1.4-sources.jar" />
-	<classpathentry kind="lib" path="lib/jcommander-1.35.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/jcommander-1.35-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-cpp-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-cpp-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-cs-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-cs-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-fortran-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-fortran-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-go-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-go-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-javascript-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-javascript-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-jsp-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-jsp-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-php-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-php-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-plsql-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-plsql-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-ruby-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-ruby-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-vm-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-vm-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/pmd-xml-5.2.2.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-xml-5.2.2-sources.jar" />
-	<classpathentry kind="lib" path="lib/rhino-1.7R4.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/rhino-1.7R4-sources.jar" />
-	<classpathentry kind="lib" path="lib/saxon-9.1.0.8-dom.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/saxon-9.1.0.8-sources.jar" />
-	<classpathentry kind="lib" path="lib/saxon-9.1.0.8.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/saxon-9.1.0.8-sources.jar" />
-	<classpathentry kind="lib" path="lib/xercesImpl-2.11.0.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/xercesImpl-2.11.0-sources.jar" />
-	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/xml-apis-1.4.01-sources.jar" />
-	<classpathentry kind="src" path="src" />
-	<classpathentry kind="con"
-		path="org.eclipse.jdt.launching.JRE_CONTAINER" />
-	<classpathentry kind="lib"
-		path="lib/openjfx-78-backport-1.8.0-ea-b96.1.jar"
-		sourcepath="C:/Users/Oyewale/.sourceattacher/openjfx-78-backport-1.8.0-ea-b96.1-sources.jar" />
-	<classpathentry kind="output" path="bin" />
+	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.23.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/pmd-core-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-core-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-java-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-java-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/commons-io-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/asm-5.0.3.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/asm-5.0.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/commons-lang3-3.3.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/javacc-5.0.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/javacc-5.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen-1.1.4.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/jaxen-1.1.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jcommander-1.35.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/jcommander-1.35-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-cpp-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-cpp-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-cs-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-cs-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-fortran-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-fortran-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-go-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-go-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-javascript-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-javascript-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-jsp-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-jsp-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-php-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-php-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-plsql-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-plsql-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-ruby-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-ruby-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-vm-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-vm-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-xml-5.2.2.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/pmd-xml-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/rhino-1.7R4.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/rhino-1.7R4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/saxon-9.1.0.8-dom.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/saxon-9.1.0.8-sources.jar"/>
+	<classpathentry kind="lib" path="lib/saxon-9.1.0.8.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/saxon-9.1.0.8-sources.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.11.0.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/xercesImpl-2.11.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/xml-apis-1.4.01-sources.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/openjfx-78-backport-1.8.0-ea-b96.1.jar" sourcepath="C:/Users/Oyewale/.sourceattacher/openjfx-78-backport-1.8.0-ea-b96.1-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

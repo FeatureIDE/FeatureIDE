@@ -9,11 +9,4 @@
 	</parent>
 	<artifactId>de.ovgu.featureide.core.featurehouse</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<dependencies>
-		<dependency>
-			<groupId>de.ovgu.featureide.Cloneanalysis</groupId>
-			<artifactId>de.ovgu.featureide.Cloneanalysis</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-	</dependencies>
 </project>

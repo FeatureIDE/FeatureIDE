@@ -12,8 +12,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Pattern;
-
 import de.ovgu.featureide.cloneanalysis.results.CloneAnalysisResults;
 import de.ovgu.featureide.cloneanalysis.results.VariantAwareClone;
 
