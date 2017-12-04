@@ -26,6 +26,8 @@ import java.util.HashMap;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
@@ -46,6 +48,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -59,6 +62,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 import de.ovgu.featureide.fm.ui.views.attributes.actions.AddFeatureAttributeAction;
@@ -113,6 +117,15 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
+	private final IPageChangedListener pageListener = new IPageChangedListener() {
+
+		@Override
+		public void pageChanged(PageChangedEvent event) {
+			event.getSelectedPage().toString();
+
+		}
+
+	};
 	private final IPartListener editorListener = new IPartListener() {
 
 		@Override
@@ -429,10 +442,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			repackAllColumns();
 			return;
 		}
-		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)) {
+		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
+			&& (activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
 			currentEditor = activeWorkbenchPart;
 			final FeatureModelEditor editor = (FeatureModelEditor) activeWorkbenchPart;
 			editor.addEventListener(this);
+			editor.addPageChangedListener(pageListener);
 			setFeatureModel(editor.getFeatureModel());
 			if (!treeViewer.getControl().isDisposed()) {
 				treeViewer.setInput(featureModel);
@@ -440,14 +455,31 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			treeViewer.expandAll();
 			repackAllColumns();
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
-			currentEditor = activeWorkbenchPart;
-			final ConfigurationEditor editor = (ConfigurationEditor) activeWorkbenchPart;
-			setFeatureModel(editor.getConfiguration().getFeatureModel());
-			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(featureModel);
+			setEditorContent(null);
+		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
+			&& !(activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
+			setEditorContent(null);
+		}
+	}
+
+	private void setEditorContentByPage(IWorkbenchPage page) {
+		if (currentEditor instanceof FeatureModelEditor) {
+			if (page instanceof FeatureDiagramEditor) {
+				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
+				setFeatureModel(editor.getFeatureModel());
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(featureModel);
+				}
+				treeViewer.expandAll();
+				repackAllColumns();
+			} else {
+				setFeatureModel(null);
+				if (!treeViewer.getControl().isDisposed()) {
+					treeViewer.setInput(FeatureAttributeContentProvider.EMPTY_ROOT);
+				}
+				repackAllColumns();
+				return;
 			}
-			treeViewer.expandAll();
-			repackAllColumns();
 		}
 	}
 
