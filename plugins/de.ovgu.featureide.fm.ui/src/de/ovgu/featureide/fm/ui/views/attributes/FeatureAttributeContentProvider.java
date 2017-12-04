@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
-	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
+	public static final Object[] EMPTY_ROOT = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 
 	private IFeatureModel featureModel;
 	private Object[] features = EMPTY_ROOT;

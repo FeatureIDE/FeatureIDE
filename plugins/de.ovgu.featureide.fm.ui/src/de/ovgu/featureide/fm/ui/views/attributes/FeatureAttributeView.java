@@ -48,7 +48,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
@@ -121,8 +120,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 		@Override
 		public void pageChanged(PageChangedEvent event) {
-			event.getSelectedPage().toString();
-
+			setEditorContentByPage(event.getSelectedPage());
 		}
 
 	};
@@ -437,23 +435,18 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			if (currentEditor instanceof FeatureModelEditor) {
 				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 				editor.removeEventListener(this);
+				editor.removePageChangedListener(pageListener);
 			}
 			currentEditor = null;
 			repackAllColumns();
 			return;
 		}
-		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
-			&& (activeWorkbenchPart.getSite() instanceof FeatureDiagramEditor)) {
-			currentEditor = activeWorkbenchPart;
+		if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)) {
 			final FeatureModelEditor editor = (FeatureModelEditor) activeWorkbenchPart;
+			currentEditor = activeWorkbenchPart;
 			editor.addEventListener(this);
 			editor.addPageChangedListener(pageListener);
-			setFeatureModel(editor.getFeatureModel());
-			if (!treeViewer.getControl().isDisposed()) {
-				treeViewer.setInput(featureModel);
-			}
-			treeViewer.expandAll();
-			repackAllColumns();
+			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
 			setEditorContent(null);
 		} else if ((activeWorkbenchPart instanceof FeatureModelEditor) && (currentEditor != activeWorkbenchPart)
@@ -462,7 +455,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		}
 	}
 
-	private void setEditorContentByPage(IWorkbenchPage page) {
+	private void setEditorContentByPage(Object page) {
 		if (currentEditor instanceof FeatureModelEditor) {
 			if (page instanceof FeatureDiagramEditor) {
 				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;

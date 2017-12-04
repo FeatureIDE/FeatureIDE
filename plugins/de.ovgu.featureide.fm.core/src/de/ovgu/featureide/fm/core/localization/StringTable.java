@@ -795,7 +795,7 @@ public class StringTable {
 	public static final String OK = "OK";
 	public static final String DATA_WAS_SUCCESSFULLY_EXPORTED_ = "Data was successfully exported.";
 	public static final String SUCCESS = "Success";
-	public static final String PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT = "Please open a file from a FeatureIDE project";
+	public static final String PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR = "Please open a feature diagram editor.";
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL = "Semantical statistics";

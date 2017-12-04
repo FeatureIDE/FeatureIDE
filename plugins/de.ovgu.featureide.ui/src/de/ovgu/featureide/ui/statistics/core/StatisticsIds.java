@@ -48,7 +48,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_ROLE
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_TERMINAL_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQUE_FIELDS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQUE_METHODS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RELATIVE_NUMBER_OF_FEATURES_IN_CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
@@ -73,7 +73,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public interface StatisticsIds {
 
-	public static final String OPEN_FILE = PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+	public static final String OPEN_FILE = PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR;
 	public static final String PRODUCT_LINE_IMPLEMENTATION = STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
 	public static final String CONTRACT_COMPLEXITY = STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
 	public static final String SEMANTICAL_STATISTICS = SEMANTICAL_STATISTICS_OF_THE_FEATURE_MODEL;

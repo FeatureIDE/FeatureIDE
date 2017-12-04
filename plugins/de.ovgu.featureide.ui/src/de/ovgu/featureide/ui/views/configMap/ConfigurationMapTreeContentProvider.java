@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  */
 public class ConfigurationMapTreeContentProvider implements ITreeContentProvider, IConfigurationMapFilterable {
 
-	private static final Object[] emptyRoot = new Object[] { StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT };
+	private static final Object[] emptyRoot = new Object[] { StringTable.PLEASE_OPEN_A_FEATURE_DIAGRAM_EDITOR };
 
 	private IFeatureProject featureProject;
 	private Object[] featureRoots = emptyRoot;
