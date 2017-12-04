@@ -91,8 +91,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	private final static String imgFeature = "FeatureIconSmall.ico";
 	private final static String imgAttribute = "attribute_obj.ico";
-	private final static String checkboxEnabled = "icon_reg_enable.ico"; // TODO ATTRIBUTE find better icos
-	private final static String checkboxDisabled = "icon_reg_disable.ico";
+	private final static String checkboxEnabled = "icon_reg_enable.png"; // TODO ATTRIBUTE find better icos
+	private final static String checkboxDisabled = "icon_reg_disable.png";
 	private final HashMap<String, Image> cachedImages;
 
 	private Tree tree;
