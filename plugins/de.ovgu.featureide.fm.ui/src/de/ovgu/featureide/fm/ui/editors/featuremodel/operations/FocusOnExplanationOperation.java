@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL_BUT_EXPLANATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_EXPLANATION;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  *
  * @author Timo G&uuml;nther
  */
-public class CollapseAllButExplanationOperation extends AbstractCollapseOperation {
+public class FocusOnExplanationOperation extends AbstractCollapseOperation {
 
 	/** The currently active explanation. */
 	private final FeatureModelExplanation<?> explanation;
@@ -50,8 +50,8 @@ public class CollapseAllButExplanationOperation extends AbstractCollapseOperatio
 	 * @param fm the feature model context
 	 * @param explanation the currently active explanation
 	 */
-	public CollapseAllButExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation<?> explanation) {
-		super(fm, COLLAPSE_ALL_BUT_EXPLANATION);
+	public FocusOnExplanationOperation(IGraphicalFeatureModel fm, FeatureModelExplanation<?> explanation) {
+		super(fm, FOCUS_ON_EXPLANATION);
 		this.explanation = explanation;
 	}
 

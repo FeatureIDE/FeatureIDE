@@ -632,7 +632,7 @@ public class StringTable {
 	public static final String CONSTRAINT_ELEMENT = "constraint element";
 	public static final String COLLAPSE_ALL = "Collapse All";
 	public static final String EXPAND_ALL = "Expand All";
-	public static final String COLLAPSE_ALL_BUT_EXPLANATION = "Collapse All But Explanation";
+	public static final String FOCUS_ON_EXPLANATION = "Focus on Explanation";
 	public static final String CREATE_FEATURE_BELOW = "Create Feature Below";
 	public static final String RENAME = "Rename";
 	public static final String NO_DATA_TO_DISPLAY_AVAILABLE_ = "No data to display available.";

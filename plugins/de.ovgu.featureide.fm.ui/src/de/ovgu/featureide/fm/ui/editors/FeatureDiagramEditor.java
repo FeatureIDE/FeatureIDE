@@ -118,7 +118,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllButExplanationAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -192,7 +192,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private CollapseAllAction expandAllAction;
-	private CollapseAllButExplanationAction collapseAllButExplanationAction;
+	private FocusOnExplanationAction focusOnExplanationAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
@@ -492,7 +492,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		collapseFeaturesAction = new CollapseSiblingsAction(this, graphicalFeatureModel);
 		collapseAllAction = new CollapseAllAction(this, graphicalFeatureModel, true, COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(FmOutlinePageContextMenu.IMG_COLLAPSE); // icon for collapse added
-		collapseAllButExplanationAction = new CollapseAllButExplanationAction(getGraphicalFeatureModel());
+		focusOnExplanationAction = new FocusOnExplanationAction(getGraphicalFeatureModel());
 		adjustModelToEditorSizeAction = new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR);
 
 		expandAllAction = new CollapseAllAction(this, graphicalFeatureModel, false, EXPAND_ALL);
@@ -670,7 +670,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(collapseAction);
 			menu.add(collapseFeaturesAction);
 			if (getActiveExplanation() != null) {
-				menu.add(collapseAllButExplanationAction);
+				menu.add(focusOnExplanationAction);
 			}
 			menu.add(changeFeatureDescriptionAction);
 			menu.add(new Separator());
@@ -688,7 +688,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(deleteAction);
 			if (getActiveExplanation() != null) {
 				menu.add(new Separator());
-				menu.add(collapseAllButExplanationAction);
+				menu.add(focusOnExplanationAction);
 			}
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
@@ -802,8 +802,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (CollapseSiblingsAction.ID.equals(workbenchActionID)) {
 			return collapseFeaturesAction;
 		}
-		if (CollapseAllButExplanationAction.ID.equals(workbenchActionID)) {
-			return collapseAllButExplanationAction;
+		if (FocusOnExplanationAction.ID.equals(workbenchActionID)) {
+			return focusOnExplanationAction;
 		}
 		if (AbstractAction.ID.equals(workbenchActionID)) {
 			return abstractAction;
