@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.editing;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -35,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.functional.Base64Encoder;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -45,8 +45,9 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  */
 public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> {
 
+	private final static SecureRandom secureRandom = new SecureRandom();
+
 	private final static int LENGTH_FACTOR = 8;
-	private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	private static final int RESULT_LENGTH = (4 * LENGTH_FACTOR) + 2;
 
 	private final IFeatureModel orgFeatureModel;
@@ -152,30 +153,13 @@ public class FeatureModelObfuscator implements LongRunningMethod<IFeatureModel> 
 		digest.update(string.getBytes(StandardCharsets.UTF_8));
 		final byte[] hash = digest.digest();
 
-		return encodeBase64(result, 2, hash);
-	}
-
-	private static String encodeBase64(final char[] result, int index, byte[] hash) {
-		final int length = ((result.length - index) >> 2) * 3;
-		if (hash.length < length) {
-			hash = Arrays.copyOf(hash, length);
-		}
-		for (int i = 0; i < length; i += 3) {
-			int x = 0xff & hash[i];
-			x |= (0xff & hash[i + 1]) << 8;
-			x |= (0xff & hash[i + 2]) << 16;
-			for (int j = 0; j < 4; j++) {
-				result[index++] = ALPHABET.charAt(x & 0x3f);
-				x >>>= 6;
-			}
-		}
-		return new String(result);
+		return Base64Encoder.encode(result, 2, hash);
 	}
 
 	public static String getRandomSalt() {
 		final byte[] saltArray = new byte[24];
-		new SecureRandom().nextBytes(saltArray);
-		return encodeBase64(new char[32], 0, saltArray);
+		secureRandom.nextBytes(saltArray);
+		return Base64Encoder.encode(new char[32], 0, saltArray);
 	}
 
 }
