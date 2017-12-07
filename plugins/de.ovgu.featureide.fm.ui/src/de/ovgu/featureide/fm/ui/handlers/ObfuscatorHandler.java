@@ -24,49 +24,34 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.FeatureModelObfuscator;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
-public class ObfuscatorHandler extends ExportHandler {
+public class ObfuscatorHandler extends FMExportHandler {
+
+	private static final String SALT_FILENAME_PATTERN = ".%s.salt";
 
 	@Override
-	protected void singleAction(IFile modelFile) {
-		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
-		setFilter(fileDialog, formatExtensions);
+	protected String getDefaultFileName(Path modelFilePath) {
+		return "obfuscated_" + FileHandler.getFileName(modelFilePath);
+	}
 
-		final Path modelFilePath = Paths.get(modelFile.getLocationURI());
-		fileDialog.setFileName("obfuscated_" + FileHandler.getFileName(modelFilePath));
-
-		final String filepath = fileDialog.open();
-		if (filepath == null) {
-			return;
-		}
-
-		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(modelFilePath);
+	@Override
+	protected void save(IPersistentFormat<IFeatureModel> format, FileHandler<IFeatureModel> fileHandler, Path path) {
 		if (!fileHandler.getLastProblems().containsError()) {
-			final IFeatureModel ofm = LongRunningWrapper.runMethod(new FeatureModelObfuscator(fileHandler.getObject(), getSalt(modelFilePath)));
-			FileHandler.save(Paths.get(filepath), ofm, formatExtensions.get(fileDialog.getFilterIndex()));
+			final IFeatureModel ofm = LongRunningWrapper.runMethod(new FeatureModelObfuscator(fileHandler.getObject(), getSalt(fileHandler.getPath())));
+			FileHandler.save(path, ofm, format);
 		}
 	}
 
 	private String getSalt(Path modelFilePath) {
-		final Path saltPath = modelFilePath.getParent().resolve(modelFilePath.getFileName().toString() + ".salt");
+		final Path saltPath = modelFilePath.getParent().resolve(String.format(SALT_FILENAME_PATTERN, modelFilePath.getFileName().toString()));
 		if (Files.exists(saltPath)) {
 			try {
 				return new String(Files.readAllBytes(saltPath), StandardCharsets.UTF_8);

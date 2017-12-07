@@ -421,7 +421,7 @@
 				commandId="de.ovgu.featureide.fm.ui.commands.FMImport">
 		</handler>
 		<handler
-				class="de.ovgu.featureide.fm.ui.handlers.ExportHandler"
+				class="de.ovgu.featureide.fm.ui.handlers.FMExportHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FMExport">
 		</handler>
 		<handler
