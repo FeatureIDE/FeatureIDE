@@ -395,9 +395,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		pages.clear();
 		addPage(diagramEditor = new FeatureDiagramEditor(fmManager, true));
-		addPage(textEditor = new FeatureModelTextEditorPage(this));
-		createExtensionPages();
 		addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
+		createExtensionPages();
+		addPage(textEditor = new FeatureModelTextEditorPage(this));
 
 		fmManager.addListener(diagramEditor);
 		getFeatureModel().addListener(diagramEditor);

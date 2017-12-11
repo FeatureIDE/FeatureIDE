@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +42,7 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ConstraintFigure extends ModelElementFigure implements GUIDefaults {
 
-	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
+	public final static String VOID_MODEL = StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
 	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
 	public final static String TAUTOLOGY = CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 	public final static String DEAD_FEATURE = "Constraint makes following features dead:";
@@ -122,16 +122,16 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			label.setIcon(null);
 			break;
 		case VOID_MODEL:
-			label.setIcon(FM_ERROR);
+			label.setIcon(null);
 			add(label);
 			toolTipContent.add(new Label(VOID_MODEL));
 			break;
 		case UNSATISFIABLE:
-			label.setIcon(FM_ERROR);
+			label.setIcon(null);
 			toolTipContent.add(new Label(UNSATISFIABLE));
 			break;
 		case TAUTOLOGY:
-			label.setIcon(FM_WARNING);
+			label.setIcon(null);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
 			break;
@@ -186,7 +186,6 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 		}
 
 		if (getActiveReason() != null) {
-			label.setIcon(FM_ERROR);
 			add(label);
 
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));

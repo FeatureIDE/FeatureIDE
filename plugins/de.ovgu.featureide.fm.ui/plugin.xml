@@ -336,6 +336,19 @@
 					</reference>
 				</visibleWhen>
 			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvet"
+					label="Analyze Velvet Model"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsVelvet">
+					</reference>
+				</visibleWhen>
+			</command>
 			<separator
 					name="de.ovgu.featureide.fm.ui.separator5"
 					visible="true">
@@ -366,6 +379,19 @@
 					</reference>
 				</visibleWhen>
 			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportCNF"
+					label="Export CNF"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+					</reference>
+				</visibleWhen>
+			</command>
 			<separator
 					name="de.ovgu.featureide.fm.ui.separator7"
 					visible="true">
@@ -388,18 +414,22 @@
 					visible="true">
 			</separator>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvet"
-					label="Analyze Velvet Model"
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
+					label="Export model to SPL Conquerer format"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsVelvet">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
 					</reference>
 				</visibleWhen>
 			</command>
+   <separator
+         name="de.ovgu.featureide.fm.ui.separator10"
+         visible="true">
+   </separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.FeatureModelSlicing"
 					icon="icons/featuretree.ico"
@@ -431,36 +461,23 @@
 					visible="true">
 			</separator>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportCNF"
-					label="Export CNF"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
-					</reference>
-				</visibleWhen>
-			</command>
-			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
-					label="Export model to SPL Conquerer format"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
-					</reference>
-				</visibleWhen>
-			</command>
-			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
 					icon="icons/export_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
 					label="Export feature dependency information"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureObfuscator"
+					label="Export an obfuscated feature model"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -516,6 +533,10 @@
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
 				name="Export feature dependency information">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator"
+				name="Export an obfuscated feature model">
 		</command>
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.ExportCNF"
@@ -595,6 +616,10 @@
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.FeatureDependenciesHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ObfuscatorHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.ImportGUIDSLHandler"
