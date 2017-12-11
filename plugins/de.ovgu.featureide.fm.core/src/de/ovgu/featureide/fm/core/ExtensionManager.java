@@ -51,6 +51,7 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public boolean addExtension(T extension) {
 		for (final T t : extensions) {
+			FMCorePlugin.getDefault().logInfo("ID:" + extension.getId() + " and the other is " + t.getId());
 			if (t.getId().equals(extension.getId())) {
 				return false;
 			}
@@ -75,6 +76,7 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 		java.util.Objects.requireNonNull(id, "ID must not be null!");
 
 		for (final T factory : getExtensions()) {
+			FMCorePlugin.getDefault().logInfo("Factory: " + factory.getId() + " and id: " + id);
 			if (id.equals(factory.getId())) {
 				return factory;
 			}

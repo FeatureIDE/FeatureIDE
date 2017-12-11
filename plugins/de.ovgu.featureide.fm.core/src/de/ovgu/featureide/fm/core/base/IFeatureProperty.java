@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.util.List;
-
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
 
 /**
  * Manages all additional properties of a feature.
@@ -55,33 +52,5 @@ public interface IFeatureProperty {
 	boolean isConstraintSelected();
 
 	boolean selectConstraint(boolean state);
-
-	/**
-	 * TODO ATTRIBUTE Add detailed description
-	 *
-	 * @return
-	 */
-	List<IFeatureAttribute> getAttributes();
-
-	/**
-	 * TODO ATTRIBUTE Add detailed description
-	 *
-	 * @return
-	 */
-	void addAttribute(IFeatureAttribute attribute);
-
-	/**
-	 * TODO ATTRIBUTE Add detailed description
-	 *
-	 * @return
-	 */
-	void removeAttribute(IFeatureAttribute attribute);
-
-	/**
-	 * TODO ATTRIBUTE Add detailed description
-	 *
-	 * @return
-	 */
-	void setAttributes(List<IFeatureAttribute> attributes);
 
 }

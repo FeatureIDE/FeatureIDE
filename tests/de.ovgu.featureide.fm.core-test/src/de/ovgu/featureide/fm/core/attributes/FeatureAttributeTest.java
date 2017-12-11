@@ -20,29 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.attributes;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.junit.Test;
-import org.w3c.dom.Document;
-
-import de.ovgu.featureide.Commons;
-import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeFactory;
-import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeParsedData;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
+import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 
 /**
  * TODO description
@@ -94,178 +72,55 @@ public class FeatureAttributeTest {
 
 	private AbstractFeatureAttributeFactory attributeFactory;
 
-	@Test
-	public void countFeatureAttributes() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(1, feature.getProperty().getAttributes().size());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(1, feature.getProperty().getAttributes().size());
-			}
-			if (feature.getName().equals(FEATURE_WONDERFUL)) {
-				assertEquals(0, feature.getProperty().getAttributes().size());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(2, feature.getProperty().getAttributes().size());
-			}
-			if (feature.getName().equals(FEATURE_WORLD)) {
-				assertEquals(0, feature.getProperty().getAttributes().size());
-			}
-		}
-	}
-
-	@Test
-	public void checkFeatureAttributeTypes() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(DOUBLE_TYPE, feature.getProperty().getAttributes().get(0).getType());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(LONG_TYPE, feature.getProperty().getAttributes().get(0).getType());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(STRING_TYPE, feature.getProperty().getAttributes().get(0).getType());
-				assertEquals(BOOLEAN_TYPE, feature.getProperty().getAttributes().get(1).getType());
-			}
-
-		}
-
-	}
-
-	@Test
-	public void checkFeatureAttributeNames() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(DOUBLE_ATTRIBUTE, feature.getProperty().getAttributes().get(0).getName());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(LONG_ATTRIBUTE, feature.getProperty().getAttributes().get(0).getName());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(STRING_ATTRIBUTE, feature.getProperty().getAttributes().get(0).getName());
-				assertEquals(BOOLEAN_ATTRIBUTE, feature.getProperty().getAttributes().get(1).getName());
-			}
-
-		}
-	}
-
-	@Test
-	public void checkFeatureAttributeValues() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(DOUBLE_VALUE, feature.getProperty().getAttributes().get(0).getValue());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(LONG_VALUE, feature.getProperty().getAttributes().get(0).getValue());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(STRING_VALUE, feature.getProperty().getAttributes().get(0).getValue());
-				assertEquals(BOOLEAN_VALUE, feature.getProperty().getAttributes().get(1).getValue());
-			}
-
-		}
-	}
-
-	@Test
-	public void checkFeatureAttributeUnits() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(DOUBLE_UNIT, feature.getProperty().getAttributes().get(0).getUnit());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(LONG_UNIT, feature.getProperty().getAttributes().get(0).getUnit());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(STRING_UNIT, feature.getProperty().getAttributes().get(0).getUnit());
-				assertEquals(BOOLEAN_UNIT, feature.getProperty().getAttributes().get(1).getUnit());
-			}
-
-		}
-	}
-
-	@Test
-	public void checkFeatureAttributeIsConfigurable() {
-		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME);
-		for (final IFeature feature : fm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				assertEquals(FALSE, feature.getProperty().getAttributes().get(0).isConfigurable());
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				assertEquals(FALSE, feature.getProperty().getAttributes().get(0).isConfigurable());
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				assertEquals(FALSE, feature.getProperty().getAttributes().get(0).isConfigurable());
-				assertEquals(FALSE, feature.getProperty().getAttributes().get(1).isConfigurable());
-			}
-
-		}
-	}
-
-	@Test
-	public void checkFeatureAttributeAdding() {
-		final File modelFile = new File(TEMP_MODEL);
-		attributeFactory = new FeatureAttributeFactory();
-
-		final IFeatureModel comparisonfm = Commons.loadTestFeatureModelFromFile(COMPARISON_MODEL);
-
-		final IFeatureAttributeParsedData booleanParsedData =
-			new FeatureAttributeParsedData(BOOLEAN_ATTRIBUTE, BOOLEAN_TYPE, BOOLEAN_UNIT, BOOLEAN_STRING, FALSE_STRING, FALSE_STRING);
-		final IFeatureAttribute booleanAttribute = attributeFactory.createFeatureAttribute(booleanParsedData);
-
-		final IFeatureAttributeParsedData doubleParsedData =
-			new FeatureAttributeParsedData(DOUBLE_ATTRIBUTE, DOUBLE_TYPE, DOUBLE_UNIT, DOUBLE_STRING, FALSE_STRING, FALSE_STRING);
-		final IFeatureAttribute doubleAttribute = attributeFactory.createFeatureAttribute(doubleParsedData);
-
-		final IFeatureAttributeParsedData longParsedData =
-			new FeatureAttributeParsedData(LONG_ATTRIBUTE, LONG_TYPE, LONG_UNIT, LONG_STRING, FALSE_STRING, FALSE_STRING);
-		final IFeatureAttribute longAttribute = attributeFactory.createFeatureAttribute(longParsedData);
-
-		for (final IFeature feature : comparisonfm.getFeatures()) {
-			if (feature.getName().equals(FEATURE_HELLO)) {
-				feature.getProperty().addAttribute(doubleAttribute);
-			}
-			if (feature.getName().equals(FEATURE_FEATURE)) {
-				feature.getProperty().addAttribute(longAttribute);
-			}
-			if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
-				feature.getProperty().addAttribute(booleanAttribute);
-			}
-
-		}
-		try {
-			SimpleFileHandler.save(modelFile.toPath(), comparisonfm, new XmlFeatureModelFormat());
-			final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			final Document doc = dBuilder.parse(PATH_TO_XML + MODEL_NAME);
-			final Document docCompare = dBuilder.parse(modelFile);
-
-			final TransformerFactory tf = TransformerFactory.newInstance();
-			final Transformer transformer = tf.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-
-			// Expected
-			final StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			final String xmlString = writer.toString();
-
-			// actual
-			final StringWriter writerCompare = new StringWriter();
-			transformer.transform(new DOMSource(docCompare), new StreamResult(writerCompare));
-			final String xmlCompareString = writerCompare.toString();
-
-			assertEquals(xmlString, xmlCompareString);
-			modelFile.delete();
-
-		} catch (final Exception e) {
-			throw new RuntimeException();
-		}
-
-	}
+	/*
+	 * @Test public void countFeatureAttributes() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature feature :
+	 * fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(1, feature.getProperty().getAttributes().size()); } if
+	 * (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(1, feature.getProperty().getAttributes().size()); } if
+	 * (feature.getName().equals(FEATURE_WONDERFUL)) { assertEquals(0, feature.getProperty().getAttributes().size()); } if
+	 * (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(2, feature.getProperty().getAttributes().size()); } if
+	 * (feature.getName().equals(FEATURE_WORLD)) { assertEquals(0, feature.getProperty().getAttributes().size()); } } }
+	 * @Test public void checkFeatureAttributeTypes() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature feature :
+	 * fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(DOUBLE_TYPE, feature.getProperty().getAttributes().get(0).getType()); }
+	 * if (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(LONG_TYPE, feature.getProperty().getAttributes().get(0).getType()); } if
+	 * (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(STRING_TYPE, feature.getProperty().getAttributes().get(0).getType());
+	 * assertEquals(BOOLEAN_TYPE, feature.getProperty().getAttributes().get(1).getType()); } } }
+	 * @Test public void checkFeatureAttributeNames() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature feature :
+	 * fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(DOUBLE_ATTRIBUTE,
+	 * feature.getProperty().getAttributes().get(0).getName()); } if (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(LONG_ATTRIBUTE,
+	 * feature.getProperty().getAttributes().get(0).getName()); } if (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(STRING_ATTRIBUTE,
+	 * feature.getProperty().getAttributes().get(0).getName()); assertEquals(BOOLEAN_ATTRIBUTE, feature.getProperty().getAttributes().get(1).getName()); } } }
+	 * @Test public void checkFeatureAttributeValues() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature feature
+	 * : fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(DOUBLE_VALUE, feature.getProperty().getAttributes().get(0).getValue());
+	 * } if (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(LONG_VALUE, feature.getProperty().getAttributes().get(0).getValue()); } if
+	 * (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(STRING_VALUE, feature.getProperty().getAttributes().get(0).getValue());
+	 * assertEquals(BOOLEAN_VALUE, feature.getProperty().getAttributes().get(1).getValue()); } } }
+	 * @Test public void checkFeatureAttributeUnits() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature feature :
+	 * fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(DOUBLE_UNIT, feature.getProperty().getAttributes().get(0).getUnit()); }
+	 * if (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(LONG_UNIT, feature.getProperty().getAttributes().get(0).getUnit()); } if
+	 * (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(STRING_UNIT, feature.getProperty().getAttributes().get(0).getUnit());
+	 * assertEquals(BOOLEAN_UNIT, feature.getProperty().getAttributes().get(1).getUnit()); } } }
+	 * @Test public void checkFeatureAttributeIsConfigurable() { final IFeatureModel fm = Commons.loadTestFeatureModelFromFile(MODEL_NAME); for (final IFeature
+	 * feature : fm.getFeatures()) { if (feature.getName().equals(FEATURE_HELLO)) { assertEquals(FALSE,
+	 * feature.getProperty().getAttributes().get(0).isConfigurable()); } if (feature.getName().equals(FEATURE_FEATURE)) { assertEquals(FALSE,
+	 * feature.getProperty().getAttributes().get(0).isConfigurable()); } if (feature.getName().equals(FEATURE_BEAUTIFUL)) { assertEquals(FALSE,
+	 * feature.getProperty().getAttributes().get(0).isConfigurable()); assertEquals(FALSE, feature.getProperty().getAttributes().get(1).isConfigurable()); } } }
+	 * @Test public void checkFeatureAttributeAdding() { final File modelFile = new File(TEMP_MODEL); attributeFactory = new FeatureAttributeFactory(); final
+	 * IFeatureModel comparisonfm = Commons.loadTestFeatureModelFromFile(COMPARISON_MODEL); final IFeatureAttributeParsedData booleanParsedData = new
+	 * FeatureAttributeParsedData(BOOLEAN_ATTRIBUTE, BOOLEAN_TYPE, BOOLEAN_UNIT, BOOLEAN_STRING, FALSE_STRING, FALSE_STRING); final IFeatureAttribute
+	 * booleanAttribute = attributeFactory.createFeatureAttribute(booleanParsedData); final IFeatureAttributeParsedData doubleParsedData = new
+	 * FeatureAttributeParsedData(DOUBLE_ATTRIBUTE, DOUBLE_TYPE, DOUBLE_UNIT, DOUBLE_STRING, FALSE_STRING, FALSE_STRING); final IFeatureAttribute
+	 * doubleAttribute = attributeFactory.createFeatureAttribute(doubleParsedData); final IFeatureAttributeParsedData longParsedData = new
+	 * FeatureAttributeParsedData(LONG_ATTRIBUTE, LONG_TYPE, LONG_UNIT, LONG_STRING, FALSE_STRING, FALSE_STRING); final IFeatureAttribute longAttribute =
+	 * attributeFactory.createFeatureAttribute(longParsedData); for (final IFeature feature : comparisonfm.getFeatures()) { if
+	 * (feature.getName().equals(FEATURE_HELLO)) { feature.getProperty().addAttribute(doubleAttribute); } if (feature.getName().equals(FEATURE_FEATURE)) {
+	 * feature.getProperty().addAttribute(longAttribute); } if (feature.getName().equals(FEATURE_BEAUTIFUL)) {
+	 * feature.getProperty().addAttribute(booleanAttribute); } } try { SimpleFileHandler.save(modelFile.toPath(), comparisonfm, new XmlFeatureModelFormat());
+	 * final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance(); final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder(); final
+	 * Document doc = dBuilder.parse(PATH_TO_XML + MODEL_NAME); final Document docCompare = dBuilder.parse(modelFile); final TransformerFactory tf =
+	 * TransformerFactory.newInstance(); final Transformer transformer = tf.newTransformer(); transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+	 * "yes"); // Expected final StringWriter writer = new StringWriter(); transformer.transform(new DOMSource(doc), new StreamResult(writer)); final String
+	 * xmlString = writer.toString(); // actual final StringWriter writerCompare = new StringWriter(); transformer.transform(new DOMSource(docCompare), new
+	 * StreamResult(writerCompare)); final String xmlCompareString = writerCompare.toString(); assertEquals(xmlString, xmlCompareString); modelFile.delete(); }
+	 * catch (final Exception e) { throw new RuntimeException(); } }
+	 */
 }

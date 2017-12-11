@@ -50,11 +50,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory;
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttribute;
-import de.ovgu.featureide.fm.core.attributes.IFeatureAttributeParsedData;
-import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeFactory;
-import de.ovgu.featureide.fm.core.attributes.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -85,14 +80,21 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	private IFeatureModelFactory factory;
 
-	private AbstractFeatureAttributeFactory attributeFactory;
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 
 		factory = FMFactoryManager.getFactory(object);
-		attributeFactory = new FeatureAttributeFactory();
 
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
@@ -248,28 +250,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 	}
 
-	private void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
-		if ((feature.getProperty().getAttributes() != null) && !feature.getProperty().getAttributes().isEmpty()) {
-			// Write FeatureAttributes into the XML
-			for (final IFeatureAttribute featureAttribute : feature.getProperty().getAttributes()) {
-				final Element attributeNode = doc.createElement(XMLFeatureModelTags.ATTRIBUTE);
-				attributeNode.setAttribute(XMLFeatureModelTags.NAME, featureAttribute.getName());
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_TYPE, featureAttribute.getType());
-				if (featureAttribute.getValue() != null) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_VALUE, featureAttribute.getValue().toString());
-				}
-				attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_UNIT, featureAttribute.getUnit());
-				if (featureAttribute.isRecursive()) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_RECURSIVE, XMLFeatureModelTags.TRUE);
-				}
-				if (featureAttribute.isConfigurable()) {
-					attributeNode.setAttribute(XMLFeatureModelTags.ATTRIBUTE_CONFIGURABLE, XMLFeatureModelTags.TRUE);
-				}
-				fnode.appendChild(attributeNode);
-			}
-		}
-	}
-
 	/**
 	 * Creates document based on feature model step by step
 	 *
@@ -289,8 +269,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			fnod = doc.createElement(FEATURE);
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
-			createFeatureAttributes(doc, fnod, feat);
-
 		} else {
 			if (feat.getStructure().isAnd()) {
 				fnod = doc.createElement(AND);
@@ -304,7 +282,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 			addDescription(doc, feat, fnod);
 			writeAttributes(node, fnod, feat);
-			createFeatureAttributes(doc, fnod, feat);
 
 			for (final IFeature feature : children) {
 				createXmlDocRec(doc, fnod, feature);
@@ -555,46 +532,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
-			// Parse the feature attributes
-			if (nodeName.equals(ATTRIBUTE)) {
-				if (e.hasAttributes()) {
-					final NamedNodeMap nodeMapFeatureAttribute = e.getAttributes();
-					String configurable = null;
-					String recursive = null;
-					String name = null;
-					String unit = null;
-					String value = null;
-					String type = null;
-					for (int i = 0; i < nodeMapFeatureAttribute.getLength(); i++) {
-						final org.w3c.dom.Node node = nodeMapFeatureAttribute.item(i);
-						final String attributeName = node.getNodeName();
-						final String attributeValue = node.getNodeValue();
-
-						if (attributeName.equals(ATTRIBUTE_CONFIGURABLE)) {
-							configurable = attributeValue;
-						} else if (attributeName.equals(ATTRIBUTE_RECURSIVE)) {
-							recursive = attributeValue;
-						} else if (attributeName.equals(NAME)) {
-							name = attributeValue;
-						} else if (attributeName.equals(ATTRIBUTE_UNIT)) {
-							unit = attributeValue;
-						} else if (attributeName.equals(ATTRIBUTE_VALUE)) {
-							value = attributeValue;
-						} else if (attributeName.equals(ATTRIBUTE_TYPE)) {
-							type = attributeValue;
-						} else {
-							throwError("Unknown feature attribute: " + attributeName, e);
-						}
-					}
-					// TODO ATTRIBUTE Error marker for missing name and/or type
-					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
-					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute);
-					if (featureAttribute != null) {
-						parent.getProperty().addAttribute(featureAttribute);
-					}
-				}
-				continue;
-			}
 			boolean mandatory = false;
 			boolean _abstract = false;
 			boolean hidden = false;
@@ -659,9 +596,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		// Check that there are only OR connections when the parent has more than one feature
-		for (
-
-		final IFeature f : object.getFeatures()) {
+		for (final IFeature f : object.getFeatures()) {
 			if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
 				f.getStructure().setAnd();
 			}
@@ -708,6 +643,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		if (feat.getStructure().isAbstract()) {
 			fnod.setAttribute(ABSTRACT, TRUE);
 		}
+
 		node.appendChild(fnod);
 	}
 

@@ -67,6 +67,7 @@ public final class FMFactoryManager extends ExtensionManager<IFeatureModelFactor
 	 * @throws NoSuchFactoryException If no factory with the given ID is registered.
 	 */
 	public static IFeatureModelFactory getFactoryById(String id) throws NoSuchExtensionException {
+
 		return instance.getExtension(id);
 	}
 

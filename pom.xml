@@ -18,6 +18,7 @@
 	<modules>
 		<module>plugins/de.ovgu.featureide.fm.core</module>
 		<module>plugins/de.ovgu.featureide.fm.ui</module>
+		<module>plugins/de.ovgu.featureide.fm.attributes</module>
 
 		<module>plugins/de.ovgu.featureide.core</module>
 		<module>plugins/de.ovgu.featureide.ui</module>

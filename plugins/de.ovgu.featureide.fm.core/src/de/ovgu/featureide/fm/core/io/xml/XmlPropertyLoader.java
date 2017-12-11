@@ -41,19 +41,19 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class XmlPropertyLoader {
 
-	static final String PROPERTIES = "properties";
-	static final String PROPERTY = "property";
-	static final String KEY = "key";
-	static final String VALUE = "value";
-	static final String TYPE = "data-type";
-	static final String FEATURE = "feature";
-	static final String NAME = "name";
+	public static final String PROPERTIES = "properties";
+	public static final String PROPERTY = "property";
+	public static final String KEY = "key";
+	public static final String VALUE = "value";
+	public static final String TYPE = "data-type";
+	public static final String FEATURE = "feature";
+	public static final String NAME = "name";
 
-	enum ParserType {
+	public enum ParserType {
 		FEATURE_PROPERTIES_PARSER
 	}
 
-	interface PropertiesParser {
+	public interface PropertiesParser {
 
 		Set<String> getIdentifier();
 

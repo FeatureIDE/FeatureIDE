@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="FeatureIDE"
+            class="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView"
+            name="Feature Attributes">
+      </view>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMFormat">
+      <fmFormat
+            class="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+            id="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+            name="XmlExtendedFeatureModelFormat">
+      </fmFormat>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMFactory">
+      <fmFactory
+            class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
+            id="de.ovgu.featureide.fm.attributes.format.ExtendedFeatureModelFactory"
+            name="ExtendedFeatureModelFactory">
+      </fmFactory>
+   </extension>
+</plugin>
