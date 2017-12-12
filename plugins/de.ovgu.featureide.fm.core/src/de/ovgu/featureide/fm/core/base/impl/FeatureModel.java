@@ -65,7 +65,7 @@ public class FeatureModel implements IFeatureModel {
 		return NEXT_ID++;
 	}
 
-	private long id;
+	protected long id;
 
 	private long nextElementId = 0;
 
@@ -98,7 +98,7 @@ public class FeatureModel implements IFeatureModel {
 	protected final IFeatureModelStructure structure;
 
 	protected Object undoContext = null;
-	private Path sourceFile;
+	protected Path sourceFile;
 
 	public FeatureModel(String factoryID) {
 		this.factoryID = factoryID;

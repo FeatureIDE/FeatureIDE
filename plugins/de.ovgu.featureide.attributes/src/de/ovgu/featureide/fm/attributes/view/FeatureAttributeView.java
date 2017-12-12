@@ -478,7 +478,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				} else {
 					setFeatureModel(null);
 					if (!treeViewer.getControl().isDisposed()) {
-						treeViewer.setInput(FeatureAttributeContentProvider.EMPTY_ROOT);
+						treeViewer.setInput(FeatureAttributeContentProvider.FALSE_MODEL_FORMAT);
 					}
 					repackAllColumns();
 					return;

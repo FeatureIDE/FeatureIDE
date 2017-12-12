@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
@@ -13,7 +14,7 @@ public class ExtendedFeature extends Feature {
 
 	protected List<IFeatureAttribute> attributes;
 
-	protected ExtendedFeature(ExtendedFeature copyFeature, ExtendedFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
+	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(copyFeature, featureModel, newFeatrureStructure);
 
 		// Copy all attributes from the copy feature
@@ -25,6 +26,9 @@ public class ExtendedFeature extends Feature {
 
 	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
+
+		// Create empty attributes list
+		attributes = new ArrayList<>();
 	}
 
 	public List<IFeatureAttribute> getAttributes() {
@@ -44,4 +48,8 @@ public class ExtendedFeature extends Feature {
 		this.attributes = attributes;
 	}
 
+	@Override
+	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return new ExtendedFeature(this, newFeatureModel, newStructure);
+	}
 }

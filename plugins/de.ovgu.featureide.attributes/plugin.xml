@@ -23,8 +23,24 @@
          point="de.ovgu.featureide.fm.core.FMFactory">
       <fmFactory
             class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
-            id="de.ovgu.featureide.fm.attributes.format.ExtendedFeatureModelFactory"
+            id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
             name="ExtendedFeatureModelFactory">
       </fmFactory>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            id="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
+            name="Extended Feature Model"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element"
+                  value="extendedFeatureModel">
+            </parameter>
+         </describer>
+      </content-type>
    </extension>
 </plugin>

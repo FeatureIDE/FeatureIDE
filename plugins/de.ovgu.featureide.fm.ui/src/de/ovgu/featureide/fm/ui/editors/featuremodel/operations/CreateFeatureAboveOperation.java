@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo functionality.
@@ -58,7 +58,8 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		int number = 0;
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
 
-		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newCompound = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+
 	}
 
 	@Override

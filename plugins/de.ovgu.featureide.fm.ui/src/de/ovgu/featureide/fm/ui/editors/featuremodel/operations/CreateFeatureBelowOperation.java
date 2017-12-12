@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * Operation with functionality to create a layer feature. Enables undo/redo functionality.
@@ -54,7 +54,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 			number++;
 		}
 
-		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newFeature = FMFactoryManager.getFactory(featureModel).createFeature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());

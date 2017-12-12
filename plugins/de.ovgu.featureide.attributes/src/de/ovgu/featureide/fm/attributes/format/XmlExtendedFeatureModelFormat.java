@@ -29,12 +29,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -58,7 +56,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 
 	public static final String ID = "de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat";
 
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_FEATURE_MODEL + "[\\s>]");
 
 	private IFeatureModelFactory factory;
 
@@ -69,12 +67,11 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		object.reset();
 
 		factory = FMFactoryManager.getFactory(object);
-		FMAttributesPlugin.getDefault().logInfo("Factory: " + factory.getClass().getSimpleName());
 		attributeFactory = new FeatureAttributeFactory();
 
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
-		for (final Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
+		for (final Element e : getElements(doc.getElementsByTagName(EXTENDED_FEATURE_MODEL))) {
 			parseStruct(e.getElementsByTagName(STRUCT));
 			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
 			parseCalculations(e.getElementsByTagName(CALCULATIONS));
@@ -90,11 +87,12 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		}
 
 		importCustomProperties(customProperties, object);
+
 	}
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root = doc.createElement(FEATURE_MODEL);
+		final Element root = doc.createElement(EXTENDED_FEATURE_MODEL);
 		final Element struct = doc.createElement(STRUCT);
 		final Element properties = doc.createElement(PROPERTIES);
 		final Element constraints = doc.createElement(CONSTRAINTS);
@@ -102,7 +100,6 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		final Element comments = doc.createElement(COMMENTS);
 		final Element order = doc.createElement(FEATURE_ORDER);
 
-		System.out.println("WRITING1: " + object.getClass().getSimpleName() + " and is: " + (object instanceof ExtendedFeatureModel));
 		doc.appendChild(root);
 		root.appendChild(properties);
 		createXmlPropertiesPart(doc, properties, object);

@@ -33,6 +33,7 @@ public interface XMLFeatureModelTags {
 
 	static final String PROPERTIES = "properties";
 	static final String FEATURE_MODEL = "featureModel";
+	static final String EXTENDED_FEATURE_MODEL = "extendedFeatureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
