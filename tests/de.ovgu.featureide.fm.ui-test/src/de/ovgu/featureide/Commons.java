@@ -51,32 +51,13 @@ public class Commons {
 	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.ui-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
-		File folder = new File(TRAVIS_REMOTE_PATH + PLUGIN_PATH + path);
-		if (!folder.canRead()) {
-			folder = new File(TRAVIS_REMOTE_PATH_FORK1 + PLUGIN_PATH + path);
-			if (!folder.canRead()) {
-				folder = new File(TRAVIS_REMOTE_PATH_FORK2 + PLUGIN_PATH + path);
-				if (!folder.canRead()) {
-					folder = new File(TRAVIS_REMOTE_PATH_FORK3 + PLUGIN_PATH + path);
-					if (!folder.canRead()) {
-						folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
-						if (!folder.canRead()) {
-							folder = new File(JENKINS_REMOTE_PATH + PLUGIN_PATH + path);
-							if (!folder.canRead()) {
-								folder = new File(ClassLoader.getSystemResource(path).getPath());
-							}
-						}
-
-					}
-				}
-			}
-		}
+		final File folder = new File(path);
 		return folder;
 	}
 
-	private static final String BENCHMARK_FEATURE_MODEL_PATH = "benchmarkFeatureModels/";
+	private static final String BENCHMARK_FEATURE_MODEL_PATH = "src/benchmarkFeatureModels/";
 
-	private static final String TEST_FEATURE_MODEL_PATH = "testFeatureModels/";
+	private static final String TEST_FEATURE_MODEL_PATH = "src/testFeatureModels/";
 
 	public final static IFeatureModel loadBenchmarkFeatureModelFromFile(final String filename) {
 		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(BENCHMARK_FEATURE_MODEL_PATH));
