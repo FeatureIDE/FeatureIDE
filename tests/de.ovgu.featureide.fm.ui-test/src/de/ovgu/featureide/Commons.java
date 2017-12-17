@@ -51,13 +51,14 @@ public class Commons {
 	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.ui-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
-		final File folder = new File(path);
+		final File folder = new File("src/" + path);
+
 		return folder;
 	}
 
-	private static final String BENCHMARK_FEATURE_MODEL_PATH = "src/benchmarkFeatureModels/";
+	private static final String BENCHMARK_FEATURE_MODEL_PATH = "benchmarkFeatureModels/";
 
-	private static final String TEST_FEATURE_MODEL_PATH = "src/testFeatureModels/";
+	private static final String TEST_FEATURE_MODEL_PATH = "testFeatureModels/";
 
 	public final static IFeatureModel loadBenchmarkFeatureModelFromFile(final String filename) {
 		return loadFeatureModelFromFile(filename, getRemoteOrLocalFolder(BENCHMARK_FEATURE_MODEL_PATH));

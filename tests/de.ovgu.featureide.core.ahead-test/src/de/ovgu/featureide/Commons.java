@@ -51,11 +51,12 @@ public class Commons {
 	private static final String PLUGIN_PATH = "de.ovgu.featureide.core.ahead-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
-		final File folder = new File(path);
+		final File folder = new File("src/" + path);
+
 		return folder;
 	}
 
-	private static final String TEST_CASE_PATH = "src/testcases/";
+	private static final String TEST_CASE_PATH = "testcases/";
 
 	public static File getTestCaseFolder() {
 		return getRemoteOrLocalFolder(TEST_CASE_PATH);
