@@ -52,6 +52,7 @@ public class Commons {
 
 	public static File getRemoteOrLocalFolder(String path) {
 		final File folder = new File(path);
+		System.out.println("----------------------------" + folder.getAbsolutePath());
 		return folder;
 	}
 
