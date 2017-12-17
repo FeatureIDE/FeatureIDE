@@ -40,6 +40,8 @@ public class Commons {
 
 	private static final String TRAVIS_REMOTE_PATH = "/home/travis/build/FeatureIDE/FeatureIDE/tests/";
 
+	private static final String JENKINS_REMOTE_PATH = "/home/neapel/.jenkins/workspace/Fide/tests/";
+
 	private static final String TRAVIS_REMOTE_PATH_FORK1 = "/home/travis/build/DawidSA2017/FeatureIDE/tests/";
 
 	private static final String TRAVIS_REMOTE_PATH_FORK2 = "/home/travis/build/Henningson/FeatureIDETeam2/tests/";
@@ -59,8 +61,12 @@ public class Commons {
 					if (!folder.canRead()) {
 						folder = new File(TEAMCITY_REMOTE_PATH + PLUGIN_PATH + path);
 						if (!folder.canRead()) {
-							folder = new File(ClassLoader.getSystemResource(path).getPath());
+							folder = new File(JENKINS_REMOTE_PATH + PLUGIN_PATH + path);
+							if (!folder.canRead()) {
+								folder = new File(ClassLoader.getSystemResource(path).getPath());
+							}
 						}
+
 					}
 				}
 			}
