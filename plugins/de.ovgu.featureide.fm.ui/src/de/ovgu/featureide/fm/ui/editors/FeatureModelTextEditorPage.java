@@ -142,13 +142,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void pageChangeFrom(int newPage) {
 		if (newPage != getIndex()) {
 			executeSaveOperation();
-			featureModelEditor.fmManager.externalSave(new Runnable() {
-
-				@Override
-				public void run() {
-					doSave(null);
-				}
-			});
 		}
 	}
 
