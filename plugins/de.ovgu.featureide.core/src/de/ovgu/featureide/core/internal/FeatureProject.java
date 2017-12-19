@@ -149,6 +149,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				break;
 			case MODEL_DATA_SAVED:
 				try {
+					checkFeatureCoverage();
+					checkConfigurations(getAllConfigurations());
 					createAndDeleteFeatureFolders();
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
