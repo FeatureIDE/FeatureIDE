@@ -55,6 +55,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
+import de.ovgu.featureide.core.signature.base.SignaturePosition;
 
 /**
  * Collects all signatures in a Munge project.

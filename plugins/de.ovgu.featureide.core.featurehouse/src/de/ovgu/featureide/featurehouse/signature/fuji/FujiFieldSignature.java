@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.featurehouse.signature.fuji;
 
+import AST.ASTNode;
+import AST.BoundTypeAccess;
+import AST.FieldDeclaration;
 import AST.TypeDecl;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
@@ -32,10 +35,12 @@ import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 public class FujiFieldSignature extends AbstractFieldSignature {
 
 	protected TypeDecl returnType;
+	protected FieldDeclaration field;
 
-	public FujiFieldSignature(AbstractClassSignature parent, String name, String modifiers, TypeDecl returnType) {
+	public FujiFieldSignature(AbstractClassSignature parent, String name, String modifiers, TypeDecl returnType, FieldDeclaration field) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
+		this.field = field;
 	}
 
 	@Override
@@ -70,6 +75,10 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		hashCode = (hashCodePrime * hashCode) + type.hashCode();
 	}
 
+	public String getFullFieldDeclaration() {
+		return field.toString();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -86,4 +95,31 @@ public class FujiFieldSignature extends AbstractFieldSignature {
 		}
 		return true;
 	}
+
+	public String getFullModifiersAndReturnTypes() {
+		String result = "";
+		for (String modifier : getModifiers()) {
+			result += modifier + " ";
+		}
+
+		result += getType();
+		findClassAccess(returnType);
+
+//		result +=  " " + getName() +";\n";
+
+		return result;
+	}
+
+	private void findClassAccess(ASTNode<?> stmt) {
+		if (stmt == null) return;
+
+		if (stmt instanceof BoundTypeAccess) {
+
+		} else {
+			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
+				findClassAccess(stmt.getChildNoTransform(i));
+			}
+		}
+	}
+
 }

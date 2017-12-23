@@ -281,7 +281,7 @@ public   class  MainWindow  extends JFrame {
 	/**{@feature 0}
 	 * Setzt die Leben auf 5.
 	 */
-	 private void  startGame__wrappee__Entities  () {
+	 private void  startGame__wrappee__SnakeFOP  () {
 		setVisibility(ELEM);
 		
 		lives = 5;
@@ -291,11 +291,11 @@ public   class  MainWindow  extends JFrame {
 	
 
 	/**{@feature 0}
-	 * Setzt die Punkte auf 0.
+	 * Setzt die Punktzahl auf 0.
 	 */
 	 private void  startGame__wrappee__Points  () {
 		points = 0;
-		startGame__wrappee__Entities();
+		startGame__wrappee__SnakeFOP();
 	}
 
 	
@@ -387,7 +387,9 @@ public   class  MainWindow  extends JFrame {
 	
 
 	/**
-	 * @param points the points to set
+	 * Setzt eine neue Punktzahl.
+	 * 
+	 * @param points Punktzahl, die gesetzt werden soll
 	 */
 	public void addPoints(int points) {
 		this.points += points;
@@ -396,6 +398,8 @@ public   class  MainWindow  extends JFrame {
 	
 
 	/**
+	 * Gibt die aktuelle Punktzahl zurück.
+	 * 
 	 * @return die aktuelle Punktzahl
 	 */
 	public int getPoints() {
@@ -403,7 +407,7 @@ public   class  MainWindow  extends JFrame {
 	}
 
 	
-	/** Namen der Level die in dem Spiel existieren  */
+	/** Namen der Level, die in dem Spiel existieren  */
 	private static final LinkedList<String> nameLevel = new LinkedList<String>();
 
 	
@@ -414,15 +418,15 @@ public   class  MainWindow  extends JFrame {
 	/**{@feature 0}
 	 * Hook method.
 	 */
-	 private static void  addLevelNames__wrappee__Torus  () {}
+	 private static void  addLevelNames__wrappee__Level  () {}
 
 	
 	/**{@feature 1}
-	 * Level 3
+	 * Level 1
 	 */
 	private static void addLevelNames() {
-		addLevelNames__wrappee__Torus();
-		nameLevel.add("level3");
+		addLevelNames__wrappee__Level();
+		nameLevel.add("level1");
 	}
 
 	

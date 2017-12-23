@@ -82,4 +82,5 @@ public class FOPFeatureData extends AFeatureData {
 			usedNonPrimitveTypes.add(usedNonPrimitveType);
 		}
 	}
+
 }

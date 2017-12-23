@@ -340,11 +340,17 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				if (file.equals(role.getFile())) {
 					for (final FSTDirective dir : role.getDirectives()) {
 						directiveMap.put(dir.getId(), dir);
+//						index++;
 						validDirectiveList.add(dir);
 					}
 				}
 			}
 		}
+
+//		for (int i = 0; i < index; i++) {
+//			FSTDirective dir = directiveMap.get(i);
+//			validDirectiveList.add(dir);
+//		}
 	}
 
 	/**
@@ -691,6 +697,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (child.getEndLength() > 0) {
 				childEnd++;
 			}
+//			if (childEnd > lastLine) {
+//				lastLine = childEnd;
+//			}
+//			lastLine = getLastChildLine(child, lastLine);
 			lastLine = Math.max(childEnd, lastLine);
 			lastLine = Math.max(getLastChildLine(child, lastLine), lastLine);
 		}
@@ -767,6 +777,14 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	public void removeAnnotation(Annotation annotation) {
 		throw new UnsupportedOperationException();
 	}
+
+	/*
+	 * @Override public Iterator<Annotation> getAnnotationIterator() { final Iterator<ColorAnnotation> origIter = annotations.iterator(); return new
+	 * Iterator<Annotation>() {
+	 * @Override public boolean hasNext() { return origIter.hasNext(); }
+	 * @Override public Annotation next() { return origIter.next(); }
+	 * @Override public void remove() { origIter.remove(); } }; }
+	 */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override

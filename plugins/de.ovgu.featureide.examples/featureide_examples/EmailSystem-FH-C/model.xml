@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel>
-		<properties/>
-		<struct>
-			<and abstract="true" mandatory="true" name="EmailSystem">
-				<feature mandatory="true" name="Base"/>
-				<feature mandatory="true" name="SingleLinkedList"/>
-				<feature name="Keys"/>
-				<feature name="Encrypt"/>
-				<feature name="AutoResponder"/>
-				<feature name="AddressBook"/>
-				<feature name="Decrypt"/>
-				<feature name="Sign"/>
-				<feature name="Forward"/>
-				<feature name="Verify"/>
-				<feature name="MessageID"/>
-				<alt abstract="true" name="tests">
-					<feature name="DecryptForward"/>
-					<feature name="AddressBookEncrypt"/>
-					<feature name="VerifyForward"/>
-					<feature name="DecryptAutoResponder"/>
-					<feature name="SignVerify"/>
-					<feature name="SignForward"/>
-					<feature name="EncryptDecrypt"/>
-					<feature name="EncryptVerify"/>
-					<feature name="EncryptAutoresponder"/>
-					<feature name="EncryptForward"/>
-				</alt>
-			</and>
-		</struct>
-		<constraints/>
-		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
-		<comments/>
-		<featureOrder userDefined="false"/>
-	</featureModel>
+<featureModel>
+	<properties />
+	<struct>
+		<and abstract="true" mandatory="true" name="EmailSystem">
+			<feature mandatory="true" name="Base" />
+			<feature mandatory="true" name="SingleLinkedList" />
+			<feature name="Keys" />
+			<feature name="Encrypt" />
+			<feature name="AutoResponder" />
+			<feature name="AddressBook" />
+			<feature name="Decrypt" />
+			<feature name="Sign" />
+			<feature name="Forward" />
+			<feature name="Verify" />
+			<feature name="MessageID" />
+			<alt abstract="true" name="tests">
+				<feature name="DecryptForward" />
+				<feature name="AddressBookEncrypt" />
+				<feature name="VerifyForward" />
+				<feature name="DecryptAutoResponder" />
+				<feature name="SignVerify" />
+				<feature name="SignForward" />
+				<feature name="EncryptDecrypt" />
+				<feature name="EncryptVerify" />
+				<feature name="EncryptAutoresponder" />
+				<feature name="EncryptForward" />
+			</alt>
+		</and>
+	</struct>
+	<constraints />
+	<calculations Auto="true" Constraints="true" Features="true"
+		Redundant="true" Tautology="true" />
+	<comments />
+	<featureOrder userDefined="false" />
+</featureModel>

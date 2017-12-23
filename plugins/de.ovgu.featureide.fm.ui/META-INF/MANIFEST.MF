@@ -11,11 +11,15 @@ Require-Bundle:
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
+ org.eclipse.jdt.ui,
  org.eclipse.debug.ui,
+ org.eclipse.jdt.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
  org.eclipse.core.expressions,
  de.ovgu.featureide.fm.core,
+ org.eclipse.jdt.core,
+ org.eclipse.swt,
  org.eclipse.draw2d
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.fm.ui,
@@ -62,6 +66,8 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.wizards
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
+Import-Package: org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.core
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors,
  de.ovgu.featureide.fm.ui.editors.configuration,

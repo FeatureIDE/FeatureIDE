@@ -11,16 +11,35 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.ui,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ org.eclipse.ltk.core.refactoring;bundle-version="3.6.100",
+ org.eclipse.ltk.ui.refactoring,
+ org.eclipse.ui.ide;bundle-version="3.9.2",
+ org.eclipse.text,
+ org.eclipse.jdt.ui,
+ org.eclipse.core.filebuffers,
+ org.eclipse.ui.editors,
+ org.eclipse.jface.text,
+ org.eclipse.jface,
+ de.ovgu.featureide.Cloneanalysis;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
- .
+ .,
+ lib/pmd-core-5.2.2.jar,
+ lib/pmd-java-5.2.2.jar
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
- org.eclipse.jdt.internal.core
+ org.eclipse.jdt.core.refactoring,
+ org.eclipse.jdt.core.refactoring.descriptors,
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.debug.core.refactoring,
+ org.eclipse.jdt.internal.ui.packageview,
+ org.eclipse.jface.text,
+ org.eclipse.ui.texteditor
 Export-Package: cide.features,
+ composer,
  de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.errorpropagation,
  de.ovgu.featureide.featurehouse.meta,

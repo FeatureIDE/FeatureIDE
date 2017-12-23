@@ -7,4 +7,5 @@ Fragment-Host: de.ovgu.featureide.core.featurehouse
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
-Import-Package: com.sun.tools.classfile
+Import-Package: com.sun.tools.classfile,
+ composer

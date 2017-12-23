@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <exampleWizard>
 	<contentProvider name="Book Example">
-		<path>Part III/Chapter 12 (Quality Assurance for Conditional Compilation)</path>
+		<path>Part III/Chapter 12 (Quality Assurance for Conditional
+			Compilation)</path>
 	</contentProvider>
 	<contentProvider name="Composer">
 		<path>Antenna</path>

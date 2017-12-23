@@ -2,9 +2,11 @@
 <projectDescription>
 	<name>ExamDB-FH-JML</name>
 	<comment>
-	[description]
- 	An exam database management system that manages exams to be passed by students, including features for subscription and backouting, bonus points, and statistics. 
-	[/description]
+		[description]
+		An exam database management system that manages exams to be passed by
+		students, including features for subscription and backouting, bonus
+		points, and statistics.
+		[/description]
 	</comment>
 	<projects>
 	</projects>

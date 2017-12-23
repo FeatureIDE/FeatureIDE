@@ -53,6 +53,27 @@ public class CustomFeaturesCustomPropertiesTest {
 			throw new RuntimeException();
 		}
 
+		/* (non-Javadoc)
+		 * @see de.ovgu.featureide.fm.core.base.IFeature#getParent()
+		 */
+		public IFeature feature;
+		@Override
+
+		public IFeature getParent() {
+			// TODO Auto-generated method stub
+//			return null;
+			return FeatureUtils.getParent(feature);
+		}
+
+		/* (non-Javadoc)
+		 * @see de.ovgu.featureide.fm.core.base.IFeature#isConcrete()
+		 */
+		@Override
+		public boolean isConcrete() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
 	}
 
 	static class MyFeatureModelFactoryImplementation implements IFeatureModelFactory {

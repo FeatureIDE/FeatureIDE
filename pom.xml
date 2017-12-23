@@ -23,6 +23,7 @@
 		<module>plugins/de.ovgu.featureide.ui</module>
 
 		<module>plugins/br.ufal.ic.colligens</module>
+		<module>plugins/de.ovgu.featureide.Cloneanalysis</module>
 		<module>plugins/de.ovgu.featureide.core.ahead</module>
 		<module>plugins/de.ovgu.featureide.core.antenna</module>
 		<module>plugins/de.ovgu.featureide.core.aspectj</module>
@@ -54,6 +55,17 @@
 
 	<build>
 		<plugins>
+		
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>0.22.0</version>
+				<configuration>
+					<compilerArgument>-warn:none</compilerArgument>     
+					<compilerArgument>-err:none</compilerArgument>      
+				</configuration>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>

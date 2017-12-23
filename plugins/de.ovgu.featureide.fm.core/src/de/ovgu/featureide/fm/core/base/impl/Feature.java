@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.FeatureConnection;
+import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -75,6 +84,7 @@ public class Feature extends AFeature {
 	 *
 	 * @since 3.0
 	 */
+
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel, newFeatrureStructure);
 	}
@@ -93,6 +103,15 @@ public class Feature extends AFeature {
 		super(featureModel, name);
 	}
 
+	private final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
+
+	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+
+	public void fire(PropertyChangeEvent event) {
+		for (PropertyChangeListener listener : listenerList)
+			listener.propertyChange(event);
+	}
+
 	@Override
 	protected IFeatureProperty createProperty() {
 		return new FeatureProperty(this);
@@ -106,6 +125,37 @@ public class Feature extends AFeature {
 	@Override
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new Feature(this, newFeatureModel, newStructure);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeature#getParent()
+	 */
+//	@Override
+
+//	private IFeature parent;
+	public IFeature feature;
+
+	public IFeature getParent() {
+//		return null;
+//		return parent;
+		return FeatureUtils.getParent(feature);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeature#isConcrete()
+	 */
+//	@Override
+//	private boolean concret;
+	public boolean isConcrete() {
+//		return false;
+//		return concret;
+		return FeatureUtils.isConcrete(feature);
+	}
+
+	public String getDisplayName() {
+		return FeatureUtils.getDisplayName(feature);
 	}
 
 }

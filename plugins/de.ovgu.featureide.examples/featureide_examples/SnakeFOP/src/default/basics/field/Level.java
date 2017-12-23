@@ -41,8 +41,6 @@ public  class  Level {
 	/**
 	 * Erstellt ein neues Field.
 	 * 
-	 * @param x Größe der darzustellenden Fläche in X-Richtung
-	 * @param y Größe der darzustellenden Fläche in Y-Richtung
 	 * @param size Größe in der die Tile dargestellt werden sollen
 	 */
 	public Level(int size) {
@@ -165,8 +163,7 @@ public  class  Level {
 	/**
 	 * Gibt den die Größe des Feldes in X-Richtung zurück.
 	 * 
-	 * @return int Anzahl der Tile in x-Richtung
-	 * 
+	 * @return Anzahl der Tile in x-Richtung
 	 */
 	public int getMaxX() {
 		return maxX;
@@ -177,8 +174,7 @@ public  class  Level {
 	/**
 	 * Gibt den die Größe des Feldes in Y-Richtung zurück.
 	 * 
-	 * @return int Anzahl der Tile in y-Richtung
-	 * 
+	 * @return Anzahl der Tile in y-Richtung
 	 */
 	public int getMaxY() {
 		return maxY;
@@ -191,9 +187,9 @@ public  class  Level {
 	 * Indexwerten des Arrays.
 	 * 
 	 * @param indX
-	 *            x-Index des Tile's im Array
+	 *      x-Index des Tile's im Array
 	 * @param indY
-	 *            y-Index des Tile's im Array
+	 * 		y-Index des Tile's im Array
 	 * @return Tile an der angegebenen Position im Array
 	 */
 	public Tile getTile(int indX, int indY) {
@@ -219,9 +215,9 @@ public  class  Level {
 	 * ist.
 	 * 
 	 * @param x
-	 *            absolute x-Position des Tile's im Field
+	 * 		absolute x-Position des Tile's im Field
 	 * @param y
-	 *            absolute y-Position des Tile's im Field
+	 * 		absolute y-Position des Tile's im Field
 	 * @return boolean Tile begehbar?
 	 */
 	public boolean getWalkableAbsolutPos(int x, int y) {

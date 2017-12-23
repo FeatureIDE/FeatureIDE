@@ -21,6 +21,8 @@
 package de.ovgu.featureide.core.signature.base;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -52,9 +54,11 @@ public abstract class AbstractSignature implements IConstrainedObject {
 
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
-
 	protected int startLine = -1;
 	protected int endLine = -1;
+	protected final boolean staticSignature;
+
+	protected final Set<ExtendedSignature> invocationSignatures;
 
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
@@ -81,12 +85,16 @@ public abstract class AbstractSignature implements IConstrainedObject {
 			visibility = VISIBILITY_DEFAULT;
 		}
 
-		finalSignature = Arrays.binarySearch(modifiers, "final") >= 0;
+		this.staticSignature = (Arrays.binarySearch(this.modifiers, "static") >= 0);
+
+		this.finalSignature = Arrays.binarySearch(this.modifiers, "final") >= 0;
+
 		if (type == null) {
 			this.type = "void";
 		} else {
 			this.type = type;
 		}
+		this.invocationSignatures = new HashSet<ExtendedSignature>();
 	}
 
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type, int startLine, int endLine) {
@@ -169,6 +177,13 @@ public abstract class AbstractSignature implements IConstrainedObject {
 
 	public boolean isFinal() {
 		return finalSignature;
+	}
+
+	/**
+	 * @return the isStatic
+	 */
+	public boolean isStatic() {
+		return staticSignature;
 	}
 
 	public void setMergedjavaDocComment(String mergedjavaDocComment) {
@@ -274,5 +289,18 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		}
 
 		return new Or(constraints).toCNF();
+	}
+
+	public void addInvocationSignature(ExtendedSignature signature) {
+		invocationSignatures.add(signature);
+	}
+
+	/**
+	 * s
+	 * 
+	 * @return the invocationSignatures
+	 */
+	public Set<ExtendedSignature> getInvocationSignatures() {
+		return invocationSignatures;
 	}
 }

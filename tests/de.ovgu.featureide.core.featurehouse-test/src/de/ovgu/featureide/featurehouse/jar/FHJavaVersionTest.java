@@ -18,13 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
+
 package de.ovgu.featureide.featurehouse.jar;
 
 import org.junit.Test;
-
 import composer.FSTGenComposer;
 import de.ovgu.featureide.fm.core.jar.JavaVersionTest;
 import fuji.Main;
+
+import de.ovgu.featureide.fm.core.jar.JavaVersionTest;
 
 /**
  * Checks the Java Version of FeatureHouse jars

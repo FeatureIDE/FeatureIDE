@@ -15,9 +15,9 @@
 			point="org.eclipse.ui.menus">
 		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<menu
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.featurehouse.ui.submenu"
-					label="FeatureHouse">
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.featurehouse.ui.submenu"
+         label="FeatureHouse">
 				<visibleWhen
 						checkEnabled="false">
 					<with
@@ -99,6 +99,115 @@
 				</command>
 			</menu>
 		</menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:#CompilationUnitEditorContext?after=additions">
+    <!--
+     <menu
+           label="Refactoring">
+           -->
+        <menu
+              label="FeatureHouse-Refactoring">
+           <command
+                 commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+                 id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
+                 label="Rename..."
+                 style="push">
+              <visibleWhen
+                    checkEnabled="false">
+                 <test
+                       property="de.ovgu.featureide.core.featurehouse.properties.rename">
+                 </test>
+              </visibleWhen>
+           </command>
+           <command
+                 commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+                 id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.pullup"
+                 label="Pull Up To Parent Feature..."
+                 style="push">
+              <visibleWhen
+                    checkEnabled="false">
+                 <test
+                       property="de.ovgu.featureide.core.featurehouse.properties.rename">
+                 </test>
+              </visibleWhen>
+           </command>
+        </menu>
+     <!--</menu>-->
+  </menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
+     <menu
+           label="FeatureHouse-Refactoring">
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+              id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
+              label="Rename..."
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <test
+                    property="de.ovgu.featureide.core.featurehouse.properties.rename">
+              </test>
+           </visibleWhen>
+        </command>
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+              label="Pull Up To Parent-Feature..."
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <test
+                    property="de.ovgu.featureide.core.featurehouse.properties.rename">
+              </test>
+           </visibleWhen>
+        </command>
+     </menu>
+  </menuContribution>
+  <menuContribution
+        locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+     <menu
+           label="FeatureHouse-Refactoring">
+        <visibleWhen
+              checkEnabled="false">
+           <with
+                 variable="activeMenuSelection">
+              <iterate
+                    ifEmpty="false"
+                    operator="or">
+                 <test
+                       args="de.ovgu.featureide.composer.featurehouse"
+                       property="de.ovgu.featureide.fm.ui.properties.composer">
+                 </test>
+              </iterate>
+           </with>
+        </visibleWhen>
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUpAllClonedMembers"
+              label="PullUp cloned Members"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <with
+                    variable="activeMenuSelection">
+                 <and>
+                    <count
+                          value="1">
+                    </count>
+                    <reference
+                          definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+                    </reference>
+                    <test
+                          args="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
+                          property="de.ovgu.featureide.core.featurehouse.properties.toggle.fuji">
+                    </test>
+                 </and>
+              </with>
+           </visibleWhen>
+        </command>
+     </menu>
+  </menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -122,6 +231,14 @@
 				id="de.ovgu.featureide.core.featurehouse.ui.commands.key"
 				name="Perform Feature-Based Verification with KeY">
 		</command>
+  <command
+        id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+        name="Rename">
+  </command>
+  <command
+        id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+        name="PullUp">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -137,6 +254,14 @@
 				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateFeatureStubsHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key">
 		</handler>
+  <handler
+        class="de.ovgu.featureide.featurehouse.ui.handlers.RenameHandler"
+        commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename">
+  </handler>
+  <handler
+        class="de.ovgu.featureide.featurehouse.ui.handlers.PullUpHandler"
+        commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp">
+  </handler>
 	</extension>
 	<extension
 			id="de.ovgu.featureide.featurehouse.meta.verificationmarker"
@@ -165,6 +290,13 @@
 				properties="metaproduct"
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
+  <propertyTester
+        class="de.ovgu.featureide.featurehouse.ui.properties.RenameTester"
+        id="de.ovgu.featureide.core.featurehouse.renamepropertyTester"
+        namespace="de.ovgu.featureide.core.featurehouse.properties"
+        properties="rename"
+        type="java.lang.Object">
+  </propertyTester>
 	</extension>
  <extension
        point="de.ovgu.featureide.fm.core.FMComposer">

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<and abstract="true" mandatory="true" name="HelloWorld">
+				<feature mandatory="true" name="Hello"/>
+				<alt abstract="true" name="Feature">
+					<feature mandatory="true" name="Beautiful"/>
+					<feature mandatory="true" name="Wonderful"/>
+				</alt>
+				<feature mandatory="true" name="World"/>
+			</and>
+		</struct>
+		<constraints/>
+		<comments/>
+	</featureModel>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and mandatory="true" name="F0">
+				<feature name="F1"/>
+				<feature name="F2"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<not>
+					<disj>
+						<var>F1</var>
+						<var>F2</var>
+					</disj>
+				</not>
+			</rule>
+		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

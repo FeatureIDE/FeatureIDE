@@ -2,9 +2,9 @@
 <projectDescription>
 	<name>DiGraph-FH-JML</name>
 	<comment>
-	[description]
-	A library for representing and manipulating directed graph structures. 
-	[/description]</comment>
+		[description]
+		A library for representing and manipulating directed graph structures.
+		[/description]</comment>
 	<projects>
 	</projects>
 	<buildSpec>
