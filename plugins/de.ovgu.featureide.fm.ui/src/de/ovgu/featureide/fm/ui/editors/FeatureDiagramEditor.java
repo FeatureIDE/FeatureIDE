@@ -601,7 +601,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		if (GraphicalViewer.class.equals(adapter) || EditPartViewer.class.equals(adapter)) {
-			return (T) adapter.cast(this);
+			return (T) adapter.cast(getViewer());
 		}
 		if (ZoomManager.class.equals(adapter)) {
 			return adapter.cast(viewer.getZoomManager());

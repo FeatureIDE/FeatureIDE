@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID_;
-
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -43,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -116,7 +115,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		"Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
-	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
+	private static final String MODEL_CONST_TOOLTIP = StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 
@@ -398,7 +397,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	 */
 	private void createHasVoidModel(int row) {
 		createSymbol(row, VOID_MODEL, true, MODEL_CONST_TOOLTIP);
-		final Label labelIndetHidden = createLabel(row, language.getVoidModelConst(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
+		final Label labelIndetHidden = createLabel(row, language.getVoidModel(), FMPropertyManager.getFeatureForgroundColor(), MODEL_CONST_TOOLTIP);
 		add(labelIndetHidden);
 	}
 
