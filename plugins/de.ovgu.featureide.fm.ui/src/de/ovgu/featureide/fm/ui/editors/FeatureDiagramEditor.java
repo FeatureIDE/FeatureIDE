@@ -1105,7 +1105,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			menuManager.add(createLayoutMenuManager());
 			menuManager.add(createNameTypeMenuManager());
-		} else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !alternativeAction.isConnectionSelected()) {
+		} else if (hiddenAction.isEnabled() && !alternativeAction.isConnectionSelected()) {
 			// don't show menu to change group type of a feature in case a
 			// connection line is selected
 			menuManager.add(createCompoundAction);
