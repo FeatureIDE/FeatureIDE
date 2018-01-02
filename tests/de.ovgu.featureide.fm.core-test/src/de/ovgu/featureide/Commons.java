@@ -36,23 +36,9 @@ import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
  */
 public class Commons {
 
-	private static final String TEAMCITY_REMOTE_PATH = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH = "/home/travis/build/FeatureIDE/FeatureIDE/tests/";
-
-	private static final String JENKINS_REMOTE_PATH = "/home/neapel/.jenkins/workspace/Fide/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK1 = "/home/travis/build/DawidSA2017/FeatureIDE/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK2 = "/home/travis/build/Henningson/FeatureIDETeam2/tests/";
-
-	private static final String TRAVIS_REMOTE_PATH_FORK3 = "/home/travis/build/madateamprojekt/Team317/tests/";
-
-	private static final String PLUGIN_PATH = "de.ovgu.featureide.fm.core-test/src/";
 
 	public static File getRemoteOrLocalFolder(String path) {
 		final File folder = new File("src/" + path);
-
 		return folder;
 	}
 
