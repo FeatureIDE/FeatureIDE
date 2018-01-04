@@ -118,7 +118,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -129,6 +128,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -952,6 +952,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						if (f instanceof IFeature) {
 							((IFeature) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 							graphicalFeatureModel.getGraphicalFeature((IFeature) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+							if (((IFeature) f).getStructure().isRoot()) {
+								for (final IFeature subFeature : getFeatureModel().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+									subFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+									graphicalFeatureModel.getGraphicalFeature(subFeature).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+								}
+							}
 						} else if (f instanceof IConstraint) {
 							((IConstraint) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 							graphicalFeatureModel.getGraphicalConstraint((IConstraint) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
