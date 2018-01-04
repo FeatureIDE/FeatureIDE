@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_TAUTOLOGY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODELIS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENGLISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FALSE_OPTIONAL_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_INTERFACE;
@@ -59,7 +59,7 @@ public class English implements ILanguage {
 	private static final String IMPLICIT = "Implicit constraint";
 	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
-	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String VOID_MODEL_CONST = FEATURE_MODELIS_VOID;
 
 	@Override
 	public String getRedundantConst() {
