@@ -296,10 +296,6 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
 		}
-		if (void_model) {
-			height = height + ROW_HEIGHT;
-			setWidth(language.getVoidModelConst());
-		}
 		if (implicitConst) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getRedundantConst());
