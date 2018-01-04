@@ -115,7 +115,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		"Indeterminate hidden feature:\n\n This feature is declared hidden, but does not depend on any unhidden features.";
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
-	private static final String MODEL_CONST_TOOLTIP = StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
+	private static final String MODEL_CONST_TOOLTIP = StringTable.FEATURE_MODELIS_VOID;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
 

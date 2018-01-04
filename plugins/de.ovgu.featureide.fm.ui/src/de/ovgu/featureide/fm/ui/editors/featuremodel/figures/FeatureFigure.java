@@ -160,10 +160,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 		}
 
-		setLabelIcon(feature.getProperty().getFeatureStatus());
-
-		if (!analyser.valid()) {
+		if (feature.getFeatureModel().getStructure().getRoot().getFeature().getProperty().getFeatureStatus() == FeatureStatus.DEAD) {
 			setLabelIcon(FeatureStatus.DEAD);
+		} else {
+			setLabelIcon(feature.getProperty().getFeatureStatus());
 		}
 
 		if (feature instanceof ExtendedFeature) {
