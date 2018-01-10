@@ -50,7 +50,25 @@
 		<module>tests/de.ovgu.featureide.core.aspectj-test</module>
 		<module>tests/de.ovgu.featureide.core.featurehouse-test</module>
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
+
+		<module>runtime</module>
 	</modules>
+
+<!--Sometimes is it usefull to skip some modules. In this case the gui-test are not set as default: if you just want to
+run the maven-lifecycle "test" it makes no sense to run gui-test too, because runtime only builds an installable version
+of FeatureIDE at lifecycle "package". However to add the module "gui-test" just run maven with: 
+mvn -Pwith:gui <phase> ...and here phase should be "package", "install" or "verify" and not "test"--> 
+	<profiles>
+        <profile>
+            <id>with:gui</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>gui-tests/de.ovgu.featureide.fm.gui-test</module>
+            </modules>
+        </profile>
+    </profiles>
 
 	<build>
 		<plugins>
