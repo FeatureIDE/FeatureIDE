@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>de.ovgu.featureide</groupId>
+    <artifactId>de.ovgu.featureide</artifactId>
+    <version>3.4.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+  <artifactId>de.ovgu.featureide.fm.gui-test</artifactId>
+  <groupId>de.ovgu.featureide.fm.gui-test</groupId>
+  <version>3.4.0-SNAPSHOT</version>
+  <packaging>rcpttTest</packaging>
+
+<build>
+	
+	<plugins>
+        <plugin>
+            <groupId>org.eclipse.rcptt</groupId>
+            <artifactId>rcptt-maven-plugin</artifactId>
+            <version>2.0.1</version>
+            <extensions>true</extensions>
+            <configuration> 
+                <runner>
+                    <!-- Manage the memory used by Runner -->
+                    <vmArgs>
+                        <vmArg>-Xmx1024m</vmArg>
+                        <vmArg>-XX:MaxPermSize=256m</vmArg>
+                    </vmArgs>
+                </runner>
+                <aut>
+                  <explicit>https://ftp.fau.de/eclipse/technology/epp/downloads/release/neon/3/eclipse-rcp-neon-3-linux-gtk-x86_64.tar.gz</explicit>
+              		<injections>
+                  		<injection>
+                    		<site>file://${project.parent.basedir}/runtime/target/repository</site>
+                  		</injection>
+              		</injections>
+
+                </aut>
+                <testOptions>
+                    <execTimeout>3000</execTimeout>
+                    <testExecTimeout>3000</testExecTimeout>
+                </testOptions>      
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+
+
+
+
+<pluginRepositories> 
+    <pluginRepository>
+      <id>rcptt-snapshot</id>
+      <name>RCPTT Snapshot Repository</name>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-snapshots/</url>
+    </pluginRepository>
+     <pluginRepository>
+      <id>rcptt-release</id>
+      <name>RCPTT Releases Repository </name>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-releases/</url>
+    </pluginRepository> 
+</pluginRepositories>
+
+</project>
