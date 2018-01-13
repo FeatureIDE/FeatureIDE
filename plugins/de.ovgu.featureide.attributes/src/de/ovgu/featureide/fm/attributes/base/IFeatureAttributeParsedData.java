@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.attributes.base;
 /**
  * TODO description
  *
- * @author User
+ * @author Chico Sundermann
  */
 public interface IFeatureAttributeParsedData {
+
 	public String getName();
 
 	public String getType();

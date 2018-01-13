@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.attributes.base.impl;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * TODO description
@@ -155,6 +157,41 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	@Override
 	public void setConfigureable(boolean configureable) {
 		this.configureable = configureable;
+	}
+
+	// TODO ATTRIBUTE: take a look at contains might cause bugs
+	public IFeature getFeature(ExtendedFeatureModel featureModel) {
+		for (final IFeature f : featureModel.getFeatures()) {
+			if (((ExtendedFeature) f).getAttributes().contains(this)) {
+				return f;
+			}
+		}
+		return null;
+	}
+
+	// recursive Method to recursive attributes to all descendants
+	public void recurseAttribute(IFeature feature) {
+		IFeatureAttribute attribute = this;
+		IFeatureAttribute newAttribute = null;
+		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
+			newAttribute = new BooleanFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Boolean) attribute.getValue()), attribute.isRecursive(),
+					attribute.isConfigurable());
+		} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
+			newAttribute = new DoubleFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Double) attribute.getValue()), attribute.isRecursive(),
+					attribute.isConfigurable());
+		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
+			newAttribute = new LongFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Long) attribute.getValue()), attribute.isRecursive(),
+					attribute.isConfigurable());
+		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
+			newAttribute = new StringFeatureAttribute(attribute.getName(), attribute.getUnit(), ((String) attribute.getValue()), attribute.isRecursive(),
+					attribute.isConfigurable());
+		}
+		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
+			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
+			recurseAttribute(feat);
+			if (!((ExtendedFeature) struct.getFeature()).isContainingAttribute(newAttribute))
+				((ExtendedFeature) struct.getFeature()).addAttribute(newAttribute);
+		}
 	}
 
 	/*

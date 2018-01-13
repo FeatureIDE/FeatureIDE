@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 /**
  * TODO description
  *
- * @author Joshua
+ * @author Joshua Sprey
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 

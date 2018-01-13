@@ -26,14 +26,17 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * TODO description
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
@@ -72,8 +75,13 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#setValue(java.lang.Object, java.lang.Object)
 	 */
 	@Override
+	// TODO ATTRIBUTE: CLEANUP
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setRecursive((Boolean) value);
+		IFeatureAttribute attribute = (IFeatureAttribute) element;
+		Boolean newRecursive = (Boolean) value;
+		attribute.setRecursive(newRecursive);
+		IFeature feat = attribute.getFeature((ExtendedFeatureModel) view.getFeatureModel());
+		attribute.recurseAttribute(feat);
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		getViewer().update(element, null);
 	}

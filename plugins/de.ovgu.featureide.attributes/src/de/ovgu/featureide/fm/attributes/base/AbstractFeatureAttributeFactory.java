@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.attributes.base;
 /**
  * TODO description
  *
- * @author User
+ * @author Chico Sundermann
  */
 public abstract class AbstractFeatureAttributeFactory {
 
