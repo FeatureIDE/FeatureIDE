@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
@@ -27,6 +29,8 @@ package de.ovgu.featureide.fm.attributes.base;
  * @author Chico Sundermann
  */
 public interface IFeatureAttribute {
+
+	public IFeature getFeature();
 
 	public String getName();
 
@@ -49,4 +53,6 @@ public interface IFeatureAttribute {
 	public void setRecursive(boolean recursive);
 
 	public void setConfigureable(boolean configureable);
+
+	public void setFeature(IFeature feature);
 }

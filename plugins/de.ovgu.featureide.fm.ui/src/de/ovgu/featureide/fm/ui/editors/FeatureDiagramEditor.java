@@ -1292,4 +1292,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return null;
 	}
 
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		viewer.addSelectionChangedListener(listener);
+	}
+
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		viewer.removeSelectionChangedListener(listener);
+	}
+
 }

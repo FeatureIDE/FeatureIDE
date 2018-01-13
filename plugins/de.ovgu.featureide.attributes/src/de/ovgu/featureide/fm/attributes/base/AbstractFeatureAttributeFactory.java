@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
@@ -27,5 +29,5 @@ package de.ovgu.featureide.fm.attributes.base;
  */
 public abstract class AbstractFeatureAttributeFactory {
 
-	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData);
+	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature);
 }

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.view;
 
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
 
@@ -28,12 +29,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
@@ -64,15 +66,24 @@ import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeNam
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeRecursiveEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeUnitEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeValueEditingSupport;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeConfigureableColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeNameColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeRecursiveColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeTypeColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeUnitColumnLabelProvider;
+import de.ovgu.featureide.fm.attributes.view.labelprovider.FeatureAttributeValueColumnLabelProvider;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * TODO ATTRIBUTE description
@@ -89,12 +100,14 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		cachedImages.put(imgAttribute, FMAttributesPlugin.getImage(imgAttribute));
 		cachedImages.put(checkboxEnabled, FMAttributesPlugin.getImage(checkboxEnabled));
 		cachedImages.put(checkboxDisabled, FMAttributesPlugin.getImage(checkboxDisabled));
+
+		FeatureColorManager.addListener(this);
 	}
 
-	private final static String imgFeature = "FeatureIconSmall.ico";
-	private final static String imgAttribute = "attribute_obj.ico";
-	private final static String checkboxEnabled = "icon_reg_enable.png"; // TODO ATTRIBUTE find better icos
-	private final static String checkboxDisabled = "icon_reg_disable.png";
+	public final static String imgFeature = "FeatureIconSmall.ico";
+	public final static String imgAttribute = "attribute_obj.ico";
+	public final static String checkboxEnabled = "icon_reg_enable.png"; // TODO ATTRIBUTE find better icos
+	public final static String checkboxDisabled = "icon_reg_disable.png";
 	private final HashMap<String, Image> cachedImages;
 
 	private Tree tree;
@@ -117,6 +130,59 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeValueEditingSupport valueEditingSupport;
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
+
+	public ArrayList<IFeature> selectedManualFeatures;
+	public ArrayList<IFeature> selectedAutomaticFeatures;
+	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
+
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			selectedManualFeatures = new ArrayList<>();
+			for (Object obj : event.getStructuredSelection().toList()) {
+				if (!(obj instanceof FeatureEditPart)) {
+					selectedManualFeatures = null;
+					treeViewer.refresh();
+					treeViewer.expandToLevel(2);
+					return;
+				} else {
+					FeatureEditPart editPart = (FeatureEditPart) obj;
+					selectedManualFeatures.add(editPart.getModel().getObject());
+				}
+			}
+
+			selectedAutomaticFeatures = new ArrayList<>();
+			for (IFeature iFeature : selectedManualFeatures) {
+				// addChildsToFullList(iFeature);
+				addParentsToFullList(iFeature);
+			}
+
+			treeViewer.refresh();
+
+			for (IFeature iFeature : selectedAutomaticFeatures) {
+				treeViewer.setExpandedState(iFeature, true);
+			}
+
+		}
+
+		private void addChildsToFullList(IFeature feature) {
+			if (!selectedAutomaticFeatures.contains(feature)) {
+				selectedAutomaticFeatures.add(feature);
+			}
+			for (IFeatureStructure iFeature : feature.getStructure().getChildren()) {
+				addChildsToFullList(iFeature.getFeature());
+			}
+		}
+
+		private void addParentsToFullList(IFeature feature) {
+			if (!selectedAutomaticFeatures.contains(feature)) {
+				selectedAutomaticFeatures.add(feature);
+			}
+			if (!feature.getStructure().isRoot()) {
+				addParentsToFullList(feature.getStructure().getParent().getFeature());
+			}
+		}
+
+	};
 
 	private final IPageChangedListener pageListener = new IPageChangedListener() {
 
@@ -177,8 +243,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		parent.setLayout(layout);
 
 		// define the TableViewer
-		treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
-
+		treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		// create edit supports (inline editors)
 		createEditSupports();
 		// create the columns
@@ -192,7 +257,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		gridData.horizontalSpan = 2;
 		tree.setLayoutData(gridData);
 
-		treeViewer.setContentProvider(new FeatureAttributeContentProvider());
+		treeViewer.setContentProvider(new FeatureAttributeContentProvider(treeViewer));
+		treeViewer.addFilter(new FeatureAttributeViewSelectionFilter(this));
 
 		if (!treeViewer.getControl().isDisposed()) {
 			setEditorContent(null);
@@ -292,138 +358,40 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		colFeature.getColumn().setWidth(200);
 		colFeature.getColumn().setText(COLUMN_ELEMENT);
 		colFeature.setEditingSupport(nameEditingSupport);
-		colFeature.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return element.toString();
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.getName();
-				}
-				return "null";
-			}
-
-			@Override
-			public Image getImage(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return cachedImages.get(imgFeature);
-				} else if (element instanceof IFeatureAttribute) {
-					return cachedImages.get(imgAttribute);
-				}
-				return null;
-			}
-		});
+		colFeature.setLabelProvider(new FeatureAttributeNameColumnLabelProvider(cachedImages, this));
 
 		// Type
 		final TreeViewerColumn colType = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colType.getColumn().setWidth(200);
 		colType.getColumn().setText(COLUMN_TYPE);
-		colType.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return "-";
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.getType();
-				}
-				return "null";
-			}
-		});
+		colType.setLabelProvider(new FeatureAttributeTypeColumnLabelProvider(cachedImages, this));
 
 		// Value
 		final TreeViewerColumn colValue = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colValue.getColumn().setWidth(200);
 		colValue.getColumn().setText(COLUMN_VALUE);
 		colValue.setEditingSupport(valueEditingSupport);
-		colValue.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return "-";
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					if (attribute.getValue() != null) {
-						return attribute.getValue().toString();
-					}
-					return "";
-				}
-				return "null";
-			}
-		});
+		colValue.setLabelProvider(new FeatureAttributeValueColumnLabelProvider(cachedImages, this));
 
 		// Unit
 		final TreeViewerColumn colUnit = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colUnit.getColumn().setWidth(200);
 		colUnit.getColumn().setText(COLUMN_UNIT);
 		colUnit.setEditingSupport(unitEditingSupport);
-		colUnit.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				if ((element instanceof IFeature) || (element instanceof String)) {
-					return "-";
-				} else if (element instanceof IFeatureAttribute) {
-					final IFeatureAttribute attribute = (IFeatureAttribute) element;
-					return attribute.getUnit();
-				}
-				return "null";
-			}
-		});
+		colUnit.setLabelProvider(new FeatureAttributeUnitColumnLabelProvider(cachedImages, this));
 
 		// Recursive
 		final TreeViewerColumn colRecursive = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colRecursive.getColumn().setWidth(200);
 		colRecursive.getColumn().setText(COLUMN_RECURSIVE);
 		colRecursive.setEditingSupport(recursiveEditingSupport);
-		colRecursive.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				return "";
-			}
-
-			@Override
-			public Image getImage(Object element) {
-				if (element instanceof IFeatureAttribute) {
-					if (((IFeatureAttribute) element).isRecursive()) {
-						return cachedImages.get(checkboxEnabled);
-					} else {
-						return cachedImages.get(checkboxDisabled);
-					}
-				}
-				return null;
-			}
-		});
-
+		colRecursive.setLabelProvider(new FeatureAttributeRecursiveColumnLabelProvider(cachedImages, this));
 		// Configureable
 		final TreeViewerColumn colConfigureable = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colConfigureable.getColumn().setWidth(200);
 		colConfigureable.getColumn().setText(COLUMN_CONFIGUREABLE);
 		colConfigureable.setEditingSupport(configureableEditingSupport);
-		colConfigureable.setLabelProvider(new ColumnLabelProvider() {
-
-			@Override
-			public String getText(Object element) {
-				return "";
-			}
-
-			@Override
-			public Image getImage(Object element) {
-				if (element instanceof IFeatureAttribute) {
-					if (((IFeatureAttribute) element).isConfigurable()) {
-						return cachedImages.get(checkboxEnabled);
-					} else {
-						return cachedImages.get(checkboxDisabled);
-					}
-				}
-				return null;
-			}
-		});
+		colConfigureable.setLabelProvider(new FeatureAttributeConfigureableColumnLabelProvider(cachedImages, this));
 	}
 
 	/*
@@ -445,6 +413,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 				editor.removeEventListener(this);
 				editor.removePageChangedListener(pageListener);
+				editor.diagramEditor.removeSelectionChangedListener(selectionListener);
 			}
 			currentEditor = null;
 			repackAllColumns();
@@ -455,6 +424,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			currentEditor = activeWorkbenchPart;
 			editor.addEventListener(this);
 			editor.addPageChangedListener(pageListener);
+			editor.diagramEditor.addSelectionChangedListener(selectionListener);
 			setEditorContentByPage(editor.getSelectedPage());
 		} else if ((activeWorkbenchPart instanceof ConfigurationEditor) && (currentEditor != activeWorkbenchPart)) {
 			setEditorContent(null);
@@ -533,6 +503,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				}
 				treeViewer.expandAll();
 			}
+		} else if (event.getEventType() == EventType.COLOR_CHANGED) {
+			treeViewer.refresh();
 		}
 	}
 
@@ -546,9 +518,11 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		if (currentEditor instanceof FeatureModelEditor) {
 			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 			editor.removeEventListener(this);
+			editor.removePageChangedListener(pageListener);
+			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
 		}
 		currentEditor = null;
+		FeatureColorManager.removeListener(this);
 		super.dispose();
 	}
-
 }

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
@@ -37,8 +39,8 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	 * @param recursive
 	 * @param configureable
 	 */
-	public BooleanFeatureAttribute(String name, String unit, Boolean value, boolean recursive, boolean configurable) {
-		super(name, unit, recursive, configurable);
+	public BooleanFeatureAttribute(IFeature feature, String name, String unit, Boolean value, boolean recursive, boolean configurable) {
+		super(feature, name, unit, recursive, configurable);
 		this.value = value;
 		attributeType = FeatureAttribute.BOOLEAN;
 	}
