@@ -271,9 +271,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 								return;
 							} else {
 								final IFeatureAttribute attribute = (IFeatureAttribute) object;
-								for (final IFeature feature : featureModel.getFeatures()) {
-									if (((ExtendedFeature) feature).getAttributes().contains(attribute)) {
-										attributes.put((IFeatureAttribute) object, (ExtendedFeature) feature);
+								// delete all of these recursive elements
+								if (attribute.isRecursive()) {
+									for (final IFeature feature : featureModel.getFeatures()) {
+										for (IFeatureAttribute att : ((ExtendedFeature) feature).getAttributes()) {
+											if (attribute.getName().equals(att.getName())) {
+												attributes.put((IFeatureAttribute) att, (ExtendedFeature) feature);
+											}
+										}
+									}
+								} else {
+									for (final IFeature feature : featureModel.getFeatures()) {
+										if (((ExtendedFeature) feature).getAttributes().contains(attribute)) {
+											attributes.put((IFeatureAttribute) object, (ExtendedFeature) feature);
+										}
 									}
 								}
 							}
@@ -532,6 +543,15 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 					treeViewer.refresh((IFeature) event.getSource()); // TODO ATTRIBUTE hmm mal schauen, komische widget dispose meldung
 				}
 				treeViewer.expandAll();
+			}
+		} else if (event.getEventType() == EventType.FEATURE_ADD) {
+			if (event.getSource() instanceof ExtendedFeatureModel) {
+				ExtendedFeature feature = (ExtendedFeature) event.getNewValue();
+				for (IFeatureAttribute att : ((ExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
+					if (att.isRecursive()) {
+						feature.addAttribute(att);
+					}
+				}
 			}
 		}
 	}

@@ -170,6 +170,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_ATTRIBUTE_CHANGED,
 		/**
+		 * Any feature attribute was deleted
+		 */
+		FEATURE_ATTRIBUTE_DELETED,
+		/**
 		 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
 		 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as
 		 * each feature model would have to search the explanation for the relevant reason again. As such, each event of this type carries the respective reason
