@@ -139,6 +139,15 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public void setName(String name) {
+		if (recursive) {
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setName(name);
+					}
+				}
+			}
+		}
 		this.name = name;
 	}
 
@@ -148,8 +157,17 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public void setUnit(String unit) {
+		// TODO ATTRIBUTE: recursive boolean is enough because otherwise it would not be clickable check this again later
+		if (recursive) {
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setUnit(unit);
+					}
+				}
+			}
+		}
 		this.unit = unit;
-
 	}
 
 	/*
@@ -175,43 +193,66 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setConfigureable(boolean)
 	 */
 	@Override
-	public void setConfigureable(boolean configureable) {
-		this.configureable = configureable;
-	}
-
-	// TODO ATTRIBUTE: take a look at contains might cause bugs
-	public IFeature getFeature(ExtendedFeatureModel featureModel) {
-		for (final IFeature f : featureModel.getFeatures()) {
-			if (((ExtendedFeature) f).getAttributes().contains(this)) {
-				return f;
+	public void setConfigureable(boolean configurable) {
+		if (recursive) {
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setConfigureable(configurable);
+					}
+				}
 			}
 		}
-		return null;
+		this.configureable = configurable;
 	}
 
 	// recursive Method to recursive attributes to all descendants
 	public void recurseAttribute(IFeature feature) {
 		IFeatureAttribute attribute = this;
 		IFeatureAttribute newAttribute = null;
-		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
-			newAttribute = new BooleanFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Boolean) attribute.getValue()), attribute.isRecursive(),
-					attribute.isConfigurable());
-		} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
-			newAttribute = new DoubleFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Double) attribute.getValue()), attribute.isRecursive(),
-					attribute.isConfigurable());
-		} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
-			newAttribute = new LongFeatureAttribute(attribute.getName(), attribute.getUnit(), ((Long) attribute.getValue()), attribute.isRecursive(),
-					attribute.isConfigurable());
-		} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
-			newAttribute = new StringFeatureAttribute(attribute.getName(), attribute.getUnit(), ((String) attribute.getValue()), attribute.isRecursive(),
-					attribute.isConfigurable());
-		}
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttribute(feat);
-			if (!((ExtendedFeature) struct.getFeature()).isContainingAttribute(newAttribute))
+			if (!((ExtendedFeature) struct.getFeature()).isContainingAttribute(newAttribute)) {
+				if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
+					newAttribute = new BooleanFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Boolean) attribute.getValue()),
+							attribute.isRecursive(), attribute.isConfigurable());
+				} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
+					newAttribute = new DoubleFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Double) attribute.getValue()),
+							attribute.isRecursive(), attribute.isConfigurable());
+				} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
+					newAttribute = new LongFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Long) attribute.getValue()),
+							attribute.isRecursive(), attribute.isConfigurable());
+				} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
+					newAttribute = new StringFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((String) attribute.getValue()),
+							attribute.isRecursive(), attribute.isConfigurable());
+				}
 				((ExtendedFeature) struct.getFeature()).addAttribute(newAttribute);
+			}
 		}
+	}
+
+	/**
+	 * Removes the recursive attribute of the descendants
+	 * 
+	 * @param Feature Holding feature
+	 */
+	public void deleteRecursiveAttributes(IFeature feature) {
+		IFeatureAttribute attribute = this;
+		for (IFeature feat : feature.getFeatureModel().getFeatures()) {
+			if (!feat.equals(feature)) {
+				for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
+					if (att.getName().equals(attribute.getName())) {
+						((ExtendedFeature) feat).removeAttribute(att);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public boolean isHeadOfRecursiveAttribute() {
+		return getFeature().getStructure().isRoot() || (!((ExtendedFeature) getFeature().getStructure().getParent().getFeature()).isContainingAttribute(this));
 	}
 
 	/*

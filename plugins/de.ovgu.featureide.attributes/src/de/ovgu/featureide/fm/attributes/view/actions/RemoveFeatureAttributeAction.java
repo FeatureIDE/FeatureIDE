@@ -58,4 +58,10 @@ public class RemoveFeatureAttributeAction extends Action {
 		}
 		featureModel.fireEvent(new FeatureIDEEvent(featureModel.getStructure().getRoot().getFeature(), EventType.FEATURE_ATTRIBUTE_CHANGED));
 	}
+
+	@Override
+	public boolean isEnabled() {
+		return map.size() > 0;
+	}
+
 }

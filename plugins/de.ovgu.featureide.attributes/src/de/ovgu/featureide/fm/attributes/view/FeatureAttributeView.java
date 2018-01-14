@@ -370,10 +370,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 								final IFeatureAttribute attribute = (IFeatureAttribute) object;
 								// delete all of these recursive elements
 								if (attribute.isRecursive()) {
-									for (final IFeature feature : featureModel.getFeatures()) {
-										for (IFeatureAttribute att : ((ExtendedFeature) feature).getAttributes()) {
-											if (attribute.getName().equals(att.getName())) {
-												attributes.put((IFeatureAttribute) att, (ExtendedFeature) feature);
+									if (attribute.isHeadOfRecursiveAttribute()) {
+										for (final IFeature feature : featureModel.getFeatures()) {
+											for (IFeatureAttribute att : ((ExtendedFeature) feature).getAttributes()) {
+												if (attribute.getName().equals(att.getName())) {
+													attributes.put((IFeatureAttribute) att, (ExtendedFeature) feature);
+												}
 											}
 										}
 									}

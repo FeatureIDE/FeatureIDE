@@ -110,4 +110,12 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 		getViewer().update(element, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
+	 */
+	@Override
+	protected boolean canEdit(Object element) {
+		return enabled && (element instanceof IFeatureAttribute);
+	}
 }

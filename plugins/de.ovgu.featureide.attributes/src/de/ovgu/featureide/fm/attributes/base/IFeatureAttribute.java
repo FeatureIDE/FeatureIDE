@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -55,9 +54,11 @@ public interface IFeatureAttribute {
 
 	public void setConfigureable(boolean configureable);
 
-	public IFeature getFeature(ExtendedFeatureModel featuremodel);
-
 	public void recurseAttribute(IFeature feature);
 
+	public void deleteRecursiveAttributes(IFeature feature);
+
 	public void setFeature(IFeature feature);
+
+	public boolean isHeadOfRecursiveAttribute();
 }

@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
-import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
@@ -80,8 +79,12 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		IFeatureAttribute attribute = (IFeatureAttribute) element;
 		Boolean newRecursive = (Boolean) value;
 		attribute.setRecursive(newRecursive);
-		IFeature feat = attribute.getFeature((ExtendedFeatureModel) view.getFeatureModel());
-		attribute.recurseAttribute(feat);
+		IFeature feat = attribute.getFeature();
+		if (newRecursive) {
+			attribute.recurseAttribute(feat);
+		} else {
+			attribute.deleteRecursiveAttributes(feat);
+		}
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		getViewer().update(element, null);
 	}

@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
@@ -105,11 +104,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 			final ExtendedFeature feature = (ExtendedFeature) element;
 			return feature.getStructure().getParent().getFeature();
 		} else if (element instanceof IFeatureAttribute) {
-			for (final IFeature f : featureModel.getFeatures()) {
-				if (((ExtendedFeature) f).getAttributes().contains(element)) {
-					return f;
-				}
-			}
+			return ((IFeatureAttribute) element).getFeature();
 		}
 		return null;
 	}
