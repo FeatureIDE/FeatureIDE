@@ -568,6 +568,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
+				boolean needsRelayout = false;
 				if (changedAttributes == null) {
 					for (final IFeature f : getFeatureModel().getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
 						f.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
@@ -580,19 +581,37 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				} else {
 					for (final Object f : changedAttributes.keySet()) {
 						if (f instanceof IFeature) {
-							((IFeature) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
-							graphicalFeatureModel.getGraphicalFeature((IFeature) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+							final IFeature feature = (IFeature) f;
+							if (changedAttributes.get(feature) instanceof FeatureStatus) {
+								final FeatureStatus status = (FeatureStatus) changedAttributes.get(f);
+								feature.getProperty().setFeatureStatus(status);
+								feature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+								graphicalFeatureModel.getGraphicalFeature(feature).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+								if (feature.getStructure().isRoot()) {
+									needsRelayout = true;
+								}
+								if (feature.getStructure().isRoot() && (feature.getProperty().getFeatureStatus() == FeatureStatus.DEAD)) {
+									// When root is dead refresh all subfeatures
+									for (final IFeature subFeature : getFeatureModel()
+											.getVisibleFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures())) {
+										subFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+										graphicalFeatureModel.getGraphicalFeature(subFeature).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+									}
+								}
+							}
 						} else if (f instanceof IConstraint) {
 							((IConstraint) f).fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, false, true));
 							graphicalFeatureModel.getGraphicalConstraint((IConstraint) f).update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 						}
 					}
 				}
+				if (needsRelayout) {
+					getFeatureModel().fireEvent(new FeatureIDEEvent(null, EventType.LOCATION_CHANGED));
+				}
 				setActiveExplanation();
 				viewer.getContents().refresh();
 				return Status.OK_STATUS;
 			}
-
 		};
 		refreshGraphics.setPriority(Job.SHORT);
 		refreshGraphics.schedule();
@@ -1108,7 +1127,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			menuManager.add(createLayoutMenuManager());
 			menuManager.add(createNameTypeMenuManager());
-		} else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !alternativeAction.isConnectionSelected()) {
+		} else if (hiddenAction.isEnabled() && !alternativeAction.isConnectionSelected()) {
 			// don't show menu to change group type of a feature in case a
 			// connection line is selected
 			menuManager.add(createCompoundAction);

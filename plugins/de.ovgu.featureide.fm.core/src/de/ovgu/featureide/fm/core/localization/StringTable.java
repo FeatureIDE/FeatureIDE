@@ -572,7 +572,7 @@ public class StringTable {
 	public static final String REDUNDANT_CONSTRAINT = "Redundant constraint";
 	public static final String UNSATISFIABLE_CONSTRAINT = "Unsatisfiable constraint";
 	public static final String CONSTRAINT_IS_TAUTOLOGY = "Constraint is tautology";
-	public static final String CONSTRAINT_MAKES_THE_MODEL_VOID = "Constraint makes the feature model void";
+	public static final String FEATURE_MODELIS_VOID = "Feature model is void";
 	public static final String GERMAN = "German";
 	public static final String OBLIGATORISCH = "Obligatorisch";
 	public static final String ABSTRAKT = "Abstrakt";
