@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
+
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -59,6 +69,15 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * @author Marcus Pinnecke
  */
 public class Feature extends AFeature {
+
+	private static String ABSTRACT = " Abstract";
+	private static String HIDDEN = " hidden";
+	private static String HIDDEN_PARENT = INHERITED_HIDDEN;
+	private static String DEAD = IS_DEAD;
+	private static String FEATURE = " feature ";
+	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
+	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
+	private static String VOID = FEATURE_MODEL_IS_VOID;
 
 	/**
 	 * <b>Copy constructor</b>. Constructs a new instance of <code>Feature</code> given another feature <code>oldFeature</code>, a feature model
@@ -108,4 +127,55 @@ public class Feature extends AFeature {
 		return new Feature(this, newFeatureModel, newStructure);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.impl.AFeature#createTooltip(java.lang.Object[])
+	 */
+	@Override
+	public String createTooltip(Object... objects) {
+		final StringBuilder toolTip = new StringBuilder();
+		final FeatureModelAnalyzer analyser = getFeatureModel().getAnalyser();
+
+		toolTip.append(getStructure().isConcrete() ? CONCRETE : ABSTRACT);
+
+		if (getStructure().hasHiddenParent()) {
+			toolTip.append(getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
+		}
+
+		toolTip.append(getStructure().isRoot() ? ROOT : FEATURE);
+
+		switch (getProperty().getFeatureStatus()) {
+		case DEAD:
+			toolTip.append(DEAD);
+			break;
+		case FALSE_OPTIONAL:
+			toolTip.append(FALSE_OPTIONAL);
+			break;
+		case INDETERMINATE_HIDDEN:
+			toolTip.append(INDETERMINATE_HIDDEN);
+			break;
+		default:
+			break;
+		}
+
+		if (!analyser.valid()) {
+			toolTip.setLength(0);
+			toolTip.trimToSize();
+			toolTip.append(VOID);
+		}
+
+		final String description = getProperty().getDescription();
+		if ((description != null) && !description.trim().isEmpty()) {
+			toolTip.append("\n\nDescription:\n");
+			toolTip.append(description);
+		}
+
+		final String contraints = FeatureUtils.getRelevantConstraintsString(this);
+		if (!contraints.isEmpty()) {
+			toolTip.append("\n\nConstraints:\n");
+			toolTip.append(contraints);
+		}
+
+		return toolTip.toString();
+	}
 }

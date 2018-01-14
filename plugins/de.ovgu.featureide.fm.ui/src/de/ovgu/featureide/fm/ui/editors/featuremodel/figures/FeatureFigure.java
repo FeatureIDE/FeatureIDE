@@ -20,13 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +47,6 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -201,50 +198,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	@Override
 	public IFigure getToolTip() {
 		if (toolTipFigure == null) {
-			final StringBuilder toolTip = new StringBuilder();
 
 			final IFeature feature = this.feature.getObject();
-			final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-
-			toolTip.append(feature.getStructure().isConcrete() ? CONCRETE : ABSTRACT);
-
-			if (feature.getStructure().hasHiddenParent()) {
-				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
-			}
-
-			toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
-
-			switch (feature.getProperty().getFeatureStatus()) {
-			case DEAD:
-				toolTip.append(DEAD);
-				break;
-			case FALSE_OPTIONAL:
-				toolTip.append(FALSE_OPTIONAL);
-				break;
-			case INDETERMINATE_HIDDEN:
-				toolTip.append(INDETERMINATE_HIDDEN);
-				break;
-			default:
-				break;
-			}
-
-			if (!analyser.valid()) {
-				toolTip.setLength(0);
-				toolTip.trimToSize();
-				toolTip.append(VOID);
-			}
-
-			final String description = feature.getProperty().getDescription();
-			if ((description != null) && !description.trim().isEmpty()) {
-				toolTip.append("\n\nDescription:\n");
-				toolTip.append(description);
-			}
-
-			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
-			if (!contraints.isEmpty()) {
-				toolTip.append("\n\nConstraints:\n");
-				toolTip.append(contraints);
-			}
+			final StringBuilder toolTip = new StringBuilder();
+			toolTip.append(feature.createTooltip(new Object[0]));
 
 			if (getActiveReason() != null) {
 				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));

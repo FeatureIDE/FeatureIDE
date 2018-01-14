@@ -119,4 +119,13 @@ public interface IFeature extends IFeatureModelElement {
 	@Nonnull
 	IFeatureStructure getStructure();
 
+	/**
+	 * Creates the tooltip for the feature. Used to have the same tooltip in the different views that are used within the project. The tooltip created for the
+	 * feature depents on the parameter objects given to it.
+	 *
+	 * @param objects Objects to determine which content should be generated.
+	 * @return Tooltip content as string
+	 */
+	String createTooltip(Object... objects);
+
 }

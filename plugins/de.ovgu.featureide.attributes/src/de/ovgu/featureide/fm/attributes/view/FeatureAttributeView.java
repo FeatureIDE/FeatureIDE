@@ -26,12 +26,15 @@ import java.util.HashMap;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -48,6 +51,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -60,7 +64,10 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.actions.AddFeatureAttributeAction;
+import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
+import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
 import de.ovgu.featureide.fm.attributes.view.actions.RemoveFeatureAttributeAction;
+import de.ovgu.featureide.fm.attributes.view.actions.SynchFeatureAttributesToFeatureDiagramAction;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeConfigureableEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeNameEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeRecursiveEditingSupport;
@@ -100,6 +107,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		cachedImages.put(imgAttribute, FMAttributesPlugin.getImage(imgAttribute));
 		cachedImages.put(checkboxEnabled, FMAttributesPlugin.getImage(checkboxEnabled));
 		cachedImages.put(checkboxDisabled, FMAttributesPlugin.getImage(checkboxDisabled));
+		cachedImages.put(expandAll, FMAttributesPlugin.getImage(expandAll));
+		cachedImages.put(collapseAll, FMAttributesPlugin.getImage(collapseAll));
+		cachedImages.put(synch_tree, FMAttributesPlugin.getImage(synch_tree));
 
 		FeatureColorManager.addListener(this);
 	}
@@ -108,6 +118,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public final static String imgAttribute = "attribute_obj.ico";
 	public final static String checkboxEnabled = "icon_reg_enable.png"; // TODO ATTRIBUTE find better icos
 	public final static String checkboxDisabled = "icon_reg_disable.png";
+	public final static String expandAll = "expand.gif";
+	public final static String collapseAll = "collapse.gif";
+	public final static String synch_tree = "synch_tree.gif";
 	private final HashMap<String, Image> cachedImages;
 
 	private Tree tree;
@@ -131,12 +144,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeRecursiveEditingSupport recursiveEditingSupport;
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
+	public boolean synchToFeatureDiagram = false;
 	public ArrayList<IFeature> selectedManualFeatures;
 	public ArrayList<IFeature> selectedAutomaticFeatures;
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
+			if (!synchToFeatureDiagram) {
+				// Prevent the feature attributes view from synching to the feature diagram
+				selectedManualFeatures = null;
+				selectedAutomaticFeatures = null;
+				treeViewer.refresh();
+				return;
+			}
 			selectedManualFeatures = new ArrayList<>();
 			for (Object obj : event.getStructuredSelection().toList()) {
 				if (!(obj instanceof FeatureEditPart)) {
@@ -314,6 +335,16 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createContexMenu() {
+		// Test toolbar
+		// menuManager.add(new AddFeatureAttributeAction(featureModel, feature, FeatureAttribute.STRING, StringTable.ADD_STRING_ATTRIBUTE));
+
+		IActionBars actionBars = getViewSite().getActionBars();
+		IMenuManager dropDownManage = actionBars.getMenuManager();
+		IToolBarManager toolBar = actionBars.getToolBarManager();
+		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
+		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
+		toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
+
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
@@ -353,6 +384,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	}
 
 	private void createColumns() {
+
+		ColumnViewerToolTipSupport.enableFor(treeViewer);
 		// Feature
 		final TreeViewerColumn colFeature = new TreeViewerColumn(treeViewer, SWT.NONE);
 		colFeature.getColumn().setWidth(200);
@@ -521,8 +554,12 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			editor.removePageChangedListener(pageListener);
 			editor.diagramEditor.removeSelectionChangedListener(selectionListener);
 		}
-		currentEditor = null;
 		FeatureColorManager.removeListener(this);
+		// Dispose all cached images to prevent leaks
+		for (Image image : cachedImages.values()) {
+			image.dispose();
+		}
+		currentEditor = null;
 		super.dispose();
 	}
 }

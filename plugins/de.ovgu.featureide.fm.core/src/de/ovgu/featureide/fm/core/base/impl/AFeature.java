@@ -163,4 +163,13 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		return getName();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeature#createTooltip(java.lang.Object[])
+	 */
+	@Override
+	public String createTooltip(Object... objects) {
+		return "No tooltip implementation.";
+	}
+
 }

@@ -1013,4 +1013,13 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	public IFeatureStructure getStructure() {
 		return feature.getStructure();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeature#createTooltip(java.lang.Object[])
+	 */
+	@Override
+	public String createTooltip(Object... objects) {
+		return "No tooltip implementation.";
+	}
 }

@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
@@ -55,5 +56,32 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 			}
 		}
 		return new Color(null, 255, 255, 255);
+	}
+
+	@Override
+	public String getToolTipText(Object element) {
+		if (element instanceof IFeature) {
+			IFeature feature = (IFeature) element;
+			return feature.createTooltip(new Object[0]);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Point getToolTipShift(Object object) {
+		return new Point(5, 5);
+	}
+
+	@Override
+	public int getToolTipDisplayDelayTime(Object object) {
+		// Dsiplay tooltip after 1000 ms (1sek)
+		return 1000;
+	}
+
+	@Override
+	public int getToolTipTimeDisplayed(Object object) {
+		// Dsiplay tooltip for 15000 ms (15sek)
+		return 15000;
 	}
 }

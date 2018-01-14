@@ -52,4 +52,39 @@ public class ExtendedFeature extends Feature {
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new ExtendedFeature(this, newFeatureModel, newStructure);
 	}
+
+	@Override
+	public String createTooltip(Object... objects) {
+		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
+		tooltip.append("\n\n");
+		if (attributes.size() == 0) {
+			tooltip.append("No Attributes.\n");
+		} else {// Append attributes as list
+			tooltip.append("Attributes:\n");
+			for (int i = 0; i < attributes.size(); i++) {
+				IFeatureAttribute attribute = attributes.get(i);
+				tooltip.append(String.format("%02d", i));
+				tooltip.append(". Name: ");
+				tooltip.append(attribute.getName());
+				tooltip.append(", Type: ");
+				tooltip.append(attribute.getType());
+				tooltip.append(", Value: ");
+				tooltip.append(attribute.getValue());
+				if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
+					tooltip.append(" ");
+					tooltip.append(attribute.getUnit());
+				}
+				if (attributes.get(i).isRecursive()) {
+					tooltip.append(", Recursive");
+				}
+				if (attributes.get(i).isConfigurable()) {
+					tooltip.append(", Configureable");
+				}
+				if (i < attributes.size() - 1) {
+					tooltip.append("\n");
+				}
+			}
+		}
+		return tooltip.toString();
+	}
 }
