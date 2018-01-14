@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
 import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * TODO description
@@ -39,7 +40,7 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 	 * @see de.ovgu.featureide.fm.core.attributes.AbstractFeatureAttributeFactory#createFeatureAttribute(java.lang.String)
 	 */
 	@Override
-	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData) {
+	public IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature feature) {
 		final Boolean configurable = Boolean.parseBoolean(attributeData.isConfigurable());
 		final Boolean recursive = Boolean.parseBoolean(attributeData.isRecursive());
 		switch (attributeData.getType()) {
@@ -48,14 +49,14 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 			if (attributeData.getValue() != null) {
 				valueBoolean = Boolean.parseBoolean(attributeData.getValue());
 			}
-			return (new BooleanFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
+			return (new BooleanFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueBoolean, recursive, configurable));
 		case FeatureAttribute.LONG:
 			try {
 				Long valueLong = null;
 				if (attributeData.getValue() != null) {
 					valueLong = Long.parseLong(attributeData.getValue());
 				}
-				return (new LongFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
+				return (new LongFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
@@ -66,13 +67,13 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				if (attributeData.getValue() != null) {
 					valueDouble = Double.parseDouble(attributeData.getValue());
 				}
-				return (new DoubleFeatureAttribute(attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
+				return (new DoubleFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
 				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
 			}
 		case FeatureAttribute.STRING:
-			return (new StringFeatureAttribute(attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
+			return (new StringFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
 		default:
 			FMCorePlugin.getDefault().logError(new UnknownFeatureAttributeTypeException(attributeData));
 			return null;

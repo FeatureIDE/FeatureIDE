@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
@@ -38,8 +40,8 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 * @param configureable
 	 */
 
-	public LongFeatureAttribute(String name, String unit, Long value, boolean recursive, boolean configureable) {
-		super(name, unit, recursive, configureable);
+	public LongFeatureAttribute(IFeature feature, String name, String unit, Long value, boolean recursive, boolean configureable) {
+		super(feature, name, unit, recursive, configureable);
 		this.value = value;
 		attributeType = FeatureAttribute.LONG;
 	}

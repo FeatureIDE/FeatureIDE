@@ -31,6 +31,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public interface IFeatureAttribute {
 
+	public IFeature getFeature();
+
 	public String getName();
 
 	public String getUnit();
@@ -56,4 +58,6 @@ public interface IFeatureAttribute {
 	public IFeature getFeature(ExtendedFeatureModel featuremodel);
 
 	public void recurseAttribute(IFeature feature);
+
+	public void setFeature(IFeature feature);
 }

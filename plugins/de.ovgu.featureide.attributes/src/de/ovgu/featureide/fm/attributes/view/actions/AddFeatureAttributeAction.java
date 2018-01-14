@@ -59,19 +59,19 @@ public class AddFeatureAttributeAction extends Action {
 	public void run() {
 		switch (attributeType) {
 		case FeatureAttribute.BOOLEAN:
-			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute("<Name>", "", null, false, false);
+			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, "<Name>", "", null, false, false);
 			feature.addAttribute(attributeBoolean);
 			break;
 		case FeatureAttribute.DOUBLE:
-			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute("<Name>", "", null, false, false);
+			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, "<Name>", "", null, false, false);
 			feature.addAttribute(attributeDouble);
 			break;
 		case FeatureAttribute.LONG:
-			final IFeatureAttribute attributeLong = new LongFeatureAttribute("<Name>", "", null, false, false);
+			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, "<Name>", "", null, false, false);
 			feature.addAttribute(attributeLong);
 			break;
 		case FeatureAttribute.STRING:
-			final IFeatureAttribute attributeString = new StringFeatureAttribute("<Name>", "", null, false, false);
+			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, "<Name>", "", null, false, false);
 			feature.addAttribute(attributeString);
 			break;
 		default:

@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.attributes.view;
 import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
@@ -43,6 +44,11 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 
 	private ExtendedFeatureModel featureModel;
 	private Object[] features = EMPTY_ROOT;
+	private TreeViewer viewer;
+
+	public FeatureAttributeContentProvider(TreeViewer viewer) {
+		this.viewer = viewer;
+	}
 
 	/*
 	 * (non-Javadoc)

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
@@ -37,8 +39,8 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 * @param recursive
 	 * @param configureable
 	 */
-	public DoubleFeatureAttribute(String name, String unit, Double value, boolean recursive, boolean configureable) {
-		super(name, unit, recursive, configureable);
+	public DoubleFeatureAttribute(IFeature feature, String name, String unit, Double value, boolean recursive, boolean configureable) {
+		super(feature, name, unit, recursive, configureable);
 		this.value = value;
 		attributeType = FeatureAttribute.DOUBLE;
 	}

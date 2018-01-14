@@ -564,7 +564,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 					}
 					// TODO ATTRIBUTE Error marker for missing name and/or type
 					final IFeatureAttributeParsedData parsedAttribute = new FeatureAttributeParsedData(name, type, unit, value, recursive, configurable);
-					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute);
+					final IFeatureAttribute featureAttribute = attributeFactory.createFeatureAttribute(parsedAttribute, parent);
 					if (featureAttribute != null) {
 						((ExtendedFeature) parent).addAttribute(featureAttribute);
 					}

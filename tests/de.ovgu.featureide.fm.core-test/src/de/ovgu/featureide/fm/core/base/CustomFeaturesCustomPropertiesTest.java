@@ -52,7 +52,6 @@ public class CustomFeaturesCustomPropertiesTest {
 		public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 			throw new RuntimeException();
 		}
-
 	}
 
 	static class MyFeatureModelFactoryImplementation implements IFeatureModelFactory {

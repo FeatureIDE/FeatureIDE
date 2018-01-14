@@ -38,6 +38,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	public static final String BOOLEAN = "boolean";
 
 	private String name;
+	private IFeature feature;
 	private String unit;
 	private boolean recursive;
 	private boolean configureable;
@@ -51,12 +52,22 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @param recursive True, if the current Attribute should be inherited
 	 * @param configureable True, if the current FeatureAttribute needs be seting the configuration.
 	 */
-	protected FeatureAttribute(String name, String unit, boolean recursive, boolean configureable) {
+	protected FeatureAttribute(IFeature feature, String name, String unit, boolean recursive, boolean configureable) {
 		super();
+		this.feature = feature;
 		this.name = name;
 		this.unit = unit;
 		this.recursive = recursive;
 		this.configureable = configureable;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#getName()
+	 */
+	@Override
+	public IFeature getFeature() {
+		return feature;
 	}
 
 	/*
@@ -111,6 +122,15 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	@Override
 	public boolean isConfigurable() {
 		return configureable;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setName(java.lang.String)
+	 */
+	@Override
+	public void setFeature(IFeature feature) {
+		this.feature = feature;
 	}
 
 	/*
@@ -206,7 +226,11 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		builder.append(", Type: ");
 		builder.append(attributeType);
 		builder.append(", Value: ");
-		builder.append(getValue().toString());
+		if (getValue() == null) {
+			builder.append("null");
+		} else {
+			builder.append(getValue().toString());
+		}
 		builder.append(", Unit: ");
 		builder.append(unit);
 		builder.append(", Recursive: ");
