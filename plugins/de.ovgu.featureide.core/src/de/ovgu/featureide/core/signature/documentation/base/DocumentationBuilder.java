@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.signature.documentation.base;
 
 import java.util.Collection;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -58,6 +59,8 @@ public class DocumentationBuilder {
 					// merge
 					pair.getSignature().setMergedjavaDocComment(merger.merge(parser.getGeneralTags(), parser.getFeatureTags()));
 				}
+			} else {
+				CorePlugin.getDefault().logWarning("No sigantures found for project '" + featureProject.getProjectName() + "'.");
 			}
 		}
 	}

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL_BUT_EXPLANATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_EXPLANATION;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
@@ -32,14 +32,14 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CollapseAllButExplanationOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FocusOnExplanationOperation;
 
 /**
  * Action for collapsing all features but those affected by the active explanation.
  *
  * @author Timo G&uuml;nther
  */
-public class CollapseAllButExplanationAction extends Action {
+public class FocusOnExplanationAction extends Action {
 
 	/** The ID of this action. */
 	public static final String ID = "de.ovgu.featureide.collapseallbutexplanation";
@@ -55,9 +55,8 @@ public class CollapseAllButExplanationAction extends Action {
 	 *
 	 * @param fm the graphical feature model context
 	 */
-	public CollapseAllButExplanationAction(IGraphicalFeatureModel fm) {
-		super(COLLAPSE_ALL_BUT_EXPLANATION);
-		setId(ID);
+	public FocusOnExplanationAction(IGraphicalFeatureModel fm) {
+		super(FOCUS_ON_EXPLANATION);
 		this.fm = fm;
 		addActiveExplanationListener();
 	}
@@ -108,7 +107,7 @@ public class CollapseAllButExplanationAction extends Action {
 
 	@Override
 	public void run() {
-		final CollapseAllButExplanationOperation op = new CollapseAllButExplanationOperation(getGraphicalFeatureModel(), getExplanation());
+		final FocusOnExplanationOperation op = new FocusOnExplanationOperation(getGraphicalFeatureModel(), getExplanation());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

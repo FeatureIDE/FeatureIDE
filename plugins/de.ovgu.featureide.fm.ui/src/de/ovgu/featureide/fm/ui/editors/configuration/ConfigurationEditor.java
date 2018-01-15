@@ -392,6 +392,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
+	public void setFocus() {
+		if (internalPages.get(0) instanceof ConfigurationPage) {
+			((ConfigurationPage) internalPages.get(0)).tree.setFocus();
+		}
+	}
+
+	@Override
 	protected void createPages() {
 		if (modelFile != null) {
 			allPages.add(initPage(new ConfigurationPage()));
