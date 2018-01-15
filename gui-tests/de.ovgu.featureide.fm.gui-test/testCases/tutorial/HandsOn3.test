@@ -1,0 +1,80 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,__Xr9MOvFEee9ofvBkamr2g
+Element-Name: HandsOn3
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _2sUkAOvPEee9ofvBkamr2g
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/28/17 3:34 PM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA,_pnctkOvREee9ofvBkamr2g
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+1. Import example Elevator-Antenna-v1.1 using the menu File >New > Example >FeatureIDE Examples
+2. Create a new configuration called Professional with menu File > New > Configuration File
+3. Select the features FIFO, DirectedCall, FloorPermission, save and close the editor 
+4. Open the feature model, change the group type below feature Modes to an alternative with context menu, and save the model
+5. Open the invalid configuration Professional, deselect feature FIFO, and save it
+6. Problem view indicates unused features, use right click >Quick Fix to create a configuration with feature Sabbath, rename configuration to Starter and open it
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-menu "File/New/Example..." | click
+get-window "New Example" | get-tree | select "FeatureIDE/FeatureIDE Examples" | double-click
+with [get-window "FeatureIDE Example Import"] {
+    get-tree | select AHEAD | get-item "Antenna/Elevator-Antenna-v1.1" | check
+    get-button Finish | click
+}
+
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.1/configs" | get-menu "New/Configuration File" 
+    | click
+with [get-window "New Configuration"] {
+    get-editbox -after [get-label "File name:"] | set-text Professional
+    get-button Finish | click
+}
+
+with [get-editor "Professional.xml" | get-tree] {
+    select Elevator | get-item "Elevator/Behavior/Modes/FIFO" | check
+    get-item "Elevator/CallButtons/DirectedCall" | check
+    get-item "Elevator/Security/Permission/FloorPermission" | check
+}
+get-button "Save (M1+S)" | click
+get-editor "Professional.xml" | close
+
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.1/model.xml" | double-click
+with [get-editor "Elevator-Antenna-v1.1 Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+        mouse-press 26 15 button3 -height 21 -width 45
+        mouse-release 26 15 button3 2097152 -height 21 -width 45
+    }
+    get-menu Alternative | click
+}
+get-button "Save (M1+S)" | click
+
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.1/configs/Professional.xml" | double-click
+get-editor "Professional.xml" | get-tree | get-item "Elevator/Behavior/Modes/FIFO" | uncheck
+get-button "Save (M1+S)" | click
+
+with [get-view Problems] {
+    click
+    get-tree | select "Infos (2 items)/Unused: 1 feature is not used: Sabbath" | get-menu "Quick Fix" | click
+}
+get-window "Quick Fix" | get-button Finish | click
+
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.1/configs/Configuration0.xml" 
+    | get-menu "Refactor/Rename..." | click
+with [get-window "Rename Resource"] {
+    get-editbox -after [get-label "New name:"] | set-text "Starter.xml"
+    get-button OK | click
+}
+get-view "Package Explorer" | get-tree | select "Elevator-Antenna-v1.1/configs/Starter.xml" | double-click
+get-editor "Starter.xml" | get-tab-folder | get-tab-item Source | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

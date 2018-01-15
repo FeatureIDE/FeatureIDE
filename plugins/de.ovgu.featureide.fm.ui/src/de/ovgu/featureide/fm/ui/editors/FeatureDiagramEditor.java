@@ -50,6 +50,7 @@ import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.Action;
@@ -111,7 +112,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CalculateDependency
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllButExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -123,6 +123,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintActio
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExpandConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ExportFeatureModelAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.FocusOnExplanationAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LayoutSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
@@ -180,7 +181,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private CollapseSiblingsAction collapseFeaturesAction;
 	private CollapseAllAction collapseAllAction;
 	private ExpandAllAction expandAllAction;
-	private CollapseAllButExplanationAction collapseAllButExplanationAction;
+	private FocusOnExplanationAction focusOnExplanationAction;
 	private SetFeatureColorAction colorSelectedFeatureAction;
 	private AdjustModelToEditorSizeAction adjustModelToEditorSizeAction;
 	private HiddenAction hiddenAction;
@@ -286,7 +287,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		collapseAction = addAction(new CollapseAction(viewer, graphicalFeatureModel));
 		collapseFeaturesAction = addAction(new CollapseSiblingsAction(viewer, graphicalFeatureModel));
 		collapseAllAction = addAction(new CollapseAllAction(graphicalFeatureModel));
-		collapseAllButExplanationAction = addAction(new CollapseAllButExplanationAction(getGraphicalFeatureModel()));
+		focusOnExplanationAction = addAction(new FocusOnExplanationAction(getGraphicalFeatureModel()));
 		expandAllAction = addAction(new ExpandAllAction(graphicalFeatureModel));
 		expandConstraintAction = addAction(new ExpandConstraintAction(viewer, graphicalFeatureModel));
 		adjustModelToEditorSizeAction = addAction(new AdjustModelToEditorSizeAction(this, graphicalFeatureModel, ADJUST_MODEL_TO_EDITOR));
@@ -1140,7 +1141,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(hiddenAction);
 			menuManager.add(collapseAction);
 			menuManager.add(collapseFeaturesAction);
-			menuManager.add(collapseAllButExplanationAction);
+			menuManager.add(focusOnExplanationAction);
 			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(new Separator());
 			menuManager.add(createLayoutMenuManager());
@@ -1300,10 +1301,56 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		for (final Action action : actions) {
-			if (action.getId().equals(workbenchActionID)) {
-				return action;
-			}
+		if (CreateLayerAction.ID.equals(workbenchActionID)) {
+			return createLayerAction;
+		}
+		if (CreateCompoundAction.ID.equals(workbenchActionID)) {
+			return createCompoundAction;
+		}
+		if (DeleteAction.ID.equals(workbenchActionID)) {
+			return deleteAction;
+		}
+		if (MandatoryAction.ID.equals(workbenchActionID)) {
+			return mandatoryAction;
+		}
+		if (AbstractAction.ID.equals(workbenchActionID)) {
+			return abstractAction;
+		}
+		if (CollapseAction.ID.equals(workbenchActionID)) {
+			return collapseAction;
+		}
+		if (CollapseSiblingsAction.ID.equals(workbenchActionID)) {
+			return collapseFeaturesAction;
+		}
+		if (FocusOnExplanationAction.ID.equals(workbenchActionID)) {
+			return focusOnExplanationAction;
+		}
+		if (AbstractAction.ID.equals(workbenchActionID)) {
+			return abstractAction;
+		}
+		if (HiddenAction.ID.equals(workbenchActionID)) {
+			return hiddenAction;
+		}
+		if (AndAction.ID.equals(workbenchActionID)) {
+			return andAction;
+		}
+		if (OrAction.ID.equals(workbenchActionID)) {
+			return orAction;
+		}
+		if (AlternativeAction.ID.equals(workbenchActionID)) {
+			return alternativeAction;
+		}
+		if (RenameAction.ID.equals(workbenchActionID)) {
+			return renameAction;
+		}
+		if (CalculateDependencyAction.ID.equals(workbenchActionID)) {
+			return calculateDependencyAction;
+		}
+		if (GEFActionConstants.ZOOM_IN.equals(workbenchActionID)) {
+			return zoomIn;
+		}
+		if (GEFActionConstants.ZOOM_OUT.equals(workbenchActionID)) {
+			return zoomOut;
 		}
 		return null;
 	}

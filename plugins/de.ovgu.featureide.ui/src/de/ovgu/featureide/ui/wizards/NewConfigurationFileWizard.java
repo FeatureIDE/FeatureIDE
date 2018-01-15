@@ -133,8 +133,12 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 			throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
-		if (!container.exists()) {
-			throwCoreException(CONTAINER_DOES_NOT_EXIST_);
+		if (!container.isAccessible()) {
+			if (container.getProject().isAccessible()) {
+				CorePlugin.createFolder(container.getProject(), container.getProjectRelativePath().toString());
+			} else {
+				throwCoreException(CONTAINER_DOES_NOT_EXIST_);
+			}
 		}
 
 		final IFile file = container.getFile(new Path(fileName));

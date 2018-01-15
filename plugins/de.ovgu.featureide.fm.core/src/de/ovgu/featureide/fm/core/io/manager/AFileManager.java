@@ -256,7 +256,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	@Override
 	public T getObject() {
-		return persistentObject;
+		synchronized (syncObject) {
+			return persistentObject;
+		}
 	}
 
 	@Override
@@ -367,8 +369,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				}
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
-				final byte[] content = format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET);
-				FileSystem.write(path, content);
+				FileSystem.write(path, format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
 				persistentObject = copyObject(tempObject);
 			} catch (final Exception e) {
 				handleException(e);
