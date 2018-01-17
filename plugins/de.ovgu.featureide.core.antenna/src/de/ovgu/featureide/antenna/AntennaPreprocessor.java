@@ -92,6 +92,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public AntennaPreprocessor() {
 		super(ANTENNA);
 		nodereader.setIgnoreMissingFeatures(true);
+		nodereader.setIgnoreUnparsableSubExpressions(true);
 	}
 
 	@Override
