@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -61,5 +62,13 @@ public class StringFeatureAttribute extends FeatureAttribute {
 			return;
 		}
 		this.value = value.toString();
+	}
+
+	/**
+	 * Returns a copy of the attribute
+	 */
+	@Override
+	public IFeatureAttribute cloneAtt() {
+		return new StringFeatureAttribute(this.getFeature(), this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
 }

@@ -214,19 +214,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttribute(feat);
 			if (!((ExtendedFeature) struct.getFeature()).isContainingAttribute(newAttribute)) {
-				if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
-					newAttribute = new BooleanFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Boolean) attribute.getValue()),
-							attribute.isRecursive(), attribute.isConfigurable());
-				} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
-					newAttribute = new DoubleFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Double) attribute.getValue()),
-							attribute.isRecursive(), attribute.isConfigurable());
-				} else if (attribute.getType().equals(FeatureAttribute.LONG)) {
-					newAttribute = new LongFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((Long) attribute.getValue()),
-							attribute.isRecursive(), attribute.isConfigurable());
-				} else if (attribute.getType().equals(FeatureAttribute.STRING)) {
-					newAttribute = new StringFeatureAttribute(feat, attribute.getName(), attribute.getUnit(), ((String) attribute.getValue()),
-							attribute.isRecursive(), attribute.isConfigurable());
-				}
+				newAttribute = attribute.cloneAtt();
 				((ExtendedFeature) struct.getFeature()).addAttribute(newAttribute);
 			}
 		}

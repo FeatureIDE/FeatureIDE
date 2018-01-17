@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -63,5 +64,13 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 		if (value instanceof Double) {
 			this.value = (Double) value;
 		}
+	}
+
+	/**
+	 * Returns a copy of the attribute
+	 */
+	@Override
+	public IFeatureAttribute cloneAtt() {
+		return new DoubleFeatureAttribute(this.getFeature(), this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
 }

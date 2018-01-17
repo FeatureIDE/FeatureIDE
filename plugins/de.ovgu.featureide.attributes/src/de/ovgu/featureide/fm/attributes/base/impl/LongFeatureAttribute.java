@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -64,5 +65,13 @@ public class LongFeatureAttribute extends FeatureAttribute {
 		if (value instanceof Long) {
 			this.value = (Long) value;
 		}
+	}
+
+	/**
+	 * Returns a copy of the attribute
+	 */
+	@Override
+	public IFeatureAttribute cloneAtt() {
+		return new LongFeatureAttribute(this.getFeature(), this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
 }
