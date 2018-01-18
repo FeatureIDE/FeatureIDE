@@ -74,7 +74,6 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 * @see de.ovgu.featureide.fm.ui.views.attributes.editingsupport.AbstractFeatureAttributeEditingSupport#setValue(java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	// TODO ATTRIBUTE: CLEANUP
 	protected void setValue(Object element, Object value) {
 		IFeatureAttribute attribute = (IFeatureAttribute) element;
 		Boolean newRecursive = (Boolean) value;

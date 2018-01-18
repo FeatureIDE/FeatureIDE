@@ -157,7 +157,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public void setUnit(String unit) {
-		// TODO ATTRIBUTE: recursive boolean is enough because otherwise it would not be clickable check this again later
+		// recursive boolean is enough because otherwise it would not be clickable check this again later
 		if (recursive) {
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
 				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
