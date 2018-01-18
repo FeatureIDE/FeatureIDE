@@ -67,7 +67,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(featureName);
+					selectablefeature = object.getSelectablefeature(object.getFeatureModel().getRenamingsManager().getNewName(featureName));
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
