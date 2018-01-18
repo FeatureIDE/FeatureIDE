@@ -195,6 +195,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	@Override
 	public void setConfigureable(boolean configurable) {
 		if (recursive) {
+			Iterable<IFeature> test = getFeature().getFeatureModel().getFeatures();
 			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
 				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
 					if (att.getName().equals(this.getName())) {
@@ -213,8 +214,8 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttribute(feat);
+			newAttribute = attribute.cloneAtt();
 			if (!((ExtendedFeature) struct.getFeature()).isContainingAttribute(newAttribute)) {
-				newAttribute = attribute.cloneAtt();
 				((ExtendedFeature) struct.getFeature()).addAttribute(newAttribute);
 			}
 		}
