@@ -267,7 +267,9 @@ public class GuidslReader {
 		}
 		final SimplePattern simplePattern = (SimplePattern) pat;
 		final AstToken token = simplePattern.getIDENTIFIER();
-		return createFeature(token);
+		final IFeature feature = createFeature(token);
+		feature.getStructure().setMandatory(true);
+		return feature;
 	}
 
 	private IFeature readGPattern(GPattern gPattern) throws UnsupportedModelException {

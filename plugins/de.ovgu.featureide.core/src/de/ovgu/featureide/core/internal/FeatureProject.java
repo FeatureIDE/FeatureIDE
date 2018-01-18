@@ -149,6 +149,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				break;
 			case MODEL_DATA_SAVED:
 				try {
+					checkFeatureCoverage();
+					checkConfigurations(getAllConfigurations());
 					createAndDeleteFeatureFolders();
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
@@ -827,7 +829,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	// TODO this should not be called if only markers are changed
 	private synchronized void setAllFeatureModuleMarkers() {
-		LongRunningWrapper.getRunner(syncModulesJob, SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES).schedule();
+		if (composerExtension.createFolderForFeatures()) {
+			LongRunningWrapper.getRunner(syncModulesJob, SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES).schedule();
+		}
 	}
 
 	/**
@@ -1085,7 +1089,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						final ProblemList lastProblems = SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
 						if (!config.isValid()) {
 							String name = file.getName();
-							name = name.substring(0, name.lastIndexOf('.'));
+							final int extIndex = name.lastIndexOf('.');
+							if (extIndex > 0) {
+								name = name.substring(0, extIndex);
+							}
 							final String message = CONFIGURATION_ + name + IS_INVALID;
 							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
 

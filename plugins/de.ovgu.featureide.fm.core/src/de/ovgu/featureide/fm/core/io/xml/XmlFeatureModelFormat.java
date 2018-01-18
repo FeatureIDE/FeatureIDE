@@ -595,12 +595,6 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			}
 		}
 
-		// Check that there are only OR connections when the parent has more than one feature
-		for (final IFeature f : object.getFeatures()) {
-			if (f.getStructure().isOr() && (f.getStructure().getChildrenCount() <= 1)) {
-				f.getStructure().setAnd();
-			}
-		}
 	}
 
 	/**

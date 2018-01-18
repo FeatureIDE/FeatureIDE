@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<extension
+      id="de.ovgu.featureide.cloneanalysis.markers"
+      point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any">
+         <menu
+               id="bar"
+               label="Code Clone Analysis">
+            <command
+                  commandId="de.ovgu.featureide.code.cloneanalysis.plugin.CloneAnalysisCommand"
+                  label="Start CPD analysis"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                     <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                        </adapt>
+                        <instanceof
+                              value="org.eclipse.core.resources.IResource">
+                        </instanceof>
+                     </or>
+                  </iterate> 
+                  
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="de.ovgu.featureide.cloneanalysis.plugin.CloneAnalysisCommandHandler"
+            id="de.ovgu.featureide.code.cloneanalysis.plugin.CloneAnalysisCommand"
+            name="Start Code Clone Analysis">
+      </command>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Code Clone Analysis"
+            id="de.ovgu.featureide.code.Cloneanalysis">
+      </category>
+      <view
+            name="Clone Analysis View"
+            icon="icons/sample.gif"
+            category="de.ovgu.featureide.code.Cloneanalysis"
+            class="de.ovgu.featureide.cloneanalysis.views.CloneAnalysisView"
+            id="de.ovgu.featureide.code.cloneanalysis.views.CloneAnalysisView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.ProblemView"
+               relationship="right"
+               id="de.ovgu.featureide.code.cloneanalysis.views.CloneAnalysisView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+<!-- -->
+<!--
+<extension
+         id="de.ovgu.featureide.cloneanalysis.cloneMarker"
+         name="Code Clone"
+         point="org.eclipse.core.resources.markers">
+      <persistent value="false"/> 
+      <super type="org.eclipse.core.resources.problemmarker"/> 
+   </extension>
+   
+   <extension
+      point="org.eclipse.jdt.ui.quickFixProcessors">
+   <quickFixProcessor
+         class="de.ovgu.featureide.cloneanalysis.util.MyQuickFixProcessor"
+         id="org.eclipse.jdt.ui.text.correction.QuickFixProcessor"
+         name="My Quick Fix Processor">
+      <handledMarkerTypes>
+         <markerType
+               id="de.ovgu.featureide.cloneanalysis.cloneMarker">
+         </markerType>
+      </handledMarkerTypes>
+   </quickFixProcessor>
+</extension>
+   -->
+    
+
+<extension
+  point="org.eclipse.ui.ide.markerResolution">
+    <markerResolutionGenerator
+        class="de.ovgu.featureide.cloneanalysis.utils.QuickFixer"
+        markerType="org.eclipse.core.resources.problemmarker">
+        
+</markerResolutionGenerator>
+</extension>
+
+
+</plugin>
