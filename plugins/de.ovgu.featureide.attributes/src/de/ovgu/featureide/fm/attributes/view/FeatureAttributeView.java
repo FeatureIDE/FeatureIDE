@@ -68,6 +68,7 @@ import de.ovgu.featureide.fm.attributes.view.actions.CollapseAllButFirstLevel;
 import de.ovgu.featureide.fm.attributes.view.actions.ExpandTreeViewer;
 import de.ovgu.featureide.fm.attributes.view.actions.RemoveFeatureAttributeAction;
 import de.ovgu.featureide.fm.attributes.view.actions.SynchFeatureAttributesToFeatureDiagramAction;
+import de.ovgu.featureide.fm.attributes.view.actions.TestSolver;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeConfigureableEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeNameEditingSupport;
 import de.ovgu.featureide.fm.attributes.view.editingsupports.FeatureAttributeRecursiveEditingSupport;
@@ -344,6 +345,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
 		toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
+		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature))));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
