@@ -14,8 +14,6 @@ public class ExtendedFeature extends Feature {
 
 	protected List<IFeatureAttribute> attributes;
 
-	protected List<IFeatureAttribute> recursiveAttributes;
-
 	protected ExtendedFeature(ExtendedFeature copyFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(copyFeature, featureModel, newFeatrureStructure);
 
@@ -54,22 +52,6 @@ public class ExtendedFeature extends Feature {
 		return new ExtendedFeature(this, newFeatureModel, newStructure);
 	}
 
-	public List<IFeatureAttribute> getRecursiveAttributes() {
-		return Collections.unmodifiableList(recursiveAttributes);
-	}
-
-	public void addRecursiveAttribute(IFeatureAttribute attribute) {
-		recursiveAttributes.add(attribute);
-	}
-
-	public void removeRecursiveAttribute(IFeatureAttribute attribute) {
-		recursiveAttributes.remove(attribute);
-	}
-
-	public void setRecursiveAttributes(List<IFeatureAttribute> recursiveAttributes) {
-		this.recursiveAttributes = recursiveAttributes;
-	}
-
 	public boolean isContainingAttribute(IFeatureAttribute attribute) {
 		for (IFeatureAttribute att : attributes) {
 			if (attribute.getName().equals(att.getName())) {
@@ -78,6 +60,7 @@ public class ExtendedFeature extends Feature {
 		}
 		return false;
 	}
+
 	@Override
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));

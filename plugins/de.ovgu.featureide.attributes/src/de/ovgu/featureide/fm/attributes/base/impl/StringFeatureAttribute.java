@@ -68,7 +68,7 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 * Returns a copy of the attribute
 	 */
 	@Override
-	public IFeatureAttribute cloneAtt() {
-		return new StringFeatureAttribute(this.getFeature(), this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+	public IFeatureAttribute cloneAtt(IFeature feature) {
+		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
 }

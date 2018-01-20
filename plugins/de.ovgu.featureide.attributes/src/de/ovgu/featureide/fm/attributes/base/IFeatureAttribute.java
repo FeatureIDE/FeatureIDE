@@ -60,7 +60,7 @@ public interface IFeatureAttribute {
 
 	public void setFeature(IFeature feature);
 
-	public IFeatureAttribute cloneAtt();
+	public IFeatureAttribute cloneAtt(IFeature feature);
 
 	public boolean isHeadOfRecursiveAttribute();
 }

@@ -70,7 +70,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	 * Returns a copy of the attribute
 	 */
 	@Override
-	public IFeatureAttribute cloneAtt() {
-		return new DoubleFeatureAttribute(this.getFeature(), this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+	public IFeatureAttribute cloneAtt(IFeature feature) {
+		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
 }
