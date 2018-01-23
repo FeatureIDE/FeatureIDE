@@ -29,7 +29,7 @@
 
       								<id>FeatureIDE</id>
       								<version>3.4.0</version>
-      								<label>FeatureIDE 3.4.0 Feature</label>
+      								<label>FeatureIDE 3.4.2 Feature</label>
       								<providerName>A provider</providerName>
      								<description>${project.description}</description>
       								<copyright>A copyright</copyright>
@@ -44,121 +44,121 @@
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.ahead:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.ahead:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.antenna:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.antenna:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.aspectj:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.aspectj:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.conversion.ahead-featurehouse:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.conversion.ahead-featurehouse:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.featurecpp:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.featurecpp:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.featurehouse:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.featurehouse:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.framework:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.framework:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.images:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.images:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.mpl:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.mpl:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.munge:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.munge:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.munge.android:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.munge.android:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.runtime:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.core.runtime:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.examples:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.examples:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.fm.ui:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.fm.ui:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.migration:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.migration:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui.android:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui.android:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
 
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui.mpl:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.ui.mpl:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
                                         
                                         <artifact>
-                                            <id>de.ovgu.featureide:de.ovgu.featureide.fm.core:3.4.0-SNAPSHOT</id>
+                                            <id>de.ovgu.featureide:de.ovgu.featureide.fm.core:3.4.2-SNAPSHOT</id>
                                             <transitive>false</transitive>
 											<source>true</source>
                                         </artifact>
