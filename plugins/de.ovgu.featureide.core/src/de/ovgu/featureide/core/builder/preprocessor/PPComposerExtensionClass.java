@@ -457,18 +457,31 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected void setModelMarkers() {
 		removeModelMarkers();
 		final LinkedList<String> features = new LinkedList<>(usedFeatures);
+		final ArrayList<String> shouldUseFeatures = new ArrayList<>();
 		for (final IFeature f : featureProject.getFeatureModel().getFeatures()) {
 			if (f.getStructure().isAbstract() && features.contains(f.getName())) {
 				features.remove(f.getName());
 				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");
 			} else if (f.getStructure().isConcrete() && !features.contains(f.getName())) {
-				createMarker("You should use the Feature \"" + f.getName() + "\" or set it abstract.");
+				shouldUseFeatures.add("\"" + f.getName() + "\"");
 			} else {
 				features.remove(f.getName());
 			}
 		}
-		for (final String f : features) {
-			createMarker("You should create a Feature named \"" + f + "\".");
+
+		if (shouldUseFeatures.size() >= 1) {
+			Collections.sort(shouldUseFeatures);
+			String markerText = "You should use the Feature";
+			if (shouldUseFeatures.size() == 1) {
+				markerText += " " + shouldUseFeatures.get(0) + " or set it abstract.";
+			} else {
+				markerText += "s ";
+				for (final String featureName : shouldUseFeatures) {
+					markerText += featureName + ", ";
+				}
+				markerText += " or set them abstract.";
+			}
+			createMarker(markerText);
 		}
 	}
 
