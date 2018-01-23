@@ -42,5 +42,26 @@
             </parameter>
          </describer>
       </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            id="de.ovgu.featureide.fm.attributes.extendedConfiguration"
+            name="ExtendedConfigurationFormat"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element"
+                  value="extendedConfiguration">
+            </parameter>
+         </describer>
+      </content-type>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.ConfigFormat">
+      <configFormat
+            class="de.ovgu.featureide.fm.attributes.config.XmlExtendedConfFormat"
+            id="de.ovgu.featureide.fm.attributes.conf.XmlExtendedConfFormat"
+            name="XmlExtendedConfFormat">
+      </configFormat>
    </extension>
 </plugin>
