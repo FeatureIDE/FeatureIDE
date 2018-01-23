@@ -67,7 +67,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(featureName);
+					selectablefeature = object.getSelectablefeature(object.getFeatureModel().getRenamingsManager().getNewName(featureName));
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
@@ -79,16 +79,9 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
 					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
-				} else {
-					createWarning("No manual selection state specified", feature, warnings);
-					continue;
 				}
-
 				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
 					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
-				} else {
-					createWarning("No automatic selection state specified", feature, warnings);
-					continue;
 				}
 
 				final NamedNodeMap attributes = feature.getAttributes();
@@ -124,7 +117,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
 		if (selection == null) {
-			createError("Selection state not specified" + selection, feature, warnings);
 			return Selection.UNDEFINED;
 		} else {
 			switch (selection) {
@@ -135,7 +127,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			case "unselected":
 				return Selection.UNSELECTED;
 			default:
-				createError("Invalid selection state: " + selection, feature, warnings);
 				return Selection.UNDEFINED;
 			}
 		}
@@ -159,11 +150,19 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 		final Element root = doc.createElement("configuration");
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
+			if ((feature.getManual() == Selection.UNDEFINED) && (feature.getAutomatic() == Selection.UNDEFINED)) {
+				continue;
+			}
 			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
-			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
-			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			if (feature.getManual() != Selection.UNDEFINED) {
+				featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
+			}
+			if (feature.getAutomatic() != Selection.UNDEFINED) {
+				featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
+			}
 			root.appendChild(featureNode);
+
 		}
 	}
 
