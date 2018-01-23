@@ -9,7 +9,7 @@
   </parent>
   <artifactId>de.ovgu.featureide.fm.gui-test</artifactId>
   <groupId>de.ovgu.featureide.fm.gui-test</groupId>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>3.4.2-SNAPSHOT</version>
   <packaging>rcpttTest</packaging>
 
 <build>
