@@ -43,4 +43,10 @@
          </describer>
       </content-type>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.ui.Outline">
+      <Outline
+            OutlineProvider="de.ovgu.featureide.fm.attributes.statistics.ExtendedFMOutlineProvider">
+      </Outline>
+   </extension>
 </plugin>
