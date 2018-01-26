@@ -43,6 +43,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -314,7 +315,18 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
 				// Enable editor only with mouse double click
-				if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
+				if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION) {
+					final EventObject source = event.sourceEvent;
+					if ((source instanceof MouseEvent) && (((MouseEvent) source).button == 3)) {
+						return false;
+					}
+					if (event.getSource() instanceof ViewerCell) {
+						int index = ((ViewerCell) event.getSource()).getColumnIndex();
+						if (index == 4 || index == 5) {
+							return true;
+						}
+					}
+				} else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
 					final EventObject source = event.sourceEvent;
 					if ((source instanceof MouseEvent) && (((MouseEvent) source).button == 3)) {
 						return false;
@@ -556,7 +568,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				ExtendedFeature feature = (ExtendedFeature) event.getNewValue();
 				for (IFeatureAttribute att : ((ExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
-						feature.addAttribute(att.cloneAtt(feature));
+						feature.addAttribute(att.cloneRecursive(feature));
 					}
 				}
 			}
@@ -572,7 +584,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				for (IFeatureAttribute att : ((ExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
 						if (!feat.isContainingAttribute(att)) {
-							feat.addAttribute(att.cloneAtt(feat));
+							feat.addAttribute(att.cloneRecursive(feat));
 						}
 					}
 				}
