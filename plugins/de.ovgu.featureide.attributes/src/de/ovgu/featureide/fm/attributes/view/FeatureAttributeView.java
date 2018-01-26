@@ -568,7 +568,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				ExtendedFeature feature = (ExtendedFeature) event.getNewValue();
 				for (IFeatureAttribute att : ((ExtendedFeature) feature.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
-						feature.addAttribute(att.cloneAtt(feature));
+						feature.addAttribute(att.cloneRecursive(feature));
 					}
 				}
 			}
@@ -584,7 +584,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				for (IFeatureAttribute att : ((ExtendedFeature) feat.getStructure().getParent().getFeature()).getAttributes()) {
 					if (att.isRecursive()) {
 						if (!feat.isContainingAttribute(att)) {
-							feat.addAttribute(att.cloneAtt(feat));
+							feat.addAttribute(att.cloneRecursive(feat));
 						}
 					}
 				}

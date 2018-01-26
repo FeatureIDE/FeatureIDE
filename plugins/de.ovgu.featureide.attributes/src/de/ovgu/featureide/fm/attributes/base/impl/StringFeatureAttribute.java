@@ -71,4 +71,15 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	public IFeatureAttribute cloneAtt(IFeature feature) {
 		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
 	}
+
+	/**
+	 * Creates a clone of a IFeatureAttribute with a new corresponding Feature and value as null
+	 * 
+	 * @param Feature that the attribute should be attached to
+	 * @return clone of the attribute with value set to null
+	 */
+	@Override
+	public IFeatureAttribute cloneRecursive(IFeature feature) {
+		return new StringFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
+	}
 }
