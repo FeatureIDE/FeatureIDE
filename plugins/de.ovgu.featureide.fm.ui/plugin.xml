@@ -12,7 +12,7 @@
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
 				base-type="org.eclipse.core.runtime.text"
-				file-extensions="conf,config,equation,expression"
+				file-extensions="conf,config,equation,expression,exml"
 				id="de.ovgu.featureide.contenttype.conf"
 				name="Configuration (for FeatureIDE projects)"
 				priority="high"/>

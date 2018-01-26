@@ -20,7 +20,7 @@ import de.ovgu.featureide.fm.core.io.xml.PositionalXMLHandler;
 
 public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
-	public static final String ID = "de.ovgu.featureide.fm.attributes.conf.XmlExtendedConfFormat";
+	public static final String ID = "de.ovgu.featureide.fm.attributes.format.config.XmlExtendedConfFormat";
 	private static final String NODE_FEATURE = "feature";
 	private static final String NODE_ATTRIBUTE = "attribute";
 	private static final String ATTRIBUTE_NAME = "name";
@@ -44,7 +44,11 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	public XmlExtendedConfFormat getInstance() {
-		return new XmlExtendedConfFormat();
+		return this;
+	}
+
+	public String getSuffix() {
+		return "exml";
 	}
 
 	@Override
@@ -178,6 +182,16 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 			}
 		}
 
+	}
+
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
 	}
 
 }
