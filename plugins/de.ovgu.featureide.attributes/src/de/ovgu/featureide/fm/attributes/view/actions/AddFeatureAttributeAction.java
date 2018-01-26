@@ -57,26 +57,45 @@ public class AddFeatureAttributeAction extends Action {
 	 */
 	@Override
 	public void run() {
+		String name = getUniqueAttributeName();
 		switch (attributeType) {
 		case FeatureAttribute.BOOLEAN:
-			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, "<Name>", "", null, false, false);
+			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeBoolean);
 			break;
 		case FeatureAttribute.DOUBLE:
-			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, "<Name>", "", null, false, false);
+			final IFeatureAttribute attributeDouble = new DoubleFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeDouble);
 			break;
 		case FeatureAttribute.LONG:
-			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, "<Name>", "", null, false, false);
+			final IFeatureAttribute attributeLong = new LongFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeLong);
 			break;
 		case FeatureAttribute.STRING:
-			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, "<Name>", "", null, false, false);
+			final IFeatureAttribute attributeString = new StringFeatureAttribute(feature, name, "", null, false, false);
 			feature.addAttribute(attributeString);
 			break;
 		default:
 			break;
 		}
 		featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_ATTRIBUTE_CHANGED));
+	}
+
+	private String getUniqueAttributeName() {
+		int amountOfAttributes = 0;
+		while (true) {
+			boolean isUnique = true;
+			String attributeName = "Attribute" + amountOfAttributes++;
+			for (IFeatureAttribute att : feature.getAttributes()) {
+				if (att.getName().equals(attributeName)) {
+					isUnique = false;
+					break;
+				}
+			}
+			if (isUnique) {
+				return attributeName;
+			}
+		}
+
 	}
 }

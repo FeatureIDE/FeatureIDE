@@ -43,6 +43,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.TreeViewerEditor;
 import org.eclipse.jface.viewers.TreeViewerFocusCellManager;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
@@ -314,7 +315,18 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			@Override
 			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
 				// Enable editor only with mouse double click
-				if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
+				if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION) {
+					final EventObject source = event.sourceEvent;
+					if ((source instanceof MouseEvent) && (((MouseEvent) source).button == 3)) {
+						return false;
+					}
+					if (event.getSource() instanceof ViewerCell) {
+						int index = ((ViewerCell) event.getSource()).getColumnIndex();
+						if (index == 4 || index == 5) {
+							return true;
+						}
+					}
+				} else if (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION) {
 					final EventObject source = event.sourceEvent;
 					if ((source instanceof MouseEvent) && (((MouseEvent) source).button == 3)) {
 						return false;

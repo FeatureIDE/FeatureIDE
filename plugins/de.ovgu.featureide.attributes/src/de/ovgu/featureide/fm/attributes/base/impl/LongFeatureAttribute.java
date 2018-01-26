@@ -59,7 +59,7 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = 0L;
+			this.value = null;
 			return;
 		}
 		if (value instanceof Long) {

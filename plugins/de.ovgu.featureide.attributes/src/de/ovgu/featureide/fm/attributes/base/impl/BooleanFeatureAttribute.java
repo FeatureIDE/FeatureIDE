@@ -58,7 +58,7 @@ public class BooleanFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = false;
+			this.value = null;
 			return;
 		}
 		if (value instanceof Boolean) {

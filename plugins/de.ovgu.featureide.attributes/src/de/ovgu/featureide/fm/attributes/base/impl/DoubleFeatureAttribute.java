@@ -58,7 +58,7 @@ public class DoubleFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = 0d;
+			this.value = null;
 			return;
 		}
 		if (value instanceof Double) {

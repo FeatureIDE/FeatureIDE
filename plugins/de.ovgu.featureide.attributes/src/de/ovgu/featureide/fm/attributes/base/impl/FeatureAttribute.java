@@ -215,6 +215,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttribute(feat);
 			newAttribute = attribute.cloneAtt(feat);
+			newAttribute.setValue(null);
 			if (!feat.isContainingAttribute(newAttribute)) {
 				feat.addAttribute(newAttribute);
 			}

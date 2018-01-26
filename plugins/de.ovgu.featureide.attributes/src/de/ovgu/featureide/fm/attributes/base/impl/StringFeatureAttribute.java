@@ -58,7 +58,7 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = "";
+			this.value = null;
 			return;
 		}
 		this.value = value.toString();
