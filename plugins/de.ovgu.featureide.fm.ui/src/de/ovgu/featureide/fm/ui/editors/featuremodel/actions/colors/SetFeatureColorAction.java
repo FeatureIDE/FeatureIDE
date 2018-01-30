@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -46,6 +47,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
@@ -201,19 +203,28 @@ public class SetFeatureColorAction extends Action {
 			if (featureModel != null) {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
-					final Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
-
-					final WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
-					dialog.create();
-
-					final int dialogExitCode = dialog.open();
-					if (dialogExitCode == Window.CANCEL) {
-						return;
-					} else if ((dialogExitCode == Window.OK) && FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
-						MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
-						return;
+					// skip color scheme wizard if there is only one color scheme available
+					if (FeatureColorManager.getColorSchemes(featureModel).size() > 2) {
+						final Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
+						final WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
+						dialog.create();
+						final int dialogExitCode = dialog.open();
+						if (dialogExitCode == Window.CANCEL) {
+							return;
+						} else if ((dialogExitCode == Window.OK) && FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
+							MessageDialog.openError(shell, StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED,
+									StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
+							return;
+						}
+					} else if (FeatureColorManager.getColorSchemes(featureModel).size() == 2) {
+						// if there is one non-default color scheme, set it active
+						final Collection<ColorScheme> colorSchemes = FeatureColorManager.getColorSchemes(featureModel);
+						for (final ColorScheme colorScheme : colorSchemes) {
+							if (!colorScheme.isDefault()) {
+								FeatureColorManager.setActive(featureModel, colorScheme.getName());
+							}
+						}
 					}
-
 				}
 			}
 
