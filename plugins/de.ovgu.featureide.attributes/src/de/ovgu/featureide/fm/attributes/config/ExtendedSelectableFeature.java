@@ -39,9 +39,7 @@ public class ExtendedSelectableFeature extends SelectableFeature {
 	}
 
 	public void addConfigurableAttribute(String name, String value) {
-		if (!configurableAttributes.containsKey(name)) {
-			configurableAttributes.put(name, value);
-		}
+		configurableAttributes.put(name, value);
 	}
 
 }

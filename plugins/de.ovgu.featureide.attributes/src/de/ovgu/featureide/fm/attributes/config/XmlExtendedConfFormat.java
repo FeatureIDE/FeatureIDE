@@ -53,8 +53,6 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		object.resetValues();
-
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
@@ -108,9 +106,11 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 					final NodeList attributeNodes = feature.getChildNodes();
 					for (int i = 0; i < attributeNodes.getLength(); i++) {
 						Node currentItem = attributeNodes.item(i);
-						((ExtendedSelectableFeature) selectablefeature).addConfigurableAttribute(
-								currentItem.getAttributes().getNamedItem(ATTRIBUTE_NAME).getNodeValue(),
-								currentItem.getAttributes().getNamedItem(ATTRIBUTE_VALUE).getNodeValue());
+						if (currentItem.hasAttributes() && currentItem.getAttributes().getNamedItem(ATTRIBUTE_NAME) != null) {
+							((ExtendedSelectableFeature) selectablefeature).addConfigurableAttribute(
+									currentItem.getAttributes().getNamedItem(ATTRIBUTE_NAME).getNodeValue(),
+									currentItem.getAttributes().getNamedItem(ATTRIBUTE_VALUE).getNodeValue());
+						}
 					}
 				}
 			}
