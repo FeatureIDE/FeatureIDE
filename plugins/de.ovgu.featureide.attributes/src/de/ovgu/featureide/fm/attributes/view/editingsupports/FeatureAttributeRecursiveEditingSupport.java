@@ -20,14 +20,17 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
@@ -80,12 +83,26 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		attribute.setRecursive(newRecursive);
 		IFeature feat = attribute.getFeature();
 		if (newRecursive) {
+			if (!isNameUnique(attribute, feat)) {
+				MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
+				return;
+			}
 			attribute.recurseAttribute(feat);
 		} else {
 			attribute.deleteRecursiveAttributes(feat);
 		}
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
-		getViewer().update(element, null);
+		getViewer().refresh();
 	}
 
+	private boolean isNameUnique(IFeatureAttribute attribute, IFeature feature) {
+		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
+			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
+			if (feat.isContainingAttribute(attribute)) {
+				return false;
+			}
+			return isNameUnique(attribute, feat);
+		}
+		return true;
+	}
 }

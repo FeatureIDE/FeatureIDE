@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -71,8 +73,18 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
+		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
+		for (IFeatureAttribute att : feat.getAttributes()) {
+			if (att.getName().equals(value.toString())) {
+				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");
+				return;
+			}
+		}
 		((IFeatureAttribute) element).setName(value.toString());
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		if (((IFeatureAttribute) element).isRecursive()) {
+			getViewer().refresh();
+		}
 		getViewer().update(element, null);
 
 	}
