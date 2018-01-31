@@ -18,32 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package org.prop4j.analysesOld;
 
-import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
-import org.prop4j.analysesOld.RandomConfigurationGenerator;
+import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Creates random configurations.
+ * Determines whether a sat instance is satisfiable and returns the found model.
  *
- * @see RandomConfigurationGenerator
- *
- * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public class ValidAnalysis extends AbstractAnalysis<int[]> {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	public ValidAnalysis(ISatSolver solver) {
+		super(solver);
+	}
+
+	public ValidAnalysis(SatInstance satInstance) {
+		super(satInstance);
 	}
 
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	public int[] analyze(IMonitor monitor) throws Exception {
+		return solver.findModel();
 	}
 
 }

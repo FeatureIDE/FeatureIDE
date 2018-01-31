@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 
-import org.prop4j.analyses.FGBuilder;
+import org.prop4j.analysesOld.FGBuilder;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;

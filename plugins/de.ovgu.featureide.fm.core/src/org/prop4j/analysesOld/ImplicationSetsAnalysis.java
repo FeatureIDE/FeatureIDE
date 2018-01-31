@@ -18,12 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses;
+package org.prop4j.analysesOld;
 
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_00;
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_01;
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_10;
-import static org.prop4j.analyses.ImplicationSetsAnalysis.Relationship.BIT_11;
+import static org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship.BIT_00;
+import static org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship.BIT_01;
+import static org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship.BIT_10;
+import static org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship.BIT_11;
 
 import java.util.Arrays;
 import java.util.Deque;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.analyses.ImplicationSetsAnalysis.Relationship;
+import org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;

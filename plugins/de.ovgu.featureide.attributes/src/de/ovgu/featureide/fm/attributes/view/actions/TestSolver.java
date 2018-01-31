@@ -3,9 +3,7 @@ package de.ovgu.featureide.fm.attributes.view.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.prop4j.Node;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jSatSolverFactory;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 
 public class TestSolver extends Action {
@@ -31,7 +29,7 @@ public class TestSolver extends Action {
 	}
 
 	private void solveSatRequestWithSMT(Node cnf) {
-		FMAttributesPlugin.getDefault().logInfo("Is Satis: " + new Sat4jSatSolverFactory().getSatSolver().isSatisfiable(cnf));
+//		FMAttributesPlugin.getDefault().logInfo("Is Satis: " + new Sat4jSatSolverFactory().getSatSolver().isSatisfiable(cnf));
 //		Configuration config;
 //		try {
 //			config = Configuration.defaultConfiguration();

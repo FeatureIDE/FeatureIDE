@@ -36,7 +36,7 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
-import org.prop4j.analyses.ConditionallyCoreDeadAnalysis;
+import org.prop4j.analysesOld.ConditionallyCoreDeadAnalysis;
 import org.prop4j.solver.BasicSolver;
 import org.prop4j.solver.ISatSolver.SatResult;
 import org.prop4j.solver.SatInstance;

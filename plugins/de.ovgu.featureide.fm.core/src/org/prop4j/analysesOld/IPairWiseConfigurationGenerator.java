@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses;
+package org.prop4j.analysesOld;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;

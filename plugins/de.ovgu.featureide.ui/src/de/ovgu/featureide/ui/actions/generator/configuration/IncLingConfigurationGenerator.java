@@ -23,7 +23,7 @@ package de.ovgu.featureide.ui.actions.generator.configuration;
 import java.util.List;
 
 import org.prop4j.Node;
-import org.prop4j.analyses.PairWiseConfigurationGenerator;
+import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -88,7 +88,7 @@ public class IncLingConfigurationGenerator extends AConfigurationGenerator {
 				}
 				foundConfigurations += as.q.size();
 				builder.configurationNumber = foundConfigurations;
-				for (final org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
+				for (final org.prop4j.analysesOld.PairWiseConfigurationGenerator.Configuration c : as.q) {
 					generateConfiguration(satInstance.convertToString(c.getModel()));
 				}
 			}

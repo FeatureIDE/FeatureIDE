@@ -20,29 +20,11 @@
  */
 package org.prop4j.analyses;
 
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.SatInstance;
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-
 /**
- * Determines whether a sat instance is satisfiable and returns the found model.
+ * Interface used to create all analysis and their used Solvers. Needs to be implemented for concrete factory's to create the analysis with appropriate solver.
  *
- * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public class ValidAnalysis extends AbstractAnalysis<int[]> {
-
-	public ValidAnalysis(ISatSolver solver) {
-		super(solver);
-	}
-
-	public ValidAnalysis(SatInstance satInstance) {
-		super(satInstance);
-	}
-
-	@Override
-	public int[] analyze(IMonitor monitor) throws Exception {
-		return solver.findModel();
-	}
+public class ISolverAnalysisFactory {
 
 }
