@@ -10,6 +10,9 @@ import org.eclipse.jface.viewers.Viewer;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.attributes.computations.IAttributeComputation;
+import de.ovgu.featureide.fm.attributes.computations.impl.AttributeComputationBundle;
+import de.ovgu.featureide.fm.attributes.computations.impl.ComputationHeader;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -60,10 +63,14 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IFeatureAttribute) {
-			String[] dummy = new String[2];
-			dummy[0] = "Rechnung1";
-			dummy[1] = "Rechnung2";
-			return dummy;
+			AttributeComputationBundle computationBundle = new AttributeComputationBundle();
+			computationBundle.initComputations(config, (IFeatureAttribute) parentElement);
+			return computationBundle.getComputationHeaders().toArray();
+		}
+		if (parentElement instanceof ComputationHeader) {
+			IAttributeComputation[] computations = new IAttributeComputation[1];
+			computations[0] = ((ComputationHeader) parentElement).getAttributeComputation();
+			return computations;
 		}
 		return null;
 	}
@@ -77,6 +84,9 @@ public class ExtendedFMTreeContentProvider extends OutlineTreeContentProvider {
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeatureAttribute) {
+			return true;
+		}
+		if (element instanceof ComputationHeader) {
 			return true;
 		}
 		return false;

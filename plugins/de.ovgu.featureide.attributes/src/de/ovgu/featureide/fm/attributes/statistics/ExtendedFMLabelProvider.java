@@ -7,6 +7,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.computations.IAttributeComputation;
+import de.ovgu.featureide.fm.attributes.computations.impl.ComputationHeader;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 
 public class ExtendedFMLabelProvider extends OutlineLabelProvider {
@@ -28,6 +30,12 @@ public class ExtendedFMLabelProvider extends OutlineLabelProvider {
 		}
 		if (element instanceof IFeatureAttribute) {
 			return ((IFeatureAttribute) element).getName();
+		}
+		if (element instanceof ComputationHeader) {
+			return ((ComputationHeader) element).getName();
+		}
+		if (element instanceof IAttributeComputation) {
+			return ((IAttributeComputation) element).getResultString();
 		}
 		return element.toString();
 	}
