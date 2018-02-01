@@ -20,74 +20,11 @@
  */
 package org.prop4j.solver;
 
-import java.util.List;
-
-import org.prop4j.Node;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.RingList;
-
 /**
- * Finds certain solutions of propositional formulas.
+ * Interface to identify the current solver as an sat solver.
  *
- * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public interface ISatSolver extends Cloneable {
-
-	public static final int MAX_SOLUTION_BUFFER = 1000;
-
-	public static enum SatResult {
-		FALSE, TIMEOUT, TRUE
-	}
-
-	public static enum SelectionStrategy {
-		NEGATIVE, ORG, POSITIVE, RANDOM
-	}
-
-	void assignmentClear(int size);
-
-	void assignmentPop();
-
-	void assignmentPush(int x);
-
-	void assignmentReplaceLast(int x);
-
-	ISatSolver clone();
-
-	int[] findModel();
-
-	void fixOrder();
-
-	IVecInt getAssignment();
-
-	int[] getAssignmentArray(int from, int to);
-
-	int[] getModel();
-
-	int getNumberOfSolutions();
-
-	SatInstance getSatInstance();
-
-	RingList<int[]> getSolutionList();
-
-	void initSolutionList(int size);
-
-	ISolver getInternalSolver();
-
-	SatResult isSatisfiable();
-
-	void setOrder(List<IFeature> orderList);
-
-	void setSelectionStrategy(SelectionStrategy strategy);
-
-	void shuffleOrder();
-
-	int[] getOrder();
-
-	List<IConstr> addClauses(Node constraint) throws ContradictionException;
+public interface ISatSolver extends ISolver {
 
 }

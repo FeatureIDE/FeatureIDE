@@ -27,10 +27,10 @@ import java.util.List;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.ISatSolver.SatResult;
-import org.prop4j.solver.ModifiableSolver;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.ISatSolver;
+import org.prop4j.solverOld.ModifiableSolver;
+import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solverOld.ISatSolver.SatResult;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 

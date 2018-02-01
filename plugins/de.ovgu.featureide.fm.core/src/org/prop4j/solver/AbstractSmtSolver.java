@@ -18,32 +18,46 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package org.prop4j.solver;
 
-import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
-import org.prop4j.analysesOld.RandomConfigurationGenerator;
-import org.prop4j.solverOld.SatInstance;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
+import java.util.Map;
 
 /**
- * Creates random configurations.
+ * Abstract class for the smt solvers
  *
- * @see RandomConfigurationGenerator
- *
- * @author Jens Meinicke
+ * @author Joshua Sprey
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public abstract class AbstractSmtSolver implements ISmtSolver {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	ISmtProblem problem;
+
+	/**
+	 * Create a new Smt solver.
+	 *
+	 * @param problem The problem that the solver should solve.
+	 */
+	public AbstractSmtSolver(ISmtProblem problem) {
+		this.problem = problem;
 	}
 
+	/**
+	 * Create a new Smt solver.
+	 *
+	 * @param problem The problem that the solver should solve.
+	 * @param config The configurations for the solver.
+	 */
+	public AbstractSmtSolver(ISmtProblem problem, Map<String, Object> config) {
+		this.problem = problem;
+		setConfiguration(config);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getProblem()
+	 */
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	public ISolverProblem getProblem() {
+		return problem;
 	}
 
 }

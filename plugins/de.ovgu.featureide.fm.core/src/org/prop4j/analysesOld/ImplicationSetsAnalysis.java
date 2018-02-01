@@ -34,9 +34,9 @@ import java.util.Set;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.ISatSolver;
+import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 

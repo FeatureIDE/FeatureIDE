@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.conf;
 
 import java.util.Arrays;
 
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.SatInstance;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
 

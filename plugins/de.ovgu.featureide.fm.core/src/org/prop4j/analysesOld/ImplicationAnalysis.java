@@ -23,10 +23,10 @@ package org.prop4j.analysesOld;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.solver.BasicSolver;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.BasicSolver;
+import org.prop4j.solverOld.ISatSolver;
+import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
 
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;

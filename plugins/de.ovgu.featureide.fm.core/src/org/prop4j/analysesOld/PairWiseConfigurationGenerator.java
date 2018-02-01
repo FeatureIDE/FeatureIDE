@@ -32,9 +32,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.ISatSolver;
+import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.SatInstance;
 
 public class ListFeatureGraph extends AFeatureGraph {
 

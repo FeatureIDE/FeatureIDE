@@ -20,8 +20,8 @@
  */
 package org.prop4j.analysesOld;
 
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.ISatSolver;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 

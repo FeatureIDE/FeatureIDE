@@ -20,11 +20,31 @@
  */
 package org.prop4j.analyses;
 
+import org.prop4j.analyses.impl.DefaultSolverAnalysisFactory;
+import org.prop4j.solver.ISolverProblem;
+
 /**
  * Interface used to create all analysis and their used Solvers. Needs to be implemented for concrete factory's to create the analysis with appropriate solver.
  *
  * @author Joshua Sprey
  */
-public class ISolverAnalysisFactory {
+public abstract class ISolverAnalysisFactory {
 
+	/**
+	 * Returns the default factory used. See {@link DefaultSolverAnalysisFactory}
+	 *
+	 * @return Default factory.
+	 */
+	public static ISolverAnalysisFactory getDefault() {
+		return new DefaultSolverAnalysisFactory();
+	}
+
+	/**
+	 * Creates an anylsis for a given class. Also determine especially which solver is used to solve the analysis.
+	 *
+	 * @param analysisClass Class of the analysis as Object.
+	 * @param problem Problem which should be looked at at the analysis.
+	 * @return New instance of the given analysis class that use the given solver.
+	 */
+	public abstract ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem);
 }

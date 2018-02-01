@@ -18,67 +18,58 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analysesOld;
+package org.prop4j.analyses;
 
-import org.prop4j.solverOld.BasicSolver;
-import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
-import org.sat4j.specs.ContradictionException;
+import org.prop4j.solver.ISolver;
 
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds atomic sets.
+ * Represents an analysis that can be solved either by SMT or SAT solvers.
  *
- * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public abstract class AbstractAnalysis<T> implements LongRunningMethod<T> {
+public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, LongRunningMethod<T> {
 
-	protected ISatSolver solver;
+	protected ISolver solver;
 
-	protected int[] assumptions = null;
-
-	public AbstractAnalysis(SatInstance satInstance) {
-		try {
-			this.solver = new BasicSolver(satInstance);
-		} catch (final ContradictionException e) {
-			this.solver = null;
-		}
-	}
-
-	public AbstractAnalysis(ISatSolver solver) {
+	protected GeneralSolverAnalysis(ISolver solver) {
 		this.solver = solver;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.job.LongRunningMethod#execute(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
 	@Override
 	public final T execute(IMonitor monitor) throws Exception {
 		if (solver == null) {
 			return null;
 		}
-		if (assumptions != null) {
-			for (final int assumption : assumptions) {
-				solver.assignmentPush(assumption);
-			}
-		}
+//		if (assumptions != null) {
+//			for (final int assumption : assumptions) {
+//				solver.assignmentPush(assumption);
+//			}
+//		}
 		monitor.checkCancel();
 		try {
 			return analyze(monitor);
 		} catch (final Throwable e) {
 			throw e;
 		} finally {
-			solver.assignmentClear(0);
+//			solver.assignmentClear(0);
 		}
 	}
 
-	protected abstract T analyze(IMonitor monitor) throws Exception;
-
-	public int[] getAssumptions() {
-		return assumptions;
-	}
-
-	public void setAssumptions(int[] assumptions) {
-		this.assumptions = assumptions;
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
+	@Override
+	public T analyze(IMonitor monitor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

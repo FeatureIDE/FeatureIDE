@@ -29,6 +29,7 @@ public class TestSolver extends Action {
 	}
 
 	private void solveSatRequestWithSMT(Node cnf) {
+
 //		FMAttributesPlugin.getDefault().logInfo("Is Satis: " + new Sat4jSatSolverFactory().getSatSolver().isSatisfiable(cnf));
 //		Configuration config;
 //		try {

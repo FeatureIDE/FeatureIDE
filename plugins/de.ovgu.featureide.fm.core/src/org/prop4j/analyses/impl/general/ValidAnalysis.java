@@ -18,32 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package org.prop4j.analyses.impl.general;
 
-import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
-import org.prop4j.analysesOld.RandomConfigurationGenerator;
-import org.prop4j.solverOld.SatInstance;
+import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.ISolver;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Creates random configurations.
+ * Analysis to check if the given problem is satisfiable and also delivering a correct configuration.
  *
- * @see RandomConfigurationGenerator
- *
- * @author Jens Meinicke
+ * @author Joshua Sprey
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
+	/**
+	 * @param solver
+	 */
+	ValidAnalysis(ISolver solver) {
+		super(solver);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
+	 */
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	public Object[] analyze(IMonitor monitor) {
+		return solver.findSolution();
 	}
 
 }

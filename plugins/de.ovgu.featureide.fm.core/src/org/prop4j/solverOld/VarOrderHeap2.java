@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solver;
+package org.prop4j.solverOld;
 
 import org.sat4j.minisat.core.Heap;
 import org.sat4j.minisat.core.IPhaseSelectionStrategy;

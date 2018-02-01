@@ -41,7 +41,7 @@ import javax.annotation.Nonnull;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;

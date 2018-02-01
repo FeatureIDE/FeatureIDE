@@ -18,49 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analysesOld;
+package org.prop4j.analyses;
 
-import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solver.ISmtSolver;
 
 /**
- * Finds core and dead features.
+ * Special abstract class for analysis that are only fitted for smt solvers.
  *
- * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public abstract class AConditionallyCoreDeadAnalysis extends AbstractAnalysis<int[]> {
+public abstract class AbstractSmtSolverAnalysis<T> extends GeneralSolverAnalysis<T> {
 
-	public int satCount;
+	protected ISmtSolver solver;
 
-	protected int[] fixedVariables;
-	protected int newCount;
-
-	public AConditionallyCoreDeadAnalysis(ISatSolver solver) {
+	/**
+	 * @param solver
+	 */
+	protected AbstractSmtSolverAnalysis(ISmtSolver solver) {
 		super(solver);
-		resetFixedFeatures();
-	}
-
-	public AConditionallyCoreDeadAnalysis(SatInstance satInstance) {
-		super(satInstance);
-		resetFixedFeatures();
-	}
-
-	public void setFixedFeatures(int[] fixedVariables, int newCount) {
-		this.fixedVariables = fixedVariables;
-		this.newCount = newCount;
-	}
-
-	public void resetFixedFeatures() {
-		fixedVariables = new int[0];
-		newCount = 0;
-	}
-
-	protected static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
-		}
-		return count;
 	}
 
 }

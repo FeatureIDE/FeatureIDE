@@ -18,30 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package org.prop4j.analyses;
 
-import java.io.Serializable;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
-import org.prop4j.solverOld.SatInstance;
+/**
+ * Interface given to specify a class to be an analysis. The generic type <T> indicates the object hat should be returned after the analysis is done. So the
+ * generic type represents the result for an analysis.
+ *
+ * @author Joshua Sprey
+ */
+public interface ISolverAnalysis<T> {
 
-public interface IFeatureGraph extends Serializable {
-
-	boolean setEdge(int from, int to, byte edgeType);
-
-	byte getEdge(int fromIndex, int toIndex);
-
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getSize();
-
-	int[] getIndex();
-
-	SatInstance getSatInstance();
-
-	void copyValues(IFeatureGraph otherGraph);
-
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getFeatureIndex(String name);
-
+	/**
+	 * Determine what should happen in the analysis. Also gives back the result.
+	 *
+	 * @return Result of the analysis.
+	 */
+	T analyze(IMonitor monitor);
 }

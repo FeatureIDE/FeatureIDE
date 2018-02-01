@@ -18,30 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package org.prop4j.solver;
 
-import java.io.Serializable;
-
-import org.prop4j.solverOld.SatInstance;
-
-public interface IFeatureGraph extends Serializable {
-
-	boolean setEdge(int from, int to, byte edgeType);
-
-	byte getEdge(int fromIndex, int toIndex);
-
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getSize();
-
-	int[] getIndex();
-
-	SatInstance getSatInstance();
-
-	void copyValues(IFeatureGraph otherGraph);
-
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getFeatureIndex(String name);
+/**
+ * Interface to identify the current solver as an smt solver.
+ *
+ * @author Joshua Sprey
+ */
+public interface ISmtSolver extends ISolver {
 
 }

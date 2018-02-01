@@ -18,32 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.actions.generator.configuration;
+package org.prop4j.analyses.impl;
 
-import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
-import org.prop4j.analysesOld.RandomConfigurationGenerator;
-import org.prop4j.solverOld.SatInstance;
-
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
+import org.prop4j.analyses.ISolverAnalysis;
+import org.prop4j.analyses.ISolverAnalysisFactory;
+import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.solver.ISolverProblem;
 
 /**
- * Creates random configurations.
+ * Default factory used to create analysis with their appropriate solver.
  *
- * @see RandomConfigurationGenerator
- *
- * @author Jens Meinicke
+ * @author Joshua Sprey
  */
-public class RandConfigurationGenerator extends IncLingConfigurationGenerator {
+public class DefaultSolverAnalysisFactory extends ISolverAnalysisFactory {
 
-	public RandConfigurationGenerator(ConfigurationBuilder builder, IFeatureModel featureModel, IFeatureProject featureProject) {
-		super(builder, featureModel, featureProject);
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysisFactory#getAnalysis(java.lang.Object, org.prop4j.solver.ISolverProblem)
+	 */
 	@Override
-	protected PairWiseConfigurationGenerator getGenerator(SatInstance satInstance, int solutionCount) {
-		return new RandomConfigurationGenerator(satInstance, solutionCount);
+	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
+		if (analysisClass.equals(ValidAnalysis.class)) {
+//			final ValidAnalysis analysis = new ValidAnalysis(new BasicSolver(satInstance));
+		}
+		return null;
 	}
-
 }

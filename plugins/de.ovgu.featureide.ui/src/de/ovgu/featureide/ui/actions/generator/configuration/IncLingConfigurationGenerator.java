@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.analysesOld.PairWiseConfigurationGenerator;
-import org.prop4j.solver.SatInstance;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
