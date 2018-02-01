@@ -85,19 +85,15 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		pushstack = new Stack<>();
 
 		// Init Solver with configuration
-		solver = initSolver(config);
+		solver = (Solver<?>) SolverFactory.newDefault();
+		setConfiguration(config);
+
 		try {
 			addVariables();
 		} catch (final ContradictionException e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new RuntimeException();
 		}
-	}
-
-	protected Solver<?> initSolver(Map<String, Object> config) {
-		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
-		setConfiguration(config);
-		return solver;
 	}
 
 	@Override
@@ -188,7 +184,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		final int[] clause = new int[children.length];
 		for (int i = 0; i < children.length; i++) {
 			final Literal literal = (Literal) children[i];
-			clause[i] = getProblem().getIndexOfVariable(literal);
+			clause[i] = getProblem().getIndexOfVariable(literal.var);
 		}
 		return solver.addClause(new VecInt(clause));
 	}
@@ -320,10 +316,15 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
+		FMCorePlugin.getDefault().logInfo("isSatisfiable: " + solver.toString());
+
 		if (isSatisfiable() == true) {
 			final int[] model = solver.model();
-			final List<Object> objectModel = new ArrayList<Object>();
-			objectModel.addAll(Arrays.asList(model));
+			FMCorePlugin.getDefault().logInfo(model.toString());
+			final List<Integer> objectModel = new ArrayList<Integer>();
+			for (int i = 0; i < model.length; i++) {
+				objectModel.add(new Integer(model[i]));
+			}
 			return objectModel.toArray();
 		}
 		return null;

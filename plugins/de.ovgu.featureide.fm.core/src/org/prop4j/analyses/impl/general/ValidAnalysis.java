@@ -35,7 +35,7 @@ public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
 	/**
 	 * @param solver
 	 */
-	ValidAnalysis(ISolver solver) {
+	public ValidAnalysis(ISolver solver) {
 		super(solver);
 	}
 

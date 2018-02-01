@@ -23,7 +23,6 @@ package org.prop4j.solver.impl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.prop4j.Literal;
@@ -38,7 +37,7 @@ import org.prop4j.solver.ISatProblem;
 public class SatProblem implements ISatProblem {
 
 	protected Node root;
-	protected Map<Object, Integer> varToInt = new HashMap<>();
+	protected HashMap<Object, Integer> varToInt = new HashMap<>();
 	protected Object[] intToVar;
 
 	/**
@@ -70,7 +69,9 @@ public class SatProblem implements ISatProblem {
 		for (final Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
 			for (int i = 0; i < literals.length; i++) {
-				result.add(((Literal) literals[i]).var);
+				if (!result.contains(((Literal) literals[i]).var)) {
+					result.add(((Literal) literals[i]).var);
+				}
 			}
 		}
 		return result;

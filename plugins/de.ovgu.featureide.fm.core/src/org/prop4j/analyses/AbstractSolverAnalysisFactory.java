@@ -28,14 +28,14 @@ import org.prop4j.solver.ISolverProblem;
  *
  * @author Joshua Sprey
  */
-public abstract class ISolverAnalysisFactory {
+public abstract class AbstractSolverAnalysisFactory {
 
 	/**
 	 * Returns the default factory used. See {@link DefaultSolverAnalysisFactory}
 	 *
 	 * @return Default factory.
 	 */
-	public static ISolverAnalysisFactory getDefault() {
+	public static AbstractSolverAnalysisFactory getDefault() {
 		return new DefaultSolverAnalysisFactory();
 	}
 

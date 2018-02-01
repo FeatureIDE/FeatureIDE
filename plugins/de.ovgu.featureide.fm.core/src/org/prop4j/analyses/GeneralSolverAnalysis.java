@@ -47,18 +47,11 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 		if (solver == null) {
 			return null;
 		}
-//		if (assumptions != null) {
-//			for (final int assumption : assumptions) {
-//				solver.assignmentPush(assumption);
-//			}
-//		}
 		monitor.checkCancel();
 		try {
 			return analyze(monitor);
 		} catch (final Throwable e) {
 			throw e;
-		} finally {
-//			solver.assignmentClear(0);
 		}
 	}
 

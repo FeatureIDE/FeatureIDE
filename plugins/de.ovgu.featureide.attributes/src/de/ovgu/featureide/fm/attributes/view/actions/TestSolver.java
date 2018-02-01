@@ -3,8 +3,14 @@ package de.ovgu.featureide.fm.attributes.view.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.prop4j.Node;
+import org.prop4j.analyses.AbstractSolverAnalysisFactory;
+import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.solver.ISolverProblem;
+import org.prop4j.solver.impl.SatProblem;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 public class TestSolver extends Action {
 
@@ -29,6 +35,26 @@ public class TestSolver extends Action {
 	}
 
 	private void solveSatRequestWithSMT(Node cnf) {
+		ISolverProblem problem = new SatProblem(cnf);
+
+		FMAttributesPlugin.getDefault().logInfo(problem.getRoot().toString());
+
+		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getDefault();
+
+		ValidAnalysis test = (ValidAnalysis) factory.getAnalysis(ValidAnalysis.class, problem);
+		try {
+			Object[] solution = test.execute(new NullMonitor());
+			int index = 0;
+			for (Object object : solution) {
+				if (object instanceof Integer) {
+					int value = (int) object;
+					FMAttributesPlugin.getDefault().logInfo("Solution of index[" + (index++) + "]: " + value);
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 //		FMAttributesPlugin.getDefault().logInfo("Is Satis: " + new Sat4jSatSolverFactory().getSatSolver().isSatisfiable(cnf));
 //		Configuration config;

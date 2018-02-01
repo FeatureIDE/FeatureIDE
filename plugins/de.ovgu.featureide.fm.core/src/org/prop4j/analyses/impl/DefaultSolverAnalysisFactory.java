@@ -20,17 +20,22 @@
  */
 package org.prop4j.analyses.impl;
 
+import java.util.HashMap;
+
+import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
-import org.prop4j.analyses.ISolverAnalysisFactory;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISolver;
 import org.prop4j.solver.ISolverProblem;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 
 /**
  * Default factory used to create analysis with their appropriate solver.
  *
  * @author Joshua Sprey
  */
-public class DefaultSolverAnalysisFactory extends ISolverAnalysisFactory {
+public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	/*
 	 * (non-Javadoc)
@@ -39,7 +44,14 @@ public class DefaultSolverAnalysisFactory extends ISolverAnalysisFactory {
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
 		if (analysisClass.equals(ValidAnalysis.class)) {
-//			final ValidAnalysis analysis = new ValidAnalysis(new BasicSolver(satInstance));
+			final HashMap<String, Object> configuration = new HashMap<>();
+			configuration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
+			configuration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
+			configuration.put(Sat4jSatSolver.CONFIG_VERBOSE, true);
+			if (problem instanceof ISatProblem) {
+				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
+				return new ValidAnalysis(solver);
+			}
 		}
 		return null;
 	}
