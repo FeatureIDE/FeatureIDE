@@ -39,24 +39,24 @@
 						<description>
 							Priorities specify that certain requests are supposed to be processed faster than others.
 						</description>
-						<feature abstract="true" name="RushHour">
+						<feature name="RushHour">
 							<description>
 								During rush hours the elevator moves to a particular floor if there are no requests. In the morning, it will move to the lowest floor and, in the afternoon, it will move to a floor in the center of the building.
 							</description>
 						</feature>
-						<feature abstract="true" name="FloorPriority">
+						<feature name="FloorPriority">
 							<description>
 								Certain floors as specified during initialization will always be handled before all remaining floors.
 							</description>
 						</feature>
-						<feature abstract="true" name="PersonPriority">
+						<feature name="PersonPriority">
 							<description>
 								With a special key, the request of certain persons are served first.
 							</description>
 						</feature>
 					</or>
 				</and>
-				<feature abstract="true" name="VoiceOutput"/>
+				<feature name="VoiceOutput"/>
 				<alt name="CallButtons">
 					<description>
 						Call buttons enable to choose the desired floor in the inside as well as to call the elevator to a certain floor.
@@ -76,7 +76,7 @@
 					<description>
 						Variability of the elevator that directly influences security.
 					</description>
-					<or abstract="true" mandatory="true" name="Permission">
+					<or abstract="true" name="Permission">
 						<description>
 							Permissions enable to specify which floors can be reached by everyone or only with privileges.
 						</description>
@@ -85,7 +85,7 @@
 								During initialization, certain floors can be deactivated and cannot be reached by the elevator.
 							</description>
 						</feature>
-						<feature abstract="true" name="PermissionControl">
+						<feature name="PermissionControl">
 							<description>
 								Permission control enables to reach non-public floors for those that are privileged.
 							</description>
@@ -96,7 +96,7 @@
 					<description>
 						Variability of the elevator that directly influences safety.
 					</description>
-					<feature abstract="true" name="Overloaded">
+					<feature name="Overloaded">
 						<description>
 							A sensor measures the load of the elevator and will not close the doors until the limit of the elevator is not reached.
 						</description>
