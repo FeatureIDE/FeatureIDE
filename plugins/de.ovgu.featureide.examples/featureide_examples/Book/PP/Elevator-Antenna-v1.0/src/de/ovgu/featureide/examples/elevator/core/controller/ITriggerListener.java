@@ -1,4 +1,3 @@
-//#if CallButtons
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -19,6 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
+//#if CallButtons
 package de.ovgu.featureide.examples.elevator.core.controller;
 
 /**
