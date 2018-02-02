@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
@@ -82,6 +81,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	public enum AnnotationStatus {
 		/** The presence condition is satisfiable but not a tautology. */
 		NORMAL,
+		/** The feature model is void. */
+		VOID,
 		/** The presence condition is a contradiction, causing a dead code block. */
 		DEAD,
 		/** The presence condition is a tautology, making the annotation superfluous. */
@@ -108,6 +109,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used for expression checking.
 	 */
 	protected Node featureModel;
+
+	/**
+	 * {@code true}, if the feature model is void, {@code false} otherwise
+	 */
+	protected boolean voidFeatureModel;
 
 	/**
 	 * Preprocessor name used for messages in build markers (must set in subclass).
@@ -153,7 +159,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	private static final String FEATURE_MODULE_MARKER = CorePlugin.PLUGIN_ID + ".featureModuleMarker";
 
 	/** contains all used features at any source file **/
-	protected HashSet<String> usedFeatures = new HashSet<String>();
+	protected HashSet<String> usedFeatures = new HashSet<>();
 
 	/**
 	 * Sets the name of the plug-in
@@ -208,6 +214,11 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 		// create expression of feature model
 		featureModel = AdvancedNodeCreator.createNodes(fm);
+		try {
+			voidFeatureModel = !new SatSolver(featureModel, 1000).isSatisfiable();
+		} catch (final TimeoutException e) {
+			voidFeatureModel = false;
+		}
 
 		featureList = Functional.toList(FeatureUtils.extractFeatureNames(fm.getFeatures()));
 
@@ -238,6 +249,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	}
 
 	private AnnotationStatus isContradictionOrTautology(Node expression, Node featureModel, Node nestedExpressions) throws TimeoutException {
+		if (voidFeatureModel) {
+			return AnnotationStatus.VOID;
+		}
+
 		/*
 		 * -SAT(expression)
 		 */
@@ -286,6 +301,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		String message;
 		switch (status) {
 		case NORMAL:
+		case VOID:
 			return;
 		case CONTRADICTION:
 			message = MESSAGE_CONTRADICTION;
@@ -456,32 +472,43 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 */
 	protected void setModelMarkers() {
 		removeModelMarkers();
-		final LinkedList<String> features = new LinkedList<>(usedFeatures);
-		final ArrayList<String> shouldUseFeatures = new ArrayList<>();
+		final ArrayList<String> unusedConcrete = new ArrayList<>();
+		final ArrayList<String> usedAbstract = new ArrayList<>();
 		for (final IFeature f : featureProject.getFeatureModel().getFeatures()) {
-			if (f.getStructure().isAbstract() && features.contains(f.getName())) {
-				features.remove(f.getName());
-				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");
-			} else if (f.getStructure().isConcrete() && !features.contains(f.getName())) {
-				shouldUseFeatures.add("\"" + f.getName() + "\"");
+			final String featureName = f.getName();
+			if (f.getStructure().isConcrete()) {
+				if (!usedFeatures.contains(featureName)) {
+					unusedConcrete.add(featureName);
+				}
 			} else {
-				features.remove(f.getName());
+				if (usedFeatures.contains(featureName)) {
+					usedAbstract.add(featureName);
+				}
 			}
 		}
 
-		if (shouldUseFeatures.size() >= 1) {
-			Collections.sort(shouldUseFeatures);
-			String markerText = "You should use the Feature";
-			if (shouldUseFeatures.size() == 1) {
-				markerText += " " + shouldUseFeatures.get(0) + " or set it abstract.";
-			} else {
-				markerText += "s ";
-				for (final String featureName : shouldUseFeatures) {
-					markerText += featureName + ", ";
-				}
-				markerText += " or set them abstract.";
+		if (!usedAbstract.isEmpty()) {
+			Collections.sort(usedAbstract);
+			final StringBuilder markerText = new StringBuilder("The following abstract features are referenced in the implementation: ");
+			for (final String featureName : usedAbstract) {
+				markerText.append("\"");
+				markerText.append(featureName);
+				markerText.append("\", ");
 			}
-			createMarker(markerText);
+			markerText.delete(markerText.length() - 2, markerText.length());
+			createMarker(markerText.toString());
+		}
+
+		if (!unusedConcrete.isEmpty()) {
+			Collections.sort(unusedConcrete);
+			final StringBuilder markerText = new StringBuilder("The following concrete features are never referenced in the implementation: ");
+			for (final String featureName : unusedConcrete) {
+				markerText.append("\"");
+				markerText.append(featureName);
+				markerText.append("\", ");
+			}
+			markerText.delete(markerText.length() - 2, markerText.length());
+			createMarker(markerText.toString());
 		}
 	}
 
