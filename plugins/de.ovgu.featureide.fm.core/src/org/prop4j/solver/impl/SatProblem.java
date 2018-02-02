@@ -98,6 +98,15 @@ public class SatProblem implements ISatProblem {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getSignedIndexOfVariable(java.lang.Object)
+	 */
+	@Override
+	public int getSignedIndexOfVariable(Literal l) {
+		return l.positive ? varToInt.get(l.var) : -varToInt.get(l.var);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolverProblem#getIndexOfVariable(java.lang.Object)
 	 */
 	@Override
@@ -120,7 +129,15 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.length;
+		return intToVar.length - 1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SatProblem[" + root.toString() + "]";
+	}
 }

@@ -20,6 +20,7 @@
  */
 package org.prop4j.solver;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
 
 /**
@@ -42,6 +43,8 @@ public interface ISolverProblem {
 	 * @return Root node of the problem.
 	 */
 	Node getRoot();
+
+	int getSignedIndexOfVariable(Literal variable);
 
 	/**
 	 * Intern the variables are mapped to a specific index to identify them. You can now retrieve the index for a given variable.

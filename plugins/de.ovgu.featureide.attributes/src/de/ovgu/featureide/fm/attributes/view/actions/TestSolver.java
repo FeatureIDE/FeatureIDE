@@ -44,11 +44,16 @@ public class TestSolver extends Action {
 		ValidAnalysis test = (ValidAnalysis) factory.getAnalysis(ValidAnalysis.class, problem);
 		try {
 			Object[] solution = test.execute(new NullMonitor());
-			int index = 0;
+			if (solution == null) {
+				FMAttributesPlugin.getDefault().logInfo("UnSolveable");
+			} else {
+				FMAttributesPlugin.getDefault().logInfo("Solveable");
+			}
+			int index = 1;
 			for (Object object : solution) {
 				if (object instanceof Integer) {
 					int value = (int) object;
-					FMAttributesPlugin.getDefault().logInfo("Solution of index[" + (index++) + "]: " + value);
+					FMAttributesPlugin.getDefault().logInfo("Solution of [" + problem.getVariableOfIndex(index++) + "]: " + value);
 				}
 			}
 		} catch (Exception e) {

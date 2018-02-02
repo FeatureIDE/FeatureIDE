@@ -124,4 +124,13 @@ public class SmtProblem implements ISmtProblem {
 		return intToVar.length;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getSignedIndexOfVariable(org.prop4j.Literal)
+	 */
+	@Override
+	public int getSignedIndexOfVariable(Literal variable) {
+		return variable.positive ? varToInt.get(variable.var) : -varToInt.get(variable.var);
+	}
+
 }

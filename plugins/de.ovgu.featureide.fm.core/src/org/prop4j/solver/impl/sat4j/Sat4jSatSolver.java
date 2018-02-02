@@ -63,9 +63,10 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	protected Solver<?> solver;
 	protected final int[] order;
 	protected final VecInt assignment;
-	protected RingList<int[]> solutionList = null;
 	protected Stack<Node> pushstack;
 	protected ArrayList<IConstr> constrList;
+	protected RingList<int[]> solutionList;
+	protected boolean contradiction = false;
 
 	public static final String CONFIG_TIMEOUT = "Timeout";
 	public static final String CONFIG_VERBOSE = "Verbose";
@@ -90,9 +91,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 		try {
 			addVariables();
+
 		} catch (final ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
-			throw new RuntimeException();
+			contradiction = true;
 		}
 	}
 
@@ -184,9 +185,17 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		final int[] clause = new int[children.length];
 		for (int i = 0; i < children.length; i++) {
 			final Literal literal = (Literal) children[i];
-			clause[i] = getProblem().getIndexOfVariable(literal.var);
+			clause[i] = getProblem().getSignedIndexOfVariable(literal);
 		}
 		return solver.addClause(new VecInt(clause));
+	}
+
+	private String arrayAsString(int[] array) {
+		String first = "Array[";
+		for (final int i : array) {
+			first += i + ", ";
+		}
+		return first.substring(0, first.length() - 2) + "]";
 	}
 
 	/*
@@ -195,6 +204,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public boolean isSatisfiable() {
+		if (contradiction) {
+			return false;
+		}
 		try {
 			if (solver.isSatisfiable(assignment, false)) {
 				if (solutionList != null) {
@@ -216,7 +228,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Node pop() {
-		if (assignment.isEmpty()) {
+		if (pushstack.isEmpty()) {
 			return null;
 		}
 		final Node oldNode = pushstack.pop();
@@ -249,12 +261,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	public void push(Node formula) {
 		if (formula instanceof Literal) {
 			final Literal literal = (Literal) formula;
-			final List<Object> variables = literal.getVariables();
-			if (variables.isEmpty()) {
-				return;
-			}
-			final Object variable = variables.get(0);
-			assignment.push(getProblem().getIndexOfVariable(variable));
+			assignment.push(getProblem().getSignedIndexOfVariable(literal));
 			pushstack.push(formula);
 		} else if (formula instanceof Or) {
 			try {
@@ -262,12 +269,13 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				final int[] clause = new int[children.length];
 				for (int i = 0; i < children.length; i++) {
 					final Literal literal = (Literal) children[i];
-					clause[i] = getProblem().getIndexOfVariable(literal);
+					clause[i] = getProblem().getSignedIndexOfVariable(literal);
 				}
 				constrList.add(solver.addClause(new VecInt(clause)));
 				pushstack.push(formula);
+				FMCorePlugin.getDefault().logInfo("Pushed: " + constrList.toString() + " and " + pushstack.toString());
 			} catch (final ContradictionException e) {
-				// TODO Auto-generated catch block
+				removeLastClauses(1);
 				e.printStackTrace();
 			}
 
@@ -316,11 +324,8 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
-		FMCorePlugin.getDefault().logInfo("isSatisfiable: " + solver.toString());
-
 		if (isSatisfiable() == true) {
 			final int[] model = solver.model();
-			FMCorePlugin.getDefault().logInfo(model.toString());
 			final List<Integer> objectModel = new ArrayList<Integer>();
 			for (int i = 0; i < model.length; i++) {
 				objectModel.add(new Integer(model[i]));
