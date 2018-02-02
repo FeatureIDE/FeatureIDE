@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -125,6 +126,19 @@ public class FeatureColorManager implements IEventListener {
 		if (removedColorScheme.isCurrent()) {
 			setActive(project, DefaultColorScheme.defaultName, true);
 		}
+
+		// Update project explorer
+		try {
+			project.touch(null);
+			project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		} catch (final CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		final ArrayList<IFeature> changedFeatures = new ArrayList<IFeature>();
+		for (final String featureName : removedColorScheme.getColors().keySet()) {
+			changedFeatures.add(featureModel.getFeature(featureName));
+		}
+		notifyColorChange(changedFeatures);
 	}
 
 	/**

@@ -68,6 +68,8 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		oldParent = FeatureUtils.getParent(feature);
 		if (oldParent != null) {
 			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
+			or = oldParent.getStructure().isOr();
+			alternative = oldParent.getStructure().isAlternative();
 		}
 		oldChildren = new LinkedList<IFeature>();
 		oldChildren.addAll(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
@@ -103,8 +105,6 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 		// make sure after delete the group type of the parent is set to and if there is only one child left
 		if (oldParent != null) {
-			or = oldParent.getStructure().isOr();
-			alternative = oldParent.getStructure().isAlternative();
 			if (oldParent.getStructure().getChildrenCount() == 1) {
 				oldParent.getStructure().changeToAnd();
 			}
