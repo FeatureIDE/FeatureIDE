@@ -221,7 +221,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	protected T persistentObject;
 	protected T variableObject;
-	protected T emptyObject;
 
 	private boolean modifying = false;
 
@@ -231,7 +230,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		path = Paths.get(absolutePath);
 
 		variableObject = object;
-		emptyObject = copyObject(object);
 
 		if (FileSystem.exists(path)) {
 			try {
@@ -302,7 +300,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				return true;
 			}
 			lastProblems.clear();
-			final T tempObject = copyObject(emptyObject);
+			final T tempObject = copyObject(persistentObject);
 			try {
 				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
 				final List<Problem> problemList = format.getInstance().read(tempObject, content);
