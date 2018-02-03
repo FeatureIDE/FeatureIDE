@@ -20,12 +20,9 @@
  */
 package org.prop4j.analyses.impl.general;
 
-import org.prop4j.Literal;
-import org.prop4j.Or;
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ISolver;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -40,17 +37,6 @@ public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
 	 */
 	public ValidAnalysis(ISolver solver) {
 		super(solver);
-
-		final Literal A = new Literal("A");
-		final Literal B = new Literal("B");
-
-		final Or clause = new Or(A, B);
-		solver.push(clause);
-
-		FMCorePlugin.getDefault().logInfo("Pushed: " + solver.toString());
-		solver.pop();
-		FMCorePlugin.getDefault().logInfo("Popped: " + solver.toString());
-
 	}
 
 	/*
@@ -59,7 +45,6 @@ public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
 	 */
 	@Override
 	public Object[] analyze(IMonitor monitor) {
-		FMCorePlugin.getDefault().logInfo(solver.toString());
 		return solver.findSolution();
 	}
 

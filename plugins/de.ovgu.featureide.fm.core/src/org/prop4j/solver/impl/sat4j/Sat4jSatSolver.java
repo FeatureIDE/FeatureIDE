@@ -21,7 +21,6 @@
 package org.prop4j.solver.impl.sat4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,6 +31,7 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.VarOrderHeap2;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
@@ -313,9 +313,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		if (model == null) {
 			return null;
 		}
-		final List<Object> objectModel = new ArrayList<Object>();
-		objectModel.addAll(Arrays.asList(model));
-		return objectModel.toArray();
+		return SolverUtils.getObjectModel(model);
 	}
 
 	/*
@@ -324,13 +322,8 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
-		if (isSatisfiable() == true) {
-			final int[] model = solver.model();
-			final List<Integer> objectModel = new ArrayList<Integer>();
-			for (int i = 0; i < model.length; i++) {
-				objectModel.add(new Integer(model[i]));
-			}
-			return objectModel.toArray();
+		if (isSatisfiable()) {
+			return getSoulution();
 		}
 		return null;
 	}

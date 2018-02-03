@@ -1,10 +1,12 @@
 package de.ovgu.featureide.fm.attributes.view.actions;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.prop4j.Node;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
-import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.SatProblem;
 
@@ -41,21 +43,10 @@ public class TestSolver extends Action {
 
 		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getDefault();
 
-		ValidAnalysis test = (ValidAnalysis) factory.getAnalysis(ValidAnalysis.class, problem);
+		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
 		try {
-			Object[] solution = test.execute(new NullMonitor());
-			if (solution == null) {
-				FMAttributesPlugin.getDefault().logInfo("UnSolveable");
-			} else {
-				FMAttributesPlugin.getDefault().logInfo("Solveable");
-			}
-			int index = 1;
-			for (Object object : solution) {
-				if (object instanceof Integer) {
-					int value = (int) object;
-					FMAttributesPlugin.getDefault().logInfo("Solution of [" + problem.getVariableOfIndex(index++) + "]: " + value);
-				}
-			}
+			int[] solution = test.execute(new NullMonitor());
+			FMAttributesPlugin.getDefault().logInfo("MySolution: " + Arrays.toString(solution));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

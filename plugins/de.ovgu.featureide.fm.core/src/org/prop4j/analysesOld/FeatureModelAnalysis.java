@@ -21,6 +21,7 @@
 package org.prop4j.analysesOld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -29,13 +30,14 @@ import java.util.List;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.solverOld.BasicSolver;
+import org.prop4j.solverOld.ISatSolver.SatResult;
 import org.prop4j.solverOld.ModifiableSolver;
 import org.prop4j.solverOld.SatInstance;
-import org.prop4j.solverOld.ISatSolver.SatResult;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -421,6 +423,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		deadFeatures.clear();
 		coreFeatures.clear();
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
+		FMCorePlugin.getDefault().logInfo("SolutionOriginal: " + Arrays.toString(solution2));
 		monitor.checkCancel();
 		for (int i = 0; i < solution2.length; i++) {
 			monitor.checkCancel();
