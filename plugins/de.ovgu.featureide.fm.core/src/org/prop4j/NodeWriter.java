@@ -210,6 +210,9 @@ public class NodeWriter {
 		if (node instanceof Literal) {
 			return literalToString((Literal) node, parent);
 		}
+		if (node instanceof AtomicFormula) {
+			return atomicFormulaToString(node);
+		}
 		return operationToString(node, parent);
 	}
 
@@ -410,5 +413,9 @@ public class NodeWriter {
 			return sb.toString();
 		}
 		return "";
+	}
+
+	private String atomicFormulaToString(Node node) {
+		return "(" + node.toString() + ")";
 	}
 }
