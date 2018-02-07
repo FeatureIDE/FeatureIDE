@@ -20,12 +20,9 @@
  */
 package org.prop4j.analysesOld;
 
-import org.prop4j.solverOld.FixedLiteralSelectionStrategy;
 import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
-import org.prop4j.solverOld.VarOrderHeap2;
 import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
-import org.sat4j.minisat.core.Solver;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -64,7 +61,6 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 		if (model1 != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			final int[] model2 = solver.findModel();
-
 			if (features != null) {
 				final int[] model3 = new int[model1.length];
 				for (int i = 0; i < features.length; i++) {
@@ -77,7 +73,8 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 			}
 
 			SatInstance.updateModel(model1, model2);
-			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
+
+			// ((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];

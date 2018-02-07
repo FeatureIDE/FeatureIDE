@@ -133,7 +133,10 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public int[] findModel() {
-		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
+		if (isSatisfiable() == SatResult.TRUE) {
+			return solver.model();
+		}
+		return null;
 	}
 
 	@Override
