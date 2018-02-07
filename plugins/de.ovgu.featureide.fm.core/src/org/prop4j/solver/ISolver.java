@@ -35,7 +35,7 @@ public interface ISolver {
 	/**
 	 * @return true, when the problem given to the solver is satisfiable.
 	 */
-	boolean isSatisfiable();
+	ISatResult isSatisfiable();
 
 	/**
 	 * Used to set specific solver configuration when the solver initiated and also during runtime.
@@ -90,7 +90,7 @@ public interface ISolver {
 
 	/**
 	 * Returns the problem that is assigned to the solver.
-	 * 
+	 *
 	 * @return The problem
 	 */
 	ISolverProblem getProblem();
