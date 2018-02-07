@@ -36,7 +36,7 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 * @param file
 	 * @throws UnsupportedModelException
 	 */
-	public TXmlReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
+	public TXmlReaderWriter(IFeatureModel fm, String s) {
 		super(fm, s);
 	}
 
