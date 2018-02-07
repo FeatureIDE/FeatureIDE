@@ -20,6 +20,8 @@ public class AttributeComputationBundle {
 	public void initComputations(Configuration config, IFeatureAttribute attribute) {
 		computations = new ArrayList<IAttributeComputation>();
 		computations.add(new CountAttributeComputation(config, attribute));
+		computations.add(new EstimatedMinimumComputation(config, attribute));
+		computations.add(new EstimatedMaximumComputation(config, attribute));
 	}
 
 	public List<ComputationHeader> getComputationHeaders() {
@@ -28,5 +30,10 @@ public class AttributeComputationBundle {
 			headers.add(new ComputationHeader(comp));
 		}
 		return headers;
+	}
+
+	private List<IAttributeComputation> getExtensions(Configuration config, IFeatureAttribute attribute) {
+		List<IAttributeComputation> extensions = new ArrayList<IAttributeComputation>();
+		return extensions;
 	}
 }

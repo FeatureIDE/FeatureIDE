@@ -11,7 +11,7 @@ public class CountAttributeComputation implements IAttributeComputation {
 
 	Configuration config;
 	IFeatureAttribute attribute;
-	String HEADER_STRING = "Count";
+	private static final String HEADER_STRING = "Count";
 
 	public CountAttributeComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
