@@ -67,7 +67,16 @@ public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupp
 	 */
 	@Override
 	protected boolean canEdit(Object element) {
-		return enabled && (element instanceof IFeatureAttribute);
+		if (enabled) {
+			if (element instanceof IFeatureAttribute) {
+				IFeatureAttribute att = (IFeatureAttribute) element;
+				if (att.isRecursive() && !att.isHeadOfRecursiveAttribute()) {
+					return false;
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*

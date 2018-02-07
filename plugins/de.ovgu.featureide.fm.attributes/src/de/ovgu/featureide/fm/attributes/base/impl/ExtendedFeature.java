@@ -37,7 +37,6 @@ public class ExtendedFeature extends Feature {
 
 	public void addAttribute(IFeatureAttribute attribute) {
 		attributes.add(attribute);
-
 	}
 
 	public void removeAttribute(IFeatureAttribute attribute) {
@@ -51,6 +50,15 @@ public class ExtendedFeature extends Feature {
 	@Override
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new ExtendedFeature(this, newFeatureModel, newStructure);
+	}
+
+	public boolean isContainingAttribute(IFeatureAttribute attribute) {
+		for (IFeatureAttribute att : attributes) {
+			if (attribute.getName().equals(att.getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -86,5 +94,6 @@ public class ExtendedFeature extends Feature {
 			}
 		}
 		return tooltip.toString();
+
 	}
 }

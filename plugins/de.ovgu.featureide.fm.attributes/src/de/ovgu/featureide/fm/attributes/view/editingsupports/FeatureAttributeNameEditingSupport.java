@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.attributes.view.editingsupports;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
+import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -35,18 +37,16 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  *
  * @author Joshua
  */
-public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttributeEditingSupport {
+public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
 	/**
 	 * @param viewer
 	 * @param enabled
 	 */
-	public FeatureAttributeRecursiveEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
+	public FeatureAttributeNameEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
 		// TODO Auto-generated constructor stub
 	}
-
-	private static final String TRUE_STRING = "true";
 
 	/*
 	 * (non-Javadoc)
@@ -54,7 +54,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new CheckboxCellEditor((Composite) getViewer().getControl());
+		return new TextCellEditor((Composite) getViewer().getControl());
 	}
 
 	/*
@@ -64,7 +64,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	@Override
 	protected Object getValue(Object element) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
-		return attribute.isRecursive();
+		return attribute.getName();
 	}
 
 	/*
@@ -73,9 +73,19 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setRecursive((Boolean) value);
+		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
+		for (IFeatureAttribute att : feat.getAttributes()) {
+			if (att.getName().equals(value.toString())) {
+				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");
+				return;
+			}
+		}
+		((IFeatureAttribute) element).setName(value.toString());
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		if (((IFeatureAttribute) element).isRecursive()) {
+			getViewer().refresh();
+		}
 		getViewer().update(element, null);
-	}
 
+	}
 }

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * TODO description
@@ -138,6 +139,15 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public void setName(String name) {
+		if (recursive) {
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setName(name);
+					}
+				}
+			}
+		}
 		this.name = name;
 	}
 
@@ -147,8 +157,17 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 */
 	@Override
 	public void setUnit(String unit) {
+		// recursive boolean is enough because otherwise it would not be clickable check this again later
+		if (recursive) {
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setUnit(unit);
+					}
+				}
+			}
+		}
 		this.unit = unit;
-
 	}
 
 	/*
@@ -174,8 +193,55 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	 * @see de.ovgu.featureide.fm.core.attribute.IFeatureAttribute#setConfigureable(boolean)
 	 */
 	@Override
-	public void setConfigureable(boolean configureable) {
-		this.configureable = configureable;
+	public void setConfigureable(boolean configurable) {
+		if (recursive) {
+			Iterable<IFeature> test = getFeature().getFeatureModel().getFeatures();
+			for (IFeatureStructure struct : getFeature().getStructure().getChildren()) {
+				for (IFeatureAttribute att : ((ExtendedFeature) struct.getFeature()).getAttributes()) {
+					if (att.getName().equals(this.getName())) {
+						att.setConfigureable(configurable);
+					}
+				}
+			}
+		}
+		this.configureable = configurable;
+	}
+
+	// recursive Method to recursive attributes to all descendants
+	public void recurseAttribute(IFeature feature) {
+		IFeatureAttribute attribute = this;
+		IFeatureAttribute newAttribute = null;
+		for (IFeatureStructure struct : feature.getStructure().getChildren()) {
+			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
+			recurseAttribute(feat);
+			newAttribute = attribute.cloneRecursive(feat);
+			if (!feat.isContainingAttribute(newAttribute)) {
+				feat.addAttribute(newAttribute);
+			}
+		}
+	}
+
+	/**
+	 * Removes the recursive attribute of the descendants
+	 * 
+	 * @param Feature Holding feature
+	 */
+	public void deleteRecursiveAttributes(IFeature feature) {
+		IFeatureAttribute attribute = this;
+		for (IFeature feat : feature.getFeatureModel().getFeatures()) {
+			if (!feat.equals(feature)) {
+				for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
+					if (att.getName().equals(attribute.getName())) {
+						((ExtendedFeature) feat).removeAttribute(att);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public boolean isHeadOfRecursiveAttribute() {
+		return getFeature().getStructure().isRoot() || (!((ExtendedFeature) getFeature().getStructure().getParent().getFeature()).isContainingAttribute(this));
 	}
 
 	/*

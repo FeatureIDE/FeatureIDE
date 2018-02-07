@@ -25,9 +25,44 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 /**
  * TODO description
  *
- * @author User
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
-public abstract class AbstractFeatureAttributeFactory {
+public interface IFeatureAttribute {
 
-	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature);
+	public IFeature getFeature();
+
+	public String getName();
+
+	public String getUnit();
+
+	public Object getValue();
+
+	public String getType();
+
+	public boolean isRecursive();
+
+	public boolean isConfigurable();
+
+	public void setName(String name);
+
+	public void setUnit(String unit);
+
+	public void setValue(Object value);
+
+	public void setRecursive(boolean recursive);
+
+	public void setConfigureable(boolean configureable);
+
+	public void recurseAttribute(IFeature feature);
+
+	public void deleteRecursiveAttributes(IFeature feature);
+
+	public void setFeature(IFeature feature);
+
+	public IFeatureAttribute cloneRecursive(IFeature feature);
+
+	public IFeatureAttribute cloneAtt(IFeature feature);
+
+	public boolean isHeadOfRecursiveAttribute();
 }

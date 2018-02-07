@@ -20,39 +20,22 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-
 /**
  * TODO description
  *
- * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public interface IFeatureAttribute {
-
-	public IFeature getFeature();
+public interface IFeatureAttributeParsedData {
 
 	public String getName();
 
-	public String getUnit();
-
-	public Object getValue();
-
 	public String getType();
 
-	public boolean isRecursive();
+	public String getUnit();
 
-	public boolean isConfigurable();
+	public String getValue();
 
-	public void setName(String name);
+	public String isRecursive();
 
-	public void setUnit(String unit);
-
-	public void setValue(Object value);
-
-	public void setRecursive(boolean recursive);
-
-	public void setConfigureable(boolean configureable);
-
-	public void setFeature(IFeature feature);
+	public String isConfigurable();
 }

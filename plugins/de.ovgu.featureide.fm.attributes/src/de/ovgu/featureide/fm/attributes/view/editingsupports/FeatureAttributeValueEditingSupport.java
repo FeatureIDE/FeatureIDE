@@ -79,6 +79,11 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 	@Override
 	protected void setValue(Object element, Object value) {
 		final IFeatureAttribute attribute = (IFeatureAttribute) element;
+		if (value == null || value.toString().equals("")) {
+			((IFeatureAttribute) element).setValue(null);
+			getViewer().update(element, null);
+			return;
+		}
 		if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
 			if (value.toString().toLowerCase().equals(TRUE_STRING)) {
 				((IFeatureAttribute) element).setValue(new Boolean(true));
@@ -96,7 +101,7 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 				((IFeatureAttribute) element).setValue(new Long(temp));
 				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} catch (final NumberFormatException e) {
-				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid integer number.");
+				MessageDialog.openError(null, "Invalid input", "Please insert a valid integer number.");
 			}
 		} else if (attribute.getType().equals(FeatureAttribute.DOUBLE)) {
 			try {
@@ -104,10 +109,18 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 				((IFeatureAttribute) element).setValue(new Double(temp));
 				view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 			} catch (final NumberFormatException e) {
-				MessageDialog.openError(null, "Ungültige Eingabe", "Please insert a valid float number.");
+				MessageDialog.openError(null, "Invalid input", "Please insert a valid float number.");
 			}
 		}
 		getViewer().update(element, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
+	 */
+	@Override
+	protected boolean canEdit(Object element) {
+		return enabled && (element instanceof IFeatureAttribute);
+	}
 }

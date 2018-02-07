@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -28,9 +29,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class StringFeatureAttribute extends FeatureAttribute {
+public class BooleanFeatureAttribute extends FeatureAttribute {
 
-	private String value;
+	private Boolean value;
 
 	/**
 	 * @param name
@@ -39,14 +40,14 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	 * @param recursive
 	 * @param configureable
 	 */
-	public StringFeatureAttribute(IFeature feature, String name, String unit, String value, boolean recursive, boolean configureable) {
-		super(feature, name, unit, recursive, configureable);
+	public BooleanFeatureAttribute(IFeature feature, String name, String unit, Boolean value, boolean recursive, boolean configurable) {
+		super(feature, name, unit, recursive, configurable);
 		this.value = value;
-		attributeType = FeatureAttribute.STRING;
+		attributeType = FeatureAttribute.BOOLEAN;
 	}
 
 	@Override
-	public String getValue() {
+	public Boolean getValue() {
 		return value;
 	}
 
@@ -57,9 +58,30 @@ public class StringFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = "";
+			this.value = null;
 			return;
 		}
-		this.value = value.toString();
+		if (value instanceof Boolean) {
+			this.value = (Boolean) value;
+		}
+	}
+
+	/**
+	 * Returns a copy of the attribute
+	 */
+	@Override
+	public IFeatureAttribute cloneAtt(IFeature feature) {
+		return new BooleanFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+	}
+
+	/**
+	 * Creates a clone of a IFeatureAttribute with a new corresponding Feature and value as null
+	 * 
+	 * @param Feature that the attribute should be attached to
+	 * @return clone of the attribute with value set to null
+	 */
+	@Override
+	public IFeatureAttribute cloneRecursive(IFeature feature) {
+		return new BooleanFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
 }

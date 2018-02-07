@@ -20,21 +20,14 @@
  */
 package de.ovgu.featureide.fm.attributes.base;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * TODO description
  *
- * @author User
+ * @author Chico Sundermann
  */
-public interface IFeatureAttributeParsedData {
-	public String getName();
+public abstract class AbstractFeatureAttributeFactory {
 
-	public String getType();
-
-	public String getUnit();
-
-	public String getValue();
-
-	public String isRecursive();
-
-	public String isConfigurable();
+	public abstract IFeatureAttribute createFeatureAttribute(IFeatureAttributeParsedData attributeData, IFeature correspondingFeature);
 }

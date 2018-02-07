@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -28,9 +29,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * @author Joshua Sprey
  * @author Chico Sundermann
  */
-public class LongFeatureAttribute extends FeatureAttribute {
+public class DoubleFeatureAttribute extends FeatureAttribute {
 
-	private Long value;
+	private Double value;
 
 	/**
 	 * @param name
@@ -39,15 +40,14 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	 * @param recursive
 	 * @param configureable
 	 */
-
-	public LongFeatureAttribute(IFeature feature, String name, String unit, Long value, boolean recursive, boolean configureable) {
+	public DoubleFeatureAttribute(IFeature feature, String name, String unit, Double value, boolean recursive, boolean configureable) {
 		super(feature, name, unit, recursive, configureable);
 		this.value = value;
-		attributeType = FeatureAttribute.LONG;
+		attributeType = FeatureAttribute.DOUBLE;
 	}
 
 	@Override
-	public Long getValue() {
+	public Double getValue() {
 		return value;
 	}
 
@@ -58,11 +58,30 @@ public class LongFeatureAttribute extends FeatureAttribute {
 	@Override
 	public void setValue(Object value) {
 		if (value == null) {
-			this.value = 0L;
+			this.value = null;
 			return;
 		}
-		if (value instanceof Long) {
-			this.value = (Long) value;
+		if (value instanceof Double) {
+			this.value = (Double) value;
 		}
+	}
+
+	/**
+	 * Returns a copy of the attribute
+	 */
+	@Override
+	public IFeatureAttribute cloneAtt(IFeature feature) {
+		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), this.getValue(), this.isRecursive(), this.isConfigurable());
+	}
+
+	/**
+	 * Creates a clone of a IFeatureAttribute with a new corresponding Feature and value as null
+	 * 
+	 * @param Feature that the attribute should be attached to
+	 * @return clone of the attribute with value set to null
+	 */
+	@Override
+	public IFeatureAttribute cloneRecursive(IFeature feature) {
+		return new DoubleFeatureAttribute(feature, this.getName(), this.getUnit(), null, this.isRecursive(), this.isConfigurable());
 	}
 }

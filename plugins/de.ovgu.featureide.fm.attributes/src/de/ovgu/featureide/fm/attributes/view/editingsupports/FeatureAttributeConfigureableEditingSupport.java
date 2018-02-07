@@ -75,6 +75,9 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	protected void setValue(Object element, Object value) {
 		((IFeatureAttribute) element).setConfigureable((Boolean) value);
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
+		if (((IFeatureAttribute) element).isRecursive()) {
+			getViewer().refresh();
+		}
 		getViewer().update(element, null);
 	}
 }
