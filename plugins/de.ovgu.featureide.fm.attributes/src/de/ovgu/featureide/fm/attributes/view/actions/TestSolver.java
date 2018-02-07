@@ -1,7 +1,5 @@
 package de.ovgu.featureide.fm.attributes.view.actions;
 
-import java.util.Arrays;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.prop4j.Constant;
@@ -13,15 +11,12 @@ import org.prop4j.LessThan;
 import org.prop4j.Node;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
-import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
+import org.prop4j.analysesOld.FeatureModelAnalysis;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.SatProblem;
 
-import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 public class TestSolver extends Action {
 
@@ -84,19 +79,24 @@ public class TestSolver extends Action {
 
 		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getDefault();
 
-		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
-		try {
-			int[] solution = LongRunningWrapper.runMethod(test, new NullMonitor());
-			String solutionString = "[";
-			for (int i : solution) {
-				solutionString += ", " + problem.getVariableOfIndex(Math.abs(i));
-			}
-			solutionString += "]";
-			FMAttributesPlugin.getDefault().logInfo("MySolution: " + solutionString + "\t" + Arrays.toString(solution));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		FeatureModelAnalysis.evaluate = true;
+
+		view.getFeatureModel().getAnalyser().analyzeFeatureModel(null);
+
+//		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
+//		try {
+//			int[] solution = LongRunningWrapper.runMethod(test, new NullMonitor());
+//			String solutionString = "[";
+//			for (int i : solution) {
+//				solutionString += ", " + problem.getVariableOfIndex(Math.abs(i));
+//			}
+//			solutionString += "]";
+//			FMAttributesPlugin.getDefault().logInfo("MySolution: " + solutionString + "\t" + Arrays.toString(solution));
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		FeatureModelAnalysis.evaluate = false;
 
 //		FMAttributesPlugin.getDefault().logInfo("Is Satis: " + new Sat4jSatSolverFactory().getSatSolver().isSatisfiable(cnf));
 //		Configuration config;

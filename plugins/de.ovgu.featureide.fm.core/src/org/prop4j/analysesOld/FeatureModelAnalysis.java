@@ -68,6 +68,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  */
 public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, Object>> {
 
+	public static boolean evaluate = false;
 	/**
 	 * Defines whether constraints should be included into calculations.
 	 */
@@ -216,7 +217,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				}
 			}
 		}
-		FMCorePlugin.getDefault().logInfo(analysisComparison);
+		if (evaluate) {
+			FMCorePlugin.getDefault().logInfo(analysisComparison);
+		}
 		return changedAttributes;
 	}
 
@@ -281,10 +284,13 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			(org.prop4j.analyses.impl.general.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ValidAnalysis.class, problem);
 
 		final int[] modelOriginal = LongRunningWrapper.runMethod(new ValidAnalysis(new SatInstance(constraintNode)));
-		final Object[] solution = LongRunningWrapper.runMethod(validAnalysis, new NullMonitor());
-		final int[] array = SolverUtils.getIntModel(solution);
+		if (evaluate) {
 
-		analysisComparison += "checkConstraintContradiction:\nORI: " + Arrays.toString(modelOriginal) + "\nNEW: " + Arrays.toString(array) + "\n\n";
+			final Object[] solution = LongRunningWrapper.runMethod(validAnalysis, new NullMonitor());
+			final int[] array = SolverUtils.getIntModel(solution);
+
+			analysisComparison += "checkConstraintContradiction:\nORI: " + Arrays.toString(modelOriginal) + "\nNEW: " + Arrays.toString(array) + "\n\n";
+		}
 		return modelOriginal == null;
 	}
 
@@ -448,7 +454,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			(org.prop4j.analyses.impl.general.CoreDeadAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.CoreDeadAnalysis.class, problem);
 
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
-		final int[] solutionNew = LongRunningWrapper.runMethod(coreDeadAnalysis, new NullMonitor());
 
 		monitor.checkCancel();
 		for (int i = 0; i < solution2.length; i++) {
@@ -462,8 +467,10 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				coreFeatures.add(feature);
 			}
 		}
-
-		analysisComparison += "checkFeatureDead:\nORI: " + Arrays.toString(solution2) + "\nNEW: " + Arrays.toString(solutionNew) + "\n\n";
+		if (evaluate) {
+			final int[] solutionNew = LongRunningWrapper.runMethod(coreDeadAnalysis, new NullMonitor());
+			analysisComparison += "checkFeatureDead:\nORI: " + Arrays.toString(solution2) + "\nNEW: " + Arrays.toString(solutionNew) + "\n\n";
+		}
 	}
 
 	private List<IFeature> checkFeatureDead2(final BasicSolver solver, List<IFeature> deadList) {
@@ -501,7 +508,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		implicationAnalysis.initParis(possibleFOFeatures);
 
 		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
-		final List<int[]> solution = LongRunningWrapper.runMethod(implicationAnalysis, new NullMonitor());
 
 		monitor.checkCancel();
 		falseOptionalFeatures.clear();
@@ -512,15 +518,18 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			falseOptionalFeatures.add(feature);
 		}
 
-		final ArrayList<IFeature> newFalseOptional = new ArrayList<>();
-		for (final int[] pair : solution) {
-			monitor.checkCancel();
-			final IFeature feature = fm.getFeature((CharSequence) problem.getVariableOfIndex(pair[1]));
-			// setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
-			newFalseOptional.add(feature);
-		}
+		if (evaluate) {
+			final List<int[]> solution = LongRunningWrapper.runMethod(implicationAnalysis, new NullMonitor());
+			final ArrayList<IFeature> newFalseOptional = new ArrayList<>();
+			for (final int[] pair : solution) {
+				monitor.checkCancel();
+				final IFeature feature = fm.getFeature((CharSequence) problem.getVariableOfIndex(pair[1]));
+				// setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
+				newFalseOptional.add(feature);
+			}
 
-		analysisComparison += "checkFeatureFalseOptional:\nORI: " + falseOptionalFeatures.toString() + "\nNEW: " + newFalseOptional.toString() + "\n\n";
+			analysisComparison += "checkFeatureFalseOptional:\nORI: " + falseOptionalFeatures.toString() + "\nNEW: " + newFalseOptional.toString() + "\n\n";
+		}
 	}
 
 	private List<IFeature> checkFeatureFalseOptional2(final BasicSolver solver, List<IFeature> foList) {
