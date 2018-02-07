@@ -21,7 +21,6 @@
 package org.prop4j.analyses.impl.general;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.prop4j.Literal;
@@ -30,6 +29,7 @@ import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -43,11 +43,6 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
 	public CoreDeadAnalysis(ISolver solver) {
 		super(solver);
-	}
-
-	public CoreDeadAnalysis(ISolver solver, int[] features) {
-		super(solver);
-		setFeatures(features);
 	}
 
 	private int[] features;
@@ -77,42 +72,38 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 			}
 
 			SolverUtils.updateModel(model1, model2);
+//			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
 					solver.push(getLiteralFromIndex(-varX));
-					switch (solver.isSatisfiable()) {
-					case FALSE:
+					if (solver.isSatisfiable()) {
+
+						solver.pop();
+						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
+						// solver.shuffleOrder();
+						break;
+					} else {
 						solver.pop();
 						solver.push(getLiteralFromIndex(varX));
 						monitor.invoke(varX);
-						break;
-					case TIMEOUT:
-						solver.pop();
-						break;
-					case TRUE:
-						solver.pop();
-						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
-						// solver.shuffleOrder();
-						break;
 					}
 				}
 			}
 		}
 
-		final ArrayList<Integer> solution = new ArrayList<>();
+		final ArrayList<Integer> test = new ArrayList<>();
 		Node currentNode = solver.pop();
 		while (currentNode != null) {
 			if (currentNode instanceof Literal) {
 				final Literal literal = (Literal) currentNode;
-				solution.add(solver.getProblem().getSignedIndexOfVariable(literal));
+				test.add(solver.getProblem().getIndexOfVariable(literal.var));
 				currentNode = solver.pop();
 			}
 		}
-		Collections.reverse(solution);
 
-		return SolverUtils.getIntModel((Integer[]) solution.toArray(new Integer[solution.size()]));
+		return SolverUtils.getIntModel((Integer[]) test.toArray(new Integer[test.size()]));
 	}
 
 	public int[] getFeatures() {

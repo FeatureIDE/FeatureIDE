@@ -25,7 +25,6 @@ import java.util.HashMap;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
-import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
@@ -62,15 +61,6 @@ public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 			if (problem instanceof ISatProblem) {
 				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
 				return new CoreDeadAnalysis(solver);
-			}
-		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
-			final HashMap<String, Object> configuration = new HashMap<>();
-			configuration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
-			configuration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-			configuration.put(Sat4jSatSolver.CONFIG_VERBOSE, true);
-			if (problem instanceof ISatProblem) {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
-				return new ImplicationAnalysis(solver);
 			}
 		}
 		return null;

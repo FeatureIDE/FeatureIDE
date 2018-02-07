@@ -29,10 +29,6 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.analyses.AbstractSolverAnalysisFactory;
-import org.prop4j.solver.ISolverProblem;
-import org.prop4j.solver.impl.SatProblem;
-import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.BasicSolver;
 import org.prop4j.solverOld.ISatSolver.SatResult;
 import org.prop4j.solverOld.ModifiableSolver;
@@ -104,10 +100,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private IMonitor monitor = new NullMonitor();
 
-	AbstractSolverAnalysisFactory factory;
-
-	private String analysisComparison = "";
-
 	public FeatureModelAnalysis(IFeatureModel fm) {
 		this.fm = fm;
 
@@ -119,8 +111,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
 		nodeCreator.setUseOldNames(false);
-
-		factory = AbstractSolverAnalysisFactory.getDefault();
 	}
 
 	public boolean isCalculateConstraints() {
@@ -184,7 +174,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 */
 	@Override
 	public HashMap<Object, Object> execute(IMonitor monitor) throws Exception {
-		analysisComparison = "";
 		this.monitor = monitor;
 		int work = 0;
 		if (calculateFeatures) {
@@ -196,6 +185,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		monitor.setRemainingWork(work);
 
 		changedAttributes.clear();
+
 		deadFeatures.clear();
 		coreFeatures.clear();
 		falseOptionalFeatures.clear();
@@ -216,7 +206,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				}
 			}
 		}
-		FMCorePlugin.getDefault().logInfo(analysisComparison);
 		return changedAttributes;
 	}
 
@@ -276,16 +265,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	}
 
 	private boolean checkConstraintContradiction(Node constraintNode) {
-		final ISolverProblem problem = new SatProblem(constraintNode);
-		final org.prop4j.analyses.impl.general.ValidAnalysis validAnalysis =
-			(org.prop4j.analyses.impl.general.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ValidAnalysis.class, problem);
-
-		final int[] modelOriginal = LongRunningWrapper.runMethod(new ValidAnalysis(new SatInstance(constraintNode)));
-		final Object[] solution = LongRunningWrapper.runMethod(validAnalysis, new NullMonitor());
-		final int[] array = SolverUtils.getIntModel(solution);
-
-		analysisComparison += "checkConstraintContradiction:\nORI: " + Arrays.toString(modelOriginal) + "\nNEW: " + Arrays.toString(array) + "\n\n";
-		return modelOriginal == null;
+		return LongRunningWrapper.runMethod(new ValidAnalysis(new SatInstance(constraintNode))) == null;
 	}
 
 	private void checkConstraintDeadAndFalseOptional(final List<IConstraint> constraints) throws ContradictionException {
@@ -442,14 +422,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	private void checkFeatureDead(final SatInstance si) {
 		deadFeatures.clear();
 		coreFeatures.clear();
-
-		final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
-		final org.prop4j.analyses.impl.general.CoreDeadAnalysis coreDeadAnalysis =
-			(org.prop4j.analyses.impl.general.CoreDeadAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.CoreDeadAnalysis.class, problem);
-
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(si), monitor.subTask(0));
-		final int[] solutionNew = LongRunningWrapper.runMethod(coreDeadAnalysis, new NullMonitor());
-
+		FMCorePlugin.getDefault().logInfo("SolutionOriginal: " + Arrays.toString(solution2));
 		monitor.checkCancel();
 		for (int i = 0; i < solution2.length; i++) {
 			monitor.checkCancel();
@@ -462,8 +436,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				coreFeatures.add(feature);
 			}
 		}
-
-		analysisComparison += "checkFeatureDead:\nORI: " + Arrays.toString(solution2) + "\nNEW: " + Arrays.toString(solutionNew) + "\n\n";
 	}
 
 	private List<IFeature> checkFeatureDead2(final BasicSolver solver, List<IFeature> deadList) {
@@ -494,15 +466,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
 			}
 		}
-
-		final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
-		final org.prop4j.analyses.impl.general.ImplicationAnalysis implicationAnalysis =
-			(org.prop4j.analyses.impl.general.ImplicationAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ImplicationAnalysis.class, problem);
-		implicationAnalysis.initParis(possibleFOFeatures);
-
 		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(si, possibleFOFeatures), monitor.subTask(0));
-		final List<int[]> solution = LongRunningWrapper.runMethod(implicationAnalysis, new NullMonitor());
-
 		monitor.checkCancel();
 		falseOptionalFeatures.clear();
 		for (final int[] pair : solution3) {
@@ -511,16 +475,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
 			falseOptionalFeatures.add(feature);
 		}
-
-		final ArrayList<IFeature> newFalseOptional = new ArrayList<>();
-		for (final int[] pair : solution) {
-			monitor.checkCancel();
-			final IFeature feature = fm.getFeature((CharSequence) problem.getVariableOfIndex(pair[1]));
-			// setFeatureAttribute(feature, FeatureStatus.FALSE_OPTIONAL);
-			newFalseOptional.add(feature);
-		}
-
-		analysisComparison += "checkFeatureFalseOptional:\nORI: " + falseOptionalFeatures.toString() + "\nNEW: " + newFalseOptional.toString() + "\n\n";
 	}
 
 	private List<IFeature> checkFeatureFalseOptional2(final BasicSolver solver, List<IFeature> foList) {

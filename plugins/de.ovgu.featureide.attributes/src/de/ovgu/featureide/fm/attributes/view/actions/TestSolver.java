@@ -19,8 +19,6 @@ import org.prop4j.solver.impl.SatProblem;
 
 import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 public class TestSolver extends Action {
@@ -46,9 +44,9 @@ public class TestSolver extends Action {
 	}
 
 	private void solveSatRequestWithSMT(Node cnf) {
-		ISolverProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+		ISolverProblem problem = new SatProblem(cnf);
 
-		// FMAttributesPlugin.getDefault().logInfo(cnf.toString());
+		FMAttributesPlugin.getDefault().logInfo(cnf.toString());
 
 		Constant<IntegerType> constant40 = new Constant<IntegerType>(40);
 		Constant<DoubleType> constant80 = new Constant<DoubleType>(80.0D);
@@ -82,17 +80,14 @@ public class TestSolver extends Action {
 		Node cnfCopy = cnf.clone();
 		cnfCopy.setChildren(newChildren);
 
+		FMAttributesPlugin.getDefault().logInfo(cnfCopy.toString());
+
 		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getDefault();
 
 		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
 		try {
-			int[] solution = LongRunningWrapper.runMethod(test, new NullMonitor());
-			String solutionString = "[";
-			for (int i : solution) {
-				solutionString += ", " + problem.getVariableOfIndex(Math.abs(i));
-			}
-			solutionString += "]";
-			FMAttributesPlugin.getDefault().logInfo("MySolution: " + solutionString + "\t" + Arrays.toString(solution));
+			int[] solution = test.execute(new NullMonitor());
+			FMAttributesPlugin.getDefault().logInfo("MySolution: " + Arrays.toString(solution));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

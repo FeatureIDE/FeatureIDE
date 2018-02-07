@@ -31,7 +31,6 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.VarOrderHeap2;
 import org.sat4j.core.VecInt;
@@ -191,27 +190,35 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		return solver.addClause(new VecInt(clause));
 	}
 
+	private String arrayAsString(int[] array) {
+		String first = "Array[";
+		for (final int i : array) {
+			first += i + ", ";
+		}
+		return first.substring(0, first.length() - 2) + "]";
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolver#isSatisfiable()
 	 */
 	@Override
-	public ISatResult isSatisfiable() {
+	public boolean isSatisfiable() {
 		if (contradiction) {
-			return ISatResult.FALSE;
+			return false;
 		}
 		try {
 			if (solver.isSatisfiable(assignment, false)) {
 				if (solutionList != null) {
 					solutionList.add(solver.model());
 				}
-				return ISatResult.TRUE;
+				return true;
 			} else {
-				return ISatResult.FALSE;
+				return false;
 			}
 		} catch (final TimeoutException e) {
 			e.printStackTrace();
-			return ISatResult.TIMEOUT;
+			return false;
 		}
 	}
 
@@ -315,7 +322,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
-		if (isSatisfiable() == ISatResult.TRUE) {
+		if (isSatisfiable()) {
 			return getSoulution();
 		}
 		return null;
