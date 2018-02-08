@@ -484,6 +484,16 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			deadVar[j++] = solver.getSatInstance().getVariable(deadFeature.getName());
 		}
 		final int[] solution2 = LongRunningWrapper.runMethod(new CoreDeadAnalysis(solver, deadVar));
+
+		if (evaluate) {
+			final ISolverProblem problem = new SatProblem(solver.getSatInstance().getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
+			final org.prop4j.analyses.impl.general.CoreDeadAnalysis coreDeadAnalysis =
+				(org.prop4j.analyses.impl.general.CoreDeadAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.CoreDeadAnalysis.class, problem);
+			coreDeadAnalysis.setFeatures(deadVar);
+			final int[] solution3 = LongRunningWrapper.runMethod(coreDeadAnalysis);
+			analysisComparison += "checkFeatureDead2:\nO: " + Arrays.toString(solution2) + "\nN: " + Arrays.toString(solution3) + "\n\n";
+		}
+
 		for (int i = 0; i < solution2.length; i++) {
 			final int var = solution2[i];
 			if (var < 0) {
@@ -546,9 +556,25 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			}
 		}
 		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(solver, possibleFOFeatures));
+
 		for (final int[] pair : solution3) {
 			result.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
 		}
+
+		if (evaluate) {
+			final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
+			final org.prop4j.analyses.impl.general.ImplicationAnalysis implicationAnalysis =
+				(org.prop4j.analyses.impl.general.ImplicationAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ImplicationAnalysis.class, problem);
+			implicationAnalysis.initParis(possibleFOFeatures);
+			final List<int[]> solution4 = LongRunningWrapper.runMethod(implicationAnalysis);
+
+			final ArrayList<IFeature> result2 = new ArrayList<>();
+			for (final int[] pair : solution4) {
+				result2.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
+			}
+			analysisComparison += "checkFeatureFalseOptional2:\nO: " + result.toString() + "\nN: " + result2.toString() + "\n\n";
+		}
+
 		return result;
 	}
 
@@ -575,6 +601,17 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		}));
 
 		final int[] determinedHidden = LongRunningWrapper.runMethod(new IndeterminedAnalysis(si, hiddenLiterals));
+
+		if (evaluate) {
+			final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
+			final org.prop4j.analyses.impl.general.IndeterminedAnalysis indeterminedAnalysis = (org.prop4j.analyses.impl.general.IndeterminedAnalysis) factory
+					.getAnalysis(org.prop4j.analyses.impl.general.IndeterminedAnalysis.class, problem);
+			indeterminedAnalysis.init(hiddenLiterals);
+			final int[] solution4 = LongRunningWrapper.runMethod(indeterminedAnalysis);
+
+			analysisComparison += "checkFeatureHidden:\nO: " + Arrays.toString(determinedHidden) + "\nN: " + Arrays.toString(solution4) + "\n\n";
+		}
+
 		for (final int feature : determinedHidden) {
 			setFeatureAttribute(fm.getFeature(si.getVariableObject(feature).toString()), FeatureStatus.INDETERMINATE_HIDDEN);
 		}
@@ -582,6 +619,14 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkValidity(final SatInstance si) {
 		valid = LongRunningWrapper.runMethod(new ValidAnalysis(si)) != null;
+		if (evaluate) {
+			final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
+			final org.prop4j.analyses.impl.general.ValidAnalysis validAnalysis =
+				(org.prop4j.analyses.impl.general.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ValidAnalysis.class, problem);
+			final Object[] solution4 = LongRunningWrapper.runMethod(validAnalysis);
+
+			analysisComparison += "checkValidity:\nO: " + valid + "\nN: " + (solution4 != null) + "\n\n";
+		}
 		if (!valid) {
 			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.DEAD);
 		}

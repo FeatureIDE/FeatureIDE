@@ -21,6 +21,7 @@
 package org.prop4j.solver.impl;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Static class used to provide some basic functionality that can be used with any kind of solver.
@@ -91,5 +92,17 @@ public class SolverUtils {
 			nar[i] = -nar[i];
 		}
 		return nar;
+	}
+
+	public static String getListArrayString(List<int[]> list) {
+		String listSTring = "[";
+		for (final int[] is : list) {
+			listSTring += Arrays.toString(is);
+			if (list.get(list.size() - 1) != is) {
+				listSTring += ", ";
+			}
+		}
+		listSTring += "]";
+		return listSTring;
 	}
 }

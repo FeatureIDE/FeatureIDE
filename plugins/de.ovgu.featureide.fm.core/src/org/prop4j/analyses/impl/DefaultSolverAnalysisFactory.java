@@ -26,6 +26,7 @@ import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
+import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
@@ -39,6 +40,17 @@ import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
  */
 public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
+	private final HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
+
+	/**
+	 *
+	 */
+	public DefaultSolverAnalysisFactory() {
+		defaultConfiguration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
+		defaultConfiguration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
+		defaultConfiguration.put(Sat4jSatSolver.CONFIG_VERBOSE, false);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.prop4j.analyses.ISolverAnalysisFactory#getAnalysis(java.lang.Object, org.prop4j.solver.ISolverProblem)
@@ -46,33 +58,48 @@ public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
 		if (analysisClass.equals(ValidAnalysis.class)) {
-			final HashMap<String, Object> configuration = new HashMap<>();
-			configuration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
-			configuration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-			configuration.put(Sat4jSatSolver.CONFIG_VERBOSE, true);
-			if (problem instanceof ISatProblem) {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
-				return new ValidAnalysis(solver);
-			}
+			return getValidAnalyis(problem);
 		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
-			final HashMap<String, Object> configuration = new HashMap<>();
-			configuration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
-			configuration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-			configuration.put(Sat4jSatSolver.CONFIG_VERBOSE, true);
-			if (problem instanceof ISatProblem) {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
-				return new CoreDeadAnalysis(solver);
-			}
+			return getCoreDeadAnalysis(problem);
 		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
-			final HashMap<String, Object> configuration = new HashMap<>();
-			configuration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
-			configuration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-			configuration.put(Sat4jSatSolver.CONFIG_VERBOSE, true);
-			if (problem instanceof ISatProblem) {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, configuration);
-				return new ImplicationAnalysis(solver);
-			}
+			return getImplicationAnalysis(problem);
 		}
 		return null;
+	}
+
+	private CoreDeadAnalysis getCoreDeadAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new CoreDeadAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new ValidAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new ImplicationAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new IndeterminedAnalysis(solver, null);
+		} else {
+			return null;
+		}
 	}
 }

@@ -21,13 +21,16 @@
 package org.prop4j.analysesOld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.BasicSolver;
 import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.SatInstance;
 import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
+import org.prop4j.solverOld.SatInstance;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -52,6 +55,7 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
 	@Override
 	public List<int[]> analyze(IMonitor monitor) throws Exception {
+		String compare = "Start:\nCNF: " + solver.getSatInstance().getCnf() + "\nAssignedPairs: " + SolverUtils.getListArrayString(pairs);
 		final List<int[]> resultList = new ArrayList<>();
 
 		if (pairs == null) {
@@ -71,6 +75,7 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
 			monitor.checkCancel();
 			final int[] model2 = solver.findModel();
+			compare += "\nModel1: " + Arrays.toString(model1) + "\nModel2: " + Arrays.toString(model2);
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
@@ -107,7 +112,8 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 				}
 			}
 		}
-
+		compare += "\n\nResult: " + SolverUtils.getListArrayString(resultList);
+		FMCorePlugin.getDefault().logInfo(compare);
 		return resultList;
 	}
 
@@ -118,5 +124,4 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 		}
 		return count;
 	}
-
 }

@@ -21,6 +21,7 @@
 package org.prop4j.analyses.impl.general;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.ISatSolver;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -59,6 +61,8 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 	@Override
 	public List<int[]> analyze(IMonitor monitor) {
+		String compare = "New Start:\nCNF: " + solver.getProblem().getRoot() + "\nAssignedPairs: " + SolverUtils.getListArrayString(pairs);
+
 		final List<int[]> resultList = new ArrayList<>();
 
 		if (pairs == null) {
@@ -84,6 +88,7 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 			monitor.checkCancel();
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
+			compare += "\nModel1: " + Arrays.toString(model1) + "\nModel2: " + Arrays.toString(model2);
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
@@ -114,7 +119,9 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 					break;
 				case TRUE:
 					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
-					// solver.shuffleOrder();
+					if (solver instanceof Sat4jSatSolver) {
+						((Sat4jSatSolver) solver).shuffleOrder();
+					}
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
@@ -122,7 +129,8 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 				}
 			}
 		}
-
+		compare += "\n\nResult: " + SolverUtils.getListArrayString(resultList);
+		FMCorePlugin.getDefault().logInfo(compare);
 		return resultList;
 	}
 
