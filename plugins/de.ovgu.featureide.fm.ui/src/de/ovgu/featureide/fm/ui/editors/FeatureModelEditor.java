@@ -631,6 +631,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				}
 			}
 		}
+		if (fmManager != null) {
+			createModelFileMarkers(fmManager.getLastProblems());
+		}
+
 		return true;
 	}
 

@@ -51,7 +51,6 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -292,7 +291,6 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 		for (final FSTRole r : clazz.getRoles()) {
 			if (colorUnselectedFeature || selectedFeatures.contains(r.getFeature().getName())) {
-				FMUIPlugin.getDefault().logInfo("The feature: " + r.getFeature().getName() + " has the color: " + r.getFeature().getColor());
 				if (r.getFeature().getColor() != FeatureColor.NO_COLOR.getValue()) {
 					myColors.add(r.getFeature().getColor());
 				}
