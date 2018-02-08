@@ -27,12 +27,4 @@ package org.prop4j;
  */
 public class DoubleType extends Datatype {
 
-	public double value;
-
-	/**
-	 * Creates a new Double type with the given value.
-	 */
-	public DoubleType(double value) {
-		this.value = value;
-	}
 }

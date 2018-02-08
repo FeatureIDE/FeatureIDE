@@ -4,17 +4,22 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.prop4j.Constant;
 import org.prop4j.DoubleType;
+import org.prop4j.Equal;
 import org.prop4j.Function;
+import org.prop4j.Greater;
 import org.prop4j.GreaterThan;
 import org.prop4j.IntegerType;
+import org.prop4j.Less;
 import org.prop4j.LessThan;
 import org.prop4j.Node;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
+import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analysesOld.FeatureModelAnalysis;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.SatProblem;
 
+import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 
@@ -52,13 +57,13 @@ public class TestSolver extends Action {
 		Function addition40802 = Function.divide(constant40, constant80);
 		Function addition40803 = Function.multiply(constant40, constant80);
 		Function addition40804 = Function.modulo(constant40, constant80);
-		Function addition40805 = Function.newgate(constant40);
+		Function addition40805 = Function.negate(constant40);
 
 		GreaterThan gT = new GreaterThan(constant80, constant40);
 		LessThan lT = new LessThan(addition4080, variableDouble);
-		LessThan lT2 = new LessThan(addition40802, variableDouble);
-		LessThan lT3 = new LessThan(addition40803, variableDouble);
-		LessThan lT4 = new LessThan(addition40804, variableDouble);
+		Less lT2 = new Less(addition40802, variableDouble);
+		Greater lT3 = new Greater(addition40803, variableDouble);
+		Equal lT4 = new Equal(addition40804, variableDouble);
 		LessThan lT5 = new LessThan(addition40805, variableDouble);
 
 		Node[] children = cnf.getChildren();
@@ -77,13 +82,15 @@ public class TestSolver extends Action {
 		Node cnfCopy = cnf.clone();
 		cnfCopy.setChildren(newChildren);
 
+		FMAttributesPlugin.getDefault().logInfo(cnfCopy.toString());
+
 		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getDefault();
 
 		FeatureModelAnalysis.evaluate = true;
 
 		view.getFeatureModel().getAnalyser().analyzeFeatureModel(null);
 
-//		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
+		CoreDeadAnalysis test = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, problem);
 //		try {
 //			int[] solution = LongRunningWrapper.runMethod(test, new NullMonitor());
 //			String solutionString = "[";

@@ -54,13 +54,13 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
-		HashMap<String, Object> config = new HashMap<>();
+		final HashMap<String, Object> config = new HashMap<>();
 		config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.POSITIVE);
 		solver.setConfiguration(config);
 		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
-			config = new HashMap<>();
+			config.clear();
 			config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.NEGATIVE);
 			solver.setConfiguration(config);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());

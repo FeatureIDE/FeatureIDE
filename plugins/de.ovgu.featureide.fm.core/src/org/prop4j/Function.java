@@ -113,7 +113,7 @@ public class Function extends Term {
 		return new Function(FunctionType.MODULO, termLeft, termRight);
 	}
 
-	public static Function newgate(Term term) {
+	public static Function negate(Term term) {
 		return new Function(FunctionType.NEGATE, term);
 	}
 
