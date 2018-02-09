@@ -224,4 +224,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	Collection<String> getFalseOptionalConfigurationFeatures();
 
 	Collection<String> getUnusedConfigurationFeatures();
+
+	void checkForProblems();
 }
