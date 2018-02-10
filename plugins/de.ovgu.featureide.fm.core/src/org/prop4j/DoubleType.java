@@ -27,4 +27,14 @@ package org.prop4j;
  */
 public class DoubleType extends Datatype {
 
+	private final double value;
+
+	public DoubleType(double value) {
+		this.value = value;
+	}
+
+	@Override
+	public Double getValue() {
+		return value;
+	}
 }

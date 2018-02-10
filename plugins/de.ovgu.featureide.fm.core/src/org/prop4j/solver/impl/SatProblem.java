@@ -29,6 +29,8 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.solver.ISatProblem;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+
 /**
  * Abstract class representing a satisfiability problem in CNF that is given as input for the sat solver.
  *
@@ -111,6 +113,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public int getIndexOfVariable(Object variable) {
+		FMCorePlugin.getDefault().logInfo("get index of variable: " + variable);
 		return varToInt.get(variable);
 	}
 

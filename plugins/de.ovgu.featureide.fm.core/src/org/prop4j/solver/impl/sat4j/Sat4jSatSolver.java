@@ -21,6 +21,7 @@
 package org.prop4j.solver.impl.sat4j;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -99,7 +100,11 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	}
 
 	@Override
-	public void setConfiguration(Map<String, Object> config) {
+	public List<String> setConfiguration(Map<String, Object> config) {
+		if (config == null) {
+			return null;
+		}
+		final HashSet<String> list = new HashSet<>();
 		for (final String configID : config.keySet()) {
 			final Object value = config.get(configID);
 			if (value == null) {
@@ -111,18 +116,21 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 					final int timeout = (int) value;
 					solver.setTimeoutMs(timeout);
 				}
+				list.add(CONFIG_TIMEOUT);
 				break;
 			case CONFIG_VERBOSE:
 				if (value instanceof Boolean) {
 					final boolean verbose = (boolean) value;
 					solver.setVerbose(verbose);
 				}
+				list.add(CONFIG_VERBOSE);
 				break;
 			case CONFIG_DB_SIMPLIFICATION_ALLOWED:
 				if (value instanceof Boolean) {
 					final boolean dbSimpiAllowed = (boolean) value;
 					solver.setDBSimplificationAllowed(dbSimpiAllowed);
 				}
+				list.add(CONFIG_DB_SIMPLIFICATION_ALLOWED);
 				break;
 			case CONFIG_SELECTION_STRATEGY:
 				if (value instanceof SelectionStrategy) {
@@ -144,11 +152,13 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 						break;
 					}
 				}
+				list.add(CONFIG_SELECTION_STRATEGY);
 				break;
 			default:
 				break;
 			}
 		}
+		return new ArrayList<>(list);
 
 	}
 

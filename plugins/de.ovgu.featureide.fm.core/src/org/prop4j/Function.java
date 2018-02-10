@@ -27,17 +27,20 @@ package org.prop4j;
  */
 public class Function extends Term {
 
-	private enum FunctionType {
-		ADD, SUBSTRACT, DIVIDE, MULTIPLY, MODULO, NEGATE
-	}
+	public static final String ADDITION = "addition";
+	public static final String NEGATE = "negate";
+	public static final String SUBSTRACT = "substract";
+	public static final String MULTIPLY = "multiply";
+	public static final String DIVISION = "division";
+	public static final String MODULO = "modulo";
 
-	public FunctionType type;
+	public String type;
 	public Term[] terms;
 
 	/**
 	 * @param var
 	 */
-	protected Function(FunctionType type, Term... terms) {
+	protected Function(String type, Term... terms) {
 		super(null);
 		this.type = type;
 		this.terms = terms;
@@ -51,7 +54,7 @@ public class Function extends Term {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 
-		if (type == FunctionType.NEGATE) {
+		if (type.equals("negate")) {
 			builder.append("-");
 		}
 		for (int i = 0; i < terms.length; i++) {
@@ -68,15 +71,15 @@ public class Function extends Term {
 
 	private String getFunctionTypeString() {
 		switch (type) {
-		case ADD:
+		case ADDITION:
 			return "+";
 		case SUBSTRACT:
 			return "-";
-		case DIVIDE:
+		case DIVISION:
 			return "/";
-		case MULTIPLY:
-			return "*";
 		case MODULO:
+			return "*";
+		case MULTIPLY:
 			return "%";
 		case NEGATE:
 		default:
@@ -86,35 +89,31 @@ public class Function extends Term {
 	////////////////////////// Static functions to create function
 
 	public static Function addition(Term termLeft, Term termRight) {
-		return new Function(FunctionType.ADD, termLeft, termRight);
+		return new Function(ADDITION, termLeft, termRight);
 	}
 
 	public static Function sum(Term... term) {
-		return new Function(FunctionType.ADD, term);
+		return new Function(ADDITION, term);
 	}
 
 	public static Function substract(Term termLeft, Term termRight) {
-		return new Function(FunctionType.SUBSTRACT, termLeft, termRight);
+		return new Function(SUBSTRACT, termLeft, termRight);
 	}
 
 	public static Function multiply(Term termLeft, Term termRight) {
-		return new Function(FunctionType.MULTIPLY, termLeft, termRight);
-	}
-
-	public static Function product(Term... term) {
-		return new Function(FunctionType.MULTIPLY, term);
+		return new Function(MULTIPLY, termLeft, termRight);
 	}
 
 	public static Function divide(Term termLeft, Term termRight) {
-		return new Function(FunctionType.DIVIDE, termLeft, termRight);
+		return new Function(DIVISION, termLeft, termRight);
 	}
 
 	public static Function modulo(Term termLeft, Term termRight) {
-		return new Function(FunctionType.MODULO, termLeft, termRight);
+		return new Function(MODULO, termLeft, termRight);
 	}
 
 	public static Function negate(Term term) {
-		return new Function(FunctionType.NEGATE, term);
+		return new Function(NEGATE, term);
 	}
 
 }

@@ -27,11 +27,14 @@ package org.prop4j;
  */
 public class Variable<T extends Datatype> extends Term {
 
+	private final T type;
+
 	/**
 	 * @param var
 	 */
-	public Variable(String varName) {
+	public Variable(String varName, T type) {
 		super(varName);
+		this.type = type;
 	}
 
 	/*
@@ -41,6 +44,10 @@ public class Variable<T extends Datatype> extends Term {
 	@Override
 	public String getValue() {
 		return var.toString();
+	}
+
+	public Datatype getType() {
+		return type;
 	}
 
 	/*

@@ -27,4 +27,14 @@ package org.prop4j;
  */
 public class IntegerType extends Datatype {
 
+	private final int value;
+
+	public IntegerType(int value) {
+		this.value = value;
+	}
+
+	@Override
+	public Integer getValue() {
+		return value;
+	}
 }

@@ -41,8 +41,9 @@ public interface ISolver {
 	 * Used to set specific solver configuration when the solver initiated and also during runtime.
 	 *
 	 * @param config Map that contains configuration with String as identifier and Object as configuration option.
+	 * @return Returns a list with every option that the solves did know and reacted to it.
 	 */
-	void setConfiguration(Map<String, Object> config);
+	List<String> setConfiguration(Map<String, Object> config);
 
 	/**
 	 * Removes one layer from the stack.

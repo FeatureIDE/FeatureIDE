@@ -18,37 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.solvers.impl.javasmt.sat;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Stack;
+
+import org.prop4j.Node;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 
 /**
- * Represents a constant type of the given generic {@link Datatype}
+ * Data structure class available connecting a hashmap with a stack principle.
  *
  * @author Joshua Sprey
  */
-public class Constant<T extends Datatype> extends Term {
+public class JavaSmtSatSolverStack {
 
-	public T var;
+	private final HashMap<Node, BooleanFormula> data = new HashMap<>();
+	private final Stack<Node> insertionStack = new Stack<Node>();
 
-	public Constant(T constant) {
-		super(constant);
+	public void push(Node node, BooleanFormula formula) {
+		insertionStack.push(node);
+		data.put(node, formula);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	protected Constant<T> clone() {
-		return new Constant<T>(var);
+	public Node pop() {
+		final Node t = insertionStack.pop();
+		data.remove(t);
+		return t;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.Term#getVar()
-	 */
-	@Override
-	public T getValue() {
-		return var;
+	public Collection<BooleanFormula> getFormulasAsStack() {
+		return data.values();
 	}
 
 	/*
@@ -57,6 +58,14 @@ public class Constant<T extends Datatype> extends Term {
 	 */
 	@Override
 	public String toString() {
-		return getValue().toString();
+		String result = "HashStack[\n";
+		for (int i = 0; i < insertionStack.size(); i++) {
+			result += i + ": " + insertionStack.get(i).toString() + " | " + data.get(insertionStack.get(i));
+			if (i < (insertionStack.size() - 1)) {
+				result += ",\n";
+			}
+		}
+		result += "]";
+		return result;
 	}
 }

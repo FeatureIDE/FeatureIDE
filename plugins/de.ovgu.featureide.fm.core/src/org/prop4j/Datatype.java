@@ -25,4 +25,7 @@ package org.prop4j;
  *
  * @author Joshua Sprey
  */
-abstract class Datatype {}
+abstract class Datatype {
+
+	public abstract Object getValue();
+}

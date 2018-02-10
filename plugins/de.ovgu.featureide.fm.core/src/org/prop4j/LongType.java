@@ -26,5 +26,14 @@ package org.prop4j;
  * @author Joshua Sprey
  */
 public class LongType extends Datatype {
+	private final long value;
 
+	public LongType(long value) {
+		this.value = value;
+	}
+
+	@Override
+	public Long getValue() {
+		return value;
+	}
 }

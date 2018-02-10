@@ -27,8 +27,8 @@ package org.prop4j;
  */
 public abstract class AtomicFormula extends Node {
 
-	protected Term leftTerm;
-	protected Term rightTerm;
+	public Term leftTerm;
+	public Term rightTerm;
 
 	public AtomicFormula(Term leftTerm, Term rightTerm) {
 		this.leftTerm = leftTerm;

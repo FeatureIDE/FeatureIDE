@@ -23,17 +23,17 @@ package org.prop4j;
 import java.util.Map;
 
 /**
- * Constraint that is true if the left term is less the right term
+ * Constraint that is true if the left term is less or equal to the right term
  *
  * @author Joshua Sprey
  */
-public class Less extends AtomicFormula implements Cloneable {
+public class LessEqual extends AtomicFormula implements Cloneable {
 
 	/**
 	 * @param leftTerm
 	 * @param rightTerm
 	 */
-	public Less(Term leftTerm, Term rightTerm) {
+	public LessEqual(Term leftTerm, Term rightTerm) {
 		super(leftTerm, rightTerm);
 	}
 
@@ -52,7 +52,7 @@ public class Less extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public Node clone() {
-		return new Less(leftTerm, rightTerm);
+		return new LessEqual(leftTerm, rightTerm);
 	}
 
 	/*
@@ -61,6 +61,6 @@ public class Less extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " < " + rightTerm.toString();
+		return leftTerm.toString() + " <= " + rightTerm.toString();
 	}
 }

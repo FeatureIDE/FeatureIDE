@@ -23,17 +23,17 @@ package org.prop4j;
 import java.util.Map;
 
 /**
- * Constraint that is true if the left term is greater as the right term
+ * Constraint that is true if the left term is greater or equal to the right term
  *
  * @author Joshua Sprey
  */
-public class Greater extends AtomicFormula implements Cloneable {
+public class GreaterEqual extends AtomicFormula implements Cloneable {
 
 	/**
 	 * @param leftTerm
 	 * @param rightTerm
 	 */
-	public Greater(Term leftTerm, Term rightTerm) {
+	public GreaterEqual(Term leftTerm, Term rightTerm) {
 		super(leftTerm, rightTerm);
 	}
 
@@ -52,7 +52,7 @@ public class Greater extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public Node clone() {
-		return new Greater(leftTerm, rightTerm);
+		return new GreaterEqual(leftTerm, rightTerm);
 	}
 
 	/*
@@ -61,7 +61,7 @@ public class Greater extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " > " + rightTerm.toString();
+		return leftTerm.toString() + " >= " + rightTerm.toString();
 	}
 
 }

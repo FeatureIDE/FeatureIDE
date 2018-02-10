@@ -61,7 +61,7 @@ public class GreaterThan extends AtomicFormula implements Cloneable {
 	 */
 	@Override
 	public String toString() {
-		return leftTerm.toString() + " >= " + rightTerm.toString();
+		return leftTerm.toString() + " > " + rightTerm.toString();
 	}
 
 }
