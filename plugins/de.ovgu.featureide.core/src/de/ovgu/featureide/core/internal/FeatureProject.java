@@ -130,7 +130,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Tom Brosch
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener, IEventListener {
+public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener {
 
 	private static final CorePlugin LOGGER = CorePlugin.getDefault();
 
@@ -150,7 +150,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
 				break;
 			case MODEL_DATA_SAVED:
-			case MODEL_DATA_OVERRIDDEN:
 				try {
 					checkFeatureCoverage();
 					checkConfigurations(getAllConfigurations());
@@ -1542,36 +1541,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	@Override
 	public IFileManager<IFeatureModel> getFeatureModelManager() {
 		return featureModelManager;
-	}
-
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		switch (event.getEventType()) {
-		case MODEL_DATA_OVERRIDDEN:
-			final Job job = new Job(LOAD_MODEL) {
-
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					if (loadModel()) {
-						final IComposerExtensionClass composerExtension = getComposer();
-						if (composerExtension.isInitialized()) {
-							composerExtension.postModelChanged();
-							if (!configurationUpdate) {
-								checkConfigurations(getAllConfigurations());
-							}
-							checkFeatureCoverage();
-							return Status.OK_STATUS;
-						}
-					}
-					return Status.CANCEL_STATUS;
-				}
-			};
-			job.setPriority(Job.INTERACTIVE);
-			job.schedule();
-			break;
-		default:
-			break;
-		}
 	}
 
 	/**
