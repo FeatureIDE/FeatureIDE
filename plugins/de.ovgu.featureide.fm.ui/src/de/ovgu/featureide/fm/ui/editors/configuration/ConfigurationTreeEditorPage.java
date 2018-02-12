@@ -1290,6 +1290,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void createTooltip(TreeItem item, MouseEvent e) {
 		final Object data = item.getData();
+
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
 			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());

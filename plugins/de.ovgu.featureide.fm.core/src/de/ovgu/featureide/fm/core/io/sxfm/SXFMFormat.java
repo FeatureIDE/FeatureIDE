@@ -269,6 +269,7 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 		line = 0;
 		object.reset();
 		buildFModelRec(doc);
+		object.handleModelDataLoaded();
 	}
 
 	private int line;
