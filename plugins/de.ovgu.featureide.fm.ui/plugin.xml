@@ -786,5 +786,8 @@
 		<Outline
 				OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.FMOutlineProvider">
 		</Outline>
+  <Outline
+        OutlineProvider="de.ovgu.featureide.fm.ui.views.outline.custom.providers.ConfigurationOutlineProvider">
+  </Outline>
 	</extension>
 </plugin>
