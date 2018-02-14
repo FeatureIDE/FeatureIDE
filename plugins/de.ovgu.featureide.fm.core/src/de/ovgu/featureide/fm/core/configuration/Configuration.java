@@ -75,6 +75,8 @@ public class Configuration implements Cloneable {
 		for (final SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
+			final SelectableFeature newFeature = table.get(f.getName());
+			newFeature.cloneProperties(f);
 		}
 		propagate = configuration.propagate;
 	}
@@ -97,6 +99,7 @@ public class Configuration implements Cloneable {
 			final SelectableFeature newFeature = table.get(oldFeature.getName());
 			if (newFeature != null) {
 				newFeature.setManual(oldFeature.getManual());
+				newFeature.cloneProperties(oldFeature);
 			}
 		}
 	}

@@ -44,17 +44,24 @@
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.xml"
-            file-extensions="exml"
+            file-extensions="xml"
             id="de.ovgu.featureide.contenttype.extendedConfiguration"
             name="ExtendedConfigurationFormat"
             priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element"
+                  value="extendedConfiguration">
+            </parameter>
+         </describer>
       </content-type>
    </extension>
    <extension
          point="de.ovgu.featureide.fm.core.ConfigFormat">
       <configFormat
-            class="de.ovgu.featureide.fm.attributes.config.XmlExtendedConfFormat"
-            id="de.ovgu.featureide.fm.attributes.format.config.XmlExtendedConfFormat"
+            class="de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat"
+            id="de.ovgu.featureide.fm.attributes.format.XmlExtendedConfFormat"
             name="XmlExtendedConfFormat">
       </configFormat>
    </extension>
