@@ -18,15 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers.base;
+package de.ovgu.featureide.fm.ui.handlers;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE_WASNT_FOUND;
-import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -41,31 +42,55 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
 /**
- * Abstract class with core functionality to import FeatureModels.</br> Implementing classes mainly provide a specific FeatureModelReader.
+ * Importer for all supported {@link IFeatureModelFormat feature model formats}.
  *
- * @author Fabian Benduhn
  * @author Sebastian Krieter
- * @author Marcus Pinnecke
  */
-public abstract class AbstractImportHandler extends AFileHandler {
+public class ImportHandler extends AFileHandler {
 
 	@Override
 	protected final void singleAction(IFile outputFile) {
+		final Path modelFilePath = Paths.get(outputFile.getLocationURI());
+
+		final List<IFeatureModelFormat> formatExtensions = FMFormatManager.getInstance().getExtensions();
+		int countReadableFormats = 0;
+		for (final IFeatureModelFormat format : formatExtensions) {
+			if (format.supportsRead()) {
+				countReadableFormats++;
+			}
+		}
+		final String[] names = new String[countReadableFormats + 1];
+		final String[] extensions = new String[countReadableFormats + 1];
+		names[0] = "All files *.*";
+		extensions[0] = "*.*";
+		int index = 1;
+		for (final IFeatureModelFormat format : formatExtensions) {
+			if (format.supportsRead()) {
+				final String extension = "*." + format.getSuffix();
+				names[index] = format.getName() + " " + extension;
+				extensions[index++] = extension;
+			}
+		}
+
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
+		fileDialog.setFilterNames(names);
+		fileDialog.setFilterExtensions(extensions);
+		fileDialog.setFileName(FileHandler.getFileName(modelFilePath));
 		fileDialog.setOverwrite(false);
-		setFilter(fileDialog);
+		fileDialog.setFilterIndex(0);
 
 		File inputFile;
 		while (true) {
@@ -80,39 +105,26 @@ public abstract class AbstractImportHandler extends AFileHandler {
 			MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 		}
 
-		final IFeatureModelFormat modelFormat = setModelReader();
-		IFeatureModel fm = null;
-		try {
-			fm = FMFactoryManager.getFactory(inputFile.getAbsolutePath(), modelFormat).createFeatureModel();
-		} catch (final NoSuchExtensionException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		if (fm != null) {
-			final ProblemList errors = SimpleFileHandler.load(inputFile.toPath(), fm, modelFormat).getErrors();
-			if (!errors.isEmpty()) {
-				final StringBuilder sb = new StringBuilder("Error while loading file: \n");
-				for (final Problem problem : errors) {
-					sb.append("Line ");
-					sb.append(problem.getLine());
-					sb.append(": ");
-					sb.append(problem.getMessage());
-					sb.append("\n");
-				}
-				MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
-			} else {
-				SimpleFileHandler.save(Paths.get(outputFile.getLocationURI()), fm, new XmlFeatureModelFormat());
-				try {
-					openFileInEditor(outputFile);
-				} catch (final PartInitException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
+		final FileHandler<IFeatureModel> filHandler = FeatureModelManager.load(inputFile.toPath());
+		final ProblemList problems = filHandler.getLastProblems();
+		if (problems.containsError()) {
+			final StringBuilder sb = new StringBuilder("Error while loading file: \n");
+			for (final Problem problem : problems.getErrors()) {
+				sb.append("Line ");
+				sb.append(problem.getLine());
+				sb.append(": ");
+				sb.append(problem.getMessage());
+				sb.append("\n");
+			}
+			MessageDialog.openWarning(new Shell(), "Warning!", sb.toString());
+		} else {
+			SimpleFileHandler.save(Paths.get(outputFile.getLocationURI()), filHandler.getObject(), new XmlFeatureModelFormat());
+			try {
+				openFileInEditor(outputFile);
+			} catch (final PartInitException e) {
+				FMUIPlugin.getDefault().logError(e);
 			}
 		}
-	}
-
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.xml" });
-		fileDialog.setFilterNames(new String[] { XML });
 	}
 
 	/**
@@ -134,8 +146,4 @@ public abstract class AbstractImportHandler extends AFileHandler {
 		IDE.openEditor(page, outputFile);
 	}
 
-	/**
-	 * Returns an instance of {@link IFeatureModelFormat}.
-	 */
-	protected abstract IFeatureModelFormat setModelReader();
 }
