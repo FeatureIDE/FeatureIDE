@@ -21,16 +21,19 @@
 package org.prop4j.solvers.impl.javasmt.sat;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.prop4j.Node;
+import org.prop4j.solver.AbstractSatSolver;
+import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
-import org.prop4j.solver.ISatSolver;
-import org.prop4j.solver.ISolverProblem;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -53,7 +56,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *
  * @author Joshua Sprey
  */
-public class JavaSmtSatSolver implements ISatSolver {
+public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor {
 
 	protected Configuration config;
 	protected LogManager logManager;
@@ -62,9 +65,10 @@ public class JavaSmtSatSolver implements ISatSolver {
 
 	protected JavaSmtSatSolverStack pushstack;
 
-	protected BooleanFormula query;
+	protected List<BooleanFormula> clauses;
+	protected HashMap<BooleanFormula, Node> formulaToNode;
+	protected HashMap<Node, BooleanFormula> nodeToFormula;
 
-	protected ISatProblem satProblem;
 	protected Prop4JToJavaSmtTranslator translator;
 
 	public static final String SOLVER_TYPE = "solver_type";
@@ -74,6 +78,7 @@ public class JavaSmtSatSolver implements ISatSolver {
 	 * @param solver The solver that should be used to solve the query's
 	 */
 	public JavaSmtSatSolver(ISatProblem problem, Solvers solver, Map<String, Object> configuration) {
+		super(problem);
 		try {
 			pushstack = new JavaSmtSatSolverStack();
 			config = Configuration.defaultConfiguration();
@@ -81,9 +86,17 @@ public class JavaSmtSatSolver implements ISatSolver {
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
 			translator = new Prop4JToJavaSmtTranslator(context);
-			satProblem = problem;
+			clauses = new ArrayList<>();
+			nodeToFormula = new HashMap<>();
+			formulaToNode = new HashMap<>();
+			for (int i = 0; i < problem.getRoot().getChildren().length; i++) {
+				final Node node = problem.getRoot().getChildren()[i];
+				final BooleanFormula formula = translator.getFormula(node);
+				clauses.add(formula);
+				nodeToFormula.put(node, formula);
+				formulaToNode.put(formula, node);
+			}
 			setConfiguration(configuration);
-			query = translator.getFormula(satProblem.getRoot());
 		} catch (final InvalidConfigurationException e) {
 
 		}
@@ -96,7 +109,14 @@ public class JavaSmtSatSolver implements ISatSolver {
 	@Override
 	public ISatResult isSatisfiable() {
 		try (ProverEnvironment prover = context.newProverEnvironment()) {
-			prover.addConstraint(query);
+			final List<BooleanFormula> usedConstraint = clauses;
+			if (!pushstack.isEmpty()) {
+				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
+				usedConstraint.addAll(pushedNodes);
+			}
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
 			final boolean isSat = !prover.isUnsat();
 			return isSat ? ISatResult.TRUE : ISatResult.FALSE;
 		} catch (final SolverException e) {
@@ -170,7 +190,7 @@ public class JavaSmtSatSolver implements ISatSolver {
 	@Override
 	public void push(Node formula) {
 		final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
-		FMCorePlugin.getDefault().logInfo("Pushed node: " + formula + " with the formula " + formulaJavaSmt.toString());
+//		FMCorePlugin.getDefault().logInfo("Pushed node: " + formula + " with the formula " + formulaJavaSmt.toString());
 		pushstack.push(formula, formulaJavaSmt);
 	}
 
@@ -192,16 +212,20 @@ public class JavaSmtSatSolver implements ISatSolver {
 	@Override
 	public Object[] getSoulution() {
 		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-			prover.addConstraint(query);
-			final boolean isSat = !prover.isUnsat();
-			if (isSat) {
-				final Object[] values = new Object[getProblem().getNumberOfVariables()];
+			final List<BooleanFormula> usedConstraint = clauses;
+			if (!pushstack.isEmpty()) {
+				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
+				usedConstraint.addAll(pushedNodes);
+			}
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
+			if (!prover.isUnsat()) {
 				final Model model = prover.getModel();
 				final Iterator<ValueAssignment> iterator = model.iterator();
 				final List<Integer> solution = new ArrayList<>();
 				while (iterator.hasNext()) {
 					final ValueAssignment value = iterator.next();
-					FMCorePlugin.getDefault().logInfo("The object " + value.getName() + " got the value " + value.getValue());
 					if (value.getValue().toString().equals("true")) {
 						solution.add(getProblem().getIndexOfVariable(value.getName().toString()));
 					} else {
@@ -230,11 +254,67 @@ public class JavaSmtSatSolver implements ISatSolver {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolver#getProblem()
+	 * @see org.prop4j.solver.IMusExtractor#getMinimalUnsatisfiableSubset()
 	 */
 	@Override
-	public ISolverProblem getProblem() {
-		return satProblem;
+	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
+		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+			final List<BooleanFormula> usedConstraint = clauses;
+			if (!pushstack.isEmpty()) {
+				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
+				usedConstraint.addAll(pushedNodes);
+			}
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
+			if (prover.isUnsat()) {
+				final List<BooleanFormula> formula = prover.getUnsatCore();
+				final Set<Node> explanation = new HashSet<>();
+				for (int i = 0; i < formula.size(); i++) {
+					if (formulaToNode.containsKey(formula.get(i))) {
+						explanation.add(formulaToNode.get(formula.get(i)));
+					}
+					if (pushstack.getNodeOfFormula(formula.get(i)) != null) {
+						explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
+					}
+				}
+				return explanation;
+			}
+		} catch (final SolverException e) {
+			return null;
+		} catch (final InterruptedException e) {
+			return null;
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IMusExtractor#getMinimalUnsatisfiableSubsetIndexes()
+	 */
+	@Override
+	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IMusExtractor#getAllMinimalUnsatisfiableSubsets()
+	 */
+	@Override
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubset());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IMusExtractor#getAllMinimalUnsatisfiableSubsetIndexes()
+	 */
+	@Override
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

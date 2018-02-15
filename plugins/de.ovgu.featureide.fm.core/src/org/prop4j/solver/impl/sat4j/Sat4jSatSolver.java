@@ -21,16 +21,20 @@
 package org.prop4j.solver.impl.sat4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
+import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.impl.SolverUtils;
@@ -45,7 +49,9 @@ import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
+import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
+import org.sat4j.tools.xplain.Xplain;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -56,7 +62,7 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
  *
  * @author Joshua Sprey
  */
-public class Sat4jSatSolver extends AbstractSatSolver {
+public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 
 	public static enum SelectionStrategy {
 		NEGATIVE, ORG, POSITIVE, RANDOM
@@ -278,8 +284,8 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				pushstack.push(formula);
 				FMCorePlugin.getDefault().logInfo("Pushed: " + constrList.toString() + " and " + pushstack.toString());
 			} catch (final ContradictionException e) {
-				removeLastClauses(1);
-				e.printStackTrace();
+				// removeLastClauses(1);
+				contradiction = true;
 			}
 
 		}
@@ -358,6 +364,10 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		}
 	}
 
+	private Xplain<ISolver> getExplanationSolver() {
+		return new Xplain<ISolver>(solver);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -371,5 +381,39 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		}
 
 		return cnf + "\n\nPushed:\n" + pushed;
+	}
+
+	@Override
+	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
+		return null;
+		// return getClauseSetFromIndexSet(getMinimalUnsatisfiableSubsetIndexes());
+	}
+
+	@Override
+	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		if (isSatisfiable() == ISatResult.TRUE) {
+			throw new IllegalStateException("Problem is satisfiable");
+		}
+		final int[] indexes;
+		try {
+			indexes = getExplanationSolver().minimalExplanation();
+		} catch (final TimeoutException e) {
+			throw new IllegalStateException(e);
+		}
+		final Set<Integer> set = new TreeSet<>();
+		for (final int index : indexes) {
+			set.add(index);
+		}
+		return set;
+	}
+
+	@Override
+	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubset());
+	}
+
+	@Override
+	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
+		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
 	}
 }

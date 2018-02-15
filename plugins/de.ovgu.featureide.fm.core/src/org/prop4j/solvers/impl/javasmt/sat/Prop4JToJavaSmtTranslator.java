@@ -51,10 +51,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-
 /**
- * Class containing functions that are used by smt and their solvers.
+ * Class containing functions that are used to translate the formulas created by prop4j to be used with java smt.
  *
  * @author Joshua Sprey
  */
@@ -80,7 +78,6 @@ public class Prop4JToJavaSmtTranslator {
 
 	public BooleanFormula getFormula(Node node) {
 		final BooleanFormula formula = nodeToFormula(node);
-		FMCorePlugin.getDefault().logInfo("CNF: " + node.toString() + "\n\nNEW: " + formula.toString());
 		return formula;
 	}
 

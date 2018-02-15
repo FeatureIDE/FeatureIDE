@@ -20,21 +20,23 @@
  */
 package org.prop4j.solvers.impl.javasmt.sat;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.prop4j.Node;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
+import com.google.common.collect.HashBiMap;
+
 /**
- * Data structure class available connecting a hashmap with a stack principle.
+ * Data structure class available connecting a HashBiMap with a stack principle.
  *
  * @author Joshua Sprey
  */
 public class JavaSmtSatSolverStack {
 
-	private final HashMap<Node, BooleanFormula> data = new HashMap<>();
+	private final HashBiMap<Node, BooleanFormula> data = HashBiMap.create();
 	private final Stack<Node> insertionStack = new Stack<Node>();
 
 	public void push(Node node, BooleanFormula formula) {
@@ -48,8 +50,24 @@ public class JavaSmtSatSolverStack {
 		return t;
 	}
 
-	public Collection<BooleanFormula> getFormulasAsStack() {
-		return data.values();
+	public List<BooleanFormula> getFormulasAsList() {
+		final ArrayList<BooleanFormula> formulas = new ArrayList<>();
+		for (final BooleanFormula booleanFormula : data.values()) {
+			formulas.add(booleanFormula);
+		}
+		return formulas;
+	}
+
+	public BooleanFormula getFormulaOfNode(Node node) {
+		return data.get(node);
+	}
+
+	public Node getNodeOfFormula(BooleanFormula formula) {
+		return data.inverse().get(formula);
+	}
+
+	public boolean isEmpty() {
+		return insertionStack.isEmpty();
 	}
 
 	/*
