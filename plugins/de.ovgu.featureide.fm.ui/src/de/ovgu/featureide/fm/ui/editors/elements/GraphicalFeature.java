@@ -166,7 +166,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public String toString() {
-		return feature.toString();
+		if (feature != null) {
+			return feature.toString();
+		} else {
+			return "";
+		}
 	}
 
 	@Override

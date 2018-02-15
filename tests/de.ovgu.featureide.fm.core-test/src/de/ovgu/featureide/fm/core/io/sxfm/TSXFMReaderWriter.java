@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.io.sxfm;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+
 import org.junit.Test;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -92,6 +94,20 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 			}
 		}
 	}
+
+	/*
+	 * This empty test case is needed because the SXFM format splits AND constraints into multiple constraints and is omitting redundant OR constarints
+	 */
+	@Override
+	public void testConstraintCount() throws FileNotFoundException, UnsupportedModelException {
+
+	}
+
+	/*
+	 * This empty test case is needed because the SXFM format does not support "AND" constraints and slits them into multiple constraints.
+	 */
+	@Override
+	public void testConstraints() throws FileNotFoundException, UnsupportedModelException {}
 
 	@Override
 	public void testDescription() {

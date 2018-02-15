@@ -3,9 +3,19 @@ Change log for FeatureIDE
 Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found here:
 
-https://github.com/tthuem/FeatureIDE/issues/milestones
+https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
+
+Release 3.4.3 (February 2018)
+* Hotfix containing only stability improvements over v3.4.2
+* Void feature model detected in constraint dialog (#704) and correctly visualized in feature diagram (#681, #687, #484)
+* Project explorer shows traces to all features (#593) and is refreshed if color scheme is deactived (#592)
+* Renaming of features in configurations is fixed (#685) and tool tips disappear on Mac (#701)
+* New configuration format more concise (does not store undefined features anymore) (#683)
+* Markers for inconsistent mappings in Antenna projects fixed (#673)
+* Feature interaction when collapsing explanations in feature diagram fixed (#682)
+* Exceptions for feature diagrams (#703) and FeatureHouse projects (#680) fixed
 
 Release 3.4.2 (December 2017)
 * Hotfix containing only stability improvements over v3.4.1

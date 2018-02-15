@@ -111,12 +111,12 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			}
 
 			// Get current Package color
-			getPackageColors((IFolder) fragmentRes, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			getPackageColors((IFolder) fragmentRes, elementColors, model, hasUnselectedColors(composer));
 
 			// Get all packages colors
 			final Set<Integer> allPackageColors = new HashSet<Integer>();
 			if (fragmentRes instanceof IFolder) {
-				getAllPackageColors((IFolder) fragmentRes, allPackageColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+				getAllPackageColors((IFolder) fragmentRes, allPackageColors, model, hasUnselectedColors(composer));
 			}
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors),
 					new ArrayList<Integer>(allPackageColors), superImage);
@@ -161,13 +161,13 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				if (element instanceof IFile) {
 					final IFile file = (IFile) element;
 					if (isInMungeSource(file)) {
-						getColors(elementColors, file, model, true);
+						getColors(elementColors, file, model, hasUnselectedColors(composer));
 						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors), null, superImage);
 					}
 				}
 				if ((element instanceof IFolder) && ((IFolder) element).getName().equals("source")) {
 					final IFolder folder = (IFolder) element;
-					getPackageColors(folder, elementColors, model, true);
+					getPackageColors(folder, elementColors, model, hasUnselectedColors(composer));
 					return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), null, superImage);
 				}
 			}
@@ -177,9 +177,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (isInBuildFolder(res) && (res instanceof IFile) && isJavaFile((IFile) res)) {
 				if (res.getParent() instanceof IFolder) {
 					parentColors = new HashSet<Integer>();
-					getAllPackageColors((IFolder) res.getParent(), parentColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					getAllPackageColors((IFolder) res.getParent(), parentColors, model, hasUnselectedColors(composer));
 				}
-				getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+				getColors(elementColors, (IFile) res, model, hasUnselectedColors(composer));
 				return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors),
 						new ArrayList<Integer>(parentColors), superImage);
 			}
@@ -209,9 +209,11 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			Set<Integer> parentColors = null;
 			if (cu.getParent() instanceof PackageFragment) {
 				parentColors = new HashSet<Integer>();
-				getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+
+				getAllPackageColors((IFolder) cu.getParent().getResource(), parentColors, model, hasUnselectedColors(composer));
 			}
-			getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			getColors(elementColors, myfile, model, hasUnselectedColors(composer));
+
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors),
 					new ArrayList<Integer>(parentColors), superImage);
 		}
@@ -426,7 +428,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			final String elementName = frag.getElementName();
 
 			getAllPackageColors((IFolder) frag.getResource(), elementColors, CorePlugin.getFeatureProject(frag.getResource()).getFSTModel(),
-					!composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					hasUnselectedColors(composer));
 			for (int i = 0; i < elementColors.size(); i++) {
 				SPACE_STRING += " ";
 			}
@@ -462,7 +464,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 						return res.getName();
 					}
 					final FSTModel model = featureProject.getFSTModel();
-					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					getColors(elementColors, (IFile) res, model, hasUnselectedColors(composer));
 					SPACE_STRING = "";
 					for (int i = 0; i < elementColors.size(); i++) {
 						SPACE_STRING += " ";
@@ -470,7 +472,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					return SPACE_STRING + res.getName();
 				} else if (isInBuildFolder(res) && (res instanceof IFile)) {
 					final FSTModel model = featureProject.getFSTModel();
-					getColors(elementColors, (IFile) res, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+					getColors(elementColors, (IFile) res, model, hasUnselectedColors(composer));
 					SPACE_STRING = "";
 					for (int i = 0; i < elementColors.size(); i++) {
 						SPACE_STRING += " ";
@@ -510,7 +512,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					if (element instanceof IFile) {
 						final IFile file = (IFile) element;
 						if (isInMungeSource(file)) {
-							getColors(elementColors, file, model, true);
+							getColors(elementColors, file, model, hasUnselectedColors(composer));
 							for (int i = 0; i < elementColors.size(); i++) {
 								SPACE_STRING += " ";
 							}
@@ -542,9 +544,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (cu.getParent() instanceof PackageFragment) {
 				final PackageFragment parent = (PackageFragment) cu.getParent();
 				getAllPackageColors((IFolder) parent.getResource(), elementColors, CorePlugin.getFeatureProject(parent.getResource()).getFSTModel(),
-						!composer.hasFeatureFolder() && !composer.hasSourceFolder());
+						hasUnselectedColors(composer));
 			} else {
-				getColors(elementColors, (IFile) myfile, featureProject.getFSTModel(), !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+				getColors(elementColors, (IFile) myfile, featureProject.getFSTModel(), hasUnselectedColors(composer));
 			}
 			for (int i = 0; i < elementColors.size(); i++) {
 				SPACE_STRING += " ";
@@ -559,6 +561,11 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		}
 
 		return null;
+	}
+
+	private boolean hasUnselectedColors(IComposerExtensionClass composer) {
+		return (!composer.hasFeatureFolder() && !composer.hasSourceFolder()) || (composer.getGenerationMechanism() == Mechanism.PREPROCESSOR)
+			|| composer.getName().equals("Munge");
 	}
 
 }

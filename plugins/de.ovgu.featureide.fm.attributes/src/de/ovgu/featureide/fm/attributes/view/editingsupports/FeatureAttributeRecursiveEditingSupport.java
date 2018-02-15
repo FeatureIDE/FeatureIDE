@@ -85,6 +85,7 @@ public class FeatureAttributeRecursiveEditingSupport extends AbstractFeatureAttr
 		if (newRecursive) {
 			if (!isNameUnique(attribute, feat)) {
 				MessageDialog.openError(null, "Invalid recursive attribute name", "Please ensure the name is not used by an attribute of a child feature.");
+				attribute.setRecursive(false);
 				return;
 			}
 			attribute.recurseAttribute(feat);
