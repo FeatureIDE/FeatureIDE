@@ -42,7 +42,7 @@ public class RemoveFeatureAttributeAction extends Action {
 	private final HashMap<IFeatureAttribute, ExtendedFeature> map;
 
 	public RemoveFeatureAttributeAction(ExtendedFeatureModel featureModel, HashMap<IFeatureAttribute, ExtendedFeature> map) {
-		super(StringTable.REMOVE_SELECTED_ATTRIBUTES);
+		super(StringTable.REMOVE_SELECTED_ATTRIBUTE);
 		this.featureModel = featureModel;
 		this.map = map;
 	}

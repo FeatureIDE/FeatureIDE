@@ -1091,5 +1091,5 @@ public class StringTable {
 	public static final String ADD_BOOLEAN_ATTRIBUTE = "Add Boolean Attribute";
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
-	public static final String REMOVE_SELECTED_ATTRIBUTES = "Remove Selected Attributes";
+	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
 }
