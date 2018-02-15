@@ -3,7 +3,7 @@ Change log for FeatureIDE
 Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found here:
 
-https://github.com/tthuem/FeatureIDE/issues/milestones
+https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
