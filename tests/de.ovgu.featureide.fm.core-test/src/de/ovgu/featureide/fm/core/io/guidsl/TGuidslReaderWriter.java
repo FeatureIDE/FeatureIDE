@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.io.guidsl;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
@@ -62,6 +64,13 @@ public class TGuidslReaderWriter extends TAbstractFeatureModelReaderWriter {
 			}
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#testConstraintCount()
+	 */
+	@Override
+	public void testConstraintCount() throws FileNotFoundException, UnsupportedModelException {}
 
 	@Override
 	public void testDescription() {

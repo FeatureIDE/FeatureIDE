@@ -164,6 +164,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	public void caseMethodDeclaration(FSTTerminal terminal) {
 		// get name
 		final String name = getMethodName(terminal);
+		if (name == null) {
+			return;
+		}
 
 		final String head = getHead(terminal.getBody(), name).replace("/*", "");
 		final int index = head.trim().lastIndexOf(' ');
@@ -220,6 +223,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	public void caseConstructorDeclaration(FSTTerminal terminal) {
 		// get name
 		final String name = getMethodName(terminal);
+		if (name == null) {
+			return;
+		}
 
 		// get modifiers
 		String modifiers = "";
@@ -257,7 +263,10 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	private String getMethodName(FSTTerminal terminal) {
-		return terminal.getName().substring(0, terminal.getName().indexOf('('));
+		if (terminal.getName().indexOf('(') != -1) {
+			return terminal.getName().substring(0, terminal.getName().indexOf('('));
+		}
+		return null;
 	}
 
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {

@@ -30,7 +30,11 @@ public class FeatureAttributeNameColumnLabelProvider extends FeatureAttributeCol
 		if ((element instanceof IFeature) || (element instanceof String)) {
 			return cachedImages.get(FeatureAttributeView.imgFeature);
 		} else if (element instanceof IFeatureAttribute) {
-			return cachedImages.get(FeatureAttributeView.imgAttribute);
+			if (((IFeatureAttribute) element).isRecursive()) {
+				return cachedImages.get(FeatureAttributeView.imgAttributeRecurisve);
+			} else {
+				return cachedImages.get(FeatureAttributeView.imgAttribute);
+			}
 		}
 		return null;
 	}

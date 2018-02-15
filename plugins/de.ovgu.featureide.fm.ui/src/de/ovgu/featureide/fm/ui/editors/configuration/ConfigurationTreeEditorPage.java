@@ -51,6 +51,7 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -511,6 +512,20 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					}
 				}
 			}
+		});
+
+		tree.addMouseTrackListener(new MouseTrackListener() {
+			@Override
+			public void mouseEnter(MouseEvent e) {}
+
+			@Override
+			public void mouseExit(MouseEvent e) {
+				tipItem = null;
+				disposeTooltip();
+			}
+
+			@Override
+			public void mouseHover(MouseEvent e) {}
 		});
 	}
 
@@ -1275,6 +1290,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void createTooltip(TreeItem item, MouseEvent e) {
 		final Object data = item.getData();
+
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
 			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());

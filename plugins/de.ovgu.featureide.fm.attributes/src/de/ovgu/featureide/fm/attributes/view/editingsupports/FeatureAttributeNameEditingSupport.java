@@ -75,7 +75,7 @@ public class FeatureAttributeNameEditingSupport extends AbstractFeatureAttribute
 	protected void setValue(Object element, Object value) {
 		ExtendedFeature feat = (ExtendedFeature) ((IFeatureAttribute) element).getFeature();
 		for (IFeatureAttribute att : feat.getAttributes()) {
-			if (att.getName().equals(value.toString())) {
+			if (att.getName().equals(value.toString()) && att != (IFeatureAttribute) element) {
 				MessageDialog.openError(null, "Invalid input", "Please insert a unique attribute name.");
 				return;
 			}

@@ -211,6 +211,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		indetHidden = fmStructure.hasIndetHidden();
 
 		void_model = !analyser.valid();
+		if (void_model) {
+			dead = false;
+		}
 
 		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
 		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);

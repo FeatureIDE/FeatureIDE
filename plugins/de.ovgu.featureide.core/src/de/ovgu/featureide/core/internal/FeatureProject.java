@@ -37,6 +37,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PERFORMING_FUL
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFESH_CONFIGURATION_FOLER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_COLLABORATION_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 
 import java.io.File;
@@ -78,6 +79,7 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -128,7 +130,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Tom Brosch
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener, IEventListener {
+public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener {
 
 	private static final CorePlugin LOGGER = CorePlugin.getDefault();
 
@@ -1523,33 +1525,31 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return featureModelManager;
 	}
 
+	/**
+	 * Checks for problems in feature model, configurations, feature coverage and feature folders
+	 */
 	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		switch (event.getEventType()) {
-		case MODEL_DATA_OVERRIDDEN:
-			final Job job = new Job(LOAD_MODEL) {
-
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					if (loadModel()) {
-						final IComposerExtensionClass composerExtension = getComposer();
-						if (composerExtension.isInitialized()) {
-							composerExtension.postModelChanged();
-							if (!configurationUpdate) {
-								checkConfigurations(getAllConfigurations());
-							}
-							checkFeatureCoverage();
-							return Status.OK_STATUS;
-						}
-					}
-					return Status.CANCEL_STATUS;
+	public void checkForProblems() {
+		checkFeatureCoverage();
+		checkConfigurations(getAllConfigurations());
+		modelFile.deleteAllModelMarkers();
+		for (final Problem warning : featureModelManager.getLastProblems()) {
+			modelFile.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
+		}
+		if (!featureModelManager.getLastProblems().containsError()) {
+			try {
+				if (!getFeatureModel().getAnalyser().isValid()) {
+					modelFile.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 				}
-			};
-			job.setPriority(Job.INTERACTIVE);
-			job.schedule();
-			break;
-		default:
-			break;
+			} catch (final TimeoutException e) {
+				// do nothing, assume the model is correct
+			}
+		}
+		try {
+			createAndDeleteFeatureFolders();
+		} catch (final CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

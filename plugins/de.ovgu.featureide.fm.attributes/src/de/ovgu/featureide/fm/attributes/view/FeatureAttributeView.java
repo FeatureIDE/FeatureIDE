@@ -108,6 +108,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		cachedImages = new HashMap<String, Image>();
 		cachedImages.put(imgFeature, FMAttributesPlugin.getImage(imgFeature));
 		cachedImages.put(imgAttribute, FMAttributesPlugin.getImage(imgAttribute));
+		cachedImages.put(imgAttributeRecurisve, FMAttributesPlugin.getImage(imgAttributeRecurisve));
 		cachedImages.put(checkboxEnabled, FMAttributesPlugin.getImage(checkboxEnabled));
 		cachedImages.put(checkboxDisabled, FMAttributesPlugin.getImage(checkboxDisabled));
 		cachedImages.put(expandAll, FMAttributesPlugin.getImage(expandAll));
@@ -119,6 +120,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 
 	public final static String imgFeature = "FeatureIconSmall.ico";
 	public final static String imgAttribute = "attribute_obj.ico";
+	public final static String imgAttributeRecurisve = "recursive_attribute_obj.ico";
 	public final static String checkboxEnabled = "icon_reg_enable.png";
 	public final static String checkboxDisabled = "icon_reg_disable.png";
 	public final static String expandAll = "expand.gif";
@@ -150,12 +152,20 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	public boolean synchToFeatureDiagram = false;
 	public ArrayList<IFeature> selectedManualFeatures;
 	public ArrayList<IFeature> selectedAutomaticFeatures;
+	public ArrayList<IFeature> selection;
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (!synchToFeatureDiagram) {
-				// Prevent the feature attributes view from synching to the feature diagram
+				// Prevent the feature attributes view from synching to the feature diagramfor (Object obj : event.getStructuredSelection().toList()) {
+				selection = new ArrayList<>();
+				for (Object obj : event.getStructuredSelection().toList()) {
+					if (obj instanceof FeatureEditPart) {
+						FeatureEditPart editPart = (FeatureEditPart) obj;
+						selectedManualFeatures.add(editPart.getModel().getObject());
+					}
+				}
 				selectedManualFeatures = null;
 				selectedAutomaticFeatures = null;
 				treeViewer.refresh();
@@ -267,7 +277,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		parent.setLayout(layout);
 
 		// define the TableViewer
-		treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
+		treeViewer = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL);
 		// create edit supports (inline editors)
 		createEditSupports();
 		// create the columns

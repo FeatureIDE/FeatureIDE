@@ -140,7 +140,7 @@ public class FeatureModel implements IFeatureModel {
 				}
 			}
 		}
-		analyser = oldFeatureModel.getAnalyser() == null ? createAnalyser() : oldFeatureModel.getAnalyser();
+		analyser = oldFeatureModel.getAnalyser() == null ? createAnalyser() : oldFeatureModel.getAnalyser().clone(this);
 	}
 
 	protected IFeatureModelProperty createProperty() {
