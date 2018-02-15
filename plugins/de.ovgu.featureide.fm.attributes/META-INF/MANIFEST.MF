@@ -25,3 +25,6 @@ Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.view,
  de.ovgu.featureide.fm.attributes.view.actions,
  de.ovgu.featureide.fm.attributes.view.editingsupports
+Bundle-ClassPath: lib/common-0.3000-229-g055f2fd.jar,
+ lib/javasmt-1.0.1-219-g535f988.jar,
+ .
