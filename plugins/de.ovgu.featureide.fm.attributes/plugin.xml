@@ -44,9 +44,11 @@
       </content-type>
    </extension>
    <extension
-         point="de.ovgu.featureide.fm.ui.Outline">
-      <Outline
-            OutlineProvider="de.ovgu.featureide.fm.attributes.statistics.ExtendedFMOutlineProvider">
-      </Outline>
+         point="de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry">
+      <configurationOutlineEntry
+            class="de.ovgu.featureide.fm.attributes.computations.impl.AttributeComputationBundle"
+            id="de.ovgu.featureide.fm.attributes.computations.impl.AttributeComputationBundle"
+            name="AttributeComputations">
+      </configurationOutlineEntry>
    </extension>
 </plugin>

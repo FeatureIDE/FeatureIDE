@@ -25,8 +25,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.ui.views.outline.computations.ComputationHeader;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 
 /**
@@ -42,7 +41,9 @@ public class ConfigurationLabelProvider extends OutlineLabelProvider {
 	 */
 	@Override
 	public Image getImage(Object element) {
-		// TODO Auto-generated method stub
+		if (element instanceof IOutlineEntry) {
+			return ((IOutlineEntry) element).getLabelImage();
+		}
 		return null;
 	}
 
@@ -55,11 +56,8 @@ public class ConfigurationLabelProvider extends OutlineLabelProvider {
 		if (element == null) {
 			return "Invalid element!";
 		}
-		if (element instanceof ComputationHeader) {
-			return ((ComputationHeader) element).getName();
-		}
-		if (element instanceof IConfigurationComputation) {
-			return ((IConfigurationComputation) element).getResultString();
+		if (element instanceof IOutlineEntry) {
+			return ((IOutlineEntry) element).getLabel();
 		}
 		return element.toString();
 	}

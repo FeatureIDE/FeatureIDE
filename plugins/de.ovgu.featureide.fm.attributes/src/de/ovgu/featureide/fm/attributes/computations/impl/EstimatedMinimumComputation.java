@@ -2,55 +2,30 @@ package de.ovgu.featureide.fm.attributes.computations.impl;
 
 import java.util.List;
 
+import org.eclipse.swt.graphics.Image;
+
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * Estimates the minimum of a numerical attribute given a partial configuration Only supposed to be used on numerical attributes
  * 
  * @author Chico Sundermann
  */
-public class EstimatedMinimumComputation implements IConfigurationComputation {
+public class EstimatedMinimumComputation implements IOutlineEntry {
 
-	private static final String HEADER_STRING = "Minimal sum of attribute value (est.)";
+	private static final String LABEL = "Minimal sum of attribute value (est.): ";
 	Configuration config;
 	IFeatureAttribute attribute;
 
 	public EstimatedMinimumComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
 		this.attribute = attribute;
-	}
-
-	@Override
-	public Object[] getResult() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getResultString() {
-		// TODO Auto-generated method stub
-		if (attribute instanceof LongFeatureAttribute) {
-			return String.valueOf(((Double) getSelectionSum()).longValue());
-		}
-		return getSelectionSum().toString();
-	}
-
-	@Override
-	public Configuration getConfiguration() {
-		// TODO Auto-generated method stub
-		return config;
-	}
-
-	@Override
-	public String getHeaderString() {
-		// TODO Auto-generated method stub
-		return HEADER_STRING;
 	}
 
 	private Object getSelectionSum() {
@@ -78,6 +53,35 @@ public class EstimatedMinimumComputation implements IConfigurationComputation {
 	@Override
 	public boolean supportsType(Object element) {
 		return attribute instanceof LongFeatureAttribute || attribute instanceof DoubleFeatureAttribute;
+	}
+
+	@Override
+	public String getLabel() {
+		if (attribute instanceof LongFeatureAttribute) {
+			return LABEL + String.valueOf(((Double) getSelectionSum()).longValue());
+		}
+		return LABEL + getSelectionSum().toString();
+	}
+
+	@Override
+	public Image getLabelImage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren() {
+		return false;
+	}
+
+	@Override
+	public List<IOutlineEntry> getChildren() {
+		return null;
+	}
+
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
 	}
 
 }

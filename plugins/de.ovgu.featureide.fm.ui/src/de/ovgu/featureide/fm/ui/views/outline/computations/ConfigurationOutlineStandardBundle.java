@@ -18,28 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.outline.computations.impl;
+package de.ovgu.featureide.fm.ui.views.outline.computations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
+import de.ovgu.featureide.fm.ui.views.outline.computations.impl.ManuallySelectedFeatureCountComputation;
+import de.ovgu.featureide.fm.ui.views.outline.computations.impl.ManuallyUnselectedFeatureCountComputation;
+import de.ovgu.featureide.fm.ui.views.outline.computations.impl.SelectedFeatureCountComputation;
+import de.ovgu.featureide.fm.ui.views.outline.computations.impl.UndecidedFeatureCountComputation;
+import de.ovgu.featureide.fm.ui.views.outline.computations.impl.UnselectedFeatureCountComputation;
 
 /**
  * TODO description
  *
- * @author Chico Sundermann
+ * @author User
  */
-public class ManuallySelectedFeatureCountComputation implements IOutlineEntry {
+public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
+
+	private static final String LABEL = "Configuration properties";
 
 	private Configuration config;
-	private static final String LABEL = "Number of manually selected features: ";
 
-	public ManuallySelectedFeatureCountComputation(Configuration config) {
+	public ConfigurationOutlineStandardBundle(Configuration config) {
 		this.config = config;
 	}
 
@@ -49,7 +54,8 @@ public class ManuallySelectedFeatureCountComputation implements IOutlineEntry {
 	 */
 	@Override
 	public String getLabel() {
-		return LABEL + Integer.toString(calculateCount());
+		// TODO Auto-generated method stub
+		return LABEL;
 	}
 
 	/*
@@ -69,7 +75,7 @@ public class ManuallySelectedFeatureCountComputation implements IOutlineEntry {
 	@Override
 	public boolean hasChildren() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/*
@@ -78,17 +84,13 @@ public class ManuallySelectedFeatureCountComputation implements IOutlineEntry {
 	 */
 	@Override
 	public List<IOutlineEntry> getChildren() {
-		return null;
-	}
-
-	private int calculateCount() {
-		int count = 0;
-		for (final SelectableFeature feat : config.getFeatures()) {
-			if ((feat.getManual() == Selection.SELECTED) && (feat.getAutomatic() == Selection.UNDEFINED)) {
-				count++;
-			}
-		}
-		return count;
+		final List<IOutlineEntry> entries = new ArrayList<>();
+		entries.add(new SelectedFeatureCountComputation(config));
+		entries.add(new ManuallySelectedFeatureCountComputation(config));
+		entries.add(new UnselectedFeatureCountComputation(config));
+		entries.add(new ManuallyUnselectedFeatureCountComputation(config));
+		entries.add(new UndecidedFeatureCountComputation(config));
+		return entries;
 	}
 
 	/*

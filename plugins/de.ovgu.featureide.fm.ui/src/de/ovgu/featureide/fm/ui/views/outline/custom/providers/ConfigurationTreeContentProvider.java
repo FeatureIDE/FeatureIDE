@@ -21,16 +21,21 @@
 package de.ovgu.featureide.fm.ui.views.outline.custom.providers;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.Viewer;
 
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.ui.views.outline.computations.ComputationHeader;
-import de.ovgu.featureide.fm.ui.views.outline.computations.ConfigurationComputationBundle;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
+import de.ovgu.featureide.fm.ui.views.outline.computations.ConfigurationOutlineStandardBundle;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
 
 /**
@@ -39,6 +44,8 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
  * @author Chico Sundermann
  */
 public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider {
+
+	private static final String ENTRY_EXTENSION_ID = "de.ovgu.featureide.fm.ui.ConfigurationOutlineEntry";
 
 	private IFeatureModel fModel;
 	private Configuration config;
@@ -67,9 +74,10 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
-		final ConfigurationComputationBundle computationBundle = new ConfigurationComputationBundle();
-		computationBundle.initComputations(config);
-		return computationBundle.getComputationHeaders().toArray();
+		final List<IOutlineEntry> topLevelEntries = new ArrayList<>();
+		topLevelEntries.add(new ConfigurationOutlineStandardBundle(config));
+		topLevelEntries.addAll(getExtensionEntries());
+		return topLevelEntries.toArray();
 	}
 
 	/*
@@ -78,10 +86,11 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof ComputationHeader) {
-			final IConfigurationComputation[] computations = new IConfigurationComputation[1];
-			computations[0] = ((ComputationHeader) parentElement).getComputation();
-			return computations;
+		if (parentElement instanceof IOutlineEntry) {
+			final IOutlineEntry entry = (IOutlineEntry) parentElement;
+			if (entry.hasChildren()) {
+				return entry.getChildren().toArray();
+			}
 		}
 		return null;
 	}
@@ -102,10 +111,29 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 	 */
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof ComputationHeader) {
-			return true;
+		if (element instanceof IOutlineEntry) {
+			return ((IOutlineEntry) element).hasChildren();
 		}
 		return false;
+	}
+
+	private List<IOutlineEntry> getExtensionEntries() {
+		final List<IOutlineEntry> extensionEntries = new ArrayList<>();
+		for (final IConfigurationElement extension : Platform.getExtensionRegistry().getConfigurationElementsFor(ENTRY_EXTENSION_ID)) {
+			try {
+				final Object o = extension.createExecutableExtension("class");
+				if (o instanceof IOutlineEntry) {
+					final IOutlineEntry entry = (IOutlineEntry) o;
+					entry.setConfig(config);
+					if (entry.supportsType(null)) {
+						extensionEntries.add(entry);
+					}
+				}
+			} catch (final CoreException e) {
+				Logger.logError(e);
+			}
+		}
+		return extensionEntries;
 	}
 
 }

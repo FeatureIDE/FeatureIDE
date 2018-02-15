@@ -20,19 +20,23 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.computations.impl;
 
+import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
+
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * TODO description
  *
  * @author Chico Sundermann
  */
-public class UnselectedFeatureCountComputation implements IConfigurationComputation {
+public class UnselectedFeatureCountComputation implements IOutlineEntry {
 
-	private final Configuration config;
+	private Configuration config;
 
-	private final static String HEADER_STRING = "Number of unselected features";
+	private final static String LABEL = "Number of unselected features: ";
 
 	public UnselectedFeatureCountComputation(Configuration config) {
 		this.config = config;
@@ -40,48 +44,59 @@ public class UnselectedFeatureCountComputation implements IConfigurationComputat
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getResult()
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getLabel()
 	 */
 	@Override
-	public Object[] getResult() {
+	public String getLabel() {
+		return LABEL + Integer.toString(config.getUnSelectedFeatures().size());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getLabelImage()
+	 */
+	@Override
+	public Image getLabelImage() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getResultString()
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#hasChildren()
 	 */
 	@Override
-	public String getResultString() {
-		return Integer.toString(config.getUnSelectedFeatures().size());
+	public boolean hasChildren() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getConfiguration()
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getChildren()
 	 */
 	@Override
-	public Configuration getConfiguration() {
-		return config;
+	public List<IOutlineEntry> getChildren() {
+		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getHeaderString()
-	 */
-	@Override
-	public String getHeaderString() {
-		return HEADER_STRING;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#supportsType(java.lang.Object)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#supportsType(java.lang.Object)
 	 */
 	@Override
 	public boolean supportsType(Object element) {
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#setConfig(de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
+
 	}
 
 }

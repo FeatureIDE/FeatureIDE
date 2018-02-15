@@ -1,11 +1,15 @@
 package de.ovgu.featureide.fm.attributes.computations.impl;
 
+import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
+
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * 
@@ -13,33 +17,15 @@ import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputa
  * 
  * @author Chico Sundermann
  */
-public class CountAttributeComputation implements IConfigurationComputation {
+public class CountAttributeComputation implements IOutlineEntry {
 
 	Configuration config;
 	IFeatureAttribute attribute;
-	private static final String HEADER_STRING = "Number of occurences";
+	private static final String LABEL = "Number of occurences: ";
 
 	public CountAttributeComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
 		this.attribute = attribute;
-	}
-
-	@Override
-	public Object[] getResult() {
-		Integer[] result = new Integer[1];
-		result[0] = calculateCount();
-		return result;
-	}
-
-	@Override
-	public String getResultString() {
-		Object[] result = getResult();
-		return result[0].toString();
-	}
-
-	@Override
-	public Configuration getConfiguration() {
-		return config;
 	}
 
 	private int calculateCount() {
@@ -59,16 +45,39 @@ public class CountAttributeComputation implements IConfigurationComputation {
 	}
 
 	@Override
-	public String getHeaderString() {
-		return HEADER_STRING;
+	public String getLabel() {
+		// TODO Auto-generated method stub
+		return LABEL + Integer.toString(calculateCount());
 	}
 
 	@Override
-	public boolean supportsType(Object element) {
-		if (element instanceof IFeatureAttribute) {
-			return true;
-		}
+	public Image getLabelImage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren() {
 		return false;
+	}
+
+	@Override
+	public List<IOutlineEntry> getChildren() {
+		return null;
+	}
+
+	public boolean supportsType(Object element) {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#setConfig(de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
+
 	}
 
 }

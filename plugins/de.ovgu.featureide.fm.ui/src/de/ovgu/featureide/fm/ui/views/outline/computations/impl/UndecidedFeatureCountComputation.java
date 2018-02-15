@@ -20,20 +20,24 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline.computations.impl;
 
+import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
+
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * TODO description
  *
  * @author User
  */
-public class UndecidedFeatureCountComputation implements IConfigurationComputation {
+public class UndecidedFeatureCountComputation implements IOutlineEntry {
 
-	private final Configuration config;
-	private static final String HEADER_STRING = "Number of undecided features";
+	private Configuration config;
+	private static final String LABEL = "Number of undecided features: ";
 
 	public UndecidedFeatureCountComputation(Configuration config) {
 		this.config = config;
@@ -41,50 +45,40 @@ public class UndecidedFeatureCountComputation implements IConfigurationComputati
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getResult()
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getLabel()
 	 */
 	@Override
-	public Object[] getResult() {
-		final Object[] result = new Object[1];
-		result[0] = calculateCount();
-		return result;
+	public String getLabel() {
+		return LABEL + Integer.toString(calculateCount());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getResultString()
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getLabelImage()
 	 */
 	@Override
-	public String getResultString() {
-		return getResult()[0].toString();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getConfiguration()
-	 */
-	@Override
-	public Configuration getConfiguration() {
-		return config;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#getHeaderString()
-	 */
-	@Override
-	public String getHeaderString() {
+	public Image getLabelImage() {
 		// TODO Auto-generated method stub
-		return HEADER_STRING;
+		return null;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.views.outline.computations.IConfigurationComputation#supportsType(java.lang.Object)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#hasChildren()
 	 */
 	@Override
-	public boolean supportsType(Object element) {
-		return true;
+	public boolean hasChildren() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#getChildren()
+	 */
+	@Override
+	public List<IOutlineEntry> getChildren() {
+		return null;
 	}
 
 	private int calculateCount() {
@@ -95,6 +89,25 @@ public class UndecidedFeatureCountComputation implements IConfigurationComputati
 			}
 		}
 		return count;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#supportsType(java.lang.Object)
+	 */
+	@Override
+	public boolean supportsType(Object element) {
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#setConfig(de.ovgu.featureide.fm.core.configuration.Configuration)
+	 */
+	@Override
+	public void setConfig(Configuration config) {
+		this.config = config;
+
 	}
 
 }
