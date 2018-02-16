@@ -39,6 +39,8 @@ public class SatProblem implements ISatProblem {
 	protected Node root;
 	protected HashMap<Object, Integer> varToInt = new HashMap<>();
 	protected Object[] intToVar;
+	protected HashMap<Node, Integer> clauseToInt = new HashMap<>();
+	protected Node[] intToClause;
 
 	/**
 	 * Initiates the problem with a root node and a given feature list that represent variables.
@@ -49,14 +51,27 @@ public class SatProblem implements ISatProblem {
 		intToVar = new Object[featureList.size() + 1];
 		root = rootNode;
 
-		int index = 0;
+		if (!root.isConjunctiveNormalForm()) {
+			throw new IllegalStateException("The given root node to create a sat problem need to be in conjunctive normal form.");
+		}
+
+		// Create mapping from index to clauses
+		intToClause = new Node[rootNode.getChildren().length + 1];
+		int indexClauses = 0;
+		for (final Node node : rootNode.getChildren()) {
+			varToInt.put(node, ++indexClauses);
+			intToClause[indexClauses] = node;
+		}
+
+		// Create mapping from index to variables
+		int indexVariables = 0;
 		for (final Object feature : featureList) {
 			final String name = feature.toString();
 			if (name == null) {
 				throw new RuntimeException();
 			}
-			varToInt.put(name, ++index);
-			intToVar[index] = name;
+			varToInt.put(name, ++indexVariables);
+			intToVar[indexVariables] = name;
 		}
 	}
 
@@ -116,10 +131,34 @@ public class SatProblem implements ISatProblem {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getIndexOfClause(java.lang.Object)
+	 */
+	@Override
+	public int getIndexOfClause(Node clause) {
+		return clauseToInt.get(clause);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauseOfIndex(java.lang.Object)
+	 */
+	@Override
+	public Node getClauseOfIndex(int index) {
+		if ((index > intToClause.length) || (index == 0)) {
+			return null;
+		}
+		return intToClause[index];
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolverProblem#getVariableOfIndex(int)
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
+		if ((index > intToVar.length) || (index == 0)) {
+			return null;
+		}
 		return intToVar[index];
 	}
 
@@ -130,6 +169,15 @@ public class SatProblem implements ISatProblem {
 	@Override
 	public Integer getNumberOfVariables() {
 		return intToVar.length - 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauses()
+	 */
+	@Override
+	public Node[] getClauses() {
+		return intToClause;
 	}
 
 	/*

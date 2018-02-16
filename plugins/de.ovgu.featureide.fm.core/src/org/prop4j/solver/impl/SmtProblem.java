@@ -133,4 +133,34 @@ public class SmtProblem implements ISmtProblem {
 		return variable.positive ? varToInt.get(variable.var) : -varToInt.get(variable.var);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauseOfIndex(int)
+	 */
+	@Override
+	public Node getClauseOfIndex(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getIndexOfClause(org.prop4j.Node)
+	 */
+	@Override
+	public int getIndexOfClause(Node clause) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauses()
+	 */
+	@Override
+	public Node[] getClauses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -68,4 +68,28 @@ public interface ISolverProblem {
 	 * @return Number of used variables as int.
 	 */
 	Integer getNumberOfVariables();
+
+	/**
+	 * Returns the clause that is mapped to the given index. Returns null if the index has no clause.
+	 *
+	 * @param index Index of the clause
+	 * @return Clause with index index, null otherwise
+	 */
+	Node getClauseOfIndex(int index);
+
+	/**
+	 * Returns the index that is mapped to the given clause. Returns 0 if the clause is not part of the problem.
+	 *
+	 * @param clause Clause to get index of.
+	 * @return Index of the clause, 0 otherwise
+	 */
+	int getIndexOfClause(Node clause);
+
+	/**
+	 * Returns all clauses in form of an array.
+	 *
+	 * @return Clauses as array
+	 */
+	Node[] getClauses();
+
 }

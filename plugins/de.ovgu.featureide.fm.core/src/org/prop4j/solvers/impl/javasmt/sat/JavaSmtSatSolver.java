@@ -22,7 +22,6 @@ package org.prop4j.solvers.impl.javasmt.sat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -63,11 +62,8 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	protected ShutdownManager shutdownManager;
 	protected SolverContext context;
 
-	protected JavaSmtSatSolverStack pushstack;
-
+	protected SolverPushStack<BooleanFormula> pushstack;
 	protected List<BooleanFormula> clauses;
-	protected HashMap<BooleanFormula, Node> formulaToNode;
-	protected HashMap<Node, BooleanFormula> nodeToFormula;
 
 	protected Prop4JToJavaSmtTranslator translator;
 
@@ -80,21 +76,16 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	public JavaSmtSatSolver(ISatProblem problem, Solvers solver, Map<String, Object> configuration) {
 		super(problem);
 		try {
-			pushstack = new JavaSmtSatSolverStack();
-			config = Configuration.defaultConfiguration();
+			pushstack = new SolverPushStack<>();
+			Configuration.defaultConfiguration();
 			logManager = BasicLogManager.create(config);
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
 			translator = new Prop4JToJavaSmtTranslator(context);
 			clauses = new ArrayList<>();
-			nodeToFormula = new HashMap<>();
-			formulaToNode = new HashMap<>();
-			for (int i = 0; i < problem.getRoot().getChildren().length; i++) {
-				final Node node = problem.getRoot().getChildren()[i];
+			for (final Node node : getProblem().getClauses()) {
 				final BooleanFormula formula = translator.getFormula(node);
 				clauses.add(formula);
-				nodeToFormula.put(node, formula);
-				formulaToNode.put(formula, node);
 			}
 			setConfiguration(configuration);
 		} catch (final InvalidConfigurationException e) {
@@ -294,8 +285,13 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
+		final Set<Node> mut = getMinimalUnsatisfiableSubset();
+
+		final Set<Integer> explanation = new HashSet<>();
+		for (final Node node : mut) {
+			explanation.add(getIndexOfClause(node));
+		}
+		return explanation;
 	}
 
 	/*
@@ -313,8 +309,27 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
+	}
+
+	public int getIndexOfClause(Node clause) {
+		final int index = getProblem().getIndexOfClause(clause);
+		if (index == 0) {
+			// Clause is not part of smt problem but could be pushed to the solver so check that
+			return 0;
+		} else {
+			return index;
+		}
+	}
+
+	public Node getClauseOfIndex(int index) {
+		final Node node = getProblem().getClauseOfIndex(index);
+		if (node == null) {
+			// index is not part of smt problem but could be pushed to the solver so check that
+			return null;
+		} else {
+			return node;
+		}
 	}
 
 }
