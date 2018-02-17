@@ -73,12 +73,13 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	protected IFeatureModel newFm;
 	protected String failureMessage;
 
-	public TAbstractFeatureModelReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
-
+	public TAbstractFeatureModelReaderWriter(IFeatureModel fm, String s) {
 		origFm = fm;
-		newFm = writeAndReadModel();
-//		System.out.println("ori:\n" + origFm);
-//		System.out.println("new:\n" + newFm);
+		try {
+			newFm = writeAndReadModel();
+		} catch (final UnsupportedModelException e) {
+			fail();
+		}
 		failureMessage = "(" + s + ")";
 	}
 
@@ -213,17 +214,17 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testConstraintCount() throws FileNotFoundException, UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getConstraintCount(), origFm.getConstraintCount());
+		assertEquals(failureMessage, origFm.getConstraintCount(), newFm.getConstraintCount());
 	}
 
 	@Test
 	public void testConstraints() throws FileNotFoundException, UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getConstraints(), origFm.getConstraints());
+		assertEquals(failureMessage, origFm.getConstraints().toString(), newFm.getConstraints().toString());
 	}
 
 	@Test
 	public void testAnnotations() throws FileNotFoundException, UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getProperty().getAnnotations(), origFm.getProperty().getAnnotations());
+		assertEquals(failureMessage, origFm.getProperty().getAnnotations(), newFm.getProperty().getAnnotations());
 	}
 
 	// @Test // java.lang.AssertionError: (gpl_medium_model.xml) expected:<REFACTORING> but was:<SPECIALIZATION>

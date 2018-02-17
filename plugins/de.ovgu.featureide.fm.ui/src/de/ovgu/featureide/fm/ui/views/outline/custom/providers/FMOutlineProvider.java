@@ -52,7 +52,10 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	public boolean isSupported(IFile file) {
-		return file.getFileExtension().equalsIgnoreCase("xml") && (FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null);
+		if (file != null) {
+			return file.getFileExtension().equalsIgnoreCase("xml") && (FeatureModelManager.getInstance(Paths.get(file.getLocationURI())) != null);
+		}
+		return false;
 	}
 
 	@Override

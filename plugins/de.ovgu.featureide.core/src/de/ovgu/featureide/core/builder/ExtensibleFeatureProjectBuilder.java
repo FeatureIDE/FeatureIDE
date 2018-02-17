@@ -185,6 +185,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		composerExtension.performFullBuild(configFile);
 
 		featureProject.built();
+		featureProject.checkForProblems();
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			CorePlugin.getDefault().fireBuildUpdated(featureProject);

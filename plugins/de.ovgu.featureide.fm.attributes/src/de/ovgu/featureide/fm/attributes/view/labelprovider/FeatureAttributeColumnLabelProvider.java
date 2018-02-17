@@ -31,6 +31,9 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 		if (element instanceof IFeatureAttribute) {
 			IFeatureAttribute attribute = (IFeatureAttribute) element;
 			IFeature feature = attribute.getFeature();
+			if (view.selection != null && view.selection.contains(feature)) {
+				return ColorPalette.toSwtColor(FeatureColor.Red);
+			}
 			if (view.selectedAutomaticFeatures == null || view.selectedManualFeatures == null) {
 				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
 				return ColorPalette.toSwtColor(featureColor);
@@ -44,6 +47,9 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 		}
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
+			if (view.selection != null && view.selection.contains(feature)) {
+				return ColorPalette.toSwtColor(FeatureColor.Red);
+			}
 			if (view.selectedAutomaticFeatures == null || view.selectedManualFeatures == null) {
 				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
 				return ColorPalette.toSwtColor(featureColor);
@@ -55,7 +61,7 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 				}
 			}
 		}
-		return new Color(null, 255, 255, 255);
+		return null;
 	}
 
 	@Override

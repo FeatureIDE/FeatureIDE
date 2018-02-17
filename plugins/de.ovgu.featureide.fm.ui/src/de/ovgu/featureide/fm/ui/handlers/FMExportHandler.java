@@ -20,30 +20,31 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import org.eclipse.swt.widgets.FileDialog;
+import java.nio.file.Path;
+import java.util.List;
 
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
-/**
- * Converts a GUIDSL feature model into our feature model format.
- *
- * @author Dariusz Krolikowski
- * @author Maik Lampe
- * @author Sebastian Krieter
- * @author Marcus Pinnecke
- */
-public class ImportGUIDSLHandler extends AbstractImportHandler {
+public class FMExportHandler extends AExportHandler<IFeatureModel> {
 
 	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new GuidslFormat();
+	protected List<? extends IPersistentFormat<IFeatureModel>> getFormats() {
+		return FMFormatManager.getInstance().getExtensions();
 	}
 
 	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.m" });
-		fileDialog.setFilterNames(new String[] { "GUIDSL" });
+	protected FileHandler<IFeatureModel> read(Path modelFilePath) {
+		return FeatureModelManager.load(modelFilePath);
 	}
+
+	@Override
+	protected int getDefaultFormat(List<? extends IPersistentFormat<IFeatureModel>> formatExtensions) {
+		return getDefaultFormat(formatExtensions, XmlFeatureModelFormat.ID);
+	}
+
 }

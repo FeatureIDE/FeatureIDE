@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<configuration>
-		<feature automatic="selected" manual="undefined" name="Elevator"/>
-		<feature automatic="selected" manual="undefined" name="Behavior"/>
-		<feature automatic="selected" manual="undefined" name="Modes"/>
-		<feature automatic="undefined" manual="selected" name="Sabbath"/>
-		<feature automatic="unselected" manual="undefined" name="FIFO"/>
-		<feature automatic="unselected" manual="undefined" name="ShortestPaht"/>
-		<feature automatic="undefined" manual="undefined" name="Service"/>
-		<feature automatic="undefined" manual="undefined" name="Priorities"/>
-		<feature automatic="undefined" manual="undefined" name="RushHour"/>
-		<feature automatic="undefined" manual="undefined" name="FloorPriority"/>
-		<feature automatic="undefined" manual="undefined" name="PersonPriority"/>
-		<feature automatic="undefined" manual="undefined" name="VoiceOutput"/>
-		<feature automatic="unselected" manual="undefined" name="CallButtons"/>
-		<feature automatic="unselected" manual="undefined" name="DirectedCall"/>
-		<feature automatic="unselected" manual="undefined" name="UndirectedCall"/>
-		<feature automatic="undefined" manual="undefined" name="Security"/>
-		<feature automatic="undefined" manual="undefined" name="Permission"/>
-		<feature automatic="undefined" manual="undefined" name="FloorPermission"/>
-		<feature automatic="undefined" manual="undefined" name="PermissionControl"/>
-		<feature automatic="undefined" manual="undefined" name="Safety"/>
-		<feature automatic="undefined" manual="undefined" name="Overloaded"/>
+		<feature automatic="selected" name="Elevator"/>
+		<feature automatic="selected" name="Behavior"/>
+		<feature automatic="selected" name="Modes"/>
+		<feature manual="selected" name="Sabbath"/>
+		<feature automatic="unselected" name="FIFO"/>
+		<feature automatic="unselected" name="ShortestPaht"/>
+		<feature automatic="unselected" name="CallButtons"/>
+		<feature automatic="unselected" name="DirectedCall"/>
+		<feature automatic="unselected" name="UndirectedCall"/>
 	</configuration>

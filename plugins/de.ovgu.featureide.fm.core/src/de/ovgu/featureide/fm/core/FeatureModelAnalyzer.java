@@ -182,6 +182,20 @@ public class FeatureModelAnalyzer implements IEventListener {
 		clearExplanations();
 	}
 
+	public FeatureModelAnalyzer(FeatureModelAnalyzer oldAnalyzer, IFeatureModel newFM) {
+		fm = newFM;
+		fm.addListener(this);
+		clearExplanations();
+
+		calculateConstraints = oldAnalyzer.calculateConstraints;
+		calculateDeadConstraints = oldAnalyzer.calculateDeadConstraints;
+		calculateFeatures = oldAnalyzer.calculateFeatures;
+		calculateFOConstraints = oldAnalyzer.calculateFOConstraints;
+		calculateRedundantConstraints = oldAnalyzer.calculateRedundantConstraints;
+		calculateTautologyConstraints = oldAnalyzer.calculateTautologyConstraints;
+		runCalculationAutomatically = oldAnalyzer.runCalculationAutomatically;
+	}
+
 	/**
 	 * Returns the feature dependencies of the feature model. If the has model changed call {@link FeatureModelAnalyzer#setDependencies()} to calculate current
 	 * dependencies.
@@ -1042,5 +1056,10 @@ public class FeatureModelAnalyzer implements IEventListener {
 		deadFeatureExplanationCreator.setFeatureModel(fm);
 		falseOptionalFeatureExplanationCreator.setFeatureModel(fm);
 		redundantConstraintExplanationCreator.setFeatureModel(fm);
+
+	}
+
+	public FeatureModelAnalyzer clone(IFeatureModel newFeatureModel) {
+		return new FeatureModelAnalyzer(this, newFeatureModel);
 	}
 }

@@ -968,8 +968,20 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final Reason<?> reason : oldActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
-						if (updatedElements.add(element)) {
-							element.update(event);
+						if (element.getObject() instanceof IFeature) {
+							if (graphicalFeatureModel.getVisibleFeatures()
+									.contains(graphicalFeatureModel.getGraphicalFeature((IFeature) element.getObject()))) {
+								if (updatedElements.add(element)) {
+									element.update(event);
+								}
+							}
+						} else if (element.getObject() instanceof IConstraint) {
+							if (graphicalFeatureModel.getVisibleConstraints()
+									.contains(graphicalFeatureModel.getGraphicalConstraint((IConstraint) element.getObject()))) {
+								if (updatedElements.add(element)) {
+									element.update(event);
+								}
+							}
 						}
 					}
 				}
@@ -982,7 +994,18 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				for (final Reason<?> reason : newActiveExplanation.getReasons()) {
 					for (final IFeatureModelElement sourceElement : ((FeatureModelReason) reason).getSubject().getElements()) {
 						final IGraphicalElement element = FeatureUIHelper.getGraphicalElement(sourceElement, getGraphicalFeatureModel());
-						element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+						if (element.getObject() instanceof IFeature) {
+							if (graphicalFeatureModel.getVisibleFeatures()
+									.contains(graphicalFeatureModel.getGraphicalFeature((IFeature) element.getObject()))) {
+								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+							}
+						} else if (element.getObject() instanceof IConstraint) {
+							if (graphicalFeatureModel.getVisibleConstraints()
+									.contains(graphicalFeatureModel.getGraphicalConstraint((IConstraint) element.getObject()))) {
+								element.update(new FeatureIDEEvent(event.getSource(), EventType.ACTIVE_REASON_CHANGED, null, reason));
+							}
+						}
+
 					}
 				}
 			}
