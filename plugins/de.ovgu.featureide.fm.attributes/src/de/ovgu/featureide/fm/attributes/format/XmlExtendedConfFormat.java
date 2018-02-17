@@ -2,6 +2,7 @@ package de.ovgu.featureide.fm.attributes.format;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -30,6 +31,7 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
 	public static final String EXTENSION = "econfig";
 	private static final String EXTENDED_CONFIGURATION = "extendedConfiguration";
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_CONFIGURATION + "[\\s>]");
 
 	@Override
 	public String getName() {
@@ -193,6 +195,11 @@ public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements 
 	@Override
 	public boolean supportsWrite() {
 		return true;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }
