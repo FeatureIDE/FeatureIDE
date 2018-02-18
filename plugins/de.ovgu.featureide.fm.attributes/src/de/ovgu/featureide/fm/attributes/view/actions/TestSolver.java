@@ -31,8 +31,8 @@ public class TestSolver extends Action {
 			// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
 			Node cnf = view.getFeatureModel().getAnalyser().getCnf();
 			ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
-			JavaSmtSatSolver solver = new JavaSmtSatSolver(problem, Solvers.Z3, null);
-//			Sat4jSatSolver solver2 = new Sat4jSatSolver(problem, null);
+
+			JavaSmtSatSolver solver = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
 
 			Literal root = new Literal(view.getFeatureModel().getStructure().getRoot().getFeature().getName());
 			Literal newFeature1 = new Literal("NewFeature1");
@@ -41,25 +41,18 @@ public class TestSolver extends Action {
 			Node nodeClause = new Or(newFeature1, root);
 
 			solver.push(nodeClause);
-//			solver2.push(nodeClause);
 
 			Object[] solution = solver.findSolution();
 
 			if (solution != null) {
 				Arrays.sort(solution);
+				FMAttributesPlugin.getDefault().logInfo("O: " + "\nN:" + Arrays.toString(solution));
 			} else {
 
 				FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsets());
+				FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsetIndexes());
 			}
-//			Object[] solution2 = solver2.findSolution();
-//
-//			if (solution2 != null) {
-//				Arrays.sort(solution2);
-//			} else {
-////				solver2.getMinimalUnsatisfiableSubsetIndexes();
-//			}
 
-			FMAttributesPlugin.getDefault().logInfo("O: " + "\nN:" + Arrays.toString(solution));
 		}
 	}
 

@@ -62,8 +62,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	protected ShutdownManager shutdownManager;
 	protected SolverContext context;
 
-	protected SolverPushStack<BooleanFormula> pushstack;
-	protected List<BooleanFormula> clauses;
+	protected SolverMemory<BooleanFormula> pushstack;
 
 	protected Prop4JToJavaSmtTranslator translator;
 
@@ -76,20 +75,20 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	public JavaSmtSatSolver(ISatProblem problem, Solvers solver, Map<String, Object> configuration) {
 		super(problem);
 		try {
-			pushstack = new SolverPushStack<>();
-			Configuration.defaultConfiguration();
+			config = Configuration.defaultConfiguration();
 			logManager = BasicLogManager.create(config);
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
 			translator = new Prop4JToJavaSmtTranslator(context);
-			clauses = new ArrayList<>();
+			final List<BooleanFormula> clauses = new ArrayList<>();
 			for (final Node node : getProblem().getClauses()) {
 				final BooleanFormula formula = translator.getFormula(node);
 				clauses.add(formula);
 			}
+			pushstack = new SolverMemory<>(problem, clauses);
 			setConfiguration(configuration);
 		} catch (final InvalidConfigurationException e) {
-
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -100,12 +99,8 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public ISatResult isSatisfiable() {
 		try (ProverEnvironment prover = context.newProverEnvironment()) {
-			final List<BooleanFormula> usedConstraint = clauses;
-			if (!pushstack.isEmpty()) {
-				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
-				usedConstraint.addAll(pushedNodes);
-			}
-			for (final BooleanFormula booleanFormula : usedConstraint) {
+			final List<BooleanFormula> formulas = pushstack.getFormulasAsList();
+			for (final BooleanFormula booleanFormula : formulas) {
 				prover.addConstraint(booleanFormula);
 			}
 			final boolean isSat = !prover.isUnsat();
@@ -156,9 +151,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public Node pop() {
-		final Node popedNode = pushstack.pop();
-		FMCorePlugin.getDefault().logInfo("Popped node: " + popedNode);
-		return popedNode;
+		return pushstack.pop();
 	}
 
 	/*
@@ -181,7 +174,6 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public void push(Node formula) {
 		final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
-//		FMCorePlugin.getDefault().logInfo("Pushed node: " + formula + " with the formula " + formulaJavaSmt.toString());
 		pushstack.push(formula, formulaJavaSmt);
 	}
 
@@ -203,11 +195,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public Object[] getSoulution() {
 		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-			final List<BooleanFormula> usedConstraint = clauses;
-			if (!pushstack.isEmpty()) {
-				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
-				usedConstraint.addAll(pushedNodes);
-			}
+			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
 			for (final BooleanFormula booleanFormula : usedConstraint) {
 				prover.addConstraint(booleanFormula);
 			}
@@ -250,10 +238,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
 		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
-			final List<BooleanFormula> usedConstraint = clauses;
-			if (!pushstack.isEmpty()) {
-				final List<BooleanFormula> pushedNodes = pushstack.getFormulasAsList();
-				usedConstraint.addAll(pushedNodes);
+			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
 			}
 			for (final BooleanFormula booleanFormula : usedConstraint) {
 				prover.addConstraint(booleanFormula);
@@ -262,12 +249,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 				final List<BooleanFormula> formula = prover.getUnsatCore();
 				final Set<Node> explanation = new HashSet<>();
 				for (int i = 0; i < formula.size(); i++) {
-					if (formulaToNode.containsKey(formula.get(i))) {
-						explanation.add(formulaToNode.get(formula.get(i)));
-					}
-					if (pushstack.getNodeOfFormula(formula.get(i)) != null) {
-						explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
-					}
+					explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
 				}
 				return explanation;
 			}
@@ -286,10 +268,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		final Set<Node> mut = getMinimalUnsatisfiableSubset();
-
 		final Set<Integer> explanation = new HashSet<>();
 		for (final Node node : mut) {
-			explanation.add(getIndexOfClause(node));
+			explanation.add(pushstack.getIndexOfNode(node));
 		}
 		return explanation;
 	}
@@ -310,26 +291,6 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
-	}
-
-	public int getIndexOfClause(Node clause) {
-		final int index = getProblem().getIndexOfClause(clause);
-		if (index == 0) {
-			// Clause is not part of smt problem but could be pushed to the solver so check that
-			return 0;
-		} else {
-			return index;
-		}
-	}
-
-	public Node getClauseOfIndex(int index) {
-		final Node node = getProblem().getClauseOfIndex(index);
-		if (node == null) {
-			// index is not part of smt problem but could be pushed to the solver so check that
-			return null;
-		} else {
-			return node;
-		}
 	}
 
 }

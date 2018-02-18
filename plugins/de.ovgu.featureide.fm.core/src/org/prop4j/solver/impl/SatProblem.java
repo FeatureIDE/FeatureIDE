@@ -49,21 +49,21 @@ public class SatProblem implements ISatProblem {
 	 */
 	public SatProblem(Node rootNode, Collection<?> featureList) {
 		intToVar = new Object[featureList.size() + 1];
+		intToClause = new Node[rootNode.getChildren().length];
 		root = rootNode;
 
 		if (!root.isConjunctiveNormalForm()) {
 			throw new IllegalStateException("The given root node to create a sat problem need to be in conjunctive normal form.");
 		}
 
-		// Create mapping from index to clauses
-		intToClause = new Node[rootNode.getChildren().length + 1];
+		// Create mapping from index to clauses starting from 0
 		int indexClauses = 0;
 		for (final Node node : rootNode.getChildren()) {
-			varToInt.put(node, ++indexClauses);
-			intToClause[indexClauses] = node;
+			clauseToInt.put(node, indexClauses);
+			intToClause[indexClauses++] = node;
 		}
 
-		// Create mapping from index to variables
+		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
 		int indexVariables = 0;
 		for (final Object feature : featureList) {
 			final String name = feature.toString();
@@ -126,7 +126,8 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public int getIndexOfVariable(Object variable) {
-		return varToInt.get(variable);
+		final Integer clauseInt = clauseToInt.get(variable);
+		return clauseInt == null ? 0 : clauseInt;
 	}
 
 	/*
@@ -135,7 +136,8 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public int getIndexOfClause(Node clause) {
-		return clauseToInt.get(clause);
+		final Integer clauseInt = clauseToInt.get(clause);
+		return clauseInt == null ? -1 : clauseInt;
 	}
 
 	/*
@@ -144,7 +146,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node getClauseOfIndex(int index) {
-		if ((index > intToClause.length) || (index == 0)) {
+		if ((index > intToClause.length)) {
 			return null;
 		}
 		return intToClause[index];
@@ -156,7 +158,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		if ((index > intToVar.length) || (index == 0)) {
+		if ((index > intToVar.length)) {
 			return null;
 		}
 		return intToVar[index];
@@ -168,7 +170,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.length - 1;
+		return intToVar.length;
 	}
 
 	/*

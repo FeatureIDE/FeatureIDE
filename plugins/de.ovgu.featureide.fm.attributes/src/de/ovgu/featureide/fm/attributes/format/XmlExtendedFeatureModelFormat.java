@@ -225,6 +225,9 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	}
 
 	private void createFeatureAttributes(Document doc, Element fnode, IFeature feature) {
+		if (!(feature instanceof ExtendedFeature)) {
+			return;
+		}
 		if ((((ExtendedFeature) feature).getAttributes() != null) && !((ExtendedFeature) feature).getAttributes().isEmpty()) {
 			// Write FeatureAttributes into the XML
 			for (final IFeatureAttribute featureAttribute : ((ExtendedFeature) feature).getAttributes()) {

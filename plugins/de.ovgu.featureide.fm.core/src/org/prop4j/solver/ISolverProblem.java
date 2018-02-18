@@ -50,7 +50,7 @@ public interface ISolverProblem {
 	 * Intern the variables are mapped to a specific index to identify them. You can now retrieve the index for a given variable.
 	 *
 	 * @param variable Variable you want to know the index of.
-	 * @return The index for the given variable.
+	 * @return The index for the given variable, 0 if variable is not known
 	 */
 	int getIndexOfVariable(Object variable);
 
@@ -58,7 +58,7 @@ public interface ISolverProblem {
 	 * Return the variables that is identified by the given index.
 	 *
 	 * @param index
-	 * @return Variable with the given index.
+	 * @return Variable with the given index, otherwise null
 	 */
 	Object getVariableOfIndex(int index);
 
@@ -78,10 +78,10 @@ public interface ISolverProblem {
 	Node getClauseOfIndex(int index);
 
 	/**
-	 * Returns the index that is mapped to the given clause. Returns 0 if the clause is not part of the problem.
+	 * Returns the index that is mapped to the given clause. Returns -1 if the clause is not part of the problem.
 	 *
 	 * @param clause Clause to get index of.
-	 * @return Index of the clause, 0 otherwise
+	 * @return Index of the clause, -1 otherwise
 	 */
 	int getIndexOfClause(Node clause);
 
