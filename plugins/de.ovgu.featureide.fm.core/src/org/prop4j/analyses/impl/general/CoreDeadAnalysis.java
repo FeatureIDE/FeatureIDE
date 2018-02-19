@@ -27,6 +27,7 @@ import java.util.HashMap;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
@@ -55,13 +56,13 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 	@Override
 	public int[] analyze(IMonitor monitor) {
 		final HashMap<String, Object> config = new HashMap<>();
-		config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.POSITIVE);
+		config.put(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.POSITIVE);
 		solver.setConfiguration(config);
 		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
 			config.clear();
-			config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.NEGATIVE);
+			config.put(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.NEGATIVE);
 			solver.setConfiguration(config);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
 

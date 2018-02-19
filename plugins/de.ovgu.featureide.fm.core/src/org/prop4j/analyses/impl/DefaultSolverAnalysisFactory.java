@@ -28,6 +28,7 @@ import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.ISolverProblem;
@@ -46,9 +47,9 @@ public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 	 *
 	 */
 	public DefaultSolverAnalysisFactory() {
-		defaultConfiguration.put(Sat4jSatSolver.CONFIG_TIMEOUT, 1000);
-		defaultConfiguration.put(Sat4jSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
-		defaultConfiguration.put(Sat4jSatSolver.CONFIG_VERBOSE, false);
+		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
+		defaultConfiguration.put(AbstractSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
+		defaultConfiguration.put(AbstractSatSolver.CONFIG_VERBOSE, false);
 	}
 
 	/*

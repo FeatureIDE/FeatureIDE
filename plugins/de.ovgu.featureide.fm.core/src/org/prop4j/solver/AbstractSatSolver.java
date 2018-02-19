@@ -20,6 +20,9 @@
  */
 package org.prop4j.solver;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,6 +66,21 @@ public abstract class AbstractSatSolver implements ISatSolver {
 	@Override
 	public ISolverProblem getProblem() {
 		return problem;
+	}
+
+	@Override
+	public List<String> setConfiguration(Map<String, Object> config) {
+		if (config == null) {
+			return null;
+		}
+		final HashSet<String> list = new HashSet<>();
+		for (final String configID : config.keySet()) {
+			final Object value = config.get(configID);
+			if (setConfiguration(configID, value)) {
+				list.add(configID);
+			}
+		}
+		return new ArrayList<>(list);
 	}
 
 }

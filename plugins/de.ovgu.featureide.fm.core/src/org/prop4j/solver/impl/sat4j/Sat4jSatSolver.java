@@ -21,24 +21,20 @@
 package org.prop4j.solver.impl.sat4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.VarOrderHeap2;
+import org.prop4j.solvers.impl.javasmt.sat.SolverMemory;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.minisat.core.Solver;
@@ -51,154 +47,147 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.xplain.Xplain;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.RingList;
 
 /**
- * Finds certain solutions of propositional formulas using the Sat4J solver.
  *
  * @author Joshua Sprey
  */
-public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
+public class Sat4jSatSolver extends AbstractSatSolver {
 
-	public static enum SelectionStrategy {
+	/** The actually solver instance from Sat4J to solve the problem. */
+	protected ISolver solver;
+	/** The order of the literals */
+	protected final int[] order;
+	/** The current vector that holds all assumptions. */
+	protected final VecInt assignment = new VecInt();
+	/** Hold information about pushed nodes which can be clauses or assumptions. */
+	protected Stack<Node> pushstack = new Stack<>();
+	/** the pseudo clause. */
+	protected IConstr pseudoClause;
+	/**
+	 * Holds information about all pushed clauses and the ability to retrieve their index. Keep in mind that the indexes need to be subtracted by 1 (2) because
+	 * Sat4J only supports index from 1 (and that the first added clause is a pseudo clause which is always true.)
+	 */
+	protected SolverMemory<IConstr> memory;
+
+	/**
+	 * Enumeration about the selection strategy's that can be used of the Sat4J solver.
+	 *
+	 * @author Joshua Sprey
+	 */
+	public static enum Sat4jSelectionStrategy {
 		NEGATIVE, ORG, POSITIVE, RANDOM
 	}
-
-	protected Solver<?> solver;
-	protected final int[] order;
-	protected final VecInt assignment;
-	protected Stack<Node> pushstack;
-	protected ArrayList<IConstr> constrList;
-	protected RingList<int[]> solutionList;
-	protected boolean contradiction = false;
 
 	public Sat4jSatSolver(ISatProblem problem, Map<String, Object> config) {
 		super(problem);
 
-		if (constrList == null) {
-			constrList = new ArrayList<>();
-		}
-
-		final int numberOfVariables = problem.getNumberOfVariables();
-		order = new int[numberOfVariables];
-		assignment = new VecInt(numberOfVariables);
-		pushstack = new Stack<>();
-
 		// Init Solver with configuration
-		solver = (Solver<?>) SolverFactory.newDefault();
+		solver = createSolver();
+		solver.setTimeoutMs(1000);
+		solver.setDBSimplificationAllowed(true);
+		solver.setVerbose(false);
 		setConfiguration(config);
 
+		// +1 because Sat4J accept no variable index of 0
+		final int numberOfVariables = problem.getNumberOfVariables() + 1;
+		order = new int[numberOfVariables];
+
+		// create the variables for Sat4J
+		registerVariables();
+	}
+
+	protected ISolver getSolver() {
+		if (solver == null) {
+			return createSolver();
+		}
+		return solver;
+	}
+
+	protected ISolver createSolver() {
+		return SolverFactory.newDefault();
+	}
+
+	/**
+	 * Adds the variables from the {@link ISatProblem} to the Sat4j solver. Also class the registration for the clauses.
+	 */
+	private void registerVariables() {
 		try {
-			addVariables();
+			final int numberOfVariables = getProblem().getNumberOfVariables();
+			if (numberOfVariables > 0) {
+				solver.newVar(numberOfVariables);
+				// Plus one because the index 0 is not available for Sat4J
+				solver.setExpectedNumberOfClauses(getProblem().getClauses().length + 1);
+
+				// Register all clauses from the problem to the solver
+				registerClauses(numberOfVariables);
+			}
+			fixOrder();
+			if (solver instanceof Solver<?>) {
+				((Solver<?>) solver).getOrder().init();
+			}
 		} catch (final ContradictionException e) {
-			FMCorePlugin.getDefault().logError("Cannot create solver because the problem contains a contradiction.", e);
+			throw new RuntimeException();
 		}
 	}
 
-	@Override
-	public List<String> setConfiguration(Map<String, Object> config) {
-		if (config == null) {
-			return null;
-		}
-		final HashSet<String> list = new HashSet<>();
-		for (final String configID : config.keySet()) {
-			final Object value = config.get(configID);
-			if (value == null) {
-				continue;
+	/**
+	 * Adds the clauses from the {@link ISatProblem} to the Sat4j solver.
+	 */
+	private void registerClauses(int numberOfVariables) throws ContradictionException {
+		// Add pseudo clause which is a tautology and contains every variables. Is needed because Sat4J ignores all variables that are not part of any
+		// clause. That behavior is not wanted. Start at 1 because 0 is not a valid Sat4j index.
+//		final VecInt pseudoClause = new VecInt(numberOfVariables + 1);
+//		for (int i = 1; i <= numberOfVariables; i++) {
+//			pseudoClause.push(i);
+//		}
+//		pseudoClause.push(-1);
+//		this.pseudoClause = solver.addClause(pseudoClause);
+
+		final List<IConstr> clauses = new ArrayList<>();
+		for (final Node node : getProblem().getClauses()) {
+			final Node[] children = node.getChildren();
+			final int[] clause = new int[children.length];
+			for (int i = 0; i < children.length; i++) {
+				final Literal literal = (Literal) children[i];
+				clause[i] = getProblem().getSignedIndexOfVariable(literal);
 			}
-			switch (configID) {
-			case CONFIG_TIMEOUT:
-				if (value instanceof Integer) {
-					final int timeout = (int) value;
-					solver.setTimeoutMs(timeout);
-				}
-				list.add(CONFIG_TIMEOUT);
-				break;
-			case CONFIG_VERBOSE:
-				if (value instanceof Boolean) {
-					final boolean verbose = (boolean) value;
-					solver.setVerbose(verbose);
-				}
-				list.add(CONFIG_VERBOSE);
-				break;
-			case CONFIG_DB_SIMPLIFICATION_ALLOWED:
-				if (value instanceof Boolean) {
-					final boolean dbSimpiAllowed = (boolean) value;
-					solver.setDBSimplificationAllowed(dbSimpiAllowed);
-				}
-				list.add(CONFIG_DB_SIMPLIFICATION_ALLOWED);
-				break;
-			case CONFIG_SELECTION_STRATEGY:
-				if (value instanceof SelectionStrategy) {
-					final SelectionStrategy strategy = (SelectionStrategy) value;
-					switch (strategy) {
-					case NEGATIVE:
-						solver.setOrder(new VarOrderHeap2(new NegativeLiteralSelectionStrategy(), order));
-						break;
-					case ORG:
-						solver.setOrder(new VarOrderHeap(new RSATPhaseSelectionStrategy()));
-						break;
-					case POSITIVE:
-						solver.setOrder(new VarOrderHeap2(new PositiveLiteralSelectionStrategy(), order));
-						break;
-					case RANDOM:
-						solver.setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
-						break;
-					default:
-						break;
-					}
-				}
-				list.add(CONFIG_SELECTION_STRATEGY);
-				break;
-			default:
-				break;
-			}
+			clauses.add(solver.addClause(new VecInt(clause)));
 		}
-		return new ArrayList<>(list);
-
+		memory = new SolverMemory<>(getProblem(), clauses);
 	}
 
-	private void addVariables() throws ContradictionException {
-		final int size = getProblem().getNumberOfVariables();
-		if (size > 0) {
-			solver.newVar(size);
-			solver.setExpectedNumberOfClauses(getProblem().getRoot().getChildren().length + 1);
-			addCNF(getProblem().getRoot().getChildren());
-			final VecInt pseudoClause = new VecInt(size + 1);
-			for (int i = 1; i <= size; i++) {
-				pseudoClause.push(i);
-			}
-			pseudoClause.push(-1);
-			solver.addClause(pseudoClause);
-		}
-		fixOrder();
-		solver.getOrder().init();
+	/**
+	 * Returns the order of the variables used by Sat4J.
+	 *
+	 * @return Order as array.
+	 */
+	public int[] getOrder() {
+		return order;
 	}
 
-	public List<IConstr> addClauses(Node constraint) throws ContradictionException {
-		return addCNF(constraint.getChildren());
+	/**
+	 * Randomizes the current order.
+	 */
+	public void shuffleOrder() {
+		final Random rnd = new Random();
+		for (int i = order.length - 1; i >= 0; i--) {
+			final int index = rnd.nextInt(i + 1);
+			final int a = order[index];
+			order[index] = order[i];
+			order[i] = a;
+		}
 	}
 
-	protected List<IConstr> addCNF(final Node[] cnfChildren) throws ContradictionException {
-		final List<IConstr> result = new ArrayList<>(cnfChildren.length);
-		for (final Node node : cnfChildren) {
-			result.add(addClause(node));
+	/**
+	 * Fixes the order.
+	 */
+	public void fixOrder() {
+		for (int i = 0; i < order.length; i++) {
+			order[i] = i + 1;
 		}
-		return result;
-	}
-
-	protected IConstr addClause(final Node node) throws ContradictionException {
-		final Node[] children = node.getChildren();
-		final int[] clause = new int[children.length];
-		for (int i = 0; i < children.length; i++) {
-			final Literal literal = (Literal) children[i];
-			clause[i] = getProblem().getSignedIndexOfVariable(literal);
-		}
-		return solver.addClause(new VecInt(clause));
 	}
 
 	/*
@@ -207,20 +196,14 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 	 */
 	@Override
 	public ISatResult isSatisfiable() {
-		if (contradiction) {
-			return ISatResult.FALSE;
-		}
 		try {
-			if (solver.isSatisfiable(assignment, false)) {
-				if (solutionList != null) {
-					solutionList.add(solver.model());
-				}
+			if (solver.isSatisfiable(assignment)) {
 				return ISatResult.TRUE;
 			} else {
 				return ISatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
-			e.printStackTrace();
+			FMCorePlugin.getDefault().logError(e);
 			return ISatResult.TIMEOUT;
 		}
 	}
@@ -238,7 +221,11 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 		if (oldNode instanceof Literal) {
 			assignment.pop();
 		} else if (oldNode instanceof Or) {
-			removeLastClauses(1);
+			final IConstr constraint = memory.popFormula();
+			if (constraint != null) {
+				solver.removeSubsumedConstr(constraint);
+				solver.clearLearntClauses();
+			}
 		}
 		return oldNode;
 	}
@@ -274,23 +261,13 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 					final Literal literal = (Literal) children[i];
 					clause[i] = getProblem().getSignedIndexOfVariable(literal);
 				}
-				constrList.add(solver.addClause(new VecInt(clause)));
+				memory.push(formula, solver.addClause(new VecInt(clause)));
 				pushstack.push(formula);
 			} catch (final ContradictionException e) {
 				FMCorePlugin.getDefault().logError("Cannot push formula \"" + formula + "\" to the solver because it would lead to a contradiction", e);
 			}
 
 		}
-	}
-
-	public void removeLastClauses(int numberOfClauses) {
-		for (int i = 0; i < numberOfClauses; i++) {
-			final IConstr removeLast = constrList.remove(constrList.size() - 1);
-			if (removeLast != null) {
-				solver.removeSubsumedConstr(removeLast);
-			}
-		}
-		solver.clearLearntClauses();
 	}
 
 	/*
@@ -329,83 +306,66 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 		return null;
 	}
 
-	public void setOrder(List<IFeature> orderList) {
-		int i = -1;
-		for (final IFeature feature : orderList) {
-			order[++i] = getProblem().getIndexOfVariable(feature.getName());
-		}
-	}
-
-	public int[] getOrder() {
-		return order;
-	}
-
-	public void shuffleOrder() {
-		final Random rnd = new Random();
-		for (int i = order.length - 1; i >= 0; i--) {
-			final int index = rnd.nextInt(i + 1);
-			final int a = order[index];
-			order[index] = order[i];
-			order[i] = a;
-		}
-	}
-
-	public void fixOrder() {
-		for (int i = 0; i < order.length; i++) {
-			order[i] = i + 1;
-		}
-	}
-
-	private Xplain<ISolver> getExplanationSolver() {
-		return new Xplain<ISolver>(solver);
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see org.prop4j.solver.ISolver#setConfiguration(java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public String toString() {
-		final String cnf = getProblem().getRoot().toString();
-		String pushed = "";
-		for (final Node node : pushstack) {
-			pushed += node.toString() + "\n";
+	public boolean setConfiguration(String key, Object value) {
+		if (value == null) {
+			return false;
 		}
-
-		return cnf + "\n\nPushed:\n" + pushed;
-	}
-
-	@Override
-	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		return null;
-		// return getClauseSetFromIndexSet(getMinimalUnsatisfiableSubsetIndexes());
-	}
-
-	@Override
-	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		if (isSatisfiable() == ISatResult.TRUE) {
-			throw new IllegalStateException("Problem is satisfiable");
+		switch (key) {
+		case CONFIG_TIMEOUT:
+			if (value instanceof Integer) {
+				final int timeout = (int) value;
+				solver.setTimeoutMs(timeout);
+			}
+			return true;
+		case CONFIG_VERBOSE:
+			if (value instanceof Boolean) {
+				final boolean verbose = (boolean) value;
+				solver.setVerbose(verbose);
+			}
+			return true;
+		case CONFIG_DB_SIMPLIFICATION_ALLOWED:
+			if (value instanceof Boolean) {
+				final boolean dbSimpiAllowed = (boolean) value;
+				solver.setDBSimplificationAllowed(dbSimpiAllowed);
+			}
+			return true;
+		case CONFIG_SELECTION_STRATEGY:
+			if (value instanceof Sat4jSelectionStrategy) {
+				final Sat4jSelectionStrategy strategy = (Sat4jSelectionStrategy) value;
+				switch (strategy) {
+				case NEGATIVE:
+					if (solver instanceof Solver<?>) {
+						((Solver<?>) solver).setOrder(new VarOrderHeap2(new NegativeLiteralSelectionStrategy(), order));
+					}
+					return true;
+				case ORG:
+					if (solver instanceof Solver<?>) {
+						((Solver<?>) solver).setOrder(new VarOrderHeap(new RSATPhaseSelectionStrategy()));
+					}
+					return true;
+				case POSITIVE:
+					if (solver instanceof Solver<?>) {
+						((Solver<?>) solver).setOrder(new VarOrderHeap2(new PositiveLiteralSelectionStrategy(), order));
+					}
+					return true;
+				case RANDOM:
+					if (solver instanceof Solver<?>) {
+						((Solver<?>) solver).setOrder(new VarOrderHeap2(new RandomLiteralSelectionStrategy(), order));
+					}
+					return true;
+				default:
+					break;
+				}
+			}
+			break;
+		default:
+			break;
 		}
-		final int[] indexes;
-		try {
-			indexes = getExplanationSolver().minimalExplanation();
-		} catch (final TimeoutException e) {
-			throw new IllegalStateException(e);
-		}
-		final Set<Integer> set = new TreeSet<>();
-		for (final int index : indexes) {
-			set.add(index);
-		}
-		return set;
-	}
-
-	@Override
-	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubset());
-	}
-
-	@Override
-	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
+		return false;
 	}
 }

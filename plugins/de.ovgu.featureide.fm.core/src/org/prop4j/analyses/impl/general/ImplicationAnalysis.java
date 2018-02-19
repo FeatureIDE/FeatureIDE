@@ -73,7 +73,7 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
-		config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.POSITIVE);
+		config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.POSITIVE);
 		solver.setConfiguration(config);
 
 		monitor.checkCancel();
@@ -83,7 +83,7 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 			solutionList.add(model1);
 
 			config.clear();
-			config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.NEGATIVE);
+			config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.NEGATIVE);
 			solver.setConfiguration(config);
 
 			monitor.checkCancel();
@@ -94,7 +94,7 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 			// if there are more negative than positive literals
 			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
 				config.clear();
-				config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.SelectionStrategy.POSITIVE);
+				config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.POSITIVE);
 				solver.setConfiguration(config);
 			}
 

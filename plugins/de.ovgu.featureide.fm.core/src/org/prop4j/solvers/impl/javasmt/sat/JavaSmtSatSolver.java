@@ -114,35 +114,28 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolver#setConfiguration(java.util.Map)
+	 * @see org.prop4j.solver.ISolver#setConfiguration(java.lang.String, java.lang.Object)
 	 */
 	@Override
-	public List<String> setConfiguration(Map<String, Object> config) {
-		if (config == null) {
-			return null;
+	public boolean setConfiguration(String key, Object value) {
+		if (value == null) {
+			return false;
 		}
-		final HashSet<String> list = new HashSet<>();
-		for (final String configID : config.keySet()) {
-			final Object value = config.get(configID);
-			if (value == null) {
-				continue;
-			}
-			switch (configID) {
-			case SOLVER_TYPE:
-				try {
-					if (value instanceof Solvers) {
-						final Solvers solverType = (Solvers) value;
-						context = SolverContextFactory.createSolverContext(this.config, logManager, shutdownManager.getNotifier(), solverType);
-						list.add(SOLVER_TYPE);
-					}
-				} catch (final InvalidConfigurationException e) {}
+		switch (key) {
+		case SOLVER_TYPE:
+			try {
+				if (value instanceof Solvers) {
+					final Solvers solverType = (Solvers) value;
+					context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solverType);
+					return true;
+				}
+			} catch (final InvalidConfigurationException e) {}
 
-				break;
-			default:
-				break;
-			}
+			break;
+		default:
+			break;
 		}
-		return new ArrayList<>(list);
+		return false;
 	}
 
 	/*

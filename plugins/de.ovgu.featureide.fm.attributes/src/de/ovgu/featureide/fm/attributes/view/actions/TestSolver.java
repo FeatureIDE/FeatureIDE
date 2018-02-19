@@ -14,7 +14,6 @@ import org.prop4j.solver.impl.SatProblem;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4JSatMusSolver;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
-import org.prop4j.solver.impl.sat4j.Sat4jSatSolverNew;
 import org.prop4j.solverOld.BasicSolver;
 import org.prop4j.solverOld.SatInstance;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
@@ -92,7 +91,7 @@ public class TestSolver extends Action {
 		try {
 			BasicSolver solver0 = new BasicSolver(new SatInstance(problem.getRoot(), FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel())));
 			Sat4jSatSolver solver1 = new Sat4jSatSolver(problem, null);
-			Sat4jSatSolverNew solver2 = new Sat4jSatSolverNew(problem, null);
+			Sat4jSatSolver solver2 = new Sat4jSatSolver(problem, null);
 			JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
 
 			int[] model0 = solver0.findModel();

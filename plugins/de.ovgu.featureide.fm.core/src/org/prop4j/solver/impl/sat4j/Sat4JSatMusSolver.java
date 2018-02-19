@@ -40,7 +40,7 @@ import org.sat4j.tools.xplain.Xplain;
  *
  * @author Joshua Sprey
  */
-public class Sat4JSatMusSolver extends Sat4jSatSolverNew implements IMusExtractor {
+public class Sat4JSatMusSolver extends Sat4jSatSolver implements IMusExtractor {
 
 	public Sat4JSatMusSolver(ISatProblem problem, Map<String, Object> config) {
 		super(problem, config);

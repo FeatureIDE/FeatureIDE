@@ -46,6 +46,15 @@ public interface ISolver {
 	List<String> setConfiguration(Map<String, Object> config);
 
 	/**
+	 * Used to set specific solver configuration when the solver initiated and also during runtime.
+	 *
+	 * @param key Identifier to identify which option should be set.
+	 * @param value The value of the option.
+	 * @return Returns true, when the solver accepted the option, false otherwise.
+	 */
+	boolean setConfiguration(String key, Object value);
+
+	/**
 	 * Removes one layer from the stack.
 	 *
 	 * @return Returns the removed node.
