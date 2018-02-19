@@ -1,75 +1,72 @@
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- *
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://www.fosd.de/featureide/ for further information.
- */
-package de.ovgu.featureide.fm.core.configuration;
+package de.ovgu.featureide.fm.attributes.format;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.core.io.xml.PositionalXMLHandler;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 
-/**
- * Extended configuration format for FeatureIDE projects in XML structure.
- *
- * @author Sebastian Krieter
- */
-public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
+public class XmlExtendedConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
 
+	public static final String ID = "de.ovgu.featureide.fm.attributes.format.config.XmlExtendedConfFormat";
 	private static final String NODE_FEATURE = "feature";
+	private static final String NODE_ATTRIBUTE = "attribute";
 	private static final String ATTRIBUTE_NAME = "name";
+	private static final String ATTRIBUTE_VALUE = "value";
 	private static final String ATTRIBUTE_MANUAL = "manual";
 	private static final String ATTRIBUTE_AUTOMATIC = "automatic";
-	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
-	public static final String EXTENSION = StringTable.CONF;
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + "configuration" + "[\\s>]");
+	public static final String EXTENSION = "econfig";
+	private static final String EXTENDED_CONFIGURATION = "extendedConfiguration";
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_CONFIGURATION + "[\\s>]");
 
 	@Override
-	public XMLConfFormat getInstance() {
-		return new XMLConfFormat();
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "ExtendedXML";
+	}
+
+	@Override
+	public String getId() {
+		// TODO Auto-generated method stub
+		return ID;
+	}
+
+	@Override
+	public XmlExtendedConfFormat getInstance() {
+		return this;
+	}
+
+	public String getSuffix() {
+		return "xml";
 	}
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-		object.resetValues();
-
 		final Element root = doc.getDocumentElement();
 		if (root == null) {
 			warnings.add(new Problem("No root element specified", 1, Problem.Severity.ERROR));
 			return;
 		}
-		if (root.getNodeName().equals("configuration")) {
+		if (root.getNodeName().equals(EXTENDED_CONFIGURATION)) {
 			for (final Element feature : getElements(root.getElementsByTagName(NODE_FEATURE))) {
 				final SelectableFeature selectablefeature;
 				if (feature.hasAttribute(ATTRIBUTE_NAME)) {
 					final String featureName = feature.getAttribute(ATTRIBUTE_NAME);
-					selectablefeature = object.getSelectablefeature(object.getFeatureModel().getRenamingsManager().getNewName(featureName));
+					selectablefeature = object.getSelectablefeature(featureName);
 					if (selectablefeature == null) {
 						createWarning("Invalid feature name: " + featureName, feature, warnings);
 						continue;
@@ -81,9 +78,16 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 				if (feature.hasAttribute(ATTRIBUTE_MANUAL)) {
 					selectablefeature.setManual(getSelection(feature.getAttribute(ATTRIBUTE_MANUAL), feature, warnings));
+				} else {
+					createWarning("No manual selection state specified", feature, warnings);
+					continue;
 				}
+
 				if (feature.hasAttribute(ATTRIBUTE_AUTOMATIC)) {
 					selectablefeature.setAutomatic(getSelection(feature.getAttribute(ATTRIBUTE_AUTOMATIC), feature, warnings));
+				} else {
+					createWarning("No automatic selection state specified", feature, warnings);
+					continue;
 				}
 
 				final NamedNodeMap attributes = feature.getAttributes();
@@ -101,10 +105,21 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 						}
 					}
 				}
-
+				if (selectablefeature instanceof ExtendedSelectableFeature) {
+					final NodeList attributeNodes = feature.getChildNodes();
+					for (int i = 0; i < attributeNodes.getLength(); i++) {
+						Node currentItem = attributeNodes.item(i);
+						if (currentItem.hasAttributes() && currentItem.getAttributes().getNamedItem(ATTRIBUTE_NAME) != null) {
+							((ExtendedSelectableFeature) selectablefeature).addConfigurableAttribute(
+									currentItem.getAttributes().getNamedItem(ATTRIBUTE_NAME).getNodeValue(),
+									currentItem.getAttributes().getNamedItem(ATTRIBUTE_VALUE).getNodeValue());
+						}
+					}
+				}
 			}
+
 		} else {
-			warnings.add(new Problem("Root element must be <configuration>", 1, Problem.Severity.ERROR));
+			warnings.add(new Problem("Root element must be <extendedConfiguration>", 1, Problem.Severity.ERROR));
 		}
 	}
 
@@ -120,6 +135,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	private Selection getSelection(String selection, Element feature, List<Problem> warnings) {
 		if (selection == null) {
+			createError("Selection state not specified" + selection, feature, warnings);
 			return Selection.UNDEFINED;
 		} else {
 			switch (selection) {
@@ -130,6 +146,7 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 			case "unselected":
 				return Selection.UNSELECTED;
 			default:
+				createError("Invalid selection state: " + selection, feature, warnings);
 				return Selection.UNDEFINED;
 			}
 		}
@@ -150,33 +167,34 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 
 	@Override
 	protected void writeDocument(Document doc) {
-		final Element root = doc.createElement("configuration");
+		final Element root = doc.createElement(EXTENDED_CONFIGURATION);
 		doc.appendChild(root);
 		for (final SelectableFeature feature : object.getFeatures()) {
-			if ((feature.getManual() == Selection.UNDEFINED) && (feature.getAutomatic() == Selection.UNDEFINED)) {
-				continue;
-			}
 			final Element featureNode = doc.createElement(NODE_FEATURE);
 			featureNode.setAttribute(ATTRIBUTE_NAME, feature.getName());
-			if (feature.getManual() != Selection.UNDEFINED) {
-				featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
-			}
-			if (feature.getAutomatic() != Selection.UNDEFINED) {
-				featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
-			}
+			featureNode.setAttribute(ATTRIBUTE_MANUAL, getSelectionString(feature.getManual()));
+			featureNode.setAttribute(ATTRIBUTE_AUTOMATIC, getSelectionString(feature.getAutomatic()));
 			root.appendChild(featureNode);
-
+			if (feature instanceof ExtendedSelectableFeature) {
+				for (Map.Entry<String, String> entry : ((ExtendedSelectableFeature) feature).getConfigurableAttributes().entrySet()) {
+					final Element attributeNode = doc.createElement(NODE_ATTRIBUTE);
+					attributeNode.setAttribute(ATTRIBUTE_NAME, entry.getKey());
+					attributeNode.setAttribute(ATTRIBUTE_VALUE, entry.getValue().toString());
+					featureNode.appendChild(attributeNode);
+				}
+			}
 		}
+
 	}
 
 	@Override
-	public String getId() {
-		return ID;
+	public boolean supportsRead() {
+		return true;
 	}
 
 	@Override
-	public String getName() {
-		return "XML";
+	public boolean supportsWrite() {
+		return true;
 	}
 
 	@Override

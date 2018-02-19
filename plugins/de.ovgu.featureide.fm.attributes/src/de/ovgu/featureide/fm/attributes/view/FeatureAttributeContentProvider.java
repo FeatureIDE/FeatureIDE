@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -42,6 +43,7 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	public static final Object[] FALSE_MODEL_FORMAT = new Object[] { StringTable.MODEL_NOT_SUPPORTED_PLEASE_CONVERT_TO_EXTENDED_MODEL };
 
 	private ExtendedFeatureModel featureModel;
+	private Configuration config;
 	private Object[] features = EMPTY_ROOT;
 	private TreeViewer viewer;
 
@@ -56,13 +58,20 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement instanceof ExtendedFeatureModel) {
+			config = null;
 			featureModel = (ExtendedFeatureModel) inputElement;
 			refreshElements();
 			return features;
 		} else if (inputElement instanceof Object[]) {
+			config = null;
 			featureModel = null;
 			refreshElements();
 			return (Object[]) inputElement;
+		} else if (inputElement instanceof Configuration) {
+			config = (Configuration) inputElement;
+			featureModel = (ExtendedFeatureModel) config.getFeatureModel();
+			refreshElements();
+			return features;
 		} else {
 			featureModel = null;
 			refreshElements();
@@ -82,7 +91,15 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (parentElement instanceof ExtendedFeature) {
 			final ExtendedFeature feature = (ExtendedFeature) parentElement;
 			final ArrayList<Object> featureList = new ArrayList<>();
-			featureList.addAll(feature.getAttributes());
+			if (config != null) {
+				for (IFeatureAttribute att : feature.getAttributes()) {
+					if (att.isConfigurable()) {
+						featureList.add(att);
+					}
+				}
+			} else {
+				featureList.addAll(feature.getAttributes());
+			}
 			for (final IFeatureStructure structure : feature.getStructure().getChildren()) {
 				featureList.add(structure.getFeature());
 			}

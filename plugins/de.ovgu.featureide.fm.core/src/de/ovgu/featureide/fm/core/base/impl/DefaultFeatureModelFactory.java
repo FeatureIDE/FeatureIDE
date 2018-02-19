@@ -23,8 +23,10 @@ package de.ovgu.featureide.fm.core.base.impl;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 /**
  *
@@ -61,6 +63,15 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public FeatureModel createFeatureModel() {
 		return new FeatureModel(ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureModelFactory#createSelectableFeature(de.ovgu.featureide.fm.core.base.IFeature)
+	 */
+	@Override
+	public SelectableFeature createSelectableFeature(IFeature feature) {
+		return new SelectableFeature(feature);
 	}
 
 }

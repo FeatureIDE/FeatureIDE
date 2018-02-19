@@ -148,6 +148,9 @@
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.contenttype.confXML">
 			</contentTypeBinding>
+   <contentTypeBinding
+         contentTypeId="de.ovgu.featureide.contenttype.extendedConfiguration">
+   </contentTypeBinding>
 		</editor>
 	</extension>
 

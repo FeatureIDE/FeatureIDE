@@ -18,7 +18,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelProvider implements IColorProvider {
 
 	protected HashMap<String, Image> cachedImages;
-	private FeatureAttributeView view;
+	protected FeatureAttributeView view;
 
 	public FeatureAttributeColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {
 		this.cachedImages = cachedImages;

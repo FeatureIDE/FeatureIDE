@@ -2,10 +2,13 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.attributes.config.ExtendedSelectableFeature;
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
@@ -41,4 +44,10 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	public ExtendedFeatureModel createFeatureModel() {
 		return new ExtendedFeatureModel(ID);
 	}
+
+	@Override
+	public SelectableFeature createSelectableFeature(IFeature feature) {
+		return new ExtendedSelectableFeature(feature);
+	}
+
 }
