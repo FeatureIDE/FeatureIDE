@@ -20,11 +20,11 @@
  */
 package org.prop4j.analyses.impl.general;
 
-import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -32,74 +32,70 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * Finds core and dead features.
  *
  * @author Sebastian Krieter
- * @author Joshua Sprey
  */
-public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
+public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnalysis {
 
-	public CoreDeadAnalysis(ISolver solver) {
+	public ConditionallyCoreDeadAnalysisSat(ISolver solver) {
 		super(solver);
 	}
-
-	public CoreDeadAnalysis(ISolver solver, int[] features) {
-		super(solver);
-		setFeatures(features);
-	}
-
-	private int[] features;
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
+		satCount = 0;
+//		solver.getAssignment().ensure(fixedVariables.length);
+		for (int i = 0; i < fixedVariables.length; i++) {
+			solver.push(getLiteralFromIndex(fixedVariables[i]));
+		}
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
-		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		satCount++;
 
 		if (model1 != null) {
 			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
+			satCount++;
 
-			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
-					if (index >= 0) {
-						model3[index] = model1[index];
-					}
-				}
-				model1 = model3;
+			// if there are more negative than positive literals
+			if ((model1.length < (countNegative(model2) + countNegative(model1)))) {
+				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+			} else {
+				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
+
 			}
 
-			SolverUtils.updateModel(model1, model2);
+			for (int i = 0; i < fixedVariables.length; i++) {
+				model1[Math.abs(fixedVariables[i]) - 1] = 0;
+			}
 
+			SatInstance.updateModel(model1, model2);
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
 					solver.push(getLiteralFromIndex(-varX));
+					satCount++;
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.pop();
 						solver.push(getLiteralFromIndex(varX));
-						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
 						solver.pop();
 						break;
 					case TRUE:
 						solver.pop();
-						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
-						// solver.shuffleOrder();
+						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
+						solver.pop();
 						break;
 					}
 				}
 			}
 		}
-
 		return getIntegerAssumptions();
 	}
 
-	public int[] getFeatures() {
-		return features;
+	@Override
+	public String toString() {
+		return "SAT_Improved";
 	}
 
-	public void setFeatures(int[] features) {
-		this.features = features;
-	}
 }

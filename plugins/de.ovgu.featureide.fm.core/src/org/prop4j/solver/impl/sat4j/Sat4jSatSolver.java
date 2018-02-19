@@ -72,15 +72,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	protected SolverMemory<IConstr> memory;
 
-	/**
-	 * Enumeration about the selection strategy's that can be used of the Sat4J solver.
-	 *
-	 * @author Joshua Sprey
-	 */
-	public static enum Sat4jSelectionStrategy {
-		NEGATIVE, ORG, POSITIVE, RANDOM
-	}
-
 	public Sat4jSatSolver(ISatProblem problem, Map<String, Object> config) {
 		super(problem);
 
@@ -335,8 +326,8 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 			}
 			return true;
 		case CONFIG_SELECTION_STRATEGY:
-			if (value instanceof Sat4jSelectionStrategy) {
-				final Sat4jSelectionStrategy strategy = (Sat4jSelectionStrategy) value;
+			if (value instanceof SatSolverSelectionStrategy) {
+				final SatSolverSelectionStrategy strategy = (SatSolverSelectionStrategy) value;
 				switch (strategy) {
 				case NEGATIVE:
 					if (solver instanceof Solver<?>) {

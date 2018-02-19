@@ -25,6 +25,7 @@ import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -32,42 +33,28 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * Finds core and dead features.
  *
  * @author Sebastian Krieter
- * @author Joshua Sprey
  */
-public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
+public class ConditionallyCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
-	public CoreDeadAnalysis(ISolver solver) {
+	public ConditionallyCoreDeadAnalysis(ISolver solver) {
 		super(solver);
 	}
-
-	public CoreDeadAnalysis(ISolver solver, int[] features) {
-		super(solver);
-		setFeatures(features);
-	}
-
-	private int[] features;
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
-		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
 			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
 
-			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
-					if (index >= 0) {
-						model3[index] = model1[index];
-					}
-				}
-				model1 = model3;
-			}
+			SatInstance.updateModel(model1, model2);
+//			for (int i = 0; i < assumptions.length; i++) {
+//				model1[Math.abs(assumptions[i]) - 1] = 0;
+//			}
 
-			SolverUtils.updateModel(model1, model2);
+//			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
 
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
@@ -77,15 +64,14 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 					case FALSE:
 						solver.pop();
 						solver.push(getLiteralFromIndex(varX));
-						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
 						solver.pop();
 						break;
 					case TRUE:
 						solver.pop();
-						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
-						// solver.shuffleOrder();
+						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
+//						solver.shuffleOrder();
 						break;
 					}
 				}
@@ -95,11 +81,4 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 		return getIntegerAssumptions();
 	}
 
-	public int[] getFeatures() {
-		return features;
-	}
-
-	public void setFeatures(int[] features) {
-		this.features = features;
-	}
 }

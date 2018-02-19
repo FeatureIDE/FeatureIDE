@@ -20,7 +20,13 @@
  */
 package org.prop4j.analyses;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.prop4j.Literal;
+import org.prop4j.Node;
 import org.prop4j.solver.ISolver;
+import org.prop4j.solver.impl.SolverUtils;
 
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -63,6 +69,27 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 	public T analyze(IMonitor monitor) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Literal getLiteralFromIndex(int index) {
+		final Object variable = solver.getProblem().getVariableOfIndex(Math.abs(index));
+		final Literal literal = new Literal(variable, index > 0);
+		return literal;
+	}
+
+	public int[] getIntegerAssumptions() {
+		final ArrayList<Integer> solution = new ArrayList<>();
+		Node currentNode = solver.pop();
+		while (currentNode != null) {
+			if (currentNode instanceof Literal) {
+				final Literal literal = (Literal) currentNode;
+				solution.add(solver.getProblem().getSignedIndexOfVariable(literal));
+				currentNode = solver.pop();
+			}
+		}
+		Collections.reverse(solution);
+
+		return SolverUtils.getIntModel((Integer[]) solution.toArray(new Integer[solution.size()]));
 	}
 
 }

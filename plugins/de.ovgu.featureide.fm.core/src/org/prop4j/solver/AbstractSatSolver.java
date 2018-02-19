@@ -40,6 +40,15 @@ public abstract class AbstractSatSolver implements ISatSolver {
 	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
 
 	/**
+	 * Enumeration about the selection strategy's that can be used of the Sat4J solver.
+	 *
+	 * @author Joshua Sprey
+	 */
+	public static enum SatSolverSelectionStrategy {
+		NEGATIVE, ORG, POSITIVE, RANDOM
+	}
+
+	/**
 	 * Create a new Sat solver.
 	 *
 	 * @param problem The problem that the solver should solve.

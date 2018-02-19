@@ -21,18 +21,15 @@
 package org.prop4j.analyses.impl.general;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import org.prop4j.Literal;
 import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.AbstractSatSolver;
+import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
-import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.ISatSolver;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -61,41 +58,29 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 	@Override
 	public List<int[]> analyze(IMonitor monitor) {
-		String compare = "New Start:\nCNF: " + solver.getProblem().getRoot() + "\nAssignedPairs: " + SolverUtils.getListArrayString(pairs);
-
 		final List<int[]> resultList = new ArrayList<>();
 
 		if (pairs == null) {
 			return resultList;
 		}
 
-		final HashMap<String, Object> config = new HashMap<>();
-
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
-		config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.POSITIVE);
-		solver.setConfiguration(config);
-
+		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
 		monitor.checkCancel();
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
 			solutionList.add(model1);
-
-			config.clear();
-			config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.NEGATIVE);
-			solver.setConfiguration(config);
+			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
 
 			monitor.checkCancel();
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-			compare += "\nModel1: " + Arrays.toString(model1) + "\nModel2: " + Arrays.toString(model2);
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
 			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
-				config.clear();
-				config.put(Sat4jSatSolver.CONFIG_SELECTION_STRATEGY, Sat4jSatSolver.Sat4jSelectionStrategy.POSITIVE);
-				solver.setConfiguration(config);
+				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
 			}
 
 			pairLoop: for (final int[] pair : pairs) {
@@ -119,9 +104,9 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 					break;
 				case TRUE:
 					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
-					if (solver instanceof Sat4jSatSolver) {
-						((Sat4jSatSolver) solver).shuffleOrder();
-					}
+//					if (solver instanceof Sat4jSatSolver) {
+//						((Sat4jSatSolver) solver).shuffleOrder();
+//					}
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
@@ -129,8 +114,6 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 				}
 			}
 		}
-		compare += "\n\nResult: " + SolverUtils.getListArrayString(resultList);
-		FMCorePlugin.getDefault().logInfo(compare);
 		return resultList;
 	}
 
@@ -141,11 +124,4 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 		}
 		return count;
 	}
-
-	public Literal getLiteralFromIndex(int index) {
-		final Object variable = solver.getProblem().getVariableOfIndex(Math.abs(index));
-		final Literal literal = new Literal(variable, index > 0);
-		return literal;
-	}
-
 }
