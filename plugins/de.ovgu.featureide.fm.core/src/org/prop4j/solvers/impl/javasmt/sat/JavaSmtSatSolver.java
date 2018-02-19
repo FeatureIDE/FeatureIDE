@@ -238,18 +238,20 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	@Override
 	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
 		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+			// Get all formulas but without assumption
 			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
-			for (final BooleanFormula booleanFormula : usedConstraint) {
-				prover.addConstraint(booleanFormula);
-			}
 			for (final BooleanFormula booleanFormula : usedConstraint) {
 				prover.addConstraint(booleanFormula);
 			}
 			if (prover.isUnsat()) {
 				final List<BooleanFormula> formula = prover.getUnsatCore();
+				final List<BooleanFormula> assumptions = pushstack.getAssumtions();
 				final Set<Node> explanation = new HashSet<>();
 				for (int i = 0; i < formula.size(); i++) {
-					explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
+					// Don't add assumptions to unsat core
+					if (!assumptions.contains(formula.get(i))) {
+						explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
+					}
 				}
 				return explanation;
 			}

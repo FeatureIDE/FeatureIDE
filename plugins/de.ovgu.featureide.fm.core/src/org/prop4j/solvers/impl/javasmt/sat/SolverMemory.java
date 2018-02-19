@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 import org.prop4j.solver.ISolverProblem;
 
 import com.google.common.collect.HashBiMap;
@@ -91,6 +93,21 @@ public class SolverMemory<T> {
 	}
 
 	/**
+	 * Removes the last pushed Node and formula from the memory and returns the formula. Cannot pop static clauses from the problem.
+	 *
+	 * @return Last Formula which was pushed to the memory, otherwise null.
+	 */
+	public T popFormula() {
+		if (isStackEmpty()) {
+			return null;
+		}
+		final Node t = insertionStack.pop();
+		final T t2 = data.get(t);
+		data.remove(t);
+		return t2;
+	}
+
+	/**
 	 * Returns a list of all formulas (constraints). Including every static clause from the Problem and every formula that was pushed to the memory.
 	 *
 	 * @return List of all constraints.
@@ -99,6 +116,22 @@ public class SolverMemory<T> {
 		final ArrayList<T> formulas = new ArrayList<>(staticClauses);
 		for (final T formula : data.values()) {
 			formulas.add(formula);
+		}
+		return formulas;
+	}
+
+	/**
+	 * Returns a list of all formulas (constraints). Including every static clause from the Problem and every formula that was pushed to the memory except
+	 * assumptions.
+	 *
+	 * @return List of all constraints.
+	 */
+	public List<T> getFormulasAsListWithoutAssumptions() {
+		final ArrayList<T> formulas = new ArrayList<>(staticClauses);
+		for (final Node node : data.keySet()) {
+			if (node instanceof Literal) {
+				formulas.add(data.get(node));
+			}
 		}
 		return formulas;
 	}
@@ -206,6 +239,49 @@ public class SolverMemory<T> {
 	public T getFormulaOfIndex(int index) {
 		final Node node = getNodeOfIndex(index);
 		return node == null ? null : getFormulaOfNode(node);
+	}
+
+	/**
+	 * Returns the formulas for every assumption. Assumption are identified by the node {@link Literal}
+	 *
+	 * @return List of formulas of all assumptions.
+	 */
+	public List<T> getAssumtions() {
+		final List<T> assumtions = new ArrayList<>();
+		for (final Node node : insertionStack) {
+			if (node instanceof Literal) {
+				assumtions.add(data.get(node));
+			}
+		}
+		return assumtions;
+	}
+
+	/**
+	 * Returns the formulas for every clause. Clauses are identified by the node {@link Or}
+	 *
+	 * @return List of formulas of all new clauses.
+	 */
+	public List<T> getNewClauses() {
+		final List<T> clauses = new ArrayList<>();
+		for (final Node node : insertionStack) {
+			if (node instanceof Or) {
+				clauses.add(data.get(node));
+			}
+		}
+		return clauses;
+	}
+
+	/**
+	 * Returns the formulas that were pushed to the memory.
+	 *
+	 * @return List of formulas.
+	 */
+	public List<T> getPushedFormulas() {
+		final List<T> formulas = new ArrayList<>();
+		for (final Node node : insertionStack) {
+			formulas.add(data.get(node));
+		}
+		return formulas;
 	}
 
 	public String getQueryPrint() {

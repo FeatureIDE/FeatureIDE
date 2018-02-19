@@ -151,9 +151,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
 	public boolean synchToFeatureDiagram = false;
-	public ArrayList<IFeature> selectedManualFeatures;
-	public ArrayList<IFeature> selectedAutomaticFeatures;
-	public ArrayList<IFeature> selection;
+	public ArrayList<IFeature> selectedManualFeatures = new ArrayList<>();
+	public ArrayList<IFeature> selectedAutomaticFeatures = new ArrayList<>();
+	public ArrayList<IFeature> selection = new ArrayList<>();
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 
 		@Override

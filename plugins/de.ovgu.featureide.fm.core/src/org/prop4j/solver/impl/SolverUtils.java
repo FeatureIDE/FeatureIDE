@@ -23,6 +23,8 @@ package org.prop4j.solver.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import org.prop4j.solver.ISolverProblem;
+
 /**
  * Static class used to provide some basic functionality that can be used with any kind of solver.
  *
@@ -38,6 +40,9 @@ public class SolverUtils {
 	 * @return int[] when model is only containing Integer objects
 	 */
 	public static int[] getIntModel(Object[] model) {
+		if (model == null) {
+			return new int[0];
+		}
 		final int[] intModel = new int[model.length];
 		for (int i = 0; i < model.length; i++) {
 			if (model[i] instanceof Integer) {
@@ -56,6 +61,9 @@ public class SolverUtils {
 	 * @return
 	 */
 	public static Object[] getObjectModel(int[] model) {
+		if (model == null) {
+			return new Object[0];
+		}
 		final Object[] objectModel = new Object[model.length];
 		for (int i = 0; i < model.length; i++) {
 			objectModel[i] = new Integer(model[i]);
@@ -87,6 +95,9 @@ public class SolverUtils {
 	}
 
 	public static int[] negateModel(int[] ar) {
+		if (ar == null) {
+			return new int[0];
+		}
 		final int[] nar = Arrays.copyOf(ar, ar.length);
 		for (int i = 0; i < nar.length; i++) {
 			nar[i] = -nar[i];
@@ -104,5 +115,24 @@ public class SolverUtils {
 		}
 		listSTring += "]";
 		return listSTring;
+	}
+
+	public static String getNamesOfIndexes(ISolverProblem problem, int[] values) {
+		if (values == null) {
+			return "EMPTY VALUES";
+		}
+		final StringBuilder result = new StringBuilder();
+		result.append("[");
+		for (int i = 0; i < values.length; i++) {
+			if (values[i] < 0) {
+				result.append("-");
+			}
+			result.append(problem.getVariableOfIndex(Math.abs(values[i])));
+			if (i < (values.length - 1)) {
+				result.append(", ");
+			}
+		}
+		result.append("]");
+		return result.toString();
 	}
 }

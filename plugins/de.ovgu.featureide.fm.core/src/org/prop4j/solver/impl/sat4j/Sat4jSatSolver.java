@@ -76,11 +76,6 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 	protected RingList<int[]> solutionList;
 	protected boolean contradiction = false;
 
-	public static final String CONFIG_TIMEOUT = "Timeout";
-	public static final String CONFIG_VERBOSE = "Verbose";
-	public static final String CONFIG_DB_SIMPLIFICATION_ALLOWED = "DBSimplification";
-	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
-
 	public Sat4jSatSolver(ISatProblem problem, Map<String, Object> config) {
 		super(problem);
 
@@ -99,9 +94,8 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 
 		try {
 			addVariables();
-
 		} catch (final ContradictionException e) {
-			contradiction = true;
+			FMCorePlugin.getDefault().logError("Cannot create solver because the problem contains a contradiction.", e);
 		}
 	}
 
@@ -282,10 +276,8 @@ public class Sat4jSatSolver extends AbstractSatSolver implements IMusExtractor {
 				}
 				constrList.add(solver.addClause(new VecInt(clause)));
 				pushstack.push(formula);
-				FMCorePlugin.getDefault().logInfo("Pushed: " + constrList.toString() + " and " + pushstack.toString());
 			} catch (final ContradictionException e) {
-				// removeLastClauses(1);
-				contradiction = true;
+				FMCorePlugin.getDefault().logError("Cannot push formula \"" + formula + "\" to the solver because it would lead to a contradiction", e);
 			}
 
 		}

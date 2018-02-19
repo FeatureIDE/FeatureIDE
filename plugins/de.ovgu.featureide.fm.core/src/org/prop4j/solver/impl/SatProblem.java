@@ -126,8 +126,8 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public int getIndexOfVariable(Object variable) {
-		final Integer clauseInt = clauseToInt.get(variable);
-		return clauseInt == null ? 0 : clauseInt;
+		final Integer varInt = varToInt.get(variable);
+		return varInt == null ? 0 : varInt;
 	}
 
 	/*
@@ -170,7 +170,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.length;
+		return intToVar.length - 1;
 	}
 
 	/*

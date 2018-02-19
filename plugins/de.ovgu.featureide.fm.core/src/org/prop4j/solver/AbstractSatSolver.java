@@ -31,6 +31,11 @@ public abstract class AbstractSatSolver implements ISatSolver {
 
 	ISatProblem problem;
 
+	public static final String CONFIG_TIMEOUT = "Timeout";
+	public static final String CONFIG_VERBOSE = "Verbose";
+	public static final String CONFIG_DB_SIMPLIFICATION_ALLOWED = "DBSimplification";
+	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
+
 	/**
 	 * Create a new Sat solver.
 	 *
