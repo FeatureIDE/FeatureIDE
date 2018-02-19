@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage;
 
 /**
  * TODO description
@@ -110,6 +111,8 @@ public class FeatureAttributeValueEditingSupport extends AbstractFeatureAttribut
 						extSelectable.addConfigurableAttribute(attribute.getName(), value.toString());
 					}
 				}
+				ConfigurationPage page = (ConfigurationPage) ((ConfigurationEditor) view.getCurrentEditor()).getSelectedPage();
+				page.setDirty();
 			}
 		} else {
 			if (attribute.getType().equals(FeatureAttribute.BOOLEAN)) {
