@@ -34,7 +34,7 @@ import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.VarOrderHeap2;
-import org.prop4j.solvers.impl.javasmt.sat.SolverMemory;
+import org.prop4j.solvers.impl.javasmt.SolverMemory;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.minisat.core.Solver;

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solvers.impl.javasmt.sat;
+package org.prop4j.solvers.impl.javasmt.smt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.prop4j.Node;
-import org.prop4j.solver.AbstractSatSolver;
+import org.prop4j.solver.AbstractSmtSolver;
 import org.prop4j.solver.IMusExtractor;
-import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
+import org.prop4j.solver.ISmtProblem;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
 import org.prop4j.solvers.impl.javasmt.SolverMemory;
 import org.sosy_lab.common.ShutdownManager;
@@ -53,11 +53,11 @@ import org.sosy_lab.java_smt.api.SolverException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Sat Solver implemented with JavaSmt to solve sat requests. The kind of solver is specified by
+ * Solver used to sovle smt querys.
  *
  * @author Joshua Sprey
  */
-public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor {
+public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor {
 
 	/** Configuration for the solver. Needed for the native solver. Not really used. */
 	protected Configuration config;
@@ -78,7 +78,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 * @param node
 	 * @param solver The solver that should be used to solve the query's
 	 */
-	public JavaSmtSatSolver(ISatProblem problem, Solvers solver, Map<String, Object> configuration) {
+	public JavaSmtSolver(ISmtProblem problem, Solvers solver, Map<String, Object> configuration) {
 		super(problem);
 		try {
 			config = Configuration.defaultConfiguration();

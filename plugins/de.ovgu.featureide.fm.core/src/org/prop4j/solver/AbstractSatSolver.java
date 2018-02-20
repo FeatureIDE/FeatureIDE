@@ -73,7 +73,7 @@ public abstract class AbstractSatSolver implements ISatSolver {
 	 * @see org.prop4j.solver.ISolver#getProblem()
 	 */
 	@Override
-	public ISolverProblem getProblem() {
+	public ISatProblem getProblem() {
 		return problem;
 	}
 

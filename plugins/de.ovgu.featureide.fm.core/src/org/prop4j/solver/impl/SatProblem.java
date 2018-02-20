@@ -53,7 +53,8 @@ public class SatProblem implements ISatProblem {
 		root = rootNode;
 
 		if (!root.isConjunctiveNormalForm()) {
-			throw new IllegalStateException("The given root node to create a sat problem need to be in conjunctive normal form.");
+			throw new IllegalStateException(
+					"The given root node to create a sat problem need to be in conjunctive normal form. And cannot containt the Node @link AtomicFormula");
 		}
 
 		// Create mapping from index to clauses starting from 0
@@ -90,16 +91,6 @@ public class SatProblem implements ISatProblem {
 			}
 		}
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolverProblem#addFormula(org.prop4j.Node)
-	 */
-	@Override
-	public void addFormula(Node formula) {
-		// TODO ATTRIBUTES todo :p
-
 	}
 
 	/*

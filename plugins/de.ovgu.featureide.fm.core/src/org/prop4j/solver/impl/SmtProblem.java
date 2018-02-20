@@ -23,43 +23,62 @@ package org.prop4j.solver.impl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.solver.ISmtProblem;
+import org.prop4j.solver.ISatProblem;
 
 /**
- * Abstract class representing a Satisfiability modulo theories (SMT) problem that is given as input for the smt solver.
- *
- * TODO ATTRIBUTES Add the type of variables to the variables. Node Extension required
+ * Abstract class representing a satisfiability problem in CNF that is given as input for the sat solver.
  *
  * @author Joshua Sprey
  */
-public class SmtProblem implements ISmtProblem {
+public class SmtProblem implements ISatProblem {
 
+	/** Root node for the problem. Needs to be a And node containing every clause. */
 	protected Node root;
-	protected Map<Object, Integer> varToInt = new HashMap<>();
+	/** Maps the variables to indexes. Variable index start by 1 */
+	protected HashMap<Object, Integer> varToInt = new HashMap<>();
+	/** Contains every variables that can be accessed by the index. Starts with 1 */
 	protected Object[] intToVar;
+	/** Maps clauses to integer */
+	protected HashMap<Node, Integer> clauseToInt = new HashMap<>();
+	/** Contains every clause that can be accessed by the index */
+	protected Node[] intToClause;
 
 	/**
-	 * Initiates the problem with a root node.
+	 * Initiates the problem with a root node and a given feature list that represent variables.
 	 *
 	 * @param rootNode
 	 */
 	public SmtProblem(Node rootNode, Collection<?> variables) {
 		intToVar = new Object[variables.size() + 1];
+		intToClause = new Node[rootNode.getChildren().length];
 		root = rootNode;
 
-		int index = 0;
-		for (final Object variable : variables) {
-			final String name = variable.toString();
+		if (!(root instanceof And)) {
+			throw new IllegalStateException(
+					"The given root node to create a smt problem need to be in conjunctive normal form like form. It can containt the Node @link AtomicFormula but every \"clause\" need to be children of a @link And node");
+		}
+
+		// Create mapping from index to clauses starting from 0
+		int indexClauses = 0;
+		for (final Node node : rootNode.getChildren()) {
+			clauseToInt.put(node, indexClauses);
+			intToClause[indexClauses++] = node;
+		}
+
+		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+		int indexVariables = 0;
+		for (final Object feature : variables) {
+			final String name = feature.toString();
 			if (name == null) {
 				throw new RuntimeException();
 			}
-			varToInt.put(name, ++index);
-			intToVar[index] = name;
+			varToInt.put(name, ++indexVariables);
+			intToVar[indexVariables] = name;
 		}
 	}
 
@@ -67,25 +86,23 @@ public class SmtProblem implements ISmtProblem {
 		this(rootNode, getDistinctVariableObjects(rootNode));
 	}
 
+	/**
+	 * Travels the complete cnf and searches for literals and variables of type {@link Variable<T>} to be used as variables.
+	 *
+	 * @param cnf
+	 * @return
+	 */
 	public static Set<Object> getDistinctVariableObjects(Node cnf) {
 		final HashSet<Object> result = new HashSet<>();
 		for (final Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
 			for (int i = 0; i < literals.length; i++) {
-				result.add(((Literal) literals[i]).var);
+				if (!result.contains(((Literal) literals[i]).var)) {
+					result.add(((Literal) literals[i]).var);
+				}
 			}
 		}
 		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolverProblem#addFormula(org.prop4j.Node)
-	 */
-	@Override
-	public void addFormula(Node formula) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -99,11 +116,43 @@ public class SmtProblem implements ISmtProblem {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getSignedIndexOfVariable(java.lang.Object)
+	 */
+	@Override
+	public int getSignedIndexOfVariable(Literal l) {
+		return l.positive ? varToInt.get(l.var) : -varToInt.get(l.var);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolverProblem#getIndexOfVariable(java.lang.Object)
 	 */
 	@Override
 	public int getIndexOfVariable(Object variable) {
-		return varToInt.get(variable);
+		final Integer varInt = varToInt.get(variable);
+		return varInt == null ? 0 : varInt;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getIndexOfClause(java.lang.Object)
+	 */
+	@Override
+	public int getIndexOfClause(Node clause) {
+		final Integer clauseInt = clauseToInt.get(clause);
+		return clauseInt == null ? -1 : clauseInt;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolverProblem#getClauseOfIndex(java.lang.Object)
+	 */
+	@Override
+	public Node getClauseOfIndex(int index) {
+		if ((index > intToClause.length)) {
+			return null;
+		}
+		return intToClause[index];
 	}
 
 	/*
@@ -112,7 +161,10 @@ public class SmtProblem implements ISmtProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		return intToVar[index];
+		if ((index > intToVar.length)) {
+			return null;
+		}
+		return intToVar[Math.abs(index)];
 	}
 
 	/*
@@ -121,36 +173,7 @@ public class SmtProblem implements ISmtProblem {
 	 */
 	@Override
 	public Integer getNumberOfVariables() {
-		return intToVar.length;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolverProblem#getSignedIndexOfVariable(org.prop4j.Literal)
-	 */
-	@Override
-	public int getSignedIndexOfVariable(Literal variable) {
-		return variable.positive ? varToInt.get(variable.var) : -varToInt.get(variable.var);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolverProblem#getClauseOfIndex(int)
-	 */
-	@Override
-	public Node getClauseOfIndex(int index) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.ISolverProblem#getIndexOfClause(org.prop4j.Node)
-	 */
-	@Override
-	public int getIndexOfClause(Node clause) {
-		// TODO Auto-generated method stub
-		return 0;
+		return intToVar.length - 1;
 	}
 
 	/*
@@ -159,8 +182,15 @@ public class SmtProblem implements ISmtProblem {
 	 */
 	@Override
 	public Node[] getClauses() {
-		// TODO Auto-generated method stub
-		return null;
+		return intToClause;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "SmtProblem[" + root.toString() + "]";
+	}
 }

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solvers.impl.javasmt.sat;
+package org.prop4j.solvers.impl.javasmt;
 
 import java.util.ArrayList;
 import java.util.List;

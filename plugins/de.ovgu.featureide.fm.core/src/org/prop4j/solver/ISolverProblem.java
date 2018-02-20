@@ -31,13 +31,6 @@ import org.prop4j.Node;
 public interface ISolverProblem {
 
 	/**
-	 * Add a new formula to the problem. Its done by adding the formula via "logical and" to the nodes. For more information about the node see {@link Node}
-	 *
-	 * @param formula Node that should be "and"-ed to the current problem
-	 */
-	void addFormula(Node formula);
-
-	/**
 	 * Returns the root node of the problem.
 	 *
 	 * @return Root node of the problem.
