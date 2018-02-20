@@ -245,9 +245,12 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 */
 	@Deprecated
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
-		final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(featureProject.getCurrentConfiguration().getLocationURI()),
-				new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY));
-		selectedFeatures = new ArrayList<>(instance.getObject().getSelectedFeatureNames());
+		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+		if (currentConfiguration != null) {
+			final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(currentConfiguration.getLocationURI()),
+					new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY));
+			selectedFeatures = new ArrayList<>(instance.getObject().getSelectedFeatureNames());
+		}
 	}
 
 	private boolean isJavaFile(final IFile file) {
