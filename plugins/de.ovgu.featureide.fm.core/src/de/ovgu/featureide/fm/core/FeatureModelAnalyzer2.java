@@ -81,7 +81,7 @@ import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
  * @author Stefan Krueger
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class FeatureModelAnalyzer implements IEventListener {
+public class FeatureModelAnalyzer2 implements IEventListener {
 
 	/**
 	 * Remembers explanations for dead features.
@@ -176,13 +176,13 @@ public class FeatureModelAnalyzer implements IEventListener {
 		return cachedValidity;
 	}
 
-	public FeatureModelAnalyzer(IFeatureModel fm) {
+	public FeatureModelAnalyzer2(IFeatureModel fm) {
 		this.fm = fm;
 		fm.addListener(this);
 		clearExplanations();
 	}
 
-	public FeatureModelAnalyzer(FeatureModelAnalyzer oldAnalyzer, IFeatureModel newFM) {
+	public FeatureModelAnalyzer2(FeatureModelAnalyzer2 oldAnalyzer, IFeatureModel newFM) {
 		fm = newFM;
 		fm.addListener(this);
 		clearExplanations();
@@ -197,7 +197,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	/**
-	 * Returns the feature dependencies of the feature model. If the has model changed call {@link FeatureModelAnalyzer#setDependencies()} to calculate current
+	 * Returns the feature dependencies of the feature model. If the has model changed call {@link FeatureModelAnalyzer2#setDependencies()} to calculate current
 	 * dependencies.
 	 *
 	 * @return
@@ -604,7 +604,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateConstraints() {
-		final org.prop4j.analyses.impl.general.FeatureModelAnalysis analysis = new org.prop4j.analyses.impl.general.FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
@@ -625,7 +625,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateFeatures() {
-		final org.prop4j.analyses.impl.general.FeatureModelAnalysis analysis = new org.prop4j.analyses.impl.general.FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
 		analysis.updateFeatures();
@@ -1059,7 +1059,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 
 	}
 
-	public FeatureModelAnalyzer clone(IFeatureModel newFeatureModel) {
-		return new FeatureModelAnalyzer(this, newFeatureModel);
+	public FeatureModelAnalyzer2 clone(IFeatureModel newFeatureModel) {
+		return new FeatureModelAnalyzer2(this, newFeatureModel);
 	}
 }

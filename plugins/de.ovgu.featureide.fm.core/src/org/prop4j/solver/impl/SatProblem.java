@@ -161,7 +161,7 @@ public class SatProblem implements ISatProblem {
 		if ((index > intToVar.length)) {
 			return null;
 		}
-		return intToVar[index];
+		return intToVar[Math.abs(index)];
 	}
 
 	/*

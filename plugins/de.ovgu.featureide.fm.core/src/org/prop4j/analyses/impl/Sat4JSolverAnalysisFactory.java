@@ -24,29 +24,32 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
+import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnaylsis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
+import org.prop4j.analyses.impl.general.RedundantConstraintAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
  * Default factory used to create analysis with their appropriate solver.
  *
  * @author Joshua Sprey
  */
-public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
+public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private final HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
 
 	/**
 	 *
 	 */
-	public DefaultSolverAnalysisFactory() {
+	public Sat4JSolverAnalysisFactory() {
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_VERBOSE, false);
@@ -64,6 +67,12 @@ public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 			return getCoreDeadAnalysis(problem);
 		} else if (analysisClass.equals(ImplicationAnalysis.class)) {
 			return getImplicationAnalysis(problem);
+		} else if (analysisClass.equals(IndeterminedAnalysis.class)) {
+			return getIndeterminedAnalysis(problem);
+		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
+			return getRedundantConstraintAnalysis(problem);
+		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnaylsis.class)) {
+			return getConstraintsUnsatisfiableAnaylsis(problem);
 		}
 		return null;
 	}
@@ -99,6 +108,24 @@ public class DefaultSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 		if (problem instanceof ISatProblem) {
 			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
 			return new IndeterminedAnalysis(solver, null);
+		} else {
+			return null;
+		}
+	}
+
+	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new RedundantConstraintAnalysis(solver, this);
+		} else {
+			return null;
+		}
+	}
+
+	private ConstraintsUnsatisfiableAnaylsis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new ConstraintsUnsatisfiableAnaylsis(solver, this);
 		} else {
 			return null;
 		}

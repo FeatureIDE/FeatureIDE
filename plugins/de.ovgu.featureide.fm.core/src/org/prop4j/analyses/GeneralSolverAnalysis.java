@@ -67,7 +67,6 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 	 */
 	@Override
 	public T analyze(IMonitor monitor) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -90,6 +89,15 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 		Collections.reverse(solution);
 
 		return SolverUtils.getIntModel((Integer[]) solution.toArray(new Integer[solution.size()]));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.ISolverAnalysis#getSolver()
+	 */
+	@Override
+	public ISolver getSolver() {
+		return solver;
 	}
 
 }

@@ -22,10 +22,12 @@ package org.prop4j.analyses.impl.general;
 
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.sat4j.core.VecInt;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.conf.AFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -50,7 +52,11 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 //		solver.getAssignment().ensure(fixedVariables.length);
 		for (int i = 0; i < fixedVariables.length; i++) {
 			final int var = fixedVariables[i];
-			solver.push(getLiteralFromIndex(var));
+			try {
+				solver.push(getLiteralFromIndex(var));
+			} catch (final ContradictionException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
 		}
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
@@ -86,27 +92,31 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 	}
 
 	private void sat(int[] model1, VecInt v) {
-		while (!v.isEmpty()) {
-			final int varX = v.get(v.size() - 1);
-			v.pop();
-			if (model1[Math.abs(varX) - 1] == varX) {
-				solver.push(getLiteralFromIndex(-varX));
-				satCount++;
-				switch (solver.isSatisfiable()) {
-				case FALSE:
-					solver.pop();
+		try {
+			while (!v.isEmpty()) {
+				final int varX = v.get(v.size() - 1);
+				v.pop();
+				if (model1[Math.abs(varX) - 1] == varX) {
 					solver.push(getLiteralFromIndex(-varX));
-					traverse2(v, varX);
-					break;
-				case TIMEOUT:
-					throw new RuntimeException();
-				case TRUE:
-					solver.pop();
-					SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
+					satCount++;
+					switch (solver.isSatisfiable()) {
+					case FALSE:
+						solver.pop();
+						solver.push(getLiteralFromIndex(-varX));
+						traverse2(v, varX);
+						break;
+					case TIMEOUT:
+						throw new RuntimeException();
+					case TRUE:
+						solver.pop();
+						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
 //					solver.shuffleOrder();
-					break;
+						break;
+					}
 				}
 			}
+		} catch (final ContradictionException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -118,10 +128,18 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 				final byte value = featureGraph.getValueInternal(Math.abs(var) - 1, j, fromSelected);
 				switch (value) {
 				case AFeatureGraph.VALUE_0:
-					solver.push(getLiteralFromIndex((-(j + 1))));
+					try {
+						solver.push(getLiteralFromIndex((-(j + 1))));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 					break;
 				case AFeatureGraph.VALUE_1:
-					solver.push(getLiteralFromIndex(((j + 1))));
+					try {
+						solver.push(getLiteralFromIndex(((j + 1))));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 					break;
 				case AFeatureGraph.VALUE_0Q:
 					v.push(-(j + 1));
@@ -149,13 +167,21 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 			switch (value) {
 			case AFeatureGraph.VALUE_0:
 				if (varX < 0) {
-					solver.push(getLiteralFromIndex(varX));
+					try {
+						solver.push(getLiteralFromIndex(varX));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 				}
 				v.delete(i);
 				break;
 			case AFeatureGraph.VALUE_1:
 				if (varX > 0) {
-					solver.push(getLiteralFromIndex(varX));
+					try {
+						solver.push(getLiteralFromIndex(varX));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 				}
 				v.delete(i);
 				break;

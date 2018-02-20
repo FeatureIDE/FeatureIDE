@@ -74,14 +74,14 @@ public interface ISolver {
 	 *
 	 * @param formula Node that should be added to the stack.
 	 */
-	void push(Node formula);
+	void push(Node formula) throws ContradictionException;
 
 	/**
 	 * Pushed multiple nodes to the stack.
 	 *
 	 * @param formulas New nodes that should be added to the stack.
 	 */
-	void push(Node... formulas);
+	void push(Node... formulas) throws ContradictionException;
 
 	/**
 	 * Returns a valid configuration for the given problem. Should only be called directly after isSatisfiable() returned true.

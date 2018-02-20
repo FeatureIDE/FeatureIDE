@@ -90,6 +90,23 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		registerVariables();
 	}
 
+	public Sat4jSatSolver(ISatProblem problem) {
+		super(problem);
+
+		// Init Solver with configuration
+		solver = createSolver();
+		solver.setTimeoutMs(1000);
+		solver.setDBSimplificationAllowed(true);
+		solver.setVerbose(false);
+
+		// +1 because Sat4J accept no variable index of 0
+		final int numberOfVariables = problem.getNumberOfVariables() + 1;
+		order = new int[numberOfVariables];
+
+		// create the variables for Sat4J
+		registerVariables();
+	}
+
 	protected ISolver getSolver() {
 		if (solver == null) {
 			return createSolver();
@@ -239,7 +256,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override
-	public void push(Node formula) {
+	public void push(Node formula) throws org.prop4j.solver.ContradictionException {
 		if (formula instanceof Literal) {
 			final Literal literal = (Literal) formula;
 			assignment.push(getProblem().getSignedIndexOfVariable(literal));
@@ -256,6 +273,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				pushstack.push(formula);
 			} catch (final ContradictionException e) {
 				FMCorePlugin.getDefault().logError("Cannot push formula \"" + formula + "\" to the solver because it would lead to a contradiction", e);
+				throw new org.prop4j.solver.ContradictionException();
 			}
 
 		}
@@ -266,7 +284,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node[])
 	 */
 	@Override
-	public void push(Node... formulas) {
+	public void push(Node... formulas) throws org.prop4j.solver.ContradictionException {
 		for (int i = 0; i < formulas.length; i++) {
 			push(formulas[i]);
 		}

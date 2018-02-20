@@ -22,10 +22,12 @@ package org.prop4j.analyses.impl.general;
 
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.SatInstance;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -44,7 +46,11 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 		satCount = 0;
 //		solver.getAssignment().ensure(fixedVariables.length);
 		for (int i = 0; i < fixedVariables.length; i++) {
-			solver.push(getLiteralFromIndex(fixedVariables[i]));
+			try {
+				solver.push(getLiteralFromIndex(fixedVariables[i]));
+			} catch (final ContradictionException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
 		}
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
@@ -71,12 +77,20 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
-					solver.push(getLiteralFromIndex(-varX));
+					try {
+						solver.push(getLiteralFromIndex(-varX));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 					satCount++;
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.pop();
-						solver.push(getLiteralFromIndex(varX));
+						try {
+							solver.push(getLiteralFromIndex(varX));
+						} catch (final ContradictionException e) {
+							FMCorePlugin.getDefault().logError(e);
+						}
 						break;
 					case TIMEOUT:
 						solver.pop();

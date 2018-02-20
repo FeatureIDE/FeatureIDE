@@ -23,6 +23,7 @@ package org.prop4j.analyses.impl.general;
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.SatInstance;
@@ -55,26 +56,31 @@ public class ConditionallyCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> 
 //			}
 
 //			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
+			try {
 
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
-				if (varX != 0) {
-					solver.push(getLiteralFromIndex(-varX));
-					switch (solver.isSatisfiable()) {
-					case FALSE:
-						solver.pop();
-						solver.push(getLiteralFromIndex(varX));
-						break;
-					case TIMEOUT:
-						solver.pop();
-						break;
-					case TRUE:
-						solver.pop();
-						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
-//						solver.shuffleOrder();
-						break;
+				for (int i = 0; i < model1.length; i++) {
+					final int varX = model1[i];
+					if (varX != 0) {
+						solver.push(getLiteralFromIndex(-varX));
+						switch (solver.isSatisfiable()) {
+						case FALSE:
+							solver.pop();
+							solver.push(getLiteralFromIndex(varX));
+							break;
+						case TIMEOUT:
+							solver.pop();
+							break;
+						case TRUE:
+							solver.pop();
+							SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
+//							solver.shuffleOrder();
+							break;
+						}
 					}
 				}
+			} catch (final ContradictionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 

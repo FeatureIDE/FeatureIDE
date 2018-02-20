@@ -46,44 +46,54 @@ public class TestSolver extends Action {
 	}
 
 	public void testeAllMus(ISatProblem problem) {
-		JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
-		Literal test = new Literal("Security", true);
-		solver3.push(test);
+		try {
+			JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+			Literal test = new Literal("Security", true);
+			solver3.push(test);
 
-		Sat4jMusExtractor extractor = new Sat4jMusExtractor();
-		Ltms ltms = new Ltms();
-		for (Node clause : problem.getClauses()) {
-			extractor.addClause(clause);
-			ltms.addClause(clause);
+			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
+			Ltms ltms = new Ltms();
+			for (Node clause : problem.getClauses()) {
+				extractor.addClause(clause);
+				ltms.addClause(clause);
+			}
+			extractor.addAssumption("Security", true);
+			ltms.addAssumption("Security", true);
+
+			Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
+
+			solver4.push(test);
+
+			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getAllMinimalUnsatisfiableSubsets());
+			FMCorePlugin.getDefault().logInfo("Ltms:" + ltms.getAllMinimalUnsatisfiableSubsetIndexes());
+			FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getAllMinimalUnsatisfiableSubsets());
+			FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getAllMinimalUnsatisfiableSubsets());
+		} catch (org.prop4j.solver.ContradictionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		extractor.addAssumption("Security", true);
-		ltms.addAssumption("Security", true);
-
-		Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
-		solver4.push(test);
-		FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getAllMinimalUnsatisfiableSubsets());
-		FMCorePlugin.getDefault().logInfo("Ltms:" + ltms.getAllMinimalUnsatisfiableSubsetIndexes());
-		FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getAllMinimalUnsatisfiableSubsets());
-		FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getAllMinimalUnsatisfiableSubsets());
 	}
 
 	public void testeMus(ISatProblem problem) {
-		JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
-		Literal test = new Literal("Security", true);
-		solver3.push(test);
+		try {
+			JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+			Literal test = new Literal("Security", true);
+			solver3.push(test);
 
-		Sat4jMusExtractor extractor = new Sat4jMusExtractor();
-		for (Node clause : problem.getClauses()) {
-			extractor.addClause(clause);
+			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
+			for (Node clause : problem.getClauses()) {
+				extractor.addClause(clause);
+			}
+			extractor.addAssumption("Security", true);
+
+			Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
+			solver4.push(test);
+			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getMinimalUnsatisfiableSubset());
+			FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getMinimalUnsatisfiableSubset());
+			FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getMinimalUnsatisfiableSubset());
+		} catch (org.prop4j.solver.ContradictionException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-		extractor.addAssumption("Security", true);
-
-		Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
-		solver4.push(test);
-		FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getMinimalUnsatisfiableSubset());
-		FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getMinimalUnsatisfiableSubset());
-		FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getMinimalUnsatisfiableSubset());
-
 	}
 
 	public void testSatSolver(ISatProblem problem) {
@@ -140,8 +150,11 @@ public class TestSolver extends Action {
 						+ "\n" + SolverUtils.getNamesOfIndexes(problem, model2) + "\n" + Arrays.toString(model3) + "\n"
 						+ SolverUtils.getNamesOfIndexes(problem, model3));
 
-		} catch (ContradictionException e) {
+		} catch (org.prop4j.solver.ContradictionException e) {
 			FMCorePlugin.getDefault().logError(e);
+		} catch (ContradictionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
@@ -163,10 +176,8 @@ public class TestSolver extends Action {
 			Arrays.sort(solution);
 			FMAttributesPlugin.getDefault().logInfo("O: " + "\nN:" + Arrays.toString(solution));
 		} else {
-
 			FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsets());
 			FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsetIndexes());
 		}
 	}
-
 }

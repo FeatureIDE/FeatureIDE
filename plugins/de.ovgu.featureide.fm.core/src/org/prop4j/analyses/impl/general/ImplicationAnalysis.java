@@ -26,10 +26,12 @@ import java.util.List;
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.ISatSolver;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -94,7 +96,11 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 					continue pairLoop;
 				}
 				for (final int i : pair) {
-					solver.push(getLiteralFromIndex(-i));
+					try {
+						solver.push(getLiteralFromIndex(-i));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 				}
 				switch (solver.isSatisfiable()) {
 				case FALSE:

@@ -18,31 +18,18 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses;
-
-import org.prop4j.solver.ISolver;
-
-import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+package org.prop4j.solver;
 
 /**
- * Interface given to specify a class to be an analysis. The generic type <T> indicates the object hat should be returned after the analysis is done. So the
- * generic type represents the result for an analysis.
+ * Contradiction is thrown when an invalid operation was performed on any solver.
  *
  * @author Joshua Sprey
  */
-public interface ISolverAnalysis<T> {
+public class ContradictionException extends Exception {
 
 	/**
-	 * Determine what should happen in the analysis. Also gives back the result.
 	 *
-	 * @return Result of the analysis.
 	 */
-	T analyze(IMonitor monitor);
+	private static final long serialVersionUID = 2459823552317959744L;
 
-	/**
-	 * Returns the solver that is used to solve the analysis.
-	 *
-	 * @return Solver
-	 */
-	ISolver getSolver();
 }

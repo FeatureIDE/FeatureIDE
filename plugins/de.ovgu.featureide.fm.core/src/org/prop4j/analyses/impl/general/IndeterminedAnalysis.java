@@ -29,10 +29,12 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISolver;
 import org.sat4j.core.VecInt;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -106,7 +108,11 @@ public class IndeterminedAnalysis extends GeneralSolverAnalysis<int[]> {
 				}
 			}
 
-			solver.push(getNodeArray(relevantClauses));
+			try {
+				solver.push(getNodeArray(relevantClauses));
+			} catch (final ContradictionException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
 
 			final ISatResult satResult = solver.isSatisfiable();
 			switch (satResult) {

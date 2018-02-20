@@ -23,9 +23,11 @@ package org.prop4j.analyses.impl.general;
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -72,11 +74,19 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
-					solver.push(getLiteralFromIndex(-varX));
+					try {
+						solver.push(getLiteralFromIndex(-varX));
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.pop();
-						solver.push(getLiteralFromIndex(varX));
+						try {
+							solver.push(getLiteralFromIndex(varX));
+						} catch (final ContradictionException e) {
+							FMCorePlugin.getDefault().logError(e);
+						}
 						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
