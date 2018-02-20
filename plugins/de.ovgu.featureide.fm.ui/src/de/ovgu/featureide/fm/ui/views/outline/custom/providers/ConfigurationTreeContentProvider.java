@@ -74,10 +74,13 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
-		final List<IOutlineEntry> topLevelEntries = new ArrayList<>();
-		topLevelEntries.add(new ConfigurationOutlineStandardBundle(config));
-		topLevelEntries.addAll(getExtensionEntries());
-		return topLevelEntries.toArray();
+		if (config != null) {
+			final List<IOutlineEntry> topLevelEntries = new ArrayList<>();
+			topLevelEntries.add(new ConfigurationOutlineStandardBundle(config));
+			topLevelEntries.addAll(getExtensionEntries());
+			return topLevelEntries.toArray();
+		}
+		return new String[] { "Config not initialized yet" };
 	}
 
 	/*
