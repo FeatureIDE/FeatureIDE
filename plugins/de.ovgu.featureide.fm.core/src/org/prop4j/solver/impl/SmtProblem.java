@@ -28,14 +28,14 @@ import java.util.Set;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISmtProblem;
 
 /**
  * Abstract class representing a satisfiability problem in CNF that is given as input for the sat solver.
  *
  * @author Joshua Sprey
  */
-public class SmtProblem implements ISatProblem {
+public class SmtProblem implements ISmtProblem {
 
 	/** Root node for the problem. Needs to be a And node containing every clause. */
 	protected Node root;

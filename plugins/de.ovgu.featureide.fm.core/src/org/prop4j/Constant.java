@@ -31,6 +31,7 @@ public class Constant<T extends Datatype> extends Term {
 
 	public Constant(T constant) {
 		super(constant);
+		this.var = constant;
 	}
 
 	/*

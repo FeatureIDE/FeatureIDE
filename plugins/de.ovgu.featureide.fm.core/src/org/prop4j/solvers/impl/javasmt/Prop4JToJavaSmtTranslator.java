@@ -21,6 +21,7 @@
 package org.prop4j.solvers.impl.javasmt;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.prop4j.And;
 import org.prop4j.Constant;
@@ -63,6 +64,7 @@ public class Prop4JToJavaSmtTranslator {
 	protected BooleanFormulaManager currentBooleanFormulaManager;
 	protected IntegerFormulaManager currentIntegerFormulaManager;
 	protected RationalFormulaManager currentRationalFormulaManager;
+	protected HashMap<String, NumeralFormula> variables = new HashMap<>();
 
 	public Prop4JToJavaSmtTranslator(SolverContext context) {
 		setContext(context);
@@ -251,9 +253,13 @@ public class Prop4JToJavaSmtTranslator {
 
 	private NumeralFormula handleVariable(Variable<?> variable) {
 		if (variable.getType() instanceof DoubleType) {
-			return currentRationalFormulaManager.makeVariable(variable.getValue());
+			final NumeralFormula variableFormula = currentRationalFormulaManager.makeVariable(variable.getValue());
+			variables.put(variable.toString(), variableFormula);
+			return variableFormula;
 		} else {
-			return currentIntegerFormulaManager.makeNumber(variable.getValue());
+			final NumeralFormula variableFormula = currentIntegerFormulaManager.makeVariable(variable.getValue());
+			variables.put(variable.toString(), variableFormula);
+			return variableFormula;
 		}
 	}
 
@@ -268,6 +274,10 @@ public class Prop4JToJavaSmtTranslator {
 			final DoubleType doubleType = (DoubleType) constant.getValue();
 			return currentRationalFormulaManager.makeNumber(doubleType.getValue());
 		}
+	}
+
+	public HashMap<String, NumeralFormula> getVariables() {
+		return variables;
 	}
 
 }

@@ -21,6 +21,7 @@
 package org.prop4j.analyses;
 
 import org.prop4j.analyses.impl.JavaSmtSatSolverAnalysisFactory;
+import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.solver.ISolverProblem;
 
@@ -45,8 +46,17 @@ public abstract class AbstractSolverAnalysisFactory {
 	 *
 	 * @return Default factory.
 	 */
-	public static AbstractSolverAnalysisFactory getJavaSmtFactory() {
+	public static AbstractSolverAnalysisFactory getJavaSmtSatFactory() {
 		return new JavaSmtSatSolverAnalysisFactory();
+	}
+
+	/**
+	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}
+	 *
+	 * @return Default factory.
+	 */
+	public static AbstractSolverAnalysisFactory getJavaSmtFactory() {
+		return new JavaSmtSolverAnalysisFactory();
 	}
 
 	/**

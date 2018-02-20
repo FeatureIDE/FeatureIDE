@@ -1,16 +1,28 @@
 package de.ovgu.featureide.fm.attributes.view.actions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.prop4j.And;
+import org.prop4j.Constant;
+import org.prop4j.Equal;
+import org.prop4j.Function;
+import org.prop4j.GreaterEqual;
+import org.prop4j.IntegerType;
+import org.prop4j.LessThan;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+import org.prop4j.Variable;
+import org.prop4j.analyses.AbstractSolverAnalysisFactory;
+import org.prop4j.analyses.impl.FeatureAttributeRangeAnalysis;
 import org.prop4j.explain.solvers.impl.ltms.Ltms;
 import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.impl.SatProblem;
+import org.prop4j.solver.impl.SmtProblem;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4JSatMusSolver;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
@@ -24,6 +36,8 @@ import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 public class TestSolver extends Action {
 
@@ -39,10 +53,37 @@ public class TestSolver extends Action {
 		if (view.getFeatureModel() != null) {
 			// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
 			Node cnf = view.getFeatureModel().getAnalyser().getCnf();
-			ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
-			testeAllMus(problem);
+			// ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+			testeAttributeRanges(cnf);
+			// testeAllMus(problem);
 			// testSatSolver(problem);
 		}
+	}
+
+	private void testeAttributeRanges(Node cnf) {
+//		Dein Problem erstellen
+		Node eq = new GreaterEqual(new Variable<IntegerType>("LOL", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(24)));
+		Node less = new LessThan(new Variable<IntegerType>("TestVar", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(5580)));
+		Node eq2 = new Equal(new Variable<IntegerType>("TestVar", new IntegerType(0)),
+				Function.sum(new Constant<IntegerType>(new IntegerType(5555)), new Variable<IntegerType>("LOL", new IntegerType(0))));
+
+		List<String> variables = new ArrayList<>();
+		variables.addAll(FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+		variables.add("TestVar");
+		variables.add("LOL");
+
+		Node and = new And(cnf, eq, less, eq2);
+
+		SmtProblem dummy = new SmtProblem(and, variables);
+
+		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getJavaSmtFactory();
+
+		FeatureAttributeRangeAnalysis analysis = (FeatureAttributeRangeAnalysis) factory.getAnalysis(FeatureAttributeRangeAnalysis.class, dummy);
+		Object result = LongRunningWrapper.runMethod(analysis, new NullMonitor());
+		FMCorePlugin.getDefault().logInfo("");
+		// falls nötig
+		// analysis.getSolver().push(formula);
+
 	}
 
 	public void testeAllMus(ISatProblem problem) {

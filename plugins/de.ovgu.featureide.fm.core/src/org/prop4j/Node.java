@@ -31,6 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -348,6 +349,9 @@ public abstract class Node {
 
 	@Override
 	public int hashCode() {
+		if (children == null) {
+			return new Random().nextInt() * 1145;
+		}
 		int hashCode = children.length * 37;
 		for (int i = 0; i < children.length; i++) {
 			hashCode += children[i].hashCode();

@@ -31,6 +31,7 @@ import java.util.Set;
 import org.prop4j.Node;
 import org.prop4j.solver.AbstractSmtSolver;
 import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISmtProblem;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
@@ -57,7 +58,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *
  * @author Joshua Sprey
  */
-public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor {
+public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, IOptimizationSolver {
 
 	/** Configuration for the solver. Needed for the native solver. Not really used. */
 	protected Configuration config;
@@ -201,16 +202,13 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor {
 			if (!prover.isUnsat()) {
 				final Model model = prover.getModel();
 				final Iterator<ValueAssignment> iterator = model.iterator();
-				final List<Integer> solution = new ArrayList<>();
+				final Object[] solution = new Object[getProblem().getNumberOfVariables() + 1];
 				while (iterator.hasNext()) {
 					final ValueAssignment value = iterator.next();
-					if (value.getValue().toString().equals("true")) {
-						solution.add(getProblem().getIndexOfVariable(value.getName().toString()));
-					} else {
-						solution.add(-getProblem().getIndexOfVariable(value.getName().toString()));
-					}
+					final int index = getProblem().getIndexOfVariable(value.getName().toString());
+					solution[index] = value.getValue();
 				}
-				return solution.toArray();
+				return solution;
 			} else {
 				return null;
 			}
@@ -292,6 +290,24 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor {
 	@Override
 	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
 		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IOptimizationSolver#minimum(java.lang.Object)
+	 */
+	@Override
+	public Object minimum(Object variable) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IOptimizationSolver#maximum(java.lang.Object)
+	 */
+	@Override
+	public Object maximum(Object variable) {
+		return null;
 	}
 
 }

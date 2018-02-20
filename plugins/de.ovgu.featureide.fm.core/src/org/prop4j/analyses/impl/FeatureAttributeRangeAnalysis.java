@@ -18,32 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.analyses.impl;
+
+import org.prop4j.analyses.AbstractSmtSolverAnalysis;
+import org.prop4j.solver.ISmtSolver;
+
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Represent the type double in query's for first-order-logic expressions.
+ * TODO description
  *
- * @author Joshua Sprey
+ * @author Joshua
  */
-public class DoubleType extends Datatype {
+public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Object[]> {
 
-	private final double value;
-
-	public DoubleType(double value) {
-		this.value = value;
-	}
-
-	@Override
-	public Double getValue() {
-		return value;
+	protected FeatureAttributeRangeAnalysis(ISmtSolver solver) {
+		super(solver);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see org.prop4j.analyses.GeneralSolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
 	 */
 	@Override
-	public String toString() {
-		return "" + value;
+	public Object[] analyze(IMonitor monitor) {
+
+		final Object[] resultSolver = getSolver().findSolution();
+
+		// Für 3 (Index 3) Variable Preis. Bekomme Lösung mit resultSolver[3]
+
+		return resultSolver;
 	}
+
 }
