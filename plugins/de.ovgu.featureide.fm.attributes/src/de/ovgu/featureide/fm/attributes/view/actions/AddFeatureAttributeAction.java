@@ -57,7 +57,7 @@ public class AddFeatureAttributeAction extends Action {
 	 */
 	@Override
 	public void run() {
-		String name = getUniqueAttributeName();
+		String name = getUniqueAttributeName(attributeType);
 		switch (attributeType) {
 		case FeatureAttribute.BOOLEAN:
 			final IFeatureAttribute attributeBoolean = new BooleanFeatureAttribute(feature, name, "", null, false, false);
@@ -81,11 +81,12 @@ public class AddFeatureAttributeAction extends Action {
 		featureModel.fireEvent(new FeatureIDEEvent(feature, EventType.FEATURE_ATTRIBUTE_CHANGED));
 	}
 
-	private String getUniqueAttributeName() {
+	private String getUniqueAttributeName(String type) {
 		int amountOfAttributes = 0;
 		while (true) {
 			boolean isUnique = true;
-			String attributeName = "Attribute" + amountOfAttributes++;
+			String capitalizedType = type.substring(0, 1).toUpperCase() + type.substring(1);
+			String attributeName = capitalizedType + "Attribute" + amountOfAttributes++;
 			for (IFeatureAttribute att : feature.getAttributes()) {
 				if (att.getName().equals(attributeName)) {
 					isUnique = false;

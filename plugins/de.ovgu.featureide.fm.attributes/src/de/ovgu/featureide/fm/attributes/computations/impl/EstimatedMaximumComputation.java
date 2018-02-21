@@ -25,6 +25,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 
 	Configuration config;
 	IFeatureAttribute attribute;
+	List<IFeature> selectedFeatures;
 
 	public EstimatedMaximumComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
@@ -65,76 +66,82 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 		return attribute instanceof LongFeatureAttribute || attribute instanceof DoubleFeatureAttribute;
 	}
 
-	private List<IFeature> getSelectedLeaves() {
-		List<IFeature> selectedFeatures = config.getSelectedFeatures();
-		List<IFeature> selectedLeaves = new ArrayList<>();
-		for (IFeature feat : selectedFeatures) {
-			if (!feat.getStructure().isRoot() && !selectedFeatures.contains(feat.getStructure().getParent().getFeature())) {
-				selectedLeaves.add(feat);
-			}
-		}
-		return selectedLeaves;
-	}
-
 	private double getSubtreeValue(IFeature root) {
 		double value = 0;
 		ExtendedFeature ext = (ExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
-			if (att.getName() == attribute.getName()) {
+			if (att.getName().equals(attribute.getName())) {
 				if (att instanceof LongFeatureAttribute) {
-					value += (long) att.getValue();
+					if (!(att.getValue() == null)) {
+						value += (long) att.getValue();
+					}
 				} else if (att instanceof DoubleFeatureAttribute) {
-					value += (double) att.getValue();
+					if (!(att.getValue() == null)) {
+						value += (double) att.getValue();
+					}
 				}
 			}
 		}
 		if (!root.getStructure().hasChildren()) {
 			return value;
 		} else {
-			if (root.getStructure().isAnd() || root.getStructure().isOr()) {
+			if (root.getStructure().isOr()) {
+				List<Double> negativeValues = new ArrayList<>();
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					value = +getSubtreeValue(struc.getFeature());
-				}
-
-			} else if (root.getStructure().isAlternative()) {
-				double maxValue = 0;
-				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					double subtreeValue = getSubtreeValue(struc.getFeature());
-					if (subtreeValue > maxValue) {
-						maxValue = subtreeValue;
+					double tempValue = getSubtreeValue(struc.getFeature());
+					if (tempValue >= 0 || isSelected(struc.getFeature())) {
+						value += tempValue;
+					} else {
+						negativeValues.add(getSubtreeValue(struc.getFeature()));
 					}
 				}
-				return value + maxValue;
+				if (negativeValues.size() == root.getStructure().getChildrenCount()) {
+					double max = negativeValues.get(0);
+					for (double temp : negativeValues) {
+						if (temp >= max) {
+							max = temp;
+						}
+					}
+					value += max;
+				}
+			} else if (root.getStructure().isAnd()) {
+				for (IFeatureStructure struct : root.getStructure().getChildren()) {
+					double tempValue = getSubtreeValue(struct.getFeature());
+					if (struct.isMandatory() || tempValue >= 0 || isSelected(struct.getFeature())) {
+						value += tempValue;
+					}
+				}
+			} else if (root.getStructure().isAlternative()) {
+				List<Double> values = new ArrayList<>();
+				for (IFeatureStructure struc : root.getStructure().getChildren()) {
+					if (isSelected(struc.getFeature())) {
+						return value + getSubtreeValue(struc.getFeature());
+					}
+					values.add(getSubtreeValue(struc.getFeature()));
+				}
+				return value + getMaxValue(values);
 			}
 		}
-		return 0;
+		return value;
 	}
 
 	private Object getSelectionSum() {
-		double sum = 0.0;
-		List<IFeature> selectedFeatures = config.getSelectedFeatures();
-		List<IFeature> selectedLeaves = getSelectedLeaves();
-		selectedFeatures.removeAll(selectedLeaves);
-		for (IFeature feat : selectedLeaves) {
-			sum += getSubtreeValue(feat);
-		}
-		for (IFeature feat : selectedFeatures) {
-			if (feat instanceof ExtendedFeature) {
-				ExtendedFeature ext = (ExtendedFeature) feat;
-				if (ext.isContainingAttribute(attribute)) {
-					for (IFeatureAttribute att : ext.getAttributes()) {
-						if (att.getName().equals(attribute.getName())) {
-							if (att.getValue() instanceof Long) {
-								sum += (long) att.getValue();
-							} else if (att.getValue() instanceof Double) {
-								sum += (double) att.getValue();
-							}
-						}
-					}
-				}
+		selectedFeatures = config.getSelectedFeatures();
+		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
+	}
+
+	private boolean isSelected(IFeature feature) {
+		return selectedFeatures.contains(feature);
+	}
+
+	private double getMaxValue(List<Double> values) {
+		double max = values.get(0);
+		for (double value : values) {
+			if (value > max) {
+				max = value;
 			}
 		}
-		return sum;
+		return max;
 	}
 
 }

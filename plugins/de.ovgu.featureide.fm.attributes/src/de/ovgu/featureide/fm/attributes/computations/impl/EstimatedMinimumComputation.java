@@ -24,6 +24,7 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 	private static final String LABEL = "Minimal sum of attribute value (est.): ";
 	Configuration config;
 	IFeatureAttribute attribute;
+	List<IFeature> selectedFeatures;
 
 	public EstimatedMinimumComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
@@ -31,30 +32,8 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 	}
 
 	private Object getSelectionSum() {
-		double sum = 0.0;
-		List<IFeature> selectedFeatures = config.getSelectedFeatures();
-		List<IFeature> selectedLeaves = getSelectedLeaves();
-		selectedFeatures.removeAll(selectedLeaves);
-		for (IFeature feat : selectedLeaves) {
-			sum += getSubtreeValue(feat);
-		}
-		for (IFeature feat : selectedFeatures) {
-			if (feat instanceof ExtendedFeature) {
-				ExtendedFeature ext = (ExtendedFeature) feat;
-				if (ext.isContainingAttribute(attribute)) {
-					for (IFeatureAttribute att : ext.getAttributes()) {
-						if (att.getName().equals(attribute.getName())) {
-							if (att.getValue() instanceof Long) {
-								sum += (long) att.getValue();
-							} else if (att.getValue() instanceof Double) {
-								sum += (double) att.getValue();
-							}
-						}
-					}
-				}
-			}
-		}
-		return sum;
+		selectedFeatures = config.getSelectedFeatures();
+		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
 	@Override
@@ -91,36 +70,20 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 		this.config = config;
 	}
 
-	private List<IFeature> getSelectedLeaves() {
-		List<IFeature> selectedFeatures = config.getSelectedFeatures();
-		List<IFeature> selectedLeaves = new ArrayList<>();
-		for (IFeature feat : selectedFeatures) {
-			if (!feat.getStructure().hasChildren()) {
-				selectedLeaves.add(feat);
-			} else {
-				boolean isLeave = true;
-				for (IFeatureStructure childrenStruct : feat.getStructure().getChildren()) {
-					if (selectedFeatures.contains(childrenStruct.getFeature())) {
-						isLeave = false;
-					}
-				}
-				if (isLeave) {
-					selectedLeaves.add(feat);
-				}
-			}
-		}
-		return selectedLeaves;
-	}
-
 	private double getSubtreeValue(IFeature root) {
 		double value = 0;
 		ExtendedFeature ext = (ExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
 			if (att.getName().equals(attribute.getName())) {
 				if (att instanceof LongFeatureAttribute) {
-					value += (long) att.getValue();
+					if (!(att.getValue() == null)) {
+						value += (long) att.getValue();
+					}
+
 				} else if (att instanceof DoubleFeatureAttribute) {
-					value += (double) att.getValue();
+					if (!(att.getValue() == null)) {
+						value += (double) att.getValue();
+					}
 				}
 			}
 		}
@@ -129,23 +92,51 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 		} else {
 			if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					if (struc.isMandatory()) {
-						value = +getSubtreeValue(struc.getFeature());
+					double tempValue = getSubtreeValue(struc.getFeature());
+					if (struc.isMandatory() || isSelected(struc.getFeature()) || tempValue < 0) {
+						value += getSubtreeValue(struc.getFeature());
 					}
 				}
 
-			} else if (root.getStructure().isAlternative() || root.getStructure().isOr()) {
-				double minValue = 0;
+			} else if (root.getStructure().isAlternative()) {
+				List<Double> values = new ArrayList<>();
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					double subtreeValue = getSubtreeValue(struc.getFeature());
-					if (subtreeValue < minValue || minValue == 0) {
-						minValue = subtreeValue;
+					if (isSelected(struc.getFeature())) {
+						return value + getSubtreeValue(struc.getFeature());
+					}
+					values.add(getSubtreeValue(struc.getFeature()));
+				}
+				return value + getMinValue(values);
+			} else if (root.getStructure().isOr()) {
+				List<Double> values = new ArrayList<>();
+				for (IFeatureStructure struc : root.getStructure().getChildren()) {
+					double tempValue = getSubtreeValue(struc.getFeature());
+					if (isSelected(struc.getFeature()) || tempValue < 0) {
+						value += tempValue;
+					} else {
+						values.add(tempValue);
 					}
 				}
-				return value + minValue;
+				if (values.size() == root.getStructure().getChildrenCount()) {
+					return value + getMinValue(values);
+				}
 			}
 		}
-		return 0;
+		return value;
+	}
+
+	private boolean isSelected(IFeature feature) {
+		return selectedFeatures.contains(feature);
+	}
+
+	private double getMinValue(List<Double> values) {
+		double min = values.get(0);
+		for (double temp : values) {
+			if (temp < min) {
+				min = temp;
+			}
+		}
+		return min;
 	}
 
 }
