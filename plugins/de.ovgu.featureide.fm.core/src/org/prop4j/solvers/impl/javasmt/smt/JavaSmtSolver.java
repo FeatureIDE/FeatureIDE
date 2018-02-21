@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.prop4j.Node;
@@ -41,6 +42,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -48,6 +50,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -316,13 +319,15 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 				prover.addConstraint(booleanFormula);
 			}
 			final NumeralFormula formula = translator.getVariables().get(variable);
-			if (formula == null) {
-				return null;
-			}
-			return prover.minimize(translator.getVariables().get(variable));
-		} catch (final InterruptedException e) {
-			return null;
+			final int handleY = prover.minimize(formula);
+			final OptStatus status = prover.check();
+			assert status == OptStatus.OPT;
+			final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
+			return lower.get();
+		} catch (final InterruptedException e) {} catch (final SolverException e) {
+			e.printStackTrace();
 		}
+		return null;
 	}
 
 	/*
@@ -339,11 +344,16 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 			for (final BooleanFormula booleanFormula : usedConstraint) {
 				prover.addConstraint(booleanFormula);
 			}
-			final int value = prover.maximize(translator.getVariables().get(variable));
-			return value;
-		} catch (final InterruptedException e) {
-			return null;
+			final NumeralFormula formula = translator.getVariables().get(variable);
+			final int handleX = prover.maximize(formula);
+			final OptStatus status = prover.check();
+			assert status == OptStatus.OPT;
+			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
+			return upper.get();
+		} catch (final InterruptedException e) {} catch (final SolverException e) {
+			e.printStackTrace();
 		}
+		return null;
 	}
 
 }

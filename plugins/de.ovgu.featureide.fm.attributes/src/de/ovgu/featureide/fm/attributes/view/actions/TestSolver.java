@@ -10,8 +10,10 @@ import org.prop4j.And;
 import org.prop4j.Constant;
 import org.prop4j.Equal;
 import org.prop4j.Function;
+import org.prop4j.GreaterThan;
 import org.prop4j.Implies;
 import org.prop4j.IntegerType;
+import org.prop4j.LessThan;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -86,6 +88,12 @@ public class TestSolver extends Action {
 
 		Node attributeSum = new Equal(sum, Function.sum(feat1a, feat2a, feat3a));
 
+		Constant<IntegerType> nst500 = new Constant<IntegerType>(new IntegerType(500));
+		Constant<IntegerType> nst300 = new Constant<IntegerType>(new IntegerType(300));
+
+		Node test = new GreaterThan(nst500, sum);
+		Node test2 = new LessThan(nst300, sum);
+
 //		Node eq = new GreaterEqual(new Variable<IntegerType>("LOL", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(24)));
 //		Node less = new LessThan(new Variable<IntegerType>("TestVar", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(5580)));
 //		Node eq2 = new Equal(new Variable<IntegerType>("TestVar", new IntegerType(0)),
@@ -96,6 +104,7 @@ public class TestSolver extends Action {
 
 //		Node and = new And(cnf, eq, less, eq2);
 
+//		Node and = new And(test, test2);
 		Node and = new And(cnf, impl1, impl2, impl11, impl12, impl21, impl22, attributeSum);
 		FMCorePlugin.getDefault().logInfo(and.toString());
 
