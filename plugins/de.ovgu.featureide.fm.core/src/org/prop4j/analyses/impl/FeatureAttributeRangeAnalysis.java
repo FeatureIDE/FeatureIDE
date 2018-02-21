@@ -21,6 +21,7 @@
 package org.prop4j.analyses.impl;
 
 import org.prop4j.analyses.AbstractSmtSolverAnalysis;
+import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISmtSolver;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -31,6 +32,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Joshua
  */
 public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Object[]> {
+
+	private Object variable;
 
 	protected FeatureAttributeRangeAnalysis(ISmtSolver solver) {
 		super(solver);
@@ -43,11 +46,20 @@ public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Obj
 	@Override
 	public Object[] analyze(IMonitor monitor) {
 
-		final Object[] resultSolver = getSolver().findSolution();
+		if ((variable == null) || !(getSolver() instanceof IOptimizationSolver)) {
+			return null;
+		}
+		final IOptimizationSolver solver = (IOptimizationSolver) getSolver();
+		final Object[] result = new Object[2];
+		getSolver().findSolution();
+		result[0] = solver.minimum(variable);
+		result[1] = solver.maximum(variable);
 
-		// Für 3 (Index 3) Variable Preis. Bekomme Lösung mit resultSolver[3]
+		return result;
+	}
 
-		return resultSolver;
+	public void setVariable(Object variable) {
+		this.variable = variable;
 	}
 
 }

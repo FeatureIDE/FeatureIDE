@@ -10,11 +10,11 @@ import org.prop4j.And;
 import org.prop4j.Constant;
 import org.prop4j.Equal;
 import org.prop4j.Function;
-import org.prop4j.GreaterEqual;
+import org.prop4j.Implies;
 import org.prop4j.IntegerType;
-import org.prop4j.LessThan;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
@@ -29,6 +29,7 @@ import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.BasicSolver;
 import org.prop4j.solverOld.SatInstance;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
+import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sat4j.specs.ContradictionException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
@@ -62,23 +63,49 @@ public class TestSolver extends Action {
 
 	private void testeAttributeRanges(Node cnf) {
 //		Dein Problem erstellen
-		Node eq = new GreaterEqual(new Variable<IntegerType>("LOL", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(24)));
-		Node less = new LessThan(new Variable<IntegerType>("TestVar", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(5580)));
-		Node eq2 = new Equal(new Variable<IntegerType>("TestVar", new IntegerType(0)),
-				Function.sum(new Constant<IntegerType>(new IntegerType(5555)), new Variable<IntegerType>("LOL", new IntegerType(0))));
+		Variable<IntegerType> sum = new Variable<IntegerType>("sum", new IntegerType(12));
+		Variable<IntegerType> feat1a = new Variable<IntegerType>("feat1a", new IntegerType(23));
+		Variable<IntegerType> feat2a = new Variable<IntegerType>("feat2a", new IntegerType(23));
+		Variable<IntegerType> feat3a = new Variable<IntegerType>("feat3a", new IntegerType(23));
 
 		List<String> variables = new ArrayList<>();
 		variables.addAll(FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
-		variables.add("TestVar");
-		variables.add("LOL");
+		variables.add("feat1a");
+		variables.add("feat2a");
+		variables.add("feat3a");
+		variables.add("sum");
 
-		Node and = new And(cnf, eq, less, eq2);
+		Node impl1 = new Implies(variables.get(0), new Equal(feat1a, new Constant<IntegerType>(new IntegerType(23))));
+		Node impl2 = new Implies(new Not(variables.get(0)), new Equal(feat1a, new Constant<IntegerType>(new IntegerType(0))));
+
+		Node impl11 = new Implies(variables.get(1), new Equal(feat2a, new Constant<IntegerType>(new IntegerType(23))));
+		Node impl12 = new Implies(new Not(variables.get(1)), new Equal(feat2a, new Constant<IntegerType>(new IntegerType(0))));
+
+		Node impl21 = new Implies(variables.get(2), new Equal(feat3a, new Constant<IntegerType>(new IntegerType(23))));
+		Node impl22 = new Implies(new Not(variables.get(2)), new Equal(feat3a, new Constant<IntegerType>(new IntegerType(0))));
+
+		Node attributeSum = new Equal(sum, Function.sum(feat1a, feat2a, feat3a));
+
+//		Node eq = new GreaterEqual(new Variable<IntegerType>("LOL", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(24)));
+//		Node less = new LessThan(new Variable<IntegerType>("TestVar", new IntegerType(0)), new Constant<IntegerType>(new IntegerType(5580)));
+//		Node eq2 = new Equal(new Variable<IntegerType>("TestVar", new IntegerType(0)),
+//				Function.sum(new Constant<IntegerType>(new IntegerType(5555)), new Variable<IntegerType>("LOL", new IntegerType(0))));
+//
+//		variables.add("TestVar");
+//		variables.add("LOL");
+
+//		Node and = new And(cnf, eq, less, eq2);
+
+		Node and = new And(impl1);
+		FMCorePlugin.getDefault().logInfo(and.toString());
 
 		SmtProblem dummy = new SmtProblem(and, variables);
 
 		AbstractSolverAnalysisFactory factory = AbstractSolverAnalysisFactory.getJavaSmtFactory();
 
 		FeatureAttributeRangeAnalysis analysis = (FeatureAttributeRangeAnalysis) factory.getAnalysis(FeatureAttributeRangeAnalysis.class, dummy);
+		analysis.setVariable("sum");
+		analysis.getSolver().setConfiguration(JavaSmtSolver.SOLVER_TYPE, Solvers.Z3);
 		Object result = LongRunningWrapper.runMethod(analysis, new NullMonitor());
 		FMCorePlugin.getDefault().logInfo("");
 		// falls nötig
