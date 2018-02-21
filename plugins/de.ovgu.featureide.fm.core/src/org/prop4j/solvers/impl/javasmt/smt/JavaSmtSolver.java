@@ -356,4 +356,42 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.IOptimizationSolver#minAndMax(java.lang.Object)
+	 */
+	@Override
+	public Object[] minAndMax(Object variable) {
+		if (!translator.getVariables().containsKey(variable)) {
+			return null;
+		}
+		try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
+			final NumeralFormula formula = translator.getVariables().get(variable);
+
+			final Object[] result = new Object[2];
+
+			// min
+			final int handleY = prover.minimize(formula);
+			final OptStatus statusMin = prover.check();
+			assert statusMin == OptStatus.OPT;
+			final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
+			result[0] = lower.get();
+
+			// max
+			final int handleX = prover.maximize(formula);
+			final OptStatus statusMax = prover.check();
+			assert statusMax == OptStatus.OPT;
+			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
+			result[1] = upper.get();
+			return result;
+		} catch (final InterruptedException e) {} catch (final SolverException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

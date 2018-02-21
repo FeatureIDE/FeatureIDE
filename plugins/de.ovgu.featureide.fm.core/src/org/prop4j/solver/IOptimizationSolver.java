@@ -30,4 +30,6 @@ public interface IOptimizationSolver extends ISolver {
 	Object minimum(Object variable);
 
 	Object maximum(Object variable);
+
+	Object[] minAndMax(Object variable);
 }
