@@ -46,6 +46,8 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -298,7 +300,22 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 	 */
 	@Override
 	public Object minimum(Object variable) {
-		return null;
+		if (!translator.getVariables().containsKey(variable)) {
+			return null;
+		}
+		try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
+			final NumeralFormula formula = translator.getVariables().get(variable);
+			if (formula == null) {
+				return null;
+			}
+			return prover.minimize(translator.getVariables().get(variable));
+		} catch (final InterruptedException e) {
+			return null;
+		}
 	}
 
 	/*
@@ -307,7 +324,19 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 	 */
 	@Override
 	public Object maximum(Object variable) {
-		return null;
+		if (!translator.getVariables().containsKey(variable)) {
+			return null;
+		}
+		try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
+			for (final BooleanFormula booleanFormula : usedConstraint) {
+				prover.addConstraint(booleanFormula);
+			}
+			final int value = prover.maximize(translator.getVariables().get(variable));
+			return value;
+		} catch (final InterruptedException e) {
+			return null;
+		}
 	}
 
 }
