@@ -136,6 +136,13 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IMusExtractor, I
 				if (value instanceof Solvers) {
 					final Solvers solverType = (Solvers) value;
 					context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solverType);
+					translator = new Prop4JToJavaSmtTranslator(context);
+					final List<BooleanFormula> clauses = new ArrayList<>();
+					for (final Node node : getProblem().getClauses()) {
+						final BooleanFormula formula = translator.getFormula(node);
+						clauses.add(formula);
+					}
+					pushstack = new SolverMemory<>(getProblem(), clauses);
 					return true;
 				}
 			} catch (final InvalidConfigurationException e) {}

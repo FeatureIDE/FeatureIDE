@@ -96,7 +96,7 @@ public class TestSolver extends Action {
 
 //		Node and = new And(cnf, eq, less, eq2);
 
-		Node and = new And(impl1);
+		Node and = new And(cnf, impl1, impl2, impl11, impl12, impl21, impl22, attributeSum);
 		FMCorePlugin.getDefault().logInfo(and.toString());
 
 		SmtProblem dummy = new SmtProblem(and, variables);
