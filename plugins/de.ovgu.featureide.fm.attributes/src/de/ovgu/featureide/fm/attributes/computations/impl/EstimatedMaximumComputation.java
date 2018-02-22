@@ -26,6 +26,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 	Configuration config;
 	IFeatureAttribute attribute;
 	List<IFeature> selectedFeatures;
+	List<IFeature> unselectedFeatures;
 
 	public EstimatedMaximumComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
@@ -42,7 +43,6 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -87,15 +87,20 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 		} else {
 			if (root.getStructure().isOr()) {
 				List<Double> negativeValues = new ArrayList<>();
+				int unselectedCount = 0;
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					double tempValue = getSubtreeValue(struc.getFeature());
-					if (tempValue >= 0 || isSelected(struc.getFeature())) {
-						value += tempValue;
+					if (isUnselected(struc.getFeature())) {
+						unselectedCount++;
 					} else {
-						negativeValues.add(getSubtreeValue(struc.getFeature()));
+						double tempValue = getSubtreeValue(struc.getFeature());
+						if (tempValue >= 0 || isSelected(struc.getFeature())) {
+							value += tempValue;
+						} else {
+							negativeValues.add(getSubtreeValue(struc.getFeature()));
+						}
 					}
 				}
-				if (negativeValues.size() == root.getStructure().getChildrenCount()) {
+				if (negativeValues.size() + unselectedCount == root.getStructure().getChildrenCount()) {
 					double max = negativeValues.get(0);
 					for (double temp : negativeValues) {
 						if (temp >= max) {
@@ -106,18 +111,22 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 				}
 			} else if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struct : root.getStructure().getChildren()) {
-					double tempValue = getSubtreeValue(struct.getFeature());
-					if (struct.isMandatory() || tempValue >= 0 || isSelected(struct.getFeature())) {
-						value += tempValue;
+					if (!isUnselected(struct.getFeature())) {
+						double tempValue = getSubtreeValue(struct.getFeature());
+						if (struct.isMandatory() || tempValue >= 0 || isSelected(struct.getFeature())) {
+							value += tempValue;
+						}
 					}
 				}
 			} else if (root.getStructure().isAlternative()) {
 				List<Double> values = new ArrayList<>();
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					if (isSelected(struc.getFeature())) {
-						return value + getSubtreeValue(struc.getFeature());
+					if (!isUnselected(struc.getFeature())) {
+						if (isSelected(struc.getFeature())) {
+							return value + getSubtreeValue(struc.getFeature());
+						}
+						values.add(getSubtreeValue(struc.getFeature()));
 					}
-					values.add(getSubtreeValue(struc.getFeature()));
 				}
 				return value + getMaxValue(values);
 			}
@@ -127,6 +136,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 
 	private Object getSelectionSum() {
 		selectedFeatures = config.getSelectedFeatures();
+		unselectedFeatures = config.getUnSelectedFeatures();
 		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
@@ -134,6 +144,16 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 		return selectedFeatures.contains(feature);
 	}
 
+	private boolean isUnselected(IFeature feature) {
+		return unselectedFeatures.contains(feature);
+	}
+
+	/**
+	 * Returns maximal value of a list of doubles
+	 * 
+	 * @param values list of doubles
+	 * @return maximal value
+	 */
 	private double getMaxValue(List<Double> values) {
 		double max = values.get(0);
 		for (double value : values) {

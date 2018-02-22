@@ -12,7 +12,7 @@ import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * 
- * TODO description
+ * Outline entry representing an feature attribute Attribute, computations are supposed to be attached to this
  * 
  * @author Chico Sundermann
  */
@@ -65,13 +65,12 @@ public class AttributeEntry implements IOutlineEntry {
 
 	@Override
 	public boolean supportsType(Object element) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
 	public void setConfig(Configuration config) {
-		// TODO Auto-generated method stub
+		this.config = config;
 
 	}
 

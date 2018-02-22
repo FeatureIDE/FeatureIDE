@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.ui.views.outline.computations.impl.UndecidedFeature
 import de.ovgu.featureide.fm.ui.views.outline.computations.impl.UnselectedFeatureCountComputation;
 
 /**
- * TODO description
+ * Standard properties of the configuration Additional properties/computataions regarding the config can be attached as child
  *
- * @author User
+ * @author Chico Sundermann
  */
 public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 
@@ -54,7 +54,6 @@ public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 	 */
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
 		return LABEL;
 	}
 
@@ -64,7 +63,6 @@ public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 	 */
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -74,7 +72,6 @@ public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 	 */
 	@Override
 	public boolean hasChildren() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 

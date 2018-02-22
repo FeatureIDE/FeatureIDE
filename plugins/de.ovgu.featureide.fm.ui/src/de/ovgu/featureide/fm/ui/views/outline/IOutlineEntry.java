@@ -33,16 +33,46 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public interface IOutlineEntry {
 
+	/**
+	 * Returns the label of the entry
+	 *
+	 * @return label
+	 */
 	public String getLabel();
 
+	/**
+	 * Returns the image (if any) attached to the left side of the label
+	 *
+	 * @return label image
+	 */
 	public Image getLabelImage();
 
+	/**
+	 * Indicates whether the entry has children in the outline
+	 *
+	 * @return
+	 */
 	public boolean hasChildren();
 
+	/**
+	 *
+	 * @return list of the children of the entry
+	 */
 	public List<IOutlineEntry> getChildren();
 
+	/**
+	 * Indicates whether entry supports a certain type
+	 *
+	 * @param extern element to check
+	 * @return
+	 */
 	public boolean supportsType(Object element);
 
+	/**
+	 * Sets the intern Configuration
+	 *
+	 * @param config new Configuration
+	 */
 	public void setConfig(Configuration config);
 
 }

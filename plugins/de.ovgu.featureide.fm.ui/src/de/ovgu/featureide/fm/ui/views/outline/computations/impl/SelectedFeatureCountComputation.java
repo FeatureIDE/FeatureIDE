@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
- * TODO description
+ * This class computes the number of selected features in a given configuration
  *
  * @author Chico Sundermann
  */

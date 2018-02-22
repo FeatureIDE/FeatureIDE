@@ -25,14 +25,21 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 	Configuration config;
 	IFeatureAttribute attribute;
 	List<IFeature> selectedFeatures;
+	List<IFeature> unselectedFeatures;
 
 	public EstimatedMinimumComputation(Configuration config, IFeatureAttribute attribute) {
 		this.config = config;
 		this.attribute = attribute;
 	}
 
+	/**
+	 * Estimates the minimum of the value sum regarding a partial configuration
+	 * 
+	 * @return Minimum
+	 */
 	private Object getSelectionSum() {
 		selectedFeatures = config.getSelectedFeatures();
+		unselectedFeatures = config.getUnSelectedFeatures();
 		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
@@ -51,7 +58,6 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 
 	@Override
 	public Image getLabelImage() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -93,7 +99,7 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 			if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
 					double tempValue = getSubtreeValue(struc.getFeature());
-					if (struc.isMandatory() || isSelected(struc.getFeature()) || tempValue < 0) {
+					if (struc.isMandatory() || isSelected(struc.getFeature()) || (tempValue < 0 && !isUnselected(struc.getFeature()))) {
 						value += getSubtreeValue(struc.getFeature());
 					}
 				}
@@ -104,20 +110,27 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 					if (isSelected(struc.getFeature())) {
 						return value + getSubtreeValue(struc.getFeature());
 					}
-					values.add(getSubtreeValue(struc.getFeature()));
+					if (!isUnselected(struc.getFeature())) {
+						values.add(getSubtreeValue(struc.getFeature()));
+					}
 				}
 				return value + getMinValue(values);
 			} else if (root.getStructure().isOr()) {
 				List<Double> values = new ArrayList<>();
+				int unselectedCount = 0;
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
-					double tempValue = getSubtreeValue(struc.getFeature());
-					if (isSelected(struc.getFeature()) || tempValue < 0) {
-						value += tempValue;
+					if (isUnselected(struc.getFeature())) {
+						unselectedCount++;
 					} else {
-						values.add(tempValue);
+						double tempValue = getSubtreeValue(struc.getFeature());
+						if (isSelected(struc.getFeature()) || tempValue < 0) {
+							value += tempValue;
+						} else {
+							values.add(tempValue);
+						}
 					}
 				}
-				if (values.size() == root.getStructure().getChildrenCount()) {
+				if (values.size() + unselectedCount == root.getStructure().getChildrenCount()) {
 					return value + getMinValue(values);
 				}
 			}
@@ -127,6 +140,10 @@ public class EstimatedMinimumComputation implements IOutlineEntry {
 
 	private boolean isSelected(IFeature feature) {
 		return selectedFeatures.contains(feature);
+	}
+
+	private boolean isUnselected(IFeature feature) {
+		return unselectedFeatures.contains(feature);
 	}
 
 	private double getMinValue(List<Double> values) {

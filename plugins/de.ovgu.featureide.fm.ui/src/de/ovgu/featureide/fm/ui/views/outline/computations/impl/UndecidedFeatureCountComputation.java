@@ -30,9 +30,9 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
- * TODO description
+ * This class computes the number of undecided features in a given configuration
  *
- * @author User
+ * @author Chico Sundermann
  */
 public class UndecidedFeatureCountComputation implements IOutlineEntry {
 
