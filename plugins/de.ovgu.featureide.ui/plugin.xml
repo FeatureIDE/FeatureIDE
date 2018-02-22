@@ -1115,7 +1115,7 @@
 					commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph"
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.actions.buildFeatureGraph"
-					label="Build Feature Graph"
+					label="Build Modal Implication Graph"
 					tooltip="Builds a graph with all non-core features and computes the transitive hull."
 					style="push">
 				<visibleWhen

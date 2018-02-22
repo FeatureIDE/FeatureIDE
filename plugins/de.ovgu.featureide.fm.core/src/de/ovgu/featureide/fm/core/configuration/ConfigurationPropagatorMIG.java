@@ -1,0 +1,200 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ *
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://www.fosd.de/featureide/ for further information.
+ */
+package de.ovgu.featureide.fm.core.configuration;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
+import org.prop4j.Literal;
+import org.prop4j.analyses.AConditionallyCoreDeadAnalysis.IntermediateResult;
+import org.prop4j.analyses.ConditionallyCoreDeadAnalysisMIG;
+import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.ISatSolver.SatResult;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.IVecInt;
+
+import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.configuration.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+
+/**
+ * Updates a configuration.
+ *
+ * @author Sebastian Krieter
+ */
+public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
+
+	public class UpdateMethod extends ConfigurationPropagator.UpdateMethod {
+
+		public UpdateMethod(boolean redundantManual) {
+			super(redundantManual, null);
+		}
+
+		public UpdateMethod(boolean redundantManual, List<SelectableFeature> featureOrder) {
+			super(redundantManual, featureOrder);
+		}
+
+		@Override
+		public Void execute(final IMonitor monitor) {
+			if (rootNode == null) {
+				return null;
+			}
+			configuration.resetAutomaticValues();
+
+			final ArrayList<Literal> manualLiterals = new ArrayList<>();
+			for (final SelectableFeature feature : featureOrder) {
+				if ((feature.getManual() != Selection.UNDEFINED)
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+					manualLiterals.add(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
+				}
+			}
+			final HashSet<Literal> manualLiteralSet = new HashSet<>(manualLiterals);
+			for (final SelectableFeature feature : configuration.features) {
+				if ((feature.getManual() != Selection.UNDEFINED)
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
+					final Literal l = new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED);
+					if (manualLiteralSet.add(l)) {
+						manualLiterals.add(l);
+					}
+				}
+			}
+
+			if (redundantManual) {
+				monitor.setRemainingWork(100 + manualLiterals.size());
+			} else {
+				monitor.setRemainingWork(100);
+			}
+			Collections.reverse(manualLiterals);
+
+			final ConditionallyCoreDeadAnalysisMIG analysis = new ConditionallyCoreDeadAnalysisMIG(rootNode, mig);
+			final int[] intLiterals = rootNode.convertToInt(manualLiterals);
+			analysis.setFixedFeatures(intLiterals, intLiterals.length);
+			final IMonitor subTask = monitor.subTask(100);
+			subTask.setIntermediateFunction(new IConsumer<Object>() {
+				@Override
+				public void invoke(Object t) {
+					if (t instanceof IntermediateResult) {
+						final IntermediateResult variableSelection = (IntermediateResult) t;
+						final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(variableSelection.getVar()));
+						configuration.setAutomatic(feature, variableSelection.getSelection());
+						monitor.invoke(feature);
+					}
+				}
+			});
+			final int[] impliedFeatures = LongRunningWrapper.runMethod(analysis, subTask);
+
+			// if there is a contradiction within the configuration
+			if (impliedFeatures == null) {
+				return null;
+			}
+
+			for (final int i : impliedFeatures) {
+				final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(i));
+//				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+//				monitor.invoke(feature);
+				manualLiteralSet.add(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
+			}
+			// only for update of configuration editor
+			for (final SelectableFeature feature : configuration.features) {
+				if (!manualLiteralSet.contains(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED))) {
+					monitor.invoke(feature);
+				}
+			}
+
+			if (redundantManual) {
+				final BasicSolver solver;
+				try {
+					solver = new BasicSolver(rootNode);
+				} catch (final ContradictionException e) {
+					Logger.logError(e);
+					return null;
+				}
+
+				for (final int feature : intLiterals) {
+					solver.assignmentPush(feature);
+				}
+
+				int literalCount = intLiterals.length;
+				final IVecInt assignment = solver.getAssignment();
+				for (int i = 0; i < assignment.size(); i++) {
+					final int oLiteral = intLiterals[i];
+					final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(oLiteral));
+					assignment.set(i, -oLiteral);
+					final SatResult satResult = solver.isSatisfiable();
+					switch (satResult) {
+					case FALSE:
+						configuration.setAutomatic(feature, oLiteral > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+						monitor.invoke(feature);
+						intLiterals[i] = intLiterals[--literalCount];
+						assignment.delete(i--);
+						break;
+					case TIMEOUT:
+					case TRUE:
+						assignment.set(i, oLiteral);
+						monitor.invoke(feature);
+						break;
+					default:
+						throw new AssertionError(satResult);
+					}
+					monitor.step();
+				}
+			}
+			return null;
+		}
+
+	}
+
+	protected final ModalImplicationGraph mig;
+
+	/**
+	 * This method creates a clone of the given {@link ConfigurationPropagatorMIG}
+	 *
+	 * @param configuration The configuration to clone
+	 */
+	ConfigurationPropagatorMIG(Configuration configuration, ModalImplicationGraph mig) {
+		super(configuration);
+		this.mig = mig;
+	}
+
+	ConfigurationPropagatorMIG(ConfigurationPropagatorMIG propagator) {
+		this(propagator, propagator.configuration);
+	}
+
+	ConfigurationPropagatorMIG(ConfigurationPropagatorMIG propagator, Configuration configuration) {
+		super(propagator, configuration);
+		mig = propagator.mig;
+	}
+
+	@Override
+	public UpdateMethod update(boolean redundantManual, List<SelectableFeature> featureOrder) {
+		return new UpdateMethod(redundantManual, featureOrder);
+	}
+
+	@Override
+	protected ConfigurationPropagatorMIG clone(Configuration configuration) {
+		return new ConfigurationPropagatorMIG(this, configuration);
+	}
+
+}

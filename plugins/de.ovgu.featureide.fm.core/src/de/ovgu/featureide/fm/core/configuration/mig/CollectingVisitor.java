@@ -18,24 +18,25 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package de.ovgu.featureide.fm.core.configuration.mig;
 
-import java.util.List;
+import org.sat4j.core.VecInt;
 
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+public class CollectingVisitor implements Visitor<VecInt[]> {
+	final VecInt[] literalList = new VecInt[] { new VecInt(), new VecInt() };
 
-/**
- * TODO description
- *
- * @author Sebastian Krieter
- */
-public interface IConfigurationChanger {
+	@Override
+	public void visitStrong(int curLiteral) {
+		literalList[0].push(curLiteral);
+	}
 
-	LongRunningMethod<Void> update(boolean redundantManual, List<SelectableFeature> featureOrder);
+	@Override
+	public void visitWeak(int curLiteral) {
+		literalList[1].push(curLiteral);
+	}
 
-	void setNewValue(int index, int value, boolean manual);
-
-	void reset();
-
+	@Override
+	public VecInt[] getResult() {
+		return literalList;
+	}
 }

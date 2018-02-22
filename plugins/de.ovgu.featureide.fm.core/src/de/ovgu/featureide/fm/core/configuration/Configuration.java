@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.configuration.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -120,10 +121,14 @@ public class Configuration implements Cloneable {
 	 *        &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
 	public Configuration(IFeatureModel featureModel, int options) {
+		this(featureModel, null, options);
+	}
+
+	public Configuration(IFeatureModel featureModel, ModalImplicationGraph mig, int options) {
 		this.featureModel = featureModel;
 		ignoreAbstractFeatures = (options & PARAM_IGNOREABSTRACT) != 0;
 		propagate = (options & PARAM_PROPAGATE) != 0;
-		propagator = new ConfigurationPropagator(this);
+		propagator = mig == null ? new ConfigurationPropagator(this) : new ConfigurationPropagatorMIG(this, mig);
 		root = initRoot();
 
 		if ((options & PARAM_LAZY) == 0) {

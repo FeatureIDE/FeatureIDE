@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.editing.cnf;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -27,7 +28,9 @@ import java.util.Arrays;
  *
  * @author Sebastian Krieter
  */
-public class Clause {
+public class Clause implements Serializable {
+
+	private static final long serialVersionUID = -5382581102781797621L;
 
 	private static final int HASHSIZE = 64;
 

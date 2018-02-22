@@ -39,6 +39,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
@@ -60,14 +61,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
-import de.ovgu.featureide.fm.core.conf.MatrixFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.configuration.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.io.FileSystem;
+import de.ovgu.featureide.fm.core.io.SMIGFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -236,12 +235,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		// featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		// }
 
-		final IFeatureGraph fg = (res == null)
-			? loadFeatureGraph(
-					org.eclipse.core.runtime.Path.fromOSString(modelFile.getAbsolutePath()).removeLastSegments(1).append("model.fg").toFile().toPath())
-			: loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg").toFile().toPath());
-		final Configuration c = (fg == null) ? new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY)
-			: new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
+		final ModalImplicationGraph mig =
+			(res == null) ? loadFeatureGraph(org.eclipse.core.runtime.Path.fromOSString(modelFile.getAbsolutePath())) : loadFeatureGraph(res.getLocation());
+		final int options = Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY;
+		final IFeatureModel featureModel = featureModelManager.getObject();
+		final Configuration c = (mig == null) ? new Configuration(featureModel, options) : new Configuration(featureModel, mig, options);
 
 		final Path path = file.getLocation().toFile().toPath();
 		configurationManager = ConfigurationManager.getInstance(path);
@@ -288,13 +286,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 	}
 
-	private IFeatureGraph loadFeatureGraph(Path filePath) {
-		final IFeatureGraph featureGraph = new MatrixFeatureGraph();
-		final FeatureGraphFormat format = new FeatureGraphFormat();
-		if (!FileSystem.exists(filePath) || SimpleFileHandler.load(filePath, featureGraph, format).containsError()) {
+	private ModalImplicationGraph loadFeatureGraph(IPath modelPath) {
+		final SMIGFormat format = new SMIGFormat();
+		final Path filePath = modelPath.removeLastSegments(1).append("model." + format.getSuffix()).toFile().toPath();
+		final ModalImplicationGraph mig = new ModalImplicationGraph();
+		if (!FileSystem.exists(filePath) || SimpleFileHandler.load(filePath, mig, format).containsError()) {
 			return null;
 		} else {
-			return featureGraph;
+			return mig;
 		}
 	}
 

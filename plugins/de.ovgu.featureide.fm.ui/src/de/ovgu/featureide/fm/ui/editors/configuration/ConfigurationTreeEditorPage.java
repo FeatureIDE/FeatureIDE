@@ -35,11 +35,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -110,8 +113,10 @@ import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
@@ -149,6 +154,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	protected static final Font treeItemItalicFont = new Font(null, ARIAL, 8, SWT.ITALIC);
 
 	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
@@ -157,7 +163,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
-	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
+	protected final Set<SelectableFeature> updateFeatures = Collections.newSetFromMap(new ConcurrentHashMap<SelectableFeature, Boolean>());
 
 	/** Generates explanations for automatic selections. */
 	private final AutomaticSelectionExplanationCreator automaticSelectionExplanationCreator =
@@ -186,6 +192,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private Label infoLabel;
 
 	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
+	protected final Object updateJobSync = new Object();
+	protected IRunner<Void> updateJob = null;
 
 	/**
 	 * The item the toolTip belongs to.
@@ -1080,16 +1088,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected LongRunningJob<Void> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected IRunner<Void> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
 		final TreeItem topItem = tree.getTopItem();
 		final SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningMethod<Void> update = configurationEditor.getConfiguration().getPropagator().update(redundantManual, Arrays.asList(feature));
-		final LongRunningJob<Void> job = new LongRunningJob<>("", update);
-		job.setIntermediateFunction(new IConsumer<Object>() {
-
+		final IRunner<Void> runner = LongRunningWrapper.getRunner(update, "Running decision propagation.");
+		runner.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
 			public void invoke(Object t) {
 				if (t instanceof SelectableFeature) {
@@ -1099,7 +1106,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						return;
 					}
 					currentDisplay.asyncExec(new Runnable() {
-
 						@Override
 						public void run() {
 							updateFeatures.remove(feature);
@@ -1109,7 +1115,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
-		return job;
+		return runner;
 	}
 
 	/**
@@ -1176,9 +1182,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void lockItem(TreeItem item) {
 		item.setGrayed(true);
-		item.setChecked(true);
-		item.setForeground(gray);
-		item.setFont(treeItemStandardFont);
+//		item.setChecked(true);
+		item.setForeground(null);
+		item.setFont(treeItemItalicFont);
 	}
 
 	protected void computeTree(boolean redundantManual) {
@@ -1188,58 +1194,80 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final LongRunningJob<Void> updateJob = computeFeatures(redundantManual, currentDisplay);
-		if (updateJob != null) {
-			updateJob.addJobFinishedListener(new JobFinishListener<List<String>>() {
+		synchronized (updateJobSync) {
+			if (updateJob != null) {
+				updateFeatures.clear();
+				updateJob.cancel();
+				try {
+					updateJob.join();
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			updateJob = computeFeatures(redundantManual, currentDisplay);
 
-				@Override
-				public void jobFinished(IJob<List<String>> finishedJob) {
-					if (finishedJob.getStatus() == JobStatus.OK) {
-						updateInfoLabel(currentDisplay);
-						autoExpand(currentDisplay);
-						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
-						// XXX Prevents configuration files from being deleted (read/write conflict)
-//						if (configurationEditor instanceof ConfigurationEditor) {
-//							final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
-//							// Get current configuration
-//							final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
-//							// Cast is necessary, don't remove
-//							final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
+			if (updateJob != null) {
+				updateJob.addJobFinishedListener(new JobFinishListener<Void>() {
+					@Override
+					public void jobFinished(IJob<Void> finishedJob) {
+						for (final Iterator<SelectableFeature> iterator = updateFeatures.iterator(); iterator.hasNext();) {
+							final TreeItem item = itemMap.get(iterator.next());
+							if (item == null) {
+								return;
+							}
+							currentDisplay.asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									refreshItem(item);
+								}
+							});
+						}
+						updateFeatures.clear();
+						if (finishedJob.getStatus() == JobStatus.OK) {
+							updateInfoLabel(currentDisplay);
+							autoExpand(currentDisplay);
+							configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+							// XXX Prevents configuration files from being deleted (read/write conflict)
+//							if (configurationEditor instanceof ConfigurationEditor) {
+//								final ConfigurationManager manager = ((ConfigurationEditor) configurationEditor).getConfigurationManager();
+//								// Get current configuration
+//								final String source = manager.getFormat().getInstance().write(configurationEditor.getConfiguration());
+//								// Cast is necessary, don't remove
+//								final IFile document = (IFile) getEditorInput().getAdapter(IFile.class);
 //
-//							byte[] content;
-//							try {
-//								content = new byte[document.getContents().available()];
-//								document.getContents().read(content);
-//								if (!source.equals(new String(content))) {
-//									setDirty();
+//								byte[] content;
+//								try {
+//									content = new byte[document.getContents().available()];
+//									document.getContents().read(content);
+//									if (!source.equals(new String(content))) {
+//										setDirty();
+//									}
+//								} catch (final IOException e) {
+//									FMUIPlugin.getDefault().logError(e);
+//								} catch (final CoreException e) {
+//									FMUIPlugin.getDefault().logError(e);
 //								}
-//							} catch (final IOException e) {
-//								FMUIPlugin.getDefault().logError(e);
-//							} catch (final CoreException e) {
-//								FMUIPlugin.getDefault().logError(e);
 //							}
-//						}
+						}
 					}
-				}
-			});
+				});
 
-			updateFeatures.clear();
-			walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
-
-				@Override
-				public Void invoke(TreeItem item, SelectableFeature feature) {
-					// lockItem(item);
-					updateFeatures.add(feature);
-					return null;
-				}
-			}, new IFunction<Void, Void>() {
-
-				@Override
-				public Void invoke(Void t) {
-					configurationEditor.getConfigJobManager().startJob(updateJob, true);
-					return null;
-				}
-			});
+				updateFeatures.clear();
+				walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+					@Override
+					public Void invoke(TreeItem item, SelectableFeature feature) {
+						lockItem(item);
+						updateFeatures.add(feature);
+						return null;
+					}
+				}, new IFunction<Void, Void>() {
+					@Override
+					public Void invoke(Void t) {
+						configurationEditor.getConfigJobManager().startJob(updateJob, true);
+						return null;
+					}
+				});
+			}
 		}
 	}
 

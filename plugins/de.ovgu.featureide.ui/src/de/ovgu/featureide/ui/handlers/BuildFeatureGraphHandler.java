@@ -24,16 +24,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 
-import org.prop4j.analyses.FGBuilder;
 import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
+import de.ovgu.featureide.fm.core.configuration.mig.MIGBuilder;
+import de.ovgu.featureide.fm.core.configuration.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.SMIGFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
@@ -53,16 +53,17 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	@Override
 	protected void endAction() {
 		for (final IFeatureProject project : projectList) {
-			final Path path = Paths.get(project.getProject().getFile("model.fg").getLocationURI());
+			final SMIGFormat format = new SMIGFormat();
+			final Path path = Paths.get(project.getProject().getFile("model." + format.getSuffix()).getLocationURI());
 			final IFeatureModel fm = project.getFeatureModel();
 			final SatInstance sat =
 				new SatInstance(AdvancedNodeCreator.createRegularCNF(fm), Functional.mapToList(fm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
-			final IRunner<IFeatureGraph> runner = LongRunningWrapper.getRunner(new FGBuilder(sat));
-			runner.addJobFinishedListener(new JobFinishListener<IFeatureGraph>() {
-
+			final IRunner<ModalImplicationGraph> runner =
+				LongRunningWrapper.getRunner(new MIGBuilder(sat, false), "Building modal implication graph for " + project.getProjectName());
+			runner.addJobFinishedListener(new JobFinishListener<ModalImplicationGraph>() {
 				@Override
-				public void jobFinished(IJob<IFeatureGraph> finishedJob) {
-					SimpleFileHandler.save(path, finishedJob.getResults(), new FeatureGraphFormat());
+				public void jobFinished(IJob<ModalImplicationGraph> finishedJob) {
+					SimpleFileHandler.save(path, runner.getResults(), format);
 				}
 			});
 			runner.schedule();

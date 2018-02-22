@@ -23,7 +23,9 @@ package org.prop4j.analyses;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
+import org.sat4j.core.VecInt;
 
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -43,44 +45,72 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 
 	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
-		satCount = 0;
+		super.analyze(monitor);
+		monitor.setRemainingWork(solver.getSatInstance().getNumberOfVariables() + 2);
+
 		solver.getAssignment().ensure(fixedVariables.length);
 		for (int i = 0; i < fixedVariables.length; i++) {
 			solver.assignmentPush(fixedVariables[i]);
 		}
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
-		final int[] model1 = solver.findModel();
-		satCount++;
+		final int[] unkownValues = solver.findModel();
+		monitor.step();
 
-		if (model1 != null) {
-			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
-			final int[] model2 = solver.findModel();
-			satCount++;
-
-			// if there are more negative than positive literals
-			solver.setSelectionStrategy(
-					(model1.length < (countNegative(model2) + countNegative(model1)) ? SelectionStrategy.POSITIVE : SelectionStrategy.NEGATIVE));
-
+		if (unkownValues != null) {
 			for (int i = 0; i < fixedVariables.length; i++) {
-				model1[Math.abs(fixedVariables[i]) - 1] = 0;
+				final int var = Math.abs(fixedVariables[i]);
+				unkownValues[var - 1] = 0;
+				monitor.step(new IntermediateResult(var, Selection.UNDEFINED));
 			}
 
-			SatInstance.updateModel(model1, model2);
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
+			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			final int[] unkownValues2 = solver.findModel();
+			monitor.step();
+
+			// if there are more negative than positive literals
+			solver.setSelectionStrategy((unkownValues.length < (countNegative(unkownValues2) + countNegative(unkownValues)) ? SelectionStrategy.POSITIVE
+				: SelectionStrategy.NEGATIVE));
+
+			updateModel(unkownValues, unkownValues2);
+
+			VecInt varsToCompute = new VecInt(unkownValues.length);
+			for (int i = 0; i < unkownValues.length; i++) {
+				final int varX = unkownValues[i];
+				if (varX != 0) {
+					varsToCompute.push(Math.abs(varX));
+				}
+			}
+
+			if (variableOrder != null) {
+				final VecInt sortedVarsToCalulate = new VecInt(varsToCompute.size());
+				for (int i = variableOrder.length - 1; i >= 0; i--) {
+					final int var = variableOrder[i];
+					if (varsToCompute.contains(var)) {
+						sortedVarsToCalulate.push(var);
+					}
+				}
+				varsToCompute = sortedVarsToCalulate;
+			}
+
+			while (!varsToCompute.isEmpty()) {
+				final int var = varsToCompute.last();
+				varsToCompute.pop();
+				final int varX = unkownValues[var - 1];
 				if (varX != 0) {
 					solver.assignmentPush(-varX);
-					satCount++;
 					switch (solver.isSatisfiable()) {
 					case FALSE:
 						solver.assignmentReplaceLast(varX);
+						monitor.step(new IntermediateResult(Math.abs(varX), varX < 0 ? Selection.UNSELECTED : Selection.SELECTED));
 						break;
 					case TIMEOUT:
 						solver.assignmentPop();
+						unkownValues[Math.abs(varX) - 1] = 0;
+						monitor.step(new IntermediateResult(Math.abs(varX), Selection.UNDEFINED));
 						break;
 					case TRUE:
 						solver.assignmentPop();
-						SatInstance.updateModel(model1, solver.getModel());
+						updateModel(unkownValues, solver.getModel());
 						solver.shuffleOrder();
 						break;
 					}
@@ -88,11 +118,6 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 			}
 		}
 		return solver.getAssignmentArray(0, solver.getAssignment().size());
-	}
-
-	@Override
-	public String toString() {
-		return "SAT_Improved";
 	}
 
 }

@@ -36,7 +36,8 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
-import org.prop4j.analyses.ConditionallyCoreDeadAnalysis;
+import org.prop4j.analyses.AConditionallyCoreDeadAnalysis.IntermediateResult;
+import org.prop4j.analyses.ConditionallyCoreDeadAnalysisSat;
 import org.prop4j.solver.BasicSolver;
 import org.prop4j.solver.ISatSolver.SatResult;
 import org.prop4j.solver.SatInstance;
@@ -56,6 +57,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
 import de.ovgu.featureide.fm.core.filter.base.OrFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -597,8 +599,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class UpdateMethod implements LongRunningMethod<Void> {
 
-		private final boolean redundantManual;
-		private final List<SelectableFeature> featureOrder;
+		protected final boolean redundantManual;
+		protected final List<SelectableFeature> featureOrder;
 
 		public UpdateMethod(boolean redundantManual) {
 			this(redundantManual, null);
@@ -610,7 +612,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Void execute(IMonitor workMonitor) {
+		public Void execute(final IMonitor workMonitor) {
 			if (rootNode == null) {
 				return null;
 			}
@@ -634,13 +636,29 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				}
 			}
 
-			workMonitor.setRemainingWork(manualLiterals.size() + 1);
+			if (redundantManual) {
+				workMonitor.setRemainingWork(100 + manualLiterals.size());
+			} else {
+				workMonitor.setRemainingWork(100);
+			}
 			Collections.reverse(manualLiterals);
 
-			final ConditionallyCoreDeadAnalysis analysis = new ConditionallyCoreDeadAnalysis(rootNode);
+			final ConditionallyCoreDeadAnalysisSat analysis = new ConditionallyCoreDeadAnalysisSat(rootNode);
 			final int[] intLiterals = rootNode.convertToInt(manualLiterals);
-			analysis.setAssumptions(intLiterals);
-			final int[] impliedFeatures = LongRunningWrapper.runMethod(analysis, workMonitor.subTask(1));
+			analysis.setFixedFeatures(intLiterals, intLiterals.length);
+			final IMonitor subTask = workMonitor.subTask(100);
+			subTask.setIntermediateFunction(new IConsumer<Object>() {
+				@Override
+				public void invoke(Object t) {
+					if (t instanceof IntermediateResult) {
+						final IntermediateResult variableSelection = (IntermediateResult) t;
+						final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(variableSelection.getVar()));
+						configuration.setAutomatic(feature, variableSelection.getSelection());
+						workMonitor.invoke(feature);
+					}
+				}
+			});
+			final int[] impliedFeatures = LongRunningWrapper.runMethod(analysis, subTask);
 
 			// if there is a contradiction within the configuration
 			if (impliedFeatures == null) {
@@ -649,8 +667,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			for (final int i : impliedFeatures) {
 				final SelectableFeature feature = configuration.getSelectablefeature((String) rootNode.getVariableObject(i));
-				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
-				workMonitor.invoke(feature);
+//				configuration.setAutomatic(feature, i > 0 ? Selection.SELECTED : Selection.UNSELECTED);
+//				workMonitor.invoke(feature);
 				manualLiteralSet.add(new Literal(feature.getFeature().getName(), feature.getManual() == Selection.SELECTED));
 			}
 			// only for update of configuration editor
@@ -705,11 +723,11 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
 
-	private static final int TIMEOUT = 1000;
+	protected static final int TIMEOUT = 1000;
 
-	private final Configuration configuration;
+	protected final Configuration configuration;
 
-	private SatInstance rootNode = null, rootNodeWithoutHidden = null;
+	protected SatInstance rootNode = null, rootNodeWithoutHidden = null;
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
@@ -825,7 +843,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		return new ConfigurationPropagator(this, configuration);
 	}
 
-	private Node[] createNodeArray(List<Node> literals, Node... formula) {
+	protected final Node[] createNodeArray(List<Node> literals, Node... formula) {
 		final Node[] nodeArray = new Node[literals.size() + formula.length];
 		literals.toArray(nodeArray);
 		for (int i = 0; i < formula.length; i++) {
@@ -834,7 +852,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		return nodeArray;
 	}
 
-	private List<Node> createNodeList() {
+	protected final List<Node> createNodeList() {
 		final List<Node> children = new ArrayList<Node>();
 
 		for (final SelectableFeature feature : configuration.features) {

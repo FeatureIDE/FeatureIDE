@@ -18,30 +18,28 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf;
+package de.ovgu.featureide.fm.core.configuration.mig;
 
-import java.io.Serializable;
+public class MarkVisitor implements Visitor<byte[]> {
+	final byte[] markerArray;
 
-import org.prop4j.solver.SatInstance;
+	public MarkVisitor(int numberOfariables) {
+		markerArray = new byte[numberOfariables];
+	}
 
-public interface IFeatureGraph extends Serializable {
+	@Override
+	public void visitStrong(int curLiteral) {
+		markerArray[Math.abs(curLiteral) - 1] = curLiteral < 0 ? ModalImplicationGraph.VALUE_0 : ModalImplicationGraph.VALUE_1;
+	}
 
-	boolean setEdge(int from, int to, byte edgeType);
+	@Override
+	public void visitWeak(int curLiteral) {
+		markerArray[Math.abs(curLiteral) - 1] |= (curLiteral < 0 ? ModalImplicationGraph.VALUE_0Q : ModalImplicationGraph.VALUE_1Q);
+	}
 
-	byte getEdge(int fromIndex, int toIndex);
-
-	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getSize();
-
-	int[] getIndex();
-
-	SatInstance getSatInstance();
-
-	void copyValues(IFeatureGraph otherGraph);
-
-	byte getValueInternal(int fromIndex, int toIndex, boolean fromSelected);
-
-	int getFeatureIndex(String name);
+	@Override
+	public byte[] getResult() {
+		return markerArray;
+	}
 
 }

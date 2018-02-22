@@ -41,7 +41,6 @@ import javax.annotation.Nonnull;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
-import org.prop4j.solver.SatInstance;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
@@ -54,7 +53,6 @@ import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -1442,37 +1440,6 @@ public final class FeatureUtils {
 			}
 		}
 		return stringBuilder.toString();
-	}
-
-	public static String[] getFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		final SatInstance satInstance = featureGraph.getSatInstance();
-		final String[] featureNames = new String[satInstance.getNumberOfVariables()];
-
-		for (int i = 0; i < featureNames.length; i++) {
-			featureNames[i] = (String) satInstance.getVariableObject(i + 1);
-		}
-		return featureNames;
-	}
-
-	public static String[] getCoreFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		return getNonCommonFeaturesFromFeatureGraph(featureGraph, -1);
-	}
-
-	public static String[] getDeadFeaturesFromFeatureGraph(IFeatureGraph featureGraph) {
-		return getNonCommonFeaturesFromFeatureGraph(featureGraph, -2);
-	}
-
-	private static String[] getNonCommonFeaturesFromFeatureGraph(IFeatureGraph featureGraph, int mode) {
-		final SatInstance satInstance = featureGraph.getSatInstance();
-		final ArrayList<String> featureNames = new ArrayList<>(satInstance.getNumberOfVariables());
-
-		final int[] index = featureGraph.getIndex();
-		for (int i = 0; i < index.length; i++) {
-			if (index[i] == mode) {
-				featureNames.add((String) satInstance.getVariableObject(i + 1));
-			}
-		}
-		return featureNames.toArray(new String[0]);
 	}
 
 }

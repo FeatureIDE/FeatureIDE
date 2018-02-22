@@ -18,15 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core.configuration.mig;
 
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
+public interface Visitor<T> {
 
-/**
- * Format for {@link IFeatureGraph feature graphs}.
- *
- * @author Sebastian Krieter
- */
-public interface IFeatureGraphFormat extends IPersistentFormat<IFeatureGraph> {
+	void visitStrong(int literal);
+
+	void visitWeak(int literal);
+
+	T getResult();
 
 }

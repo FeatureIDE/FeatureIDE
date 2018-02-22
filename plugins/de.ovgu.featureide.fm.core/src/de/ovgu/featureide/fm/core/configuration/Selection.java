@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import de.ovgu.featureide.fm.core.conf.nodes.Variable;
-
 /**
  * Defines Selection types Selected, Unselected, Undefined. These are needed for the configuration process.
  *
@@ -29,21 +27,6 @@ import de.ovgu.featureide.fm.core.conf.nodes.Variable;
  */
 public enum Selection {
 
-	SELECTED(Variable.TRUE), UNSELECTED(Variable.FALSE), UNDEFINED(Variable.UNDEFINED);
-
-	private final int value;
-
-	private Selection(int value) {
-		this.value = value;
-	}
-
-	public int getValue() {
-		return value;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString();
-	}
+	SELECTED, UNSELECTED, UNDEFINED;
 
 }

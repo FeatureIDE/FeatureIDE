@@ -25,27 +25,28 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
+import de.ovgu.featureide.fm.core.configuration.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.functional.Base64Encoder;
 
 /**
- * Reads / Writes a feature graph.
+ * Reads / Writes a modal implication graph using serialization.
  *
  * @author Sebastian Krieter
  */
-public class FeatureGraphFormat extends APersistentFormat<IFeatureGraph> implements IFeatureGraphFormat {
+public class SMIGFormat implements IPersistentFormat<ModalImplicationGraph> {
 
-	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + FeatureGraphFormat.class.getSimpleName();
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fg." + SMIGFormat.class.getSimpleName();
 
 	@Override
-	public ProblemList read(IFeatureGraph object, CharSequence source) {
+	public ProblemList read(ModalImplicationGraph object, CharSequence source) {
 		final ProblemList problems = new ProblemList();
-		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
-			final IFeatureGraph featureGraph = (IFeatureGraph) in.readObject();
-			object.copyValues(featureGraph);
+		final byte[] bytes = Base64Encoder.decode(source.toString());
+		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+		try (final ObjectInputStream in = new ObjectInputStream(byteArrayInputStream)) {
+			object.copyValues((ModalImplicationGraph) in.readObject());
 		} catch (IOException | ClassNotFoundException e) {
 			problems.add(new Problem(e));
 		}
@@ -53,12 +54,13 @@ public class FeatureGraphFormat extends APersistentFormat<IFeatureGraph> impleme
 	}
 
 	@Override
-	public String write(IFeatureGraph object) {
+	public String write(ModalImplicationGraph object) {
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		String ret = null;
 		try (final ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream)) {
 			out.writeObject(object);
-			ret = byteArrayOutputStream.toString("UTF-8");
+			out.flush();
+			ret = Base64Encoder.encode(byteArrayOutputStream.toByteArray());
 		} catch (final IOException e) {
 			Logger.logError(e);
 		}
@@ -67,11 +69,11 @@ public class FeatureGraphFormat extends APersistentFormat<IFeatureGraph> impleme
 
 	@Override
 	public String getSuffix() {
-		return "fg";
+		return "smig";
 	}
 
 	@Override
-	public FeatureGraphFormat getInstance() {
+	public IPersistentFormat<ModalImplicationGraph> getInstance() {
 		return this;
 	}
 
@@ -91,8 +93,18 @@ public class FeatureGraphFormat extends APersistentFormat<IFeatureGraph> impleme
 	}
 
 	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead();
+	}
+
+	@Override
+	public boolean initExtension() {
+		return true;
+	}
+
+	@Override
 	public String getName() {
-		return "FeatureIDE";
+		return "Modal Implication Graph";
 	}
 
 }

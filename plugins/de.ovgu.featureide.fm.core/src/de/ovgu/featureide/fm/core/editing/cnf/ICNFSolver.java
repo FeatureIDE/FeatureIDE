@@ -22,14 +22,12 @@ package de.ovgu.featureide.fm.core.editing.cnf;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.editing.remove.DeprecatedClause;
-
 public interface ICNFSolver {
 
 	boolean isSatisfiable(int[] literals) throws TimeoutException;
 
 	void reset();
 
-	void addClause(DeprecatedClause mainClause);
+	void addClause(Clause mainClause);
 
 }

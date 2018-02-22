@@ -18,31 +18,60 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf.nodes;
+package de.ovgu.featureide.fm.core.configuration.mig;
 
-public class And2 extends Expression {
+import java.io.Serializable;
 
-	private static final long serialVersionUID = 8373469012995551048L;
+public class Vertex implements Serializable {
 
-	public And2(Variable[] children) {
-		super(children);
+	private static final long serialVersionUID = -3218194304764541434L;
+
+	private final int var;
+
+	private byte core;
+	private int id;
+
+	private int[] complexClauses;
+	private int[] strongEdges;
+
+	public Vertex(int var) {
+		this.var = var;
 	}
 
-	@Override
-	protected int computeValue() {
-		byte ret = TRUE;
-		for (int i = 0; i < children.length; i++) {
-			final int childValue = children[i].getValue();
-			switch (childValue) {
-			case FALSE:
-				return FALSE;
-			case UNDEFINED:
-				ret = UNDEFINED;
-			default:
-				continue;
-			}
-		}
-		return ret;
+	public int getVar() {
+		return var;
+	}
+
+	public byte getCore() {
+		return core;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public int[] getComplexClauses() {
+		return complexClauses;
+	}
+
+	public int[] getStrongEdges() {
+		return strongEdges;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setCore(byte core) {
+		this.core = core;
+	}
+
+	public void setComplexClauses(int[] complexClauses) {
+		this.complexClauses = complexClauses;
+	}
+
+	public void setStrongEdges(int[] strongEdges) {
+		this.strongEdges = strongEdges;
 	}
 
 }
