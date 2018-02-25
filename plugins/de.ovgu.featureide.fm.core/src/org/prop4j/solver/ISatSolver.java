@@ -27,4 +27,19 @@ package org.prop4j.solver;
  */
 public interface ISatSolver extends ISolver {
 
+	public static final String CONFIG_TIMEOUT = "Timeout";
+	public static final String CONFIG_VERBOSE = "Verbose";
+	public static final String CONFIG_DB_SIMPLIFICATION_ALLOWED = "DBSimplification";
+	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
+
+	public static final int MAX_SOLUTION_BUFFER = 1000;
+
+	public static enum SatResult {
+		FALSE, TIMEOUT, TRUE
+	}
+
+	public static enum SelectionStrategy {
+		NEGATIVE, ORG, POSITIVE, RANDOM
+	}
+
 }

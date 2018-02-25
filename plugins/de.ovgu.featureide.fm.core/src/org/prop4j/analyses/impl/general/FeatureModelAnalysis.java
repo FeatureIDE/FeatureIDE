@@ -31,10 +31,8 @@ import org.prop4j.Not;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.impl.SatProblem;
-import org.sat4j.specs.ContradictionException;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -122,7 +120,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyConstraints);
 		constraintModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 
-		factory = AbstractSolverAnalysisFactory.getJavaSmtSatFactory();
+		factory = AbstractSolverAnalysisFactory.getJavaSmtFactory();
 	}
 
 	public boolean isCalculateConstraints() {
@@ -256,8 +254,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		deadFeatures.clear();
 		coreFeatures.clear();
 
-		final org.prop4j.analyses.impl.general.CoreDeadAnalysis coreDeadAnalysis =
-			(org.prop4j.analyses.impl.general.CoreDeadAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.CoreDeadAnalysis.class, allModelProblem);
+		final CoreDeadAnalysis coreDeadAnalysis = (CoreDeadAnalysis) factory.getAnalysis(CoreDeadAnalysis.class, allModelProblem);
 
 		final int[] solution2 = LongRunningWrapper.runMethod(coreDeadAnalysis, monitor.subTask(0));
 
@@ -315,8 +312,9 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 				return feature.getName();
 			}
 		}));
-		final org.prop4j.analyses.impl.general.IndeterminedAnalysis indeterminedAnalysis = (org.prop4j.analyses.impl.general.IndeterminedAnalysis) factory
-				.getAnalysis(org.prop4j.analyses.impl.general.IndeterminedAnalysis.class, allModelProblem);
+
+		final IndeterminedAnalysis indeterminedAnalysis = (IndeterminedAnalysis) factory.getAnalysis(IndeterminedAnalysis.class, allModelProblem);
+
 		indeterminedAnalysis.init(hiddenLiterals);
 		final int[] determinedHidden = LongRunningWrapper.runMethod(indeterminedAnalysis);
 
@@ -348,19 +346,15 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			checkValidity(allModelProblem);
 		}
 
-		try {
-			if (valid) {
-				checkConstraintRedundant(constraints);
-				monitor.step();
-//				checkConstraintDeadAndFalseOptional(constraints);
-				monitor.step();
-			} else {
-				checkConstraintUnsatisfiable(constraints);
-				monitor.step();
-				monitor.step();
-			}
-		} catch (final ContradictionException e) {
-			FMCorePlugin.getDefault().logError(e);
+		if (valid) {
+//				checkConstraintRedundant(constraints);
+			checkConstraintTautology(constraints);
+			monitor.step();
+			monitor.step();
+		} else {
+			checkConstraintUnsatisfiable(constraints);
+			monitor.step();
+			monitor.step();
 		}
 	}
 
@@ -371,109 +365,6 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		return LongRunningWrapper.runMethod(validAnalysis, new NullMonitor()) == null;
 	}
 
-//
-//	private void checkConstraintDeadAndFalseOptional(final List<IConstraint> constraints) throws ContradictionException {
-//		if (!calculateFOConstraints && !calculateDeadConstraints) {
-//			return;
-//		}
-//		nodeCreator.setModelType(ModelType.OnlyStructure);
-//		final SatProblem problem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
-//		final Sat4jSatSolver modSat = new Sat4jSatSolver(problem);
-//
-//		final List<IFeature> deadList = new LinkedList<>(deadFeatures);
-//		final List<IFeature> foList = new LinkedList<>(falseOptionalFeatures);
-//		monitor.checkCancel();
-//
-//		for (final IConstraint constraint : constraints) {
-//			modSat.push(constraint.getNode().toRegularCNF());
-//
-//			if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-//				if (calculateDeadConstraints) {
-//					final List<IFeature> newDeadFeature = checkFeatureDead2(modSat, deadList);
-//					if (!newDeadFeature.isEmpty()) {
-//						constraint.setDeadFeatures(newDeadFeature);
-//						deadList.removeAll(newDeadFeature);
-//						setConstraintAttribute(constraint, ConstraintAttribute.DEAD);
-//					}
-//				}
-//
-//				if (calculateFOConstraints) {
-//					final List<IFeature> newFOFeature = checkFeatureFalseOptional2(modSat, foList);
-//					if (!newFOFeature.isEmpty()) {
-//						constraint.setFalseOptionalFeatures(newFOFeature);
-//						foList.removeAll(newFOFeature);
-//						if (constraint.getConstraintAttribute() == ConstraintAttribute.NORMAL) {
-//							setConstraintAttribute(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-//						}
-//					}
-//				}
-//			}
-//			monitor.checkCancel();
-//		}
-//	}
-//
-//	private List<IFeature> checkFeatureDead2(final ISolverProblem problem, List<IFeature> deadList) {
-//		if (deadList.size() == 0) {
-//			return Collections.emptyList();
-//		}
-//		final List<IFeature> result = new ArrayList<>();
-//		final int[] deadVar = new int[deadList.size()];
-//		int j = 0;
-//		for (final IFeature deadFeature : deadList) {
-//			deadVar[j++] = problem.getIndexOfVariable(deadFeature.getName());
-//		}
-//
-//		final org.prop4j.analyses.impl.general.CoreDeadAnalysis coreDeadAnalysis =
-//			(org.prop4j.analyses.impl.general.CoreDeadAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.CoreDeadAnalysis.class, problem);
-//		coreDeadAnalysis.setFeatures(deadVar);
-//
-//		final int[] solution2 = LongRunningWrapper.runMethod(coreDeadAnalysis);
-//
-//		for (int i = 0; i < solution2.length; i++) {
-//			final int var = solution2[i];
-//			if (var < 0) {
-//				result.add(fm.getFeature((String) problem.getVariableOfIndex(var)));
-//			}
-//		}
-//		return result;
-//	}
-//
-//	private List<IFeature> checkFeatureFalseOptional2(final BasicSolver solver, List<IFeature> foList) {
-//		if (foList.size() == 0) {
-//			return Collections.emptyList();
-//		}
-//		final List<IFeature> result = new ArrayList<>();
-//		final List<int[]> possibleFOFeatures = new ArrayList<>();
-//		final SatInstance si = solver.getSatInstance();
-//		for (final IFeature feature : foList) {
-//			final IFeature parent = FeatureUtils.getParent(feature);
-//			if ((parent != null) && (!feature.getStructure().isMandatorySet() || !parent.getStructure().isAnd())) {
-//				possibleFOFeatures.add(new int[] { -si.getVariable(parent.getName()), si.getVariable(feature.getName()) });
-//			}
-//		}
-//		final List<int[]> solution3 = LongRunningWrapper.runMethod(new ImplicationAnalysis(solver, possibleFOFeatures));
-//
-//		for (final int[] pair : solution3) {
-//			result.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
-//		}
-//
-//		if (evaluate) {
-//			final ISolverProblem problem = new SatProblem(si.getCnf(), FeatureUtils.getFeatureNamesPreorder(fm));
-//			final org.prop4j.analyses.impl.general.ImplicationAnalysis implicationAnalysis =
-//				(org.prop4j.analyses.impl.general.ImplicationAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ImplicationAnalysis.class, problem);
-//			implicationAnalysis.initParis(possibleFOFeatures);
-//			final List<int[]> solution4 = LongRunningWrapper.runMethod(implicationAnalysis);
-//
-//			final ArrayList<IFeature> result2 = new ArrayList<>();
-//			for (final int[] pair : solution4) {
-//				result2.add(fm.getFeature((CharSequence) si.getVariableObject(pair[1])));
-//			}
-//			analysisComparison += "checkFeatureFalseOptional2:\nO: " + result.toString() + "\nN: " + result2.toString() + "\n\n";
-//		}
-//
-//		return result;
-//	}
-//
 	/**
 	 * Detects redundancy of a constraint by checking if the model without the new (possibly redundant) constraint implies the model with the new constraint and
 	 * the other way round. If this is the case, both models are equivalent and the constraint is redundant. If a redundant constraint has been detected, it is
@@ -481,7 +372,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 	 *
 	 * @param constraint The constraint to check whether it is redundant
 	 */
-	private void checkConstraintRedundant(final List<IConstraint> constraints) throws ContradictionException {
+	private void checkConstraintRedundant(final List<IConstraint> constraints) {
 		if (calculateRedundantConstraints) {
 			final RedundantConstraintAnalysis redundantAnalysis =
 				(RedundantConstraintAnalysis) factory.getAnalysis(RedundantConstraintAnalysis.class, structureModelProblem);
@@ -491,9 +382,13 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			for (final IConstraint iConstraint : map.keySet()) {
 				setConstraintAttribute(iConstraint, map.get(iConstraint));
 			}
-		} else if (calculateTautologyConstraints) {
+		}
+	}
+
+	private void checkConstraintTautology(final List<IConstraint> constraints) {
+		if (calculateTautologyConstraints) {
 			for (final IConstraint constraint : constraints) {
-				if (checkConstraintTautology(constraint.getNode())) {
+				if (checkConstraintContradiction(new Not(constraint.getNode()).toRegularCNF())) {
 					setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
 				}
 				monitor.checkCancel();
@@ -501,11 +396,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		}
 	}
 
-	private boolean checkConstraintTautology(Node constraintNode) {
-		return checkConstraintContradiction(new Not(constraintNode).toRegularCNF());
-	}
-
-	private void checkConstraintUnsatisfiable(final List<IConstraint> constraints) throws ContradictionException {
+	private void checkConstraintUnsatisfiable(final List<IConstraint> constraints) {
 		// Only structure problem needed
 		final ConstraintsUnsatisfiableAnaylsis constraintsUnsatisfiableAnaylsis =
 			(ConstraintsUnsatisfiableAnaylsis) factory.getAnalysis(ConstraintsUnsatisfiableAnaylsis.class, structureModelProblem);

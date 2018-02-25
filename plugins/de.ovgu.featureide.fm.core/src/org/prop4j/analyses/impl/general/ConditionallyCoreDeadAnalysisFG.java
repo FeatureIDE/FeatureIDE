@@ -21,8 +21,8 @@
 package org.prop4j.analyses.impl.general;
 
 import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.sat4j.core.VecInt;
@@ -58,20 +58,20 @@ public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnaly
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 		satCount++;
 
 		if (model1 != null) {
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
+			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
 			satCount++;
 
 			// if there are more negative than positive literals
 			if ((model1.length < (countNegative(model2) + countNegative(model1)))) {
-				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 			} else {
-				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
+				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 
 			}
 

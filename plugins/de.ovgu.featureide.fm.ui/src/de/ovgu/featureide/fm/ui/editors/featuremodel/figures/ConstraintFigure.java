@@ -127,11 +127,11 @@ public class ConstraintFigure extends ModelElementFigure implements GUIDefaults 
 			toolTipContent.add(new Label(VOID_MODEL));
 			break;
 		case UNSATISFIABLE:
-			label.setIcon(null);
+			label.setIcon(FM_ERROR);
 			toolTipContent.add(new Label(UNSATISFIABLE));
 			break;
 		case TAUTOLOGY:
-			label.setIcon(null);
+			label.setIcon(FM_WARNING);
 			add(label);
 			toolTipContent.add(new Label(TAUTOLOGY));
 			break;

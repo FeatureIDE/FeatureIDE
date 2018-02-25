@@ -18,40 +18,48 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analysesOld;
+package org.prop4j.analyses.impl.sat4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.solverOld.BasicSolver;
-import org.prop4j.solverOld.ISatSolver;
-import org.prop4j.solverOld.ISatSolver.SelectionStrategy;
-import org.prop4j.solverOld.SatInstance;
+import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
+import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds core and dead features. Especially optimized for the Sat4J Sat solver.
  *
  * @author Sebastian Krieter
+ * @author Joshua Sprey
  */
-public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
+public class Sat4JImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
-	private final List<int[]> pairs;
+	private List<int[]> pairs;
+	Sat4jSatSolver solver;
 
-	public ImplicationAnalysis(SatInstance satInstance, List<int[]> pairs) {
-		super(satInstance);
-		this.pairs = pairs;
+	public Sat4JImplicationAnalysis(Sat4jSatSolver solver) {
+		super(solver);
+		this.solver = solver;
 	}
 
-	public ImplicationAnalysis(BasicSolver solver, List<int[]> pairs) {
-		super(solver);
+	/**
+	 * Sets the pairs assumed to contain the false optional feature with its parent in structure {-Parent, FAfeature}
+	 *
+	 * @param pairs Pairs to check
+	 */
+	public void setPairs(List<int[]> pairs) {
 		this.pairs = pairs;
 	}
 
 	@Override
-	public List<int[]> analyze(IMonitor monitor) throws Exception {
+	public List<int[]> analyze(IMonitor monitor) {
 		final List<int[]> resultList = new ArrayList<>();
 
 		if (pairs == null) {
@@ -60,22 +68,22 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
-		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+		solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 
 		monitor.checkCancel();
-		final int[] model1 = solver.findModel();
+		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
 			solutionList.add(model1);
-			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
+			solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 
 			monitor.checkCancel();
-			final int[] model2 = solver.findModel();
+			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
 			solutionList.add(model2);
 
 			// if there are more negative than positive literals
 			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
-				solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+				solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 			}
 
 			pairLoop: for (final int[] pair : pairs) {
@@ -89,7 +97,12 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 					continue pairLoop;
 				}
 				for (final int i : pair) {
-					solver.assignmentPush(-i);
+					try {
+						solver.push(getLiteralFromIndex(-i));
+					} catch (final ContradictionException e) {
+						// Is unsatisfiable => false optional
+						resultList.add(pair);
+					}
 				}
 				switch (solver.isSatisfiable()) {
 				case FALSE:
@@ -98,12 +111,12 @@ public class ImplicationAnalysis extends AbstractAnalysis<List<int[]>> {
 				case TIMEOUT:
 					break;
 				case TRUE:
-					solutionList.add(solver.getModel());
+					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
 					solver.shuffleOrder();
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
-					solver.assignmentPop();
+					solver.pop();
 				}
 			}
 		}

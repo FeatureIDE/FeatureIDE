@@ -34,7 +34,6 @@ import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISolver;
 import org.sat4j.core.VecInt;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -110,26 +109,23 @@ public class IndeterminedAnalysis extends GeneralSolverAnalysis<int[]> {
 
 			try {
 				solver.push(getNodeArray(relevantClauses));
+				final ISatResult satResult = solver.isSatisfiable();
+				switch (satResult) {
+				case FALSE:
+				case TIMEOUT:
+					break;
+				case TRUE:
+					resultList.push(literal);
+					break;
+				default:
+					throw new AssertionError(satResult);
+				}
+				solver.pop(relevantClauses.size());
 			} catch (final ContradictionException e) {
-				FMCorePlugin.getDefault().logError(e);
+				// Continue
 			}
-
-			final ISatResult satResult = solver.isSatisfiable();
-			switch (satResult) {
-			case FALSE:
-			case TIMEOUT:
-				break;
-			case TRUE:
-				resultList.push(literal);
-				break;
-			default:
-				throw new AssertionError(satResult);
-			}
-			solver.pop(relevantClauses.size());
-
 			monitor.step();
 		}
-
 		return Arrays.copyOf(resultList.toArray(), resultList.size());
 	}
 

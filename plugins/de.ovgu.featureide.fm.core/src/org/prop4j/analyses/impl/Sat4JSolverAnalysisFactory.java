@@ -24,18 +24,21 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
+import org.prop4j.analyses.impl.cleanGeneral.AAACoreDeadAnalysis;
+import org.prop4j.analyses.impl.cleanGeneral.AAAImplicationAnalysis;
 import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnaylsis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.RedundantConstraintAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
+import org.prop4j.analyses.impl.sat4j.Sat4JCoreDeadAnalysis;
+import org.prop4j.analyses.impl.sat4j.Sat4JImplicationAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
  * Default factory used to create analysis with their appropriate solver.
@@ -72,7 +75,21 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
 			return getRedundantConstraintAnalysis(problem);
 		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnaylsis.class)) {
-			return getConstraintsUnsatisfiableAnaylsis(problem);
+			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
+		}
+
+		// Check for AAA analysis
+		if (analysisClass.equals(AAACoreDeadAnalysis.class)) {
+			return getAAACoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(AAAImplicationAnalysis.class)) {
+			return getAAAImplicationAnalysis(problem);
+		}
+
+		// Check for SAT4J analysis
+		if (analysisClass.equals(Sat4JCoreDeadAnalysis.class)) {
+			return getSat4JCoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(Sat4JImplicationAnalysis.class)) {
+			return getSat4JImplicationAnalysis(problem);
 		}
 		return null;
 	}
@@ -130,4 +147,41 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 			return null;
 		}
 	}
+
+	private AAACoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new AAACoreDeadAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private AAAImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new AAAImplicationAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private Sat4JImplicationAnalysis getSat4JImplicationAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new Sat4JImplicationAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private Sat4JCoreDeadAnalysis getSat4JCoreDeadAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+			return new Sat4JCoreDeadAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
 }

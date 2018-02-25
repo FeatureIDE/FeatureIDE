@@ -34,20 +34,6 @@ public abstract class AbstractSatSolver implements ISatSolver {
 
 	ISatProblem problem;
 
-	public static final String CONFIG_TIMEOUT = "Timeout";
-	public static final String CONFIG_VERBOSE = "Verbose";
-	public static final String CONFIG_DB_SIMPLIFICATION_ALLOWED = "DBSimplification";
-	public static final String CONFIG_SELECTION_STRATEGY = "SelectionStrategy";
-
-	/**
-	 * Enumeration about the selection strategy's that can be used of the Sat4J solver.
-	 *
-	 * @author Joshua Sprey
-	 */
-	public static enum SatSolverSelectionStrategy {
-		NEGATIVE, ORG, POSITIVE, RANDOM
-	}
-
 	/**
 	 * Create a new Sat solver.
 	 *

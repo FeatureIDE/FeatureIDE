@@ -44,7 +44,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
-import org.prop4j.analysesOld.FeatureModelAnalysis;
+import org.prop4j.analyses.impl.general.FeatureModelAnalysis;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -604,7 +604,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateConstraints() {
-		final org.prop4j.analyses.impl.general.FeatureModelAnalysis analysis = new org.prop4j.analyses.impl.general.FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
@@ -625,7 +625,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateFeatures() {
-		final org.prop4j.analyses.impl.general.FeatureModelAnalysis analysis = new org.prop4j.analyses.impl.general.FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
 		analysis.updateFeatures();

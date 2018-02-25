@@ -21,8 +21,6 @@
 package org.prop4j.analyses.impl.general;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
-import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
@@ -51,57 +49,42 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
-		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
-		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
-
-		if (model1 != null) {
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
-			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-
-			if (features != null) {
-				final int[] model3 = new int[model1.length];
-				for (int i = 0; i < features.length; i++) {
-					final int index = features[i] - 1;
-					if (index >= 0) {
-						model3[index] = model1[index];
-					}
-				}
-				model1 = model3;
-			}
-
-			SolverUtils.updateModel(model1, model2);
-
-			for (int i = 0; i < model1.length; i++) {
-				final int varX = model1[i];
-				if (varX != 0) {
+		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		for (int i = 0; i < model1.length; i++) {
+			final int varX = model1[i];
+			if (varX != 0) {
+				try {
+					solver.push(getLiteralFromIndex(-varX));
+				} catch (final ContradictionException e) {
+					// Unsatisfiable => dead or core feature
 					try {
-						solver.push(getLiteralFromIndex(-varX));
+						solver.push(getLiteralFromIndex(varX));
+					} catch (final ContradictionException e1) {
+						// Should not be thrown
+					}
+					monitor.invoke(varX);
+				}
+				switch (solver.isSatisfiable()) {
+				case FALSE:
+					// Unsatisfiable => dead or core feature
+					solver.pop();
+					try {
+						solver.push(getLiteralFromIndex(varX));
 					} catch (final ContradictionException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
-					switch (solver.isSatisfiable()) {
-					case FALSE:
-						solver.pop();
-						try {
-							solver.push(getLiteralFromIndex(varX));
-						} catch (final ContradictionException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
-						monitor.invoke(varX);
-						break;
-					case TIMEOUT:
-						solver.pop();
-						break;
-					case TRUE:
-						solver.pop();
-						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
-						// solver.shuffleOrder();
-						break;
-					}
+					monitor.invoke(varX);
+					break;
+				case TIMEOUT:
+					solver.pop();
+					break;
+				case TRUE:
+					solver.pop();
+					SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
+					break;
 				}
 			}
 		}
-
 		return getIntegerAssumptions();
 	}
 

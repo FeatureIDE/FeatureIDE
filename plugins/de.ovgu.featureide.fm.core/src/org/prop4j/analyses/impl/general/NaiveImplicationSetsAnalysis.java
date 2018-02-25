@@ -27,8 +27,8 @@ import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.analysesOld.ImplicationSetsAnalysis;
 import org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship;
 import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.SatInstance;
@@ -56,14 +56,14 @@ public class NaiveImplicationSetsAnalysis extends GeneralSolverAnalysis<HashMap<
 	public HashMap<Relationship, Relationship> analyze(IMonitor monitor) {
 		final HashMap<Relationship, Relationship> relationSet = new HashMap<>();
 
-		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		// satisfiable?
 		if (model1 != null) {
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
+			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 			int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 
 			// find core/dead features
 			final byte[] done = new byte[model1.length];

@@ -24,19 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
-import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.ISatSolver;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.util.RingList;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds false optional features.
  *
  * @author Sebastian Krieter
  * @author Joshua Sprey
@@ -67,31 +64,18 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 		}
 
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
-
-		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
 		monitor.checkCancel();
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
 			solutionList.add(model1);
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
-
-			monitor.checkCancel();
-			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-			solutionList.add(model2);
-
-			// if there are more negative than positive literals
-			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
-				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
-			}
 
 			pairLoop: for (final int[] pair : pairs) {
 				monitor.checkCancel();
 				solutionLoop: for (final int[] is : solutionList) {
-					for (final int i : pair) {
-						if (is[Math.abs(i) - 1] == i) {
-							continue solutionLoop;
-						}
+					// get assumed fa feature and check if it appears in every solution
+					if (isInSolution(is, pair[1])) {
+						continue solutionLoop;
 					}
 					continue pairLoop;
 				}
@@ -99,7 +83,8 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 					try {
 						solver.push(getLiteralFromIndex(-i));
 					} catch (final ContradictionException e) {
-						FMCorePlugin.getDefault().logError(e);
+						// Is unsatisfiable => false optional
+						resultList.add(pair);
 					}
 				}
 				switch (solver.isSatisfiable()) {
@@ -110,9 +95,6 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 					break;
 				case TRUE:
 					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
-//					if (solver instanceof Sat4jSatSolver) {
-//						((Sat4jSatSolver) solver).shuffleOrder();
-//					}
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
@@ -129,5 +111,14 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 			count += model[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
+	}
+
+	private boolean isInSolution(int[] solution, int value) {
+		for (final int i : solution) {
+			if (i == value) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

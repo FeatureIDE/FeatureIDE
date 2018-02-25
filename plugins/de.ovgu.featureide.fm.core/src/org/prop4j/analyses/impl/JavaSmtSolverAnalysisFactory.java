@@ -24,6 +24,8 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
+import org.prop4j.analyses.impl.cleanGeneral.AAACoreDeadAnalysis;
+import org.prop4j.analyses.impl.cleanGeneral.AAAImplicationAnalysis;
 import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnaylsis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
@@ -40,9 +42,9 @@ import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
- * TODO description
+ * JavaSMT factory used to create analysis with JavaSMT appropriated solvers.
  *
- * @author Joshua
+ * @author Joshua Sprey
  */
 public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
@@ -68,6 +70,13 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 			return getConstraintsUnsatisfiableAnaylsis(problem);
 		} else if (analysisClass.equals(FeatureAttributeRangeAnalysis.class)) {
 			return getFeatureAttributeRangeAnalysis(problem);
+		}
+
+		// Check for AAA analysis
+		if (analysisClass.equals(AAACoreDeadAnalysis.class)) {
+			return getAAACoreDeadAnalysis(problem);
+		} else if (analysisClass.equals(AAAImplicationAnalysis.class)) {
+			return getAAAImplicationAnalysis(problem);
 		}
 		return null;
 	}
@@ -135,4 +144,21 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 		}
 	}
 
+	private AAACoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			return new AAACoreDeadAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
+
+	private AAAImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			return new AAAImplicationAnalysis(solver);
+		} else {
+			return null;
+		}
+	}
 }

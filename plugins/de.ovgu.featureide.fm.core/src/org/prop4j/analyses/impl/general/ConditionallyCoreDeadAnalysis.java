@@ -22,8 +22,8 @@ package org.prop4j.analyses.impl.general;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.AbstractSatSolver.SatSolverSelectionStrategy;
 import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solverOld.SatInstance;
@@ -43,11 +43,11 @@ public class ConditionallyCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> 
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
-		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.POSITIVE);
+		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
 
 		if (model1 != null) {
-			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SatSolverSelectionStrategy.NEGATIVE);
+			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
 
 			SatInstance.updateModel(model1, model2);

@@ -48,8 +48,6 @@ import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-
 /**
  *
  * @author Joshua Sprey
@@ -211,7 +209,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				return ISatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
 			return ISatResult.TIMEOUT;
 		}
 	}
@@ -272,7 +269,6 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				memory.push(formula, solver.addClause(new VecInt(clause)));
 				pushstack.push(formula);
 			} catch (final ContradictionException e) {
-				FMCorePlugin.getDefault().logError("Cannot push formula \"" + formula + "\" to the solver because it would lead to a contradiction", e);
 				throw new org.prop4j.solver.ContradictionException();
 			}
 
@@ -315,6 +311,18 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		return null;
 	}
 
+	/**
+	 * Returns the native solver.
+	 *
+	 * @return native solver
+	 */
+	public Solver<?> getInternalSolver() {
+		if (solver instanceof Solver<?>) {
+			return (Solver<?>) solver;
+		}
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolver#setConfiguration(java.lang.String, java.lang.Object)
@@ -329,23 +337,23 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 			if (value instanceof Integer) {
 				final int timeout = (int) value;
 				solver.setTimeoutMs(timeout);
+				return true;
 			}
-			return true;
 		case CONFIG_VERBOSE:
 			if (value instanceof Boolean) {
 				final boolean verbose = (boolean) value;
 				solver.setVerbose(verbose);
+				return true;
 			}
-			return true;
 		case CONFIG_DB_SIMPLIFICATION_ALLOWED:
 			if (value instanceof Boolean) {
 				final boolean dbSimpiAllowed = (boolean) value;
 				solver.setDBSimplificationAllowed(dbSimpiAllowed);
+				return true;
 			}
-			return true;
 		case CONFIG_SELECTION_STRATEGY:
-			if (value instanceof SatSolverSelectionStrategy) {
-				final SatSolverSelectionStrategy strategy = (SatSolverSelectionStrategy) value;
+			if (value instanceof SelectionStrategy) {
+				final SelectionStrategy strategy = (SelectionStrategy) value;
 				switch (strategy) {
 				case NEGATIVE:
 					if (solver instanceof Solver<?>) {
