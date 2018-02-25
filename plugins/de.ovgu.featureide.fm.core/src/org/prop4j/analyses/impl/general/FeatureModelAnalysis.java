@@ -347,7 +347,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		}
 
 		if (valid) {
-//				checkConstraintRedundant(constraints);
+			checkConstraintRedundant(constraints);
 			checkConstraintTautology(constraints);
 			monitor.step();
 			monitor.step();

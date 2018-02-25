@@ -43,9 +43,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds redundant constraints.
  *
- * @author Sebastian Krieter
  * @author Joshua Sprey
  */
 public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<IConstraint, ConstraintAttribute>> {
@@ -76,26 +75,19 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 		for (final IConstraint constraint : constraints) {
 			i++;
 			boolean redundant = true;
-			boolean removedAtLeastOne = false;
-			for (final Node cm : cnfNodes.get(i).getChildren()) {
-				if (cm != null) {
-					removedAtLeastOne = true;
-				}
-			}
-			if (removedAtLeastOne) {
-				final Node constraintNode = cnfNodes.get(i);
 
-				final Node[] clauses = constraintNode.getChildren();
-				for (int j = 0; j < clauses.length; j++) {
-					if (!isImplied(clauses[j].getChildren())) {
-						redundant = false;
-						try {
-							solver.push(constraintNode);
-						} catch (final ContradictionException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
-						break;
+			final Node constraintNode = cnfNodes.get(i);
+
+			final Node[] clauses = constraintNode.getChildren();
+			for (int j = 0; j < clauses.length; j++) {
+				if (!isImplied(clauses[j].getChildren())) {
+					redundant = false;
+					try {
+						solver.push(constraintNode);
+					} catch (final ContradictionException e) {
+						FMCorePlugin.getDefault().logError(e);
 					}
+					break;
 				}
 			}
 
@@ -120,23 +112,25 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 	}
 
 	public boolean isImplied(Node... or) {
-		// Add the variables ass assumptions
+		// Add the variables as assumptions
 		for (int i = 0; i < or.length; i++) {
 			final Literal node = (Literal) or[i];
+			node.positive ^= true;
 			try {
 				solver.push(node);
 			} catch (final ContradictionException e) {
-				FMCorePlugin.getDefault().logError(e);
+				solver.pop(i);	// Removes the pushed assumptions
+				return true;
 			}
 		}
 		switch (solver.isSatisfiable()) {
 		case FALSE:
-			solver.pop(or.length);	// Removes the pushed assumptions
+//			solver.pop(or.length);	// Removes the pushed assumptions
 			return true;
 		case TIMEOUT:
 		case TRUE:
 		default:
-			solver.pop(or.length); // Removes the pushed assumptions
+//			solver.pop(or.length); // Removes the pushed assumptions
 			return false;
 		}
 	}

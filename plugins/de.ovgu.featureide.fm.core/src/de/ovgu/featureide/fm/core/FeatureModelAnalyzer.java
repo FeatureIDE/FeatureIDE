@@ -582,7 +582,8 @@ public class FeatureModelAnalyzer implements IEventListener {
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
 		this.monitor = monitor == null ? new NullMonitor() : monitor;
-		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		final org.prop4j.analysesOld.FeatureModelAnalysis analysis = new org.prop4j.analysesOld.FeatureModelAnalysis(fm);
+//		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
 		analysis.setCalculateFeatures(calculateFeatures);
 		analysis.setCalculateConstraints(calculateConstraints);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
@@ -815,7 +816,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 		case FEATURE_MODIFY: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
 		case FEATURE_NAME_CHANGED: // Required because feature names are used as variable names.
 		case GROUP_TYPE_CHANGED:
-		case HIDDEN_CHANGED: // TODO If a formula reset is required for this event type, remove this comment. Otherwise, remove this case.
+		case HIDDEN_CHANGED:
 		case MANDATORY_CHANGED:
 		case MODEL_DATA_CHANGED:
 		case MODEL_DATA_LOADED:
