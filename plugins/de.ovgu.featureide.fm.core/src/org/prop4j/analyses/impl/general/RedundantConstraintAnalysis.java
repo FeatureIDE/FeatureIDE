@@ -77,7 +77,6 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 			boolean redundant = true;
 
 			final Node constraintNode = cnfNodes.get(i);
-
 			final Node[] clauses = constraintNode.getChildren();
 			for (int j = 0; j < clauses.length; j++) {
 				if (!isImplied(clauses[j].getChildren())) {
@@ -115,9 +114,8 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 		// Add the variables as assumptions
 		for (int i = 0; i < or.length; i++) {
 			final Literal node = (Literal) or[i];
-			node.positive ^= true;
 			try {
-				solver.push(node);
+				solver.push(new Literal(node.var, !node.positive));
 			} catch (final ContradictionException e) {
 				solver.pop(i);	// Removes the pushed assumptions
 				return true;
@@ -125,12 +123,12 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 		}
 		switch (solver.isSatisfiable()) {
 		case FALSE:
-//			solver.pop(or.length);	// Removes the pushed assumptions
+			solver.pop(or.length);	// Removes the pushed assumptions
 			return true;
 		case TIMEOUT:
 		case TRUE:
 		default:
-//			solver.pop(or.length); // Removes the pushed assumptions
+			solver.pop(or.length); // Removes the pushed assumptions
 			return false;
 		}
 	}
