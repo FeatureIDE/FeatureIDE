@@ -26,7 +26,7 @@ import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
 import org.prop4j.analyses.impl.cleanGeneral.AAACoreDeadAnalysis;
 import org.prop4j.analyses.impl.cleanGeneral.AAAImplicationAnalysis;
-import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnaylsis;
+import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnalysis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
@@ -74,7 +74,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 			return getIndeterminedAnalysis(problem);
 		} else if (analysisClass.equals(RedundantConstraintAnalysis.class)) {
 			return getRedundantConstraintAnalysis(problem);
-		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnaylsis.class)) {
+		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
 			return getConstraintsUnsatisfiableAnaylsis(problem);// Start AAAAAAAAAAAAAAAAAAAAAAS
 		}
 
@@ -139,10 +139,10 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 		}
 	}
 
-	private ConstraintsUnsatisfiableAnaylsis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
+	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-			return new ConstraintsUnsatisfiableAnaylsis(solver, this);
+			return new ConstraintsUnsatisfiableAnalysis(solver, this);
 		} else {
 			return null;
 		}

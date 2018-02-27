@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl;
+package org.prop4j.analyses.impl.smt;
 
 import org.prop4j.analyses.AbstractSmtSolverAnalysis;
 import org.prop4j.solver.IOptimizationSolver;
@@ -27,15 +27,15 @@ import org.prop4j.solver.ISmtSolver;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * TODO description
+ * Finds the minimum and maximum value of a Term.
  *
- * @author Joshua
+ * @author Joshua Sprey
  */
 public class FeatureAttributeRangeAnalysis extends AbstractSmtSolverAnalysis<Object[]> {
 
 	private Object variable;
 
-	protected FeatureAttributeRangeAnalysis(ISmtSolver solver) {
+	public FeatureAttributeRangeAnalysis(ISmtSolver solver) {
 		super(solver);
 	}
 

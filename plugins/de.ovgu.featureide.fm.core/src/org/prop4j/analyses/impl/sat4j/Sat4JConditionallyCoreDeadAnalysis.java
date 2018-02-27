@@ -18,16 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.sat4j;
 
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.SatInstance;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
@@ -35,81 +34,60 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnalysis {
+public class Sat4JConditionallyCoreDeadAnalysis extends AbstractSat4JAnalysis<int[]> {
 
-	public ConditionallyCoreDeadAnalysisSat(ISolver solver) {
+	public Sat4JConditionallyCoreDeadAnalysis(Sat4jSatSolver solver) {
 		super(solver);
 	}
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
-		satCount = 0;
-//		solver.getAssignment().ensure(fixedVariables.length);
-		for (int i = 0; i < fixedVariables.length; i++) {
-			try {
-				solver.push(getLiteralFromIndex(fixedVariables[i]));
-			} catch (final ContradictionException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
 		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
-		satCount++;
 
 		if (model1 != null) {
 			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
 			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-			satCount++;
-
-			// if there are more negative than positive literals
-			if ((model1.length < (countNegative(model2) + countNegative(model1)))) {
-				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
-			} else {
-				solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
-
-			}
-
-			for (int i = 0; i < fixedVariables.length; i++) {
-				model1[Math.abs(fixedVariables[i]) - 1] = 0;
-			}
 
 			SatInstance.updateModel(model1, model2);
+//			for (int i = 0; i < assumptions.length; i++) {
+//				model1[Math.abs(assumptions[i]) - 1] = 0;
+//			}
+
+//			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(model1, true), solver.getOrder()));
+
 			for (int i = 0; i < model1.length; i++) {
 				final int varX = model1[i];
 				if (varX != 0) {
 					try {
 						solver.push(getLiteralFromIndex(-varX));
 					} catch (final ContradictionException e) {
-						FMCorePlugin.getDefault().logError(e);
+						try {
+							solver.pop();
+							solver.push(getLiteralFromIndex(varX));
+						} catch (final ContradictionException e1) {}
 					}
-					satCount++;
 					switch (solver.isSatisfiable()) {
 					case FALSE:
-						solver.pop();
 						try {
+							solver.pop();
 							solver.push(getLiteralFromIndex(varX));
-						} catch (final ContradictionException e) {
-							FMCorePlugin.getDefault().logError(e);
-						}
+						} catch (final ContradictionException e) {}
 						break;
 					case TIMEOUT:
 						solver.pop();
 						break;
 					case TRUE:
 						solver.pop();
-						SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
-						solver.pop();
+						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
+						solver.shuffleOrder();
 						break;
 					}
 				}
 			}
 		}
-		return getIntegerAssumptions();
-	}
 
-	@Override
-	public String toString() {
-		return "SAT_Improved";
+		return getIntegerAssumptions();
 	}
 
 }

@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds indetermined features. Hidden feature that does not depend on non-Hidden features.
  *
  * @author Sebastian Krieter
  * @author Joshua Sprey

@@ -284,6 +284,15 @@ public class SolverMemory<T> {
 		return formulas;
 	}
 
+	/**
+	 * Returns the number of clauses.
+	 *
+	 * @return int number of clauses
+	 */
+	public int getNumberOfClauses() {
+		return getFormulasAsListWithoutAssumptions().size();
+	}
+
 	public String getQueryPrint() {
 		final StringBuilder query = new StringBuilder();
 		for (int i = 0; i < problem.getClauses().length; i++) {

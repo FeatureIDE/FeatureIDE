@@ -18,45 +18,35 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.sat4j;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
-import org.prop4j.solver.ISolver;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 
 /**
- * Finds core and dead features.
+ * Abstract class for every Sat4J specific analysis
  *
- * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public abstract class AConditionallyCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
+public class AbstractSat4JAnalysis<T> extends GeneralSolverAnalysis<T> {
 
-	public int satCount;
+	protected Sat4jSatSolver solver;
 
-	protected int[] fixedVariables;
-	protected int newCount;
-
-	public AConditionallyCoreDeadAnalysis(ISolver solver) {
+	/**
+	 * @param solver
+	 */
+	protected AbstractSat4JAnalysis(Sat4jSatSolver solver) {
 		super(solver);
-		resetFixedFeatures();
+		this.solver = solver;
 	}
 
-	public void setFixedFeatures(int[] fixedVariables, int newCount) {
-		this.fixedVariables = fixedVariables;
-		this.newCount = newCount;
-	}
-
-	public void resetFixedFeatures() {
-		fixedVariables = new int[0];
-		newCount = 0;
-	}
-
-	protected static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
-		}
-		return count;
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.GeneralSolverAnalysis#getSolver()
+	 */
+	@Override
+	public Sat4jSatSolver getSolver() {
+		return solver;
 	}
 
 }

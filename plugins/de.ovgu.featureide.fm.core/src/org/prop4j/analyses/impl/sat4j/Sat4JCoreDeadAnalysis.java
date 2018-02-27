@@ -20,7 +20,6 @@
  */
 package org.prop4j.analyses.impl.sat4j;
 
-import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
@@ -38,13 +37,10 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public class Sat4JCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
-
-	Sat4jSatSolver solver;
+public class Sat4JCoreDeadAnalysis extends AbstractSat4JAnalysis<int[]> {
 
 	public Sat4JCoreDeadAnalysis(Sat4jSatSolver solver) {
 		super(solver);
-		this.solver = solver;
 	}
 
 	private int[] features;

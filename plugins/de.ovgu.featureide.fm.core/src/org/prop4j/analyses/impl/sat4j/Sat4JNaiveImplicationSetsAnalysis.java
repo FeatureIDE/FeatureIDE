@@ -18,19 +18,18 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.sat4j;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.analysesOld.ImplicationSetsAnalysis;
 import org.prop4j.analysesOld.ImplicationSetsAnalysis.Relationship;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.SatInstance;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -40,15 +39,16 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * Creates a complete implication graph.</br> This class is only for benchmark purposes. Uses {@link ImplicationSetsAnalysis} instead.
  *
  * @author Sebastian Krieter AtomicSetAnalysis
+ * @author Joshua Sprey
  */
-public class NaiveImplicationSetsAnalysis extends GeneralSolverAnalysis<HashMap<Relationship, Relationship>> {
+public class Sat4JNaiveImplicationSetsAnalysis extends AbstractSat4JAnalysis<HashMap<Relationship, Relationship>> {
 
 	private static final byte BIT_11 = 1 << 3;
 	private static final byte BIT_10 = 1 << 2;
 	private static final byte BIT_01 = 1 << 1;
 	private static final byte BIT_00 = 1 << 0;
 
-	public NaiveImplicationSetsAnalysis(ISolver solver) {
+	public Sat4JNaiveImplicationSetsAnalysis(Sat4jSatSolver solver) {
 		super(solver);
 	}
 
@@ -96,7 +96,7 @@ public class NaiveImplicationSetsAnalysis extends GeneralSolverAnalysis<HashMap<
 						solver.pop();
 						model2 = SolverUtils.getIntModel(solver.findSolution());
 						SolverUtils.updateModel(model1Copy, model2);
-//						solver.shuffleOrder();
+						solver.shuffleOrder();
 						break;
 					}
 				}

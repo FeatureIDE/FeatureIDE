@@ -23,7 +23,6 @@ package org.prop4j.analyses.impl.sat4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
@@ -39,10 +38,9 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public class Sat4JImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
+public class Sat4JImplicationAnalysis extends AbstractSat4JAnalysis<List<int[]>> {
 
 	private List<int[]> pairs;
-	Sat4jSatSolver solver;
 
 	public Sat4JImplicationAnalysis(Sat4jSatSolver solver) {
 		super(solver);

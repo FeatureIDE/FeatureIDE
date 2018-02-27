@@ -20,7 +20,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
-import org.prop4j.analyses.impl.FeatureAttributeRangeAnalysis;
+import org.prop4j.analyses.impl.smt.FeatureAttributeRangeAnalysis;
 import org.prop4j.explain.solvers.impl.ltms.Ltms;
 import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 import org.prop4j.solver.ISatProblem;

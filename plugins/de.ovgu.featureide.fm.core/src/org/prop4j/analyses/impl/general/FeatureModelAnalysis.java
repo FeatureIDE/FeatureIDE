@@ -398,8 +398,8 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkConstraintUnsatisfiable(final List<IConstraint> constraints) {
 		// Only structure problem needed
-		final ConstraintsUnsatisfiableAnaylsis constraintsUnsatisfiableAnaylsis =
-			(ConstraintsUnsatisfiableAnaylsis) factory.getAnalysis(ConstraintsUnsatisfiableAnaylsis.class, structureModelProblem);
+		final ConstraintsUnsatisfiableAnalysis constraintsUnsatisfiableAnaylsis =
+			(ConstraintsUnsatisfiableAnalysis) factory.getAnalysis(ConstraintsUnsatisfiableAnalysis.class, structureModelProblem);
 		constraintsUnsatisfiableAnaylsis.setConstraints(constraints);
 		final Map<IConstraint, ConstraintAttribute> map = LongRunningWrapper.runMethod(constraintsUnsatisfiableAnaylsis, monitor.subTask(0));
 		for (final IConstraint iConstraint : map.keySet()) {

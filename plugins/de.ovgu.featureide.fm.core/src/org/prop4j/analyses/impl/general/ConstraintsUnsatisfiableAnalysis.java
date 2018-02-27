@@ -40,19 +40,19 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
- * Finds core and dead features.
+ * Finds constraints that are unsatisfiable.
  *
  * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public class ConstraintsUnsatisfiableAnaylsis extends GeneralSolverAnalysis<Map<IConstraint, ConstraintAttribute>> {
+public class ConstraintsUnsatisfiableAnalysis extends GeneralSolverAnalysis<Map<IConstraint, ConstraintAttribute>> {
 
-	public ConstraintsUnsatisfiableAnaylsis(ISolver solver, AbstractSolverAnalysisFactory factory) {
+	public ConstraintsUnsatisfiableAnalysis(ISolver solver, AbstractSolverAnalysisFactory factory) {
 		super(solver);
 		this.factory = factory;
 	}
 
-	AbstractSolverAnalysisFactory factory;
+	private final AbstractSolverAnalysisFactory factory;
 	private List<IConstraint> constraints;
 
 	@Override

@@ -18,13 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.general;
+package org.prop4j.analyses.impl.sat4j;
 
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
-import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
+import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -37,11 +37,11 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Sebastian Krieter
  */
-public class ConditionallyCoreDeadAnalysisFG extends AConditionallyCoreDeadAnalysis {
+public class Sat4JConditionallyCoreDeadAnalysisFG extends Sat4JAConditionallyCoreDeadAnalysis {
 
 	private final IFeatureGraph featureGraph;
 
-	public ConditionallyCoreDeadAnalysisFG(ISolver solver, IFeatureGraph featureGraph) {
+	public Sat4JConditionallyCoreDeadAnalysisFG(Sat4jSatSolver solver, IFeatureGraph featureGraph) {
 		super(solver);
 		this.featureGraph = featureGraph;
 	}
