@@ -18,32 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.solver;
+
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 
 /**
- * Term represent a variable, constant or function
+ * Factory used to create solvers.
  *
  * @author Joshua Sprey
  */
-public abstract class Term {
+public abstract class SatSolverFactory {
 
-	protected Term(Object var) {
-		this.var = var;
-	}
-
-	protected Object var;
-
-	public Object getValue() {
-		return var;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/**
+	 * Return a solver with a mus extractor interface
 	 */
-	@Override
-	public int hashCode() {
-		final int hashCode = "terminus".hashCode() * 24;
-		return hashCode;
+	public abstract IMusExtractor getMusExtractor(ISatProblem problem);
+
+	/**
+	 * Return a solver to solve sat querys
+	 */
+	public abstract ISatSolver getSolver(ISatProblem problem);
+
+	/**
+	 * Return a solver with a optimization interface
+	 */
+	public abstract IOptimizationSolver getOptimizationSolver(ISmtProblem problem);
+
+	/**
+	 * Returns the default factory for Sat4J solver
+	 *
+	 * @return
+	 */
+	public static SatSolverFactory getDefault() {
+		return new Sat4JSatSolverFactory();
 	}
 }

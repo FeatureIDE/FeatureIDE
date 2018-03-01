@@ -18,32 +18,47 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.solver.impl.sat4j;
+
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.IOptimizationSolver;
+import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.ISmtProblem;
+import org.prop4j.solver.SatSolverFactory;
 
 /**
- * Term represent a variable, constant or function
+ * Concrete factory for Sat4J sat solver
  *
  * @author Joshua Sprey
  */
-public abstract class Term {
+public class Sat4JSatSolverFactory extends SatSolverFactory {
 
-	protected Term(Object var) {
-		this.var = var;
-	}
-
-	protected Object var;
-
-	public Object getValue() {
-		return var;
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
+	 */
+	@Override
+	public IMusExtractor getMusExtractor(ISatProblem problem) {
+		return new Sat4JSatMusSolver(problem, null);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	 * @see org.prop4j.solver.SatSolverFactory#getSolver()
 	 */
 	@Override
-	public int hashCode() {
-		final int hashCode = "terminus".hashCode() * 24;
-		return hashCode;
+	public ISatSolver getSolver(ISatProblem problem) {
+		return new Sat4JSatMusSolver(problem, null);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.SatSolverFactory#getOptimizationSolver()
+	 */
+	@Override
+	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
+		throw new UnsupportedOperationException("Sat4J does not support optimizing.");
+	}
+
 }

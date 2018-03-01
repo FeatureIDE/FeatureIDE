@@ -73,15 +73,17 @@ public interface ISolver {
 	 * Pushes a new node to the stack.
 	 *
 	 * @param formula Node that should be added to the stack.
+	 * @return number of clauses added to the solver.
 	 */
-	void push(Node formula) throws ContradictionException;
+	int push(Node formula) throws ContradictionException;
 
 	/**
 	 * Pushed multiple nodes to the stack.
 	 *
 	 * @param formulas New nodes that should be added to the stack.
+	 * @return number of clauses added to the solver.
 	 */
-	void push(Node... formulas) throws ContradictionException;
+	int push(Node... formulas) throws ContradictionException;
 
 	/**
 	 * Returns a valid configuration for the given problem. Should only be called directly after isSatisfiable() returned true.
@@ -104,5 +106,28 @@ public interface ISolver {
 	 * @return The problem
 	 */
 	ISolverProblem getProblem();
+
+	/**
+	 * Returns the clause at the given index. Also includes the pushed clauses.
+	 *
+	 * @param clause
+	 * @return
+	 */
+	int getIndexOfClause(Node clause);
+
+	/**
+	 * Returns the index of the given node that should be a clause.
+	 *
+	 * @param index
+	 * @return
+	 */
+	Node getClauseOfIndex(int index);
+
+	/**
+	 * Returns all current clauses from the solver
+	 *
+	 * @return
+	 */
+	List<Node> getClauses();
 
 }

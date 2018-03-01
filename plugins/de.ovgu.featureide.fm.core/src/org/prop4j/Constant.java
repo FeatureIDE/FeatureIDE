@@ -60,4 +60,13 @@ public class Constant<T extends Datatype> extends Term {
 	public String toString() {
 		return getValue().toString();
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Term#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode() + (var.hashCode() * 5);
+	}
 }

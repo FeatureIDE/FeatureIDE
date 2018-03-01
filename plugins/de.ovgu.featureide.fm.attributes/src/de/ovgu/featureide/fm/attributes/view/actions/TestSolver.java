@@ -21,15 +21,15 @@ import org.prop4j.Or;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.impl.smt.FeatureAttributeRangeAnalysis;
-import org.prop4j.explain.solvers.impl.ltms.Ltms;
-import org.prop4j.explain.solvers.impl.sat4j.Sat4jMusExtractor;
 import org.prop4j.solver.ISatProblem;
+import org.prop4j.solver.impl.SatProblem;
 import org.prop4j.solver.impl.SmtProblem;
 import org.prop4j.solver.impl.SolverUtils;
 import org.prop4j.solver.impl.sat4j.Sat4JSatMusSolver;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 import org.prop4j.solverOld.BasicSolver;
 import org.prop4j.solverOld.SatInstance;
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatMusExtractor;
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolver;
 import org.prop4j.solvers.impl.javasmt.smt.JavaSmtSolver;
 import org.sat4j.specs.ContradictionException;
@@ -56,9 +56,10 @@ public class TestSolver extends Action {
 		if (view.getFeatureModel() != null) {
 			// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
 			Node cnf = view.getFeatureModel().getAnalyser().getCnf();
-			// ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+			ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+
 			testeAttributeRanges(cnf);
-			// testeAllMus(problem);
+			// testeMus(problem);
 			// testSatSolver(problem);
 		}
 	}
@@ -116,7 +117,7 @@ public class TestSolver extends Action {
 		analysis.setVariable("sum");
 		analysis.getSolver().setConfiguration(JavaSmtSolver.SOLVER_TYPE, Solvers.Z3);
 		Object result = LongRunningWrapper.runMethod(analysis, new NullMonitor());
-		FMCorePlugin.getDefault().logInfo("");
+		FMCorePlugin.getDefault().logInfo("" + result);
 		// falls nötig
 		// analysis.getSolver().push(formula);
 
@@ -124,25 +125,30 @@ public class TestSolver extends Action {
 
 	public void testeAllMus(ISatProblem problem) {
 		try {
-			JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
-			Literal test = new Literal("Security", true);
-			solver3.push(test);
+			JavaSmtSatMusExtractor solver3 = new JavaSmtSatMusExtractor(problem, Solvers.SMTINTERPOL, null);
+			Node test = new And(new Or(new Literal("Security"), new Literal("Security2")), new Implies(new Literal("Base"), new Literal("Security", false)));
+			test = test.toRegularCNF();
+			solver3.push(new Literal("Security", true));
+			solver3.push(test.getChildren());
 
-			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
-			Ltms ltms = new Ltms();
-			for (Node clause : problem.getClauses()) {
-				extractor.addClause(clause);
-				ltms.addClause(clause);
-			}
-			extractor.addAssumption("Security", true);
-			ltms.addAssumption("Security", true);
+//			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
+//			Ltms ltms = new Ltms();
+//			for (Node clause : problem.getClauses()) {
+//				extractor.addClause(clause);
+//				ltms.addClause(clause);
+//			}
+//			extractor.addAssumption("Security", true);
+//			ltms.addClause(test.getChildren()[0]);
+//			ltms.addClause(test.getChildren()[1]);
+//			ltms.addAssumption("Security", true);
 
 			Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
 
-			solver4.push(test);
+			solver4.push(new Literal("Security", true));
+			solver4.push(test.getChildren());
 
-			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getAllMinimalUnsatisfiableSubsets());
-			FMCorePlugin.getDefault().logInfo("Ltms:" + ltms.getAllMinimalUnsatisfiableSubsetIndexes());
+//			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getAllMinimalUnsatisfiableSubsets());
+//			FMCorePlugin.getDefault().logInfo("Ltms:" + ltms.getAllMinimalUnsatisfiableSubsetIndexes());
 			FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getAllMinimalUnsatisfiableSubsets());
 			FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getAllMinimalUnsatisfiableSubsets());
 		} catch (org.prop4j.solver.ContradictionException e) {
@@ -153,19 +159,19 @@ public class TestSolver extends Action {
 
 	public void testeMus(ISatProblem problem) {
 		try {
-			JavaSmtSatSolver solver3 = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+			JavaSmtSatMusExtractor solver3 = new JavaSmtSatMusExtractor(problem, Solvers.SMTINTERPOL, null);
 			Literal test = new Literal("Security", true);
 			solver3.push(test);
 
-			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
-			for (Node clause : problem.getClauses()) {
-				extractor.addClause(clause);
-			}
-			extractor.addAssumption("Security", true);
+//			Sat4jMusExtractor extractor = new Sat4jMusExtractor();
+//			for (Node clause : problem.getClauses()) {
+//				extractor.addClause(clause);
+//			}
+//			extractor.addAssumption("Security", true);
 
 			Sat4JSatMusSolver solver4 = new Sat4JSatMusSolver(problem, null);
 			solver4.push(test);
-			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getMinimalUnsatisfiableSubset());
+//			FMCorePlugin.getDefault().logInfo("Timo:" + extractor.getMinimalUnsatisfiableSubset());
 			FMCorePlugin.getDefault().logInfo("JavaSmt:" + solver3.getMinimalUnsatisfiableSubset());
 			FMCorePlugin.getDefault().logInfo("Josh:" + solver4.getMinimalUnsatisfiableSubset());
 		} catch (org.prop4j.solver.ContradictionException e) {
@@ -237,7 +243,7 @@ public class TestSolver extends Action {
 	}
 
 	public void testJAvaSat(ISatProblem problem) {
-		JavaSmtSatSolver solver = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+		JavaSmtSatMusExtractor solver = new JavaSmtSatMusExtractor(problem, Solvers.SMTINTERPOL, null);
 
 		Literal root = new Literal(view.getFeatureModel().getStructure().getRoot().getFeature().getName());
 		Literal newFeature1 = new Literal("NewFeature1");

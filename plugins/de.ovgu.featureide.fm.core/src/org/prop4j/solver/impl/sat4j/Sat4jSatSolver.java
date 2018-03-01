@@ -21,10 +21,10 @@
 package org.prop4j.solver.impl.sat4j;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Stack;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -61,7 +61,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	/** The current vector that holds all assumptions. */
 	protected final VecInt assignment = new VecInt();
 	/** Hold information about pushed nodes which can be clauses or assumptions. */
-	protected Stack<Node> pushstack = new Stack<>();
+	protected LinkedList<Node> pushstack = new LinkedList<>();
 	/** the pseudo clause. */
 	protected IConstr pseudoClause;
 	/**
@@ -253,11 +253,12 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override
-	public void push(Node formula) throws org.prop4j.solver.ContradictionException {
+	public int push(Node formula) throws org.prop4j.solver.ContradictionException {
 		if (formula instanceof Literal) {
 			final Literal literal = (Literal) formula;
 			assignment.push(getProblem().getSignedIndexOfVariable(literal));
 			pushstack.push(formula);
+			return 0;
 		} else if (formula instanceof Or) {
 			try {
 				final Node[] children = formula.getChildren();
@@ -268,11 +269,12 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				}
 				memory.push(formula, solver.addClause(new VecInt(clause)));
 				pushstack.push(formula);
+				return 1;
 			} catch (final ContradictionException e) {
 				throw new org.prop4j.solver.ContradictionException();
 			}
-
 		}
+		return 0;
 	}
 
 	/*
@@ -280,10 +282,12 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node[])
 	 */
 	@Override
-	public void push(Node... formulas) throws org.prop4j.solver.ContradictionException {
+	public int push(Node... formulas) throws org.prop4j.solver.ContradictionException {
+		int newClauses = 0;
 		for (int i = 0; i < formulas.length; i++) {
-			push(formulas[i]);
+			newClauses += push(formulas[i]);
 		}
+		return newClauses;
 	}
 
 	/*
@@ -384,5 +388,32 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 			break;
 		}
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getIndexOfClause(org.prop4j.Node)
+	 */
+	@Override
+	public int getIndexOfClause(Node clause) {
+		return memory.getIndexOfNode(clause);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getClauseOfIndex(int)
+	 */
+	@Override
+	public Node getClauseOfIndex(int index) {
+		return memory.getNodeOfIndex(index);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#getClauses()
+	 */
+	@Override
+	public List<Node> getClauses() {
+		return memory.getAllClauses();
 	}
 }

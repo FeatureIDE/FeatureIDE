@@ -24,8 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Literal;
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -65,9 +66,8 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 
 	@Override
 	public AutomaticSelectionExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle = getOracle();
-		final AutomaticSelectionExplanation explanation;
-		oracle.push();
+		final IMusExtractor oracle = getOracle();
+		AutomaticSelectionExplanation explanation;
 		try {
 			selectedFeatures.clear();
 			for (final SelectableFeature featureSelection : getConfiguration().getFeatures()) {
@@ -86,7 +86,7 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					default:
 						throw new IllegalStateException("Unknown feature selection state");
 					}
-					oracle.addAssumption(var, value); // Assumptions do not show up in the explanation.
+					oracle.push(new Literal(var, value)); // Assumptions do not show up in the explanation. TODO ATTRIBUTES they do in the new solver rework :/
 				} else {
 					switch (featureSelection.getManual()) {
 					case SELECTED:
@@ -100,13 +100,13 @@ public class MusAutomaticSelectionExplanationCreator extends MusConfigurationExp
 					default:
 						throw new IllegalStateException("Unknown feature selection state");
 					}
-					oracle.addFormula(new Literal(var, value));
+					oracle.push(new Literal(var, value));
 					selectedFeatures.add(featureSelection);
 				}
 			}
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
-		} finally {
-			oracle.pop();
+		} catch (final ContradictionException e) {
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		}
 		return explanation;
 	}

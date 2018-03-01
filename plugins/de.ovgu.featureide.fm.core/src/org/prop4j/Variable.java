@@ -59,4 +59,13 @@ public class Variable<T extends Datatype> extends Term {
 		return var.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Term#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode() + (var.hashCode() * 7);
+	}
+
 }

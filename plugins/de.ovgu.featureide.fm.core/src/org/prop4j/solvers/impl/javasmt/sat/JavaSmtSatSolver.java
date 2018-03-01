@@ -21,16 +21,14 @@
 package org.prop4j.solvers.impl.javasmt.sat;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 import org.prop4j.solver.AbstractSatSolver;
-import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
 import org.prop4j.solvers.impl.javasmt.Prop4JToJavaSmtTranslator;
@@ -57,7 +55,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *
  * @author Joshua Sprey
  */
-public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor {
+public class JavaSmtSatSolver extends AbstractSatSolver {
 
 	/** Configuration for the solver. Needed for the native solver. Not really used. */
 	protected Configuration config;
@@ -71,6 +69,8 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	protected SolverMemory<BooleanFormula> pushstack;
 	/** Translator used to transform prop4j nodes to JavaSMT formulas. */
 	protected Prop4JToJavaSmtTranslator translator;
+	/** Native Environment of JavaSMT used to solve the query's */
+	protected ProverEnvironment prover;
 	/** Configuration option for JavaSMT solver to determine the solver used. @link Solvers */
 	public static final String SOLVER_TYPE = "solver_type";
 
@@ -86,16 +86,28 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
 			translator = new Prop4JToJavaSmtTranslator(context);
+			prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
 			final List<BooleanFormula> clauses = new ArrayList<>();
 			for (final Node node : getProblem().getClauses()) {
 				final BooleanFormula formula = translator.getFormula(node);
 				clauses.add(formula);
+				prover.addConstraint(formula);
 			}
 			pushstack = new SolverMemory<>(problem, clauses);
 			setConfiguration(configuration);
+
 		} catch (final InvalidConfigurationException e) {
 			FMCorePlugin.getDefault().logError(e);
-		}
+		} catch (final InterruptedException e) {}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#finalize()
+	 */
+	@Override
+	protected void finalize() throws Throwable {
+		prover.close();
 	}
 
 	/*
@@ -104,12 +116,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public ISatResult isSatisfiable() {
-		try (ProverEnvironment prover = context.newProverEnvironment()) {
-			final List<BooleanFormula> formulas = pushstack.getFormulasAsList();
-			for (final BooleanFormula booleanFormula : formulas) {
-				prover.addConstraint(booleanFormula);
-			}
-			final boolean isSat = !prover.isUnsat();
+		try {
+			final List<BooleanFormula> formulas = pushstack.getAssumtions();
+			final boolean isSat = !prover.isUnsatWithAssumptions(formulas);
 			return isSat ? ISatResult.TRUE : ISatResult.FALSE;
 		} catch (final SolverException e) {
 			return ISatResult.TIMEOUT;
@@ -150,7 +159,15 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public Node pop() {
-		return pushstack.pop();
+		if (pushstack.isStackEmpty()) {
+			return null;
+		}
+		final Node node = pushstack.pop();
+		if (!(node instanceof Literal) || ((node.getChildren() != null) && (node.getChildren().length != 1))) {
+			// Is clause so pop from context
+			prover.pop();
+		}
+		return node;
 	}
 
 	/*
@@ -171,9 +188,20 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override
-	public void push(Node formula) {
-		final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
-		pushstack.push(formula, formulaJavaSmt);
+	public int push(Node formula) {
+		if ((formula instanceof Literal) || (formula instanceof Or)) {
+			final BooleanFormula formulaJavaSmt = translator.getFormula(formula);
+			pushstack.push(formula, formulaJavaSmt);
+			if ((formula instanceof Literal)) {
+				return 0;
+			} else {
+				try {
+					prover.push(formulaJavaSmt);
+				} catch (final InterruptedException e) {}
+				return 1;
+			}
+		}
+		return 0;
 	}
 
 	/*
@@ -181,10 +209,12 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node[])
 	 */
 	@Override
-	public void push(Node... formulas) {
+	public int push(Node... formulas) {
+		int newClauses = 0;
 		for (final Node node : formulas) {
-			push(node);
+			newClauses += push(node);
 		}
+		return newClauses;
 	}
 
 	/*
@@ -193,12 +223,8 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 	 */
 	@Override
 	public Object[] getSoulution() {
-		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
-			for (final BooleanFormula booleanFormula : usedConstraint) {
-				prover.addConstraint(booleanFormula);
-			}
-			if (!prover.isUnsat()) {
+		try {
+			if (!prover.isUnsatWithAssumptions(pushstack.getAssumtions())) {
 				final Model model = prover.getModel();
 				final Iterator<ValueAssignment> iterator = model.iterator();
 				final List<Integer> solution = new ArrayList<>();
@@ -232,66 +258,29 @@ public class JavaSmtSatSolver extends AbstractSatSolver implements IMusExtractor
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.solver.IMusExtractor#getMinimalUnsatisfiableSubset()
+	 * @see org.prop4j.solver.ISolver#getIndexOfClause(org.prop4j.Node)
 	 */
 	@Override
-	public Set<Node> getMinimalUnsatisfiableSubset() throws IllegalStateException {
-		try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
-			// Get all formulas but without assumption
-			final List<BooleanFormula> usedConstraint = pushstack.getFormulasAsList();
-			for (final BooleanFormula booleanFormula : usedConstraint) {
-				prover.addConstraint(booleanFormula);
-			}
-			if (prover.isUnsat()) {
-				final List<BooleanFormula> formula = prover.getUnsatCore();
-				final List<BooleanFormula> assumptions = pushstack.getAssumtions();
-				final Set<Node> explanation = new HashSet<>();
-				for (int i = 0; i < formula.size(); i++) {
-					// Don't add assumptions to unsat core
-					if (!assumptions.contains(formula.get(i))) {
-						explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
-					}
-				}
-				return explanation;
-			}
-		} catch (final SolverException e) {
-			return null;
-		} catch (final InterruptedException e) {
-			return null;
-		}
-		return null;
+	public int getIndexOfClause(Node clause) {
+		return pushstack.getIndexOfNode(clause);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.solver.IMusExtractor#getMinimalUnsatisfiableSubsetIndexes()
+	 * @see org.prop4j.solver.ISolver#getClauseOfIndex(int)
 	 */
 	@Override
-	public Set<Integer> getMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		final Set<Node> mut = getMinimalUnsatisfiableSubset();
-		final Set<Integer> explanation = new HashSet<>();
-		for (final Node node : mut) {
-			explanation.add(pushstack.getIndexOfNode(node));
-		}
-		return explanation;
+	public Node getClauseOfIndex(int index) {
+		return pushstack.getNodeOfIndex(index);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.prop4j.solver.IMusExtractor#getAllMinimalUnsatisfiableSubsets()
+	 * @see org.prop4j.solver.ISolver#getClauses()
 	 */
 	@Override
-	public List<Set<Node>> getAllMinimalUnsatisfiableSubsets() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubset());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.prop4j.solver.IMusExtractor#getAllMinimalUnsatisfiableSubsetIndexes()
-	 */
-	@Override
-	public List<Set<Integer>> getAllMinimalUnsatisfiableSubsetIndexes() throws IllegalStateException {
-		return Collections.singletonList(getMinimalUnsatisfiableSubsetIndexes());
+	public List<Node> getClauses() {
+		return pushstack.getAllClauses();
 	}
 
 }

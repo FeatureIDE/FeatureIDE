@@ -61,4 +61,13 @@ public abstract class AtomicFormula extends Node {
 	protected Node eliminateNonCNFOperators(Node[] newChildren) {
 		return null;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Node#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return leftTerm.hashCode() * rightTerm.hashCode();
+	}
 }

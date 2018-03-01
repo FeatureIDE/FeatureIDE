@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite;
 
 import java.util.Arrays;
 
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.ltms.LtmsPreprocessorExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreprocessorExplanationCreatorFactory;
 
 /**
@@ -36,13 +37,15 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus.MusPreproc
 public class CompositePreprocessorExplanationCreatorFactory extends PreprocessorExplanationCreatorFactory {
 
 	/** Factory for LTMS. */
-	private final PreprocessorExplanationCreatorFactory ltms = new LtmsPreprocessorExplanationCreatorFactory();
-	/** Factory for MUS. */
-	private final PreprocessorExplanationCreatorFactory mus = new MusPreprocessorExplanationCreatorFactory();
+	// private final PreprocessorExplanationCreatorFactory ltms = new LtmsPreprocessorExplanationCreatorFactory();
+	/** Factory for Sat4J MUS. */
+	private final PreprocessorExplanationCreatorFactory musSat4j = new MusPreprocessorExplanationCreatorFactory();
+	/** Factory for JavaSMT MUS. */
+	private final PreprocessorExplanationCreatorFactory musJavaSMT = new MusPreprocessorExplanationCreatorFactory(new JavaSmtSatSolverFactory());
 
 	@Override
 	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {
 		return new CompositeInvariantPresenceConditionExplanationCreator(
-				Arrays.asList(ltms.getInvariantPresenceConditionExplanationCreator(), mus.getInvariantPresenceConditionExplanationCreator()));
+				Arrays.asList(musJavaSMT.getInvariantPresenceConditionExplanationCreator(), musSat4j.getInvariantPresenceConditionExplanationCreator()));
 	}
 }

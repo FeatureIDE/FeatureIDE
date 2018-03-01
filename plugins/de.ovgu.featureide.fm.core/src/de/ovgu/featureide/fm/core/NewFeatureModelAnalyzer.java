@@ -45,7 +45,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.prop4j.analysesOld.FeatureModelAnalysis;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.SatSolverFactory;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;

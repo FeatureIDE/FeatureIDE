@@ -48,31 +48,39 @@ public class SatProblem implements ISatProblem {
 	 * @param rootNode
 	 */
 	public SatProblem(Node rootNode, Collection<?> featureList) {
-		intToVar = new Object[featureList.size() + 1];
-		intToClause = new Node[rootNode.getChildren().length];
 		root = rootNode;
 
-		if (!root.isConjunctiveNormalForm()) {
-			throw new IllegalStateException(
-					"The given root node to create a sat problem need to be in conjunctive normal form. And cannot containt the Node @link AtomicFormula");
-		}
+		if (rootNode != null) {
+			intToClause = new Node[rootNode.getChildren().length];
 
-		// Create mapping from index to clauses starting from 0
-		int indexClauses = 0;
-		for (final Node node : rootNode.getChildren()) {
-			clauseToInt.put(node, indexClauses);
-			intToClause[indexClauses++] = node;
-		}
-
-		// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
-		int indexVariables = 0;
-		for (final Object feature : featureList) {
-			final String name = feature.toString();
-			if (name == null) {
-				throw new RuntimeException();
+			if (!rootNode.isConjunctiveNormalForm()) {
+				rootNode = rootNode.toRegularCNF();
 			}
-			varToInt.put(name, ++indexVariables);
-			intToVar[indexVariables] = name;
+
+			// Create mapping from index to clauses starting from 0
+			int indexClauses = 0;
+			for (final Node node : rootNode.getChildren()) {
+				clauseToInt.put(node, indexClauses);
+				intToClause[indexClauses++] = node;
+			}
+		} else {
+			intToClause = new Node[0];
+		}
+
+		if (featureList != null) {
+			intToVar = new Object[featureList.size() + 1];
+			// Create mapping from index to variables starting from 1 to represent 1 as variable 1 is true and -1 as variable 1 is false.
+			int indexVariables = 0;
+			for (final Object feature : featureList) {
+				final String name = feature.toString();
+				if (name == null) {
+					throw new RuntimeException();
+				}
+				varToInt.put(name, ++indexVariables);
+				intToVar[indexVariables] = name;
+			}
+		} else {
+			intToVar = new Object[1];
 		}
 	}
 
@@ -81,6 +89,12 @@ public class SatProblem implements ISatProblem {
 	}
 
 	public static Set<Object> getDistinctVariableObjects(Node cnf) {
+		if (cnf == null) {
+			return null;
+		}
+		if (!cnf.isConjunctiveNormalForm()) {
+			cnf = cnf.toRegularCNF();
+		}
 		final HashSet<Object> result = new HashSet<>();
 		for (final Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
@@ -137,7 +151,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Node getClauseOfIndex(int index) {
-		if ((index > intToClause.length)) {
+		if ((index >= intToClause.length)) {
 			return null;
 		}
 		return intToClause[index];
@@ -149,7 +163,7 @@ public class SatProblem implements ISatProblem {
 	 */
 	@Override
 	public Object getVariableOfIndex(int index) {
-		if ((index > intToVar.length)) {
+		if ((index >= intToVar.length)) {
 			return null;
 		}
 		return intToVar[Math.abs(index)];

@@ -22,12 +22,13 @@ package de.ovgu.featureide.fm.core.explanations.fm.impl.composite;
 
 import java.util.Arrays;
 
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
-import de.ovgu.featureide.fm.core.explanations.fm.impl.ltms.LtmsFeatureModelExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplanationCreatorFactory;
 
 /**
@@ -38,24 +39,27 @@ import de.ovgu.featureide.fm.core.explanations.fm.impl.mus.MusFeatureModelExplan
 public class CompositeFeatureModelExplanationCreatorFactory extends FeatureModelExplanationCreatorFactory {
 
 	/** Factory for LTMS. */
-	private final FeatureModelExplanationCreatorFactory ltms = new LtmsFeatureModelExplanationCreatorFactory();
+	// private final FeatureModelExplanationCreatorFactory ltms = new LtmsFeatureModelExplanationCreatorFactory();
 	/** Factory for MUS. */
-	private final FeatureModelExplanationCreatorFactory mus = new MusFeatureModelExplanationCreatorFactory();
+	private final FeatureModelExplanationCreatorFactory musSat4J = new MusFeatureModelExplanationCreatorFactory();
+	/** Factory for JavaSmt MUS */
+	private final FeatureModelExplanationCreatorFactory musJavaSmt = new MusFeatureModelExplanationCreatorFactory(new JavaSmtSatSolverFactory());
 
 	@Override
 	public DeadFeatureExplanationCreator getDeadFeatureExplanationCreator() {
-		return new CompositeDeadFeatureExplanationCreator(Arrays.asList(ltms.getDeadFeatureExplanationCreator(), mus.getDeadFeatureExplanationCreator()));
+		return new CompositeDeadFeatureExplanationCreator(
+				Arrays.asList(musSat4J.getDeadFeatureExplanationCreator(), musJavaSmt.getDeadFeatureExplanationCreator()));
 	}
 
 	@Override
 	public FalseOptionalFeatureExplanationCreator getFalseOptionalFeatureExplanationCreator() {
 		return new CompositeFalseOptionalFeatureExplanationCreator(
-				Arrays.asList(ltms.getFalseOptionalFeatureExplanationCreator(), mus.getFalseOptionalFeatureExplanationCreator()));
+				Arrays.asList(musSat4J.getFalseOptionalFeatureExplanationCreator(), musJavaSmt.getFalseOptionalFeatureExplanationCreator()));
 	}
 
 	@Override
 	public RedundantConstraintExplanationCreator getRedundantConstraintExplanationCreator() {
 		return new CompositeRedundantConstraintExplanationCreator(
-				Arrays.asList(ltms.getRedundantConstraintExplanationCreator(), mus.getRedundantConstraintExplanationCreator()));
+				Arrays.asList(musSat4J.getRedundantConstraintExplanationCreator(), musJavaSmt.getRedundantConstraintExplanationCreator()));
 	}
 }

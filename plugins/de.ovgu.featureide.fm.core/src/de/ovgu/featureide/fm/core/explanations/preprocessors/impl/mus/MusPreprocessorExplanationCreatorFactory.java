@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.mus;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;

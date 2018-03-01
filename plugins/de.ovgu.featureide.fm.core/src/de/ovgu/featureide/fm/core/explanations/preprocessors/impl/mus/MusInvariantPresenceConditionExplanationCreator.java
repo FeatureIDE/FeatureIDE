@@ -26,8 +26,9 @@ import java.util.List;
 
 import org.prop4j.Node;
 import org.prop4j.Not;
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanation;
@@ -35,7 +36,7 @@ import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceCo
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorReason;
 
 /**
- * Implementation of {@link InvariantPresenceConditionExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Implementation of {@link InvariantPresenceConditionExplanationCreator} using a {@link IMusExtractor MUS extractor}.
  *
  * @author Timo G&uuml;nther
  */
@@ -83,17 +84,19 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 
 	@Override
 	public InvariantPresenceConditionExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle = getOracle();
-		final InvariantPresenceConditionExplanation explanation;
-		oracle.push();
+		final IMusExtractor oracle = getOracle();
+		InvariantPresenceConditionExplanation explanation = null;
 		try {
 			expressionClauses.clear();
 			boolean first = true; // The first expression on the stack is the subject, i.e., the invariant expression.
 			for (Node expression : getExpressionStack()) {
 				if (first && isTautology()) {
-					expression = new Not(expression);
+					expression = new Not(expression).toRegularCNF();
 				}
-				final int expressionClauseCount = oracle.addFormula(expression);
+				int expressionClauseCount = 0;
+				for (final Node clause : expression.getChildren()) {
+					expressionClauseCount += oracle.push(clause);
+				}
 				for (int i = 0; i < expressionClauseCount; i++) {
 					expressionClauses.add(expression);
 				}
@@ -103,9 +106,9 @@ public class MusInvariantPresenceConditionExplanationCreator extends MusPreproce
 				first = false;
 			}
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
-		} finally {
-			oracle.pop();
-		}
+		} catch (final ContradictionException e) {
+
+		} finally {}
 		return explanation;
 	}
 

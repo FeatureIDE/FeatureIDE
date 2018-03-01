@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.FalseOptionalFeatureExplanationCreator;
@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator
 import de.ovgu.featureide.fm.core.explanations.fm.RedundantConstraintExplanationCreator;
 
 /**
- * Provides instances of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Provides instances of {@link FeatureModelExplanationCreator} using a {@link IMusExtractor MUS extractor}.
  *
  * @author Timo G&uuml;nther
  */

@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.core.explanations.config.impl.composite;
 
 import java.util.Arrays;
 
+import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+
 import de.ovgu.featureide.fm.core.explanations.config.AutomaticSelectionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.config.ConfigurationExplanationCreatorFactory;
-import de.ovgu.featureide.fm.core.explanations.config.impl.ltms.LtmsConfigurationExplanationCreatorFactory;
 import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationExplanationCreatorFactory;
 
 /**
@@ -36,13 +37,15 @@ import de.ovgu.featureide.fm.core.explanations.config.impl.mus.MusConfigurationE
 public class CompositeConfigurationExplanationCreatorFactory extends ConfigurationExplanationCreatorFactory {
 
 	/** Factory for LTMS. */
-	private final ConfigurationExplanationCreatorFactory ltms = new LtmsConfigurationExplanationCreatorFactory();
-	/** Factory for MUS. */
-	private final ConfigurationExplanationCreatorFactory mus = new MusConfigurationExplanationCreatorFactory();
+	// private final ConfigurationExplanationCreatorFactory ltms = new LtmsConfigurationExplanationCreatorFactory();
+	/** Factory for Sat4J MUS. */
+	private final MusConfigurationExplanationCreatorFactory musSat4J = new MusConfigurationExplanationCreatorFactory();
+	/** Factory for JavaSmt MUS */
+	private final MusConfigurationExplanationCreatorFactory musJavaSmt = new MusConfigurationExplanationCreatorFactory(new JavaSmtSatSolverFactory());
 
 	@Override
 	public AutomaticSelectionExplanationCreator getAutomaticSelectionExplanationCreator() {
 		return new CompositeAutomaticSelectionExplanationCreator(
-				Arrays.asList(ltms.getAutomaticSelectionExplanationCreator(), mus.getAutomaticSelectionExplanationCreator()));
+				Arrays.asList(musJavaSmt.getAutomaticSelectionExplanationCreator(), musSat4J.getAutomaticSelectionExplanationCreator()));
 	}
 }

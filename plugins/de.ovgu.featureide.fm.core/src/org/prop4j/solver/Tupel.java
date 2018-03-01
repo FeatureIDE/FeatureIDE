@@ -18,20 +18,20 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j;
+package org.prop4j.solver;
 
 /**
- * Represents a constant type of a type
+ * Tupel containing information about two data types.
  *
- * @author Joshua
+ * @author Joshua Sprey
  */
-public class Konstante<T extends Datatype> extends Term {
+public class Tupel<A, B> {
 
-	/**
-	 * @param value
-	 */
-	protected Konstante(T value) {
-		super(value);
+	public A key;
+	public B value;
+
+	public Tupel(A key, B value) {
+		this.key = key;
+		this.value = value;
 	}
-
 }

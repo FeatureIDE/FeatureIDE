@@ -20,22 +20,23 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
+import org.prop4j.solver.impl.SatProblem;
 
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.fm.impl.AbstractFeatureModelExplanationCreator;
 
 /**
- * Abstract implementation of {@link FeatureModelExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Abstract implementation of {@link FeatureModelExplanationCreator} using a {@link IMusExtractor MUS extractor}.
  *
  * @param <S> subject
  * @param <E> explanation
  * @author Timo G&uuml;nther
  */
 public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureModelExplanation<S>>
-		extends AbstractFeatureModelExplanationCreator<S, E, MusExtractor> {
+		extends AbstractFeatureModelExplanationCreator<S, E, IMusExtractor> {
 
 	/** The solver factory used to create the oracle. */
 	private final SatSolverFactory solverFactory;
@@ -62,9 +63,8 @@ public abstract class MusFeatureModelExplanationCreator<S, E extends FeatureMode
 	}
 
 	@Override
-	protected MusExtractor createOracle() {
-		final MusExtractor oracle = getSatSolverFactory().getMusExtractor();
-		oracle.addFormula(getCnf());
+	protected IMusExtractor createOracle() {
+		final IMusExtractor oracle = getSatSolverFactory().getMusExtractor(new SatProblem(getCnf()));
 		return oracle;
 	}
 }

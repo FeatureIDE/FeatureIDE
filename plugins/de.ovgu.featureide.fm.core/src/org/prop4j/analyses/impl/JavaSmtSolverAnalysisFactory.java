@@ -138,7 +138,7 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 
 	private FeatureAttributeRangeAnalysis getFeatureAttributeRangeAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISmtProblem) {
-			final ISmtSolver solver = new JavaSmtSolver((ISmtProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			final ISmtSolver solver = new JavaSmtSolver((ISmtProblem) problem, Solvers.Z3, defaultConfiguration);
 			return new FeatureAttributeRangeAnalysis(solver);
 		} else {
 			return null;

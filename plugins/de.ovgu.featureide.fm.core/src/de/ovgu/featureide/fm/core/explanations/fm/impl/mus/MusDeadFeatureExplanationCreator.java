@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.Literal;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -29,7 +31,7 @@ import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.DeadFeatureExplanationCreator;
 
 /**
- * Implementation of {@link DeadFeatureExplanationCreator} using a {@link MusExtractor MUS extractor}.
+ * Implementation of {@link DeadFeatureExplanationCreator} using a {@link IMusExtractor MUS extractor}.
  *
  * @author Timo G&uuml;nther
  */
@@ -54,14 +56,14 @@ public class MusDeadFeatureExplanationCreator extends MusFeatureModelExplanation
 
 	@Override
 	public DeadFeatureExplanation getExplanation() throws IllegalStateException {
-		final MusExtractor oracle = getOracle();
-		final DeadFeatureExplanation explanation;
-		oracle.push();
+		final IMusExtractor oracle = getOracle();
+		DeadFeatureExplanation explanation;
 		try {
-			oracle.addAssumption(NodeCreator.getVariable(getSubject()), true);
+			oracle.push(new Literal(NodeCreator.getVariable(getSubject()), true));
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
-		} finally {
 			oracle.pop();
+		} catch (final ContradictionException ex) {
+			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		}
 		return explanation;
 	}

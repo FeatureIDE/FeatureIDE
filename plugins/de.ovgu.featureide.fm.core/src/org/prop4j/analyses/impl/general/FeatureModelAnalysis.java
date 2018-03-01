@@ -120,7 +120,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyConstraints);
 		constraintModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 
-		factory = AbstractSolverAnalysisFactory.getJavaSmtFactory();
+		factory = AbstractSolverAnalysisFactory.getDefault();
 	}
 
 	public boolean isCalculateConstraints() {

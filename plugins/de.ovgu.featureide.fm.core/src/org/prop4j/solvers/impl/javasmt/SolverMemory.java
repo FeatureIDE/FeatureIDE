@@ -21,15 +21,15 @@
 package org.prop4j.solvers.impl.javasmt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 import org.prop4j.solver.ISolverProblem;
-
-import com.google.common.collect.HashBiMap;
+import org.prop4j.solver.Tupel;
 
 /**
  *
@@ -57,11 +57,7 @@ public class SolverMemory<T> {
 	/**
 	 * Stack holds the correct order how the Nodes were pushed to the stack.
 	 */
-	private final Stack<Node> insertionStack = new Stack<Node>();
-	/**
-	 * Connects the Nodes with the formulas.
-	 */
-	private final HashBiMap<Node, T> data = HashBiMap.create();
+	private final LinkedList<Tupel<Node, T>> insertionStack = new LinkedList<>();
 	/**
 	 * Holds all formulas for the clauses which are part of the problem itself.
 	 */
@@ -74,8 +70,7 @@ public class SolverMemory<T> {
 	 * @param formula Formula that represents the Node for the given Solver.
 	 */
 	public void push(Node node, T formula) {
-		insertionStack.push(node);
-		data.put(node, formula);
+		insertionStack.push(new Tupel<Node, T>(node, formula));
 	}
 
 	/**
@@ -87,9 +82,8 @@ public class SolverMemory<T> {
 		if (isStackEmpty()) {
 			return null;
 		}
-		final Node t = insertionStack.pop();
-		data.remove(t);
-		return t;
+		final Tupel<Node, T> t = insertionStack.pop();
+		return t.key;
 	}
 
 	/**
@@ -101,10 +95,8 @@ public class SolverMemory<T> {
 		if (isStackEmpty()) {
 			return null;
 		}
-		final Node t = insertionStack.pop();
-		final T t2 = data.get(t);
-		data.remove(t);
-		return t2;
+		final Tupel<Node, T> t = insertionStack.pop();
+		return t.value;
 	}
 
 	/**
@@ -114,8 +106,8 @@ public class SolverMemory<T> {
 	 */
 	public List<T> getFormulasAsList() {
 		final ArrayList<T> formulas = new ArrayList<>(staticClauses);
-		for (final T formula : data.values()) {
-			formulas.add(formula);
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			formulas.add(tupel.value);
 		}
 		return formulas;
 	}
@@ -128,9 +120,9 @@ public class SolverMemory<T> {
 	 */
 	public List<T> getFormulasAsListWithoutAssumptions() {
 		final ArrayList<T> formulas = new ArrayList<>(staticClauses);
-		for (final Node node : data.keySet()) {
-			if (node instanceof Literal) {
-				formulas.add(data.get(node));
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			if (!(tupel.key instanceof Literal)) {
+				formulas.add(tupel.value);
 			}
 		}
 		return formulas;
@@ -150,7 +142,12 @@ public class SolverMemory<T> {
 			}
 			index++;
 		}
-		return data.get(node);
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			if (tupel.key == node) {
+				return tupel.value;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -166,8 +163,13 @@ public class SolverMemory<T> {
 			return problem.getClauseOfIndex(index);
 		} else {
 			// Formula is in pushed nodes maybe
-			return data.inverse().get(formula);
+			for (final Tupel<Node, T> tupel : insertionStack) {
+				if (tupel.value == formula) {
+					return tupel.key;
+				}
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -190,7 +192,7 @@ public class SolverMemory<T> {
 		if (index != -1) {
 			return index;
 		} else {
-			index = insertionStack.indexOf(node);
+			index = insertionStack.indexOf(new Tupel<Node, T>(node, getFormulaOfNode(node)));
 			if (index == -1) {
 				return index;
 			} else {
@@ -226,7 +228,7 @@ public class SolverMemory<T> {
 			return problem.getClauseOfIndex(index);
 		} else {
 			index -= staticClauses.size();
-			return insertionStack.get(index);
+			return insertionStack.get(index).key;
 		}
 	}
 
@@ -248,9 +250,9 @@ public class SolverMemory<T> {
 	 */
 	public List<T> getAssumtions() {
 		final List<T> assumtions = new ArrayList<>();
-		for (final Node node : insertionStack) {
-			if (node instanceof Literal) {
-				assumtions.add(data.get(node));
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			if (tupel.key instanceof Literal) {
+				assumtions.add(tupel.value);
 			}
 		}
 		return assumtions;
@@ -263,9 +265,9 @@ public class SolverMemory<T> {
 	 */
 	public List<T> getNewClauses() {
 		final List<T> clauses = new ArrayList<>();
-		for (final Node node : insertionStack) {
-			if (node instanceof Or) {
-				clauses.add(data.get(node));
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			if (tupel.key instanceof Or) {
+				clauses.add(tupel.value);
 			}
 		}
 		return clauses;
@@ -278,8 +280,8 @@ public class SolverMemory<T> {
 	 */
 	public List<T> getPushedFormulas() {
 		final List<T> formulas = new ArrayList<>();
-		for (final Node node : insertionStack) {
-			formulas.add(data.get(node));
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			formulas.add(tupel.value);
 		}
 		return formulas;
 	}
@@ -300,11 +302,21 @@ public class SolverMemory<T> {
 			query.append(" & ");
 		}
 		query.append("[");
-		for (final Node node : insertionStack) {
-			query.append(node);
+		for (final Tupel<Node, T> node : insertionStack) {
+			query.append(node.key);
 			query.append(" & ");
 		}
 		query.append("]");
 		return query.toString();
+	}
+
+	public List<Node> getAllClauses() {
+		final ArrayList<Node> clauses = new ArrayList<>(Arrays.asList(problem.getClauses()));
+		for (final Tupel<Node, T> tupel : insertionStack) {
+			if (tupel.key instanceof Or) {
+				clauses.add(tupel.key);
+			}
+		}
+		return clauses;
 	}
 }

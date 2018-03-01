@@ -116,4 +116,13 @@ public class Function extends Term {
 		return new Function(NEGATE, term);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.Term#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode() + (type.hashCode() * 9);
+	}
+
 }

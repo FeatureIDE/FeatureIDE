@@ -20,18 +20,24 @@
  */
 package org.prop4j.explain.solvers.impl.sat4j;
 
-import org.prop4j.explain.solvers.MutableSatSolver;
-import org.prop4j.explain.solvers.MutableSatSolverTests;
+import org.prop4j.Node;
+import org.prop4j.solver.ISatSolver;
+import org.prop4j.solver.impl.SatProblem;
+import org.prop4j.solver.impl.sat4j.Sat4JSatSolverFactory;
 
 /**
  * Tests for {@link Sat4jMutableSatSolver}.
  *
  * @author Timo G&uuml;nther
  */
-public class Sat4jMutableSatSolverTests extends MutableSatSolverTests {
+public class Sat4jMutableSatSolverTests extends Sat4jSatSolverTests {
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.explain.solvers.MutableSatSolverTests#getInstance()
+	 */
 	@Override
-	protected MutableSatSolver getInstance() {
-		return new Sat4jSatSolverFactory().getMutableSatSolver();
+	protected ISatSolver getInstance(Node cnf) {
+		return new Sat4JSatSolverFactory().getSolver(new SatProblem(cnf));
 	}
 }

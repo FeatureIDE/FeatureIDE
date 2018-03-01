@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.explanations.fm.impl.mus;
 
+import org.prop4j.And;
 import org.prop4j.Node;
-import org.prop4j.explain.solvers.MusExtractor;
-import org.prop4j.explain.solvers.SatSolverFactory;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.IMusExtractor;
+import org.prop4j.solver.SatSolverFactory;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -80,15 +82,31 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 	 */
 	private int addConstraint(IConstraint constraint, boolean negated) {
 		final AdvancedNodeCreator nc = getNodeCreator();
-		final Node constraintNode = nc.createConstraintNode(constraint, negated);
-		return getOracle().addFormula(constraintNode);
+		final Node constraintNode = nc.createConstraintNode(constraint, negated).toRegularCNF();
+		int clausesAdded = 0;
+		if (constraintNode instanceof And) {
+			for (final Node clauses : constraintNode.getChildren()) {
+				try {
+					clausesAdded += getOracle().push(clauses);
+				} catch (final ContradictionException e) {
+					e.printStackTrace();
+				}
+			}
+			return clausesAdded;
+		} else {
+			try {
+				clausesAdded += getOracle().push(constraintNode);
+			} catch (final ContradictionException e) {
+				e.printStackTrace();
+			}
+			return clausesAdded;
+		}
 	}
 
 	@Override
 	public RedundantConstraintExplanation getExplanation() throws IllegalStateException {
 		final RedundantConstraintExplanation explanation;
-		final MusExtractor oracle = getOracle();
-		oracle.push();
+		final IMusExtractor oracle = getOracle();
 		int constraintClauseCount = 0;
 		try {
 			// Add each constraint but the redundant one.
@@ -106,7 +124,6 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			// Get the explanation.
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
 		} finally {
-			oracle.pop();
 			getTraceModel().removeTraces(constraintClauseCount);
 		}
 		return explanation;
