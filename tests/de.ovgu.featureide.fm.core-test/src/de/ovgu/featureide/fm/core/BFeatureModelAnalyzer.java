@@ -216,7 +216,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(200);
 	}
 
-	@Test(timeout = 16000) // 5.446s @ i5(3,3GHz)
+	@Test // 5.446s @ i5(3,3GHz)
 	public final void BUpdateFeatures201() {
 		BUpdateFeatures(201);
 	}
