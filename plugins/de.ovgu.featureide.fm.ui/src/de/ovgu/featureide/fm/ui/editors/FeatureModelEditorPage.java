@@ -43,7 +43,6 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	protected final IFileManager<IFeatureModel> fmManager;
 
 	private int index;
-	private boolean dirty;
 
 	protected IEditorInput input;
 	protected IEditorSite site;
@@ -73,11 +72,10 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public boolean isDirty() {
-		return dirty;
+		return false;
 	}
 
 	protected void setDirty(boolean dirty) {
-		this.dirty = dirty;
 		firePropertyChange(PROP_DIRTY);
 	}
 
