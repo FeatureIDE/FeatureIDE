@@ -120,4 +120,9 @@ public class VirtualFileManager<T> implements IFileManager<T>, IEventManager {
 		return "Virtual File manager for " + variableObject;
 	}
 
+	@Override
+	public boolean hasChanged() {
+		return false;
+	}
+
 }
