@@ -26,10 +26,10 @@ import java.util.Iterator;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.ui.actions.PrintAction;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.ActionFactory;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
@@ -64,9 +64,14 @@ public class FMPrintAction extends PrintAction {
 		final Iterator<IGraphicalFeature> featureIter = features.iterator();
 		final Point minP = featureIter.next().getLocation().getCopy();
 
+		final ISelection selection = fmEditor.getViewer().getSelection();
 		move(featureModel, layout, features, featureIter, minP);
+		// lock the diagram to prevent the action from omitting the explanation which is currently shown to the user.
+		fmEditor.lockDiagram(true);
 		// print
 		super.run();
+		// unlock the diagram
+		fmEditor.lockDiagram(false);
 		moveBack(featureModel, layout, layoutOld, features, minP);
 		return;
 	}
@@ -103,7 +108,6 @@ public class FMPrintAction extends PrintAction {
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
 		final GraphicalViewer viewer = (GraphicalViewer) getWorkbenchPart().getAdapter(GraphicalViewer.class);
 		for (final Object obj : viewer.getEditPartRegistry().values()) {
-			FMUIPlugin.getDefault().logInfo("" + obj + " is of type " + obj.getClass());
 			if (obj instanceof LegendEditPart) {
 				final Point legendPos = layout.getLegendPos();
 				final Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);

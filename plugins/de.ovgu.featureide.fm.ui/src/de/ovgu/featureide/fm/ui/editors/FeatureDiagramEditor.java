@@ -232,6 +232,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/** The currently active explanation. */
 	private Explanation<?> activeExplanation;
 
+	/** Prevents every event in propertyChanged to be processed. Used to prevent the Print to PDP action of omitting the current active explanation. */
+	private boolean lockDiagramm = false;
+
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
@@ -638,6 +641,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	@Override
 	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
+		if (lockDiagramm) {
+			return;
+		}
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
@@ -1387,6 +1393,14 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		viewer.removeSelectionChangedListener(listener);
+	}
+
+	/**
+	 * This method is used before printing the feature model to pdf to prevent the explanation from omitting. When set to true no event in the propertyChange
+	 * method will be processed.
+	 */
+	public void lockDiagram(boolean lock) {
+		lockDiagramm = lock;
 	}
 
 }
