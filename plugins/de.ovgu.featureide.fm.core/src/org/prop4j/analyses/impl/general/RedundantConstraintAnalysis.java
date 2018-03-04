@@ -66,7 +66,7 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 		final Map<IConstraint, ConstraintAttribute> map = new HashMap<>();
 		final List<Node> cnfNodes = new ArrayList<>();
 		final List<IConstraint> constraintsLocal = new ArrayList<>(3);
-		for (final IConstraint iConstraint : this.constraints) {
+		for (final IConstraint iConstraint : constraints) {
 			constraintsLocal.add(iConstraint);
 		}
 
@@ -89,19 +89,18 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 		for (int i = 0; i < constraintsLocal.size(); i++) {
 			final Node cnf = constraintsLocal.get(i).getNode().toRegularCNF();
 			cnfNodes.add(cnf);
-			// Push all except the last constraint
 			try {
 				solver.push(cnf.getChildren());
 			} catch (final ContradictionException e) {}
 		}
 		monitor.checkCancel();
 
-		for (int j = constraintsLocal.size() - 1; j > 0; j--) {
+		for (int j = constraintsLocal.size() - 1; j >= 0; j--) {
 			final IConstraint constraint = constraintsLocal.get(j);
 			boolean redundant = true;
 
 			// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
-			for (int i = constraintsLocal.size() - 1; i > 0; i--) {
+			for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
 				if (i >= j) {
 					final IConstraint constraintStack = constraintsLocal.get(i);
 					// Pop all non redundant constraints till we reach our constraint
