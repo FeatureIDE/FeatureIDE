@@ -58,7 +58,6 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 	@Override
 	public List<int[]> analyze(IMonitor monitor) {
 		final List<int[]> resultList = new ArrayList<>();
-
 		if (pairs == null) {
 			return resultList;
 		}
@@ -73,8 +72,8 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 			pairLoop: for (final int[] pair : pairs) {
 				monitor.checkCancel();
 				solutionLoop: for (final int[] is : solutionList) {
-					// get assumed fa feature and check if it appears in every solution
-					if (isInSolution(is, pair[1])) {
+					// check if pair appears in every solution
+					if (isInSolutionBothPositiveOrBothNegative(is, pair)) {
 						continue solutionLoop;
 					}
 					continue pairLoop;
@@ -113,12 +112,21 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 		return count;
 	}
 
-	private boolean isInSolution(int[] solution, int value) {
+	private boolean isInSolutionBothPositiveOrBothNegative(int[] solution, int[] pair) {
+		int parent = 0;
+		int feature = 0;
 		for (final int i : solution) {
-			if (i == value) {
-				return true;
+			if (Math.abs(i) == pair[1]) {
+				feature = i;
+			}
+			if (Math.abs(i) == Math.abs(pair[0])) {
+				parent = i;
 			}
 		}
-		return false;
+		if (((parent <= 0) && (feature <= 0)) || ((parent >= 0) && (feature >= 0))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

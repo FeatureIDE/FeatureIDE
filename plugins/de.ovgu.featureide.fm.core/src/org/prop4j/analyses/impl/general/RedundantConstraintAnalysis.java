@@ -110,11 +110,10 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 				}
 			}
 
-			// Push all constraints which where popped before except the redundant one
+			// Push all constraints which where popped before except the redundant ones
 			for (int i = 0; i < constraintsLocal.size(); i++) {
 				if (i > j) {
 					final IConstraint constraintStack = constraintsLocal.get(i);
-					// Pop all non redundant constraints till we reach our constraint
 					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
 						try {
 							solver.push(cnfNodes.get(i).getChildren());
