@@ -61,6 +61,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
@@ -144,7 +145,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunMan
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelElementEditPart;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
@@ -1147,17 +1151,60 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
+	private boolean isFeatureMenu(IStructuredSelection selection) {
+		boolean featureMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof FeatureEditPart)) {
+				featureMenu = false;
+			}
+		}
+		return featureMenu;
+	}
+
+	private boolean isLegendMenu(IStructuredSelection selection) {
+		boolean legendMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof LegendEditPart)) {
+				legendMenu = false;
+			}
+		}
+		return legendMenu;
+	}
+
+	private boolean isConstraintMenu(IStructuredSelection selection) {
+		boolean constraintMenu = !selection.toList().isEmpty();
+		for (final Object obj : selection.toList()) {
+			if (!(obj instanceof ConstraintEditPart)) {
+				constraintMenu = false;
+			}
+		}
+		return constraintMenu;
+	}
+
+	private boolean isConnectionMenu(IStructuredSelection selection) {
+		boolean connectionMenu = false;
+		for (final Object obj : selection.toList()) {
+			if ((obj instanceof ConnectionEditPart)) {
+				connectionMenu = true;
+			}
+		}
+		return connectionMenu;
+
+	}
+
 	private void fillContextMenu(IMenuManager menuManager) {
+		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			menuManager.add(createLayoutMenuManager());
 			menuManager.add(createNameTypeMenuManager());
-		} else if (hiddenAction.isEnabled() && !alternativeAction.isConnectionSelected()) {
-			// don't show menu to change group type of a feature in case a
-			// connection line is selected
+		}
+		if (isFeatureMenu(selection)) {
 			menuManager.add(createCompoundAction);
 			menuManager.add(createLayerAction);
 			menuManager.add(createConstraintWithAction);
 			menuManager.add(renameAction);
+			menuManager.add(changeFeatureDescriptionAction);
 			menuManager.add(deleteAction);
 			menuManager.add(deleteAllAction);
 			menuManager.add(new Separator());
@@ -1165,30 +1212,28 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(mandatoryAction);
 			menuManager.add(abstractAction);
 			menuManager.add(hiddenAction);
+			menuManager.add(new Separator());
+			menuManager.add(new Separator());
+			menuManager.add(colorSelectedFeatureAction);
+			menuManager.add(new Separator());
 			menuManager.add(collapseAction);
 			menuManager.add(collapseFeaturesAction);
 			menuManager.add(focusOnExplanationAction);
-			menuManager.add(changeFeatureDescriptionAction);
-			menuManager.add(new Separator());
-			menuManager.add(createLayoutMenuManager());
-			menuManager.add(createCalculationsMenuManager());
-			menuManager.add(new Separator());
-			menuManager.add(calculateDependencyAction);
-			menuManager.add(reverseOrderAction);
-			menuManager.add(new Separator());
+			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+				extension.extendContextMenu(menuManager, this);
+			}
+		} else if (isLegendMenu(selection)) {
+			menuManager.add(legendLayoutAction);
 			menuManager.add(legendAction);
-		} else if (editConstraintAction.isEnabled() && !alternativeAction.isConnectionSelected()) {
+		} else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
 			menuManager.add(editConstraintAction);
 			menuManager.add(deleteAction);
-		} else if (legendLayoutAction.isEnabled()) {
-			menuManager.add(new Separator());
-			menuManager.add(legendLayoutAction);
-			menuManager.add(legendAction);
-		} else if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
+		} else if (isConnectionMenu(selection)) {
 			connectionEntrys(menuManager);
 		} else {
+			// nothing selected, build presentation menu
 			menuManager.add(createConstraintAction);
 			menuManager.add(new Separator());
 			menuManager.add(collapseAllAction);
@@ -1199,48 +1244,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createCalculationsMenuManager());
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
+			menuManager.add(showHiddenFeaturesAction);
+			menuManager.add(showCollapsedConstraintsAction);
 			menuManager.add(new Separator());
 			menuManager.add(legendAction);
+			menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			menuManager.add(exportFeatureModelAction);
 		}
-
-		if (getFeatureModel().getStructure().hasHidden()) {
-			menuManager.add(showHiddenFeaturesAction);
-		}
-		menuManager.add(showCollapsedConstraintsAction);
-
-		for (final Object selected : viewer.getSelectedEditParts()) {
-			if ((selected instanceof FeatureEditPart) || (selected instanceof IFeature)) {
-				menuManager.add(new Separator());
-				menuManager.add(colorSelectedFeatureAction);
-				break;
-			}
-		}
-
-		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		menuManager.add(exportFeatureModelAction);
-
-		// call of the FeatureDiagramExtensions (for features only)
-		if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !alternativeAction.isConnectionSelected()) {
-			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
-				extension.extendContextMenu(menuManager, this);
-			}
-		}
-
 		showHiddenFeaturesAction.setChecked(graphicalFeatureModel.getLayout().showHiddenFeatures());
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
-		// Get the primary selected element.
-		ModelElementEditPart primaryElement = null;
-		for (final Object selected : viewer.getSelectedEditParts()) {
-			if ((selected instanceof ModelElementEditPart) && (primaryElement == null)) {
-				primaryElement = (ModelElementEditPart) selected;
-			} else {
-				primaryElement = null; // multiple selected
-				break;
-			}
-		}
-		if (primaryElement instanceof FeatureEditPart) {
-			collapseAction.setEnabled(((FeatureEditPart) primaryElement).getModel().getObject().getStructure().hasChildren());
-		}
 	}
 
 	private void connectionEntrys(IMenuManager menu) {
