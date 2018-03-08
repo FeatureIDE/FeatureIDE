@@ -134,13 +134,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		createXmlDocRec(doc, struct, FeatureUtils.getRoot(object));
 
 		root.appendChild(constraints);
-		for (int i = 0; i < object.getConstraints().size(); i++) {
+		for (final IConstraint constraint : object.getConstraints()) {
 			Element rule;
 			rule = doc.createElement(RULE);
 
 			constraints.appendChild(rule);
-			addDescription(doc, object.getConstraints().get(i), rule);
-			createPropositionalConstraints(doc, rule, object.getConstraints().get(i).getNode());
+			addDescription(doc, constraint, rule);
+			createPropositionalConstraints(doc, rule, constraint.getNode());
 		}
 
 		root.appendChild(calculations);
@@ -203,50 +203,37 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			return;
 		}
 
-		Element op;
+		final Element op;
 		if (node instanceof Literal) {
-			Literal literal = (Literal) node;
-			if (literal.positive) {
-				op = doc.createElement(VAR);
-				xmlNode.appendChild(op);
-				op.appendChild(doc.createTextNode(node.toString()));
-			} else {
-				op = doc.createElement(NOT);
-				xmlNode.appendChild(op);
-				literal = literal.clone();
-				literal.positive = true;
-				createPropositionalConstraints(doc, op, literal);
+			final Literal literal = (Literal) node;
+			if (!literal.positive) {
+				final Element opNot = doc.createElement(NOT);
+				xmlNode.appendChild(opNot);
+				xmlNode = opNot;
 			}
-			return;
-		}
-
-		if (node instanceof And) {
-			op = doc.createElement(CONJ);
+			op = doc.createElement(VAR);
+			op.appendChild(doc.createTextNode(String.valueOf(literal.var)));
 			xmlNode.appendChild(op);
+			return;
 		} else if (node instanceof Or) {
 			op = doc.createElement(DISJ);
-			xmlNode.appendChild(op);
-		} else if (node instanceof Not) {
-			op = doc.createElement(NOT);
-			xmlNode.appendChild(op);
 		} else if (node instanceof Equals) {
 			op = doc.createElement(EQ);
-			xmlNode.appendChild(op);
 		} else if (node instanceof Implies) {
 			op = doc.createElement(IMP);
-			xmlNode.appendChild(op);
+		} else if (node instanceof And) {
+			op = doc.createElement(CONJ);
+		} else if (node instanceof Not) {
+			op = doc.createElement(NOT);
 		} else if (node instanceof AtMost) {
 			op = doc.createElement(ATMOST1);
-			xmlNode.appendChild(op);
 		} else {
 			op = doc.createElement(UNKNOWN);
-			xmlNode.appendChild(op);
 		}
+		xmlNode.appendChild(op);
 
-		final org.prop4j.Node[] children = node.getChildren();
-
-		for (int i = 0; i < children.length; i++) {
-			createPropositionalConstraints(doc, op, children[i]);
+		for (final org.prop4j.Node child : node.getChildren()) {
+			createPropositionalConstraints(doc, op, child);
 		}
 	}
 
@@ -335,8 +322,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				for (final String featureName : parser.getIdentifier()) {
 					object.getFeature(featureName).getCustomProperties().setEntrySet(parser.getPropertyEntries(featureName));
 				}
-			}
 				break;
+			}
 			default:
 				throw new UnsupportedOperationException("Unkown property container parser type " + parser.getType());
 			}
