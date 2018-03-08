@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_T
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOUBLE_CLICK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRAM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
@@ -1208,7 +1209,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(deleteAction);
 			menuManager.add(deleteAllAction);
 			menuManager.add(new Separator());
-			connectionEntrys(menuManager);
+			connectionEntries(menuManager);
 			menuManager.add(mandatoryAction);
 			menuManager.add(abstractAction);
 			menuManager.add(hiddenAction);
@@ -1231,7 +1232,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(editConstraintAction);
 			menuManager.add(deleteAction);
 		} else if (isConnectionMenu(selection)) {
-			connectionEntrys(menuManager);
+			connectionEntries(menuManager);
 		} else {
 			// nothing selected, build presentation menu
 			menuManager.add(createConstraintAction);
@@ -1255,13 +1256,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		showCollapsedConstraintsAction.setChecked(graphicalFeatureModel.getLayout().showCollapsedConstraints());
 	}
 
-	private void connectionEntrys(IMenuManager menu) {
+	private void connectionEntries(IMenuManager menu) {
 		if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			final boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
 				andAction.setText(AND);
 				if (connectionSelected) {
-					orAction.setText("Or (Double Click)");
+					orAction.setText(OR + DOUBLE_CLICK);
 				} else {
 					orAction.setText(OR);
 				}
@@ -1270,13 +1271,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				andAction.setText(AND);
 				orAction.setText(OR);
 				if (connectionSelected) {
-					alternativeAction.setText("Alternative (Double Click)");
+					alternativeAction.setText(ALTERNATIVE + DOUBLE_CLICK);
 				} else {
 					alternativeAction.setText(ALTERNATIVE);
 				}
 			} else if (alternativeAction.isChecked()) {
 				if (connectionSelected) {
-					andAction.setText("And (Double Click)");
+					andAction.setText(AND + DOUBLE_CLICK);
 				} else {
 					andAction.setText(AND);
 				}
