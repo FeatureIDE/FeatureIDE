@@ -142,19 +142,19 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
-	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+	protected <T extends Collection<String>> T getContainedFeatures(T containedFeatures) {
 		containedFeatures.add(String.valueOf(var));
 		return containedFeatures;
 	}
 
 	@Override
-	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+	protected <T extends Collection<Literal>> T getLiterals(T literals) {
 		literals.add(this);
 		return literals;
 	}
 
 	@Override
-	protected Collection<Object> getVariables(Collection<Object> variables) {
+	protected <T extends Collection<Object>> T getVariables(T variables) {
 		variables.add(var);
 		return variables;
 	}
