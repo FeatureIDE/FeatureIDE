@@ -51,7 +51,6 @@ import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import jdk.internal.joptsimple.internal.Strings;
 
 /**
  * Prints a feature model in XML format.
@@ -122,7 +121,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 			db = dbf.newDocumentBuilder();
 		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
-			return Strings.EMPTY;
+			return "";
 		}
 		final Document doc = db.newDocument();
 		// Create the XML Representation
@@ -137,7 +136,7 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 			return streamResult.getWriter().toString();
 		} catch (final IOException | TransformerException e) {
 			Logger.logError(e);
-			return Strings.EMPTY;
+			return "";
 		}
 	}
 
