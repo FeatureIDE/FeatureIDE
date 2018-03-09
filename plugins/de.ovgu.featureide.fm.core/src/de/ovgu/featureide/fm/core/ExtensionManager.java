@@ -74,9 +74,9 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 	public T getExtension(String id) throws NoSuchExtensionException {
 		java.util.Objects.requireNonNull(id, "ID must not be null!");
 
-		for (final T factory : getExtensions()) {
-			if (id.equals(factory.getId())) {
-				return factory;
+		for (final T extension : getExtensions()) {
+			if (id.equals(extension.getId())) {
+				return extension;
 			}
 		}
 		throw new NoSuchExtensionException("No extension found for ID " + id);
