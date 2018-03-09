@@ -27,6 +27,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,6 +50,7 @@ import org.xml.sax.SAXParseException;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -148,6 +151,19 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 	@Override
 	public boolean supportsWrite() {
 		return true;
+	}
+
+	protected final boolean supportsContent(LazyReader reader, Pattern pattern) {
+		if (supportsRead()) {
+			final Matcher matcher = pattern.matcher("");
+			do {
+				matcher.reset(reader);
+				if (matcher.find()) {
+					return true;
+				}
+			} while (matcher.hitEnd() && reader.expand());
+		}
+		return false;
 	}
 
 	/**
