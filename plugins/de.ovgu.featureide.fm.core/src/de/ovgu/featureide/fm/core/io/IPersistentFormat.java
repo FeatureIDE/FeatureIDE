@@ -45,4 +45,6 @@ public interface IPersistentFormat<T> extends IExtension {
 
 	boolean supportsContent(CharSequence content);
 
+	boolean supportsContent(LazyReader reader);
+
 }
