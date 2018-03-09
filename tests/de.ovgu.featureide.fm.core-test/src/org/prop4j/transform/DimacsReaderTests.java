@@ -92,7 +92,8 @@ public class DimacsReaderTests {
 
 	@Test
 	public void testWhitespaceIndent() throws ParseException, IOException {
-		testEquals("" + "p\n" + "  cnf\n" + "    3\n" + "    2\n" + "  1 -3 0\n" + "  2 3 -1 0");
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p\n" + "  cnf\n" + "    3\n" + "    2\n" + "  1 -3 0\n" + "  2 3 -1 0");
 	}
 
 	@Test
@@ -132,12 +133,14 @@ public class DimacsReaderTests {
 
 	@Test
 	public void testCommentMiddleClause() throws ParseException, IOException {
-		testEquals("" + "p cnf 3 2\n" + "1 c this comment tops them all\n" + "-3 0\n" + "2 3 -1 0");
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p cnf 3 2\n" + "1 c this comment tops them all\n" + "-3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
 	public void testCommentMiddleProblem() throws ParseException, IOException {
-		testEquals("" + "p cnf c another rebellious comment\n" + "3 2\n" + "1 -3 0\n" + "2 3 -1 0");
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p cnf c another rebellious comment\n" + "3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
@@ -285,9 +288,8 @@ public class DimacsReaderTests {
 	public void testSequential() throws ParseException, IOException {
 		final String s = "" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
 		final DimacsReader r = new DimacsReader();
-		r.read(s);
-		exception.expect(IllegalStateException.class);
-		r.read(s);
+		assertEquals(r.read(s), getDefaultExpected());
+		assertEquals(r.read(s), getDefaultExpected());
 	}
 
 	@Test
