@@ -42,6 +42,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.Term;
 import org.prop4j.Variable;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -65,6 +66,7 @@ public class Prop4JToJavaSmtTranslator {
 	protected IntegerFormulaManager currentIntegerFormulaManager;
 	protected RationalFormulaManager currentRationalFormulaManager;
 	protected HashMap<String, NumeralFormula> variables = new HashMap<>();
+	protected boolean isPrincess = false;
 
 	public Prop4JToJavaSmtTranslator(SolverContext context) {
 		setContext(context);
@@ -75,7 +77,12 @@ public class Prop4JToJavaSmtTranslator {
 		currentFormulaManager = context.getFormulaManager();
 		currentBooleanFormulaManager = currentFormulaManager.getBooleanFormulaManager();
 		currentIntegerFormulaManager = currentFormulaManager.getIntegerFormulaManager();
-		currentRationalFormulaManager = currentFormulaManager.getRationalFormulaManager();
+		if (context.getSolverName() != Solvers.PRINCESS) { // Princess does not support Rationals
+			isPrincess = false;
+			currentRationalFormulaManager = currentFormulaManager.getRationalFormulaManager();
+		} else {
+			isPrincess = true;
+		}
 	}
 
 	public BooleanFormula getFormula(Node node) {
@@ -122,7 +129,7 @@ public class Prop4JToJavaSmtTranslator {
 	private BooleanFormula handleEqualNode(Equal node) {
 		final NumeralFormula leftTerm = termToFormula(node.leftTerm);
 		final NumeralFormula rightTerm = termToFormula(node.rightTerm);
-		if ((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) {
+		if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
 			return currentRationalFormulaManager.equal(leftTerm, rightTerm);
 		} else {
 			return currentIntegerFormulaManager.equal((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
@@ -132,7 +139,7 @@ public class Prop4JToJavaSmtTranslator {
 	private BooleanFormula handleGreaterEqualNode(GreaterEqual node) {
 		final NumeralFormula leftTerm = termToFormula(node.leftTerm);
 		final NumeralFormula rightTerm = termToFormula(node.rightTerm);
-		if ((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) {
+		if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
 			return currentRationalFormulaManager.greaterOrEquals(leftTerm, rightTerm);
 		} else {
 			return currentIntegerFormulaManager.greaterOrEquals((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
@@ -142,7 +149,7 @@ public class Prop4JToJavaSmtTranslator {
 	private BooleanFormula handleLessEqualNode(LessEqual node) {
 		final NumeralFormula leftTerm = termToFormula(node.leftTerm);
 		final NumeralFormula rightTerm = termToFormula(node.rightTerm);
-		if ((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) {
+		if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
 			return currentRationalFormulaManager.lessOrEquals(leftTerm, rightTerm);
 		} else {
 			return currentIntegerFormulaManager.lessOrEquals((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
@@ -152,7 +159,7 @@ public class Prop4JToJavaSmtTranslator {
 	private BooleanFormula handleGreaterThanNode(GreaterThan node) {
 		final NumeralFormula leftTerm = termToFormula(node.leftTerm);
 		final NumeralFormula rightTerm = termToFormula(node.rightTerm);
-		if ((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) {
+		if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
 			return currentRationalFormulaManager.greaterThan(leftTerm, rightTerm);
 		} else {
 			return currentIntegerFormulaManager.greaterThan((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
@@ -162,7 +169,7 @@ public class Prop4JToJavaSmtTranslator {
 	private BooleanFormula handleLessThanNode(LessThan node) {
 		final NumeralFormula leftTerm = termToFormula(node.leftTerm);
 		final NumeralFormula rightTerm = termToFormula(node.rightTerm);
-		if ((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) {
+		if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
 			return currentRationalFormulaManager.lessThan(leftTerm, rightTerm);
 		} else {
 			return currentIntegerFormulaManager.lessThan((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
@@ -227,32 +234,58 @@ public class Prop4JToJavaSmtTranslator {
 		for (int i = 0; i < childs.length; i++) {
 			childs[i] = termToFormula(function.terms[i]);
 		}
-
-		switch (function.type) {
-		case Function.ADDITION:
-			if (function.terms.length == 2) {
-				return currentRationalFormulaManager.add(childs[0], childs[1]);
-			} else {
-				return currentRationalFormulaManager.sum(Arrays.asList(childs));
+		if (isPrincess) {
+			// Princess does not support rational therefore everything should be integer formula an save to cast.
+			final IntegerFormula leftChild = (IntegerFormula) childs[0];
+			final IntegerFormula rightChild = (IntegerFormula) childs[1];
+			switch (function.type) {
+			case Function.ADDITION:
+				if (function.terms.length == 2) {
+					return currentIntegerFormulaManager.add(leftChild, rightChild);
+				} else {
+					return currentIntegerFormulaManager.sum(Arrays.asList((IntegerFormula[]) childs));
+				}
+			case Function.SUBSTRACT:
+				return currentIntegerFormulaManager.subtract(leftChild, rightChild);
+			case Function.MODULO:
+				return currentIntegerFormulaManager.modulo(leftChild, rightChild);
+			case Function.MULTIPLY:
+				return currentIntegerFormulaManager.multiply(leftChild, rightChild);
+			case Function.NEGATE:
+				return currentIntegerFormulaManager.negate(leftChild);
+			case Function.DIVISION:
+				return currentIntegerFormulaManager.divide(leftChild, rightChild);
+			default:
+				throw new RuntimeException("The given function is not supported by JavaSMT: " + function.type);
 			}
-		case Function.SUBSTRACT:
-			return currentRationalFormulaManager.subtract(childs[0], childs[1]);
-		case Function.MODULO:
-			return currentRationalFormulaManager.modulo(childs[0], childs[1]);
-		case Function.MULTIPLY:
-			return currentRationalFormulaManager.multiply(childs[0], childs[1]);
-		case Function.NEGATE:
-			return currentRationalFormulaManager.negate(childs[0]);
-		case Function.DIVISION:
-			return currentRationalFormulaManager.divide(childs[0], childs[1]);
-		default:
-			throw new RuntimeException("The given function is not supported by JavaSMT: " + function.type);
+		} else {
+
+			switch (function.type) {
+			case Function.ADDITION:
+				if (function.terms.length == 2) {
+					return currentRationalFormulaManager.add(childs[0], childs[1]);
+				} else {
+					return currentRationalFormulaManager.sum(Arrays.asList(childs));
+				}
+			case Function.SUBSTRACT:
+				return currentRationalFormulaManager.subtract(childs[0], childs[1]);
+			case Function.MODULO:
+				return currentRationalFormulaManager.modulo(childs[0], childs[1]);
+			case Function.MULTIPLY:
+				return currentRationalFormulaManager.multiply(childs[0], childs[1]);
+			case Function.NEGATE:
+				return currentRationalFormulaManager.negate(childs[0]);
+			case Function.DIVISION:
+				return currentRationalFormulaManager.divide(childs[0], childs[1]);
+			default:
+				throw new RuntimeException("The given function is not supported by JavaSMT: " + function.type);
+			}
 		}
 
 	}
 
 	private NumeralFormula handleVariable(Variable<?> variable) {
-		if (variable.getType() instanceof DoubleType) {
+		if ((variable.getType() instanceof DoubleType) && !isPrincess) {
 			final NumeralFormula variableFormula = currentRationalFormulaManager.makeVariable(variable.getValue());
 			variables.put(variable.toString(), variableFormula);
 			return variableFormula;
@@ -272,7 +305,11 @@ public class Prop4JToJavaSmtTranslator {
 			return currentIntegerFormulaManager.makeNumber(longType.getValue());
 		} else {
 			final DoubleType doubleType = (DoubleType) constant.getValue();
-			return currentRationalFormulaManager.makeNumber(doubleType.getValue());
+			if (!isPrincess) {
+				return currentRationalFormulaManager.makeNumber(doubleType.getValue());
+			} else {
+				throw new UnsupportedOperationException("Princess does not support constants from type: Double");
+			}
 		}
 	}
 

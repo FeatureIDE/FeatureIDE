@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -40,7 +39,6 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -277,8 +275,9 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 			final int handleY = prover.minimize(formula);
 			final OptStatus status = prover.check();
 			assert status == OptStatus.OPT;
-			final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
-			return lower.get();
+			// final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
+			// return lower.get();
+			return null;
 		} catch (final InterruptedException e) {} catch (final SolverException e) {
 			e.printStackTrace();
 		}
@@ -303,8 +302,9 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 			final int handleX = prover.maximize(formula);
 			final OptStatus status = prover.check();
 			assert status == OptStatus.OPT;
-			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
-			return upper.get();
+//			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
+//			return upper.get();
+			return null;
 		} catch (final InterruptedException e) {} catch (final SolverException e) {
 			e.printStackTrace();
 		}
@@ -333,15 +333,17 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 			final int handleY = prover.minimize(formula);
 			final OptStatus statusMin = prover.check();
 			assert statusMin == OptStatus.OPT;
-			final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
-			result[0] = lower.get();
+//			final Optional<Rational> lower = prover.lower(handleY, Rational.ofString("1/1000"));
+//			result[0] = lower.get();
+			result[0] = null;
 
 			// max
 			final int handleX = prover.maximize(formula);
 			final OptStatus statusMax = prover.check();
 			assert statusMax == OptStatus.OPT;
-			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
-			result[1] = upper.get();
+//			final Optional<Rational> upper = prover.upper(handleX, Rational.ofString("1/1000"));
+//			result[1] = upper.get();
+			result[1] = null;
 			return result;
 		} catch (final InterruptedException e) {} catch (final SolverException e) {
 			e.printStackTrace();

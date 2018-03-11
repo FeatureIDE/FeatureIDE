@@ -58,10 +58,25 @@ public class TestSolver extends Action {
 			Node cnf = view.getFeatureModel().getAnalyser().getCnf();
 			ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
 
-			testeAttributeRanges(cnf);
+			testeAlleSolverJavaSMT(cnf);
+
+			// testeAttributeRanges(cnf);
 			// testeMus(problem);
 			// testSatSolver(problem);
 		}
+	}
+
+	private void testeAlleSolverJavaSMT(Node cnf) {
+		SatProblem problem = new SatProblem(cnf);
+		JavaSmtSatSolver z3 = new JavaSmtSatSolver(problem, Solvers.Z3, null);
+		JavaSmtSatSolver smtInterpol = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+		JavaSmtSatSolver princess = new JavaSmtSatSolver(problem, Solvers.PRINCESS, null);
+		JavaSmtSatSolver mat5SatPlusOpti = new JavaSmtSatSolver(problem, Solvers.MATHSAT5, null);
+
+		FMAttributesPlugin.getDefault().logInfo("Z3:" + z3.isSatisfiable());
+		FMAttributesPlugin.getDefault().logInfo("SmtInterpol:" + smtInterpol.isSatisfiable());
+		FMAttributesPlugin.getDefault().logInfo("Princess:" + princess.isSatisfiable());
+		FMAttributesPlugin.getDefault().logInfo("Math5Sat:" + mat5SatPlusOpti.isSatisfiable());
 	}
 
 	private void testeAttributeRanges(Node cnf) {

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/java-cup-11a.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/parser.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/princess-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/princess.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/scala-library-2.11.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smt-parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>

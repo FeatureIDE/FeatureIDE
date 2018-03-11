@@ -24,7 +24,13 @@ Bundle-ClassPath: .,
  lib/smtinterpol-2.1-335-g4c543a5.jar,
  lib/spotbugs-annotations-3.1.1.jar,
  lib/truth-0.39.jar,
- lib/truth-java8-extension-0.39.jar
+ lib/truth-java8-extension-0.39.jar,
+ lib/java-cup-11a.jar,
+ lib/parser.jar,
+ lib/princess-all.jar,
+ lib/princess.jar,
+ lib/scala-library-2.11.1.jar,
+ lib/smt-parser.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
