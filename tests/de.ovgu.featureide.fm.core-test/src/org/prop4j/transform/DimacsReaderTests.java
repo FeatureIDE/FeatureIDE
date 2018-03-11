@@ -22,6 +22,7 @@ package org.prop4j.transform;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import org.junit.Rule;
@@ -31,6 +32,8 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+
+import de.ovgu.featureide.fm.core.io.dimacs.DimacsReader;
 
 /**
  * Tests for {@link DimacsReader}.
@@ -43,343 +46,345 @@ public class DimacsReaderTests {
 	public final ExpectedException exception = ExpectedException.none();
 
 	@Test
-	public void testSimple() throws ParseException {
+	public void testSimple() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testWhitespaceLinebreakEnd() throws ParseException {
+	public void testWhitespaceLinebreakEnd() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0\n" + "");
 	}
 
 	@Test
-	public void testWhitespaceLinebreakNone() throws ParseException {
+	public void testWhitespaceLinebreakNone() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2 1 -3 0 2 3 -1 0");
 	}
 
 	@Test
-	public void testWhitespaceLinebreakMultiple() throws ParseException {
+	public void testWhitespaceLinebreakMultiple() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n\n\n \n \n\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testWhitespaceLinebreakMiddleLine() throws ParseException {
+	public void testWhitespaceLinebreakMiddleLine() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1\n-3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testWhitespaceTab() throws ParseException {
+	public void testWhitespaceTab() throws ParseException, IOException {
 		testEquals("" + "p\tcnf\t3\t2\n" + "1\t-3\t0\t\n" + "2\t3\t-1\t0");
 	}
 
 	@Test
-	public void testWhitespaceMixed() throws ParseException {
+	public void testWhitespaceMixed() throws ParseException, IOException {
 		testEquals("" + "p cnf 3\t2\n" + "1\t-3 0\n" + "2 3\t-1 0");
 	}
 
 	@Test
-	public void testWhitespaceLeading() throws ParseException {
+	public void testWhitespaceLeading() throws ParseException, IOException {
 		testEquals("" + "  p cnf 3 2\n" + "  1 -3 0\n" + "  2 3 -1 0");
 	}
 
 	@Test
-	public void testWhitespaceTrailing() throws ParseException {
+	public void testWhitespaceTrailing() throws ParseException, IOException {
 		testEquals("" + "  p cnf 3 2\n  " + "  1 -3 0  \n" + "  2 3 -1 0  ");
 	}
 
 	@Test
-	public void testWhitespaceIndent() throws ParseException {
-		testEquals("" + "p\n" + "  cnf\n" + "    3\n" + "    2\n" + "  1 -3 0\n" + "  2 3 -1 0");
+	public void testWhitespaceIndent() throws ParseException, IOException {
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p\n" + "  cnf\n" + "    3\n" + "    2\n" + "  1 -3 0\n" + "  2 3 -1 0");
 	}
 
 	@Test
-	public void testComment() throws ParseException {
+	public void testComment() throws ParseException, IOException {
 		testEquals("" + "c Hello! My name is Test Case. Nice to meet you!\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentEmpty() throws ParseException {
+	public void testCommentEmpty() throws ParseException, IOException {
 		testEquals("" + "c\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentSpace() throws ParseException {
+	public void testCommentSpace() throws ParseException, IOException {
 		testEquals("" + "c \n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentSpaceMissing() throws ParseException {
+	public void testCommentSpaceMissing() throws ParseException, IOException {
 		testException("" + "cWhere is my space?" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0\n");
 	}
 
 	@Test
-	public void testCommentMultiple() throws ParseException {
+	public void testCommentMultiple() throws ParseException, IOException {
 		testEquals("" + "c\n" + "c multiple comments\n" + "c\n" + "c like, really many\n" + "c\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentMiddleFile() throws ParseException {
+	public void testCommentMiddleFile() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "c this comment is hiding in the middle of the file\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentMiddleClauses() throws ParseException {
+	public void testCommentMiddleClauses() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "c this comment is being even more sneaky\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentMiddleClause() throws ParseException {
-		testEquals("" + "p cnf 3 2\n" + "1 c this comment tops them all\n" + "-3 0\n" + "2 3 -1 0");
+	public void testCommentMiddleClause() throws ParseException, IOException {
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p cnf 3 2\n" + "1 c this comment tops them all\n" + "-3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentMiddleProblem() throws ParseException {
-		testEquals("" + "p cnf c another rebellious comment\n" + "3 2\n" + "1 -3 0\n" + "2 3 -1 0");
+	public void testCommentMiddleProblem() throws ParseException, IOException {
+		exception.expect(ParseException.class);
+		new DimacsReader().read("" + "p cnf c another rebellious comment\n" + "3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentInline() throws ParseException {
+	public void testCommentInline() throws ParseException, IOException {
 		testException("" + "p cnf 3 2\n" + "1 c this looks like it might work, but no c -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCommentEnd() throws ParseException {
+	public void testCommentEnd() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0\n" + "c Bye!");
 	}
 
 	@Test
-	public void testCommentTokenMissing() throws ParseException {
+	public void testCommentTokenMissing() throws ParseException, IOException {
 		testException("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0\n" + "Bye, correctness!");
 	}
 
 	@Test
-	public void testCaseSensitiveProblemToken() throws ParseException {
+	public void testCaseSensitiveProblemToken() throws ParseException, IOException {
 		testException("" + "P cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCaseSensitiveProblemType() throws ParseException {
+	public void testCaseSensitiveProblemType() throws ParseException, IOException {
 		testException("" + "p CNF 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testCaseSensitiveCommentToken() throws ParseException {
+	public void testCaseSensitiveCommentToken() throws ParseException, IOException {
 		testException("" + "C this comment thinks it's important\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testClauseEndTokenMissing() throws ParseException {
+	public void testClauseEndTokenMissing() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1");
 	}
 
 	@Test
-	public void testClauseEndTokenMissingTrailing() throws ParseException {
+	public void testClauseEndTokenMissingTrailing() throws ParseException, IOException {
 		testException("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1\n" + "Just tagging along");
 	}
 
 	@Test
-	public void testClauseEndTokenMissingComment() throws ParseException {
+	public void testClauseEndTokenMissingComment() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1\n" + "c I don't have a token for ending clauses, but at least I have a comment");
 	}
 
 	@Test
-	public void testClauseEndTokenMissingCommentTrailing() throws ParseException {
+	public void testClauseEndTokenMissingCommentTrailing() throws ParseException, IOException {
 		testException("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1\n" + "c I'm being followed\n" + "by trailing data");
 	}
 
 	@Test
-	public void testProblemTokenMissing() throws ParseException {
+	public void testProblemTokenMissing() throws ParseException, IOException {
 		testException("" + "cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemTypeMissing() throws ParseException {
+	public void testProblemTypeMissing() throws ParseException, IOException {
 		testException("" + "p 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemTypeWrong() throws ParseException {
+	public void testProblemTypeWrong() throws ParseException, IOException {
 		testException("" + "p wrong 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemVariableCountZero() throws ParseException {
+	public void testProblemVariableCountZero() throws ParseException, IOException {
 		testException("" + "p cnf 0 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemVariableCountNegative() throws ParseException {
+	public void testProblemVariableCountNegative() throws ParseException, IOException {
 		testException("" + "p cnf -3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemVariableCountTooHigh() throws ParseException {
+	public void testProblemVariableCountTooHigh() throws ParseException, IOException {
 		testException("" + "p cnf 4 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemVariableCountTooLow() throws ParseException {
+	public void testProblemVariableCountTooLow() throws ParseException, IOException {
 		testException("" + "p cnf 2 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemClauseCountZero() throws ParseException {
+	public void testProblemClauseCountZero() throws ParseException, IOException {
 		testException("" + "p cnf 3 0\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemClauseCountNegative() throws ParseException {
+	public void testProblemClauseCountNegative() throws ParseException, IOException {
 		testException("" + "p cnf 3 -2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemClauseCountTooHigh() throws ParseException {
+	public void testProblemClauseCountTooHigh() throws ParseException, IOException {
 		testException("" + "p cnf 3 3\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testProblemClauseCountTooLow() throws ParseException {
+	public void testProblemClauseCountTooLow() throws ParseException, IOException {
 		testException("" + "p cnf 3 1\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testEmpty() throws ParseException {
+	public void testEmpty() throws ParseException, IOException {
 		testException("");
 	}
 
 	@Test
-	public void testClausesMissing() throws ParseException {
+	public void testClausesMissing() throws ParseException, IOException {
 		testException("" + "p cnf 0 0");
 	}
 
 	@Test
-	public void testProblemMissing() throws ParseException {
+	public void testProblemMissing() throws ParseException, IOException {
 		testException("" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testMultiple() throws ParseException {
+	public void testMultiple() throws ParseException, IOException {
 		testException("" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0");
 	}
 
 	@Test
-	public void testIndexStart() throws ParseException {
+	public void testIndexStart() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "11 -13 0\n" + "12 13 -11 0",
 				new And(new Or("11", new Literal("13", false)), new Or("12", "13", new Literal("11", false))));
 	}
 
 	@Test
-	public void testIndexGap() throws ParseException {
+	public void testIndexGap() throws ParseException, IOException {
 		testEquals("" + "p cnf 3 2\n" + "1 -4 0\n" + "2 4 -1 0", new And(new Or("1", new Literal("4", false)), new Or("2", "4", new Literal("1", false))));
 	}
 
 	@Test
-	public void testIndexDuplicates() throws ParseException {
+	public void testIndexDuplicates() throws ParseException, IOException {
 		testEquals("" + "p cnf 1 2\n" + "1 -1 0\n" + "1 1 -1 0", new And(new Or("1", new Literal("1", false)), new Or("1", "1", new Literal("1", false))));
 	}
 
 	@Test
-	public void testSequential() throws ParseException {
+	public void testSequential() throws ParseException, IOException {
 		final String s = "" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
-		r.read();
-		exception.expect(IllegalStateException.class);
-		r.read();
+		final DimacsReader r = new DimacsReader();
+		assertEquals(r.read(s), getDefaultExpected());
+		assertEquals(r.read(s), getDefaultExpected());
 	}
 
 	@Test
-	public void testVariableDirectoryFoo() throws ParseException {
+	public void testVariableDirectoryFoo() throws ParseException, IOException {
 		final String s = "" + "c 1 Foo\n" + "c 2 Bar\n" + "c 3 Baz\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("Baz", false)), new Or("Bar", "Baz", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryWhitespace() throws ParseException {
+	public void testVariableDirectoryWhitespace() throws ParseException, IOException {
 		final String s = "" + "c 1 Variable\twith\twhitespace\n" + "c 2  \n" + "c 3   Surrounding whitespace  \n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Variable\twith\twhitespace", new Literal("  Surrounding whitespace  ", false)),
 				new Or(" ", "  Surrounding whitespace  ", new Literal("Variable\twith\twhitespace", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryFormat() throws ParseException {
+	public void testVariableDirectoryFormat() throws ParseException, IOException {
 		final String s = "" + "c 1\n" + "c 2 \n" + "c\t\t3 c 3 Foo\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("1", new Literal("c 3 Foo", false)), new Or("2", "c 3 Foo", new Literal("1", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryOrder() throws ParseException {
+	public void testVariableDirectoryOrder() throws ParseException, IOException {
 		final String s = "" + "c 3 Baz\n" + "c 2 Bar\n" + "c 1 Foo\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("Baz", false)), new Or("Bar", "Baz", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryMultiple() throws ParseException {
+	public void testVariableDirectoryMultiple() throws ParseException, IOException {
 		final String s = "" + "c 1 Foo\n" + "c 1 Overwritten\n" + "c 2 Bar\n" + "c 3 Baz\n" + "p cnf 3 2\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("Baz", false)), new Or("Bar", "Baz", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryMiddle() throws ParseException {
+	public void testVariableDirectoryMiddle() throws ParseException, IOException {
 		final String s = "" + "p cnf 3 2\n" + "c 1 Foo\n" + "c 2 Bar\n" + "c 3 Baz\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("Baz", false)), new Or("Bar", "Baz", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectorySplit() throws ParseException {
+	public void testVariableDirectorySplit() throws ParseException, IOException {
 		final String s = "" + "c 1 Foo\n" + "c 2 Bar\n" + "p cnf 3 2\n" + "c 3 Baz\n" + "1 -3 0\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("Baz", false)), new Or("Bar", "Baz", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void testVariableDirectoryStraggler() throws ParseException {
+	public void testVariableDirectoryStraggler() throws ParseException, IOException {
 		final String s = "" + "c 1 Foo\n" + "c 2 Bar\n" + "p cnf 3 2\n" + "1 -3 0\n" + "c 3 Baz\n" + "2 3 -1 0";
-		final DimacsReader r = new DimacsReader(s);
+		final DimacsReader r = new DimacsReader();
 		r.setReadingVariableDirectory(true);
-		final Node actual = r.read();
+		final Node actual = r.read(s);
 		final Node expected = new And(new Or("Foo", new Literal("3", false)), new Or("Bar", "3", new Literal("Foo", false)));
 		assertEquals(expected, actual);
 	}
 
-	private void testEquals(String s) throws ParseException {
+	private void testEquals(String s) throws ParseException, IOException {
 		testEquals(s, getDefaultExpected());
 	}
 
-	private void testEquals(String s, Node expected) throws ParseException {
-		final Node actual = new DimacsReader(s).read();
+	private void testEquals(String s, Node expected) throws ParseException, IOException {
+		final Node actual = new DimacsReader().read(s);
 		assertEquals(expected, actual);
 	}
 
-	private void testException(String s) throws ParseException {
+	private void testException(String s) throws ParseException, IOException {
 		exception.expect(ParseException.class);
-		new DimacsReader(s).read();
+		new DimacsReader().read(s);
 	}
 
 	private Node getDefaultExpected() {
