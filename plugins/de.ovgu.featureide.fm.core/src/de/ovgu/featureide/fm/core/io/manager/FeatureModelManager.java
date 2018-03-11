@@ -31,7 +31,6 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.InternalFeatureModelFormat;
 
 /**
  * Responsible to load and save all information for a feature model instance.
@@ -90,14 +89,6 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
 		model.setSourceFile(Paths.get(absolutePath));
 		return model;
-	}
-
-	@Override
-	protected boolean compareObjects(IFeatureModel o1, IFeatureModel o2) {
-		final InternalFeatureModelFormat format = new InternalFeatureModelFormat();
-		final String s1 = format.getInstance().write(o1);
-		final String s2 = format.getInstance().write(o2);
-		return s1.equals(s2);
 	}
 
 	@Override

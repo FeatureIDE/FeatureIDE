@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.job;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
+import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
@@ -43,8 +44,9 @@ public final class LongRunningWrapper {
 		monitor = monitor != null ? monitor : new NullMonitor();
 		try {
 			return method.execute(monitor);
+		} catch (final MethodCancelException e) {
+			return null;
 		} catch (final Exception e) {
-			e.printStackTrace();
 			Logger.logError(e);
 			return null;
 		} finally {

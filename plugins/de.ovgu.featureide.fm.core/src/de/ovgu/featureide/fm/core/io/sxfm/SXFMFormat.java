@@ -71,6 +71,7 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -854,6 +855,11 @@ public class SXFMFormat extends AXMLFormat<IFeatureModel> implements IFeatureMod
 	@Override
 	public boolean supportsContent(CharSequence content) {
 		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return super.supportsContent(reader, CONTENT_REGEX);
 	}
 
 	@Override
