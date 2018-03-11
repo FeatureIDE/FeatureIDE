@@ -20,7 +20,7 @@
  */
 package org.prop4j.analyses.impl.sat4j;
 
-import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.analyses.AbstractSatSolverAnalysis;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 
 /**
@@ -28,7 +28,7 @@ import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
  *
  * @author Joshua Sprey
  */
-public class AbstractSat4JAnalysis<T> extends GeneralSolverAnalysis<T> {
+public class AbstractSat4JAnalysis<T> extends AbstractSatSolverAnalysis<T> {
 
 	protected Sat4jSatSolver solver;
 

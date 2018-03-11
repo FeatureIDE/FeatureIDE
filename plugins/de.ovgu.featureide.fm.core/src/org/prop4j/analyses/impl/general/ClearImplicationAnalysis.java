@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.cleanGeneral;
+package org.prop4j.analyses.impl.general;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +39,16 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public class AAAImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
+public class ClearImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 	private List<int[]> pairs;
 
-	public AAAImplicationAnalysis(ISolver solver, List<int[]> pairs) {
+	public ClearImplicationAnalysis(ISolver solver, List<int[]> pairs) {
 		super(solver);
 		this.pairs = pairs;
 	}
 
-	public AAAImplicationAnalysis(ISolver solver) {
+	public ClearImplicationAnalysis(ISolver solver) {
 		super(solver);
 	}
 

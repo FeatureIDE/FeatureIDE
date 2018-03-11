@@ -24,8 +24,8 @@ import java.util.HashMap;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.ISolverAnalysis;
-import org.prop4j.analyses.impl.cleanGeneral.AAACoreDeadAnalysis;
-import org.prop4j.analyses.impl.cleanGeneral.AAAImplicationAnalysis;
+import org.prop4j.analyses.impl.general.ClearCoreDeadAnalysis;
+import org.prop4j.analyses.impl.general.ClearImplicationAnalysis;
 import org.prop4j.analyses.impl.general.ConstraintsUnsatisfiableAnalysis;
 import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
@@ -79,9 +79,9 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 		}
 
 		// Check for AAA analysis
-		if (analysisClass.equals(AAACoreDeadAnalysis.class)) {
+		if (analysisClass.equals(ClearCoreDeadAnalysis.class)) {
 			return getAAACoreDeadAnalysis(problem);
-		} else if (analysisClass.equals(AAAImplicationAnalysis.class)) {
+		} else if (analysisClass.equals(ClearImplicationAnalysis.class)) {
 			return getAAAImplicationAnalysis(problem);
 		}
 
@@ -148,19 +148,19 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 		}
 	}
 
-	private AAACoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
+	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-			return new AAACoreDeadAnalysis(solver);
+			return new ClearCoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
 	}
 
-	private AAAImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
+	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-			return new AAAImplicationAnalysis(solver);
+			return new ClearImplicationAnalysis(solver);
 		} else {
 			return null;
 		}

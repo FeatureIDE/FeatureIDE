@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.analyses.impl.cleanGeneral;
+package org.prop4j.analyses.impl.general;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
@@ -33,13 +33,13 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  * @author Sebastian Krieter
  * @author Joshua Sprey
  */
-public class AAACoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
+public class ClearCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
-	public AAACoreDeadAnalysis(ISolver solver) {
+	public ClearCoreDeadAnalysis(ISolver solver) {
 		super(solver);
 	}
 
-	public AAACoreDeadAnalysis(ISolver solver, int[] features) {
+	public ClearCoreDeadAnalysis(ISolver solver, int[] features) {
 		super(solver);
 		setFeatures(features);
 	}
