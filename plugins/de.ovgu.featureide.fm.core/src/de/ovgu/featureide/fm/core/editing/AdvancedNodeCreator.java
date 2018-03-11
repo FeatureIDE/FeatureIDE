@@ -209,7 +209,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			if (!positive) {
 				clause = new Not(clause);
 			}
-			final Node cnfNode = Node.buildCNF(clause);
+			final Node cnfNode = clause.toCNF();
 			if (cnfNode instanceof And) {
 				for (final Node andChild : cnfNode.getChildren()) {
 					clause = compact || (andChild instanceof Or) ? andChild : new Or(andChild);

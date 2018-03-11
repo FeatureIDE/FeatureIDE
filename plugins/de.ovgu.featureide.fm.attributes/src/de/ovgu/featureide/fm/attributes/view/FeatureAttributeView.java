@@ -606,6 +606,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	@Override
 	public void dispose() {
 		setFeatureModel(null);
+		getSite().getPage().removePartListener(editorListener);
 		if (currentEditor instanceof FeatureModelEditor) {
 			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 			editor.removeEventListener(this);

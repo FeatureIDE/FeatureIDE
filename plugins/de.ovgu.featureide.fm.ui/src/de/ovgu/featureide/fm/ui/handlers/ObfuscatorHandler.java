@@ -65,7 +65,7 @@ public class ObfuscatorHandler extends FMExportHandler {
 	private String getRandomSalt(final Path saltPath) {
 		try {
 			final String randomSalt = FeatureModelObfuscator.getRandomSalt();
-			Files.write(saltPath, randomSalt.getBytes(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+			Files.write(saltPath, randomSalt.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
 			return randomSalt;
 		} catch (final Exception e) {
 			Logger.logWarning("Salt file could not be created!");

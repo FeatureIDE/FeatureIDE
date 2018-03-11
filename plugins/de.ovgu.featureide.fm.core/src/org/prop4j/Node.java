@@ -544,7 +544,7 @@ public abstract class Node {
 	 * @return all features contained in this node and its children; not null
 	 */
 	public List<String> getContainedFeatures() {
-		return new ArrayList<>(getContainedFeatures(new LinkedList<String>()));
+		return getContainedFeatures(new ArrayList<String>());
 	}
 
 	/**
@@ -553,7 +553,7 @@ public abstract class Node {
 	 * @return all features contained in this node and its children; not null
 	 */
 	public Set<String> getUniqueContainedFeatures() {
-		return (Set<String>) getContainedFeatures(new LinkedHashSet<String>());
+		return getContainedFeatures(new LinkedHashSet<String>());
 	}
 
 	/**
@@ -562,7 +562,7 @@ public abstract class Node {
 	 * @param containedFeatures collection of previously found features to add to; not null
 	 * @return all features contained in this node and its children; not null
 	 */
-	protected Collection<String> getContainedFeatures(Collection<String> containedFeatures) {
+	protected <T extends Collection<String>> T getContainedFeatures(T containedFeatures) {
 		for (final Node child : children) {
 			child.getContainedFeatures(containedFeatures);
 		}
@@ -575,7 +575,7 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	public List<Literal> getLiterals() {
-		return new ArrayList<>(getLiterals(new LinkedList<Literal>()));
+		return getLiterals(new LinkedList<Literal>());
 	}
 
 	/**
@@ -584,7 +584,7 @@ public abstract class Node {
 	 * @return all literals contained in this node and its children; not null
 	 */
 	public Set<Literal> getUniqueLiterals() {
-		return (Set<Literal>) getLiterals(new LinkedHashSet<Literal>());
+		return getLiterals(new LinkedHashSet<Literal>());
 	}
 
 	/**
@@ -593,7 +593,7 @@ public abstract class Node {
 	 * @param literals collection of previously found literals to add to; not null
 	 * @return all literals contained in this node and its children; not null
 	 */
-	protected Collection<Literal> getLiterals(Collection<Literal> literals) {
+	protected <T extends Collection<Literal>> T getLiterals(T literals) {
 		for (final Node child : children) {
 			child.getLiterals(literals);
 		}
@@ -606,7 +606,7 @@ public abstract class Node {
 	 * @return all variables contained in this node and its children; not null
 	 */
 	public List<Object> getVariables() {
-		return new ArrayList<>(getVariables(new LinkedList<Object>()));
+		return getVariables(new LinkedList<Object>());
 	}
 
 	/**
@@ -615,7 +615,7 @@ public abstract class Node {
 	 * @return all variables contained in this node and its children; not null
 	 */
 	public Set<Object> getUniqueVariables() {
-		return (Set<Object>) getVariables(new LinkedHashSet<Object>());
+		return getVariables(new LinkedHashSet<Object>());
 	}
 
 	/**
@@ -624,7 +624,7 @@ public abstract class Node {
 	 * @param variables collection of previously found variables to add to; not null
 	 * @return all variables contained in this node and its children; not null
 	 */
-	protected Collection<Object> getVariables(Collection<Object> variables) {
+	protected <T extends Collection<Object>> T getVariables(T variables) {
 		for (final Node child : children) {
 			child.getVariables(variables);
 		}

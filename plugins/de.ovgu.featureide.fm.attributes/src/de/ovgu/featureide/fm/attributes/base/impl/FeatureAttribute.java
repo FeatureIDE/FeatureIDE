@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.attributes.base.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -43,6 +46,8 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 	private boolean recursive;
 	private boolean configureable;
 	protected String attributeType;
+
+	private Map<ExtendedFeature, Object> savedRecursiveValues = new HashMap<>();
 
 	/**
 	 * @param name Name of the FeatureAttribute
@@ -215,6 +220,9 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 			ExtendedFeature feat = (ExtendedFeature) struct.getFeature();
 			recurseAttribute(feat);
 			newAttribute = attribute.cloneRecursive(feat);
+			if (savedRecursiveValues.containsKey(feat)) {
+				newAttribute.setValue(savedRecursiveValues.get(feat));
+			}
 			if (!feat.isContainingAttribute(newAttribute)) {
 				feat.addAttribute(newAttribute);
 			}
@@ -232,6 +240,7 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 			if (!feat.equals(feature)) {
 				for (IFeatureAttribute att : ((ExtendedFeature) feat).getAttributes()) {
 					if (att.getName().equals(attribute.getName())) {
+						saveRecursiveValue((ExtendedFeature) feat, att.getValue());
 						((ExtendedFeature) feat).removeAttribute(att);
 						break;
 					}
@@ -269,6 +278,14 @@ public abstract class FeatureAttribute implements IFeatureAttribute {
 		builder.append(configureable);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public void saveRecursiveValue(ExtendedFeature feature, Object value) {
+		savedRecursiveValues.put(feature, value);
+	}
+
+	public Map<ExtendedFeature, Object> getSavedRecursiveValues() {
+		return savedRecursiveValues;
 	}
 
 }

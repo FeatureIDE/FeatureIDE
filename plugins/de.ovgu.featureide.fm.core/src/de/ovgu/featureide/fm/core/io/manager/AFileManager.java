@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.CheckForNull;
 
@@ -219,6 +220,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	protected final String absolutePath;
 	protected final Path path;
 
+	protected String persistentObjectSource;
 	protected T persistentObject;
 	protected T variableObject;
 
@@ -242,7 +244,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				handleException(e);
 			}
 		}
-		persistentObject = copyObject(variableObject);
+		setPersistentObject(copyObject(variableObject));
 	}
 
 	@Override
@@ -290,6 +292,15 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		lastProblems.add(new Problem(e));
 	}
 
+	protected void setPersistentObject(T persistentObject) {
+		this.persistentObject = persistentObject;
+		if (persistentObject == null) {
+			persistentObjectSource = null;
+		} else {
+			persistentObjectSource = format.getInstance().write(persistentObject);
+		}
+	}
+
 	@Override
 	public boolean read() {
 		if (!FileSystem.exists(path)) {
@@ -308,13 +319,13 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				if (problemList != null) {
 					lastProblems.addAll(problemList);
 				}
-				changed = !compareObjects(tempObject, persistentObject);
+				changed = hasChanged(tempObject);
 			} catch (final Exception e) {
 				handleException(e);
 				return false;
 			}
 			if (changed) {
-				persistentObject = tempObject;
+				setPersistentObject(tempObject);
 			}
 			success = lastProblems.isEmpty();
 		}
@@ -345,16 +356,23 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	}
 
 	/**
-	 * Compares two object for equality.<br/> Subclasses should override (implement) this method.
+	 * Compares the persistent with the given object for equality.<br/> Subclasses could override this method.
 	 *
-	 * @param o1 First object.
-	 * @param o2 Second object.
-	 * @return {@code true} if objects are considered equal, {@code false} otherwise.
+	 * @param newObject The given object.
+	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */
-	protected boolean compareObjects(T o1, T o2) {
-		final String s1 = format.getInstance().write(o1);
-		final String s2 = format.getInstance().write(o2);
-		return s1.equals(s2);
+	protected boolean hasChanged(T newObject) {
+		return !Objects.equals(format.getInstance().write(newObject), persistentObjectSource);
+	}
+
+	/**
+	 * Compares the persistent with the variable object for equality.<br/> Uses {@link #hasChanged(T)}.
+	 *
+	 * @return {@code true} if objects differ, {@code false} otherwise.
+	 */
+	@Override
+	public boolean hasChanged() {
+		return hasChanged(variableObject);
 	}
 
 	@Override
@@ -394,7 +412,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
 				externalSaveMethod.run();
-				persistentObject = copyObject(tempObject);
+				setPersistentObject(copyObject(tempObject));
 			} catch (final Exception e) {
 				handleException(e);
 				return false;
@@ -411,7 +429,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	public void dispose() {
 		removeInstance(Paths.get(absolutePath));
 		synchronized (syncObject) {
-			persistentObject = null;
+			setPersistentObject(null);
 			variableObject = null;
 		}
 	}

@@ -385,7 +385,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (!modified) {
 			operationCounter = 0;
 		}
-		isPageModified = modified;
+		isPageModified = modified && (isPageModified || fmManager.hasChanged());
 		firePropertyChange(PROP_DIRTY);
 	}
 
@@ -402,7 +402,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		fmManager.addListener(diagramEditor);
 		getFeatureModel().addListener(diagramEditor);
 
-		extensionPages = pages.subList(2, pages.size());
+		extensionPages = pages.subList(2, pages.size() - 1);
 
 		currentPageIndex = 0;
 		// if there are errors in the model file, go to source page
@@ -505,7 +505,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void handlePropertyChange(int propertyId) {
 		if (propertyId == PROP_DIRTY) {
-			isPageModified = isDirty();
+			isPageModified = isPageModified || fmManager.hasChanged();
 		}
 		super.handlePropertyChange(propertyId);
 	}

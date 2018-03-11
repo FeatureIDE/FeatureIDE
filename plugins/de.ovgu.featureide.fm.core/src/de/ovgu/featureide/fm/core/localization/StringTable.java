@@ -443,6 +443,7 @@ public class StringTable {
 	public static final String AND = "And";
 	public static final String OR = "Or";
 	public static final String ALTERNATIVE = "Alternative";
+	public static final String DOUBLE_CLICK = " (Double Click)";
 	public static final String ANALYZE_FEATURE_MODEL = "Analyze feature model";
 	public static final String UPDATING_FEATURE_MODEL_ATTRIBUTES = "Updating feature model attributes";
 	public static final String AUTO_LAYOUT_CONSTRAINTS = "Auto Layout Constraints";
