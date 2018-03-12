@@ -72,7 +72,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 		// get core / dead variables
 		for (final Vertex vertex : mig.getAdjList()) {
 			final byte core = vertex.getCore();
-			final int var = vertex.getVar();
+			final int var = vertex.getLiteral();
 			if ((core != 0) && (var > 0)) {
 				final int signedVar = core < 0 ? -var : var;
 				knownValues[var - 1] = signedVar;

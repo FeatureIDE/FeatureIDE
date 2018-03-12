@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.core.configuration.mig;
 
 import java.io.Serializable;
 
-public class Vertex implements Serializable {
+public class Vertex implements Serializable, Comparable<Vertex> {
 
 	private static final long serialVersionUID = -3218194304764541434L;
 
-	private final int var;
+	private final int literal;
 
 	private byte core;
 	private int id;
@@ -34,12 +34,12 @@ public class Vertex implements Serializable {
 	private int[] complexClauses;
 	private int[] strongEdges;
 
-	public Vertex(int var) {
-		this.var = var;
+	public Vertex(int literal) {
+		this.literal = literal;
 	}
 
-	public int getVar() {
-		return var;
+	public int getLiteral() {
+		return literal;
 	}
 
 	public byte getCore() {
@@ -72,6 +72,32 @@ public class Vertex implements Serializable {
 
 	public void setStrongEdges(int[] strongEdges) {
 		this.strongEdges = strongEdges;
+	}
+
+	@Override
+	public int hashCode() {
+		return literal;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
+			return false;
+		}
+		return (literal == ((Vertex) obj).literal);
+	}
+
+	@Override
+	public String toString() {
+		return Integer.toString(literal);
+	}
+
+	@Override
+	public int compareTo(Vertex o) {
+		return literal - o.literal;
 	}
 
 }
