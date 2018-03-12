@@ -70,8 +70,10 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 		r.setReadingVariableDirectory(true);
 		try {
 			addNodeToFeatureModel(featureModel, r.read(source.toString()));
-		} catch (final IllegalStateException | IOException | ParseException e) {
+		} catch (final IllegalStateException | IOException e) {
 			problemList.add(new Problem(e));
+		} catch (final ParseException e) {
+			problemList.add(new Problem(e, e.getErrorOffset()));
 		}
 
 		return problemList;

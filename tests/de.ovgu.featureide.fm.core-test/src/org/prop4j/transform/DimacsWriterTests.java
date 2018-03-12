@@ -32,6 +32,8 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.io.dimacs.DimacsWriter;
+
 /**
  * Tests for {@link DimacsWriter}.
  *
@@ -83,29 +85,29 @@ public class DimacsWriterTests {
 	public void testNotNode() {
 		final Node in = new Not("A");
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter().write(in);
 	}
 
 	@Test
 	public void testImplies() {
 		final Node in = new Implies("A", "B");
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter().write(in);
 	}
 
 	@Test
 	public void testNull() {
 		final Node in = null;
 		exception.expect(IllegalArgumentException.class);
-		new DimacsWriter(in);
+		new DimacsWriter().write(in);
 	}
 
 	@Test
 	public void testVariableDirectory() {
 		final Node in = new And(new Or("A", new Literal("B", false)), new Or("C", "B", new Literal("A", false)));
-		final DimacsWriter w = new DimacsWriter(in);
+		final DimacsWriter w = new DimacsWriter();
 		w.setWritingVariableDirectory(true);
-		final String actual = w.write();
+		final String actual = w.write(in);
 		final String expected = "c 1 A" + LN + "c 2 B" + LN + "c 3 C" + LN + getDefaultExpected();
 		assertEquals(expected, actual);
 	}
@@ -115,8 +117,8 @@ public class DimacsWriterTests {
 	}
 
 	private void testEquals(Node in, String expected) {
-		final DimacsWriter w = new DimacsWriter(in);
-		final String actual = w.write();
+		final DimacsWriter w = new DimacsWriter();
+		final String actual = w.write(in);
 		assertEquals(expected, actual);
 	}
 

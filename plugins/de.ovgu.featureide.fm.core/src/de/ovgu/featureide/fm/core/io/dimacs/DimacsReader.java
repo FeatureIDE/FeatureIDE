@@ -25,8 +25,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
@@ -39,8 +44,12 @@ import org.prop4j.Or;
  * Transforms DIMACS CNF files into instances of {@link Node}.
  *
  * @author Timo G&uuml;nther
+ * @author Sebastian Krieter
  */
 public class DimacsReader {
+
+	private static final Pattern commentPattern = Pattern.compile("\\A" + DIMACSFormat.COMMENT + "\\s*(.*)\\Z");
+	private static final Pattern problemPattern = Pattern.compile("\\A\\s*" + DIMACSFormat.PROBLEM + "\\s+" + DIMACSFormat.CNF + "\\s+(\\d+)\\s+(\\d+)");
 
 	/** Maps indexes to variables. */
 	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
@@ -50,11 +59,6 @@ public class DimacsReader {
 	private int variableCount;
 	/** The amount of clauses in the problem. */
 	private int clauseCount;
-	/**
-	 * True iff the last clause has been reached. In this case, the token denoting the end of a clause is optional. However, if it exists, any non-comment data
-	 * past it is illegal.
-	 */
-	private boolean eof = false;
 	/** True to read the variable directory for naming variables. */
 	private boolean readVariableDirectory = false;
 	/** True when currently reading the comment section at the beginning of the file and parsing variable names. */
@@ -84,16 +88,18 @@ public class DimacsReader {
 	public Node read(Reader in) throws ParseException, IOException {
 		readingVariables = readVariableDirectory;
 		try (final BufferedReader reader = new BufferedReader(in)) {
-			eof = false;
-			readProblem(reader);
-			final Node[] clauses = readClauses(reader);
-			eof = true;
-			if (readToken(reader) != null) {
-				throw new ParseException("Trailing data", -1);
-			}
+			final LineIterator lineIterator = new LineIterator(reader);
+			lineIterator.nextLine();
+
+			readComments(lineIterator);
+			readProblem(lineIterator);
+			readComments(lineIterator);
+			readingVariables = false;
+
+			final Node[] clauses = readClauses(lineIterator);
 			final int actualVariableCount = indexVariables.size();
-			if (variableCount < actualVariableCount) {
-				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), -1);
+			if (variableCount != actualVariableCount) {
+				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), 1);
 			}
 			return new And(clauses);
 		} finally {
@@ -103,27 +109,54 @@ public class DimacsReader {
 		}
 	}
 
-	/**
-	 * Reads the next non-comment token. Also reads any comments before it.
-	 *
-	 * @return the next token; null if already completely read and empty
-	 * @throws ParseException if there is no token left in the input but the reader is not yet done
-	 * @throws IOException
-	 */
-	private String readToken(BufferedReader reader) throws ParseException, IOException {
-		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-			if (line.startsWith(DIMACSFormat.COMMENT_START)) {
-				readComment(line); // read comments ...
-			} else if (!line.trim().isEmpty()) {
-				readingVariables = false;
-				return line; // ... until a non-comment token is found.
+	private void readComments(final LineIterator lineIterator) {
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+			final Matcher matcher = commentPattern.matcher(line);
+			if (matcher.matches()) {
+				readComment(matcher.group(1)); // read comments ...
+			} else {
+				break; // ... until a non-comment token is found.
 			}
 		}
-		if (!eof) {
-			throw new ParseException("Unexpected end of input", -1);
-		}
-		return null;
 	}
+
+	private static class LineIterator {
+		private final BufferedReader reader;
+		private String line = null;
+		private int lineCount = 0;
+
+		public LineIterator(BufferedReader reader) {
+			this.reader = reader;
+		}
+
+		public String nextLine() {
+			try {
+				do {
+					line = reader.readLine();
+					if (line == null) {
+						return null;
+					}
+					lineCount++;
+				} while (line.trim().isEmpty());
+				return line;
+			} catch (final IOException e) {
+				return null;
+			}
+		}
+
+		public String currentLine() {
+			return line;
+		}
+
+		public void setCurrentLine(String line) {
+			this.line = line;
+		}
+
+		public int getLineCount() {
+			return lineCount;
+		}
+
+	};
 
 	/**
 	 * Reads the input. Calls {@link #read(Reader)}.
@@ -142,40 +175,39 @@ public class DimacsReader {
 	 * Reads the problem definition.
 	 *
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
-	 * @throws IOException
 	 */
-	private void readProblem(BufferedReader reader) throws ParseException, IOException {
-		final String line = readToken(reader);
+	private void readProblem(LineIterator lineIterator) throws ParseException {
+		final String line = lineIterator.currentLine();
 		if (line == null) {
-			throw new ParseException("Invalid problem format", -1);
+			throw new ParseException("Invalid problem format", lineIterator.getLineCount());
 		}
-		final String[] tokens = line.split("\\s+");
-		if (tokens.length != 4) {
-			throw new ParseException("Invalid problem format", -1);
+		final Matcher matcher = problemPattern.matcher(line);
+		if (!matcher.find()) {
+			throw new ParseException("Invalid problem format", lineIterator.getLineCount());
 		}
-		if (!DIMACSFormat.PROBLEM.equals(tokens[0])) {
-			throw new ParseException("Missing problem definition", -1);
-		}
-		if (!DIMACSFormat.CNF.equals(tokens[1])) {
-			throw new ParseException("Problem type is not CNF", -1);
+		final String trail = line.substring(matcher.end());
+		if (trail.trim().isEmpty()) {
+			lineIterator.nextLine();
+		} else {
+			lineIterator.setCurrentLine(trail);
 		}
 
 		try {
-			variableCount = Integer.parseInt(tokens[2]);
+			variableCount = Integer.parseInt(matcher.group(1));
 		} catch (final NumberFormatException e) {
-			throw new ParseException("Variable count is not an integer", -1);
+			throw new ParseException("Variable count is not an integer", lineIterator.getLineCount());
 		}
 		if (variableCount <= 0) {
-			throw new ParseException("Variable count is not positive", -1);
+			throw new ParseException("Variable count is not positive", lineIterator.getLineCount());
 		}
 
 		try {
-			clauseCount = Integer.parseInt(tokens[3]);
+			clauseCount = Integer.parseInt(matcher.group(2));
 		} catch (final NumberFormatException e) {
-			throw new ParseException("Clause count is not an integer", -1);
+			throw new ParseException("Clause count is not an integer", lineIterator.getLineCount());
 		}
 		if (clauseCount <= 0) {
-			throw new ParseException("Clause count is not positive", -1);
+			throw new ParseException("Clause count is not positive", lineIterator.getLineCount());
 		}
 	}
 
@@ -186,39 +218,71 @@ public class DimacsReader {
 	 * @throws ParseException if the input does not conform to the DIMACS CNF file format
 	 * @throws IOException
 	 */
-	private Node[] readClauses(BufferedReader reader) throws ParseException, IOException {
+	private Node[] readClauses(LineIterator lineIterator) throws ParseException, IOException {
+		final LinkedList<String> literalQueue = new LinkedList<>();
 		final Node[] clauses = new Node[clauseCount];
-		for (int i = 0; i < clauseCount; i++) {
-			final String[] tokens = readToken(reader).split("\\s+");
-			if (tokens.length < 2) {
-				throw new ParseException("Empty clause", -1);
+		int readClausesCount = 0;
+		for (String line = lineIterator.currentLine(); line != null; line = lineIterator.nextLine()) {
+			if (commentPattern.matcher(line).matches()) {
+				continue;
 			}
-			final Node[] literals = new Node[tokens.length - 1];
-			for (int j = 0; j < (tokens.length - 1); j++) {
-				final String token = tokens[j];
-				final int index;
-				try {
-					index = Integer.parseInt(token);
-				} catch (final NumberFormatException e) {
-					throw new ParseException("Illegal literal", -1);
+			List<String> literalList = Arrays.asList(line.trim().split("\\s+"));
+			literalQueue.addAll(literalList);
+
+			do {
+				final int clauseEndIndex = literalList.indexOf("0");
+				if (clauseEndIndex < 0) {
+					break;
 				}
-				if (index == 0) {
-					throw new ParseException("Illegal literal", -1);
+				final int clauseSize = literalQueue.size() - (literalList.size() - clauseEndIndex);
+				if (clauseSize <= 0) {
+					throw new ParseException("Empty clause", lineIterator.getLineCount());
 				}
-				final Integer key = Math.abs(index);
-				Object variable = indexVariables.get(key);
-				if (variable == null) {
-					variable = String.valueOf(key);
-					indexVariables.put(key, variable);
+
+				clauses[readClausesCount] = parseClause(readClausesCount, clauseSize, literalQueue, lineIterator);
+				readClausesCount++;
+
+				if (!DIMACSFormat.CLAUSE_END.equals(literalQueue.removeFirst())) {
+					throw new ParseException("Illegal clause end", lineIterator.getLineCount());
 				}
-				literals[j] = new Literal(variable, index > 0);
-			}
-			if (!DIMACSFormat.CLAUSE_END.equals(tokens[tokens.length - 1])) {
-				throw new ParseException("Illegal clause end", -1);
-			}
-			clauses[i] = new Or(literals);
+				literalList = literalQueue;
+			} while (!literalQueue.isEmpty());
+		}
+		if (!literalQueue.isEmpty()) {
+			clauses[readClausesCount] = parseClause(readClausesCount, literalQueue.size(), literalQueue, lineIterator);
+			readClausesCount++;
+		}
+		if (readClausesCount < clauseCount) {
+			throw new ParseException(String.format("Found %d instead of %d clauses", readClausesCount, clauseCount), 1);
 		}
 		return clauses;
+	}
+
+	private Or parseClause(int readClausesCount, int clauseSize, LinkedList<String> literalQueue, LineIterator lineIterator) throws ParseException {
+		if (readClausesCount == clauseCount) {
+			throw new ParseException(String.format("Found more than %d clauses", clauseCount), 1);
+		}
+		final Node[] literals = new Node[clauseSize];
+		for (int j = 0; j < literals.length; j++) {
+			final String token = literalQueue.removeFirst();
+			final int index;
+			try {
+				index = Integer.parseInt(token);
+			} catch (final NumberFormatException e) {
+				throw new ParseException("Illegal literal", lineIterator.getLineCount());
+			}
+			if (index == 0) {
+				throw new ParseException("Illegal literal", lineIterator.getLineCount());
+			}
+			final Integer key = Math.abs(index);
+			Object variable = indexVariables.get(key);
+			if (variable == null) {
+				variable = String.valueOf(key);
+				indexVariables.put(key, variable);
+			}
+			literals[j] = new Literal(variable, index > 0);
+		}
+		return new Or(literals);
 	}
 
 	/**
@@ -237,8 +301,7 @@ public class DimacsReader {
 	 * @param line variable directory entry
 	 * @return true if an entry was found
 	 */
-	private boolean readVariableDirectoryEntry(String line) {
-		final String comment = line.substring(DIMACSFormat.COMMENT_START.length());
+	private boolean readVariableDirectoryEntry(String comment) {
 		final int firstSeparator = comment.indexOf(' ');
 		if (firstSeparator <= 0) {
 			return false;
