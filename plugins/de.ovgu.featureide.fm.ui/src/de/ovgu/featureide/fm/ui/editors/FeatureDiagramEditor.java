@@ -667,6 +667,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			setDirty(true);
 			analyzeFeatureModel();
+			break;
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			setDirty(true);
