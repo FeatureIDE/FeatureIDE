@@ -63,6 +63,7 @@ public class ExpandConstraintAction extends Action {
 
 	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
 		super(EXPAND_CONSTRAINT);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
 		this.graphcialFeatureModel = graphcialFeatureModel;
 		setId(ID);
 		if (viewer instanceof TreeViewer) {

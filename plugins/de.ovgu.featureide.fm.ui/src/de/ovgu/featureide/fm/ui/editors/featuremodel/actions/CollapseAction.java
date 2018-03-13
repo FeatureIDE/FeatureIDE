@@ -73,8 +73,9 @@ public class CollapseAction extends MultipleSelectionAction {
 
 	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer, ID);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse_single.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		
+
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -82,38 +83,37 @@ public class CollapseAction extends MultipleSelectionAction {
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 		}
 	}
-	
+
 	private boolean isEveryFeatureCollapsed() {
-		for (IGraphicalFeature tempFeature : graphicalFeatureArray) {
+		for (final IGraphicalFeature tempFeature : graphicalFeatureArray) {
 			if (!(tempFeature.isCollapsed())) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	
+
 	private void refreshGraphicalFeatures() {
-		ArrayList<IGraphicalFeature> tempGraphicalFeatureList = new ArrayList<>();
-		
-		for (IFeature tempFeature : featureArray) {
+		final ArrayList<IGraphicalFeature> tempGraphicalFeatureList = new ArrayList<>();
+
+		for (final IFeature tempFeature : featureArray) {
 			tempGraphicalFeatureList.add(graphicalFeatureModel.getGraphicalFeature(tempFeature));
 		}
-		
+
 		graphicalFeatureArray = tempGraphicalFeatureList.toArray(new IGraphicalFeature[tempGraphicalFeatureList.size()]);
 	}
-	
+
 	@Override
 	protected void selectionElementChanged(boolean validSelection) {
 		if (featureArray != null) {
-			for (Object obj : featureArray) {
-				((IFeature)obj).removeListener(this);
+			for (final Object obj : featureArray) {
+				((IFeature) obj).removeListener(this);
 			}
 		}
 		if (validSelection) {
-			featureArray =  getSelectedFeatures();
+			featureArray = getSelectedFeatures();
 			refreshGraphicalFeatures();
-			for (IFeature tempFeature : featureArray) {
+			for (final IFeature tempFeature : featureArray) {
 				tempFeature.addListener(this);
 			}
 			updateProperties();
@@ -128,7 +128,7 @@ public class CollapseAction extends MultipleSelectionAction {
 		setChecked(isEveryFeatureCollapsed());
 		changeCollapsedStatus(isEveryFeatureCollapsed());
 	}
-	
+
 	private void changeCollapsedStatus(boolean allCollapsed) {
 		final SetFeatureToCollapseOperation op = new SetFeatureToCollapseOperation(featureArray, graphicalFeatureModel, allCollapsed, getStringLabel());
 
@@ -136,10 +136,10 @@ public class CollapseAction extends MultipleSelectionAction {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-	
+
 		}
 	}
-	
+
 	private String getStringLabel() {
 		if (featureArray.length == 1) {
 			if (isEveryFeatureCollapsed()) {
@@ -166,35 +166,35 @@ public class CollapseAction extends MultipleSelectionAction {
 			setChecked(isEveryFeatureCollapsed());
 		}
 	}
-	
+
 	private boolean isThereAtLeastOneFeatureThatHasChildren() {
-		for (IFeature tempFeature : featureArray) {
+		for (final IFeature tempFeature : featureArray) {
 			if (tempFeature.getStructure().hasChildren()) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	// Modified getSelectedFeatures() so that only features with children are included
 	@Override
 	protected IFeature[] getSelectedFeatures() {
-		ArrayList<IFeature> features = new ArrayList<>();
-		
+		final ArrayList<IFeature> features = new ArrayList<>();
+
 		IStructuredSelection selection;
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage) {
-				for (Object obj : selection.toArray()) {
+				for (final Object obj : selection.toArray()) {
 					if (((FmOutlineGroupStateStorage) obj).getFeature().getStructure().hasChildren()) {
 						features.add(((FmOutlineGroupStateStorage) obj).getFeature());
 					}
 				}
 				return features.toArray(new IFeature[features.size()]);
 			} else {
-				for (Object obj : selection.toArray()) {
-					if (((IFeature)obj).getStructure().hasChildren()) {
-						features.add((IFeature)obj);
+				for (final Object obj : selection.toArray()) {
+					if (((IFeature) obj).getStructure().hasChildren()) {
+						features.add((IFeature) obj);
 					}
 				}
 				return features.toArray(new IFeature[features.size()]);
@@ -206,15 +206,15 @@ public class CollapseAction extends MultipleSelectionAction {
 		final Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected) {
-			for (Object obj : selection.toArray()) {
-				IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
+			for (final Object obj : selection.toArray()) {
+				final IFeature tempFeature = ((ConnectionEditPart) obj).getModel().getTarget().getObject();
 				if (tempFeature.getStructure().hasChildren()) {
 					features.add(tempFeature);
 				}
 			}
 			return features.toArray(new IFeature[features.size()]);
 		}
-		for (Object obj : selection.toArray()) {
+		for (final Object obj : selection.toArray()) {
 			if (((FeatureEditPart) obj).getModel().getObject().getStructure().hasChildren()) {
 				features.add(((FeatureEditPart) obj).getModel().getObject());
 			}
