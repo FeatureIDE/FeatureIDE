@@ -60,20 +60,20 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path) {
-		return AFileManager.getInstance(path);
+		return AFileManager.getInstance(path, new ObjectCreator(null), false);
 	}
 
 	@CheckForNull
 	public static ConfigurationManager getInstance(Path path, Configuration configuration) {
-		return AFileManager.getInstance(path, new ObjectCreator(configuration));
+		return AFileManager.getInstance(path, new ObjectCreator(configuration), true);
 	}
 
 	public static FileHandler<Configuration> load(Path path, Configuration configuration) {
 		return AFileManager.getFileHandler(path, new ObjectCreator(configuration));
 	}
 
-	protected ConfigurationManager(Configuration configuration, String absolutePath, IPersistentFormat<Configuration> modelHandler) {
-		super(configuration, absolutePath, modelHandler);
+	protected ConfigurationManager(Configuration configuration, FileIdentifier<Configuration> identifier) {
+		super(configuration, identifier);
 	}
 
 	@Override

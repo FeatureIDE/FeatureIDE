@@ -20,14 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.nio.file.Paths;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -41,7 +36,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.ExternalChangeListener;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.io.manager.EclipseFileManagerVisitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -51,24 +46,6 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Sebastian Krieter
  */
 public class EclipseExternalChangeListener extends ExternalChangeListener implements IResourceChangeListener {
-
-	private static final class FileManagerVisitor implements IResourceDeltaVisitor {
-
-		@Override
-		public boolean visit(IResourceDelta delta) {
-			// only interested in removal changes
-			if ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT)) != 0)) {
-				final IResource resource = delta.getResource();
-				if (resource instanceof IFile) {
-					final IFileManager<?> instance = AFileManager.getInstance(Paths.get(resource.getLocationURI()));
-					if (instance != null) {
-						instance.read();
-					}
-				}
-			}
-			return true;
-		}
-	}
 
 	@Override
 	protected void doUpdate(final AFileManager<?> fileManager) {
@@ -108,7 +85,7 @@ public class EclipseExternalChangeListener extends ExternalChangeListener implem
 	public void resourceChanged(IResourceChangeEvent event) {
 		if ((event.getDelta() != null) && (event.getType() == IResourceChangeEvent.POST_CHANGE)) {
 			try {
-				event.getDelta().accept(new FileManagerVisitor());
+				event.getDelta().accept(new EclipseFileManagerVisitor());
 			} catch (final CoreException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
