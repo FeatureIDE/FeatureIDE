@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.annotation.CheckForNull;
 
@@ -51,7 +50,8 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		};
 
 	/**
-	 * Returns an instance of a {@link IFileManager} for a certain file.
+	 * Returns an instance of a {@link IFileManager} for a certain file. Creates a new instance if none is available (Equivalent to calling
+	 * {@link #getInstance(Path, boolean) getInstance(path, true)}).
 	 *
 	 * @param path The path pointing to the file.
 	 *
@@ -60,8 +60,24 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 	 * @throws ClassCastException When the found instance is no subclass of R.
 	 */
 	@CheckForNull
-	public static FeatureModelManager getInstance(Path absolutePath) {
-		return (FeatureModelManager) AFileManager.getInstance(absolutePath, objectCreator);
+	public static FeatureModelManager getInstance(Path path) {
+		return getInstance(path, true);
+	}
+
+	/**
+	 * Returns an instance of a {@link IFileManager} for a certain file.
+	 *
+	 * @param createInstance Whether a new instance should be created, if none is available.
+	 *
+	 * @param path The path pointing to the file.
+	 *
+	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
+	 *
+	 * @throws ClassCastException When the found instance is no subclass of R.
+	 */
+	@CheckForNull
+	public static FeatureModelManager getInstance(Path path, boolean createInstance) {
+		return (FeatureModelManager) AFileManager.getInstance(path, objectCreator, createInstance);
 	}
 
 	public static IFeatureModelFormat getFormat(String fileName) {
@@ -82,12 +98,12 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return save(featureModel, outPath);
 	}
 
-	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(setSourcePath(model, absolutePath), absolutePath, modelHandler);
+	protected FeatureModelManager(IFeatureModel model, FileIdentifier<IFeatureModel> identifier) {
+		super(setSourcePath(model, identifier.getPath()), identifier);
 	}
 
-	private static IFeatureModel setSourcePath(IFeatureModel model, String absolutePath) {
-		model.setSourceFile(Paths.get(absolutePath));
+	private static IFeatureModel setSourcePath(IFeatureModel model, Path path) {
+		model.setSourceFile(path);
 		return model;
 	}
 

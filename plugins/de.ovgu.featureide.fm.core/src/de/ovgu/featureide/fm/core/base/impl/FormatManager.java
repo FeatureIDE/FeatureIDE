@@ -20,12 +20,20 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 
 /**
  * Manages additional formats for a certain object (e.g., a feature model or configuration).
@@ -101,6 +109,24 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 				if (extension.equals(format.getSuffix()) && format.supportsContent(content)) {
 					return format;
 				}
+			}
+		}
+		return null;
+	}
+
+	public T getFormatByContent(Path path) {
+		if (path != null) {
+			try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
+				final LazyReader lazyReader = new LazyReader(inputStream);
+				final String extension = getFileExtension(path.getFileName().toString());
+				for (final T format : getExtensions()) {
+					if (extension.equals(format.getSuffix()) && format.supportsContent(lazyReader)) {
+						return format;
+					}
+				}
+			} catch (final IOException e) {
+				Logger.logError(e);
+				return getFormatByFileName(path.getFileName().toString());
 			}
 		}
 		return null;

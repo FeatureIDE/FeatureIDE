@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.projectExplorer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,7 +62,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
-	private List<String> selectedFeatures = new ArrayList<String>();
+	private List<String> selectedFeatures = new ArrayList<>();
 
 	public ProjectExplorerLabelProvider() {
 		super(new PackageExplorerContentProvider(true));
@@ -249,7 +250,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		if (currentConfiguration != null) {
 			final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(currentConfiguration.getLocationURI()),
 					new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY));
-			selectedFeatures = new ArrayList<>(instance.getObject().getSelectedFeatureNames());
+			selectedFeatures = (instance != null) ? new ArrayList<String>(instance.getObject().getSelectedFeatureNames()) : Collections.<String> emptyList();
 		}
 	}
 
