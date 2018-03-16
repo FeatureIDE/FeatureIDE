@@ -57,14 +57,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		private final Path path;
 		private final IPersistentFormat<T> format;
 
-		public FileIdentifier(Path path, IPersistentFormat<T> format) {
+		private FileIdentifier(Path path, IPersistentFormat<T> format) {
 			this.path = path.toAbsolutePath().normalize();
 			this.format = format;
-		}
-
-		public FileIdentifier(Path path, FormatManager<? extends IPersistentFormat<T>> formatManager) {
-			this.path = path.toAbsolutePath().normalize();
-			this.format = formatManager.getFormatByContent(this.path);
 		}
 
 		@Override
@@ -280,13 +275,16 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@SuppressWarnings("unchecked")
 	@CheckForNull
 	protected static final <T, R extends IFileManager<T>> R getInstance(Path path, ObjectCreator<T> objectCreator, boolean createInstance) {
-		final IFileManager<?> instance = idMap.get(new FileIdentifier<T>(path, objectCreator.formatManager));
-		if (instance == null) {
-			if (createInstance) {
-				return newInstance(path, objectCreator);
+		final IPersistentFormat<T> format = objectCreator.formatManager.getFormatByContent(path);
+		if (format != null) {
+			final IFileManager<?> instance = idMap.get(new FileIdentifier<T>(path, format));
+			if (instance == null) {
+				if (createInstance) {
+					return newInstance(path, objectCreator);
+				}
+			} else if (objectCreator.fileManagerClass.isInstance(instance)) {
+				return (R) objectCreator.fileManagerClass.cast(instance);
 			}
-		} else if (objectCreator.fileManagerClass.isInstance(instance)) {
-			return (R) objectCreator.fileManagerClass.cast(instance);
 		}
 		return null;
 	}
