@@ -116,7 +116,7 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 
 	public T getFormatByContent(Path path) {
 		if (path != null) {
-			try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
+			try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.SYNC, StandardOpenOption.READ)) {
 				final LazyReader lazyReader = new LazyReader(inputStream);
 				final String extension = getFileExtension(path.getFileName().toString());
 				for (final T format : getExtensions()) {
