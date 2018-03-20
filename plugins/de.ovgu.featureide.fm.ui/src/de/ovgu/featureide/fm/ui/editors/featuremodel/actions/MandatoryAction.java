@@ -52,18 +52,18 @@ public class MandatoryAction extends MultipleSelectionAction {
 		changeMandatoryStatus(isEveryFeatureMandatory());
 		setChecked(isEveryFeatureMandatory());
 	}
-	
+
 	private boolean selectionContainsOptionalFeature() {
-		for (IFeature tempFeature : featureArray) {
+		for (final IFeature tempFeature : featureArray) {
 			if (!tempFeature.getStructure().isRoot() && tempFeature.getStructure().getParent().isAnd()) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean isEveryFeatureMandatory() {
-		for (IFeature tempFeature : featureArray) {
+		for (final IFeature tempFeature : featureArray) {
 			if (!(tempFeature.getStructure().isMandatory())) {
 				return false;
 			}
@@ -72,8 +72,7 @@ public class MandatoryAction extends MultipleSelectionAction {
 	}
 
 	private void changeMandatoryStatus(boolean allMandatory) {
-		final SetFeatureToMandatoryOperation op = 
-				new SetFeatureToMandatoryOperation(featureModel, allMandatory, getSelectedFeatures());
+		final SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(featureModel, allMandatory, getSelectedFeatures());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_CONTAINED_FEATURES;
 
 import java.util.Iterator;
 
@@ -62,7 +62,8 @@ public class ExpandConstraintAction extends Action {
 	};
 
 	public ExpandConstraintAction(Object viewer, IGraphicalFeatureModel graphcialFeatureModel) {
-		super(EXPAND_CONSTRAINT);
+		super(FOCUS_ON_CONTAINED_FEATURES);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.graphcialFeatureModel = graphcialFeatureModel;
 		setId(ID);
 		if (viewer instanceof TreeViewer) {
