@@ -73,7 +73,6 @@ public class CollapseAction extends MultipleSelectionAction {
 
 	public CollapseAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_FEATURE, viewer, ID);
-		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse_single.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
 
 		setEnabled(false);
