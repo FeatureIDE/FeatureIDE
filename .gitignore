@@ -20,3 +20,4 @@
 /plugins/de.ovgu.featureide.examples/featureide_examples/StringMatcher-FH-JML/src
 /tests/de.ovgu.featureide.fm.core-test/.featureide/
 /tests/de.ovgu.featureide.fm.core-test/feature_model_tmp**
+**/target

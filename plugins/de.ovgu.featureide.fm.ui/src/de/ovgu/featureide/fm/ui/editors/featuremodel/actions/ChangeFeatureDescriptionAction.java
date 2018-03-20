@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
 /**
@@ -40,6 +41,7 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
 	public ChangeFeatureDescriptionAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
 		super(CHANGE_DESCRIPTION, viewer, ID);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 	}
 
 	@Override

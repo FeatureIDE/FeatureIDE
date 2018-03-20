@@ -21,9 +21,11 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Menu;
@@ -40,14 +42,22 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ToolBarMenuManager extends MenuManager {
 
+	private Image image;
+
 	public ToolBarMenuManager(String text) {
 		super(text);
+	}
+
+	public ToolBarMenuManager(String text, ImageDescriptor image, String id) {
+		super(text, image, id);
+		this.image = image.createImage();
 	}
 
 	@Override
 	public void fill(final ToolBar toolbar, int index) {
 		final ToolItem toolItem = (index >= 0) ? new ToolItem(toolbar, SWT.DROP_DOWN, index) : new ToolItem(toolbar, SWT.DROP_DOWN);
 		toolItem.setText(getMenuText());
+		toolItem.setImage(image);
 		toolItem.addSelectionListener(new SelectionListener() {
 
 			@Override
