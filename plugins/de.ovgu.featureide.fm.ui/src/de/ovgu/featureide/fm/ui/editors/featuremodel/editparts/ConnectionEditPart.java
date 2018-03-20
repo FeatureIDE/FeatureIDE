@@ -62,7 +62,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -219,6 +218,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			getFigure().setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 			getFigure().setLineWidth(1);
 		}
+		getFigure().revalidate();
 	}
 
 	public void refreshSourceDecoration() {
@@ -354,6 +354,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			refreshParent();
 		} else if (EventType.MANDATORY_CHANGED.toString().equals(prop)) {
 			refreshSourceDecoration();
+		} else if (EventType.FEATURE_NAME_CHANGED.toString().equals(prop)) {
+			refreshVisuals();
 		}
 	}
 
