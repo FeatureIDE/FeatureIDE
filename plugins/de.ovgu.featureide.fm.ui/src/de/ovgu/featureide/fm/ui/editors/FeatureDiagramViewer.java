@@ -275,16 +275,10 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
-	public void refreshAll() {
-		refresh(graphicalFeatureModel.getFeatures(), true);
-	}
-
-	public void refresh(Collection<IGraphicalFeature> features, boolean checkModification) {
+	public void refresh(Collection<IGraphicalFeature> features) {
 		for (final IGraphicalFeature f : features) {
-			if (!checkModification) {
-				final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
-				editPart.refresh();
-			}
+			final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
+			editPart.refresh();
 		}
 	}
 
