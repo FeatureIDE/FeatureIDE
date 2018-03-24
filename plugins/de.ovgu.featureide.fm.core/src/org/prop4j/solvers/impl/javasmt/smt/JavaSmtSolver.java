@@ -75,6 +75,10 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	protected Prop4JToJavaSmtTranslator translator;
 	/** Configuration option for JavaSMT solver to determine the solver used. @link Solvers */
 	public static final String SOLVER_TYPE = "solver_type";
+	/** Engine to use for the optimization. [basic, farkas, symba] */
+	public static final String OPTIMIZATION_ENGINE = "OptimizationEngine";
+	/** Ordering for objectives in the optimization context. [lex, pareto, box] */
+	public static final String OPTIMIZATION_OBJECTIVE_ORDERING = "OptimizationObjectiveOrdering";
 	/** Native environment for JavaSMT to solve optimization query's */
 	protected OptimizationProverEnvironment prover;
 
@@ -89,7 +93,7 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 			logManager = BasicLogManager.create(config);
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
-			translator = new Prop4JToJavaSmtTranslator(context);
+			translator = new Prop4JToJavaSmtTranslator(context, this);
 			prover = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS);
 			final List<BooleanFormula> clauses = new ArrayList<>();
 			for (final Node node : getProblem().getClauses()) {
@@ -134,14 +138,16 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 			return false;
 		}
 		switch (key) {
+		case OPTIMIZATION_ENGINE:
 		case SOLVER_TYPE:
 			try {
 				if (value instanceof Solvers) {
 					final Solvers solverType = (Solvers) value;
 					context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solverType);
-					translator = new Prop4JToJavaSmtTranslator(context);
+					translator = new Prop4JToJavaSmtTranslator(context, this);
 					prover.close();
 					prover = context.newOptimizationProverEnvironment();
+
 					final List<BooleanFormula> clauses = new ArrayList<>();
 					for (final Node node : getProblem().getClauses()) {
 						final BooleanFormula formula = translator.getFormula(node);
@@ -226,7 +232,7 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	 * @see org.prop4j.solver.ISolver#getSoulution()
 	 */
 	@Override
-	public Object[] getSoulution() {
+	public Object[] getSolution() {
 		try {
 			if (!prover.isUnsatWithAssumptions(pushstack.getAssumtions())) {
 				final Model model = prover.getModel();
@@ -254,7 +260,7 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 	 */
 	@Override
 	public Object[] findSolution() {
-		return getSoulution();
+		return getSolution();
 	}
 
 	/*

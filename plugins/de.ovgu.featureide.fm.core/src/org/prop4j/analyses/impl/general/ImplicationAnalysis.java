@@ -64,7 +64,9 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 		monitor.checkCancel();
-		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+
+		solverSatisfiable();
+		final int[] model1 = SolverUtils.getIntModel(solver.getSolution());
 
 		if (model1 != null) {
 			solutionList.add(model1);
@@ -80,36 +82,28 @@ public class ImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>> {
 				}
 				for (final int i : pair) {
 					try {
-						solver.push(getLiteralFromIndex(-i));
+						solverPush(getLiteralFromIndex(-i));
 					} catch (final ContradictionException e) {
 						// Is unsatisfiable => false optional
 						resultList.add(pair);
 					}
 				}
-				switch (solver.isSatisfiable()) {
+				switch (solverSatisfiable()) {
 				case FALSE:
 					resultList.add(pair);
 					break;
 				case TIMEOUT:
 					break;
 				case TRUE:
-					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
+					solutionList.add(SolverUtils.getIntModel(solver.getSolution()));
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
-					solver.pop();
+					solverPop();
 				}
 			}
 		}
 		return resultList;
-	}
-
-	private static int countNegative(int[] model) {
-		int count = 0;
-		for (int i = 0; i < model.length; i++) {
-			count += model[i] >>> (Integer.SIZE - 1);
-		}
-		return count;
 	}
 
 	private boolean isInSolutionBothPositiveOrBothNegative(int[] solution, int[] pair) {

@@ -126,9 +126,10 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 		if (featureModel == null) {
 			features = EMPTY_ROOT;
 		} else {
-			final ArrayList<Object> featureList = new ArrayList<>();
-			featureList.add(featureModel.getStructure().getRoot().getFeature());
-			features = featureList.toArray();
+			features = EMPTY_ROOT;
+//			final ArrayList<Object> featureList = new ArrayList<>();
+//			featureList.add(featureModel.getStructure().getRoot().getFeature());
+//			features = featureList.toArray();
 		}
 	}
 

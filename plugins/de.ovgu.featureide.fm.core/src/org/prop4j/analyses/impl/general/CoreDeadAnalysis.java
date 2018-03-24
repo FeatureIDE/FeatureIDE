@@ -49,38 +49,39 @@ public class CoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 
 	@Override
 	public int[] analyze(IMonitor monitor) {
-		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		solverSatisfiable();
+		final int[] model1 = SolverUtils.getIntModel(solver.getSolution());
 		for (int i = 0; i < model1.length; i++) {
 			final int varX = model1[i];
 			if (varX != 0) {
 				try {
-					solver.push(getLiteralFromIndex(-varX));
+					solverPush(getLiteralFromIndex(-varX));
 				} catch (final ContradictionException e) {
 					// Unsatisfiable => dead or core feature
 					try {
-						solver.push(getLiteralFromIndex(varX));
+						solverPush(getLiteralFromIndex(varX));
 					} catch (final ContradictionException e1) {
 						// Should not be thrown
 					}
 					monitor.invoke(varX);
 				}
-				switch (solver.isSatisfiable()) {
+				switch (solverSatisfiable()) {
 				case FALSE:
 					// Unsatisfiable => dead or core feature
-					solver.pop();
+					solverPop();
 					try {
-						solver.push(getLiteralFromIndex(varX));
+						solverPush(getLiteralFromIndex(varX));
 					} catch (final ContradictionException e) {
 						FMCorePlugin.getDefault().logError(e);
 					}
 					monitor.invoke(varX);
 					break;
 				case TIMEOUT:
-					solver.pop();
+					solverPop();
 					break;
 				case TRUE:
-					solver.pop();
-					SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSoulution()));
+					solverPop();
+					SolverUtils.updateModel(model1, SolverUtils.getIntModel(solver.getSolution()));
 					break;
 				}
 			}

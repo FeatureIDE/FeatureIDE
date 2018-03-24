@@ -26,6 +26,7 @@ import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.SatSolverFactory;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
@@ -122,7 +123,10 @@ public class MusRedundantConstraintExplanationCreator extends MusFeatureModelExp
 			constraintClauseCount += redundantConstraintClauseCount;
 
 			// Get the explanation.
+			final long t1 = System.currentTimeMillis();
 			explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
+			final long resultingTime = System.currentTimeMillis() - t1;
+			FMCorePlugin.getDefault().logInfo("REDUNDANT" + getOracle().getClass().toString() + " - Time: " + resultingTime);
 
 			oracle.pop(constraintClauseCount);
 		} finally {

@@ -20,6 +20,7 @@
  */
 package org.prop4j.solver.impl.sat4j;
 
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.IOptimizationSolver;
 import org.prop4j.solver.ISatProblem;
@@ -40,7 +41,11 @@ public class Sat4JSatSolverFactory extends SatSolverFactory {
 	 */
 	@Override
 	public IMusExtractor getMusExtractor(ISatProblem problem) {
-		return new Sat4JSatMusSolver(problem, null);
+		try {
+			return new Sat4JSatMusSolver(problem, null);
+		} catch (final ContradictionException e) {
+			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
+		}
 	}
 
 	/*
@@ -49,7 +54,11 @@ public class Sat4JSatSolverFactory extends SatSolverFactory {
 	 */
 	@Override
 	public ISatSolver getSolver(ISatProblem problem) {
-		return new Sat4JSatMusSolver(problem, null);
+		try {
+			return new Sat4JSatMusSolver(problem, null);
+		} catch (final ContradictionException e) {
+			throw new RuntimeException("Cannot create solver because the problem is not satisfiable!");
+		}
 	}
 
 	/*

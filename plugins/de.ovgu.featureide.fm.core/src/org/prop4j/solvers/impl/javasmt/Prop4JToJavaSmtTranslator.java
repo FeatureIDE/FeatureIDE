@@ -42,6 +42,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.Term;
 import org.prop4j.Variable;
+import org.prop4j.solver.ISolver;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -67,9 +68,11 @@ public class Prop4JToJavaSmtTranslator {
 	protected RationalFormulaManager currentRationalFormulaManager;
 	protected HashMap<String, NumeralFormula> variables = new HashMap<>();
 	protected boolean isPrincess = false;
+	protected ISolver solver;
 
-	public Prop4JToJavaSmtTranslator(SolverContext context) {
+	public Prop4JToJavaSmtTranslator(SolverContext context, ISolver solver) {
 		setContext(context);
+		this.solver = solver;
 	}
 
 	public void setContext(SolverContext context) {
@@ -177,10 +180,11 @@ public class Prop4JToJavaSmtTranslator {
 	}
 
 	private BooleanFormula handleLiteralNode(Literal node) {
+		final String variable = "" + solver.getProblem().getIndexOfVariable(node.var.toString());
 		if (node.positive) {
-			return currentBooleanFormulaManager.makeVariable(node.var.toString());
+			return currentBooleanFormulaManager.makeVariable(variable);
 		} else {
-			return currentBooleanFormulaManager.not(currentBooleanFormulaManager.makeVariable(node.var.toString()));
+			return currentBooleanFormulaManager.not(currentBooleanFormulaManager.makeVariable(variable));
 		}
 	}
 

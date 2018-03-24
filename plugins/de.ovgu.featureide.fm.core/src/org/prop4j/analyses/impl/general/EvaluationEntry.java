@@ -18,21 +18,40 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package org.prop4j.solver;
+package org.prop4j.analyses.impl.general;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Tupel containing information about two data types.
+ * TODO description
  *
- * @author Joshua Sprey
+ * @author Joshua
  */
-public class Tupel<A, B> {
+public class EvaluationEntry {
 
-	public A key;
-	public B value;
+	public List<Long> times;
+	public int numberOfFeatures;
+	public int numberOfConstraints;
+	public int numberOfClauses;
+	public String modelName;
 
-	public Tupel(A key, B value) {
-		this.key = key;
-		this.value = value;
+	/**
+	 * @param times
+	 * @param numberOfFeatures
+	 * @param modelName
+	 */
+	public EvaluationEntry(int numberOfFeatures, int numberOfConstraints, int numberOfClauses, String modelName) {
+		super();
+		times = new ArrayList<>();
+		this.numberOfFeatures = numberOfFeatures;
+		this.numberOfConstraints = numberOfConstraints;
+		this.numberOfClauses = numberOfClauses;
+		this.modelName = modelName;
+	}
+
+	public void addTime(long time) {
+		times.add(time);
 	}
 
 	/*
@@ -41,7 +60,14 @@ public class Tupel<A, B> {
 	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return "" + key + ", " + value;
+		String name = modelName + "," + numberOfFeatures + "," + numberOfConstraints + "," + numberOfClauses + ",";
+		for (int i = 0; i < times.size(); i++) {
+			name += times.get(i);
+			if (i != (times.size() - 1)) {
+				name += ", ";
+			}
+		}
+		return name;
 	}
+
 }

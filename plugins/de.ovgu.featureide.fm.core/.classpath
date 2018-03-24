@@ -10,7 +10,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guidsl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar" sourcepath="C:/Users/Joshua/Documents/sat4j.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.pb.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

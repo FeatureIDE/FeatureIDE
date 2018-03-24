@@ -91,7 +91,7 @@ public interface ISolver {
 	 * @return A valid configuration for the solver problem as array. The first object is the value for the variable with the index of 0. The second object is
 	 *         the value for the variable with the index of 1. For more information of the index take a look at {@link ISolverProblem}
 	 */
-	Object[] getSoulution();
+	Object[] getSolution();
 
 	/**
 	 * Chain call for the methods isSatisfiable followed by getSolution().

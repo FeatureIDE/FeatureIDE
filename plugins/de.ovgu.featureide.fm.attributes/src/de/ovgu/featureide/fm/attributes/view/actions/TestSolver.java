@@ -20,6 +20,10 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.Variable;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
+import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
+import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
+import org.prop4j.analyses.impl.general.EvauatedFeatureModelAnaysis;
+import org.prop4j.analyses.impl.general.ValidAnalysis;
 import org.prop4j.analyses.impl.smt.FeatureAttributeRangeAnalysis;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.impl.SatProblem;
@@ -39,44 +43,166 @@ import de.ovgu.featureide.fm.attributes.FMAttributesPlugin;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 public class TestSolver extends Action {
 
 	private FeatureAttributeView view;
+	private boolean reset = false;
 
-	public TestSolver(FeatureAttributeView view, ImageDescriptor icon) {
+	public static List<String> dataExplanations = new ArrayList<>();
+
+	public TestSolver(FeatureAttributeView view, ImageDescriptor icon, boolean reset) {
 		super("", icon);
 		this.view = view;
+		this.reset = reset;
 	}
 
 	@Override
 	public void run() {
+		// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
 		if (view.getFeatureModel() != null) {
-			// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
-			Node cnf = view.getFeatureModel().getAnalyser().getCnf();
-			ISatProblem problem = new SatProblem(cnf, FeatureUtils.getFeatureNamesPreorder(view.getFeatureModel()));
+			evaluiereValid(view.getFeatureModel());
+		}
 
-			testeAlleSolverJavaSMT(cnf);
+//		List<IProject> projectList = new LinkedList<IProject>();
+//
+//		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+//		IProject[] projects = workspaceRoot.getProjects();
+//		for (int i = 0; i < projects.length; i++) {
+//			IProject project = projects[i];
+//			if (project.isOpen()) {
+//				projectList.add(project);
+//			}
+//		}
+//
+//		boolean small = true;
+//		boolean big = true;
+//
+//		// Kleine Modelle Evaluieren
+//		if (small) {
+//			List<IFeatureModel> modelleSmall = new ArrayList<>();
+//			for (IProject iProject : projects) {
+//				if (iProject.getName().equals("EvaluationSmall")) {
+//					try {
+//						for (IResource resource : iProject.members()) {
+//							if (resource.getFileExtension().equals("xml")) {
+//								Path file = resource.getRawLocation().toFile().toPath();
+//								Path absolute = file.toAbsolutePath();
+//								FeatureModelManager manager = FeatureModelManager.getInstance(absolute);
+//								IFeatureModel model = manager.getObject();
+//								modelleSmall.add(model);
+//							}
+//						}
+//					} catch (CoreException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			for (IFeatureModel iFeatureModel : modelleSmall) {
+//				evaluiereValid(iFeatureModel);
+//			}
+//		}
+//
+//		// Groﬂe Modelle Evaluieren
+//		if (big) {
+//			List<IFeatureModel> modelleSmall = new ArrayList<>();
+//			for (IProject iProject : projects) {
+//				if (iProject.getName().equals("EvaluationBig")) {
+//					try {
+//						for (IResource resource : iProject.members()) {
+//							if (resource.getFileExtension().equals("xml")) {
+//								Path file = resource.getRawLocation().toFile().toPath();
+//								Path absolute = file.toAbsolutePath();
+//								FeatureModelManager manager = FeatureModelManager.getInstance(absolute);
+//								IFeatureModel model = manager.getObject();
+//								modelleSmall.add(model);
+//							}
+//						}
+//					} catch (CoreException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//			for (IFeatureModel iFeatureModel : modelleSmall) {
+//				evaluiereValid(iFeatureModel);
+//			}
+//		}
 
-			// testeAttributeRanges(cnf);
-			// testeMus(problem);
-			// testSatSolver(problem);
+//			testeAlleSolverJavaSMT(cnf);
+
+//			testeAttributeRanges(cnf);
+		// testeMus(problem);
+		// testSatSolver(problem);
+
+	}
+
+	private void evaluiereValid(IFeatureModel featureModel) {
+		if (reset) {
+			EvauatedFeatureModelAnaysis.validAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.cleanCoreDeadAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.cleanFalseOptionalAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.optiCoreDeadAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.optiFalseOptionalAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.sat4CoreDeadAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.sat4FalseOptionalAnalysis = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.redundantConstraints = new ArrayList<>();
+			EvauatedFeatureModelAnaysis.tautologicalConstraints = new ArrayList<>();
+		} else {
+			EvauatedFeatureModelAnaysis analysis = new EvauatedFeatureModelAnaysis(featureModel, null);
+			EvauatedFeatureModelAnaysis.printResult();
 		}
 	}
 
 	private void testeAlleSolverJavaSMT(Node cnf) {
-		SatProblem problem = new SatProblem(cnf);
-		JavaSmtSatSolver z3 = new JavaSmtSatSolver(problem, Solvers.Z3, null);
-		JavaSmtSatSolver smtInterpol = new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
-		JavaSmtSatSolver princess = new JavaSmtSatSolver(problem, Solvers.PRINCESS, null);
-		JavaSmtSatSolver mat5SatPlusOpti = new JavaSmtSatSolver(problem, Solvers.MATHSAT5, null);
+		Sat4JSolverAnalysisFactory sat4jFactory = new Sat4JSolverAnalysisFactory();
+		JavaSmtSolverAnalysisFactory javaSmtFactory = new JavaSmtSolverAnalysisFactory();
 
-		FMAttributesPlugin.getDefault().logInfo("Z3:" + z3.isSatisfiable());
-		FMAttributesPlugin.getDefault().logInfo("SmtInterpol:" + smtInterpol.isSatisfiable());
-		FMAttributesPlugin.getDefault().logInfo("Princess:" + princess.isSatisfiable());
-		FMAttributesPlugin.getDefault().logInfo("Math5Sat:" + mat5SatPlusOpti.isSatisfiable());
+		SatProblem problem = new SatProblem(cnf);
+
+		ValidAnalysis validSat4j = (ValidAnalysis) sat4jFactory.getAnalysis(ValidAnalysis.class, problem);
+		ValidAnalysis validJavaSMT = (ValidAnalysis) javaSmtFactory.getAnalysis(ValidAnalysis.class, problem);
+
+		FMCorePlugin.getDefault().logInfo("Sat4J:\n");
+		try {
+			validSat4j.execute(new NullMonitor());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		FMCorePlugin.getDefault().logInfo("\n\n");
+
+		validJavaSMT.getSolver().setConfiguration(JavaSmtSatSolver.SOLVER_TYPE, Solvers.Z3);
+		FMCorePlugin.getDefault().logInfo("Z3:\n");
+		try {
+			validJavaSMT.execute(new NullMonitor());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		FMCorePlugin.getDefault().logInfo("\n\n");
+
+		validJavaSMT.getSolver().setConfiguration(JavaSmtSatSolver.SOLVER_TYPE, Solvers.PRINCESS);
+		FMCorePlugin.getDefault().logInfo("Princess:\n");
+		try {
+			validJavaSMT.execute(new NullMonitor());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		FMCorePlugin.getDefault().logInfo("\n\n");
+
+		validJavaSMT.getSolver().setConfiguration(JavaSmtSatSolver.SOLVER_TYPE, Solvers.SMTINTERPOL);
+		FMCorePlugin.getDefault().logInfo("SmtInterpol:\n");
+		try {
+			validJavaSMT.execute(new NullMonitor());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		FMCorePlugin.getDefault().logInfo("\n\n");
+
 	}
 
 	private void testeAttributeRanges(Node cnf) {

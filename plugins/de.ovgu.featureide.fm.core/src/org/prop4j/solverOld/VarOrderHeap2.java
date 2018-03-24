@@ -51,12 +51,16 @@ public class VarOrderHeap2 extends VarOrderHeap {
 		heap = new Heap(activity);
 		heap.setBounds(nlength);
 		nlength--;
-		for (int i = 0; i < nlength; i++) {
-			final int x = order[i];
-			activity[x] = 0.0;
-			if (lits.belongsToPool(x)) {
-				heap.insert(x);
+		try {
+			for (int i = 0; i < nlength; i++) {
+				final int x = order[i];
+				activity[x] = 0.0;
+				if (lits.belongsToPool(x)) {
+					heap.insert(x);
+				}
 			}
+		} catch (final IndexOutOfBoundsException ioobe) {
+			System.out.println();
 		}
 	}
 

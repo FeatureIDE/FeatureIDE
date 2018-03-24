@@ -20,6 +20,8 @@
  */
 package org.prop4j.analyses;
 
+import java.util.HashMap;
+
 import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.solver.ISolverProblem;
@@ -30,6 +32,20 @@ import org.prop4j.solver.ISolverProblem;
  * @author Joshua Sprey
  */
 public abstract class AbstractSolverAnalysisFactory {
+
+	/**
+	 * Returns the default configuration used to instantiate the solvers.
+	 *
+	 * @return Map containing the different configurations
+	 */
+	public abstract HashMap<String, Object> getDefaultConfiguration();
+
+	/**
+	 * Sets the default configuration used to instantiate the solvers.
+	 *
+	 * @param map Map containing the different configurations
+	 */
+	public abstract void setDefaultConfiguration(HashMap<String, Object> map);
 
 	/**
 	 * Returns the default factory used. See {@link Sat4JSolverAnalysisFactory}

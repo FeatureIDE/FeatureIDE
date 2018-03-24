@@ -56,11 +56,13 @@ public class Sat4JCoreDeadAnalysis extends AbstractSat4JAnalysis<int[]> {
 		}
 
 		solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
-		int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		solverSatisfiable();
+		int[] model1 = SolverUtils.getIntModel(solver.getSolution());
 
 		if (model1 != null) {
 			solver.setConfiguration(AbstractSatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
-			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
+			solverSatisfiable();
+			final int[] model2 = SolverUtils.getIntModel(solver.getSolution());
 			if (features != null) {
 				final int[] model3 = new int[model1.length];
 				for (int i = 0; i < features.length; i++) {
@@ -79,33 +81,33 @@ public class Sat4JCoreDeadAnalysis extends AbstractSat4JAnalysis<int[]> {
 				final int varX = model1[i];
 				if (varX != 0) {
 					try {
-						solver.push(getLiteralFromIndex(-varX));
+						solverPush(getLiteralFromIndex(-varX));
 					} catch (final ContradictionException e) {
-						solver.pop();
+						solverPop();
 						try {
-							solver.push(getLiteralFromIndex(varX));
+							solverPush(getLiteralFromIndex(varX));
 						} catch (final ContradictionException e1) {
 							// Should not happen
 						}
 						monitor.invoke(varX);
 					}
-					switch (solver.isSatisfiable()) {
+					switch (solverSatisfiable()) {
 					case FALSE:
-						solver.pop();
+						solverPop();
 						try {
-							solver.push(getLiteralFromIndex(varX));
+							solverPush(getLiteralFromIndex(varX));
 						} catch (final ContradictionException e) {
 							// Should not happen
 						}
 						monitor.invoke(varX);
 						break;
 					case TIMEOUT:
-						solver.pop();
+						solverPop();
 						break;
 					case TRUE:
-						solver.pop();
-						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.findSolution()));
-						solver.pop();
+						solverPop();
+						SatInstance.updateModel(model1, SolverUtils.getIntModel(solver.getSolution()));
+						solverPop();
 						break;
 					}
 				}

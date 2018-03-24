@@ -66,27 +66,17 @@ public class Sat4JImplicationAnalysis extends AbstractSat4JAnalysis<List<int[]>>
 
 		final RingList<int[]> solutionList = new RingList<>(Math.min(pairs.size(), ISatSolver.MAX_SOLUTION_BUFFER));
 
-		solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
+		solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.RANDOM);
 
 		monitor.checkCancel();
-		final int[] model1 = SolverUtils.getIntModel(solver.findSolution());
+		solverSatisfiable();
+		final int[] model1 = SolverUtils.getIntModel(solver.getSolution());
 
 		if (model1 != null) {
-			solutionList.add(model1);
-			solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.NEGATIVE);
-
-			monitor.checkCancel();
-			final int[] model2 = SolverUtils.getIntModel(solver.findSolution());
-			solutionList.add(model2);
-
-			// if there are more negative than positive literals
-			if ((model1.length - countNegative(model1)) < countNegative(model2)) {
-				solver.setConfiguration(ISatSolver.CONFIG_SELECTION_STRATEGY, SelectionStrategy.POSITIVE);
-			}
-
 			pairLoop: for (final int[] pair : pairs) {
 				monitor.checkCancel();
 				solutionLoop: for (final int[] is : solutionList) {
+					// check if pair appears in every solution
 					for (final int i : pair) {
 						if (is[Math.abs(i) - 1] == i) {
 							continue solutionLoop;
@@ -96,25 +86,25 @@ public class Sat4JImplicationAnalysis extends AbstractSat4JAnalysis<List<int[]>>
 				}
 				for (final int i : pair) {
 					try {
-						solver.push(getLiteralFromIndex(-i));
+						solverPush(getLiteralFromIndex(-i));
 					} catch (final ContradictionException e) {
 						// Is unsatisfiable => false optional
 						resultList.add(pair);
 					}
 				}
-				switch (solver.isSatisfiable()) {
+				switch (solverSatisfiable()) {
 				case FALSE:
 					resultList.add(pair);
 					break;
 				case TIMEOUT:
 					break;
 				case TRUE:
-					solutionList.add(SolverUtils.getIntModel(solver.getSoulution()));
+					solutionList.add(SolverUtils.getIntModel(solver.getSolution()));
 					solver.shuffleOrder();
 					break;
 				}
 				for (int i = 0; i < pair.length; i++) {
-					solver.pop();
+					solverPop();
 				}
 			}
 		}
@@ -127,5 +117,23 @@ public class Sat4JImplicationAnalysis extends AbstractSat4JAnalysis<List<int[]>>
 			count += model[i] >>> (Integer.SIZE - 1);
 		}
 		return count;
+	}
+
+	private boolean isInSolutionBothPositiveOrBothNegative(int[] solution, int[] pair) {
+		int parent = 0;
+		int feature = 0;
+		for (final int i : solution) {
+			if (Math.abs(i) == pair[1]) {
+				feature = i;
+			}
+			if (Math.abs(i) == Math.abs(pair[0])) {
+				parent = i;
+			}
+		}
+		if (((parent <= 0) && (feature <= 0)) || ((parent >= 0) && (feature >= 0))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

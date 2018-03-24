@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.prop4j.Node;
+import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISatResult;
@@ -42,7 +43,7 @@ import org.sat4j.tools.xplain.Xplain;
  */
 public class Sat4JSatMusSolver extends Sat4jSatSolver implements IMusExtractor {
 
-	public Sat4JSatMusSolver(ISatProblem problem, Map<String, Object> config) {
+	public Sat4JSatMusSolver(ISatProblem problem, Map<String, Object> config) throws ContradictionException {
 		super(problem, config);
 	}
 

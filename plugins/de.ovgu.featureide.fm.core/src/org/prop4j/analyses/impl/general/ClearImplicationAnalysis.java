@@ -70,14 +70,14 @@ public class ClearImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>>
 			for (final int i : pair) {
 				try {
 					// Push the assumption (Parent & -FAFeature)
-					solver.push(getLiteralFromIndex(-i));
+					solverPush(getLiteralFromIndex(-i));
 				} catch (final ContradictionException e) {
 					// If contradiction then it is unsatisfiable => false optional
 					resultList.add(pair);
 					continue;
 				}
 			}
-			switch (solver.isSatisfiable()) {
+			switch (solverSatisfiable()) {
 			case FALSE:
 				// Feature is false optional add to result list
 				resultList.add(pair);
@@ -89,7 +89,7 @@ public class ClearImplicationAnalysis extends GeneralSolverAnalysis<List<int[]>>
 			}
 			// Remove pushed assumptions from the solver
 			for (int i = 0; i < pair.length; i++) {
-				solver.pop();
+				solverPop();
 			}
 		}
 		return resultList;

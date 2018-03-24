@@ -85,7 +85,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 			logManager = BasicLogManager.create(config);
 			shutdownManager = ShutdownManager.create();
 			context = SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
-			translator = new Prop4JToJavaSmtTranslator(context);
+			translator = new Prop4JToJavaSmtTranslator(context, this);
 			prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
 			final List<BooleanFormula> clauses = new ArrayList<>();
 			for (final Node node : getProblem().getClauses()) {
@@ -222,7 +222,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#getSoulution()
 	 */
 	@Override
-	public Object[] getSoulution() {
+	public Object[] getSolution() {
 		try {
 			if (!prover.isUnsatWithAssumptions(pushstack.getAssumtions())) {
 				final Model model = prover.getModel();
@@ -231,9 +231,9 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 				while (iterator.hasNext()) {
 					final ValueAssignment value = iterator.next();
 					if (value.getValue().toString().equals("true")) {
-						solution.add(getProblem().getIndexOfVariable(value.getName().toString()));
+						solution.add(Integer.parseInt(value.getName()));
 					} else {
-						solution.add(-getProblem().getIndexOfVariable(value.getName().toString()));
+						solution.add(-Integer.parseInt(value.getName()));
 					}
 				}
 				return solution.toArray();
@@ -253,7 +253,7 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	 */
 	@Override
 	public Object[] findSolution() {
-		return getSoulution();
+		return getSolution();
 	}
 
 	/*

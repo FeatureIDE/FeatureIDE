@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 import org.prop4j.Literal;
@@ -70,7 +71,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 */
 	protected SolverMemory<IConstr> memory;
 
-	public Sat4jSatSolver(ISatProblem problem, Map<String, Object> config) {
+	public Sat4jSatSolver(ISatProblem problem, Map<String, Object> config) throws org.prop4j.solver.ContradictionException {
 		super(problem);
 
 		// Init Solver with configuration
@@ -80,15 +81,20 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		solver.setVerbose(false);
 		setConfiguration(config);
 
-		// +1 because Sat4J accept no variable index of 0
-		final int numberOfVariables = problem.getNumberOfVariables() + 1;
-		order = new int[numberOfVariables];
+		if (problem != null) {
+			final int numberOfVariables = problem.getNumberOfVariables();
+			order = new int[numberOfVariables];
+			fixOrder();
 
-		// create the variables for Sat4J
-		registerVariables();
+			// create the variables for Sat4J
+			registerVariables();
+		} else {
+			order = new int[0];
+		}
+
 	}
 
-	public Sat4jSatSolver(ISatProblem problem) {
+	public Sat4jSatSolver(ISatProblem problem) throws org.prop4j.solver.ContradictionException {
 		super(problem);
 
 		// Init Solver with configuration
@@ -97,12 +103,16 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
 
-		// +1 because Sat4J accept no variable index of 0
-		final int numberOfVariables = problem.getNumberOfVariables() + 1;
-		order = new int[numberOfVariables];
+		if (problem != null) {
+			final int numberOfVariables = problem.getNumberOfVariables();
+			order = new int[numberOfVariables];
+			fixOrder();
 
-		// create the variables for Sat4J
-		registerVariables();
+			// create the variables for Sat4J
+			registerVariables();
+		} else {
+			order = new int[0];
+		}
 	}
 
 	protected ISolver getSolver() {
@@ -119,7 +129,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	/**
 	 * Adds the variables from the {@link ISatProblem} to the Sat4j solver. Also class the registration for the clauses.
 	 */
-	private void registerVariables() {
+	private void registerVariables() throws org.prop4j.solver.ContradictionException {
 		try {
 			final int numberOfVariables = getProblem().getNumberOfVariables();
 			if (numberOfVariables > 0) {
@@ -135,7 +145,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 				((Solver<?>) solver).getOrder().init();
 			}
 		} catch (final ContradictionException e) {
-			throw new RuntimeException();
+			throw new org.prop4j.solver.ContradictionException();
 		}
 	}
 
@@ -228,8 +238,9 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 		} else if (oldNode instanceof Or) {
 			final IConstr constraint = memory.popFormula();
 			if (constraint != null) {
-				solver.removeSubsumedConstr(constraint);
-				solver.clearLearntClauses();
+				try {
+					solver.removeConstr(constraint);
+				} catch (final NoSuchElementException e) {}
 			}
 		}
 		return oldNode;
@@ -267,9 +278,14 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 					final Literal literal = (Literal) children[i];
 					clause[i] = getProblem().getSignedIndexOfVariable(literal);
 				}
-				memory.push(formula, solver.addClause(new VecInt(clause)));
+				final IConstr constaint = solver.addClause(new VecInt(clause));
+				memory.push(formula, constaint);
 				pushstack.push(formula);
-				return 1;
+				if (constaint != null) {
+					return 1;
+				} else {
+					return 0;
+				}
 			} catch (final ContradictionException e) {
 				throw new org.prop4j.solver.ContradictionException();
 			}
@@ -295,7 +311,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	 * @see org.prop4j.solver.ISolver#getSoulution()
 	 */
 	@Override
-	public Object[] getSoulution() {
+	public Object[] getSolution() {
 		final int[] model = solver.model();
 		if (model == null) {
 			return null;
@@ -310,7 +326,7 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 	@Override
 	public Object[] findSolution() {
 		if (isSatisfiable() == ISatResult.TRUE) {
-			return getSoulution();
+			return getSolution();
 		}
 		return null;
 	}

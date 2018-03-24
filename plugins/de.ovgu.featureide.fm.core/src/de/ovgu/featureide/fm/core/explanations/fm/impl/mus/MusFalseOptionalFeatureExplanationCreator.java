@@ -25,6 +25,7 @@ import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.IMusExtractor;
 import org.prop4j.solver.SatSolverFactory;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -67,7 +68,10 @@ public class MusFalseOptionalFeatureExplanationCreator extends MusFeatureModelEx
 		} catch (final ContradictionException e) {
 			oracle.pop();
 		}
+		final long t1 = System.currentTimeMillis();
 		explanation = getExplanation(oracle.getAllMinimalUnsatisfiableSubsetIndexes());
+		final long resultingTime = System.currentTimeMillis() - t1;
+		FMCorePlugin.getDefault().logInfo("FA " + getOracle().getClass().toString() + " - Time: " + resultingTime);
 		return explanation;
 	}
 

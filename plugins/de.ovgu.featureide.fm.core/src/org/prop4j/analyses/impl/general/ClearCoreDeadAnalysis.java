@@ -52,31 +52,30 @@ public class ClearCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 		for (int i = 1; i <= solver.getProblem().getNumberOfVariables(); i++) {
 			final int varX = i;
 			try {
-				solver.push(getLiteralFromIndex(-varX));
+				solverPush(getLiteralFromIndex(-varX));
 			} catch (final ContradictionException e1) {
 				// If contradiction then it is unsatisfiable => core feature
 				try {
-					solver.push(getLiteralFromIndex(varX));
+					solverPush(getLiteralFromIndex(varX));
 				} catch (final ContradictionException e) {}
 				monitor.invoke(varX);
 			}
-			switch (solver.isSatisfiable()) {
+			switch (solverSatisfiable()) {
 			case FALSE:
 				// If unsatisfiable => core feature
-				solver.pop();
+				solverPop();
 				try {
-					solver.push(getLiteralFromIndex(varX));
+					solverPush(getLiteralFromIndex(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
 				monitor.invoke(varX);
 				break;
 			case TIMEOUT:
-				solver.pop();
+				solverPop();
 				break;
 			case TRUE:
-				solver.pop();
-				// solver.shuffleOrder();
+				solverPop();
 				break;
 			}
 
@@ -85,31 +84,30 @@ public class ClearCoreDeadAnalysis extends GeneralSolverAnalysis<int[]> {
 		for (int i = 1; i <= solver.getProblem().getNumberOfVariables(); i++) {
 			final int varX = -i;
 			try {
-				solver.push(getLiteralFromIndex(-varX));
+				solverPush(getLiteralFromIndex(-varX));
 			} catch (final ContradictionException e1) {
 				// If contradiction then it is unsatisfiable => dead feature
 				try {
-					solver.push(getLiteralFromIndex(varX));
+					solverPush(getLiteralFromIndex(varX));
 				} catch (final ContradictionException e) {}
 				monitor.invoke(varX);
 			}
-			switch (solver.isSatisfiable()) {
+			switch (solverSatisfiable()) {
 			case FALSE:
 				// If unsatisfiable => dead feature
-				solver.pop();
+				solverPop();
 				try {
-					solver.push(getLiteralFromIndex(varX));
+					solverPush(getLiteralFromIndex(varX));
 				} catch (final ContradictionException e) {
 					FMCorePlugin.getDefault().logError(e);
 				}
 				monitor.invoke(varX);
 				break;
 			case TIMEOUT:
-				solver.pop();
+				solverPop();
 				break;
 			case TRUE:
-				solver.pop();
-				// solver.shuffleOrder();
+				solverPop();
 				break;
 			}
 		}

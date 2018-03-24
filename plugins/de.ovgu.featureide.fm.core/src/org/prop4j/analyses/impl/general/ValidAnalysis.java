@@ -21,6 +21,7 @@
 package org.prop4j.analyses.impl.general;
 
 import org.prop4j.analyses.GeneralSolverAnalysis;
+import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISolver;
 
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -30,7 +31,7 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
  *
  * @author Joshua Sprey
  */
-public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
+public class ValidAnalysis extends GeneralSolverAnalysis<Boolean> {
 
 	/**
 	 * @param solver
@@ -44,8 +45,8 @@ public class ValidAnalysis extends GeneralSolverAnalysis<Object[]> {
 	 * @see org.prop4j.analyses.ISolverAnalysis#analyze(de.ovgu.featureide.fm.core.job.monitor.IMonitor)
 	 */
 	@Override
-	public Object[] analyze(IMonitor monitor) {
-		return solver.findSolution();
+	public Boolean analyze(IMonitor monitor) {
+		return solverSatisfiable() == ISatResult.TRUE;
 	}
 
 }

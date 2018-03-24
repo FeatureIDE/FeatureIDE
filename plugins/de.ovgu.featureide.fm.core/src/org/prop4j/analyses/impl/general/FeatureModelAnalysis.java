@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.impl.SatProblem;
@@ -100,7 +99,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	AbstractSolverAnalysisFactory factory;
 
-	public FeatureModelAnalysis(IFeatureModel fm) {
+	public FeatureModelAnalysis(IFeatureModel fm, AbstractSolverAnalysisFactory factory) {
 		this.fm = fm;
 
 		deadFeatures = new ArrayList<>();
@@ -120,7 +119,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 		nodeCreator.setModelType(ModelType.OnlyConstraints);
 		constraintModelProblem = new SatProblem(nodeCreator.createNodes(), FeatureUtils.getFeatureNamesPreorder(fm));
 
-		factory = AbstractSolverAnalysisFactory.getJavaSmtFactory();
+		this.factory = factory;
 	}
 
 	public boolean isCalculateConstraints() {
@@ -244,7 +243,7 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 
 	private void checkValidity(final SatProblem modelProblem) {
 		final ValidAnalysis validAnalysis = (ValidAnalysis) factory.getAnalysis(ValidAnalysis.class, modelProblem);
-		valid = LongRunningWrapper.runMethod(validAnalysis) != null;
+		valid = LongRunningWrapper.runMethod(validAnalysis);
 		if (!valid) {
 			changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.DEAD);
 		}
@@ -379,19 +378,24 @@ public class FeatureModelAnalysis implements LongRunningMethod<HashMap<Object, O
 			redundantAnalysis.setConstraints(constraints);
 
 			final Map<IConstraint, ConstraintAttribute> map = LongRunningWrapper.runMethod(redundantAnalysis, monitor.subTask(0));
-			for (final IConstraint iConstraint : map.keySet()) {
-				setConstraintAttribute(iConstraint, map.get(iConstraint));
+			if (map != null) {
+				for (final IConstraint iConstraint : map.keySet()) {
+					setConstraintAttribute(iConstraint, map.get(iConstraint));
+				}
 			}
 		}
 	}
 
 	private void checkConstraintTautology(final List<IConstraint> constraints) {
 		if (calculateTautologyConstraints) {
-			for (final IConstraint constraint : constraints) {
-				if (checkConstraintContradiction(new Not(constraint.getNode()).toRegularCNF())) {
-					setConstraintAttribute(constraint, ConstraintAttribute.TAUTOLOGY);
-				}
-				monitor.checkCancel();
+			final TautologicalConstraintAnalysis constraintsUnsatisfiableAnaylsis =
+				(TautologicalConstraintAnalysis) factory.getAnalysis(TautologicalConstraintAnalysis.class, structureModelProblem);
+			constraintsUnsatisfiableAnaylsis.init(constraints);
+
+			final List<IConstraint> tautologies = LongRunningWrapper.runMethod(constraintsUnsatisfiableAnaylsis);
+
+			for (final IConstraint iConstraint : tautologies) {
+				setConstraintAttribute(iConstraint, ConstraintAttribute.TAUTOLOGY);
 			}
 		}
 	}

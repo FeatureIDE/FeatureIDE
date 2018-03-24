@@ -363,7 +363,8 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
 		toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
-		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature))));
+		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature)), false));
+		toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgAttributeRecurisve)), true));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);

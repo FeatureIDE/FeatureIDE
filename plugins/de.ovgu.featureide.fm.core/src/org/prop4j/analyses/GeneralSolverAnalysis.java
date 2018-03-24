@@ -25,6 +25,8 @@ import java.util.Collections;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.solver.ContradictionException;
+import org.prop4j.solver.ISatResult;
 import org.prop4j.solver.ISolver;
 import org.prop4j.solver.impl.SolverUtils;
 
@@ -39,6 +41,9 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, LongRunningMethod<T> {
 
 	protected ISolver solver;
+	public long solveTime = 0;
+	public long editTime = 0;
+	public long gesamtTime = 0;
 
 	protected GeneralSolverAnalysis(ISolver solver) {
 		this.solver = solver;
@@ -55,7 +60,9 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 		}
 		monitor.checkCancel();
 		try {
-			return analyze(monitor);
+			final T value = analyze(monitor);
+			gesamtTime = solveTime + editTime;
+			return value;
 		} catch (final Throwable e) {
 			throw e;
 		}
@@ -98,6 +105,31 @@ public abstract class GeneralSolverAnalysis<T> implements ISolverAnalysis<T>, Lo
 	@Override
 	public ISolver getSolver() {
 		return solver;
+	}
+
+	protected ISatResult solverSatisfiable() {
+		final long time = System.currentTimeMillis();
+		final ISatResult result = solver.isSatisfiable();
+		solveTime += (System.currentTimeMillis() - time);
+		return result;
+	}
+
+	protected void solverPush(Node... node) throws ContradictionException {
+		final long time = System.currentTimeMillis();
+		solver.push(node);
+		editTime += (System.currentTimeMillis() - time);
+	}
+
+	protected void solverPop() {
+		final long time = System.currentTimeMillis();
+		solver.pop();
+		editTime += (System.currentTimeMillis() - time);
+	}
+
+	protected void solverPop(int count) {
+		final long time = System.currentTimeMillis();
+		solver.pop(count);
+		editTime += (System.currentTimeMillis() - time);
 	}
 
 }

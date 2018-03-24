@@ -38,7 +38,6 @@ import org.prop4j.analyses.impl.sat4j.Sat4JImplicationAnalysis;
 import org.prop4j.solver.AbstractSatSolver;
 import org.prop4j.solver.ContradictionException;
 import org.prop4j.solver.ISatProblem;
-import org.prop4j.solver.ISolver;
 import org.prop4j.solver.ISolverProblem;
 import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
 
@@ -47,14 +46,16 @@ import org.prop4j.solver.impl.sat4j.Sat4jSatSolver;
  *
  * @author Joshua Sprey
  */
-public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
+public class Sat4JSolverAnalysisFactoryTOGO extends AbstractSolverAnalysisFactory {
 
 	private HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
+
+	Sat4jSatSolver solver;
 
 	/**
 	 *
 	 */
-	public Sat4JSolverAnalysisFactory() {
+	public Sat4JSolverAnalysisFactoryTOGO() {
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_TIMEOUT, 1000);
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_DB_SIMPLIFICATION_ALLOWED, true);
 		defaultConfiguration.put(AbstractSatSolver.CONFIG_VERBOSE, false);
@@ -84,6 +85,11 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	 */
 	@Override
 	public ISolverAnalysis<?> getAnalysis(Class<?> analysisClass, ISolverProblem problem) {
+		if ((solver == null) && (problem instanceof ISatProblem)) {
+			try {
+				solver = new Sat4jSatSolver((ISatProblem) problem, getDefaultConfiguration());
+			} catch (final ContradictionException e) {}
+		}
 		if (analysisClass.equals(ValidAnalysis.class)) {
 			return getValidAnalyis(problem);
 		} else if (analysisClass.equals(CoreDeadAnalysis.class)) {
@@ -118,12 +124,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private CoreDeadAnalysis getCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new CoreDeadAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new CoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -131,12 +132,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private ValidAnalysis getValidAnalyis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ValidAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new ValidAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -144,12 +140,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private ImplicationAnalysis getImplicationAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new ImplicationAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -157,12 +148,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private IndeterminedAnalysis getIndeterminedAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new IndeterminedAnalysis(solver, null);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new IndeterminedAnalysis(solver, null);
 		} else {
 			return null;
 		}
@@ -171,7 +157,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	private RedundantConstraintAnalysis getRedundantConstraintAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+				solver = new Sat4jSatSolver((ISatProblem) problem, getDefaultConfiguration());
 				return new RedundantConstraintAnalysis(solver, this);
 			} catch (final ContradictionException e) {
 				return null;
@@ -184,7 +170,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	private ConstraintsUnsatisfiableAnalysis getConstraintsUnsatisfiableAnaylsis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+				solver = new Sat4jSatSolver((ISatProblem) problem, getDefaultConfiguration());
 				return new ConstraintsUnsatisfiableAnalysis(solver, this);
 			} catch (final ContradictionException e) {
 				return null;
@@ -197,7 +183,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
 			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
+				solver = new Sat4jSatSolver((ISatProblem) problem, getDefaultConfiguration());
 				return new TautologicalConstraintAnalysis(solver, this);
 			} catch (final ContradictionException e) {
 				return null;
@@ -209,12 +195,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private ClearCoreDeadAnalysis getAAACoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ClearCoreDeadAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new ClearCoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -222,12 +203,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private ClearImplicationAnalysis getAAAImplicationAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final ISolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new ClearImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new ClearImplicationAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -235,12 +211,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private Sat4JImplicationAnalysis getSat4JImplicationAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new Sat4JImplicationAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new Sat4JImplicationAnalysis(solver);
 		} else {
 			return null;
 		}
@@ -248,12 +219,7 @@ public class Sat4JSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
 	private Sat4JCoreDeadAnalysis getSat4JCoreDeadAnalysis(ISolverProblem problem) {
 		if (problem instanceof ISatProblem) {
-			try {
-				final Sat4jSatSolver solver = new Sat4jSatSolver((ISatProblem) problem, defaultConfiguration);
-				return new Sat4JCoreDeadAnalysis(solver);
-			} catch (final ContradictionException e) {
-				return null;
-			}
+			return new Sat4JCoreDeadAnalysis(solver);
 		} else {
 			return null;
 		}

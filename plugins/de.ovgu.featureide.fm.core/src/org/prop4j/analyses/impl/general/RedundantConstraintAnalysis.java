@@ -27,21 +27,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.GeneralSolverAnalysis;
 import org.prop4j.solver.ContradictionException;
-import org.prop4j.solver.ISatProblem;
 import org.prop4j.solver.ISolver;
-import org.prop4j.solver.impl.SatProblem;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
 /**
  * Finds redundant constraints.
@@ -79,9 +74,9 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 				if (o1Childs == o2Childs) {
 					return 0;
 				} else if (o1Childs > o2Childs) {
-					return -1;
-				} else {
 					return 1;
+				} else {
+					return -1;
 				}
 			}
 		});
@@ -90,14 +85,14 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 			final Node cnf = constraintsLocal.get(i).getNode().toRegularCNF();
 			cnfNodes.add(cnf);
 			try {
-				solver.push(cnf.getChildren());
+				solverPush(cnf.getChildren());
 			} catch (final ContradictionException e) {}
 		}
 		monitor.checkCancel();
 
 		for (int j = constraintsLocal.size() - 1; j >= 0; j--) {
 			final IConstraint constraint = constraintsLocal.get(j);
-			boolean redundant = true;
+			boolean redundant = false;
 
 			// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
 			for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
@@ -105,37 +100,85 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 					final IConstraint constraintStack = constraintsLocal.get(i);
 					// Pop all non redundant constraints till we reach our constraint
 					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
-						solver.pop(cnfNodes.get(i).getChildren().length);
+						solverPop(cnfNodes.get(i).getChildren().length);
 					}
+				} else {
+					break;
 				}
+
 			}
 
 			// Push all constraints which where popped before except the redundant ones
-			for (int i = 0; i < constraintsLocal.size(); i++) {
+			for (int i = j + 1; i < constraintsLocal.size(); i++) {
 				if (i > j) {
 					final IConstraint constraintStack = constraintsLocal.get(i);
 					if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
 						try {
-							solver.push(cnfNodes.get(i).getChildren());
+							solverPush(cnfNodes.get(i).getChildren());
 						} catch (final ContradictionException e) {}
 					}
 				}
 			}
 
-			final Node constraintNode = cnfNodes.get(j);
+			final Node constraintNode = new Not(cnfNodes.get(j)).toRegularCNF();
 			final Node[] clauses = constraintNode.getChildren();
-			for (final Node clause : clauses) {
-				if (!isImplied(clause.getChildren())) {
-					redundant = false;
+			for (int i = 0; i < clauses.length; i++) {
+				try {
+					solverPush(clauses[i]);
+				} catch (final ContradictionException e) {
+					// Unsatisfiable => redundant
+					redundant = true;
+					solverPop(i);
+				}
+			}
+			if (!redundant) {
+				switch (solverSatisfiable()) {
+				case TRUE:
+				case TIMEOUT:
+					solverPop(clauses.length);
+					break;
+				case FALSE:
+					redundant = true;
+					solverPop(clauses.length);
+					break;
+				default:
 					break;
 				}
 			}
 
 			if (redundant) {
-				if (checkConstraintTautology(constraint.getNode())) {
-					map.put(constraint, ConstraintAttribute.TAUTOLOGY);
-				} else {
-					map.put(constraint, ConstraintAttribute.REDUNDANT);
+				map.put(constraint, ConstraintAttribute.REDUNDANT);
+			} else {
+				// Pop all constraints, which are not redundant, until we reach the constraint that should be checked for redundancy (also remove that one)
+				for (int i = constraintsLocal.size() - 1; i >= 0; i--) {
+					if (i > j) {
+						final IConstraint constraintStack = constraintsLocal.get(i);
+						// Pop all non redundant constraints till we reach our constraint
+						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
+							solverPop(cnfNodes.get(i).getChildren().length);
+						}
+					} else {
+						break;
+					}
+
+				}
+
+				try {
+					solverPush(cnfNodes.get(j).getChildren());
+				} catch (final ContradictionException e1) {}
+
+				// Push all constraints which where popped before except the redundant ones
+				for (int i = j + 1; i < constraintsLocal.size(); i++) {
+					if (i > j) {
+						final IConstraint constraintStack = constraintsLocal.get(i);
+						if (map.get(constraintStack) != ConstraintAttribute.REDUNDANT) {
+							try {
+								solverPush(cnfNodes.get(i).getChildren());
+							} catch (final ContradictionException e) {}
+						}
+					} else {
+						break;
+					}
 				}
 			}
 
@@ -150,42 +193,5 @@ public class RedundantConstraintAnalysis extends GeneralSolverAnalysis<Map<ICons
 
 	public void setConstraints(List<IConstraint> constraints) {
 		this.constraints = constraints;
-	}
-
-	public boolean isImplied(Node... literals) {
-		for (int i = 0; i < literals.length; i++) {
-			try {
-				final Literal literal = (Literal) literals[i];
-				// Assume the negated variables of the clause
-				solver.push(new Literal(literal.var, !literal.positive));
-			} catch (final ContradictionException e) {
-				solver.pop(i);
-				return false;
-			}
-		}
-		switch (solver.isSatisfiable()) {
-		case FALSE:
-			solver.pop(literals.length);	// Removes the pushed assumptions
-			return true;
-		case TIMEOUT:
-		case TRUE:
-		default:
-			solver.pop(literals.length); // Removes the pushed assumptions
-			return false;
-		}
-	}
-
-	private boolean checkConstraintTautology(Node constraintNode) {
-		return checkConstraintContradiction(new Not(constraintNode).toRegularCNF());
-	}
-
-	private boolean checkConstraintContradiction(Node constraintNode) {
-		final ISatProblem problem = new SatProblem(constraintNode);
-		final org.prop4j.analyses.impl.general.ValidAnalysis validAnalysis =
-			(org.prop4j.analyses.impl.general.ValidAnalysis) factory.getAnalysis(org.prop4j.analyses.impl.general.ValidAnalysis.class, problem);
-
-		final Object[] solution = LongRunningWrapper.runMethod(validAnalysis, new NullMonitor());
-
-		return solution == null;
 	}
 }

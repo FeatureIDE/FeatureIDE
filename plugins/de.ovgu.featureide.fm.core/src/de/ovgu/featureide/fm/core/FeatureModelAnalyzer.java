@@ -44,6 +44,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
+import org.prop4j.analyses.AbstractSolverAnalysisFactory;
 import org.prop4j.analyses.impl.general.FeatureModelAnalysis;
 import org.sat4j.specs.TimeoutException;
 
@@ -583,7 +584,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	public HashMap<Object, Object> analyzeFeatureModel(IMonitor monitor) {
 		this.monitor = monitor == null ? new NullMonitor() : monitor;
 //		final org.prop4j.analysesOld.FeatureModelAnalysis analysis = new org.prop4j.analysesOld.FeatureModelAnalysis(fm);
-		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm, AbstractSolverAnalysisFactory.getDefault());
 		analysis.setCalculateFeatures(calculateFeatures);
 		analysis.setCalculateConstraints(calculateConstraints);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
@@ -605,7 +606,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateConstraints() {
-		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm, AbstractSolverAnalysisFactory.getDefault());
 		analysis.setCalculateFeatures(false);
 		analysis.setCalculateConstraints(true);
 		analysis.setCalculateRedundantConstraints(calculateRedundantConstraints);
@@ -626,7 +627,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	}
 
 	public void updateFeatures() {
-		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm);
+		final FeatureModelAnalysis analysis = new FeatureModelAnalysis(fm, AbstractSolverAnalysisFactory.getDefault());
 		analysis.setCalculateFeatures(true);
 		analysis.setCalculateConstraints(false);
 		analysis.updateFeatures();

@@ -31,6 +31,7 @@ import org.prop4j.analyses.impl.general.CoreDeadAnalysis;
 import org.prop4j.analyses.impl.general.ImplicationAnalysis;
 import org.prop4j.analyses.impl.general.IndeterminedAnalysis;
 import org.prop4j.analyses.impl.general.RedundantConstraintAnalysis;
+import org.prop4j.analyses.impl.general.TautologicalConstraintAnalysis;
 import org.prop4j.analyses.impl.general.ValidAnalysis;
 import org.prop4j.analyses.impl.smt.FeatureAttributeRangeAnalysis;
 import org.prop4j.solver.ISatProblem;
@@ -49,7 +50,25 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
  */
 public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory {
 
-	private final HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
+	protected HashMap<String, Object> defaultConfiguration = new HashMap<String, Object>();
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.AbstractSolverAnalysisFactory#getDefaultConfiguration()
+	 */
+	@Override
+	public HashMap<String, Object> getDefaultConfiguration() {
+		return defaultConfiguration;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.prop4j.analyses.AbstractSolverAnalysisFactory#setDefaultConfiguration(java.util.HashMap)
+	 */
+	@Override
+	public void setDefaultConfiguration(HashMap<String, Object> map) {
+		defaultConfiguration = map;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -69,6 +88,8 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 			return getRedundantConstraintAnalysis(problem);
 		} else if (analysisClass.equals(ConstraintsUnsatisfiableAnalysis.class)) {
 			return getConstraintsUnsatisfiableAnaylsis(problem);
+		} else if (analysisClass.equals(TautologicalConstraintAnalysis.class)) {
+			return getConstraintsTautologyAnaylsis(problem);
 		} else if (analysisClass.equals(FeatureAttributeRangeAnalysis.class)) {
 			return getFeatureAttributeRangeAnalysis(problem);
 		}
@@ -131,6 +152,15 @@ public class JavaSmtSolverAnalysisFactory extends AbstractSolverAnalysisFactory 
 		if (problem instanceof ISatProblem) {
 			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
 			return new ConstraintsUnsatisfiableAnalysis(solver, this);
+		} else {
+			return null;
+		}
+	}
+
+	private TautologicalConstraintAnalysis getConstraintsTautologyAnaylsis(ISolverProblem problem) {
+		if (problem instanceof ISatProblem) {
+			final ISolver solver = new JavaSmtSatSolver((ISatProblem) problem, Solvers.SMTINTERPOL, defaultConfiguration);
+			return new TautologicalConstraintAnalysis(solver, this);
 		} else {
 			return null;
 		}
