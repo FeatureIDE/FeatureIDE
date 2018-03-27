@@ -23,14 +23,11 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
-import org.sat4j.specs.TimeoutException;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
@@ -106,15 +103,10 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 	@Override
 	protected void initChildren() {
+		// Cached validity for speed
+		final boolean isValid = model.getAnalyser().valid();
 
-		Boolean isValid = null;
-		try {
-			isValid = model.getAnalyser().isValid();
-		} catch (final TimeoutException e) {
-			UIPlugin.getDefault().logError(e);
-		}
-
-		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
+		addChild(new Parent(MODEL_VOID, isValid));
 
 		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
 
