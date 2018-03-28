@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="lib.fm" default="build" basedir=".">
+
+	<target name="check-external">
+	    <available file="subant_build_external.xml" property="build.external"/>
+	</target>
+
+	<target name="external_build" description="Build External Libraries" depends="check-external" if="build.external">
+
+		<!-- Build external libraries -->
+		<subant>
+			<fileset file="subant_build_external.xml" />
+			<target name="build" />
+		</subant>
+
+	</target>
+	
+	<target name="external_clean_build" description="Clean and Build External Libraries" depends="check-external" if="build.external">
+
+		<!-- Build external libraries -->
+		<subant>
+			<fileset file="subant_build_external.xml" />
+			<target name="clean_build" />
+		</subant>
+
+	</target>
+
+	<target name="build" description="Build Project" depends="external_build">
+
+		<!-- Build own project -->
+		<subant>
+			<fileset file="subant_build_jar.xml" />
+			<target name="build" />
+		</subant>
+
+	</target>
+
+	<target name="clean" description="Clean Project">
+
+		<!-- Clean own project -->
+		<subant>
+			<fileset file="subant_build_jar.xml" />
+			<target name="clean" />
+		</subant>
+
+	</target>
+
+	<target name="clean_build" description="Clean and Build Project" depends="external_clean_build">
+
+		<!-- Clean and build own project -->
+		<subant>
+			<fileset file="subant_build_jar.xml" />
+			<target name="clean" />
+			<target name="build" />
+		</subant>
+
+	</target>
+
+</project>

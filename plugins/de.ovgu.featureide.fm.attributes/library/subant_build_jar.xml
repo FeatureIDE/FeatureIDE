@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="JAR Build Script" default="build" basedir=".">
 
-	<!-- Path to Java Compiler (must be Java 1.7) -->
+	<!-- Path to Java Compiler (must be Java 1.7) --> 
 	<property name="bin.javac.path" value="C:/Program Files/Java/jdk1.7.0_80/bin/javac.exe" />
 
 	<!-- Set JAR name -->
-	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm" />
+	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes" />
 	<property name="build.jar.version" value="3.5.0" />
 
 	<!-- Constants -->

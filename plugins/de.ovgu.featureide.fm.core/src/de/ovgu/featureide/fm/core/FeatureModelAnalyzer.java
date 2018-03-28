@@ -177,7 +177,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 			try {
 				cachedValidity = isValid();
 			} catch (final TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+				// FMCorePlugin.getDefault().logError(e);
 			}
 		}
 		return cachedValidity;
