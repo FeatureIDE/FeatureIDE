@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import org.sat4j.specs.TimeoutException;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
@@ -44,15 +41,10 @@ public class StatisticsSemanticalFeatureModel extends LazyParent {
 
 	@Override
 	protected void initChildren() {
+		// Cached validity for speed
+		final boolean isValid = model.getAnalyser().valid();
 
-		Boolean isValid = null;
-		try {
-			isValid = model.getAnalyser().isValid();
-		} catch (final TimeoutException e) {
-			UIPlugin.getDefault().logError(e);
-		}
-
-		addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
+		addChild(new Parent(MODEL_VOID, isValid));
 
 		addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
 
