@@ -27,7 +27,9 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
@@ -84,11 +86,13 @@ public abstract class LazyParent extends Parent {
 	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
 			final TreeJob job = new StatisticTreeJob(this, expand);
-			final LongRunningJob<Boolean> runner = new LongRunningJob<>(CALCULATE + this.getClass().getName(), job);
-			runner.setPriority(Job.SHORT);
-			final JobDoneListener listener = JobDoneListener.getInstance();
-			if (listener != null) {
-				runner.addJobChangeListener(listener);
+			final IRunner<Boolean> runner = LongRunningWrapper.getRunner(job, CALCULATE + this.getClass().getName());
+			if (runner instanceof LongRunningJob<?>) {
+				((LongRunningJob<?>) runner).setPriority(Job.SHORT);
+				final JobDoneListener listener = JobDoneListener.getInstance();
+				if (listener != null) {
+					((LongRunningJob<?>) runner).addJobChangeListener(listener);
+				}
 			}
 			runner.schedule();
 		}
