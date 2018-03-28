@@ -78,4 +78,16 @@ public final class LongRunningWrapper {
 		return new LongRunningThread<>(name, method, monitor);
 	}
 
+	public static JobToken createToken(JobStartingStrategy strategy) {
+		return JobSynchronizer.createToken(strategy);
+	}
+
+	public static void startJob(JobToken token, final IRunner<?> job) {
+		JobSynchronizer.startJob(token, job);
+	}
+
+	public static void cancelAllJobs(JobToken token) {
+		JobSynchronizer.cancelAllJobs(token);
+	}
+
 }
