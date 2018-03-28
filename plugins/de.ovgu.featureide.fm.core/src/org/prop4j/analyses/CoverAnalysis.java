@@ -77,7 +77,7 @@ public class CoverAnalysis extends AbstractAnalysis<List<int[]>> {
 				if (countCovered == countLastCovered) {
 					break;
 				}
-				solutions.add(solver.getModel());
+				solutions.add(solver.findModel());
 				solver.assignmentClear(orgAssignmentSize);
 			}
 		}

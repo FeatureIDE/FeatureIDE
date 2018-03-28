@@ -180,7 +180,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 			final CountSolutionAnalysis analysis = new CountSolutionAnalysis(rootNodeWithoutHidden, timeout);
 			analysis.setAssumptions(rootNodeWithoutHidden.convertToInt(definedFeatures));
-			return LongRunningWrapper.runMethod(analysis);
+			final Long result = LongRunningWrapper.runMethod(analysis);
+			return result == null ? 0 : result;
 		}
 	}
 
@@ -325,7 +326,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		@Override
 		public List<List<String>> execute(IMonitor monitor) throws TimeoutException {
 			if (rootNode == null) {
-				return null;
+				return Collections.emptyList();
 			}
 
 			final List<Literal> definedFeatures = new ArrayList<>();
@@ -346,6 +347,9 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 			analysis.setAssumptions(rootNode.convertToInt(definedFeatures));
 
 			final List<int[]> solutions = LongRunningWrapper.runMethod(analysis);
+			if (solutions == null) {
+				return Collections.emptyList();
+			}
 			final List<List<String>> solutionList = new ArrayList<>(solutions.size());
 			for (final int[] solution : solutions) {
 				solutionList.add(rootNode.convertToString(solution, true, false));

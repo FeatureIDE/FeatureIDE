@@ -179,7 +179,6 @@ public class BasicSolver implements ISatSolver {
 				return SatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
-			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}
