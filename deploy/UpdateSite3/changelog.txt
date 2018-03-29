@@ -7,6 +7,24 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.0 (April 2018)
+* Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
+* New tool bar and revised context menu for feature diagrams (#648, #651, #672, #720)
+* New notation for dead and false-optional features to avoid confusion with feature coloring (#649)
+* Descriptions for cross-tree constraints (#648)
+* Obfuscator for names in feature models (#667)
+* Added examples with real-world configurations, namely Agrib and Profile (#606)
+* Wizards for feature models and constraints available when installing only feature modeling (#649)
+* Feature order can be changed by drag and drop (#649)
+* Improved performance of readers and writers for XML and DIMACS formats (#695)
+* Unified dialogs for importing and exporting feature models from/to different formats
+* Fixed problems:
+  * saving of feature models (#537, #591, #662, #677, #700)
+  * layouting after renaming features (#604, #612)
+  * wrong number of variants (#722)
+  * impossible feature coloring (#708)
+  * editing of redundant constraints (#622)
+
 Release 3.4.3 (February 2018)
 * Hotfix containing only stability improvements over v3.4.2
 * Void feature model detected in constraint dialog (#704) and correctly visualized in feature diagram (#681, #687, #484)
