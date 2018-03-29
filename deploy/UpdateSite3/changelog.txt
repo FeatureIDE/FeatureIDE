@@ -17,7 +17,7 @@ Release 3.5.0 (April 2018)
 * Wizards for feature models and constraints available when installing only feature modeling (#649)
 * Feature order can be changed by drag and drop (#649)
 * Improved performance of readers and writers for XML and DIMACS formats (#695)
-* Unified dialog for importing and exporting feature models from/to differnt formats
+* Unified dialogs for importing and exporting feature models from/to different formats
 * Fixed problems:
   * saving of feature models (#537, #591, #662, #677, #700)
   * layouting after renaming features (#604, #612)
