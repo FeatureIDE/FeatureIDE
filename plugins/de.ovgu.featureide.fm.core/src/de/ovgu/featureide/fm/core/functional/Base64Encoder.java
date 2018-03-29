@@ -33,7 +33,7 @@ public abstract class Base64Encoder {
 
 	public static String encode(final char[] result, int index, byte[] message) {
 		final int length = ((result.length - index) >> 2) * 3;
-		if (message.length < length) {
+		if (message.length != length) {
 			message = Arrays.copyOf(message, length);
 		}
 		return encodeInternal(result, index, message);
