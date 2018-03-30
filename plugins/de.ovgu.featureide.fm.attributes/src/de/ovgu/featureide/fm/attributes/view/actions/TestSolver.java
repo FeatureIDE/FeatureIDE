@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.impl.composite.CompositeExplanationCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.NullMonitor;
 
@@ -51,8 +52,6 @@ public class TestSolver extends Action {
 
 	private FeatureAttributeView view;
 	private boolean reset = false;
-
-	public static List<String> dataExplanations = new ArrayList<>();
 
 	public TestSolver(FeatureAttributeView view, ImageDescriptor icon, boolean reset) {
 		super("", icon);
@@ -62,6 +61,9 @@ public class TestSolver extends Action {
 
 	@Override
 	public void run() {
+//		if (view.getFeatureModel() != null) {
+//			testJAvaSat(view.getFeatureModel().getAnalyser().getCnf());
+//		}
 		// FMAttributesPlugin.getDefault().logInfo("" + view.getFeatureModel().getAnalyser().getCnf());
 		if (view.getFeatureModel() != null) {
 			evaluiereValid(view.getFeatureModel());
@@ -144,6 +146,8 @@ public class TestSolver extends Action {
 
 	private void evaluiereValid(IFeatureModel featureModel) {
 		if (reset) {
+			CompositeExplanationCreator.printResultHidden("Explanations");
+			CompositeExplanationCreator.dataExplanations = new ArrayList<String>();
 			EvauatedFeatureModelAnaysis.validAnalysis = new ArrayList<>();
 			EvauatedFeatureModelAnaysis.cleanCoreDeadAnalysis = new ArrayList<>();
 			EvauatedFeatureModelAnaysis.cleanFalseOptionalAnalysis = new ArrayList<>();
@@ -153,9 +157,33 @@ public class TestSolver extends Action {
 			EvauatedFeatureModelAnaysis.sat4FalseOptionalAnalysis = new ArrayList<>();
 			EvauatedFeatureModelAnaysis.redundantConstraints = new ArrayList<>();
 			EvauatedFeatureModelAnaysis.tautologicalConstraints = new ArrayList<>();
+			JavaSmtSatSolver.convertTime = 0;
+			JavaSmtSatSolver.retrieveTime = 0;
+			JavaSmtSatSolver.modelTime = 0;
 		} else {
+//			for (int i = 0; i < 0; i++) {
+//				featureModel.getAnalyser().clearExplanations();
+//				for (IFeature iConstraint : featureModel.getAnalyser().getCachedDeadFeatures()) {
+//					featureModel.getAnalyser().getDeadFeatureExplanation(iConstraint);
+//				}
+//			}
+//
+//			for (int i = 0; i < 5; i++) {
+//				featureModel.getAnalyser().clearExplanations();
+//				for (IConstraint iConstraint : featureModel.getConstraints()) {
+//					if (iConstraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+//						featureModel.getAnalyser().getRedundantConstraintExplanation(iConstraint);
+//					}
+//				}
+//			}
+			JavaSmtSatSolver.convertTime = 0;
+			JavaSmtSatSolver.retrieveTime = 0;
+			JavaSmtSatSolver.modelTime = 0;
 			EvauatedFeatureModelAnaysis analysis = new EvauatedFeatureModelAnaysis(featureModel, null);
 			EvauatedFeatureModelAnaysis.printResult();
+			String ausgabe =
+				"Model: " + JavaSmtSatSolver.modelTime + "\nRetrieve: " + JavaSmtSatSolver.retrieveTime + "\nConvert: " + JavaSmtSatSolver.convertTime;
+			FMAttributesPlugin.getDefault().logInfo(ausgabe);
 		}
 	}
 
@@ -383,8 +411,8 @@ public class TestSolver extends Action {
 
 	}
 
-	public void testJAvaSat(ISatProblem problem) {
-		JavaSmtSatMusExtractor solver = new JavaSmtSatMusExtractor(problem, Solvers.SMTINTERPOL, null);
+	public void testJAvaSat(Node cnf) {
+		JavaSmtSatSolver solver = new JavaSmtSatSolver(new SatProblem(cnf), Solvers.SMTINTERPOL, null);
 
 		Literal root = new Literal(view.getFeatureModel().getStructure().getRoot().getFeature().getName());
 		Literal newFeature1 = new Literal("NewFeature1");
@@ -396,12 +424,5 @@ public class TestSolver extends Action {
 
 		Object[] solution = solver.findSolution();
 
-		if (solution != null) {
-			Arrays.sort(solution);
-			FMAttributesPlugin.getDefault().logInfo("O: " + "\nN:" + Arrays.toString(solution));
-		} else {
-			FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsets());
-			FMAttributesPlugin.getDefault().logInfo("Explanation:" + solver.getAllMinimalUnsatisfiableSubsetIndexes());
-		}
 	}
 }

@@ -36,13 +36,19 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
  */
 public class JavaSmtSatSolverFactory extends SatSolverFactory {
 
+	private final Solvers solver;
+
+	public JavaSmtSatSolverFactory(Solvers solver) {
+		this.solver = solver;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.prop4j.solver.SatSolverFactory#getMusExtractor()
 	 */
 	@Override
 	public IMusExtractor getMusExtractor(ISatProblem problem) {
-		return new JavaSmtSatMusExtractor(problem, Solvers.SMTINTERPOL, null);
+		return new JavaSmtSatMusExtractor(problem, solver, null);
 	}
 
 	/*
@@ -51,7 +57,7 @@ public class JavaSmtSatSolverFactory extends SatSolverFactory {
 	 */
 	@Override
 	public ISatSolver getSolver(ISatProblem problem) {
-		return new JavaSmtSatSolver(problem, Solvers.SMTINTERPOL, null);
+		return new JavaSmtSatSolver(problem, solver, null);
 	}
 
 	/*
@@ -60,7 +66,7 @@ public class JavaSmtSatSolverFactory extends SatSolverFactory {
 	 */
 	@Override
 	public IOptimizationSolver getOptimizationSolver(ISmtProblem problem) {
-		return new JavaSmtSolver(problem, Solvers.SMTINTERPOL, null);
+		return new JavaSmtSolver(problem, solver, null);
 	}
 
 }

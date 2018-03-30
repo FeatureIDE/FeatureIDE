@@ -20,10 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.explanations.impl.composite;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
 
@@ -38,6 +41,8 @@ import de.ovgu.featureide.fm.core.explanations.ExplanationCreator;
  * @author Timo G&uuml;nther
  */
 public abstract class CompositeExplanationCreator<S, E extends Explanation<S>, C extends ExplanationCreator<S, E>> implements ExplanationCreator<S, E> {
+
+	public static List<String> dataExplanations = new ArrayList<>();
 
 	/** The explanation creators this composes. */
 	private final List<C> composites;
@@ -77,12 +82,39 @@ public abstract class CompositeExplanationCreator<S, E extends Explanation<S>, C
 
 	@Override
 	public E getExplanation() throws IllegalStateException {
-		for (final C composite : getComposites()) {
-			final E explanation = composite.getExplanation();
-			if (explanation != null) {
-				return explanation;
-			}
+		E firstExplanation = null;
+		String evaluationEntry = getSubject() + ", ";
+		if (this.getClass().toString().contains("Dead")) {
+			evaluationEntry += "Dead, ";
 		}
-		return null;
+		if (this.getClass().toString().contains("Redundant")) {
+			evaluationEntry += "Redundant, ";
+		}
+		if (this.getClass().toString().contains("False")) {
+			evaluationEntry += "FalseOptional, ";
+		}
+		for (final C composite : getComposites()) {
+			final long t1 = System.currentTimeMillis();
+			final E explanation = composite.getExplanation();
+			final long reslutTime = System.currentTimeMillis() - t1;
+			if (firstExplanation == null) {
+				firstExplanation = explanation;
+			}
+			evaluationEntry += reslutTime + ", ";
+		}
+		CompositeExplanationCreator.dataExplanations.add(evaluationEntry);
+		return firstExplanation;
+	}
+
+	public static void printResultHidden(String filename) {
+		final String filetowrite =
+			"C:\\Users\\Joshua\\Documents\\bachelorarbeit-joshua-sprey-chico-sundermann\\data\\Evaluation_Sprey\\Data\\" + filename + ".txt";
+		try (FileWriter fw = new FileWriter(filetowrite)) {
+			for (final String evaluationEntry : CompositeExplanationCreator.dataExplanations) {
+				fw.write(evaluationEntry.toString() + "\n");
+			}
+		} catch (final IOException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 }

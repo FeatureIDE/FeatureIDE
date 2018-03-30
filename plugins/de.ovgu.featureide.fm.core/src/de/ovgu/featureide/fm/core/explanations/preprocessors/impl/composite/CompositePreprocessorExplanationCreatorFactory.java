@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.explanations.preprocessors.impl.composite;
 import java.util.Arrays;
 
 import org.prop4j.solvers.impl.javasmt.sat.JavaSmtSatSolverFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 import de.ovgu.featureide.fm.core.explanations.preprocessors.InvariantPresenceConditionExplanationCreator;
 import de.ovgu.featureide.fm.core.explanations.preprocessors.PreprocessorExplanationCreator;
@@ -41,7 +42,8 @@ public class CompositePreprocessorExplanationCreatorFactory extends Preprocessor
 	/** Factory for Sat4J MUS. */
 	private final PreprocessorExplanationCreatorFactory musSat4j = new MusPreprocessorExplanationCreatorFactory();
 	/** Factory for JavaSMT MUS. */
-	private final PreprocessorExplanationCreatorFactory musJavaSMT = new MusPreprocessorExplanationCreatorFactory(new JavaSmtSatSolverFactory());
+	private final PreprocessorExplanationCreatorFactory musJavaSMT =
+		new MusPreprocessorExplanationCreatorFactory(new JavaSmtSatSolverFactory(Solvers.SMTINTERPOL));
 
 	@Override
 	public InvariantPresenceConditionExplanationCreator getInvariantPresenceConditionExplanationCreator() {

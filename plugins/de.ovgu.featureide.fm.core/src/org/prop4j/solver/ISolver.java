@@ -70,6 +70,13 @@ public interface ISolver {
 	List<Node> pop(int count);
 
 	/**
+	 * Removes all layer from the stack.
+	 *
+	 * @return List containing all removed nodes, Empty List if nothing was pushed before.
+	 */
+	List<Node> popAll();
+
+	/**
 	 * Pushes a new node to the stack.
 	 *
 	 * @param formula Node that should be added to the stack.

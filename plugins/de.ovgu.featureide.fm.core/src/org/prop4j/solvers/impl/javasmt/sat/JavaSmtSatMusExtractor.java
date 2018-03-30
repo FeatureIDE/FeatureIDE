@@ -70,7 +70,7 @@ public class JavaSmtSatMusExtractor extends JavaSmtSatSolver implements IMusExtr
 				final Set<Node> explanation = new HashSet<>();
 				final List<BooleanFormula> assumptions = pushstack.getAssumtions();
 				for (int i = 0; i < formula.size(); i++) {
-					if (!assumptions.contains(formula.get(i))) {
+					if (!assumptions.contains(formula.get(i)) && (formula.get(i) != null)) {
 						explanation.add(pushstack.getNodeOfFormula(formula.get(i)));
 					}
 				}

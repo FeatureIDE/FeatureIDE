@@ -74,6 +74,10 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	/** Configuration option for JavaSMT solver to determine the solver used. @link Solvers */
 	public static final String SOLVER_TYPE = "solver_type";
 
+	public static long retrieveTime = 0;
+	public static long convertTime = 0;
+	public static long modelTime = 0;
+
 	/**
 	 * @param node
 	 * @param solver The solver that should be used to solve the query's
@@ -185,6 +189,20 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#pop(int)
+	 */
+	@Override
+	public List<Node> popAll() {
+		final ArrayList<Node> nodes = new ArrayList<>();
+		final int pushstackLength = pushstack.getNumberOfPushedNodes();
+		for (int i = 0; i < pushstackLength; i++) {
+			nodes.add(pop());
+		}
+		return nodes;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override
@@ -225,16 +243,25 @@ public class JavaSmtSatSolver extends AbstractSatSolver {
 	public Object[] getSolution() {
 		try {
 			if (!prover.isUnsatWithAssumptions(pushstack.getAssumtions())) {
+				final String ausgabe = "";
+				final long t1 = System.currentTimeMillis();
 				final Model model = prover.getModel();
+				modelTime += (System.currentTimeMillis() - t1);
 				final Iterator<ValueAssignment> iterator = model.iterator();
 				final List<Integer> solution = new ArrayList<>();
+
 				while (iterator.hasNext()) {
+					final long start = System.currentTimeMillis();
 					final ValueAssignment value = iterator.next();
+					final long t2 = System.currentTimeMillis();
 					if (value.getValue().toString().equals("true")) {
-						solution.add(Integer.parseInt(value.getName()));
+						solution.add(getProblem().getIndexOfVariable(value.getName()));
 					} else {
-						solution.add(-Integer.parseInt(value.getName()));
+						solution.add(-getProblem().getIndexOfVariable(value.getName()));
 					}
+					final long t3 = System.currentTimeMillis();
+					retrieveTime += t2 - start;
+					convertTime += t3 - t2;
 				}
 				return solution.toArray();
 			} else {

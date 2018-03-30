@@ -58,6 +58,16 @@ public class SolverMemory<T> {
 	 * Stack holds the correct order how the Nodes were pushed to the stack.
 	 */
 	private final LinkedList<Tupel<Node, T>> insertionStack = new LinkedList<>();
+
+//	/**
+//	 * Maps Nodes to Formulas.
+//	 */
+//	private final HashMap<Node, T> nodeToFormula = new HashMap<>();
+//	/**
+//	 * Maps Formulas to Nodes.
+//	 */
+//	private final HashMap<T, Node> formulaToNode = new HashMap<>();
+
 	/**
 	 * Holds all formulas for the clauses which are part of the problem itself.
 	 */
@@ -164,7 +174,7 @@ public class SolverMemory<T> {
 		} else {
 			// Formula is in pushed nodes maybe
 			for (final Tupel<Node, T> tupel : insertionStack) {
-				if (tupel.value == formula) {
+				if (tupel.value.hashCode() == formula.hashCode()) {
 					return tupel.key;
 				}
 			}
@@ -192,7 +202,13 @@ public class SolverMemory<T> {
 		if (index != -1) {
 			return index;
 		} else {
-			index = insertionStack.indexOf(new Tupel<Node, T>(node, getFormulaOfNode(node)));
+			index = -1;
+			for (int i = 0; i < insertionStack.size(); i++) {
+				final Tupel<Node, T> pushedNode = insertionStack.get(i);
+				if (pushedNode.key.equals(node)) {
+					index = i;
+				}
+			}
 			if (index == -1) {
 				return index;
 			} else {
@@ -318,5 +334,9 @@ public class SolverMemory<T> {
 			}
 		}
 		return clauses;
+	}
+
+	public int getNumberOfPushedNodes() {
+		return insertionStack.size();
 	}
 }

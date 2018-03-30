@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.analyses.AbstractSolverAnalysisFactory;
+import org.prop4j.analyses.impl.JavaSmtSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactory;
 import org.prop4j.analyses.impl.Sat4JSolverAnalysisFactoryTOGO;
 import org.prop4j.analyses.impl.sat4j.Sat4JCoreDeadAnalysis;
@@ -170,7 +171,7 @@ public class EvauatedFeatureModelAnaysis {
 			}
 		}
 
-		// evaluateClearFalseOptional(name, possibleFOFeatures);
+		evaluateClearFalseOptional(name, possibleFOFeatures);
 		// evaluateOptiFalseOptional(name, possibleFOFeatures);
 		// evaluateSat4jFalseOptional(name, possibleFOFeatures);
 
@@ -226,9 +227,16 @@ public class EvauatedFeatureModelAnaysis {
 		for (final AbstractSolverAnalysisFactory factory : factoryList) {
 			this.factory = factory;
 
-			// Valid Analysis
-			checkCleanFeatureFalseOptional(possibleFOFeatures, entry);
-
+			if (factory instanceof JavaSmtSolverAnalysisFactory) {
+				final JavaSmtSolverAnalysisFactory jSMTFactory = (JavaSmtSolverAnalysisFactory) factory;
+				final Object solverType = jSMTFactory.getDefaultConfiguration().get(JavaSmtSatSolver.SOLVER_TYPE);
+				if ((solverType != null) && (solverType instanceof Solvers)) {
+					// Valid Analysis
+					if (((Solvers) solverType) == Solvers.Z3) {
+						checkCleanFeatureFalseOptional(possibleFOFeatures, entry);
+					}
+				}
+			}
 		}
 		cleanFalseOptionalAnalysis.add(entry);
 	}

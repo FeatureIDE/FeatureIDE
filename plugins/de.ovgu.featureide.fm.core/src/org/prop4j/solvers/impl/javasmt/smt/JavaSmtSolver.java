@@ -195,6 +195,20 @@ public class JavaSmtSolver extends AbstractSmtSolver implements IOptimizationSol
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#pop(int)
+	 */
+	@Override
+	public List<Node> popAll() {
+		final ArrayList<Node> nodes = new ArrayList<>();
+		final int pushstackLength = pushstack.getNumberOfPushedNodes();
+		for (int i = 0; i < pushstackLength; i++) {
+			nodes.add(pop());
+		}
+		return nodes;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override

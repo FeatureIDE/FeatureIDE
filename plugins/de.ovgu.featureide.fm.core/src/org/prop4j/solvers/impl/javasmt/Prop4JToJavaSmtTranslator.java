@@ -180,7 +180,7 @@ public class Prop4JToJavaSmtTranslator {
 	}
 
 	private BooleanFormula handleLiteralNode(Literal node) {
-		final String variable = "" + solver.getProblem().getIndexOfVariable(node.var.toString());
+		final String variable = "" + node.var.toString();
 		if (node.positive) {
 			return currentBooleanFormulaManager.makeVariable(variable);
 		} else {

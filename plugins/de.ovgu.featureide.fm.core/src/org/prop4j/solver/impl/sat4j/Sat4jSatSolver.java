@@ -261,6 +261,20 @@ public class Sat4jSatSolver extends AbstractSatSolver {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.prop4j.solver.ISolver#pop(int)
+	 */
+	@Override
+	public List<Node> popAll() {
+		final ArrayList<Node> nodes = new ArrayList<>();
+		final int pushstackLength = pushstack.size();
+		for (int i = 0; i < pushstackLength; i++) {
+			nodes.add(pop());
+		}
+		return nodes;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.prop4j.solver.ISolver#push(org.prop4j.Node)
 	 */
 	@Override
