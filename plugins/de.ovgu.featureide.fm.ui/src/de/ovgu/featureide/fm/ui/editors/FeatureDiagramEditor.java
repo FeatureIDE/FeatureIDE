@@ -665,9 +665,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				}
 			}
 			viewer.internRefresh(true);
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			setDirty(true);
 			analyzeFeatureModel();
 			break;
@@ -714,9 +711,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFigure()), getFeatureModel()).show();
 			}
 			viewer.internRefresh(true);
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			analyzeFeatureModel();
 			break;
 		case FEATURE_NAME_CHANGED:
@@ -733,9 +727,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			viewer.reload();
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			setDirty(true);
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
@@ -786,9 +777,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			break;
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
@@ -801,9 +789,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
-			}
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
 			}
 			break;
 		case MODEL_DATA_OVERRIDDEN:
@@ -866,9 +851,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(root.getObject());
 			}
 			viewer.internRefresh(true);
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			setDirty(true);
 			analyzeFeatureModel();
 			break;
@@ -897,9 +879,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				setDirty(true);
 			}
 			legendLayoutAction.refresh();
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			viewer.internRefresh(false);
 			break;
 		case HIDDEN_CHANGED:
