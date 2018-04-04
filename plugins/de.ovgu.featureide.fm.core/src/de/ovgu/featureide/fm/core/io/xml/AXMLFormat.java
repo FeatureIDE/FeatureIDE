@@ -132,7 +132,9 @@ public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPer
 
 		try (StringWriter stringWriter = new StringWriter()) {
 			final StreamResult streamResult = new StreamResult(stringWriter);
-			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			final TransformerFactory factory = TransformerFactory.newInstance();
+			factory.setAttribute("indent-number", new Integer(4));
+			final Transformer transformer = factory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.METHOD, SUFFIX);
 			transformer.setOutputProperty(OutputKeys.INDENT, YES);
 			transformer.transform(new DOMSource(doc), streamResult);
