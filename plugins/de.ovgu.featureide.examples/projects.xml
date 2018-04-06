@@ -236,4 +236,6 @@
 		<project name="Tracing Example-AspectJ" path="featureide_examples/Tracing Example-AspectJ/.project"/>
 		<project name="UnionFind-FH-JML" path="featureide_examples/UnionFind-FH-JML/.project"/>
 		<project name="VariableCharacters-ImageComposer" path="featureide_examples/VariableCharacters-ImageComposer/.project"/>
+		<project name="CommandLineConfigurator" path="featureide_examples/Library/CommandLineConfigurator/.project"/>
+		<project name="GraphicalConfigurator" path="featureide_examples/Library/GraphicalConfigurator/.project"/>
 	</projectRecords>
