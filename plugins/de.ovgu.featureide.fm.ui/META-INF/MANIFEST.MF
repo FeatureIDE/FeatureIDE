@@ -15,7 +15,6 @@ Require-Bundle:
  org.eclipse.ui.views,
  org.eclipse.gef,
  org.eclipse.core.expressions,
- org.eclipse.draw2d,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

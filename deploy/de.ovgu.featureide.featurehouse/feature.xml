@@ -197,8 +197,10 @@ Library.
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.ltk.core.refactoring"/>
       <import plugin="org.eclipse.jdt.core.manipulation"/>
-      <import plugin="org.eclipse.draw2d"/>
       <import plugin="de.ovgu.featureide.core.mpl"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="de.ovgu.featureide.core.ahead"/>
+      <import plugin="de.ovgu.featureide.core.featurehouse"/>
    </requires>
 
    <plugin

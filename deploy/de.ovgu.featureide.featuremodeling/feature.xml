@@ -216,4 +216,11 @@ Library.
          version="3.4.3.qualifier"
          unpack="false"/>
 
+   <plugin
+         id="de.ovgu.featureide.fm.attributes"
+         download-size="0"
+         install-size="0"
+         version="3.4.3.qualifier"
+         unpack="false"/>
+
 </feature>
