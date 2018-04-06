@@ -84,7 +84,8 @@ public class ConfigurationManager extends AFileManager<Configuration> {
 	public void setConfiguration(Configuration configuration) {
 		variableObject = configuration;
 		synchronized (syncObject) {
-			persistentObject = copyObject(variableObject);
+			// persistentObject = copyObject(variableObject);
+			setPersistentObject(copyObject(variableObject));
 		}
 	}
 

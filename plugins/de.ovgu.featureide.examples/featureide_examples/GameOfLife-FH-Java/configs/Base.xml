@@ -1,26 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<configuration>
-		<feature automatic="selected" manual="undefined" name="GameOfLife"/>
-		<feature automatic="undefined" manual="undefined" name="Composed"/>
-		<feature automatic="undefined" manual="undefined" name="UndoRedoGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="UndoRedoTest"/>
-		<feature automatic="undefined" manual="undefined" name="UndoRedoGuiBase"/>
-		<feature automatic="undefined" manual="undefined" name="Options"/>
-		<feature automatic="undefined" manual="undefined" name="UndoRedo"/>
-		<feature automatic="undefined" manual="undefined" name="Test"/>
-		<feature automatic="undefined" manual="undefined" name="Generator"/>
-		<feature automatic="undefined" manual="undefined" name="GeneratorSelection"/>
-		<feature automatic="undefined" manual="undefined" name="DefaultGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="RandomDefaultGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="FormDefaultGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="ConcretGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="RandomGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="FormGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="AbstractGenerator"/>
-		<feature automatic="undefined" manual="undefined" name="IO"/>
-		<feature automatic="undefined" manual="undefined" name="PopUpMenu"/>
-		<feature automatic="selected" manual="undefined" name="View"/>
-		<feature automatic="undefined" manual="selected" name="GuiBase"/>
-		<feature automatic="selected" manual="undefined" name="Model"/>
-		<feature automatic="undefined" manual="undefined" name="ModelBase"/>
-	</configuration>
+<configuration>
+<feature automatic="selected" name="GameOfLife"/>
+<feature automatic="selected" name="View"/>
+<feature automatic="selected" name="GuiBase"/>
+<feature automatic="selected" name="Model"/>
+<feature automatic="selected" name="ModelBase"/>
+</configuration>

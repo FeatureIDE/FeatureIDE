@@ -59,13 +59,13 @@
 		<comments/>
 		<featureOrder userDefined="true">
 			<feature name="Elevator"/>
-			<feature name="Sabbath"/>
-			<feature name="FIFO"/>
-			<feature name="ShortestPath"/>
-			<feature name="Service"/>
-			<feature name="CallButtons"/>
-			<feature name="DirectedCall"/>
-			<feature name="UndirectedCall"/>
-			<feature name="FloorPermission"/>
+       		<feature name="CallButtons"/>
+        	<feature name="UndirectedCall"/>
+        	<feature name="Service"/>
+        	<feature name="Sabbath"/>
+        	<feature name="FIFO"/>
+        	<feature name="ShortestPath"/>
+        	<feature name="DirectedCall"/>
+        	<feature name="FloorPermission"/>
 		</featureOrder>
 	</featureModel>
