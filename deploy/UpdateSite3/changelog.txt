@@ -9,11 +9,13 @@ Here, is a list of high-level enhancements.
 
 Release 3.5.0 (April 2018)
 * Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
+* New library without Eclipse dependencies for extended feature models (#714)
 * New tool bar and revised context menu for feature diagrams (#648, #651, #672, #720)
 * New notation for dead and false-optional features to avoid confusion with feature coloring (#649)
 * Descriptions for cross-tree constraints (#648)
 * Obfuscator for names in feature models (#667)
 * Added examples with real-world configurations, namely Agrib and Profile (#606)
+* Added examples for the FeatureIDE library (#664)
 * Wizards for feature models and constraints available when installing only feature modeling (#649)
 * Feature order can be changed by drag and drop (#649)
 * Improved performance of readers and writers for XML and DIMACS formats (#695)

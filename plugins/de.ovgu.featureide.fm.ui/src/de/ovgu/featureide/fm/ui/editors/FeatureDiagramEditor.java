@@ -705,7 +705,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {// TODO move to FeatureEditPart
-				viewer.refreshAll();
 				newEditPart.activate();
 				viewer.select(newEditPart);
 				// open the renaming command
@@ -787,7 +786,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			viewer.internRefresh(true);
 			setDirty(true);
-			viewer.refreshAll();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));

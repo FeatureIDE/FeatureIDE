@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -272,19 +271,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			final int yCenter =
 				(int) (((getZoomManager().getZoom() * y) - (getFigureCanvas().getViewport().getSize().height / 2)) + (getZoomManager().getZoom() * offsetY));
 			getFigureCanvas().getViewport().setViewLocation(xCenter, yCenter);
-		}
-	}
-
-	public void refreshAll() {
-		refresh(graphicalFeatureModel.getFeatures(), true);
-	}
-
-	public void refresh(Collection<IGraphicalFeature> features, boolean checkModification) {
-		for (final IGraphicalFeature f : features) {
-			if (!checkModification) {
-				final FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
-				editPart.refresh();
-			}
 		}
 	}
 
