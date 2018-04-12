@@ -194,7 +194,7 @@ public class SetFeatureColorAction extends Action {
 				// only allow coloration if the active profile is not the default profile
 				if (FeatureColorManager.isDefault(featureModel)) {
 					// skip color scheme wizard if there is only one color scheme available
-					if (FeatureColorManager.getColorSchemes(featureModel).size() > 2) {
+					if (FeatureColorManager.getColorSchemes(featureModel).size() == 1) {
 						final Wizard colorSchemeWizard = new ColorSchemeWizard(featureModel);
 						final WizardDialog dialog = new WizardDialog(shell, colorSchemeWizard);
 						dialog.create();
@@ -206,7 +206,8 @@ public class SetFeatureColorAction extends Action {
 									StringTable.CURRENTLY_NO_COLOR_SCHEME_SELECTED_DIALOG);
 							return;
 						}
-					} else if (FeatureColorManager.getColorSchemes(featureModel).size() == 2) {
+					}
+					if (FeatureColorManager.getColorSchemes(featureModel).size() == 2) {
 						// if there is one non-default color scheme, set it active
 						final Collection<ColorScheme> colorSchemes = FeatureColorManager.getColorSchemes(featureModel);
 						for (final ColorScheme colorScheme : colorSchemes) {

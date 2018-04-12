@@ -101,6 +101,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
+		if (nodes == null) {
+			FeatureHouseCorePlugin.getDefault().logError("FST could not be build!", null);
+		}
 		if (!completeModel) {
 			model.reset();
 		}

@@ -418,11 +418,11 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		toolBarManager.add(new Separator());
 
 		// 3. Layout
-		toolBarManager.add(createLayoutMenuManager());
+		toolBarManager.add(createLayoutMenuManager(false));
 		toolBarManager.add(new Separator());
 
 		// 3. Analysis
-		toolBarManager.add(createCalculationsMenuManager());
+		toolBarManager.add(createCalculationsMenuManager(false));
 		toolBarManager.add(new Separator());
 
 		// 4. Viewer Options
@@ -667,6 +667,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.internRefresh(true);
 			setDirty(true);
 			analyzeFeatureModel();
+			break;
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
 			setDirty(true);
@@ -704,7 +705,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {// TODO move to FeatureEditPart
-				viewer.refreshAll();
 				newEditPart.activate();
 				viewer.select(newEditPart);
 				// open the renaming command
@@ -786,7 +786,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			viewer.internRefresh(true);
 			setDirty(true);
-			viewer.refreshAll();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
@@ -1095,8 +1094,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.createMouseHandlers();
 	}
 
-	private MenuManager createLayoutMenuManager() {
-		final MenuManager menuManager = new ToolBarMenuManager(SET_LAYOUT);
+	private MenuManager createLayoutMenuManager(boolean showText) {
+		final MenuManager menuManager =
+			new ToolBarMenuManager(showText ? SET_LAYOUT : "", FMUIPlugin.getDefault().getImageDescriptor("icons/tree_mode.gif"), "");
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
 
@@ -1118,8 +1118,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		return menuManager;
 	}
 
-	private MenuManager createCalculationsMenuManager() {
-		final MenuManager menuManager = new ToolBarMenuManager(SET_CALCULATIONS);
+	private MenuManager createCalculationsMenuManager(boolean showText) {
+		final MenuManager menuManager =
+			new ToolBarMenuManager(showText ? SET_CALCULATIONS : "", FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"), "");
 		menuManager.setRemoveAllWhenShown(true);
 		menuManager.addMenuListener(new IMenuListener() {
 
@@ -1197,7 +1198,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
 
 		if (getFeatureModel() instanceof ExtendedFeatureModel) {
-			menuManager.add(createLayoutMenuManager());
+			menuManager.add(createLayoutMenuManager(true));
 			menuManager.add(createNameTypeMenuManager());
 		}
 		if (isFeatureMenu(selection)) {
@@ -1241,8 +1242,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(expandAllAction);
 			menuManager.add(adjustModelToEditorSizeAction);
 			menuManager.add(new Separator());
-			menuManager.add(createLayoutMenuManager());
-			menuManager.add(createCalculationsMenuManager());
+			menuManager.add(createLayoutMenuManager(true));
+			menuManager.add(createCalculationsMenuManager(true));
 			menuManager.add(new Separator());
 			menuManager.add(reverseOrderAction);
 			menuManager.add(showHiddenFeaturesAction);

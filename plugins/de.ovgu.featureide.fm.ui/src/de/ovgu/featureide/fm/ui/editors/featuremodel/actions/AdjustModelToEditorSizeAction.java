@@ -48,6 +48,7 @@ public class AdjustModelToEditorSizeAction extends Action {
 	public AdjustModelToEditorSizeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel, String title) {
 		super(title);
 		setId(ID);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		if (viewer instanceof FeatureDiagramEditor) {
 			editor = (FeatureDiagramEditor) viewer;
 		}

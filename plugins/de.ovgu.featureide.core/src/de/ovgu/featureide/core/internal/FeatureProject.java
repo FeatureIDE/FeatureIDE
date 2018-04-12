@@ -483,31 +483,33 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
-		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
-		final IFeatureModel featureModel = featureModelManager.getObject();
-		// create folders for all layers
-		if (featureModel instanceof ExtendedFeatureModel) {
-			for (final IFeature feature : featureModel.getFeatures()) {
-				if (feature.getStructure().isConcrete() && (feature instanceof ExtendedFeature) && !((ExtendedFeature) feature).isFromExtern()) {
-					createFeatureFolder(feature.getName());
+		if ((sourceFolder != null) && sourceFolder.isAccessible()) {
+			sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
+			final IFeatureModel featureModel = featureModelManager.getObject();
+			// create folders for all layers
+			if (featureModel instanceof ExtendedFeatureModel) {
+				for (final IFeature feature : featureModel.getFeatures()) {
+					if (feature.getStructure().isConcrete() && (feature instanceof ExtendedFeature) && !((ExtendedFeature) feature).isFromExtern()) {
+						createFeatureFolder(feature.getName());
+					}
+				}
+			} else {
+				for (final IFeature feature : featureModel.getFeatures()) {
+					if (feature.getStructure().isConcrete()) {
+						createFeatureFolder(feature.getName());
+					}
 				}
 			}
-		} else {
-			for (final IFeature feature : featureModel.getFeatures()) {
-				if (feature.getStructure().isConcrete()) {
-					createFeatureFolder(feature.getName());
-				}
-			}
-		}
-		// delete all empty folders which do not anymore belong to layers
-		for (final IResource res : sourceFolder.members()) {
-			if ((res instanceof IFolder) && res.isAccessible()) {
-				final IFeature feature = featureModel.getFeature(res.getName());
-				if ((feature == null) || !feature.getStructure().isConcrete()) {
-					final IFolder folder = (IFolder) res;
-					folder.refreshLocal(IResource.DEPTH_ONE, null);
-					if (folder.members().length == 0) {
-						folder.delete(false, null);
+			// delete all empty folders which do not anymore belong to layers
+			for (final IResource res : sourceFolder.members()) {
+				if ((res instanceof IFolder) && res.isAccessible()) {
+					final IFeature feature = featureModel.getFeature(res.getName());
+					if ((feature == null) || !feature.getStructure().isConcrete()) {
+						final IFolder folder = (IFolder) res;
+						folder.refreshLocal(IResource.DEPTH_ONE, null);
+						if (folder.members().length == 0) {
+							folder.delete(false, null);
+						}
 					}
 				}
 			}

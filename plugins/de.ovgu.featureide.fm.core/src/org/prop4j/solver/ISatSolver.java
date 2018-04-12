@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
  */
 public interface ISatSolver extends Cloneable {
 
+	public static final int DEFAULT_TIMEOUT = 1000;
 	public static final int MAX_SOLUTION_BUFFER = 1000;
 
 	public static enum SatResult {
@@ -89,5 +90,9 @@ public interface ISatSolver extends Cloneable {
 	int[] getOrder();
 
 	List<IConstr> addClauses(Node constraint) throws ContradictionException;
+
+	boolean getGlobalTimeout();
+
+	void setGlobalTimeout(boolean globalTimeout);
 
 }

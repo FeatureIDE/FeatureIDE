@@ -169,15 +169,18 @@ public class ComposerWrapper {
 		allFeatureFolders.clear();
 		featureFolders.clear();
 
-		final Configuration configuration = new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
-		final ProblemList load = FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-		if (!load.containsError()) {
-			final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
-			for (final IFeature feature : selectedFeatures) {
-				if (feature.getStructure().isConcrete()) {
-					final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
-					if (f != null) {
-						featureFolders.add(f);
+		if (configFile != null) {
+			final Configuration configuration =
+				new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+			final ProblemList load = FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+			if (!load.containsError()) {
+				final List<IFeature> selectedFeatures = configuration.getSelectedFeatures();
+				for (final IFeature feature : selectedFeatures) {
+					if (feature.getStructure().isConcrete()) {
+						final IFolder f = featureProject.getSourceFolder().getFolder(feature.getName());
+						if (f != null) {
+							featureFolders.add(f);
+						}
 					}
 				}
 			}
