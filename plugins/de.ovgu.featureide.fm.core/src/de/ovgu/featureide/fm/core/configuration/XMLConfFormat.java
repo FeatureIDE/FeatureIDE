@@ -51,8 +51,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	public static final String EXTENSION = StringTable.CONF;
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + "configuration" + "[\\s>]");
 
-	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration[\\s>]");
-
 	@Override
 	public XMLConfFormat getInstance() {
 		return new XMLConfFormat();
@@ -190,11 +188,6 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getName() {
 		return "XML";
-	}
-
-	@Override
-	public boolean supportsContent(CharSequence content) {
-		return supportsRead() && CONTENT_REGEX.matcher(content).find();
 	}
 
 }

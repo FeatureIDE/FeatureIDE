@@ -59,7 +59,10 @@ public class ConfigurationTreeContentProvider extends OutlineTreeContentProvider
 			} else if (newInput instanceof IFile) {
 				if (((IFile) newInput).exists()) {
 					try {
-						final ConfigurationManager confManager = ConfigurationManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()));
+						final ConfigurationManager confManager = ConfigurationManager.getInstance(Paths.get(((IFile) newInput).getLocationURI()), true);
+						if (confManager == null) {
+							return;
+						}
 						config = confManager.getObject();
 						fModel = config.getFeatureModel();
 					} catch (final ClassCastException e) {}
