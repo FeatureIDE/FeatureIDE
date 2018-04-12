@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.EditingSupport;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.view.FeatureAttributeView;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
  * TODO description
@@ -67,7 +68,7 @@ public abstract class AbstractFeatureAttributeEditingSupport extends EditingSupp
 	 */
 	@Override
 	protected boolean canEdit(Object element) {
-		if (enabled) {
+		if (enabled && view.getCurrentEditor() instanceof FeatureModelEditor) {
 			if (element instanceof IFeatureAttribute) {
 				IFeatureAttribute att = (IFeatureAttribute) element;
 				if (att.isRecursive() && !att.isHeadOfRecursiveAttribute()) {

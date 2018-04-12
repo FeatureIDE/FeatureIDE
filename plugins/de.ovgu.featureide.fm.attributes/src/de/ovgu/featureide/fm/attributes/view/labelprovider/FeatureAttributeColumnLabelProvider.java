@@ -18,7 +18,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelProvider implements IColorProvider {
 
 	protected HashMap<String, Image> cachedImages;
-	private FeatureAttributeView view;
+	protected FeatureAttributeView view;
 
 	public FeatureAttributeColumnLabelProvider(HashMap<String, Image> cachedImages, FeatureAttributeView view) {
 		this.cachedImages = cachedImages;
@@ -31,10 +31,7 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 		if (element instanceof IFeatureAttribute) {
 			IFeatureAttribute attribute = (IFeatureAttribute) element;
 			IFeature feature = attribute.getFeature();
-			if (view.selection != null && view.selection.contains(feature)) {
-				return ColorPalette.toSwtColor(FeatureColor.Red);
-			}
-			if (view.selectedAutomaticFeatures == null || view.selectedManualFeatures == null) {
+			if (view.selectedManualFeatures == null) {
 				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
 				return ColorPalette.toSwtColor(featureColor);
 			} else {
@@ -47,10 +44,7 @@ public abstract class FeatureAttributeColumnLabelProvider extends ColumnLabelPro
 		}
 		if (element instanceof IFeature) {
 			IFeature feature = (IFeature) element;
-			if (view.selection != null && view.selection.contains(feature)) {
-				return ColorPalette.toSwtColor(FeatureColor.Red);
-			}
-			if (view.selectedAutomaticFeatures == null || view.selectedManualFeatures == null) {
+			if (view.selectedManualFeatures == null) {
 				final FeatureColor featureColor = FeatureColorManager.getColor(feature);
 				return ColorPalette.toSwtColor(featureColor);
 			} else {

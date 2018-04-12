@@ -55,7 +55,6 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 
 	public TXMLFeatureModelFormat(IFeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm, s);
-
 	}
 
 	@Test
@@ -65,7 +64,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTest.xml");
 		assertEquals(1, fm.getConstraints().size());
 
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Description");
 
@@ -79,7 +78,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("constraintDescriptionTwoRulesTest.xml");
 		assertEquals(2, fm.getConstraints().size());
 		int i = 1;
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Description " + i);
 			i++;
@@ -130,11 +129,11 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testConstraintDescriptionWrite() throws FileNotFoundException, UnsupportedModelException {
-		IFeatureModel newFm = this.prepareFeatureModel();
+		final IFeatureModel newFm = prepareFeatureModel();
 
 		String constraintdescriptionFromXml = "";
 		int i = 1;
-		for (IConstraint constraint : newFm.getConstraints()) {
+		for (final IConstraint constraint : newFm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "Test Write Description " + i);
 			i++;
@@ -149,7 +148,7 @@ public class TXMLFeatureModelFormat extends TAbstractFeatureModelReaderWriter {
 		final IFeatureModel fm = Commons.loadTestFeatureModelFromFile("basic.xml");
 		assertEquals(1, fm.getConstraints().size());
 
-		for (IConstraint constraint : fm.getConstraints()) {
+		for (final IConstraint constraint : fm.getConstraints()) {
 			constraintdescriptionFromXml = constraint.getDescription();
 			assertEquals(constraintdescriptionFromXml, "");
 
