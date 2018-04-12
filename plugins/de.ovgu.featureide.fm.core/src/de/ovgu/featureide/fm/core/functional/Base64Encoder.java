@@ -31,15 +31,26 @@ public abstract class Base64Encoder {
 
 	private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	public static String encode(final char[] result, int index, byte[] hash) {
+	public static String encode(final char[] result, int index, byte[] message) {
 		final int length = ((result.length - index) >> 2) * 3;
-		if (hash.length < length) {
-			hash = Arrays.copyOf(hash, length);
+		if (message.length != length) {
+			message = Arrays.copyOf(message, length);
 		}
-		for (int i = 0; i < length; i += 3) {
-			int x = 0xff & hash[i];
-			x |= (0xff & hash[i + 1]) << 8;
-			x |= (0xff & hash[i + 2]) << 16;
+		return encodeInternal(result, index, message);
+	}
+
+	public static String encode(byte[] message) {
+		if ((message.length % 3) != 0) {
+			message = Arrays.copyOf(message, message.length + (3 - (message.length % 3)));
+		}
+		return encodeInternal(new char[(message.length / 3) * 4], 0, message);
+	}
+
+	private static String encodeInternal(final char[] result, int index, byte[] message) {
+		for (int i = 0; i < message.length; i += 3) {
+			int x = 0xff & message[i];
+			x |= (0xff & message[i + 1]) << 8;
+			x |= (0xff & message[i + 2]) << 16;
 			for (int j = 0; j < 4; j++) {
 				result[index++] = ALPHABET.charAt(x & 0x3f);
 				x >>>= 6;
@@ -47,6 +58,33 @@ public abstract class Base64Encoder {
 		}
 
 		return new String(result);
+	}
+
+	public static byte[] decode(String encodedMessage) {
+		return decodeInternal(encodedMessage);
+	}
+
+	private static byte[] decodeInternal(String encodedMessage) {
+		final char[] charArray = encodedMessage.toCharArray();
+		final int length = ((charArray.length) >> 2) * 3;
+		final byte[] result = new byte[length];
+
+		int index = 0;
+		for (int i = 0; i < charArray.length; i += 4) {
+			int x = 0;
+			for (int j = 0; j < 4; j++) {
+				final int indexOf = ALPHABET.indexOf(charArray[i + j]);
+				if (indexOf >= 0) {
+					x |= indexOf << (j * 6);
+				} else {
+					return null;
+				}
+			}
+			result[index++] = (byte) (0xff & x);
+			result[index++] = (byte) (0xff & (x >>> 8));
+			result[index++] = (byte) (0xff & (x >>> 16));
+		}
+		return result;
 	}
 
 }

@@ -41,6 +41,10 @@
                   value="extendedFeatureModel">
             </parameter>
          </describer>
+         <property
+               default="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+               name="de.ovgu.featureide.fm.ui.contentType.format">
+         </property>
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.xml"
@@ -73,4 +77,11 @@
             name="AttributeComputations">
       </configurationOutlineEntry>
    </extension>
+   <extension
+			point="org.eclipse.ui.editors">
+  <editorContentTypeBinding
+        contentTypeId="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
+        editorId="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor">
+  </editorContentTypeBinding>
+	</extension>
 </plugin>

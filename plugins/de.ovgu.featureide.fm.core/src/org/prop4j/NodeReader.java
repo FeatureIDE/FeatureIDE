@@ -159,7 +159,7 @@ public class NodeReader {
 	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
 		constraint = " " + constraint + " ";
 		if ("  ".equals(constraint)) {
-			return getInvalidLiteral("Sub expression is empty", "");
+			return handleInvalidExpression("Sub expression is empty", "");
 		}
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {
@@ -175,12 +175,12 @@ public class NodeReader {
 				final Node node1, node2;
 				if (i == 4) {
 					node1 = null;
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression", constraint)
+					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression", constraint)
 						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				} else {
-					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side", constraint)
+					node1 = (leftSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on left side", constraint)
 						: checkExpression(leftSide, quotedFeatureNames, subExpressions);
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side", constraint)
+					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on right side", constraint)
 						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				}
 
@@ -209,7 +209,7 @@ public class NodeReader {
 			if ((subExpressionMatcher.start() == 0) && (subExpressionMatcher.end() == constraint.length())) {
 				return checkExpression(subExpressions.get(Integer.parseInt(constraint.substring(1))).trim(), quotedFeatureNames, subExpressions);
 			} else {
-				return getInvalidLiteral("Missing operator", constraint);
+				return handleInvalidExpression("Missing operator", constraint);
 			}
 		} else {
 			String featureName;
@@ -218,29 +218,33 @@ public class NodeReader {
 				if ((featureNameMatcher.start() == 0) && (featureNameMatcher.end() == constraint.length())) {
 					featureName = quotedFeatureNames.get(Integer.parseInt(constraint.substring(1)));
 				} else {
-					return getInvalidLiteral("Missing operator", constraint);
+					return handleInvalidExpression("Missing operator", constraint);
 				}
 			} else {
 				if (constraint.contains(" ")) {
-					return getInvalidLiteral("'" + constraint + "' is no valid feature name", constraint);
+					return handleInvalidFeatureName(constraint);
 				}
 				featureName = constraint;
 			}
 			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
 			if ((featureNames != null) && !featureNames.contains(featureName)) {
-				return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName);
+				return handleInvalidFeatureName(featureName);
 			}
 			return new Literal(featureName);
 		}
 	}
 
-	private Node getInvalidLiteral(String message, String constraint) throws ParseException {
-		if (ignoreMissingFeatures) {
-			if (ignoreUnparsableSubExpressions) {
-				return new ErrorLiteral(constraint);
-			} else {
-				return new Literal("FALSE");
-			}
+	private Node handleInvalidFeatureName(String featureName) throws ParseException {
+		return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName, ignoreMissingFeatures);
+	}
+
+	private Node handleInvalidExpression(String message, String constraint) throws ParseException {
+		return getInvalidLiteral(message, constraint, ignoreUnparsableSubExpressions);
+	}
+
+	private Node getInvalidLiteral(String message, String element, boolean ignoreError) throws ParseException {
+		if (ignoreError) {
+			return new ErrorLiteral(element);
 		} else {
 			throw new ParseException(message, 0);
 		}

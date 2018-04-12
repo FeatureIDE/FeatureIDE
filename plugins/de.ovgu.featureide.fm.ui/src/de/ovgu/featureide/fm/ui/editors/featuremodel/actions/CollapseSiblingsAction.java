@@ -74,6 +74,7 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	 */
 	public CollapseSiblingsAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(COLLAPSE_SIBLINGS, viewer, ID);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif"));
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {

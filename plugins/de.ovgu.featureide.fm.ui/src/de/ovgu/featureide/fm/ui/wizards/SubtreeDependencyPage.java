@@ -115,12 +115,13 @@ public class SubtreeDependencyPage extends AbstractWizardPage {
 		viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 
 		final FeatureModelAnalyzer analyzer = subtreeModel.getAnalyser();
-		analyzer.calculateFeatures = completeFm.getAnalyser().calculateFeatures;
-		analyzer.calculateConstraints = completeFm.getAnalyser().calculateConstraints;
-		analyzer.calculateRedundantConstraints = completeFm.getAnalyser().calculateRedundantConstraints;
-		analyzer.calculateTautologyConstraints = completeFm.getAnalyser().calculateTautologyConstraints;
-		analyzer.calculateDeadConstraints = completeFm.getAnalyser().calculateDeadConstraints;
-		analyzer.calculateFOConstraints = completeFm.getAnalyser().calculateFOConstraints;
+		final FeatureModelAnalyzer completeAnalyzer = completeFm.getAnalyser();
+		analyzer.calculateFeatures = completeAnalyzer.calculateFeatures;
+		analyzer.calculateConstraints = completeAnalyzer.calculateConstraints;
+		analyzer.calculateRedundantConstraints = completeAnalyzer.calculateRedundantConstraints;
+		analyzer.calculateTautologyConstraints = completeAnalyzer.calculateTautologyConstraints;
+		analyzer.calculateDeadConstraints = completeAnalyzer.calculateDeadConstraints;
+		analyzer.calculateFOConstraints = completeAnalyzer.calculateFOConstraints;
 		analyzer.analyzeFeatureModel(null); // analyze the subtree model
 
 		explainImplicitConstraints(analyzer, graphicalFeatureModel); // explain implicit, i.e. redundant, constraints

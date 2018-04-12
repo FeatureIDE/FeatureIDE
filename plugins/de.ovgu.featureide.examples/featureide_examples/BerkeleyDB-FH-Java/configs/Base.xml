@@ -1,122 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<configuration>
-		<feature automatic="selected" manual="undefined" name="SPL"/>
-		<feature automatic="selected" manual="undefined" name="generatedSPL"/>
-		<feature automatic="selected" manual="undefined" name="DERIVATIVES"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingEvictor_Statistics_Evictor_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingEvictor_Evictor_MemoryBudget_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingInfo_Statistics_Verifier"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_Statistics_Verifier"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_Verifier_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_Verifier_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_Verifier_DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LookAHEADCache_Evictor_CriticalEviction"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_INCompressor_Evictor_CriticalEviction"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Evictor_MemoryBudget_CriticalEviction"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingEvictor_Evictor_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_FSync_Latches"/>
-		<feature automatic="unselected" manual="undefined" name="Derivative_NIO_ChunkedNIO"/>
-		<feature automatic="undefined" manual="selected" name="Derivative_IO_SynchronizedIO"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingConfig_Statistics"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_FSync_Statistics"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LookAHEADCache_Statistics"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_Statistics"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_CheckLeaks"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_CheckLeaks"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_Verifier"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFinest_CPBytes"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_CheckpointerDaemon_CPBytes"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFinest_CPTime"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_CPBytes_CPTime"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFine_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Verifier_INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingCleaner_DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_INCompressor_DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFinest_TruncateOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_TruncateOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_DeleteOp_TruncateOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_RenameOp"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingEvictor_Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_INCompressor_Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_DeleteOp_Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingInfo_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LookAHEADCache_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Statistics_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_DeleteOp_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Evictor_MemoryBudget"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Evictor_CriticalEviction"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Evictor_EvictorDaemon"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_Latches_FileHandleCache"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingSevere_EnvironmentLocking"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFinest_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFiner_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFine_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingSevere_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingRecovery_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingCleaner_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingFileHandler_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingDbLogHandler_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Derivative_LoggingConsoleHandler_LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="Logging"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingFiner"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingConfig"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingSevere"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingEvictor"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingCleaner"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingRecovery"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingDbLogHandler"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingConsoleHandler"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingInfo"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingBase"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingFileHandler"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingFine"/>
-		<feature automatic="undefined" manual="undefined" name="LoggingFinest"/>
-		<feature automatic="selected" manual="undefined" name="ConcurrTrans"/>
-		<feature automatic="undefined" manual="undefined" name="Latches"/>
-		<feature automatic="undefined" manual="undefined" name="Transactions"/>
-		<feature automatic="undefined" manual="undefined" name="CheckLeaks"/>
-		<feature automatic="undefined" manual="undefined" name="FSync"/>
-		<feature automatic="selected" manual="undefined" name="Persistance"/>
-		<feature automatic="undefined" manual="undefined" name="Checksum"/>
-		<feature automatic="selected" manual="undefined" name="IIO"/>
-		<feature automatic="selected" manual="undefined" name="OldIO"/>
-		<feature automatic="selected" manual="undefined" name="SynchronizedIO"/>
-		<feature automatic="selected" manual="selected" name="IO"/>
-		<feature automatic="unselected" manual="undefined" name="NewIO"/>
-		<feature automatic="unselected" manual="undefined" name="NIOAccess"/>
-		<feature automatic="unselected" manual="undefined" name="ChunkedNIO"/>
-		<feature automatic="unselected" manual="undefined" name="NIO"/>
-		<feature automatic="unselected" manual="undefined" name="DirectNIO"/>
-		<feature automatic="undefined" manual="undefined" name="EnvironmentLocking"/>
-		<feature automatic="selected" manual="undefined" name="Checkpointer"/>
-		<feature automatic="undefined" manual="undefined" name="CPBytes"/>
-		<feature automatic="undefined" manual="undefined" name="CPTime"/>
-		<feature automatic="undefined" manual="undefined" name="CheckpointerDaemon"/>
-		<feature automatic="undefined" manual="undefined" name="DiskFullErro"/>
-		<feature automatic="undefined" manual="undefined" name="FileHandleCache"/>
-		<feature automatic="selected" manual="undefined" name="IICleaner"/>
-		<feature automatic="undefined" manual="undefined" name="CleanerDaemon"/>
-		<feature automatic="selected" manual="undefined" name="Cleaner"/>
-		<feature automatic="undefined" manual="undefined" name="LookAHEADCache"/>
-		<feature automatic="undefined" manual="undefined" name="Statistics"/>
-		<feature automatic="selected" manual="undefined" name="BTree"/>
-		<feature automatic="undefined" manual="undefined" name="INCompressor"/>
-		<feature automatic="undefined" manual="undefined" name="IEvictor"/>
-		<feature automatic="undefined" manual="undefined" name="CriticalEviction"/>
-		<feature automatic="undefined" manual="undefined" name="EvictorDaemon"/>
-		<feature automatic="undefined" manual="undefined" name="Evictor"/>
-		<feature automatic="undefined" manual="undefined" name="Verifier"/>
-		<feature automatic="selected" manual="undefined" name="Ops"/>
-		<feature automatic="undefined" manual="undefined" name="DeleteOp"/>
-		<feature automatic="undefined" manual="undefined" name="RenameOp"/>
-		<feature automatic="undefined" manual="undefined" name="TruncateOp"/>
-		<feature automatic="undefined" manual="undefined" name="MemoryBudget"/>
-		<feature automatic="selected" manual="selected" name="base"/>
-	</configuration>
+<configuration>
+	<feature automatic="selected" name="SPL"/>
+	<feature automatic="selected" name="generatedSPL"/>
+	<feature automatic="selected" name="DERIVATIVES"/>
+	<feature automatic="unselected" name="Derivative_NIO_ChunkedNIO"/>
+	<feature manual="selected" name="Derivative_IO_SynchronizedIO"/>
+	<feature automatic="selected" name="ConcurrTrans"/>
+	<feature automatic="selected" name="Persistance"/>
+	<feature automatic="selected" name="IIO"/>
+	<feature automatic="selected" name="OldIO"/>
+	<feature automatic="selected" name="SynchronizedIO"/>
+	<feature automatic="selected" name="IO"/>
+	<feature automatic="unselected" name="NewIO"/>
+	<feature automatic="unselected" name="NIOAccess"/>
+	<feature automatic="unselected" name="ChunkedNIO"/>
+	<feature automatic="unselected" name="NIO"/>
+	<feature automatic="unselected" name="DirectNIO"/>
+	<feature automatic="selected" name="Checkpointer"/>
+	<feature automatic="selected" name="IICleaner"/>
+	<feature automatic="selected" name="Cleaner"/>
+	<feature automatic="selected" name="BTree"/>
+	<feature automatic="selected" name="Ops"/>
+	<feature automatic="selected" name="base"/>
+</configuration>

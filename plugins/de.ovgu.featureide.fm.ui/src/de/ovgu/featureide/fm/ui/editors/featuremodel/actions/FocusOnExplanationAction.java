@@ -57,6 +57,7 @@ public class FocusOnExplanationAction extends Action {
 	 */
 	public FocusOnExplanationAction(IGraphicalFeatureModel fm) {
 		super(FOCUS_ON_EXPLANATION);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/monitor_obj.gif"));
 		this.fm = fm;
 		addActiveExplanationListener();
 	}

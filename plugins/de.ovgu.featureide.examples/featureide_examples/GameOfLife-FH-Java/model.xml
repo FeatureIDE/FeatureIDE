@@ -115,20 +115,20 @@
 		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
 		<featureOrder userDefined="true">
-			<feature name="UndoRedoGenerator"/>
-			<feature name="UndoRedoTest"/>
-			<feature name="UndoRedoGuiBase"/>
-			<feature name="UndoRedo"/>
-			<feature name="Test"/>
-			<feature name="GeneratorSelection"/>
-			<feature name="RandomDefaultGenerator"/>
-			<feature name="FormDefaultGenerator"/>
-			<feature name="RandomGenerator"/>
-			<feature name="FormGenerator"/>
-			<feature name="AbstractGenerator"/>
-			<feature name="IO"/>
-			<feature name="PopUpMenu"/>
-			<feature name="GuiBase"/>
 			<feature name="ModelBase"/>
+			<feature name="GuiBase"/>
+			<feature name="PopUpMenu"/>
+			<feature name="IO"/>
+			<feature name="AbstractGenerator"/>
+			<feature name="FormGenerator"/>
+			<feature name="RandomGenerator"/>
+			<feature name="FormDefaultGenerator"/>
+			<feature name="GeneratorSelection"/>
+			<feature name="Test"/>
+			<feature name="UndoRedo"/>
+			<feature name="UndoRedoGuiBase"/>
+			<feature name="UndoRedoTest"/>
+			<feature name="UndoRedoGenerator"/>
+			<feature name="RandomDefaultGenerator"/>
 		</featureOrder>
 	</featureModel>

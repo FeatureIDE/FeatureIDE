@@ -163,7 +163,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		super.start(context);
 		plugin = this;
 
-		featureProjectMap = new HashMap<IProject, IFeatureProject>();
+		featureProjectMap = new HashMap<>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			try {
 				if (project.isOpen()) {
@@ -224,25 +224,29 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void addProject(IProject project) {
-		if (featureProjectMap.containsKey(project) || !project.isOpen()) {
+		if (project == null) {
 			return;
 		}
+		synchronized (project) {
+			if (!featureProjectMap.containsKey(project) && project.isOpen()) {
+				featureProjectMap.put(project, null);
+				final IFeatureProject data = new FeatureProject(project);
+				featureProjectMap.put(project, data);
+				logInfo("Feature project " + project.getName() + " added");
 
-		final IFeatureProject data = new FeatureProject(project);
-		featureProjectMap.put(project, data);
-		logInfo("Feature project " + project.getName() + " added");
+				for (final IProjectListener listener : projectListeners) {
+					listener.projectAdded(data);
+				}
 
-		for (final IProjectListener listener : projectListeners) {
-			listener.projectAdded(data);
-		}
+				final IStatus status = isComposable(project);
 
-		final IStatus status = isComposable(project);
-
-		if (status.getCode() != IStatus.OK) {
-			for (final IStatus child : status.getChildren()) {
-				data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				if (status.getCode() != IStatus.OK) {
+					for (final IStatus child : status.getChildren()) {
+						data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+					}
+					data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				}
 			}
-			data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
 		}
 	}
 
@@ -287,18 +291,21 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void removeProject(IProject project) {
-		if (!featureProjectMap.containsKey(project)) {
+		if (project == null) {
 			return;
 		}
+		synchronized (project) {
+			if (featureProjectMap.containsKey(project)) {
+				final IFeatureProject featureProject = featureProjectMap.remove(project);
+				// Quick fix #402
+				featureProject.dispose();
 
-		final IFeatureProject featureProject = featureProjectMap.remove(project);
-		// Quick fix #402
-		featureProject.dispose();
+				logInfo(project.getName() + REMOVED);
 
-		logInfo(project.getName() + REMOVED);
-
-		for (final IProjectListener listener : projectListeners) {
-			listener.projectRemoved(featureProject);
+				for (final IProjectListener listener : projectListeners) {
+					listener.projectRemoved(featureProject);
+				}
+			}
 		}
 	}
 
@@ -663,12 +670,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	 * @param project
 	 */
 	public void addProjectToList(IProject project) {
-		if (featureProjectMap.containsKey(project) || !project.isOpen() || projectsToAdd.contains(project)) {
-			return;
+		if (!featureProjectMap.containsKey(project) && project.isOpen() && !projectsToAdd.contains(project)) {
+			projectsToAdd.offer(project);
+			scheduleAddJob();
 		}
-
-		projectsToAdd.offer(project);
-		scheduleAddJob();
 	}
 
 	private void scheduleAddJob() {
@@ -680,11 +685,10 @@ public class CorePlugin extends AbstractCorePlugin {
 					@Override
 					public void jobFinished(IJob<Void> finishedJob) {
 						synchronized (CorePlugin.this) {
-							if (!projectsToAdd.isEmpty()) {
-								scheduleAddJob();
-							} else {
-								job = null;
-							}
+							job = null;
+						}
+						if (!projectsToAdd.isEmpty()) {
+							scheduleAddJob();
 						}
 					}
 				});

@@ -76,6 +76,8 @@ public interface IFileManager<T> extends IEventManager {
 	 */
 	T editObject();
 
+	boolean hasChanged();
+
 	IPersistentFormat<T> getFormat();
 
 	void dispose();

@@ -167,7 +167,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				return;
 			}
 			selectedManualFeatures = new ArrayList<>();
-			for (Object obj : event.getStructuredSelection().toList()) {
+			for (Object obj : ((IStructuredSelection) event.getSelection()).toList()) {
 				if (!(obj instanceof FeatureEditPart)) {
 					selectedManualFeatures = null;
 					treeViewer.refresh();
@@ -637,6 +637,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	@Override
 	public void dispose() {
 		setFeatureModel(null);
+		getSite().getPage().removePartListener(editorListener);
 		if (currentEditor instanceof FeatureModelEditor) {
 			final FeatureModelEditor editor = (FeatureModelEditor) currentEditor;
 			editor.removeEventListener(this);

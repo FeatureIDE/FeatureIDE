@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.projectExplorer;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,11 +47,10 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -62,7 +62,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
-	private List<String> selectedFeatures = new ArrayList<String>();
+	private List<String> selectedFeatures = new ArrayList<>();
 
 	public ProjectExplorerLabelProvider() {
 		super(new PackageExplorerContentProvider(true));
@@ -241,14 +241,17 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * Stores all selected Features in a string list.
 	 *
 	 * @param featureProject
+	 *
+	 * @deprecated TODO This should be included in {@link IFeatureProject}.
 	 */
+	@Deprecated
 	private void readCurrentConfiguration(IFeatureProject featureProject) {
-		final Configuration config = new Configuration(featureProject.getFeatureModel());
-		final IFile currentConfig = featureProject.getCurrentConfiguration();
-		if (currentConfig != null) {
-			SimpleFileHandler.load(Paths.get(currentConfig.getLocationURI()), config, ConfigFormatManager.getInstance());
+		final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+		if (currentConfiguration != null) {
+			final ConfigurationManager instance = ConfigurationManager.getInstance(Paths.get(currentConfiguration.getLocationURI()),
+					new Configuration(featureProject.getFeatureModel(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY));
+			selectedFeatures = (instance != null) ? new ArrayList<String>(instance.getObject().getSelectedFeatureNames()) : Collections.<String> emptyList();
 		}
-		selectedFeatures = new ArrayList<>(config.getSelectedFeatureNames());
 	}
 
 	private boolean isJavaFile(final IFile file) {

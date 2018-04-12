@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOCUS_ON_CONTAINED_FEATURES;
 
 import java.util.LinkedList;
 
@@ -49,7 +49,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	 * @param label
 	 */
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
-		super(graphicalFeatureModel.getFeatureModel(), EXPAND_CONSTRAINT);
+		super(graphicalFeatureModel.getFeatureModel(), FOCUS_ON_CONTAINED_FEATURES);
 		this.iConstraint = iConstraint;
 		this.graphicalFeatureModel = graphicalFeatureModel;
 	}

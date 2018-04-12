@@ -21,13 +21,11 @@
 package de.ovgu.featureide.fm.ui.handlers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -41,19 +39,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
 
@@ -66,7 +60,7 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = readModel(file);
+		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
 
 		IConverterStrategy strategy = new NNFConverter();
 		final ComplexConstraintConverter converter = new ComplexConstraintConverter();
@@ -121,30 +115,6 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 		}
 		IDE.openEditor(page, outputFile);
-	}
-
-	/**
-	 * reads the featureModel from file
-	 *
-	 * @param inputFile
-	 * @return featureModel
-	 * @throws UnsupportedModelException
-	 * @throws FileNotFoundException
-	 */
-	private IFeatureModel readModel(IFile inputFile) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
-		IFeatureModel fm;
-		try {
-			fm = FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
-		} catch (final NoSuchExtensionException e) {
-			fm = FMFactoryManager.getDefaultFactory().createFeatureModel();
-		}
-		try {
-			SimpleFileHandler.load(inputFile.getContents(), fm, format);
-		} catch (final CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		return fm;
 	}
 
 }

@@ -41,18 +41,18 @@
 			<c> non-grammar constraints</c>
 		</comments>
 		<featureOrder userDefined="true">
-			<feature name="FullStyled"/>
-			<feature name="Print"/>
-			<feature name="FormatRaw"/>
-			<feature name="FormatStyled"/>
-			<feature name="Find"/>
-			<feature name="Clipboard"/>
-			<feature name="Undo"/>
-			<feature name="File"/>
-			<feature name="MenuBar"/>
-			<feature name="ToolBar"/>
-			<feature name="TextRaw"/>
-			<feature name="TextStyled"/>
 			<feature name="Base"/>
+			<feature name="TextRaw"/>
+			<feature name="ToolBar"/>
+			<feature name="MenuBar"/>
+			<feature name="File"/>
+			<feature name="Undo"/>
+			<feature name="Clipboard"/>
+			<feature name="Find"/>
+			<feature name="FormatRaw"/>
+			<feature name="Print"/>
+			<feature name="FullStyled"/>
+			<feature name="FormatStyled"/>
+			<feature name="TextStyled"/>
 		</featureOrder>
 	</featureModel>

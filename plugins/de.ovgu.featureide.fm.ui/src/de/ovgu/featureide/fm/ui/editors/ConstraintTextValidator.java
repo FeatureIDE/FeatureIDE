@@ -42,6 +42,7 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -70,6 +71,7 @@ public final class ConstraintTextValidator {
 	private SortedSet<IFeature> getDeadFeatures(IConstraint constraint, String input, IFeatureModel model) {
 		Collection<IFeature> deadFeaturesBefore = null;
 		final IFeatureModel clonedModel = model.clone(null);
+		final FeatureModelAnalyzer analyzer = clonedModel.getAnalyser();
 
 		final NodeReader nodeReader = new NodeReader();
 
@@ -79,14 +81,14 @@ public final class ConstraintTextValidator {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
-			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
+			deadFeaturesBefore = analyzer.getDeadFeatures();
 			clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 
 		final SortedSet<IFeature> deadFeaturesAfter = new TreeSet<IFeature>(new FeatureComparator(true));
 
-		for (final IFeature l : clonedModel.getAnalyser().getDeadFeatures()) {
+		for (final IFeature l : analyzer.getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
@@ -132,32 +134,36 @@ public final class ConstraintTextValidator {
 	private List<IFeature> getFalseOptional(IConstraint constraint, String input, IFeatureModel model) {
 		final List<IFeature> list = new ArrayList<IFeature>();
 		final IFeatureModel clonedModel = model.clone(null);
+		final FeatureModelAnalyzer analyzer = clonedModel.getAnalyser();
+		if (analyzer.runCalculationAutomatically) {
 
-		final NodeReader nodeReader = new NodeReader();
+			final NodeReader nodeReader = new NodeReader();
 
-		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
+			final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
-		// The following code fixes issue #406; should be enhanced in further development
-		// to not always clone the whole feature model for every performed analysis
-		if (propNode != null) {
-			if (constraint != null) {
-				clonedModel.removeConstraint(constraint);
+			// The following code fixes issue #406; should be enhanced in further development
+			// to not always clone the whole feature model for every performed analysis
+			if (propNode != null) {
+				if (constraint != null) {
+					clonedModel.removeConstraint(constraint);
+				}
 			}
-		}
 
-		for (final IFeature feature : model.getFeatures()) {
-			if (input.contains(feature.getName())) {
-				// if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
-				clonedModel.addConstraint(new Constraint(clonedModel, propNode));
-				clonedModel.getAnalyser().analyzeFeatureModel(null);
-				if ((clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) && !list.contains(feature)) {
-					list.add(feature);
-					// }
+			for (final IFeature feature : model.getFeatures()) {
+				if (input.contains(feature.getName())) {
+					// if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
+					clonedModel.addConstraint(new Constraint(clonedModel, propNode));
+					analyzer.analyzeFeatureModel(null);
+					if ((clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL)
+						&& !list.contains(feature)) {
+						list.add(feature);
+						// }
+					}
 				}
 			}
 		}
-
 		return list;
+
 	}
 
 	private String getFalseOptionalString(List<IFeature> list) {
@@ -434,12 +440,11 @@ public final class ConstraintTextValidator {
 	 *        * @throws TimeoutException
 	 */
 	private boolean voidsModel(final IConstraint constraint, String input, IFeatureModel model) throws TimeoutException {
-		if (!model.getAnalyser().isValid()) {
-
+		// Cached validity for speed
+		if (!model.getAnalyser().valid()) {
 			return false;
 		}
 		if (input.length() == 0) {
-
 			return false;
 		}
 		final IFeatureModel clonedModel = model.clone(null);
@@ -453,8 +458,8 @@ public final class ConstraintTextValidator {
 			clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
-
-		return (!clonedModel.getAnalyser().isValid());
+		// Cached validity for speed
+		return (!clonedModel.getAnalyser().valid());
 
 	}
 }

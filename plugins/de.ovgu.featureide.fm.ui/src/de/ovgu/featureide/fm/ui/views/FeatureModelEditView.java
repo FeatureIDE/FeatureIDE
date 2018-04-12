@@ -46,7 +46,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -162,8 +161,20 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType())) {
+			switch (evt.getEventType()) {
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case FEATURE_MODIFY:
+			case GROUP_TYPE_CHANGED:
+			case MANDATORY_CHANGED:
 				refresh();
+				break;
+			default:
+				break;
 			}
 		}
 	};
@@ -234,6 +245,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 		getSite().getPage().removePartListener(editorListener);
 		if (featureModelEditor != null) {
+			featureModelEditor.removeEventListener(modelListener);
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
 			featureModelEditor = null;
 		}
@@ -254,12 +266,14 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 
 		if (featureModelEditor != null) {
+			featureModelEditor.removeEventListener(modelListener);
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 
 		if (activeEditor instanceof FeatureModelEditor) {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
+			featureModelEditor.addEventListener(modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 		}
 		refresh();

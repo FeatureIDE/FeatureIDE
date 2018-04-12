@@ -18,30 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.properties;
+package de.ovgu.featureide.fm.core.io.manager;
 
 import java.nio.file.Paths;
+import java.util.List;
 
-import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
-
-public class FeatureModelTester extends PropertyTester {
+public class EclipseFileManagerVisitor implements IResourceDeltaVisitor {
 
 	@Override
-	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		final IFile res = SelectionWrapper.checkClass(receiver, IFile.class);
-		if (res != null) {
-			final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(res.getLocationURI())).getObject();
-			if (featureModel != null) {
-				return true;
+	public boolean visit(IResourceDelta delta) {
+		if (((delta.getKind() == IResourceDelta.ADDED))
+			|| ((delta.getKind() == IResourceDelta.CHANGED) && ((delta.getFlags() & (IResourceDelta.CONTENT | IResourceDelta.REPLACED)) != 0))) {
+			final IResource resource = delta.getResource();
+			if (resource instanceof IFile) {
+				final List<IFileManager<?>> instanceList = AFileManager.getInstanceList(Paths.get(resource.getLocationURI()));
+				if (instanceList != null) {
+					for (final IFileManager<?> instance : instanceList) {
+						instance.read();
+					}
+				}
 			}
-			return false;
 		}
-		return false;
+		return true;
 	}
-
 }

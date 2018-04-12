@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import org.eclipse.swt.SWT;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -39,6 +40,7 @@ public class RenameAction extends SingleSelectionAction {
 	public RenameAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
 		super("Rename (F2)", viewer, ID);
 		setAccelerator(SWT.F2);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/wordassist_co.gif"));
 		diagramEditor = graphicalViewer;
 	}
 

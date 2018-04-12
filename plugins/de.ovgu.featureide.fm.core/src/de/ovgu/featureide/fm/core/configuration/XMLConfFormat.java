@@ -29,6 +29,7 @@ import org.w3c.dom.NamedNodeMap;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
@@ -49,6 +50,8 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	public static final String ID = PluginID.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
 	public static final String EXTENSION = StringTable.CONF;
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + "configuration" + "[\\s>]");
+
+	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<configuration[\\s>]");
 
 	@Override
 	public XMLConfFormat getInstance() {
@@ -172,6 +175,16 @@ public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigu
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public boolean supportsContent(CharSequence content) {
+		return supportsRead() && CONTENT_REGEX.matcher(content).find();
+	}
+
+	@Override
+	public boolean supportsContent(LazyReader reader) {
+		return super.supportsContent(reader, CONTENT_REGEX);
 	}
 
 	@Override

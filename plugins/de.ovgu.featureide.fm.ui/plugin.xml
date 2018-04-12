@@ -12,11 +12,37 @@
 
 	<extension point="org.eclipse.core.contenttype.contentTypes">
 		<content-type
-				base-type="org.eclipse.core.runtime.text"
-				file-extensions="conf,config,equation,expression"
-				id="de.ovgu.featureide.contenttype.conf"
-				name="Configuration (for FeatureIDE projects)"
-				priority="high"/>
+        base-type="org.eclipse.core.runtime.text"
+        file-extensions="config"
+        id="de.ovgu.featureide.contenttype.conf"
+        name="Configuration (for FeatureIDE projects)"
+        priority="high">
+		     <property
+		           default="de.ovgu.featureide.fm.core.format.config.DefaultFormat"
+		           name="de.ovgu.featureide.fm.ui.contentType.format">
+		     </property>
+		  </content-type>
+		  <content-type
+		        base-type="org.eclipse.core.runtime.text"
+		        file-extensions="equation"
+		        id="de.ovgu.featureide.contenttype.confEq"
+		        name="Configuration (for FeatureIDE projects)"
+		        priority="high">
+		     <property
+		           default="de.ovgu.featureide.fm.core.format.config.EquationFormat"
+		           name="de.ovgu.featureide.fm.ui.contentType.format">
+		     </property>
+		  </content-type><content-type
+		        base-type="org.eclipse.core.runtime.text"
+		        file-extensions="expression"
+		        id="de.ovgu.featureide.contenttype.confExp"
+		        name="Configuration (for FeatureIDE projects)"
+		        priority="high">
+		     <property
+		           default="de.ovgu.featureide.fm.core.format.config.ExpressionFormat"
+		           name="de.ovgu.featureide.fm.ui.contentType.format">
+		     </property>
+		  </content-type>
 		<content-type
 				base-type="org.eclipse.core.runtime.xml"
 				file-extensions="xml"
@@ -30,6 +56,10 @@
 						value="configuration">
 				</parameter>
 			</describer>
+   <property
+         default="de.ovgu.featureide.fm.core.format.config.XMLConfFormat"
+         name="de.ovgu.featureide.fm.ui.contentType.format">
+   </property>
 		</content-type>
 		<content-type
 				base-type="org.eclipse.core.runtime.text"
@@ -65,6 +95,10 @@
 						value="featureModel">
 				</parameter>
 			</describer>
+		   <property
+		         default="de.ovgu.featureide.fm.core.format.fm.XmlFeatureModelFormat"
+		         name="de.ovgu.featureide.fm.ui.contentType.format">
+		   </property>
 		</content-type>
 		<content-type
 				base-type="org.eclipse.core.runtime.xml"
@@ -78,14 +112,26 @@
 						name="element"
 						value="feature_model">
 				</parameter>
+    <parameter
+          name="de.ovgu.featureide.fm.ui.parameter1"
+          value="de.ovgu.featureide.fm.ui.parameter1">
+    </parameter>
 			</describer>
+		   <property
+		         default="de.ovgu.featureide.fm.core.format.fm.SXFMFormat"
+		         name="de.ovgu.featureide.fm.ui.contentType.format">
+		   </property>
 		</content-type>
 		<content-type
-				base-type="org.eclipse.core.runtime.text"
-				file-extensions="velvet"
-				id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
-				name="Extended Feature Model"
-				priority="high">
+		        base-type="org.eclipse.core.runtime.text"
+		        file-extensions="velvet"
+		        id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
+		        name="Extended Feature Model"
+		        priority="high">
+		   <property
+		         default="de.ovgu.featureide.fm.core.format.fm.VelvetFeatureModelFormat"
+		         name="de.ovgu.featureide.fm.ui.contentType.format">
+		   </property>
 		</content-type>
 	</extension>
 
@@ -131,9 +177,6 @@
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
 			</contentTypeBinding>
-   <contentTypeBinding
-         contentTypeId="de.ovgu.featureide.fm.attributes.extendedFeatureModel">
-   </contentTypeBinding>
 		</editor>
 		<editor
 				class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
@@ -205,27 +248,6 @@
 					id="de.ovgu.featureide.fm.ui.menus.popupMenu"
 					label="FeatureIDE">
 
-				<visibleWhen
-						checkEnabled="false">
-					<with
-							variable="activeMenuSelection">
-						<iterate
-								ifEmpty="false"
-								operator="or">
-							<or>
-								<test
-										args="de.ovgu.featureide.core.featureProjectNature"
-										property="de.ovgu.featureide.fm.ui.properties.nature"
-										value="true">
-								</test>
-								<test
-										property="de.ovgu.featureide.fm.ui.properties.featuremodel"
-										value="true">
-								</test>
-							</or>
-						</iterate>
-					</with>
-				</visibleWhen>
 				<separator
 						name="de.ovgu.featureide.fm.ui.menus.popupMenu.submenus"
 						visible="true">
@@ -294,7 +316,7 @@
 			</separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.FMImport"
-					icon="icons/export_wiz.gif"
+					icon="icons/import_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FMImport"
 					label="Import feature model"
 					style="push">
@@ -473,30 +495,17 @@
 		<definition
 				id="de.ovgu.featureide.fm.ui.expressions.isFeatureModel">
 			<adapt type="org.eclipse.core.resources.IResource">
-				<or>
-					<test 
-							property="org.eclipse.core.resources.contentTypeId" 
-							value="de.ovgu.featureide.fm.ui.featureModel" />
-					<test 
-							property="org.eclipse.core.resources.contentTypeId" 
-							value="de.ovgu.featureide.fm.ui.featureModel.sxfm" />
-					<test 
-							property="org.eclipse.core.resources.contentTypeId" 
-							value="de.ovgu.featureide.fm.ui.extendedfeatureModel" />
-				</or>
+               <test
+					property="de.ovgu.featureide.fm.ui.properties.featuremodel">
+				</test>
 			</adapt>
 		</definition>
 		<definition
 				id="de.ovgu.featureide.fm.ui.expressions.isConfiguration">
 			<adapt type="org.eclipse.core.resources.IResource">
-				<or>
-					<test 
-							property="org.eclipse.core.resources.contentTypeId" 
-							value="de.ovgu.featureide.contenttype.conf" />
-					<test 
-							property="org.eclipse.core.resources.contentTypeId" 
-							value="de.ovgu.featureide.contenttype.confXML" />
-				</or>
+               <test
+					property="de.ovgu.featureide.fm.ui.properties.configuration">
+				</test>
 			</adapt>
 		</definition>
 		<definition
@@ -594,10 +603,10 @@
 				type="java.lang.Object">
 		</propertyTester>
 		<propertyTester
-				class="de.ovgu.featureide.fm.ui.properties.FeatureModelTester"
-				id="de.ovgu.featureide.fm.ui.propertytester.featuremodel"
+				class="de.ovgu.featureide.fm.ui.properties.FormatTester"
+				id="de.ovgu.featureide.fm.ui.propertytester.format"
 				namespace="de.ovgu.featureide.fm.ui.properties"
-				properties="featuremodel"
+				properties="featuremodel,configuration"
 				type="java.lang.Object">
 		</propertyTester>
 	</extension>

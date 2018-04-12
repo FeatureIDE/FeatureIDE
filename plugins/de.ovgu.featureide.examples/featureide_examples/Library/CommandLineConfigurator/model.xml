@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Elevator">
+				<and mandatory="true" name="Module">
+					<alt mandatory="true" name="Modes">
+						<feature name="Sabbath"/>
+						<feature name="FIFO"/>
+					</alt>
+					<or name="Behavior">
+						<feature name="Service"/>
+						<feature name="Call Buttons"/>
+					</or>
+				</and>
+				<alt mandatory="true" name="Produktgruppen">
+					<alt name="Elevator mit Sabbath">
+						<feature name="Produkt 1a"/>
+						<feature name="Produkt 1b"/>
+					</alt>
+					<alt name="Elevator mit FIFO">
+						<feature name="Produkt 2a"/>
+						<feature name="Produkt 2b"/>
+					</alt>
+				</alt>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<var>Call Buttons</var>
+					<var>Sabbath</var>
+				</disj>
+			</rule>
+			<rule>
+				<imp>
+					<var>Elevator mit Sabbath</var>
+					<var>Sabbath</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Elevator mit FIFO</var>
+					<var>FIFO</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Produkt 1a</var>
+					<not>
+						<var>Behavior</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Produkt 1b</var>
+					<conj>
+						<not>
+							<var>Service</var>
+						</not>
+						<var>Call Buttons</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Produkt 2a</var>
+					<not>
+						<var>Service</var>
+					</not>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Produkt 2b</var>
+					<var>Service</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="false" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="Elevator"/>
+			<feature name="Sabbath"/>
+			<feature name="FIFO"/>
+			<feature name="Service"/>
+			<feature name="Call Buttons"/>
+			<feature name="Produktgruppen"/>
+			<feature name="Elevator mit Sabbath"/>
+			<feature name="Produkt 1a"/>
+			<feature name="Produkt 1b"/>
+			<feature name="Elevator mit FIFO"/>
+			<feature name="Module"/>
+			<feature name="Modes"/>
+			<feature name="Behavior"/>
+			<feature name="Produkt 2a"/>
+			<feature name="Produkt 2b"/>
+		</featureOrder>
+	</featureModel>

@@ -45,7 +45,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -165,8 +164,24 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()) {
-				refresh(false);
+			switch (evt.getEventType()) {
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_OVERRIDDEN:
+			case MODEL_DATA_SAVED:
+			case MODEL_DATA_LOADED:
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case FEATURE_MODIFY:
+			case GROUP_TYPE_CHANGED:
+			case MANDATORY_CHANGED:
+				refresh(true);
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -253,6 +268,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 
 			if (currentEditor instanceof FeatureModelEditor) {
+				((FeatureModelEditor) currentEditor).removeEventListener(modelListener);
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
@@ -272,6 +288,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 		currentEditor = newEditor;
 		if (newEditor instanceof FeatureModelEditor) {
+			((FeatureModelEditor) currentEditor).addEventListener(modelListener);
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}
 		refresh(force);
