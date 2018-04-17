@@ -20,6 +20,7 @@ public class HierarchyReconstruction {
 	private static final String regx_split_list="[\\,\\|]";
 	private static final Pattern regx_sep_list=Pattern.compile("\\w+"+regx_split_list+"\\w+");
 	private static final String regx_split_key="[\\_\\-\\.]";
+	//private static final String regx_split_key="[\\-\\.]";
 	private static final Pattern regx_sep_key = Pattern.compile("\\w+"+regx_split_key+"\\w+");
 	
 	public static Feature getFDLHierarchy(OscarProperties op, Map<String, Integer[]> allPropMap, double threshold){
@@ -58,9 +59,12 @@ public class HierarchyReconstruction {
 						String name=key.substring(0,key.lastIndexOf(path[i])+path[i].length());
 						aux=base.getFeature(name);
 						if (aux==null){
-							aux=new Feature(name,true,FeatureType.MORE_OF);
+							aux=new Feature(name,true,FeatureType.ALL);
 							aux.setAbstract(true);
 							father.addHierarchy(aux);
+							father=aux;
+						}else{
+							aux.setType(FeatureType.ALL);
 							father=aux;
 						}
 						

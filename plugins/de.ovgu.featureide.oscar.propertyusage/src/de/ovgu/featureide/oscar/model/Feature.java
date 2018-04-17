@@ -31,6 +31,14 @@ public class Feature {
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
 	}
+	
+	public FeatureType getType() {
+		return type;
+	}
+	public void setType(FeatureType type) {
+		this.type = type;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -41,7 +49,7 @@ public class Feature {
 	    }
 	    final Feature other = (Feature) obj;
 		
-		return this.name.equals(other.name) && (this.type==other.type)&&(this.hierarchy.equals(other.hierarchy));
+		return this.name.equals(other.name);
 	}
 	@Override
 	public String toString() {
@@ -50,13 +58,28 @@ public class Feature {
 		switch (this.type){
 		
 			case ALL:
+				sb.append("	<and name=\""+this.name+"\""+(this.isAbstract?" abstract=\"true\"":"")+">\r");
+				for(Feature f:this.hierarchy){
+					sb.append(f.toString());
+				}
+				sb.append("	</and>\r");
 				break;
 			case ATOMIC:
-				sb.append("<feature name=\""+this.name+"\"/>");
+				sb.append("	<feature name=\""+this.name+(this.isAbstract?" abstract=\"true\"":"")+"\"/>\r");
 				break;
 			case MORE_OF:
+				sb.append("	<alt name=\""+this.name+"\""+(this.isAbstract?" abstract=\"true\"":"")+">\r");
+				for(Feature f:this.hierarchy){
+					sb.append(f.toString());
+				}
+				sb.append("	</alt>\r");
 				break;
 			case ONE_OF:
+				sb.append("	<or name=\""+this.name+"\""+(this.isAbstract?" abstract=\"true\"":"")+">\r");
+				for(Feature f:this.hierarchy){
+					sb.append(f.toString());
+				}
+				sb.append("	</or>\r");
 				break;
 			default:
 				break;
@@ -71,7 +94,7 @@ public class Feature {
 		if (this.name.equals(name)) return this;
 		Feature res=null;
 		for (Feature f:hierarchy){
-			if (f.name.equals(name)) return f;
+			if (f.name.toLowerCase().equals(name.toLowerCase())) return f;
 			res=f.getFeature(name);
 			if ( res !=null) return res; 
 		}

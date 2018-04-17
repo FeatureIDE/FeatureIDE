@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.oscar.model.Feature;
 import oscar.OscarProperties;
 
 public class ExportImport {
@@ -24,7 +25,7 @@ public class ExportImport {
 
 	
 	
-	public static void export(OscarProperties op, Map<String, Integer[]> allPropMap, String format, IProject project){
+	public static void export(Feature base, OscarProperties op, Map<String, Integer[]> allPropMap, String format, IProject project){
 	    
 		
 		
@@ -39,7 +40,7 @@ public class ExportImport {
 				break;
 			case MOD:
 				fileName = project.getLocation().toOSString()+File.separator+"propertyUsageResult_"+tsmp.toString()+"."+XML;
-				sb=generateModel(op, allPropMap);
+				sb=generateModel(base);
 				break;
 			default:
 				sb=generateOutputCsv(op, allPropMap);
@@ -65,6 +66,7 @@ public class ExportImport {
 		}
 		
 	}
+	
 	
 	public static StringBuilder generateOutputCsv (OscarProperties op, Map<String, Integer[]> allPropMap){
 		
@@ -95,22 +97,14 @@ public class ExportImport {
 		return sb;
 	}
 	
-	public static StringBuilder generateModel (OscarProperties op, Map<String, Integer[]> allPropMap){
+	public static StringBuilder generateModel (Feature base){
 		StringBuilder sb = new StringBuilder ();
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r");
 		sb.append("<featureModel>\r");
 		sb.append("<properties/>\r");
 		sb.append("<struct>\r");
-		sb.append("<and abstract=\"true\" mandatory=\"true\" name=\"Base\">\r");
-		for (String s : allPropMap.keySet()) {
-			if (allPropMap.get(s)[1] > 0) {	
-				sb.append("<feature name=\"" + s + "\"/>\r");
-			}
-			
-		}
-		
-		sb.append("</and>\r"
-				+ "</struct>\r"
+		sb.append(base.toString());
+		sb.append("</struct>\r"
 				+ "<constraints/>\r"
 				+ "<calculations Auto=\"true\" Constraints=\"true\" Features=\"true\" "
 				+ "Redundant=\"true\" Tautology=\"true\"/>\r"

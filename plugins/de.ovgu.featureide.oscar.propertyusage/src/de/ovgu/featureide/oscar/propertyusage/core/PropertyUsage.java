@@ -200,7 +200,7 @@ public class PropertyUsage {
 		
 		this.base=HierarchyReconstruction.getFDLHierarchy(op,allPropMap,1);
 
-		ExportImport.export(op,allPropMap,outputmode,reportProject);
+		ExportImport.export(this.base,op,allPropMap,outputmode,reportProject);
 		
 
 		console.writeln("Nodes found: " + astNodes.size());
