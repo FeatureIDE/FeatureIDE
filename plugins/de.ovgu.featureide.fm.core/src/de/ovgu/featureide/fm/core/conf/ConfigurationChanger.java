@@ -612,7 +612,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	}
 
 	@Override
-	public CountSolutionsMethod number(long timeout) {
+	public CountSolutionsMethod number(long timeout, boolean includeHiddenFeatures) {
 		return new CountSolutionsMethod();
 	}
 
