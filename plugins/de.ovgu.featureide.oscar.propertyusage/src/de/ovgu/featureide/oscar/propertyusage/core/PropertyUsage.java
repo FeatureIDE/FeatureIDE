@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import de.ovgu.featureide.oscar.IO.Console;
 import de.ovgu.featureide.oscar.IO.ExportImport;
+import de.ovgu.featureide.oscar.model.Feature;
 import oscar.OscarProperties;
 import oscar.Startup;
 
@@ -81,6 +82,8 @@ public class PropertyUsage {
 	// Used to store {<key, [number of usages, number of boolean usages]>}.
 	final private Map<String, Integer[]> allPropMap ;
 	
+	//Hierarchy model in FDL language
+	private Feature base;
 	
 
 	private String varName = null;
@@ -104,7 +107,7 @@ public class PropertyUsage {
 	public OscarProperties loadOscarProperties() {
 		Startup start = new Startup(this.properties,this.project);
 		start.contextInitialized();
-		OscarProperties op = new OscarProperties(this.properties);
+		OscarProperties op = new OscarProperties(this.properties);	
 		return op;
 	}
 
@@ -194,6 +197,8 @@ public class PropertyUsage {
 		} else {
 			console.writeln("No new OscarProperties methods found");
 		}
+		
+		this.base=HierarchyReconstruction.getFDLHierarchy(op,allPropMap,1);
 
 		ExportImport.export(op,allPropMap,outputmode,reportProject);
 		
