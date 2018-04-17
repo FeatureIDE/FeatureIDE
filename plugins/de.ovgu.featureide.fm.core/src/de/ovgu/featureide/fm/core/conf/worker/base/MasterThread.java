@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -51,7 +51,7 @@ final class MasterThread<T> {
 			throw new IndexOutOfBoundsException("Number of threads must be greater than 0 (was " + numberOfThreads + ").");
 		} else if (initialized == numberOfThreads) {
 			threads.clear();
-			for (AWorkerThread<T> worker : workers) {
+			for (final AWorkerThread<T> worker : workers) {
 				threads.add(new Thread(worker));
 			}
 		} else {
@@ -62,7 +62,7 @@ final class MasterThread<T> {
 			for (int i = 1; i < numberOfThreads; i++) {
 				workers.add(factory.newThread());
 			}
-			for (AWorkerThread<T> worker : workers) {
+			for (final AWorkerThread<T> worker : workers) {
 				threads.add(new Thread(worker));
 			}
 			initialized = numberOfThreads;
@@ -76,14 +76,14 @@ final class MasterThread<T> {
 	void start(int numberOfThreads) {
 		init(numberOfThreads);
 
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			thread.start();
 		}
 		try {
-			for (Thread thread : threads) {
+			for (final Thread thread : threads) {
 				thread.join();
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			Logger.logError(e);
 			stop();
 		}
@@ -91,7 +91,7 @@ final class MasterThread<T> {
 
 	@SuppressWarnings("deprecation")
 	void stop() {
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			thread.stop();
 		}
 	}

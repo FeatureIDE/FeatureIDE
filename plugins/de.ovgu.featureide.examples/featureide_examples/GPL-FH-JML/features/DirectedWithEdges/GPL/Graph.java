@@ -13,6 +13,7 @@ public class Graph {
     public /*@spec_public@*/ static final boolean isDirected = true;
 
     /*@ensures vertices != null && edges != null;@*/
+    /*@assignable vertices, edges; @*/
     public Graph() {
         vertices = new LinkedList();
         edges = new LinkedList();
@@ -22,7 +23,8 @@ public class Graph {
     public void run( Vertex s ) {}
 
     /*@ requires c != null;
-    ensures isSorted(edges); @*/
+    ensures isSorted(edges); 
+    assignable edges; @*/
     public void sortEdges(Comparator c) {
         Collections.sort(edges, c);
     }
@@ -33,7 +35,8 @@ public class Graph {
     
     
     /*@ requires c != null;
-    ensures isSorted(vertices); @*/
+    ensures isSorted(vertices); 
+    assignable vertices; @*/
     public void sortVertices(Comparator c) {
         Collections.sort(vertices, c);
     }
@@ -41,6 +44,7 @@ public class Graph {
     // Adds an edge without weights if Weighted layer is not present
 	/*@ requires start != null && end != null; @*/
 	/*@ ensures \result.getOtherVertex(start)==end && \result.getOtherVertex(end)==start; @*/
+    /*@assignable edges; @*/
     public EdgeIfc addEdge(Vertex start,  Vertex end) {
         Edge theEdge = new  Edge();
         theEdge.EdgeConstructor( start, end );
@@ -53,6 +57,7 @@ public class Graph {
 
     /*@requires v != null;@*/
     /*@ensures vertices.getLast()==v;@*/
+    /*@assignable vertices; @*/
     protected void addVertex( Vertex v ) {
         vertices.add( v );
     }
@@ -79,6 +84,7 @@ public class Graph {
         return theVertex;
     }
     /*@ ensures \result != null; @*/
+    /*@assignable \nothing; @*/
     public VertexIter getVertices() {
         return new VertexIter() {
                 private Iterator iter = vertices.iterator();

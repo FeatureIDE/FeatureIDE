@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.explanations.Explanation;
+import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -44,12 +44,10 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
 import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
 
 /**
- * Manages all persistent properties defined at the property page.<br>
- * These properties are defined for the whole workspace.<br>
- * <br>
- * 
+ * Manages all persistent properties defined at the property page.<br> These properties are defined for the whole workspace.<br> <br>
+ *
  * Use this methods instead of {@link GUIDefaults}.
- * 
+ *
  * @see FMPropertyPage
  * @author Jens Meinicke
  * @author Marcus Pinnecke
@@ -57,8 +55,8 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
 @CheckReturnValue
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
 
-	/* ****************************************************
-	 * current values
+	/*
+	 * **************************************************** current values
 	 ******************************************************/
 	private volatile static Boolean CURRENT_HIDE_LEGEND = null;
 	private volatile static Boolean CURRENT_HIDE_BORDER_COLOR = null;
@@ -118,7 +116,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Register the model for property changes.
-	 * 
+	 *
 	 * @param model
 	 */
 	public static void registerEditor(FeatureModelEditor model) {
@@ -127,7 +125,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Removes the model from listener.
-	 * 
+	 *
 	 * @param model
 	 */
 	public static void unregisterEditor(FeatureModelEditor model) {
@@ -138,7 +136,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		for (FeatureModelEditor model : editors) {
+		for (final FeatureModelEditor model : editors) {
 			model.propertyChange(new FeatureIDEEvent(model, EventType.REDRAW_DIAGRAM));
 		}
 	}
@@ -305,16 +303,15 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return CURRENT_CONSTRAINT_BACKGROUND;
 	}
-	
+
 	public static Color getImplicitConstraintBackgroundColor() {
 		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
 			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
 		}
 		return IMPLICIT_CONSTRAINT;
 	}
-	
-	Color color = new Color (null,255,0,0);
 
+	Color color = new Color(null, 255, 0, 0);
 
 	public static void setConstraintBackgroundColor(Color color) {
 		CURRENT_CONSTRAINT_BACKGROUND = color;
@@ -435,7 +432,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_CONSTRAINT_SPACE_Y = value;
 		setInt(QN_CONSTRAINT_SPACE, value);
 	}
-	
+
 	public static Color getImplicitConstraintBorderColor(boolean implicit) {
 		if (implicit) {
 			return GUIBasics.createBorderColor(getImplicitConstraintBackgroundColor());
@@ -456,7 +453,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return GUIBasics.createLineBorder(getConstraintBorderColor(false), 0);
 	}
-	
+
 	public static Border getImplicitConstraintBorder() {
 		return GUIBasics.createLineBorder(getImplicitConstraintBorderColor(true), 3);
 	}
@@ -468,9 +465,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(HIDDEN_BORDER_COLOR, 1, Graphics.LINE_DASH);
 	}
 
-	//	private static Color getHiddenBorderColor() {
-	//		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
-	//	}
+	// private static Color getHiddenBorderColor() {
+	// return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
+	// }
 
 	public static Border getDeadFeatureBorder(boolean selected) {
 		if (selected) {
@@ -578,35 +575,34 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	public static Color getDecoratorBackgroundColor() {
 		return getDiagramBackgroundColor();
 	}
-	
-	public static Border getReasonBorder(Explanation.Reason reason) {
+
+	public static Border getReasonBorder(Reason<?> reason) {
 		return GUIBasics.createLineBorder(getReasonColor(reason), getReasonLineWidth(reason));
 	}
-	
-	public static Color getReasonColor(Explanation.Reason reason) {
+
+	public static Color getReasonColor(Reason<?> reason) {
 //		FMCorePlugin.getDefault().logInfo(reason.getSourceElement().getName() + " got color " + GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0));
 		return GUIBasics.createColor(reason.getConfidence(), 0.0, 0.0);
 	}
-	
-	public static int getReasonLineWidth(Explanation.Reason reason) {
+
+	public static int getReasonLineWidth(Reason<?> reason) {
 		return 3;
 	}
 
 	/**
-	 * Gets the value(int) saved for the QualifiedName.<br>
-	 * If there is no value saved, the given default value is returned.
-	 * 
+	 * Gets the value(int) saved for the QualifiedName.<br> If there is no value saved, the given default value is returned.
+	 *
 	 * @param name The QualifiedName
 	 * @param defaultValue The default value from {@link GUIDefaults}
 	 * @return The value for the QualifiedName
 	 */
 	private static int getInt(QualifiedName name, int defaultValue) {
 		try {
-			String property = workspaceRoot.getPersistentProperty(name);
-			if (property != null && !"".equals(property)) {
+			final String property = workspaceRoot.getPersistentProperty(name);
+			if ((property != null) && !"".equals(property)) {
 				return Integer.parseInt(property);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return defaultValue;
@@ -614,29 +610,28 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
-	 * 
+	 *
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
 	private static void setInt(QualifiedName name, int value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, Integer.toString(value));
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
-	 * Gets the value(boolean) saved for the QualifiedName.<br>
-	 * If there is no value saved, it returns: <code>false</code>
-	 * 
+	 * Gets the value(boolean) saved for the QualifiedName.<br> If there is no value saved, it returns: <code>false</code>
+	 *
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
 	 */
 	private static boolean getBoolean(QualifiedName name) {
 		try {
 			return "true".equals(workspaceRoot.getPersistentProperty(name));
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return false;
@@ -644,36 +639,35 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
-	 * 
+	 *
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
 	private static void setBoolean(QualifiedName name, boolean value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, value ? TRUE : FALSE);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
-	 * Gets the value(Color) saved for the QualifiedName.<br>
-	 * If there is no value saved, the given default value is returned.
-	 * 
+	 * Gets the value(Color) saved for the QualifiedName.<br> If there is no value saved, the given default value is returned.
+	 *
 	 * @param name The QualifiedName
 	 * @param defaultColor The default value from {@link GUIDefaults}
 	 * @return The value for the QualifiedName
 	 */
 	private static Color getColor(QualifiedName name, Color deafaultColor) {
 		try {
-			String property = workspaceRoot.getPersistentProperty(name);
+			final String property = workspaceRoot.getPersistentProperty(name);
 			if (property != null) {
-				String[] color = property.split("[|]");
+				final String[] color = property.split("[|]");
 				if (color.length == 3) {
 					return new Color(null, Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return deafaultColor;
@@ -681,23 +675,22 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the color for the QualifiedName.
-	 * 
+	 *
 	 * @param name The QualifiedName
 	 * @param color The color to set
 	 */
 	private static void setColor(QualifiedName name, Color color) {
-		String c = color.getRed() + "|" + color.getGreen() + "|" + color.getBlue();
+		final String c = color.getRed() + "|" + color.getGreen() + "|" + color.getBlue();
 		try {
 			workspaceRoot.setPersistentProperty(name, c);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
-	 * Gets the value(String) saved for the QualifiedName.<br>
-	 * If there is no value saved, it returns: "".
-	 * 
+	 * Gets the value(String) saved for the QualifiedName.<br> If there is no value saved, it returns: "".
+	 *
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
 	 */
@@ -706,7 +699,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 			if (workspaceRoot.getPersistentProperty(name) != null) {
 				return workspaceRoot.getPersistentProperty(name);
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return "";
@@ -714,30 +707,30 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
-	 * 
+	 *
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
 	private static void setString(QualifiedName name, String value) {
 		try {
 			workspaceRoot.setPersistentProperty(name, value);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	public static LinkedList<QualifiedName> getQualifiedNames() {
-		LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
+		final LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
 		names.add(QN_HIDE_LEGEND);
-		//		names.add(QN_LEGEND_FORGOUND);
+		// names.add(QN_LEGEND_FORGOUND);
 		names.add(QN_LEGEND_BACKGROUND);
 		names.add(QN_LEGEND_BORDER);
 		names.add(QN_LANGUAGE);
 		names.add(QN_DIAGRAM_BACKGROUND);
-		//		names.add(QN_FEATURE_FORGROUND);
+		// names.add(QN_FEATURE_FORGROUND);
 		names.add(QN_FEATURE_CONCRETE);
 		names.add(QN_FEATURE_ABSTRACT);
-		//		names.add(QN_FEATURE_HIDEEN_FORGROUND);
+		// names.add(QN_FEATURE_HIDEEN_FORGROUND);
 		names.add(QN_FEATURE_HIDEEN_BACKGROUND);
 		names.add(QN_FEATURE_DEAD);
 		names.add(QN_CONSTRAINT);

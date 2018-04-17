@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 3.3.2.qualifier
+Bundle-Version: 3.5.0.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
@@ -64,8 +64,7 @@ Export-Package:
    de.ovgu.featureide.fm.core",
  de.ovgu.featureide.ui.views.collaboration.editparts,
  de.ovgu.featureide.ui.views.collaboration.figures,
- de.ovgu.featureide.ui.views.collaboration.model,
- de.ovgu.featureide.ui.views.collaboration.outline;
+ de.ovgu.featureide.ui.views.collaboration.model;
   uses:="org.eclipse.ui,
    de.ovgu.featureide.core.fstmodel,
    org.eclipse.ui.part,
@@ -78,12 +77,13 @@ Export-Package:
    de.ovgu.featureide.core.listeners,
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
+ de.ovgu.featureide.ui.views.collaboration.outline,
+ de.ovgu.featureide.ui.views.collaboration.outline.filters,
  de.ovgu.featureide.ui.views.collaboration.policy,
  de.ovgu.featureide.ui.views.configMap,
  de.ovgu.featureide.ui.views.configMap.actions,
  de.ovgu.featureide.ui.views.configMap.filters,
  de.ovgu.featureide.ui.views.configMap.header,
- de.ovgu.featureide.ui.views.outline,
  de.ovgu.featureide.ui.visualization,
  de.ovgu.featureide.ui.wizards;
   uses:="org.eclipse.jface.wizard,
@@ -97,7 +97,34 @@ Export-Package:
    de.ovgu.featureide.core.builder,
    de.ovgu.featureide.fm.core",
  no.sintef.ict.splcatool,
- org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception"
+ org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception",
+ splar.apps,
+ splar.apps.experiments,
+ splar.apps.generator,
+ splar.core.constraints,
+ splar.core.constraints.parsing,
+ splar.core.fm,
+ splar.core.fm.clustering,
+ splar.core.fm.configuration,
+ splar.core.fm.randomization,
+ splar.core.fm.reasoning,
+ splar.core.heuristics,
+ splar.core.util,
+ splar.core.util.alloy,
+ splar.core.util.hypergraphs,
+ splar.plugins.configuration.bdd.javabdd,
+ splar.plugins.configuration.bdd.javabdd.catalog,
+ splar.plugins.configuration.sat.sat4j,
+ splar.plugins.configuration.tests,
+ splar.plugins.configuration.tests.bdd.javabdd,
+ splar.plugins.configuration.tests.sat.sat4j,
+ splar.plugins.reasoners.bdd.javabdd,
+ splar.plugins.reasoners.sat.sat4j,
+ splar.plugins.reasoners.tests,
+ splar.plugins.reasoners.tests.bdd.javabdd,
+ splar.plugins.reasoners.tests.sat.sat4j,
+ splar.plugins.tests,
+ splar.samples
 Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.core.compiler.batch,
  org.eclipse.jdt.internal.core,

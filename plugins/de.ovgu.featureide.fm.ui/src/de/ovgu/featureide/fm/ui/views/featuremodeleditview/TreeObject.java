@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 
 /**
  * Stores a text and an image to show in a tree view.
- * 
+ *
  * @author Thomas Thuem
  */
 public class TreeObject extends TreeElement {
@@ -62,14 +62,15 @@ public class TreeObject extends TreeElement {
 	}
 
 	public void set(TreeParent parent) {
-		this.name = parent.getName();
-		this.image = parent.getImage();
-		this.removeChildren();
-		for (TreeElement child : parent.getChildren()) {
-			this.addChild(child);
+		name = parent.getName();
+		image = parent.getImage();
+		removeChildren();
+		for (final TreeElement child : parent.getChildren()) {
+			addChild(child);
 		}
 	}
 
+	@Override
 	public String toString() {
 		return getName();
 	}

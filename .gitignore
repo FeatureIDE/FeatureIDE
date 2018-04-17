@@ -18,4 +18,6 @@
 /plugins/de.ovgu.featureide.examples/featureide_examples/BankAccount-FH-JML/src
 /plugins/de.ovgu.featureide.examples/featureide_examples/ExamDB-FH-JML-withoutPMR/src
 /plugins/de.ovgu.featureide.examples/featureide_examples/StringMatcher-FH-JML/src
-/.DS_Store
+/tests/de.ovgu.featureide.fm.core-test/.featureide/
+/tests/de.ovgu.featureide.fm.core-test/feature_model_tmp**
+**/target

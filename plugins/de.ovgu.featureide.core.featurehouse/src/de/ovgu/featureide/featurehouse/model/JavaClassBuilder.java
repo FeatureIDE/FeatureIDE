@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,9 +32,8 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
- * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java
- * files.
- * 
+ * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java files.
+ *
  * @see ClassBuilder
  * @author Jens Meinicke
  */
@@ -44,39 +43,37 @@ public class JavaClassBuilder extends ClassBuilder {
 		super(builder);
 	}
 
-	private String[] modifier = { "static", "final", "private", "public", "protected", "nullable" };
+	private final String[] modifier = { "static", "final", "private", "public", "protected", "nullable" };
 
+	@Override
 	public void caseFieldDeclaration(FSTTerminal terminal) {
-		LinkedList<String> fields = getFields(terminal.getBody());
+		final LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			IRoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			final IRoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
 			r.setJavaDocComment(findJavaDocComments(terminal));
 		}
 	}
-	
+
 	public static String findJavaDocComments(FSTTerminal terminal) {
 		final String prefix = terminal.getSpecialTokenPrefix();
 		final int start = prefix.indexOf("/**");
 		final int end = prefix.lastIndexOf("*/");
-		if (start > -1 && end > -1) {
+		if ((start > -1) && (end > -1)) {
 			return prefix.substring(start, end + "*/".length());
-		} 
+		}
 		return null;
 	}
 
 	/**
-	 * 
-	 * @param terminal
-	 *            body
-	 * @return list(0) field modifiers<br>
-	 *         list(1) field type<br>
-	 *         ... field names
+	 *
+	 * @param terminal body
+	 * @return list(0) field modifiers<br> list(1) field type<br> ... field names
 	 */
 	public LinkedList<String> getFields(String body) {
 		String modifiers = "";
-		StringBuilder type = new StringBuilder();
-		StringBuilder namesBuilder = new StringBuilder();
+		final StringBuilder type = new StringBuilder();
+		final StringBuilder namesBuilder = new StringBuilder();
 		boolean mod = false;
 		boolean t1 = false;
 		boolean t2 = false;
@@ -90,7 +87,7 @@ public class JavaClassBuilder extends ClassBuilder {
 			body = body.replace("  ", " ");
 		}
 		body = body.trim();
-		for (String s : body.split(" ")) {
+		for (final String s : body.split(" ")) {
 			if (s.contains("=")) {
 				if (!s.startsWith("=")) {
 					namesBuilder.append(s.split("[=]")[0]);
@@ -134,7 +131,7 @@ public class JavaClassBuilder extends ClassBuilder {
 			names = names.substring(0, names.length() - 1);
 		}
 
-		String[] namesArray = names.split(",");
+		final String[] namesArray = names.split(",");
 		for (int i = 0; i < namesArray.length; i++) {
 			String f = namesArray[i];
 			f = f.replace("\n", "");
@@ -145,17 +142,17 @@ public class JavaClassBuilder extends ClassBuilder {
 			namesArray[i] = f;
 		}
 
-		LinkedList<String> field = new LinkedList<String>();
+		final LinkedList<String> field = new LinkedList<String>();
 		field.add(modifiers);
 		field.add(type.toString());
-		for (String name : namesArray) {
+		for (final String name : namesArray) {
 			field.add(name);
 		}
 		return field;
 	}
 
 	private boolean isModifier(String ss) {
-		for (String modifier : this.modifier) {
+		for (final String modifier : this.modifier) {
 			if (modifier.equals(ss)) {
 				return true;
 			}
@@ -163,24 +160,28 @@ public class JavaClassBuilder extends ClassBuilder {
 		return false;
 	}
 
+	@Override
 	public void caseMethodDeclaration(FSTTerminal terminal) {
 		// get name
-		String name = getMethodName(terminal);
+		final String name = getMethodName(terminal);
+		if (name == null) {
+			return;
+		}
 
-		String head = getHead(terminal.getBody(), name).replace("/*", "");
-		int index = head.trim().lastIndexOf(' ');
+		final String head = getHead(terminal.getBody(), name).replace("/*", "");
+		final int index = head.trim().lastIndexOf(' ');
 
 		// get return type
-		String returnType = head.substring(index + 1).trim();
+		final String returnType = head.substring(index + 1).trim();
 
-		String modifiers = (index == -1) ? "" : head.substring(0, index);
+		final String modifiers = (index == -1) ? "" : head.substring(0, index);
 		String contractBody = "", contractCompKey = "";
 		int startLine = -1;
-		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
+		for (final FSTNode nonT1 : terminal.getParent().getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
-				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
+				for (final FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
-						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
+						for (final FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
 							if (nonT3.getType().equals("SpecCaseSeq")) {
 								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
 								startLine = fstTerminal.beginLine;
@@ -197,7 +198,8 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		}
 		// add method
-		IRoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey, startLine);
+		final IRoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine,
+				false, contractBody, contractCompKey, startLine);
 		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
@@ -217,9 +219,13 @@ public class JavaClassBuilder extends ClassBuilder {
 		return body.substring(0, body.indexOf(name + "("));
 	}
 
+	@Override
 	public void caseConstructorDeclaration(FSTTerminal terminal) {
 		// get name
-		String name = getMethodName(terminal);
+		final String name = getMethodName(terminal);
+		if (name == null) {
+			return;
+		}
 
 		// get modifiers
 		String modifiers = "";
@@ -229,18 +235,19 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		String contractBody = "", contractCompKey = "";
 		int startLine = -1;
-		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
+		for (final FSTNode nonT1 : terminal.getParent().getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
-				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
+				for (final FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
-						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
+						for (final FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
 							if (nonT3.getType().equals("SpecCaseSeq")) {
 								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
 								startLine = fstTerminal.beginLine;
 								contractBody = fstTerminal.getBody();
 							}
-							if (nonT3.getType().equals("ContractCompKey"))
+							if (nonT3.getType().equals("ContractCompKey")) {
 								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
+							}
 
 						}
 					}
@@ -250,19 +257,23 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		IRoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey, startLine);
+		final IRoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true,
+				contractBody, contractCompKey, startLine);
 		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
 	private String getMethodName(FSTTerminal terminal) {
-		return terminal.getName().substring(0, terminal.getName().indexOf('('));
+		if (terminal.getName().indexOf('(') != -1) {
+			return terminal.getName().substring(0, terminal.getName().indexOf('('));
+		}
+		return null;
 	}
 
 	private LinkedList<String> getMethodParameter(FSTTerminal terminal) {
-		String parameter = terminal.getName().substring(terminal.getName().indexOf('(') + 1, terminal.getName().indexOf(')'));
-		LinkedList<String> parameterTypes = new LinkedList<String>();
+		final String parameter = terminal.getName().substring(terminal.getName().indexOf('(') + 1, terminal.getName().indexOf(')'));
+		final LinkedList<String> parameterTypes = new LinkedList<String>();
 		if (!"".equals(parameter) && !parameter.startsWith("{")) {
-			String[] p = parameter.split("[-]");
+			final String[] p = parameter.split("[-]");
 			for (int i = 0; i < p.length; i += 2) {
 				parameterTypes.add(p[i]);
 			}
@@ -300,9 +311,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseImplementsList(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			String body = terminal.getBody().replace("implements ", "");
-			String[] classNames = body.split(", ");
-			for (String className : classNames) {
+			final String body = terminal.getBody().replace("implements ", "");
+			final String[] classNames = body.split(", ");
+			for (final String className : classNames) {
 				modelBuilder.getCurrentClassFragment().addImplement(className);
 			}
 		}
@@ -311,9 +322,9 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseExtendsList(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			String body = terminal.getBody().replace("extends ", "");
-			String[] classNames = body.split(", ");
-			for (String className : classNames) {
+			final String body = terminal.getBody().replace("extends ", "");
+			final String[] classNames = body.split(", ");
+			for (final String className : classNames) {
 				modelBuilder.getCurrentClassFragment().addExtend(className);
 			}
 		}
@@ -321,20 +332,19 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseInvariant(FSTTerminal terminal) {
-		FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
+		final FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
 			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);
 		}
 	}
 
 	@Override
-	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {
-	}
+	public void caseJMLSpecCaseSeq(FSTTerminal terminal) {}
 
 	@Override
 	public void caseModifiers(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			String body = terminal.getBody().replaceAll("\\W", "");
+			final String body = terminal.getBody().replaceAll("\\W", "");
 			modelBuilder.getCurrentClassFragment().setModifiers(body);
 		}
 	}

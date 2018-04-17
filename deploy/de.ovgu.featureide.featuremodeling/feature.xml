@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featuremodeling"
       label="Feature Modeling (required)"
-      version="3.3.2.qualifier"
+      version="3.5.0.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -198,21 +198,29 @@ Library.
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.core.expressions"/>
-      <import plugin="de.ovgu.featureide.core"/>
+      <import plugin="de.ovgu.featureide.fm.ui"/>
+      <import plugin="de.ovgu.featureide.fm.core"/>
    </requires>
 
    <plugin
          id="de.ovgu.featureide.fm.core"
          download-size="0"
          install-size="0"
-         version="3.3.2.qualifier"
+         version="3.5.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.fm.ui"
          download-size="0"
          install-size="0"
-         version="3.3.2.qualifier"
+         version="3.5.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="de.ovgu.featureide.fm.attributes"
+         download-size="0"
+         install-size="0"
+         version="3.5.0.qualifier"
          unpack="false"/>
 
 </feature>

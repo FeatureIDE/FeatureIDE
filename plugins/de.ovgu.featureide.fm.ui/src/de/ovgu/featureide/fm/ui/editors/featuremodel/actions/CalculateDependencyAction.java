@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -44,10 +43,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CalculateDependencyOperation;
 
 /**
- * Action to calculate implicit dependencies of a sub feature model after selecting a feature
- * and choosing to "calculate implicit dependencies". This feature will be the root of the new
- * sub feature model.
- * 
+ * Action to calculate implicit dependencies of a sub feature model after selecting a feature and choosing to "calculate implicit dependencies". This feature
+ * will be the root of the new sub feature model.
+ *
  * @author "Ananieva Sofia"
  */
 public class CalculateDependencyAction extends Action {
@@ -65,28 +63,29 @@ public class CalculateDependencyAction extends Action {
 	/**
 	 * The selected feature which will be used as new root.
 	 */
-	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
+	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	/**
 	 * The listener which remembers the selection and checks whether it is valid.
 	 */
-	private ISelectionChangedListener listener = new ISelectionChangedListener() {
+	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 		}
 	};
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param viewer
 	 * @param featureModel The complete feature model
 	 */
 	public CalculateDependencyAction(Object viewer, IFeatureModel featureModel) {
 		super(CALCULATE_DEPENDENCY);
 		this.featureModel = featureModel;
-
+		setId(ID);
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -100,49 +99,53 @@ public class CalculateDependencyAction extends Action {
 	 */
 	@Override
 	public void run() {
-		if (selectedFeatures.size() != 1)
+		if (selectedFeatures.size() != 1) {
 			throw new RuntimeException("Calculate dependencies for multiple selected features is not supported.");
-		CalculateDependencyOperation op = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
+		}
+		final CalculateDependencyOperation op = new CalculateDependencyOperation(featureModel, selectedFeatures.get(0));
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute((IUndoableOperation) op, null, null);
-		} catch (ExecutionException e) {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
 	/**
 	 * Checks if selection is valid, i.e. selection is not empty, not root and a feature from the feature model tree.
-	 * 
+	 *
 	 * @param selection the selected feature from the feature model tree
 	 * @return true if valid selection, else false
 	 */
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1 && (selection.getFirstElement() instanceof ModelEditPart))
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
 			return false;
+		}
 
 		selectedFeatures.clear();
-		Iterator<?> iter = selection.iterator();
+		final Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
+			final Object editPart = iter.next();
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
 				continue;
+			}
 			IFeature feature;
 
-			if (editPart instanceof FeatureEditPart)
+			if (editPart instanceof FeatureEditPart) {
 				feature = ((FeatureEditPart) editPart).getModel().getObject();
-			else
+			} else {
 				feature = (IFeature) editPart;
+			}
 
 			selectedFeatures.add(feature);
 		}
 
-		boolean res = !selectedFeatures.isEmpty();
+		final boolean res = !selectedFeatures.isEmpty();
 
 		// permit selection to be root of the origin feature model
 		if (res) {
-			String s = selectedFeatures.getFirst().toString();
+			final String s = selectedFeatures.getFirst().toString();
 			if (s.equals(FeatureUtils.getRoot(featureModel).toString())) {
 				return false;
 			}

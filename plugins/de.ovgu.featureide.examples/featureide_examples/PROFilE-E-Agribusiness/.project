@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>PROFilE-E-Agribusiness</name>
+	<comment>
+	[description]
+	This dataset represents variability from the electronic marketplaces in the agribusiness domain. It consists two types of e-commerce transactions: Business-to-Business (B2B) and Business-to-Consumer (B2C) transactions. While B2B transactions are conducted between dealers enterprises, B2C are conducted between final consumers. The complete E-Agribusiness system is considered a large application as it is composed of 2008 features. It integrates these various features for direct sales of agribusiness products to customers (i.e., final consumers and dealers enterprises). The product configuration is performed as a process of customization and generation of a specific configuration for each final consumer or dealer enterprise. For this dataset, only about 10% of the data are from final consumers, the others 90% are from dealers enterprises.
+	[/description]
+	</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>composer</key>
+					<value>de.ovgu.featureide.core.FeatureModeling</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+	</natures>
+</projectDescription>

@@ -1,0 +1,30 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: EditConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _rPvPUKoNEeeF3P5ISwke7w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/5/17 10:44 PM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/configs/Enterprise.xml" | double-click
+with [get-editor "Enterprise.xml"] {
+    with [get-tree] {
+        select Elevator | get-item "Elevator/Behavior/Priorities/RushHour" | check
+        get-item "Elevator/CallButtons/DirectedCall" | uncheck
+        get-item "Elevator/Safety/Overloaded" | check
+        get-item "Elevator/CallButtons/UndirectedCall" | check
+        get-item "Elevator/Behavior/Modes/ShortestPath" | uncheck
+        get-item "Elevator/Behavior/Modes/FIFO" | check
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

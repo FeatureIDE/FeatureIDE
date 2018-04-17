@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="SPL"/>
+	<feature automatic="selected" name="generatedSPL"/>
+	<feature automatic="selected" name="DERIVATIVES"/>
+	<feature automatic="unselected" name="Derivative_NIO_ChunkedNIO"/>
+	<feature manual="selected" name="Derivative_IO_SynchronizedIO"/>
+	<feature automatic="selected" name="ConcurrTrans"/>
+	<feature automatic="selected" name="Persistance"/>
+	<feature automatic="selected" name="IIO"/>
+	<feature automatic="selected" name="OldIO"/>
+	<feature automatic="selected" name="SynchronizedIO"/>
+	<feature automatic="selected" name="IO"/>
+	<feature automatic="unselected" name="NewIO"/>
+	<feature automatic="unselected" name="NIOAccess"/>
+	<feature automatic="unselected" name="ChunkedNIO"/>
+	<feature automatic="unselected" name="NIO"/>
+	<feature automatic="unselected" name="DirectNIO"/>
+	<feature automatic="selected" name="Checkpointer"/>
+	<feature automatic="selected" name="IICleaner"/>
+	<feature automatic="selected" name="Cleaner"/>
+	<feature automatic="selected" name="BTree"/>
+	<feature automatic="selected" name="Ops"/>
+	<feature automatic="selected" name="base"/>
+</configuration>

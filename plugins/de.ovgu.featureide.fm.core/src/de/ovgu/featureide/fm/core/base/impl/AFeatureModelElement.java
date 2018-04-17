@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -20,31 +20,31 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.util.LinkedList;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
  * Partial implementation of feature and constraint.
- * 
+ *
  * @author Sebastian Krieter
- * 
+ *
  */
 public abstract class AFeatureModelElement implements IFeatureModelElement {
-	
+
 	protected final long id;
 
 	protected String name;
 
 	protected final IFeatureModel featureModel;
-	protected final LinkedList<IEventListener> listenerList = new LinkedList<>();
-	
+	protected final IEventManager eventManager = new DefaultEventManager();
+
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
-		this.id = oldElement.id;
+		id = oldElement.id;
 		name = (oldElement.name == null) ? null : new String(oldElement.name);
 	}
 
@@ -52,9 +52,9 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 		if (featureModel == null) {
 			throw new RuntimeException();
 		}
-		this.id = featureModel.getNextElementId();
+		id = featureModel.getNextElementId();
 		this.featureModel = featureModel;
-		this.name = null;
+		name = null;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	public final long getInternalId() {
 		return id;
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;
@@ -76,24 +76,20 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public final void addListener(IEventListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
+		eventManager.addListener(listener);
 	}
 
 	@Override
 	public final void removeListener(IEventListener listener) {
-		listenerList.remove(listener);
+		eventManager.removeListener(listener);
 	}
 
 	@Override
 	public final void fireEvent(FeatureIDEEvent event) {
-		for (final IEventListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
+		eventManager.fireEvent(event);
 	}
 
 	@Override
@@ -103,11 +99,13 @@ public abstract class AFeatureModelElement implements IFeatureModelElement {
 
 	@Override
 	public final boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		AFeatureModelElement other = (AFeatureModelElement) obj;
+		}
+		final AFeatureModelElement other = (AFeatureModelElement) obj;
 		return id == other.id;
 	}
 

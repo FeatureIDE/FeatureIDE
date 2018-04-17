@@ -59,7 +59,7 @@
           <command
                 commandId="de.ovgu.featureide.core.munge.ui.commands.signature"
                 id="de.ovgu.featureide.core.munge.ui.actions.munge"
-                label="Create Signature"
+                label="Enable Signatures"
                 style="toggle">
              <visibleWhen
                    checkEnabled="false">
@@ -70,7 +70,7 @@
                             value="1">
                       </count>
                       <reference
-                            definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+                            definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
                       </reference>
                       <test
                             args="de.ovgu.featureide.core.munge.ui.commands.signature"

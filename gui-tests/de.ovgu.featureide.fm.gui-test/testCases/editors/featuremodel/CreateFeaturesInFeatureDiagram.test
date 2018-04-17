@@ -1,0 +1,93 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: CreateFeaturesInFeatureDiagram
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _MyILcKoPEeeF3P5ISwke7w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/9/17 9:31 AM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA,_EVrRoKoREeeF3P5ISwke7w
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Checks if the following actions work as intended:
+- Creating a new feature above an existing feature
+- Creating a new feature below an existing feature
+- Changing the parent of a feature via drag and drop
+The test fails if there is an entry in the error log or the XML file of the diagram is different than expected.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text Sabbath] {
+            mouse-move 24 11 button1 -height 21 -width 52
+            mouse-press 24 11 button1 -height 21 -width 52
+            mouse-release 24 11 button1 524288 -height 21 -width 52
+            mouse-hover 24 11 -height 21 -width 52
+            mouse-press 24 11 button3 -height 21 -width 52
+            mouse-release 24 11 button3 2097152 -height 21 -width 52
+        }
+        get-menu "Create Feature Above" | click
+    }
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+        mouse-hover 242 241 -height 689 -width 1094
+        mouse-move 242 241 button1 -height 689 -width 1094
+        mouse-press 242 241 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 242 241 button1 524288 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+            mouse-hover 62 11 -height 21 -width 78
+            mouse-move 62 11 button3 -height 21 -width 78
+            mouse-press 62 11 button3 -height 21 -width 78
+            mouse-release 62 11 button3 2097152 -height 21 -width 78
+        }
+        get-menu "Create Feature Below (Ins)" | click
+    }
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature2 | activate-direct-edit
+        mouse-move 268 259 button1 -height 689 -width 1094
+        mouse-press 268 259 button1 -height 689 -width 1094
+        commit-direct-edit
+        mouse-release 268 259 button1 524288 -height 689 -width 1094
+        mouse-hover 268 259 -height 689 -width 1094
+        with [get-edit-part -className ModelEditPart] {
+            with [get-edit-part -text NewFeature1] {
+                mouse-hover 60 11 -height 21 -width 78
+                mouse-move 60 11 button1 -height 21 -width 78
+                mouse-press 60 11 button1 -height 21 -width 78
+                mouse-release 60 11 button1 524288 -height 21 -width 78
+            }
+            with [get-edit-part -text FIFO] {
+                mouse-move 28 9 button1 CTRL -height 21 -width 38
+                mouse-press 28 9 button1 CTRL -height 21 -width 38
+                mouse-release 28 9 button1 786432 -height 21 -width 38
+                mouse-move 24 11 button3 -height 21 -width 38
+                mouse-press 24 11 button3 -height 21 -width 38
+                mouse-release 24 11 button3 2097152 -height 21 -width 38
+            }
+        }
+        get-menu "Create Feature Above" | click
+    }
+    with [get-diagram] {
+        with [get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1] {
+            mouse-move 60 9 button1 -height 21 -width 78
+            mouse-press 60 9 button1 -height 21 -width 78
+            mouse-release 60 9 button1 524288 -height 21 -width 78
+        }
+        mouse-hover 318 285 -height 689 -width 1094
+        key-type Insert
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

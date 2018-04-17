@@ -3,9 +3,59 @@ Change log for FeatureIDE
 Each release contains smaller changes, bug fixes, and performance improvements,
 which can be found here:
 
-https://github.com/tthuem/FeatureIDE/issues/milestones
+https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
+
+Release 3.5.0 (April 2018)
+* Feature attributes can be defined with new view and stored in new format for extended feature models (#255, #650)
+* New library without Eclipse dependencies for extended feature models (#714)
+* New tool bar and revised context menu for feature diagrams (#648, #651, #672, #720)
+* New notation for dead and false-optional features to avoid confusion with feature coloring (#649)
+* Descriptions for cross-tree constraints (#648)
+* Obfuscator for names in feature models (#667)
+* Added examples with real-world configurations, namely Agrib and Profile (#606)
+* Added examples for the FeatureIDE library (#664)
+* Wizards for feature models and constraints available when installing only feature modeling (#649)
+* Feature order can be changed by drag and drop (#649)
+* Improved performance of readers and writers for XML and DIMACS formats (#695)
+* Unified dialogs for importing and exporting feature models from/to different formats
+* Fixed problems:
+  * saving of feature models (#537, #591, #662, #677, #700)
+  * layouting after renaming features (#604, #612)
+  * wrong number of variants (#722)
+  * impossible feature coloring (#708)
+  * editing of redundant constraints (#622)
+
+Release 3.4.3 (February 2018)
+* Hotfix containing only stability improvements over v3.4.2
+* Void feature model detected in constraint dialog (#704) and correctly visualized in feature diagram (#681, #687, #484)
+* Project explorer shows traces to all features (#593) and is refreshed if color scheme is deactived (#592)
+* Renaming of features in configurations is fixed (#685) and tool tips disappear on Mac (#701)
+* New configuration format more concise (does not store undefined features anymore) (#683)
+* Markers for inconsistent mappings in Antenna projects fixed (#673)
+* Feature interaction when collapsing explanations in feature diagram fixed (#682)
+* Exceptions for feature diagrams (#703) and FeatureHouse projects (#680) fixed
+
+Release 3.4.2 (December 2017)
+* Hotfix containing only stability improvements over v3.4.1
+* Feature models created with v3.3.0 and v3.3.1 are correctly loaded (some or-groups we automatically transformed into mandatory features)
+* Fixed problems: missing markers for invalid configurations, opening multiple configurations in project explorer
+* Usability of feature diagram improved
+
+Release 3.4.1 (October 2017)
+* Hotfix containing only stability improvements over v3.4.0
+* Removed dependency from feature modeling to FeatureIDE
+* Numerous fixes with respect to new configuration format
+* Improvements for feature-model editor, configuration editor, explanations, and product generation
+
+Release 3.4.0 (September 2017)
+* All feature diagram anomalies can be explained now (based on SAT4J's minimal unsatisfiable subset computation) 
+* Visual explanations for feature diagrams improved
+* XML format is used as default for new configurations (storing manual and automatic selection and deselection of concrete and abstract features)
+* Configuration editor restores unchanged selection state when opened if configuration is saved in XML format
+* Outline view for feature models available if only feature modeling is installed
+* Numerous stability and performance improvements
 
 Release 3.3.2 (July 2017)
 * Hotfix containing merely stability improvements over v3.3.1

@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -30,37 +30,37 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 
 /**
- * Starts the configuration file wizard for the selected configuration file
- * at the context menu. 
+ * Starts the configuration file wizard for the selected configuration file at the context menu.
  */
 public class StartConfigurationFileWizard implements IWorkbenchWindowActionDelegate {
 
 	private IWorkbenchWindow window;
 
-	public void dispose() {
-	}
+	@Override
+	public void dispose() {}
 
+	@Override
 	public void init(IWorkbenchWindow window) {
-		this.window=window;
+		this.window = window;
 	}
 
+	@Override
 	public void run(IAction action) {
-		
-		NewConfigurationFileWizard wizard=new NewConfigurationFileWizard();
-		ISelection selection = window.getSelectionService().getSelection();
-		
-		if(selection instanceof IStructuredSelection){
-			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);	
-		}
-		else{
+
+		final NewConfigurationFileWizard wizard = new NewConfigurationFileWizard();
+		final ISelection selection = window.getSelectionService().getSelection();
+
+		if (selection instanceof IStructuredSelection) {
+			wizard.init(window.getWorkbench(), (IStructuredSelection) selection);
+		} else {
 			wizard.init(window.getWorkbench(), null);
 		}
-		
-		WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
+
+		final WizardDialog dialog = new WizardDialog(window.getShell(), wizard);
 		dialog.open();
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
-	}
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {}
 
 }

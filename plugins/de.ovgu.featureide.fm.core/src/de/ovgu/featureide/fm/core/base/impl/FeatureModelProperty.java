@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -29,67 +29,76 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 
 /**
  * All additional properties of one {@link IFeature} instance.
- * 
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
-		result = prime * result + ((comments == null) ? 0 : comments.hashCode());
-		result = prime * result + (featureOrderInXML ? 1231 : 1237);
+		result = (prime * result) + ((annotations == null) ? 0 : annotations.hashCode());
+		result = (prime * result) + ((comments == null) ? 0 : comments.hashCode());
+		result = (prime * result) + (featureOrderInXML ? 1231 : 1237);
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		FeatureModelProperty other = (FeatureModelProperty) obj;
+		}
+		final FeatureModelProperty other = (FeatureModelProperty) obj;
 		if (annotations == null) {
-			if (other.annotations != null)
+			if (other.annotations != null) {
 				return false;
-		} else if (!annotations.equals(other.annotations))
+			}
+		} else if (!annotations.equals(other.annotations)) {
 			return false;
+		}
 		if (comments == null) {
-			if (other.comments != null)
+			if (other.comments != null) {
 				return false;
-		} else if (!comments.equals(other.comments))
+			}
+		} else if (!comments.equals(other.comments)) {
 			return false;
+		}
 		if (correspondingFeatureModel == null) {
-			if (other.correspondingFeatureModel != null)
+			if (other.correspondingFeatureModel != null) {
 				return false;
-		} 
+			}
+		}
 //		else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
 //			return false;
-		if (featureOrderInXML != other.featureOrderInXML)
+		if (featureOrderInXML != other.featureOrderInXML) {
 			return false;
+		}
 		return true;
 	}
 
 	/**
-	 * Saves the annotations from the model file as they were read,
-	 * because they were not yet used.
+	 * Saves the annotations from the model file as they were read, because they were not yet used.
 	 */
 	protected final List<String> annotations;
 
 	/**
-	 * All comment lines from the model file without line number at which they
-	 * occur
+	 * All comment lines from the model file without line number at which they occur
 	 */
 	protected final List<String> comments;
 

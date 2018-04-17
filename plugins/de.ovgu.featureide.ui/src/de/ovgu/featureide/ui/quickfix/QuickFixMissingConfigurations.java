@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,12 +39,13 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default implementation for quick fix of missing configurations.
- * 
+ *
  * @author Jens Meinicke
  */
 public abstract class QuickFixMissingConfigurations implements IMarkerResolution {
@@ -56,6 +57,9 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	protected IFeatureModel featureModel;
 	private int configurationNr = 0;
 
+	protected final IPersistentFormat<Configuration> configFormat = ConfigurationManager.getDefaultFormat();
+
+	@Override
 	public String getLabel() {
 		return CREATE_MISSING_CONFIGURATIONS_;
 	}
@@ -74,42 +78,42 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 		}
 	}
 
-    public QuickFixMissingConfigurations(IFeatureModel model) {
+	public QuickFixMissingConfigurations(IFeatureModel model) {
 		featureModel = model;
 		project = null;
 	}
 
 	protected IFile getConfigurationFile(final IFolder configFolder) {
 		IFile newConfig = null;
-		while (newConfig == null || newConfig.exists()) {
+		while ((newConfig == null) || newConfig.exists()) {
 			newConfig = configFolder.getFile(getConfigurationName(configurationNr));
 			configurationNr++;
 		}
 		return newConfig;
 	}
-	
+
 	protected void writeConfigurations(final Collection<Configuration> confs) {
-		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(configFormat);
 		try {
 			configurationNr = 0;
-			for (final Configuration c : confs) {				
+			for (final Configuration c : confs) {
 				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
 				writer.write(Paths.get(configurationFile.getLocationURI()), c);
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			LOGGER.logError(e);
 		}
 	}
 
 	private String getConfigurationName(final int number) {
-		return PREFIX + number + "." + project.getComposer().getConfigurationExtension();
+		return PREFIX + number + "." + configFormat.getSuffix();
 	}
 
 	protected String createShortMessage(Collection<String> features) {
-		StringBuilder message = new StringBuilder();
+		final StringBuilder message = new StringBuilder();
 		int addedFeatures = 0;
-		for (String feature : features) {
+		for (final String feature : features) {
 			message.append(feature);
 			message.append(", ");
 			if (addedFeatures++ >= 25) {

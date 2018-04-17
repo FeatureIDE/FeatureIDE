@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,6 +39,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -50,33 +51,32 @@ import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
 /**
- * This class is responsible for exporting graphics (FeatureModel and
- * CollaborationDiagram)
- * 
+ * This class is responsible for exporting graphics (FeatureModel and CollaborationDiagram)
+ *
  * @author Guenter Ulreich
  * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
-	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor) {
-		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
+	public static boolean exportAs(IFeatureModel featureModel, ScrollingGraphicalViewer diagramEditor) {
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
-				"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
+		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
+			"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
-		String filePath = fileDialog.open();
-		if (filePath == null)
+		final String filePath = fileDialog.open();
+		if (filePath == null) {
 			return false;
+		}
 
 		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
-			return FeatureModelManager.writeToFile(featureModel, Paths.get(filePath));
+			return FeatureModelManager.save(featureModel, Paths.get(filePath));
 		} else {
 			final File file = new File(filePath);
 			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
@@ -87,16 +87,17 @@ public class GraphicsExporter {
 	}
 
 	public static boolean exportAs(GraphicalViewerImpl viewer) {
-		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.svg" };
+		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
+		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "Scalable Vector Graphics *.svg" };
+		final String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
-		String filePath = fileDialog.open();
-		if (filePath == null)
+		final String filePath = fileDialog.open();
+		if (filePath == null) {
 			return false;
-		File file = new File(filePath);
+		}
+		final File file = new File(filePath);
 
 		return GraphicsExporter.exportAs(viewer, file);
 	}
@@ -105,57 +106,57 @@ public class GraphicsExporter {
 		boolean succ = false;
 
 		if (file.getAbsolutePath().endsWith(".svg")) {
-			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
-			IFigure rootFigure = part.getFigure();
+			final ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
+			final IFigure rootFigure = part.getFigure();
 
 			Bundle bundleExport = null;
 			Bundle bundleExportSVG = null;
-			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+			for (final Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 				if (b.getSymbolicName().equals(NL_UTWENTE_CE_IMAGEEXPORT)) {
 					bundleExport = b;
 				}
 				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
 					bundleExportSVG = b;
 				}
-				if (bundleExport != null && bundleExportSVG != null) {
+				if ((bundleExport != null) && (bundleExportSVG != null)) {
 					break;
 				}
 			}
 
 			// check if gef-imageexport is existing and activated!
-			if (bundleExport != null && bundleExportSVG != null) {
+			if ((bundleExport != null) && (bundleExportSVG != null)) {
 				try {
-					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExport.loadClass(
-							NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
+					final org.osgi.framework.BundleActivator act =
+						((org.osgi.framework.BundleActivator) bundleExport.loadClass(NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
-					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-					Object exportSVGObject = cl.newInstance();
+					final Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
+					final Object exportSVGObject = cl.newInstance();
 
-					Method provideSettings = cl.getMethod(PROVIDESETTINGS, String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
+					final Method provideSettings = cl.getMethod(PROVIDESETTINGS, String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
 					provideSettings.invoke(exportSVGObject, "SVG", viewer.getControl(), FMUIPlugin.getDefault().getPreferenceStore());
 
-					Method exportImage = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
+					final Method exportImage = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
 					exportImage.invoke(exportSVGObject, "SVG", file.getAbsolutePath(), rootFigure);
 
-					Field disableClippingButton = cl.getDeclaredField(DISABLECLIPPINGBUTTON);
+					final Field disableClippingButton = cl.getDeclaredField(DISABLECLIPPINGBUTTON);
 					disableClippingButton.setAccessible(true);
 
-					Object disableClippingButtonObj = disableClippingButton.get(exportSVGObject);
+					final Object disableClippingButtonObj = disableClippingButton.get(exportSVGObject);
 					if (disableClippingButtonObj instanceof Button) {
 						((Button) disableClippingButtonObj).dispose();
 					}
 
 					succ = true;
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
 				final String infoMessage = ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_
-						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
+					+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
+					+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
 
-				MessageDialog dialog = new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
+				final MessageDialog dialog = new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
 						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 				dialog.open();
@@ -173,8 +174,8 @@ public class GraphicsExporter {
 	}
 
 	public static void printExportMessage(File file, boolean successful) {
-		boolean done = successful && file != null;
-		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
+		final boolean done = successful && (file != null);
+		final String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
 		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }

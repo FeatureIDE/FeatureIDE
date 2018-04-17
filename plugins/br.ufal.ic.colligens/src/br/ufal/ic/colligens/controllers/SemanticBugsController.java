@@ -15,6 +15,7 @@ import br.ufal.ic.colligens.models.cppchecker.CppCheckerFileLogs;
 import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class SemanticBugsController {
+
 	private final ProjectExplorerController projectExplorer;
 
 	public SemanticBugsController() {
@@ -40,14 +41,14 @@ public class SemanticBugsController {
 			final List<IResource> resources = projectExplorer.getList();
 
 			Display.getDefault().asyncExec(new Runnable() {
+
 				@Override
 				public void run() {
-					CppCheckAnalyzer analyser = new CppCheckAnalyzer();
+					final CppCheckAnalyzer analyser = new CppCheckAnalyzer();
 
-					for (Iterator<IResource> iterator = resources.iterator(); iterator
-							.hasNext();) {
+					for (final Iterator<IResource> iterator = resources.iterator(); iterator.hasNext();) {
 
-						IResource iResource = iterator.next();
+						final IResource iResource = iterator.next();
 
 						// System.out.println(iResource);
 
@@ -55,11 +56,10 @@ public class SemanticBugsController {
 
 					}
 
-					List<CppCheckerFileLogs> fileLogs = analyser.getFiles();
+					final List<CppCheckerFileLogs> fileLogs = analyser.getFiles();
 
 					// returns the list to view
-					SemanticBugsViewController statisticsViewController = SemanticBugsViewController
-							.getInstance();
+					final SemanticBugsViewController statisticsViewController = SemanticBugsViewController.getInstance();
 
 					statisticsViewController.setInput(fileLogs);
 
@@ -67,7 +67,7 @@ public class SemanticBugsController {
 
 			});
 
-		} catch (ProjectExplorerException e1) {
+		} catch (final ProjectExplorerException e1) {
 
 		}
 	}

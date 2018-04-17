@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -56,7 +56,7 @@ import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 
 /**
  * Class for creating the sub-projects
- * 
+ *
  * @author Daniel Hohmann
  */
 public class FrameworkProjectCreator {
@@ -65,7 +65,7 @@ public class FrameworkProjectCreator {
 
 	/**
 	 * Creates a new subproject inside a folder
-	 * 
+	 *
 	 * @param name - project name
 	 * @param destination - folder which contains the subproject
 	 * @throws CoreException
@@ -118,7 +118,7 @@ public class FrameworkProjectCreator {
 
 	/**
 	 * Creates an <code>info.xml</code> file for subproject
-	 * 
+	 *
 	 * @param destination
 	 */
 	private static void createInfoXML(IFolder destination) {
@@ -145,8 +145,8 @@ public class FrameworkProjectCreator {
 			final Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			final DOMSource source = new DOMSource(infoXML);
-			final StreamResult result = new StreamResult(new File(destination.getLocationURI()).getAbsolutePath().concat(
-					FileSystems.getDefault().getSeparator() + "info.xml"));
+			final StreamResult result =
+				new StreamResult(new File(destination.getLocationURI()).getAbsolutePath().concat(FileSystems.getDefault().getSeparator() + "info.xml"));
 			transformer.transform(source, result);
 		} catch (ParserConfigurationException | TransformerException e) {
 			FrameworkCorePlugin.getDefault().logError(e);

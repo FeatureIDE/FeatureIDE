@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,13 +41,14 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * <b>This class is deprecated and only existing due to compatibility considerations</b>. Use {@link de.ovgu.featureide.fm.core.base.impl.Feature new Feature class} instead.
- * 
+ * <b>This class is deprecated and only existing due to compatibility considerations</b>. Use {@link de.ovgu.featureide.fm.core.base.impl.Feature new Feature
+ * class} instead.
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  *
  * @see IFeature Interface for features (<code>IFeature</code>)
- * @see de.ovgu.featureide.fm.core.base.impl.Feature Default implementation of interface for features (<code>Feature</code>) since version 3.0 
+ * @see de.ovgu.featureide.fm.core.base.impl.Feature Default implementation of interface for features (<code>Feature</code>) since version 3.0
  * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
  * @see IFeatureModel Interface for feature models (<code>IFeatureModel</code>)
  * @see IFeatureProperty Interface for feature properties (<code>IFeatureProperty</code>)
@@ -59,16 +60,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	public final IFeature feature;
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getDescription(IFeature);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getDescription(IFeature); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@CheckForNull
 	@Deprecated
@@ -77,16 +74,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setDescription(IFeature, CharSequence)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setDescription(IFeature, CharSequence) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setDescription(String description) {
@@ -94,13 +87,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * <i>This constructor is a bridge to the IFeature interface and establish the delegation. This method should not be used by third party.</i> 
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> <i>This
+	 * constructor is a bridge to the IFeature interface and establish the delegation. This method should not be used by third party.</i>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Feature(IFeature feature) {
@@ -108,32 +100,24 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setNewLocation(IFeature, FMPoint);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setNewLocation(IFeature, FMPoint); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	public void setNewLocation(FMPoint newLocation) {
 		FeatureUtilsLegacy.setNewLocation(feature, newLocation);
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getLocation(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getLocation(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public FMPoint getLocation() {
@@ -141,16 +125,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isAnd(IFeature);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isAnd(IFeature); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isAnd() {
@@ -158,16 +138,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.getStructure().isOr();
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> IFeature.getStructure().isOr(); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isOr() {
@@ -175,16 +151,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isAlternative(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isAlternative(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isAlternative() {
@@ -192,16 +164,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.changeToAnd(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.changeToAnd(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void changeToAnd() {
@@ -209,16 +177,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.changeToOr(IFeature);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.changeToOr(IFeature); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void changeToOr() {
@@ -226,16 +190,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.changeToAlternative(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.changeToAlternative(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void changeToAlternative() {
@@ -243,16 +203,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setAnd(IFeature, boolean)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setAnd(IFeature, boolean) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setAND(boolean and) {
@@ -260,16 +216,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isMandatorySet(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isMandatorySet(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isMandatorySet() {
@@ -277,16 +229,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isMandatory(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isMandatory(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isMandatory() {
@@ -294,16 +242,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setMandatory(IFeature, boolean)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setMandatory(IFeature, boolean) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setMandatory(boolean mandatory) {
@@ -311,16 +255,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isHidden(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isHidden(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isHidden() {
@@ -328,16 +268,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setHiddden(IFeature, boolean)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setHiddden(IFeature, boolean) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setHidden(boolean hid) {
@@ -345,16 +281,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isConstraintSelected(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isConstraintSelected(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isConstraintSelected() {
@@ -362,32 +294,24 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.getStructure().selectConstraint(selection);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> IFeature.getStructure().selectConstraint(selection); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	public void setConstraintSelected(boolean selection) {
 		FeatureUtils.setConstraintSelected(feature, selection);
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setAbstract(IFeature, boolean)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setAbstract(IFeature, boolean) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setAbstract(boolean value) {
@@ -395,16 +319,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getRelevantConstraints(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getRelevantConstraints(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Collection<IConstraint> getRelevantConstraints() {
@@ -412,16 +332,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getRelevantConstraintsString(IFeature, IFeatureModel).getConstraints());
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getRelevantConstraintsString(IFeature, IFeatureModel).getConstraints()); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public String getRelevantConstraintsString() {
@@ -429,16 +345,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setRelevantConstraints(feature);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setRelevantConstraints(feature); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setRelevantConstraints() {
@@ -446,16 +358,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getFeatureStatus(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getFeatureStatus(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public FeatureStatus getFeatureStatus() {
@@ -463,33 +371,26 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getFeatureModel(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getFeatureModel(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
+	@Override
 	@Deprecated
 	public IFeatureModel getFeatureModel() {
 		return FeatureUtils.getFeatureModel(feature);
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setFeatureStatus(IFeature, FeatureStatus, boolean);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setFeatureStatus(IFeature, FeatureStatus, boolean); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
@@ -497,16 +398,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isMultiple(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isMultiple(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isMultiple() {
@@ -514,16 +411,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setMultiple(IFeature, boolean)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setMultiple(IFeature, boolean) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setMultiple(boolean multiple) {
@@ -531,50 +424,40 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getName(Feature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getName(Feature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
+	@Override
 	@Deprecated
 	public String getName() {
 		return FeatureUtils.getName(feature);
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setName(feature, name)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setName(feature, name) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
+	@Override
 	@Deprecated
 	public void setName(String name) {
 		FeatureUtils.setName(feature, name);
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.hasInlineRule(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.hasInlineRule(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean hasInlineRule() {
@@ -582,16 +465,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setParent(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setParent(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setParent(Feature newParent) {
@@ -599,16 +478,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getParent(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getParent(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Feature getParent() {
@@ -616,16 +491,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isRoot(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isRoot(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isRoot() {
@@ -633,16 +504,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.getStructure().getChildren();
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> IFeature.getStructure().getChildren(); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public LinkedList<Feature> getChildren() {
@@ -650,16 +517,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setChildren(IFeature,  Iterable)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setChildren(IFeature, Iterable) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setChildren(LinkedList<Feature> children) {
@@ -667,16 +530,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.hasChildren(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.hasChildren(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean hasChildren() {
@@ -684,16 +543,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.addChild(IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.addChild(IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void addChild(Feature newChild) {
@@ -701,16 +556,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.addChildAtPosition(IFeature, int, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.addChildAtPosition(IFeature, int, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void addChildAtPosition(int index, Feature newChild) {
@@ -718,16 +569,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.replaceChild(IFeature, IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.replaceChild(IFeature, IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void replaceChild(Feature oldChild, Feature newChild) {
@@ -735,16 +582,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.removeChild(IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.removeChild(IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void removeChild(Feature child) {
@@ -752,16 +595,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.removeLastChild(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.removeLastChild(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Feature removeLastChild() {
@@ -769,16 +608,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getSourceConnections(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getSourceConnections(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public List<FeatureConnection> getSourceConnections() {
@@ -787,16 +622,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getTargetConnections(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getTargetConnections(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public List<FeatureConnection> getTargetConnections() {
@@ -805,16 +636,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.addTargetConnection(IFeature, FeatureConnection)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.addTargetConnection(IFeature, FeatureConnection) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void addTargetConnection(FeatureConnection connection) {
@@ -822,16 +649,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.removeTargetConnection(IFeature, FeatureConnection)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.removeTargetConnection(IFeature, FeatureConnection) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean removeTargetConnection(FeatureConnection connection) {
@@ -840,16 +663,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.addListener(IFeature, PropertyChangeListener);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.addListener(IFeature, PropertyChangeListener); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void addListener(PropertyChangeListener listener) {
@@ -857,16 +676,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.removeListener(IFeature, PropertyChangeListener);
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.removeListener(IFeature, PropertyChangeListener); </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void removeListener(PropertyChangeListener listener) {
@@ -874,16 +689,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isAncestorOf(IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isAncestorOf(IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isAncestorOf(Feature next) {
@@ -891,16 +702,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isFirstChild(IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isFirstChild(IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isFirstChild(Feature child) {
@@ -908,16 +715,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getChildrenCount(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getChildrenCount(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public int getChildrenCount() {
@@ -925,16 +728,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getFirstChild(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getFirstChild(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Feature getFirstChild() {
@@ -942,16 +741,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getLastChild(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getLastChild(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public Feature getLastChild() {
@@ -959,16 +754,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getChildIndex(IFeature, IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getChildIndex(IFeature, IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public int getChildIndex(Feature child) {
@@ -976,16 +767,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isAbstract(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isAbstract(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isAbstract() {
@@ -993,16 +780,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isConcrete(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isConcrete(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isConcrete() {
@@ -1010,16 +793,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.isANDPossible(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.isANDPossible(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean isANDPossible() {
@@ -1027,16 +806,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.fire(IFeature, PropertyChangeEvent)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.fire(IFeature, PropertyChangeEvent) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void fire(PropertyChangeEvent event) {
@@ -1044,16 +819,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.clone(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.clone(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	@Override
@@ -1066,16 +837,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setAnd(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setAnd(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setAnd() {
@@ -1083,16 +850,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setOr(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setOr(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setOr() {
@@ -1100,16 +863,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.setAlternative(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.setAlternative(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public void setAlternative() {
@@ -1117,16 +876,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.hasHiddenParent(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.hasHiddenParent(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public boolean hasHiddenParent() {
@@ -1134,16 +889,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.toString(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.toString(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	@Override
@@ -1152,16 +903,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getDisplayName(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getDisplayName(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public String getDisplayName() {
@@ -1186,16 +933,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getColorList(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getColorList(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	public ColorList getColorList() {
@@ -1204,16 +947,12 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.hashCode(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.hashCode(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	@Override
@@ -1222,23 +961,19 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	}
 
 	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * FeatureUtils.getItemType(IFeature)
-	 * </code>
-	 * 
+	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b> </br>Internally, the
+	 * <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying {@link IFeature IFeature interface}.<br/><br/> Instead of this
+	 * method you should use<br/> <code> FeatureUtils.getItemType(IFeature) </code>
+	 *
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
+	 * @since 2.7.5
 	 */
 	@Deprecated
 	@Override
 	public GraphicItem getItemType() {
 		return FeatureUtils.getItemType(feature);
 	}
-	
+
 	@Override
 	public long getInternalId() {
 		return feature.getInternalId();
@@ -1277,5 +1012,14 @@ public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 	@Override
 	public IFeatureStructure getStructure() {
 		return feature.getStructure();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeature#createTooltip(java.lang.Object[])
+	 */
+	@Override
+	public String createTooltip(Object... objects) {
+		return "No tooltip implementation.";
 	}
 }

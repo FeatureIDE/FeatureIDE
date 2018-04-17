@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Reads / Writes a graphical feature model.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
@@ -48,7 +48,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 
 	@Override
 	protected void readDocument(Document doc, List<Problem> warnings) {
-		for (Element e : getElements(doc.getElementsByTagName("layout"))) {
+		for (final Element e : getElements(doc.getElementsByTagName("layout"))) {
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
 			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
@@ -56,35 +56,35 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	private void setFeatureModelAttributes(Element eElement) {
-		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
+		final String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
 		if (!algorithm.equals("")) {
 			object.getLayout().setLayout(Integer.parseInt(algorithm));
 		}
-		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
+		final String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
 		if (layout.equals(TRUE)) {
 			object.getLayout().verticalLayout(false);
 		} else if (layout.equals(FALSE)) {
 			object.getLayout().verticalLayout(true);
 		}
-		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
+		final String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
 		if (showHidden.equals(TRUE)) {
 			object.getLayout().showHiddenFeatures(true);
 		} else if (showHidden.equals(FALSE)) {
 			object.getLayout().showHiddenFeatures(false);
 		}
-		String showCollapsedConstraints = eElement.getAttribute(SHOW_COLLAPSED_CONSTRAINTS);
+		final String showCollapsedConstraints = eElement.getAttribute(SHOW_COLLAPSED_CONSTRAINTS);
 		if (showCollapsedConstraints.equals(TRUE)) {
 			object.getLayout().showCollapsedConstraints(true);
 		} else if (showCollapsedConstraints.equals(FALSE)) {
 			object.getLayout().showCollapsedConstraints(false);
 		}
-		String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
+		final String showShort = eElement.getAttribute(SHOW_SHORT_NAMES);
 		if (showShort.equals(TRUE)) {
 			object.getLayout().setShowShortNames(true);
 		} else if (showShort.equals(FALSE)) {
 			object.getLayout().setShowShortNames(false);
 		}
-		String hideLegend = eElement.getAttribute(HIDE_LEGEND);
+		final String hideLegend = eElement.getAttribute(HIDE_LEGEND);
 		if (hideLegend.equals(TRUE)) {
 			object.setLegendHidden(true);
 		} else if (hideLegend.equals(FALSE)) {
@@ -93,17 +93,17 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	private void parseStruct(NodeList struct) {
-		for (Element e : getElements(struct)) {
+		for (final Element e : getElements(struct)) {
 			parseFeatures(e.getChildNodes());
 		}
 	}
 
 	private void parseFeatures(NodeList nodeList) {
 		final HashMap<String, IGraphicalFeature> map = new HashMap<>();
-		for (IGraphicalFeature feature : object.getFeatures()) {
+		for (final IGraphicalFeature feature : object.getFeatures()) {
 			map.put(feature.getObject().getName(), feature);
 		}
-		for (Element e : getElements(nodeList)) {
+		for (final Element e : getElements(nodeList)) {
 			if (e.hasAttributes()) {
 				final NamedNodeMap nodeMap = e.getAttributes();
 
@@ -113,19 +113,19 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				boolean collapsed = false;
 
 				for (int i = 0; i < nodeMap.getLength(); i++) {
-					org.w3c.dom.Node node = nodeMap.item(i);
-					String attributeName = node.getNodeName();
-					String attributeValue = node.getNodeValue();
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String attributeName = node.getNodeName();
+					final String attributeValue = node.getNodeValue();
 					if (attributeName.equals("X")) {
 						try {
 							x = Integer.parseInt(attributeValue);
-						} catch (NumberFormatException error) {
+						} catch (final NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
 					} else if (attributeName.equals("Y")) {
 						try {
 							y = Integer.parseInt(attributeValue);
-						} catch (NumberFormatException error) {
+						} catch (final NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
 					} else if (attributeName.equals("name")) {
@@ -145,38 +145,38 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	private void parseConstraints(NodeList struct) {
-		for (Element e : getElements(struct)) {
+		for (final Element e : getElements(struct)) {
 			parseConstraint(e.getChildNodes());
 		}
 	}
 
 	private void parseConstraint(NodeList nodeList) {
-		Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
-		for (Element e : getElements(nodeList)) {
-			//			String nodeName = e.getNodeName();
+		final Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
+		for (final Element e : getElements(nodeList)) {
+			// String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
-			IGraphicalConstraint constraint = iterator.next();
+			final IGraphicalConstraint constraint = iterator.next();
 			if (e.hasAttributes()) {
-				NamedNodeMap nodeMap = e.getAttributes();
+				final NamedNodeMap nodeMap = e.getAttributes();
 				int x = 0;
 				int y = 0;
 
 				for (int i = 0; i < nodeMap.getLength(); i++) {
-					org.w3c.dom.Node node = nodeMap.item(i);
-					String attributeName = node.getNodeName();
-					String attributeValue = node.getNodeValue();
+					final org.w3c.dom.Node node = nodeMap.item(i);
+					final String attributeName = node.getNodeName();
+					final String attributeValue = node.getNodeValue();
 					if (attributeName.equals("X")) {
 						try {
 							x = Integer.parseInt(attributeValue);
-						} catch (NumberFormatException error) {
+						} catch (final NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
 					} else if (attributeName.equals("Y")) {
 						try {
 							y = Integer.parseInt(attributeValue);
-						} catch (NumberFormatException error) {
+						} catch (final NumberFormatException error) {
 							// throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 						}
 					} else {
@@ -192,9 +192,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 
 	@Override
 	protected void writeDocument(Document doc) {
-		Element root = doc.createElement("layout");
-		Element struct = doc.createElement(STRUCT);
-		Element constraints = doc.createElement(CONSTRAINTS);
+		final Element root = doc.createElement("layout");
+		final Element struct = doc.createElement(STRUCT);
+		final Element constraints = doc.createElement(CONSTRAINTS);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, Integer.toString(object.getLayout().getLayoutAlgorithm()));
 
 		if (object.getLayout().verticalLayout()) {
@@ -221,7 +221,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		root.appendChild(constraints);
 
 		if (!object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalFeature feat : object.getAllFeatures()) {
+			for (final IGraphicalFeature feat : object.getAllFeatures()) {
 				final Element fnod = doc.createElement(FEATURE);
 				fnod.setAttribute(NAME, feat.getObject().getName());
 
@@ -234,7 +234,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				struct.appendChild(fnod);
 			}
 		} else if (object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalFeature feat : object.getAllFeatures()) {
+			for (final IGraphicalFeature feat : object.getAllFeatures()) {
 				if (feat.isCollapsed()) {
 					final Element fnod = doc.createElement(FEATURE);
 					fnod.setAttribute(NAME, feat.getObject().getName());
@@ -244,7 +244,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 			}
 		}
 		if (!object.getLayout().hasFeaturesAutoLayout()) {
-			for (IGraphicalConstraint constr : object.getConstraints()) {
+			for (final IGraphicalConstraint constr : object.getConstraints()) {
 				final Element rule = doc.createElement(RULE);
 				final Point location = constr.getLocation();
 				rule.setAttribute("X", Integer.toString(location.x));
@@ -261,18 +261,13 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	}
 
 	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
-	}
-
-	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public String getName() {
+		return "FeatureIDE";
 	}
 
 }

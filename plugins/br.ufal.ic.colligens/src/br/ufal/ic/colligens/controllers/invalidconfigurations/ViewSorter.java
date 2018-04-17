@@ -14,7 +14,7 @@ class ViewSorter extends ViewerSorter {
 	private int direction = DESCENDING;
 
 	public ViewSorter() {
-		this.propertyIndex = 0;
+		propertyIndex = 0;
 		direction = DESCENDING;
 	}
 
@@ -23,12 +23,12 @@ class ViewSorter extends ViewerSorter {
 	}
 
 	public void setColumn(int column) {
-		if (column == this.propertyIndex) {
+		if (column == propertyIndex) {
 			// Same column as last sort; toggle the direction
 			direction = 1 - direction;
 		} else {
 			// New column; do an ascending sort
-			this.propertyIndex = column;
+			propertyIndex = column;
 			direction = DESCENDING;
 		}
 	}
@@ -39,31 +39,26 @@ class ViewSorter extends ViewerSorter {
 
 		switch (propertyIndex) {
 		case 0:
-			if (e1 instanceof FileProxy && e2 instanceof FileProxy) {
-				rc = ((FileProxy) e1).getFileName().compareTo(
-						((FileProxy) e2).getFileName());
+			if ((e1 instanceof FileProxy) && (e2 instanceof FileProxy)) {
+				rc = ((FileProxy) e1).getFileName().compareTo(((FileProxy) e2).getFileName());
 			}
-			if (e1 instanceof Log && e2 instanceof Log) {
-				rc = ((Log) e1).getMessage().compareTo(
-						((Log) e2).getMessage());
+			if ((e1 instanceof Log) && (e2 instanceof Log)) {
+				rc = ((Log) e1).getMessage().compareTo(((Log) e2).getMessage());
 			}
 			break;
 		case 1:
-			if (e1 instanceof Log && e2 instanceof Log) {
-				rc = ((Log) e1).getFileName().compareTo(
-						((Log) e2).getFileName());
+			if ((e1 instanceof Log) && (e2 instanceof Log)) {
+				rc = ((Log) e1).getFileName().compareTo(((Log) e2).getFileName());
 			}
 			break;
 		case 2:
-			if (e1 instanceof Log && e2 instanceof Log) {
-				rc = ((Log) e1).getPath().compareTo(
-						((Log) e2).getPath());
+			if ((e1 instanceof Log) && (e2 instanceof Log)) {
+				rc = ((Log) e1).getPath().compareTo(((Log) e2).getPath());
 			}
 			break;
 		case 3:
-			if (e1 instanceof Log && e2 instanceof Log) {
-				rc = ((Log) e1).getFeature().compareTo(
-						((Log) e2).getFeature());
+			if ((e1 instanceof Log) && (e2 instanceof Log)) {
+				rc = ((Log) e1).getFeature().compareTo(((Log) e2).getFeature());
 			}
 		default:
 			rc = 0;

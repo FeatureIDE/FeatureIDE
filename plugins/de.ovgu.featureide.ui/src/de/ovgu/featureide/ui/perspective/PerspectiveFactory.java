@@ -29,11 +29,11 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
+import de.ovgu.featureide.fm.ui.views.outline.custom.Outline;
 import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.outline.Outline;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard;
 import de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard;
@@ -50,9 +50,10 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureIDEperspective";
 
+	@Override
 	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
-		String editorArea = layout.getEditorArea();
+		final String editorArea = layout.getEditorArea();
 
 		layout.addNewWizardShortcut(NewFeatureProjectWizard.ID);
 		layout.addNewWizardShortcut(NewFeatureIDEFileWizard.ID);
@@ -61,9 +62,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
 
-		IFolderLayout left = layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
-		IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
-		IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
+		final IFolderLayout left = layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
+		final IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
+		final IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 
 		down.addView(CollaborationView.ID);
 		down.addView(ConfigurationMap.ID);
@@ -87,6 +88,6 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addShowViewShortcut(IPageLayout.ID_RES_NAV);
 		layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 		layout.addShowViewShortcut(IPageLayout.ID_TASK_LIST);
-		
+
 	}
 }

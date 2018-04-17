@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -31,12 +31,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectio
 
 /**
  * Action to select the name type (short or lang name) of the feature model.
- * 
+ *
  * @author Reimar Schroeter
  */
 public class NameTypeSelectionAction extends Action {
-	private int newNameType;
-	private int oldNameType;
+
+	public static final String ID = "de.ovgu.featureide.nametypeselection";
+
+	private final int newNameType;
+	private final int oldNameType;
 	private final IGraphicalFeatureModel featureModel;
 
 	public NameTypeSelectionAction(IGraphicalFeatureModel featureModel, int newNameType, int oldNameType) {
@@ -44,6 +47,7 @@ public class NameTypeSelectionAction extends Action {
 		this.newNameType = newNameType;
 		this.oldNameType = oldNameType;
 		this.featureModel = featureModel;
+		setId(ID);
 	}
 
 	@Override
@@ -51,7 +55,7 @@ public class NameTypeSelectionAction extends Action {
 		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}

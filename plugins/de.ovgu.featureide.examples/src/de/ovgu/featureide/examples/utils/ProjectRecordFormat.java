@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -27,15 +27,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 
 /**
  * Reads / Writes the XML structure that holds the paths for all example projects.
- * 
- * @author skrieter
+ *
+ * @author Sebastian Krieter
  */
 public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
@@ -48,22 +47,12 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 
 	@Override
 	public String getId() {
-		return null;
+		return ID;
 	}
 
 	@Override
-	public IPersistentFormat<ProjectRecordCollection> getInstance() {
+	public ProjectRecordFormat getInstance() {
 		return this;
-	}
-
-	@Override
-	public boolean supportsRead() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return true;
 	}
 
 	@Override
@@ -74,7 +63,7 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	private void parseProjects(List<Element> elements, Collection<ProjectRecord> projectRecords) {
-		for (Element element : elements) {
+		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
 				final String name = element.getAttribute(ATTRIBUTE_NAME);
 				final String path = element.getAttribute(ATTRIBUTE_PATH);
@@ -86,7 +75,7 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	private void parseSubProjects(List<Element> elements, ProjectRecord parentRecord) {
-		for (Element element : elements) {
+		for (final Element element : elements) {
 			if (PROJECT.equals(element.getTagName())) {
 				final String name = element.getAttribute(ATTRIBUTE_NAME);
 				final String path = element.getAttribute(ATTRIBUTE_PATH);
@@ -105,7 +94,7 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 	}
 
 	private void addProjectRecords(Document doc, final Element root, Collection<ProjectRecord> projects) {
-		for (ProjectRecord projectRecord : projects) {
+		for (final ProjectRecord projectRecord : projects) {
 			final Element projectElement = doc.createElement(PROJECT);
 			root.appendChild(projectElement);
 			projectElement.setAttribute(ATTRIBUTE_NAME, projectRecord.getProjectName());
@@ -114,6 +103,11 @@ public class ProjectRecordFormat extends AXMLFormat<ProjectRecordCollection> {
 				addProjectRecords(doc, projectElement, projectRecord.getSubProjects());
 			}
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "";
 	}
 
 }

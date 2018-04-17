@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -53,9 +53,8 @@ import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
- * A solver that computes if a given propositional node is satisfiable and
- * retrieves solutions.
- * 
+ * A solver that computes if a given propositional node is satisfiable and retrieves solutions.
+ *
  * @author Thomas Thuem
  */
 public class SatSolver {
@@ -93,15 +92,17 @@ public class SatSolver {
 
 	protected void readVars(Node node) {
 		if (node instanceof Literal) {
-			Object var = ((Literal) node).var;
+			final Object var = ((Literal) node).var;
 			if (!varToInt.containsKey(var)) {
-				int index = varToInt.size() + 1;
+				final int index = varToInt.size() + 1;
 				varToInt.put(var, index);
 				intToVar.put(index, var);
 			}
-		} else
-			for (Node child : node.getChildren())
+		} else {
+			for (final Node child : node.getChildren()) {
 				readVars(child);
+			}
+		}
 	}
 
 	protected void initSolver(Node node, long timeout, boolean createCNF) {
@@ -118,9 +119,8 @@ public class SatSolver {
 
 	/**
 	 * Adds clauses to the SatSolver. Assumes that the given node is in CNF.
-	 * 
-	 * @param root
-	 *            the new clauses (e.g. AND or OR node)
+	 *
+	 * @param root the new clauses (e.g. AND or OR node)
 	 */
 	public void addClauses(Node root) {
 		if (contradiction) {
@@ -128,13 +128,13 @@ public class SatSolver {
 		}
 		try {
 			if (root instanceof And) {
-				for (Node node : root.getChildren()) {
+				for (final Node node : root.getChildren()) {
 					addClause(node);
 				}
 			} else {
 				addClause(root);
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			contradiction = true;
 		}
 	}
@@ -142,25 +142,25 @@ public class SatSolver {
 	protected IConstr addClause(Node node) throws ContradictionException {
 		try {
 			if (node instanceof Or) {
-				int[] clause = new int[node.children.length];
+				final int[] clause = new int[node.children.length];
 				int i = 0;
-				for (Node child : node.getChildren()) {
+				for (final Node child : node.getChildren()) {
 					clause[i++] = getIntOfLiteral(child);
 				}
 				return solver.addClause(new VecInt(clause));
 			} else {
-				int literal = getIntOfLiteral(node);
+				final int literal = getIntOfLiteral(node);
 				return solver.addClause(new VecInt(new int[] { literal }));
 			}
-		} catch (ClassCastException e) {
+		} catch (final ClassCastException e) {
 			throw new RuntimeException(EXPRESSION_IS_NOT_IN_CNF, e);
 		}
 	}
 
 	protected int getIntOfLiteral(Node node) {
-		Object var = ((Literal) node).var;
+		final Object var = ((Literal) node).var;
 		if (!varToInt.containsKey(var)) {
-			int index = varToInt.size() + 1;
+			final int index = varToInt.size() + 1;
 			varToInt.put(var, index);
 			intToVar.put(index, var);
 			solver.newVar(1);
@@ -168,7 +168,7 @@ public class SatSolver {
 			// 2.0.5
 			try {
 				solver.addClause(new VecInt(new int[] { index, -index }));
-			} catch (ContradictionException e) {
+			} catch (final ContradictionException e) {
 				// cannot occur
 			}
 			// hack end
@@ -181,7 +181,7 @@ public class SatSolver {
 	private boolean test() {
 		try {
 			contradiction = contradiction || !solver.isSatisfiable();
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 			return false;
 		}
@@ -210,13 +210,13 @@ public class SatSolver {
 						} else {
 							backbone.pop().push(x);
 						}
-					} catch (TimeoutException e) {
+					} catch (final TimeoutException e) {
 						Logger.logError(e);
 						backbone.pop();
 					}
 				}
 			}
-			
+
 			for (int i = 0; i < tempNodes.length; i++) {
 				backbone.delete(i);
 			}
@@ -224,31 +224,31 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-	
+
 	public void setDBSimplificationAllowed(boolean allowed) {
 		solver.setDBSimplificationAllowed(allowed);
 	}
-	
+
 	public void removeConstraint(IConstr constr) {
 		solver.removeConstr(constr);
 	}
-	
+
 	public List<IConstr> addTempConstraint(Node constraint) {
-		List<IConstr> result = new LinkedList<>();
+		final List<IConstr> result = new LinkedList<>();
 		try {
 			if (constraint instanceof And) {
-				for (Node node : constraint.getChildren()) {
+				for (final Node node : constraint.getChildren()) {
 					result.add(addClause(node));
 				}
 			} else {
 				result.add(addClause(constraint));
 			}
-		} catch (ContradictionException e) {
+		} catch (final ContradictionException e) {
 			contradiction = true;
 		}
 		return result;
 	}
-	
+
 	public boolean isImplied(Literal... or) {
 		if (!contradiction) {
 			final IVecInt backbone = new VecInt();
@@ -258,7 +258,7 @@ public class SatSolver {
 			}
 			try {
 				return !solver.isSatisfiable(backbone);
-			} catch (TimeoutException e) {
+			} catch (final TimeoutException e) {
 				Logger.logError(e);
 			}
 		}
@@ -299,7 +299,7 @@ public class SatSolver {
 					for (int i = 0; i < model.length; i++) {
 						if (done[i] < 2) {
 							final int x = model[i];
-							done[i] = (byte) ((x * y < 0) ? 0 : sat(backbone, -x) ? 0 : 1);
+							done[i] = (byte) (((x * y) < 0) ? 0 : sat(backbone, -x) ? 0 : 1);
 						}
 					}
 
@@ -321,7 +321,7 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-	
+
 	public List<List<Literal>> atomicSuperSets() {
 		if (test()) {
 			final int[] globalModel = solver.model();
@@ -332,16 +332,16 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-	
+
 	public List<List<Literal>> atomicSuperSets(Collection<String> featureSet) {
 		if (test()) {
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
 			max = 0;
-			
-			Arrays.fill(done, (byte)2);
-			for (String b : featureSet) {
-				Integer x = varToInt.get(b);
+
+			Arrays.fill(done, (byte) 2);
+			for (final String b : featureSet) {
+				final Integer x = varToInt.get(b);
 				if (x != null) {
 					done[x - 1] = 0;
 					max++;
@@ -354,16 +354,16 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-	
+
 	private int max = 0;
 
 	private List<List<Literal>> atomicSuperSets(final int[] globalModel, final byte[] done) {
 		final List<List<Literal>> result = new ArrayList<>();
 		final ArrayList<Literal> coreList = new ArrayList<>();
 		result.add(coreList);
-		
+
 		final IVecInt backbone = new VecInt();
-		
+
 		int c = 0;
 		for (int i = 0; i < globalModel.length; i++) {
 			final int x = globalModel[i];
@@ -377,25 +377,25 @@ public class SatSolver {
 				} else {
 					final ArrayList<Literal> setList = new ArrayList<>();
 					setList.add(new Literal(intToVar.get(Math.abs(x)), x > 0));
-					
+
 					final int[] model = solver.model();
 					backbone.push(-x);
-					
+
 					for (int j = i + 1; j < model.length; j++) {
 						if (done[j] == 0) {
 							final int y = model[j];
-							
+
 							if (!sat(backbone, -y)) {
 								done[j] = 1;
 							}
 						}
 					}
-				
+
 					backbone.pop().push(x);
 					for (int j = i + 1; j < model.length; j++) {
 						if (done[j] == 1) {
 							final int y = model[j];
-							
+
 							if (!sat(backbone, y)) {
 								done[j] = 2;
 								setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
@@ -417,7 +417,7 @@ public class SatSolver {
 		backbone.push(x);
 		try {
 			return (solver.isSatisfiable(backbone, false));
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			Logger.logError(e);
 			return false;
 		} finally {
@@ -438,7 +438,7 @@ public class SatSolver {
 
 	/**
 	 * Checks whether the formula currently feed into the solver is satisfiable.
-	 * 
+	 *
 	 * @return true if the formula is satisfiable
 	 * @throws TimeoutException
 	 */
@@ -448,46 +448,22 @@ public class SatSolver {
 
 	/**
 	 * Checks whether the formula the following formula is satisfiable.
-	 * 
+	 *
 	 * f and l1 and l2 and ... and ln
-	 * 
-	 * Where f is the formula currently feed into the solver and l1,...,ln are
-	 * the elements in the given array <code>literals</code>.
-	 * 
-	 * @param literals
-	 *            an array of literals for which the value is assumed
+	 *
+	 * Where f is the formula currently feed into the solver and l1,...,ln are the elements in the given array <code>literals</code>.
+	 *
+	 * @param literals an array of literals for which the value is assumed
 	 * @return true if the formula with all assumed values is satisfiable
 	 * @throws TimeoutException
 	 */
 	public boolean isSatisfiable(Node[] literals) throws TimeoutException {
-		if (contradiction)
+		if (contradiction) {
 			return false;
-		int[] unitClauses = new int[literals.length];
+		}
+		final int[] unitClauses = new int[literals.length];
 		int i = 0;
-		for (Node literal : literals)
-			unitClauses[i++] = getIntOfLiteral(literal);
-		return solver.isSatisfiable(new VecInt(unitClauses));
-	}
-
-	/**
-	 * Checks whether the formula the following formula is satisfiable.
-	 * 
-	 * f and l1 and l2 and ... and ln
-	 * 
-	 * Where f is the formula currently feed into the solver and l1,...,ln are
-	 * the elements in the given list <code>literals</code>.
-	 * 
-	 * @param literals
-	 *            a list of literals for which the value is assumed
-	 * @return true if the formula with all assumed values is satisfiable
-	 * @throws TimeoutException
-	 */
-	public boolean isSatisfiable(List<Node> literals) throws TimeoutException {
-		if (contradiction)
-			return false;
-		int[] unitClauses = new int[literals.size()];
-		int i = 0;
-		for (Node literal : literals) {
+		for (final Node literal : literals) {
 			unitClauses[i++] = getIntOfLiteral(literal);
 		}
 		return solver.isSatisfiable(new VecInt(unitClauses));
@@ -495,14 +471,35 @@ public class SatSolver {
 
 	/**
 	 * Checks whether the formula the following formula is satisfiable.
-	 * 
+	 *
+	 * f and l1 and l2 and ... and ln
+	 *
+	 * Where f is the formula currently feed into the solver and l1,...,ln are the elements in the given list <code>literals</code>.
+	 *
+	 * @param literals a list of literals for which the value is assumed
+	 * @return true if the formula with all assumed values is satisfiable
+	 * @throws TimeoutException
+	 */
+	public boolean isSatisfiable(List<Node> literals) throws TimeoutException {
+		if (contradiction) {
+			return false;
+		}
+		final int[] unitClauses = new int[literals.size()];
+		int i = 0;
+		for (final Node literal : literals) {
+			unitClauses[i++] = getIntOfLiteral(literal);
+		}
+		return solver.isSatisfiable(new VecInt(unitClauses));
+	}
+
+	/**
+	 * Checks whether the formula the following formula is satisfiable.
+	 *
 	 * f and g
-	 * 
-	 * Where f is the formula currently feed into the solver and g is the
-	 * formula given in the parameter <code>node</code>.
-	 * 
-	 * @param node
-	 *            a propositional formula
+	 *
+	 * Where f is the formula currently feed into the solver and g is the formula given in the parameter <code>node</code>.
+	 *
+	 * @param node a propositional formula
 	 * @return true if adding the given formula results in a satisfiable formula
 	 * @throws TimeoutException
 	 */
@@ -515,47 +512,45 @@ public class SatSolver {
 			node = new And(node);
 		}
 
-		ConstrGroup group = new ConstrGroup();
-		IVecInt unit = new VecInt();
+		final ConstrGroup group = new ConstrGroup();
 		try {
-			for (Node child : node.getChildren()) {
+			final IVecInt unit = new VecInt();
+			for (final Node child : node.getChildren()) {
 				if (child instanceof Or) {
-					IVecInt clause = new VecInt();
-					for (Node literal : child.getChildren())
+					final IVecInt clause = new VecInt();
+					for (final Node literal : child.getChildren()) {
 						clause.push(getIntOfLiteral(literal));
+					}
 					group.add(solver.addClause(clause));
 				} else {
 					unit.push(getIntOfLiteral(child));
 				}
 			}
-		} catch (ContradictionException e) {
-			group.removeFrom(solver);
+			return solver.isSatisfiable(unit);
+		} catch (final ContradictionException e) {
 			return false;
+		} finally {
+			group.removeFrom(solver);
 		}
-
-		boolean satisfiable = solver.isSatisfiable(unit);
-		group.removeFrom(solver);
-		return satisfiable;
 	}
 
 	/**
-	 * Counts the solutions of the propositional formula. If the given timeout
-	 * is reached the result is negative.
-	 * 
-	 * Since -0 equals 0, the output is y = -1 - x. If the output y is negative
-	 * there are at least x = -1 - y solutions.
-	 * 
+	 * Counts the solutions of the propositional formula. If the given timeout is reached the result is negative.
+	 *
+	 * Since -0 equals 0, the output is y = -1 - x. If the output y is negative there are at least x = -1 - y solutions.
+	 *
 	 * @return number of solutions (at least solutions)
 	 */
 	public long countSolutions() {
-		if (contradiction)
+		if (contradiction) {
 			return 0;
+		}
 		long number = 0;
-		SolutionCounter counter = new SolutionCounter(solver);
+		final SolutionCounter counter = new SolutionCounter(solver);
 
 		try {
 			number = counter.countSolutions();
-		} catch (TimeoutException e) {
+		} catch (final TimeoutException e) {
 			number = -1 - counter.lowerBound();
 		}
 		return number;
@@ -564,9 +559,9 @@ public class SatSolver {
 	public long countSolutions(Literal[] literals) {
 		long number = 0;
 		if (!contradiction) {
-			ReusableModelIterator it = new ReusableModelIterator(solver);
+			final ReusableModelIterator it = new ReusableModelIterator(solver);
 			solver.expireTimeout();
-			if (literals != null && literals.length > 0) {
+			if ((literals != null) && (literals.length > 0)) {
 				final int[] unitClauses = new int[literals.length];
 				for (int i = 0; i < literals.length; i++) {
 					unitClauses[i] = getIntOfLiteral(literals[i]);
@@ -579,36 +574,41 @@ public class SatSolver {
 	}
 
 	public String getSolutions(int number) throws TimeoutException {
-		if (contradiction)
+		if (contradiction) {
 			return "contradiction\n";
+		}
 
-		StringBuilder out = new StringBuilder();
-		IProblem problem = new ModelIterator(solver);
+		final StringBuilder out = new StringBuilder();
+		final IProblem problem = new ModelIterator(solver);
 		int[] lastModel = null;
 		for (int i = 0; i < number; i++) {
 			if (!problem.isSatisfiable(i > 0)) {
 				out.append(ONLY + i + " solutions\n");
 				break;
 			}
-			int[] model = problem.model();
+			final int[] model = problem.model();
 			if (lastModel != null) {
 				boolean same = true;
-				for (int j = 0; j < model.length; j++)
-					if (model[j] != lastModel[j])
+				for (int j = 0; j < model.length; j++) {
+					if (model[j] != lastModel[j]) {
 						same = false;
+					}
+				}
 				if (same) {
 					out.append(ONLY + i + " solutions\n");
 					break;
 				}
 			}
 			lastModel = model;
-			StringBuilder pos = new StringBuilder();
-			StringBuilder neg = new StringBuilder();
-			for (int var : model)
-				if (var > 0)
+			final StringBuilder pos = new StringBuilder();
+			final StringBuilder neg = new StringBuilder();
+			for (final int var : model) {
+				if (var > 0) {
 					pos.append(intToVar.get(Math.abs(var)) + " ");
-				else
+				} else {
 					neg.append(intToVar.get(Math.abs(var)) + " ");
+				}
+			}
 			out.append("true: " + pos + "    false: " + neg + "\n");
 		}
 		return out.toString();
@@ -618,7 +618,7 @@ public class SatSolver {
 		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
 
 		if (!contradiction) {
-			int[] unitClauses = new int[literals.length];
+			final int[] unitClauses = new int[literals.length];
 			for (int i = 0; i < literals.length; i++) {
 				unitClauses[i] = getIntOfLiteral(literals[i]);
 			}
@@ -629,7 +629,7 @@ public class SatSolver {
 				final int[] model = modelIterator.model();
 
 				final List<String> featureList = new LinkedList<>();
-				for (int var : model) {
+				for (final int var : model) {
 					if (var > 0) {
 						featureList.add(intToVar.get(Math.abs(var)).toString());
 					}
@@ -645,21 +645,23 @@ public class SatSolver {
 		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
 
 		if (!contradiction) {
-			IProblem problem = new ModelIterator(solver);
+			final IProblem problem = new ModelIterator(solver);
 			int[] lastModel = null;
 			for (int i = 0; i < number; i++) {
-				List<String> featureList = new LinkedList<String>();
+				final List<String> featureList = new LinkedList<String>();
 
 				if (!problem.isSatisfiable(i > 0)) {
 					break;
 				}
 
-				int[] model = problem.model();
+				final int[] model = problem.model();
 				if (lastModel != null) {
 					boolean same = true;
-					for (int j = 0; j < model.length; j++)
-						if (model[j] != lastModel[j])
+					for (int j = 0; j < model.length; j++) {
+						if (model[j] != lastModel[j]) {
 							same = false;
+						}
+					}
 					if (same) {
 						break;
 					}
@@ -667,7 +669,7 @@ public class SatSolver {
 
 				lastModel = model;
 
-				for (int var : model) {
+				for (final int var : model) {
 					if (var > 0) {
 						featureList.add(intToVar.get(Math.abs(var)).toString());
 					}
@@ -684,12 +686,13 @@ public class SatSolver {
 			return null;
 		}
 
-		StringBuilder out = new StringBuilder();
-		IProblem problem = new ModelIterator(solver);
-		if (!problem.isSatisfiable())
+		final StringBuilder out = new StringBuilder();
+		final IProblem problem = new ModelIterator(solver);
+		if (!problem.isSatisfiable()) {
 			return null;
-		int[] model = problem.model();
-		for (int var : model) {
+		}
+		final int[] model = problem.model();
+		for (final int var : model) {
 			if (var > 0) {
 				out.append(intToVar.get(Math.abs(var)) + "\n");
 			}
@@ -705,11 +708,11 @@ public class SatSolver {
 			try {
 				s.setOrder(new VarOrderHeap(positive ? new PositiveLiteralSelectionStrategy() : new NegativeLiteralSelectionStrategy()));
 
-				int[] model = solver.findModel();
+				final int[] model = solver.findModel();
 				if (model != null) {
 					final List<String> resultList = new ArrayList<>();
-					for (int var : model) {
-						Object varObject = intToVar.get(var);
+					for (final int var : model) {
+						final Object varObject = intToVar.get(var);
 						if (varObject instanceof String) {
 							resultList.add((String) varObject);
 						}
@@ -717,7 +720,7 @@ public class SatSolver {
 
 					return resultList;
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Logger.logError(e);
 			} finally {
 				s.setOrder(oldOrder);
@@ -733,15 +736,15 @@ public class SatSolver {
 
 	/**
 	 * Creates one solutions to cover the given features.
-	 * 
-	 * @param features The features that should be covered. 
+	 *
+	 * @param features The features that should be covered.
 	 * @param selection true is the features should be selected, false otherwise.
 	 */
 	public List<String> coverFeatures(Collection<String> features, boolean selection, IMonitor monitor) throws TimeoutException {
 		final VecInt vector = new VecInt();
-		List<String> coveredFeatures = new LinkedList<>();
+		final List<String> coveredFeatures = new LinkedList<>();
 		for (final String feature : features) {
-			Integer integer = (selection ? 1 : -1) * varToInt.get(feature);
+			final Integer integer = (selection ? 1 : -1) * varToInt.get(feature);
 			vector.push(integer);
 			if (solver.isSatisfiable(vector)) {
 				monitor.worked();
@@ -758,9 +761,9 @@ public class SatSolver {
 			throw new RuntimeException("Unexpected solver exception");
 		}
 
-		int[] model = solver.model();
-		List<String> featureList = new ArrayList<String>(model.length);
-		for (int var : model) {
+		final int[] model = solver.model();
+		final List<String> featureList = new ArrayList<String>(model.length);
+		for (final int var : model) {
 			if (var > 0) {
 				featureList.add(intToVar.get(var).toString().intern());
 			}

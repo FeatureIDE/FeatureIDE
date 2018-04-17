@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" name="Elevator"/>
+		<feature automatic="selected" name="Behavior"/>
+		<feature automatic="selected" name="Modes"/>
+		<feature manual="selected" name="Sabbath"/>
+		<feature automatic="unselected" name="FIFO"/>
+		<feature automatic="unselected" name="ShortestPaht"/>
+		<feature automatic="unselected" name="CallButtons"/>
+		<feature automatic="unselected" name="DirectedCall"/>
+		<feature automatic="unselected" name="UndirectedCall"/>
+	</configuration>

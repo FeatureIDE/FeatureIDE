@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,29 +26,28 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 /**
  * Holds the java signature of a class.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class MungeClassSignature extends AbstractClassSignature {
-	
-	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers, 
-			String type, String pckg) {
-		super(parent, name,  Modifier.toString(modifiers), type, pckg);
+
+	public MungeClassSignature(AbstractClassSignature parent, String name, int modifiers, String type, String pckg) {
+		super(parent, name, Modifier.toString(modifiers), type, pckg);
 	}
-	
+
 	@Override
-	public String toString() {		
-		StringBuilder sb = new StringBuilder();
-		
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+
 //		sb.append(super.toString());
 //		sb.append(LINE_SEPARATOR);
-		
+
 		if (mergedjavaDocComment != null) {
 			sb.append(mergedjavaDocComment);
 		}
-		
+
 		if (modifiers.length > 0) {
-			for (String modifier : modifiers) {
+			for (final String modifier : modifiers) {
 				sb.append(modifier);
 				sb.append(' ');
 			}
@@ -56,7 +55,7 @@ public class MungeClassSignature extends AbstractClassSignature {
 		sb.append(type);
 		sb.append(' ');
 		sb.append(name);
-		
+
 		return sb.toString();
 	}
 
@@ -71,17 +70,19 @@ public class MungeClassSignature extends AbstractClassSignature {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		
-		MungeClassSignature otherSig = (MungeClassSignature) obj;
-		
+		}
+
+		final MungeClassSignature otherSig = (MungeClassSignature) obj;
+
 		if (!super.sigEquals(otherSig)) {
 			return false;
-		}		
-		
+		}
+
 		return true;
 	}
 }

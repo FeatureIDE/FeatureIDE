@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -47,9 +47,8 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 
 /**
- * This builder builds the {@link FSTModel} for FeatureHouse projects, by
- * parsing the FeatureHouse internal FSTModel.
- * 
+ * This builder builds the {@link FSTModel} for FeatureHouse projects, by parsing the FeatureHouse internal FSTModel.
+ *
  * @author Jens Meinicke
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -59,7 +58,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private IFeatureProject featureProject;
 
-	private LinkedList<FSTClassFragment> classFragmentStack = new LinkedList<FSTClassFragment>();
+	private final LinkedList<FSTClassFragment> classFragmentStack = new LinkedList<FSTClassFragment>();
 	private FSTRole currentRole = null;
 	private IFile currentFile = null;
 
@@ -86,29 +85,29 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	public FSTClassFragment getCurrentClassFragment() {
-		FSTClassFragment currentClassFragment = classFragmentStack.peek();
+		final FSTClassFragment currentClassFragment = classFragmentStack.peek();
 		return (currentClassFragment == null) ? currentRole.getClassFragment() : classFragmentStack.peek();
 	}
 
 	public boolean hasCurrentClassFragment() {
-		return currentRole != null || classFragmentStack.peek() != null;
+		return (currentRole != null) || (classFragmentStack.peek() != null);
 	}
 
 	/**
 	 * Builds the model out of the FSTNodes of the FeatureHouse composer
-	 * 
-	 * @param nodes
-	 *            The fstNodes
-	 * @param completeModel
-	 *            <code>true</code> for completions mode: old methods will not
-	 *            be overwritten
+	 *
+	 * @param nodes The fstNodes
+	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
+		if (nodes == null) {
+			FeatureHouseCorePlugin.getDefault().logError("FST could not be build!", null);
+		}
 		if (!completeModel) {
 			model.reset();
 		}
-		for (FSTNode node : (ArrayList<FSTNode>) nodes.clone()) {
+		for (final FSTNode node : (ArrayList<FSTNode>) nodes.clone()) {
 			if (NODE_TYPE_FEATURE.equals(node.getType())) {
 				caseAddFeature(node);
 			} else if (NODE_TYPE_CLASS.equals(node.getType())) {
@@ -134,9 +133,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private void addArbitraryFiles() {
-		IFolder folder = featureProject.getSourceFolder();
-		for (String feature : FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel())) {
-			IFolder featureFolder = folder.getFolder(feature);
+		final IFolder folder = featureProject.getSourceFolder();
+		for (final String feature : FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel())) {
+			final IFolder featureFolder = folder.getFolder(feature);
 			if (featureFolder.isAccessible()) {
 				addArbitraryFiles(featureFolder, feature);
 			}
@@ -145,7 +144,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private void addArbitraryFiles(IFolder featureFolder, String feature) {
 		try {
-			for (IResource res : featureFolder.members()) {
+			for (final IResource res : featureFolder.members()) {
 				if (res instanceof IFolder) {
 					addArbitraryFiles((IFolder) res, feature);
 				} else if (res instanceof IFile) {
@@ -154,18 +153,20 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 				}
 			}
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		}
 	}
 
 	private void caseCompileUnit(FSTNode node) {
 		node.accept(new FSTVisitor() {
+
+			@Override
 			public boolean visit(FSTTerminal terminal) {
 				if (JAVA_NODE_IMPORTDECLARATION.equals(terminal.getType())) {
-					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this).caseAddImport(terminal);
+					ClassBuilder.getClassBuilder(currentFile, FeatureHouseModelBuilder.this).caseAddImport(terminal);
 				} else if (JAVA_NODE_PACKAGEDECLARATION.equals(terminal.getType())) {
-					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this).casePackage(terminal);
+					ClassBuilder.getClassBuilder(currentFile, FeatureHouseModelBuilder.this).casePackage(terminal);
 				}
 				return true;
 			}
@@ -182,7 +183,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			return;
 		}
 		currentRole = model.addRole(currentFeature.getName(), model.getAbsoluteClassName(currentFile), currentFile);
-		//create directives?? class added ppmodelbuilder
+		// create directives?? class added ppmodelbuilder
 		classFragmentStack.clear();
 		classFragmentStack.push(currentRole.getClassFragment());
 	}
@@ -195,14 +196,14 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private void caseClassDeclaration(FSTNode node) {
-		if (node instanceof FSTNonTerminal && canCompose()) {
-			List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
-			for (FSTNode child : children) {
+		if ((node instanceof FSTNonTerminal) && canCompose()) {
+			final List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
+			for (final FSTNode child : children) {
 
-				String type = child.getType();
-				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
+				final String type = child.getType();
+				final ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
 				if (child instanceof FSTTerminal) {
-					FSTTerminal terminal = (FSTTerminal) child;
+					final FSTTerminal terminal = (FSTTerminal) child;
 					if (JAVA_NODE_DECLARATION_TYPE1.equals(type) || JAVA_NODE_DECLARATION_TYPE2.equals(type)) {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
@@ -279,7 +280,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 				final FSTClassFragment lastElement = classFragmentStack.pop();
 				if (lastElement != null) {
 					final FSTClassFragment nextElement = classFragmentStack.peek();
-					if (lastElement.isInnerClass() && nextElement != null && !lastElement.equals(nextElement)) {
+					if (lastElement.isInnerClass() && (nextElement != null) && !lastElement.equals(nextElement)) {
 						classFragmentStack.peek().add(lastElement);
 					}
 				}
@@ -288,16 +289,19 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private IFile getFile(String name) {
-		IProject project = featureProject.getProject();
-		IPath rl = project.getRawLocation();
+		final IProject project = featureProject.getProject();
+		final IPath rl = project.getRawLocation();
 		final String projectName;
 		if (rl != null) {
 			projectName = rl.toOSString();
 		} else {
 			projectName = featureProject.getProjectName();
 		}
-		name = name.substring(name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName())
-				+ projectName.length() + 1);
+		if ((name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName()) == -1)) {
+			return null;
+		}
+		name = name.substring(
+				name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName()) + projectName.length() + 1);
 		return featureProject.getProject().getFile(new Path(name));
 	}
 

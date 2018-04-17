@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
 
 /**
  * EditPart for constraint movements
- * 
+ *
  * @author David Broneske
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
@@ -46,16 +46,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 
 	/**
-	 * Allows constraints to be moved at the feature diagram and provides a
-	 * feedback figure.
-	 * 
+	 * Allows constraints to be moved at the feature diagram and provides a feedback figure.
+	 *
 	 */
-	private ConstraintEditPart editPart;
+	private final ConstraintEditPart editPart;
 
-	private ModelLayoutEditPolicy superPolicy;
+	private final ModelLayoutEditPolicy superPolicy;
 
 	public ConstraintMoveEditPolicy(ConstraintEditPart child, ModelLayoutEditPolicy superPolicy) {
-		this.editPart = child;
+		editPart = child;
 		this.superPolicy = superPolicy;
 	}
 
@@ -72,13 +71,13 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = editPart.getModel().getLocation().getCopy();
+		final Point s = editPart.getModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
 		c = new PolylineConnection();
 		c.setForegroundColor(ColorConstants.white);
 		c.setLineWidth(3);
-		FreeformLayer l = new FreeformLayer();
+		final FreeformLayer l = new FreeformLayer();
 		// l.add(r);
 		l.add(c);
 
@@ -92,7 +91,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
+		final PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
@@ -100,12 +99,12 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setBounds(rect);
 
 		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
-			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
-
-			if (cmd.canExecute()) {
+			final ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
+			final boolean isAutoLayout = editPart.getModel().getGraphicalModel().getLayout().hasFeaturesAutoLayout();
+			if (cmd.canExecute() && isAutoLayout) {
 				c.setForegroundColor(ColorConstants.black);
-				Point l = cmd.getLeftPoint();
-				Point r = cmd.getRightPoint();
+				final Point l = cmd.getLeftPoint();
+				final Point r = cmd.getRightPoint();
 				getHostFigure().translateToAbsolute(l);
 				getHostFigure().translateToAbsolute(r);
 				c.setSourceAnchor(new XYAnchor(l));

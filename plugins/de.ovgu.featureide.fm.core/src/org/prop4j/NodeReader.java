@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 /**
  * This class can be used to parse propositional formulas.
- * 
+ *
  * @author Dariusz Krolikowski
  * @author David Broneske
  * @author Fabian Benduhn
@@ -95,7 +95,7 @@ public class NodeReader {
 
 		try {
 			return parseNode(constraint);
-		} catch (ParseException e) {
+		} catch (final ParseException e) {
 			errorMessage = e;
 			return null;
 		}
@@ -103,7 +103,7 @@ public class NodeReader {
 
 	/**
 	 * returns true if constraint is well formed
-	 * 
+	 *
 	 * @param constraint
 	 * @return
 	 */
@@ -113,11 +113,9 @@ public class NodeReader {
 
 	/**
 	 * returns true if constraint is well formed
-	 * 
-	 * @param constraint
-	 *            constraint supposed to be checked
-	 * @param featureNames
-	 *            list of feature names
+	 *
+	 * @param constraint constraint supposed to be checked
+	 * @param featureNames list of feature names
 	 * @return true if constraint is well formed
 	 */
 	public boolean isWellFormed(String constraint, final Collection<String> featureNames) {
@@ -125,9 +123,8 @@ public class NodeReader {
 	}
 
 	/**
-	 * if stringToNode or isWellFormed were called with not well-formed
-	 * constraint this method returns the error message otherwise empty String
-	 * 
+	 * if stringToNode or isWellFormed were called with not well-formed constraint this method returns the error message otherwise empty String
+	 *
 	 * @return
 	 */
 	public ParseException getErrorMessage() {
@@ -152,21 +149,17 @@ public class NodeReader {
 
 	/**
 	 * Checking expression on correct syntax
-	 * 
-	 * @param constraint
-	 *            constraint (without parenthesis) to convert
-	 * @param symbols
-	 *            array containing strings for: iff, implies, or, and, not
-	 * @param quotedFeatureNames
-	 *            list of substituted feature names
-	 * @param subExpressions
-	 *            list of substituted parenthesis expressions
+	 *
+	 * @param constraint constraint (without parenthesis) to convert
+	 * @param symbols array containing strings for: iff, implies, or, and, not
+	 * @param quotedFeatureNames list of substituted feature names
+	 * @param subExpressions list of substituted parenthesis expressions
 	 * @return
 	 */
 	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
 		constraint = " " + constraint + " ";
 		if ("  ".equals(constraint)) {
-			return getInvalidLiteral("Sub expression is empty", "");
+			return handleInvalidExpression("Sub expression is empty", "");
 		}
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {
@@ -182,13 +175,13 @@ public class NodeReader {
 				final Node node1, node2;
 				if (i == 4) {
 					node1 = null;
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression", constraint)
-							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression", constraint)
+						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				} else {
-					node1 = (leftSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on left side", constraint)
-							: checkExpression(leftSide, quotedFeatureNames, subExpressions);
-					node2 = (rightSide.isEmpty()) ? getInvalidLiteral("Missing feature name or expression on right side", constraint)
-							: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					node1 = (leftSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on left side", constraint)
+						: checkExpression(leftSide, quotedFeatureNames, subExpressions);
+					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on right side", constraint)
+						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
 				}
 
 				switch (i) {
@@ -213,41 +206,45 @@ public class NodeReader {
 		constraint = constraint.trim();
 		final Matcher subExpressionMatcher = subExpressionPattern.matcher(constraint);
 		if (subExpressionMatcher.find()) {
-			if (subExpressionMatcher.start() == 0 && subExpressionMatcher.end() == constraint.length()) {
+			if ((subExpressionMatcher.start() == 0) && (subExpressionMatcher.end() == constraint.length())) {
 				return checkExpression(subExpressions.get(Integer.parseInt(constraint.substring(1))).trim(), quotedFeatureNames, subExpressions);
 			} else {
-				return getInvalidLiteral("Missing operator", constraint);
+				return handleInvalidExpression("Missing operator", constraint);
 			}
 		} else {
 			String featureName;
 			final Matcher featureNameMatcher = featureNamePattern.matcher(constraint);
 			if (featureNameMatcher.find()) {
-				if (featureNameMatcher.start() == 0 && featureNameMatcher.end() == constraint.length()) {
+				if ((featureNameMatcher.start() == 0) && (featureNameMatcher.end() == constraint.length())) {
 					featureName = quotedFeatureNames.get(Integer.parseInt(constraint.substring(1)));
 				} else {
-					return getInvalidLiteral("Missing operator", constraint);
+					return handleInvalidExpression("Missing operator", constraint);
 				}
 			} else {
 				if (constraint.contains(" ")) {
-					return getInvalidLiteral("'" + constraint + "' is no valid feature name", constraint);
+					return handleInvalidFeatureName(constraint);
 				}
 				featureName = constraint;
 			}
 			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
-			if (featureNames != null && !featureNames.contains(featureName)) {
-				return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName);
+			if ((featureNames != null) && !featureNames.contains(featureName)) {
+				return handleInvalidFeatureName(featureName);
 			}
 			return new Literal(featureName);
 		}
 	}
 
-	private Node getInvalidLiteral(String message, String constraint) throws ParseException {
-		if (ignoreMissingFeatures) {
-			if (ignoreUnparsableSubExpressions) {
-				return new ErrorLiteral(constraint);
-			} else {
-				return new Literal("FALSE");				
-			}
+	private Node handleInvalidFeatureName(String featureName) throws ParseException {
+		return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName, ignoreMissingFeatures);
+	}
+
+	private Node handleInvalidExpression(String message, String constraint) throws ParseException {
+		return getInvalidLiteral(message, constraint, ignoreUnparsableSubExpressions);
+	}
+
+	private Node getInvalidLiteral(String message, String element, boolean ignoreError) throws ParseException {
+		if (ignoreError) {
+			return new ErrorLiteral(element);
 		} else {
 			throw new ParseException(message, 0);
 		}

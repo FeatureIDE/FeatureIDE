@@ -18,7 +18,6 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-//#if CallButtons
 package de.ovgu.featureide.examples.elevator.core.model;
 
 //#if FloorPermission

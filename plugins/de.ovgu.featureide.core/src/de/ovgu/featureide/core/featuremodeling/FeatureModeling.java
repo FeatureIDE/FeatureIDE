@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -37,16 +37,17 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * 
+ *
  * ComposerExtensionClass for the Feature Modeling extension.
- * 
+ *
  * @author Jens Meinicke
  */
 public class FeatureModeling extends ComposerExtensionClass {
 
+	@Override
 	public void performFullBuild(IFile config) {
 
 	}
@@ -67,6 +68,16 @@ public class FeatureModeling extends ComposerExtensionClass {
 	}
 
 	@Override
+	public boolean hasBuildFolder() {
+		return false;
+	}
+
+	@Override
+	public boolean hasSource() {
+		return false;
+	}
+
+	@Override
 	public boolean clean() {
 		return false;
 	}
@@ -76,6 +87,7 @@ public class FeatureModeling extends ComposerExtensionClass {
 
 	}
 
+	@Override
 	public Mechanism getGenerationMechanism() {
 		return null;
 	}
@@ -83,13 +95,13 @@ public class FeatureModeling extends ComposerExtensionClass {
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		try {
-			IContainer parent = folder.getParent();
+			final IContainer parent = folder.getParent();
 			if (!parent.exists()) {
 				folder.create(true, true, null);
 			}
 			final IPersistentFormat<Configuration> format = ConfigFormatManager.getInstance().getFormatById(DefaultFormat.ID);
-			IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
-			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
+			final IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
+			SimpleFileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException | NoSuchExtensionException e) {
 			CorePlugin.getDefault().logError(e);

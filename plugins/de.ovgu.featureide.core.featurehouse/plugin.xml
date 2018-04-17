@@ -46,7 +46,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+										definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 								</reference>
 								<test
 										args="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct"
@@ -70,7 +70,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+										definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 								</reference>
 							</and>
 						</with>
@@ -91,7 +91,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+										definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 								</reference>
 							</and>
 						</with>
@@ -166,4 +166,13 @@
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMComposer">
+    <fmComposer
+          class="de.ovgu.featureide.featurehouse.FeatureHouseFMComposerExtension"
+          composer="de.ovgu.featureide.composer.featurehouse"
+          id="de.ovgu.featureide.core.featurehouse.fmComposer"
+          name="de.ovgu.featureide.core.featurehouse.fmComposer">
+    </fmComposer>
+ </extension>
 </plugin>

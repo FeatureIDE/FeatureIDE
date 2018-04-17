@@ -21,6 +21,7 @@ public class Vertex {
         VertexConstructor();
     }
     /*@ensures name == null && adjacentVertices != null;@*/
+    /*@assignable name, neighbors; @*/
     public void VertexConstructor() {
         name      = null;
         neighbors = new LinkedList();
@@ -28,7 +29,8 @@ public class Vertex {
     
     /*@ requires name != null;
     ensures this.name == name;
-    ensures \result == this; @*/
+    ensures \result == this; 
+    assignable name; @*/
     public  Vertex assignName( String name ) {
         this.name = name;
         return ( Vertex ) this;
@@ -36,6 +38,7 @@ public class Vertex {
 
     /*@ requires n != null;@*/
     /*@ ensures neighbors.getLast() == n;@*/
+    /*@assignable neighbors; @*/
     public void addNeighbor( Neighbor n ) {
         neighbors.add( n );
     }

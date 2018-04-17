@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Test Fragment
-Bundle-SymbolicName: de.ovgu.featureide.fm.core_test;singleton:=true
-Bundle-Version: 2.2.4.qualifier
-Fragment-Host: de.ovgu.featureide.core
+Bundle-SymbolicName: de.ovgu.featureide.fm.core-test;singleton:=true
+Bundle-Version: 3.5.0.qualifier
+Fragment-Host: de.ovgu.featureide.fm.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit
@@ -13,7 +13,3 @@ Bundle-ClassPath: .,
  lib/log4j-api-2.2.jar,
  lib/log4j-core-2.2.jar,
  lib/commons-math3-3.4.1.jar
-Import-Package: de.ovgu.featureide.fm.core.base,
- de.ovgu.featureide.fm.core.io,
- de.ovgu.featureide.fm.ui.editors,
- de.ovgu.featureide.fm.ui.editors.elements

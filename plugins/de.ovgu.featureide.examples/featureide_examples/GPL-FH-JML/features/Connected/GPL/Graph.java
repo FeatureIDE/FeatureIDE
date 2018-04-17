@@ -7,6 +7,7 @@ public class Graph
     // Executes Connected Components
 	/*@requires \original;
 	 ensures \original;
+	 assignable \nothing;
 	 @*/
     public void run( Vertex s )
     {

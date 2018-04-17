@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -23,30 +23,18 @@ package de.ovgu.featureide.fm.core.base.event;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
- * Event triggered by changes to a feature model or its elements.
- * <br/>
- * <br/>
- * Each event contains the following information:
- * <ul>
- * <li>an event type which determine the kind of event</li>
- * <li>the sender (source) of this event, i.e., which object fired this event</li>
- * <li>the old value (if available), and the new value</li>
- * </ul>
- * <br/>
- * <br/>
- * This events are intended to be processed by {@link IEventListener} instances.
- * <br/>
- * <br/>
- * For usage to fire <code>FeatureIDEEvent</code>s, see {@link FeatureModel#fireEvent(FeatureIDEEvent)}.
- * 
+ * Event triggered by changes to a feature model or its elements. <br/> <br/> Each event contains the following information: <ul> <li>an event type which
+ * determine the kind of event</li> <li>the sender (source) of this event, i.e., which object fired this event</li> <li>the old value (if available), and the
+ * new value</li> </ul> <br/> <br/> This events are intended to be processed by {@link IEventListener} instances. <br/> <br/> For usage to fire
+ * <code>FeatureIDEEvent</code>s, see {@link FeatureModel#fireEvent(FeatureIDEEvent)}.
+ *
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
 public class FeatureIDEEvent {
 
 	/**
-	 * Typing of the event instance. This type have to be used in order to
-	 * distinguish of the event kind.
+	 * Typing of the event instance. This type have to be used in order to distinguish of the event kind.
 	 */
 	public enum EventType {
 		/**
@@ -164,7 +152,7 @@ public class FeatureIDEEvent {
 		/**
 		 * The refresh action command was triggered.
 		 */
-		REFRESH_ACTIONS, 
+		REFRESH_ACTIONS,
 		/**
 		 * The children of a feature changed.
 		 */
@@ -178,11 +166,14 @@ public class FeatureIDEEvent {
 		 */
 		ACTIVE_EXPLANATION_CHANGED,
 		/**
-		 * The active reason changed.
-		 * Events of this type are fired for feature model elements when the active explanation has changed.
-		 * It would be possible to instead simply notify each affected feature model element of the new active explanation.
-		 * However, this would lead to a negative performance impact as each feature model would have to search the explanation for the relevant reason again.
-		 * As such, each event of this type carries the respective reason so the feature model element does not have to look for it itself.
+		 * Any feature attribute was added or altered.
+		 */
+		FEATURE_ATTRIBUTE_CHANGED,
+		/**
+		 * The active reason changed. Events of this type are fired for feature model elements when the active explanation has changed. It would be possible to
+		 * instead simply notify each affected feature model element of the new active explanation. However, this would lead to a negative performance impact as
+		 * each feature model would have to search the explanation for the relevant reason again. As such, each event of this type carries the respective reason
+		 * so the feature model element does not have to look for it itself.
 		 */
 		ACTIVE_REASON_CHANGED,
 		/**
@@ -190,18 +181,18 @@ public class FeatureIDEEvent {
 		 */
 		DEFAULT,
 	}
-	
+
 	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];
 	static {
-		for (EventType e : EventType.values()) {
+		for (final EventType e : EventType.values()) {
 			defaultEvents[e.ordinal()] = new FeatureIDEEvent(e);
 		}
 	}
-	
+
 	public static FeatureIDEEvent getDefault(final EventType e) {
 		return defaultEvents[e.ordinal()];
 	}
-	
+
 	private final Object source;
 	private final EventType eventType;
 	private final Object oldValue;
@@ -210,7 +201,7 @@ public class FeatureIDEEvent {
 	private FeatureIDEEvent(EventType e) {
 		this(null, e);
 	}
-	
+
 	public FeatureIDEEvent(Object source, EventType eventType) {
 		this(source, eventType, null, null);
 	}
@@ -240,8 +231,7 @@ public class FeatureIDEEvent {
 
 	@Override
 	public String toString() {
-		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue
-				+ ", newValue=" + newValue + "]";
+		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue + ", newValue=" + newValue + "]";
 	}
-	
+
 }

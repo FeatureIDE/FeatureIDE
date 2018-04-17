@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -70,10 +70,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlineGroupStateStorage;
 
 /**
  * Context Menu for Outline view of FeatureModels
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
@@ -83,9 +84,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureCo
  */
 public class FmOutlinePageContextMenu {
 
-	private Object site;
+	private final Object site;
 	private FeatureModelEditor fTextEditor;
-	private TreeViewer viewer;
+	private final TreeViewer viewer;
 	private IFeatureModel fInput;
 
 	private SetFeatureColorAction setFeatureColorAction;
@@ -106,6 +107,7 @@ public class FmOutlinePageContextMenu {
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
 	private boolean syncCollapsedFeatures = false;
+	private boolean registerContextMenu = true;
 
 	private static final String CONTEXT_MENU_ID = "de.ovgu.feautureide.fm.view.outline.contextmenu";
 
@@ -133,35 +135,58 @@ public class FmOutlinePageContextMenu {
 		initContextMenu();
 	}
 
+	public FmOutlinePageContextMenu(Object site, TreeViewer viewer, IFeatureModel fInput, boolean registerContextMenu) {
+		this.site = site;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.registerContextMenu = registerContextMenu;
+		initContextMenu();
+	}
+
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput, boolean syncCollapsedFeatures,
+			boolean registerContextMenu) {
+		this.site = site;
+		this.fTextEditor = fTextEditor;
+		this.viewer = viewer;
+		this.fInput = fInput;
+		this.syncCollapsedFeatures = syncCollapsedFeatures;
+		this.registerContextMenu = registerContextMenu;
+		initContextMenu();
+	}
+
 	private void initContextMenu() {
 		initActions();
 		addListeners();
-		initMenuManager();
+		if (registerContextMenu) {
+			initMenuManager();
+		}
 	}
 
 	private void initMenuManager() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		final MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				FmOutlinePageContextMenu.this.fillContextMenu(manager);
 			}
 		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
+		final Menu menu = menuMgr.createContextMenu(viewer.getControl());
 		viewer.getControl().setMenu(menu);
 
-		if (site instanceof IWorkbenchPartSite)
+		if (site instanceof IWorkbenchPartSite) {
 			((IWorkbenchPartSite) site).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
-		else
+		} else {
 			((IPageSite) site).registerContextMenu(CONTEXT_MENU_ID, menuMgr, viewer);
+		}
 	}
 
 	private void initActions() {
-		setFeatureColorAction = new SetFeatureColorAction(viewer, getFeatureModel());
+		setFeatureColorAction = new SetFeatureColorAction(viewer, fInput);
 		mAction = new MandatoryAction(viewer, fInput);
 		hAction = new HiddenAction(viewer, fInput);
-		//collapseAction = new CollapseAction(viewer, fInput);
-		aAction = new AbstractAction(viewer, fInput, (ObjectUndoContext) fInput.getUndoContext());
+		aAction = new AbstractAction(viewer, fInput);
 		dAction = new DeleteAction(viewer, fInput);
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
@@ -169,16 +194,19 @@ public class FmOutlinePageContextMenu {
 		cAction = new CreateCompoundAction(viewer, fInput);
 		clAction = new CreateLayerAction(viewer, fInput);
 
-		if (fTextEditor != null)
+		if (fTextEditor != null) {
 			reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
+		}
 
 		oAction = new OrAction(viewer, fInput);
-		//TODO _interfaces Removed Code
-		//		roAction = new ReverseOrderAction(viewer, fInput);
+		// TODO _interfaces Removed Code
+		// roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
 
 		collapseAllAction = new Action() {
+
+			@Override
 			public void run() {
 				viewer.collapseAll();
 			}
@@ -187,6 +215,8 @@ public class FmOutlinePageContextMenu {
 		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
 
 		expandAllAction = new Action() {
+
+			@Override
 			public void run() {
 				viewer.expandAll();
 			}
@@ -195,13 +225,16 @@ public class FmOutlinePageContextMenu {
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
 
 		dblClickListener = new IDoubleClickListener() {
+
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature))
+				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
 					if (syncCollapsedFeatures) {
-						//collapseAction.run();
+						// collapseAction.run();
 					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
 						ecAction.run();
 					}
+				}
 			}
 		};
 
@@ -211,65 +244,68 @@ public class FmOutlinePageContextMenu {
 	 * adds all listeners to the TreeViewer
 	 */
 	private void addListeners() {
+		viewer.removeDoubleClickListener(dblClickListener);
 		viewer.addDoubleClickListener(dblClickListener);
 
-		if(fTextEditor != null)
+		if (fTextEditor != null) {
 			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 				@Override
 				public void selectionChanged(SelectionChangedEvent event) {
-					if (viewer.getSelection() == null)
+					if (viewer.getSelection() == null) {
 						return;
-	
+					}
+
 					EditPart part;
 					if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
-	
-						IFeature feat = (IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-	
-						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(feat);
+
+						final IFeature feat = (IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+
+						part = (EditPart) fTextEditor.diagramEditor.getViewer().getEditPartRegistry().get(feat);
 					} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
-	
-						IConstraint constr = (IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-	
-						part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(constr);
-	
+
+						final IConstraint constr = (IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+
+						part = (EditPart) fTextEditor.diagramEditor.getViewer().getEditPartRegistry().get(constr);
+
 					} else {
 						return;
 					}
-					// workaround for bug: close the FM-editor and open it again, 
-					//					-> selecting something at the outline causes a null-pointer exception
+					// workaround for bug: close the FM-editor and open it again,
+					// -> selecting something at the outline causes a null-pointer exception
 					if (part == null) {
 						return;
 					}
-					((GraphicalViewerImpl) fTextEditor.diagramEditor).setSelection(new StructuredSelection(part));
-	
-					EditPartViewer view = part.getViewer();
+					((GraphicalViewerImpl) fTextEditor.diagramEditor.getViewer()).setSelection(new StructuredSelection(part));
+
+					final EditPartViewer view = part.getViewer();
 					if (view != null) {
 						view.reveal(part);
 					}
 				}
-		});
+			});
+		}
 	}
 
 	/**
 	 * fills the ContextMenu depending on the current selection
-	 * 
+	 *
 	 * @param manager
 	 */
-	protected void fillContextMenu(IMenuManager manager) {
-		Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();		
-		setFeatureColorAction.setFeatureModel(fInput);
+	public void fillContextMenu(IMenuManager manager) {
+		final Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 		if (sel instanceof FmOutlineGroupStateStorage) {
-			IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
-			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+			final IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
+			if ((feature instanceof ExtendedFeature) && ((ExtendedFeature) feature).isFromExtern()) {
 				return;
 			}
 			manager.add(andAction);
 			manager.add(oAction);
 			manager.add(altAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			//TODO _interfaces Removed Code
-			//			manager.add(roAction);
+			// TODO _interfaces Removed Code
+			// manager.add(roAction);
 		}
 		if (sel instanceof IFeature) {
 
@@ -277,8 +313,8 @@ public class FmOutlinePageContextMenu {
 
 			clAction.setText(CREATE_FEATURE_BELOW);
 			manager.add(clAction);
-			
-			if(reAction != null){
+
+			if (reAction != null) {
 				reAction.setChecked(false);
 				reAction.setText(RENAME);
 				manager.add(reAction);
@@ -302,7 +338,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(aAction);
 			manager.add(hAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			//TODO _interfaces Removed Code
+			// TODO _interfaces Removed Code
 			manager.add(setFeatureColorAction);
 		}
 		if (sel instanceof IConstraint) {
@@ -312,11 +348,13 @@ public class FmOutlinePageContextMenu {
 			dAction.setText(DELETE);
 			manager.add(dAction);
 		}
-		if (sel instanceof String)
-			if (sel.equals(CONSTRAINTS))
+		if (sel instanceof String) {
+			if (sel.equals(CONSTRAINTS)) {
 				manager.add(ccAction);
+			}
+		}
 	}
-	
+
 	/**
 	 * @param iToolBarManager
 	 */
@@ -339,11 +377,12 @@ public class FmOutlinePageContextMenu {
 
 	public void setFeatureModel(IFeatureModel fm) {
 		fInput = fm;
-}
+	}
+
 	/**
 	 * @param syncCollapsedFeaturesToggle
 	 */
 	public void setSyncCollapsedFeatures(boolean syncCollapsedFeaturesToggle) {
-		this.syncCollapsedFeatures = syncCollapsedFeaturesToggle;
+		syncCollapsedFeatures = syncCollapsedFeaturesToggle;
 	}
 }

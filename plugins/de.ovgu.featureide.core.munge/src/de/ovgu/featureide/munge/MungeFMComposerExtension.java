@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -41,114 +41,113 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Munge specific feature model extensions.
- *  
+ *
  * @author Jens Meinicke
-*/
+ */
 public class MungeFMComposerExtension extends FMComposerExtension {
 
-	private static String ORDER_PAGE_MESSAGE = 
-			"FeatureIDE projects based on preprocessors such as Munge do not\n" +
-			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
-	
+	private static String ORDER_PAGE_MESSAGE =
+		"FeatureIDE projects based on preprocessors such as Munge do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+
 	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
-	
+
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
 		return s.matches(FEATURE_NAME_PATTERN);
 	}
-	
+
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
 	}
-	
+
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
-		
-		IFolder sourceFolder = featureProject.getSourceFolder();
-		if (!sourceFolder.exists())
+
+		final IFolder sourceFolder = featureProject.getSourceFolder();
+		if (!sourceFolder.exists()) {
 			return true;
-		
+		}
+
 		try {
 			performRenamings(oldName, newName, sourceFolder);
 			sourceFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return true;
 	}
 
 	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
+		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				performRenamings(oldName, newName, (IFolder)res);
+				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file = (IFile)res;
+				final IFile file = (IFile) res;
 				performRenamings(oldName, newName, file);
 			}
-			
+
 		}
 	}
-	
+
 	private void performRenamings(String oldName, String newName, IFile iFile) {
 		setFilecontent(performRenamings(oldName, newName, getFileContent(iFile)), iFile);
 	}
-	
-	public String performRenamings(String oldName, String newName,
-			String fileContent) {
+
+	public String performRenamings(String oldName, String newName, String fileContent) {
 		if (!fileContent.contains(oldName)) {
 			return null;
 		}
-		return fileContent.replaceAll("\\["+oldName+"\\]\\*\\/","[" + newName + "]*/");
+		return fileContent.replaceAll("\\[" + oldName + "\\]\\*\\/", "[" + newName + "]*/");
 	}
-	
+
 	private void setFilecontent(String filecontent, IFile iFile) {
 		if (filecontent == null) {
 			return;
 		}
-		File file = iFile.getRawLocation().toFile();
+		final File file = iFile.getRawLocation().toFile();
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(file);
 			fw.write(filecontent);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			MungeCorePlugin.getDefault().logError(e);
-		} finally{
-			if(fw!=null) {
+		} finally {
+			if (fw != null) {
 				try {
 					fw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					MungeCorePlugin.getDefault().logError(e);
-				}	
+				}
 			}
 		}
 	}
-	
+
 	private String getFileContent(IFile iFile) {
 		Scanner scanner = null;
-		StringBuilder fileText = new StringBuilder();
+		final StringBuilder fileText = new StringBuilder();
 		try {
 			scanner = new Scanner(iFile.getRawLocation().toFile(), "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append("\r\n");
 			}
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			MungeCorePlugin.getDefault().logError(e);
-		} finally{
-			if(scanner!=null) {
+		} finally {
+			if (scanner != null) {
 				scanner.close();
 			}
 		}
 		return fileText.toString();
 	}
-	
+
 	@Override
 	public boolean hasFeatureOrder() {
 		return false;

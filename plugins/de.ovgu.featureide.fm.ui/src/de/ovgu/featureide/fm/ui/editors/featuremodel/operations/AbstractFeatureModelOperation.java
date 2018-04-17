@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,9 +35,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
- * This operation should be used as superclass for all operations on the feature model.
- * It provides standard handling and refreshing of the model.
- * 
+ * This operation should be used as superclass for all operations on the feature model. It provides standard handling and refreshing of the model.
+ *
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
@@ -74,7 +73,8 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
 			redo();
-		} catch (Exception e) {
+		} catch (final Exception e) {
+			e.printStackTrace();
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
 		}
@@ -93,7 +93,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
 			undo();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
 		}

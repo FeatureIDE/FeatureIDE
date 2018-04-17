@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for Multi Product Lines
 Bundle-SymbolicName: de.ovgu.featureide.core.mpl;singleton:=true
-Bundle-Version: 3.3.2.qualifier
+Bundle-Version: 3.5.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
@@ -15,8 +15,7 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.core.refactoring,
  org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core
-Export-Package: .,
- de.ovgu.featureide.core.mpl,
+Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
  de.ovgu.featureide.core.mpl.job,
  de.ovgu.featureide.core.mpl.signature,

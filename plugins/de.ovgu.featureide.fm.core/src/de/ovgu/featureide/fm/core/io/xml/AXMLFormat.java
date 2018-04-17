@@ -22,12 +22,13 @@ package de.ovgu.featureide.fm.core.io.xml;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,10 +36,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -46,33 +45,26 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.Logger;
+import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Prints a feature model in XML format.
- * 
+ *
  * @author Sebastian Krieter
  */
-public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
+public abstract class AXMLFormat<T> extends APersistentFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
 
 	private static final String SUFFIX = "xml";
 
 	protected T object;
-
-	public static Document readXML(CharSequence source) throws IOException, SAXException, ParserConfigurationException {
-		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-
-		final InputSource inputSource = new InputSource(new StringReader(source.toString()));
-		SAXParserFactory.newInstance().newSAXParser().parse(inputSource, new PositionalXMLHandler(doc));
-		return doc;
-	}
 
 	/**
 	 * @param nodeList
@@ -90,51 +82,6 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		return elements;
 	}
 
-	/**
-	 * Inserts indentations into the text
-	 * 
-	 * @param text
-	 * @return
-	 */
-	private static String prettyPrint(String text) {
-		final StringBuilder result = new StringBuilder();
-		String line;
-		int indentLevel = 0;
-		final BufferedReader reader = new BufferedReader(new StringReader(text));
-		try {
-			line = reader.readLine();
-			while (line != null) {
-				if (line.startsWith("</")) {
-					indentLevel--;
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
-					}
-				}
-
-				else if (line.startsWith("<")) {
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
-					}
-					if (!line.contains("</")) {
-						indentLevel++;
-					}
-				} else {
-					for (int i = 0; i < indentLevel; i++) {
-						result.append("\t");
-					}
-				}
-				result.append(line + "\n");
-				if (line.contains("/>")) {
-					indentLevel--;
-				}
-				line = reader.readLine();
-			}
-		} catch (final IOException e) {
-			Logger.logError(e);
-		}
-		return result.toString();
-	}
-
 	@Override
 	public String getSuffix() {
 		return SUFFIX;
@@ -143,16 +90,18 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	@Override
 	public ProblemList read(T object, CharSequence source) {
 		this.object = object;
+
 		final ProblemList lastWarnings = new ProblemList();
 		try {
-			final Document doc = readXML(source);
+			final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			SAXParserFactory.newInstance().newSAXParser().parse(new InputSource(new StringReader(source.toString())), new PositionalXMLHandler(doc));
 			doc.getDocumentElement().normalize();
 			readDocument(doc, lastWarnings);
-		} catch (SAXParseException e) {
+		} catch (final SAXParseException e) {
 			lastWarnings.add(new Problem(e, e.getLineNumber()));
-		} catch (UnsupportedModelException e) {
+		} catch (final UnsupportedModelException e) {
 			lastWarnings.add(new Problem(e, e.lineNumber));
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			lastWarnings.add(new Problem(e));
 		}
 
@@ -162,7 +111,8 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	@Override
 	public String write(T object) {
 		this.object = object;
-		//Create Empty DOM Document
+
+		// Create Empty DOM Document
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		dbf.setIgnoringComments(true);
@@ -174,37 +124,53 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 			db = dbf.newDocumentBuilder();
 		} catch (final ParserConfigurationException pce) {
 			Logger.logError(pce);
+			return "";
 		}
 		final Document doc = db.newDocument();
-		//Create the XML Representation
+		// Create the XML Representation
 		writeDocument(doc);
 
-		//Transform the XML Representation into a String
-		Transformer transfo = null;
-		try {
-			transfo = TransformerFactory.newInstance().newTransformer();
-		} catch (final TransformerConfigurationException e) {
+		try (StringWriter stringWriter = new StringWriter()) {
+			final StreamResult streamResult = new StreamResult(stringWriter);
+			final TransformerFactory factory = TransformerFactory.newInstance();
+			factory.setAttribute("indent-number", new Integer(4));
+			final Transformer transformer = factory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, SUFFIX);
+			transformer.setOutputProperty(OutputKeys.INDENT, YES);
+			transformer.transform(new DOMSource(doc), streamResult);
+			return streamResult.getWriter().toString();
+		} catch (final IOException | TransformerException e) {
 			Logger.logError(e);
-		} catch (final TransformerFactoryConfigurationError e) {
-			Logger.logError(e);
+			return "";
 		}
+	}
 
-		transfo.setOutputProperty(OutputKeys.METHOD, SUFFIX);
-		transfo.setOutputProperty(OutputKeys.INDENT, YES);
-		final StreamResult result = new StreamResult(new StringWriter());
-		final DOMSource source = new DOMSource(doc);
-		try {
-			transfo.transform(source, result);
-		} catch (final TransformerException e) {
-			Logger.logError(e);
+	@Override
+	public boolean supportsRead() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsWrite() {
+		return true;
+	}
+
+	protected final boolean supportsContent(LazyReader reader, Pattern pattern) {
+		if (supportsRead()) {
+			final Matcher matcher = pattern.matcher("");
+			do {
+				matcher.reset(reader);
+				if (matcher.find()) {
+					return true;
+				}
+			} while (matcher.hitEnd() && reader.expand());
 		}
-
-		return prettyPrint(result.getWriter().toString());
+		return false;
 	}
 
 	/**
 	 * Reads an XML-Document.
-	 * 
+	 *
 	 * @param doc document to read
 	 * @param warnings list of warnings / errors that occur during read
 	 */
@@ -212,7 +178,7 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 
 	/**
 	 * Writes an XML-Document.
-	 * 
+	 *
 	 * @param doc document to write
 	 */
 	protected abstract void writeDocument(Document doc);

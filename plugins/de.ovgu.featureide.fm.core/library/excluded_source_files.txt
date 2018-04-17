@@ -27,6 +27,7 @@ de/ovgu/featureide/fm/core/io/EclipseFileSystem.java
 de/ovgu/featureide/fm/core/io/FeatureModelReaderIFileWrapper.java
 de/ovgu/featureide/fm/core/io/FeatureModelWriterIFileWrapper.java
 de/ovgu/featureide/fm/core/io/fama/FAMAWriter.java
+de/ovgu/featureide/fm/core/io/manager/EclipseFileManagerVisitor.java
 de/ovgu/featureide/fm/core/io/manager/FileListener.java
 de/ovgu/featureide/fm/core/io/sxfm/SXFMWriter.java
 de/ovgu/featureide/fm/core/io/velvet/VelvetFeatureModelFormat.java

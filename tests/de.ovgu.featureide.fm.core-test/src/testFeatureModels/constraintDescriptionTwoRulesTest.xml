@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="Root">
+				<feature name="A"/>
+				<feature name="B"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+			<description>
+				Test Description 1
+			</description>
+				<conj>
+					<var>A</var>
+					<var>B</var>
+				</conj>
+			</rule>
+			<rule>
+			
+				<imp>
+					<var>A</var>
+					<var>B</var>
+				</imp>
+			<description>
+				Test Description 2
+			</description>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+</featureModel>

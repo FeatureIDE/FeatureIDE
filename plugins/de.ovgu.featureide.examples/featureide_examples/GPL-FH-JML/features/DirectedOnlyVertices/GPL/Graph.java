@@ -18,6 +18,7 @@ public class Graph {
         vertices = new LinkedList();
     }
     /*@ ensures \result != null; @*/
+    /*@assignable \nothing; @*/
     public VertexIter getVertices( ) 
     { 
         // dja - trying to fix logic problems
@@ -52,7 +53,8 @@ public class Graph {
 
     
     /*@ requires c != null;
-    ensures isSorted(vertices); @*/
+    ensures isSorted(vertices); 
+    assignable vertices; @*/
     public void sortVertices(Comparator c) {
         Collections.sort(vertices, c);
     }
@@ -60,6 +62,7 @@ public class Graph {
     // Adds an edge without weights if Weighted layer is not present
     /*@requires start != null && end != null; @*/
     /*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
+    /*@assignable \nothing; @*/
     public void addAnEdge( Vertex start,  Vertex end, int weight )
       {
         addEdge( start,end );
@@ -68,6 +71,7 @@ public class Graph {
 
     /*@requires v != null;@*/
     /*@ensures vertices.getLast()==v;@*/
+    /*@assignable vertices; @*/
     public void addVertex( Vertex v ) {
         vertices.add( v );
     }
@@ -75,6 +79,7 @@ public class Graph {
     // Adds and edge by setting end as adjacent to start vertices
 	/*@ requires v1 != null && v2 != null; @*/
 	/*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
+    /*@ assignable \nothing; @*/
     public EdgeIfc addEdge( Vertex start,  Vertex end ) {
         start.addAdjacent( end );
         return( EdgeIfc ) start;

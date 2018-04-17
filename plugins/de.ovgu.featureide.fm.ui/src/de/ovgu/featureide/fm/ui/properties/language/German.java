@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,9 +35,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANTES_CO
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNBESTIMMBAR_VERSTECKTES_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERSTECKT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VON_INTERFACE;
+
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
- * 
+ *
  * @author Jens Meinicke
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -65,12 +66,13 @@ public class German implements ILanguage {
 	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
 	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
 	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";
+	private static final String VOID_MODEL = "Unerfüllbare Produktlinie";
 
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
 	}
-	
+
 	@Override
 	public String getImplicitConst() {
 		return IMPLICIT;
@@ -89,6 +91,11 @@ public class German implements ILanguage {
 	@Override
 	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
+	}
+
+	@Override
+	public String getVoidModel() {
+		return VOID_MODEL;
 	}
 
 	@Override
@@ -140,7 +147,7 @@ public class German implements ILanguage {
 	public String getHidden() {
 		return HIDDEN;
 	}
-	
+
 	@Override
 	public String getCollapsed() {
 		return COLLAPSED;
@@ -169,5 +176,20 @@ public class German implements ILanguage {
 	@Override
 	public String getOptional() {
 		return OPTIONAL;
+	}
+
+	@Override
+	public String getExplanation() {
+		return "Das ausgewählte Element ist defekt" + System.lineSeparator() + "wegen der hervorgehobenen Abhängigkeiten:";
+	}
+
+	@Override
+	public String getLikelyCause() {
+		return "wahrsch. Ursache";
+	}
+
+	@Override
+	public String getUnlikelyCause() {
+		return "unwahrsch. Ursache";
 	}
 }

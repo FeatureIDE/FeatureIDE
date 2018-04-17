@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,9 +33,8 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * Layouts the features at the feature diagram using a reverse level order
- * search.
- * 
+ * Layouts the features at the feature diagram using a reverse level order search.
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -52,37 +51,40 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
+		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		layout(root);
-		layout(featureDiagramBottom, featureModel.getVisibleConstraints());
+		Rectangle rootBounds = getBounds(root);
+		layoutConstraints(featureDiagramBottom, featureModel.getVisibleConstraints(), rootBounds);
 	}
 
 	private void layout(IGraphicalFeature root) {
-		LinkedList<LinkedList<IGraphicalFeature>> levels = calculateLevels(root);
+		final LinkedList<LinkedList<IGraphicalFeature>> levels = calculateLevels(root);
 
 		int i = levels.size() - 1;
-		for (Iterator<LinkedList<IGraphicalFeature>> iterator = levels.descendingIterator(); iterator.hasNext();) {
-			LinkedList<IGraphicalFeature> level = iterator.next();
+		for (final Iterator<LinkedList<IGraphicalFeature>> iterator = levels.descendingIterator(); iterator.hasNext();) {
+			final LinkedList<IGraphicalFeature> level = iterator.next();
 			layoutLevelInY(level, i--);
 			layoutLevelInX(level);
 		}
 
 		centerTheRoot(root);
 
-		featureDiagramBottom = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * (levels.size() - 1);
+		featureDiagramBottom = FMPropertyManager.getLayoutMarginY() + (FMPropertyManager.getFeatureSpaceY() * (levels.size() - 1));
 	}
 
 	private void layoutLevelInY(LinkedList<IGraphicalFeature> level, int i) {
-		int y = FMPropertyManager.getLayoutMarginY() + FMPropertyManager.getFeatureSpaceY() * i;
-		for (IGraphicalFeature feature : level)
+		final int y = FMPropertyManager.getLayoutMarginY() + (FMPropertyManager.getFeatureSpaceY() * i);
+		for (final IGraphicalFeature feature : level) {
 			setLocation(feature, new Point(0, y));
+		}
 	}
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
-		for (IGraphicalFeature feature : level)
-			if (!feature.isCollapsed() && getChildren(feature).size() > 0) {
+		for (final IGraphicalFeature feature : level) {
+			if (!feature.isCollapsed() && (getChildren(feature).size() > 0)) {
 				centerAboveChildren(feature);
 			}
+		}
 
 		IGraphicalFeature lastFeature = null;
 		int moveWidth = 0;
@@ -93,26 +95,32 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
-		IGraphicalFeature feature = level.get(j);
+		final IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		
-		if (getChildren(feature).size() == 0)
+
+		if (getChildren(feature).size() == 0) {
 			nextToLeftSibling(feature, lastFeature);
-		else {
-			if (lastFeature != null)
-				moveWidth = Math.max(moveWidth, getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() - getLocation(feature).x);
-			if (moveWidth > 0)
+		} else {
+			if (lastFeature != null) {
+				moveWidth = Math.max(moveWidth, (getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX()) - getLocation(feature).x);
+			}
+			if (moveWidth > 0) {
 				moveTree(feature, moveWidth);
+			}
 			layoutSiblingsEquidistant(level, j, feature);
 			if (firstCompound) {
 				firstCompound = false;
 				boolean compoundSibling = false;
-				for (int k = j - 1; k >= 0; k--)
-					if (getChildren(level.get(k)).size() > 0)
+				for (int k = j - 1; k >= 0; k--) {
+					if (getChildren(level.get(k)).size() > 0) {
 						compoundSibling = true;
-				if (!compoundSibling)
-					for (int k = j - 1; k >= 0; k--)
+					}
+				}
+				if (!compoundSibling) {
+					for (int k = j - 1; k >= 0; k--) {
 						nextToRightSibling(level.get(k), level.get(k + 1));
+					}
+				}
 			}
 		}
 		return moveWidth;
@@ -124,7 +132,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		int space = 0;
 		boolean right = true;
 		for (int k = j - 1; k >= 0; k--) {
-			IGraphicalFeature sibling = level.get(k);
+			final IGraphicalFeature sibling = level.get(k);
 			if (sibling.getObject().getStructure().getParent() != feature.getObject().getStructure().getParent()) {
 				l = k + 1;
 				break;
@@ -137,28 +145,30 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 			}
 			width += sibling.getSize().width + FMPropertyManager.getFeatureSpaceX();
 		}
-		if (right)
+		if (right) {
 			space = getBounds(feature).x - (getBounds(level.get(l)).x - FMPropertyManager.getFeatureSpaceX()) - width;
+		}
 		for (int k = l; k < j; k++) {
-			IGraphicalFeature sibling = level.get(k);
-			if (right)
+			final IGraphicalFeature sibling = level.get(k);
+			if (right) {
 				moveTree(sibling, space);
-			else
-				moveTree(sibling, space * (k - l + 1) / (j - l + 1));
+			} else {
+				moveTree(sibling, (space * ((k - l) + 1)) / ((j - l) + 1));
+			}
 		}
 	}
 
 	private LinkedList<LinkedList<IGraphicalFeature>> calculateLevels(IGraphicalFeature root) {
-		LinkedList<LinkedList<IGraphicalFeature>> levels = new LinkedList<LinkedList<IGraphicalFeature>>();
+		final LinkedList<LinkedList<IGraphicalFeature>> levels = new LinkedList<LinkedList<IGraphicalFeature>>();
 
 		LinkedList<IGraphicalFeature> level = new LinkedList<IGraphicalFeature>();
 		level.add(root);
 
 		while (!level.isEmpty()) {
 			levels.add(level);
-			LinkedList<IGraphicalFeature> newLevel = new LinkedList<IGraphicalFeature>();
-			for (IGraphicalFeature feature : level) {
-				for (IGraphicalFeature child : getChildren(feature)) {
+			final LinkedList<IGraphicalFeature> newLevel = new LinkedList<IGraphicalFeature>();
+			for (final IGraphicalFeature feature : level) {
+				for (final IGraphicalFeature child : getChildren(feature)) {
 					newLevel.add(child);
 				}
 			}
@@ -170,37 +180,38 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
 		final List<IGraphicalFeature> graphicalChildren = getChildren(feature);
-		if(graphicalChildren.size() == 0) {
+		if (graphicalChildren.size() == 0) {
 			return;
 		}
-		int minX = getBounds(graphicalChildren.get(0)).x;
-		int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
-		Point location = getLocation(feature);
-		int x = (maxX + minX) / 2 - feature.getSize().width / 2;
+		final int minX = getBounds(graphicalChildren.get(0)).x;
+		final int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
+		final Point location = getLocation(feature);
+		final int x = ((maxX + minX) / 2) - (feature.getSize().width / 2);
 		setLocation(feature, new Point(x, location.y));
 	}
 
 	private void nextToLeftSibling(IGraphicalFeature feature, IGraphicalFeature lastFeature) {
-		Point location = getLocation(feature);
-		int x = lastFeature != null ? getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() : 0;
+		final Point location = getLocation(feature);
+		final int x = lastFeature != null ? getBounds(lastFeature).right() + FMPropertyManager.getFeatureSpaceX() : 0;
 		setLocation(feature, new Point(x, location.y));
 	}
 
 	private void nextToRightSibling(IGraphicalFeature feature, IGraphicalFeature rightSibling) {
-		Rectangle bounds = getBounds(feature);
-		int x = rightSibling != null ? getBounds(rightSibling).x - FMPropertyManager.getFeatureSpaceX() - bounds.width : 0;
+		final Rectangle bounds = getBounds(feature);
+		final int x = rightSibling != null ? getBounds(rightSibling).x - FMPropertyManager.getFeatureSpaceX() - bounds.width : 0;
 		setLocation(feature, new Point(x, bounds.y));
 	}
 
 	private void moveTree(IGraphicalFeature root, int deltaX) {
-		Point location = getLocation(root);
+		final Point location = getLocation(root);
 		setLocation(root, new Point(location.x + deltaX, location.y));
-		for (IGraphicalFeature child : getChildren(root))
+		for (final IGraphicalFeature child : getChildren(root)) {
 			moveTree(child, deltaX);
+		}
 	}
 
 	private void centerTheRoot(IGraphicalFeature root) {
-		int newX = (controlWidth - getBounds(root).width) / 2;
+		final int newX = (controlWidth - getBounds(root).width) / 2;
 		moveTree(root, newX - getLocation(root).x);
 	}
 

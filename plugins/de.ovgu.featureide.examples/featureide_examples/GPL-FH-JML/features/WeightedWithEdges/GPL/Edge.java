@@ -7,6 +7,7 @@ public class Edge {
     
     /*@requires the_start != null && the_end != null && the_weight != null; @*/
     /*@ensures this.start == the_start && end == this.the_end && this.weight == the_weight;@*/
+    /*@assignable weight; @*/
     public void EdgeConstructor( Vertex the_start,  Vertex the_end,
                 int the_weight ) {
         EdgeConstructor( the_start,the_end );
@@ -20,12 +21,14 @@ public class Edge {
     // }
     /*@requires the_edge != null;@*/
     /*@ensures \original && this.getWeight() == the_edge.getWeight();@*/
+    /*@assignable weight; @*/
     public void adjustAdorns( EdgeIfc the_edge ) {
         setWeight(the_edge.getWeight());
         original( the_edge );
     }
 
     /*@ensures this.weight == weight; @*/
+    /*@assignable weight; @*/
     public void setWeight(int weight)
     {
         this.weight = weight;

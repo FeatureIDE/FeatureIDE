@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.io.sxfm;
 
 import static org.junit.Assert.assertTrue;
+
+import java.io.FileNotFoundException;
 
 import org.junit.Test;
 import org.prop4j.Literal;
@@ -36,7 +38,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Test class for SXFM reader and writer
- * 
+ *
  * @author Fabian Benduhn
  */
 public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
@@ -59,9 +61,10 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 
 	}
 
+	@Override
 	@Test
 	public void testPropNodes() {
-		for (IConstraint constraint : newFm.getConstraints()) {
+		for (final IConstraint constraint : newFm.getConstraints()) {
 			final Node n = constraint.getNode();
 			if (n instanceof Literal) {
 				// case: feature
@@ -69,7 +72,7 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 			}
 			if (n instanceof Not) {
 				// case: ~feature
-				if (n.getChildren().length == 1 && n.getChildren()[0] instanceof Literal) {
+				if ((n.getChildren().length == 1) && (n.getChildren()[0] instanceof Literal)) {
 					continue;
 				}
 			}
@@ -80,7 +83,7 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 	}
 
 	private void isCnf(Node node) {
-		for (Node n : node.getChildren()) {
+		for (final Node n : node.getChildren()) {
 			if (n instanceof Not) {
 				assertTrue("Not statement has to much children", n.getChildren().length == 1);
 				assertTrue(n + "is not a Literal after Not", n.getChildren()[0] instanceof Literal);
@@ -91,6 +94,20 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter {
 			}
 		}
 	}
+
+	/*
+	 * This empty test case is needed because the SXFM format splits AND constraints into multiple constraints and is omitting redundant OR constarints
+	 */
+	@Override
+	public void testConstraintCount() throws FileNotFoundException, UnsupportedModelException {
+
+	}
+
+	/*
+	 * This empty test case is needed because the SXFM format does not support "AND" constraints and slits them into multiple constraints.
+	 */
+	@Override
+	public void testConstraints() throws FileNotFoundException, UnsupportedModelException {}
 
 	@Override
 	public void testDescription() {

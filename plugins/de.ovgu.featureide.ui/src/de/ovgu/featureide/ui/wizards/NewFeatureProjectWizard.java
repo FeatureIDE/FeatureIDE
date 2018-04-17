@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A creation wizard for FeatureIDE projects that adds the FeatureIDE nature after creation.
- * 
+ *
  * @author Marcus Leich
  * @author Thomas Thüm
  * @author Tom Brosch
@@ -58,35 +58,35 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 
 	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureIconSmall.ico").createImage();
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
-	
+
 	protected NewFeatureProjectPage page;
 	private DefaultNewFeatureProjectWizardExtension wizardExtension = null;
-	
+
 	@Override
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
 		page = new NewFeatureProjectPage();
-		Shell shell = getShell();
+		final Shell shell = getShell();
 		if (shell != null) {
 			shell.setImage(colorImage);
 		}
 		addPage(page);
 		super.addPages();
 	}
-	
+
 	@Override
 	public boolean canFinish() {
 		if (page.getCompositionTool().getId().equals("de.ovgu.featureide.preprocessor.munge-android")) {
 			return page.isPageComplete();
 		}
-		
+
 		if (wizardExtension != null) {
 			return wizardExtension.isFinished();
 		} else {
 			return super.canFinish();
 		}
 	}
-	
+
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
 		// determine wizard extension and next page (basic new project page) when composer has been selected
@@ -113,36 +113,38 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 				// determine next page (extension pages) when extension exists and reference page or an extension page active
 				return nextExtensionPage;
 			}
-		} 
+		}
 		// every other occurrence
 		return super.getNextPage(page);
 	}
-	
+
+	@Override
 	public boolean performFinish() {
 		if (!page.hasCompositionTool()) {
 			return false;
 		}
-		
+
 //		this.wizardExtension = null;
-		IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
-		for (IConfigurationElement c : conf) {
+		final IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
+		for (final IConfigurationElement c : conf) {
 			try {
-				if (c.getAttribute("composerid").equals(this.page.getCompositionTool().getId())) {
+				if (c.getAttribute("composerid").equals(page.getCompositionTool().getId())) {
 					wizardExtension = (DefaultNewFeatureProjectWizardExtension) c.createExecutableExtension("class");
 					wizardExtension.setWizard(this);
 				}
-			} catch (CoreException e) {
+			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
-		
+
 		if (wizardExtension == null) {
 			wizardExtension = new DefaultNewFeatureProjectWizardExtension();
 			wizardExtension.setWizard(this);
-		} 
-		
+		}
+
 		if (wizardExtension.performOwnFinish()) {
-			UIJob job = new UIJob(CREATING_ANDROID_PROJECT) {
+			final UIJob job = new UIJob(CREATING_ANDROID_PROJECT) {
+
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					if (wizardExtension.performBeforeFinish(page)) {
@@ -164,10 +166,11 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			if (wizardExtension.isFinished()) {
 				try {
 					final IProject newProject = getNewProject();
-					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(),page.getConfigPath(),page.getBuildPath());
+					wizardExtension.enhanceProject(newProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
+							page.getBuildPath(), page.sourcePath.isEnabled(), page.buildPath.isEnabled());
 					// open editor
 					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, newProject.getFile("model.xml"));
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}

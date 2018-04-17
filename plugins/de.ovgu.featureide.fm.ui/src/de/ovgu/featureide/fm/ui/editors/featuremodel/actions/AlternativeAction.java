@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGro
 
 /**
  * Turns a group type into an Alternative-group.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
@@ -43,28 +43,26 @@ public class AlternativeAction extends SingleSelectionAction {
 	private final IFeatureModel featureModel;
 
 	public AlternativeAction(Object viewer, IFeatureModel featureModel) {
-		super(ALTERNATIVE, viewer);
+		super(ALTERNATIVE, viewer, ID);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.ALTERNATIVE, feature, featureModel);
+		final ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.ALTERNATIVE, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
+		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
-
 	}
 
 	@Override
 	protected void updateProperties() {
-		boolean alt = feature.getStructure().isAlternative();
-		setEnabled(!alt && feature.getStructure().hasChildren() && feature.getStructure().getChildrenCount() > 1);
+		final boolean alt = feature.getStructure().isAlternative();
+		setEnabled(!alt && feature.getStructure().hasChildren() && (feature.getStructure().getChildrenCount() > 1));
 		setChecked(alt);
 	}
 

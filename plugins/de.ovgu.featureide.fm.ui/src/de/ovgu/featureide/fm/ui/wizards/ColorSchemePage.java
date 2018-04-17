@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistributecolorSchemeNameText/or modify
  * it under the terms of the GNU LcolorSchemeNameTexteneral PucolorSchemeNameTextcense as published by
  * the FrecolorSchemeNameTextare Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Page for {@link ColorSchemeWizard}.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class ColorSchemePage extends WizardPage {
@@ -66,7 +66,7 @@ public class ColorSchemePage extends WizardPage {
 		final Collection<ColorScheme> colorSchemes = FeatureColorManager.getColorSchemes(featureModel);
 		colorSchemeNames = new ArrayList<>(colorSchemes.size() + 1);
 
-		for (ColorScheme colorScheme : colorSchemes) {
+		for (final ColorScheme colorScheme : colorSchemes) {
 			if (!colorScheme.isDefault()) {
 				colorSchemeNames.add(colorScheme.getName());
 			}
@@ -97,6 +97,7 @@ public class ColorSchemePage extends WizardPage {
 		colorSchemeList = new List(composite, SWT.FILL | SWT.BORDER | SWT.NO_FOCUS | SWT.SINGLE | SWT.HIDE_SELECTION);
 		colorSchemeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		colorSchemeList.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final String[] selection = ((List) e.getSource()).getSelection();
@@ -106,8 +107,7 @@ public class ColorSchemePage extends WizardPage {
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		// Col 3
 		final Composite buttonComposite = new Composite(composite, SWT.NULL);
@@ -119,38 +119,38 @@ public class ColorSchemePage extends WizardPage {
 		Button button = new Button(buttonComposite, SWT.NULL);
 		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_BACK));
 		button.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectColorScheme();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		button = new Button(buttonComposite, SWT.NULL);
 		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_DELETE));
 		button.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				deleteColorScheme();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		button = new Button(buttonComposite, SWT.NULL);
 		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ETOOL_CLEAR));
 		button.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				renameColorScheme();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
 		// New Color Scheme
@@ -164,14 +164,14 @@ public class ColorSchemePage extends WizardPage {
 		button = new Button(composite, SWT.NULL);
 		button.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD));
 		button.addSelectionListener(new SelectionListener() {
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				createNewColorScheme();
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
+			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 
 		updateColorSchemeList();
@@ -195,8 +195,8 @@ public class ColorSchemePage extends WizardPage {
 				FeatureColorManager.setActive(featureModel, colorSchemeName);
 				selectedColorSchemeText.setText(colorSchemeName);
 			}
-		} else if (selectedColorSchemeText.getText().equals("")){
-			if(colorSchemeList.getItemCount() > 0){
+		} else if (selectedColorSchemeText.getText().equals("")) {
+			if (colorSchemeList.getItemCount() > 0) {
 				final String first = colorSchemeList.getItem(0);
 				if (FeatureColorManager.hasColorScheme(featureModel, first)) {
 					FeatureColorManager.setActive(featureModel, first);
@@ -211,8 +211,8 @@ public class ColorSchemePage extends WizardPage {
 		if (selection.length > 0) {
 			final String oldSchemeName = selection[0];
 			final String newSchemeName = newColorSchemeText.getText();
-			if (oldSchemeName != null && !oldSchemeName.isEmpty() && FeatureColorManager.hasColorScheme(featureModel, oldSchemeName)
-					&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
+			if ((oldSchemeName != null) && !oldSchemeName.isEmpty() && FeatureColorManager.hasColorScheme(featureModel, oldSchemeName)
+				&& !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
 				FeatureColorManager.renameColorScheme(featureModel, oldSchemeName, newSchemeName);
 				final int index = colorSchemeNames.indexOf(oldSchemeName);
 				colorSchemeNames.set(index, newSchemeName);
@@ -256,12 +256,12 @@ public class ColorSchemePage extends WizardPage {
 
 	private void createNewColorScheme() {
 		final String newSchemeName = newColorSchemeText.getText();
-		if (newSchemeName != null && !newSchemeName.isEmpty() && !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
+		if ((newSchemeName != null) && !newSchemeName.isEmpty() && !FeatureColorManager.hasColorScheme(featureModel, newSchemeName)) {
 			FeatureColorManager.newColorScheme(featureModel, newSchemeName);
 			colorSchemeNames.add(newSchemeName);
 			updateColorSchemeList();
 			selectColorScheme(newSchemeName);
-			if(colorSchemeList.getItemCount() == 1){
+			if (colorSchemeList.getItemCount() == 1) {
 				selectColorScheme();
 			}
 		}

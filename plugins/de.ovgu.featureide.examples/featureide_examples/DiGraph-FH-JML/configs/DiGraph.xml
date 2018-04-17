@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="DiGraph"/>
+		<feature automatic="undefined" manual="selected" name="Transposable"/>
+		<feature automatic="undefined" manual="selected" name="Searchable"/>
+		<feature automatic="undefined" manual="selected" name="Removal"/>
+	</configuration>

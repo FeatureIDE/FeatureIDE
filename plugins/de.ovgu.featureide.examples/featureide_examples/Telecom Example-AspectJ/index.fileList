@@ -1,8 +1,8 @@
 .classpath
 .project
-configs/basic.config
-configs/billing.config
-configs/timing.config
+configs/basic.xml
+configs/billing.xml
+configs/timing.xml
 model.xml
 src/telecom/AbstractSimulation.java
 src/telecom/BasicSimulation.java

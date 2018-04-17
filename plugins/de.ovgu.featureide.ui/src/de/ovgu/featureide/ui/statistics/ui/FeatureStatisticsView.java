@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -58,11 +57,12 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 
 /**
  * View to calculate and show the statistics of a feature project.
- * 
+ *
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
+
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IEditorPart currentEditor;
@@ -87,22 +87,26 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		getSite().getPage().addPartListener(editorListener);
 		setEditor(getSite().getPage().getActiveEditor());
 		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
-		
+
 		addButtons();
 	}
 
 	private void addButtons() {
 
-		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
-		Action checkBoxer = new Action() {
+		final Action checkBoxer = new Action() {
+
+			@Override
 			public void run() {
-				CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
+				final CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
 				dial.open();
 			}
 		};
 
-		Action refresher = new Action() {
+		final Action refresher = new Action() {
+
+			@Override
 			public void run() {
 				FeatureStatisticsView.this.refresh(true);
 			}
@@ -117,25 +121,29 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		checkBoxer.setToolTipText("Export to *.csv");
 	}
 
-	private IPartListener editorListener = new IPartListener() {
+	private final IPartListener editorListener = new IPartListener() {
 
-		public void partOpened(IWorkbenchPart part) {
-		}
+		@Override
+		public void partOpened(IWorkbenchPart part) {}
 
-		public void partDeactivated(IWorkbenchPart part) {
-		}
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {}
 
+		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (part == currentEditor) {
 				setEditor(null);
 			}
 		}
 
+		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
-			if (part instanceof IEditorPart)
+			if (part instanceof IEditorPart) {
 				setEditor((IEditorPart) part);
+			}
 		}
 
+		@Override
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart) {
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
@@ -152,10 +160,28 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private IEventListener modelListener = new IEventListener() {
+	private final IEventListener modelListener = new IEventListener() {
+
+		@Override
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()){
-				refresh(false);
+			switch (evt.getEventType()) {
+			case MODEL_DATA_CHANGED:
+			case MODEL_DATA_OVERRIDDEN:
+			case MODEL_DATA_SAVED:
+			case MODEL_DATA_LOADED:
+			case CONSTRAINT_ADD:
+			case CONSTRAINT_DELETE:
+			case CONSTRAINT_MODIFY:
+			case FEATURE_ADD:
+			case FEATURE_ADD_ABOVE:
+			case FEATURE_DELETE:
+			case FEATURE_MODIFY:
+			case GROUP_TYPE_CHANGED:
+			case MANDATORY_CHANGED:
+				refresh(true);
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -172,10 +198,10 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 
 		/*
-		 * This job waits for the calculation job to finish and starts
-		 * immediately a new one
+		 * This job waits for the calculation job to finish and starts immediately a new one
 		 */
-		Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
+		final Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
+
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -187,20 +213,21 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						job.join();
 						contentProvider.setCanceled(false);
 					}
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 
 				job = new Job(UPDATING_FEATURESTATISTICSVIEW) {
+
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (currentEditor == null) {
 							contentProvider.defaultContent();
 						} else {
-							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
-							//TODO is refresh really necessary? -> true?
+							final IResource anyFile = ResourceUtil.getResource(currentEditor.getEditorInput());
+							// TODO is refresh really necessary? -> true?
 
-							if (force || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
+							if (force || (currentInput == null) || !anyFile.getProject().equals(currentInput.getProject())) {
 								contentProvider.calculateContent(anyFile, true);
 								currentInput = anyFile;
 							} else {
@@ -221,7 +248,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	}
 
 	private void cancelJobs() {
-		JobDoneListener jobListener = JobDoneListener.getInstance();
+		final JobDoneListener jobListener = JobDoneListener.getInstance();
 		if (jobListener != null) {
 			jobListener.cancelAllRunningTreeJobs();
 		}
@@ -232,8 +259,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	}
 
 	/**
-	 * Watches changes in the feature model if the selected editor is an
-	 * instance of @{link FeatureModelEditor}
+	 * Watches changes in the feature model if the selected editor is an instance of @{link FeatureModelEditor}
 	 */
 	private void setEditor(IEditorPart newEditor) {
 		if (currentEditor != null) {
@@ -242,17 +268,18 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 
 			if (currentEditor instanceof FeatureModelEditor) {
+				((FeatureModelEditor) currentEditor).removeEventListener(modelListener);
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
 		boolean force = true;
-		if (newEditor != null && currentEditor != null) {
-			IEditorInput newInput = newEditor.getEditorInput();
+		if ((newEditor != null) && (currentEditor != null)) {
+			final IEditorInput newInput = newEditor.getEditorInput();
 			if (newInput instanceof FileEditorInput) {
-				IEditorInput oldInput = currentEditor.getEditorInput();
+				final IEditorInput oldInput = currentEditor.getEditorInput();
 				if (oldInput instanceof FileEditorInput) {
-					IProject newProject = ((FileEditorInput) newInput).getFile().getProject();
-					IProject oldProject = ((FileEditorInput) oldInput).getFile().getProject();
+					final IProject newProject = ((FileEditorInput) newInput).getFile().getProject();
+					final IProject oldProject = ((FileEditorInput) oldInput).getFile().getProject();
 					if (newProject.equals(oldProject)) {
 						force = false;
 					}
@@ -261,6 +288,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 		currentEditor = newEditor;
 		if (newEditor instanceof FeatureModelEditor) {
+			((FeatureModelEditor) currentEditor).addEventListener(modelListener);
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}
 		refresh(force);

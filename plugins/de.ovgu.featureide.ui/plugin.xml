@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-	<extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>
 	<extension
 			point="org.eclipse.ui.newWizards">
 		<wizard
@@ -96,28 +95,20 @@
 		</view>
 		<view
 				category="FeatureIDE"
-				class="de.ovgu.featureide.ui.views.collaboration.outline.Outline"
-				icon="icons/FeatureIconSmall.ico"
-				id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
-				name="FeatureIDE Outline"
-				restorable="true">
-		</view>
-		<view
-				category="FeatureIDE"
 				class="de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView"
 				icon="icons/FeatureIconSmall.ico"
 				id="de.ovgu.featureide.ui.statistics.ui.FeatureStatisticsView"
 				name="FeatureIDE Statistics"
 				restorable="true">
 		</view>
-  <view
-        category="FeatureIDE"
-        class="de.ovgu.featureide.ui.views.configMap.ConfigurationMap"
-        icon="icons/FeatureIconSmall.ico"
-        id="de.ovgu.featureide.ui.views.configMap"
-        name="Configuration Map"
-        restorable="true">
-  </view>
+		<view
+				category="FeatureIDE"
+				class="de.ovgu.featureide.ui.views.configMap.ConfigurationMap"
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.featureide.ui.views.configMap"
+				name="Configuration Map"
+				restorable="true">
+		</view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.perspectives">
@@ -149,7 +140,7 @@
 				name="Jak (for non-FeatureIDE projects)"
 				priority="low">
 		</content-type>
-			<content-type
+		<content-type
 				base-type="org.eclipse.core.runtime.text"
 				file-extensions="asm"
 				id="de.ovgu.featureide.contenttype.asm"
@@ -181,24 +172,24 @@
 	<extension
 			point="org.eclipse.ui.editors.markerAnnotationSpecification">
 		<specification
-        annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
-        annotationType="de.ovgu.featureide.ui.editors.annotations.image"
-        colorPreferenceKey="colorAnnotationImage_color"
-        colorPreferenceValue="0,0,0"
-        contributesToHeader="false"
-        highlightPreferenceKey="colorAnnotationImage_highlight"
-        highlightPreferenceValue="false"
-        includeOnPreferencePage="false"
-        label="ColorAnnotationImage"
-        overviewRulerPreferenceKey="colorAnnotationImage_overviewRuler"
-        overviewRulerPreferenceValue="false"
-        presentationLayer="0"
-        textPreferenceKey="colorAnnotationImage_text"
-        textPreferenceValue="false"
-        textStylePreferenceKey="colorAnnotationImage_textStyle"
-        textStylePreferenceValue="NONE"
-        verticalRulerPreferenceKey="colorAnnotationImage_verticalRuler"
-        verticalRulerPreferenceValue="true">
+				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationType="de.ovgu.featureide.ui.editors.annotations.image"
+				colorPreferenceKey="colorAnnotationImage_color"
+				colorPreferenceValue="0,0,0"
+				contributesToHeader="false"
+				highlightPreferenceKey="colorAnnotationImage_highlight"
+				highlightPreferenceValue="false"
+				includeOnPreferencePage="false"
+				label="ColorAnnotationImage"
+				overviewRulerPreferenceKey="colorAnnotationImage_overviewRuler"
+				overviewRulerPreferenceValue="false"
+				presentationLayer="0"
+				textPreferenceKey="colorAnnotationImage_text"
+				textPreferenceValue="false"
+				textStylePreferenceKey="colorAnnotationImage_textStyle"
+				textStylePreferenceValue="NONE"
+				verticalRulerPreferenceKey="colorAnnotationImage_verticalRuler"
+				verticalRulerPreferenceValue="true">
 		</specification>
 		<specification
 				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
@@ -1039,7 +1030,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -1051,7 +1042,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -1063,7 +1054,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -1075,7 +1066,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -1088,7 +1079,7 @@
 							checkEnabled="false">
 						<and>
 							<reference
-									definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+									definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 							</reference>
 							<test
 									args="de.ovgu.featureide.core.mpl.MPLExperimentalNature"
@@ -1098,9 +1089,9 @@
 						</and>
 					</visibleWhen>
 				</command>
-    <visibleWhen
-          checkEnabled="true">
-    </visibleWhen>
+				<visibleWhen
+						checkEnabled="true">
+				</visibleWhen>
 			</menu>
 		</menuContribution>
 		<menuContribution
@@ -1116,7 +1107,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -1130,7 +1121,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -1144,33 +1135,33 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.containsConfiguration">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsOnlyConfiguration">
 					</reference>
 				</visibleWhen>
 			</command>   
 			<command
-         commandId="de.ovgu.featureide.fm.ui.commands.ManageColorSchemes"
-         icon="icons/FeatureColorIcon.gif"
-         id="de.ovgu.featureide.fm.ui.actions.ManageColorSchemes"
-         label="Manage Color Schemes"
-         style="push">     
-		         <visibleWhen
-            checkEnabled="false">
-         <reference
-               definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-         </reference>
-      </visibleWhen>
-		   </command>
-   <dynamic
-         class="de.ovgu.featureide.ui.actions.DynamicProfileMenu"
-         id="de.ovgu.featureide.ui.ProfileSchemeMenu">
-      <visibleWhen
-            checkEnabled="false">
-         <reference
-               definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-         </reference>
-      </visibleWhen>
-   </dynamic>
+					commandId="de.ovgu.featureide.fm.ui.commands.ManageColorSchemes"
+					icon="icons/FeatureColorIcon.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ManageColorSchemes"
+					label="Manage Color Schemes"
+					style="push">     
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
+					</reference>
+				</visibleWhen>
+			</command>
+			<dynamic
+					class="de.ovgu.featureide.ui.actions.DynamicProfileMenu"
+					id="de.ovgu.featureide.ui.ProfileSchemeMenu">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
+					</reference>
+				</visibleWhen>
+			</dynamic>
 		</menuContribution>
 
 		<menuContribution
@@ -1186,69 +1177,69 @@
 				allPopups="false"
 				locationURI="popup:#CompilationUnitEditorContext?after=additions">
 			<command
-         commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
-         icon="icons/FeatureColorIcon.gif"
-         id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
-         label="Enable Editor Highlighting"
-         style="toggle">
+					commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
+					icon="icons/FeatureColorIcon.gif"
+					id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
+					label="Enable Editor Highlighting"
+					style="toggle">
 			</command>
-   <command
-         commandId="de.ovgu.featureide.fm.ui.colorscheme"
-         icon="icons/FeatureColorIcon.gif"
-         label="Feature Color"
-         style="push">
-   </command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.colorscheme"
+					icon="icons/FeatureColorIcon.gif"
+					label="Feature Color"
+					style="push">
+			</command>
 		</menuContribution>
-  <menuContribution
-        allPopups="false"
-        locationURI="popup:org.eclipse.ui.projectConfigure">
-     <command
-           commandId="de.ovgu.featureide.ui.commands.Conversion"
-           icon="icons/FeatureIconSmall.ico"
-           id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
-           label="Convert to FeatureIDE Project..."
-           style="push">
-        <visibleWhen
-              checkEnabled="false">
-           <and>
-              <reference
-                    definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-              </reference>
-              <with
-                      variable="activeMenuSelection">
-                <iterate ifEmpty="false"
-                            operator="or">
-                      <test
-                                  args="de.ovgu.featureide.core.featureProjectNature"
-                                  property="de.ovgu.featureide.fm.ui.properties.nature"
-                                  value="false">
-                      </test>
-                </iterate>
-          </with>
-           </and>
-        </visibleWhen>
-     </command>
-  </menuContribution>
-  <menuContribution
-        allPopups="false"
-        locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
-     <menu
-           icon="icons/FeatureIconSmall.ico"
-           id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualizations"
-           label="Visualization">
-        <visibleWhen
-              checkEnabled="false">
-           <reference
-                 definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-           </reference>
-        </visibleWhen>
-        <command
-              commandId="de.ovgu.featureide.ui.visualization.command.featurerelations"
-              label="Feature Relations Graph"
-              style="push">
-        </command>
-     </menu>
-  </menuContribution>
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:org.eclipse.ui.projectConfigure">
+			<command
+					commandId="de.ovgu.featureide.ui.commands.Conversion"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.actions.addFeatureIDENature"
+					label="Convert to FeatureIDE Project..."
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<and>
+						<reference
+								definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
+						</reference>
+						<with
+								variable="activeMenuSelection">
+							<iterate ifEmpty="false"
+									operator="or">
+								<test
+										args="de.ovgu.featureide.core.featureProjectNature"
+										property="de.ovgu.featureide.fm.ui.properties.nature"
+										value="false">
+								</test>
+							</iterate>
+						</with>
+					</and>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+			<menu
+					icon="icons/FeatureIconSmall.ico"
+					id="popup:de.ovgu.featureide.fm.ui.menus.popupMenu.visualizations"
+					label="Visualization">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
+					</reference>
+				</visibleWhen>
+				<command
+						commandId="de.ovgu.featureide.ui.visualization.command.featurerelations"
+						label="Feature Relations Graph"
+						style="push">
+				</command>
+			</menu>
+		</menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -1302,16 +1293,16 @@
 				id="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
 				name="Create documentation statistics">
 		</command>
-  <command
-        defaultHandler="de.ovgu.featureide.ui.handlers.ColorSchemeHandler"
-        id="de.ovgu.featureide.fm.ui.colorscheme"
-        name="Colorscheme">
-  </command>
-  <command
-        defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
-        id="de.ovgu.featureide.ui.visualization.command.featurerelations"
-        name="Feature Relations Graph">
-  </command>
+		<command
+				defaultHandler="de.ovgu.featureide.ui.handlers.ColorSchemeHandler"
+				id="de.ovgu.featureide.fm.ui.colorscheme"
+				name="Colorscheme">
+		</command>
+		<command
+				defaultHandler="de.ovgu.featureide.ui.visualization.ShowFeatureRelationsGraphCommandHandler"
+				id="de.ovgu.featureide.ui.visualization.command.featurerelations"
+				name="Feature Relations Graph">
+		</command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1331,41 +1322,27 @@
 				class="de.ovgu.featureide.ui.handlers.BuildFeatureGraphHandler"
 				commandId="de.ovgu.featureide.ui.commands.buildFeatureGraph">
 		</handler>
-	  <handler
-	        class="de.ovgu.featureide.ui.handlers.VariantDocumentationHandler"
-	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
-	  </handler>
-	  <handler
-	        class="de.ovgu.featureide.ui.handlers.SPLDocumentationHandler"
-	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta">
-	  </handler>
-	  <handler
-	        class="de.ovgu.featureide.ui.handlers.ContextDocumentationHandler"
-	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context">
-	  </handler>
-	  <handler
-	        class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
-	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
-	  </handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.VariantDocumentationHandler"
+				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.SPLDocumentationHandler"
+				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.ContextDocumentationHandler"
+				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
+				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
+		</handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">
 		<definition
-				id="de.ovgu.featureide.ui.expressions.containsResource">
-			<with
-					variable="activeMenuSelection">
-				<iterate
-						ifEmpty="false"
-						operator="or">
-					<test
-							property="de.ovgu.featureide.fm.ui.properties.class"
-							value="org.eclipse.core.resources.IResource">
-					</test>
-				</iterate>
-			</with>
-		</definition>
-		<definition
-				id="de.ovgu.featureide.ui.expressions.onlyProjects">
+				id="de.ovgu.featureide.ui.expressions.containsOnlyProjects">
 			<with
 					variable="activeMenuSelection">
 				<iterate
@@ -1374,20 +1351,6 @@
 					<test
 							property="de.ovgu.featureide.fm.ui.properties.class"
 							value="org.eclipse.core.resources.IProject">
-					</test>
-				</iterate>
-			</with>
-		</definition>
-		<definition
-				id="de.ovgu.featureide.ui.expressions.containsConfiguration">
-			<with
-					variable="activeMenuSelection">
-				<iterate
-						ifEmpty="false"
-						operator="or">
-					<test
-							args=".config,.equation,.expression"
-							property="de.ovgu.featureide.fm.ui.properties.file">
 					</test>
 				</iterate>
 			</with>
@@ -1404,34 +1367,34 @@
 		</propertyTester>
 	</extension>
 	<extension point="org.eclipse.debug.ui.launchShortcuts">
-	    <shortcut
-           class="de.ovgu.featureide.ui.actions.generator.IntegrationTestLaunchShortcut"
-           description="Runs JUnit test cases on a product with and a product without the feature (if possible)."
-           icon="icons/FeatureIconSmall.ico"
-           id="de.ovgu.javaAppletShortcut"
-           label="Run as JUnit Integration Test"
-           modes="run">
-            <contextualLaunch>
-				  <enablement>
-				    <with variable="selection">
-				     <count value="1"/>
-				      <iterate operator="and">
-				             <instanceof
-				                   value="org.eclipse.core.resources.IFolder">
-				             </instanceof>
-				             <test
-				                   property="de.ovgu.featureide.ui.properties.integration">
-				             </test>
-             				<test
+		<shortcut
+				class="de.ovgu.featureide.ui.actions.generator.IntegrationTestLaunchShortcut"
+				description="Runs JUnit test cases on a product with and a product without the feature (if possible)."
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.javaAppletShortcut"
+				label="Run as JUnit Integration Test"
+				modes="run">
+			<contextualLaunch>
+				<enablement>
+					<with variable="selection">
+						<count value="1"/>
+						<iterate operator="and">
+							<instanceof
+									value="org.eclipse.core.resources.IFolder">
+							</instanceof>
+							<test
+									property="de.ovgu.featureide.ui.properties.integration">
+							</test>
+							<test
 									args="de.ovgu.featureide.core.featureProjectNature"
 									property="de.ovgu.featureide.fm.ui.properties.nature"
 									value="true">
 							</test>
-				      </iterate>
-				     </with>
-				  </enablement>
-			  </contextualLaunch>
-	    </shortcut>
+						</iterate>
+					</with>
+				</enablement>
+			</contextualLaunch>
+		</shortcut>
 	</extension>
 	<extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
@@ -1442,41 +1405,99 @@
 				type="org.eclipse.core.resources.IFolder">
 		</propertyTester>
 	</extension>
- <extension
-       point="org.eclipse.ui.navigator.viewer">
-    <viewerContentBinding
-          viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-       <includes>
-          <contentExtension
-                pattern="de.ovgu.featureide.ui.contentID">
-          </contentExtension>
-       </includes>
-    </viewerContentBinding>
- </extension>
- <extension
-       point="org.eclipse.ui.navigator.navigatorContent">
-    <navigatorContent
-          contentProvider="de.ovgu.featureide.ui.projectExplorer.NullContentProvider"
-          icon="icons/FeatureIconSmall.ico"
-          id="de.ovgu.featureide.ui.contentID"
-          labelProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerLabelProvider"
-          name="FeatureIDEProjectExplorer"
-          priority="highest">
-       <triggerPoints>
-          <or>
-             <instanceof
-                   value="org.eclipse.core.resources.IFile">
-             </instanceof>
-             <instanceof
-                   value="org.eclipse.core.resources.IFolder">
-             </instanceof>
-             <instanceof
-                   value="java.lang.Object">
-             </instanceof>
-          </or>
-       </triggerPoints>
-    </navigatorContent>
- </extension>
-	
-	
+	<extension
+			point="org.eclipse.ui.navigator.viewer">
+		<viewerContentBinding
+				viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+			<includes>
+				<contentExtension
+						pattern="de.ovgu.featureide.ui.contentID">
+				</contentExtension>
+			</includes>
+		</viewerContentBinding>
+	</extension>
+	<extension
+			point="org.eclipse.ui.navigator.navigatorContent">
+		<navigatorContent
+				contentProvider="de.ovgu.featureide.ui.projectExplorer.NullContentProvider"
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.featureide.ui.contentID"
+				labelProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerLabelProvider"
+				name="FeatureIDEProjectExplorer"
+				priority="highest">
+			<triggerPoints>
+				<or>
+					<instanceof
+							value="org.eclipse.core.resources.IFile">
+					</instanceof>
+					<instanceof
+							value="org.eclipse.core.resources.IFolder">
+					</instanceof>
+					<instanceof
+							value="java.lang.Object">
+					</instanceof>
+				</or>
+			</triggerPoints>
+		</navigatorContent>
+		<commonWizard
+				menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+				type="new"
+				wizardId="de.ovgu.featureide.ui.wizards.NewFeatureIDEFileWizard">
+			<enablement>
+				<with
+						variable="activeWorkbenchWindow.activePerspective">
+					<equals
+							value="de.ovgu.featureide.ui.FeatureIDEperspective">
+					</equals>
+				</with></enablement>
+		</commonWizard>
+		<commonWizard
+				menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+				type="new"
+				wizardId="de.ovgu.featureide.ui.wizards.NewConfigurationFileWizard">
+			<enablement>
+				<with
+						variable="activeWorkbenchWindow.activePerspective">
+					<equals
+							value="de.ovgu.featureide.ui.FeatureIDEperspective">
+					</equals>
+				</with></enablement>
+		</commonWizard>
+		<commonWizard
+				menuGroupId="de.ovgu.featureide.ui.wizards.groupProjectExplorer"
+				type="new"
+				wizardId="de.ovgu.featureide.fm.ui.wizard.NewFeatureModelWizard">
+			<enablement>
+				<with
+						variable="activeWorkbenchWindow.activePerspective">
+					<equals
+							value="de.ovgu.featureide.ui.FeatureIDEperspective">
+					</equals>
+				</with></enablement>
+		</commonWizard>
+		<commonWizard
+				menuGroupId="additions"
+				type="new"
+				wizardId="de.ovgu.featureide.ui.FeatureProjectWizard">
+			<enablement>
+				<with
+						variable="activeWorkbenchWindow.activePerspective">
+					<equals
+							value="de.ovgu.featureide.ui.FeatureIDEperspective">
+					</equals>
+				</with></enablement>
+		</commonWizard>
+	</extension>
+	<extension
+			point="de.ovgu.featureide.fm.ui.Outline">
+		<Outline
+				OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
+		</Outline>
+		<Outline
+				OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.ContextOutline">
+		</Outline>
+		<Outline
+				OutlineProvider="de.ovgu.featureide.ui.views.collaboration.outline.ExtendedOutline">
+		</Outline>
+	</extension>
 </plugin>

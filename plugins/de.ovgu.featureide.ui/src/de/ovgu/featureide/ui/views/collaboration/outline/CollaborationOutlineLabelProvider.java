@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -50,12 +50,13 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
 /**
  * Provides labels and images for Collaboration outline
- * 
+ *
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Dominic Labsch
@@ -64,12 +65,10 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
+	public void addListener(ILabelProviderListener listener) {}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
@@ -77,8 +76,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
+	public void removeListener(ILabelProviderListener listener) {}
 
 	@Override
 	public Image getImage(Object element) {
@@ -86,7 +84,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			return IMAGE_CLASS;
 		}
 		if (element instanceof IRoleElement) {
-			IRoleElement fstModelElement = (IRoleElement) element;
+			final IRoleElement fstModelElement = (IRoleElement) element;
 			if (fstModelElement instanceof FSTAsmetaLDomain) {
 				return IMAGE_FIELD_PUBLIC;
 			} else if (fstModelElement instanceof FSTAstemaLFunction) {
@@ -121,23 +119,25 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
 
 					if (method.hasContract() || method.contractsInRefinements()) {
-						if (method.isPrivate())
+						if (method.isPrivate()) {
 							return IMAGE_METHODE_PRIVATE_CONTRACT;
-						else if (method.isProtected())
+						} else if (method.isProtected()) {
 							return IMAGE_METHODE_PROTECTED_CONTRACT;
-						else if (method.isPublic())
+						} else if (method.isPublic()) {
 							return IMAGE_METHODE_PUBLIC_CONTRACT;
-						else
+						} else {
 							return IMAGE_METHODE_DEFAULT_CONTRACT;
+						}
 					} else {
-						if (method.isPrivate())
+						if (method.isPrivate()) {
 							return IMAGE_METHODE_PRIVATE;
-						else if (method.isProtected())
+						} else if (method.isProtected()) {
 							return IMAGE_METHODE_PROTECTED;
-						else if (method.isPublic())
+						} else if (method.isPublic()) {
 							return IMAGE_METHODE_PUBLIC;
-						else
+						} else {
 							return IMAGE_METHODE_DEFAULT;
+						}
 					}
 				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_LAMBDA;
@@ -147,13 +147,13 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			}
 		} else if (element instanceof FSTClass) {
 
-			FSTClass datClass = (FSTClass) element;
+			final FSTClass datClass = (FSTClass) element;
 			final String className = datClass.getName();
 			final int extIndex = className.lastIndexOf('.');
 			if (extIndex > -1) {
 				final String fileExtension = className.substring(extIndex + 1);
 				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension)
-						|| "c".equals(fileExtension)) {
+					|| "c".equals(fileExtension)) {
 					return IMAGE_CLASS;
 				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_MODULE;
@@ -168,48 +168,56 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	@Override
 	public String getText(Object element) {
 		if (element instanceof FSTClass) {
-			FSTClass fstclass = (FSTClass) element;
+			final FSTClass fstclass = (FSTClass) element;
 			String toAppend = "";
-			for (FSTRole r : fstclass.getRoles()) {
+			for (final FSTRole r : fstclass.getRoles()) {
 				if (!r.getDirectives().isEmpty()) {
 					return fstclass.getName();
 				}
-				if (viewer != null && viewer.getInput() != null && r.getFile().equals(viewer.getInput())) {
+				if ((viewer != null) && (viewer.getInput() != null) && r.getFile().equals(viewer.getInput())) {
 					toAppend = " - " + r.getFeature().getName();
 				}
 			}
 			return fstclass.getName() + toAppend;
 		}
 
-		if (element instanceof FSTMethod)
+		if (element instanceof FSTMethod) {
 			return ((FSTMethod) element).getFullName();
+		}
 
-		if (element instanceof FSTInvariant)
+		if (element instanceof FSTInvariant) {
 			return ((FSTInvariant) element).getFullName();
+		}
 
-		if (element instanceof FSTField)
+		if (element instanceof FSTField) {
 			return ((FSTField) element).getFullName();
+		}
 
-		if (element instanceof FSTFeature)
+		if (element instanceof FSTFeature) {
 			return ((FSTFeature) element).getName();
+		}
 
-		if (element instanceof FSTRole)
+		if (element instanceof FSTRole) {
 			return ((FSTRole) element).getFeature().getName();
+		}
 
 		if (element instanceof FSTDirective) {
 			return ((FSTDirective) element).toString();
 		}
 
-		if (element instanceof String)
+		if (element instanceof String) {
 			return (String) element;
+		}
 
-		if (element instanceof FSTClassFragment)
+		if (element instanceof FSTClassFragment) {
 			return ((FSTClassFragment) element).getName();
+		}
 
 		return "";
 
 	}
 
+	@Override
 	public String getLabelProvName() {
 		return DEFAULT_OUTLINE;
 	}
@@ -219,6 +227,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		return OutlineLabelProvider.OUTLINE_CODE;
 	}
 
+	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 		for (int i = 0; i < treeItems.length; i++) {
 			if (treeItems[i].getData() instanceof IRoleElement) {
@@ -227,11 +236,11 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (treeItems[i].getData() instanceof FSTRole) {
 				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) {
 					// get old Font and simply make it bold
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
-							.getFontData()[0].getHeight(), SWT.BOLD));
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(),
+							treeItems[i].getFont().getFontData()[0].getHeight(), SWT.BOLD));
 				} else {
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
-							.getFontData()[0].getHeight(), SWT.NORMAL));
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(),
+							treeItems[i].getFont().getFontData()[0].getHeight(), SWT.NORMAL));
 				}
 				setForeground(treeItems[i], file);
 			}
@@ -242,8 +251,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	/**
-	 * @return <code>true</code> if the new input does not change the old
-	 *         content.
+	 * @return <code>true</code> if the new input does not change the old content.
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
@@ -269,7 +277,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		}
 		boolean i = false;
 		boolean j = false;
-		for (FSTRole role : Class.getRoles()) {
+		for (final FSTRole role : Class.getRoles()) {
 			if (role.getFile().equals(oldFile)) {
 				i = true;
 			} else if (role.getFile().equals(currentFile)) {
@@ -297,33 +305,32 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		return false;
 	}
 
+	@Override
 	public void setForeground(TreeItem item, IFile iFile) {
 		final Object data = item.getData();
 		if (data instanceof FSTDirective) {
 			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
-			int colorID = ((FSTDirective) data).getColor();
+			final int colorID = ((FSTDirective) data).getColor();
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
-			}
-			else {
+			} else {
 				item.setBackground(null);
 			}
 		} else if (data instanceof FSTRole) {
-			int colorID = ((FSTRole) data).getFeature().getColor();
+			final int colorID = ((FSTRole) data).getFeature().getColor();
 			if (colorID != FeatureColor.NO_COLOR.getValue()) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
-			}
-			else {
+			} else {
 				item.setBackground(null);
 			}
 		} else {
 			final IRoleElement element = (IRoleElement) data;
-			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
+			for (final FSTRole role : element.getRole().getFSTClass().getRoles()) {
 				if (role.getFile().equals(iFile)
-						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element) && role.getClassFragment().getMethods().contains(element))
-								|| (element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element))
-								|| (element instanceof FSTField && role.getAllFields().contains(element) && role.getClassFragment().getFields().contains(element)) 
-								|| (element instanceof FSTClassFragment && role.getAllInnerClasses().contains(element)))) {
+					&& (((element instanceof FSTMethod) && role.getAllMethods().contains(element) && role.getClassFragment().getMethods().contains(element))
+						|| ((element instanceof FSTInvariant) && role.getClassFragment().getInvariants().contains(element))
+						|| ((element instanceof FSTField) && role.getAllFields().contains(element) && role.getClassFragment().getFields().contains(element))
+						|| ((element instanceof FSTClassFragment) && role.getAllInnerClasses().contains(element)))) {
 					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 					return;
 				}
@@ -332,15 +339,14 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 		}
 	}
-	
-	
 
+	@Override
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
-		if (currentFile != null && oldFile != null) {
+		if ((currentFile != null) && (oldFile != null)) {
 			/** only set the colors of the tree if the content is the same **/
-			TreeItem[] items = viewer.getTree().getItems();
-			if (currentFile.getName().equals(oldFile.getName()) && items.length > 0) {
-				TreeItem item = items[0];
+			final TreeItem[] items = viewer.getTree().getItems();
+			if (currentFile.getName().equals(oldFile.getName()) && (items.length > 0)) {
+				final TreeItem item = items[0];
 				if (item != null) {
 					if (item.getData() instanceof FSTClass) {
 						if (!hasSameClass((FSTClass) item.getData(), oldFile, currentFile)) {
@@ -348,7 +354,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 						}
 						oldFile = currentFile;
 						String toAppend = " - Composed class";
-						for (FSTRole r : ((FSTClass) item.getData()).getRoles()) {
+						for (final FSTRole r : ((FSTClass) item.getData()).getRoles()) {
 							if (!r.getDirectives().isEmpty()) {
 								toAppend = "";
 								break;
@@ -369,6 +375,5 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	@Override
-	public void init() {
-	}
+	public void init() {}
 }

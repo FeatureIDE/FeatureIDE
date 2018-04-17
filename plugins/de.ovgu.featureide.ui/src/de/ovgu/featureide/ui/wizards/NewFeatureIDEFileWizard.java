@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -54,23 +54,23 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A wizard to create a new language specific featureIDE file.
- * 
+ *
  * @author Dariusz Krolikowski
  */
 public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
-	
-	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard"; 
+
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewFeatureIDEFileWizard";
 
 	public NewFeatureIDEFilePage page;
-	
+
 	private ISelection selection;
-	
+
 	private String feature;
-	
+
 	private String clss;
-	
+
 	private String pack;
-	
+
 	/**
 	 * Constructor for NewFeatureIDEFileWizard.
 	 */
@@ -79,25 +79,25 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		setNeedsProgressMonitor(true);
 		setWindowTitle(NEW_FEATUREIDE_SOURCE_FILE);
 	}
-	
+
 	/**
 	 * Adding the page to the wizard.
 	 */
+	@Override
 	public void addPages() {
 		page = new NewFeatureIDEFilePage(selection, feature, clss, pack);
 		if (clss == null) {
-			this.page.setRefines(false);
+			page.setRefines(false);
 		} else {
-			this.page.setRefines(!clss.isEmpty());
+			page.setRefines(!clss.isEmpty());
 		}
 		addPage(page);
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in
-	 * the wizard. We will create an operation and run it
-	 * using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We will create an operation and run it using wizard as execution context.
 	 */
+	@Override
 	public boolean performFinish() {
 		final IContainer container = page.getContainerObject();
 		final String fileName = page.getFileName();
@@ -112,11 +112,13 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 			sourceFolder = sourceFolder.getFolder(featureName);
 		}
 		createFolder(page.getPackage(), sourceFolder);
-		IRunnableWithProgress op = new IRunnableWithProgress() {
+		final IRunnableWithProgress op = new IRunnableWithProgress() {
+
+			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
 					doFinish(featureName, container, fileName, className, fileExtension, fileTemplate, composer, page.isRefinement(), packageName, monitor);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
 					monitor.done();
@@ -125,27 +127,27 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		};
 		try {
 			getContainer().run(true, false, op);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			return false;
-		} catch (InvocationTargetException e) {
-			Throwable realException = e.getTargetException();
+		} catch (final InvocationTargetException e) {
+			final Throwable realException = e.getTargetException();
 			MessageDialog.openError(getShell(), "Error", realException.getMessage());
 			return false;
 		}
 		return true;
 	}
-	
+
 	/**
-	 * @param packageName 
+	 * @param packageName
 	 * @param sourceFolder
 	 */
 	private void createFolder(String packageName, IFolder folder) {
-		for (String p : packageName.split("[.]")) {
+		for (final String p : packageName.split("[.]")) {
 			folder = folder.getFolder(p);
 			if (!folder.exists()) {
 				try {
 					folder.create(true, true, null);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					UIPlugin.getDefault().logError(e);
 				}
 			}
@@ -153,44 +155,43 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
-	 * @param packageName 
+	 * The worker method. It will find the container, create the file if missing or just replace its contents, and open the editor on the newly created file.
+	 *
+	 * @param packageName
 	 */
-	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template, 
+	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template,
 			IComposerExtensionClass composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask(CREATING + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
-	
+
 		try {
-			InputStream stream = openContentStream(featureName, container, classname, template, composer, refines, packageName);
+			final InputStream stream = openContentStream(featureName, container, classname, template, composer, refines, packageName);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
 				file.create(stream, true, monitor);
 			}
 			stream.close();
-		} catch (IOException e) {
-		}
+		} catch (final IOException e) {}
 		monitor.worked(1);
 		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
 		getShell().getDisplay().asyncExec(new Runnable() {
+
+			@Override
 			public void run() {
-				IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
-				} catch (PartInitException e) {
-				}
+				} catch (final PartInitException e) {}
 			}
 		});
 		monitor.worked(1);
 	}
-	
+
 	// TODO Rename, method name does not describe the functionality
-	private InputStream openContentStream(String featurename, IContainer container, String classname, String template, IComposerExtensionClass composer, boolean refines, String packageName) {
+	private InputStream openContentStream(String featurename, IContainer container, String classname, String template, IComposerExtensionClass composer,
+			boolean refines, String packageName) {
 		String contents = template;
 		contents = composer.replaceSourceContentMarker(contents, refines, packageName);
 		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);
@@ -199,16 +200,18 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
+	 * We will accept the selection in the workbench to see if we can initialize from it.
+	 *
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
+	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
 	}
-	
+
 	/**
 	 * Extended for passing selected feature.
+	 *
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection, String feature, String clss, String pack) {

@@ -1,0 +1,2546 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and mandatory="true" name="root">
+				<alt abstract="true" mandatory="true" name="CONFIG_386_alt">
+					<feature mandatory="true" name="CONFIG_GENERIC_386"/>
+					<feature mandatory="true" name="CONFIG_386"/>
+					<feature mandatory="true" name="CONFIG_486"/>
+					<feature mandatory="true" name="CONFIG_586"/>
+					<feature mandatory="true" name="CONFIG_586MMX"/>
+					<feature mandatory="true" name="CONFIG_686"/>
+					<feature mandatory="true" name="CONFIG_PENTIUMII"/>
+					<feature mandatory="true" name="CONFIG_PENTIUMIII"/>
+					<feature mandatory="true" name="CONFIG_PENTIUM4"/>
+					<feature mandatory="true" name="CONFIG_K6"/>
+					<feature mandatory="true" name="CONFIG_K7"/>
+					<feature mandatory="true" name="CONFIG_ELAN"/>
+					<feature mandatory="true" name="CONFIG_CRUSOE"/>
+					<feature mandatory="true" name="CONFIG_WINCHIPC6"/>
+					<feature mandatory="true" name="CONFIG_WINCHIP2"/>
+					<feature mandatory="true" name="CONFIG_CYRIXIII"/>
+					<feature mandatory="true" name="CONFIG_NEHEMIAH"/>
+				</alt>
+				<feature name="DOMULTI"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_ARM926T_alt">
+					<feature mandatory="true" name="CONFIG_GENERIC_ARM"/>
+					<feature mandatory="true" name="CONFIG_ARM610"/>
+					<feature mandatory="true" name="CONFIG_ARM710"/>
+					<feature mandatory="true" name="CONFIG_ARM7TDMI"/>
+					<feature mandatory="true" name="CONFIG_ARM720T"/>
+					<feature mandatory="true" name="CONFIG_ARM920T"/>
+					<feature mandatory="true" name="CONFIG_ARM922T"/>
+					<feature mandatory="true" name="CONFIG_ARM926T"/>
+					<feature mandatory="true" name="CONFIG_ARM10T"/>
+					<feature mandatory="true" name="CONFIG_ARM1136JF_S"/>
+					<feature mandatory="true" name="CONFIG_ARM1176JZ_S"/>
+					<feature mandatory="true" name="CONFIG_ARM1176JZF_S"/>
+					<feature mandatory="true" name="CONFIG_ARM_CORTEX_M3"/>
+					<feature mandatory="true" name="CONFIG_ARM_CORTEX_M1"/>
+					<feature mandatory="true" name="CONFIG_ARM_SA110"/>
+					<feature mandatory="true" name="CONFIG_ARM_SA1100"/>
+					<feature mandatory="true" name="CONFIG_ARM_XSCALE"/>
+					<feature mandatory="true" name="CONFIG_ARM_IWMMXT"/>
+				</alt>
+				<feature name="ARCH_LITTLE_ENDIAN"/>
+				<alt abstract="true" mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_512_alt">
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_NONE"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_256"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_512"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_1024"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_2048"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_4096"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUFSIZ_8192"/>
+				</alt>
+				<alt abstract="true" mandatory="true" name="TARGET_i960_alt">
+					<feature mandatory="true" name="TARGET_alpha"/>
+					<feature mandatory="true" name="TARGET_arm"/>
+					<feature mandatory="true" name="TARGET_avr32"/>
+					<feature mandatory="true" name="TARGET_bfin"/>
+					<feature mandatory="true" name="TARGET_cris"/>
+					<feature mandatory="true" name="TARGET_e1"/>
+					<feature mandatory="true" name="TARGET_frv"/>
+					<feature mandatory="true" name="TARGET_h8300"/>
+					<feature mandatory="true" name="TARGET_hppa"/>
+					<feature mandatory="true" name="TARGET_i386"/>
+					<feature mandatory="true" name="TARGET_i960"/>
+					<feature mandatory="true" name="TARGET_ia64"/>
+					<feature mandatory="true" name="TARGET_m68k"/>
+					<feature mandatory="true" name="TARGET_microblaze"/>
+					<feature mandatory="true" name="TARGET_mips"/>
+					<feature mandatory="true" name="TARGET_nios"/>
+					<feature mandatory="true" name="TARGET_nios2"/>
+					<feature mandatory="true" name="TARGET_powerpc"/>
+					<feature mandatory="true" name="TARGET_sh"/>
+					<feature mandatory="true" name="TARGET_sh64"/>
+					<feature mandatory="true" name="TARGET_sparc"/>
+					<feature mandatory="true" name="TARGET_v850"/>
+					<feature mandatory="true" name="TARGET_vax"/>
+					<feature mandatory="true" name="TARGET_x86_64"/>
+					<feature mandatory="true" name="TARGET_xtensa"/>
+				</alt>
+				<alt abstract="true" mandatory="true" name="MALLOC_alt">
+					<feature mandatory="true" name="MALLOC"/>
+					<feature mandatory="true" name="MALLOC_SIMPLE"/>
+					<feature mandatory="true" name="MALLOC_STANDARD"/>
+				</alt>
+				<feature name="COMPAT_ATEXIT"/>
+				<feature name="UCLIBC_HAS_OBSOLETE_SYSV_SIGNAL"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_MIPS_ISA_1_alt">
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_1"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_2"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_3"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_4"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_MIPS32"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_MIPS32R2"/>
+					<feature mandatory="true" name="CONFIG_MIPS_ISA_MIPS64"/>
+				</alt>
+				<feature name="UCLIBC_HAS_LONG_DOUBLE_MATH"/>
+				<alt abstract="true" mandatory="true" name="LINUXTHREADS_OLD_alt">
+					<feature mandatory="true" name="HAS_NO_THREADS"/>
+					<feature mandatory="true" name="LINUXTHREADS_OLD"/>
+					<feature mandatory="true" name="LINUXTHREADS_NEW"/>
+					<feature mandatory="true" name="UCLIBC_HAS_THREADS_NATIVE"/>
+				</alt>
+				<alt abstract="true" mandatory="true" name="ARCH_WANTS_LITTLE_ENDIAN_alt">
+					<feature mandatory="true" name="ARCH_WANTS_BIG_ENDIAN"/>
+					<feature mandatory="true" name="ARCH_WANTS_LITTLE_ENDIAN"/>
+				</alt>
+				<feature name="UCLIBC_SV4_DEPRECATED"/>
+				<feature name="UCLIBC_HAS_STRING_ARCH_OPT"/>
+				<feature mandatory="true" name="DESIRED_TARGET_ARCH"/>
+				<feature name="ARCH_BIG_ENDIAN"/>
+				<alt abstract="true" mandatory="true" name="UCLIBC_FORMAT_FLAT_SEP_DATA_alt">
+					<feature mandatory="true" name="UCLIBC_FORMAT_ELF"/>
+					<feature mandatory="true" name="UCLIBC_FORMAT_FDPIC_ELF"/>
+					<feature mandatory="true" name="UCLIBC_FORMAT_FLAT"/>
+					<feature mandatory="true" name="UCLIBC_FORMAT_FLAT_SEP_DATA"/>
+					<feature mandatory="true" name="UCLIBC_FORMAT_SHARED_FLAT"/>
+				</alt>
+				<feature mandatory="true" name="KERNEL_HEADERS"/>
+				<and name="UCLIBC_HAS_NETWORK_SUPPORT">
+					<feature name="UCLIBC_HAS_LIBNSL_STUB"/>
+					<feature name="UCLIBC_HAS_EXTRA_COMPAT_RES_STATE"/>
+					<feature name="UCLIBC_HAS_IPV4"/>
+					<feature name="UCLIBC_HAS_LIBRESOLV_STUB"/>
+					<feature name="UCLIBC_HAS_COMPAT_RES_STATE"/>
+					<feature name="UCLIBC_HAS_BSD_RES_CLOSE"/>
+					<and name="UCLIBC_USE_NETLINK">
+						<feature name="UCLIBC_SUPPORT_AI_ADDRCONFIG"/>
+					</and>
+					<feature name="UCLIBC_HAS_SOCKET"/>
+					<and name="UCLIBC_HAS_IPV6">
+						<and name="UCLIBC_HAS_RPC">
+							<feature name="UCLIBC_HAS_REENTRANT_RPC"/>
+							<feature name="UCLIBC_HAS_FULL_RPC"/>
+						</and>
+					</and>
+				</and>
+				<feature name="UCLIBC_HAS_GNU_GETSUBOPT"/>
+				<feature name="UCLIBC_HAS_GETOPT_LONG"/>
+				<and name="UCLIBC_HAS_REALTIME">
+					<feature name="UCLIBC_HAS_ADVANCED_REALTIME"/>
+				</and>
+				<feature name="UCLIBC_HAS_SCANF_GLIBC_A_FLAG"/>
+				<feature mandatory="true" name="DEVEL_PREFIX"/>
+				<feature mandatory="true" name="WARNINGS"/>
+				<feature name="UCLIBC_HAS_GNU_GETOPT"/>
+				<feature name="PTHREADS_DEBUG_SUPPORT"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_SH4_alt">
+					<feature mandatory="true" name="CONFIG_SH2A"/>
+					<feature mandatory="true" name="CONFIG_SH2"/>
+					<feature mandatory="true" name="CONFIG_SH3"/>
+					<feature mandatory="true" name="CONFIG_SH4"/>
+				</alt>
+				<and name="UCLIBC_HAS_PROGRAM_INVOCATION_NAME">
+					<feature name="UCLIBC_HAS___PROGNAME"/>
+				</and>
+				<feature name="ARCH_ANY_ENDIAN"/>
+				<feature name="ARCH_HAS_NO_SHARED"/>
+				<and name="UCLIBC_HAS_PTY">
+					<feature name="UNIX98PTY_ONLY"/>
+					<feature name="ASSUME_DEVPTS"/>
+				</and>
+				<feature name="UCLIBC_HAS_TLS"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_SPARC_V9_alt">
+					<feature mandatory="true" name="CONFIG_SPARC_V7"/>
+					<feature mandatory="true" name="CONFIG_SPARC_V8"/>
+					<feature mandatory="true" name="CONFIG_SPARC_V9"/>
+					<feature mandatory="true" name="CONFIG_SPARC_V9B"/>
+				</alt>
+				<feature name="UCLIBC_HAS_STDIO_GETC_MACRO"/>
+				<feature name="SUPPORT_LD_DEBUG"/>
+				<and name="UCLIBC_HAS_GLIBC_DIGIT_GROUPING">
+					<feature name="UCLIBC_HAS_SCANF_LENIENT_DIGIT_GROUPING"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="CONFIG_H8S_alt">
+					<feature mandatory="true" name="CONFIG_H8300H"/>
+					<feature mandatory="true" name="CONFIG_H8S"/>
+				</alt>
+				<feature name="UCLIBC_SUSV3_LEGACY"/>
+				<feature name="UCLIBC_HAS_PROFILING"/>
+				<and name="HAVE_SHARED">
+					<feature name="LDSO_LDD_SUPPORT"/>
+					<feature name="UCLIBC_STATIC_LDCONFIG"/>
+					<feature name="LDSO_PRELOAD_ENV_SUPPORT"/>
+					<and name="LDSO_PRELOAD_FILE_SUPPORT">
+						<feature mandatory="true" name="LDSO_BASE_FILENAME"/>
+					</and>
+					<feature name="FORCE_SHAREABLE_TEXT_SEGMENTS"/>
+					<feature name="LDSO_CACHE_SUPPORT"/>
+					<feature name="LDSO_RUNPATH"/>
+					<feature name="LDSO_SEARCH_INTERP_PATH"/>
+				</and>
+				<alt abstract="true" mandatory="true" name="UCLIBC_HAS_STDIO_BUILTIN_BUFFER_4_alt">
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUILTIN_BUFFER_NONE"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUILTIN_BUFFER_4"/>
+					<feature mandatory="true" name="UCLIBC_HAS_STDIO_BUILTIN_BUFFER_8"/>
+				</alt>
+				<feature name="UCLIBC_NTP_LEGACY"/>
+				<feature name="UCLIBC_HAS_STDIO_PUTC_MACRO"/>
+				<feature name="UCLIBC_HAS_STDIO_AUTO_RW_TRANSITION"/>
+				<feature name="UCLIBC_MALLOC_DEBUGGING"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_CRISV32_alt">
+					<feature mandatory="true" name="CONFIG_CRIS"/>
+					<feature mandatory="true" name="CONFIG_CRISV32"/>
+				</alt>
+				<feature name="UCLIBC_HAS_PRINTF_M_SPEC"/>
+				<feature name="UCLIBC_HAS_FOPEN_EXCLUSIVE_MODE"/>
+				<feature name="UCLIBC_HAS_HEXADECIMAL_FLOATS"/>
+				<feature name="UCLIBC_HAS_LIBUTIL"/>
+				<feature name="LINKRELAX"/>
+				<feature name="HAVE_DOT_CONFIG"/>
+				<feature name="UCLIBC_DOWNLOAD_PREGENERATED_LOCALE_DATA"/>
+				<feature name="UCLIBC_HAS_SYSLOG"/>
+				<and name="UCLIBC_HAS_REGEX">
+					<feature name="UCLIBC_HAS_REGEX_OLD"/>
+				</and>
+				<feature name="USE_BX"/>
+				<feature name="DOASSERTS"/>
+				<and name="UCLIBC_HAS_LOCALE">
+					<alt abstract="true" mandatory="true" name="UCLIBC_BUILD_ALL_LOCALE_alt">
+						<feature mandatory="true" name="UCLIBC_BUILD_ALL_LOCALE"/>
+						<feature mandatory="true" name="UCLIBC_BUILD_MINIMAL_LOCALE"/>
+						<feature mandatory="true" name="UCLIBC_PREGENERATED_LOCALE_DATA"/>
+					</alt>
+				</and>
+				<feature mandatory="true" name="UCLIBC_GRP_BUFFER_SIZE"/>
+				<feature name="UCLIBC_HAS_GLIBC_CUSTOM_STREAMS"/>
+				<feature name="MALLOC_GLIBC_COMPAT"/>
+				<feature name="ARCH_HAS_NO_LDSO"/>
+				<feature name="DODEBUG"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_MIPS_O32_ABI_alt">
+					<feature mandatory="true" name="CONFIG_MIPS_O32_ABI"/>
+					<feature mandatory="true" name="CONFIG_MIPS_N32_ABI"/>
+					<feature mandatory="true" name="CONFIG_MIPS_N64_ABI"/>
+				</alt>
+				<feature name="UCLIBC_HAS_TM_EXTENSIONS"/>
+				<feature name="UCLIBC_BUILD_RELRO"/>
+				<and name="UCLIBC_HAS_GLOB">
+					<feature name="UCLIBC_HAS_GNU_GLOB"/>
+				</and>
+				<feature name="UCLIBC_HAS_WORDEXP"/>
+				<feature name="UCLIBC_BUILD_NOW"/>
+				<feature name="UCLIBC_HAS_STRING_GENERIC_OPT"/>
+				<feature name="LDSO_GNU_HASH_SUPPORT"/>
+				<feature name="UCLIBC_HAS_FTW"/>
+				<feature mandatory="true" name="TARGET_ARCH"/>
+				<feature name="UCLIBC_BUILD_PIE"/>
+				<feature name="UCLIBC_SUSV4_LEGACY"/>
+				<and name="UCLIBC_HAS_FNMATCH">
+					<feature name="UCLIBC_HAS_FNMATCH_OLD"/>
+				</and>
+				<feature name="ARCH_HAS_BWD_MEMCPY"/>
+				<feature name="UCLIBC_HAS_OBSOLETE_BSD_SIGNAL"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_CLASSIC_alt">
+					<feature mandatory="true" name="CONFIG_CLASSIC"/>
+					<feature mandatory="true" name="CONFIG_E500"/>
+				</alt>
+				<feature name="UCLIBC_LINUX_SPECIFIC"/>
+				<feature name="UCLIBC_HAS_GETTEXT_AWARENESS"/>
+				<feature name="USE_OLD_VFPRINTF"/>
+				<feature name="UCLIBC_UCLINUX_BROKEN_MUNMAP"/>
+				<feature name="UCLIBC_HAS_BSD_ERR"/>
+				<feature name="UCLIBC_CTOR_DTOR"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_AVR32_AP7_alt">
+					<feature mandatory="true" name="CONFIG_AVR32_AP7"/>
+				</alt>
+				<feature mandatory="true" name="TARGET_SUBARCH"/>
+				<feature name="UCLIBC_HAS_STDIO_FUTEXES"/>
+				<feature mandatory="true" name="UCLIBC_PRINTF_SCANF_POSITIONAL_ARGS"/>
+				<feature name="UCLIBC_BSD_SPECIFIC"/>
+				<feature name="UCLIBC_HAS_ARC4RANDOM"/>
+				<feature name="UCLIBC_HAS_FOPEN_LARGEFILE_MODE"/>
+				<and name="UCLIBC_HAS_CRYPT_IMPL">
+					<feature name="UCLIBC_HAS_CRYPT"/>
+					<feature name="UCLIBC_HAS_CRYPT_STUB"/>
+				</and>
+				<feature mandatory="true" name="UCLIBC_EXTRA_CFLAGS"/>
+				<feature name="UCLIBC_LINUX_MODULE_24"/>
+				<and name="UCLIBC_HAS_TZ_FILE">
+					<feature mandatory="true" name="UCLIBC_TZ_FILE_PATH"/>
+					<feature name="UCLIBC_HAS_TZ_FILE_READ_MANY"/>
+					<feature name="UCLIBC_FALLBACK_TO_ETC_LOCALTIME"/>
+				</and>
+				<feature name="HAVE_NO_SSP"/>
+				<feature mandatory="true" name="CROSS_COMPILER_PREFIX"/>
+				<and name="UCLIBC_HAS_FLOATS">
+					<and name="UCLIBC_HAS_FPU">
+						<feature name="UCLIBC_HAS_SOFT_FLOAT"/>
+					</and>
+					<feature name="DO_C99_MATH"/>
+					<feature name="UCLIBC_HAS_FENV"/>
+					<feature name="DO_XSI_MATH"/>
+				</and>
+				<feature name="UCLIBC_HAS_XATTR"/>
+				<and name="UCLIBC_HAS_SSP">
+					<alt abstract="true" mandatory="true" name="PROPOLICE_BLOCK_SEGV_alt">
+						<feature mandatory="true" name="PROPOLICE_BLOCK_ABRT"/>
+						<feature mandatory="true" name="PROPOLICE_BLOCK_SEGV"/>
+					</alt>
+					<feature name="SSP_QUICK_CANARY"/>
+					<feature name="UCLIBC_HAS_SSP_COMPAT"/>
+					<feature name="UCLIBC_BUILD_SSP"/>
+				</and>
+				<feature mandatory="true" name="UCLIBC_PWD_BUFFER_SIZE"/>
+				<feature name="UCLIBC_SUSV3_LEGACY_MACROS"/>
+				<feature mandatory="true" name="MULTILIB_DIR"/>
+				<feature name="EXTRA_WARNINGS"/>
+				<feature name="DODEBUG_PT"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_ARM_EABI_alt">
+					<feature mandatory="true" name="CONFIG_ARM_OABI"/>
+					<feature mandatory="true" name="CONFIG_ARM_EABI"/>
+				</alt>
+				<feature name="UCLIBC_HAS_WCHAR"/>
+				<and name="UCLIBC_HAS_CTYPE_TABLES">
+					<alt abstract="true" mandatory="true" name="UCLIBC_HAS_CTYPE_ENFORCED_alt">
+						<feature mandatory="true" name="UCLIBC_HAS_CTYPE_UNSAFE"/>
+						<feature mandatory="true" name="UCLIBC_HAS_CTYPE_CHECKED"/>
+						<feature mandatory="true" name="UCLIBC_HAS_CTYPE_ENFORCED"/>
+					</alt>
+					<feature name="UCLIBC_HAS_CTYPE_SIGNED"/>
+				</and>
+				<feature name="HAVE_NO_PIC"/>
+				<feature name="UCLIBC_HAS_NFTW"/>
+				<feature name="UCLIBC_HAS_LFS"/>
+				<feature name="ARCH_HAS_NO_MMU"/>
+				<feature name="UCLIBC_HAS_STUBS"/>
+				<feature name="UCLIBC_HAS_BACKTRACE"/>
+				<feature name="DOSTRIP"/>
+				<feature name="FORCE_OPTIONS_FOR_ARCH"/>
+				<and name="UCLIBC_HAS_SIGNUM_MESSAGES">
+					<feature name="UCLIBC_HAS_SYS_SIGLIST"/>
+				</and>
+				<feature mandatory="true" name="UCLIBC_BUILD_MINIMAL_LOCALES"/>
+				<and name="UCLIBC_HAS_ERRNO_MESSAGES">
+					<feature name="UCLIBC_HAS_SYS_ERRLIST"/>
+				</and>
+				<feature name="UCLIBC_HAS_XLOCALE"/>
+				<feature name="UCLIBC_HAS_EPOLL"/>
+				<feature name="UCLIBC_BUILD_NOEXECSTACK"/>
+				<feature name="UCLIBC_HAS_GETPT"/>
+				<feature name="UCLIBC_HAS_STDIO_SHUTDOWN_ON_ABORT"/>
+				<feature mandatory="true" name="RUNTIME_PREFIX"/>
+				<feature name="UCLIBC_HAS_GNU_ERROR"/>
+				<feature name="SUPPORT_LD_DEBUG_EARLY"/>
+				<alt abstract="true" mandatory="true" name="CONFIG_SH5_alt">
+					<feature mandatory="true" name="CONFIG_SH5"/>
+				</alt>
+				<feature name="UCLIBC_HAS_SHADOW"/>
+				<feature name="UCLIBC_HAS_TZ_CACHING"/>
+				<and name="ARCH_HAS_MMU">
+					<feature name="ARCH_USE_MMU"/>
+				</and>
+				<feature name="UCLIBC_HAS_GLIBC_CUSTOM_PRINTF"/>
+				<feature mandatory="true" name="UCLIBC_SHARED_FLAT_ID"/>
+				<feature name="DOPIC"/>
+				<feature name="UCLIBC_HAS_THREADS"/>
+				<feature name="UCLIBC_MJN3_ONLY"/>
+				<feature name="UCLIBC_DYNAMIC_ATEXIT"/>
+				<feature name="UCLIBC_HAS_UTMPX"/>
+				<feature name="HARDWIRED_ABSPATH"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<disj>
+					<conj>
+						<var>TARGET_arm</var>
+						<conj>
+							<not>
+								<var>CONFIG_GENERIC_ARM</var>
+							</not>
+							<conj>
+								<not>
+									<var>CONFIG_ARM610</var>
+								</not>
+								<not>
+									<var>CONFIG_ARM710</var>
+								</not>
+							</conj>
+						</conj>
+					</conj>
+					<conj>
+						<disj>
+							<conj>
+								<conj>
+									<not>
+										<var>CONFIG_ARM_CORTEX_M1</var>
+									</not>
+									<not>
+										<var>CONFIG_ARM_CORTEX_M3</var>
+									</not>
+								</conj>
+								<disj>
+									<not>
+										<var>TARGET_arm</var>
+									</not>
+									<disj>
+										<var>CONFIG_GENERIC_ARM</var>
+										<disj>
+											<var>CONFIG_ARM610</var>
+											<var>CONFIG_ARM710</var>
+										</disj>
+									</disj>
+								</disj>
+							</conj>
+							<var>USE_BX</var>
+						</disj>
+						<disj>
+							<not>
+								<var>USE_BX</var>
+							</not>
+							<disj>
+								<disj>
+									<var>CONFIG_ARM_CORTEX_M1</var>
+									<var>CONFIG_ARM_CORTEX_M3</var>
+								</disj>
+								<conj>
+									<var>TARGET_arm</var>
+									<conj>
+										<not>
+											<var>CONFIG_GENERIC_ARM</var>
+										</not>
+										<conj>
+											<not>
+												<var>CONFIG_ARM610</var>
+											</not>
+											<not>
+												<var>CONFIG_ARM710</var>
+											</not>
+										</conj>
+									</conj>
+								</conj>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>TARGET_avr32</var>
+					<conj>
+						<disj>
+							<not>
+								<var>TARGET_avr32</var>
+							</not>
+							<var>LINKRELAX</var>
+						</disj>
+						<disj>
+							<not>
+								<var>LINKRELAX</var>
+							</not>
+							<var>TARGET_avr32</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>TARGET_sh</var>
+							</not>
+							<not>
+								<var>CONFIG_SH4</var>
+							</not>
+						</disj>
+						<var>ARCH_HAS_BWD_MEMCPY</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_HAS_BWD_MEMCPY</var>
+						</not>
+						<conj>
+							<var>TARGET_sh</var>
+							<var>CONFIG_SH4</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>ARCH_USE_MMU</var>
+					</not>
+					<disj>
+						<not>
+							<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+							</not>
+							<var>UCLIBC_SHARED_FLAT_ID</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_SHARED_FLAT_ID</var>
+							</not>
+							<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<disj>
+											<not>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+											</not>
+											<not>
+												<var>TARGET_mips</var>
+											</not>
+										</disj>
+										<disj>
+											<not>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+											</not>
+											<not>
+												<var>TARGET_sh</var>
+											</not>
+										</disj>
+									</conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_sh64</var>
+										</not>
+									</disj>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_h8300</var>
+									</not>
+								</disj>
+							</conj>
+							<disj>
+								<not>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+								</not>
+								<not>
+									<var>TARGET_arm</var>
+								</not>
+							</disj>
+						</conj>
+						<var>ARCH_ANY_ENDIAN</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_ANY_ENDIAN</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<conj>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+											<var>TARGET_mips</var>
+										</conj>
+										<conj>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+											<var>TARGET_sh</var>
+										</conj>
+									</disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_sh64</var>
+									</conj>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_h8300</var>
+								</conj>
+							</disj>
+							<conj>
+								<var>FORCE_OPTIONS_FOR_ARCH</var>
+								<var>TARGET_arm</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<disj>
+															<not>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+															</not>
+															<not>
+																<var>TARGET_e1</var>
+															</not>
+														</disj>
+														<disj>
+															<not>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+															</not>
+															<not>
+																<var>TARGET_sparc</var>
+															</not>
+														</disj>
+													</conj>
+													<disj>
+														<not>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+														</not>
+														<not>
+															<var>TARGET_powerpc</var>
+														</not>
+													</disj>
+												</conj>
+												<disj>
+													<not>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+													</not>
+													<not>
+														<var>TARGET_microblaze</var>
+													</not>
+												</disj>
+											</conj>
+											<disj>
+												<not>
+													<var>FORCE_OPTIONS_FOR_ARCH</var>
+												</not>
+												<not>
+													<var>TARGET_frv</var>
+												</not>
+											</disj>
+										</conj>
+										<disj>
+											<not>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+											</not>
+											<not>
+												<var>TARGET_hppa</var>
+											</not>
+										</disj>
+									</conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_m68k</var>
+										</not>
+									</disj>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_avr32</var>
+									</not>
+								</disj>
+							</conj>
+							<not>
+								<var>ARCH_WANTS_BIG_ENDIAN</var>
+							</not>
+						</conj>
+						<var>ARCH_BIG_ENDIAN</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_BIG_ENDIAN</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<conj>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+															<var>TARGET_e1</var>
+														</conj>
+														<conj>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+															<var>TARGET_sparc</var>
+														</conj>
+													</disj>
+													<conj>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+														<var>TARGET_powerpc</var>
+													</conj>
+												</disj>
+												<conj>
+													<var>FORCE_OPTIONS_FOR_ARCH</var>
+													<var>TARGET_microblaze</var>
+												</conj>
+											</disj>
+											<conj>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+												<var>TARGET_frv</var>
+											</conj>
+										</disj>
+										<conj>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+											<var>TARGET_hppa</var>
+										</conj>
+									</disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_m68k</var>
+									</conj>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_avr32</var>
+								</conj>
+							</disj>
+							<var>ARCH_WANTS_BIG_ENDIAN</var>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<conj>
+															<conj>
+																<conj>
+																	<disj>
+																		<not>
+																			<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		</not>
+																		<not>
+																			<var>TARGET_i960</var>
+																		</not>
+																	</disj>
+																	<disj>
+																		<not>
+																			<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		</not>
+																		<not>
+																			<var>TARGET_vax</var>
+																		</not>
+																	</disj>
+																</conj>
+																<disj>
+																	<not>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																	</not>
+																	<not>
+																		<var>TARGET_nios2</var>
+																	</not>
+																</disj>
+															</conj>
+															<disj>
+																<not>
+																	<var>FORCE_OPTIONS_FOR_ARCH</var>
+																</not>
+																<not>
+																	<var>TARGET_bfin</var>
+																</not>
+															</disj>
+														</conj>
+														<disj>
+															<not>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+															</not>
+															<not>
+																<var>TARGET_x86_64</var>
+															</not>
+														</disj>
+													</conj>
+													<not>
+														<var>ARCH_WANTS_LITTLE_ENDIAN</var>
+													</not>
+												</conj>
+												<disj>
+													<not>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+													</not>
+													<not>
+														<var>TARGET_alpha</var>
+													</not>
+												</disj>
+											</conj>
+											<disj>
+												<not>
+													<var>FORCE_OPTIONS_FOR_ARCH</var>
+												</not>
+												<not>
+													<var>TARGET_i386</var>
+												</not>
+											</disj>
+										</conj>
+										<disj>
+											<not>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+											</not>
+											<not>
+												<var>TARGET_nios</var>
+											</not>
+										</disj>
+									</conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_ia64</var>
+										</not>
+									</disj>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_cris</var>
+									</not>
+								</disj>
+							</conj>
+							<disj>
+								<not>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+								</not>
+								<not>
+									<var>TARGET_v850</var>
+								</not>
+							</disj>
+						</conj>
+						<var>ARCH_LITTLE_ENDIAN</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_LITTLE_ENDIAN</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<disj>
+															<disj>
+																<disj>
+																	<conj>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		<var>TARGET_i960</var>
+																	</conj>
+																	<conj>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		<var>TARGET_vax</var>
+																	</conj>
+																</disj>
+																<conj>
+																	<var>FORCE_OPTIONS_FOR_ARCH</var>
+																	<var>TARGET_nios2</var>
+																</conj>
+															</disj>
+															<conj>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+																<var>TARGET_bfin</var>
+															</conj>
+														</disj>
+														<conj>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+															<var>TARGET_x86_64</var>
+														</conj>
+													</disj>
+													<var>ARCH_WANTS_LITTLE_ENDIAN</var>
+												</disj>
+												<conj>
+													<var>FORCE_OPTIONS_FOR_ARCH</var>
+													<var>TARGET_alpha</var>
+												</conj>
+											</disj>
+											<conj>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+												<var>TARGET_i386</var>
+											</conj>
+										</disj>
+										<conj>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+											<var>TARGET_nios</var>
+										</conj>
+									</disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_ia64</var>
+									</conj>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_cris</var>
+								</conj>
+							</disj>
+							<conj>
+								<var>FORCE_OPTIONS_FOR_ARCH</var>
+								<var>TARGET_v850</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<conj>
+															<conj>
+																<conj>
+																	<conj>
+																		<conj>
+																			<disj>
+																				<not>
+																					<var>FORCE_OPTIONS_FOR_ARCH</var>
+																				</not>
+																				<not>
+																					<var>TARGET_i960</var>
+																				</not>
+																			</disj>
+																			<disj>
+																				<not>
+																					<var>FORCE_OPTIONS_FOR_ARCH</var>
+																				</not>
+																				<not>
+																					<var>TARGET_e1</var>
+																				</not>
+																			</disj>
+																		</conj>
+																		<not>
+																			<var>CONFIG_ARM7TDMI</var>
+																		</not>
+																	</conj>
+																	<disj>
+																		<not>
+																			<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		</not>
+																		<not>
+																			<var>TARGET_nios2</var>
+																		</not>
+																	</disj>
+																</conj>
+																<disj>
+																	<not>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																	</not>
+																	<not>
+																		<var>TARGET_microblaze</var>
+																	</not>
+																</disj>
+															</conj>
+															<disj>
+																<not>
+																	<var>FORCE_OPTIONS_FOR_ARCH</var>
+																</not>
+																<not>
+																	<var>TARGET_frv</var>
+																</not>
+															</disj>
+														</conj>
+														<disj>
+															<not>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+															</not>
+															<not>
+																<var>TARGET_bfin</var>
+															</not>
+														</disj>
+													</conj>
+													<disj>
+														<not>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+														</not>
+														<not>
+															<var>TARGET_h8300</var>
+														</not>
+													</disj>
+												</conj>
+												<not>
+													<var>CONFIG_SH2</var>
+												</not>
+											</conj>
+											<not>
+												<var>CONFIG_ARM_CORTEX_M1</var>
+											</not>
+										</conj>
+										<not>
+											<var>CONFIG_SH2A</var>
+										</not>
+									</conj>
+									<not>
+										<var>CONFIG_ARM_CORTEX_M3</var>
+									</not>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_nios</var>
+									</not>
+								</disj>
+							</conj>
+							<disj>
+								<not>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+								</not>
+								<not>
+									<var>TARGET_v850</var>
+								</not>
+							</disj>
+						</conj>
+						<var>ARCH_HAS_NO_MMU</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_HAS_NO_MMU</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<disj>
+															<disj>
+																<disj>
+																	<disj>
+																		<disj>
+																			<conj>
+																				<var>FORCE_OPTIONS_FOR_ARCH</var>
+																				<var>TARGET_i960</var>
+																			</conj>
+																			<conj>
+																				<var>FORCE_OPTIONS_FOR_ARCH</var>
+																				<var>TARGET_e1</var>
+																			</conj>
+																		</disj>
+																		<var>CONFIG_ARM7TDMI</var>
+																	</disj>
+																	<conj>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		<var>TARGET_nios2</var>
+																	</conj>
+																</disj>
+																<conj>
+																	<var>FORCE_OPTIONS_FOR_ARCH</var>
+																	<var>TARGET_microblaze</var>
+																</conj>
+															</disj>
+															<conj>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+																<var>TARGET_frv</var>
+															</conj>
+														</disj>
+														<conj>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+															<var>TARGET_bfin</var>
+														</conj>
+													</disj>
+													<conj>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+														<var>TARGET_h8300</var>
+													</conj>
+												</disj>
+												<var>CONFIG_SH2</var>
+											</disj>
+											<var>CONFIG_ARM_CORTEX_M1</var>
+										</disj>
+										<var>CONFIG_SH2A</var>
+									</disj>
+									<var>CONFIG_ARM_CORTEX_M3</var>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_nios</var>
+								</conj>
+							</disj>
+							<conj>
+								<var>FORCE_OPTIONS_FOR_ARCH</var>
+								<var>TARGET_v850</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>ARCH_HAS_NO_MMU</var>
+					</not>
+					<conj>
+						<disj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<conj>
+															<conj>
+																<conj>
+																	<conj>
+																		<conj>
+																			<conj>
+																				<conj>
+																					<conj>
+																						<conj>
+																							<conj>
+																								<conj>
+																									<conj>
+																										<conj>
+																											<conj>
+																												<conj>
+																													<conj>
+																														<conj>
+																															<conj>
+																																<not>
+																																	<var>CONFIG_ARM922T</var>
+																																</not>
+																																<not>
+																																	<var>CONFIG_ARM1176JZ_S</var>
+																																</not>
+																															</conj>
+																															<disj>
+																																<not>
+																																	<var>FORCE_OPTIONS_FOR_ARCH</var>
+																																</not>
+																																<not>
+																																	<var>TARGET_powerpc</var>
+																																</not>
+																															</disj>
+																														</conj>
+																														<not>
+																															<var>CONFIG_ARM920T</var>
+																														</not>
+																													</conj>
+																													<not>
+																														<var>CONFIG_ARM720T</var>
+																													</not>
+																												</conj>
+																												<not>
+																													<var>CONFIG_CRISV32</var>
+																												</not>
+																											</conj>
+																											<not>
+																												<var>CONFIG_ARM610</var>
+																											</not>
+																										</conj>
+																										<disj>
+																											<not>
+																												<var>FORCE_OPTIONS_FOR_ARCH</var>
+																											</not>
+																											<not>
+																												<var>TARGET_hppa</var>
+																											</not>
+																										</disj>
+																									</conj>
+																									<not>
+																										<var>CONFIG_ARM_SA110</var>
+																									</not>
+																								</conj>
+																								<not>
+																									<var>CONFIG_AVR32_AP7</var>
+																								</not>
+																							</conj>
+																							<disj>
+																								<not>
+																									<var>FORCE_OPTIONS_FOR_ARCH</var>
+																								</not>
+																								<not>
+																									<var>TARGET_x86_64</var>
+																								</not>
+																							</disj>
+																						</conj>
+																						<not>
+																							<var>CONFIG_ARM_XSCALE</var>
+																						</not>
+																					</conj>
+																					<not>
+																						<var>CONFIG_ARM10T</var>
+																					</not>
+																				</conj>
+																				<not>
+																					<var>CONFIG_ARM_SA1100</var>
+																				</not>
+																			</conj>
+																			<not>
+																				<var>CONFIG_CRIS</var>
+																			</not>
+																		</conj>
+																		<disj>
+																			<not>
+																				<var>FORCE_OPTIONS_FOR_ARCH</var>
+																			</not>
+																			<not>
+																				<var>TARGET_alpha</var>
+																			</not>
+																		</disj>
+																	</conj>
+																	<disj>
+																		<not>
+																			<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		</not>
+																		<not>
+																			<var>TARGET_i386</var>
+																		</not>
+																	</disj>
+																</conj>
+																<not>
+																	<var>CONFIG_SH5</var>
+																</not>
+															</conj>
+															<not>
+																<var>CONFIG_ARM710</var>
+															</not>
+														</conj>
+														<not>
+															<var>CONFIG_ARM926T</var>
+														</not>
+													</conj>
+													<disj>
+														<not>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+														</not>
+														<not>
+															<var>TARGET_ia64</var>
+														</not>
+													</disj>
+												</conj>
+												<not>
+													<var>CONFIG_ARM1136JF_S</var>
+												</not>
+											</conj>
+											<not>
+												<var>CONFIG_ARM1176JZF_S</var>
+											</not>
+										</conj>
+										<not>
+											<var>CONFIG_SH3</var>
+										</not>
+									</conj>
+									<not>
+										<var>CONFIG_ARM_IWMMXT</var>
+									</not>
+								</conj>
+								<var>ARCH_HAS_NO_MMU</var>
+							</conj>
+							<var>ARCH_HAS_MMU</var>
+						</disj>
+						<disj>
+							<not>
+								<var>ARCH_HAS_MMU</var>
+							</not>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<disj>
+															<disj>
+																<disj>
+																	<disj>
+																		<disj>
+																			<disj>
+																				<disj>
+																					<disj>
+																						<disj>
+																							<disj>
+																								<disj>
+																									<disj>
+																										<disj>
+																											<disj>
+																												<disj>
+																													<disj>
+																														<disj>
+																															<disj>
+																																<var>CONFIG_ARM922T</var>
+																																<var>CONFIG_ARM1176JZ_S</var>
+																															</disj>
+																															<conj>
+																																<var>FORCE_OPTIONS_FOR_ARCH</var>
+																																<var>TARGET_powerpc</var>
+																															</conj>
+																														</disj>
+																														<var>CONFIG_ARM920T</var>
+																													</disj>
+																													<var>CONFIG_ARM720T</var>
+																												</disj>
+																												<var>CONFIG_CRISV32</var>
+																											</disj>
+																											<var>CONFIG_ARM610</var>
+																										</disj>
+																										<conj>
+																											<var>FORCE_OPTIONS_FOR_ARCH</var>
+																											<var>TARGET_hppa</var>
+																										</conj>
+																									</disj>
+																									<var>CONFIG_ARM_SA110</var>
+																								</disj>
+																								<var>CONFIG_AVR32_AP7</var>
+																							</disj>
+																							<conj>
+																								<var>FORCE_OPTIONS_FOR_ARCH</var>
+																								<var>TARGET_x86_64</var>
+																							</conj>
+																						</disj>
+																						<var>CONFIG_ARM_XSCALE</var>
+																					</disj>
+																					<var>CONFIG_ARM10T</var>
+																				</disj>
+																				<var>CONFIG_ARM_SA1100</var>
+																			</disj>
+																			<var>CONFIG_CRIS</var>
+																		</disj>
+																		<conj>
+																			<var>FORCE_OPTIONS_FOR_ARCH</var>
+																			<var>TARGET_alpha</var>
+																		</conj>
+																	</disj>
+																	<conj>
+																		<var>FORCE_OPTIONS_FOR_ARCH</var>
+																		<var>TARGET_i386</var>
+																	</conj>
+																</disj>
+																<var>CONFIG_SH5</var>
+															</disj>
+															<var>CONFIG_ARM710</var>
+														</disj>
+														<var>CONFIG_ARM926T</var>
+													</disj>
+													<conj>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+														<var>TARGET_ia64</var>
+													</conj>
+												</disj>
+												<var>CONFIG_ARM1136JF_S</var>
+											</disj>
+											<var>CONFIG_ARM1176JZF_S</var>
+										</disj>
+										<var>CONFIG_SH3</var>
+									</disj>
+									<var>CONFIG_ARM_IWMMXT</var>
+								</disj>
+								<not>
+									<var>ARCH_HAS_NO_MMU</var>
+								</not>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_FLOATS</var>
+					<conj>
+						<disj>
+							<conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_frv</var>
+									</not>
+								</disj>
+								<not>
+									<var>UCLIBC_HAS_FLOATS</var>
+								</not>
+							</conj>
+							<var>UCLIBC_HAS_FPU</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_FPU</var>
+							</not>
+							<disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_frv</var>
+								</conj>
+								<var>UCLIBC_HAS_FLOATS</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_FLOATS</var>
+							</not>
+							<var>UCLIBC_HAS_FPU</var>
+						</disj>
+						<var>UCLIBC_HAS_SOFT_FLOAT</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_SOFT_FLOAT</var>
+						</not>
+						<conj>
+							<var>UCLIBC_HAS_FLOATS</var>
+							<not>
+								<var>UCLIBC_HAS_FPU</var>
+							</not>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>DO_C99_MATH</var>
+						<disj>
+							<var>TARGET_i386</var>
+							<disj>
+								<var>TARGET_m68k</var>
+								<disj>
+									<var>TARGET_sparc</var>
+									<disj>
+										<var>TARGET_x86_64</var>
+										<disj>
+											<var>TARGET_powerpc</var>
+											<var>TARGET_sh</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+					<conj>
+						<disj>
+							<disj>
+								<not>
+									<var>DO_C99_MATH</var>
+								</not>
+								<conj>
+									<not>
+										<var>TARGET_i386</var>
+									</not>
+									<conj>
+										<not>
+											<var>TARGET_m68k</var>
+										</not>
+										<conj>
+											<not>
+												<var>TARGET_sparc</var>
+											</not>
+											<conj>
+												<not>
+													<var>TARGET_x86_64</var>
+												</not>
+												<conj>
+													<not>
+														<var>TARGET_powerpc</var>
+													</not>
+													<not>
+														<var>TARGET_sh</var>
+													</not>
+												</conj>
+											</conj>
+										</conj>
+									</conj>
+								</conj>
+							</disj>
+							<var>UCLIBC_HAS_LONG_DOUBLE_MATH</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_LONG_DOUBLE_MATH</var>
+							</not>
+							<conj>
+								<var>DO_C99_MATH</var>
+								<disj>
+									<var>TARGET_i386</var>
+									<disj>
+										<var>TARGET_m68k</var>
+										<disj>
+											<var>TARGET_sparc</var>
+											<disj>
+												<var>TARGET_x86_64</var>
+												<disj>
+													<var>TARGET_powerpc</var>
+													<var>TARGET_sh</var>
+												</disj>
+											</disj>
+										</disj>
+									</disj>
+								</disj>
+							</conj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<var>ARCH_USE_MMU</var>
+						<var>UCLIBC_UCLINUX_BROKEN_MUNMAP</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UCLIBC_UCLINUX_BROKEN_MUNMAP</var>
+						</not>
+						<not>
+							<var>ARCH_USE_MMU</var>
+						</not>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_v850</var>
+										</not>
+									</disj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_nios</var>
+										</not>
+									</disj>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_nios2</var>
+									</not>
+								</disj>
+							</conj>
+							<not>
+								<var>CONFIG_SH2A</var>
+							</not>
+						</conj>
+						<var>HAVE_NO_PIC</var>
+					</disj>
+					<disj>
+						<not>
+							<var>HAVE_NO_PIC</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_v850</var>
+									</conj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_nios</var>
+									</conj>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_nios2</var>
+								</conj>
+							</disj>
+							<var>CONFIG_SH2A</var>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>HAVE_NO_PIC</var>
+					</not>
+					<conj>
+						<disj>
+							<conj>
+								<conj>
+									<disj>
+										<not>
+											<var>FORCE_SHAREABLE_TEXT_SEGMENTS</var>
+										</not>
+										<not>
+											<var>HAVE_SHARED</var>
+										</not>
+									</disj>
+									<disj>
+										<not>
+											<var>UCLIBC_FORMAT_FDPIC_ELF</var>
+										</not>
+										<var>ARCH_USE_MMU</var>
+									</disj>
+								</conj>
+								<var>HAVE_NO_PIC</var>
+							</conj>
+							<var>DOPIC</var>
+						</disj>
+						<disj>
+							<not>
+								<var>DOPIC</var>
+							</not>
+							<disj>
+								<disj>
+									<conj>
+										<var>FORCE_SHAREABLE_TEXT_SEGMENTS</var>
+										<var>HAVE_SHARED</var>
+									</conj>
+									<conj>
+										<var>UCLIBC_FORMAT_FDPIC_ELF</var>
+										<conj>
+											<not>
+												<var>ARCH_USE_MMU</var>
+											</not>
+										</conj>
+									</conj>
+								</disj>
+								<not>
+									<var>HAVE_NO_PIC</var>
+								</not>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<not>
+									<var>ARCH_HAS_NO_LDSO</var>
+								</not>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_e1</var>
+									</not>
+								</disj>
+							</conj>
+							<not>
+								<var>CONFIG_SPARC_V7</var>
+							</not>
+						</conj>
+						<var>ARCH_HAS_NO_SHARED</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_HAS_NO_SHARED</var>
+						</not>
+						<disj>
+							<disj>
+								<var>ARCH_HAS_NO_LDSO</var>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_e1</var>
+								</conj>
+							</disj>
+							<var>CONFIG_SPARC_V7</var>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<conj>
+								<conj>
+									<conj>
+										<conj>
+											<conj>
+												<conj>
+													<conj>
+														<disj>
+															<not>
+																<var>UCLIBC_FORMAT_FLAT_SEP_DATA</var>
+															</not>
+															<var>ARCH_USE_MMU</var>
+														</disj>
+														<disj>
+															<not>
+																<var>FORCE_OPTIONS_FOR_ARCH</var>
+															</not>
+															<not>
+																<var>TARGET_vax</var>
+															</not>
+														</disj>
+													</conj>
+													<disj>
+														<not>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+														</not>
+														<not>
+															<var>TARGET_nios2</var>
+														</not>
+													</disj>
+												</conj>
+												<disj>
+													<not>
+														<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+													</not>
+													<var>ARCH_USE_MMU</var>
+												</disj>
+											</conj>
+											<disj>
+												<not>
+													<var>FORCE_OPTIONS_FOR_ARCH</var>
+												</not>
+												<not>
+													<var>TARGET_hppa</var>
+												</not>
+											</disj>
+										</conj>
+										<disj>
+											<not>
+												<var>UCLIBC_FORMAT_FLAT</var>
+											</not>
+											<var>ARCH_USE_MMU</var>
+										</disj>
+									</conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_alpha</var>
+										</not>
+									</disj>
+								</conj>
+								<disj>
+									<not>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+									</not>
+									<not>
+										<var>TARGET_nios</var>
+									</not>
+								</disj>
+							</conj>
+							<disj>
+								<not>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+								</not>
+								<not>
+									<var>TARGET_ia64</var>
+								</not>
+							</disj>
+						</conj>
+						<var>ARCH_HAS_NO_LDSO</var>
+					</disj>
+					<disj>
+						<not>
+							<var>ARCH_HAS_NO_LDSO</var>
+						</not>
+						<disj>
+							<disj>
+								<disj>
+									<disj>
+										<disj>
+											<disj>
+												<disj>
+													<disj>
+														<conj>
+															<var>UCLIBC_FORMAT_FLAT_SEP_DATA</var>
+															<conj>
+																<not>
+																	<var>ARCH_USE_MMU</var>
+																</not>
+															</conj>
+														</conj>
+														<conj>
+															<var>FORCE_OPTIONS_FOR_ARCH</var>
+															<var>TARGET_vax</var>
+														</conj>
+													</disj>
+													<conj>
+														<var>FORCE_OPTIONS_FOR_ARCH</var>
+														<var>TARGET_nios2</var>
+													</conj>
+												</disj>
+												<conj>
+													<var>UCLIBC_FORMAT_SHARED_FLAT</var>
+													<conj>
+														<not>
+															<var>ARCH_USE_MMU</var>
+														</not>
+													</conj>
+												</conj>
+											</disj>
+											<conj>
+												<var>FORCE_OPTIONS_FOR_ARCH</var>
+												<var>TARGET_hppa</var>
+											</conj>
+										</disj>
+										<conj>
+											<var>UCLIBC_FORMAT_FLAT</var>
+											<conj>
+												<not>
+													<var>ARCH_USE_MMU</var>
+												</not>
+											</conj>
+										</conj>
+									</disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_alpha</var>
+									</conj>
+								</disj>
+								<conj>
+									<var>FORCE_OPTIONS_FOR_ARCH</var>
+									<var>TARGET_nios</var>
+								</conj>
+							</disj>
+							<conj>
+								<var>FORCE_OPTIONS_FOR_ARCH</var>
+								<var>TARGET_ia64</var>
+							</conj>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>ARCH_HAS_NO_SHARED</var>
+					</not>
+					<conj>
+						<disj>
+							<var>ARCH_HAS_NO_SHARED</var>
+							<var>HAVE_SHARED</var>
+						</disj>
+						<disj>
+							<not>
+								<var>HAVE_SHARED</var>
+							</not>
+							<not>
+								<var>ARCH_HAS_NO_SHARED</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<conj>
+						<disj>
+							<conj>
+								<conj>
+									<disj>
+										<not>
+											<var>FORCE_OPTIONS_FOR_ARCH</var>
+										</not>
+										<not>
+											<var>TARGET_avr32</var>
+										</not>
+									</disj>
+									<disj>
+										<not>
+											<var>UCLIBC_BUILD_PIE</var>
+										</not>
+										<disj>
+											<not>
+												<var>HAVE_SHARED</var>
+											</not>
+											<conj>
+												<not>
+													<var>TARGET_arm</var>
+												</not>
+												<conj>
+													<not>
+														<var>TARGET_frv</var>
+													</not>
+													<conj>
+														<not>
+															<var>TARGET_i386</var>
+														</not>
+														<conj>
+															<not>
+																<var>TARGET_mips</var>
+															</not>
+															<not>
+																<var>TARGET_powerpc</var>
+															</not>
+														</conj>
+													</conj>
+												</conj>
+											</conj>
+										</disj>
+									</disj>
+								</conj>
+								<not>
+									<var>CONFIG_SH4</var>
+								</not>
+							</conj>
+							<var>FORCE_SHAREABLE_TEXT_SEGMENTS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>FORCE_SHAREABLE_TEXT_SEGMENTS</var>
+							</not>
+							<disj>
+								<disj>
+									<conj>
+										<var>FORCE_OPTIONS_FOR_ARCH</var>
+										<var>TARGET_avr32</var>
+									</conj>
+									<conj>
+										<var>UCLIBC_BUILD_PIE</var>
+										<conj>
+											<var>HAVE_SHARED</var>
+											<disj>
+												<var>TARGET_arm</var>
+												<disj>
+													<var>TARGET_frv</var>
+													<disj>
+														<var>TARGET_i386</var>
+														<disj>
+															<var>TARGET_mips</var>
+															<var>TARGET_powerpc</var>
+														</disj>
+													</disj>
+												</disj>
+											</disj>
+										</conj>
+									</conj>
+								</disj>
+								<var>CONFIG_SH4</var>
+							</disj>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<disj>
+						<not>
+							<var>LDSO_GNU_HASH_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<var>HAS_NO_THREADS</var>
+						<var>UCLIBC_HAS_THREADS</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_THREADS</var>
+						</not>
+						<not>
+							<var>HAS_NO_THREADS</var>
+						</not>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_THREADS_NATIVE</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_THREADS_NATIVE</var>
+							</not>
+							<var>UCLIBC_HAS_TLS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_TLS</var>
+							</not>
+							<var>UCLIBC_HAS_THREADS_NATIVE</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_THREADS</var>
+					<disj>
+						<not>
+							<var>PTHREADS_DEBUG_SUPPORT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_NETWORK_SUPPORT</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_NETWORK_SUPPORT</var>
+							</not>
+							<var>UCLIBC_HAS_SYSLOG</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_SYSLOG</var>
+							</not>
+							<var>UCLIBC_HAS_NETWORK_SUPPORT</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>ARCH_USE_MMU</var>
+					<disj>
+						<not>
+							<var>MALLOC_STANDARD</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_PTY</var>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_LIBUTIL</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>UCLIBC_HAS_CRYPT_IMPL</var>
+					</not>
+					<conj>
+						<disj>
+							<var>UCLIBC_HAS_CRYPT_IMPL</var>
+							<var>UCLIBC_HAS_CRYPT_STUB</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_CRYPT_STUB</var>
+							</not>
+							<not>
+								<var>UCLIBC_HAS_CRYPT_IMPL</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<conj>
+							<not>
+								<var>UCLIBC_HAS_CRYPT_IMPL</var>
+							</not>
+							<not>
+								<var>UCLIBC_HAS_CRYPT_STUB</var>
+							</not>
+						</conj>
+						<var>UCLIBC_HAS_CRYPT</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_CRYPT</var>
+						</not>
+						<disj>
+							<var>UCLIBC_HAS_CRYPT_IMPL</var>
+							<var>UCLIBC_HAS_CRYPT_STUB</var>
+						</disj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UCLIBC_HAS_NETWORK_SUPPORT</var>
+						<var>UCLIBC_HAS_SOCKET</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_USE_NETLINK</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_BUILD_MINIMAL_LOCALE</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_BUILD_MINIMAL_LOCALE</var>
+							</not>
+							<var>UCLIBC_BUILD_MINIMAL_LOCALES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_BUILD_MINIMAL_LOCALES</var>
+							</not>
+							<var>UCLIBC_BUILD_MINIMAL_LOCALE</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_PREGENERATED_LOCALE_DATA</var>
+					<disj>
+						<not>
+							<var>UCLIBC_DOWNLOAD_PREGENERATED_LOCALE_DATA</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UCLIBC_HAS_CTYPE_TABLES</var>
+						<var>UCLIBC_HAS_FLOATS</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_HEXADECIMAL_FLOATS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UCLIBC_HAS_LOCALE</var>
+						<var>UCLIBC_HAS_FLOATS</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_GLIBC_DIGIT_GROUPING</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>USE_OLD_VFPRINTF</var>
+					</not>
+					<conj>
+						<disj>
+							<var>USE_OLD_VFPRINTF</var>
+							<var>UCLIBC_PRINTF_SCANF_POSITIONAL_ARGS</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_PRINTF_SCANF_POSITIONAL_ARGS</var>
+							</not>
+							<not>
+								<var>USE_OLD_VFPRINTF</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>UCLIBC_HAS_WCHAR</var>
+					</not>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+					</not>
+					<conj>
+						<disj>
+							<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+							<var>UCLIBC_HAS_STDIO_GETC_MACRO</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_STDIO_GETC_MACRO</var>
+							</not>
+							<not>
+								<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+					</not>
+					<conj>
+						<disj>
+							<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+							<var>UCLIBC_HAS_STDIO_PUTC_MACRO</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_STDIO_PUTC_MACRO</var>
+							</not>
+							<not>
+								<var>UCLIBC_HAS_STDIO_BUFSIZ_NONE</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_LFS</var>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_FOPEN_LARGEFILE_MODE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UCLIBC_HAS_LOCALE</var>
+						<var>UCLIBC_MJN3_ONLY</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_GETTEXT_AWARENESS</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_THREADS_NATIVE</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_THREADS_NATIVE</var>
+							</not>
+							<var>UCLIBC_HAS_STDIO_FUTEXES</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_STDIO_FUTEXES</var>
+							</not>
+							<var>UCLIBC_HAS_THREADS_NATIVE</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>UCLIBC_HAS_GNU_GETOPT</var>
+					</not>
+					<conj>
+						<disj>
+							<var>UCLIBC_HAS_GNU_GETOPT</var>
+							<var>UCLIBC_HAS_GETOPT_LONG</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_GETOPT_LONG</var>
+							</not>
+							<not>
+								<var>UCLIBC_HAS_GNU_GETOPT</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_GLOB</var>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_WORDEXP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_SUSV4_LEGACY</var>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_FTW</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>UCLIBC_HAS_FNMATCH</var>
+					<conj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_FNMATCH</var>
+							</not>
+							<var>UCLIBC_HAS_GLOB</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_HAS_GLOB</var>
+							</not>
+							<var>UCLIBC_HAS_FNMATCH</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>HAVE_SHARED</var>
+						<disj>
+							<var>TARGET_arm</var>
+							<disj>
+								<var>TARGET_frv</var>
+								<disj>
+									<var>TARGET_i386</var>
+									<disj>
+										<var>TARGET_mips</var>
+										<var>TARGET_powerpc</var>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_BUILD_PIE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<conj>
+					<disj>
+						<disj>
+							<not>
+								<var>FORCE_OPTIONS_FOR_ARCH</var>
+							</not>
+							<not>
+								<var>TARGET_hppa</var>
+							</not>
+						</disj>
+						<var>HAVE_NO_SSP</var>
+					</disj>
+					<disj>
+						<not>
+							<var>HAVE_NO_SSP</var>
+						</not>
+						<conj>
+							<var>FORCE_OPTIONS_FOR_ARCH</var>
+							<var>TARGET_hppa</var>
+						</conj>
+					</disj>
+				</conj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>HAVE_NO_SSP</var>
+					</not>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_SSP</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<conj>
+						<disj>
+							<not>
+								<var>HAVE_SHARED</var>
+							</not>
+							<var>UCLIBC_BUILD_RELRO</var>
+						</disj>
+						<disj>
+							<not>
+								<var>UCLIBC_BUILD_RELRO</var>
+							</not>
+							<var>HAVE_SHARED</var>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<disj>
+						<not>
+							<var>UCLIBC_BUILD_NOW</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>UCLIBC_HAS_THREADS</var>
+						<var>LINUXTHREADS_OLD</var>
+					</conj>
+					<disj>
+						<not>
+							<var>DODEBUG_PT</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<not>
+						<var>DODEBUG</var>
+					</not>
+					<conj>
+						<disj>
+							<var>DODEBUG</var>
+							<var>DOSTRIP</var>
+						</disj>
+						<disj>
+							<not>
+								<var>DOSTRIP</var>
+							</not>
+							<not>
+								<var>DODEBUG</var>
+							</not>
+						</disj>
+					</conj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<disj>
+						<not>
+							<var>SUPPORT_LD_DEBUG</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<var>HAVE_SHARED</var>
+					<disj>
+						<not>
+							<var>SUPPORT_LD_DEBUG_EARLY</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<disj>
+						<var>MALLOC</var>
+						<var>MALLOC_STANDARD</var>
+					</disj>
+					<disj>
+						<not>
+							<var>UCLIBC_MALLOC_DEBUGGING</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+			<rule>
+				<disj>
+					<conj>
+						<var>HAVE_SHARED</var>
+						<var>TARGET_sh</var>
+					</conj>
+					<disj>
+						<not>
+							<var>UCLIBC_HAS_BACKTRACE</var>
+						</not>
+					</disj>
+				</disj>
+			</rule>
+		</constraints>
+		<calculations Auto="false" Constraints="false" Features="false" Redundant="false" Tautology="false"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

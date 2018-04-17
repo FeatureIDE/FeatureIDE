@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -20,13 +20,27 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import javax.annotation.Nonnull;
+
 /**
- * A FeatureIDE extension with its ID.
- * 
+ * A FeatureIDE extension with its ID.<br/> <b>NOTE:</b> All extensions should provide a default/nullary constructor.
+ *
  * @author Tom Brosch
+ * @author Sebastian Krieter
  */
 public interface IExtension {
-	
-	public abstract String getId();
-	
+
+	/**
+	 * @return the unique ID of this extension.
+	 */
+	@Nonnull
+	String getId();
+
+	/**
+	 * Is called, when the extension is loaded for the first time by the {@link ExtensionManager}.
+	 *
+	 * @return {@code true} if the initialization was successful, {@code false} otherwise.
+	 */
+	boolean initExtension();
+
 }

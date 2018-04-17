@@ -5,30 +5,36 @@
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1447695622628</id>
+			<id>1523475680239</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-true-false-tests</arguments>
+				<arguments>1.0-projectRelativePath-matches-true-false-tests/*</arguments>
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622638</id>
+			<id>1523475680254</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-true-false-plugins</arguments>
+				<arguments>1.0-projectRelativePath-matches-true-false-plugins/*</arguments>
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622650</id>
+			<id>1523475680273</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -37,7 +43,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622661</id>
+			<id>1523475680318</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -46,7 +52,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622671</id>
+			<id>1523475680319</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -55,7 +61,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622683</id>
+			<id>1523475680321</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -64,12 +70,21 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1447695622698</id>
+			<id>1523475680323</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-projectRelativePath-matches-true-false-misc</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1523475680324</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-true-false-gui-tests/*</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>

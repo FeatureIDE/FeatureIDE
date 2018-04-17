@@ -1,3 +1,4 @@
+.featureide/model.xml/model.xml.xml
 .project
 IntModels/F_079A5285BA97.xml
 IntModels/F_13333FCFD00D.xml
@@ -47,7 +48,6 @@ IntModels/N_3567789813__F_D9BAB7B884BA.xml
 IntModels/N_4229289184__F_5C639A59D8B1.xml
 LocalRootFeatures.txt
 model.xml
-.featureide/model.xml/model.xml.xml
 SubModels/F_079A5285BA97.xml
 SubModels/F_13333FCFD00D.xml
 SubModels/F_1DB4A8F021D3.xml

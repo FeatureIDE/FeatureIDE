@@ -1,0 +1,70 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: EditFeatureModelInOutline
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _TAFC0KoMEeeF3P5ISwke7w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/27/17 3:37 PM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA,_7kfFoKoMEeeF3P5ISwke7w
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Modes] {
+        mouse-move 30 7 button1 -height 21 -width 45
+        mouse-press 30 7 button1 -height 21 -width 45
+        mouse-release 30 7 button1 524288 -height 21 -width 45
+        mouse-press 30 7 button1 -height 21 -width 45
+        mouse-double-click 30 7 button1 -height 21 -width 45
+    }
+    with [get-diagram | get-edit-part -className ModelEditPart | get-edit-part -text Service] {
+        mouse-release 4 7 button1 524288 -height 21 -width 49
+        mouse-hover 4 7 -height 21 -width 49
+    }
+}
+get-view "FeatureIDE Outline" | get-tree | select "Elevator/Behavior/Modes/Sabbath" | get-menu "Create Feature Below" 
+    | click
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+        mouse-hover 277 272 -height 689 -width 1094
+    }
+    with [get-editbox] {
+        set-text Test
+        key-type Enter
+    }
+    get-diagram | commit-direct-edit
+}
+with [get-view "FeatureIDE Outline" | get-tree] {
+    select "Elevator/Behavior/Service" | get-menu Mandatory | click
+    select "Elevator/Behavior/Priorities" | get-menu And | click
+    select "Elevator/VoiceOutput" | get-menu Abstract | click
+    select "Elevator/CallButtons" | get-menu And | click
+    select "Elevator/CallButtons/UndirectedCall" | get-menu Mandatory | click
+    select "Elevator/Security/Permission" | get-menu Delete | click
+    select "Elevator/Safety" | get-menu "Delete Including Subfeatures (CTRL + D)" | click
+    select "Elevator/Behavior" | get-menu "Create Feature Above" | click
+}
+with [get-editor "Elevator-FeatureModeling Model"] {
+    with [get-diagram] {
+        get-edit-part -className ModelEditPart | get-edit-part -text NewFeature1 | activate-direct-edit
+        mouse-hover 763 360 -height 672 -width 1205
+    }
+    with [get-editbox] {
+        set-text Test2
+        key-type Enter
+    }
+    with [get-diagram] {
+        commit-direct-edit
+        mouse-hover 862 432 -height 672 -width 1186
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

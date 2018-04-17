@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -35,9 +35,9 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All structural information of an {@link IFeatureModel}.
- * 
+ *
  * @author Sebastian Krieter
- * @author Marcus Pinnecke  
+ * @author Marcus Pinnecke
  */
 public class FeatureStructure implements IFeatureStructure {
 
@@ -54,7 +54,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	protected IFeatureStructure parent = null;
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
-	
+
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
 			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
@@ -107,7 +107,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void changeToAlternative() {
-		if(getChildrenCount() <= 1){
+		if (getChildrenCount() <= 1) {
 			return;
 		}
 		and = false;
@@ -124,7 +124,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void changeToOr() {
-		if(getChildrenCount() <= 1){
+		if (getChildrenCount() <= 1) {
 			return;
 		}
 		and = false;
@@ -141,7 +141,7 @@ public class FeatureStructure implements IFeatureStructure {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED);
 		correspondingFeature.fireEvent(event);
 	}
-	
+
 	protected void fireChildrenChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.GROUP_TYPE_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
@@ -151,7 +151,7 @@ public class FeatureStructure implements IFeatureStructure {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
-	
+
 	protected void fireMandatoryChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
@@ -166,11 +166,11 @@ public class FeatureStructure implements IFeatureStructure {
 	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		return children;
 	}
-	
+
 	@Override
 	public boolean hasVisibleChildren(boolean showHiddenFeature) {
 		boolean check = false;
-		for (IFeatureStructure child: children) {
+		for (final IFeatureStructure child : children) {
 			if ((!child.hasHiddenParent() || showHiddenFeature)) {
 				check = true;
 			}
@@ -242,10 +242,8 @@ public class FeatureStructure implements IFeatureStructure {
 		return false;
 	}
 
-
 	/**
-	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
-	 * Gh'.
+	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef :: Gh'.
 	 */
 	@Override
 	public boolean hasInlineRule() {
@@ -259,7 +257,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAlternative() {
-		return !and && !multiple;
+		return !and && !multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
@@ -276,7 +274,7 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isAnd() {
-		return and;
+		return and || (getChildrenCount() <= 1);
 	}
 
 	@Override
@@ -306,7 +304,7 @@ public class FeatureStructure implements IFeatureStructure {
 	public boolean isHidden() {
 		return hidden;
 	}
-	
+
 	@Override
 	public boolean isMandatory() {
 		return (parent == null) || !parent.isAnd() || mandatory;
@@ -319,12 +317,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public boolean isMultiple() {
-		return multiple;
+		return multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
 	public boolean isOr() {
-		return !and && multiple;
+		return !and && multiple && (getChildrenCount() > 1);
 	}
 
 	@Override
@@ -334,8 +332,9 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void removeChild(IFeatureStructure child) {
-		if(!children.remove(child))
+		if (!children.remove(child)) {
 			throw new NoSuchElementException();
+		}
 		child.setParent(null);
 		fireChildrenChanged();
 	}
@@ -439,14 +438,13 @@ public class FeatureStructure implements IFeatureStructure {
 	public void setRelevantConstraints(List<IConstraint> constraints) {
 		partOfConstraints = constraints;
 	}
-	
+
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("FeatureStructure=(");
+		final StringBuilder sb = new StringBuilder("FeatureStructure=(");
 		FeatureUtils.print(getFeature(), sb);
 		sb.append(")");
 		return sb.toString();
 	}
-
 
 }

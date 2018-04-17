@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -28,13 +28,13 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 
-/** 
+/**
  * A decorator for MPL projects.
- * 
+ *
  * @author Sebastian Krieter
  */
 public class InterfaceProjectDecorator implements ILightweightLabelDecorator {
-	
+
 	private static final ImageDescriptor OVERLAY = MPLUIPlugin.getDefault().getImageDescriptor("icons/FeatureProjectDecorator.png");
 
 	@Override
@@ -48,16 +48,13 @@ public class InterfaceProjectDecorator implements ILightweightLabelDecorator {
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
-	
+
 	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
-	
+	public void addListener(ILabelProviderListener listener) {}
+
 	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
-	
+	public void removeListener(ILabelProviderListener listener) {}
+
 	@Override
-	public void dispose() {
-	}
+	public void dispose() {}
 }

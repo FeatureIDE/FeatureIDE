@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+	<feature automatic="selected" name="Notepad"/>
+	<feature automatic="unselected" name="FormatRaw"/>
+	<feature automatic="selected" name="Text"/>
+	<feature automatic="unselected" name="TextRaw"/>
+	<feature manual="selected" name="TextStyled"/>
+	<feature automatic="selected" name="Base"/>
+</configuration>

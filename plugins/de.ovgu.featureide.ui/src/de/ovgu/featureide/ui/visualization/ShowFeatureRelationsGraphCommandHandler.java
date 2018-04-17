@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Show Feature Relations Graph
- * 
+ *
  * @author Jabier Martinez
  */
 public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
@@ -55,13 +55,14 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		IProject project = null;
 		if (!(element instanceof IProject)) {
 			if (element instanceof IAdaptable) {
+				// Cast is necessary, don't remove
 				project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 			}
 		} else {
 			project = (IProject) element;
 		}
 
-		Shell shell = new Shell(Display.getCurrent());
+		final Shell shell = new Shell(Display.getCurrent());
 		shell.setText("Select feature");
 		shell.setSize(400, 200);
 		shell.setLayout(new FillLayout(SWT.VERTICAL));
@@ -69,18 +70,20 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject != null) {
-			List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
-			for (String f : featureList) {
+			final List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+			for (final String f : featureList) {
 				list.add(f);
 			}
 
 			list.addSelectionListener(new SelectionListener() {
 
+				@Override
 				public void widgetSelected(SelectionEvent event) {
-					int[] selections = list.getSelectionIndices();
+					final int[] selections = list.getSelectionIndices();
 					showFrog(featureProject, list.getItem(selections[0]));
 				}
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent event) {
 
 				}
@@ -110,33 +113,33 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 
 	/**
 	 * Show frog
-	 * 
+	 *
 	 * @param featureProject
 	 * @param featureCenter
 	 */
 	public static void showFrog(IFeatureProject featureProject, String featureCenter) {
 
 		// Get feature in the center
-		IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
+		final IFeature fc = featureProject.getFeatureModel().getFeature(featureCenter);
 
 		// Get formalized constraints, implies and excludes
-		List<String> formalizedRequires = new ArrayList<String>();
-		List<String> formalizedExcludes = new ArrayList<String>();
-		FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
-		for (IFeature f : fd.always(fc)) {
+		final List<String> formalizedRequires = new ArrayList<String>();
+		final List<String> formalizedExcludes = new ArrayList<String>();
+		final FeatureDependencies fd = new FeatureDependencies(featureProject.getFeatureModel());
+		for (final IFeature f : fd.always(fc)) {
 			formalizedRequires.add(f.getName());
 		}
-		for (IFeature f : fd.never(fc)) {
+		for (final IFeature f : fd.never(fc)) {
 			formalizedExcludes.add(f.getName());
 		}
 
 		// Get all features in order ignoring the mandatory features
-		List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
+		final List<String> featureList = ConfigAnalysisUtils.getNoCoreNoHiddenFeatures(featureProject);
 		// Create the matrix configurations/features for the calculations
 		boolean[][] matrix = null;
 		try {
 			matrix = ConfigAnalysisUtils.getConfigsMatrix(featureProject, featureList);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			e.printStackTrace();
 		}
 
@@ -148,10 +151,10 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		// var FORMALIZED_REQUIRES = [];
 		// var FORMALIZED_EXCLUDES = [];
 
-		StringBuffer data = new StringBuffer(" CENTRAL_FEATURE = \"");
+		final StringBuffer data = new StringBuffer(" CENTRAL_FEATURE = \"");
 		data.append(featureCenter);
 		data.append("\";\n FEATURE_NAMES = [");
-		for (String f : featureList) {
+		for (final String f : featureList) {
 			if (!f.equals(featureCenter)) {
 				data.append("\"");
 				data.append(f);
@@ -160,10 +163,10 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 		data.setLength(data.length() - 1); // remove last comma
 		data.append("];\n GIVEN = [");
-		for (String f : featureList) {
+		for (final String f : featureList) {
 			if (!f.equals(featureCenter)) {
-				int i = featureList.indexOf(f);
-				int ic = featureList.indexOf(featureCenter);
+				final int i = featureList.indexOf(f);
+				final int ic = featureList.indexOf(featureCenter);
 				data.append(getGivenOperation(matrix, ic, i));
 				data.append(",");
 			}
@@ -171,7 +174,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		data.setLength(data.length() - 1); // remove last comma
 		boolean atLeastOne = false;
 		data.append("];\n FORMALIZED_REQUIRES = [");
-		for (String f : formalizedRequires) {
+		for (final String f : formalizedRequires) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
@@ -182,7 +185,7 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 		atLeastOne = false;
 		data.append("];\n FORMALIZED_EXCLUDES = [");
-		for (String f : formalizedExcludes) {
+		for (final String f : formalizedExcludes) {
 			data.append("\"");
 			data.append(f);
 			data.append("\",");
@@ -193,19 +196,19 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		}
 		data.append("];\n");
 
-		File fi = Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
+		final File fi = Utils.getFileFromPlugin(UIPlugin.PLUGIN_ID, "template/featureRelations/page.html");
 		String html = Utils.getStringOfFile(fi);
 		html = html.replaceFirst("// DATA_HERE", data.toString());
 
 		// Open the browser
-		Shell shell = new Shell(Display.getCurrent());
+		final Shell shell = new Shell(Display.getCurrent());
 		shell.setLayout(new FillLayout());
 		shell.setSize(900, 800);
 		shell.setText("Feature relations graph: " + featureCenter);
 		Browser browser;
 		try {
 			browser = new Browser(shell, SWT.NONE);
-		} catch (SWTError e) {
+		} catch (final SWTError e) {
 			System.out.println("Could not instantiate Browser: " + e.getMessage());
 			return;
 		}

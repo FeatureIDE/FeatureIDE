@@ -1,7 +1,7 @@
 .classpath
 .featureide/model.xml/model.xml.xml
 .project
-configs/default.config
+configs/default.xml
 features/CallButtons/de/ovgu/featureide/examples/elevator/core/controller/ControlUnit.java
 features/CallButtons/de/ovgu/featureide/examples/elevator/core/controller/ITickListener.java
 features/CallButtons/de/ovgu/featureide/examples/elevator/core/controller/ITriggerListener.java

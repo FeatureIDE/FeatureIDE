@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="undefined" name="Hello5"/>
+		<feature automatic="selected" manual="selected" name="src"/>
+		<feature automatic="selected" manual="selected" name="res"/>
+		<feature automatic="undefined" manual="undefined" name="CustomMessage"/>
+		<feature automatic="selected" manual="undefined" name="SayHello"/>
+		<feature automatic="undefined" manual="selected" name="Hello"/>
+		<feature automatic="selected" manual="undefined" name="Feature"/>
+		<feature automatic="unselected" manual="undefined" name="Beautiful"/>
+		<feature automatic="undefined" manual="selected" name="Wonderful"/>
+		<feature automatic="undefined" manual="selected" name="World"/>
+	</configuration>

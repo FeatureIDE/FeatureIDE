@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,31 +34,29 @@ import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
- * Images composer through images overlapping.
- * Images in the different feature folders need to have the same relative path to be combined.
- * 
+ * Images composer through images overlapping. Images in the different feature folders need to have the same relative path to be combined.
+ *
  * @author Jabier Martinez
  *
  */
 public class ImagesComposer extends ComposerExtensionClass {
 
 	/**
-	 * This is call when the project builds
-	 * using the currently selected configuration by the user
+	 * This is call when the project builds using the currently selected configuration by the user
 	 */
 	@Override
 	public void performFullBuild(IFile config) {
 		// Get the selected features and order them
-		List<String> selectedFeatures = getSelectedNonAbstractFeatures(config);
-		List<String> orderedFeatures = orderSelectedFeatures(selectedFeatures);
+		final List<String> selectedFeatures = getSelectedNonAbstractFeatures(config);
+		final List<String> orderedFeatures = orderSelectedFeatures(selectedFeatures);
 
 		// Default output folder
-		File output = featureProject.getBuildFolder().getRawLocation().makeAbsolute().toFile();
+		final File output = featureProject.getBuildFolder().getRawLocation().makeAbsolute().toFile();
 		compose(orderedFeatures, output);
 	}
 
@@ -69,30 +67,30 @@ public class ImagesComposer extends ComposerExtensionClass {
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		// call super to save the config file and others
 		super.buildConfiguration(folder, configuration, configurationName);
-		List<String> orderedFeatures = orderSelectedFeatures(configuration.getSelectedFeatureNames());
+		final List<String> orderedFeatures = orderSelectedFeatures(configuration.getSelectedFeatureNames());
 
 		// The output folder
-		File output = new File(folder.getRawLocationURI());
+		final File output = new File(folder.getRawLocationURI());
 		compose(orderedFeatures, output);
 	}
 
 	/**
 	 * Compose and generate in the output folder
-	 * 
+	 *
 	 * @param orderedFeatures
 	 * @param output
 	 */
 	private void compose(List<String> orderedFeatures, File output) {
 		// Create imagesMap, the key is the relative path from the feature
 		// folder to the image file
-		Map<String, List<File>> imagesMap = new LinkedHashMap<String, List<File>>();
+		final Map<String, List<File>> imagesMap = new LinkedHashMap<String, List<File>>();
 		for (int i = 0; i < orderedFeatures.size(); i++) {
-			IFolder f = featureProject.getSourceFolder().getFolder(orderedFeatures.get(i));
-			File folder = f.getRawLocation().makeAbsolute().toFile();
-			List<File> files = ImagesComposerUtils.getAllFiles(folder);
-			for (File file : files) {
+			final IFolder f = featureProject.getSourceFolder().getFolder(orderedFeatures.get(i));
+			final File folder = f.getRawLocation().makeAbsolute().toFile();
+			final List<File> files = ImagesComposerUtils.getAllFiles(folder);
+			for (final File file : files) {
 				if (ImagesComposerUtils.getImageFormat(file.getName()) != null) {
-					String relative = folder.toURI().relativize(file.toURI()).getPath();
+					final String relative = folder.toURI().relativize(file.toURI()).getPath();
 					List<File> currentList = imagesMap.get(relative);
 					if (currentList == null) {
 						currentList = new ArrayList<File>();
@@ -104,12 +102,12 @@ public class ImagesComposer extends ComposerExtensionClass {
 		}
 
 		// For each image, combine the related image files
-		for (Entry<String, List<File>> entry : imagesMap.entrySet()) {
+		for (final Entry<String, List<File>> entry : imagesMap.entrySet()) {
 
-			File outputImageFile = new File(output, entry.getKey());
+			final File outputImageFile = new File(output, entry.getKey());
 			try {
 				ImagesComposerUtils.overlapImages(entry.getValue(), outputImageFile);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -117,15 +115,15 @@ public class ImagesComposer extends ComposerExtensionClass {
 
 	/**
 	 * Get selected non abstract features
-	 * 
+	 *
 	 * @param config
 	 * @return features
 	 */
 	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
-		List<String> selectedFeatures = new ArrayList<String>();
+		final List<String> selectedFeatures = new ArrayList<String>();
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
-		for (IFeature f : configuration.getSelectedFeatures()) {
+		SimpleFileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigFormatManager.getInstance());
+		for (final IFeature f : configuration.getSelectedFeatures()) {
 			if (!f.getStructure().isAbstract()) {
 				selectedFeatures.add(f.getName());
 			}
@@ -135,16 +133,16 @@ public class ImagesComposer extends ComposerExtensionClass {
 
 	/**
 	 * Order the features in case of user-defined ordering
-	 * 
+	 *
 	 * @param selectedFeatures
 	 * @return ordered features
 	 */
 	protected List<String> orderSelectedFeatures(Collection<String> selectedFeatures) {
 		// Order them if needed
-		List<String> orderedFeatures = new ArrayList<String>();
+		final List<String> orderedFeatures = new ArrayList<String>();
 		if (featureProject.getFeatureModel().isFeatureOrderUserDefined()) {
-			List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
-			for (String feature : featureOrderList) {
+			final List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
+			for (final String feature : featureOrderList) {
 				if (selectedFeatures.contains(feature)) {
 					orderedFeatures.add(feature);
 				}
@@ -165,4 +163,3 @@ public class ImagesComposer extends ComposerExtensionClass {
 	}
 
 }
-

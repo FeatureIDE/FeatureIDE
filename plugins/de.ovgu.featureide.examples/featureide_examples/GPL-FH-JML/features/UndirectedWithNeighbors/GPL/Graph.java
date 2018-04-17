@@ -19,7 +19,7 @@ public class Graph
     private /*@spec_public@*/  Map verticesMap;
 
     /*@ ensures vertices != null && verticesMap != null;@*/
-   
+    /*@ assignable vertices, verticesMap; @*/
     public Graph( ) 
     {
         vertices = new LinkedList();
@@ -37,6 +37,7 @@ public class Graph
     // Adds an edge without weights if Weighted layer is not present
 	/*@ requires start != null && theNeighbor != null; @*/
 	/*@ ensures \result.getOtherVertex(start)==theNeighbor && \result.getOtherVertex(theNeighbor)==start; @*/
+    /*@assignable \nothing; @*/
     public void addEdge( Vertex start,   Neighbor theNeighbor ) 
     {
         start.addEdge( theNeighbor );
@@ -78,6 +79,7 @@ public class Graph
 
     }
     /*@ ensures \result != null; @*/
+    /*@ assignable \nothing; @*/
     public VertexIter getVertices( ) 
     {
         return new VertexIter( ) 
@@ -143,6 +145,7 @@ public class Graph
     // Adds an edge without weights if Weighted layer is not present
 	/*@ requires v1 != null && v2 != null; @*/
 	/*@ ensures \result.getOtherVertex(v1)==v2 && \result.getOtherVertex(v2)==v1; @*/
+    /*@assignable \nothing; @*/
     public EdgeIfc addEdge( Vertex start,  Vertex end )
       {
 	  Neighbor e = new Neighbor( end );

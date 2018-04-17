@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.23.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.19.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/pmd-core-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-java-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/asm-5.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/javacc-5.0.jar"/>
+	<classpathentry kind="lib" path="lib/jaxen-1.1.4.jar"/>
+	<classpathentry kind="lib" path="lib/jcommander-1.35.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-cpp-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-cs-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-fortran-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-go-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-javascript-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-jsp-5.2.2.jar" />
+	<classpathentry kind="lib" path="lib/pmd-php-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-plsql-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-ruby-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-vm-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/pmd-xml-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/rhino-1.7R4.jar"/>
+	<classpathentry kind="lib" path="lib/saxon-9.1.0.8-dom.jar"/>
+	<classpathentry kind="lib" path="lib/saxon-9.1.0.8.jar"/>
+	<classpathentry kind="lib" path="lib/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/openjfx-78-backport-1.8.0-ea-b96.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

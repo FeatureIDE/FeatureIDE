@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -44,24 +44,23 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * Antenna specific feature model extensions.
- *  
+ *
  * @author Christoph Giesel
  * @author Marcus Kamieth
  * @author Marcus Pinnecke
-*/
+ */
 public class AntennaFMComposerExtension extends FMComposerExtension {
-	
-	private static String ORDER_PAGE_MESSAGE = 
-			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
-			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
-	
+
+	private static String ORDER_PAGE_MESSAGE =
+		"FeatureIDE projects based on preprocessors such as Antenna do not\n" + NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+
 	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z][\\w\\.\\-]*$";
-	
+
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
 		return s.matches(FEATURE_NAME_PATTERN);
 	}
-	
+
 	@Override
 	public String getOrderPageMessage() {
 		return ORDER_PAGE_MESSAGE;
@@ -71,84 +70,87 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	public boolean hasFeatureOrder() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			return false;
 		}
-		
-		IFolder sourceFolder = featureProject.getSourceFolder();
-		if (!sourceFolder.exists())
+
+		final IFolder sourceFolder = featureProject.getSourceFolder();
+		if (!sourceFolder.exists()) {
 			return true;
-		
+		}
+
 		try {
 			performRenamings(oldName, newName, sourceFolder);
 			sourceFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
+		} catch (final CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		return true;
 	}
 
 	private void performRenamings(String oldName, String newName, IFolder folder) throws CoreException {
-		for (IResource res : folder.members()) {
+		for (final IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				performRenamings(oldName, newName, (IFolder)res);
+				performRenamings(oldName, newName, (IFolder) res);
 			} else if (res instanceof IFile) {
-				IFile file = (IFile)res;
+				final IFile file = (IFile) res;
 				performRenamings(oldName, newName, file);
 			}
-			
+
 		}
 	}
-	
+
 	private void performRenamings(String oldName, String newName, IFile iFile) {
 		Scanner scanner = null;
 		FileWriter fw = null;
 		try {
-			File file = iFile.getRawLocation().toFile();
-			
-			StringBuilder fileText = new StringBuilder();
+			final File file = iFile.getRawLocation().toFile();
+
+			final StringBuilder fileText = new StringBuilder();
 			scanner = new Scanner(file, "UTF-8");
 			while (scanner.hasNext()) {
 				fileText.append(scanner.nextLine());
 				fileText.append(System.getProperty("line.separator"));
 			}
-			
-			String string = fileText.toString();
-			String newText = replaceFeatureInText(string, oldName, newName);
-			
+
+			final String string = fileText.toString();
+			final String newText = replaceFeatureInText(string, oldName, newName);
+
 			if (string.equals(newText)) {
 				return;
 			}
-			
+
 			fw = new FileWriter(file);
 			fw.write(newText);
-			
-		} catch (FileNotFoundException e) {
+
+		} catch (final FileNotFoundException e) {
 			AntennaCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AntennaCorePlugin.getDefault().logError(e);
-		} finally{
-			if(scanner!=null)
-			scanner.close();
-			if(fw!=null)
+		} finally {
+			if (scanner != null) {
+				scanner.close();
+			}
+			if (fw != null) {
 				try {
 					fw.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					AntennaCorePlugin.getDefault().logError(e);
-				}	
+				}
+			}
 		}
 	}
-	
-	private String replaceFeatureInText(String text, String oldName, String newName){
-		Pattern pattern = Pattern.compile(String.format(AntennaModelBuilder.REGEX, oldName));
-		Matcher matcher = pattern.matcher(text);
 
-		while(matcher.find()){
-			String newText = matcher.group(1) + newName + matcher.group(3);
+	private String replaceFeatureInText(String text, String oldName, String newName) {
+		final Pattern pattern = Pattern.compile(String.format(AntennaModelBuilder.REGEX, oldName));
+		final Matcher matcher = pattern.matcher(text);
+
+		while (matcher.find()) {
+			final String newText = matcher.group(1) + newName + matcher.group(3);
 			text = text.replace(matcher.group(0), newText);
 			matcher.reset(text);
 		}

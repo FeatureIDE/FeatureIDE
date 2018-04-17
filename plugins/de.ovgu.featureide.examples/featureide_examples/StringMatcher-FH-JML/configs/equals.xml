@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<configuration>
+		<feature automatic="selected" manual="selected" name="StringMatcher"/>
+		<feature automatic="selected" manual="selected" name="Comparison"/>
+		<feature automatic="unselected" manual="undefined" name="Length"/>
+		<feature automatic="unselected" manual="undefined" name="substring"/>
+		<feature automatic="unselected" manual="undefined" name="Substring_a_b"/>
+		<feature automatic="unselected" manual="undefined" name="Prefix_a_b"/>
+		<feature automatic="unselected" manual="undefined" name="Substring_b_a"/>
+		<feature automatic="unselected" manual="undefined" name="Prefix_b_a"/>
+		<feature automatic="undefined" manual="selected" name="Equals"/>
+	</configuration>

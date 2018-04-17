@@ -1,7 +1,6 @@
 .classpath
-.featureide/model.xml/model.xml.xml
 .project
-configs/default.config
+configs/default.xml
 features/Ball/character.png
 features/Balloon/character.png
 features/BrownPant/character.png

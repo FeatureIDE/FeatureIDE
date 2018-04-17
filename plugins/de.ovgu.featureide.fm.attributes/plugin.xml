@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="FeatureIDE"
+            class="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView"
+            icon="icons/FeatureIconSmall.ico"
+            id="de.ovgu.featureide.fm.attributes.view.FeatureAttributeView"
+            name="Feature Attributes">
+      </view>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMFormat">
+      <fmFormat
+            class="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+            id="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+            name="XmlExtendedFeatureModelFormat">
+      </fmFormat>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMFactory">
+      <fmFactory
+            class="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
+            id="de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModelFactory"
+            name="ExtendedFeatureModelFactory">
+      </fmFactory>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            id="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
+            name="Extended Feature Model"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element"
+                  value="extendedFeatureModel">
+            </parameter>
+         </describer>
+         <property
+               default="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat"
+               name="de.ovgu.featureide.fm.ui.contentType.format">
+         </property>
+      </content-type>
+   </extension>
+   <extension
+			point="org.eclipse.ui.editors">
+  <editorContentTypeBinding
+        contentTypeId="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
+        editorId="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor">
+  </editorContentTypeBinding>
+	</extension>
+</plugin>

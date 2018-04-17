@@ -2,9 +2,9 @@
 .project
 .settings/de.ovgu.featureide.core.prefs
 .settings/org.eclipse.jdt.core.prefs
-configs/equals.config
-configs/length.config
-configs/prefix_b_a.config
+configs/equals.xml
+configs/length.xml
+configs/prefix_b_a.xml
 features/Comparison/StringMatcher.java
 features/Comparison/StringMatcherTest.java
 features/Equals/StringMatcher.java

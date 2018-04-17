@@ -2,13 +2,13 @@ package br.ufal.ic.colligens.models.cppchecker;
 
 /*
  * Author: FLAVIO MEDEIROS
- * 
+ *
  * Use this class to analyze a specific path with source codes of projects.
  * For each project source code, this class will generate an XML file with
  * the error candidates that CppCheck identifies for each configuration.
  * Set the path in the variable PROJECT_PATH. At the end, you can check
  * all XML files in the results folder.
- * 
+ *
  */
 
 import java.io.BufferedReader;
@@ -28,24 +28,20 @@ public class CppChecker {
 	}
 
 	public String getXmlFile() {
-		this.xmlFile += "</results>";
-		return this.xmlFile;
+		xmlFile += "</results>";
+		return xmlFile;
 	}
 
 	public void checkProjects(File path, String projectName) {
-		for (File file : path.listFiles()) {
+		for (final File file : path.listFiles()) {
 			if (!file.isDirectory()) {
-				if (file.getName().endsWith(".c")
-						|| file.getName().endsWith(".h")) {
+				if (file.getName().endsWith(".c") || file.getName().endsWith(".h")) {
 					try {
 
-						Process proc = new ProcessBuilder(Colligens
-								.getDefault().getPreferenceStore()
-								.getString("CppCheck"), "--xml", "--force",
-								file.getAbsolutePath()).redirectErrorStream(
-								true).start();
-						BufferedReader stdInput = new BufferedReader(
-								new InputStreamReader(proc.getInputStream()));
+						final Process proc =
+							new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+									.redirectErrorStream(true).start();
+						final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 						String s = null;
 						String config = null;
@@ -56,7 +52,7 @@ public class CppChecker {
 
 							if (s.startsWith("Checking")) {
 								if (s.contains(":")) {
-									String[] parts = s.split(":");
+									final String[] parts = s.split(":");
 									if (parts.length > 1) {
 										parts[1] = parts[1].trim();
 										config = parts[1].replace("...", "");
@@ -65,23 +61,19 @@ public class CppChecker {
 									config = "1";
 								}
 							}
-							if (s.startsWith("<error file")
-									&& !s.contains("/" + projectName + "/bin/")) {
-								xmlFile += "\t"
-										+ s.replace("/>", " config=\"" + config
-												+ "\"/>") + "\n";
+							if (s.startsWith("<error file") && !s.contains("/" + projectName + "/bin/")) {
+								xmlFile += "\t" + s.replace("/>", " config=\"" + config + "\"/>") + "\n";
 							}
 
 						}
 
-					} catch (IOException e) {
-						System.out.println("Error analyzing file + "
-								+ file.getAbsolutePath() + "...");
+					} catch (final IOException e) {
+						System.out.println("Error analyzing file + " + file.getAbsolutePath() + "...");
 						e.printStackTrace();
 					}
 				}
 			} else {
-				this.checkProjects(file, projectName);
+				checkProjects(file, projectName);
 			}
 		}
 	}
@@ -90,12 +82,10 @@ public class CppChecker {
 
 		try {
 
-			Process proc = new ProcessBuilder(Colligens.getDefault()
-					.getPreferenceStore().getString("CppCheck"), "--xml",
-					"--force", file.getAbsolutePath())
-					.redirectErrorStream(true).start();
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
-					proc.getInputStream()));
+			final Process proc =
+				new ProcessBuilder(Colligens.getDefault().getPreferenceStore().getString("CppCheck"), "--xml", "--force", file.getAbsolutePath())
+						.redirectErrorStream(true).start();
+			final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
 			String s = null;
 			String config = null;
@@ -106,7 +96,7 @@ public class CppChecker {
 
 				if (s.startsWith("Checking")) {
 					if (s.contains(":")) {
-						String[] parts = s.split(":");
+						final String[] parts = s.split(":");
 						if (parts.length > 1) {
 							parts[1] = parts[1].trim();
 							config = parts[1].replace("...", "");
@@ -115,18 +105,14 @@ public class CppChecker {
 						config = "1";
 					}
 				}
-				if (s.startsWith("<error file")
-						&& !s.contains("/" + projectName + "/bin/")) {
-					xmlFile += "\t"
-							+ s.replace("/>", " config=\"" + config + "\"/>")
-							+ "\n";
+				if (s.startsWith("<error file") && !s.contains("/" + projectName + "/bin/")) {
+					xmlFile += "\t" + s.replace("/>", " config=\"" + config + "\"/>") + "\n";
 				}
 
 			}
 
-		} catch (IOException e) {
-			System.out.println("Error analyzing file + "
-					+ file.getAbsolutePath() + "...");
+		} catch (final IOException e) {
+			System.out.println("Error analyzing file + " + file.getAbsolutePath() + "...");
 			e.printStackTrace();
 		}
 	}

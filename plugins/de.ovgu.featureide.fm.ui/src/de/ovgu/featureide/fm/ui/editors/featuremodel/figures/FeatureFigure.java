@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -20,17 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
@@ -46,7 +46,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -54,6 +54,9 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.explanations.ExplanationWriter;
+import de.ovgu.featureide.fm.core.explanations.Reason;
+import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -64,7 +67,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A figure that represents a feature with its name.
- * 
+ *
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
@@ -77,7 +80,7 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private final ConnectionAnchor sourceAnchor;
 	private final ConnectionAnchor targetAnchor;
 
-	private IGraphicalFeature feature;
+	private final IGraphicalFeature feature;
 	private Figure toolTipFigure = null;
 	private static GridLayout gl = new GridLayout();
 
@@ -89,6 +92,8 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
+
+	private final Set<FeatureModelReason> activeReasons = new LinkedHashSet<>();
 
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
@@ -136,11 +141,11 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		IFeature feature = this.feature.getObject();
+		final IFeature feature = this.feature.getObject();
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 
-		//First draw custom color
-		FeatureColor color = FeatureColorManager.getColor(feature);
+		// First draw custom color
+		final FeatureColor color = FeatureColorManager.getColor(feature);
 		if (color != FeatureColor.NO_COLOR) {
 			setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 		} else if (!feature.getStructure().isConcrete()) {
@@ -152,26 +157,10 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			label.setForegroundColor(HIDDEN_FOREGROUND);
 		}
 
-		switch (feature.getProperty().getFeatureStatus()) {
-		case DEAD:
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		case FALSE_OPTIONAL:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		case INDETERMINATE_HIDDEN:
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
-			break;
-		default:
-			break;
-		}
-
-		if (!analyser.valid()) {
-			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
+		if (feature.getFeatureModel().getStructure().getRoot().getFeature().getProperty().getFeatureStatus() == FeatureStatus.DEAD) {
+			setLabelIcon(FeatureStatus.DEAD);
+		} else {
+			setLabelIcon(feature.getProperty().getFeatureStatus());
 		}
 
 		if (feature instanceof ExtendedFeature) {
@@ -194,87 +183,47 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
 		}
 
-		Panel panel = new Panel();
+		final Panel panel = new Panel();
 		panel.setLayoutManager(new ToolbarLayout(false));
 
 		toolTipFigure = null;
+
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * Lazy implementation.
 	 */
 	@Override
 	public IFigure getToolTip() {
 		if (toolTipFigure == null) {
+
+			final IFeature feature = this.feature.getObject();
 			final StringBuilder toolTip = new StringBuilder();
+			toolTip.append(feature.createTooltip(new Object[0]));
 
-			IFeature feature = this.feature.getObject();
-			final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-
-			//First draw custom color
-			if (FeatureColorManager.getColor(feature) == FeatureColor.NO_COLOR) {
-				if (feature.getStructure().isConcrete()) {
-					toolTip.append(CONCRETE);
-				} else {
-					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-					toolTip.append(ABSTRACT);
-				}
-			}
-
-			if (feature.getStructure().hasHiddenParent()) {
-				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
-			}
-
-			toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
-
-			switch (feature.getProperty().getFeatureStatus()) {
-			case DEAD:
-				toolTip.append(DEAD);
-				break;
-			case FALSE_OPTIONAL:
-				toolTip.append(FALSE_OPTIONAL);
-				break;
-			case INDETERMINATE_HIDDEN:
-				toolTip.append(INDETERMINATE_HIDDEN);
-				break;
-			default:
-				break;
-			}
-
-			if (!analyser.valid()) {
-				toolTip.setLength(0);
-				toolTip.trimToSize();
-				toolTip.append(VOID);
-			}
-
-			final String description = feature.getProperty().getDescription();
-			if (description != null && !description.trim().isEmpty()) {
-				toolTip.append("\n\nDescription:\n");
-				toolTip.append(description);
-			}
-
-			final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
-			if (!contraints.isEmpty()) {
-				toolTip.append("\n\nConstraints:\n");
-				toolTip.append(contraints);
-				toolTip.append("\n");
+			if (getActiveReason() != null) {
+				setBorder(FMPropertyManager.getReasonBorder(getActiveReason()));
+				final ExplanationWriter<?> w = getActiveReason().getExplanation().getWriter();
+				String explanationString = "\n\nThis feature is involved in the selected defect:";
+				explanationString += w.getReasonsString(activeReasons);
+				toolTip.append(explanationString);
 			}
 
 			Figure toolTipContent = new Figure();
 			toolTipContent.setLayoutManager(gl);
 
-			Label featureName = new Label(feature.getName());
+			final Label featureName = new Label(feature.getName());
 			featureName.setFont(DEFAULT_FONT_BOLD);
 			toolTipContent.add(featureName);
-			Label furtherInfos = new Label(toolTip.toString());
+			final Label furtherInfos = new Label(toolTip.toString());
 			furtherInfos.setFont(DEFAULT_FONT);
 			toolTipContent.add(furtherInfos);
 			appendCustomProperties(toolTipContent);
 
 			// call of the FeatureDiagramExtensions
-			for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
+			for (final FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 				toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 			}
 			toolTipFigure = toolTipContent;
@@ -283,28 +232,30 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	}
 
 	private void appendCustomProperties(Figure toolTipContent) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		final IPropertyContainer props = feature.getObject().getCustomProperties();
 		final List<String> keys = new ArrayList<>(props.keySet());
 		Collections.sort(keys);
 		if (!keys.isEmpty()) {
-			int size = props.keySet().size();
+			final int size = props.keySet().size();
 			int maxKeyLength = 0;
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; i++) {
 				maxKeyLength = Math.max(maxKeyLength, keys.get(i).length());
+			}
 
 			for (int i = 0; i < size; i++) {
 				final String key = keys.get(i);
 				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
 				sb.append("\t=\t");
 				sb.append(props.get(key));
-				if (i + 1 < size)
+				if ((i + 1) < size) {
 					sb.append("\n");
+				}
 			}
 
-			Label propertiesInfo = new Label("\nCustom Properties");
+			final Label propertiesInfo = new Label("\nCustom Properties");
 			propertiesInfo.setFont(DEFAULT_FONT_BOLD);
-			Label properties = new Label(sb.toString());
+			final Label properties = new Label(sb.toString());
 			properties.setFont(DEFAULT_FONT);
 
 			toolTipContent.add(propertiesInfo);
@@ -320,14 +271,35 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 		return targetAnchor;
 	}
 
-	public void setName(String newName) {
-		if (label.getText().equals(newName)) {
-			return;
+	/**
+	 *
+	 * @param {@link FeatureStatus}
+	 */
+	private void setLabelIcon(FeatureStatus featureStatus) {
+		switch (featureStatus) {
+		case NORMAL:
+			label.setIcon(null);
+			break;
+		case DEAD:
+			label.setIcon(FM_ERROR);
+			break;
+		case FALSE_OPTIONAL:
+			label.setIcon(FM_WARNING);
+			break;
+		case INDETERMINATE_HIDDEN:
+			label.setIcon(WARNING_IMAGE);
+			break;
+		default:
+			break;
 		}
+		setName(label.getText());
+	}
+
+	public void setName(String newName) {
 		label.setText(newName);
 
 		final Dimension labelSize = label.getPreferredSize();
-		this.minSize = labelSize;
+		minSize = labelSize;
 
 		if (!labelSize.equals(label.getSize())) {
 			label.setSize(labelSize);
@@ -339,7 +311,6 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 			if (!oldSize.equals(0, 0)) {
 				bounds.x += (oldSize.width - bounds.width) >> 1;
 			}
-
 			setBounds(bounds);
 		}
 	}
@@ -363,5 +334,28 @@ public class FeatureFigure extends ModelElementFigure implements GUIDefaults {
 	@Override
 	public void setLocation(Point p) {
 		super.setLocation(p);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p> Only does so in any of the following cases: <ul> <li> The new active reason is null. This makes it possible to reset the active reason. </li> <li>
+	 * The old active reason is null. After resetting, any new active reason is accepted. </li> <li> The new active reason has a greater
+	 * {@link Reason#getConfidence() confidence} than the old one. This means that, in case of graphically overlapping reasons, the greatest confidence is
+	 * displayed. </li> </ul> </p>
+	 *
+	 * @param activeReason the new active reason; null to reset
+	 */
+	@Override
+	public void setActiveReason(FeatureModelReason activeReason) {
+		if (activeReason == null) {
+			activeReasons.clear();
+			super.setActiveReason(activeReason);
+		} else {
+			if ((getActiveReason() == null) || (activeReason.getConfidence() >= getActiveReason().getConfidence())) {
+				super.setActiveReason(activeReason);
+			}
+			activeReasons.add(activeReason);
+		}
 	}
 }

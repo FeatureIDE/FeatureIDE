@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Attributes-test
+Bundle-SymbolicName: de.ovgu.featureide.fm.attributes-test
+Bundle-Version: 3.4.1.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: de.ovgu.featureide.fm.attributes.base,
+ de.ovgu.featureide.fm.core.base,
+ org.junit;version="4.12.0"
+Require-Bundle: de.ovgu.featureide.fm.attributes,
+ de.ovgu.featureide.ui

@@ -1,0 +1,160 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fCiw0KjoEeeuipbK_M3LHA,_urHYwKoHEeeF3P5ISwke7w
+Element-Name: SelectingFeaturesInFeatureDiagram
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _dOp9YKoREeeF3P5ISwke7w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/9/17 9:16 AM
+Testcase-Type: ecl
+Verifications: _2o2TwKjoEeeuipbK_M3LHA
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+This test checks if you can select every single feature in a feature diagram without causing an error.
+It does not test the selection of multiple features at the same time.
+The test fails if there is an entry in the error log.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Package Explorer" | get-tree | select "Elevator-FeatureModeling/model.xml" | double-click
+with [get-editor "Elevator-FeatureModeling Model" | get-diagram] {
+    with [get-edit-part -className ModelEditPart] {
+        with [get-edit-part -text Elevator] {
+            mouse-move 12 8 button1 -height 21 -width 52
+            mouse-press 12 8 button1 -height 21 -width 52
+            mouse-release 12 8 button1 524288 -height 21 -width 52
+        }
+        with [get-edit-part -text Behavior] {
+            mouse-move 35 8 button1 -height 21 -width 55
+            mouse-press 35 8 button1 -height 21 -width 55
+            mouse-release 35 8 button1 524288 -height 21 -width 55
+        }
+        with [get-edit-part -text VoiceOutput] {
+            mouse-move 30 8 button1 -height 21 -width 72
+            mouse-press 30 8 button1 -height 21 -width 72
+            mouse-release 30 8 button1 524288 -height 21 -width 72
+        }
+        with [get-edit-part -text CallButtons] {
+            mouse-move 30 7 button1 -height 21 -width 67
+            mouse-press 30 7 button1 -height 21 -width 67
+            mouse-release 30 7 button1 524288 -height 21 -width 67
+        }
+        with [get-edit-part -text Security] {
+            mouse-move 15 6 button1 -height 21 -width 52
+            mouse-press 15 6 button1 -height 21 -width 52
+            mouse-release 15 6 button1 524288 -height 21 -width 52
+        }
+        with [get-edit-part -text Safety] {
+            mouse-move 35 4 button1 -height 21 -width 43
+            mouse-press 35 4 button1 -height 21 -width 43
+            mouse-release 35 4 button1 524288 -height 21 -width 43
+        }
+        with [get-edit-part -text Modes] {
+            mouse-move 22 12 button1 -height 21 -width 45
+            mouse-press 22 12 button1 -height 21 -width 45
+            mouse-release 22 12 button1 524288 -height 21 -width 45
+        }
+        with [get-edit-part -text Service] {
+            mouse-move 18 8 button1 -height 21 -width 49
+            mouse-press 18 8 button1 -height 21 -width 49
+            mouse-release 18 8 button1 524288 -height 21 -width 49
+        }
+        with [get-edit-part -text Priorities] {
+            mouse-move 26 8 button1 -height 21 -width 54
+            mouse-press 26 8 button1 -height 21 -width 54
+            mouse-release 26 8 button1 524288 -height 21 -width 54
+        }
+        with [get-edit-part -text DirectedCall] {
+            mouse-move 22 8 button1 -height 21 -width 71
+            mouse-press 22 8 button1 -height 21 -width 71
+            mouse-release 22 8 button1 524288 -height 21 -width 71
+        }
+        with [get-edit-part -text UndirectedCall] {
+            mouse-move 22 6 button1 -height 21 -width 83
+            mouse-press 22 6 button1 -height 21 -width 83
+            mouse-release 22 6 button1 524288 -height 21 -width 83
+        }
+        with [get-edit-part -text Permission] {
+            mouse-move 28 7 button1 -height 21 -width 65
+            mouse-press 28 7 button1 -height 21 -width 65
+            mouse-release 28 7 button1 524288 -height 21 -width 65
+        }
+        with [get-edit-part -text Overloaded] {
+            mouse-move 17 10 button1 -height 21 -width 69
+            mouse-press 17 10 button1 -height 21 -width 69
+            mouse-release 17 10 button1 524288 -height 21 -width 69
+        }
+        with [get-edit-part -text Sabbath] {
+            mouse-move 50 10 button1 -height 21 -width 52
+            mouse-press 50 10 button1 -height 21 -width 52
+            mouse-release 50 10 button1 524288 -height 21 -width 52
+        }
+        with [get-edit-part -text FIFO] {
+            mouse-move 13 10 button1 -height 21 -width 38
+            mouse-press 13 10 button1 -height 21 -width 38
+            mouse-release 13 10 button1 524288 -height 21 -width 38
+        }
+        with [get-edit-part -text ShortestPath] {
+            mouse-move 46 10 button1 -height 21 -width 75
+            mouse-press 46 10 button1 -height 21 -width 75
+            mouse-release 46 10 button1 524288 -height 21 -width 75
+        }
+        with [get-edit-part -text RushHour] {
+            mouse-move 20 11 button1 -height 21 -width 62
+            mouse-press 20 11 button1 -height 21 -width 62
+            mouse-release 20 11 button1 524288 -height 21 -width 62
+        }
+        with [get-edit-part -text FloorPriority] {
+            mouse-move 24 9 button1 -height 21 -width 71
+            mouse-press 24 9 button1 -height 21 -width 71
+            mouse-release 24 9 button1 524288 -height 21 -width 71
+        }
+        with [get-edit-part -text PersonPriority] {
+            mouse-move 23 6 button1 -height 21 -width 81
+            mouse-press 23 6 button1 -height 21 -width 81
+            mouse-release 23 6 button1 524288 -height 21 -width 81
+        }
+        with [get-edit-part -text FloorPermission] {
+            mouse-move 46 15 button1 -height 21 -width 90
+            mouse-press 46 15 button1 -height 21 -width 90
+            mouse-release 46 15 button1 524288 -height 21 -width 90
+        }
+        with [get-edit-part -text PermissionControl] {
+            mouse-move 31 6 button1 -height 21 -width 100
+            mouse-press 31 6 button1 -height 21 -width 100
+            mouse-release 31 6 button1 524288 -height 21 -width 100
+        }
+        with [get-edit-part -text "CallButtons ∨ Sabbath"] {
+            mouse-move 49 10 button1 -height 19 -width 123
+            mouse-press 49 10 button1 -height 19 -width 123
+            mouse-release 49 10 button1 524288 -height 19 -width 123
+        }
+        with [get-edit-part -text "DirectedCall ⇒ ShortestPath"] {
+            mouse-move 62 13 button1 -height 19 -width 152
+            mouse-press 62 13 button1 -height 19 -width 152
+            mouse-release 62 13 button1 524288 -height 19 -width 152
+        }
+        with [get-edit-part -text "UndirectedCall ⇒ FIFO ∨ ShortestPath"] {
+            mouse-move 87 10 button1 -height 19 -width 202
+            mouse-press 87 10 button1 -height 19 -width 202
+            mouse-release 87 10 button1 524288 -height 19 -width 202
+        }
+        with [get-edit-part -text "Legend:"] {
+            mouse-move 33 85 button1 -height 119 -width 105
+            mouse-press 33 85 button1 -height 119 -width 105
+            mouse-release 33 85 button1 524288 -height 119 -width 105
+        }
+    }
+    mouse-move 425 365 button1 -height 689 -width 1094
+    mouse-press 425 365 button1 -height 689 -width 1094
+    mouse-release 425 365 button1 524288 -height 689 -width 1094
+    mouse-hover 425 365 -height 689 -width 1094
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

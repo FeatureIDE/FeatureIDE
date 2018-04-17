@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -38,14 +38,14 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * Default colors, fonts, images and borders for the feature diagram.<br>
- * It is recommended to use {@link FMPropertyManager} for colors and borders instead of these values.
- * 
+ * Default colors, fonts, images and borders for the feature diagram.<br> It is recommended to use {@link FMPropertyManager} for colors and borders instead of
+ * these values.
+ *
  * @author Thomas Thuem
  */
 public interface GUIDefaults {
 
-	//general settings
+	// general settings
 
 	/**
 	 * an Unicode font to be able to display constraints at the feature diagram correctly
@@ -55,10 +55,10 @@ public interface GUIDefaults {
 
 	public static final Color DIAGRAM_BACKGROUND = ColorConstants.white;
 
-	//concrete, hidden, dead and abstract features
+	// concrete, hidden, dead and abstract features
 
 	public static final Color FEATURE_FOREGROUND = GUIBasics.createColor(0.0, 0.0, 0.0);
-	public static final Insets FEATURE_INSETS = new Insets(3, 6, 3, 6);//4, 8, 4, 8
+	public static final Insets FEATURE_INSETS = new Insets(3, 6, 3, 6);// 4, 8, 4, 8
 
 	public static final Color CONCRETE_BACKGROUND = GUIBasics.createColor(0.8, 0.8, 1.0);
 	public static final Color CONCRETE_BORDER_COLOR = GUIBasics.createBorderColor(CONCRETE_BACKGROUND);
@@ -88,7 +88,7 @@ public interface GUIDefaults {
 	public static final Color IMPORTED_BORDER_COLOR = GUIBasics.createColor(128, 0, 128);
 	public static final Color INTERFACED_BORDER_COLOR = GUIBasics.createColor(0, 191, 255);
 
-	//connections and decorators
+	// connections and decorators
 
 	public static final Color CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 0.4, 0.4);
 	public static final Color NEW_CONNECTION_FOREGROUND = GUIBasics.createColor(0.4, 1.0, 0.4);
@@ -101,7 +101,7 @@ public interface GUIDefaults {
 	public static final int TARGET_ANCHOR_DIAMETER = 25;
 	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
-	//cross-tree constraints
+	// cross-tree constraints
 
 	public static final Color CONSTRAINT_FOREGROUND = FEATURE_FOREGROUND;
 	public static final Insets CONSTRAINT_INSETS = new Insets(2, 8, 2, 8);
@@ -113,32 +113,31 @@ public interface GUIDefaults {
 	public static final Color IMPLICIT_CONSTRAINT = GUIBasics.createColor(1.0, 0.0, 0.0);
 	public static final Border IMPLICIT_CONSTRAINT_BORDER = new LineBorder(IMPLICIT_CONSTRAINT, 2);
 
-
-	//false constraints
+	// false constraints
 
 	public static final Color WARNING_BACKGROUND = GUIBasics.createColor(1.0, 1.0, 0.6);
 	public static final Color ERROR_BACKGROUND = DEAD_BACKGROUND;
 
-	//cell editor for renaming features / editing constraints
+	// cell editor for renaming features / editing constraints
 
 	public static final Insets CELL_EDITOR_INSETS = new Insets(0, 4, 0, 4);
 	public static final Dimension CELL_EDITOR_MINSIZE = new Dimension(50, 5);
 
-	//space between features for layouting
+	// space between features for layouting
 
 	public static final int LAYOUT_MARGIN_X = 20;
 	public static final int LAYOUT_MARGIN_Y = 40;
 	public static final int FEATURE_SPACE_X = 5;
 	public static final int FEATURE_SPACE_Y = 30 + 20;
 	public static final int CONSTRAINT_SPACE_Y = 5 + 20;
-	
-	//space between text and bounds for collapsed decorator
+
+	// space between text and bounds for collapsed decorator
 	public static final int COLLAPSED_DECORATOR_X_SPACE = 3;
 	public static final int COLLAPSED_DECORATOR_Y_SPACE = 2;
 	public static final int COLLAPSED_DECORATOR_FEATURE_SPACE = -1;
 	public static final int COLLAPSED_DECORATOR_ARC_RADIUS = 5;
 
-	//legend
+	// legend
 	public static final int LEGEND_WIDTH = 105;
 	public static final Color LEGEND_FOREGROUND = FEATURE_FOREGROUND;
 	public static final Color LEGEND_BACKGROUND = DIAGRAM_BACKGROUND;
@@ -165,7 +164,7 @@ public interface GUIDefaults {
 
 	public static final Image OPERATOR_SYMBOL = FMUIPlugin.getImage("operator_symbol.gif");
 	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
-		
+
 	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
 	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
 	public static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
@@ -180,5 +179,9 @@ public interface GUIDefaults {
 	public static final Image ERROR_IMAGE_TSK = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 
 	public static final Image IMAGE_EMPTY = FMUIPlugin.getImage("empty.png");
+
+	public static final Image FM_ERROR = FMUIPlugin.getImage("fmerror.png");
+	public static final Image FM_WARNING = FMUIPlugin.getImage("fmwarning.png");
+	public static final Image FM_INFO = FMUIPlugin.getImage("fminfo.png");
 
 }

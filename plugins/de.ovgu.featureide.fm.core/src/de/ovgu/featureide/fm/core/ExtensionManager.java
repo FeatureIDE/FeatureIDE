@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -26,9 +26,10 @@ import java.util.List;
 
 /**
  * Manages all extension of a certain extension point.
- * 
+ *
  * @author Sebastian Krieter
  */
+// TODO Check synchronization for get and add extension methods
 public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 
 	public static class NoSuchExtensionException extends Exception {
@@ -49,7 +50,7 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 	}
 
 	public boolean addExtension(T extension) {
-		for (T t : extensions) {
+		for (final T t : extensions) {
 			if (t.getId().equals(extension.getId())) {
 				return false;
 			}
@@ -69,13 +70,13 @@ public class ExtensionManager<T extends de.ovgu.featureide.fm.core.IExtension> {
 		}
 		return Collections.unmodifiableList(extensions);
 	}
-	
+
 	public T getExtension(String id) throws NoSuchExtensionException {
 		java.util.Objects.requireNonNull(id, "ID must not be null!");
 
-		for (T factory : getExtensions()) {
-			if (id.equals(factory.getId())) {
-				return factory;
+		for (final T extension : getExtensions()) {
+			if (id.equals(extension.getId())) {
+				return extension;
 			}
 		}
 		throw new NoSuchExtensionException("No extension found for ID " + id);

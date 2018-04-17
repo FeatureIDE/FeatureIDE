@@ -1,7 +1,7 @@
 .classpath
 .order
 .project
-configs/Base.config
+configs/Base.xml
 features/base/com/sleepycat/bind/ByteArrayBinding.java
 features/base/com/sleepycat/bind/EntityBinding.java
 features/base/com/sleepycat/bind/EntryBinding.java

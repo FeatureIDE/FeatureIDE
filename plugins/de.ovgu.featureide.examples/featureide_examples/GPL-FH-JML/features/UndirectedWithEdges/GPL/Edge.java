@@ -10,6 +10,7 @@ public class Edge extends Neighbor implements EdgeIfc
 
     /*@requires the_start != null && the_end != null;@*/
     /*@ensures this.start == the_start && this.end == the_end;@*/
+    /*@assignable start, end; @*/
     public void EdgeConstructor( Vertex the_start, Vertex the_end )
     {
         start = the_start;

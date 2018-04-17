@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -33,16 +33,17 @@ import de.ovgu.featureide.fm.core.configuration.io.IConfigurationLoaderCallback;
 
 /**
  * Reads all configuration file from a certain folder and saves their content in form of a selection matrix.
- * 
+ *
  * @author Paul Maximilan Bittner
  * @author Sebastian Krieter
  * @author Antje Moench
  */
 public class ConfigurationMatrix {
+
 	private final List<Config> configurationMatrix;
-	private ConfigurationLoader loader;
-	private IFeatureModel featureModel;
-	private Path path;
+	private final ConfigurationLoader loader;
+	private final IFeatureModel featureModel;
+	private final Path path;
 
 	private double[] rec = null;
 
@@ -53,7 +54,7 @@ public class ConfigurationMatrix {
 	public ConfigurationMatrix(IFeatureModel featureModel, Path path) {
 		this.featureModel = featureModel;
 		this.path = path;
-		this.configurationMatrix = new ArrayList<>();
+		configurationMatrix = new ArrayList<>();
 		loader = new ConfigurationLoader(new IConfigurationLoaderCallback() {
 
 			@Override
@@ -72,24 +73,24 @@ public class ConfigurationMatrix {
 			@Override
 			public void onLoadingFinished() {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 	}
 
 	public void readConfigurations() {
-		loader.loadConfigurations(this.featureModel, this.path);
+		loader.loadConfigurations(featureModel, path);
 	}
 
 	public void readConfigurations(String excludeFile) {
-		loader.loadConfigurations(this.featureModel, this.path, excludeFile);
+		loader.loadConfigurations(featureModel, path, excludeFile);
 	}
 
 	private Config createConfig(Configuration configuration) {
 		final List<SelectableFeature> features = configuration.getFeatures();
-		byte[] configArray = new byte[features.size()];
+		final byte[] configArray = new byte[features.size()];
 		int i = 0;
-		for (SelectableFeature feature : features) {
+		for (final SelectableFeature feature : features) {
 			switch (feature.getSelection()) {
 			case SELECTED:
 				configArray[i++] = 1;
@@ -118,11 +119,11 @@ public class ConfigurationMatrix {
 		rec = new double[configurationMatrix.get(0).configArray.length];
 		Arrays.fill(rec, 0);
 
-		int[] w = new int[configurationMatrix.size()];
+		final int[] w = new int[configurationMatrix.size()];
 		int wSum = 0;
 		{
 			int j = 0;
-			for (Config config : configurationMatrix) {
+			for (final Config config : configurationMatrix) {
 				final int delta = curConfig.getDelta(config);
 				w[j++] = delta;
 				wSum += delta;
@@ -143,6 +144,7 @@ public class ConfigurationMatrix {
 	}
 
 	private static class Config {
+
 		private final byte[] configArray;
 
 		public Config(byte[] configArray) {

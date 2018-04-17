@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -21,15 +21,13 @@
 package de.ovgu.featureide.fm.ui.handlers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -41,70 +39,67 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
 
 /**
  * TODO description
- * 
+ *
  * @author Alexander
  */
 public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = readModel(file);
+		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
 
 		IConverterStrategy strategy = new NNFConverter();
-		ComplexConstraintConverter converter = new ComplexConstraintConverter();
+		final ComplexConstraintConverter converter = new ComplexConstraintConverter();
 		String path = "";
 
-		boolean trivial = ComplexConstraintConverter.trivialRefactoring(featureModel);
+		final boolean trivial = ComplexConstraintConverter.trivialRefactoring(featureModel);
 
 		int pseudo = 0, strict = 0;
-		for (IConstraint c : featureModel.getConstraints()) {
-			if (ComplexConstraintConverter.isSimple(c.getNode())) {
-			} else if (ComplexConstraintConverter.isPseudoComplex(c.getNode()))
+		for (final IConstraint c : featureModel.getConstraints()) {
+			if (ComplexConstraintConverter.isSimple(c.getNode())) {} else if (ComplexConstraintConverter.isPseudoComplex(c.getNode())) {
 				pseudo++;
-			else {
+			} else {
 				strict++;
 			}
 		}
 
-		//count number of constraints
-		//set file extension
+		// count number of constraints
+		// set file extension
 		final EliminateConstraintsWizard wizard = new EliminateConstraintsWizard(file, "Complex-constraints elimination", trivial, pseudo, strict, "xml");
 
-		List<Option> options = new ArrayList<Option>();
+		final List<Option> options = new ArrayList<Option>();
 
-		if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
+		if (Window.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
 			strategy = wizard.getStrategy();
-			if (wizard.preserveConfigurations())
+			if (wizard.preserveConfigurations()) {
 				options.add(Option.COHERENT);
-			if (wizard.removeRedundancy())
+			}
+			if (wizard.removeRedundancy()) {
 				options.add(Option.REMOVE_RDUNDANCY);
+			}
 			path = wizard.getPath();
 			if ((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
 				return;
 			}
 		}
 
-		IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
+		final IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
 
-		FileHandler.save(Paths.get(path), result, FMFormatManager.getInstance().getFormatByFileName(path));
+		SimpleFileHandler.save(Paths.get(path), result, FMFormatManager.getInstance().getFormatByFileName(path));
 	}
 
 	@SuppressWarnings("unused")
@@ -120,30 +115,6 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 		}
 		IDE.openEditor(page, outputFile);
-	}
-
-	/**
-	 * reads the featureModel from file
-	 * 
-	 * @param inputFile
-	 * @return featureModel
-	 * @throws UnsupportedModelException
-	 * @throws FileNotFoundException
-	 */
-	private IFeatureModel readModel(IFile inputFile) {
-		final IFeatureModelFormat format = FMFormatManager.getInstance().getFormatByFileName(inputFile.getName());
-		IFeatureModel fm;
-		try {
-			fm = FMFactoryManager.getFactory(inputFile.getLocation().toString(), format).createFeatureModel();
-		} catch (NoSuchExtensionException e) {
-			fm = FMFactoryManager.getDefaultFactory().createFeatureModel();
-		}
-		try {
-			FileHandler.load(inputFile.getContents(), fm, format);
-		} catch (CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-		return fm;
 	}
 
 }

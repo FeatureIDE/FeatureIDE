@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJE
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -52,19 +53,25 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
+import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
+import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * The NEW wizard page allows setting the container for the new file as well
- * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (.config).
- * 
+ * The NEW wizard page allows setting the container for the new file as well as the file name. The page will only accept file name without the extension OR with
+ * the extension that matches the expected one (.config).
+ *
  * @author Christian Becker
  * @author Jens Meinicke
  */
 public class NewConfigurationFilePage extends WizardPage {
 
+	private final List<IConfigurationFormat> formatExtensions = ConfigFormatManager.getInstance().getExtensions();
+
 	private Combo featureComboProject;
+	private Combo formatCombo;
 
 	private Text fileText;
 
@@ -72,17 +79,17 @@ public class NewConfigurationFilePage extends WizardPage {
 
 	private IFeatureProject featureProject = null;
 
-	private Collection<IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
+	private final Collection<IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
 
 	private String text;
 
-	private LinkedList<String> configNames = new LinkedList<String>();
+	private List<String> configNames = new LinkedList<>();
 	private boolean projectbool = false;
 	private boolean configbool = false;
 
 	/**
 	 * Constructor for SampleNewWizardPage.
-	 * 
+	 *
 	 * @param pageName
 	 */
 	public NewConfigurationFilePage(IFolder configFolder) {
@@ -95,10 +102,11 @@ public class NewConfigurationFilePage extends WizardPage {
 	/**
 	 * @see IDialogPage#createControl(Composite)
 	 */
+	@Override
 	public void createControl(Composite parent) {
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		final Composite composite = new Composite(parent, SWT.NULL);
+		final GridLayout layout = new GridLayout();
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
@@ -113,6 +121,13 @@ public class NewConfigurationFilePage extends WizardPage {
 		label.setText("&File name:");
 		fileText = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		fileText.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
+
+		label = new Label(composite, SWT.NULL);
+		label.setText("&Format:");
+		formatCombo = new Combo(composite, SWT.BORDER | SWT.SINGLE);
+		formatCombo.setLayoutData(gd);
+		new Label(composite, SWT.NULL);
 
 		initialize();
 		addListeners();
@@ -126,33 +141,45 @@ public class NewConfigurationFilePage extends WizardPage {
 	 */
 	private void addListeners() {
 		featureComboProject.addModifyListener(new ModifyListener() {
+
+			@Override
 			public void modifyText(ModifyEvent e) {
 				featureProject = null;
 				text = featureComboProject.getText();
-				for (IFeatureProject feature : featureProjects) {
+				for (final IFeatureProject feature : featureProjects) {
 					if (text.equalsIgnoreCase(feature.getProjectName())) {
 						featureProject = feature;
 					}
 				}
 				if (featureProject != null) {
 					try {
-						for (IResource configFile : featureProject.getConfigFolder().members()) {
+						for (final IResource configFile : featureProject.getConfigFolder().members()) {
 							if (configFile instanceof IFile) {
 								configNames.add(configFile.getName());// .split("[.]")[0]);
 							}
 						}
-					} catch (CoreException e2) {
+					} catch (final CoreException e2) {
 						UIPlugin.getDefault().logError(e2);
 					}
-					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName());
-					IFeatureProject data = CorePlugin.getFeatureProject(res);
-					if (data != null)
+					final IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName());
+					final IFeatureProject data = CorePlugin.getFeatureProject(res);
+					if (data != null) {
 						configFolder = data.getConfigFolder();
+					}
 				}
 				dialogChanged();
 			}
 		});
 		fileText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				dialogChanged();
+			}
+		});
+		formatCombo.addModifyListener(new ModifyListener() {
+
+			@Override
 			public void modifyText(ModifyEvent e) {
 				dialogChanged();
 			}
@@ -160,17 +187,25 @@ public class NewConfigurationFilePage extends WizardPage {
 	}
 
 	private void initialize() {
-		for (IFeatureProject feature : featureProjects) {
+		for (final IFeatureProject feature : featureProjects) {
 			featureComboProject.add(feature.getProjectName());
 		}
 		if (configFolder != null) {
 			featureComboProject.setText(configFolder.getProject().getName());
 		}
+		for (final IConfigurationFormat format : formatExtensions) {
+			formatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
+		}
+		try {
+			formatCombo.select(formatExtensions.indexOf(ConfigFormatManager.getInstance().getExtension(XMLConfFormat.ID)));
+		} catch (final NoSuchExtensionException e) {
+			formatCombo.select(0);
+		}
 	}
 
 	private void dialogChanged() {
-		String fileName = getFileName();
-		if (featureComboProject.getText().length() == 0 && !projectbool) {
+		final String fileName = getFileName();
+		if ((featureComboProject.getText().length() == 0) && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);
 			projectbool = true;
@@ -189,7 +224,7 @@ public class NewConfigurationFilePage extends WizardPage {
 
 		if (fileName.length() != 0) {
 			configbool = true;
-			String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
+			final String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
 			if (featureProject.getConfigFolder().getFile(fullFileName).exists()) {
 				updateStatus(FILE + fullFileName + ALREADY_EXISTS_);
 				return;
@@ -207,13 +242,12 @@ public class NewConfigurationFilePage extends WizardPage {
 			return;
 		}
 
-		int dotLoc = fileName.lastIndexOf('.');
+		final int dotLoc = fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
 			updateStatus("Configuration name must not contain \".\"");
 			return;
 		}
 		updateStatus(null);
-
 	}
 
 	private void updateStatus(String message) {
@@ -229,20 +263,24 @@ public class NewConfigurationFilePage extends WizardPage {
 		return fileText.getText();
 	}
 
+	public IConfigurationFormat getFormat() {
+		return formatExtensions.get(formatCombo.getSelectionIndex());
+	}
+
 	public boolean isFeatureProject(String text) {
 		boolean isFP = false;
-		for (IFeatureProject feature : featureProjects) {
+		for (final IFeatureProject feature : featureProjects) {
 			if (text.equalsIgnoreCase(feature.getProjectName())) {
 				isFP = true;
 				featureProject = feature;
 				try {
 					configNames = new LinkedList<String>();
-					for (IResource configurationFile : featureProject.getConfigFolder().members()) {
+					for (final IResource configurationFile : featureProject.getConfigFolder().members()) {
 						if (configurationFile instanceof IFile) {
 							configNames.add(configurationFile.getName().split("[.]")[0]);
 						}
 					}
-				} catch (CoreException e2) {
+				} catch (final CoreException e2) {
 					UIPlugin.getDefault().logError(e2);
 				}
 			}

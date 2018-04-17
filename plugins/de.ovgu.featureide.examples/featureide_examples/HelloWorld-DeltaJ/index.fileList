@@ -1,6 +1,6 @@
 .classpath
 .project
-configs/hello.config
+configs/hello.xml
 execute_program/Main.java
 model.xml
 modules/DHello.deltaj

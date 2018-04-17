@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -34,10 +34,9 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 
 /**
- * Represents an instance of a satisfiability problem in CNF.</br>
- * Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()}
- * method to get a {@link BasicSolver solver} for this problem.
- * 
+ * Represents an instance of a satisfiability problem in CNF.</br> Use a {@link ISatSolverProvider solver provider} or the {@link #getSolver()} method to get a
+ * {@link BasicSolver solver} for this problem.
+ *
  * @author Sebastian Krieter
  */
 public class SatInstance {
@@ -55,7 +54,7 @@ public class SatInstance {
 	public static void updateModel(final int[] model1, Iterable<int[]> models) {
 		for (int i = 0; i < model1.length; i++) {
 			final int x = model1[i];
-			for (int[] model2 : models) {
+			for (final int[] model2 : models) {
 				final int y = model2[i];
 				if (x != y) {
 					model1[i] = 0;
@@ -66,7 +65,7 @@ public class SatInstance {
 	}
 
 	public static int[] negateModel(int[] ar) {
-		int[] nar = Arrays.copyOf(ar, ar.length);
+		final int[] nar = Arrays.copyOf(ar, ar.length);
 		for (int i = 0; i < nar.length; i++) {
 			nar[i] = -nar[i];
 		}
@@ -78,11 +77,11 @@ public class SatInstance {
 	protected final Node cnf;
 
 	public SatInstance(Node root, Collection<?> featureList) {
-		this.intToVar = new Object[featureList.size() + 1];
-		this.cnf = root;
+		intToVar = new Object[featureList.size() + 1];
+		cnf = root;
 
 		int index = 0;
-		for (Object feature : featureList) {
+		for (final Object feature : featureList) {
 			final String name = feature.toString();
 			if (name == null) {
 				throw new RuntimeException();
@@ -98,7 +97,7 @@ public class SatInstance {
 
 	public static Set<Object> getDistinctVariableObjects(Node cnf) {
 		final HashSet<Object> result = new HashSet<>();
-		for (Node clause : cnf.getChildren()) {
+		for (final Node clause : cnf.getChildren()) {
 			final Node[] literals = clause.getChildren();
 			for (int i = 0; i < literals.length; i++) {
 				result.add(((Literal) literals[i]).var);
@@ -113,7 +112,7 @@ public class SatInstance {
 
 	public List<String> convertToString(int[] model, boolean includePositive, boolean includeNegative) {
 		final List<String> resultList = new ArrayList<>();
-		for (int var : model) {
+		for (final int var : model) {
 			if (var > 0) {
 				if (includePositive) {
 					resultList.add(intToVar[Math.abs(var)].toString());
@@ -130,7 +129,7 @@ public class SatInstance {
 	public int[] convertToInt(Collection<Literal> literals) {
 		final int[] resultList = new int[literals.size()];
 		int i = 0;
-		for (Literal literal : literals) {
+		for (final Literal literal : literals) {
 			final Integer varIndex = varToInt.get(literal.var);
 			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
 		}
@@ -144,8 +143,8 @@ public class SatInstance {
 	public int[] convertToInt(Node[] literals) {
 		final int[] resultList = new int[literals.length];
 		int i = 0;
-		for (Node node : literals) {
-			Literal literal = (Literal) node;
+		for (final Node node : literals) {
+			final Literal literal = (Literal) node;
 			final Integer varIndex = varToInt.get(literal.var);
 			resultList[i++] = varIndex == null ? 0 : (literal.positive ? varIndex : -varIndex);
 		}
@@ -154,7 +153,7 @@ public class SatInstance {
 
 	public List<Literal> convertToLiterals(int[] model) {
 		final List<Literal> resultList = new ArrayList<>();
-		for (int var : model) {
+		for (final int var : model) {
 			resultList.add(new Literal(intToVar[Math.abs(var)], (var > 0)));
 		}
 		return resultList;

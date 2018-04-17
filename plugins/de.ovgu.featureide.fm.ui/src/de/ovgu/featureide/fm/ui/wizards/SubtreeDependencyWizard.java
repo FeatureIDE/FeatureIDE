@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -23,9 +23,8 @@ package de.ovgu.featureide.fm.ui.wizards;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only
- * and not persistent.
- * 
+ * A wizard to show a sub feature model and its implicit dependencies. The sub feature model is read-only and not persistent.
+ *
  * @author "Ananieva Sofia"
  */
 public class SubtreeDependencyWizard extends AbstractWizard {
@@ -33,18 +32,18 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	/**
 	 * The sub feature model which contains implicit constraints if there are any.
 	 */
-	IFeatureModel subFm;
+	private final IFeatureModel subFm;
 
 	/**
 	 * The origin feature model which contains the sub feature model.
 	 */
-	IFeatureModel completeFm;
+	private final IFeatureModel completeFm;
 
 	/**
-	 * Constructor. 
-	 * 
+	 * Constructor.
+	 *
 	 * @param title The title of the wizard page
-	 * @param newModel The sub feature model 
+	 * @param newModel The sub feature model
 	 * @param completeModel The origin feature model
 	 */
 	public SubtreeDependencyWizard(String title, IFeatureModel newModel, IFeatureModel completeModel) {
@@ -60,7 +59,6 @@ public class SubtreeDependencyWizard extends AbstractWizard {
 	public void addPages() {
 		addPage(new SubtreeDependencyPage(subFm, completeFm));
 	}
-
 
 	/**
 	 * Performs finishing actions when closing the wizard.

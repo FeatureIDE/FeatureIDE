@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
@@ -30,29 +29,25 @@ import org.eclipse.core.resources.IProject;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Holds all relevant information about the interface project.
- * 
+ *
  * @author Sebastian Krieter
  * @author Reimar Schroeter
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class InterfaceProject {
+
 	private final IProject projectReference;
 	private final IFeatureProject featureProject;
 
@@ -82,6 +77,7 @@ public class InterfaceProject {
 	}
 
 	private class FeaturePropertyChangeListener implements IEventListener {
+
 		private final int id;
 
 		public FeaturePropertyChangeListener(int id) {
@@ -90,7 +86,7 @@ public class InterfaceProject {
 
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			EventType prop = event.getEventType();
+			final EventType prop = event.getEventType();
 			if (EventType.LOCATION_CHANGED == prop) {
 
 			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
@@ -112,17 +108,7 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 
 		if (projectReference != null) {
-			final Path featureModelPath = Paths.get(projectReference.getFile("model.xml").getLocationURI());
-			final IFeatureModelFormat format = FeatureModelManager.getFormat(featureModelPath.getFileName().toString());
-			IFeatureModelFactory factory;
-			try {
-				factory = FMFactoryManager.getFactory(featureModelPath.toString(), format);
-			} catch (NoSuchExtensionException e) {
-				Logger.logError(e);
-				factory = FMFactoryManager.getDefaultFactory();
-			}
-			featureModel = factory.createFeatureModel();
-			FileHandler.load(featureModelPath, featureModel, format);
+			featureModel = FeatureModelManager.load(Paths.get(projectReference.getFile("model.xml").getLocationURI())).getObject();
 		} else {
 			featureModel = null;
 		}
@@ -134,7 +120,7 @@ public class InterfaceProject {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
 
-			for (IFeature feature : featureModel.getFeatures()) {
+			for (final IFeature feature : featureModel.getFeatures()) {
 				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = feature.getName();
@@ -152,9 +138,9 @@ public class InterfaceProject {
 	}
 
 	public int[] getFeatureIDs(Collection<String> featureNames) {
-		int[] ids = new int[featureNames.size()];
+		final int[] ids = new int[featureNames.size()];
 		int i = -1;
-		for (String featureName : featureNames) {
+		for (final String featureName : featureNames) {
 			ids[++i] = getFeatureID(featureName);
 		}
 		return ids;
@@ -212,8 +198,7 @@ public class InterfaceProject {
 		if (configuration == null) {
 			final IFile configFile = featureProject.getCurrentConfiguration();
 			configuration = new Configuration(featureModel);
-			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration,
-					ConfigurationManager.getFormat(configFile.getName()));
+			SimpleFileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigFormatManager.getInstance());
 		}
 		return configuration;
 	}
@@ -253,12 +238,12 @@ public class InterfaceProject {
 
 	public void setFilterViewTag(String viewName, int viewLevel) {
 		if (viewName != null) {
-			this.filterViewTag = new ViewTag(viewName, viewLevel);
+			filterViewTag = new ViewTag(viewName, viewLevel);
 		}
 	}
 
 	public void clearFilterViewTag() {
-		this.filterViewTag = null;
+		filterViewTag = null;
 	}
 
 	// public void scaleUpViewTag(String name, int level) {
