@@ -1,0 +1,414 @@
+Property => AdtA09Handler.CHECK_IN_EARLY_ALLOWANCE
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+663 :  AdtA09Handler.CHECK_IN_EARLY_ALLOWANCE=4
+Property => AdtA09Handler.CHECK_IN_LATE_ALLOWANCE
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+662 :  AdtA09Handler.CHECK_IN_LATE_ALLOWANCE=2
+Property => ALT_DISCHARGE_REASON
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+615 :  ALT_DISCHARGE_REASON=no
+Property => born18m_sftp_host
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+947 :  born18m_sftp_host=ftp.test.com
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN18M.xml
+15 :  		<property name="host" value="${born18m_sftp_host}"/>
+Property => born18m_sftp_password
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+950 :  born18m_sftp_password=test
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN18M.xml
+18 :  		<property name="password" value="${born18m_sftp_password}"/>
+Property => born18m_sftp_port
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+948 :  born18m_sftp_port=22
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN18M.xml
+16 :  		<property name="port" value="${born18m_sftp_port}"/>
+Property => born18m_sftp_username
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+949 :  born18m_sftp_username=test
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN18M.xml
+17 :  		<property name="user" value="${born18m_sftp_username}"/>
+Property => born_sftp_host
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN.xml
+15 :  		<property name="host" value="${born_sftp_host}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+939 :  born_sftp_host=ftp.test.com
+Property => born_sftp_password
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN.xml
+18 :  		<property name="password" value="${born_sftp_password}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+942 :  born_sftp_password=test
+Property => born_sftp_port
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN.xml
+16 :  		<property name="port" value="${born_sftp_port}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+940 :  born_sftp_port=22
+Property => born_sftp_username
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN.xml
+17 :  		<property name="user" value="${born_sftp_username}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+941 :  born_sftp_username=test
+Property => CASELOAD_DEFAULT_ALL_PROVIDERS
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+538 :  CASELOAD_DEFAULT_ALL_PROVIDERS=false
+  --- /home/rrusk/git/oscar/src/main/webapp/provider/caseload.jspf
+101 :  					boolean bDefaultAllProviders = props.getBooleanProperty("CASELOAD_DEFAULT_ALL_PROVIDERS", "true");
+Property => CBI_JOB_INTERVAL
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextCBI.xml
+21 :  		<property name="period" value="${CBI_JOB_INTERVAL}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1167 :  CBI_JOB_INTERVAL=43200000
+Property => cobalt
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1232 :  cobalt=no
+1264 :  cobalt=no
+  --- /home/rrusk/git/oscar/src/main/java/oscar/login/LoginAction.java
+415 :              	where="cobalt";
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/common/model/UserProperty.java
+109 :      public static final String COBALT="cobalt";
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/managers/ProviderManager2.java
+427 :  		if(map.get("cobalt") != null) {
+428 :  			settings.setUseCobaltOnLogin("yes".equals(map.get("cobalt").getValue())?true:false);
+717 :  		p = getMappedOrNewProperty(map, "cobalt", providerNo);
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/struts-config.xml
+768 :  			<forward name="cobalt" path="/web/" redirect="true" />
+Property => confidentiality_statement.v1
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+28 :  confidentiality_statement.v1=This document may contain personal health information.  Please consider confidentiality when distributing or disposing of this document.
+Property => confidentiality_statement.v2
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+29 :  confidentiality_statement.v2=Personal Health Information: CONFIDENTIAL
+Property => db_log_abandoned
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+35 :  		<property name="logAbandoned" value="${db_log_abandoned}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+80 :  db_log_abandoned = true
+Property => db_max_active
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+21 :  		<property name="maxActive" value="${db_max_active}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+76 :  db_max_active = 32
+Property => db_max_idle
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+22 :  		<property name="maxIdle" value="${db_max_idle}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+77 :  db_max_idle = 8
+Property => db_max_wait
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+23 :  		<property name="maxWait" value="${db_max_wait}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+78 :  db_max_wait = 20000
+Property => db_remove_abandoned
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+33 :  		<property name="removeAbandoned" value="${db_remove_abandoned}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+81 :  db_remove_abandoned = true
+Property => db_remove_abandoned_timeout
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+34 :  		<property name="removeAbandonedTimeout" value="${db_remove_abandoned_timeout}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+82 :  db_remove_abandoned_timeout = 15
+Property => db_validationQuery
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+26 :  		<property name="validationQuery" value="${db_validationQuery}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+86 :  db_validationQuery = select 1
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+12 :  db_validationQuery = select 1 from dual
+Property => EA_FORWORD
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+172 :  EA_FORWORD: /billing/CA/ON/billingEAreport.jsp
+Property => email.connection_security
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+778 :  email.connection_security=ssl
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/util/EmailUtilsOld.java
+65 :   * The email.connection_security parameter sets which type of connection security is used (choices are: ssl, starttls, or unset for none)
+Property => email.host
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+259 :              <property name="host" value="${email.host}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+773 :  email.host=localhost
+Property => email.password
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+263 :              <property name="password" value="${email.password}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+776 :  email.password=
+Property => email.port
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+260 :              <property name="port" value="${email.port}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+774 :  email.port=25
+Property => email.print_instead_of_send
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+780 :  #email.print_instead_of_send=true
+Property => email.protocol
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+261 :              <property name="protocol" value="${email.protocol}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+777 :  email.protocol=smtp
+Property => email.recipient_override
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+779 :  #email.recipient_override=test@example.com
+Property => email.username
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+262 :              <property name="username" value="${email.username}" />
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+775 :  email.username=
+Property => ENABLE_PREVENTION_BILLING
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1410 :  ENABLE_PREVENTION_BILLING=false
+Property => enable_rx_custom_methodone_suboxone
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1384 :  enable_rx_custom_methodone_suboxone=false
+1397 :  enable_rx_custom_methodone_suboxone=false
+Property => enable_rx_watermark
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1387 :  enable_rx_watermark=false
+1400 :  enable_rx_watermark=false
+Property => group_billing
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+315 :  # group_billing = on
+Property => hibernate.generate_statistics
+  --- /home/rrusk/git/oscar/src/main/resources/spring_hibernate.xml
+36 :  				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+69 :  				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+49 :  				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+93 :  hibernate.generate_statistics=false
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+15 :  hibernate.generate_statistics=false
+Property => hibernate.show_sql
+  --- /home/rrusk/git/oscar/src/main/resources/spring_hibernate.xml
+35 :  				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+68 :  				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+  --- /home/rrusk/git/oscar/src/main/resources/spring_jpa.xml
+48 :  				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+97 :  hibernate.show_sql=false
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+14 :  hibernate.show_sql=false
+Property => HL7_A04_TRANSPORT_ADDR
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+226 :  HL7_A04_TRANSPORT_ADDR=127.0.0.1
+Property => HL7_A04_TRANSPORT_PORT
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+227 :  HL7_A04_TRANSPORT_PORT=3987
+Property => host
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContext.xml
+259 :              <property name="host" value="${email.host}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/spellcheck-english.0
+42737 :  host
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN.xml
+15 :  		<property name="host" value="${born_sftp_host}"/>
+  --- /home/rrusk/git/oscar/src/main/resources/applicationContextBORN18M.xml
+15 :  		<property name="host" value="${born18m_sftp_host}"/>
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/util/EmailUtilsOld.java
+75 :  	private static final String SMTP_HOST_KEY = "host";
+  --- /home/rrusk/git/oscar/src/main/webapp/js/history.js
+246 :  		"host": {
+Property => INTEGRATOR_SLEEP_ON_ERROR
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+645 :  INTEGRATOR_SLEEP_ON_ERROR=300000
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/PMmodule/caisi_integrator/CaisiIntegratorUpdateTask.java
+186 :  	private static final String INTEGRATOR_SLEEP_ON_ERROR_KEY = "INTEGRATOR_SLEEP_ON_ERROR";
+Property => INTEGRATOR_THROTTLE_DELAY
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+639 :  INTEGRATOR_THROTTLE_DELAY=100
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/PMmodule/caisi_integrator/CaisiIntegratorUpdateTask.java
+184 :  	private static final String INTEGRATOR_THROTTLE_DELAY_PROPERTIES_KEY = "INTEGRATOR_THROTTLE_DELAY";
+185 :  	private static final long INTEGRATOR_THROTTLE_DELAY = Long.parseLong((String) OscarProperties.getInstance().get(INTEGRATOR_THROTTLE_DELAY_PROPERTIES_KEY));
+1901 :  			Thread.sleep(INTEGRATOR_THROTTLE_DELAY);
+Property => INTEGRATOR_UPDATE_PERIOD
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+636 :  INTEGRATOR_UPDATE_PERIOD=43200000
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/PMmodule/caisi_integrator/CaisiIntegratorUpdateTask.java
+183 :  	private static final String INTEGRATOR_UPDATE_PERIOD_PROPERTIES_KEY = "INTEGRATOR_UPDATE_PERIOD";
+Property => l7_a04_sent_dir
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+221 :  l7_a04_sent_dir=/var/lib/adt/sent/
+Property => ldap.authMethod
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+41 :  ldap.authMethod=simple
+42 :  #ldap.authMethod=digest-md5
+  --- /home/rrusk/git/oscar/src/main/java/oscar/login/jaas/LoginModuleFactory.java
+47 :  	public static final String OPTION_LDAP_AUTH_METHOD = "ldap.authMethod";
+Property => ldap.authorization
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+39 :  ldap.authorization=false
+  --- /home/rrusk/git/oscar/src/main/java/oscar/login/jaas/LoginModuleFactory.java
+43 :  	public static final String OPTION_ATN_ENABLED = "ldap.authorization";
+Property => mcedt.enabled
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1203 :  mcedt.enabled=false
+Property => MY_OSCAR
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+721 :  MY_OSCAR = no
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+136 :  #MY_OSCAR = yes
+Property => MY_OSCAR_EXCHANGE_INTERVAL
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+723 :  MY_OSCAR_EXCHANGE_INTERVAL = 5
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+138 :  #MY_OSCAR_EXCHANGE_INTERVAL = 2
+Property => MYOSCAR_SYMPTOM_CHECKLIST_REPORT_TEMPLATE_NAME
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+742 :  MYOSCAR_SYMPTOM_CHECKLIST_REPORT_TEMPLATE_NAME=Symptom Checklist
+Property => oscarMeasurement_css
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+346 :  oscarMeasurement_css=/OscarDocument/oscar_mcmaster/oscarEncounter/oscarMeasurements/styles/
+  --- /home/rrusk/git/oscar/src/main/java/oscar/oscarEncounter/oscarMeasurements/pageUtil/EctValidation.java
+232 :              // option of using the oscarMeasurement_css property to form the css path.
+239 :               *    place = OscarProperties.getInstance().getProperty("oscarMeasurement_css");
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+61 :  oscarMeasurement_css=oscarEncounter/oscarMeasurements/styles/
+Property => oscarMeasurement_css_download_method
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+349 :  oscarMeasurement_css_download_method = stream
+  --- /home/rrusk/git/oscar/src/main/java/oscar/oscarEncounter/oscarMeasurements/pageUtil/EctValidation.java
+236 :               * String downloadMethod = OscarProperties.getInstance().getProperty("oscarMeasurement_css_download_method");
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+63 :  oscarMeasurement_css_download_method = stream
+Property => plugins
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+527 :  #plugins=on
+540 :  ##caisi plugins
+  --- /home/rrusk/git/oscar/src/main/java/org/caisi/tickler/prepared/PreparedTicklerManager.java
+43 :  	/* loads up the runtime plugins */
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap2-datepicker/bootstrap-datepicker.js
+1336 :  		// Derive options from locale plugins
+  --- /home/rrusk/git/oscar/src/main/webapp/library/DataTables-1.10.12/media/js/jquery.dataTables.js
+3624 :  			// @todo Move options into their own plugins?
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/modal.jsp
+90 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+92 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/tables.jsp
+107 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+109 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/index.jsp
+78 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+80 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/popover.jsp
+57 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+59 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/alert.jsp
+72 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+74 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/icons.jsp
+70 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+72 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/tooltip.jsp
+58 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+60 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/basic-example.jsp
+56 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+58 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/library/bootstrap/3.0.0/data-tables.jsp
+494 :      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+496 :      <!-- Include all compiled plugins (below), or include individual files as needed -->
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery.treeview.js
+4 :   * http://bassistance.de/jquery-plugins/jquery-plugin-treeview/
+19 :  	// TODO rewrite as a widget, removing all the extra plugins
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery.validate.js
+4 :   * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery-ui-1.8.18.custom.min.js
+49 :  line too long:  18558  characters
+76 :  line too long:  17299  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery-ui-1.10.2.custom.min.js
+6 :  line too long:  143101  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery.js
+1163 :  // It's included for backwards compatibility and plugins,
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jquery.validate.min.js
+4 :   * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jqplot/jquery.jqplot2.min.js
+5 :  line too long:  32007  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jqplot/jquery.jqplot.min.js
+3 :  line too long:  172375  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/js/jqplot/plugins/jqplot.pieRenderer.js
+41 :       * > <script type="text/javascript" src="plugins/jqplot.pieRenderer.js"></script>
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+153 :  plugins=on
+155 :  #caisi plugins
+  --- /home/rrusk/git/oscar/src/main/webapp/dojoAjax/src/widget/Editor2.js
+434 :  		//		Plugins are available using dojo's require syntax. Please find available built-in plugins
+533 :  		//event for plugins to use
+537 :  			//		This event is for plugins to use
+540 :  		//TODO: provide a query mechanism about loaded plugins?
+  --- /home/rrusk/git/oscar/src/main/webapp/dojoAjax/src/widget/Editor2Plugin/ContextMenu.js
+15 :  //		This plugin should be dojo.required-ed before all other plugins which
+  --- /home/rrusk/git/oscar/src/main/webapp/share/javascript/jquery/jquery.validate.js
+4 :   * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+  --- /home/rrusk/git/oscar/src/main/webapp/share/javascript/jquery/jquery-ui-1.8.15.custom.draggable.slider.min.js
+102 :  line too long:  514  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/share/javascript/jquery/jquery-ui-1.8.4.custom_full.min.js
+98 :  line too long:  510  characters
+173 :  line too long:  511  characters
+  --- /home/rrusk/git/oscar/src/main/webapp/share/javascript/jquery/jSignature.min.js
+29 :  jSignature v2 jSignature's custom "base30" format export and import plugins.
+  --- /home/rrusk/git/oscar/src/main/webapp/oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf
+1682 :  <!-- Additional plugins go here -->
+1683 :      <script class="include" language="javascript" type="text/javascript" src="<%=request.getContextPath() %>/js/jqplot/plugins/jqplot.highlighter.min.js"></script>
+  --- /home/rrusk/git/oscar/src/main/webapp/layouts/nonPatientContextHeader.jspf
+398 :  			<!-- plugins menu extension point add -->
+  --- /home/rrusk/git/oscar/src/main/webapp/provider/providerheader-classic.jspf
+316 :  <!-- plugins menu extension point add -->
+  --- /home/rrusk/git/oscar/src/main/webapp/provider/appointmentprovideradminday.jsp
+1011 :  <!-- plugins menu extension point add -->
+  --- /home/rrusk/git/oscar/src/main/webapp/web/dashboard/display/DashboardDisplay.jsp
+52 :  	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jqplot/plugins/jqplot.pieRenderer.js" ></script>
+53 :  	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jqplot/plugins/jqplot.json2.js" ></script>
+Property => quick_chart_size
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+809 :  #quick_chart_size=20
+Property => REDIRECT_TRACKING_DATA_RETENTION_MILLIS
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+565 :  #REDIRECT_TRACKING_DATA_RETENTION_MILLIS=31536000000
+Property => roster_Status
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+647 :  # Has to be enabled for Ontario MD funded sites.  This will autoselect primaryEMR to yes if roster_Status = RO
+Property => rx_watermark_file_name
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1391 :  #rx_watermark_file_name=north_toronto_eye_care_watermark.png
+1407 :  #rx_watermark_file_name=north_toronto_eye_care_watermark.png
+Property => schedule_templatecode
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+402 :  schedule_templatecode = true
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+71 :  schedule_templatecode = true
+Property => search.searchName.addLeadingWildcard
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1367 :  search.searchName.addLeadingWildcard=false
+Property => streethealth
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+570 :  streethealth=yes
+Property => SUPERUSER
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+321 :  SUPERUSER = oscardoc
+  --- /home/rrusk/git/oscar/src/main/webapp/WEB-INF/QuatroShelter.properties
+44 :  SUPERUSER = oscardoc
+Property => TESTING
+  --- /home/rrusk/git/oscar/src/test/resources/initFormONAREnhanced.sql
+24 :  line too long:  627494  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+243 :  TESTING=yes
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20080930.xml
+444 :  line too long:  44238  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20150226.xml
+1601 :  line too long:  39365  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20100422.xml
+761 :  line too long:  43210  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20110804.xml
+877 :  line too long:  39211  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20161124.xml
+1869 :  line too long:  37594  characters
+  --- /home/rrusk/git/oscar/src/main/resources/oscar/oscarRx/data_extract_20151222.xml
+1802 :  line too long:  36942  characters
+  --- /home/rrusk/git/oscar/src/main/java/org/oscarehr/research/eaaps/SshHandler.java
+101 :  			// UNCOMMENT THIS FOR TESTING PURPOSES, BUT DO NOT USE IN PRODUCTION
+Property => TRANSPORTATION_TIME_MANDATORY
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+1364 :  TRANSPORTATION_TIME_MANDATORY=false
+Property => versionDate
+  --- /home/rrusk/git/oscar/src/main/resources/oscar_mcmaster.properties
+763 :  versionDate=versionDate not set
+  --- /home/rrusk/git/oscar/src/main/webapp/form/hsfo2/xsd-schema.txt
+1212 :        <xs:attribute name="versionDate" type="xs:date" use="required" fixed="2010-12-09"/>

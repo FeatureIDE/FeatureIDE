@@ -658,4 +658,10 @@ public class CPPComposer extends PPComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
+	@Override
+	public boolean hasPropertyManager() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -97,6 +97,11 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return whether all dependencies are fulfilled to use this composer
 	 */
 	IStatus isComposable();
+	
+	/**
+	 * @return <code>true</code> if the composer has a property Manager.
+	 */
+	boolean hasPropertyManager();
 
 	@CheckForNull
 	<T extends IComposerObject> T getComposerObjectInstance(Class<T> c);

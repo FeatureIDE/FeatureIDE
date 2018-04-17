@@ -1,0 +1,10 @@
+--- .classpath	2017-09-26 14:43:26.312028984 -0700
++++ .classpath_modified	2017-09-26 10:07:19.401023804 -0700
+@@ -6,6 +6,7 @@
+ 			<attribute name="maven.pomderived" value="true"/>
+ 		</attributes>
+ 	</classpathentry>
++	<classpathentry kind="src" path="target/generated_jsp_classes"/>
+ 	<classpathentry excluding="**/*.java" including="**/*.java" kind="src" output="target/test-classes" path="src/test/resources"/>
+ 	<classpathentry kind="src" output="target/classes" path="src/main/java">
+ 		<attributes>

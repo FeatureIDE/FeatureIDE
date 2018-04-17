@@ -1,0 +1,17 @@
+--- src/main/java/oscar/OscarProperties.java	2017-09-26 14:06:07.944159632 -0700
++++ src/main/java/oscar/OscarProperties_modified.java	2017-09-25 16:12:26.403847777 -0700
+@@ -51,6 +51,14 @@
+ 		return oscarProperties;
+ 	}
+ 
++	public String getProperty(String key) {
++		return super.getProperty(key);
++	}
++
++	public String getProperty(String key, String defaultValue) {
++		return super.getProperty(key, defaultValue);
++	}
++
+ 	/* If cant find the file, inform and continue */
+ 	/*
+ 	 * private OscarProperties() {

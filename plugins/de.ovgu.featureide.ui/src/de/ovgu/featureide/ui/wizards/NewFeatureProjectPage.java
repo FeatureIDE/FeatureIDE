@@ -38,6 +38,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_BUILD_PATH_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PROPERTY_MANAGER_CLASS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_GET_PROPERTY_METHOD_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_RESTRICTION_ANDROID;
 
 import java.util.Arrays;
@@ -72,7 +74,9 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	protected Text sourcePath;
 	protected Text configsPath;
-	protected Text buildPath;
+
+	protected Text propertyManagerPath;
+	protected Text propertyMethodPath;
 
 	protected Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -190,6 +194,31 @@ public class NewFeatureProjectPage extends WizardPage {
 		configsPath.setText("configs");
 		configsPath.setToolTipText(tooltip);
 
+		//New for Mavis Project
+		
+		tooltip = SETS_THE_PROPERTY_MANAGER_CLASS_;
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Property Manager Class:");
+		label.setToolTipText(tooltip);
+		propertyManagerPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		propertyManagerPath.setLayoutData(gd);
+		propertyManagerPath.setText("properties.PropertyManager");
+		propertyManagerPath.setToolTipText(tooltip);
+		propertyManagerPath.setEnabled(getCompositionTool().hasPropertyManager());
+		
+		tooltip = SETS_THE_GET_PROPERTY_METHOD_;
+		label = new Label(pathGroup, SWT.NULL);
+		label.setText("&Get Property Method:");
+		label.setToolTipText(tooltip);
+		propertyMethodPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		propertyMethodPath.setLayoutData(gd);
+		propertyMethodPath.setText("getProperty");
+		propertyMethodPath.setToolTipText(tooltip);
+		propertyMethodPath.setEnabled(getCompositionTool().hasPropertyManager());
+		
+		//End Mavis Project
+		
+
 		addListeners();
 	}
 
@@ -239,6 +268,8 @@ public class NewFeatureProjectPage extends WizardPage {
 		final IComposerExtensionBase compositionTool = getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
+		propertyManagerPath.setEnabled(compositionTool.hasPropertyManager());
+		propertyMethodPath.setEnabled(compositionTool.hasPropertyManager());
 
 		if (isEnabled(sourcePath) && isEnabled(configsPath) && getSourcePath().equals(getConfigPath())) {
 			updateStatus(SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_);
