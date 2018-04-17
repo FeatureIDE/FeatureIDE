@@ -6,5 +6,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/SPLACAT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-math-2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/FeatureIDEAnnotations.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/de.ovgu.featureide.fm.core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

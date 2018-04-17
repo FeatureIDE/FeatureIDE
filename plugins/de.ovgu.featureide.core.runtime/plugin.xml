@@ -31,4 +31,11 @@
           name="RuntimeFMComposer">
     </fmComposer>
  </extension>
+ <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="de.ovgu.featureide.core.runtime.menuContribution1">
+    </menuContribution>
+ </extension>
 </plugin>

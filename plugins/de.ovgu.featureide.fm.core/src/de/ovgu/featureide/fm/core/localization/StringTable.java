@@ -933,6 +933,10 @@ public class StringTable {
 	public static final String SETS_THE_PATH_OF_COMPOSED_FILES_ = "Sets the path of composed files.";
 	public static final String SETS_THE_PATH_OF_FEATUREFOLDERS_ = "Sets the path of feature folders.";
 	public static final String SETS_THE_PATH_OF_CONFIGURATIONFILES_ = "Sets the path of configuration files.";
+	//Mavis
+	public static final String SETS_THE_GET_PROPERTY_METHOD_ = "Sets the getter of the properties.";
+	public static final String SETS_THE_PROPERTY_MANAGER_CLASS_ = "Sets the class that manage the properties.";
+	//
 	public static final String SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_ = "Source path equals configurations path.";
 	public static final String SOURCE_PATH_EQUALS_BUILD_PATH_ = "Source path equals build path.";
 	public static final String BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_ = "Build path equals configurations path.";

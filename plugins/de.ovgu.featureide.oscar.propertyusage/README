@@ -1,0 +1,65 @@
+NOTES ON USAGE:
+
+Note that oscar.OscarProperties extends the Properties class.  At the
+time this README was written, it uses the parent Properties
+getProperty() methods.  However, locating Properties in the Oscar code
+base using the Abstract Syntax Tree is faster and more reliable if
+ASTParser is able to determine when getProperty() is a method
+belonging to OscarProperties rather than just Properties.  The file
+OscarProperties.patch adds the two getProperty() methods to
+OscarProperties.  These methods are:
+
+	public String getProperty(String key) {
+		return super.getProperty(key);
+	}
+
+	public String getProperty(String key, String defaultValue) {
+		return super.getProperty(key, defaultValue);
+	}
+
+
+Copy 'OscarProperties.patch' from the patches subdirectory of this
+directory to the root of the oscar git repository.  From there apply
+the patch using:
+
+$ patch src/main/java/oscar/OscarProperties.java < OscarProperties.patch
+
+OscarProperties are used extensively in jsp files so it is essential
+that they can be parsed by ASTParser.  To make that possible, the
+Eclipse build path of the Oscar repository being analyzed needs to
+include the subdirectory "target/generated_jsp_classes" which is
+created when Oscar is built using 'mvn clean verify'.  The
+".classpath" file in the root of the Oscar git repository can be
+patched to include the Java files generated from the jsp by adding
+
+<classpathentry kind="src" path="target/generated_jsp_classes"/>
+
+This can be done by copying the file 'classpath.patch' from the
+patches subdirectory of this directory to the root of the Oscar git
+repo and applying the patch:
+
+$ patch < classpath.patch
+
+Also copy the Eclipse settings patch
+"org.eclipse.wst.common.component.patch" to the root of the Oscar git
+repo and apply it using:
+
+$ patch .settings/org.eclipse.wst.common.component < org.eclipse.wst.common.component.patch
+
+It add the line:
+
+<wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated_jsp_classes"/>
+
+CAVEATS:
+
+The ASTParser can only find Oscar properties in compilable Java source
+files.  It cannot find properties in files that cannot be compiled
+such as those with the extension .jspf (Java Server Page Fragment
+files).  Also, it cannot find properties in xml files, for instance
+those used to generate Java code created at runtime by the Spring
+framework.  The subdirectory misc has a Python script that can be used
+to locate such properties.  It takes as input a file "not_found.txt"
+which contains the properties not found and writes to standard output
+results similar to "not_found_properties.txt".  (The properties that
+are not found will be written to the Eclipse console with the
+substring ",0,0,,true".)

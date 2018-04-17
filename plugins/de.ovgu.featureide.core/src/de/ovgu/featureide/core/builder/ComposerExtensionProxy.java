@@ -154,6 +154,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return defaultComposerExtensionClass.getComposerObjectInstance(c);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#hasPropertyManager()
+	 */
+	@Override
+	public boolean hasPropertyManager() {
+		// TODO Auto-generated method stub
+		return defaultComposerExtensionClass.hasPropertyManager();
 	@Override
 	public boolean hasBuildFolder() {
 		return defaultComposerExtensionClass.hasBuildFolder();

@@ -359,4 +359,13 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	public boolean clean() {
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#hasPropertyManager()
+	 */
+	@Override
+	public boolean hasPropertyManager() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
