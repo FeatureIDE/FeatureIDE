@@ -19,9 +19,10 @@ import oscar.OscarProperties;
 
 public class ExportImport {
 	
-	private static final String CSV = "csv";
-	private static final String XML = "xml";
-	private static final String MOD = "FeatureIDE model";
+	public static final String CSV = "csv";
+	public static final String XML = "xml";
+	public static final String MOD = "FeatureIDE model";
+	public static final String ALL = "All";
 
 	
 	
@@ -37,18 +38,29 @@ public class ExportImport {
 			case CSV:
 				fileName = project.getLocation().toOSString()+File.separator+"propertyUsageResult_"+tsmp.toString()+"."+CSV;
 				sb=generateOutputCsv(op, allPropMap);
+				writeFile(fileName,sb);
 				break;
 			case MOD:
 				fileName = project.getLocation().toOSString()+File.separator+"propertyUsageResult_"+tsmp.toString()+"."+XML;
 				sb=generateModel(base);
+				writeFile(fileName,sb);
 				break;
+			case ALL:
+				fileName = project.getLocation().toOSString()+File.separator+"propertyUsageResult_"+tsmp.toString()+"."+CSV;
+				sb=generateOutputCsv(op, allPropMap);
+				writeFile(fileName,sb);
+				fileName = project.getLocation().toOSString()+File.separator+"propertyUsageResult_"+tsmp.toString()+"."+XML;
+				sb=generateModel(base);	
+				writeFile(fileName,sb);
 			default:
 				sb=generateOutputCsv(op, allPropMap);
 				console.writeln(sb.toString());
-				return;
-		}
-
-
+		}		
+	}
+	
+	
+	public static void writeFile(String fileName, StringBuilder sb){
+		Console console = new Console();
 		FileWriter fileWriter = null;
 		try {
 			fileWriter = new FileWriter(fileName);
@@ -64,9 +76,7 @@ public class ExportImport {
 				console.writeln(e.getMessage());
 			}
 		}
-		
 	}
-	
 	
 	public static StringBuilder generateOutputCsv (OscarProperties op, Map<String, Integer[]> allPropMap){
 		

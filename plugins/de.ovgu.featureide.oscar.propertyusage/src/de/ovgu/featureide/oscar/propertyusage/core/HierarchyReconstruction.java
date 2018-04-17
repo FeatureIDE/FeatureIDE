@@ -32,7 +32,10 @@ public class HierarchyReconstruction {
 		
 		for (String key:allPropMap.keySet()){
 			try {
-				if ((allPropMap.get(key)[0] == 0) || (1.0*(allPropMap.get(key)[1] / (allPropMap.get(key)[0]))<threshold)) continue;
+				int numerator=allPropMap.get(key)[1];
+				int denominator=allPropMap.get(key)[0];
+				double coef= (denominator > 0) ? ((1.0*numerator)/denominator) : 0.0;
+				if (coef<threshold) continue;
 				String value=op.getProperty(key);
 				Feature current;
 				if ((value == null) || (value.equals(""))){
@@ -47,6 +50,7 @@ public class HierarchyReconstruction {
 					}					
 				}else {
 					current= new Feature(key, true, FeatureType.MORE_OF);
+					current.setAbstract(true);
 					current.addHierarchy(new Feature(key+"."+value,true,FeatureType.ATOMIC));
 					//TO-DO: maybe mark this in red as to grab attention.
 				}

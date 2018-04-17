@@ -198,7 +198,7 @@ public class PropertyUsage {
 			console.writeln("No new OscarProperties methods found");
 		}
 		
-		this.base=HierarchyReconstruction.getFDLHierarchy(op,allPropMap,1);
+		this.base=HierarchyReconstruction.getFDLHierarchy(op,allPropMap,0.1);
 
 		ExportImport.export(this.base,op,allPropMap,outputmode,reportProject);
 		

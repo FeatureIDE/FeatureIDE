@@ -23,6 +23,8 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog;
 import org.eclipse.ui.dialogs.ResourceListSelectionDialog;
 
+import de.ovgu.featureide.oscar.IO.ExportImport;
+
 public class PropertyUsageWizardPage extends WizardPage {
 
 	private Button debug;
@@ -122,8 +124,8 @@ public class PropertyUsageWizardPage extends WizardPage {
 		lblOutputFormat.setBounds(31, 108, 82, 14);
 		lblOutputFormat.setText("Output format:");
 		
-		output_format = new Combo(container, SWT.NONE);
-		output_format.setItems(new String[] {"csv", "FeatureIDE model"});
+		output_format = new Combo(container, SWT.READ_ONLY);
+		output_format.setItems(new String[] {ExportImport.CSV, ExportImport.MOD, ExportImport.ALL});
 		output_format.setBounds(125, 104, 324, 36);
 		output_format.select(0);
 		
