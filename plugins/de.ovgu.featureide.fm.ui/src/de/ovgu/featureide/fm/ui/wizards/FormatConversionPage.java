@@ -24,26 +24,30 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class FeatureModelConversionPage extends AbstractWizardPage {
+public class FormatConversionPage extends AbstractWizardPage {
 
 	private final class DialogChangedListener implements ModifyListener {
 
@@ -53,14 +57,17 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 		}
 	}
 
-	protected Text outputPath;
+	protected Text outputPathText;
+	protected Button button;
 
 	protected Combo fromFormatCombo;
 	protected Combo toFormatCombo;
 
-	public FeatureModelConversionPage() {
+	protected List<? extends IPersistentFormat<?>> extensions = null;
+
+	public FormatConversionPage() {
 		super("Specfiy Conversion Settings");
-		setDescription("Converts the File Format of Feature Model Files");
+		setDescription("Converts the File Format");
 	}
 
 	@Override
@@ -72,61 +79,84 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 		setControl(container);
 
 		final Group toolGroup = new Group(container, SWT.NONE);
-		toolGroup.setText("Format Conversion:");
+		toolGroup.setText("Export Format:");
 		toolGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		final GridLayout projGridLayout = new GridLayout();
 		projGridLayout.numColumns = 2;
 		toolGroup.setLayout(projGridLayout);
 
-		new Label(toolGroup, SWT.NONE).setText("From:");
-		new Label(toolGroup, SWT.NONE).setText("To:");
-		fromFormatCombo = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
-		fromFormatCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
 		toFormatCombo = new Combo(toolGroup, SWT.READ_ONLY | SWT.DROP_DOWN);
 		toFormatCombo.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		for (final IFeatureModelFormat format : FMFormatManager.getInstance().getExtensions()) {
-			fromFormatCombo.add(format.getId());
-			toFormatCombo.add(format.getId());
-		}
+		extensions = ((FormatConversionWizard<?>) abstractWizard).formatManager.getExtensions();
+		if (extensions != null) {
+			for (final IPersistentFormat<?> format : extensions) {
+				toFormatCombo.add(format.getName() + " (*." + format.getSuffix() + ")");
+			}
 
-		if (fromFormatCombo.getItems().length > 0) {
-			fromFormatCombo.select(0);
-			toFormatCombo.select(0);
+			if (toFormatCombo.getItems().length > 0) {
+				toFormatCombo.select(0);
+			}
 		}
 
 		// Path Group
 		final Group pathGroup = new Group(container, SWT.NONE);
+		pathGroup.setText("Output Path:");
+		pathGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		final GridLayout layout = new GridLayout();
-		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		layout.numColumns = 2;
 		layout.verticalSpacing = 9;
-		pathGroup.setText("Output Path:");
-		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 
-		outputPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
-		outputPath.setLayoutData(gd);
-		outputPath.setText("converted");
+		outputPathText = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
+		outputPathText.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
+		final String homePath = System.getProperty("user.home");
+		if (homePath != null) {
+			outputPathText.setText(homePath);
+		}
+
+		button = new Button(pathGroup, SWT.PUSH);
+		button.setText("Choose ...");
+		button.setLayoutData(new GridData(SWT.RIGHT, GridData.FILL, false, true));
 
 		addListeners();
 		updatePage();
 	}
 
 	protected void addListeners() {
-		outputPath.addModifyListener(new DialogChangedListener());
+		outputPathText.addModifyListener(new DialogChangedListener());
+
+		button.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final DirectoryDialog fileDialog = new DirectoryDialog(new Shell(), SWT.SAVE);
+				fileDialog.setFilterPath(".");
+
+				// Ask for output folder
+				final String outputPath = fileDialog.open();
+				if (outputPath != null) {
+					outputPathText.setText(outputPath);
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
 	}
 
 	@Override
 	protected String checkPage() {
-		final String text = outputPath.getText();
+		final String text = outputPathText.getText();
 		try {
 			final Path path = Paths.get(text);
-			if (Files.isDirectory(path)) {
+			if (!Files.isDirectory(path)) {
 				return (text + " is not a directory!");
 			}
-			if (Files.exists(path)) {
-				setMessage("Directory already exists. Files will be overridden!", WARNING);
+			if (Files.exists(path) && (path.toFile().listFiles().length > 0)) {
+				setMessage("Directory is not empty. Exisiting files with the same name will be overridden!", WARNING);
+			} else {
+				setMessage(null);
 			}
 		} catch (InvalidPathException | NullPointerException ex) {
 			return (text + " is not a valid path name!");
@@ -136,11 +166,9 @@ public class FeatureModelConversionPage extends AbstractWizardPage {
 
 	@Override
 	protected void putData() {
-		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, outputPath.getText());
-		int selectionIndex = fromFormatCombo.getSelectionIndex();
-		abstractWizard.putData(WizardConstants.KEY_OUT_INPUTFORMAT, selectionIndex >= 0 ? fromFormatCombo.getItem(selectionIndex) : null);
-		selectionIndex = toFormatCombo.getSelectionIndex();
-		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, selectionIndex >= 0 ? toFormatCombo.getItem(selectionIndex) : null);
+		abstractWizard.putData(WizardConstants.KEY_OUT_FOLDER, outputPathText.getText());
+		final int selectionIndex = toFormatCombo.getSelectionIndex();
+		abstractWizard.putData(WizardConstants.KEY_OUT_OUTPUTFORMAT, selectionIndex >= 0 ? extensions.get(selectionIndex) : null);
 	}
 
 }
