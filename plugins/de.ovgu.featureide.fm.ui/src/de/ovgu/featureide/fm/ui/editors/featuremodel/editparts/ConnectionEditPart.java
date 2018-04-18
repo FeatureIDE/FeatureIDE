@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
 import de.ovgu.featureide.fm.core.explanations.Reason;
@@ -70,7 +69,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, IEventListener {
+public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults {
 
 	private static final DirectEditPolicy ROLE_DIRECT_EDIT_POLICY = new DirectEditPolicy() {
 
@@ -92,7 +91,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	ConnectionEditPart(FeatureConnection connection) {
 		setModel(connection);
-		connection.getSource().getObject().getFeatureModel().addListener(this);
 	}
 
 	@Override
@@ -435,10 +433,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
+	 * Catches the events thrown by the feature model editor and refreshes the connection accordingly. The events are forwarded by the FeatureEditPart.
 	 */
-	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		if (EventType.PARENT_CHANGED.equals(prop)) {

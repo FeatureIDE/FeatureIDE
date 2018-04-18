@@ -20,11 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERATION;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_OPERATION;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.gef.EditPolicy;
@@ -258,6 +259,11 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			}
 			getFigure().setName(displayName);
 			getModel().setSize(getFigure().getSize());
+
+			sourceConnection = getModel().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.propertyChange(event);
 			break;
 		case COLOR_CHANGED:
 		case ATTRIBUTE_CHANGED:
@@ -277,6 +283,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
+			connectionEditPart.propertyChange(event);
 			break;
 		case FEATURE_DELETE:
 			deactivate();
@@ -286,6 +293,7 @@ public class FeatureEditPart extends ModelElementEditPart implements NodeEditPar
 			registry = getViewer().getEditPartRegistry();
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshVisuals();
+			connectionEditPart.propertyChange(event);
 			break;
 		case HIDDEN_CHANGED:
 			getFigure().setProperties();
