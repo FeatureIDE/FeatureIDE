@@ -407,7 +407,7 @@ public class StringTable {
 	public static final String CONSTRAINT_IS_UNSATISFIABLE = "constraint is unsatisfiable";
 	public static final String PLEASE_INSERT_A_CONSTRAINT_ = "Please insert a constraint.";
 	public static final String CHECKING_CONSTRAINT___ = "Checking constraint...";
-	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Your input contains syntax errors.";
+	public static final String YOUR_INPUT_CONSTAINS_SYNTAX_ERRORS_ = "Input contains syntax errors.";
 	public static final String CONSTRAINT_CONTAINS_ONE_UNKNOWN_FEATURE_NAME_ = "Constraint contains unknown feature name.";
 	public static final String TYPE_FILTER_TEXT = "type filter text";
 	public static final String CONSTRAINT_DIALOG = "Constraint Dialog";

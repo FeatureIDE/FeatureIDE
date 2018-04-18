@@ -58,6 +58,7 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 
 	@Override
 	public int[] analyze(IMonitor monitor) throws Exception {
+		final int orgAssignmentSize = solver.getAssignment().size();
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		int[] model1 = solver.findModel();
 
@@ -101,7 +102,7 @@ public class CoreDeadAnalysis extends AbstractAnalysis<int[]> {
 			}
 		}
 
-		return solver.getAssignmentArray(0, solver.getAssignment().size());
+		return solver.getAssignmentArray(orgAssignmentSize, solver.getAssignment().size());
 	}
 
 	public int[] getFeatures() {
