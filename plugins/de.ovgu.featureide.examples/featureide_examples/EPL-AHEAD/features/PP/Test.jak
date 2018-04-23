@@ -1,7 +1,0 @@
-public refines class Test {
-	public static void printtest() {
-      Super().printtest();
-      e  = new Plus( new Num(5), new Num(7));
-      System.out.println( "print(5+7) = " + e );
-   }
-}

@@ -1,8 +1,0 @@
-public refines class Test {
-	public static void evaltest() {
-		Super().evaltest();      
-		e = new Neg( new Num(1));      
-		System.out.println( "eval(Neg(1)) = " + e.eval());
-	}
-
-}

@@ -1,6 +1,0 @@
-public refines class Indexer {
-	public void getAvailableContentHandlers() throws IndexerException{
-		Super().getAvailableContentHandlers();
-		contentHandlers.add(new HTML());
-	}
-}

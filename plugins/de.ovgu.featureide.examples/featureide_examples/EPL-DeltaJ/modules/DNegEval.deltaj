@@ -1,5 +1,0 @@
-delta DNegEval {
-	modifies Neg {
-		adds int eval() { return -1 * this.expr.eval(); }
-	}
-}

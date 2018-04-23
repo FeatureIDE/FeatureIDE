@@ -1,5 +1,0 @@
-delta DOptionalPrint {
-	modifies Add {
-		modifies String toString() { return "(" + original() + ")"; }
-	} 
-}

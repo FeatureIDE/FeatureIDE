@@ -1,5 +1,0 @@
-public refines class Plus {
-	public String toString() { 
-		return x + " + " + y ; 
-	}
-}

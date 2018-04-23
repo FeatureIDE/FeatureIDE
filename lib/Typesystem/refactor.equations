@@ -1,5 +1,0 @@
-refactor=typesys refactoring/base refactoring/changemodifier refactoring/createmethod refactoring/createclass refactoring/extrmethod refactoring/extrstmts refactoring/extrref
-dependency = typesys deplog 
-ast=parser lang ahead/StringAST ahead/Comments
-parser=ahead/kernel ahead/syntax
-lang=ahead/Java

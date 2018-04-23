@@ -1,8 +1,0 @@
-public refines class Test {
-	public static void printtest() {      
-		Super().printtest();      
-		e  = new Neg( new Num(5) );      
-		System.out.println( "print(Neg(5)) = " + e );   
-	}
-
-}

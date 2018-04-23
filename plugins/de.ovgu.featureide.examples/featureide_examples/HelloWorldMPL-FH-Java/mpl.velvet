@@ -1,8 +1,0 @@
-concept HelloWorldMPL-FH-Java : HelloWorldMPL-FH-Java
-	instance HelloWorld-FH-Java-MPLDependency helloInstance
-	interface IHelloWorld helloInterface {
-	feature HelloWorldMPL-FH-Java.Greetings {
-		use helloInterface;
-		use helloInstance;
-	}
-}

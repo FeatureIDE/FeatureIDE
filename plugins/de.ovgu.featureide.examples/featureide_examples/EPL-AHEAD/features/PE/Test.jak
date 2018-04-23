@@ -1,8 +1,0 @@
-public refines class Test {
-	public static void evaltest() {      
-		Super().evaltest();      
-		e = new Plus( new Num(1), new Num(2));      
-		System.out.println("eval(1+2)="+ e.eval());   
-	}
-
-}
