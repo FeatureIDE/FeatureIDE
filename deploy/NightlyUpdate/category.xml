@@ -31,7 +31,7 @@
 	    <category name="&category;"/>
 	</feature>
 
-	<feature url="features/de.ovgu.featureide.feature_&version;.qualifier.jar" id="de.ovgu.featureide.feature" version="&version;.qualifier">
+	<feature url="features/de.ovgu.featureide_&version;.qualifier.jar" id="de.ovgu.featureide" version="&version;.qualifier">
 	    <category name="&category;"/>
 	</feature>
 
