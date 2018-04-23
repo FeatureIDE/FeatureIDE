@@ -1,9 +1,0 @@
-digraph G {
-  //rankdir=LR;
-  edge [fontname="Monospace", fontsize=10];
-  init;
-  state1;
-  inconsistent;
-  init -> state1 [label="call(mail(client, msg)):\l  if (isEncrypted(msg))\l  {msgId = msg.id;}\l"];
-  state1 -> inconsistent [label="call(decrypt(client, msg)):\l  if (!isKeyPairValid(msg->encryptionKey,\l    client->privateKey)\l    && msgId == msg.id)\l"];
-}

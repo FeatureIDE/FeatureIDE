@@ -1,7 +1,0 @@
-1.
-product names are unique within a program.
-
-2.
-the when-formula of a delta module containing a remove statement
-must imply the when-formula of a delta module containing the
-corresponding add statement 

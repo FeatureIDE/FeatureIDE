@@ -1,5 +1,0 @@
-delta DAddEval {
-	modifies Add {
-		adds int eval() { return this.expr1.eval() + this.expr2.eval(); }
-	}
-}

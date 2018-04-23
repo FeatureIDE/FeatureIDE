@@ -1,8 +1,0 @@
-public refines class TankManager {
-
-	public void toolsLaden() {
-		toolInit(370);
-		Super().toolsLaden();
-	}
-
-}

@@ -1,5 +1,0 @@
-delta DNegPrint {
-	modifies Neg {
-		adds String toString() { return "-" + this.expr.toString(); }
-	}
-}

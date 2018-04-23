@@ -1,7 +1,0 @@
-digraph G {
-//  rankdir=LR;
-  edge [fontname="Monospace", fontsize=10];
-  init;
-  inconsistent;
-  init -> inconsistent [label="call(verify(client, msg)):\l  if (!isReadable(msg))\l"];
-}

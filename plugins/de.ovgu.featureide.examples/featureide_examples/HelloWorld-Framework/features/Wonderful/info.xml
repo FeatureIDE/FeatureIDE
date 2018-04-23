@@ -1,5 +1,0 @@
-<plugin>
-	<interface id="interfaces.IMessage">
-		<class>Wonderful</class>
-	</interface>
-</plugin>

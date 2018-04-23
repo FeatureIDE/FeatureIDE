@@ -1,3 +1,0 @@
-mixin   = super.mixin   dsl/java/MixinWrapper
-jak2java = super.jak2java   dsl/java/Jak2JavaWrapper
-jampack = super.jampack   dsl/java/JampackWrapper
