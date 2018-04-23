@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.functional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -29,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.filter.base.AndFilter;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -331,6 +333,15 @@ public abstract class Functional {
 	 */
 	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
 		return predicate == null ? source : new FilterIterator<U, T>(source, predicate);
+	}
+
+	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final List<IFilter<U>> predicate) {
+		return predicate == null ? source : new FilterIterator<U, T>(source, new AndFilter<U>(predicate));
+	}
+
+	@SafeVarargs
+	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U>... predicate) {
+		return filter(source, Arrays.asList(predicate));
 	}
 
 	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {

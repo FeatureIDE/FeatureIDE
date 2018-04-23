@@ -66,7 +66,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				builder.configurationNumber = Math.min(new Configuration(featureModel, false, false).number(1000000), builder.configurationNumber);
+				builder.configurationNumber = Math.min(new Configuration(featureModel, false, false).number(1000000, false), builder.configurationNumber);
 				if (builder.configurationNumber < 0) {
 					UIPlugin.getDefault().logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
 					builder.configurationNumber = Math.min(Integer.MAX_VALUE, builder.configurationNumber);

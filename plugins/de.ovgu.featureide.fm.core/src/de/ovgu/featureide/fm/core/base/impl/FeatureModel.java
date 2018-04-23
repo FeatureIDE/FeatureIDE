@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -42,9 +41,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -89,7 +90,7 @@ public class FeatureModel implements IFeatureModel {
 	 */
 	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
-	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
+	protected final IEventManager eventManager = new DefaultEventManager();
 
 	protected final IFeatureModelProperty property;
 
@@ -172,13 +173,6 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void addListener(IEventListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
-	}
-
-	@Override
 	public IFeatureModel clone(IFeature newRoot) {
 		return new FeatureModel(this, newRoot);
 	}
@@ -250,14 +244,18 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public void fireEvent(FeatureIDEEvent event) {
-		for (final IEventListener listener : listenerList) {
-			try {
-				listener.propertyChange(event);
-			} catch (final Exception e) {
-				Logger.logError(e);
-			}
-		}
+	public final void addListener(IEventListener listener) {
+		eventManager.addListener(listener);
+	}
+
+	@Override
+	public final void removeListener(IEventListener listener) {
+		eventManager.removeListener(listener);
+	}
+
+	@Override
+	public final void fireEvent(FeatureIDEEvent event) {
+		eventManager.fireEvent(event);
 	}
 
 	protected void fireEvent(final EventType action) {
@@ -391,11 +389,6 @@ public class FeatureModel implements IFeatureModel {
 	public void removeConstraint(int index) {
 		constraints.remove(index);
 
-	}
-
-	@Override
-	public void removeListener(IEventListener listener) {
-		listenerList.remove(listener);
 	}
 
 	@Override

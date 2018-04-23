@@ -18,31 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.fm.ui.handlers.base;
 
-import java.nio.file.Path;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.base.impl.FormatManager;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import org.eclipse.core.resources.IContainer;
 
 /**
+ * Abstract class for handlers that work on containers (IProject and IFolder).
  *
  * @author Sebastian Krieter
  */
-public class FeatureModelConversionHandler extends AMultipleExportHandler<IFeatureModel> {
+public abstract class AContainerHandler extends ASelectionHandler {
+
+	/**
+	 * This method is called for every container in the current selection.
+	 *
+	 * @param container the current container handle.
+	 */
+	protected abstract void singleAction(IContainer container);
 
 	@Override
-	protected FormatManager<? extends IPersistentFormat<IFeatureModel>> getFormatManager() {
-		return FMFormatManager.getInstance();
+	protected void singleAction(Object element) {
+		final IContainer container = SelectionWrapper.checkClass(element, IContainer.class);
+		if (container != null) {
+			singleAction(container);
+		}
 	}
-
-	@Override
-	protected FileHandler<IFeatureModel> read(Path modelFilePath) {
-		return FeatureModelManager.load(modelFilePath);
-	}
-
 }

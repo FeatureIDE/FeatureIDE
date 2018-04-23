@@ -245,7 +245,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!fm) {
 			return true;
 		}
-		return validSelect && validReject && (currentConfig.number() > 0);
+		return validSelect && validReject && (currentConfig.canBeValid());
 	}
 
 	@Override

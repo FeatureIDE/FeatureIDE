@@ -61,7 +61,7 @@ public class ConfigNode extends Parent {
 					return "1";
 				}
 
-				final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
+				final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout, !ignoreAbstract);
 
 				return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 			}
