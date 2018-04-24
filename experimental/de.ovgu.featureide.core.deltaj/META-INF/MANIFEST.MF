@@ -6,20 +6,20 @@ Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.deltaj.DeltajCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources,
- de.ovgu.featureide.core,
- de.ovgu.featureide.fm.core,
- org.junit,
  org.eclipse.xtext.util,
  org.eclipse.xtend,
- de.ovgu.featureide.ui,
- de.ovgu.featureide.fm.ui,
  org.eclipse.ui.ide,
- org.deltaj.ui,
  org.eclipse.xtext.builder,
  org.eclipse.ui.console,
+ org.junit,
+ org.eclipse.core.resources,
+ org.deltaj.ui,
+ org.deltaj.transformations.ui,
  org.deltaj.transformations,
- org.deltaj.transformations.ui
+ de.ovgu.featureide.ui,
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: com.google.inject,
