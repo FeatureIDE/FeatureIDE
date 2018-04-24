@@ -70,9 +70,9 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
 
-	private String sourcePathText = "";
-	private String configsPathText = "";
-	private String buildPathText = "";
+	protected String sourcePathText = "";
+	protected String configsPathText = "";
+	protected String buildPathText = "";
 
 	protected Text sourcePath;
 	protected Text configsPath;
@@ -218,6 +218,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				sourcePathText = sourcePath.getText();
 				dialogChanged();
 			}
 		});
@@ -226,6 +227,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				buildPathText = buildPath.getText();
 				dialogChanged();
 			}
 		});
@@ -234,6 +236,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				configsPathText = configsPath.getText();
 				dialogChanged();
 			}
 		});
@@ -294,10 +297,6 @@ public class NewFeatureProjectPage extends WizardPage {
 				updateStatus(CONFIG_PATH_RESTRICTION_ANDROID);
 				return;
 			}
-
-			sourcePathText = getSourcePath();
-			configsPathText = getConfigPath();
-			buildPathText = getBuildPath();
 
 			return;
 		}

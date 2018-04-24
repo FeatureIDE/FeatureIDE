@@ -28,6 +28,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import de.ovgu.featureide.featurehouse_android.FeatureHouseAndroidProjectConversion;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.munge_android.AndroidProjectConversion;
@@ -59,9 +60,22 @@ public class ConversionWizard extends Wizard implements INewWizard {
 			// TODO : select FeatureHouse Android Project
 
 			if (curProject.isAccessible()) {
-				AndroidProjectConversion.convertAndroidProject(curProject, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(),
-						page.getBuildPath());
-				AndroidUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, curProject.getFile("model.xml"));
+
+				final String compositionTool = page.getCompositionTool().getId();
+
+				// FeatureHouse composer for Android
+				if (compositionTool.equals("de.ovgu.featureide.composer.featurehouse-android")) {
+					FeatureHouseAndroidProjectConversion.convertAndroidProject(curProject, compositionTool, page.getSourcePath(), page.getConfigPath(),
+							page.getBuildPathText());
+				}
+
+				// Munge Composer for Android
+				else if (compositionTool.equals("de.ovgu.featureide.preprocessor.munge-android")) {
+					AndroidProjectConversion.convertAndroidProject(curProject, page.getCompositionTool().getId(), page.getSourcePathText(),
+							page.getConfigsPathText(), page.getBuildPathText());
+					AndroidUIPlugin.getDefault().openEditor(FeatureModelEditor.ID, curProject.getFile("model.xml"));
+				}
+
 			}
 		}
 		return true;
