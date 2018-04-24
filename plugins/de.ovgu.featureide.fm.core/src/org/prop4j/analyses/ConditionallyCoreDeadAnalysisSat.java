@@ -48,19 +48,39 @@ public class ConditionallyCoreDeadAnalysisSat extends AConditionallyCoreDeadAnal
 		super.analyze(monitor);
 		monitor.setRemainingWork(solver.getSatInstance().getNumberOfVariables() + 2);
 
-		solver.getAssignment().ensure(fixedVariables.length);
-		for (int i = 0; i < fixedVariables.length; i++) {
-			solver.assignmentPush(fixedVariables[i]);
+		final int[] knownValues = new int[solver.getSatInstance().getNumberOfVariables()];
+		if (assumptions != null) {
+			for (final int assumption : assumptions) {
+				final int var = Math.abs(assumption);
+				knownValues[var - 1] = assumption;
+			}
+			solver.getAssignment().ensure(assumptions.length + fixedVariables.length + 1);
+		} else {
+			solver.getAssignment().ensure(fixedVariables.length + 1);
 		}
+
+		for (int i = 0; i < fixedVariables.length; i++) {
+			final int var = Math.abs(fixedVariables[i]);
+			knownValues[var - 1] = fixedVariables[i];
+		}
+		solver.assignmentClear(0);
+		for (final int var : knownValues) {
+			if (var != 0) {
+				solver.assignmentPush(var);
+			}
+		}
+
 		solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
 		final int[] unkownValues = solver.findModel();
 		monitor.step();
 
 		if (unkownValues != null) {
-			for (int i = 0; i < fixedVariables.length; i++) {
-				final int var = Math.abs(fixedVariables[i]);
-				unkownValues[var - 1] = 0;
-				monitor.step(new IntermediateResult(var, Selection.UNDEFINED));
+			for (int i = 0; i < knownValues.length; i++) {
+				final int var = Math.abs(knownValues[i]);
+				if (var != 0) {
+					unkownValues[var - 1] = 0;
+					monitor.step(new IntermediateResult(var, Selection.UNDEFINED));
+				}
 			}
 
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);

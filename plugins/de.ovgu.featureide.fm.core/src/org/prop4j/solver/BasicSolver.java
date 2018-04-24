@@ -52,6 +52,8 @@ import de.ovgu.featureide.fm.core.base.util.RingList;
  */
 public class BasicSolver implements ISatSolver {
 
+	protected final Random rnd = new Random(100);
+
 	protected final SatInstance satInstance;
 	protected final Solver<?> solver;
 	protected final int[] order;
@@ -218,7 +220,6 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public void shuffleOrder() {
-		final Random rnd = new Random();
 		for (int i = order.length - 1; i >= 0; i--) {
 			final int index = rnd.nextInt(i + 1);
 			final int a = order[index];

@@ -60,8 +60,18 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 		monitor.setRemainingWork(solver.getSatInstance().getNumberOfVariables() + 2);
 
 		final Traverser traverser = mig.traverse();
-		solver.getAssignment().ensure(fixedVariables.length + 1);
 		final int[] knownValues = new int[solver.getSatInstance().getNumberOfVariables()];
+
+		if (assumptions != null) {
+			for (final int assumption : assumptions) {
+				final int var = Math.abs(assumption);
+				knownValues[var - 1] = assumption;
+				monitor.step(new IntermediateResult(var, Selection.UNDEFINED));
+			}
+			solver.getAssignment().ensure(assumptions.length + fixedVariables.length + 1);
+		} else {
+			solver.getAssignment().ensure(fixedVariables.length + 1);
+		}
 
 		for (final int fixedVar : fixedVariables) {
 			final int var = Math.abs(fixedVar);
@@ -111,6 +121,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 			valuesToCompute = sortedValuesToCalulate;
 		}
 
+		solver.assignmentClear(0);
 		for (final int var : knownValues) {
 			if (var != 0) {
 				solver.assignmentPush(var);
@@ -133,7 +144,7 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 
 				for (int k = 0; k < knownValues.length; k++) {
 					final int var = knownValues[k];
-					if ((var != 0) && (unkownValues[k] != 0)) {
+					if ((var != 0)) {
 						unkownValues[k] = 0;
 					}
 				}
@@ -163,9 +174,11 @@ public class ConditionallyCoreDeadAnalysisMIG extends AConditionallyCoreDeadAnal
 					final VecInt newFoundValues = visitor.getResult()[0];
 					for (int j = 0; j < newFoundValues.size(); j++) {
 						final int var = newFoundValues.get(j);
-						solver.assignmentPush(var);
-						unkownValues[Math.abs(var) - 1] = 0;
-						monitor.step(new IntermediateResult(Math.abs(var), var < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+						if (unkownValues[Math.abs(var) - 1] != 0) {
+							solver.assignmentPush(var);
+							unkownValues[Math.abs(var) - 1] = 0;
+							monitor.step(new IntermediateResult(Math.abs(var), var < 0 ? Selection.UNSELECTED : Selection.SELECTED));
+						}
 					}
 					break;
 				case TIMEOUT:

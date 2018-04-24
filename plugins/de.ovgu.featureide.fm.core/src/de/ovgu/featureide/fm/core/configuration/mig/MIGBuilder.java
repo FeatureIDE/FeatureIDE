@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -33,9 +34,12 @@ import java.util.Set;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.FixedLiteralSelectionStrategy;
 import org.prop4j.solver.ISatSolver;
 import org.prop4j.solver.ISatSolver.SelectionStrategy;
 import org.prop4j.solver.SatInstance;
+import org.prop4j.solver.VarOrderHeap2;
+import org.sat4j.minisat.core.Solver;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.TimeoutException;
 
@@ -47,6 +51,14 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
 /**
  * Adjacency matrix implementation for a feature graph.
+ *
+ * TODO Remove any weak edges from a node that satisfies them with its strongly connected nodes.
+ *
+ * TODO Implement check for compatibility with feature model.
+ *
+ * TODO Remove any weak edges from a node that satisfies them with its strongly connected nodes.
+ *
+ * TODO Implement check for compatibility with feature model.
  *
  * @author Sebastian Krieter
  */
@@ -273,37 +285,38 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 	}
 
 	private void initEdges() {
-		outer: for (final Node clause : solver.getSatInstance().getCnf().getChildren()) {
-			final Node[] literals = clause.getChildren();
-
-			// Sort out dead and core features
-			int childrenCount = literals.length;
-			for (int i = 0; i < childrenCount; i++) {
-				final int var = solver.getSatInstance().getSignedVariable((Literal) literals[i]);
-				final int coreB = var * adjMatrix.core[Math.abs(var) - 1];
-				if (coreB > 0) {
-					// Clause is satisfied
-					continue outer;
-				} else if (coreB < 0) {
-					// Current literal is unsatisfied (dead or core feature)
-					if (childrenCount <= 2) {
-						continue outer;
-					}
-					childrenCount--;
-					// Switch literals (faster than deletion within an
-					// array)
-					final Node temp = literals[i];
-					literals[i] = literals[childrenCount];
-					literals[childrenCount] = temp;
-					i--;
-				}
-			}
-			final Clause newClause = addClause(convert(Arrays.copyOf(literals, childrenCount, Literal[].class)));
+		for (final Node clause : solver.getSatInstance().getCnf().getChildren()) {
+			final Clause newClause = convertNode(clause);
 			if (newClause != null) {
 				// If clause has exactly two literals
 				addRelation(newClause.getLiterals());
 			}
 		}
+	}
+
+	private Clause convertNode(Node clause) {
+		final Node[] literals = clause.getChildren();
+		final Set<Integer> literalSet = new LinkedHashSet<>(literals.length << 1);
+
+		// Sort out dead and core features
+		int childrenCount = literals.length;
+		for (int i = 0; i < literals.length; i++) {
+			final int var = solver.getSatInstance().getSignedVariable((Literal) literals[i]);
+			final int coreB = var * adjMatrix.core[Math.abs(var) - 1];
+			if ((coreB > 0) || ((coreB < 0) && (--childrenCount < 2)) || literalSet.contains(-var)) {
+				return null;
+			} else {
+				literalSet.add(var);
+			}
+		}
+
+		final int[] literalArray = new int[literalSet.size()];
+		int i = 0;
+		for (final int lit : literalSet) {
+			literalArray[i++] = lit;
+		}
+		return addClause(literalArray);
+
 	}
 
 	private void addRelation(final int[] newLiterals) {
@@ -407,26 +420,6 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		}
 	}
 
-	private int[] convert(Literal[] newChildren) {
-		final HashSet<Integer> literalSet = new HashSet<>(newChildren.length << 1);
-
-		for (int j = 0; j < newChildren.length; j++) {
-			final int literal = solver.getSatInstance().getSignedVariable(newChildren[j]);
-			if (literalSet.contains(-literal)) {
-				return null;
-			} else {
-				literalSet.add(literal);
-			}
-		}
-
-		final int[] literalArray = new int[literalSet.size()];
-		int i = 0;
-		for (final int lit : literalSet) {
-			literalArray[i++] = lit;
-		}
-		return literalArray;
-	}
-
 	// Transitive closure for strong edges
 	private void dfsStrong(int curVar) {
 		final int curIndex = Math.abs(curVar) - 1;
@@ -506,7 +499,7 @@ public class MIGBuilder implements LongRunningMethod<ModalImplicationGraph>, IEd
 		if (firstSolution != null) {
 			solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 			SatInstance.updateModel(firstSolution, solver.findModel());
-			solver.setSelectionStrategy(SelectionStrategy.POSITIVE);
+			((Solver<?>) solver.getInternalSolver()).setOrder(new VarOrderHeap2(new FixedLiteralSelectionStrategy(firstSolution, true), solver.getOrder()));
 
 			// find core/dead features
 			for (int i = 0; i < firstSolution.length; i++) {
