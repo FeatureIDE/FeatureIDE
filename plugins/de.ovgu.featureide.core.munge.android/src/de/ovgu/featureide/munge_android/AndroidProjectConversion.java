@@ -38,6 +38,7 @@ public class AndroidProjectConversion {
 	 *
 	 */
 	public static void convertAndroidProject(IProject project, String compositionTool, String sourcePath, String configPath, String buildPath) {
+
 		// Move Android src and res folders to feature source path
 		final IFolder folderSrc = project.getFolder("src");
 		final IFolder folderRes = project.getFolder("res");

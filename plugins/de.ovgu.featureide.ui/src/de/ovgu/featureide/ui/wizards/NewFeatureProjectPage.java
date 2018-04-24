@@ -70,6 +70,10 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
 
+	private String sourcePathText = "";
+	private String configsPathText = "";
+	private String buildPathText = "";
+
 	protected Text sourcePath;
 	protected Text configsPath;
 	protected Text buildPath;
@@ -291,6 +295,10 @@ public class NewFeatureProjectPage extends WizardPage {
 				return;
 			}
 
+			sourcePathText = getSourcePath();
+			configsPathText = getConfigPath();
+			buildPathText = getBuildPath();
+
 			return;
 		}
 
@@ -344,6 +352,27 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	public String getBuildPath() {
 		return buildPath.getText();
+	}
+
+	/**
+	 * @return the sourcePathText
+	 */
+	public String getSourcePathText() {
+		return sourcePathText;
+	}
+
+	/**
+	 * @return the configsPathText
+	 */
+	public String getConfigsPathText() {
+		return configsPathText;
+	}
+
+	/**
+	 * @return the buildPathText
+	 */
+	public String getBuildPathText() {
+		return buildPathText;
 	}
 
 	@Override

@@ -12,6 +12,7 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.core.munge.android,
+ de.ovgu.featureide.core.featurehouse.android;bundle-version="3.4.3",
  org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

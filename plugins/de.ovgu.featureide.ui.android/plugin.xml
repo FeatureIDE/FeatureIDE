@@ -10,6 +10,15 @@
 				name="MungeAndroidNewProjectWizard">
 		</newProjectWizard>
 	</extension>
+		<extension
+			point="de.ovgu.featureide.core.wizard">
+		<newProjectWizard
+				class="de.ovgu.featureide.ui.android.wizards.FeatureHouseAndroidNewProjectWizardExtension"
+				composerid="de.ovgu.featureide.composer.featurehouse-android"
+				id="de.ovgu.featureide.ui.android.newProjectWizard"
+				name="FeatureHouseeAndroidNewProjectWizard">
+		</newProjectWizard>
+	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
 		<handler

@@ -103,8 +103,8 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 						return false;
 					}
 					final NewFeatureProjectPage featurePage = (NewFeatureProjectPage) page;
-					AndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(), featurePage.getSourcePath(),
-							featurePage.getConfigPath(), featurePage.getBuildPath());
+					AndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(),
+							featurePage.getSourcePathText(), featurePage.getConfigsPathText(), featurePage.getBuildPathText());
 				}
 			} catch (final CoreException e) {
 				UIPlugin.getDefault().logError(e);
