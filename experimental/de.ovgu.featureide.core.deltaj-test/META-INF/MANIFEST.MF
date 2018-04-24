@@ -6,4 +6,4 @@ Bundle-Version: 2.2.4.qualifier
 Fragment-Host: de.ovgu.featureide.core.deltaj;bundle-version="2.6.5.qualifier"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Magdeburg
-Require-Bundle: org.junit4;bundle-version="4.8.1"
+Require-Bundle: org.junit

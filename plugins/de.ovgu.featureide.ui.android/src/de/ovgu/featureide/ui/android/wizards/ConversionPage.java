@@ -179,6 +179,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("composed");
+		buildPathText = buildPath.getText();
 		buildPath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_SOURCE_FILES_;
@@ -188,6 +189,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText("source");
+		sourcePathText = sourcePath.getText();
 		sourcePath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
@@ -197,6 +199,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
+		configsPathText = configsPath.getText();
 		configsPath.setToolTipText(tooltip);
 
 		addListeners();

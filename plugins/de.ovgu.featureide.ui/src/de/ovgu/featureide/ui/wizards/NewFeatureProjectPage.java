@@ -70,6 +70,10 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
 
+	protected String sourcePathText = "";
+	protected String configsPathText = "";
+	protected String buildPathText = "";
+
 	protected Text sourcePath;
 	protected Text configsPath;
 	protected Text buildPath;
@@ -214,6 +218,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				sourcePathText = sourcePath.getText();
 				dialogChanged();
 			}
 		});
@@ -222,6 +227,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				buildPathText = buildPath.getText();
 				dialogChanged();
 			}
 		});
@@ -230,6 +236,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				configsPathText = configsPath.getText();
 				dialogChanged();
 			}
 		});
@@ -344,6 +351,27 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	public String getBuildPath() {
 		return buildPath.getText();
+	}
+
+	/**
+	 * @return the sourcePathText
+	 */
+	public String getSourcePathText() {
+		return sourcePathText;
+	}
+
+	/**
+	 * @return the configsPathText
+	 */
+	public String getConfigsPathText() {
+		return configsPathText;
+	}
+
+	/**
+	 * @return the buildPathText
+	 */
+	public String getBuildPathText() {
+		return buildPathText;
 	}
 
 	@Override

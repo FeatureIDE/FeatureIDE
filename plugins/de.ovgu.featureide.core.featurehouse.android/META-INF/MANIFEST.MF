@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: FeatureIDE Plug-In for Android with FeatureHouse
+Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse.android;singleton:=true
+Bundle-Version: 3.4.3.qualifier
+Bundle-Activator: de.ovgu.featureide.featurehouse_android.FeatureHouseAndroidCorePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core.featurehouse;bundle-version="3.4.3"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: de.ovgu.featureide.featurehouse_android

@@ -5,7 +5,7 @@
 	[description]
 	This dataset consists of multiple enterprise software modules (i.e., features) that are: purchase, sale, supply chain management, inventory control, finances, manufacturing, accounting, fiscal affairs, customer relationship and marketing. The ERP system integrates these various modules into one complete system to manage processes and information across the entire organization. The complete system is considered a large application as it is composed of 1.653 features.
 
-	The product configuration is performed as a process of customization and generation of a specific product for each company employee. The company configuration strategy takes into account two activities: eliciting employees' requirements and decision-making process. The elicitation of requirements involves multiple stakeholders, while the decision-making process is conducted only by an Information Technology (IT) expert. On the one hand, the eliciting employees' requirements activity is concerned with collecting the needs of employees. This activity defines the functionalities or properties that a system must have that meet the employees' needs to perform their specific set of tasks. On the other hand, the  decision-making activity is performed interactively, mapping the target employees' requirements to features in the feature model. Finally, as a result of the process, a concrete and complete product configuration is derived and delivered to the employee.
+	The product configuration is performed as a process of customization and generation of a specific product for each company employee. The company configuration strategy takes into account two activities: eliciting employees&apos; requirements and decision-making process. The elicitation of requirements involves multiple stakeholders, while the decision-making process is conducted only by an Information Technology (IT) expert. On the one hand, the eliciting employees&apos; requirements activity is concerned with collecting the needs of employees. This activity defines the functionalities or properties that a system must have that meet the employees&apos; needs to perform their specific set of tasks. On the other hand, the  decision-making activity is performed interactively, mapping the target employees&apos; requirements to features in the feature model. Finally, as a result of the process, a concrete and complete product configuration is derived and delivered to the employee.
 	[/description]
 	</comment>
 	<projects>
@@ -15,8 +15,20 @@
 			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
 			<arguments>
 				<dictionary>
+					<key>build</key>
+					<value>build</value>
+				</dictionary>
+				<dictionary>
 					<key>composer</key>
 					<value>de.ovgu.featureide.core.FeatureModeling</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>equations</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>src</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
