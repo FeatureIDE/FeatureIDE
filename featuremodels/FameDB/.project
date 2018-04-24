@@ -6,7 +6,7 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>FeatureIDE_Core.jakBuilder</name>
+			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -14,13 +14,26 @@
 			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
 			<arguments>
 				<dictionary>
+					<key>build</key>
+					<value>build</value>
+				</dictionary>
+				<dictionary>
 					<key>composer</key>
 					<value>de.ovgu.featureide.composer.ahead</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>equations</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>src</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>de.ovgu.featureide.core.featureProjectNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

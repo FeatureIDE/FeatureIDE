@@ -103,7 +103,6 @@ public class FeatureHouseAndroidNewProjectWizardExtension extends DefaultNewFeat
 						return false;
 					}
 					final NewFeatureProjectPage featurePage = (NewFeatureProjectPage) page;
-					// TODO : featureHouse Android Call here
 
 					FeatureHouseAndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(),
 							featurePage.getSourcePathText(), featurePage.getConfigsPathText(), featurePage.getBuildPathText());
