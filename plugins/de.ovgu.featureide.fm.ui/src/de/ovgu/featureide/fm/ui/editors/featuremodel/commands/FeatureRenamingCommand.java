@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
@@ -62,7 +63,18 @@ public class FeatureRenamingCommand extends Command {
 		if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(newName)) {
 			return false;
 		}
-		return FMComposerManager.getFMComposerExtension(null).isValidFeatureName(newName);
+
+		if ((featureModel.getSourceFile() == null) || (featureModel.getSourceFile().toUri() == null)
+			|| (ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0] == null)
+			|| (FMComposerManager.getFMComposerExtension(
+					ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0].getProject()) == null)) {
+			return false;
+		} else {
+			return FMComposerManager
+					.getFMComposerExtension(
+							ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(featureModel.getSourceFile().toUri())[0].getProject())
+					.isValidFeatureName(newName);
+		}
 	}
 
 	@Override
