@@ -26,6 +26,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -38,6 +41,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineLabelProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider;
 import de.ovgu.featureide.fm.ui.views.outline.custom.OutlineTreeContentProvider;
@@ -51,6 +55,8 @@ import de.ovgu.featureide.fm.ui.views.outline.custom.filters.IOutlineFilter;
 public class ConfigurationOutlineProvider extends OutlineProvider {
 
 	Configuration config;
+	TreeViewer viewer;
+	IDoubleClickListener dblClickListener;
 
 	public ConfigurationOutlineProvider() {
 		super(new ConfigurationTreeContentProvider(), new ConfigurationLabelProvider());
@@ -133,12 +139,29 @@ public class ConfigurationOutlineProvider extends OutlineProvider {
 		}
 	}
 
+	private void initListeners() {
+		dblClickListener = new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IOutlineEntry)) {
+					final IOutlineEntry entry = (IOutlineEntry) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+					entry.handleDoubleClick();
+					viewer.refresh(entry);
+				}
+			}
+		};
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.views.outline.custom.OutlineProvider#handleUpdate(org.eclipse.jface.viewers.TreeViewer, org.eclipse.core.resources.IFile)
 	 */
 	@Override
 	public void handleUpdate(TreeViewer viewer, IFile iFile) {
+		this.viewer = viewer;
+		initListeners();
+		viewer.removeDoubleClickListener(dblClickListener);
+		viewer.addDoubleClickListener(dblClickListener);
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 		final IWorkbenchPage page = window.getActivePage();
