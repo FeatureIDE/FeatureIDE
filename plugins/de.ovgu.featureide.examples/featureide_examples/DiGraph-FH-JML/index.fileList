@@ -24,9 +24,9 @@ originalProject/DiGraph/src/org/jmlspecs/samples/digraph/ArcType.jml
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/Digraph.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/Digraph.jml
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/NodeType.java
-originalProject/DiGraph/src/org/jmlspecs/samples/digraph/package.html
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/SearchableDigraph.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/SearchableNode.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/TransposableDigraph.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/TransposableNode.java
 originalProject/DiGraph/src/org/jmlspecs/samples/digraph/ValueNode.java
+originalProject/DiGraph/src/org/jmlspecs/samples/digraph/package.html

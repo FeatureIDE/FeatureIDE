@@ -15,14 +15,6 @@ features/ExamDB/Student.java
 features/Statistics/ExamDataBase.java
 features/Statistics/ExamDataBaseImpl.java
 model.xml
-originalProject/ExamDB/.classpath
-originalProject/ExamDB/.project
-originalProject/ExamDB/.settings/org.eclipse.jdt.core.prefs
-originalProject/ExamDB/readme.txt
-originalProject/ExamDB/src/core/ExamDataBase.java
-originalProject/ExamDB/src/core/ExamDataBaseException.java
-originalProject/ExamDB/src/core/ExamDataBaseImpl.java
-originalProject/ExamDB/src/core/Student.java
 originalProject/ExamDB-VarEnc/.classpath
 originalProject/ExamDB-VarEnc/.project
 originalProject/ExamDB-VarEnc/.settings/org.eclipse.jdt.core.prefs
@@ -37,4 +29,12 @@ originalProject/ExamDB-VarEnc/src/FeatureModel.java
 originalProject/ExamDB-VarEnc/src/FeatureModel.java.proof
 originalProject/ExamDB-VarEnc/src/Student.java
 originalProject/ExamDB-VarEnc/src/Student.java.proof
+originalProject/ExamDB/.classpath
+originalProject/ExamDB/.project
+originalProject/ExamDB/.settings/org.eclipse.jdt.core.prefs
+originalProject/ExamDB/readme.txt
+originalProject/ExamDB/src/core/ExamDataBase.java
+originalProject/ExamDB/src/core/ExamDataBaseException.java
+originalProject/ExamDB/src/core/ExamDataBaseImpl.java
+originalProject/ExamDB/src/core/Student.java
 readme.txt
