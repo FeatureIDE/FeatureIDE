@@ -1,4 +1,4 @@
-package de.ovgu.featureide.fm.attributes.computations.impl;
+package de.ovgu.featureide.fm.attributes.outlineentry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class AttributeComputationBundle implements IOutlineEntry {
 	@Override
 	public String getLabel() {
 		// TODO Auto-generated method stub
-		return "Attribute calculations";
+		return "Attribute statistics";
 	}
 
 	@Override
@@ -84,6 +84,12 @@ public class AttributeComputationBundle implements IOutlineEntry {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.ui.views.outline.computations.impl.UnselectedFeatur
  */
 public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 
-	private static final String LABEL = "Configuration properties";
+	private static final String LABEL = "Configuration statistics";
 
 	private Configuration config;
 
@@ -106,6 +106,16 @@ public class ConfigurationOutlineStandardBundle implements IOutlineEntry {
 	@Override
 	public void setConfig(Configuration config) {
 		this.config = config;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry#handleDoubleClick()
+	 */
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
 
 	}
 

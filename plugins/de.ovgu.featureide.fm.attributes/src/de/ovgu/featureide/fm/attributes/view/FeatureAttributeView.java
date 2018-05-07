@@ -151,9 +151,9 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 	private FeatureAttributeConfigureableEditingSupport configureableEditingSupport;
 
 	public boolean synchToFeatureDiagram = false;
-	public ArrayList<IFeature> selectedManualFeatures;
-	public ArrayList<IFeature> selectedAutomaticFeatures;
-	public ArrayList<IFeature> selection;
+	public ArrayList<IFeature> selectedManualFeatures = new ArrayList<>();
+	public ArrayList<IFeature> selectedAutomaticFeatures = new ArrayList<>();
+	public ArrayList<IFeature> selection = new ArrayList<>();
 	private final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
 
 		@Override
@@ -167,7 +167,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 				return;
 			}
 			selectedManualFeatures = new ArrayList<>();
-			for (Object obj : ((IStructuredSelection) event.getSelection()).toList()) {
+			for (Object obj : event.getStructuredSelection().toList()) {
 				if (!(obj instanceof FeatureEditPart)) {
 					selectedManualFeatures = null;
 					treeViewer.refresh();
@@ -363,6 +363,7 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 		toolBar.add(new ExpandTreeViewer(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(expandAll))));
 		toolBar.add(new CollapseAllButFirstLevel(treeViewer, ImageDescriptor.createFromImage(cachedImages.get(collapseAll))));
 		toolBar.add(new SynchFeatureAttributesToFeatureDiagramAction(this, treeViewer, ImageDescriptor.createFromImage(cachedImages.get(synch_tree))));
+		// toolBar.add(new TestSolver(this, ImageDescriptor.createFromImage(cachedImages.get(imgFeature))));
 
 		menuManager = new MenuManager();
 		menuManager.setRemoveAllWhenShown(true);
