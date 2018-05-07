@@ -588,7 +588,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (configurationEditor.getConfiguration().getPropagator() == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = new LongRunningJob<>("", configurationEditor.getConfiguration().getPropagator().number(250));
+		final LongRunningJob<Long> job = new LongRunningJob<>("", configurationEditor.getConfiguration().getPropagator().number(250, false));
 		job.addJobFinishedListener(new JobFinishListener<Long>() {
 
 			@Override

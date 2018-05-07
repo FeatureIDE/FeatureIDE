@@ -8,10 +8,10 @@ configs/tracev3.xml
 model.xml
 src/tracing/Circle.java
 src/tracing/ExampleMain.java
-src/tracing/lib/AbstractTrace.aj
-src/tracing/lib/TraceMyClasses.aj
 src/tracing/Square.java
 src/tracing/TwoDShape.java
+src/tracing/lib/AbstractTrace.aj
+src/tracing/lib/TraceMyClasses.aj
 src/tracing/version1/Trace.java
 src/tracing/version1/TraceMyClasses.aj
 src/tracing/version2/Trace.aj

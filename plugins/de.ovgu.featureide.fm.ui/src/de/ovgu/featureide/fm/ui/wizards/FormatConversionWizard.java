@@ -22,54 +22,37 @@ package de.ovgu.featureide.fm.ui.wizards;
 
 import org.eclipse.ui.INewWizard;
 
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class FeatureModelConversionWizard extends AbstractWizard implements INewWizard {
+public class FormatConversionWizard<T> extends AbstractWizard implements INewWizard {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizzard.FeatureModelConversionWizzard";
 
-	public FeatureModelConversionWizard() {
+	protected final FormatManager<? extends IPersistentFormat<T>> formatManager;
+
+	public FormatConversionWizard(FormatManager<? extends IPersistentFormat<T>> formatManager) {
 		super("Convert Feature Models");
+		this.formatManager = formatManager;
 	}
 
 	@Override
 	public void addPages() {
-		addPage(new FeatureModelConversionPage());
+		addPage(new FormatConversionPage());
 	}
 
 	public String getOutputFolder() {
 		return (String) getData(WizardConstants.KEY_OUT_FOLDER);
 	}
 
-	public IFeatureModelFormat getInputFormat() {
-		final Object data = getData(WizardConstants.KEY_OUT_INPUTFORMAT);
-		if (data != null) {
-			try {
-				return FMFormatManager.getInstance().getExtension((String) data);
-			} catch (final NoSuchExtensionException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-		}
-		return null;
-	}
-
-	public IFeatureModelFormat getOutputFormat() {
-		final Object data = getData(WizardConstants.KEY_OUT_OUTPUTFORMAT);
-		if (data != null) {
-			try {
-				return FMFormatManager.getInstance().getExtension((String) data);
-			} catch (final NoSuchExtensionException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-		}
-		return null;
+	@SuppressWarnings("unchecked")
+	public IPersistentFormat<T> getOutputFormat() {
+		return (IPersistentFormat<T>) getData(WizardConstants.KEY_OUT_OUTPUTFORMAT);
 	}
 
 }

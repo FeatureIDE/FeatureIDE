@@ -1,13 +1,13 @@
 .classpath
 .project
-features/Base/EdgeIfc.cs
-features/Base/images/GPL.model
-features/Base/Iterator.cs
-features/Base/NeighborIfc.cs
 features/BFS/GlobalVarsWrapper.cs
 features/BFS/Graph.cs
 features/BFS/Vertex.cs
 features/BFS/WorkSpace.cs
+features/Base/EdgeIfc.cs
+features/Base/Iterator.cs
+features/Base/NeighborIfc.cs
+features/Base/images/GPL.model
 features/Connected/Graph.cs
 features/Connected/RegionWorkSpace.cs
 features/Connected/Vertex.cs

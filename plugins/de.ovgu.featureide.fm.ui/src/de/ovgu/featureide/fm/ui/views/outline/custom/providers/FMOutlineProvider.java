@@ -70,6 +70,10 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 		if (activeEditor instanceof FeatureModelEditor) {
 			final FeatureModelEditor fTextEditor = (FeatureModelEditor) activeEditor;
 			featureModel = fTextEditor.getFeatureModel();
+
+			// Remove Listener and add the listener again to minimize the listeners held by the provider to one. With a feature model check does not help here
+			// as otherwise SyncCollapsedStateAction does not work
+			featureModel.removeListener(this);
 			featureModel.addListener(this);
 			graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 
@@ -91,7 +95,7 @@ public class FMOutlineProvider extends OutlineProvider implements IEventListener
 
 	@Override
 	protected void initToolbarActions(IToolBarManager manager) {
-		syncCollapsedStateAction = new SyncCollapsedStateAction(viewer, true);
+		syncCollapsedStateAction = new SyncCollapsedStateAction(viewer);
 		syncCollapsedStateAction.setEnabled(true);
 		manager.add(syncCollapsedStateAction);
 	}

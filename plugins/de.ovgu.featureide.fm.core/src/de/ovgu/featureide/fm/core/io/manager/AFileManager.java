@@ -349,7 +349,6 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
-
 	}
 
 	@Override
@@ -461,7 +460,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
 				FileSystem.write(identifier.getPath(), identifier.getFormat().getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
-				persistentObject = copyObject(tempObject);
+				setPersistentObject(copyObject(tempObject));
 			} catch (final Exception e) {
 				handleException(e);
 				return false;

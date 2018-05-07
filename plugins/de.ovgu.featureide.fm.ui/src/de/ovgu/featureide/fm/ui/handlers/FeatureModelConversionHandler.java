@@ -21,65 +21,28 @@
 package de.ovgu.featureide.fm.ui.handlers;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
-
-import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
-import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
-import de.ovgu.featureide.fm.ui.wizards.FeatureModelConversionWizard;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
+import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  *
  * @author Sebastian Krieter
  */
-public class FeatureModelConversionHandler extends ASelectionHandler {
+public class FeatureModelConversionHandler extends AMultipleExportHandler<IFeatureModel> {
 
 	@Override
-	protected boolean startAction(IStructuredSelection selection) {
-		final IContainer next = SelectionWrapper.init(selection, IContainer.class).getNext();
-		if (next != null) {
-			final FeatureModelConversionWizard wizard = new FeatureModelConversionWizard();
-			wizard.init(null, selection);
-			final WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-			if (dialog.open() == Window.OK) {
-				final IFeatureModelFormat inputFormat = wizard.getInputFormat();
-				final IFeatureModelFormat outputFormat = wizard.getOutputFormat();
-				if ((inputFormat == null) || (outputFormat == null)) {
-					return false;
-				}
-				final Path projectPath = Paths.get(next.getProject().getLocationURI());
-				final Path inPath = Paths.get(next.getLocationURI());
-				try {
-					final IFeatureModel fm = FMFactoryManager.getFactory(inPath.toString(), inputFormat).createFeatureModel();
-					SimpleFileHandler.convert(inPath, projectPath.resolve(wizard.getOutputFolder()), fm, inputFormat, outputFormat);
-				} catch (final NoSuchExtensionException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
-
-			}
-		}
-		return true;
+	protected FormatManager<? extends IPersistentFormat<IFeatureModel>> getFormatManager() {
+		return FMFormatManager.getInstance();
 	}
 
 	@Override
-	protected void singleAction(Object element) {
-
-	}
-
-	@Override
-	protected void endAction() {
-		super.endAction();
+	protected FileHandler<IFeatureModel> read(Path modelFilePath) {
+		return FeatureModelManager.load(modelFilePath);
 	}
 
 }

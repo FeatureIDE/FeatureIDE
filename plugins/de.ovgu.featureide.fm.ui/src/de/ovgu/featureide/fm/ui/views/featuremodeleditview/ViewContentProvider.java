@@ -457,7 +457,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
+		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION, !ignoreAbstractFeatures);
 		String s = "";
 		if (number < 0) {
 			s += MORE_THAN + (-1 - number);
