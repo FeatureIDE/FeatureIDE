@@ -23,6 +23,9 @@ package de.ovgu.featureide.fm.attributes.base.impl;
 import de.ovgu.featureide.fm.attributes.base.AbstractFeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
+import de.ovgu.featureide.fm.attributes.base.exceptions.FeatureAttributeParseException;
+import de.ovgu.featureide.fm.attributes.base.exceptions.UnknownFeatureAttributeTypeException;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -55,6 +58,7 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				}
 				return (new LongFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueLong, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
+				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
 			}
 		case FeatureAttribute.DOUBLE:
@@ -65,11 +69,13 @@ public class FeatureAttributeFactory extends AbstractFeatureAttributeFactory {
 				}
 				return (new DoubleFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), valueDouble, recursive, configurable));
 			} catch (final NumberFormatException nfe) {
+				FMCorePlugin.getDefault().logError(new FeatureAttributeParseException(attributeData));
 				return null;
 			}
 		case FeatureAttribute.STRING:
 			return (new StringFeatureAttribute(feature, attributeData.getName(), attributeData.getUnit(), attributeData.getValue(), recursive, configurable));
 		default:
+			FMCorePlugin.getDefault().logError(new UnknownFeatureAttributeTypeException(attributeData));
 			return null;
 		}
 	}

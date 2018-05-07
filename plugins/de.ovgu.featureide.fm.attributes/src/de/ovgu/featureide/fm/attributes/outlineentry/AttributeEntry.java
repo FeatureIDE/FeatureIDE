@@ -1,4 +1,4 @@
-package de.ovgu.featureide.fm.attributes.computations.impl;
+package de.ovgu.featureide.fm.attributes.outlineentry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class AttributeEntry implements IOutlineEntry {
 	@Override
 	public String getLabel() {
 		// TODO Auto-generated method stub
-		return attribute.getName();
+		return attribute.getName() + " (" + attribute.getType() + ")";
 	}
 
 	@Override
@@ -51,15 +51,14 @@ public class AttributeEntry implements IOutlineEntry {
 	public List<IOutlineEntry> getChildren() {
 		List<IOutlineEntry> children = new ArrayList<>();
 		children.add(new CountAttributeComputation(config, attribute));
-		EstimatedMinimumComputation min = new EstimatedMinimumComputation(config, attribute);
-		EstimatedMaximumComputation max = new EstimatedMaximumComputation(config, attribute);
+		AttributeMinimumEntry min = new AttributeMinimumEntry(config, attribute);
+		AttributeMaximumEntry max = new AttributeMaximumEntry(config, attribute);
 		if (min.supportsType(null)) {
 			children.add(min);
 		}
 		if (max.supportsType(null)) {
 			children.add(max);
 		}
-
 		return children;
 	}
 
@@ -71,6 +70,12 @@ public class AttributeEntry implements IOutlineEntry {
 	@Override
 	public void setConfig(Configuration config) {
 		this.config = config;
+
+	}
+
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
 
 	}
 

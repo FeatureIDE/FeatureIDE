@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -101,7 +103,15 @@ public class FeatureAttributeContentProvider implements ITreeContentProvider {
 				featureList.addAll(feature.getAttributes());
 			}
 			for (final IFeatureStructure structure : feature.getStructure().getChildren()) {
-				featureList.add(structure.getFeature());
+				if (config == null) {
+					featureList.add(structure.getFeature());
+				} else {
+					SelectableFeature selectableF = config.getSelectablefeature(structure.getFeature().getName());
+					if (selectableF.getSelection() == Selection.SELECTED) {
+						featureList.add(structure.getFeature());
+					}
+				}
+
 			}
 			return featureList.toArray();
 		}

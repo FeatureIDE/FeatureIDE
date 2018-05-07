@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.attributes;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_EDITOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_FEATUREIDE_PLUG_IN_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STOPPING_FEATUREIDE_PLUG_IN_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_OPEN_FILE;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,12 +36,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.osgi.framework.BundleContext;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.IN_EDITOR;
-import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_FEATUREIDE_PLUG_IN_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.STOPPING_FEATUREIDE_PLUG_IN_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_OPEN_FILE;
-
 
 /**
  * A default implementation for UI plug-ins within FeatureIDE.

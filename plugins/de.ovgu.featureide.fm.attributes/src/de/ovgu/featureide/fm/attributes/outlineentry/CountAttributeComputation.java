@@ -1,4 +1,4 @@
-package de.ovgu.featureide.fm.attributes.computations.impl;
+package de.ovgu.featureide.fm.attributes.outlineentry;
 
 import java.util.List;
 
@@ -77,6 +77,12 @@ public class CountAttributeComputation implements IOutlineEntry {
 	@Override
 	public void setConfig(Configuration config) {
 		this.config = config;
+
+	}
+
+	@Override
+	public void handleDoubleClick() {
+		// TODO Auto-generated method stub
 
 	}
 

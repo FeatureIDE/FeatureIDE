@@ -3,8 +3,6 @@ package de.ovgu.featureide.fm.attributes.computations.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.graphics.Image;
-
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.DoubleFeatureAttribute;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
@@ -12,14 +10,13 @@ import de.ovgu.featureide.fm.attributes.base.impl.LongFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.ui.views.outline.IOutlineEntry;
 
 /**
  * Estimates maximum of a given numerical attribute
  * 
  * @author Chico Sundermann
  */
-public class EstimatedMaximumComputation implements IOutlineEntry {
+public class EstimatedMaximumComputation {
 
 	private static final String LABEL = "Maximal sum of attribute value (est.): ";
 
@@ -33,40 +30,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 		this.attribute = attribute;
 	}
 
-	@Override
-	public String getLabel() {
-		if (attribute instanceof LongFeatureAttribute) {
-			return LABEL + String.valueOf(((Double) getSelectionSum()).longValue());
-		}
-		return LABEL + getSelectionSum().toString();
-	}
-
-	@Override
-	public Image getLabelImage() {
-		return null;
-	}
-
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
-
-	@Override
-	public List<IOutlineEntry> getChildren() {
-		return null;
-	}
-
-	@Override
-	public void setConfig(Configuration config) {
-		this.config = config;
-	}
-
-	@Override
-	public boolean supportsType(Object element) {
-		return attribute instanceof LongFeatureAttribute || attribute instanceof DoubleFeatureAttribute;
-	}
-
-	private double getSubtreeValue(IFeature root) {
+	private double getSubtreeMaximum(IFeature root) {
 		double value = 0;
 		ExtendedFeature ext = (ExtendedFeature) root;
 		for (IFeatureAttribute att : ext.getAttributes()) {
@@ -92,11 +56,11 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 					if (isUnselected(struc.getFeature())) {
 						unselectedCount++;
 					} else {
-						double tempValue = getSubtreeValue(struc.getFeature());
+						double tempValue = getSubtreeMaximum(struc.getFeature());
 						if (tempValue >= 0 || isSelected(struc.getFeature())) {
 							value += tempValue;
 						} else {
-							negativeValues.add(getSubtreeValue(struc.getFeature()));
+							negativeValues.add(getSubtreeMaximum(struc.getFeature()));
 						}
 					}
 				}
@@ -112,7 +76,7 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 			} else if (root.getStructure().isAnd()) {
 				for (IFeatureStructure struct : root.getStructure().getChildren()) {
 					if (!isUnselected(struct.getFeature())) {
-						double tempValue = getSubtreeValue(struct.getFeature());
+						double tempValue = getSubtreeMaximum(struct.getFeature());
 						if (struct.isMandatory() || tempValue >= 0 || isSelected(struct.getFeature())) {
 							value += tempValue;
 						}
@@ -123,9 +87,9 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 				for (IFeatureStructure struc : root.getStructure().getChildren()) {
 					if (!isUnselected(struc.getFeature())) {
 						if (isSelected(struc.getFeature())) {
-							return value + getSubtreeValue(struc.getFeature());
+							return value + getSubtreeMaximum(struc.getFeature());
 						}
-						values.add(getSubtreeValue(struc.getFeature()));
+						values.add(getSubtreeMaximum(struc.getFeature()));
 					}
 				}
 				return value + getMaxValue(values);
@@ -134,10 +98,10 @@ public class EstimatedMaximumComputation implements IOutlineEntry {
 		return value;
 	}
 
-	private Object getSelectionSum() {
+	public Object getEstimatedMaximum() {
 		selectedFeatures = config.getSelectedFeatures();
 		unselectedFeatures = config.getUnSelectedFeatures();
-		return getSubtreeValue(config.getFeatureModel().getStructure().getRoot().getFeature());
+		return getSubtreeMaximum(config.getFeatureModel().getStructure().getRoot().getFeature());
 	}
 
 	private boolean isSelected(IFeature feature) {

@@ -75,4 +75,9 @@ public interface IOutlineEntry {
 	 */
 	public void setConfig(Configuration config);
 
+	/**
+	 * This method is called if the entry is double clicked
+	 */
+	public void handleDoubleClick();
+
 }
