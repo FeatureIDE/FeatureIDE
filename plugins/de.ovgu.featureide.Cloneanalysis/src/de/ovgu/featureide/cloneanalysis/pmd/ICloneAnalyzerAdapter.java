@@ -13,6 +13,7 @@ public interface ICloneAnalyzerAdapter<Tool> {
 
 	/**
 	 * Register the files to be analyzed with the tool.
+	 * @param files the files
 	 */
 	public abstract void registerFilesForAnalysis(Object files);
 
