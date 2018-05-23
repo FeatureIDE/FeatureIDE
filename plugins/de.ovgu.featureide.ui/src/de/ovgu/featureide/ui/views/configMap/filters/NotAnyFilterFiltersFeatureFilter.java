@@ -37,10 +37,6 @@ public class NotAnyFilterFiltersFeatureFilter extends ConfigurationMapFilter {
 
 	private final List<IConfigurationMapFilter> filters;
 
-	/**
-	 * @param name
-	 * @param isDefault
-	 */
 	public NotAnyFilterFiltersFeatureFilter(String name, boolean isDefault, List<IConfigurationMapFilter> filters) {
 		super(name, isDefault);
 		this.filters = filters;

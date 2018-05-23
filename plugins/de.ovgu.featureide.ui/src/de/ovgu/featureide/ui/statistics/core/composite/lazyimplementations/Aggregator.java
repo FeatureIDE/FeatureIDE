@@ -75,8 +75,7 @@ public class Aggregator {
 	/**
 	 * Counts and groups all directives in the project and adds the information to the given node.
 	 *
-	 * @param fstModel
-	 * @param parent
+	 * @param fstModel fst model
 	 */
 	public void processAll(FSTModel fstModel) {
 		initializeDirectiveCount(fstModel);
@@ -213,9 +212,6 @@ public class Aggregator {
 		return new ArrayList<Integer>();
 	}
 
-	/**
-	 * @return
-	 */
 	public Double getAverageNumberOfDirectives() {
 
 		final int amount_classes = class_to_directives.size();
@@ -230,9 +226,6 @@ public class Aggregator {
 		return val;
 	}
 
-	/**
-	 * @return
-	 */
 	public Map.Entry<String, Integer> getMaxNumberOfFeatures() {
 		int maxNumber = Integer.MIN_VALUE;
 		String className = "";
@@ -248,9 +241,6 @@ public class Aggregator {
 		return new AbstractMap.SimpleEntry<String, Integer>(className, maxNumber);
 	}
 
-	/**
-	 * @return
-	 */
 	public Map.Entry<String, Integer> getMinNumberOfFeatures() {
 		int maxNumber = Integer.MAX_VALUE;
 		String className = "";
@@ -267,9 +257,6 @@ public class Aggregator {
 		return new AbstractMap.SimpleEntry<String, Integer>(className, maxNumber);
 	}
 
-	/**
-	 * @return
-	 */
 	public Double getAverageNumberOfFeatures() {
 
 		int sumFeaturePerDirectives = 0;

@@ -84,7 +84,8 @@ public class ConfigDialog extends TitleAreaDialog {
 	/**
 	 * Create the dialog.
 	 *
-	 * @param parentShell
+	 * @param parentShell Shell of parent
+	 * @param titlePart part
 	 */
 	public ConfigDialog(Shell parentShell, String titlePart) {
 		super(parentShell);

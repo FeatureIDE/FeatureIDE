@@ -56,10 +56,6 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 
 	private LongRunningJob<Boolean> number;
 
-	/**
-	 * @param builder
-	 * @param featureModel
-	 */
 	public AllConfigrationsGenerator(final ConfigurationBuilder builder, final IFeatureModel featureModel, IFeatureProject featureProject) {
 		super(builder, featureModel, featureProject);
 		number = new LongRunningJob<>(IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS, new LongRunningMethod<Boolean>() {
