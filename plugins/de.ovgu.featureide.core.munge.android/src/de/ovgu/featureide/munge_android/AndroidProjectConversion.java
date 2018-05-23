@@ -36,6 +36,11 @@ public class AndroidProjectConversion {
 	/**
 	 * Adds the FeatureIDE nature to an Android project and transforms the folder structure.
 	 *
+	 * @param project Project to convert
+	 * @param compositionTool Composition tool
+	 * @param sourcePath Path of src folder
+	 * @param configPath Path of config folder
+	 * @param buildPath Path of build folder
 	 */
 	public static void convertAndroidProject(IProject project, String compositionTool, String sourcePath, String configPath, String buildPath) {
 		// Move Android src and res folders to feature source path
