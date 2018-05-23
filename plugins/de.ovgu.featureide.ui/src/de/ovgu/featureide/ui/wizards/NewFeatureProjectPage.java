@@ -70,6 +70,10 @@ public class NewFeatureProjectPage extends WizardPage {
 	protected IComposerExtensionBase composerExtension = null;
 	protected IComposerExtensionBase[] extensions = null;
 
+	protected String sourcePathText = "";
+	protected String configsPathText = "";
+	protected String buildPathText = "";
+
 	protected Text sourcePath;
 	protected Text configsPath;
 	protected Text buildPath;
@@ -170,6 +174,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("src");
+		buildPathText = buildPath.getText();
 		buildPath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
@@ -179,6 +184,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText(FEATURES);
+		sourcePathText = sourcePath.getText();
 		sourcePath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
@@ -188,6 +194,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
+		configsPathText = configsPath.getText();
 		configsPath.setToolTipText(tooltip);
 
 		addListeners();
@@ -214,6 +221,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				sourcePathText = sourcePath.getText();
 				dialogChanged();
 			}
 		});
@@ -222,6 +230,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				buildPathText = buildPath.getText();
 				dialogChanged();
 			}
 		});
@@ -230,6 +239,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
+				configsPathText = configsPath.getText();
 				dialogChanged();
 			}
 		});
@@ -344,6 +354,27 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	public String getBuildPath() {
 		return buildPath.getText();
+	}
+
+	/**
+	 * @return the sourcePathText
+	 */
+	public String getSourcePathText() {
+		return sourcePathText;
+	}
+
+	/**
+	 * @return the configsPathText
+	 */
+	public String getConfigsPathText() {
+		return configsPathText;
+	}
+
+	/**
+	 * @return the buildPathText
+	 */
+	public String getBuildPathText() {
+		return buildPathText;
 	}
 
 	@Override
