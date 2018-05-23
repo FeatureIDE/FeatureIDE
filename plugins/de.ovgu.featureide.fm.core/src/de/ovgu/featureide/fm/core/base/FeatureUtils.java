@@ -749,6 +749,7 @@ public final class FeatureUtils {
 	}
 
 	public static final IFeature getRoot(IFeatureModel featureModel) {
+
 		requireNonNull(featureModel);
 
 		final IFeatureStructure root = featureModel.getStructure().getRoot();
@@ -1157,7 +1158,7 @@ public final class FeatureUtils {
 	}
 
 	public static final void requireNonNull(Object object) {
-		// TODO check unnecessary null checks, may cuase defect itself
+		// TODO check unnecessary null checks, may cause defect itself
 		// or move to constructors
 		// java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
 	}
