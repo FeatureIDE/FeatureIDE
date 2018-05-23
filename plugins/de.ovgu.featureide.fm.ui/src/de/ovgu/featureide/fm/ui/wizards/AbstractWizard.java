@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
 /**
- * Wizard for the {@link BuildExtendedModulesHandler}.
+ * Wizard
  *
  * @author Reimar Schroeter
  */

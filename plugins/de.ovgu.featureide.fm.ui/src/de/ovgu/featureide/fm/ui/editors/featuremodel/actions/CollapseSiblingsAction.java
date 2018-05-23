@@ -68,8 +68,8 @@ public class CollapseSiblingsAction extends SingleSelectionAction {
 	};
 
 	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
+	 * @param viewer viewer that calls this action
+	 * @param graphicalFeatureModel graphical feature model
 	 *
 	 */
 	public CollapseSiblingsAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {

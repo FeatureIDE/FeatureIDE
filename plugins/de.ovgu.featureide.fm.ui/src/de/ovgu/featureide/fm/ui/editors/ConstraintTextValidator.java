@@ -206,10 +206,10 @@ public final class ConstraintTextValidator {
 	}
 
 	/**
-	 * returns true if constraint is satisfiable otherwise false
-	 *
 	 * @param constraint the constraint to be evaluated
 	 * @param timeout timeout in ms
+	 *
+	 * @return returns true if constraint is satisfiable otherwise false
 	 */
 	public static boolean isSatisfiable(String constraint, int timeout) {
 		final NodeReader nodeReader = new NodeReader();

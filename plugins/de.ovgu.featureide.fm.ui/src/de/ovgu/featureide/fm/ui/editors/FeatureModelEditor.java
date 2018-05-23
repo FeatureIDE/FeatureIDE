@@ -366,7 +366,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	/**
 	 * This is just a call to the private method {@link #setActivePage(int)}.
 	 *
-	 * @param index
+	 * @param index index to set
 	 */
 	public void setActiveEditorPage(int index) {
 		setActivePage(index);

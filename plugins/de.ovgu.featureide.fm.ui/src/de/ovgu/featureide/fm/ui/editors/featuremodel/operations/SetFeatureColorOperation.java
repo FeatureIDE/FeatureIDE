@@ -40,10 +40,6 @@ public class SetFeatureColorOperation extends AbstractFeatureModelOperation {
 	FeatureColor newColor;
 	ArrayList<IFeature> features;
 
-	/**
-	 * @param featureModel
-	 * @param label
-	 */
 	public SetFeatureColorOperation(IFeatureModel featureModel, ArrayList<IFeature> featureListBuffer, FeatureColor newColor) {
 		super(featureModel, "Change feature color");
 		features = featureListBuffer;

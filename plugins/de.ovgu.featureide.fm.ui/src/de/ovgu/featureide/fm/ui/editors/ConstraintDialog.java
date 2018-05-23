@@ -65,6 +65,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -98,7 +99,6 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
-import org.eclipse.swt.custom.SashForm;
 
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -193,7 +193,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		/**
 		 * Constructs a new header panel to the shell. This panel contains a header text ({@link #setHeader(String)}), a details text (
-		 * {@link #setDetails(String)}).
+		 * {@link #setDetails(String, HeaderDescriptionImage)}).
 		 *
 		 * By default a short info about possibilities with this dialog is display as details and that a new constraint will be created now. This should be
 		 * altered with the methods above depending on the current state.
@@ -260,6 +260,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * To set the header panels text, consider to use {@link #setHeader(String)}
 		 *
 		 * @param text Text to display
+		 * @param image Image to display
 		 */
 		public void setDetails(String text, HeaderDescriptionImage image) {
 			detailsLabel.setText(text);
@@ -269,8 +270,6 @@ public class ConstraintDialog implements GUIDefaults {
 		/**
 		 * Sets the header text for this panel. This text should highlight the current dialogs state, e.g. editing an existing constraint. More information
 		 * should be displayed in the details text are.
-		 *
-		 * {@link ConstraintDialog.HeaderPanel#setDetails(String)}
 		 *
 		 * @param text Text to display
 		 */
@@ -393,7 +392,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group featureGroup;
 	private Group descriptionGroup;
 	private StyledText searchFeatureText;
-	private SashForm sashForm;
+	private final SashForm sashForm;
 	private Text constraintDescriptionText;
 
 	private Table featureTable;
@@ -555,7 +554,7 @@ public class ConstraintDialog implements GUIDefaults {
 		initHead();
 
 		sashForm = new SashForm(shell, SWT.HORIZONTAL);
-		GridData layoutData = new GridData();
+		final GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = GridData.FILL;
 		layoutData.verticalAlignment = GridData.FILL;
 		layoutData.grabExcessVerticalSpace = true;
@@ -771,7 +770,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private void initConstraintDescriptionText(String description) {
 		descriptionGroup = new Group(sashForm, SWT.NONE);
 		descriptionGroup.setText("Description");
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		descriptionGroup.setLayoutData(gridData);

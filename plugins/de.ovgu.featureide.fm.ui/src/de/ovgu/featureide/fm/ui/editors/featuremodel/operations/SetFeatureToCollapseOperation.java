@@ -34,18 +34,12 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 
-	
 	private final IGraphicalFeatureModel graphicalFeatureModel;
-	
-	private IFeature[] featureArray;
-	private boolean allCollapsed;
-	private String operationLabel;
-	
-	/**
-	 * @param label Description of this operation to be used in the menu
-	 * @param feature feature on which this operation will be executed
-	 *
-	 */
+
+	private final IFeature[] featureArray;
+	private final boolean allCollapsed;
+	private final String operationLabel;
+
 	public SetFeatureToCollapseOperation(IFeature[] featureArray, IGraphicalFeatureModel graphicalFeatureModel, boolean allCollapsed, String operationLabel) {
 		super(graphicalFeatureModel.getFeatureModel(), operationLabel);
 		this.graphicalFeatureModel = graphicalFeatureModel;
@@ -56,8 +50,8 @@ public class SetFeatureToCollapseOperation extends MultiFeatureModelOperation {
 
 	@Override
 	protected void createSingleOperations() {
-		for (IFeature tempFeature : featureArray) {
-			if(allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
+		for (final IFeature tempFeature : featureArray) {
+			if (allCollapsed || !graphicalFeatureModel.getGraphicalFeature(tempFeature).isCollapsed()) {
 				final CollapseFeatureOperation op = new CollapseFeatureOperation(tempFeature, graphicalFeatureModel, operationLabel);
 				operations.add(op);
 			}

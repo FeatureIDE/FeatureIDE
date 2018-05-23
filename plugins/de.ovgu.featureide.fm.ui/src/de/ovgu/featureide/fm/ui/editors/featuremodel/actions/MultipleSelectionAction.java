@@ -61,9 +61,10 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param text of the action in context menu
-	 * @param viewer2
+	 * @param viewer2 viewer
+	 * @param id id
 	 */
 	public MultipleSelectionAction(String text, Object viewer2, String id) {
 		super(text);
@@ -79,7 +80,7 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * returns the selected features as IFeatures
-	 * 
+	 *
 	 * @return selected IFeature array
 	 */
 	protected IFeature[] getSelectedFeatures() {
@@ -120,7 +121,7 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * Is called whenever the selection changes
-	 * 
+	 *
 	 * @param validSelection
 	 */
 	protected void selectionElementChanged(boolean validSelection) {
@@ -148,7 +149,7 @@ public abstract class MultipleSelectionAction extends Action implements IEventLi
 
 	/**
 	 * Checks whether selection only contains features
-	 * 
+	 *
 	 * @param selection
 	 * @return boolean indicating whether there are only features selected
 	 */
