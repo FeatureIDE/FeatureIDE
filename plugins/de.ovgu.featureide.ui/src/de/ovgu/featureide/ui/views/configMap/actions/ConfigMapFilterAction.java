@@ -44,6 +44,15 @@ public class ConfigMapFilterAction extends Action {
 		setChecked(filter.isDefault());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#isChecked()
+	 */
+	@Override
+	public boolean isChecked() {
+		return filterable.hasFilter(filter);
+	}
+
 	public void initializeImage(Image image) {
 		setImageDescriptor(ImageDescriptor.createFromImage(image));
 	}
@@ -54,7 +63,6 @@ public class ConfigMapFilterAction extends Action {
 
 	@Override
 	public void setChecked(boolean checked) {
-		super.setChecked(checked);
 		if (checked) {
 			filterable.addFilter(filter);
 		} else {

@@ -2,13 +2,13 @@
 .order
 .project
 configs/Base.xml
-features/AbstractGenerator/generator/ClearGeneratorStrategy.java
-features/AbstractGenerator/generator/GeneratorStrategy.java
 features/AbstractGenerator/GODLModel.java
 features/AbstractGenerator/ModelObservable.java
+features/AbstractGenerator/generator/ClearGeneratorStrategy.java
+features/AbstractGenerator/generator/GeneratorStrategy.java
 features/FormDefaultGenerator/GODLModel.java
-features/FormGenerator/generator/FormGeneratorStrategy.java
 features/FormGenerator/GODLModel.java
+features/FormGenerator/generator/FormGeneratorStrategy.java
 features/GeneratorSelection/ButtonsToolBar.java
 features/GeneratorSelection/GenerationSelector.java
 features/GuiBase/ButtonsToolBar.java
@@ -17,7 +17,6 @@ features/GuiBase/GolView.java
 features/GuiBase/Main.java
 features/GuiBase/PlaygroundMouseAdapter.java
 features/GuiBase/PlaygroundPanel.java
-features/GuiBase/ressources/images/open24.gif
 features/GuiBase/ressources/images/Pause24.gif
 features/GuiBase/ressources/images/Play24.gif
 features/GuiBase/ressources/images/Redo24.gif
@@ -25,6 +24,7 @@ features/GuiBase/ressources/images/Save24.gif
 features/GuiBase/ressources/images/StepForward24.gif
 features/GuiBase/ressources/images/Stop24.gif
 features/GuiBase/ressources/images/Undo24.gif
+features/GuiBase/ressources/images/open24.gif
 features/IO/ButtonsToolBar.java
 features/IO/PlaygroundIO.java
 features/ModelBase/GODLModel.java
@@ -37,8 +37,8 @@ features/ModelBase/RuleSet.java
 features/PopUpMenu/PlaygroundMouseAdapter.java
 features/PopUpMenu/PopUpMenu.java
 features/RandomDefaultGenerator/GODLModel.java
-features/RandomGenerator/generator/RandomGeneratorStrategy.java
 features/RandomGenerator/GODLModel.java
+features/RandomGenerator/generator/RandomGeneratorStrategy.java
 features/Test/GODLModel.java
 features/Test/Playground.java
 features/Test/RuleSet.java

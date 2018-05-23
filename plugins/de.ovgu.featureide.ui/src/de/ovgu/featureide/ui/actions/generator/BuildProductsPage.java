@@ -207,8 +207,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelTWise = new Label(groupDeriveConf, SWT.NULL);
 		labelTWise.setText(LABEL_INTERACTIONS + "10");
 		labelTWise.setToolTipText(TOOL_TIP_T);
+		labelTWise.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelTWise);
 		scaleTWise = new Scale(groupDeriveConf, SWT.HORIZONTAL);
+		scaleTWise.setLayoutData(gd_Fill_H);
 		scaleTWise.setMaximum(5);
 		scaleTWise.setIncrement(1);
 		scaleTWise.setPageIncrement(1);
@@ -219,6 +221,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelMax.setText("Max Configurations:");
 		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
 		labelMax.setToolTipText(maxToolTip);
+		labelMax.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelMax);
 		textField = new Text(groupDeriveConf, SWT.BORDER);
 		textField.setToolTipText(maxToolTip);
@@ -253,8 +256,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelOrderInteraction = new Label(groupOrder, SWT.NULL);
 		labelOrderInteraction.setText(LABEL_INTERACTIONS + "1");
 		labelOrderInteraction.setToolTipText(TOOL_TIP_T_ORDER);
+		labelOrderInteraction.setLayoutData(gd_LeftColumnInsideGroup);
 		labels.add(labelOrderInteraction);
 		scaleInteraction = new Scale(groupOrder, SWT.HORIZONTAL);
+		scaleInteraction.setLayoutData(gd_Fill_H);
 		scaleInteraction.setMaximum(5);
 		scaleInteraction.setIncrement(1);
 		scaleInteraction.setPageIncrement(1);

@@ -173,23 +173,25 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * Returns selected FeatureProject
 	 */
 	private static IFeatureProject getCurrentFeatureProject() {
-		final Object element = getIStructuredCurrentSelection().getFirstElement();
-		if (element != null) {
-			if (element instanceof IResource) {
-				return CorePlugin.getFeatureProject((IResource) element);
-			} else if (element instanceof PackageFragmentRootContainer) {
-				final IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
-				return CorePlugin.getFeatureProject(jProject.getProject());
-			} else if (element instanceof IJavaElement) {
-				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-			} else if (element instanceof IAdaptable) {
-				// Cast is necessary, don't remove
-				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
-				if (project != null) {
-					return CorePlugin.getFeatureProject(project);
+		if (getIStructuredCurrentSelection() != null) {
+			final Object element = getIStructuredCurrentSelection().getFirstElement();
+			if (element != null) {
+				if (element instanceof IResource) {
+					return CorePlugin.getFeatureProject((IResource) element);
+				} else if (element instanceof PackageFragmentRootContainer) {
+					final IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
+					return CorePlugin.getFeatureProject(jProject.getProject());
+				} else if (element instanceof IJavaElement) {
+					return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
+				} else if (element instanceof IAdaptable) {
+					// Cast is necessary, don't remove
+					final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+					if (project != null) {
+						return CorePlugin.getFeatureProject(project);
+					}
 				}
+				throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 			}
-			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
 		return null;
 	}

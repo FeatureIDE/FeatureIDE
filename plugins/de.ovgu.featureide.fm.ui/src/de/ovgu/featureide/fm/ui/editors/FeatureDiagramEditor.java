@@ -855,6 +855,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
+			if (extraPath != null) {
+				FileHandler.save(extraPath, graphicalFeatureModel, format);
+			}
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			viewer.reload();

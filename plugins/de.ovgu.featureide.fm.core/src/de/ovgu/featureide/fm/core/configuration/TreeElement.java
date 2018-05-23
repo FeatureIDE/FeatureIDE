@@ -21,18 +21,22 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Basic implementation of a tree element for the configuration editor.
  */
 public class TreeElement {
 
-	ArrayList<TreeElement> children = new ArrayList<TreeElement>();
+	List<TreeElement> children = Collections.synchronizedList(new ArrayList<TreeElement>());
 
 	TreeElement parent = null;
 
 	public void addChild(TreeElement child) {
-		children.add(child);
+		synchronized (children) {
+			children.add(child);
+		}
 		child.setParent(this);
 	}
 
@@ -46,20 +50,26 @@ public class TreeElement {
 
 	public void setChild(TreeElement child) {
 		removeChildren();
-		children.add(child);
+		synchronized (children) {
+			children.add(child);
+		}
 		child.setParent(this);
 	}
 
 	public void removeChild(TreeElement child) {
-		children.remove(child);
+		synchronized (children) {
+			children.remove(child);
+		}
 		child.setParent(null);
 	}
 
 	public void removeChildren() {
-		for (final TreeElement child : children) {
-			child.setParent(null);
+		synchronized (children) {
+			for (final TreeElement child : children) {
+				child.setParent(null);
+			}
+			children.clear();
 		}
-		children.clear();
 	}
 
 	public TreeElement[] getChildren() {
