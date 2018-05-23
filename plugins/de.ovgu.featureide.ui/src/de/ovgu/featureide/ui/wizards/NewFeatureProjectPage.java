@@ -174,6 +174,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		buildPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		buildPath.setLayoutData(gd);
 		buildPath.setText("src");
+		buildPathText = buildPath.getText();
 		buildPath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
@@ -183,6 +184,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
 		sourcePath.setText(FEATURES);
+		sourcePathText = sourcePath.getText();
 		sourcePath.setToolTipText(tooltip);
 
 		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
@@ -192,6 +194,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		configsPath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		configsPath.setLayoutData(gd);
 		configsPath.setText("configs");
+		configsPathText = configsPath.getText();
 		configsPath.setToolTipText(tooltip);
 
 		addListeners();
