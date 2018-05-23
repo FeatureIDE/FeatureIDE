@@ -1,8 +1,8 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/default.xml
 Deviations_from_vonRhein.txt
+configs/default.xml
 features/Addressbook/EmailSystem/Client.java
 features/AutoResponder/EmailSystem/Client.java
 features/Base/EmailSystem/Client.java

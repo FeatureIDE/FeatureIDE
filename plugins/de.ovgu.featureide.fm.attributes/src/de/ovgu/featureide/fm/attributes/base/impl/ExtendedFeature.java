@@ -65,32 +65,56 @@ public class ExtendedFeature extends Feature {
 	public String createTooltip(Object... objects) {
 		StringBuilder tooltip = new StringBuilder(super.createTooltip(objects));
 		tooltip.append("\n\n");
+		StringBuilder attributesString = new StringBuilder();
+		StringBuilder inhreritedString = new StringBuilder();
 		if (attributes.size() == 0) {
 			tooltip.append("No Attributes.\n");
 		} else {// Append attributes as list
-			tooltip.append("Attributes:\n");
+			attributesString.append("Attributes:\n");
+			inhreritedString.append("Inherited Attributes:\n");
 			for (int i = 0; i < attributes.size(); i++) {
 				IFeatureAttribute attribute = attributes.get(i);
-				tooltip.append(String.format("%02d", i));
-				tooltip.append(". Name: ");
-				tooltip.append(attribute.getName());
-				tooltip.append(", Type: ");
-				tooltip.append(attribute.getType());
-				tooltip.append(", Value: ");
-				tooltip.append(attribute.getValue());
-				if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
-					tooltip.append(" ");
-					tooltip.append(attribute.getUnit());
+
+				if (attributes.get(i).isRecursive() && !attributes.get(i).isHeadOfRecursiveAttribute()) {
+					if (attributes.get(i).isRecursive()) {
+						inhreritedString.append("recursive ");
+					}
+					if (attributes.get(i).isConfigurable()) {
+						inhreritedString.append("configureable ");
+					}
+					inhreritedString.append(attribute.getType() + " ");
+					inhreritedString.append(attribute.getName() + " = ");
+					inhreritedString.append(attribute.getValue());
+					if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
+						inhreritedString.append(" ");
+						inhreritedString.append(attribute.getUnit());
+					}
+					if (i < attributes.size() - 1) {
+						inhreritedString.append("\n");
+					}
+				} else {
+					if (attributes.get(i).isRecursive()) {
+						attributesString.append("recursive ");
+					}
+					if (attributes.get(i).isConfigurable()) {
+						attributesString.append("configureable ");
+					}
+					attributesString.append(attribute.getType() + " ");
+					attributesString.append(attribute.getName() + " = ");
+					attributesString.append(attribute.getValue());
+					if (attribute.getUnit() != null && !attribute.getUnit().equals("")) {
+						attributesString.append(" ");
+						attributesString.append(attribute.getUnit());
+					}
+					if (i < attributes.size() - 1) {
+						attributesString.append("\n");
+					}
 				}
-				if (attributes.get(i).isRecursive()) {
-					tooltip.append(", Recursive");
-				}
-				if (attributes.get(i).isConfigurable()) {
-					tooltip.append(", Configureable");
-				}
-				if (i < attributes.size() - 1) {
-					tooltip.append("\n");
-				}
+			}
+
+			tooltip.append(attributesString.toString());
+			if (!inhreritedString.toString().equals("Inherited Attributes:\\n")) {
+				tooltip.append("\n" + inhreritedString.toString());
 			}
 		}
 		return tooltip.toString();

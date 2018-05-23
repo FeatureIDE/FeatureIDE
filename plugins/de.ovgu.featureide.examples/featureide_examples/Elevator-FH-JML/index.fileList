@@ -1,9 +1,9 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
-configs/default.xml
 Deviations_from_vonRhein.txt
 Experiences.txt
+configs/default.xml
 features/Base/Actions.java
 features/Base/ElevatorSystem/Elevator.java
 features/Base/ElevatorSystem/Environment.java

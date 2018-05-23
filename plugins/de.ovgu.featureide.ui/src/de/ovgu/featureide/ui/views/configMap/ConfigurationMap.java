@@ -200,10 +200,10 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	 * If you want to add filters to the view, do it here. The gui elements will be created automatically.
 	 */
 	private void createFilters() {
-		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new FeatureIsFalseOptionalFilter(true));
-		getFilters().add(new FeatureUnusedFilter(true));
+		getFilters().add(new CoreFeatureFilter(true));
 		getFilters().add(new DeadFeatureFilter(true));
+		getFilters().add(new FeatureUnusedFilter(true));
 
 		final List<IConfigurationMapFilter> previousFiltersCopy = new ArrayList<>(getFilters());
 
@@ -519,6 +519,7 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	private void setFeatureProject(IFeatureProject featureProject) {
 		if (this.featureProject != featureProject) {
 			this.featureProject = featureProject;
+
 			if (isActive()) {
 				loadConfigurations();
 			} else {
@@ -637,5 +638,4 @@ public class ConfigurationMap extends ViewPart implements ICustomTableHeaderSele
 	public List<IConfigurationMapFilter> getFilters() {
 		return filters;
 	}
-
 }
