@@ -77,7 +77,8 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	/**
 	 * Create a record for a project based on the info given in the file.
 	 *
-	 * @param file
+	 * @param projectDescriptionRelativePath path
+	 * @param projectName name
 	 */
 	public ProjectRecord(String projectDescriptionRelativePath, String projectName) {
 		this.projectName = projectName;
@@ -88,9 +89,9 @@ public class ProjectRecord implements Comparable<ProjectRecord> {
 	/**
 	 * Deserialization
 	 *
-	 * @param in
-	 * @throws ClassNotFoundException
-	 * @throws IOException
+	 * @param in in
+	 * @throws ClassNotFoundException exception
+	 * @throws IOException exception
 	 */
 	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
 		in.defaultReadObject();

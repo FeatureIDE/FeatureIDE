@@ -296,7 +296,6 @@ public class ExampleNewWizardPage extends WizardPage {
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 *
-	 * @param pageName
 	 */
 	public ExampleNewWizardPage() {
 		super("");
