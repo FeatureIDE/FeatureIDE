@@ -43,8 +43,8 @@ public class ProjectExplorerController {
 	}
 
 	/**
-	 * @return
-	 * @throws ProjectExplorerException
+	 * @return List of resources
+	 * @throws ProjectExplorerException exception
 	 */
 	public List<IResource> start() throws ProjectExplorerException {
 		iResources.clear();
@@ -101,7 +101,7 @@ public class ProjectExplorerController {
 	}
 
 	/**
-	 * @throws ProjectExplorerException
+	 * @throws ProjectExplorerException exception
 	 */
 	public void run() throws ProjectExplorerException {
 		final List<IResource> list = start();

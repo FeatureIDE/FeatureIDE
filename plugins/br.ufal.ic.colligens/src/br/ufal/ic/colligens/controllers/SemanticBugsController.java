@@ -12,7 +12,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import br.ufal.ic.colligens.controllers.semanticbugs.SemanticBugsViewController;
 import br.ufal.ic.colligens.models.cppchecker.CppCheckAnalyzer;
 import br.ufal.ic.colligens.models.cppchecker.CppCheckerFileLogs;
-import br.ufal.ic.colligens.util.metrics.MetricsException;
 
 public class SemanticBugsController {
 
@@ -30,9 +29,6 @@ public class SemanticBugsController {
 		projectExplorer.setSelection(selection);
 	}
 
-	/**
-	 * @throws MetricsException
-	 */
 	public void run() {
 		try {
 

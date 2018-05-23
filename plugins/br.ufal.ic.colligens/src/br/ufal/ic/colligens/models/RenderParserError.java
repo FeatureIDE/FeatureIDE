@@ -12,7 +12,7 @@ public class RenderParserError implements Function3<FeatureExpr, String, Positio
 	private FileProxy fileProxie;
 
 	/**
-	 * @param fileProxie
+	 * @param fileProxie list of file proxies
 	 */
 	public void setFile(FileProxy fileProxie) {
 		this.fileProxie = fileProxie;
