@@ -30,11 +30,14 @@ import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
- * TODO description
+ * Implements the {@link ITreeContentProvider} and has the task to provide the content for the {@link FeatureAttributeView}. Structures the feature and their
+ * attributes in the same way as the {@link FeatureDiagramEditor}.
  *
  * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeContentProvider implements ITreeContentProvider {
 

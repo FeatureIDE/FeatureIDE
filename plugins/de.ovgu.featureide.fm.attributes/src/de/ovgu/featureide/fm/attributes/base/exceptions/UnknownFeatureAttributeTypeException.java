@@ -23,14 +23,16 @@ package de.ovgu.featureide.fm.attributes.base.exceptions;
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 
 /**
- * TODO description
+ * Exception is thrown on parsing if the given attribute type is not known.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class UnknownFeatureAttributeTypeException extends Exception {
 
 	private static final long serialVersionUID = 6366719326744299124L;
 
+	/** Parsed data of the unknown attribute */
 	IFeatureAttributeParsedData data;
 
 	public UnknownFeatureAttributeTypeException(IFeatureAttributeParsedData data) {

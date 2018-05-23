@@ -31,19 +31,15 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
- * TODO description
+ * Editing support for the configurable column of the {@link FeatureAttributeView}. The boolean value of the column is shown as checkbox.
  *
- * @author Joshua
+ * @author Joshua Sprey
+ * @author Chico Sundermann
  */
 public class FeatureAttributeConfigureableEditingSupport extends AbstractFeatureAttributeEditingSupport {
 
-	/**
-	 * @param viewer
-	 * @param enabled
-	 */
 	public FeatureAttributeConfigureableEditingSupport(FeatureAttributeView view, ColumnViewer viewer, boolean enabled) {
 		super(view, viewer, enabled);
-		// TODO Auto-generated constructor stub
 	}
 
 	private static final String TRUE_STRING = "true";
@@ -73,7 +69,7 @@ public class FeatureAttributeConfigureableEditingSupport extends AbstractFeature
 	 */
 	@Override
 	protected void setValue(Object element, Object value) {
-		((IFeatureAttribute) element).setConfigureable((Boolean) value);
+		((IFeatureAttribute) element).setConfigurable((Boolean) value);
 		view.getFeatureModel().fireEvent(new FeatureIDEEvent(element, EventType.FEATURE_ATTRIBUTE_CHANGED));
 		if (((IFeatureAttribute) element).isRecursive()) {
 			getViewer().refresh();

@@ -23,9 +23,10 @@ package de.ovgu.featureide.fm.attributes.base;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * TODO description
+ * Factory responsible to create feature attributes. A user can subclass the factory to handle the creation of the feature attributes by themselfes.
  *
  * @author Chico Sundermann
+ * @author Joshua Sprey
  */
 public abstract class AbstractFeatureAttributeFactory {
 

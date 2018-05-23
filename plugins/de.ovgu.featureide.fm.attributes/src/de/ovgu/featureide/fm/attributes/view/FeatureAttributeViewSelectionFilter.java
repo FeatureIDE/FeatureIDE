@@ -6,7 +6,14 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 import de.ovgu.featureide.fm.attributes.base.IFeatureAttribute;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
+/**
+ * Realizes filtering for the {@link FeatureAttributeView}. Only selected features of the {@link FeatureDiagramEditor} are shown when the filter is activated.
+ * 
+ * @author Joshua Sprey
+ * @author Chico Sundermann
+ */
 public class FeatureAttributeViewSelectionFilter extends ViewerFilter {
 
 	private FeatureAttributeView faView;
