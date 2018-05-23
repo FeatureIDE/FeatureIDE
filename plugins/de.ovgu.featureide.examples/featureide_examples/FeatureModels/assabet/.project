@@ -9,8 +9,20 @@
 			<name>de.ovgu.featureide.core.extensibleFeatureProjectBuilder</name>
 			<arguments>
 				<dictionary>
+					<key>build</key>
+					<value>build</value>
+				</dictionary>
+				<dictionary>
 					<key>composer</key>
 					<value>de.ovgu.featureide.core.FeatureModeling</value>
+				</dictionary>
+				<dictionary>
+					<key>equations</key>
+					<value>equations</value>
+				</dictionary>
+				<dictionary>
+					<key>source</key>
+					<value>src</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

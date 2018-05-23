@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.featurehouse_android.FeatureHouseAndroidComposer"
+            description="FeatureHouse composer for Android projects."
+            id="de.ovgu.featureide.composer.featurehouse-android"
+            name="Android (FeatureHouse)"
+            nature="FeatureIDE_Core.featurehouseAndroid">
+      </composer>
+   </extension>
+</plugin>

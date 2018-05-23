@@ -80,6 +80,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return page.isPageComplete();
 		}
 
+		if (page.getCompositionTool().getId().equals("de.ovgu.featureide.composer.featurehouse-android")) {
+			return page.isPageComplete();
+		}
+
 		if (wizardExtension != null) {
 			return wizardExtension.isFinished();
 		} else {

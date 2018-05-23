@@ -90,13 +90,13 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 
 		// Copy not composed files
 		try {
-			copy(featureProject.getSourceFolder(), featureProject.getBuildFolder());
+			copy(featureProject.getSourceFolder(), destination);
 		} catch (final CoreException e) {
 			MungeAndroidCorePlugin.getDefault().logError(e);
 		}
 
 		// Move src and res folders from FeatureIDE build path to project root
-		final IFolder build = featureProject.getBuildFolder();
+		final IFolder build = destination;
 		final IProject project = featureProject.getProject();
 
 		final IFolder srcFolder = project.getFolder("src");
