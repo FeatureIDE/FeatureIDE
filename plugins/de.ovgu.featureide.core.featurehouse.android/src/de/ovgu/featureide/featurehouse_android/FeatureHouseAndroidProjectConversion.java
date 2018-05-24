@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge_android;
+package de.ovgu.featureide.featurehouse_android;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -30,8 +30,9 @@ import de.ovgu.featureide.core.CorePlugin;
 /**
  * @author Lars-Christian Schulz
  * @author Eric Guimatsia
+ * @author Nicolas Hlad
  */
-public class AndroidProjectConversion {
+public class FeatureHouseAndroidProjectConversion {
 
 	/**
 	 * Adds the FeatureIDE nature to an Android project and transforms the folder structure.
@@ -48,22 +49,30 @@ public class AndroidProjectConversion {
 			if (!newSourceFolder.exists()) {
 				newSourceFolder.create(false, true, null);
 			}
-			if (folderSrc.exists()) {
-				folderSrc.move(newSourceFolder.getFullPath().append("/src"), false, null);
-			} else {
-				newSourceFolder.getFolder("src").create(false, true, null);
-			}
-			if (folderRes.exists()) {
-				folderRes.move(newSourceFolder.getFullPath().append("/res"), false, null);
-			} else {
-				newSourceFolder.getFolder("res").create(false, true, null);
-			}
+
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (final CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
 		}
 
 		CorePlugin.setupProject(project, compositionTool, sourcePath, configPath, buildPath, true, false);
+
+		final IFolder FeatureFolder = project.getFolder(sourcePath + "/Base/");
+		try {
+			if (folderSrc.exists()) {
+				folderSrc.move(FeatureFolder.getFullPath().append("src"), false, null);
+			} else {
+				FeatureFolder.getFolder("src").create(false, true, null);
+			}
+			if (folderRes.exists()) {
+				folderRes.move(FeatureFolder.getFullPath().append("res"), false, null);
+			} else {
+				FeatureFolder.getFolder("res").create(false, true, null);
+			}
+
+		} catch (final CoreException e) {
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
+		}
 
 		// Hide build folder
 		try {
@@ -72,7 +81,7 @@ public class AndroidProjectConversion {
 				buildFolder.setHidden(true);
 			}
 		} catch (final CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
 		}
 	}
 }

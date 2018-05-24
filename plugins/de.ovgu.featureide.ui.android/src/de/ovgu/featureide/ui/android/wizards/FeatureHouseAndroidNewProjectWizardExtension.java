@@ -45,11 +45,11 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
-import de.ovgu.featureide.munge_android.AndroidProjectConversion;
+import de.ovgu.featureide.featurehouse_android.FeatureHouseAndroidProjectConversion;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
 
-public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProjectWizardExtension {
+public class FeatureHouseAndroidNewProjectWizardExtension extends DefaultNewFeatureProjectWizardExtension {
 
 	private BasicNewResourceWizard wizard = null;
 	private IProject project = null;
@@ -103,7 +103,8 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 						return false;
 					}
 					final NewFeatureProjectPage featurePage = (NewFeatureProjectPage) page;
-					AndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(),
+
+					FeatureHouseAndroidProjectConversion.convertAndroidProject(project, featurePage.getCompositionTool().getId(),
 							featurePage.getSourcePathText(), featurePage.getConfigsPathText(), featurePage.getBuildPathText());
 				}
 			} catch (final CoreException e) {

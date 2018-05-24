@@ -18,32 +18,30 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge_android;
+package de.ovgu.featureide.featurehouse_android;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.munge.MungeCorePlugin;
-import de.ovgu.featureide.munge.MungePreprocessor;
 
 /**
- * Munge Preprocessor adapted for usage with Android projects.
+ * FeatureHouse adapted for usage with Android projects.
  *
  * Compatibility with the Android Toolkit is achieved by bundling the src and res folders the Android builder expects into the FeatureIDE source folder. The
  * composed files are copied to the project's root folder after every FeatureIDE build. Then they can be processed by the Android builders.
  *
  * @author Lars-Christian Schulz
  * @author Eric Guimatsia
+ * @author Nicolas Hlad
  */
-public class MungeAndroidPreprocessor extends MungePreprocessor {
+public class FeatureHouseAndroidComposer extends FeatureHouseComposer {
 
 	private static final LinkedHashSet<String> EXTENSIONS = new LinkedHashSet<String>();
 	static {
@@ -51,7 +49,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 		EXTENSIONS.add("xml");
 	};
 
-	public MungeAndroidPreprocessor() {
+	public FeatureHouseAndroidComposer() {
 		super();
 	}
 
@@ -77,7 +75,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 				}
 			}
 		} catch (final CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
 		}
 		return super.clean();
 	}
@@ -92,7 +90,7 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 		try {
 			copy(featureProject.getSourceFolder(), destination);
 		} catch (final CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
 		}
 
 		// Move src and res folders from FeatureIDE build path to project root
@@ -113,39 +111,8 @@ public class MungeAndroidPreprocessor extends MungePreprocessor {
 			build.getFolder("src").move(dst.append("/src"), IResource.DERIVED, null);
 			build.getFolder("res").move(dst.append("/res"), IResource.DERIVED, null);
 		} catch (final CoreException e) {
-			MungeAndroidCorePlugin.getDefault().logError(e);
+			FeatureHouseAndroidCorePlugin.getDefault().logError(e);
 		}
-	}
-
-	@Override
-	protected void runMunge(LinkedList<String> featureArgs, IFolder sourceFolder, IFolder buildFolder) {
-		final LinkedList<String> packageArgs = new LinkedList<String>(featureArgs);
-		boolean added = false;
-		try {
-			createBuildFolder(buildFolder);
-			for (final IResource res : sourceFolder.members()) {
-				if (res instanceof IFolder) {
-					runMunge(featureArgs, (IFolder) res, buildFolder.getFolder(res.getName()));
-				} else if (res instanceof IFile) {
-					final String extension = res.getFileExtension();
-					if ((extension != null) && (extension.equals("java") || extension.equals("xml"))) {
-						added = true;
-						packageArgs.add(res.getRawLocation().toOSString());
-					}
-				}
-			}
-		} catch (final CoreException e) {
-			MungeCorePlugin.getDefault().logError(e);
-		}
-		if (!added) {
-			return;
-		}
-		// add output directory
-		packageArgs.add(buildFolder.getRawLocation().toOSString());
-
-		// CommandLine syntax:
-		// -DFEATURE1 -DFEATURE2 ... File1 File2 ... outputDirectory
-		runMunge(packageArgs);
 	}
 
 	@Override
