@@ -664,7 +664,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.refreshChildAll(newCompound);
 				}
 			}
-			viewer.internRefresh(true);
+			viewer.internRefresh(false);
 			setDirty(true);
 			analyzeFeatureModel();
 			break;
