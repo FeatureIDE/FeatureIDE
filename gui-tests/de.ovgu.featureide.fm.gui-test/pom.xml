@@ -27,21 +27,23 @@
                         <vmArg>-Xmx1024m</vmArg>
                     </vmArgs>
                 </runner>
+
                 <aut>
                   <explicit>https://ftp.fau.de/eclipse/technology/epp/downloads/release/neon/3/eclipse-rcp-neon-3-linux-gtk-x86_64.tar.gz</explicit>
               		<injections>
-              			
                   		<injection>
                     		<site>file://${project.parent.basedir}/deploy/NightlyUpdate/target/repository</site>
                   		</injection>
-                  		
               		</injections>
-
                 </aut>
+                	
                 <testOptions>
-                    <execTimeout>3000</execTimeout>
-                    <testExecTimeout>3000</testExecTimeout>
-                </testOptions>      
+                   <!--<execTimeout>150</execTimeout>-->
+                   <!--3min is max for each job-->
+                    <testExecTimeout>180</testExecTimeout>
+                    <eclExecutionDelay>500</eclExecutionDelay>
+                </testOptions> 
+                
             </configuration>
         </plugin>
     </plugins>
