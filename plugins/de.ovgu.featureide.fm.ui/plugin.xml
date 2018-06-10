@@ -248,6 +248,23 @@
 						name="de.ovgu.featureide.fm.ui.menus.popupMenu.submenus"
 						visible="true">
 				</separator>
+    <visibleWhen
+          checkEnabled="false">
+			<with
+                 variable="activeMenuSelection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <and>
+                    <test
+                          args="de.ovgu.featureide.core.featureProjectNature"
+                          property="de.ovgu.featureide.fm.ui.properties.nature"
+                          value="true">
+                    </test>
+                 </and>
+              </iterate>
+           </with>
+    </visibleWhen>
 			</menu>
 		</menuContribution>
 		<menuContribution

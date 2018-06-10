@@ -14,10 +14,10 @@ source/res/drawable-xhdpi/ic_launcher.png
 source/res/drawable-xxhdpi/ic_launcher.png
 source/res/layout/activity_main.xml
 source/res/menu/main.xml
-source/res/values/dimens.xml
-source/res/values/strings.xml
-source/res/values/styles.xml
 source/res/values-v11/styles.xml
 source/res/values-v14/styles.xml
 source/res/values-w820dp/dimens.xml
+source/res/values/dimens.xml
+source/res/values/strings.xml
+source/res/values/styles.xml
 source/src/de/ovgu/helloworld_android/MainActivity.java

@@ -160,12 +160,6 @@ public class FeatureAttributeView extends ViewPart implements IEventListener {
 			if (!synchToFeatureDiagram) {
 				// Prevent the feature attributes view from synching to the feature diagramfor (Object obj : event.getStructuredSelection().toList()) {
 				selection = new ArrayList<>();
-				for (Object obj : ((IStructuredSelection) event.getSelection()).toList()) {
-					if (obj instanceof FeatureEditPart) {
-						FeatureEditPart editPart = (FeatureEditPart) obj;
-						selectedManualFeatures.add(editPart.getModel().getObject());
-					}
-				}
 				selectedManualFeatures = null;
 				selectedAutomaticFeatures = null;
 				treeViewer.refresh();

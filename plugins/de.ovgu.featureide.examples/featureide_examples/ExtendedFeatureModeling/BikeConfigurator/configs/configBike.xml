@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <feature automatic="selected" name="BikeConfigurator"/>
+    <feature automatic="selected" name="Frame"/>
+    <feature automatic="selected" name="Handlebar"/>
+    <feature manual="selected" name="S Type"/>
+    <feature automatic="unselected" name="M Type"/>
+    <feature automatic="unselected" name="P Type"/>
+    <feature automatic="unselected" name="H Type"/>
+    <feature automatic="selected" name="Frame Color"/>
+    <feature automatic="unselected" name="Black"/>
+    <feature manual="selected" name="Grey"/>
+    <feature automatic="unselected" name="Raw Lacquer"/>
+    <feature automatic="selected" name="Mudguards"/>
+    <feature automatic="unselected" name="Version E"/>
+    <feature manual="selected" name="Version L"/>
+    <feature automatic="unselected" name="Version R"/>
+    <feature automatic="selected" name="Number of Gears"/>
+    <feature automatic="selected" name="Gear Ratio"/>
+    <feature automatic="unselected" name="Standard"/>
+    <feature manual="selected" name="+8%"/>
+    <feature automatic="unselected" name="-12%"/>
+    <feature automatic="selected" name="Tyres"/>
+    <feature automatic="selected" name="Lightning"/>
+    <feature automatic="selected" name="Saddle Height"/>
+    <feature automatic="selected" name="Saddle Type"/>
+</configuration>

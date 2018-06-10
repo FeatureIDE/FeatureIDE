@@ -1,9 +1,9 @@
 .classpath
 .project
-configs/default.config
-features/HelloWorldMPL-FH-Java.Greetings/Main.java
 InterfaceMapping/default.config
 Interfaces/IHelloWorld.velvet
+configs/default.config
+features/HelloWorldMPL-FH-Java.Greetings/Main.java
 model.xml
 mpl.velvet
 projects/HelloWorld-FH-Java-MPLDependency/.classpath

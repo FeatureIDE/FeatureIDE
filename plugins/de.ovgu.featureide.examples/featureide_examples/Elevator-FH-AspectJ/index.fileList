@@ -1,7 +1,8 @@
 .classpath
 .project
-configs/default.xml
 Deviations_from_Plath&Ryan.txt
+ScenarioDefinitions.txt
+configs/default.xml
 features/Base/Actions.java
 features/Base/ElevatorSystem/Elevator.java
 features/Base/ElevatorSystem/Environment.java
@@ -26,4 +27,3 @@ features/Weight/ElevatorSystem/Elevator.java
 features/Weight/Specifications/Specification_Overloaded.aj
 features/Weight/Specifications/Specification_TwoThirdsFull.aj
 model.xml
-ScenarioDefinitions.txt

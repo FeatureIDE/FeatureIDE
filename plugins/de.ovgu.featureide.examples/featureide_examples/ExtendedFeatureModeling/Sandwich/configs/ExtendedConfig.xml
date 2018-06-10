@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extendedConfiguration>
+<feature automatic="selected" manual="undefined" name="Sandwich"/>
+<feature automatic="selected" manual="undefined" name="Bread"/>
+<feature automatic="undefined" manual="undefined" name="Full Grain "/>
+<feature automatic="undefined" manual="undefined" name="Flatbread"/>
+<feature automatic="undefined" manual="undefined" name="Toast"/>
+<feature automatic="selected" manual="undefined" name="Cheese"/>
+<feature automatic="undefined" manual="undefined" name="Gouda"/>
+<feature automatic="undefined" manual="undefined" name="Sprinkled"/>
+<feature automatic="undefined" manual="undefined" name="Slice"/>
+<feature automatic="undefined" manual="undefined" name="Cheddar"/>
+<feature automatic="undefined" manual="selected" name="Cream Cheese "/>
+<feature automatic="selected" manual="undefined" name="Meat"/>
+<feature automatic="undefined" manual="selected" name="Salami "/>
+<feature automatic="undefined" manual="undefined" name="Ham"/>
+<feature automatic="undefined" manual="unselected" name="Chicken Breast"/>
+<feature automatic="undefined" manual="selected" name="Vegetables"/>
+<feature automatic="undefined" manual="undefined" name="Cucumber "/>
+<feature automatic="undefined" manual="undefined" name="Tomatoes"/>
+<feature automatic="undefined" manual="undefined" name="Lettuce"/>
+</extendedConfiguration>
