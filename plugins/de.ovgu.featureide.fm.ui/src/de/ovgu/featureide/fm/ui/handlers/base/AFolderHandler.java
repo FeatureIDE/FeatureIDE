@@ -38,9 +38,9 @@ public abstract class AFolderHandler extends ASelectionHandler {
 
 	@Override
 	protected void singleAction(Object element) {
-		final IFolder project = SelectionWrapper.checkClass(element, IFolder.class);
-		if (project != null) {
-			singleAction(project);
+		final IFolder folder = SelectionWrapper.checkClass(element, IFolder.class);
+		if (folder != null) {
+			singleAction(folder);
 		}
 	}
 }

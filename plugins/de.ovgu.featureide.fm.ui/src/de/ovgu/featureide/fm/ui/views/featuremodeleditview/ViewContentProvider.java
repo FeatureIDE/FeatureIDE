@@ -38,8 +38,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASKS_TO_FINISH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASK_TO_FINISH;
 
-import java.util.ConcurrentModificationException;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -49,7 +47,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.progress.UIJob;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -366,11 +363,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 				@Override
 				public void initChildren() {
-					try {
-						addChild(MODEL_VOID + model.getAnalyser().isValid());
-					} catch (final TimeoutException e) {
-						addChild(MODEL_TIMEOUT);
-					}
+					// Cached validity for speed
+					addChild(MODEL_VOID + model.getAnalyser().valid());
 					addChild(NUMBER_FEATURES + features);
 					addChild(NUMBER_CONCRETE + concrete);
 					addChild(NUMBER_ABSTRACT + (features - concrete));
@@ -388,20 +382,12 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			// calculates the statistics
 			final TreeObject statistics = (TreeObject) root.getChildren()[position];
 			final TreeElement[] children = statistics.getChildren();
-			try {
-				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
-				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
-				}
-			} catch (final TimeoutException e) {
-				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
-				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
-				}
-			} catch (final ConcurrentModificationException e) {
-
+			if (children[INDEX_VALID] instanceof SelectableFeature) {
+				// Cached validity for speed
+				((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().valid());
+			} else {
+				// Cached validity for speed
+				((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().valid());
 			}
 			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
 			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
@@ -471,7 +457,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
+		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION, !ignoreAbstractFeatures);
 		String s = "";
 		if (number < 0) {
 			s += MORE_THAN + (-1 - number);

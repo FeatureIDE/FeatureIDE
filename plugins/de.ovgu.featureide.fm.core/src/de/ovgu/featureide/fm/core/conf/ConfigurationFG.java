@@ -301,26 +301,9 @@ public class ConfigurationFG extends Configuration {
 		}
 	}
 
-	/**
-	 * Convenience method.
-	 *
-	 * @return the values of number(250)
-	 * @see #number(long)
-	 */
 	@Override
-	public long number() {
-		return LongRunningWrapper.runMethod(propagator.number(250));
-	}
-
-	/**
-	 * Counts the number of possible solutions.
-	 *
-	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occured) that
-	 *         indicates that there are more solutions than the absolute value
-	 */
-	@Override
-	public long number(long timeout) {
-		return LongRunningWrapper.runMethod(propagator.number(timeout));
+	public long number(long timeout, boolean includeHiddenFeatures) {
+		return LongRunningWrapper.runMethod(propagator.number(timeout, includeHiddenFeatures));
 	}
 
 	@Override

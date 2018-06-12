@@ -126,7 +126,7 @@ public class FeatureModelAnalyzer implements IEventListener {
 	private List<IFeature> cachedCoreFeatures = Collections.emptyList();
 	private List<IFeature> cachedFalseOptionalFeatures = Collections.emptyList();
 
-	private boolean cachedValidity = true;
+	private Boolean cachedValidity = null;
 
 	private final IFeatureModel fm;
 	/**
@@ -169,11 +169,18 @@ public class FeatureModelAnalyzer implements IEventListener {
 	private FeatureDependencies dependencies;
 
 	/**
-	 * Returns the value calculated during the last call of updateFeatureModel().
+	 * Returns the cached value. Calculated on the first call and on each call of updateFeatureModel().
 	 *
 	 * @return cached value
 	 */
 	public boolean valid() {
+		if (cachedValidity == null) {
+			try {
+				cachedValidity = isValid();
+			} catch (final TimeoutException e) {
+				Logger.logError(e);
+			}
+		}
 		return cachedValidity;
 	}
 
@@ -219,6 +226,12 @@ public class FeatureModelAnalyzer implements IEventListener {
 		dependencies = new FeatureDependencies(fm);
 	}
 
+	/**
+	 * Returns the value calculated by the SatSolver
+	 *
+	 * @return value
+	 * @throws TimeoutException after 1000ms
+	 */
 	public boolean isValid() throws TimeoutException {
 		return new SatSolver(getCnf(), 1000, false).isSatisfiable();
 	}

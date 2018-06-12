@@ -1,0 +1,7 @@
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
+lib/de.ovgu.featureide.lib.fm-v3.5.0.jar
+lib/miglayout15-swing.jar
+lib/org.sat4j.core.jar
+src/de/ovgu/featureide/examples/graphicalconfigurator/GraphicalConfigurator.java

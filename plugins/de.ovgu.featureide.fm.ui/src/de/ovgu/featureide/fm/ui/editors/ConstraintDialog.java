@@ -65,6 +65,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -98,7 +99,6 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
-import org.eclipse.swt.custom.SashForm;
 
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -393,7 +393,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group featureGroup;
 	private Group descriptionGroup;
 	private StyledText searchFeatureText;
-	private SashForm sashForm;
+	private final SashForm sashForm;
 	private Text constraintDescriptionText;
 
 	private Table featureTable;
@@ -555,10 +555,11 @@ public class ConstraintDialog implements GUIDefaults {
 		initHead();
 
 		sashForm = new SashForm(shell, SWT.HORIZONTAL);
-		GridData layoutData = new GridData();
+		final GridData layoutData = new GridData();
 		layoutData.horizontalAlignment = GridData.FILL;
 		layoutData.verticalAlignment = GridData.FILL;
 		layoutData.grabExcessVerticalSpace = true;
+		layoutData.grabExcessHorizontalSpace = true;
 		sashForm.setLayoutData(layoutData);
 
 		initFeatureGroup(featuremodel);
@@ -568,6 +569,7 @@ public class ConstraintDialog implements GUIDefaults {
 		initBottom(featuremodel, constraint);
 		constraintText.setFocus();
 		constraintText.setSelection(constraintText.getCharCount());
+
 		shell.open();
 
 		if (constraint != null) {
@@ -769,19 +771,20 @@ public class ConstraintDialog implements GUIDefaults {
 	 * Initializes the text containing the descriptions.
 	 */
 	private void initConstraintDescriptionText(String description) {
+
 		descriptionGroup = new Group(sashForm, SWT.NONE);
 		descriptionGroup.setText("Description");
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		descriptionGroup.setLayoutData(gridData);
 		final GridLayout featureGroupLayout = new GridLayout();
 		featureGroupLayout.numColumns = 1;
 		descriptionGroup.setLayout(featureGroupLayout);
-
-		constraintDescriptionText = new Text(descriptionGroup, SWT.WRAP | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		constraintDescriptionText = new Text(descriptionGroup, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		constraintDescriptionText.setLayoutData(gridData);
 		constraintDescriptionText.setText(description);
+
 	}
 
 	/**

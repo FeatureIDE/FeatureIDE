@@ -20,6 +20,7 @@
 package de.ovgu.featureide.ui.views.configMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
@@ -53,7 +54,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public boolean addFilter(IConfigurationMapFilter filter) {
 		if (featureProject != null) {
-			if (configurationMap.getFilters().add(filter)) {
+			if (!hasFilter(filter) && configurationMap.getFilters().add(filter)) {
 				filter.initialize(configurationMap);
 				updateElements();
 				return true;
@@ -65,7 +66,7 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public boolean removeFilter(IConfigurationMapFilter filter) {
 		if (featureProject != null) {
-			if (configurationMap.getFilters().remove(filter)) {
+			if (hasFilter(filter) && configurationMap.getFilters().remove(filter)) {
 				updateElements();
 				return true;
 			}
@@ -102,11 +103,12 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 		// add Features
 		for (final IFeature feature : featureProject.getFeatureModel().getFeatures()) {
 			// getParent(feature) == null <=> With the used filter, this feature is a root (although originally it may be not).
-			if (filter(feature) && (feature.getStructure().isRoot() || (getParent(feature) == null))) {
+			if (filter(feature) && !hasVisibleParent(feature)) {
 				featureRootList.add(feature);
 			}
 		}
 
+		Collections.reverse(featureRootList);
 		featureRoots = featureRootList.toArray();
 
 		configurationMap.updateTree();
@@ -119,6 +121,13 @@ public class ConfigurationMapTreeContentProvider implements ITreeContentProvider
 	@Override
 	public Object[] getElements(Object inputElement) {
 		return featureRoots;
+	}
+
+	private boolean hasVisibleParent(IFeature feature) {
+		if (feature.getStructure().getParent() != null) {
+			return filter(feature.getStructure().getParent().getFeature());
+		}
+		return false;
 	}
 
 	/**

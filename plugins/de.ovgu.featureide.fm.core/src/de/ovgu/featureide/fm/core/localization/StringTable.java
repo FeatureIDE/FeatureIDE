@@ -460,7 +460,7 @@ public class StringTable {
 	public static final String CALCULATE_DEPENDENCY = "Show Hidden Dependencies of Submodel";
 	public static final String CREATE_CONSTRAINT = "Create Constraint";
 	public static final String STARTING_WITH = "Starting with";
-	public static final String EXPAND_CONSTRAINT = "Show contained features";
+	public static final String FOCUS_ON_CONTAINED_FEATURES = "Focus on contained Features";
 	public static final String DELETE_INCLUDING_SUBFEATURES = "Delete Including Subfeatures (CTRL + D)";
 	public static final String COLLAPSE_FEATURE = "Collapse (CTRL + C)";
 	public static final String EDIT_CONSTRAINT = "Edit Constraint";

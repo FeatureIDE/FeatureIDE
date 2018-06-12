@@ -279,7 +279,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 						@Override
 						public void run() {
-							getPage(getActivePage()).propertyChange(null);
+							final IConfigurationEditorPage page = getPage(getActivePage());
+							if (page != null) {
+								page.propertyChange(null);
+							}
 						}
 					});
 				}
@@ -401,32 +404,38 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	@Override
 	protected void createPages() {
 		if (modelFile != null) {
-			allPages.add(initPage(new ConfigurationPage()));
-			allPages.add(initPage(new AdvancedConfigurationPage()));
+			internalPages = new ArrayList<>(3);
+			internalPages.add(initPage(new ConfigurationPage()));
+			internalPages.add(initPage(new AdvancedConfigurationPage()));
+		} else {
+			internalPages = new ArrayList<>(1);
 		}
 		textEditorPage = (TextEditorPage) initPage(new TextEditorPage());
-		allPages.add(textEditorPage);
-		internalPages = allPages.subList(0, allPages.size());
+		internalPages.add(textEditorPage);
+		allPages.addAll(internalPages);
 
 		final IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
+		extensionPages = new ArrayList<>(config.length);
 		try {
 			for (final IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");
 				if (o instanceof IConfigurationEditorPage) {
-					final IConfigurationEditorPage externalPage = initPage(((IConfigurationEditorPage) o));
-					allPages.add(externalPage);
-					externalPage.propertyChange(null);
+					extensionPages.add(initPage((IConfigurationEditorPage) o));
 				}
 			}
 		} catch (final Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		extensionPages = allPages.subList(internalPages.size(), allPages.size());
+		allPages.addAll(extensionPages);
 
 		if ((modelFile == null) || containsError()) {
 			setActivePage(textEditorPage.getIndex());
 		} else if (requiresAdvancedConfigurationPage()) {
 			setActivePage(internalPages.get(1).getIndex());
+		}
+
+		for (final IConfigurationEditorPage externalPage : extensionPages) {
+			externalPage.propertyChange(null);
 		}
 	}
 

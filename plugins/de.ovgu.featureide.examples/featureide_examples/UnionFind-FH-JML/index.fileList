@@ -1,15 +1,17 @@
 .classpath
 .project
 .settings/de.ovgu.featureide.core.prefs
+TestData/mediumUF.txt
+TestData/tinyUF.txt
 configs/QuickFind.xml
 configs/QuickUnion.xml
 configs/WeightedQuickUnion.xml
 configs/WeightedQuickUnionByHalfing.xml
 configs/WeightedQuickUnionByHeight.xml
 configs/WeightedQuickUnionWithPathCompression.xml
+features/QU_Weighted/UnionFind.java
 features/QuickFind/UnionFind.java
 features/QuickUnion/UnionFind.java
-features/QU_Weighted/UnionFind.java
 features/Tests/Stopwatch.java
 features/Tests/TestPerformance.java
 features/Tests/TestUF.java
@@ -19,5 +21,3 @@ features/WQU_Halfing/UnionFind.java
 features/WQU_PathCompression/UnionFind.java
 model.xml
 stdlib.jar
-TestData/mediumUF.txt
-TestData/tinyUF.txt

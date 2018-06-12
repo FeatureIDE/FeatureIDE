@@ -248,6 +248,23 @@
 						name="de.ovgu.featureide.fm.ui.menus.popupMenu.submenus"
 						visible="true">
 				</separator>
+    <visibleWhen
+          checkEnabled="false">
+			<with
+                 variable="activeMenuSelection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <and>
+                    <test
+                          args="de.ovgu.featureide.core.featureProjectNature"
+                          property="de.ovgu.featureide.fm.ui.properties.nature"
+                          value="true">
+                    </test>
+                 </and>
+              </iterate>
+           </with>
+    </visibleWhen>
 			</menu>
 		</menuContribution>
 		<menuContribution
@@ -297,7 +314,7 @@
 					commandId="de.ovgu.featureide.fm.ui.commands.EliminateComplexConstraints"
 					icon="icons/featuretree.ico"
 					id="de.ovgu.featureide.fm.ui.actions.EliminateComplexConstraints"
-					label="Product-equivalent model with simple constraints"
+					label="Product-Equivalent Model with Simple Constraints"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -314,7 +331,7 @@
 					commandId="de.ovgu.featureide.fm.ui.commands.FMImport"
 					icon="icons/import_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FMImport"
-					label="Import feature model"
+					label="Import Feature Model"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -331,20 +348,20 @@
 					commandId="de.ovgu.featureide.fm.ui.commands.FMExport"
 					icon="icons/export_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FMExport"
-					label="Export feature model"
+					label="Export Feature Model"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
-					</reference>
+			          <reference
+								definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModel">
+			          </reference>
 				</visibleWhen>
 			</command>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.FeatureObfuscator"
 					icon="icons/export_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FeatureObfuscator"
-					label="Export obfuscated feature model"
+					label="Export Obfuscated Feature Model"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -357,7 +374,7 @@
 					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
 					icon="icons/export_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
-					label="Export feature dependency information"
+					label="Export Feature Dependency Information"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -367,14 +384,15 @@
 				</visibleWhen>
 			</command>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.Convert"
-					id="de.ovgu.featureide.fm.ui.actions.Convert"
-					label="Convert Feature Models"
-					style="push">
+         commandId="de.ovgu.featureide.fm.ui.commands.Convert"
+         icon="icons/export_wiz.gif"
+         id="de.ovgu.featureide.fm.ui.actions.Convert"
+         label="Export All Feature Models"
+         style="push">
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFolder">
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsFeatureModelFolder">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -574,6 +592,19 @@
 				</iterate>
 			</with>
 		</definition>
+  <definition
+        id="de.ovgu.featureide.fm.ui.expressions.containsFeatureModelFolder">
+     <with
+           variable="activeMenuSelection">
+        <iterate
+              ifEmpty="false"
+              operator="or">
+           <test
+                 property="de.ovgu.featureide.fm.ui.properties.featureModelFolder">
+           </test>
+        </iterate>
+     </with>
+  </definition>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.propertyTesters">
@@ -605,6 +636,13 @@
 				properties="featuremodel,configuration"
 				type="java.lang.Object">
 		</propertyTester>
+  <propertyTester
+        class="de.ovgu.featureide.fm.ui.properties.FormatFolderTester"
+        id="de.ovgu.featureide.fm.ui.propertytester.formatFolder"
+        namespace="de.ovgu.featureide.fm.ui.properties"
+        properties="featureModelFolder,configurationFolder"
+        type="java.lang.Object">
+  </propertyTester>
 	</extension>
 	<extension
 			point="de.ovgu.featureide.fm.ui.Outline">

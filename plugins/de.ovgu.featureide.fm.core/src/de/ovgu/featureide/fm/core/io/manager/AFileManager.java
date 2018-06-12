@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,7 +53,50 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  */
 public abstract class AFileManager<T> implements IFileManager<T>, IEventManager {
 
-	public static abstract class ObjectCreator<T> {
+	public static class FileIdentifier<T> {
+		private final Path path;
+		private final IPersistentFormat<T> format;
+
+		private FileIdentifier(Path path, IPersistentFormat<T> format) {
+			this.path = path.toAbsolutePath().normalize();
+			this.format = format;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = format.getId().hashCode();
+			result = (31 * result) + path.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if ((obj == null) || (getClass() != obj.getClass())) {
+				return false;
+			}
+			final FileIdentifier<?> other = (FileIdentifier<?>) obj;
+			return (format.getId().equals(other.format.getId()) && path.equals(other.path));
+		}
+
+		public Path getPath() {
+			return path;
+		}
+
+		public IPersistentFormat<T> getFormat() {
+			return format;
+		}
+
+		@Override
+		public String toString() {
+			return "Path: " + path + ", Format: " + format.getId();
+		}
+
+	}
+
+	protected static abstract class ObjectCreator<T> {
 
 		private final Class<T> objectClass;
 		private final Class<? extends IFileManager<T>> fileManagerClass;
@@ -71,7 +114,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
-	private static final Map<String, IFileManager<?>> map = new HashMap<>();
+	private static final Map<FileIdentifier<?>, IFileManager<?>> idMap = new HashMap<>();
+	private static final Map<Path, List<IFileManager<?>>> pathMap = new HashMap<>();
 
 	/**
 	 * Constructs a path for a given file to store additional information.
@@ -107,18 +151,13 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	}
 
 	/**
-	 * Returns and casts an instance of a {@link IFileManager} for a certain file.
+	 * Checks whether there is already an instance.
 	 *
-	 * @param path The path pointing to the file.
-	 *
-	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
-	 *
-	 * @throws ClassCastException When the found instance is no subclass of R.
+	 * @param identifier The {@link FileIdentifier identifier} for the file.
+	 * @return {@code true} if there is an instance, {@code false} otherwise
 	 */
-	@SuppressWarnings("unchecked")
-	@CheckForNull
-	public static <R extends IFileManager<?>> R getInstance(Path path) {
-		return (R) map.get(constructAbsolutePath(path));
+	protected static final boolean hasInstance(FileIdentifier<?> identifier) {
+		return idMap.containsKey(identifier);
 	}
 
 	/**
@@ -128,13 +167,17 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	 * @return {@code true} if there is an instance, {@code false} otherwise
 	 */
 	public static final boolean hasInstance(Path path) {
-		return map.containsKey(constructAbsolutePath(path));
+		return pathMap.containsKey(path);
+	}
+
+	public static List<IFileManager<?>> getInstanceList(Path path) {
+		return pathMap.get(path);
 	}
 
 	/**
-	 * Removes and returns an instance of a {@link IFileManager} for a certain file.
+	 * Removes an instance of a {@link IFileManager} for a certain file.
 	 *
-	 * @param path The path pointing to the file.
+	 * @param identifier The {@link FileIdentifier identifier} for the file.
 	 *
 	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
 	 *
@@ -142,17 +185,18 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	 */
 	@SuppressWarnings("unchecked")
 	@CheckForNull
-	public static final <R extends IFileManager<?>> R removeInstance(Path path) {
-		return (R) map.remove(constructAbsolutePath(path));
+	protected static final <R extends IFileManager<?>> R removeInstance(FileIdentifier<?> identifier) {
+		final List<IFileManager<?>> managerList = pathMap.get(identifier.getPath());
+		if (managerList != null) {
+			managerList.remove(identifier);
+			if (managerList.isEmpty()) {
+				pathMap.remove(identifier.getPath());
+			}
+		}
+		return (R) idMap.remove(identifier);
 	}
 
-	private static final String constructAbsolutePath(Path path) {
-		final Path p = path.toAbsolutePath();
-		final String absolutePath = p.toString();
-		return absolutePath;
-	}
-
-	public static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator) {
+	protected static final <T> FileHandler<T> getFileHandler(Path path, ObjectCreator<T> objectCreator) {
 		final FileHandler<T> fileHandler = new FileHandler<>(path, null, null);
 		final String content = fileHandler.getContent();
 
@@ -176,18 +220,37 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return fileHandler;
 	}
 
+	/**
+	 * Creates an instance of a {@link IFileManager} for a certain file.
+	 *
+	 * @param path The path pointing to the file.
+	 * @param objectCreator Provides a corresponding content object for the file manager.
+	 *
+	 * @return The manager instance for the specified file, or {@code null} if no instance was created yet.
+	 *
+	 * @throws ClassCastException When the found instance is no subclass of R.
+	 */
 	@SuppressWarnings("unchecked")
 	@CheckForNull
-	public static final <T, R extends IFileManager<T>> R newInstance(Path path, ObjectCreator<T> objectCreator) {
+	protected static final <T, R extends IFileManager<T>> R newInstance(Path path, ObjectCreator<T> objectCreator) {
 		final SimpleFileHandler<T> fileHandler = getFileHandler(path, objectCreator);
 		if (fileHandler.getObject() != null) {
 			try {
-				final String absolutePath = constructAbsolutePath(path);
+				final FileIdentifier<T> fileIdentifier = new FileIdentifier<T>(path, fileHandler.getFormat());
+
 				final Constructor<? extends IFileManager<T>> constructor =
-					objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, String.class, IPersistentFormat.class);
+					objectCreator.fileManagerClass.getDeclaredConstructor(objectCreator.objectClass, FileIdentifier.class);
 				constructor.setAccessible(true);
-				final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), absolutePath, fileHandler.getFormat());
-				map.put(absolutePath, instance);
+				final IFileManager<?> instance = constructor.newInstance(fileHandler.getObject(), fileIdentifier);
+
+				idMap.put(fileIdentifier, instance);
+				List<IFileManager<?>> managerlist = pathMap.get(path);
+				if (managerlist == null) {
+					managerlist = new LinkedList<>();
+					pathMap.put(path, managerlist);
+				}
+				managerlist.add(instance);
+
 				instance.getLastProblems().addAll(fileHandler.getLastProblems());
 				return (R) objectCreator.fileManagerClass.cast(instance);
 			} catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
@@ -197,17 +260,33 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		return null;
 	}
 
+	/**
+	 * Returns an instance of a {@link IFileManager} for a certain file. If no previous instance is available, this method creates a new one using
+	 * {@link #newInstance(Path, ObjectCreator)}.
+	 *
+	 * @param identifier The {@link FileIdentifier identifier} for the file.
+	 * @param objectCreator Provides a corresponding content object for the file manager.
+	 * @param createInstance Whether a new instance should be created, if none is available.
+	 *
+	 * @return The manager instance for the specified file, or {@code null} if no instance is available and no new instance could be created.
+	 *
+	 * @throws ClassCastException When the found instance is no subclass of R.
+	 */
 	@SuppressWarnings("unchecked")
 	@CheckForNull
-	public static final <T, R extends IFileManager<T>> R getInstance(Path path, ObjectCreator<T> objectCreator) {
-		final IFileManager<?> instance = getInstance(path);
-		if (instance == null) {
-			return newInstance(path, objectCreator);
-		} else if (objectCreator.fileManagerClass.isInstance(instance)) {
-			return (R) objectCreator.fileManagerClass.cast(instance);
-		} else {
-			return null;
+	protected static final <T, R extends IFileManager<T>> R getInstance(Path path, ObjectCreator<T> objectCreator, boolean createInstance) {
+		final IPersistentFormat<T> format = objectCreator.formatManager.getFormatByContent(path);
+		if (format != null) {
+			final IFileManager<?> instance = idMap.get(new FileIdentifier<T>(path, format));
+			if (instance == null) {
+				if (createInstance) {
+					return newInstance(path, objectCreator);
+				}
+			} else if (objectCreator.fileManagerClass.isInstance(instance)) {
+				return (R) objectCreator.fileManagerClass.cast(instance);
+			}
 		}
+		return null;
 	}
 
 	private final IEventManager eventManager = new DefaultEventManager();
@@ -215,10 +294,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	protected final Object syncObject = new Object();
 
-	protected final IPersistentFormat<T> format;
-
-	protected final String absolutePath;
-	protected final Path path;
+	protected final FileIdentifier<T> identifier;
 
 	protected String persistentObjectSource;
 	protected T persistentObject;
@@ -226,17 +302,15 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	private boolean modifying = false;
 
-	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
-		this.format = format;
-		this.absolutePath = absolutePath;
-		path = Paths.get(absolutePath);
+	protected AFileManager(T object, FileIdentifier<T> identifier) {
+		this.identifier = identifier;
 
 		variableObject = object;
 
-		if (FileSystem.exists(path)) {
+		if (FileSystem.exists(identifier.getPath())) {
 			try {
-				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
-				final ProblemList problems = format.getInstance().read(variableObject, content);
+				final String content = new String(FileSystem.read(identifier.getPath()), DEFAULT_CHARSET);
+				final ProblemList problems = identifier.getFormat().getInstance().read(variableObject, content);
 				if (problems != null) {
 					lastProblems.addAll(problems);
 				}
@@ -275,12 +349,11 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
-
 	}
 
 	@Override
 	public IPersistentFormat<T> getFormat() {
-		return format;
+		return identifier.format;
 	}
 
 	@Override
@@ -297,13 +370,13 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		if (persistentObject == null) {
 			persistentObjectSource = null;
 		} else {
-			persistentObjectSource = format.getInstance().write(persistentObject);
+			persistentObjectSource = identifier.getFormat().getInstance().write(persistentObject);
 		}
 	}
 
 	@Override
 	public boolean read() {
-		if (!FileSystem.exists(path)) {
+		if (!FileSystem.exists(identifier.getPath())) {
 			return false;
 		}
 		final boolean success, changed;
@@ -314,8 +387,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			lastProblems.clear();
 			final T tempObject = copyObject(persistentObject);
 			try {
-				final String content = new String(FileSystem.read(path), DEFAULT_CHARSET);
-				final List<Problem> problemList = format.getInstance().read(tempObject, content);
+				final String content = new String(FileSystem.read(identifier.getPath()), DEFAULT_CHARSET);
+				final List<Problem> problemList = identifier.getFormat().getInstance().read(tempObject, content);
 				if (problemList != null) {
 					lastProblems.addAll(problemList);
 				}
@@ -342,8 +415,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 			if (modifying) {
 				return;
 			}
-			final String write = format.getInstance().write(persistentObject);
-			format.getInstance().read(variableObject, write);
+			final String write = identifier.getFormat().getInstance().write(persistentObject);
+			identifier.getFormat().getInstance().read(variableObject, write);
 			// variableObject = copyObject(localObject);
 			// persistentObject = copyObject(localObject);
 		}
@@ -362,7 +435,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 	 * @return {@code true} if objects differ, {@code false} otherwise.
 	 */
 	protected boolean hasChanged(T newObject) {
-		return !Objects.equals(format.getInstance().write(newObject), persistentObjectSource);
+		return !Objects.equals(identifier.getFormat().getInstance().write(newObject), persistentObjectSource);
 	}
 
 	/**
@@ -386,8 +459,8 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 				}
 				modifying = true;
 				final T tempObject = copyObject(variableObject);
-				FileSystem.write(path, format.getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
-				persistentObject = copyObject(tempObject);
+				FileSystem.write(identifier.getPath(), identifier.getFormat().getInstance().write(tempObject).getBytes(DEFAULT_CHARSET));
+				setPersistentObject(copyObject(tempObject));
 			} catch (final Exception e) {
 				handleException(e);
 				return false;
@@ -427,7 +500,7 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	@Override
 	public void dispose() {
-		removeInstance(Paths.get(absolutePath));
+		removeInstance(identifier);
 		synchronized (syncObject) {
 			setPersistentObject(null);
 			variableObject = null;
@@ -436,17 +509,17 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 
 	@Override
 	public String getAbsolutePath() {
-		return absolutePath;
+		return identifier.getPath().toString();
 	}
 
 	@Override
 	public Path getPath() {
-		return path;
+		return identifier.path;
 	}
 
 	@Override
 	public String toString() {
-		return "File manager for " + absolutePath;
+		return "File manager for " + identifier;
 	}
 
 }

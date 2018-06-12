@@ -2,6 +2,7 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 AndroidManifest.xml
+LICENCE.TXT
 assets/reprise.ttf
 configs/ApoDiceDemo.xml
 configs/ApoDiceLight.xml
@@ -11,7 +12,6 @@ configs/ApoSnakeLight.xml
 configs/ApoSnakePro.xml
 libs/android-support-v4.jar
 libs/bitsengine_dice.jar
-LICENCE.TXT
 model.xml
 proguard.cfg
 project.properties

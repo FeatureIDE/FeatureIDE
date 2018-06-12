@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -109,14 +108,15 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 
 		final IFolder buildFolder = featureProject.getBuildFolder();
-		if (buildFolder != null) {
+		final IFolder binFolder = featureProject.getBinFolder();
+		final boolean updateBuildeFolder = (buildFolder != null) && buildFolder.isAccessible();
+		final boolean updateBinFolder = !hasOtherNature && (binFolder != null) && binFolder.isAccessible();
+
+		if (updateBuildeFolder) {
 			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
-		final IFolder binFolder = featureProject.getBinFolder();
-		if (!hasOtherNature) {
-			if ((binFolder != null) && binFolder.exists()) {
-				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-			}
+		if (updateBinFolder) {
+			binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
 
 		if (cleanBuild) {
@@ -127,22 +127,18 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		} else {
 			cleaned = true;
 		}
-		if (!hasOtherNature) {
-			if ((binFolder != null) && binFolder.exists()) {
-				for (final IResource member : binFolder.members()) {
-					member.delete(true, monitor);
-				}
-			}
-		}
-		for (final IResource member : buildFolder.members()) {
-			member.delete(true, monitor);
-		}
 
-		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-		if (!hasOtherNature) {
-			if ((binFolder != null) && binFolder.exists()) {
-				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		if (updateBuildeFolder) {
+			for (final IResource member : buildFolder.members()) {
+				member.delete(true, monitor);
 			}
+			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+		}
+		if (updateBinFolder) {
+			for (final IResource member : binFolder.members()) {
+				member.delete(true, monitor);
+			}
+			binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
 		cleanBuild = false;
 	}
@@ -162,22 +158,21 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		final IFile configFile = featureProject.getCurrentConfiguration();
 		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
 
+		if (configFile == null) {
+			return null;
+		}
+
 		try {
-			for (final IResource res : featureProject.getConfigFolder().members()) {
-				res.refreshLocal(IResource.DEPTH_ZERO, null);
-			}
 			featureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
+			if (featureProject.getConfigFolder().isAccessible()) {
+				featureProject.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
+			}
 			cleanBuild = true;
 			clean(monitor);
-		} catch (final ResourceException e) {
-			CorePlugin.getDefault().logWarning(e.getMessage());
 		} catch (final CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 
-		if (configFile == null) {
-			return null;
-		}
 		final IFeatureModel featureModel = featureProject.getFeatureModel();
 		if ((featureModel == null) || (featureModel.getStructure().getRoot() == null)) {
 			return null;

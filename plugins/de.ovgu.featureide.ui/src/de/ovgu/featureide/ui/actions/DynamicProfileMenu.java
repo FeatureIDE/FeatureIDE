@@ -63,11 +63,8 @@ public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
-	private final IFeatureModel featureModel;
-	{
-		final IFeatureProject curFeatureProject = getCurrentFeatureProject();
-		featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
-	}
+	private IFeatureModel featureModel;
+
 	private final boolean multipleSelected = isMultipleSelection();
 
 	public DynamicProfileMenu() {}
@@ -76,12 +73,9 @@ public class DynamicProfileMenu extends ContributionItem {
 		super(id);
 	}
 
-	/**
-	 * Creates dynamic menu
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
-		if (featureModel == null) {
+		if (!initFeatureModel()) {
 			return;
 		}
 		final MenuManager man = new MenuManager("Color Scheme Menu", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
@@ -99,6 +93,16 @@ public class DynamicProfileMenu extends ContributionItem {
 
 		man.setVisible(true);
 		createActions();
+	}
+
+	private boolean initFeatureModel() {
+		try {
+			final IFeatureProject curFeatureProject = getCurrentFeatureProject();
+			featureModel = curFeatureProject == null ? FMFactoryManager.getEmptyFeatureModel() : curFeatureProject.getFeatureModel();
+			return featureModel != null;
+		} catch (final Exception e) {
+			return false;
+		}
 	}
 
 	/**
@@ -169,27 +173,26 @@ public class DynamicProfileMenu extends ContributionItem {
 
 	}
 
-	/**
-	 * Returns selected FeatureProject
-	 */
-	private static IFeatureProject getCurrentFeatureProject() {
-		final Object element = getIStructuredCurrentSelection().getFirstElement();
-		if (element != null) {
-			if (element instanceof IResource) {
-				return CorePlugin.getFeatureProject((IResource) element);
-			} else if (element instanceof PackageFragmentRootContainer) {
-				final IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
-				return CorePlugin.getFeatureProject(jProject.getProject());
-			} else if (element instanceof IJavaElement) {
-				return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
-			} else if (element instanceof IAdaptable) {
-				// Cast is necessary, don't remove
-				final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
-				if (project != null) {
-					return CorePlugin.getFeatureProject(project);
+	private static IFeatureProject getCurrentFeatureProject() throws Exception {
+		if (getIStructuredCurrentSelection() != null) {
+			final Object element = getIStructuredCurrentSelection().getFirstElement();
+			if (element != null) {
+				if (element instanceof IResource) {
+					return CorePlugin.getFeatureProject((IResource) element);
+				} else if (element instanceof PackageFragmentRootContainer) {
+					final IJavaProject jProject = ((PackageFragmentRootContainer) element).getJavaProject();
+					return CorePlugin.getFeatureProject(jProject.getProject());
+				} else if (element instanceof IJavaElement) {
+					return CorePlugin.getFeatureProject(((IJavaElement) element).getJavaProject().getProject());
+				} else if (element instanceof IAdaptable) {
+					// Cast is necessary, don't remove
+					final IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+					if (project != null) {
+						return CorePlugin.getFeatureProject(project);
+					}
 				}
+				throw new Exception("element " + element + "(" + element.getClass() + ") not covered");
 			}
-			throw new RuntimeException("element " + element + "(" + element.getClass() + ") not covered");
 		}
 		return null;
 	}

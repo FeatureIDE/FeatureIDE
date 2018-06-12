@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +42,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.editing.FeatureModelToNodeTraceModel.Origin;
@@ -62,7 +61,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConnectionFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MandatoryFeatureOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -71,7 +69,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyChangeListener {
+public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults {
 
 	private static final DirectEditPolicy ROLE_DIRECT_EDIT_POLICY = new DirectEditPolicy() {
 
@@ -219,6 +217,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			getFigure().setForegroundColor(FMPropertyManager.getConnectionForegroundColor());
 			getFigure().setLineWidth(1);
 		}
+		getFigure().revalidate();
 	}
 
 	public void refreshSourceDecoration() {
@@ -347,16 +346,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		getFigure().setVisible(false);
 	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		final String prop = event.getPropertyName();
-		if (EventType.PARENT_CHANGED.toString().equals(prop)) {
-			refreshParent();
-		} else if (EventType.MANDATORY_CHANGED.toString().equals(prop)) {
-			refreshSourceDecoration();
-		}
-	}
-
 	/**
 	 * Sets the active reason.
 	 *
@@ -441,5 +430,19 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		final IFeature target = graphicalTarget.getObject();
 		return ((source instanceof ExtendedFeature) && ((ExtendedFeature) source).isFromExtern() && (target instanceof ExtendedFeature)
 			&& ((ExtendedFeature) target).isFromExtern());
+	}
+
+	/*
+	 * Catches the events thrown by the feature model editor and refreshes the connection accordingly. The events are forwarded by the FeatureEditPart.
+	 */
+	public void propertyChange(FeatureIDEEvent event) {
+		final EventType prop = event.getEventType();
+		if (EventType.PARENT_CHANGED.equals(prop)) {
+			refreshParent();
+		} else if (EventType.MANDATORY_CHANGED.equals(prop)) {
+			refreshSourceDecoration();
+		} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
+			refreshVisuals();
+		}
 	}
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ovgu.featureide</groupId>
 	<artifactId>de.ovgu.featureide</artifactId>
-	<version>3.4.3-SNAPSHOT</version>
+	<version>3.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -53,6 +53,29 @@
 		<module>tests/de.ovgu.featureide.core.munge-test</module>
 	</modules>
 
+	<!-- mvn -Pruntime -Pgui <phase> -OR- mvn -Pruntime <phase> -BUT NOT ONLY- mvn -Pgui <phase>-->
+	<profiles>
+		<profile>
+            <id>runtime</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>runtime</module>
+            </modules>
+        </profile>
+        
+        <profile>
+            <id>gui</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>gui-tests/de.ovgu.featureide.fm.gui-test</module>
+            </modules>
+        </profile>
+    </profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -94,6 +117,27 @@
 						<include>**/*Tests.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.0</version>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
@@ -173,6 +217,24 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<!-- mvn clean verify jacoco:report -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.0</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 
 	<repositories>
 		<repository>

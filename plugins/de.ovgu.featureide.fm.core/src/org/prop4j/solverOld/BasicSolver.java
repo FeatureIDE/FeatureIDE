@@ -57,6 +57,7 @@ public class BasicSolver implements ISatSolver {
 	protected final int[] order;
 	protected final VecInt assignment;
 	protected RingList<int[]> solutionList = null;
+	protected boolean globalTimeout = false;
 
 	public BasicSolver(SatInstance satInstance) throws ContradictionException {
 		this.satInstance = satInstance;
@@ -102,7 +103,7 @@ public class BasicSolver implements ISatSolver {
 
 	protected Solver<?> initSolver() {
 		final Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
-		solver.setTimeoutMs(1000);
+		solver.setTimeoutMs(DEFAULT_TIMEOUT);
 		solver.setDBSimplificationAllowed(true);
 		solver.setVerbose(false);
 		return solver;
@@ -133,10 +134,7 @@ public class BasicSolver implements ISatSolver {
 
 	@Override
 	public int[] findModel() {
-		if (isSatisfiable() == SatResult.TRUE) {
-			return solver.model();
-		}
-		return null;
+		return isSatisfiable() == SatResult.TRUE ? solver.model() : null;
 	}
 
 	@Override
@@ -172,7 +170,7 @@ public class BasicSolver implements ISatSolver {
 	@Override
 	public SatResult isSatisfiable() {
 		try {
-			if (solver.isSatisfiable(assignment, false)) {
+			if (solver.isSatisfiable(assignment, globalTimeout)) {
 				if (solutionList != null) {
 					solutionList.add(solver.model());
 				}
@@ -181,7 +179,6 @@ public class BasicSolver implements ISatSolver {
 				return SatResult.FALSE;
 			}
 		} catch (final TimeoutException e) {
-			e.printStackTrace();
 			return SatResult.TIMEOUT;
 		}
 	}
@@ -235,6 +232,16 @@ public class BasicSolver implements ISatSolver {
 		for (int i = 0; i < order.length; i++) {
 			order[i] = i + 1;
 		}
+	}
+
+	@Override
+	public boolean getGlobalTimeout() {
+		return globalTimeout;
+	}
+
+	@Override
+	public void setGlobalTimeout(boolean globalTimeout) {
+		this.globalTimeout = globalTimeout;
 	}
 
 	@Override

@@ -22,9 +22,9 @@ package de.ovgu.featureide.ui.views.configMap.filters;
 
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMap;
 import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
 
@@ -34,9 +34,22 @@ import de.ovgu.featureide.ui.views.configMap.ConfigurationMapFilter;
  */
 public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 
+	private List<IFeature> foFeatures;
+	private IFeatureModel featureModelFilterIsInitializedFor;
+
 	public FeatureIsFalseOptionalFilter(boolean isDefault) {
 		super("false optional features", isDefault);
 		setImagePath(Image_Plus);
+	}
+
+	@Override
+	public void initialize(ConfigurationMap configurationMap) {
+		final IFeatureModel featureModel = configurationMap.getFeatureProject().getFeatureModel();
+		if (featureModel != featureModelFilterIsInitializedFor) {
+			final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
+			foFeatures = analyser.getFalseOptionalFeatures();
+			featureModelFilterIsInitializedFor = featureModel;
+		}
 	}
 
 	/*
@@ -46,30 +59,6 @@ public class FeatureIsFalseOptionalFilter extends ConfigurationMapFilter {
 	 */
 	@Override
 	public boolean test(ConfigurationMap configurationMap, IFeature feature) {
-		final IFeatureStructure structure = feature.getStructure();
-
-		if (structure.isMandatory()) {
-			return false;
-		}
-
-		if (structure.isRoot()) {
-			return false;
-		}
-
-		if (!structure.getParent().isAnd()) {
-			return false;
-		}
-
-		final List<Configuration> configs = configurationMap.getConfigurations();
-		if (configs == null) {
-			return false;
-		}
-		for (final Configuration config : configs) {
-			if (!config.getSelectedFeatures().contains(feature)) {
-				return false;
-			}
-		}
-
-		return true;
+		return foFeatures.contains(feature);
 	}
 }

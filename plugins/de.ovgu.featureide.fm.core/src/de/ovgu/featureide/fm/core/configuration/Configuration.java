@@ -308,23 +308,42 @@ public class Configuration implements Cloneable {
 	}
 
 	/**
-	 * Convenience method.
+	 * Convenience method, fully equivalent to {@link #number(long, boolean) number(250, false)}.
 	 *
-	 * @return the values of number(250)
+	 * @return number of possible solutions
+	 *
 	 * @see #number(long)
+	 * @see #number(long, boolean)
 	 */
 	public long number() {
-		return LongRunningWrapper.runMethod(propagator.number(250));
+		return number(250, false);
+	}
+
+	/**
+	 * Convenience method, fully equivalent to {@link #number(long, boolean) number(250, includeHiddenFeatures)}.
+	 *
+	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
+	 *
+	 * @return number of possible solutions
+	 *
+	 * @see #number()
+	 * @see #number(long, boolean)
+	 */
+	public long number(boolean includeHiddenFeatures) {
+		return number(250, includeHiddenFeatures);
 	}
 
 	/**
 	 * Counts the number of possible solutions.
 	 *
+	 * @param timeout Timeout in milliseconds.
+	 * @param includeHiddenFeatures {@code true} if hidden feature should be considered, {@code false} otherwise
+	 *
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occured) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
-	public long number(long timeout) {
-		return LongRunningWrapper.runMethod(propagator.number(timeout));
+	public long number(long timeout, boolean includeHiddenFeatures) {
+		return LongRunningWrapper.runMethod(propagator.number(timeout, includeHiddenFeatures));
 	}
 
 	public void resetValues() {

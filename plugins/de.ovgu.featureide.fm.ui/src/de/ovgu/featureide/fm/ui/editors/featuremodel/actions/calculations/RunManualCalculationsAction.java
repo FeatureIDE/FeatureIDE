@@ -28,6 +28,7 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Action to specify feature model analysis.<br> A manual call of the feature model analysis.
@@ -43,6 +44,7 @@ public class RunManualCalculationsAction extends Action {
 
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
+		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/thread_obj.gif"));
 		this.featureModel = featureModel;
 		setId(ID);
 	}

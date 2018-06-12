@@ -67,7 +67,7 @@ public interface IConfigurationPropagator {
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br> or a negative value (if a timeout occurred) that
 	 *         indicates that there are more solutions than the absolute value
 	 */
-	LongRunningMethod<Long> number(long timeout);
+	LongRunningMethod<Long> number(long timeout, boolean includeHiddenFeatures);
 
 	LongRunningMethod<Void> update(boolean redundantManual, List<SelectableFeature> featureOrder);
 

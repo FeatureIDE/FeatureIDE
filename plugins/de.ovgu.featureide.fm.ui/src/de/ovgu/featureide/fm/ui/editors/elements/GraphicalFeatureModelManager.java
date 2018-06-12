@@ -56,20 +56,20 @@ public class GraphicalFeatureModelManager extends AFileManager<IGraphicalFeature
 
 	@CheckForNull
 	public static GraphicalFeatureModelManager getInstance(Path path) {
-		return AFileManager.getInstance(path);
+		return AFileManager.getInstance(path, new ObjectCreator(null), false);
 	}
 
 	@CheckForNull
 	public static GraphicalFeatureModelManager getInstance(Path path, IGraphicalFeatureModel model) {
-		return AFileManager.getInstance(path, new ObjectCreator(model));
+		return AFileManager.getInstance(path, new ObjectCreator(model), true);
 	}
 
 	public static FileHandler<IGraphicalFeatureModel> load(Path path, IGraphicalFeatureModel model) {
 		return getFileHandler(path, new ObjectCreator(model));
 	}
 
-	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, String absolutePath, IPersistentFormat<IGraphicalFeatureModel> format) {
-		super(model, absolutePath, format);
+	protected GraphicalFeatureModelManager(IGraphicalFeatureModel model, FileIdentifier<IGraphicalFeatureModel> identifier) {
+		super(model, identifier);
 	}
 
 	@Override
