@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- de.ovgu.featureide.core.featurehouse;bundle-version="3.5.0"
+ de.ovgu.featureide.core.featurehouse;
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.ovgu.featureide.featurehouse_android

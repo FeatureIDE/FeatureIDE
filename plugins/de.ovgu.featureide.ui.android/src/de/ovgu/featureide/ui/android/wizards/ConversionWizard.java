@@ -57,7 +57,6 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		final SelectionWrapper<IProject> selectionWrapper = SelectionWrapper.init(selection, IProject.class);
 		IProject curProject;
 		while ((curProject = selectionWrapper.getNext()) != null) {
-			// TODO : select FeatureHouse Android Project
 
 			if (curProject.isAccessible()) {
 

@@ -35,6 +35,7 @@
 		<module>plugins/de.ovgu.featureide.core.mpl</module>
 		<module>plugins/de.ovgu.featureide.core.munge</module>
 		<module>plugins/de.ovgu.featureide.core.munge.android</module>
+		<module>plugins/de.ovgu.featureide.core.featurehouse.android</module>
 		<module>plugins/de.ovgu.featureide.core.runtime</module>
 		<module>plugins/de.ovgu.featureide.examples</module>
 		<module>plugins/de.ovgu.featureide.migration</module>
