@@ -272,13 +272,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix, concreteFeatures);
 				next("create marker: dead features", workMonitor);
 				if (!deadFeatures.isEmpty()) {
-					createConfigurationMarker(folder, MARKER_UNUSED + deadFeatures.size() + (deadFeatures.size() > 1 ? " features are " : " feature is ")
-						+ "not used: " + createShortMessage(deadFeatures), -1, IMarker.SEVERITY_INFO);
+					createConfigurationMarker(folder, MARKER_NEVER_SELECTED + deadFeatures.size()
+						+ (deadFeatures.size() > 1 ? " features are " : " feature is ") + "not used: " + createShortMessage(deadFeatures), -1,
+							IMarker.SEVERITY_INFO);
 				}
 				next("create marker: false optional features", workMonitor);
 				if (!falseOptionalFeatures.isEmpty()) {
 					createConfigurationMarker(folder,
-							MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + (falseOptionalFeatures.size() > 1 ? " features are " : " feature is ")
+							MARKER_ALWAYS_SELECTED + falseOptionalFeatures.size() + (falseOptionalFeatures.size() > 1 ? " features are " : " feature is ")
 								+ "optional but used in all configurations: " + createShortMessage(falseOptionalFeatures),
 							-1, IMarker.SEVERITY_INFO);
 				}
