@@ -387,9 +387,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		setupFeatureProject(project, compositionToolID, sourcePath, configPath, buildPath, false, false, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		final IFeatureModel featureModel = createFeatureModelFile(project);
-		createConfigFile(project, configPath, featureModel, project.getName().split("[-]")[0] + ".");
-
 		if (composer != null) {
 			final ISafeRunnable runnable = new ISafeRunnable() {
 
