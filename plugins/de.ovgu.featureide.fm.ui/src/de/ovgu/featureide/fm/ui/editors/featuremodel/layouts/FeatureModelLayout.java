@@ -41,10 +41,10 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public FeatureModelLayout() {
 		autoLayoutLegend = true;
 		showHiddenFeatures = true;
-		showCollapsedConstraints = true;
+		showCollapsedConstraints = false;
 		hasVerticalLayout = true;
 		legendPos = new Point(0, 0);
-		selectedLayoutAlgorithm = 1;
+		selectedLayoutAlgorithm = 4;
 	}
 
 	protected FeatureModelLayout(FeatureModelLayout featureModelLayout) {
