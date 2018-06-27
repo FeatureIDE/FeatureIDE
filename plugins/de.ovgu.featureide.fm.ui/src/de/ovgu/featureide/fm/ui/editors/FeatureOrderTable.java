@@ -115,7 +115,7 @@ public class FeatureOrderTable {
 					updateTableOrder();
 				}
 				featureOrderEditor.updateFeatureOrderList();
-				featureOrderEditor.setDirty(true);
+				featureOrderEditor.setDirty();
 			}
 		});
 	}

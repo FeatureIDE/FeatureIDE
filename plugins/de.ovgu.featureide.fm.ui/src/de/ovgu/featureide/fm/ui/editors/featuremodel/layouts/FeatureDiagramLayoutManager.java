@@ -78,8 +78,10 @@ abstract public class FeatureDiagramLayoutManager {
 				// does not change the position no event is performed and the connections are not drawn. So for the first
 				// start perform the location changed event to refresh the connection only in manual layout
 				entry.update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
-				firstManualLayout = true;
 			}
+			firstManualLayout = true;
+		} else if (featureModel.getLayout().getLayoutAlgorithm() != 0) {
+			firstManualLayout = false;
 		}
 
 		if (!featureModel.isLegendHidden()) {

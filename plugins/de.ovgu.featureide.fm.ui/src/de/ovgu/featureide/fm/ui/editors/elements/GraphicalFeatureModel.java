@@ -54,10 +54,10 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	protected final FeatureModelLayout layout;
 
-	protected Map<IFeature, IGraphicalFeature> features;
-	protected Map<IConstraint, IGraphicalConstraint> constraints;
+	protected Map<IFeature, IGraphicalFeature> features = new HashMap<IFeature, IGraphicalFeature>();
+	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<IConstraint, IGraphicalConstraint>();
 
-	protected boolean hiddenLegend;
+	protected boolean hiddenLegend = false;
 	protected Legend legend;
 
 	/**
@@ -75,12 +75,18 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
 		correspondingFeatureModel = oldModel.correspondingFeatureModel;
-
 		layout = oldModel.layout;
+		hiddenLegend = oldModel.hiddenLegend;
+
+		if (oldModel.legend != null) {
+			legend = oldModel.legend;
+		}
+
 		features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 		for (final IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
+
 		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
 		for (final Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
 			constraints.put(constraint.getKey(), constraint.getValue().clone());

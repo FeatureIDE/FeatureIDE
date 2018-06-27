@@ -41,15 +41,17 @@ import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
 	protected final IFileManager<IFeatureModel> fmManager;
+	protected final IFileManager<IGraphicalFeatureModel> gfmManager;
 
 	private int index;
 
 	protected IEditorInput input;
 	protected IEditorSite site;
 
-	public FeatureModelEditorPage(IFileManager<IFeatureModel> fmManager) {
+	public FeatureModelEditorPage(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
 		super();
 		this.fmManager = fmManager;
+		this.gfmManager = gfmManager;
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -58,7 +60,6 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		setDirty(false);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 		return false;
 	}
 
-	protected void setDirty(boolean dirty) {
+	protected void setDirty() {
 		firePropertyChange(PROP_DIRTY);
 	}
 

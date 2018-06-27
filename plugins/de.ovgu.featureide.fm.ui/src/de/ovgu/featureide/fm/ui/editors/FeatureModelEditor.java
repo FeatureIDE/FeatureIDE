@@ -87,11 +87,16 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
+import de.ovgu.featureide.fm.core.io.manager.AFileManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
@@ -115,6 +120,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	private ModelMarkerHandler<IFile> markerHandler;
 	boolean isPageModified = false;
 	IFileManager<IFeatureModel> fmManager;
+	IFileManager<IGraphicalFeatureModel> gfmManager;
 
 	private boolean closeEditor;
 
@@ -129,9 +135,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		super();
 	}
 
-	public FeatureModelEditor(IFileManager<IFeatureModel> fmManager) {
+	public FeatureModelEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
 		super();
 		this.fmManager = fmManager;
+		this.gfmManager = gfmManager;
 	}
 
 	@Override
@@ -180,6 +187,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			});
 		} else {
 			fmManager.save();
+			gfmManager.save();
 		}
 
 		setPageModified(false);
@@ -394,8 +402,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		createActions();
 
 		pages.clear();
-		addPage(diagramEditor = new FeatureDiagramEditor(fmManager, true));
-		addPage(featureOrderEditor = new FeatureOrderEditor(fmManager));
+		addPage(diagramEditor = new FeatureDiagramEditor(fmManager, gfmManager, true));
+		addPage(featureOrderEditor = new FeatureOrderEditor(fmManager, gfmManager));
 		createExtensionPages();
 		addPage(textEditor = new FeatureModelTextEditorPage(this));
 
@@ -505,7 +513,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	@Override
 	protected void handlePropertyChange(int propertyId) {
 		if (propertyId == PROP_DIRTY) {
-			isPageModified = isPageModified || fmManager.hasChanged();
+			isPageModified = isPageModified || fmManager.hasChanged() || gfmManager.hasChanged();
 		}
 		super.handlePropertyChange(propertyId);
 	}
@@ -538,6 +546,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		fmManager = FeatureModelManager.getInstance(path);
 		createModelFileMarkers(fmManager.getLastProblems());
+
+		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
+		if ((extraPath != null) && !extraPath.toFile().exists()) {
+			FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
+		}
+
+		gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
 
 		// TODO _Interfaces Removed Code
 		// FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
