@@ -18,34 +18,46 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.configuration;
+package de.ovgu.featureide.fm.core.job;
 
-import java.io.File;
+// @formatter:off
+/**
+ * Strategies for handling jobs that want to wait for other jobs to be finished first.<br/>
+ * Possible strategies:<br/>
+ * <pre>
+ * {@link #RETURN}
+ * {@link #WAIT}
+ * {@link #WAIT_ONE}
+ * {@link #CANCEL_WAIT}
+ * {@link #CANCEL_WAIT_ONE}
+ * </pre>
+ *
+ * @author Sebastian Krieter
+ */
+//@formatter:on
+public enum JobStartingStrategy {
+	/**
+	 * If another job is already running the given job is not started.
+	 */
+	RETURN,
 
-import org.eclipse.core.resources.IFile;
+	/**
+	 * Waits for all other jobs to finish.
+	 */
+	WAIT,
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+	/**
+	 * Waits for another job to finish, except a third job is already waiting.
+	 */
+	WAIT_ONE,
 
-public interface IConfigurationEditor {
+	/**
+	 * Same as {@link #WAIT}, but attempts to cancel all previous jobs.
+	 */
+	CANCEL_WAIT,
 
-	Configuration getConfiguration();
-
-	IFile getFile();
-
-	File getModelFile();
-
-	boolean isAutoSelectFeatures();
-
-	void setAutoSelectFeatures(boolean autoSelectFeatures);
-
-	boolean hasValidFeatureModel();
-
-	enum EXPAND_ALGORITHM {
-		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
-	}
-
-	EXPAND_ALGORITHM getExpandAlgorithm();
-
-	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
-
+	/**
+	 * Same as {@link #WAIT_ONE}, but attempts to cancel all previous jobs.
+	 */
+	CANCEL_WAIT_ONE
 }

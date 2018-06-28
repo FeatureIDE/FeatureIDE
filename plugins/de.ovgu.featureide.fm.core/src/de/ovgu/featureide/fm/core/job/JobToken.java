@@ -18,34 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.configuration;
+package de.ovgu.featureide.fm.core.job;
 
-import java.io.File;
+import java.util.Random;
 
-import org.eclipse.core.resources.IFile;
+/**
+ * Object to identifier related jobs.
+ *
+ * @see JobStartingStrategy
+ * @see LongRunningWrapper#startJob(JobToken, IRunner)
+ * @see LongRunningWrapper#cancelAllJobs(JobToken)
+ *
+ * @author Sebastian Krieter
+ */
+public class JobToken {
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+	private final int id = new Random().nextInt();
 
-public interface IConfigurationEditor {
+	JobToken() {}
 
-	Configuration getConfiguration();
-
-	IFile getFile();
-
-	File getModelFile();
-
-	boolean isAutoSelectFeatures();
-
-	void setAutoSelectFeatures(boolean autoSelectFeatures);
-
-	boolean hasValidFeatureModel();
-
-	enum EXPAND_ALGORITHM {
-		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	@Override
+	public int hashCode() {
+		return id;
 	}
 
-	EXPAND_ALGORITHM getExpandAlgorithm();
-
-	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj;
+	}
 
 }
