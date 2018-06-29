@@ -159,6 +159,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 
+	private static final int MAX_TOOLTIP_ELEMENT_LENGTH = 500;
+
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<>();
 
@@ -1305,34 +1307,24 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final StringBuilder sb = new StringBuilder();
 
 			if (!describ.isEmpty()) {
-				sb.append("Description:\n");
-				sb.append(describ);
+				addElement(sb, "Description:", describ);
 			}
 			if (!relConst.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Constraints:\n");
-				sb.append(relConst);
+				addElement(sb, "Constraints:", relConst);
 			}
 			final Collection<Node> openClauses = feature.getOpenClauses();
 			if (!openClauses.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Open Clauses:\n");
+				final StringBuilder elementBuilder = new StringBuilder();
 				for (final Node clause : openClauses) {
-					sb.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
+					elementBuilder.append(clause.toString(NodeWriter.logicalSymbols)).append('\n');
 				}
+				addElement(sb, "Open Clauses:", elementBuilder.toString());
 			}
 
 			// Print the explanation.
 			final Explanation<?> explanation = getExplanation(feature);
 			if ((explanation != null) && (explanation.getReasons() != null) && !explanation.getReasons().isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append(explanation.getWriter().getString());
+				addElement(sb, null, explanation.getWriter().getString());
 			}
 
 			if (sb.length() > 0) {
@@ -1342,6 +1334,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				newToolTip(tree.getShell(), sb, false, displayPoint.x, displayPoint.y);
 			}
 		}
+	}
+
+	private void addElement(final StringBuilder sb, final String header, final String element) {
+		if (sb.length() > 0) {
+			sb.append("\n\n");
+		}
+		if (header != null) {
+			sb.append(header);
+			sb.append("\n");
+		}
+		sb.append((element.length() <= MAX_TOOLTIP_ELEMENT_LENGTH) ? element : element.substring(0, MAX_TOOLTIP_ELEMENT_LENGTH) + "\n[...]");
 	}
 
 	private void newToolTip(Shell shell, CharSequence toolTipText, boolean autoHide, int x, int y) {
