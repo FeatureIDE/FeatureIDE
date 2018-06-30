@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.aspectj"
       label="FeatureIDE extension for AspectJ (optional)"
-      version="3.5.1.qualifier"
+      version="3.5.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -197,7 +197,7 @@ Library.
          id="de.ovgu.featureide.core.aspectj"
          download-size="0"
          install-size="0"
-         version="3.5.1.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
 </feature>

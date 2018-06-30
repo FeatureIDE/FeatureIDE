@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.munge.android"
       label="FeatureIDE extension for Android with Munge (optional)"
-      version="3.5.1.qualifier"
+      version="3.5.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -202,14 +202,14 @@ Library.
          id="de.ovgu.featureide.ui.android"
          download-size="0"
          install-size="0"
-         version="3.5.1.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.munge.android"
          download-size="0"
          install-size="0"
-         version="3.5.1.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
 </feature>

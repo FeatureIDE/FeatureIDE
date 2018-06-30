@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE site [
-  <!ENTITY version "3.5.1">
+  <!ENTITY version "3.5.2">
   <!ENTITY category "FeatureIDE-&version;-UpdateSite">
 ]>
 
 <site>
 	<category-def name="&category;" label="&category;">
 		<description name="&category;" url="http://featureide.cs.ovgu.de/update/v3/">FeatureIDE v3.x</description>
-		<version>3.5.1</version>
+		<version>3.5.2</version>
 	</category-def>
 
 	<feature url="features/br.ufal.ic.colligens.feature_1.1.4.qualifier.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.qualifier">

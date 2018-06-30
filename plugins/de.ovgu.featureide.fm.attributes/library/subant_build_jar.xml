@@ -6,7 +6,7 @@
 
 	<!-- Set JAR name -->
 	<property name="build.jar.name" value="de.ovgu.featureide.lib.fm.attributes" />
-	<property name="build.jar.version" value="3.5.1" />
+	<property name="build.jar.version" value="3.5.2" />
 
 	<!-- Constants -->
 	<property name="src.dir" value="../src" />
