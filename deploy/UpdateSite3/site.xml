@@ -462,6 +462,39 @@
    <feature url="features/de.ovgu.featureide.munge.android_3.5.0.201804061108.jar" id="de.ovgu.featureide.munge.android" version="3.5.0.201804061108">
       <category name="FeatureIDE 3.5"/>
    </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201806301305.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_3.5.1.201806301305.jar" id="de.ovgu.featureide" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_3.5.1.201806301305.jar" id="de.ovgu.featureide.ahead" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_3.5.1.201806301305.jar" id="de.ovgu.featureide.antenna" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_3.5.1.201806301305.jar" id="de.ovgu.featureide.aspectj" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_3.5.1.201806301305.jar" id="de.ovgu.featureide.exampleprojects" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_3.5.1.201806301305.jar" id="de.ovgu.featureide.featurecpp" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_3.5.1.201806301305.jar" id="de.ovgu.featureide.featurehouse" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_3.5.1.201806301305.jar" id="de.ovgu.featureide.featuremodeling" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_3.5.1.201806301305.jar" id="de.ovgu.featureide.munge" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_3.5.1.201806301305.jar" id="de.ovgu.featureide.munge.android" version="3.5.1.201806301305">
+      <category name="FeatureIDE 3.5"/>
+   </feature>
    <archive path="FeatureIDE v2.5 and earlier versions" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>
    <archive path="FeatureIDE v2.6 and v2.7" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/"/>
    <category-def name="FeatureIDE 3.0" label="FeatureIDE 3.0"/>
