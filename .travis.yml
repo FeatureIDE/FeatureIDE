@@ -18,7 +18,7 @@ cache:
 install: true
 
 script:
-- mvn -Pgui clean verify
+- mvn clean verify
 
 after_failure:
 - find -name "*.txt" | grep -F 'surefire-reports' | xargs cat
