@@ -57,6 +57,7 @@
     <project name="FameDB" path="featureide_examples/FeatureModels/FameDB/.project"/>
     <project name="FameDB2" path="featureide_examples/FeatureModels/FameDB2/.project"/>
     <project name="FeatureIDE" path="featureide_examples/FeatureModels/FeatureIDE/.project"/>
+    <project name="FinancialServices01" path="featureide_examples/FeatureModels/FinancialServices01/.project"/>
     <project name="GPLmedium" path="featureide_examples/FeatureModels/GPLmedium/.project"/>
     <project name="GPLsmall" path="featureide_examples/FeatureModels/GPLsmall/.project"/>
     <project name="GPLtiny" path="featureide_examples/FeatureModels/GPLtiny/.project"/>
