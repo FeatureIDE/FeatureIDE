@@ -511,13 +511,15 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			final String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
 				/* case: description */
-				String nodeValue = e.getFirstChild().getNodeValue();
-				if ((nodeValue != null) && !nodeValue.isEmpty()) {
-					nodeValue = nodeValue.replace("\t", "");
-					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
-					nodeValue = nodeValue.trim();
+				if (e.getFirstChild() != null) {
+					String nodeValue = e.getFirstChild().getNodeValue();
+					if ((nodeValue != null) && !nodeValue.isEmpty()) {
+						nodeValue = nodeValue.replace("\t", "");
+						nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
+						nodeValue = nodeValue.trim();
+					}
+					parent.getProperty().setDescription(nodeValue);
 				}
-				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
 			boolean mandatory = false;

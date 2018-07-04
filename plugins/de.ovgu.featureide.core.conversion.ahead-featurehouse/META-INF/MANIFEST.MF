@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Converter Plug-In between AHEAD and FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.conversion.ahead-featurehouse;singleton:=true
-Bundle-Version: 3.5.1.qualifier
+Bundle-Version: 3.5.2.qualifier
 Bundle-Activator: de.ovgu.featureide.core.conversion.ahead_featurehouse.ConversionPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
