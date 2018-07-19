@@ -154,9 +154,4 @@ public class LongRunningThread<T> extends Thread implements IRunner<T> {
 		this.stoppable = stoppable;
 	}
 
-	@Override
-	public Class<?> getImplementationClass() {
-		return method.getClass();
-	}
-
 }
