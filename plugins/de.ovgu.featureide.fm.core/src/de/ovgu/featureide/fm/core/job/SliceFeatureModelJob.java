@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -65,6 +66,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final Path modelFile;
+		private final String newModelName;
+		private final IPersistentFormat<IFeatureModel> newModelFormat;
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
@@ -72,7 +75,21 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			this.featuremodel = featuremodel;
 			this.featureNames = featureNames;
 			this.considerConstraints = considerConstraints;
+			newModelName = "";
+			newModelFormat = null;
 		}
+
+		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints, String newModelName,
+				IPersistentFormat<IFeatureModel> newModelFormat) {
+			super(Arguments.class);
+			this.modelFile = modelFile;
+			this.featuremodel = featuremodel;
+			this.featureNames = featureNames;
+			this.considerConstraints = considerConstraints;
+			this.newModelName = newModelName;
+			this.newModelFormat = newModelFormat;
+		}
+
 	}
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
@@ -338,11 +355,19 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		if ((filePath != null) && (root != null)) {
 			String fileName = filePath.toString();
 			final int extIndex = fileName.lastIndexOf('.');
-			fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-				: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+			if (arguments.newModelName.isEmpty()) {
+				fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
+					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+			} else {
+				fileName = arguments.newModelName;
+			}
 			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
 
-			SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
+			if (arguments.newModelFormat != null) {
+				SimpleFileHandler.save(outputPath, newInterfaceModel, arguments.newModelFormat);
+			} else {
+				SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
+			}
 		}
 	}
 
