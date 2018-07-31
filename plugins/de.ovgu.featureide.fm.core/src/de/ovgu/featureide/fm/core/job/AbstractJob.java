@@ -140,11 +140,6 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 		this.intermediateFunction = intermediateFunction;
 	}
 
-	@Override
-	public Class<?> getImplementationClass() {
-		return getClass();
-	}
-
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not. The default method is empty.
 	 *

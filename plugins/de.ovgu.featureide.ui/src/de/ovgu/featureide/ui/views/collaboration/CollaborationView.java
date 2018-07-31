@@ -123,7 +123,6 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -842,9 +841,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					}
 				};
 				final IRunner<Boolean> runner = LongRunningWrapper.getRunner(job, REFRESH_COLLABORATION_VIEW);
-				if (runner instanceof LongRunningJob<?>) {
-					((LongRunningJob<?>) runner).setPriority(Job.SHORT);
-				}
+				runner.setPriority(Job.SHORT);
 				runner.schedule();
 			}
 		};

@@ -92,7 +92,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.job.ModelScheduleRule;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMComposerManager;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -107,6 +106,9 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.filter.HashSetFilter;
+import de.ovgu.featureide.fm.core.filter.base.InverseFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureOrderFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
@@ -173,7 +175,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private FSTModel fstModel;
 
 	/**
-	 * a folder for the generated files (only needed if the Prject has only the FeatureIDE Nature)
+	 * a folder for the generated files (only needed if the project has only the FeatureIDE Nature)
 	 */
 	private IFolder binFolder;
 
@@ -265,7 +267,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setRemainingWork(7);
 			next(CALCULATE_CORE_AND_DEAD_FEATURES, workMonitor);
-			final List<String> concreteFeatures = (List<String>) getOptionalConcreteFeatures();
+			final List<String> concreteFeatures = getOptionalConcreteFeatures();
 			next(GET_SELECTION_MATRIX, workMonitor);
 			final boolean[][] selectionMatrix = getSelectionMatrix(concreteFeatures);
 			next(GET_FALSE_OPTIONAL_FEATURES, workMonitor);
@@ -1153,18 +1155,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> falseOptionalFeatures = new LinkedList<String>();
-		for (int column = 0; column < concreteFeatures.size(); column++) {
-			boolean invalid = true;
+		final List<String> falseOptionalFeatures = new ArrayList<>();
+		columnLoop: for (int column = 0; column < concreteFeatures.size(); column++) {
 			for (int conf = 0; conf < selections.length; conf++) {
 				if (selections[conf][column] == selectionState) {
-					invalid = false;
-					break;
+					continue columnLoop;
 				}
 			}
-			if (invalid) {
-				falseOptionalFeatures.add(concreteFeatures.get(column));
-			}
+			falseOptionalFeatures.add(concreteFeatures.get(column));
 		}
 		return falseOptionalFeatures;
 	}
@@ -1177,16 +1175,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<IFile> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
+		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 
 		int row = 0;
 		for (final IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
-			try {
-				SimpleFileHandler.load(Paths.get(file.getLocationURI()), configuration, ConfigFormatManager.getInstance());
-			} catch (final Exception e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+			ConfigurationManager.load(Paths.get(file.getLocationURI()), configuration);
 
 			int column = 0;
 			for (final String feature : concreteFeatures) {
@@ -1200,17 +1194,18 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return selections;
 	}
 
-	private Collection<String> getOptionalConcreteFeatures() {
+	private List<String> getOptionalConcreteFeatures() {
 		final IFeatureModel featureModel = featureModelManager.getObject();
-		final Collection<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
+
 		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (final IFeature feature : deadCoreList.get(0)) {
-			concreteFeatures.remove(feature.getName());
-		}
-		for (final IFeature feature : deadCoreList.get(1)) {
-			concreteFeatures.remove(feature.getName());
-		}
-		return concreteFeatures;
+		final List<IFeature> coreList = deadCoreList.get(0);
+		final List<IFeature> deadList = deadCoreList.get(1);
+		final HashSetFilter<IFeature> deadCoreFilter = new HashSetFilter<>((coreList.size() + deadList.size()) << 1);
+		deadCoreFilter.addAll(coreList);
+		deadCoreFilter.addAll(deadList);
+
+		return Functional
+				.mapToStringList(Functional.filter(featureModel.getFeatures(), FeatureUtils.CONCRETE_FEATURE_FILTER, new InverseFilter<>(deadCoreFilter)));
 	}
 
 	@Override

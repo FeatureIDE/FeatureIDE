@@ -35,7 +35,6 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 
 	private Executer<T> executer;
 
-	private boolean stoppable = true;
 	private int cancelingTimeout = -1;
 
 	public LongRunningJob(String name, LongRunningMethod<T> method) {
@@ -45,7 +44,7 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 
 	@Override
 	protected T work(IMonitor monitor) throws Exception {
-		executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
+		executer = cancelingTimeout < 0 ? new Executer<>(method) : new StoppableExecuter<>(method, cancelingTimeout);
 		methodResult = executer.execute(monitor);
 		return methodResult;
 	}
@@ -64,18 +63,13 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 	}
 
 	@Override
-	public Class<?> getImplementationClass() {
-		return method.getClass();
-	}
-
-	@Override
 	public boolean isStoppable() {
-		return stoppable;
+		return cancelingTimeout >= 0;
 	}
 
 	@Override
 	public void setStoppable(boolean stoppable) {
-		this.stoppable = stoppable;
+		this.cancelingTimeout = stoppable ? StoppableExecuter.DEFAULT_TIMEOUT : -1;
 	}
 
 	@Override
