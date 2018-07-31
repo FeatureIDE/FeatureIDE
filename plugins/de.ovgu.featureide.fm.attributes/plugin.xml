@@ -54,4 +54,39 @@
         editorId="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor">
   </editorContentTypeBinding>
 	</extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="de.ovgu.featureide.fm.attributes.isExtendedFeatureModel">
+         <adapt
+               type="org.eclipse.core.resources.IResource">
+            <test
+                  property="de.ovgu.featureide.fm.attributes.properties.extendedfeaturemodel">
+            </test>
+         </adapt>
+      </definition>
+      <definition
+            id="de.ovgu.featureide.fm.ui.expressions.containsExtendedFeatureModel">
+         <with
+               variable="activeMenuSelection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <reference
+                     definitionId="de.ovgu.featureide.fm.attributes.isExtendedFeatureModel">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="de.ovgu.featureide.fm.attributes.properties.ExtendedFormatTester"
+            id="de.ovgu.featureide.fm.attributes.propertytester.format"
+            namespace="de.ovgu.featureide.fm.attributes.properties"
+            properties="extendedfeaturemodel"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
 </plugin>
