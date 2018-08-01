@@ -103,6 +103,7 @@ public class VelvetFeatureModelFormat extends APersistentFormat<IFeatureModel> i
 
 	public static boolean IS_USED_AS_API = false;
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + VelvetFeatureModelFormat.class.getSimpleName();
+	public static final String FILE_EXTENSION = "velvet";
 
 	protected File featureModelFile;
 
@@ -1368,7 +1369,7 @@ public class VelvetFeatureModelFormat extends APersistentFormat<IFeatureModel> i
 
 	@Override
 	public String getSuffix() {
-		return "velvet";
+		return FILE_EXTENSION;
 	}
 
 	@Override

@@ -49,10 +49,6 @@
    </extension>
    <extension
 			point="org.eclipse.ui.editors">
-  <editorContentTypeBinding
-        contentTypeId="de.ovgu.featureide.fm.attributes.extendedFeatureModel"
-        editorId="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor">
-  </editorContentTypeBinding>
 	</extension>
    <extension
          point="org.eclipse.core.expressions.definitions">

@@ -82,46 +82,6 @@
 				priority="low">
 		</content-type>
 		<content-type
-				base-type="org.eclipse.core.runtime.xml"
-				file-extensions="xml"
-				id="de.ovgu.featureide.fm.ui.featureModel"
-				name="Feature Model"
-				priority="high">
-			<describer
-					class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-				<parameter
-						name="element"
-						value="featureModel">
-				</parameter>
-			</describer>
-		   <property
-		         default="de.ovgu.featureide.fm.core.format.fm.XmlFeatureModelFormat"
-		         name="de.ovgu.featureide.fm.ui.contentType.format">
-		   </property>
-		</content-type>
-		<content-type
-				base-type="org.eclipse.core.runtime.xml"
-				file-extensions="xml"
-				id="de.ovgu.featureide.fm.ui.featureModel.sxfm"
-				name="SXFM Feature Model"
-				priority="high">
-			<describer
-					class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-				<parameter
-						name="element"
-						value="feature_model">
-				</parameter>
-    <parameter
-          name="de.ovgu.featureide.fm.ui.parameter1"
-          value="de.ovgu.featureide.fm.ui.parameter1">
-    </parameter>
-			</describer>
-		   <property
-		         default="de.ovgu.featureide.fm.core.format.fm.SXFMFormat"
-		         name="de.ovgu.featureide.fm.ui.contentType.format">
-		   </property>
-		</content-type>
-		<content-type
 		        base-type="org.eclipse.core.runtime.text"
 		        file-extensions="velvet"
 		        id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
@@ -132,6 +92,14 @@
 		         name="de.ovgu.featureide.fm.ui.contentType.format">
 		   </property>
 		</content-type>
+  <content-type
+        base-type="org.eclipse.core.runtime.xml"
+        describer="de.ovgu.featureide.fm.ui.editors.XMLFeatureModelContentDescriber"
+        file-extensions="xml"
+        id="de.ovgu.featureide.fm.ui.XMLFeatureModel"
+        name="XMLFeatureModel"
+        priority="high">
+  </content-type>
 	</extension>
 
 	<extension
@@ -168,13 +136,10 @@
 				id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
 				name="Feature Model Editor">
 			<contentTypeBinding
-					contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
+					contentTypeId="de.ovgu.featureide.fm.ui.XMLFeatureModel">
 			</contentTypeBinding>
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
-			</contentTypeBinding>
-			<contentTypeBinding
-					contentTypeId="de.ovgu.featureide.fm.ui.featureModel.sxfm">
 			</contentTypeBinding>
 		</editor>
 		<editor

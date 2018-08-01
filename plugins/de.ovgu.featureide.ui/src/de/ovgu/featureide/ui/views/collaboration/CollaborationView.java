@@ -51,6 +51,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CL
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -504,7 +505,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				// }
 				// });
 
-				if (ConfigFormatManager.getInstance().hasFormat(inputFile.getName())) {
+				if (ConfigFormatManager.getInstance().hasFormat(Paths.get(inputFile.getLocationURI()))) {
 					// case: open configuration editor
 					CollaborationModelBuilder.editorFile = null;
 					if ((builder.configuration != null) && builder.configuration.equals(inputFile)

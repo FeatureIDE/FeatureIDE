@@ -353,21 +353,14 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final Path filePath = arguments.modelFile.getFileName();
 		final Path root = arguments.modelFile.getRoot();
 		if ((filePath != null) && (root != null)) {
-			String fileName = filePath.toString();
-			final int extIndex = fileName.lastIndexOf('.');
-			if (arguments.newModelName.isEmpty()) {
-				fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
-			} else {
-				fileName = arguments.newModelName;
-			}
+			final IPersistentFormat<IFeatureModel> format =
+				arguments.newModelFormat != null ? arguments.newModelFormat : FMFormatManager.getInstance().getFormatByContent(filePath);
+			final String fileName = !arguments.newModelName.isEmpty() ? arguments.newModelName
+				: SimpleFileHandler.getFileName(filePath) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
+
 			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
 
-			if (arguments.newModelFormat != null) {
-				SimpleFileHandler.save(outputPath, newInterfaceModel, arguments.newModelFormat);
-			} else {
-				SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
-			}
+			SimpleFileHandler.save(outputPath, newInterfaceModel, format);
 		}
 	}
 
