@@ -227,7 +227,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/** The currently active explanation. */
 	private Explanation<?> activeExplanation;
 
-	private IGraphicalFeatureModel graphicalFeatureModel;
+	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	/**
 	 * Constructor. Handles editable and read-only feature models.
@@ -770,23 +770,19 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
+					graphicalFeatureModel.getLayout().setLayout(1);
 					graphicalFeatureModel.init();
-					graphicalFeatureModel = gfmManager.getObject();
 
 					viewer.setContents(graphicalFeatureModel);
-					viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-					viewer.reload();
 				}
 			});
-			setDirty();
+//			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
 			viewer.deregisterEditParts();
 			viewer.setContents(graphicalFeatureModel);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-			viewer.reload();
 			setDirty();
 			analyzeFeatureModel();
 			break;
