@@ -57,6 +57,17 @@ public class NodeWriter {
 		POSTFIX,
 	}
 
+	public enum LineFormat {
+		/**
+		 * <p> Return a single line without any line breaks. </p>
+		 */
+		SINGLE,
+		/**
+		 * <p> Return multiple lines with indentation corresponding to nesting depth of the nodes. </p>
+		 */
+		TREE,
+	}
+
 	/** Denotes an unsupported symbol. */
 	public static final String noSymbol = "?";
 	/**
@@ -87,6 +98,8 @@ public class NodeWriter {
 	private String[] symbols = shortSymbols;
 	/** The notation to use. */
 	private Notation notation = Notation.INFIX;
+	/** The line format to use. */
+	private LineFormat lineFormat = LineFormat.SINGLE;
 	/** If true, this writer will always place brackets, even if they are semantically irrelevant. */
 	private boolean enforceBrackets = false;
 	/** If true, this writer will enquote variables if they contain whitespace. */
@@ -144,6 +157,14 @@ public class NodeWriter {
 		return notation;
 	}
 
+	public LineFormat getLineFormat() {
+		return lineFormat;
+	}
+
+	public void setLineFormat(LineFormat lineFormat) {
+		this.lineFormat = lineFormat;
+	}
+
 	/**
 	 * Sets the enforcing brackets flag. If true, this writer will always place brackets, even if they are semantically irrelevant.
 	 *
@@ -186,7 +207,9 @@ public class NodeWriter {
 	 * @return the textual representation; not null
 	 */
 	public String nodeToString() {
-		return nodeToString(root, null);
+		final StringBuilder sb = new StringBuilder();
+		nodeToString(root, null, sb, -1);
+		return sb.toString();
 	}
 
 	/**
@@ -194,23 +217,25 @@ public class NodeWriter {
 	 *
 	 * @param node propositional node to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
-	 * @return the textual representation; not null
+	 * @param sb the {@link StringBuilder} containing the textual representation.
 	 */
-	protected String nodeToString(Node node, Class<? extends Node> parent) {
+	protected void nodeToString(Node node, Class<? extends Node> parent, StringBuilder sb, int depth) {
 		if (node == null) {
-			return String.valueOf(node);
-		}
-		if (node instanceof Not) {
-			final Node child = node.children[0];
-			if (child instanceof Literal) {
-				final Literal l = (Literal) child;
-				node = new Literal(l.var, !l.positive);
+			sb.append(String.valueOf(node));
+		} else {
+			if (node instanceof Not) {
+				final Node child = node.children[0];
+				if (child instanceof Literal) {
+					final Literal l = (Literal) child;
+					node = new Literal(l.var, !l.positive);
+				}
+			}
+			if (node instanceof Literal) {
+				literalToString((Literal) node, parent, sb, depth + 1);
+			} else {
+				operationToString(node, parent, sb, depth + 1);
 			}
 		}
-		if (node instanceof Literal) {
-			return literalToString((Literal) node, parent);
-		}
-		return operationToString(node, parent);
 	}
 
 	/**
@@ -218,31 +243,58 @@ public class NodeWriter {
 	 *
 	 * @param l a literal to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
-	 * @return the textual representation; not null
+	 * @param sb the {@link StringBuilder} containing the textual representation.
 	 */
-	protected String literalToString(Literal l, Class<? extends Node> parent) {
+	protected void literalToString(Literal l, Class<? extends Node> parent, StringBuilder sb, int depth) {
+		switch (lineFormat) {
+		case SINGLE:
+			break;
+		case TREE:
+			if (depth > 0) {
+				sb.append('\n');
+			}
+			for (int i = 0; i < depth; i++) {
+				sb.append('\t');
+			}
+			break;
+		default:
+			throw new IllegalStateException("Unknown line format: " + lineFormat);
+		}
 		final String s = variableToString(l.var);
 		if (!l.positive) {
 			final Notation notation = getNotation();
 			switch (notation) {
 			case INFIX:
-				return getSymbols()[0] + ((getSymbols() == textualSymbols) ? " " : "") + s;
+				sb.append(getSymbols()[0]);
+				sb.append((getSymbols() == textualSymbols) ? " " : "");
+				sb.append(s);
+				break;
 			case PREFIX:
-				return String.format("(%s %s)", getSymbols()[0], s);
+				sb.append('(');
+				sb.append(getSymbols()[0]);
+				sb.append(' ');
+				sb.append(s);
+				sb.append(')');
+				break;
 			case POSTFIX:
-				return String.format("(%s %s)", s, getSymbols()[0]);
+				sb.append('(');
+				sb.append(s);
+				sb.append(' ');
+				sb.append(getSymbols()[0]);
+				sb.append(')');
+				break;
 			default:
 				throw new IllegalStateException("Unknown notation: " + notation);
 			}
+		} else {
+			sb.append(s);
 		}
-		return s;
 	}
 
 	/**
 	 * Converts a variable into the specified textual representation.
 	 *
 	 * @param variable a variable to convert; not null
-	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
 	 * @return the textual representation; not null
 	 */
 	protected String variableToString(Object variable) {
@@ -255,14 +307,27 @@ public class NodeWriter {
 	 *
 	 * @param node an operation to convert; not null
 	 * @param parent the class of the node's parent; null if not available (i.e. the current node is the root node)
-	 * @return the textual representation; not null
+	 * @param sb the {@link StringBuilder} containing the textual representation.
 	 */
-	protected String operationToString(Node node, Class<? extends Node> parent) {
+	protected void operationToString(Node node, Class<? extends Node> parent, StringBuilder sb, int depth) {
+		switch (lineFormat) {
+		case SINGLE:
+			break;
+		case TREE:
+			if (depth > 0) {
+				sb.append('\n');
+			}
+			for (int i = 0; i < depth; i++) {
+				sb.append('\t');
+			}
+			break;
+		default:
+			throw new IllegalStateException("Unknown line format: " + lineFormat);
+		}
 		final Node[] children = node.getChildren();
-
-		final String[] operands = new String[children.length];
-		for (int i = 0; i < children.length; i++) {
-			operands[i] = nodeToString(children[i], node.getClass());
+		if (children.length == 0) {
+			sb.append("()");
+			return;
 		}
 
 		final String operator = getOperator(node);
@@ -270,19 +335,60 @@ public class NodeWriter {
 		switch (notation) {
 		case INFIX:
 			if (isInfixCompatibleOperation(node)) {
-				final String s = join(" " + operator + " ", operands);
 				final int orderParent;
 				final int orderChild;
-				return (isEnforceBrackets() || ((orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass())))
-					|| ((orderParent == orderChild) && (orderParent == getOrder(Implies.class)))) ? "(" + s + ")" : s;
+				final boolean parenthesis = (isEnforceBrackets() || ((orderParent = getOrder(parent)) > (orderChild = getOrder(node.getClass())))
+					|| ((orderParent == orderChild) && (orderParent == getOrder(Implies.class))));
+				if (parenthesis) {
+					sb.append('(');
+				}
+				nodeToString(children[0], node.getClass(), sb, depth);
+				for (int i = 1; i < children.length; i++) {
+					sb.append(' ');
+					sb.append(operator);
+					sb.append(' ');
+					nodeToString(children[i], node.getClass(), sb, depth);
+				}
+				if (parenthesis) {
+					sb.append(')');
+				}
 			} else {
-				return String.format("%s(%s)", operator + (((node instanceof Not) && (getSymbols() == textualSymbols)) ? " " : ""),
-						join(getSymbols()[5], operands));
+				sb.append(operator);
+				if ((node instanceof Not) && (getSymbols() == textualSymbols)) {
+					sb.append(' ');
+				}
+				sb.append('(');
+				nodeToString(children[0], node.getClass(), sb, depth);
+				for (int i = 1; i < children.length; i++) {
+					sb.append(getSymbols()[5]);
+					sb.append(' ');
+					nodeToString(children[i], node.getClass(), sb, depth);
+				}
+				sb.append(')');
 			}
+			break;
 		case PREFIX:
-			return String.format("(%s %s)", operator, join(" ", operands));
+			sb.append('(');
+			sb.append(operator);
+			sb.append(' ');
+			nodeToString(children[0], node.getClass(), sb, depth);
+			for (int i = 1; i < children.length; i++) {
+				sb.append(' ');
+				nodeToString(children[i], node.getClass(), sb, depth);
+			}
+			sb.append(')');
+			break;
 		case POSTFIX:
-			return String.format("(%s %s)", join(" ", operands), operator);
+			sb.append('(');
+			nodeToString(children[0], node.getClass(), sb, depth);
+			for (int i = 1; i < children.length; i++) {
+				sb.append(' ');
+				nodeToString(children[i], node.getClass(), sb, depth);
+			}
+			sb.append(' ');
+			sb.append(operator);
+			sb.append(')');
+			break;
 		default:
 			throw new IllegalStateException("Unknown notation: " + notation);
 		}
@@ -393,22 +499,4 @@ public class NodeWriter {
 		return s.matches(".*?\\s+.*");
 	}
 
-	/**
-	 * Returns the given strings concatenated with the given separator.
-	 *
-	 * @param separator string to insert between the given strings
-	 * @param strings strings to join
-	 * @return the given strings concatenated with the given separator
-	 */
-	private static String join(String separator, String... strings) {
-		if (strings.length > 0) {
-			final StringBuilder sb = new StringBuilder(strings[0]);
-			for (int i = 1; i < strings.length; i++) {
-				sb.append(separator);
-				sb.append(strings[i]);
-			}
-			return sb.toString();
-		}
-		return "";
-	}
 }

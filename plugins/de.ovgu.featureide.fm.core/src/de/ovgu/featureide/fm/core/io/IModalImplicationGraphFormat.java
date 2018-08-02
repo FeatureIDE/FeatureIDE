@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 
 /**
  * Format for {@link IFeatureGraph feature graphs}.

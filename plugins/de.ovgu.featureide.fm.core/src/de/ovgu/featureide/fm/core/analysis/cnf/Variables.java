@@ -114,7 +114,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	@Override
-	public LiteralSet convertToVariables(List<String> variableNames) {
+	public LiteralSet convertToVariables(Collection<String> variableNames) {
 		final int[] literals = new int[variableNames.size()];
 		int i = 0;
 		for (final String varName : variableNames) {
@@ -124,7 +124,7 @@ public class Variables implements Serializable, IVariables, IInternalVariables {
 	}
 
 	@Override
-	public LiteralSet convertToVariables(List<String> variableNames, boolean sign) {
+	public LiteralSet convertToVariables(Collection<String> variableNames, boolean sign) {
 		final int[] literals = new int[variableNames.size()];
 		int i = 0;
 		for (final String varName : variableNames) {

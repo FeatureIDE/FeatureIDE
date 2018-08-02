@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.formula;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraphBuilder;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
@@ -33,7 +33,7 @@ public class ModalImplicationGraphCreator extends ACreator<ModalImplicationGraph
 
 	@Override
 	protected ModalImplicationGraph create() {
-		return LongRunningWrapper.runMethod(new ModalImplicationGraphBuilder(formula.getElement(new CNFCreator()), false));
+		return LongRunningWrapper.runMethod(new MIGBuilder(formula.getElement(new CNFCreator()), false));
 	}
 
 }

@@ -31,6 +31,12 @@ import javax.annotation.CheckForNull;
  */
 public class SatUtils {
 
+	/**
+	 * Returns a copy of the given array with all entries negated.
+	 * 
+	 * @param solution the given array
+	 * @return Array with negated entries.
+	 */
 	public static int[] negateSolution(int[] solution) {
 		final int[] negSolution = Arrays.copyOf(solution, solution.length);
 		for (int i = 0; i < solution.length; i++) {

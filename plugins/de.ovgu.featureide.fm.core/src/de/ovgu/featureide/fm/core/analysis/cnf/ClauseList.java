@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -54,6 +55,44 @@ public class ClauseList extends ArrayList<LiteralSet> implements Cloneable {
 	@Override
 	public ClauseList clone() {
 		return new ClauseList(this);
+	}
+
+	/**
+	 * Negates all clauses in the list (applies De Morgan).
+	 *
+	 * @return A newly construct {@code ClauseList}.
+	 */
+	public ClauseList negate() {
+		final ClauseList negatedClauseList = new ClauseList();
+		for (final LiteralSet clause : this) {
+			negatedClauseList.add(clause.negate());
+		}
+		return negatedClauseList;
+	}
+
+	/**
+	 * Converts CNF to DNF and vice-versa.
+	 *
+	 * @return A newly construct {@code ClauseList}.
+	 */
+	public ClauseList convert() {
+		final ClauseList convertedClauseList = new ClauseList();
+		convert(this, convertedClauseList, new int[size()], 0);
+		return convertedClauseList;
+	}
+
+	private void convert(ClauseList cnf, ClauseList dnf, int[] literals, int index) {
+		if (index == cnf.size()) {
+			final LiteralSet literalSet = new LiteralSet(Arrays.copyOf(literals, literals.length)).clean();
+			if (literalSet != null) {
+				dnf.add(literalSet);
+			}
+		} else {
+			for (final int literal : cnf.get(index).getLiterals()) {
+				literals[index] = literal;
+				convert(cnf, dnf, literals, index + 1);
+			}
+		}
 	}
 
 }

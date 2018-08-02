@@ -104,4 +104,10 @@ public class Not extends Node implements Cloneable {
 		return !children[0].getValue(map);
 	}
 
+	@Override
+	public Node flatten() {
+		children[0] = children[0].flatten();
+		return this;
+	}
+
 }

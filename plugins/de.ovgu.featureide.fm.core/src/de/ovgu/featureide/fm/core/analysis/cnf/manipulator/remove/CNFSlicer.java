@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -62,7 +63,7 @@ public class CNFSlicer extends AbstractManipulator {
 	protected final Set<DeprecatedClause> dirtyClauseSet = new HashSet<>();
 	protected final Set<DeprecatedClause> cleanClauseSet = new HashSet<>();
 
-	protected final LiteralSet dirtyLiterals;
+	protected final LiteralSet dirtyVariables;
 	private int numberOfDirtyFeatures = 0;
 
 	protected int[] helper;
@@ -78,15 +79,15 @@ public class CNFSlicer extends AbstractManipulator {
 	protected int dirtyListNegIndex = 0;
 	protected int newDirtyListDelIndex = 0;
 
-	public CNFSlicer(CNF orgCNF, List<String> dirtyFeatures) {
+	public CNFSlicer(CNF orgCNF, Collection<String> dirtyVariableNames) {
 		super(orgCNF);
-		dirtyLiterals = orgCNF.getVariables().convertToVariables(dirtyFeatures);
+		dirtyVariables = orgCNF.getVariables().convertToVariables(dirtyVariableNames);
 		cnfCopy = new CNF(orgCNF, false);
 	}
 
-	public CNFSlicer(CNF orgCNF, LiteralSet dirtyLiterals) {
+	public CNFSlicer(CNF orgCNF, LiteralSet dirtyVariables) {
 		super(orgCNF);
-		this.dirtyLiterals = dirtyLiterals;
+		this.dirtyVariables = dirtyVariables;
 		cnfCopy = new CNF(orgCNF, false);
 	}
 
@@ -99,7 +100,7 @@ public class CNFSlicer extends AbstractManipulator {
 		final String[] variableObjects = Arrays.copyOf(names, names.length);
 		map = new DeprecatedFeature[orgCNF.getVariables().maxVariableID() + 1];
 		numberOfDirtyFeatures = 0;
-		for (final int curFeature : dirtyLiterals.getLiterals()) {
+		for (final int curFeature : dirtyVariables.getLiterals()) {
 			map[curFeature] = new DeprecatedFeature(curFeature);
 			variableObjects[curFeature] = null;
 			numberOfDirtyFeatures++;

@@ -106,6 +106,11 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	@Override
+	public Node flatten() {
+		return this;
+	}
+
+	@Override
 	protected List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
 		if (var.equals(feature.getName())) {
 			var = replaceWithFeature.getName();

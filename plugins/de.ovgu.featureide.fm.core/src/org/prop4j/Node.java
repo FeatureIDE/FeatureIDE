@@ -114,7 +114,10 @@ public abstract class Node {
 	}
 
 	public Node toRegularCNF() {
-		Node regularCNFNode = toCNF();
+		final Node node = flatten();
+		node.simplify();
+		node.removeDuplicates();
+		Node regularCNFNode = node.toCNF();
 		if (regularCNFNode instanceof And) {
 			final Node[] children = regularCNFNode.getChildren();
 			for (int i = 0; i < children.length; i++) {
@@ -340,6 +343,35 @@ public abstract class Node {
 	public void simplify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
+		}
+	}
+
+	public Node flatten() {
+		if (children.length == 1) {
+			return children[0];
+		} else {
+			for (int i = 0; i < children.length; i++) {
+				children[i] = children[i].flatten();
+			}
+			return this;
+		}
+	}
+
+	public void removeDuplicates() {
+		if ((children != null) && (children.length > 1)) {
+			final HashSet<Node> childrenSet = new HashSet<>();
+			for (int i = 0; i < children.length; i++) {
+				final Node child = children[i];
+				child.removeDuplicates();
+				childrenSet.add(child);
+			}
+			if (childrenSet.size() < children.length) {
+				final Node[] newChildren = new Node[childrenSet.size()];
+				int i = 0;
+				for (final Node child : childrenSet) {
+					newChildren[i++] = child;
+				}
+			}
 		}
 	}
 

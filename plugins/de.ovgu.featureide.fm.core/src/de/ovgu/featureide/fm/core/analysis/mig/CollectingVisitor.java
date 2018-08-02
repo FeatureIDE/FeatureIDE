@@ -18,59 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.mig;
 
-import java.util.Iterator;
+import org.sat4j.core.VecInt;
 
-/**
- * NOTE: 1-based
- *
- * @author Sebastian Krieter
- */
-public class LexicographicIterator2 implements Iterator<int[]> {
+public class CollectingVisitor implements Visitor<VecInt[]> {
+	final VecInt[] literalList = new VecInt[] { new VecInt(), new VecInt() };
 
-	private final int t, length;
-	private boolean hasNext = true;
-
-	private final int[] c;
-
-	public LexicographicIterator2(int t, int length) {
-		this.t = t;
-		this.length = length;
-		c = new int[t];
-		for (int i = 0; i < (c.length - 1); i++) {
-			c[i] = i + 1;
-		}
-		c[t - 1] = t - 1;
+	@Override
+	public void visitStrong(int curLiteral) {
+		literalList[0].push(curLiteral);
 	}
 
 	@Override
-	public boolean hasNext() {
-		return hasNext;
+	public boolean visitWeak(int curLiteral) {
+		literalList[1].push(curLiteral);
+		return false;
 	}
 
 	@Override
-	public int[] next() {
-		int i = t;
-		for (; i > 0; i--) {
-			final int ci = ++c[i - 1];
-			if (ci < ((length - t) + i + 1)) {
-				break;
-			}
-		}
-		if ((i == 0) && (c[i] == ((length - t) + 2))) {
-			hasNext = false;
-			return null;
-		}
-
-		for (; i < t; i++) {
-			if (i == 0) {
-				c[i] = 1;
-			} else {
-				c[i] = c[i - 1] + 1;
-			}
-		}
-
-		return c;
+	public VecInt[] getResult() {
+		return literalList;
 	}
 }

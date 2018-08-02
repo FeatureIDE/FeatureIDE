@@ -25,6 +25,7 @@ import java.util.Random;
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 import de.ovgu.featureide.fm.core.analysis.cnf.SatUtils;
+import de.ovgu.featureide.fm.core.analysis.cnf.Solution;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver.SelectionStrategy;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.RuntimeContradictionException;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -68,7 +69,7 @@ public class RandomConfigurationGenerator extends AConfigurationGenerator {
 			if (solution == null) {
 				break;
 			}
-			addResult(solution);
+			addResult(new Solution(solution));
 			monitor.step();
 			if (!allowDuplicates) {
 				try {

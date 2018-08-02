@@ -18,45 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.mig;
 
-import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+public class DefaultVisitor implements Visitor<Void> {
 
-/**
- *
- * @author Sebastian Krieter
- */
-public class Condition implements Comparable<Condition> {
+	@Override
+	public void visitStrong(int curLiteral) {}
 
-	private final LiteralSet[] positiveExpressions, negativeExpressions;
-
-	private int outgoingEdge = 0;
-
-	public Condition(LiteralSet[] positiveExpressions, LiteralSet[] negativeExpressions) {
-		super();
-		this.positiveExpressions = positiveExpressions;
-		this.negativeExpressions = negativeExpressions;
-	}
-
-	public LiteralSet[] getPositiveExpressions() {
-		return positiveExpressions;
-	}
-
-	public LiteralSet[] getNegativeExpressions() {
-		return negativeExpressions;
-	}
-
-	public int getOutgoingEdge() {
-		return outgoingEdge;
-	}
-
-	public void setOutgoingEdge(int outgoingEdge) {
-		this.outgoingEdge = outgoingEdge;
+	@Override
+	public boolean visitWeak(int curLiteral) {
+		return false;
 	}
 
 	@Override
-	public int compareTo(Condition o) {
-		return outgoingEdge - o.outgoingEdge;
+	public Void getResult() {
+		return null;
 	}
 
 }

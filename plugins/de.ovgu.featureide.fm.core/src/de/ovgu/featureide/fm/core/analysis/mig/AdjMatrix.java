@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator;
+package de.ovgu.featureide.fm.core.analysis.mig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +26,17 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
 
 /**
- * Adjacency matrix implementation for a feature graph.
+ * Adjacency matrix implementation for a modal implication graph.
  *
  * @author Sebastian Krieter
  */
-class AdjMatrix {
+class AdjMatrix implements IEdgeTypes {
 
 	final List<LiteralSet> clauseList = new ArrayList<>();
 
 	final byte[] edges;
 	final byte[] core;
-	final int numVariables;
+	private final int numVariables;
 
 	public AdjMatrix(int numVariables) {
 		this.numVariables = numVariables;
@@ -54,15 +54,6 @@ class AdjMatrix {
 
 	public byte getCore(int i) {
 		return core[i];
-	}
-
-	public long size() {
-		long sum = 0;
-
-		sum += edges.length;
-		sum += core.length;
-
-		return sum;
 	}
 
 	public int getNumVariables() {

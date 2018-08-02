@@ -21,30 +21,55 @@
 package de.ovgu.featureide.fm.core;
 
 /**
+ * Logs messages to the standard console (out and error stream).
  *
  * @author Sebastian Krieter
  */
 public class JavaLogger implements ILogger {
 
+	public static final boolean DEBUG_MODE = false;
+
+	private static String getDebugInfo() {
+		final StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
+		final String debugInfo = " [ " + stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "(" + stackTraceElement.getFileName()
+			+ ":" + stackTraceElement.getLineNumber() + ") ]";
+		return debugInfo;
+	}
+
 	@Override
 	public void logInfo(String message) {
-		System.out.println("INFO: " + message);
+		if (DEBUG_MODE) {
+			System.out.println("INFO: " + message + getDebugInfo());
+		} else {
+			System.out.println("INFO: " + message);
+		}
 	}
 
 	@Override
 	public void logWarning(String message) {
-		System.out.println("WARNING: " + message);
+		if (DEBUG_MODE) {
+			System.out.println("WARNING: " + message + getDebugInfo());
+		} else {
+			System.out.println("WARNING: " + message);
+		}
 	}
 
 	@Override
 	public void logError(String message) {
 		System.err.println("ERROR: " + message);
+		if (DEBUG_MODE) {
+			System.err.println("ERROR: " + message + getDebugInfo());
+		} else {
+			System.err.println("ERROR: " + message);
+		}
 	}
 
 	@Override
 	public void logError(String message, Throwable exception) {
 		System.err.println("ERROR: " + message);
-		exception.printStackTrace(System.err);
+		if (exception != null) {
+			exception.printStackTrace(System.err);
+		}
 	}
 
 	@Override

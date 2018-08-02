@@ -27,11 +27,11 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
-import de.ovgu.featureide.fm.core.analysis.cnf.analysis.DecisionPropagationAnalysisMIG;
+import de.ovgu.featureide.fm.core.analysis.cnf.analysis.ConditionallyCoreDeadAnalysisMIG;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 
@@ -79,7 +79,7 @@ public class ConfigurationPropagatorMIG extends ConfigurationPropagator {
 			workMonitor.setRemainingWork(manualLiterals.size() + 1);
 			Collections.reverse(manualLiterals);
 
-			final DecisionPropagationAnalysisMIG analysis = new DecisionPropagationAnalysisMIG(rootNode, graph);
+			final ConditionallyCoreDeadAnalysisMIG analysis = new ConditionallyCoreDeadAnalysisMIG(rootNode, graph);
 			final int[] intLiterals = new int[manualLiterals.size()];
 			for (int i = 0; i < intLiterals.length; i++) {
 				intLiterals[i] = manualLiterals.get(i);

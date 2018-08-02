@@ -31,7 +31,7 @@ import javax.annotation.CheckForNull;
  *
  * @author Sebastian Krieter
  */
-public class LiteralSet implements Cloneable, Serializable {
+public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSet> {
 
 	private static final long serialVersionUID = 8948014814795787431L;
 
@@ -94,26 +94,34 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	public boolean containsLiteral(int literal) {
-		return Arrays.binarySearch(literals, literal) >= 0;
+		return indexOfLiteral(literal) >= 0;
+	}
+
+	public boolean containsVariable(int variable) {
+		return indexOfVariable(variable) >= 0;
+	}
+
+	public int indexOfLiteral(int literal) {
+		return Arrays.binarySearch(literals, literal);
+	}
+
+	public int indexOfVariable(int variable) {
+		for (int i = 0; i < literals.length; i++) {
+			if (Math.abs(literals[i]) == variable) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	// TODO exploit that both sets are sorted
 	public boolean containsAll(LiteralSet otherLiteralSet) {
 		for (final int otherLiteral : otherLiteralSet.getLiterals()) {
-			if (Arrays.binarySearch(literals, otherLiteral) < 0) {
+			if (indexOfLiteral(otherLiteral) < 0) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	public boolean contains(int variable) {
-		for (final int curLiteral : literals) {
-			if (Math.abs(curLiteral) == variable) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public int countNegative() {
@@ -181,45 +189,51 @@ public class LiteralSet implements Cloneable, Serializable {
 	}
 
 	// TODO exploit fact that variables and literals are sorted
-	private int getDuplicates(LiteralSet variables, final boolean[] removeMarker) {
+	protected int getDuplicates(LiteralSet variables, final boolean[] removeMarker) {
 		final int[] otherLiterals = variables.getLiterals();
 		int count = 0;
 		for (int i = 0; i < otherLiterals.length; i++) {
-			final int otherLiteral = otherLiterals[i];
-			for (int j = 0; j < literals.length; j++) {
-				if (literals[j] == otherLiteral) {
-					count++;
-					removeMarker[j] = true;
+			final int index = indexOfLiteral(otherLiterals[i]);
+			if (index >= 0) {
+				count++;
+				if (removeMarker != null) {
+					removeMarker[index] = true;
 				}
 			}
 		}
 		return count;
 	}
 
-	public int countDuplicates(LiteralSet variables) {
+	public boolean hasDuplicates(LiteralSet variables) {
 		final int[] otherLiterals = variables.getLiterals();
-		int count = 0;
 		for (int i = 0; i < otherLiterals.length; i++) {
-			final int otherLiteral = otherLiterals[i];
-			for (int j = 0; j < literals.length; j++) {
-				if (literals[j] == otherLiteral) {
-					count++;
-				}
+			if (indexOfLiteral(otherLiterals[i]) >= 0) {
+				return true;
 			}
 		}
-		return count;
+		return false;
+	}
+
+	public int countDuplicates(LiteralSet variables) {
+		return getDuplicates(variables, null);
+	}
+
+	public boolean hasConflicts(LiteralSet variables) {
+		final int[] otherLiterals = variables.getLiterals();
+		for (int i = 0; i < otherLiterals.length; i++) {
+			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public int countConflicts(LiteralSet variables) {
 		final int[] otherLiterals = variables.getLiterals();
 		int count = 0;
 		for (int i = 0; i < otherLiterals.length; i++) {
-			final int otherLiteral = -otherLiterals[i];
-			for (int j = 0; j < literals.length; j++) {
-				if (literals[j] == otherLiteral) {
-					count++;
-					break;
-				}
+			if (indexOfLiteral(-otherLiterals[i]) >= 0) {
+				count++;
 			}
 		}
 		return count;
@@ -305,6 +319,12 @@ public class LiteralSet implements Cloneable, Serializable {
 
 	public boolean isEmpty() {
 		return literals.length == 0;
+	}
+
+	@Override
+	public int compareTo(LiteralSet o) {
+		// TODO implement more efficient comparison
+		return Arrays.toString(literals).compareTo(Arrays.toString(o.literals));
 	}
 
 }

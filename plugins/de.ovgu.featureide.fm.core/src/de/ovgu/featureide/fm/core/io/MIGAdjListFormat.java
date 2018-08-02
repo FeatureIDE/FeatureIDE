@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.PluginID;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 
 /**
  * Reads / Writes a feature graph.

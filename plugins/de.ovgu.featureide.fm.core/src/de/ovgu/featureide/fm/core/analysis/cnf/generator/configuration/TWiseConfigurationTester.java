@@ -20,15 +20,28 @@
  */
 package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
+
+import org.sat4j.core.VecInt;
 
 import de.ovgu.featureide.fm.core.analysis.cnf.CNF;
+import de.ovgu.featureide.fm.core.analysis.cnf.ClauseList;
 import de.ovgu.featureide.fm.core.analysis.cnf.LiteralSet;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.ICombinationIterator;
+import de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration.iterator.LexicographicIterator;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.AdvancedSatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISatSolver;
 import de.ovgu.featureide.fm.core.analysis.cnf.solver.ISimpleSatSolver.SatResult;
+import de.ovgu.featureide.fm.core.analysis.mig.CollectingVisitor;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGBuilder;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
+import de.ovgu.featureide.fm.core.analysis.mig.Traverser;
+import de.ovgu.featureide.fm.core.analysis.mig.Vertex;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -39,23 +52,177 @@ public class TWiseConfigurationTester {
 
 	private final int t;
 	private final CNF cnf;
-	private final LiteralSet[] nodeArray;
+	private final List<List<ClauseList>> nodeArray;
 	private final ISatSolver solver;
+	private final ModalImplicationGraph mig;
 	private final List<int[]> configurations;
 
-	public TWiseConfigurationTester(CNF cnf, int t, LiteralSet[] nodeArray, List<int[]> configurations) {
+	protected LiteralSet[] strongHull;
+
+	public TWiseConfigurationTester(CNF cnf, int t, List<List<ClauseList>> nodeArray, List<int[]> configurations) {
 		this.cnf = cnf;
 		this.t = t;
 		this.nodeArray = nodeArray;
 		this.configurations = configurations;
 		if (!this.cnf.getClauses().isEmpty()) {
 			solver = new AdvancedSatSolver(this.cnf);
+			mig = LongRunningWrapper.runMethod(new MIGBuilder(solver.getSatInstance(), false));
+			genHulls();
 		} else {
 			solver = null;
+			mig = null;
+		}
+	}
+
+	private void genHulls() {
+		strongHull = new LiteralSet[mig.getAdjList().size()];
+
+		for (final Vertex vertex : mig.getAdjList()) {
+			final int literalSet = vertex.getVar();
+			final Traverser traverser = new Traverser(mig);
+			traverser.setModel(new int[mig.getAdjList().size()]);
+			final CollectingVisitor visitor = new CollectingVisitor();
+			traverser.setVisitor(visitor);
+			traverser.traverse(literalSet);
+			final VecInt strong = visitor.getResult()[0];
+			strongHull[vertex.getId()] = new LiteralSet(Arrays.copyOf(strong.toArray(), strong.size()));
 		}
 	}
 
 	public void test() {
+		testSolutionValidity();
+		testCompleteness();
+	}
+
+	private void testCompleteness() throws AssertionError {
+		final int[] clauseIndex = new int[t];
+		final ArrayList<LiteralSet> combinations = new ArrayList<>();
+
+		System.out.print("\tTesting combination completeness...");
+		for (final List<ClauseList> expressions : nodeArray) {
+			comboLoop: for (final ICombinationIterator iterator = new LexicographicIterator(t, expressions); iterator.hasNext();) {
+				final ClauseList[] clauseListArray = iterator.next();
+				if (clauseListArray == null) {
+					break;
+				}
+
+				if (isCovered(clauseListArray)) {
+					continue comboLoop;
+				}
+
+				Arrays.fill(clauseIndex, 0);
+				clauseIndex[0] = -1;
+				combinations.clear();
+
+				int i = 0;
+				loop: while (i < t) {
+					for (i = 0; i < t; i++) {
+						final int cindex = clauseIndex[i];
+						if (cindex == (clauseListArray[i].size() - 1)) {
+							clauseIndex[i] = 0;
+						} else {
+							clauseIndex[i] = cindex + 1;
+
+							final LiteralSet literalSet = getCombinationLiterals(clauseIndex, clauseListArray);
+							if (literalSet != null) {
+								combinations.add(literalSet);
+								continue loop;
+							}
+						}
+					}
+				}
+
+				if (solver != null) {
+					for (final Iterator<LiteralSet> it = combinations.iterator(); it.hasNext();) {
+						if (checkMig(it.next())) {
+							it.remove();
+						}
+					}
+
+					for (final Iterator<LiteralSet> it = combinations.iterator(); it.hasNext();) {
+						if (checkSolver(it.next())) {
+							it.remove();
+						} else {
+							break;
+						}
+					}
+				}
+
+				if (combinations.isEmpty()) {
+					continue comboLoop;
+				}
+
+				System.out.println(" FAIL");
+				throw new RuntimeException("Uncovered combination. " + iterator.getIndex() + " - " + Arrays.toString(clauseListArray));
+			}
+		}
+		System.out.println(" PASS");
+	}
+
+	private boolean checkSolver(final LiteralSet literalSet) throws AssertionError {
+		for (final Integer literal : literalSet.getLiterals()) {
+			solver.assignmentPush(literal);
+		}
+		final SatResult hasSolution = solver.hasSolution();
+		switch (hasSolution) {
+		case FALSE:
+			solver.assignmentClear(0);
+			return true;
+		case TIMEOUT:
+			System.err.println("Timeout!");
+			solver.assignmentClear(0);
+			return true;
+		case TRUE:
+			solver.assignmentClear(0);
+			return false;
+		default:
+			throw new AssertionError();
+		}
+	}
+
+	private boolean checkMig(final LiteralSet literalSet) {
+		for (final int literal : literalSet.getLiterals()) {
+			if (strongHull[mig.getVertex(literal).getId()].hasConflicts(literalSet)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private LiteralSet getCombinationLiterals(final int[] clauseIndex, final ClauseList[] clauseListArray) {
+		final TreeSet<Integer> newLiteralSet = new TreeSet<>();
+		for (int j = 0; j < t; j++) {
+			for (final int literal : clauseListArray[j].get(clauseIndex[j]).getLiterals()) {
+				if (newLiteralSet.contains(-literal)) {
+					return null;
+				} else {
+					newLiteralSet.add(literal);
+				}
+			}
+		}
+
+		final int[] combinationLiterals = new int[newLiteralSet.size()];
+		int j = 0;
+		for (final Integer literal : newLiteralSet) {
+			combinationLiterals[j++] = literal;
+		}
+		final LiteralSet literalSet = new LiteralSet(combinationLiterals);
+		return literalSet;
+	}
+
+	private boolean isCovered(final ClauseList[] clauseListArray) {
+		configurationLoop: for (final int[] solution : configurations) {
+			for (final ClauseList clauseList : clauseListArray) {
+				if (!containsAtLeastOne(solution, clauseList)) {
+					continue configurationLoop;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void testSolutionValidity() throws AssertionError {
 		System.out.println("Testing results...");
 		if (solver != null) {
 			System.out.print("\tTesting configuration validity...");
@@ -84,58 +251,24 @@ public class TWiseConfigurationTester {
 			}
 			System.out.println(" PASS");
 		}
+	}
 
-		System.out.print("\tTesting combination completeness...");
-		comboLoop: for (final Iterator<int[]> iterator = new LexicographicIterator(t, nodeArray.length); iterator.hasNext();) {
-			final int[] indexArray = iterator.next();
-			if (indexArray == null) {
-				break;
+	private boolean containsAtLeastOne(final int[] solution, final ClauseList clauseList) {
+		for (final LiteralSet literalSet : clauseList) {
+			if (contains(solution, literalSet)) {
+				return true;
 			}
-
-			for (int i = 0; i < indexArray.length; i++) {
-				final LiteralSet literalsI = nodeArray[indexArray[i]];
-				for (int j = i + 1; j < indexArray.length; j++) {
-					final LiteralSet literalsJ = nodeArray[indexArray[j]];
-					if (literalsI.countConflicts(literalsJ) != 0) {
-						continue comboLoop;
-					}
-				}
-			}
-
-			configurationLoop: for (final int[] solution : configurations) {
-				for (final int i : indexArray) {
-					for (final int literal : nodeArray[i].getLiterals()) {
-						if (solution[Math.abs(literal) - 1] == -literal) {
-							continue configurationLoop;
-						}
-					}
-				}
-				continue comboLoop;
-			}
-
-			if (solver != null) {
-				for (int i = 0; i < t; i++) {
-					solver.assignmentPushAll(nodeArray[indexArray[i]].getLiterals());
-				}
-				final SatResult hasSolution = solver.hasSolution();
-				switch (hasSolution) {
-				case FALSE:
-					solver.assignmentClear(0);
-					continue comboLoop;
-				case TIMEOUT:
-					System.err.println("Timeout!");
-					solver.assignmentClear(0);
-					continue comboLoop;
-				case TRUE:
-					break;
-				default:
-					throw new AssertionError();
-				}
-			}
-			System.out.println(" FAIL");
-			throw new RuntimeException("Uncovered combination.");
 		}
-		System.out.println(" PASS");
+		return false;
+	}
+
+	private boolean contains(final int[] solution, LiteralSet literalSet) {
+		for (final int literal : literalSet.getLiterals()) {
+			if (solution[Math.abs(literal) - 1] == -literal) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

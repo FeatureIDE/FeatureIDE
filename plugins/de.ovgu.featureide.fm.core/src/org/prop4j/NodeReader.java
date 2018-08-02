@@ -20,14 +20,13 @@
  */
 package org.prop4j;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.IFF;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NUMBER_OF_QUOTATION_MARKS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_POSITIONING_OF_PARENTHESES;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public class NodeReader {
 
-	public final static String[] textualSymbols = new String[] { IFF, IMPLIES, "or", "and", "not" };
+	public final static String[] textualSymbols = new String[] { " iff ", " implies ", " or ", " and ", " not " };
 	public final static String[] shortSymbols = new String[] { "<=>", "=>", "|", "&", "-" };
 	public final static String[] logicalSymbols = new String[] { "\u21D4", "\u21D2", "\u2228", "\u2227", "\u00AC" };
 	public final static String[] javaSymbols = new String[] { "==", "=>", "||", "&&", "!" };
@@ -85,19 +84,45 @@ public class NodeReader {
 		symbols = javaSymbols;
 	}
 
+	public Collection<String> getFeatureNames() {
+		return featureNames;
+	}
+
+	public void setFeatureNames(Collection<String> featureNames) {
+		this.featureNames = new HashSet<>(featureNames);
+	}
+
+	/**
+	 * Parses a constraint and create a corresponding {@link Node} tree.
+	 *
+	 * @param constraint The constraint as a string representation.
+	 * @return A node representing the constraint.
+	 */
 	public Node stringToNode(String constraint) {
 		return stringToNode(constraint, null);
 	}
 
+	/**
+	 * Parses a constraint and create a corresponding {@link Node} tree.
+	 *
+	 * @deprecated Use {@link #stringToNode(String)} and {@link #setFeatureNames(Collection)} instead.
+	 * @param constraint The constraint to be parsed.
+	 * @param featureNames The valid feature names.
+	 * @return A node representing the constraint.
+	 */
+	@Deprecated
 	public Node stringToNode(String constraint, Collection<String> featureNames) {
-		this.featureNames = featureNames;
+		if (featureNames != null) {
+			setFeatureNames(featureNames);
+		}
 		errorMessage = null;
 
 		try {
-			return parseNode(constraint);
+			final Node parseNode = parseNode(constraint);
+			return parseNode;
 		} catch (final ParseException e) {
 			errorMessage = e;
-			return null;
+			return ignoreUnparsableSubExpressions ? new ErrorLiteral(constraint) : null;
 		}
 	}
 
@@ -157,13 +182,13 @@ public class NodeReader {
 	 * @return
 	 */
 	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
-		constraint = " " + constraint + " ";
-		if ("  ".equals(constraint)) {
+		if ("".equals(constraint)) {
 			return getInvalidLiteral("Sub expression is empty", "");
 		}
+		constraint = " " + constraint + " ";
 		// traverse all symbols
 		for (int i = 0; i < symbols.length; i++) {
-			final Matcher matcher = Pattern.compile("\\s+(" + Pattern.quote(symbols[i]) + ")\\s+").matcher(constraint);
+			final Matcher matcher = Pattern.compile("\\s*(" + Pattern.quote(symbols[i]) + ")\\s*").matcher(constraint);
 			while (matcher.find()) {
 				// 1st symbol occurrence
 				final int index = matcher.start(1);

@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.analysis.cnf;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -118,8 +117,8 @@ public class CNF implements Serializable {
 		}
 	}
 
-	public List<LiteralSet> getClauses() {
-		return Collections.unmodifiableList(clauses);
+	public ClauseList getClauses() {
+		return clauses;
 	}
 
 	@Override

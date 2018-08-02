@@ -18,59 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.analysis.cnf.generator.configuration;
+package de.ovgu.featureide.fm.core.analysis.mig;
 
-import java.util.Iterator;
+abstract class ATraverser implements ITraverser {
 
-/**
- * NOTE: 0-based
- *
- * @author Sebastian Krieter
- */
-public class LexicographicIterator implements Iterator<int[]> {
+	protected final boolean[] dfsMark;
+	protected final ModalImplicationGraph mig;
 
-	private final int t, length;
-	private boolean hasNext = true;
+	protected Visitor<?> visitor = null;
+	protected int[] model = null;
 
-	private final int[] c;
-
-	public LexicographicIterator(int t, int length) {
-		this.t = t;
-		this.length = length;
-		c = new int[t];
-		for (int i = 0; i < (c.length - 1); i++) {
-			c[i] = i;
-		}
-		c[t - 1] = t - 2;
+	public ATraverser(ModalImplicationGraph mig) {
+		this.mig = mig;
+		dfsMark = new boolean[mig.getAdjList().size()];
 	}
 
 	@Override
-	public boolean hasNext() {
-		return hasNext;
+	public Visitor<?> getVisitor() {
+		return visitor;
 	}
 
 	@Override
-	public int[] next() {
-		int i = t;
-		for (; i > 0; i--) {
-			final int ci = ++c[i - 1];
-			if (ci < ((length - t) + i)) {
-				break;
-			}
-		}
-		if ((i == 0) && (c[i] == ((length - t) + 1))) {
-			hasNext = false;
-			return null;
-		}
-
-		for (; i < t; i++) {
-			if (i == 0) {
-				c[i] = 0;
-			} else {
-				c[i] = c[i - 1] + 1;
-			}
-		}
-
-		return c;
+	public void setVisitor(Visitor<?> visitor) {
+		this.visitor = visitor;
 	}
+
+	@Override
+	public void setModel(int[] model) {
+		this.model = model;
+	}
+
 }

@@ -21,14 +21,19 @@
 package de.ovgu.featureide.fm.core.analysis.cnf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.prop4j.And;
+import org.prop4j.ErrorLiteral;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+
+import de.ovgu.featureide.fm.core.analysis.cnf.manipulator.remove.CNFSlicer;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
  * Several methods concerning {@link Node} framework.
@@ -39,8 +44,8 @@ public final class Nodes {
 
 	private Nodes() {}
 
-	public static List<LiteralSet> convert(IVariables satInstance, Node node) {
-		final ArrayList<LiteralSet> clauses = new ArrayList<>();
+	public static ClauseList convert(IVariables satInstance, Node node) {
+		final ClauseList clauses = new ClauseList();
 		CNFCreator.getClauseFromNode(satInstance, clauses, node);
 		return clauses;
 	}
@@ -56,6 +61,44 @@ public final class Nodes {
 		final Variables mapping = new Variables(variableList);
 		final List<LiteralSet> clauses = convert(mapping, node);
 		return new CNF(mapping, clauses);
+	}
+
+	public static CNF convertSlicingError(IVariables satInstance, Node cnfNode) {
+		final HashSet<String> varNames = new HashSet<>();
+		final HashSet<String> errorNames = new HashSet<>();
+		collectVariables(satInstance, cnfNode, varNames, errorNames);
+
+		if (varNames.isEmpty()) {
+			return null;
+		}
+
+		final ArrayList<String> variableList = new ArrayList<>(satInstance.size() + errorNames.size());
+		variableList.addAll(Arrays.asList(satInstance.getNames()).subList(1, satInstance.size()));
+		variableList.addAll(errorNames);
+		final Variables mappingWithErrors = new Variables(variableList);
+
+		final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode);
+		final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
+		final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
+		return slicedCnf == null ? null : new CNF((Variables) satInstance, slicedCnf.getClauses());
+	}
+
+	public static void collectVariables(IVariables variables, Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {
+		for (final Node clause : cnfNode.getChildren()) {
+			final Node[] literals = clause.getChildren();
+			for (int i = 0; i < literals.length; i++) {
+				final Literal literal = (Literal) literals[i];
+				final Object varObject = literal.var;
+				if (varObject instanceof String) {
+					final String varName = (String) varObject;
+					if ((literal instanceof ErrorLiteral) || (variables.getVariable(varName) == 0)) {
+						errorNames.add(varName);
+					} else {
+						varNames.add(varName);
+					}
+				}
+			}
+		}
 	}
 
 	public static Node convert(CNF satInstance) {

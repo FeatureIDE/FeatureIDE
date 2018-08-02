@@ -100,9 +100,7 @@ public class SlicedVariables extends Variables {
 
 	@Override
 	public int convertToInternal(int orgLiteral) {
-		final int convertedLiteral = orgToInternal[Math.abs(orgLiteral)];
-		assert convertedLiteral != 0;
-		return orgLiteral > 0 ? convertedLiteral : -convertedLiteral;
+		return orgLiteral == 0 ? 0 : orgLiteral > 0 ? orgToInternal[Math.abs(orgLiteral)] : -orgToInternal[Math.abs(orgLiteral)];
 	}
 
 	@Override

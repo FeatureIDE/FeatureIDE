@@ -41,8 +41,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.analysis.cnf.IVariables;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.FeatureModelFormula;
 import de.ovgu.featureide.fm.core.analysis.cnf.formula.ModalImplicationGraphCreator;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.ModalImplicationGraph;
-import de.ovgu.featureide.fm.core.analysis.cnf.generator.Traverser;
+import de.ovgu.featureide.fm.core.analysis.mig.MIGUtils;
+import de.ovgu.featureide.fm.core.analysis.mig.ModalImplicationGraph;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.FeatureModelSnapshot;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
@@ -137,11 +137,9 @@ public class ShowFeatureRelationsGraphCommandHandler extends ASelectionHandler {
 		final int variable = variables.getVariable(fc.getName());
 
 		final ModalImplicationGraph modalImplicationGraph = formula.getElement(new ModalImplicationGraphCreator());
-		modalImplicationGraph.complete(variable);
 
-		for (final int strongylConnectedVar : new Traverser(modalImplicationGraph).getStronglyConnected(variable).getLiterals()) {
-			modalImplicationGraph.complete(strongylConnectedVar);
-			if (modalImplicationGraph.isStrongPath(variable, strongylConnectedVar)) {
+		for (final int strongylConnectedVar : MIGUtils.getStronglyConnected(modalImplicationGraph, variable)) {
+			if (MIGUtils.isStronglyConnected(modalImplicationGraph, strongylConnectedVar, variable)) {
 				if (strongylConnectedVar > 0) {
 					formalizedRequires.add(variables.getName(strongylConnectedVar));
 				} else {
