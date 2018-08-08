@@ -45,6 +45,7 @@ public class NodeReader {
 
 	public final static String[] textualSymbols = new String[] { " iff ", " implies ", " or ", " and ", " not " };
 	public final static String[] shortSymbols = new String[] { "<=>", "=>", "|", "&", "-" };
+	public final static String[] shortSymbols2 = new String[] { "<=>", "=>", "|", "&", "!" };
 	public final static String[] logicalSymbols = new String[] { "\u21D4", "\u21D2", "\u2228", "\u2227", "\u00AC" };
 	public final static String[] javaSymbols = new String[] { "==", "=>", "||", "&&", "!" };
 
@@ -70,6 +71,10 @@ public class NodeReader {
 
 	public void activateShortSymbols() {
 		symbols = shortSymbols;
+	}
+
+	public void activateShortSymbols2() {
+		symbols = shortSymbols2;
 	}
 
 	public void activateTextualSymbols() {
