@@ -175,6 +175,8 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 
 	private int[] allYesSolution, allNoSolution;
 
+	private List<int[]> predefinedConfigurations;
+
 	public PairWiseConfigurationGenerator(SatInstance satInstance, int maxNumber) {
 		super(satInstance);
 		this.maxNumber = maxNumber;
@@ -223,12 +225,18 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		solver.setSelectionStrategy(SelectionStrategy.NEGATIVE);
 
 		// allyes
-		handleNewConfig(allYesSolution, featuresUsedOrg);
+		handleNewConfig(allYesSolution);
 		if (maxNumber == 1) {
 			return getConfigurations();
 		}
 		// allno
-		handleNewConfig(allNoSolution, featuresUsedOrg);
+		handleNewConfig(allNoSolution);
+
+		if (predefinedConfigurations != null) {
+			for (final int[] predefinedConfiguration : predefinedConfigurations) {
+				handleNewConfig(predefinedConfiguration);
+			}
+		}
 
 		final int[] varStatus = new int[2];
 
@@ -287,12 +295,20 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 				}
 			}
 
-			if (handleNewConfig(solver.findModel(), featuresUsedOrg)) {
+			if (handleNewConfig(solver.findModel())) {
 				break;
 			}
 			solver.assignmentClear(numberOfFixedFeatures);
 		}
 		return getConfigurations();
+	}
+
+	public List<int[]> getPredefinedConfigurations() {
+		return Collections.unmodifiableList(predefinedConfigurations);
+	}
+
+	public void setPredefinedConfigurations(Collection<int[]> predefinedConfigurations) {
+		this.predefinedConfigurations = new ArrayList<>(predefinedConfigurations);
 	}
 
 	public List<List<String>> getConfigurations() {
@@ -714,7 +730,7 @@ public class PairWiseConfigurationGenerator extends AbstractAnalysis<List<List<S
 		return model;
 	}
 
-	protected boolean handleNewConfig(int[] curModel, final boolean[] featuresUsedOrg) {
+	protected boolean handleNewConfig(int[] curModel) {
 		if (curModel == null) {
 			return true;
 		}
