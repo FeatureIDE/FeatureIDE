@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featuremodeling"
       label="Feature Modeling (required)"
-      version="3.5.0.qualifier"
+      version="3.5.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -206,21 +206,21 @@ Library.
          id="de.ovgu.featureide.fm.core"
          download-size="0"
          install-size="0"
-         version="3.5.0.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.fm.ui"
          download-size="0"
          install-size="0"
-         version="3.5.0.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.fm.attributes"
          download-size="0"
          install-size="0"
-         version="3.5.0.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
 </feature>

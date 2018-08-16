@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for Android with Munge
 Bundle-SymbolicName: de.ovgu.featureide.core.munge.android;singleton:=true
-Bundle-Version: 3.5.0.qualifier
+Bundle-Version: 3.5.2.qualifier
 Bundle-Activator: de.ovgu.featureide.munge_android.MungeAndroidCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,

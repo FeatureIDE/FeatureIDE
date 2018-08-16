@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 3.5.0.qualifier
+Bundle-Version: 3.5.2.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,

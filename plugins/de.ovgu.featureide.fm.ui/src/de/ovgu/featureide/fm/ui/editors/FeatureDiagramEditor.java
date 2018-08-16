@@ -94,8 +94,12 @@ import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
+import de.ovgu.featureide.fm.core.job.IRunner;
+import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
+import de.ovgu.featureide.fm.core.job.JobToken;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -216,9 +220,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private int index;
 
-	private Job analyzeJob;
-
-	private boolean waiting = false;
+	private final JobToken analysisToken = LongRunningWrapper.createToken(JobStartingStrategy.CANCEL_WAIT_ONE);
 
 	private FeatureModelAnalyzer analyzer;
 
@@ -476,68 +478,33 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if ((getFeatureModel() == null) || (getFeatureModel().getStructure().getRoot() == null) || (viewer.getContents() == null)) {
 			return;
 		}
-		if (waiting) {
-			return;
-		}
-		waiting = true;
 		final boolean runAnalysis = getFeatureModel().getAnalyser().runCalculationAutomatically && getFeatureModel().getAnalyser().calculateFeatures;
-		/**
-		 * This extra job is necessary, else the UI will stop.
-		 */
-		final Job waiter = new Job("Analyze feature model (waiting)") {
-
+		final IRunner<Boolean> analyzeJob = LongRunningWrapper.getRunner(new LongRunningMethod<Boolean>() {
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-
-				try {
-					if ((analyzeJob != null) && (analyzer != null)) {
-						// waiting for analyzing job to finish
-						analyzer.cancel(true);
-						analyzeJob.join();
-					}
-				} catch (final InterruptedException e) {
-					FMUIPlugin.getDefault().logError(e);
-				} finally {
-					// avoid a dead lock
-					if (analyzer != null) {
-						analyzer.cancel(false);
-					}
-					waiting = false;
+			public Boolean execute(IMonitor monitor) throws Exception {
+				// TODO could be combined with analysis results
+				for (final IFeature f : getFeatureModel().getFeatures()) {
+					f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 				}
-				analyzeJob = new LongRunningJob<>(ANALYZE_FEATURE_MODEL, new LongRunningMethod<Boolean>() {
+				for (final IConstraint c : getFeatureModel().getConstraints()) {
+					c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+				}
+				refreshGraphics(null);
 
-					@Override
-					public Boolean execute(IMonitor monitor) throws Exception {
-						if (waiting) {
-							return true;
-						}
+				if (!runAnalysis) {
+					return true;
+				}
 
-						// TODO could be combined with analysis results
-						for (final IFeature f : getFeatureModel().getFeatures()) {
-							f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
-						}
-						for (final IConstraint c : getFeatureModel().getConstraints()) {
-							c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
-						}
-						refreshGraphics(null);
-
-						if (!runAnalysis) {
-							return true;
-						}
-
-						analyzer = getFeatureModel().getAnalyser();
-						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
-						refreshGraphics(changedAttributes);
-						return true;
-					}
-				});
-				analyzeJob.setPriority(Job.LONG);
-				analyzeJob.schedule();
-				return Status.OK_STATUS;
+				analyzer = getFeatureModel().getAnalyser();
+				final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
+				refreshGraphics(changedAttributes);
+				return true;
 			}
-		};
-		waiter.setPriority(Job.DECORATE);
-		waiter.schedule();
+		}, ANALYZE_FEATURE_MODEL);
+		if (analyzeJob instanceof LongRunningJob<?>) {
+			((LongRunningJob<?>) analyzeJob).setPriority(Job.LONG);
+		}
+		LongRunningWrapper.startJob(analysisToken, analyzeJob);
 	}
 
 	/**
@@ -1273,9 +1240,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 */
 	@Override
 	public void dispose() {
-		if (analyzeJob != null) {
-			analyzeJob.cancel();
-		}
+		LongRunningWrapper.cancelAllJobs(analysisToken);
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
 		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);

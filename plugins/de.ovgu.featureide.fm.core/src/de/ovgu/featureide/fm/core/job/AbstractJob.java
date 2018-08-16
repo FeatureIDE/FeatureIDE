@@ -79,7 +79,7 @@ public abstract class AbstractJob<T> extends Job implements IJob<T> {
 
 	private IConsumer<Object> intermediateFunction;
 
-	private T methodResult = null;
+	protected T methodResult = null;
 
 	private JobStatus status = JobStatus.NOT_STARTED;
 

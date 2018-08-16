@@ -32,9 +32,10 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 
 	private final LongRunningMethod<T> method;
-	private T methodResult = null;
 
-	private boolean stoppable;
+	private Executer<T> executer;
+
+	private boolean stoppable = true;
 	private int cancelingTimeout = -1;
 
 	public LongRunningJob(String name, LongRunningMethod<T> method) {
@@ -44,14 +45,17 @@ public class LongRunningJob<T> extends AbstractJob<T> implements IRunner<T> {
 
 	@Override
 	protected T work(IMonitor monitor) throws Exception {
-		final Executer<T> executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
+		executer = stoppable ? new StoppableExecuter<>(method, cancelingTimeout) : new Executer<>(method);
 		methodResult = executer.execute(monitor);
 		return methodResult;
 	}
 
 	@Override
-	public T getResults() {
-		return methodResult;
+	protected void canceling() {
+		if (executer != null) {
+			executer.cancel();
+		}
+		super.canceling();
 	}
 
 	@Override

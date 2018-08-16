@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.exampleprojects"
       label="FeatureIDE example projects (optional)"
-      version="3.5.0.qualifier"
+      version="3.5.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -214,7 +214,7 @@ Library.
          id="de.ovgu.featureide.examples"
          download-size="0"
          install-size="0"
-         version="3.5.0.qualifier"
+         version="3.5.2.qualifier"
          unpack="false"/>
 
 </feature>
