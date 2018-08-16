@@ -379,6 +379,9 @@ public abstract class AFileManager<T> implements IFileManager<T>, IEventManager 
 		if (!FileSystem.exists(identifier.getPath())) {
 			return false;
 		}
+		if (persistentObject == null) {
+			return false;
+		}
 		final boolean success, changed;
 		synchronized (syncObject) {
 			if (modifying) {
