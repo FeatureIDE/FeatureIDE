@@ -142,7 +142,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			before += " ";
 		}
 
-		if (isFeature && !before.endsWith("(")) {
+		if (!before.isEmpty() && isFeature && !before.endsWith("(")) {
 			before += " ";
 		}
 
