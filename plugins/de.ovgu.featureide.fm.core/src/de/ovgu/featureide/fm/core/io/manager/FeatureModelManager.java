@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.ExtensionManager.NoSuchExtensionException;
+import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
@@ -127,6 +128,19 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
 	public static FileHandler<IFeatureModel> load(Path path) {
 		return getFileHandler(path, objectCreator);
+	}
+
+	@CheckForNull
+	public static IFeatureModel load(CharSequence source, String fileName) {
+		final IPersistentFormat<IFeatureModel> format = FMFormatManager.getInstance().getFormatByContent(source, fileName);
+		try {
+			final IFeatureModel featureModel = FMFactoryManager.getFactory(fileName, format).createFeatureModel();
+			format.read(featureModel, source);
+			return featureModel;
+		} catch (final NoSuchExtensionException e) {
+			Logger.logError(e);
+			return null;
+		}
 	}
 
 }
