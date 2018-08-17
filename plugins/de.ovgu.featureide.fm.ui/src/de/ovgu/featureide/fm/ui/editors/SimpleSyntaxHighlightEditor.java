@@ -93,20 +93,18 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	private void updateHighlight() {
-		if (!underlineEverything) {
-			final String text = super.getText();
+	public void updateHighlight() {
+		final String text = super.getText();
 
-			final StyleRange resetStyleRange = new StyleRange();
-			resetStyleRange.start = 0;
-			resetStyleRange.length = text.length();
-			resetStyleRange.fontStyle = SWT.NORMAL;
-			resetStyleRange.foreground = normalColor;
-			setStyleRange(resetStyleRange);
+		final StyleRange resetStyleRange = new StyleRange();
+		resetStyleRange.start = 0;
+		resetStyleRange.length = text.length();
+		resetStyleRange.fontStyle = SWT.NORMAL;
+		resetStyleRange.foreground = normalColor;
+		setStyleRange(resetStyleRange);
 
-			hightlightKeywords(text);
-			hightlightWrongWords(text);
-		}
+		hightlightKeywords(text);
+		hightlightWrongWords(text);
 	}
 
 	/**
@@ -178,7 +176,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		final StringBuilder sb = new StringBuilder("(");
 		for (final String keyword : keywords) {
 			sb.append(Pattern.quote(keyword.toLowerCase()));
-			sb.append('|');
+			sb.append("|");
 		}
 		sb.setCharAt(sb.length() - 1, ')');
 
@@ -241,21 +239,15 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
 	}
 
-	public void underlineEverything(boolean b) {
-		underlineEverything = b;
-		if (underlineEverything) {
-			final StyleRange styleRange = new StyleRange();
-			styleRange.start = 0;
-			styleRange.length = this.getText().length();
-			styleRange.fontStyle = SWT.NORMAL;
-			styleRange.foreground = normalColor;
-			styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-			styleRange.underline = true;
-			styleRange.underlineColor = wrongWordColor;
-			setStyleRange(styleRange);
-		} else {
-			updateHighlight();
-		}
+	public void highlightEverything() {
+		final StyleRange styleRange = new StyleRange();
+		styleRange.start = 0;
+		styleRange.length = this.getText().length();
+		styleRange.fontStyle = SWT.NORMAL;
+		styleRange.foreground = normalColor;
+		styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+		styleRange.underline = true;
+		styleRange.underlineColor = wrongWordColor;
+		setStyleRange(styleRange);
 	}
-
 }
