@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.List;
+
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.IControlContentAdapter2;
 import org.eclipse.swt.graphics.Point;
@@ -35,6 +37,15 @@ import de.ovgu.featureide.fm.core.Features;
  * @author Fabian Benduhn
  */
 public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControlContentAdapter, IControlContentAdapter2 {
+
+	ConstraintDialog constraintDialog;
+
+	/**
+	 *
+	 */
+	public SimpleSyntaxHighlighterConstraintContentAdapter(ConstraintDialog cd) {
+		constraintDialog = cd;
+	}
 
 	public enum TextChangeMode {
 		INSERT_TEXT, REPLACE_TEXT, UNKNOWN
@@ -70,8 +81,10 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final SimpleSyntaxHighlightEditor editor = (SimpleSyntaxHighlightEditor) control;
 		final Point selection = editor.getSelection();
 		final String currentText = editor.getText();
+		final List<String> featureList = constraintDialog.GetFeatureListFromConstraintDialog();
+		final Boolean isFeature = featureList.contains(text + Features.FEATURE_SUFFIX);
 
-		final InsertionResult result = performInsertion(currentText, selection, text);
+		final InsertionResult result = performInsertion(currentText, selection, text, isFeature);
 
 		editor.setText(result.text);
 		editor.setSelection(result.selection);
@@ -83,7 +96,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	 * @param text
 	 * @return
 	 */
-	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert) {
+	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert, final Boolean isFeature) {
 		String before = "", after = "";
 		String text = textToInsert;
 
@@ -123,7 +136,11 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			throw new UnsupportedOperationException();
 		}
 
-		if (!before.isEmpty() && !before.endsWith(" ")) {
+		if (!before.isEmpty() && !before.endsWith(" ") && !isFeature) {
+			before += " ";
+		}
+
+		if (isFeature && !before.endsWith("(")) {
 			before += " ";
 		}
 
