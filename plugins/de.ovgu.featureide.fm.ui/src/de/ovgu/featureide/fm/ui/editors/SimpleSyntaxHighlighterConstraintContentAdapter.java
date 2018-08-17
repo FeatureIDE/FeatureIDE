@@ -137,10 +137,12 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	private static int getSubStringStartIndex(final String currentText, final int x) {
-		int substringStartIndex = Math.max(0, x - 1);
+
+		int substringStartIndex = Math.max(0, x);
 		for (; substringStartIndex > 0; substringStartIndex--) {
-			final char ch = currentText.charAt(substringStartIndex);
+			final char ch = currentText.charAt(substringStartIndex - 1);
 			if ((ch == ' ') || (ch == '(') || (ch == ')')) {
+
 				break;
 			}
 		}
