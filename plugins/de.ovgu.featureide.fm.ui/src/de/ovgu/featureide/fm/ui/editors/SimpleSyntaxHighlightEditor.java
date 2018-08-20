@@ -36,6 +36,8 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.prop4j.ErrorType;
+import org.prop4j.ErrorType.ErrorEnum;
 
 /**
  * Simple syntax highlighted editor
@@ -69,7 +71,8 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updateHighlight(true, false);
+
+				updateHighlight(true, new ErrorType(ErrorEnum.None));
 			}
 		});
 	}
@@ -97,17 +100,18 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	public void updateHighlight(boolean isConstraintProper, boolean noValidFeatureName) {
+	public void updateHighlight(boolean isConstraintProper, ErrorType errorType) {
 		final String text = super.getText();
 
 		retireveUnknownWords(text);
 		defaultStyleRange();
-		if (!isConstraintProper) {
-			highlightEverything();
-		}
-		if (!unknownWords.isEmpty() && noValidFeatureName) {
+
+		if (errorType.error == ErrorEnum.InvalidFeatureName) {
 			defaultStyleRange();
 			hightlightWrongWords(text);
+		} else if (errorType.error != ErrorEnum.None) {
+			defaultStyleRange();
+			highlightEverything();
 		}
 
 		hightlightKeywords(text);
@@ -131,6 +135,28 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		defaultStyleRange.underlineColor = wrongWordColor;
 		setStyleRange(defaultStyleRange);
 	}
+
+	private void hightlightBetween(ErrorType errorType) {
+		int start = 0;
+		int end = super.getText().length();
+		if (errorType.error == ErrorEnum.InvalidExpressionRight) {
+			start = errorType.EndErrorIndex - 2;
+			end = super.getText().length();
+		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
+			start = 0;
+			end = errorType.StartErrorIndex;
+		}
+
+		final StyleRange hightlightBetweenStyleRange = new StyleRange();
+		hightlightBetweenStyleRange.start = start;
+		hightlightBetweenStyleRange.length = end;
+		hightlightBetweenStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+		hightlightBetweenStyleRange.underline = true;
+		hightlightBetweenStyleRange.underlineColor = wrongWordColor;
+		setStyleRange(hightlightBetweenStyleRange);
+
+	}
+	// highlight keywords in text
 
 	private void hightlightWrongWords(String text) {
 		final List<Match> keywordPositions = new ArrayList<>();

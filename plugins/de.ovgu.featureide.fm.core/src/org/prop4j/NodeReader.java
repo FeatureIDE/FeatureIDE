@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.prop4j.ErrorType.ErrorEnum;
+
 /**
  * This class can be used to parse propositional formulas.
  *
@@ -64,6 +66,7 @@ public class NodeReader {
 
 	private String[] symbols = textualSymbols;
 	private boolean noValidFeatureName;
+	public ErrorType errorType = new ErrorType(ErrorEnum.None);
 	private ParseException errorMessage = null;
 
 	private boolean ignoreMissingFeatures = false;
@@ -96,6 +99,7 @@ public class NodeReader {
 		try {
 			return parseNode(constraint);
 		} catch (final ParseException e) {
+
 			errorMessage = e;
 			return null;
 		}
@@ -168,6 +172,7 @@ public class NodeReader {
 	private Node checkExpression(String constraint, List<String> quotedFeatureNames, List<String> subExpressions) throws ParseException {
 		constraint = " " + constraint + " ";
 		if ("  ".equals(constraint)) {
+			errorType.error = ErrorEnum.Default;
 			return handleInvalidExpression("Sub expression is empty", "");
 		}
 		// traverse all symbols
@@ -184,13 +189,30 @@ public class NodeReader {
 				final Node node1, node2;
 				if (i == 4) {
 					node1 = null;
-					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression", constraint)
-						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+
+					if (rightSide.isEmpty()) {
+						errorType.error = ErrorEnum.Default;
+						node2 = handleInvalidExpression("Missing feature name or expression", constraint);
+
+					} else {
+						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					}
+
 				} else {
-					node1 = (leftSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on left side", constraint)
-						: checkExpression(leftSide, quotedFeatureNames, subExpressions);
-					node2 = (rightSide.isEmpty()) ? handleInvalidExpression("Missing feature name or expression on right side", constraint)
-						: checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					if (leftSide.isEmpty()) {
+						errorType = new ErrorType(ErrorEnum.InvalidExpressionLeft, matcher.start(), matcher.end());
+
+						node1 = handleInvalidExpression("Missing feature name or expression on left side", constraint);
+					} else {
+						node1 = checkExpression(leftSide, quotedFeatureNames, subExpressions);
+					}
+					if (rightSide.isEmpty()) {
+						errorType = new ErrorType(ErrorEnum.InvalidExpressionRight, matcher.start(), matcher.end());
+						node2 = handleInvalidExpression("Missing feature name or expression on right side", constraint);
+					} else {
+						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
+					}
+
 				}
 
 				switch (i) {
@@ -218,6 +240,7 @@ public class NodeReader {
 			if ((subExpressionMatcher.start() == 0) && (subExpressionMatcher.end() == constraint.length())) {
 				return checkExpression(subExpressions.get(Integer.parseInt(constraint.substring(1))).trim(), quotedFeatureNames, subExpressions);
 			} else {
+				errorType.error = ErrorEnum.Default;
 				return handleInvalidExpression("Missing operator", constraint);
 			}
 		} else {
@@ -227,18 +250,20 @@ public class NodeReader {
 				if ((featureNameMatcher.start() == 0) && (featureNameMatcher.end() == constraint.length())) {
 					featureName = quotedFeatureNames.get(Integer.parseInt(constraint.substring(1)));
 				} else {
+					errorType.error = ErrorEnum.Default;
 					return handleInvalidExpression("Missing operator", constraint);
 				}
 			} else {
 				if (constraint.contains(" ")) {
-					noValidFeatureName = true;
+					errorType.error = ErrorEnum.InvalidFeatureName;
 					return handleInvalidFeatureName(constraint);
 				}
 				featureName = constraint;
 			}
 			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
 			if ((featureNames != null) && !featureNames.contains(featureName)) {
-				noValidFeatureName = true;
+
+				errorType.error = ErrorEnum.InvalidFeatureName;
 				return handleInvalidFeatureName(featureName);
 			}
 			return new Literal(featureName);
@@ -275,6 +300,7 @@ public class NodeReader {
 			switch (curChar) {
 			case '(':
 				if (quoteSign) {
+					errorType.error = ErrorEnum.Default;
 					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": parenthesis are not allowed in feature names", i);
 				}
 				parenthesisCounter++;
@@ -284,9 +310,11 @@ public class NodeReader {
 				break;
 			case ')':
 				if (quoteSign) {
+					errorType.error = ErrorEnum.Default;
 					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": parenthesis are not allowed in feature names", i);
 				}
 				if (--parenthesisCounter < 0) {
+					errorType.error = ErrorEnum.Default;
 					throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": to many closing parentheses", i);
 				}
 				break;
@@ -298,6 +326,7 @@ public class NodeReader {
 			throw new ParseException(INVALID_NUMBER_OF_QUOTATION_MARKS, 0);
 		}
 		if (parenthesisCounter > 0) {
+			errorType.error = ErrorEnum.Default;
 			throw new ParseException(INVALID_POSITIONING_OF_PARENTHESES + ": there are unclosed opening parentheses", 0);
 		}
 
