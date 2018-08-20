@@ -354,7 +354,7 @@ public final class FeatureUtils {
 		final List<String> featureList = getFeatureNamesList(featureModel);
 		final ArrayList<String> result = new ArrayList<String>();
 		for (final String s : featureList) {
-			result.add(s + Features.FEATURE_SUFFIX);
+			result.add(s + " " + Features.FEATURE_SUFFIX);
 		}
 		return result;
 	}

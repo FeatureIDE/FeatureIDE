@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
@@ -27,6 +28,7 @@ import org.eclipse.jface.fieldassist.IControlContentAdapter2;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
+import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.fm.core.Features;
 
@@ -81,8 +83,9 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final SimpleSyntaxHighlightEditor editor = (SimpleSyntaxHighlightEditor) control;
 		final Point selection = editor.getSelection();
 		final String currentText = editor.getText();
-		final List<String> featureList = constraintDialog.GetFeatureListFromConstraintDialog();
-		final Boolean isFeature = featureList.contains(text + Features.FEATURE_SUFFIX);
+		final List<String> textualSymbols = Arrays.asList(NodeReader.textualSymbols);
+
+		final Boolean isFeature = !textualSymbols.contains(text);
 
 		final InsertionResult result = performInsertion(currentText, selection, text, isFeature);
 
@@ -105,7 +108,6 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		} else if (text.contains(" ")) {
 			text = "\"" + text + "\"";
 		}
-
 		switch (getMode(selection)) {
 		case INSERT_TEXT: {
 
