@@ -107,6 +107,18 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		hightlightWrongWords(text);
 	}
 
+	public void highlightEverything() {
+		final StyleRange styleRange = new StyleRange();
+		styleRange.start = 0;
+		styleRange.length = this.getText().length();
+		styleRange.fontStyle = SWT.NORMAL;
+		styleRange.foreground = normalColor;
+		styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+		styleRange.underline = true;
+		styleRange.underlineColor = wrongWordColor;
+		setStyleRange(styleRange);
+	}
+
 	/**
 	 * @param text
 	 */
@@ -241,17 +253,5 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setText(temp.toString());
 		super.setFocus();
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
-	}
-
-	public void highlightEverything() {
-		final StyleRange styleRange = new StyleRange();
-		styleRange.start = 0;
-		styleRange.length = this.getText().length();
-		styleRange.fontStyle = SWT.NORMAL;
-		styleRange.foreground = normalColor;
-		styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-		styleRange.underline = true;
-		styleRange.underlineColor = wrongWordColor;
-		setStyleRange(styleRange);
 	}
 }

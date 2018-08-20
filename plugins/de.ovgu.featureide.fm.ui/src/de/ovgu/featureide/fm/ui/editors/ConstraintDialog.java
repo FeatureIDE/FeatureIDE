@@ -981,11 +981,7 @@ public class ConstraintDialog implements GUIDefaults {
 			if (constraintNode == null) {
 				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
 						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
-				if (!constraintText.getUnknownWords().isEmpty()) {
-					constraintText.highlightEverything();
-				} else {
-					constraintText.updateHighlight();
-				}
+				constraintText.updateHighlight();
 			} else {
 				if (!validator.validateAsync(constraintNode, onUpdate)) {
 					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
