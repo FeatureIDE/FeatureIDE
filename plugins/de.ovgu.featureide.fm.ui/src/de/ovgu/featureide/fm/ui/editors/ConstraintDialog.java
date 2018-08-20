@@ -978,15 +978,16 @@ public class ConstraintDialog implements GUIDefaults {
 		} else {
 			final NodeReader nodeReader = new NodeReader();
 			final Node constraintNode = nodeReader.stringToNode(text, featureNamesList);
-			if (constraintNode == null) {
+			final boolean properConstraint = constraintNode != null;
+			if (!properConstraint) {
 				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
 						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
-				constraintText.updateHighlight();
 			} else {
 				if (!validator.validateAsync(constraintNode, onUpdate)) {
 					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
 				}
 			}
+			constraintText.updateHighlight(properConstraint);
 		}
 	}
 }

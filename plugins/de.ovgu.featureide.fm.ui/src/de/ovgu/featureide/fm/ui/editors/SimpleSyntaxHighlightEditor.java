@@ -65,7 +65,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updateHighlight();
+				updateHighlight(true);
 			}
 		});
 	}
@@ -93,7 +93,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	public void updateHighlight() {
+	public void updateHighlight(boolean isConstraintProper) {
 		final String text = super.getText();
 
 		final StyleRange resetStyleRange = new StyleRange();
@@ -103,11 +103,15 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		resetStyleRange.foreground = normalColor;
 		setStyleRange(resetStyleRange);
 
-		hightlightKeywords(text);
-		hightlightWrongWords(text);
+		if (isConstraintProper) {
+			hightlightWrongWords(text);
+		} else {
+			highlightEverything();
+		}
+		hightlightKeywords(text, !isConstraintProper);
 	}
 
-	public void highlightEverything() {
+	private void highlightEverything() {
 		final StyleRange styleRange = new StyleRange();
 		styleRange.start = 0;
 		styleRange.length = this.getText().length();
@@ -182,7 +186,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 	private static final Pattern nonOperators = Pattern.compile("\"[^\"]*\"");
 
-	private void hightlightKeywords(String text) {
+	private void hightlightKeywords(String text, boolean isWrong) {
 		final List<Match> keywordPositions = new ArrayList<>();
 
 		final StringBuilder sb = new StringBuilder("(");
@@ -227,6 +231,11 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			styleRange.fontStyle = SWT.BOLD;
 			styleRange.foreground = keywordColor;
 
+			if (isWrong) {
+				styleRange.underline = true;
+				styleRange.underlineColor = wrongWordColor;
+				styleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+			}
 			setStyleRange(styleRange);
 		}
 	}
