@@ -103,12 +103,11 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		resetStyleRange.foreground = normalColor;
 		setStyleRange(resetStyleRange);
 
-		if (isConstraintProper) {
-			hightlightWrongWords(text);
-		} else {
+		hightlightWrongWords(text);
+		if (!isConstraintProper && unknownWords.isEmpty()) {
 			highlightEverything();
 		}
-		hightlightKeywords(text, !isConstraintProper);
+		hightlightKeywords(text, !isConstraintProper && unknownWords.isEmpty());
 	}
 
 	private void highlightEverything() {
