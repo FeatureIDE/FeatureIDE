@@ -175,7 +175,11 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 		final StringBuilder sb = new StringBuilder("(");
 		for (final String keyword : keywords) {
-			sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
+			if ((keyword == "(") || (keyword == ")")) {
+				sb.append("\\" + keyword);
+			} else {
+				sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
+			}
 			sb.append("|");
 		}
 		sb.setCharAt(sb.length() - 1, ')');
