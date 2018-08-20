@@ -69,7 +69,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updateHighlight(true);
+				updateHighlight(true, false);
 			}
 		});
 	}
@@ -97,7 +97,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	public void updateHighlight(boolean isConstraintProper) {
+	public void updateHighlight(boolean isConstraintProper, boolean noValidFeatureName) {
 		final String text = super.getText();
 
 		retireveUnknownWords(text);
@@ -105,7 +105,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		if (!isConstraintProper) {
 			highlightEverything();
 		}
-		if (!unknownWords.isEmpty()) {
+		if (!unknownWords.isEmpty() && noValidFeatureName) {
 			defaultStyleRange();
 			hightlightWrongWords(text);
 		}

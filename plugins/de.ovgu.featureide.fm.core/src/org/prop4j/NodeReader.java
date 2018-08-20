@@ -63,7 +63,7 @@ public class NodeReader {
 	private Collection<String> featureNames;
 
 	private String[] symbols = textualSymbols;
-
+	private boolean noValidFeatureName;
 	private ParseException errorMessage = null;
 
 	private boolean ignoreMissingFeatures = false;
@@ -129,6 +129,15 @@ public class NodeReader {
 	 */
 	public ParseException getErrorMessage() {
 		return errorMessage;
+	}
+
+	/**
+	 * TODO
+	 *
+	 * @return
+	 */
+	public boolean getnoValidFeatureName() {
+		return noValidFeatureName;
 	}
 
 	public boolean ignoresMissingFeatures() {
@@ -222,12 +231,14 @@ public class NodeReader {
 				}
 			} else {
 				if (constraint.contains(" ")) {
+					noValidFeatureName = true;
 					return handleInvalidFeatureName(constraint);
 				}
 				featureName = constraint;
 			}
 			featureName = featureName.replace(replacedFeatureNameMarker, featureNameMarker).replace(replacedSubExpressionMarker, subExpressionMarker);
 			if ((featureNames != null) && !featureNames.contains(featureName)) {
+				noValidFeatureName = true;
 				return handleInvalidFeatureName(featureName);
 			}
 			return new Literal(featureName);
@@ -235,6 +246,7 @@ public class NodeReader {
 	}
 
 	private Node handleInvalidFeatureName(String featureName) throws ParseException {
+
 		return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName, ignoreMissingFeatures);
 	}
 
