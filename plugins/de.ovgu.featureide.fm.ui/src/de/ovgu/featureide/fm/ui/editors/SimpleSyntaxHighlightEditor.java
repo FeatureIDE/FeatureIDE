@@ -81,6 +81,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private final Color wrongWordColor;
 	private final Color normalColor;
 	private boolean underlineEverything;
+	private boolean keywordsUnderline;
 
 	public Set<String> getUnknownWords() {
 		return unknownWords;
@@ -109,7 +110,12 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		if (errorType.error == ErrorEnum.InvalidFeatureName) {
 			defaultStyleRange();
 			hightlightWrongWords(text);
-		} else if (errorType.error != ErrorEnum.None) {
+		}
+		if ((errorType.error == ErrorEnum.InvalidExpressionRight) || (errorType.error == ErrorEnum.InvalidExpressionLeft)) {
+			defaultStyleRange();
+			hightlightBetween(errorType);
+		}
+		if (errorType.error == ErrorEnum.Default) {
 			defaultStyleRange();
 			highlightEverything();
 		}
@@ -143,13 +149,14 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			start = errorType.EndErrorIndex - 2;
 			end = super.getText().length();
 		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
+			keywordsUnderline = true;
 			start = 0;
-			end = errorType.StartErrorIndex;
+			end = end - errorType.EndErrorIndex;
 		}
 
 		final StyleRange hightlightBetweenStyleRange = new StyleRange();
 		hightlightBetweenStyleRange.start = start;
-		hightlightBetweenStyleRange.length = end;
+		hightlightBetweenStyleRange.length = end - start;
 		hightlightBetweenStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
 		hightlightBetweenStyleRange.underline = true;
 		hightlightBetweenStyleRange.underlineColor = wrongWordColor;
@@ -298,7 +305,10 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			keywordsStyleRange.length = match.end - match.start;
 			keywordsStyleRange.fontStyle = SWT.BOLD;
 			keywordsStyleRange.foreground = keywordColor;
-
+			/*
+			 * if (keywordsUnderline) { keywordsStyleRange.underlineStyle = SWT.UNDERLINE_ERROR; keywordsStyleRange.underline = true;
+			 * keywordsStyleRange.underlineColor = wrongWordColor; }
+			 */
 			setStyleRange(keywordsStyleRange);
 		}
 	}
