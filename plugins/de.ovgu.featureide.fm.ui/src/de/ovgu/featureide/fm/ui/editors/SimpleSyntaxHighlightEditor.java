@@ -82,6 +82,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private final Color normalColor;
 	private boolean underlineEverything;
 	private boolean keywordsUnderline;
+	private int index;
 
 	public Set<String> getUnknownWords() {
 		return unknownWords;
@@ -103,6 +104,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 	public void updateHighlight(boolean isConstraintProper, ErrorType errorType) {
 		final String text = super.getText();
+		keywordsUnderline = false;
 
 		retireveUnknownWords(text);
 		defaultStyleRange();
@@ -150,8 +152,9 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			end = super.getText().length();
 		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
 			keywordsUnderline = true;
+			index = end - errorType.EndErrorIndex;
 			start = 0;
-			end = end - errorType.EndErrorIndex;
+			end = (end - errorType.EndErrorIndex) + 1;
 		}
 
 		final StyleRange hightlightBetweenStyleRange = new StyleRange();
@@ -305,10 +308,13 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			keywordsStyleRange.length = match.end - match.start;
 			keywordsStyleRange.fontStyle = SWT.BOLD;
 			keywordsStyleRange.foreground = keywordColor;
-			/*
-			 * if (keywordsUnderline) { keywordsStyleRange.underlineStyle = SWT.UNDERLINE_ERROR; keywordsStyleRange.underline = true;
-			 * keywordsStyleRange.underlineColor = wrongWordColor; }
-			 */
+
+			if (keywordsUnderline && (match.end <= index)) {
+				keywordsStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+				keywordsStyleRange.underline = true;
+				keywordsStyleRange.underlineColor = wrongWordColor;
+			}
+
 			setStyleRange(keywordsStyleRange);
 		}
 	}
