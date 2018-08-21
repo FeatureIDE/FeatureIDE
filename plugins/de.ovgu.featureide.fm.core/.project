@@ -41,7 +41,7 @@
 		<link>
 			<name>src/org/prop4j/ErrorType.java</name>
 			<type>1</type>
-			<location>/Users/BTMK/softwareProjekt/FeatureIDE/plugins/de.ovgu.featureide.fm.core/src/org/prop4j/ErrorType.java</location>
+			<locationURI>PARENT_LOC/ErrorType.java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
