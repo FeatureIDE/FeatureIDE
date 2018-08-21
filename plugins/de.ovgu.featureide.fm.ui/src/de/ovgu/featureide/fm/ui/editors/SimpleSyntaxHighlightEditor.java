@@ -85,10 +85,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private boolean keywordsUnderline;
 	private int index;
 
-	public Set<String> getUnknownWords() {
-		return unknownWords;
-	}
-
 	public void setPossibleWords(Set<String> words) {
 		possibleWords.clear();
 
@@ -198,7 +194,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private String generateRegexForUnknownStrings() {
 		final StringBuilder sb = new StringBuilder("(");
 		for (final String keyword : unknownWords) {
-			sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
+			sb.append("\\b" + Pattern.quote(keyword) + "\\b");
 			sb.append("|");
 		}
 		sb.setCharAt(sb.length() - 1, ')');
