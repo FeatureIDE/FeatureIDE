@@ -58,7 +58,7 @@ public class Solution extends LiteralSet {
 	@Override
 	public int indexOfLiteral(int literal) {
 		final int index = Math.abs(literal) - 1;
-		return literals[index] == literal ? index : -1;
+		return literal == 0 ? -1 : literals[index] == literal ? index : -1;
 	}
 
 	@Override

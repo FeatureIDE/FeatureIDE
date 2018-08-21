@@ -30,9 +30,12 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.prop4j.And;
+import org.prop4j.ErrorLiteral;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
+
+import de.ovgu.featureide.fm.core.Logger;
 
 /**
  * Transforms DIMACS CNF files into instances of {@link Node}.
@@ -53,8 +56,10 @@ public class DimacsReader {
 	/** The scanner for tokenizing the input. */
 	private Scanner scanner;
 
+	private boolean ignoreMissingVariableNames = true;
+
 	/** Maps indexes to variables. */
-	private final Map<Integer, Object> indexVariables = new LinkedHashMap<>();
+	private final Map<Integer, Literal> indexVariables = new LinkedHashMap<>();
 	/**
 	 * The amount of variables as declared in the problem definition. May differ from the actual amount of variables found.
 	 */
@@ -144,8 +149,10 @@ public class DimacsReader {
 				throw new ParseException("Trailing data", -1);
 			}
 			final int actualVariableCount = indexVariables.size();
-			if (variableCount != actualVariableCount) {
+			if (variableCount < actualVariableCount) {
 				throw new ParseException(String.format("Found %d instead of %d variables", actualVariableCount, variableCount), -1);
+			} else if (variableCount > actualVariableCount) {
+				Logger.logWarning(String.format("Found %d instead of %d variables", actualVariableCount, variableCount));
 			}
 			return new And(clauses.toArray(new Node[clauseCount]));
 		}
@@ -251,12 +258,14 @@ public class DimacsReader {
 			return null;
 		}
 		final Integer key = Math.abs(index);
-		Object variable = indexVariables.get(key);
+		Literal variable = indexVariables.get(key);
 		if (variable == null) {
-			variable = String.valueOf(key);
+			variable = (ignoreMissingVariableNames) ? new Literal(Integer.toString(key)) : new ErrorLiteral(key);
 			indexVariables.put(key, variable);
 		}
-		return new Literal(variable, index > 0);
+		final Literal newLiteral = variable.clone();
+		newLiteral.positive = index > 0;
+		return newLiteral;
 	}
 
 	/**
@@ -294,9 +303,31 @@ public class DimacsReader {
 				return false;
 			}
 			if (!indexVariables.containsKey(index)) {
-				indexVariables.put(index, variable);
+				indexVariables.put(index, new Literal(variable));
 			}
 			return true;
 		}
+	}
+
+	/**
+	 * A flag for the behavior of handling variables that are not specified in the comments of the file. If {@code true} a literal that has no corresponding
+	 * variable name in the comment section will create a {@link Literal} with its id as variable name. If {@code false} an {@code ErrorLiteral} will be created
+	 * instead.
+	 *
+	 * @return the current value of the flag
+	 */
+	public boolean isIgnoreMissingVariableNames() {
+		return ignoreMissingVariableNames;
+	}
+
+	/**
+	 * Sets the flag for the behavior of handling variables that are not specified in the comments of the file. If {@code true} a literal that has no
+	 * corresponding variable name in the comment section will create a {@link Literal} with its id as variable name. If {@code false} an {@code ErrorLiteral}
+	 * will be created instead.
+	 *
+	 * @param ignoreMissingVariableNames the new flag value
+	 */
+	public void setIgnoreMissingVariableNames(boolean ignoreMissingVariableNames) {
+		this.ignoreMissingVariableNames = ignoreMissingVariableNames;
 	}
 }

@@ -75,10 +75,7 @@ public class LiteralSet implements Cloneable, Serializable, Comparable<LiteralSe
 	 * @param literals literals of the clause
 	 */
 	public LiteralSet(int... literals) {
-		this.literals = literals;
-		Arrays.sort(this.literals);
-
-		hashCode = Arrays.hashCode(literals);
+		this(literals, true);
 	}
 
 	protected LiteralSet(int[] literals, boolean sort) {

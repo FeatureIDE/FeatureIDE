@@ -73,14 +73,18 @@ public final class Nodes {
 		}
 
 		final ArrayList<String> variableList = new ArrayList<>(satInstance.size() + errorNames.size());
-		variableList.addAll(Arrays.asList(satInstance.getNames()).subList(1, satInstance.size()));
+		variableList.addAll(Arrays.asList(satInstance.getNames()).subList(1, satInstance.size() + 1));
 		variableList.addAll(errorNames);
 		final Variables mappingWithErrors = new Variables(variableList);
 
 		final List<LiteralSet> clauses = convert(mappingWithErrors, cnfNode);
-		final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
-		final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
-		return slicedCnf == null ? null : new CNF((Variables) satInstance, slicedCnf.getClauses());
+		try {
+			final CNFSlicer slicer = new CNFSlicer(new CNF(mappingWithErrors, clauses), errorNames);
+			final CNF slicedCnf = LongRunningWrapper.runMethod(slicer);
+			return slicedCnf == null ? null : new CNF((Variables) satInstance, slicedCnf.getClauses());
+		} catch (final Exception e) {
+			return null;
+		}
 	}
 
 	public static void collectVariables(IVariables variables, Node cnfNode, final Set<String> varNames, final Set<String> errorNames) {

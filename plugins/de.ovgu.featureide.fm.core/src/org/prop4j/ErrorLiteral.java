@@ -28,7 +28,11 @@ package org.prop4j;
 public class ErrorLiteral extends Literal {
 
 	public ErrorLiteral(Object var) {
-		super(var, true);
+		super(var);
+	}
+
+	public ErrorLiteral(Object var, boolean positive) {
+		super(var, positive);
 	}
 
 	public ErrorLiteral(ErrorLiteral oldLiteral) {
