@@ -21,9 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,8 +46,6 @@ import de.ovgu.featureide.fm.core.Operator;
  */
 public class SimpleSyntaxHighlightEditor extends StyledText {
 
-	private final String[] keywords;
-	private final Set<String> possibleWords = new HashSet<String>();
 	private final StyleRange defaultStyleRange = new StyleRange();
 	private static final Pattern nonOperators = Pattern.compile("\"[^\"]*\"");
 
@@ -59,7 +55,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	 */
 	public SimpleSyntaxHighlightEditor(Composite parent, int style, final String[] keywords) {
 		super(parent, style);
-		this.keywords = keywords;
 
 		keywordColor = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
 		wrongWordColor = Display.getDefault().getSystemColor(SWT.COLOR_RED);
@@ -82,24 +77,12 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private boolean keywordsUnderline;
 	private int index;
 
-	public void setPossibleWords(Set<String> words) {
-		possibleWords.clear();
-
-		for (final String word : words) {
-			possibleWords.add(word);
-			possibleWords.add("\"" + word + "\"");
-		}
-
-		for (int i = 0; i < keywords.length; i++) {
-			final String keyword = keywords[i].toLowerCase();
-			possibleWords.add(keyword);
-		}
-	}
-
 	/**
 	 * Updates highlight according to error type.
 	 *
 	 * @param errorType
+	 * @author Mohammed Khaled
+	 * @author Iris-Maria Banciu
 	 */
 	public void updateHighlight(ErrorType errorType) {
 		final String text = super.getText();

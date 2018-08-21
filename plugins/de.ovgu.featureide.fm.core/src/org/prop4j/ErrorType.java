@@ -20,6 +20,11 @@
  */
 package org.prop4j;
 
+/**
+ * ErrorType class for NodeReader Errors
+ * 
+ * @author Mohammed Khaled
+ */
 public class ErrorType {
 	public ErrorEnum error;
 	public int startErrorIndex;
