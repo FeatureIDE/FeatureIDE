@@ -1197,6 +1197,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
+			menuManager.add(focusOnExplanationAction);
 			menuManager.add(editConstraintAction);
 			menuManager.add(deleteAction);
 		} else if (isConnectionMenu(selection)) {
