@@ -26,23 +26,79 @@ package org.prop4j;
  * @author Mohammed Khaled
  */
 public class ErrorType {
-	public ErrorEnum error;
-	public int startErrorIndex;
-	public int endErrorIndex;
-	public String keyword;
+	private ErrorEnum error;
+	private int startErrorIndex;
+	private int endErrorIndex;
+	private String keyword;
 
 	public ErrorType(ErrorEnum error, int startErrorIndex, int endErrorIndex) {
-		this.error = error;
-		this.startErrorIndex = startErrorIndex;
-		this.endErrorIndex = endErrorIndex;
+		setError(error);
+		setStartErrorIndex(startErrorIndex);
+		setEndErrorIndex(endErrorIndex);
 	}
 
 	public ErrorType(ErrorEnum error) {
-		this.error = error;
+		setError(error);
 	}
 
 	public ErrorType(ErrorEnum error, String keyword) {
+		setError(error);
+		setKeyword(keyword);
+	}
+
+	/**
+	 * @return the error
+	 */
+	public ErrorEnum getError() {
+		return error;
+	}
+
+	/**
+	 * @param error the error to set
+	 */
+	public void setError(ErrorEnum error) {
 		this.error = error;
+	}
+
+	/**
+	 * @return the startErrorIndex
+	 */
+	public int getStartErrorIndex() {
+		return startErrorIndex;
+	}
+
+	/**
+	 * @param startErrorIndex the startErrorIndex to set
+	 */
+	public void setStartErrorIndex(int startErrorIndex) {
+		this.startErrorIndex = startErrorIndex;
+	}
+
+	/**
+	 * @return the endErrorIndex
+	 */
+	public int getEndErrorIndex() {
+		return endErrorIndex;
+	}
+
+	/**
+	 * @param endErrorIndex the endErrorIndex to set
+	 */
+	public void setEndErrorIndex(int endErrorIndex) {
+		this.endErrorIndex = endErrorIndex;
+	}
+
+	/**
+	 * @return the keyword
+	 */
+	public String getKeyword() {
+		return keyword;
+	}
+
+	/**
+	 * @param keyword the keyword to set
+	 */
+	public void setKeyword(String keyword) {
 		this.keyword = keyword;
 	}
 
