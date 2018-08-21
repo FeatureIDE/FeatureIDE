@@ -192,18 +192,21 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	 * @return
 	 */
 	private String generateRegexForUnknownStrings() {
-		final StringBuilder sb = new StringBuilder("(");
-		for (final String keyword : unknownWords) {
-			sb.append("\\b" + Pattern.quote(keyword) + "\\b");
-			sb.append("|");
+		final StringBuilder sb = new StringBuilder();
+		if (!unknownWords.isEmpty()) {
+			sb.append("(");
+			for (final String keyword : unknownWords) {
+				sb.append("\\b" + Pattern.quote(keyword) + "\\b");
+				sb.append("|");
+			}
+			sb.setCharAt(sb.length() - 1, ')');
 		}
-		sb.setCharAt(sb.length() - 1, ')');
 		final String regexUnknownWords = sb.toString();
 		return regexUnknownWords;
 	}
 
 	private void retireveUnknownWords(String text) {
-		// TODO : Fix 2 Features Nacheinandern && lowerCase UpperCase
+		// TODO : Fix 2 Features Nacheinandern
 
 		unknownWords.clear();
 
