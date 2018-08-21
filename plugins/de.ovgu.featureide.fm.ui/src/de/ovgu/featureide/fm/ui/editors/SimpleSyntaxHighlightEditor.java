@@ -105,6 +105,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		final String text = super.getText();
 		keywordsUnderline = false;
 		defaultStyleRange();
+
 		switch (errorType.error) {
 		case Default:
 			defaultStyleRange();
