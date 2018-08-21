@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -31,12 +32,11 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
-	// public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
-	public static final String ID = "de.ovgu.featureide.tikzformat";
+	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
 	@Override
 	public String write(IGraphicalFeatureModel object) {
-		throw new UnsupportedOperationException();
+		return "Hello World";
 	}
 
 	@Override
@@ -51,31 +51,18 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentFormat#getSuffix()
-	 */
 	@Override
 	public String getSuffix() {
 		return ".tex";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentFormat#getName()
-	 */
 	@Override
 	public String getName() {
-		return "FeatureIDE";
+		return "LaTeX-Document with TikZ";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.IExtension#getId()
-	 */
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
 		return ID;
 	}
 
