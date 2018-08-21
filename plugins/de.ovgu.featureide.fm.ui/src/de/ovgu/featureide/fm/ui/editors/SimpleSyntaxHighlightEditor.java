@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Display;
 import org.prop4j.ErrorType;
 import org.prop4j.ErrorType.ErrorEnum;
 
+import de.ovgu.featureide.fm.core.Operator;
+
 /**
  * Simple syntax highlighted editor
  *
@@ -137,9 +139,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	}
 
 	private void highlightEverything() {
-		defaultStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-		defaultStyleRange.underline = true;
-		defaultStyleRange.underlineColor = wrongWordColor;
+		setUnderlineForError(defaultStyleRange);
 		setStyleRange(defaultStyleRange);
 	}
 
@@ -159,57 +159,51 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		final StyleRange hightlightBetweenStyleRange = new StyleRange();
 		hightlightBetweenStyleRange.start = start;
 		hightlightBetweenStyleRange.length = end - start;
-		hightlightBetweenStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-		hightlightBetweenStyleRange.underline = true;
-		hightlightBetweenStyleRange.underlineColor = wrongWordColor;
+		setUnderlineForError(hightlightBetweenStyleRange);
 		setStyleRange(hightlightBetweenStyleRange);
 
 	}
 	// highlight keywords in text
 
-	private void hightlightWrongWords(String text) {
-		final List<Match> keywordPositions = new ArrayList<>();
+	/**
+	 * @param hightlightBetweenStyleRange
+	 */
+	private void setUnderlineForError(final StyleRange hightlightBetweenStyleRange) {
+		hightlightBetweenStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
+		hightlightBetweenStyleRange.underline = true;
+		hightlightBetweenStyleRange.underlineColor = wrongWordColor;
+	}
 
+	private void hightlightWrongWords(String text) {
+		final String regexUnknownWords = generateRegexForUnknownStrings();
+
+		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
+		final Matcher operatorMatcher = Pattern.compile(regexUnknownWords).matcher(text);
+
+		final List<Match> keywordPositions = extractRegexMatchesFromText(nonOperatorMatcher, operatorMatcher);
+
+		for (final Match match : keywordPositions) {
+			final StyleRange wrongWordsStyleRange = (StyleRange) defaultStyleRange.clone();
+			wrongWordsStyleRange.start = match.start;
+			wrongWordsStyleRange.length = match.end - match.start;
+			setUnderlineForError(wrongWordsStyleRange);
+			setStyleRange(wrongWordsStyleRange);
+
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	private String generateRegexForUnknownStrings() {
 		final StringBuilder sb = new StringBuilder("(");
 		for (final String keyword : unknownWords) {
 			sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
 			sb.append("|");
 		}
 		sb.setCharAt(sb.length() - 1, ')');
-
-		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
-		final Matcher operatorMatcher = Pattern.compile(sb.toString()).matcher(text);
-
-		Match nonOperatorMatch = null;
-		if (nonOperatorMatcher.find()) {
-			nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
-		}
-		while (operatorMatcher.find()) {
-			final int start = operatorMatcher.start();
-			final int end = operatorMatcher.end();
-
-			while ((nonOperatorMatch != null) && (start > nonOperatorMatch.end)) {
-				if (nonOperatorMatcher.find()) {
-					nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
-				} else {
-					nonOperatorMatch = null;
-				}
-			}
-			if ((nonOperatorMatch == null) || !((start < nonOperatorMatch.end) && (end > nonOperatorMatch.start))) {
-				keywordPositions.add(new Match(start, end));
-			}
-		}
-
-		for (final Match match : keywordPositions) {
-			final StyleRange wrongWordsStyleRange = (StyleRange) defaultStyleRange.clone();
-			wrongWordsStyleRange.start = match.start;
-			wrongWordsStyleRange.length = match.end - match.start;
-			wrongWordsStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-			wrongWordsStyleRange.underline = true;
-			wrongWordsStyleRange.underlineColor = wrongWordColor;
-			setStyleRange(wrongWordsStyleRange);
-
-		}
+		final String regexUnknownWords = sb.toString();
+		return regexUnknownWords;
 	}
 
 	private void retireveUnknownWords(String text) {
@@ -265,41 +259,11 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	}
 
 	private void hightlightKeywords(String text) {
-		final List<Match> keywordPositions = new ArrayList<>();
 
-		final StringBuilder sb = new StringBuilder("(");
-		for (final String keyword : keywords) {
-			if ((keyword == "(") || (keyword == ")")) {
-				sb.append("\\" + keyword);
-			} else {
-				sb.append("\\b" + Pattern.quote(keyword.toLowerCase()) + "\\b");
-			}
-			sb.append("|");
-		}
-		sb.setCharAt(sb.length() - 1, ')');
-
-		final Matcher operatorMatcher = Pattern.compile(sb.toString()).matcher(text);
+		final Matcher operatorMatcher = Pattern.compile(Operator.REGEX).matcher(text);
 		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
 
-		Match nonOperatorMatch = null;
-		if (nonOperatorMatcher.find()) {
-			nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
-		}
-		while (operatorMatcher.find()) {
-			final int start = operatorMatcher.start();
-			final int end = operatorMatcher.end();
-
-			while ((nonOperatorMatch != null) && (start > nonOperatorMatch.end)) {
-				if (nonOperatorMatcher.find()) {
-					nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
-				} else {
-					nonOperatorMatch = null;
-				}
-			}
-			if ((nonOperatorMatch == null) || !((start < nonOperatorMatch.end) && (end > nonOperatorMatch.start))) {
-				keywordPositions.add(new Match(start, end));
-			}
-		}
+		final List<Match> keywordPositions = extractRegexMatchesFromText(nonOperatorMatcher, operatorMatcher);
 
 		// highlight keywords in text
 		for (final Match match : keywordPositions) {
@@ -310,13 +274,19 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			keywordsStyleRange.fontStyle = SWT.BOLD;
 			keywordsStyleRange.foreground = keywordColor;
 
-			if (keywordsUnderline && (match.end <= index)) {
-				keywordsStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
-				keywordsStyleRange.underline = true;
-				keywordsStyleRange.underlineColor = wrongWordColor;
-			}
+			underlineWrongKeywords(match, keywordsStyleRange);
 
 			setStyleRange(keywordsStyleRange);
+		}
+	}
+
+	/**
+	 * @param match
+	 * @param keywordsStyleRange
+	 */
+	private void underlineWrongKeywords(final Match match, final StyleRange keywordsStyleRange) {
+		if (keywordsUnderline && (match.end <= index)) {
+			setUnderlineForError(keywordsStyleRange);
 		}
 	}
 
@@ -342,5 +312,34 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setText(temp.toString());
 		super.setFocus();
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
+	}
+
+	/**
+	 * @param matchAnything
+	 * @param regexMatcher
+	 * @return
+	 */
+	private List<Match> extractRegexMatchesFromText(final Matcher matchAnything, final Matcher regexMatcher) {
+		final List<Match> keywordPositions = new ArrayList<>();
+		Match nonOperatorMatch = null;
+		if (matchAnything.find()) {
+			nonOperatorMatch = new Match(matchAnything.start(), matchAnything.end());
+		}
+		while (regexMatcher.find()) {
+			final int start = regexMatcher.start();
+			final int end = regexMatcher.end();
+
+			while ((nonOperatorMatch != null) && (start > nonOperatorMatch.end)) {
+				if (matchAnything.find()) {
+					nonOperatorMatch = new Match(matchAnything.start(), matchAnything.end());
+				} else {
+					nonOperatorMatch = null;
+				}
+			}
+			if ((nonOperatorMatch == null) || !((start < nonOperatorMatch.end) && (end > nonOperatorMatch.start))) {
+				keywordPositions.add(new Match(start, end));
+			}
+		}
+		return keywordPositions;
 	}
 }
