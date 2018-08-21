@@ -78,7 +78,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	@Override
 	public void sessionStarted() {}
 
-	public List<CompletionProposal> getCompl(final IFeatureProject featureProject, final CharSequence prefix) {
+	public List<CompletionProposal> getComplForFeatures(final IFeatureProject featureProject, final CharSequence prefix) {
 		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
 
 		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
@@ -93,6 +93,23 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			}
 		}
 		return ret_List;
+	}
+
+	public List<CompletionProposal> getComplForAnnotations(final CharSequence prefix) {
+		final LinkedList<CompletionProposal> completionProposalList = new LinkedList<CompletionProposal>();
+
+		final Iterable<String> directives = Directives.getAllDirectives();
+		for (final String string : directives) {
+			CompletionProposal pr = null;
+			pr = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
+			pr.setName(string.toCharArray());
+			pr.setCompletion(string.toCharArray());
+
+			if (string.startsWith(prefix.toString())) {
+				completionProposalList.add(pr);
+			}
+		}
+		return completionProposalList;
 	}
 
 	@Override
@@ -122,7 +139,8 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			e.printStackTrace();
 		}
 
-		final List<CompletionProposal> completionProp = getCompl(featureProject, prefix);
+		final List<CompletionProposal> completionProp = getComplForFeatures(featureProject, prefix);
+		final List<CompletionProposal> completionDirectives = getComplForAnnotations(prefix);
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		for (final CompletionProposal prop : completionProp) {
@@ -134,6 +152,16 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			curFeature.setReplacementOffset(context.getInvocationOffset());
 
 			list.add(curFeature);
+		}
+
+		for (final CompletionProposal prop : completionDirectives) {
+
+			final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
+			// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+			curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
+			curAnnotation.setReplacementOffset(context.getInvocationOffset());
+
+			list.add(curAnnotation);
 		}
 		return list;
 	}
