@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.elements;
 
 import de.ovgu.featureide.fm.core.PluginID;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -36,7 +37,61 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	@Override
 	public String write(IGraphicalFeatureModel object) {
-		return "Hello World";
+		final StringBuilder str = new StringBuilder();
+		str.append("\\documentclass[border=5pt]{standalone}\n" + "%---required packages & variable definitions------------------------------------\n"
+			+ "\\usepackage{forest}\n" + "\\usepackage{xcolor}\n" + "\\usetikzlibrary{angles}\n" + "\\definecolor{drawColor}{RGB}{128 128 128}\n"
+			+ "\\newcommand{\\circleSize}{2.3pt}\n" + "\\newcommand{\\angleSize}{8.3pt}\n"
+			+ "%-------------------------------------------------------------------------------\n"
+			+ "%---Define the style of the tree------------------------------------------------\n" + "\\forestset{\n" + "	/tikz/mandatory/.style={\n"
+			+ "		circle,fill=drawColor,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n" + "	/tikz/optional/.style={\n"
+			+ "		circle,\n" + "		fill=white,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n"
+			+ "	featureDiagram/.style={\n" + "		for tree={\n" + "			parent anchor = south,\n" + "			child anchor = north,\n"
+			+ "			draw = drawColor,\n" + "			edge = {draw=drawColor},\n" + "			font = \\sffamily\n" + "		}\n" + "	},\n"
+			+ "	abstract/.style={\n" + "		for tree={\n" + "		fill = blue!85!cyan!5\n" + "		}\n" + "	},\n" + "	concrete/.style={\n"
+			+ "		for tree={\n" + "			fill = blue!85!cyan!20\n" + "		}\n" + "	},\n" + "	mandatory/.style={\n"
+			+ "		edge label={node [mandatory] {} }\n" + "	},\n" + "	optional/.style={\n" + "		edge label={node [optional] {} }\n" + "	},\n"
+			+ "	or/.style={\n" + "		tikz+={\n"
+			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
+			+ "		}	\n"
+			+ "			%\\draw  (.children first) coordinate (A) -- () coordinate (B) -- (.children last) coordinate (C) pic[fill=drawColor, angle radius=5pt]{angle};}\n"
+			+ "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
+			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
+			+ "		}	\n" + "	}\n" + "}\n" + "%-------------------------------------------------------------------------------\n" + "\\begin{document}\n"
+			+ "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n" + "		featureDiagram\n");
+		// TODO: Tree implementation
+		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
+		String myRoot = null;
+		// System.out.println();
+
+		for (final IFeature feature : myList) {
+			System.out.println(feature + "\n");
+			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot()) {
+				myRoot = feature.getName();
+			}
+			System.out.println(
+					"is Root?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot());
+			System.out.println("is Concrete: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isConcrete());
+			System.out.println("is Abstract?: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAbstract());
+			System.out.println("is Mandatory?: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isMandatory());
+			System.out
+					.println("is Or?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isOr());
+			System.out.println("is Alternative?: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAlternative());
+			System.out.println(
+					"is And?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAnd());
+			System.out.println("is ANDPossible?: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isANDPossible());
+			System.out.println("is MandatorySet?: "
+				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isMandatorySet());
+			System.out.println("\n---------------------------------------------------------------------------\n");
+		}
+		System.out.println(object.getFeatureModel().getNumberOfFeatures());
+		str.append("[" + myRoot + "]" + "\n");
+		str.append("	\\end{forest}\n" + "	%---------------------------------------------------------------------------\n" + "\\end{document}");
+		return str.toString();
 	}
 
 	@Override
