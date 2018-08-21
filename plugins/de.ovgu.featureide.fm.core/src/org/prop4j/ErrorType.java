@@ -21,21 +21,27 @@
 package org.prop4j;
 
 public class ErrorType {
-	public ErrorEnum error;
+	public ErrorEnum Error;
 	public int StartErrorIndex;
 	public int EndErrorIndex;
+	public String Keyword;
 
-	public ErrorType(ErrorEnum error, int StartErrorIndex, int EndErrorIndex) {
-		this.error = error;
-		this.StartErrorIndex = StartErrorIndex;
-		this.EndErrorIndex = EndErrorIndex;
+	public ErrorType(ErrorEnum error, int startErrorIndex, int endErrorIndex) {
+		Error = error;
+		StartErrorIndex = startErrorIndex;
+		EndErrorIndex = endErrorIndex;
 	}
 
 	/**
-	 * @param none
+	 * @param ErrorEnum error
 	 */
 	public ErrorType(ErrorEnum error) {
-		this.error = error;
+		Error = error;
+	}
+
+	public ErrorType(ErrorEnum error, String keyword) {
+		Error = error;
+		Keyword = keyword;
 	}
 
 	public enum ErrorEnum {

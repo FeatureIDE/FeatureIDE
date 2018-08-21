@@ -106,15 +106,15 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		retireveUnknownWords(text);
 		defaultStyleRange();
 
-		if (errorType.error == ErrorEnum.InvalidFeatureName) {
+		if (errorType.Error == ErrorEnum.InvalidFeatureName) {
 			defaultStyleRange();
-			hightlightWrongWords(text);
+			underlineKeyword(errorType.Keyword);
 		}
-		if ((errorType.error == ErrorEnum.InvalidExpressionRight) || (errorType.error == ErrorEnum.InvalidExpressionLeft)) {
+		if ((errorType.Error == ErrorEnum.InvalidExpressionRight) || (errorType.Error == ErrorEnum.InvalidExpressionLeft)) {
 			defaultStyleRange();
 			hightlightBetween(errorType);
 		}
-		if (errorType.error == ErrorEnum.Default) {
+		if (errorType.Error == ErrorEnum.Default) {
 			defaultStyleRange();
 			highlightEverything();
 		}
@@ -139,13 +139,28 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		setStyleRange(defaultStyleRange);
 	}
 
+	private void underlineKeyword(String keyword) {
+		final Matcher operatorMatcher = Pattern.compile(keyword).matcher(super.getText());
+		final Matcher nonOperatorMatcher = nonOperators.matcher(super.getText());
+		final List<Match> keywordPositions = extractRegexMatchesFromText(nonOperatorMatcher, operatorMatcher);
+		for (final Match match : keywordPositions) {
+			final StyleRange highlightKeywordStyleRange = (StyleRange) defaultStyleRange.clone();
+			highlightKeywordStyleRange.start = match.start;
+			highlightKeywordStyleRange.length = match.end - match.start;
+			setUnderlineForError(highlightKeywordStyleRange);
+			setStyleRange(highlightKeywordStyleRange);
+
+		}
+
+	}
+
 	private void hightlightBetween(ErrorType errorType) {
 		int start = 0;
 		int end = super.getText().length();
-		if (errorType.error == ErrorEnum.InvalidExpressionRight) {
+		if (errorType.Error == ErrorEnum.InvalidExpressionRight) {
 			start = errorType.EndErrorIndex - 2;
 			end = super.getText().length();
-		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
+		} else if (errorType.Error == ErrorEnum.InvalidExpressionLeft) {
 			keywordsUnderline = true;
 			index = end - errorType.EndErrorIndex;
 			start = 0;
