@@ -80,7 +80,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private final Color keywordColor;
 	private final Color wrongWordColor;
 	private final Color normalColor;
-	private boolean underlineEverything;
 	private boolean keywordsUnderline;
 	private int index;
 
@@ -214,6 +213,8 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	}
 
 	private void retireveUnknownWords(String text) {
+		// TODO : Fix 2 Features Nacheinandern && lowerCase UpperCase
+
 		unknownWords.clear();
 
 		final StringBuilder safeCopySb = generateSafeString(text);
