@@ -987,7 +987,7 @@ public class ConstraintDialog implements GUIDefaults {
 					update(null, null, DialogState.SAVE_CHANGES_DONT_MIND);
 				}
 			}
-			constraintText.updateHighlight(properConstraint, nodeReader.errorType);
+			constraintText.updateHighlight(nodeReader.errorType);
 		}
 	}
 }

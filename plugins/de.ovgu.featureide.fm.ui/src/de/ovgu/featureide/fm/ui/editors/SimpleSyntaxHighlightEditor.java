@@ -50,10 +50,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 	private final String[] keywords;
 	private final Set<String> possibleWords = new HashSet<String>();
-	private final Set<String> unknownWords = new HashSet<String>();
 	private final StyleRange defaultStyleRange = new StyleRange();
-
-	private final char ILLEGAL_FEATURE_NAME_CHAR = '\u0000';
 	private static final Pattern nonOperators = Pattern.compile("\"[^\"]*\"");
 
 	/**
@@ -74,7 +71,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			@Override
 			public void modifyText(ModifyEvent e) {
 
-				updateHighlight(true, new ErrorType(ErrorEnum.None));
+				updateHighlight(new ErrorType(ErrorEnum.None));
 			}
 		});
 	}
@@ -99,32 +96,38 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	public void updateHighlight(boolean isConstraintProper, ErrorType errorType) {
+	/**
+	 * Updates highlight according to error type.
+	 *
+	 * @param errorType
+	 */
+	public void updateHighlight(ErrorType errorType) {
 		final String text = super.getText();
 		keywordsUnderline = false;
-
-		retireveUnknownWords(text);
 		defaultStyleRange();
-
-		if (errorType.Error == ErrorEnum.InvalidFeatureName) {
-			defaultStyleRange();
-			underlineKeyword(errorType.Keyword);
-		}
-		if ((errorType.Error == ErrorEnum.InvalidExpressionRight) || (errorType.Error == ErrorEnum.InvalidExpressionLeft)) {
-			defaultStyleRange();
-			hightlightBetween(errorType);
-		}
-		if (errorType.Error == ErrorEnum.Default) {
+		switch (errorType.error) {
+		case Default:
 			defaultStyleRange();
 			highlightEverything();
+			break;
+		case InvalidExpressionLeft:
+			defaultStyleRange();
+			hightlightBetween(errorType);
+			break;
+		case InvalidExpressionRight:
+			defaultStyleRange();
+			hightlightBetween(errorType);
+			break;
+		case InvalidFeatureName:
+			defaultStyleRange();
+			underlineKeyword(errorType.keyword);
+			break;
+		default:
+			break;
 		}
-
 		hightlightKeywords(text);
 	}
 
-	/**
-	 * @param text
-	 */
 	private void defaultStyleRange() {
 		defaultStyleRange.start = 0;
 		defaultStyleRange.length = super.getText().length();
@@ -157,14 +160,16 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private void hightlightBetween(ErrorType errorType) {
 		int start = 0;
 		int end = super.getText().length();
-		if (errorType.Error == ErrorEnum.InvalidExpressionRight) {
-			start = errorType.EndErrorIndex - 2;
-			end = super.getText().length();
-		} else if (errorType.Error == ErrorEnum.InvalidExpressionLeft) {
+		if (errorType.error == ErrorEnum.InvalidExpressionRight) {
 			keywordsUnderline = true;
-			index = end - errorType.EndErrorIndex;
+			index = end - errorType.endErrorIndex;
+			start = errorType.endErrorIndex - 2;
+			end = super.getText().length();
+		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
+			keywordsUnderline = true;
+			index = end - errorType.endErrorIndex;
 			start = 0;
-			end = (end - errorType.EndErrorIndex) + 1;
+			end = (end - errorType.endErrorIndex) + 1;
 		}
 
 		final StyleRange hightlightBetweenStyleRange = new StyleRange();
@@ -174,92 +179,11 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		setStyleRange(hightlightBetweenStyleRange);
 
 	}
-	// highlight keywords in text
 
-	/**
-	 * @param hightlightBetweenStyleRange
-	 */
 	private void setUnderlineForError(final StyleRange hightlightBetweenStyleRange) {
 		hightlightBetweenStyleRange.underlineStyle = SWT.UNDERLINE_ERROR;
 		hightlightBetweenStyleRange.underline = true;
 		hightlightBetweenStyleRange.underlineColor = wrongWordColor;
-	}
-
-	private void hightlightWrongWords(String text) {
-		final String regexUnknownWords = generateRegexForUnknownStrings();
-
-		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
-		final Matcher operatorMatcher = Pattern.compile(regexUnknownWords).matcher(text);
-
-		final List<Match> keywordPositions = extractRegexMatchesFromText(nonOperatorMatcher, operatorMatcher);
-
-		for (final Match match : keywordPositions) {
-			final StyleRange wrongWordsStyleRange = (StyleRange) defaultStyleRange.clone();
-			wrongWordsStyleRange.start = match.start;
-			wrongWordsStyleRange.length = match.end - match.start;
-			setUnderlineForError(wrongWordsStyleRange);
-			setStyleRange(wrongWordsStyleRange);
-
-		}
-	}
-
-	/**
-	 * @return
-	 */
-	private String generateRegexForUnknownStrings() {
-		final StringBuilder sb = new StringBuilder();
-		if (!unknownWords.isEmpty()) {
-			sb.append("(");
-			for (final String keyword : unknownWords) {
-				sb.append("\\b" + Pattern.quote(keyword) + "\\b");
-				sb.append("|");
-			}
-			sb.setCharAt(sb.length() - 1, ')');
-		}
-		final String regexUnknownWords = sb.toString();
-		return regexUnknownWords;
-	}
-
-	private void retireveUnknownWords(String text) {
-		// TODO : Fix 2 Features Nacheinandern
-
-		unknownWords.clear();
-
-		final StringBuilder safeCopySb = generateSafeString(text);
-		final String[] tokens = safeCopySb.toString().split(" ");
-		for (int i = 0; i < keywords.length; i++) {
-			possibleWords.add(keywords[i]);
-		}
-		for (int i = 0; i < tokens.length; i++) {
-			final String token = tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
-			if (!token.isEmpty() && !possibleWords.contains(token) && !possibleWords.contains(token.toLowerCase())) {
-				unknownWords.add(token);
-			}
-		}
-	}
-
-	/**
-	 * @param text
-	 * @return
-	 */
-	private StringBuilder generateSafeString(String text) {
-		String safeCopy = new String(text);
-		safeCopy = safeCopy.replace("(", " ").replace(")", " ");
-
-		final StringBuilder safeCopySb = new StringBuilder(safeCopy);
-
-		// avoid splitting feature names with containing spaces by replace spaces inside brackets with a char
-		// that could never be inside a feature name and recode this later
-		boolean insideFeatureNameWithWhitespace = false;
-		for (int i = 0; i < safeCopy.length(); i++) {
-			if (safeCopy.charAt(i) == '\"') {
-				insideFeatureNameWithWhitespace = !insideFeatureNameWithWhitespace;
-			}
-			if (insideFeatureNameWithWhitespace && (safeCopy.charAt(i) == ' ')) {
-				safeCopySb.replace(i, i + 1, String.valueOf(ILLEGAL_FEATURE_NAME_CHAR));
-			}
-		}
-		return safeCopySb;
 	}
 
 	private static class Match {
@@ -294,12 +218,8 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	/**
-	 * @param match
-	 * @param keywordsStyleRange
-	 */
 	private void underlineWrongKeywords(final Match match, final StyleRange keywordsStyleRange) {
-		if (keywordsUnderline && (match.end <= index)) {
+		if ((keywordsUnderline && (match.end <= index))) {
 			setUnderlineForError(keywordsStyleRange);
 		}
 	}
@@ -328,11 +248,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
 	}
 
-	/**
-	 * @param matchAnything
-	 * @param regexMatcher
-	 * @return
-	 */
 	private List<Match> extractRegexMatchesFromText(final Matcher matchAnything, final Matcher regexMatcher) {
 		final List<Match> keywordPositions = new ArrayList<>();
 		Match nonOperatorMatch = null;
