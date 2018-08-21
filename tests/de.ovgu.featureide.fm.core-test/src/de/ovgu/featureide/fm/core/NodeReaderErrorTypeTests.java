@@ -44,7 +44,7 @@ public class NodeReaderErrorTypeTests {
 		final NodeReader reader = new NodeReader();
 		reader.stringToNode(constraint, featureList);
 
-		Assert.assertEquals(ErrorEnum.None, reader.errorType.error);
+		Assert.assertEquals(ErrorEnum.None, reader.errorType.getError());
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class NodeReaderErrorTypeTests {
 		constraint = "()";
 		reader.stringToNode(constraint, featureList);
 
-		Assert.assertEquals(ErrorEnum.Default, reader.errorType.error);
+		Assert.assertEquals(ErrorEnum.Default, reader.errorType.getError());
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class NodeReaderErrorTypeTests {
 		constraint = badFeatureName + " or A";
 		reader.stringToNode(constraint, featureList);
 
-		Assert.assertEquals(ErrorEnum.InvalidFeatureName, reader.errorType.error);
+		Assert.assertEquals(ErrorEnum.InvalidFeatureName, reader.errorType.getError());
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class NodeReaderErrorTypeTests {
 		final NodeReader reader = new NodeReader();
 		constraint = "A or B implies implies";
 		reader.stringToNode(constraint, featureList);
-		Assert.assertEquals(ErrorEnum.InvalidExpressionLeft, reader.errorType.error);
+		Assert.assertEquals(ErrorEnum.InvalidExpressionLeft, reader.errorType.getError());
 	}
 
 	@Test
@@ -78,6 +78,6 @@ public class NodeReaderErrorTypeTests {
 		final NodeReader reader = new NodeReader();
 		constraint = "A or B or ";
 		reader.stringToNode(constraint, featureList);
-		Assert.assertEquals(ErrorEnum.InvalidExpressionRight, reader.errorType.error);
+		Assert.assertEquals(ErrorEnum.InvalidExpressionRight, reader.errorType.getError());
 	}
 }

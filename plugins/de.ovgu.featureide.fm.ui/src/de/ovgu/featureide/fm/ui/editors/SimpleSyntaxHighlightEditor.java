@@ -106,7 +106,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		keywordsUnderline = false;
 		defaultStyleRange();
 
-		switch (errorType.error) {
+		switch (errorType.getError()) {
 		case Default:
 			defaultStyleRange();
 			highlightEverything();
@@ -121,7 +121,7 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 			break;
 		case InvalidFeatureName:
 			defaultStyleRange();
-			underlineKeyword(errorType.keyword);
+			underlineKeyword(errorType.getKeyword());
 			break;
 		default:
 			break;
@@ -161,16 +161,16 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	private void hightlightBetween(ErrorType errorType) {
 		int start = 0;
 		int end = super.getText().length();
-		if (errorType.error == ErrorEnum.InvalidExpressionRight) {
+		if (errorType.getError() == ErrorEnum.InvalidExpressionRight) {
 			keywordsUnderline = true;
-			index = end - errorType.endErrorIndex;
-			start = errorType.endErrorIndex - 2;
+			index = end - errorType.getEndErrorIndex();
+			start = errorType.getEndErrorIndex() - 2;
 			end = super.getText().length();
-		} else if (errorType.error == ErrorEnum.InvalidExpressionLeft) {
+		} else if (errorType.getError() == ErrorEnum.InvalidExpressionLeft) {
 			keywordsUnderline = true;
-			index = end - errorType.endErrorIndex;
+			index = end - errorType.getEndErrorIndex();
 			start = 0;
-			end = (end - errorType.endErrorIndex) + 1;
+			end = (end - errorType.getEndErrorIndex()) + 1;
 		}
 
 		final StyleRange hightlightBetweenStyleRange = new StyleRange();
