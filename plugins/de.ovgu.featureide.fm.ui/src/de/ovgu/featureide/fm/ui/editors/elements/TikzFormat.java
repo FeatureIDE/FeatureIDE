@@ -52,19 +52,34 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
+	private void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
+		str.append("[" + node);
+		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isAbstract() == true) {
+			str.append(",abstract");
+		}
+		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isConcrete() == true) {
+			str.append(",concrete");
+		}
+	}
+
+	private void insertNodeTail(StringBuilder str) {
+		str.append("]");
+	}
+
 	private void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
 		if (numberOfChildren == 0) {
-			str.append("[" + node + "]");
+			insertNodeHead(node, object, str);
+			insertNodeTail(str);
 		} else {
-			str.append("[" + node + " ");
+			insertNodeHead(node, object, str);
 			final List<IFeatureStructure> nodesChildren =
 				object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildren();
 			final Iterable<IFeatureStructure> myChildren = nodesChildren;
 			for (final IFeatureStructure child : myChildren) {
 				printTree(child.getFeature().getName(), object, str);
 			}
-			str.append("]");
+			insertNodeTail(str);
 		}
 	}
 
