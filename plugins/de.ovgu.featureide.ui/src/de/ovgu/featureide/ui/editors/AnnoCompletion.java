@@ -128,10 +128,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			return Collections.emptyList();
 		}
 
-		if (!isContextValid(context)) {
-			return Collections.emptyList();
-		}
-
 		CharSequence prefix = "";
 		try {
 			prefix = context.computeIdentifierPrefix();
@@ -155,7 +151,8 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 
 		for (final CompletionProposal prop : completionDirectives) {
-
+			final char[] name = prop.getName();
+			prop.setName(name);
 			final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
 			// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
 			curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
@@ -166,21 +163,4 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return list;
 	}
 
-	/**
-	 * @param context
-	 */
-	private boolean isContextValid(JavaContentAssistInvocationContext context) {
-		try {
-			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
-			final int offsetOfLine = context.getDocument().getLineOffset(line);
-			final int lineLength = context.getDocument().getLineLength(line);
-			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			if (!lineContent.contains("#if") && !lineContent.contains("#elif") && !lineContent.contains("#condition")) {
-				return false;
-			}
-		} catch (final BadLocationException e1) {
-			e1.printStackTrace();
-		}
-		return true;
-	}
 }
