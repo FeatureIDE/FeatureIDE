@@ -128,7 +128,8 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			return Collections.emptyList();
 		}
 
-		if (isContextValid(context) == Status.ShowNothing) {
+		final Status contextValid = computeList(context, featureProject);
+		if (contextValid == Status.ShowNothing) {
 			return Collections.emptyList();
 		}
 
@@ -143,7 +144,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		final List<CompletionProposal> completionDirectives = getComplForAnnotations(prefix);
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
-		if (isContextValid(context) == Status.ShowFeatures) {
+		if (contextValid == Status.ShowFeatures) {
 			for (final CompletionProposal prop : completionProp) {
 
 				final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
@@ -154,12 +155,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 				list.add(curFeature);
 			}
-		} else if (isContextValid(context) == Status.ShowDirectives) {
+		} else if (contextValid == Status.ShowDirectives) {
 			for (final CompletionProposal prop : completionDirectives) {
 
 				final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
 				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
-				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace("#" + prefix, ""));
+				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
 				curAnnotation.setReplacementOffset(context.getInvocationOffset());
 
 				list.add(curAnnotation);
@@ -168,10 +169,9 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return list;
 	}
 
-	private boolean hasDirectives(String lineContent) {
+	private boolean hasElement(String lineContent, List<String> list) {
 
-		final List<String> allDirectives = Directives.getAllDirectives();
-		for (final String div : allDirectives) {
+		for (final String div : list) {
 			if (lineContent.contains(div)) {
 				return true;
 			}
@@ -181,8 +181,10 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	/**
 	 * @param context
+	 * @author Mohammed Khaled
+	 * @author Iris-Maria Banciu
 	 */
-	private Status isContextValid(JavaContentAssistInvocationContext context) {
+	private Status computeList(JavaContentAssistInvocationContext context, final IFeatureProject featureProject) {
 		Status status = Status.ShowNothing;
 		try {
 			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
@@ -190,14 +192,15 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
 			final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
-			final boolean hasDirectives = hasDirectives(lineContent);
-			final boolean showFeaturesAfterDirectives = lineContent.contains("#if");
+			final boolean hasDirectives = hasElement(lineContent, Directives.getAllDirectives());
+			final boolean showFeaturesAfterDirectives = lineContent.contains("#if") || lineContent.contains("#elif") || lineContent.contains("#condition");
+			final boolean hasFeatures = hasElement(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 			if (startsWithHashTag && !hasDirectives) {
 				status = Status.ShowDirectives;
 			} else {
 				status = Status.ShowNothing;
 			}
-			if (showFeaturesAfterDirectives) {
+			if (showFeaturesAfterDirectives && !hasFeatures) {
 				status = Status.ShowFeatures;
 			}
 

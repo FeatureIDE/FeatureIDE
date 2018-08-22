@@ -30,8 +30,8 @@ import java.util.List;
  */
 
 public enum Directives {
-	IF("#if"), ENDIF("#endif"), IFDEF("#ifdef"), IFNDEF("#ifndef"), ELIF("#elif"), ELIFDEF("#elifdef"), ELIFNDEF("#elifndef"), ELSE("#else"), CONDITION(
-			"#condition"), DEFINE("#define"), UNDEFINE("#undefine");
+	IF("if"), ENDIF("endif"), IFDEF("ifdef"), IFNDEF("ifndef"), ELIF("elif"), ELIFDEF("elifdef"), ELIFNDEF("elifndef"), ELSE("else"), CONDITION(
+			"condition"), DEFINE("define"), UNDEFINE("undefine");
 
 	private String text;
 
