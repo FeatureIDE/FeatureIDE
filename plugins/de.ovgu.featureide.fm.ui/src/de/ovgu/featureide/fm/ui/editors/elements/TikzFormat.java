@@ -20,8 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -34,6 +37,36 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
+
+	private StringBuilder postProcessing(StringBuilder str) {
+		final int strLength = str.length();
+		StringBuilder newString = new StringBuilder();
+		newString = newString.append(str);
+		for (int i = 0, j = 0; i < strLength; ++i) {
+			if (str.charAt(i) == '_') {
+				newString.insert(i + j, '\\');
+				++j;
+			}
+		}
+		return newString;
+
+	}
+
+	private void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
+		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
+		if (numberOfChildren == 0) {
+			str.append("[" + node + "]");
+		} else {
+			str.append("[" + node + " ");
+			final List<IFeatureStructure> nodesChildren =
+				object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildren();
+			final Iterable<IFeatureStructure> myChildren = nodesChildren;
+			for (final IFeatureStructure child : myChildren) {
+				printTree(child.getFeature().getName(), object, str);
+			}
+			str.append("]");
+		}
+	}
 
 	@Override
 	public String write(IGraphicalFeatureModel object) {
@@ -61,35 +94,27 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		// TODO: Tree implementation
 		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
 		String myRoot = null;
-		// System.out.println();
+		final int numberOfFeatures = object.getFeatureModel().getNumberOfFeatures();
+		System.out.println("Number of Features: " + numberOfFeatures);
 
 		for (final IFeature feature : myList) {
 			System.out.println(feature + "\n");
 			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot()) {
 				myRoot = feature.getName();
 			}
-			System.out.println(
-					"is Root?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot());
-			System.out.println("is Concrete: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isConcrete());
-			System.out.println("is Abstract?: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAbstract());
-			System.out.println("is Mandatory?: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isMandatory());
-			System.out
-					.println("is Or?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isOr());
-			System.out.println("is Alternative?: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAlternative());
-			System.out.println(
-					"is And?: " + object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isAnd());
-			System.out.println("is ANDPossible?: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isANDPossible());
-			System.out.println("is MandatorySet?: "
-				+ object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isMandatorySet());
-			System.out.println("\n---------------------------------------------------------------------------\n");
 		}
-		System.out.println(object.getFeatureModel().getNumberOfFeatures());
-		str.append("[" + myRoot + "]" + "\n");
+
+		// PRE-OREDER TRAVERSEL
+		StringBuilder myTree = new StringBuilder();
+		str.append("		");
+		printTree(myRoot, object, myTree);
+		myTree = postProcessing(myTree);
+		str.append(myTree);
+		str.append("\n");
+		final String myChild =
+			object.getGraphicalFeature(object.getFeatureModel().getFeature(myRoot)).getObject().getStructure().getFirstChild().getFeature().getName();
+		System.out.println("erstes Kind der Wurzel: " + myChild);
+
 		str.append("	\\end{forest}\n" + "	%---------------------------------------------------------------------------\n" + "\\end{document}");
 		return str.toString();
 	}
