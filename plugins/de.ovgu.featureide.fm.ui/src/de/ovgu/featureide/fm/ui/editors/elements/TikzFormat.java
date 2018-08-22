@@ -68,6 +68,20 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 				str.append(",optional");
 			}
 		}
+		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false) {
+			if ((object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().isOr() == true)
+				&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().getFirstChild()
+						.equals(object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure()) == true)) {
+				str.append(",or");
+			}
+		}
+		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false) {
+			if ((object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().isAlternative() == true)
+				&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().getFirstChild()
+						.equals(object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure()) == true)) {
+				str.append(",alternative");
+			}
+		}
 
 	}
 
@@ -123,6 +137,8 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 		for (final IFeature feature : myList) {
 			System.out.println(feature + "\n");
+			// System.out.println(object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getStructure().getFirstChild().getFeature().getName()))
+			// .getObject().getStructure().isOr());
 			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot()) {
 				myRoot = feature.getName();
 			}
