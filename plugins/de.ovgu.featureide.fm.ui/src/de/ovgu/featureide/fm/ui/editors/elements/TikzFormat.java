@@ -60,6 +60,15 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isConcrete() == true) {
 			str.append(",concrete");
 		}
+		if ((object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false)
+			&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().isAnd() == true)) {
+			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isMandatory() == true) {
+				str.append(",mandatory");
+			} else {
+				str.append(",optional");
+			}
+		}
+
 	}
 
 	private void insertNodeTail(StringBuilder str) {
