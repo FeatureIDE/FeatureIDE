@@ -128,7 +128,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			return Collections.emptyList();
 		}
 
-		if (!isContextValid(context)) {
+		if (isContextValid(context) == Status.ShowNothing) {
 			return Collections.emptyList();
 		}
 
@@ -143,44 +143,71 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		final List<CompletionProposal> completionDirectives = getComplForAnnotations(prefix);
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
-		for (final CompletionProposal prop : completionProp) {
+		if (isContextValid(context) == Status.ShowFeatures) {
+			for (final CompletionProposal prop : completionProp) {
 
-			final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
-			curFeature.setImage(FEATURE_ICON);
-			// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
-			curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
-			curFeature.setReplacementOffset(context.getInvocationOffset());
+				final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
+				curFeature.setImage(FEATURE_ICON);
+				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+				curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
+				curFeature.setReplacementOffset(context.getInvocationOffset());
 
-			list.add(curFeature);
-		}
+				list.add(curFeature);
+			}
+		} else if (isContextValid(context) == Status.ShowDirectives) {
+			for (final CompletionProposal prop : completionDirectives) {
 
-		for (final CompletionProposal prop : completionDirectives) {
+				final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
+				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace("#" + prefix, ""));
+				curAnnotation.setReplacementOffset(context.getInvocationOffset());
 
-			final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
-			// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
-			curAnnotation.setReplacementString(new String(prop.getCompletion()).replace("#" + prefix, ""));
-			curAnnotation.setReplacementOffset(context.getInvocationOffset());
-
-			list.add(curAnnotation);
+				list.add(curAnnotation);
+			}
 		}
 		return list;
+	}
+
+	private boolean hasDirectives(String lineContent) {
+
+		final List<String> allDirectives = Directives.getAllDirectives();
+		for (final String div : allDirectives) {
+			if (lineContent.contains(div)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
 	 * @param context
 	 */
-	private boolean isContextValid(JavaContentAssistInvocationContext context) {
+	private Status isContextValid(JavaContentAssistInvocationContext context) {
+		Status status = Status.ShowNothing;
 		try {
 			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
 			final int offsetOfLine = context.getDocument().getLineOffset(line);
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			if (!lineContent.contains("#")) {
-				return false;
+			final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
+			final boolean hasDirectives = hasDirectives(lineContent);
+			final boolean showFeaturesAfterDirectives = lineContent.contains("#if");
+			if (startsWithHashTag && !hasDirectives) {
+				status = Status.ShowDirectives;
+			} else {
+				status = Status.ShowNothing;
 			}
+			if (showFeaturesAfterDirectives) {
+				status = Status.ShowFeatures;
+			}
+
 		} catch (final BadLocationException e1) {
 			e1.printStackTrace();
 		}
-		return true;
+		return status;
+	}
+
+	public enum Status {
+		ShowFeatures, ShowDirectives, ShowNothing
 	}
 }
