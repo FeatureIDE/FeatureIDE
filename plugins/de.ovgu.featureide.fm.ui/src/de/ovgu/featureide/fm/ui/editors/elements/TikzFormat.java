@@ -36,6 +36,63 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
+	public class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
+
+		@Override
+		public String getSuffix() {
+			return ".tex";
+		}
+
+		@Override
+		public String getName() {
+			return "LaTeX-Document with TikZ";
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+	}
+
+	public class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
+
+		@Override
+		public String getSuffix() {
+			return ".tex";
+		}
+
+		@Override
+		public String getName() {
+			return "LaTeX-Document with TikZ";
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+	}
+
+	public class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
+
+		@Override
+		public String getSuffix() {
+			return ".tex";
+		}
+
+		@Override
+		public String getName() {
+			return "LaTeX-Document with TikZ";
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+
+	}
+
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
 	private StringBuilder postProcessing(StringBuilder str) {
@@ -106,12 +163,10 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		}
 	}
 
-	@Override
-	public String write(IGraphicalFeatureModel object) {
-		final StringBuilder str = new StringBuilder();
+	private void printHead(StringBuilder str) {
 		str.append("\\documentclass[border=5pt]{standalone}\n" + "%---required packages & variable definitions------------------------------------\n"
 			+ "\\usepackage{forest}\n" + "\\usepackage{xcolor}\n" + "\\usetikzlibrary{angles}\n" + "\\definecolor{drawColor}{RGB}{128 128 128}\n"
-			+ "\\newcommand{\\circleSize}{2.3pt}\n" + "\\newcommand{\\angleSize}{8.3pt}\n"
+			+ "\\newcommand{\\circleSize}{0.25em}\n" + "\\newcommand{\\angleSize}{0.8em}\n"
 			+ "%-------------------------------------------------------------------------------\n"
 			+ "%---Define the style of the tree------------------------------------------------\n" + "\\forestset{\n" + "	/tikz/mandatory/.style={\n"
 			+ "		circle,fill=drawColor,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n" + "	/tikz/optional/.style={\n"
@@ -123,13 +178,27 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			+ "		edge label={node [mandatory] {} }\n" + "	},\n" + "	optional/.style={\n" + "		edge label={node [optional] {} }\n" + "	},\n"
 			+ "	or/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n"
-			+ "			%\\draw  (.children first) coordinate (A) -- () coordinate (B) -- (.children last) coordinate (C) pic[fill=drawColor, angle radius=5pt]{angle};}\n"
-			+ "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
+			+ "		}	\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	}\n" + "}\n" + "%-------------------------------------------------------------------------------\n" + "\\begin{document}\n"
-			+ "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n" + "		featureDiagram\n");
-		// TODO: Tree implementation
+			+ "		}	\n" + "	}\n" + "}\n" + "%-------------------------------------------------------------------------------\n");
+	}
+
+	private void printBody(StringBuilder str) {
+		str.append("\\begin{document}\n-----------------------------------------------------\n");
+		// TODO main function
+		str.append("\\end{document}");
+	}
+
+	private void printMain(String myRoot, IGraphicalFeatureModel object, StringBuilder str) {
+		// TODO: Implementation
+	}
+
+	@Override
+	public String write(IGraphicalFeatureModel object) {
+		final StringBuilder str = new StringBuilder();
+		printHead(str);
+		str.append("\\begin{document}\n" + "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n"
+			+ "		featureDiagram\n");
 		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
 		String myRoot = null;
 		final int numberOfFeatures = object.getFeatureModel().getNumberOfFeatures();

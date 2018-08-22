@@ -30,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SVG_EXPORT_FAILED;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
@@ -50,6 +51,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
@@ -113,6 +115,21 @@ public class GraphicsExporter {
 		if (file.getAbsolutePath().endsWith(".tex")) {
 			final IPersistentFormat<IGraphicalFeatureModel> format = new TikzFormat();
 			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), format);
+			System.out.println("Absolute Path: " + file.getAbsolutePath());
+			System.out.println("Path: " + file.getPath());
+			System.out.println("Name: " + file.getName());
+			System.out.println("toPath: " + file.toPath().toString());
+			System.out.println("isDirectory: " + file.isDirectory());
+			System.out.println("getParent: " + file.getParent());
+			final File file2 = new File(file.getParent() + "/hello.tex");
+
+			try {
+				FileSystem.mkDir(Paths.get("new"));
+			} catch (final IOException e) {
+				FMUIPlugin.getDefault().logError(e);
+
+			}
+			file.renameTo(file2);
 		} else if (file.getAbsolutePath().endsWith(".svg")) {
 			final ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			final IFigure rootFigure = part.getFigure();
