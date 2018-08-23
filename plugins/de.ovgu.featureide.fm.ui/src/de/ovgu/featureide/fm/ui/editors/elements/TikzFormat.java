@@ -214,8 +214,12 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	private static void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
-		if ((numberOfChildren == 0) || object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).isCollapsed()) {
+		if ((numberOfChildren == 0)) {
 			insertNodeHead(node, object, str);
+			insertNodeTail(str);
+		} else if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).isCollapsed()) {
+			insertNodeHead(node, object, str);
+			str.append("[,collapsed,edge label={node[hiddenNodes]{" + countNodes(node, object, -1) + "}}]");
 			insertNodeTail(str);
 		} else {
 			insertNodeHead(node, object, str);
@@ -226,6 +230,22 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 				printTree(child.getFeature().getName(), object, str);
 			}
 			insertNodeTail(str);
+		}
+	}
+
+	private static int countNodes(String node, IGraphicalFeatureModel object, int counter) {
+		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
+		if (numberOfChildren == 0) {
+			return ++counter;
+		} else {
+			final List<IFeatureStructure> nodesChildren =
+				object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildren();
+			final Iterable<IFeatureStructure> myChildren = nodesChildren;
+			for (final IFeatureStructure child : myChildren) {
+				counter = countNodes(child.getFeature().getName(), object, counter);
+
+			}
+			return ++counter;
 		}
 	}
 
@@ -246,7 +266,10 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
 			+ "		}	\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	}\n" + "}\n" + "%-------------------------------------------------------------------------------\n");
+			+ "		}	\n" + "	},\n" + "collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n"
+			+ "			fill opacity=0,\n" + "			draw opacity=0,\n" + "			l = 0em,\n" + "		}\n" + "	},\n"
+			+ "	/tikz/hiddenNodes/.style={\n" + "		midway,\n" + "		rounded corners,\n" + "		draw=drawColor,\n" + "		fill=white,\n"
+			+ "		scale=0.9\n" + "	}\n}\n" + "%-------------------------------------------------------------------------------\n");
 	}
 
 	private static void printBody(StringBuilder str) {
