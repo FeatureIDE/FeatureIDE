@@ -57,6 +57,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 *
 	 */
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
+	private boolean newDirectives;
 
 	public AnnoCompletion() {}
 
@@ -150,16 +151,19 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 				final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
 				curFeature.setImage(FEATURE_ICON);
 				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+
 				curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
 				curFeature.setReplacementOffset(context.getInvocationOffset());
 
 				list.add(curFeature);
 			}
 		} else if (contextValid == Status.ShowDirectives) {
+
 			for (final CompletionProposal prop : completionDirectives) {
 
 				final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
 				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+
 				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, "") + " ");
 				curAnnotation.setReplacementOffset(context.getInvocationOffset());
 				list.add(curAnnotation);
@@ -185,23 +189,32 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @author Mohammed Khaled
 	 * @author Iris-Maria Banciu
 	 */
+	private String findLastKeyword(String context) {
+		final String text = context.trim();
+		final int indexofKeyword = text.lastIndexOf(" ");
+		return text.substring(indexofKeyword).trim();
+	}
+
 	private Status computeList(JavaContentAssistInvocationContext context, final IFeatureProject featureProject) {
 		Status status = Status.ShowNothing;
+
 		try {
 			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
 			final int offsetOfLine = context.getDocument().getLineOffset(line);
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
+			final String lastKeyword = findLastKeyword(lineContent);
 			final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
 			final boolean hasDirectives = hasElement(lineContent, Directives.getAllDirectives());
 			final boolean showFeaturesAfterDirectives = lineContent.contains("#if") || lineContent.contains("#elif") || lineContent.contains("#condition");
 			final boolean hasFeatures = hasElement(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-			if (startsWithHashTag && !hasDirectives) {
+			newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+			if ((startsWithHashTag && !hasDirectives)) {
 				status = Status.ShowDirectives;
 			} else {
 				status = Status.ShowNothing;
 			}
-			if (showFeaturesAfterDirectives && !hasFeatures) {
+			if ((showFeaturesAfterDirectives && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
 				status = Status.ShowFeatures;
 			}
 
