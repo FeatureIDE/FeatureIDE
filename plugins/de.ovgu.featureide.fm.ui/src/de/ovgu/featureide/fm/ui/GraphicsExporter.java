@@ -68,6 +68,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
+	private static String FileName = null;
+
+	public static String getFileName() {
+		return FileName;
+	}
+
 	public static boolean exportAs(IFeatureModel featureModel, ScrollingGraphicalViewer diagramEditor) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg", "*.tex" };
@@ -111,25 +117,45 @@ public class GraphicsExporter {
 	public static boolean exportAs(GraphicalViewerImpl viewer, File file) {
 		boolean succ = false;
 
-		// Here we go
 		if (file.getAbsolutePath().endsWith(".tex")) {
-			final IPersistentFormat<IGraphicalFeatureModel> format = new TikzFormat();
-			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), format);
-			System.out.println("Absolute Path: " + file.getAbsolutePath());
-			System.out.println("Path: " + file.getPath());
-			System.out.println("Name: " + file.getName());
-			System.out.println("toPath: " + file.toPath().toString());
-			System.out.println("isDirectory: " + file.isDirectory());
-			System.out.println("getParent: " + file.getParent());
-			final File file2 = new File(file.getParent() + "/hello.tex");
+			FileName = file.getName();
 
+			// create new folder
+			final StringBuilder myFileName = new StringBuilder();
+			myFileName.append(file.getName().toString());
+			myFileName.delete(myFileName.length() - 4, myFileName.length());
 			try {
-				FileSystem.mkDir(Paths.get("new"));
+				FileSystem.mkDir(Paths.get(file.getParent() + "/" + myFileName.toString()));
 			} catch (final IOException e) {
 				FMUIPlugin.getDefault().logError(e);
 
 			}
-			file.renameTo(file2);
+
+			// ---old-----------------------------------------------------------------
+			// final IPersistentFormat<IGraphicalFeatureModel> format = new TikzFormat();
+			// FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), format);
+			// -----------------------------------------------------------------------
+
+			// output Head
+			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
+			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatHead);
+			final File fileHead = new File(file.getParent() + "/" + myFileName.toString() + "/head.tex");
+			file.renameTo(fileHead);
+
+			// output body
+			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody();
+			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatBody);
+			final File fileBody = new File(file.getParent() + "/" + myFileName.toString() + "/body.tex");
+			file.renameTo(fileBody);
+
+			// output main
+			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat.TikZMain();
+			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
+			final File fileMain = new File(file.getParent() + "/" + myFileName.toString() + "/" + file.getName());
+			file.renameTo(fileMain);
+
+			succ = true;
+
 		} else if (file.getAbsolutePath().endsWith(".svg")) {
 			final ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			final IFigure rootFigure = part.getFigure();

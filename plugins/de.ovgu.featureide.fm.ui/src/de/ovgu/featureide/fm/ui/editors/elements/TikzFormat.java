@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
+import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -36,7 +37,67 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
-	public class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
+	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
+
+		@Override
+		public String write(IGraphicalFeatureModel object) {
+			final StringBuilder str = new StringBuilder();
+
+			printHead(str);
+
+			return str.toString();
+		}
+
+		@Override
+		public boolean supportsRead() {
+			return false;
+
+		}
+
+		@Override
+		public boolean supportsWrite() {
+			return true;
+
+		}
+
+		@Override
+		public String getSuffix() {
+			return ".tex";
+		}
+
+		@Override
+		public String getName() {
+			return "LaTeX-Document with TikZ";
+		}
+
+		@Override
+		public String getId() {
+			return ID;
+		}
+	}
+
+	public static class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
+
+		@Override
+		public String write(IGraphicalFeatureModel object) {
+			final StringBuilder str = new StringBuilder();
+
+			printBody(str);
+
+			return str.toString();
+		}
+
+		@Override
+		public boolean supportsRead() {
+			return false;
+
+		}
+
+		@Override
+		public boolean supportsWrite() {
+			return true;
+
+		}
 
 		@Override
 		public String getSuffix() {
@@ -55,26 +116,31 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	public class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
+	public static class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
 
 		@Override
-		public String getSuffix() {
-			return ".tex";
+		public String write(IGraphicalFeatureModel object) {
+			StringBuilder str = new StringBuilder();
+
+			str.append("\\begin{forest}\n	featureDiagram\n	");
+			printTree(getRoot(object), object, str);
+			str = postProcessing(str);
+			str.append("\n\\end{forest}");
+
+			return str.toString();
 		}
 
 		@Override
-		public String getName() {
-			return "LaTeX-Document with TikZ";
+		public boolean supportsRead() {
+			return false;
+
 		}
 
 		@Override
-		public String getId() {
-			return ID;
+		public boolean supportsWrite() {
+			return true;
+
 		}
-
-	}
-
-	public class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
 
 		@Override
 		public String getSuffix() {
@@ -95,7 +161,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
-	private StringBuilder postProcessing(StringBuilder str) {
+	private static StringBuilder postProcessing(StringBuilder str) {
 		final int strLength = str.length();
 		StringBuilder newString = new StringBuilder();
 		newString = newString.append(str);
@@ -109,7 +175,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	private void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
+	private static void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		str.append("[" + node);
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isAbstract() == true) {
 			str.append(",abstract");
@@ -142,11 +208,11 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	private void insertNodeTail(StringBuilder str) {
+	private static void insertNodeTail(StringBuilder str) {
 		str.append("]");
 	}
 
-	private void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
+	private static void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
 		if (numberOfChildren == 0) {
 			insertNodeHead(node, object, str);
@@ -163,7 +229,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		}
 	}
 
-	private void printHead(StringBuilder str) {
+	private static void printHead(StringBuilder str) {
 		str.append("\\documentclass[border=5pt]{standalone}\n" + "%---required packages & variable definitions------------------------------------\n"
 			+ "\\usepackage{forest}\n" + "\\usepackage{xcolor}\n" + "\\usetikzlibrary{angles}\n" + "\\definecolor{drawColor}{RGB}{128 128 128}\n"
 			+ "\\newcommand{\\circleSize}{0.25em}\n" + "\\newcommand{\\angleSize}{0.8em}\n"
@@ -183,14 +249,25 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			+ "		}	\n" + "	}\n" + "}\n" + "%-------------------------------------------------------------------------------\n");
 	}
 
-	private void printBody(StringBuilder str) {
-		str.append("\\begin{document}\n-----------------------------------------------------\n");
-		// TODO main function
+	private static void printBody(StringBuilder str) {
+		str.append("\\input{head.tex}\n"); // Include head
+		str.append("\\begin{document}\n	");
+		str.append("\\input{" + GraphicsExporter.getFileName() + "}\n"); // Include main
 		str.append("\\end{document}");
 	}
 
-	private void printMain(String myRoot, IGraphicalFeatureModel object, StringBuilder str) {
-		// TODO: Implementation
+	private static String getRoot(IGraphicalFeatureModel object) {
+		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
+		String myRoot = null;
+
+		for (final IFeature feature : myList) {
+			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot()) {
+				myRoot = feature.getName();
+				break;
+			}
+		}
+
+		return myRoot;
 	}
 
 	@Override
@@ -199,8 +276,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		printHead(str);
 		str.append("\\begin{document}\n" + "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n"
 			+ "		featureDiagram\n");
+
+		// for debugging only
 		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
-		String myRoot = null;
 		final int numberOfFeatures = object.getFeatureModel().getNumberOfFeatures();
 		System.out.println("Number of Features: " + numberOfFeatures);
 
@@ -208,21 +286,17 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			System.out.println(feature + "\n");
 			// System.out.println(object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getStructure().getFirstChild().getFeature().getName()))
 			// .getObject().getStructure().isOr());
-			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getName())).getObject().getStructure().isRoot()) {
-				myRoot = feature.getName();
-			}
 		}
+		System.out.println("FileName in TikZFormat class: " + GraphicsExporter.getFileName());
+		// -------------------
 
 		// PRE-OREDER TRAVERSEL
 		StringBuilder myTree = new StringBuilder();
 		str.append("		");
-		printTree(myRoot, object, myTree);
+		printTree(getRoot(object), object, myTree);
 		myTree = postProcessing(myTree);
 		str.append(myTree);
 		str.append("\n");
-		final String myChild =
-			object.getGraphicalFeature(object.getFeatureModel().getFeature(myRoot)).getObject().getStructure().getFirstChild().getFeature().getName();
-		System.out.println("erstes Kind der Wurzel: " + myChild);
 
 		str.append("	\\end{forest}\n" + "	%---------------------------------------------------------------------------\n" + "\\end{document}");
 		return str.toString();
