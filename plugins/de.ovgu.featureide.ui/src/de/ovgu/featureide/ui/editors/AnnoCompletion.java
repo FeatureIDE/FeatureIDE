@@ -160,11 +160,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 				final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
 				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
-				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
+				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, "") + " ");
 				curAnnotation.setReplacementOffset(context.getInvocationOffset());
-
 				list.add(curAnnotation);
+
 			}
+			return list;
 		}
 		return list;
 	}
