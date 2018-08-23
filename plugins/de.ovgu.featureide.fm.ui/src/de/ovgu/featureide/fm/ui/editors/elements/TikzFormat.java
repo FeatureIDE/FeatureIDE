@@ -214,7 +214,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	private static void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
-		if (numberOfChildren == 0) {
+		if ((numberOfChildren == 0) || object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).isCollapsed()) {
 			insertNodeHead(node, object, str);
 			insertNodeTail(str);
 		} else {
