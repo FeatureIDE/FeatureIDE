@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,18 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 	private boolean newDirectives;
 
+	private Preprocessor currentPreprocessor = Preprocessor.Unknown;
+	private Status status = Status.ShowNothing;
+
+	private IFile file;
+	private IFeatureProject featureProject;
+
 	public AnnoCompletion() {}
+
+	private void setProjectDetails() {
+		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+		featureProject = CorePlugin.getFeatureProject(file);
+	}
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
@@ -77,59 +89,54 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	@Override
-	public void sessionStarted() {}
-
-	public List<CompletionProposal> getComplForFeatures(final IFeatureProject featureProject, final CharSequence prefix) {
-		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
-
-		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
-		for (final String string : featureNames) {
-			CompletionProposal pr = null;
-			pr = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
-			pr.setName(string.toCharArray());
-			pr.setCompletion(string.toCharArray());
-
-			if (string.startsWith(prefix.toString())) {
-				ret_List.add(pr);
-			}
-		}
-		return ret_List;
+	public void sessionStarted() {
+		setProjectDetails();
 	}
 
-	public List<CompletionProposal> getComplForAnnotations(final CharSequence prefix) {
-		final LinkedList<CompletionProposal> completionProposalList = new LinkedList<CompletionProposal>();
+	public List<CompletionProposal> getFeatureList(final IFeatureProject featureProject, final CharSequence prefix) {
+		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
 
-		final Iterable<String> directives = Directives.getAllDirectives();
-		for (final String string : directives) {
-			CompletionProposal pr = null;
-			pr = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
-			pr.setName(string.toCharArray());
-			pr.setCompletion(string.toCharArray());
+		final LinkedList<CompletionProposal> completionProposalsList = createListOfCompletionProposals(prefix, featureNames);
+		return completionProposalsList;
+	}
+
+	/**
+	 * @param prefix
+	 * @param list
+	 * @return
+	 */
+	private LinkedList<CompletionProposal> createListOfCompletionProposals(final CharSequence prefix, final Iterable<String> list) {
+		final LinkedList<CompletionProposal> completionProposalList = new LinkedList<CompletionProposal>();
+		for (final String string : list) {
+			CompletionProposal proposal = null;
+			proposal = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
+			proposal.setName(string.toCharArray());
+			proposal.setCompletion(string.toCharArray());
 
 			if (string.startsWith(prefix.toString())) {
-				completionProposalList.add(pr);
+				completionProposalList.add(proposal);
 			}
 		}
+		return completionProposalList;
+	}
+
+	public List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
+		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, Directives.getAllDirectives());
 		return completionProposalList;
 	}
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
 
-		JavaContentAssistInvocationContext context = null;
-		if (arg0 instanceof JavaContentAssistInvocationContext) {
-			context = (JavaContentAssistInvocationContext) arg0;
-		}
+		currentPreprocessor = Preprocessor.getPreprocessor(featureProject);
 
-		final IFile file =
-			((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
-		final IFeatureProject featureProject = CorePlugin.getFeatureProject(file);
+		final JavaContentAssistInvocationContext context = setCurrentContext(arg0);
 
 		if ((context == null) || (file == null) || (featureProject == null)) {
 			return Collections.emptyList();
 		}
 
-		final Status contextValid = computeList(context, featureProject);
+		final Status contextValid = computeList(context);
 		if (contextValid == Status.ShowNothing) {
 			return Collections.emptyList();
 		}
@@ -141,37 +148,45 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			e.printStackTrace();
 		}
 
-		final List<CompletionProposal> completionProp = getComplForFeatures(featureProject, prefix);
-		final List<CompletionProposal> completionDirectives = getComplForAnnotations(prefix);
+		final List<CompletionProposal> completionProp = getFeatureList(featureProject, prefix);
+		final List<CompletionProposal> completionDirectives = getAntennaCompletionProposals(prefix);
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		if (contextValid == Status.ShowFeatures) {
 			for (final CompletionProposal prop : completionProp) {
 
-				final LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
-				curFeature.setImage(FEATURE_ICON);
-				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
+				final LazyJavaCompletionProposal feature = new LazyJavaCompletionProposal(prop, context);
+				feature.setImage(FEATURE_ICON);
+				feature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
+				feature.setReplacementOffset(context.getInvocationOffset());
 
-				curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
-				curFeature.setReplacementOffset(context.getInvocationOffset());
-
-				list.add(curFeature);
+				list.add(feature);
 			}
 		} else if (contextValid == Status.ShowDirectives) {
 
 			for (final CompletionProposal prop : completionDirectives) {
 
-				final LazyJavaCompletionProposal curAnnotation = new LazyJavaCompletionProposal(prop, context);
-				// curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
-
-				curAnnotation.setReplacementString(new String(prop.getCompletion()).replace(prefix, "") + " ");
-				curAnnotation.setReplacementOffset(context.getInvocationOffset());
-				list.add(curAnnotation);
+				final LazyJavaCompletionProposal syntax = new LazyJavaCompletionProposal(prop, context);
+				syntax.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
+				syntax.setReplacementOffset(context.getInvocationOffset());
+				list.add(syntax);
 
 			}
 			return list;
 		}
 		return list;
+	}
+
+	/**
+	 * @param arg0
+	 * @return
+	 */
+	private JavaContentAssistInvocationContext setCurrentContext(ContentAssistInvocationContext arg0) {
+		JavaContentAssistInvocationContext context = null;
+		if (arg0 instanceof JavaContentAssistInvocationContext) {
+			context = (JavaContentAssistInvocationContext) arg0;
+		}
+		return context;
 	}
 
 	private boolean hasElement(String lineContent, List<String> list) {
@@ -192,39 +207,106 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private String findLastKeyword(String context) {
 		final String text = context.trim();
 		final int indexofKeyword = text.lastIndexOf(" ");
+		if (indexofKeyword < 0) {
+			return text;
+		}
 		return text.substring(indexofKeyword).trim();
 	}
 
-	private Status computeList(JavaContentAssistInvocationContext context, final IFeatureProject featureProject) {
-		Status status = Status.ShowNothing;
-
+	private Status computeList(JavaContentAssistInvocationContext context) {
 		try {
 			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
 			final int offsetOfLine = context.getDocument().getLineOffset(line);
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
 			final String lastKeyword = findLastKeyword(lineContent);
-			final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
-			final boolean hasDirectives = hasElement(lineContent, Directives.getAllDirectives());
-			final boolean showFeaturesAfterDirectives = lineContent.contains("#if") || lineContent.contains("#elif") || lineContent.contains("#condition");
-			final boolean hasFeatures = hasElement(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-			newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
-			if ((startsWithHashTag && !hasDirectives)) {
-				status = Status.ShowDirectives;
-			} else {
-				status = Status.ShowNothing;
-			}
-			if ((showFeaturesAfterDirectives && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
-				status = Status.ShowFeatures;
-			}
 
-		} catch (final BadLocationException e1) {
+			getStatusAccordingToPreprocessor(lineContent, lastKeyword);
+		}
+
+		catch (final BadLocationException e1) {
 			e1.printStackTrace();
 		}
 		return status;
 	}
 
-	public enum Status {
+	/**
+	 * @param lineContent
+	 * @param lastKeyword
+	 */
+	private void getStatusAccordingToPreprocessor(final String lineContent, final String lastKeyword) {
+		switch (currentPreprocessor) {
+		case Antenna:
+			status = getStatusForAntenna(lineContent, lastKeyword);
+		case Munge:
+			status = getStatusForMunge(lineContent, lastKeyword);
+		case C:
+			status = getStatusForC(lineContent, lastKeyword);
+		case Unknown:
+			status = getStatusForAntenna(lineContent, lastKeyword);
+		}
+	}
+
+	/**
+	 * @param lineContent
+	 * @param lastKeyword
+	 * @return
+	 */
+	private Status getStatusForMunge(String lineContent, String lastKeyword) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @param lineContent
+	 * @param lastKeyword
+	 * @return
+	 */
+	private Status getStatusForC(String lineContent, String lastKeyword) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @param lineContent
+	 * @param lastKeyword
+	 * @return
+	 */
+	private Status getStatusForAntenna(final String lineContent, final String lastKeyword) {
+		final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
+		final boolean hasDirectives = hasElement(lineContent, Directives.getAllDirectives());
+		final boolean showFeaturesAfterDirectives = hasElement(lineContent, Arrays.asList("#if", "#elif", "#condition"));
+		final boolean hasFeatures = hasElement(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+		if ((startsWithHashTag && !hasDirectives)) {
+			status = Status.ShowDirectives;
+		} else {
+			status = Status.ShowNothing;
+		}
+		if ((showFeaturesAfterDirectives && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
+			status = Status.ShowFeatures;
+		}
+		return status;
+	}
+
+	private enum Status {
 		ShowFeatures, ShowDirectives, ShowNothing
+	}
+
+	private enum Preprocessor {
+		Antenna, Munge, C, Unknown;
+
+		public static Preprocessor getPreprocessor(final IFeatureProject featureProject) {
+			switch (featureProject.getComposer().getName()) {
+			case "Antenna":
+				return Preprocessor.Antenna;
+			case "Munge":
+				return Preprocessor.Munge;
+			case "C":
+				return Preprocessor.C;
+			default:
+				return Preprocessor.Unknown;
+			}
+		}
 	}
 }

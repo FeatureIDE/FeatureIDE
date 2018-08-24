@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Enums all directives so that Eclipse can autocomplete them.
+ * Enums all Antenna directives so that Eclipse can autocomplete them.
  *
  * @author Iris-Maria Banciu
  */
@@ -46,7 +46,7 @@ public enum Directives {
 	public static List<String> getAllDirectives() {
 		final List<String> list = new ArrayList<String>();
 		for (final Directives d : Directives.values()) {
-			list.add(d.text);
+			list.add(d.text + " ");
 		}
 		return list;
 	}
