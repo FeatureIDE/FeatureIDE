@@ -58,16 +58,12 @@ import de.ovgu.featureide.ui.UIPlugin;
 @SuppressWarnings("restriction")
 public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
-	/**
-	 *
-	 */
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
-	private boolean newDirectives;
 
 	private Preprocessor currentPreprocessor = Preprocessor.Unknown;
 	private Status status = Status.ShowNothing;
 
-	List<CompletionProposal> completionDirectives = Collections.emptyList();
+	List<CompletionProposal> directivesCompletionProposalList = Collections.emptyList();
 
 	private IFile file;
 	private IFeatureProject featureProject;
@@ -154,16 +150,16 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			e.printStackTrace();
 		}
 
-		final List<CompletionProposal> completionProp = getFeatureList(featureProject, prefix);
+		final List<CompletionProposal> featureCompletionProposalList = getFeatureList(featureProject, prefix);
 		switch (currentPreprocessor) {
 		case Antenna:
-			completionDirectives = getAntennaCompletionProposals(prefix);
+			directivesCompletionProposalList = getAntennaCompletionProposals(prefix);
 			break;
 		case C:
-			completionDirectives = getCCompletionProposals(prefix);
+			directivesCompletionProposalList = getCCompletionProposals(prefix);
 			break;
 		case Munge:
-			completionDirectives = getMungeCompletionProposals(prefix);
+			directivesCompletionProposalList = getMungeCompletionProposals(prefix);
 			break;
 		default:
 			break;
@@ -171,31 +167,48 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		if (status == Status.ShowFeatures) {
-			for (final CompletionProposal prop : completionProp) {
+			for (final CompletionProposal proposal : featureCompletionProposalList) {
 
-				final LazyJavaCompletionProposal feature = new LazyJavaCompletionProposal(prop, context);
+				final LazyJavaCompletionProposal feature = createLazyJavaCompletionProposal(context, prefix, proposal);
 				feature.setImage(FEATURE_ICON);
-				feature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
-				feature.setReplacementOffset(context.getInvocationOffset());
 
 				list.add(feature);
 			}
 		} else if (status == Status.ShowDirectives) {
 
-			for (final CompletionProposal prop : completionDirectives) {
+			for (final CompletionProposal proposal : directivesCompletionProposalList) {
 
-				final LazyJavaCompletionProposal syntax = new LazyJavaCompletionProposal(prop, context);
-				syntax.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
-				syntax.setReplacementOffset(context.getInvocationOffset());
-				if (currentPreprocessor == Preprocessor.Munge) {
-					syntax.setCursorPosition(syntax.toString().length() - 3);
-				}
+				final LazyJavaCompletionProposal syntax = createLazyJavaCompletionProposal(context, prefix, proposal);
+				spawnCursorInbetweenSyntaxForMunge(syntax);
 
 				list.add(syntax);
 
 			}
 		}
 		return list;
+	}
+
+	/**
+	 * @param context
+	 * @param prefix
+	 * @param proposal
+	 * @return
+	 */
+	private LazyJavaCompletionProposal createLazyJavaCompletionProposal(final JavaContentAssistInvocationContext context, CharSequence prefix,
+			final CompletionProposal proposal) {
+		final LazyJavaCompletionProposal lazyJavaCompletionProposal = new LazyJavaCompletionProposal(proposal, context);
+		lazyJavaCompletionProposal.setReplacementString(new String(proposal.getCompletion()).replace(prefix, ""));
+		lazyJavaCompletionProposal.setReplacementOffset(context.getInvocationOffset());
+		return lazyJavaCompletionProposal;
+	}
+
+	/**
+	 * @param syntax
+	 */
+	private void spawnCursorInbetweenSyntaxForMunge(final LazyJavaCompletionProposal syntax) {
+		if (currentPreprocessor == Preprocessor.Munge) {
+			syntax.setCursorPosition(syntax.toString().length() - 3);
+		}
 	}
 
 	private boolean lineContainsElements(String lineContent, List<String> list) {
@@ -243,7 +256,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			status = getStatusForMunge(lineContent, lastKeyword);
 			break;
 		case C:
-			status = getStatusForC(lineContent, lastKeyword);
+			status = getStatusForCPP(lineContent, lastKeyword);
 			break;
 		default:
 			break;
@@ -252,17 +265,17 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private Status getStatusForAntenna(final String lineContent, final String lastKeyword) {
 		final boolean triggerAutocomplete = lineContent.trim().substring(2).trim().contains("#");
-		final boolean hasDirectives = lineContainsElements(lineContent, AntennaEnum.getAllDirectives());
+		final boolean hasDirective = lineContainsElements(lineContent, AntennaEnum.getAllDirectives());
 		final boolean directiveHasCondition = lineContainsElements(lineContent, Arrays.asList("#if", "#elif", "#condition"));
-		final boolean hasFeatures = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		final boolean acceptsNewDirective = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
 
-		if (triggerAutocomplete && !hasDirectives) {
+		if (triggerAutocomplete && !hasDirective) {
 			status = Status.ShowDirectives;
 		} else {
 			status = Status.ShowNothing;
 		}
-		if ((directiveHasCondition && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
+		if ((directiveHasCondition && !hasFeature) || (hasFeature && hasDirective && acceptsNewDirective)) {
 			status = Status.ShowFeatures;
 		}
 		return status;
@@ -281,9 +294,16 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return status;
 	}
 
-	private Status getStatusForC(String lineContent, String lastKeyword) {
-		// TODO Auto-generated method stub
-		return null;
+	private Status getStatusForCPP(String lineContent, String lastKeyword) {
+		final boolean triggerAutocomplete = lineContent.trim() == "#";
+		final boolean hasDirective = lineContainsElements(lineContent, CPPEnum.getAllDirectives());
+		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+
+		if (triggerAutocomplete && !hasDirective) {
+			status = Status.ShowDirectives;
+		}
+		return status;
 	}
 
 	private List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
@@ -296,13 +316,9 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return completionProposalList;
 	}
 
-	/**
-	 * @param prefix
-	 * @return
-	 */
 	private List<CompletionProposal> getCCompletionProposals(CharSequence prefix) {
-		// TODO Auto-generated method stub
-		return null;
+		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, CPPEnum.getAllDirectives());
+		return completionProposalList;
 	}
 
 	private enum Status {
