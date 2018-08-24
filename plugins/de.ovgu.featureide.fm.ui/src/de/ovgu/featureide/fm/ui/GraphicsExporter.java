@@ -68,12 +68,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
-	private static String FileName = null;
-
-	public static String getFileName() {
-		return FileName;
-	}
-
 	public static boolean exportAs(IFeatureModel featureModel, ScrollingGraphicalViewer diagramEditor) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		final String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg", "*.tex" };
@@ -118,8 +112,6 @@ public class GraphicsExporter {
 		boolean succ = false;
 
 		if (file.getAbsolutePath().endsWith(".tex")) {
-			FileName = file.getName();
-
 			// create new folder
 			final StringBuilder myFileName = new StringBuilder();
 			myFileName.append(file.getName().toString());
@@ -143,7 +135,7 @@ public class GraphicsExporter {
 			file.renameTo(fileHead);
 
 			// output body
-			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody();
+			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody(file.getName());
 			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatBody);
 			final File fileBody = new File(file.getParent() + "/" + myFileName.toString() + "/body.tex");
 			file.renameTo(fileBody);

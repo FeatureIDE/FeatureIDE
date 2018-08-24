@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -78,11 +77,17 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
 
+		private final String FileName;
+
+		public TikZBody(String FileName) {
+			this.FileName = FileName;
+		}
+
 		@Override
 		public String write(IGraphicalFeatureModel object) {
 			final StringBuilder str = new StringBuilder();
 
-			printBody(str);
+			printBody(str, FileName);
 
 			return str.toString();
 		}
@@ -266,16 +271,16 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
 			+ "		}	\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	},\n" + "collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n"
+			+ "		}	\n" + "	},\n" + "	collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n"
 			+ "			fill opacity=0,\n" + "			draw opacity=0,\n" + "			l = 0em,\n" + "		}\n" + "	},\n"
 			+ "	/tikz/hiddenNodes/.style={\n" + "		midway,\n" + "		rounded corners,\n" + "		draw=drawColor,\n" + "		fill=white,\n"
 			+ "		scale=0.9\n" + "	}\n}\n" + "%-------------------------------------------------------------------------------\n");
 	}
 
-	private static void printBody(StringBuilder str) {
+	private static void printBody(StringBuilder str, String FileName) {
 		str.append("\\input{head.tex}\n"); // Include head
 		str.append("\\begin{document}\n	");
-		str.append("\\input{" + GraphicsExporter.getFileName() + "}\n"); // Include main
+		str.append("\\input{" + FileName + "}\n"); // Include main
 		str.append("\\end{document}");
 	}
 
@@ -310,7 +315,6 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			// System.out.println(object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getStructure().getFirstChild().getFeature().getName()))
 			// .getObject().getStructure().isOr());
 		}
-		System.out.println("FileName in TikZFormat class: " + GraphicsExporter.getFileName());
 		// -------------------
 
 		// PRE-OREDER TRAVERSEL
