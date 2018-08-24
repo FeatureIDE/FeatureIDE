@@ -20,8 +20,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.eclipse.cdt.core.model,
- org.eclipse.cdt.internal.core.model
+Import-Package: de.ovgu.featureide.ui,
+ org.eclipse.cdt.core.model,
+ org.eclipse.cdt.internal.core.model,
+ org.eclipse.cdt.ui.text.contentassist,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.ui.text.java
 Bundle-ClassPath: .,
  lib/TypeChef-0.3.6.jar,
  lib/jdom-2.0.4.jar,
