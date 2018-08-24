@@ -40,10 +40,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.antenna.AntennaEnum;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.ui.utils.AntennaEnum;
+import de.ovgu.featureide.fm.ui.utils.MungeEnum;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**

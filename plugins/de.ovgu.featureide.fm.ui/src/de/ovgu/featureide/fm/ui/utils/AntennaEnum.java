@@ -18,22 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.fm.ui.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Enums all Munge directives so that Eclipse can autocomplete them.
+ * Enums all Antenna directives so that Eclipse can autocomplete them.
  *
  * @author Iris-Maria Banciu
  */
-public enum MungeEnum {
-	IF("if"), IF_NOT("if_not"), ELSE("else"), END("end");
+
+public enum AntennaEnum {
+	IF("if"), ENDIF("endif"), IFDEF("ifdef"), IFNDEF("ifndef"), ELIF("elif"), ELIFDEF("elifdef"), ELIFNDEF("elifndef"), ELSE("else"), CONDITION(
+			"condition"), DEFINE("define"), UNDEFINE("undefine");
 
 	private String text;
 
-	MungeEnum(String text) {
+	AntennaEnum(String text) {
 		this.text = text;
 	}
 
@@ -43,8 +45,8 @@ public enum MungeEnum {
 
 	public static List<String> getAllDirectives() {
 		final List<String> list = new ArrayList<String>();
-		for (final MungeEnum d : MungeEnum.values()) {
-			list.add(d.text + "[]*/");
+		for (final AntennaEnum d : AntennaEnum.values()) {
+			list.add(d.text + " ");
 		}
 		return list;
 	}
