@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.utils;
+package br.ufal.ic.colligens.util;
 
 import java.util.ArrayList;
 import java.util.List;
