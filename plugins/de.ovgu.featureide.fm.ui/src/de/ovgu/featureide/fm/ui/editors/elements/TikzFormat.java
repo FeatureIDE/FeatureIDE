@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
+	static boolean[] legend = { false, false, false, false, false, false, false };
+
 	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
 
 		@Override
@@ -130,6 +132,8 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			str.append("\\begin{forest}\n	featureDiagram\n	");
 			printTree(getRoot(object), object, str);
 			str = postProcessing(str);
+			str.append("	\n");
+			printLegend(str);
 			str.append("\n\\end{forest}");
 
 			return str.toString();
@@ -184,16 +188,20 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		str.append("[" + node);
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isAbstract() == true) {
 			str.append(",abstract");
+			legend[0] = true;
 		}
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isConcrete() == true) {
 			str.append(",concrete");
+			legend[1] = true;
 		}
 		if ((object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false)
 			&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().isAnd() == true)) {
 			if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isMandatory() == true) {
 				str.append(",mandatory");
+				legend[2] = true;
 			} else {
 				str.append(",optional");
+				legend[3] = true;
 			}
 		}
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false) {
@@ -201,6 +209,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 				&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().getFirstChild()
 						.equals(object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure()) == true)) {
 				str.append(",or");
+				legend[4] = true;
 			}
 		}
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isRoot() == false) {
@@ -208,9 +217,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 				&& (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getParent().getFirstChild()
 						.equals(object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure()) == true)) {
 				str.append(",alternative");
+				legend[5] = true;
 			}
 		}
-
 	}
 
 	private static void insertNodeTail(StringBuilder str) {
@@ -218,11 +227,13 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	private static void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
+		// PRE-OREDER TRAVERSEL
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
 		if ((numberOfChildren == 0)) {
 			insertNodeHead(node, object, str);
 			insertNodeTail(str);
 		} else if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).isCollapsed()) {
+			legend[6] = true;
 			insertNodeHead(node, object, str);
 			str.append("[,collapsed,edge label={node[hiddenNodes]{" + countNodes(node, object, -1) + "}}]");
 			insertNodeTail(str);
@@ -263,23 +274,25 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			+ "		circle,fill=drawColor,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n" + "	/tikz/optional/.style={\n"
 			+ "		circle,\n" + "		fill=white,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n"
 			+ "	featureDiagram/.style={\n" + "		for tree={\n" + "			parent anchor = south,\n" + "			child anchor = north,\n"
-			+ "			draw = drawColor,\n" + "			edge = {draw=drawColor},\n" + "			font = \\sffamily\n" + "		}\n" + "	},\n"
-			+ "	abstract/.style={\n" + "		for tree={\n" + "		fill = blue!85!cyan!5\n" + "		}\n" + "	},\n" + "	concrete/.style={\n"
-			+ "		for tree={\n" + "			fill = blue!85!cyan!20\n" + "		}\n" + "	},\n" + "	mandatory/.style={\n"
-			+ "		edge label={node [mandatory] {} }\n" + "	},\n" + "	optional/.style={\n" + "		edge label={node [optional] {} }\n" + "	},\n"
-			+ "	or/.style={\n" + "		tikz+={\n"
+			+ "			draw = drawColor,\n" + "			edge = {draw=drawColor},\n" + "		}\n" + "	},\n" + "	/tikz/abstract/.style={\n"
+			+ "		fill = blue!85!cyan!5,\n" + "		draw = drawColor\n" + "	},\n" + "	/tikz/concrete/.style={\n" + "		fill = blue!85!cyan!20,\n"
+			+ "		draw = drawColor\n" + "	},\n" + "	mandatory/.style={\n" + "		edge label={node [mandatory] {} }\n" + "	},\n"
+			+ "	optional/.style={\n" + "		edge label={node [optional] {} }\n" + "	},\n" + "	or/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
+			+ "		}	\n" + "	},\n" + "	/tikz/or/.style={\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
 			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	},\n" + "	collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n"
-			+ "			fill opacity=0,\n" + "			draw opacity=0,\n" + "			l = 0em,\n" + "		}\n" + "	},\n"
-			+ "	/tikz/hiddenNodes/.style={\n" + "		midway,\n" + "		rounded corners,\n" + "		draw=drawColor,\n" + "		fill=white,\n"
-			+ "		scale=0.9\n" + "	}\n}\n" + "%-------------------------------------------------------------------------------\n");
+			+ "		}	\n" + "	},\n" + "	/tikz/alternative/.style={\n" + "	},\n" + "	/tikz/placeholder/.style={\n" + "	},\n"
+			+ "	collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n" + "			fill opacity=0,\n"
+			+ "			draw opacity=0,\n" + "			l = 0em,\n" + "		}\n" + "	},\n" + "	/tikz/hiddenNodes/.style={\n" + "		midway,\n"
+			+ "		rounded corners,\n" + "		draw=drawColor,\n" + "		fill=white,\n" + "		minimum size = 1.2em,\n"
+			+ "		minimum width = 0.8em,\n" + "		scale=0.9\n" + "	},\n" + "}\n"
+			+ "%-------------------------------------------------------------------------------\n");
 	}
 
 	private static void printBody(StringBuilder str, String FileName) {
 		str.append("\\input{head.tex}\n"); // Include head
 		str.append("\\begin{document}\n	");
+		str.append("\\sffamily\n");
 		str.append("\\input{" + FileName + "}\n"); // Include main
 		str.append("\\end{document}");
 	}
@@ -298,6 +311,48 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return myRoot;
 	}
 
+	private static void printLegend(StringBuilder str) {
+		boolean check = false;
+		final StringBuilder myString = new StringBuilder();
+		if (legend[0]) {
+			check = true;
+			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\\n");
+		}
+		if (legend[1]) {
+			check = true;
+			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\\n");
+		}
+		if (legend[2]) {
+			check = true;
+			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\\n");
+		}
+		if (legend[3]) {
+			check = true;
+			myString.append("		\\node [optional,label=right:Optional] {}; \\\\\n");
+		}
+		if (legend[4]) {
+			check = true;
+			myString.append("		\\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; \n"
+				+ "		\\node [or,label=right:Or] {}; \\\\\n");
+		}
+		if (legend[5]) {
+			check = true;
+			myString.append("		\\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; \n"
+				+ "		\\node [alternative,label=right:Alternative] {}; \\\\\n");
+		}
+		if (legend[6]) {
+			check = true;
+			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\\n");
+		}
+		if (check) {
+			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {\n" + "		\\node [placeholder] {}; \\\\\n" + "	};\n"
+				+ "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {\n"
+				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\\n");
+			str.append(myString);
+			str.append("	};");
+		}
+	}
+
 	@Override
 	public String write(IGraphicalFeatureModel object) {
 		final StringBuilder str = new StringBuilder();
@@ -305,26 +360,13 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		str.append("\\begin{document}\n" + "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n"
 			+ "		featureDiagram\n");
 
-		// for debugging only
-		final Iterable<IFeature> myList = object.getFeatureModel().getFeatures();
-		final int numberOfFeatures = object.getFeatureModel().getNumberOfFeatures();
-		System.out.println("Number of Features: " + numberOfFeatures);
-
-		for (final IFeature feature : myList) {
-			System.out.println(feature + "\n");
-			// System.out.println(object.getGraphicalFeature(object.getFeatureModel().getFeature(feature.getStructure().getFirstChild().getFeature().getName()))
-			// .getObject().getStructure().isOr());
-		}
-		// -------------------
-
-		// PRE-OREDER TRAVERSEL
 		StringBuilder myTree = new StringBuilder();
 		str.append("		");
 		printTree(getRoot(object), object, myTree);
 		myTree = postProcessing(myTree);
 		str.append(myTree);
 		str.append("\n");
-
+		printLegend(str);
 		str.append("	\\end{forest}\n" + "	%---------------------------------------------------------------------------\n" + "\\end{document}");
 		return str.toString();
 	}

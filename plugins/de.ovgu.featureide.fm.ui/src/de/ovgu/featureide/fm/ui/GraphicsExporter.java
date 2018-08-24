@@ -123,7 +123,7 @@ public class GraphicsExporter {
 
 			}
 
-			// ---old-----------------------------------------------------------------
+			// ---old: one Latex Document---------------------------------------------
 			// final IPersistentFormat<IGraphicalFeatureModel> format = new TikzFormat();
 			// FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), format);
 			// -----------------------------------------------------------------------
