@@ -293,7 +293,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		str.append("\\input{head.tex}\n"); // Include head
 		str.append("\\begin{document}\n	");
 		str.append("\\sffamily\n");
-		str.append("\\input{" + FileName + "}\n"); // Include main
+		str.append("	\\input{" + FileName + "}\n"); // Include main
 		str.append("\\end{document}");
 	}
 
