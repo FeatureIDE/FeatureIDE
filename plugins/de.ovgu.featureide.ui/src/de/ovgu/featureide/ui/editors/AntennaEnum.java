@@ -29,13 +29,13 @@ import java.util.List;
  * @author Iris-Maria Banciu
  */
 
-public enum Directives {
+public enum AntennaEnum {
 	IF("if"), ENDIF("endif"), IFDEF("ifdef"), IFNDEF("ifndef"), ELIF("elif"), ELIFDEF("elifdef"), ELIFNDEF("elifndef"), ELSE("else"), CONDITION(
 			"condition"), DEFINE("define"), UNDEFINE("undefine");
 
 	private String text;
 
-	Directives(String text) {
+	AntennaEnum(String text) {
 		this.text = text;
 	}
 
@@ -45,7 +45,7 @@ public enum Directives {
 
 	public static List<String> getAllDirectives() {
 		final List<String> list = new ArrayList<String>();
-		for (final Directives d : Directives.values()) {
+		for (final AntennaEnum d : AntennaEnum.values()) {
 			list.add(d.text + " ");
 		}
 		return list;

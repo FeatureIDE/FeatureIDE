@@ -121,7 +121,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	public List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
-		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, Directives.getAllDirectives());
+		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, AntennaEnum.getAllDirectives());
 		return completionProposalList;
 	}
 
@@ -159,7 +159,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 				feature.setImage(FEATURE_ICON);
 				feature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
 				feature.setReplacementOffset(context.getInvocationOffset());
-
 				list.add(feature);
 			}
 		} else if (contextValid == Status.ShowDirectives) {
@@ -189,7 +188,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return context;
 	}
 
-	private boolean hasElement(String lineContent, List<String> list) {
+	private boolean lineContainsElements(String lineContent, List<String> list) {
 
 		for (final String div : list) {
 			if (lineContent.contains(div)) {
@@ -252,9 +251,43 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @param lastKeyword
 	 * @return
 	 */
+	private Status getStatusForAntenna(final String lineContent, final String lastKeyword) {
+		final boolean triggerAutocomplete = lineContent.trim().substring(2).trim().contains("#");
+		final boolean hasDirectives = lineContainsElements(lineContent, AntennaEnum.getAllDirectives());
+		final boolean directiveHasCondition = lineContainsElements(lineContent, Arrays.asList("#if", "#elif", "#condition"));
+		final boolean hasFeatures = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+
+		if (triggerAutocomplete && !hasDirectives) {
+			status = Status.ShowDirectives;
+		} else {
+			status = Status.ShowNothing;
+		}
+		if ((directiveHasCondition && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
+			status = Status.ShowFeatures;
+		}
+		return status;
+	}
+
+	/**
+	 * @param lineContent
+	 * @param lastKeyword
+	 * @return
+	 */
 	private Status getStatusForMunge(String lineContent, String lastKeyword) {
-		// TODO Auto-generated method stub
-		return null;
+		final boolean hasOpeningSyntax = lineContent.trim().contains("/*");
+		final boolean hasDirective = lineContainsElements(lineContent, Arrays.asList("if", "if_not", "else", "end"));
+		// final boolean hasFeatures = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		final boolean hasClosingSyntax = lineContainsElements(lineContent, Arrays.asList("*/"));
+
+		if (hasOpeningSyntax) {
+			status = Status.ShowDirectives;
+		} else if (hasDirective) {
+			status = Status.ShowFeatures;
+		} else if (hasClosingSyntax) {
+			status = Status.ShowNothing;
+		}
+		return status;
 	}
 
 	/**
@@ -265,28 +298,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private Status getStatusForC(String lineContent, String lastKeyword) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * @param lineContent
-	 * @param lastKeyword
-	 * @return
-	 */
-	private Status getStatusForAntenna(final String lineContent, final String lastKeyword) {
-		final boolean startsWithHashTag = lineContent.trim().substring(2).trim().contains("#");
-		final boolean hasDirectives = hasElement(lineContent, Directives.getAllDirectives());
-		final boolean showFeaturesAfterDirectives = hasElement(lineContent, Arrays.asList("#if", "#elif", "#condition"));
-		final boolean hasFeatures = hasElement(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
-		if ((startsWithHashTag && !hasDirectives)) {
-			status = Status.ShowDirectives;
-		} else {
-			status = Status.ShowNothing;
-		}
-		if ((showFeaturesAfterDirectives && !hasFeatures) || (hasFeatures && hasDirectives && newDirectives)) {
-			status = Status.ShowFeatures;
-		}
-		return status;
 	}
 
 	private enum Status {
