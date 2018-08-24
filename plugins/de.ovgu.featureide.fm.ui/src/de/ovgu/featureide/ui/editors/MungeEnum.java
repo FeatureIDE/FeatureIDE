@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.munge;
+package de.ovgu.featureide.ui.editors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public enum MungeEnum {
 	public static List<String> getAllDirectives() {
 		final List<String> list = new ArrayList<String>();
 		for (final MungeEnum d : MungeEnum.values()) {
-			list.add("/*" + d.text + "[]*/");
+			list.add(d.text + "[]*/");
 		}
 		return list;
 	}
