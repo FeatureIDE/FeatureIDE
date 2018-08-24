@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.editors;
+package de.ovgu.featureide.antenna;
 
 import java.util.ArrayList;
 import java.util.List;

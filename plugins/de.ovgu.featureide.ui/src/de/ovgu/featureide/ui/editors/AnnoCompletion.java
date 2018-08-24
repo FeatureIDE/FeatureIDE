@@ -40,6 +40,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.antenna.AntennaEnum;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -62,6 +63,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private Preprocessor currentPreprocessor = Preprocessor.Unknown;
 	private Status status = Status.ShowNothing;
+	List<CompletionProposal> completionDirectives = Collections.emptyList();
 
 	private IFile file;
 	private IFeatureProject featureProject;
@@ -120,7 +122,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return completionProposalList;
 	}
 
-	public List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
+	private List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
+		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, AntennaEnum.getAllDirectives());
+		return completionProposalList;
+	}
+
+	private List<CompletionProposal> getMungeCompletionProposals(CharSequence prefix) {
 		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, AntennaEnum.getAllDirectives());
 		return completionProposalList;
 	}
@@ -137,6 +144,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 
 		final Status contextValid = computeList(context);
+
 		if (contextValid == Status.ShowNothing) {
 			return Collections.emptyList();
 		}
@@ -149,7 +157,19 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 
 		final List<CompletionProposal> completionProp = getFeatureList(featureProject, prefix);
-		final List<CompletionProposal> completionDirectives = getAntennaCompletionProposals(prefix);
+		switch (currentPreprocessor) {
+		case Antenna:
+			completionDirectives = getAntennaCompletionProposals(prefix);
+			break;
+		case C:
+			completionDirectives = getCCompletionProposals(prefix);
+			break;
+		case Munge:
+			completionDirectives = getMungeCompletionProposals(prefix);
+			break;
+		default:
+			break;
+		}
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		if (contextValid == Status.ShowFeatures) {
@@ -174,6 +194,15 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			return list;
 		}
 		return list;
+	}
+
+	/**
+	 * @param prefix
+	 * @return
+	 */
+	private List<CompletionProposal> getCCompletionProposals(CharSequence prefix) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -275,14 +304,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @return
 	 */
 	private Status getStatusForMunge(String lineContent, String lastKeyword) {
-		final boolean hasOpeningSyntax = lineContent.trim().contains("/*");
+		// final boolean hasOpeningSyntax = lineContent.trim().contains("/");
 		final boolean hasDirective = lineContainsElements(lineContent, Arrays.asList("if", "if_not", "else", "end"));
 		// final boolean hasFeatures = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		final boolean hasClosingSyntax = lineContainsElements(lineContent, Arrays.asList("*/"));
-
-		if (hasOpeningSyntax) {
-			status = Status.ShowDirectives;
-		} else if (hasDirective) {
+		status = Status.ShowDirectives;
+		if (hasDirective) {
 			status = Status.ShowFeatures;
 		} else if (hasClosingSyntax) {
 			status = Status.ShowNothing;
