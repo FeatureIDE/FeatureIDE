@@ -118,6 +118,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			}
 		} else {
 			featureModel.getStructure().replaceRoot(child.getStructure());
+			newCompound.getStructure().removeChild(child.getStructure());
 			return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, null);
 		}
 		return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, parent.getFeature(), null);
