@@ -30,12 +30,13 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * TODO check description manages Layout for Features
  *
- * @author Martha
- * @author lukas
+ * @author Martha Nyerembe
+ * @author Lukas Vogt
  */
 public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
@@ -43,10 +44,15 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 		super();
 	}
 
+	int yoffset;
+	int xoffset;
+
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		// TODO Auto-generated method stub
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
+
+		yoffset = FMPropertyManager.getLayoutMarginY();
+		xoffset = FMPropertyManager.getLayoutMarginX();
 
 		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
 		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
@@ -59,8 +65,8 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 		while (!list.isEmpty()) {
 			final IGraphicalFeature feature = list.removeFirst();
 			final Double bounds = treeLayout.getNodeBounds().get(feature);
-			setLocation(feature, new Point((int) (bounds.getX()), ((int) bounds.getY())));
 			list.addAll(getChildren(feature));
+			setLocation(feature, new Point((int) (bounds.getX() + xoffset), ((int) bounds.getY() + yoffset)));
 		}
 
 	}
