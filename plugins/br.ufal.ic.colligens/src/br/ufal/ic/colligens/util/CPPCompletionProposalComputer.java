@@ -34,12 +34,14 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Autocomplete computer for CPP preprocessor.
@@ -50,6 +52,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 public class CPPCompletionProposalComputer implements ICompletionProposalComputer {
 
 	private Status status;
+	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
 	ArrayList<ICompletionProposal> directivesCompletionProposalList;
 
@@ -88,7 +91,7 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 
 		for (final String string : list) {
 			final int start = context.getInvocationOffset();
-			final CompletionProposal proposal = new CompletionProposal(string, start, prefix.length(), string.length());
+			final CompletionProposal proposal = new CompletionProposal(string, start, prefix.length(), string.length(), FEATURE_ICON, "#" + string, null, null);
 
 			if (string.startsWith(prefix.toString())) {
 				directivesCompletionProposalList.add(proposal);
