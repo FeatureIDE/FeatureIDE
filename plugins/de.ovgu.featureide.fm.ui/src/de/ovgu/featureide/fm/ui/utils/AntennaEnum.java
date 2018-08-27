@@ -46,7 +46,7 @@ public enum AntennaEnum {
 	public static List<String> getAllDirectives() {
 		final List<String> list = new ArrayList<String>();
 		for (final AntennaEnum d : AntennaEnum.values()) {
-			list.add(d.text + " ");
+			list.add(d.text);
 		}
 		return list;
 	}

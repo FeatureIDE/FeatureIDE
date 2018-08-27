@@ -68,7 +68,9 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private IFile file;
 	private IFeatureProject featureProject;
 
-	public AnnoCompletion() {}
+	public AnnoCompletion() {
+
+	}
 
 	private void init() {
 		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
@@ -87,9 +89,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	@Override
-	public void sessionEnded() {
-
-	}
+	public void sessionEnded() {}
 
 	@Override
 	public void sessionStarted() {
@@ -105,11 +105,14 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private LinkedList<CompletionProposal> createListOfCompletionProposals(final CharSequence prefix, final Iterable<String> list) {
 		final LinkedList<CompletionProposal> completionProposalList = new LinkedList<CompletionProposal>();
-		for (final String string : list) {
+		for (String string : list) {
 			CompletionProposal proposal = null;
 			proposal = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
-			proposal.setName(string.toCharArray());
-			proposal.setCompletion(string.toCharArray());
+			proposal.setName((string).toCharArray());
+			if (currentPreprocessor == JavaPreprocessor.Antenna) {
+				string += " ";
+			}
+			proposal.setCompletion((string).toCharArray());
 
 			if (string.startsWith(prefix.toString())) {
 				completionProposalList.add(proposal);
@@ -119,11 +122,48 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	private JavaContentAssistInvocationContext setCurrentContext(ContentAssistInvocationContext arg0) {
+
 		JavaContentAssistInvocationContext context = null;
 		if (arg0 instanceof JavaContentAssistInvocationContext) {
 			context = (JavaContentAssistInvocationContext) arg0;
 		}
+
 		return context;
+	}
+
+	private String getFeatureNameFromCondition(String conditionLine) {
+		final String featurename = conditionLine.trim().substring(conditionLine.indexOf('[') - 1, conditionLine.indexOf(']') - 2);
+
+		return featurename;
+	}
+
+	private String getSuggestedFeatureName(JavaContentAssistInvocationContext context) throws BadLocationException {
+
+		int counter = 0;
+		final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
+		final int lineIndex = line;
+		for (int i = lineIndex; i >= 0; i--) {
+			final int offsetOfLine = context.getDocument().getLineOffset(i);
+			final int lineLength = context.getDocument().getLineLength(i);
+			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
+			if ((i == lineIndex) && !lineContent.contains("/*end[")) {
+				return null;
+
+			}
+			if (lineContent.contains("/*end[")) {
+				counter++;
+			}
+			if (lineContent.contains("/*if[")) {
+				if (counter > 1) {
+					counter--;
+					continue;
+				}
+				return getFeatureNameFromCondition(lineContent);
+
+			}
+		}
+		return null;
+
 	}
 
 	@Override
@@ -164,25 +204,81 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		if (status == Status.ShowFeatures) {
-			for (final CompletionProposal proposal : featureCompletionProposalList) {
+			final List<CompletionProposal> newFeatureCompletionProposalList = sortMungeProposalList(context, featureCompletionProposalList);
+
+			for (final CompletionProposal proposal : newFeatureCompletionProposalList) {
 
 				final LazyJavaCompletionProposal feature = createLazyJavaCompletionProposal(context, prefix, proposal);
+
 				feature.setImage(FEATURE_ICON);
 
+				setCursorPostionForMunge(proposal, feature);
 				list.add(feature);
+
 			}
+
 		} else if (status == Status.ShowDirectives) {
 
 			for (final CompletionProposal proposal : directivesCompletionProposalList) {
-
 				final LazyJavaCompletionProposal syntax = createLazyJavaCompletionProposal(context, prefix, proposal);
+
 				spawnCursorInbetweenSyntaxForMunge(syntax);
 
 				list.add(syntax);
 
 			}
 		}
+
 		return list;
+	}
+
+	/**
+	 * @param context
+	 * @param featureCompletionProposalList
+	 * @return
+	 */
+	private List<CompletionProposal> sortMungeProposalList(final JavaContentAssistInvocationContext context,
+			List<CompletionProposal> featureCompletionProposalList) {
+		String suggestedFeatureName = null;
+		final List<CompletionProposal> newfeatureCompletionProposalList = featureCompletionProposalList;
+		if (currentPreprocessor == JavaPreprocessor.Munge) {
+
+			try {
+				suggestedFeatureName = getSuggestedFeatureName(context);
+			} catch (final BadLocationException e) {
+				// TODO Auto-generated catch block
+				suggestedFeatureName = null;
+			}
+
+			if (suggestedFeatureName != null) {
+				for (final CompletionProposal proposal : featureCompletionProposalList) {
+					if (Arrays.equals(proposal.getName(), suggestedFeatureName.toCharArray())) {
+						newfeatureCompletionProposalList.removeAll(newfeatureCompletionProposalList);
+						newfeatureCompletionProposalList.add(proposal);
+						Collections.swap(featureCompletionProposalList, 0, featureCompletionProposalList.indexOf(proposal));
+
+						break;
+					}
+
+				}
+
+			}
+
+		}
+		return newfeatureCompletionProposalList;
+
+	}
+
+	/**
+	 * @param proposal
+	 * @param feature
+	 */
+	private void setCursorPostionForMunge(final CompletionProposal proposal, final LazyJavaCompletionProposal feature) {
+		if (currentPreprocessor == JavaPreprocessor.Munge) {
+
+			feature.setCursorPosition(proposal.getName().length + 3);
+
+		}
 	}
 
 	/**
@@ -194,8 +290,10 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private LazyJavaCompletionProposal createLazyJavaCompletionProposal(final JavaContentAssistInvocationContext context, CharSequence prefix,
 			final CompletionProposal proposal) {
 		final LazyJavaCompletionProposal lazyJavaCompletionProposal = new LazyJavaCompletionProposal(proposal, context);
+
 		lazyJavaCompletionProposal.setReplacementString(new String(proposal.getCompletion()).replace(prefix, ""));
 		lazyJavaCompletionProposal.setReplacementOffset(context.getInvocationOffset());
+
 		return lazyJavaCompletionProposal;
 	}
 
@@ -295,6 +393,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private List<CompletionProposal> getMungeCompletionProposals(final CharSequence prefix) {
 		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, MungeEnum.getAllDirectives());
+
 		return completionProposalList;
 	}
 
