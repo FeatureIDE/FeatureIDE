@@ -317,32 +317,44 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		if (legend[0]) {
 			check = true;
 			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\\n");
+			legend[0] = false;
 		}
 		if (legend[1]) {
 			check = true;
 			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\\n");
+			legend[1] = false;
 		}
 		if (legend[2]) {
 			check = true;
 			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\\n");
+			legend[2] = false;
 		}
 		if (legend[3]) {
 			check = true;
 			myString.append("		\\node [optional,label=right:Optional] {}; \\\\\n");
+			legend[3] = false;
 		}
 		if (legend[4]) {
 			check = true;
-			myString.append("		\\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; \n"
-				+ "		\\node [or,label=right:Or] {}; \\\\\n");
+			// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; \n"
+			// + " \\node [or,label=right:Or] {}; \\\\\n");
+			myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);\n"
+				+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);\n" + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);\n"
+				+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);\n" + "		\\node [or,label=right:Or] {}; \\\\");
+			legend[4] = false;
 		}
 		if (legend[5]) {
 			check = true;
-			myString.append("		\\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; \n"
-				+ "		\\node [alternative,label=right:Alternative] {}; \\\\\n");
+			// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; \n"
+			// + " \\node [alternative,label=right:Alternative] {}; \\\\\n");
+			myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);\n" + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);\n"
+				+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);\n" + "		\\node [alternative,label=right:Alternative] {}; \\\\");
+			legend[5] = false;
 		}
 		if (legend[6]) {
 			check = true;
 			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\\n");
+			legend[6] = false;
 		}
 		if (check) {
 			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {\n" + "		\\node [placeholder] {}; \\\\\n" + "	};\n"
@@ -350,6 +362,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\\n");
 			str.append(myString);
 			str.append("	};");
+			check = false;
 		}
 	}
 

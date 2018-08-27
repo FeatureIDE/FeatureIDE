@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
@@ -116,11 +117,13 @@ public class GraphicsExporter {
 			final StringBuilder myFileName = new StringBuilder();
 			myFileName.append(file.getName().toString());
 			myFileName.delete(myFileName.length() - 4, myFileName.length());
+			Path outputDir;
 			try {
-				FileSystem.mkDir(Paths.get(file.getParent() + "/" + myFileName.toString()));
+				outputDir = Paths.get(file.getParent()).resolve(myFileName.toString());
+				FileSystem.mkDir(outputDir);
 			} catch (final IOException e) {
 				FMUIPlugin.getDefault().logError(e);
-
+				return false;
 			}
 
 			// ---old: one Latex Document---------------------------------------------
@@ -130,21 +133,15 @@ public class GraphicsExporter {
 
 			// output Head
 			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
-			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatHead);
-			final File fileHead = new File(file.getParent() + "/" + myFileName.toString() + "/head.tex");
-			file.renameTo(fileHead);
+			FileHandler.save(outputDir.resolve("head.tex"), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatHead);
 
 			// output body
 			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody(file.getName());
-			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatBody);
-			final File fileBody = new File(file.getParent() + "/" + myFileName.toString() + "/body.tex");
-			file.renameTo(fileBody);
+			FileHandler.save(outputDir.resolve("body.tex"), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatBody);
 
 			// output main
 			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat.TikZMain();
-			FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
-			final File fileMain = new File(file.getParent() + "/" + myFileName.toString() + "/" + file.getName());
-			file.renameTo(fileMain);
+			FileHandler.save(outputDir.resolve(file.getName()), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
 
 			succ = true;
 
