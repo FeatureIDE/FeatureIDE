@@ -34,8 +34,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 /**
  * TODO check description manages Layout for Features
  *
- * @author Martha
- * @author lukas
+ * @author Martha Nyerembe
+ * @author Lukas Vogt
  */
 public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
@@ -50,30 +50,29 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 	}
 
 	int yoffset;
+	int xoffset;
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		// TODO Auto-generated method stub
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 
-		yoffset = 0;
-		yoffset += FMPropertyManager.getLayoutMarginY();
+		yoffset = FMPropertyManager.getLayoutMarginY();
+		xoffset = FMPropertyManager.getLayoutMarginX();
 
 		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
 		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
 		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(20.0, 5.0);
 
 		final TreeLayout<IGraphicalFeature> treeLayout = new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
+
 		for (final IGraphicalFeature feature : featureModel.getAllFeatures()) {
 			final Double bounds = treeLayout.getNodeBounds().get(feature);
-			setLocation(feature, new Point((int) (bounds.getX()), ((int) bounds.getY())));
+			setLocation(feature, new Point((int) (bounds.getX() + xoffset), ((int) bounds.getY() + yoffset)));
 		}
 
 		// missing: to show how many features are hidden in parent feature
 
-//		setLocation(root, new Point(100, 100));
-//		 setLocations(root); // check if nessecary
-//		  final org.eclipse.draw2d.geometry.Rectangle rootBounds = getBounds(root);
+//		final Rectangle rootBounds = (Rectangle) treeLayout.getTree().getRoot().getObject();
 //		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 
 	}
