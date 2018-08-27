@@ -23,7 +23,6 @@ package br.ufal.ic.colligens.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
@@ -51,6 +50,10 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class CPPCompletionProposalComputer implements ICompletionProposalComputer {
 
+	/**
+	 * 
+	 */
+	private static final List<String> ALL_DIRECTIVES = CPPEnum.getAllDirectives();
 	private Status status;
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
@@ -87,11 +90,12 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 	}
 
 	private void getListOfCompletionProposals(ContentAssistInvocationContext context, final IFeatureProject featureProject, final CharSequence prefix,
-			Collection<String> list) {
+			Collection<String> list, String stringPrefix) {
 
 		for (final String string : list) {
 			final int start = context.getInvocationOffset();
-			final CompletionProposal proposal = new CompletionProposal(string, start, prefix.length(), string.length(), FEATURE_ICON, "#" + string, null, null);
+			final CompletionProposal proposal =
+				new CompletionProposal(string, start, prefix.length(), string.length(), FEATURE_ICON, stringPrefix + string, null, null);
 
 			if (string.startsWith(prefix.toString())) {
 				directivesCompletionProposalList.add(proposal);
@@ -119,12 +123,12 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			e.printStackTrace();
 		}
 
-		final Collection<String> featureNames = iterableToCollection(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		final ArrayList<String> featureNames = new ArrayList<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
 
 		if (status == Status.ShowFeatures) {
-			getListOfCompletionProposals(context, featureProject, prefix, featureNames);
+			getListOfCompletionProposals(context, featureProject, prefix, featureNames, "");
 		} else if (status == Status.ShowDirectives) {
-			getListOfCompletionProposals(context, featureProject, prefix, CPPEnum.getAllDirectives());
+			getListOfCompletionProposals(context, featureProject, prefix, ALL_DIRECTIVES, "#");
 		}
 		return directivesCompletionProposalList;
 	}
@@ -138,14 +142,14 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			final String lastKeyword = findLastKeyword(lineContent);
 
 			final boolean triggerAutocomplete = lineContent.trim().equals("#");
-			final boolean hasDirective = lineContainsElements(lineContent, CPPEnum.getAllDirectives());
+			final boolean hasDirective = lineContainsElements(lineContent, ALL_DIRECTIVES);
 			final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 			final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
 
-			if ((triggerAutocomplete && !hasDirective) || newDirectives) {
+			if (triggerAutocomplete && !hasDirective) {
 				status = Status.ShowDirectives;
 			}
-			if (hasFeature) {
+			if ((hasDirective && !hasFeature) || newDirectives) {
 				status = Status.ShowFeatures;
 			}
 		}
@@ -177,16 +181,4 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 	private enum Status {
 		ShowFeatures, ShowDirectives, ShowNothing
 	}
-
-	public <T> Collection<T> iterableToCollection(Iterable<T> iterable) {
-		final Collection<T> collection = new ArrayList<>();
-
-		final Iterator<T> iterator = iterable.iterator();
-		while (iterator.hasNext()) {
-			collection.add(iterator.next());
-		}
-
-		return collection;
-	}
-
 }

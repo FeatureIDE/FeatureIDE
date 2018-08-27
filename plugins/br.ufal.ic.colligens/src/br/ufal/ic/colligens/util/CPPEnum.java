@@ -26,10 +26,11 @@ import java.util.List;
 /**
  * Enums all Colligen CPP directives so that Eclipse can autocomplete them.
  *
+ * @author Mohammed Khaled
  * @author Iris-Maria Banciu
  */
 public enum CPPEnum {
-	IF("ifdef"), ELSE("else"), END("endif"), DEFINE("define");
+	IF("ifdef"), IFNOTDEF("ifndef"), ELSE("else"), END("endif"), DEFINE("define"), UNDEFINE("undefine");
 
 	private String text;
 
