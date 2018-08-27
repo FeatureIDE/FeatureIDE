@@ -39,7 +39,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
-import br.ufal.ic.colligens.util.CPPEnum;
+
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -60,7 +60,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
-	private Preprocessor currentPreprocessor = Preprocessor.Unknown;
+	private JavaPreprocessor currentPreprocessor = JavaPreprocessor.Unknown;
 	private Status status = Status.ShowNothing;
 
 	List<CompletionProposal> directivesCompletionProposalList = Collections.emptyList();
@@ -129,7 +129,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
 
-		currentPreprocessor = Preprocessor.getPreprocessor(featureProject);
+		currentPreprocessor = JavaPreprocessor.getPreprocessor(featureProject);
 
 		final JavaContentAssistInvocationContext context = setCurrentContext(arg0);
 
@@ -154,9 +154,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		switch (currentPreprocessor) {
 		case Antenna:
 			directivesCompletionProposalList = getAntennaCompletionProposals(prefix);
-			break;
-		case C:
-			directivesCompletionProposalList = getCCompletionProposals(prefix);
 			break;
 		case Munge:
 			directivesCompletionProposalList = getMungeCompletionProposals(prefix);
@@ -206,7 +203,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @param syntax
 	 */
 	private void spawnCursorInbetweenSyntaxForMunge(final LazyJavaCompletionProposal syntax) {
-		if (currentPreprocessor == Preprocessor.Munge) {
+		if (currentPreprocessor == JavaPreprocessor.Munge) {
 			syntax.setCursorPosition(syntax.toString().length() - 3);
 		}
 	}
@@ -255,9 +252,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		case Munge:
 			status = getStatusForMunge(lineContent, lastKeyword);
 			break;
-		case C:
-			status = getStatusForCPP(lineContent, lastKeyword);
-			break;
 		default:
 			break;
 		}
@@ -294,18 +288,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return status;
 	}
 
-	private Status getStatusForCPP(String lineContent, String lastKeyword) {
-		final boolean triggerAutocomplete = lineContent.trim() == "#";
-		final boolean hasDirective = lineContainsElements(lineContent, CPPEnum.getAllDirectives());
-		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-		final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
-
-		if (triggerAutocomplete && !hasDirective) {
-			status = Status.ShowDirectives;
-		}
-		return status;
-	}
-
 	private List<CompletionProposal> getAntennaCompletionProposals(final CharSequence prefix) {
 		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, AntennaEnum.getAllDirectives());
 		return completionProposalList;
@@ -316,28 +298,21 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return completionProposalList;
 	}
 
-	private List<CompletionProposal> getCCompletionProposals(CharSequence prefix) {
-		final LinkedList<CompletionProposal> completionProposalList = createListOfCompletionProposals(prefix, CPPEnum.getAllDirectives());
-		return completionProposalList;
-	}
-
 	private enum Status {
 		ShowFeatures, ShowDirectives, ShowNothing
 	}
 
-	private enum Preprocessor {
-		Antenna, Munge, C, Unknown;
+	private enum JavaPreprocessor {
+		Antenna, Munge, Unknown;
 
-		public static Preprocessor getPreprocessor(final IFeatureProject featureProject) {
+		public static JavaPreprocessor getPreprocessor(final IFeatureProject featureProject) {
 			switch (featureProject.getComposer().getName()) {
 			case "Antenna":
-				return Preprocessor.Antenna;
+				return JavaPreprocessor.Antenna;
 			case "Munge":
-				return Preprocessor.Munge;
-			case "C":
-				return Preprocessor.C;
+				return JavaPreprocessor.Munge;
 			default:
-				return Preprocessor.Unknown;
+				return JavaPreprocessor.Unknown;
 			}
 		}
 	}
