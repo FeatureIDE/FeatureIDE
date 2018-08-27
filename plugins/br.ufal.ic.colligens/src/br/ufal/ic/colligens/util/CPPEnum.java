@@ -29,7 +29,7 @@ import java.util.List;
  * @author Iris-Maria Banciu
  */
 public enum CPPEnum {
-	IF("ifdef"), ELSE("else"), END("endif");
+	IF("ifdef"), ELSE("else"), END("endif"), DEFINE("define");
 
 	private String text;
 

@@ -21,26 +21,25 @@
 package br.ufal.ic.colligens.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.cdt.ui.text.contentassist.ContentAssistInvocationContext;
 import org.eclipse.cdt.ui.text.contentassist.ICompletionProposalComputer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Autocomplete computer for CPP preprocessor.
@@ -50,11 +49,9 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class CPPCompletionProposalComputer implements ICompletionProposalComputer {
 
-	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
+	private Status status;
 
-	private Status status = Status.ShowNothing;
-
-	List<CompletionProposal> directivesCompletionProposalList = Collections.emptyList();
+	ArrayList<ICompletionProposal> directivesCompletionProposalList;
 
 	private IFile file;
 	private IFeatureProject featureProject;
@@ -63,6 +60,7 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		featureProject = CorePlugin.getFeatureProject(file);
 		status = Status.ShowNothing;
+		directivesCompletionProposalList = new ArrayList<ICompletionProposal>();
 	}
 
 	@Override
@@ -85,53 +83,30 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		init();
 	}
 
-	public List<CompletionProposal> getFeatureList(final IFeatureProject featureProject, final CharSequence prefix) {
-		final Iterable<String> featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
-		final LinkedList<CompletionProposal> completionProposalList = new LinkedList<CompletionProposal>();
-		for (final String string : featureNames) {
-			CompletionProposal proposal = null;
-			proposal = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix.length());
-			proposal.setName(string.toCharArray());
-			proposal.setCompletion(string.toCharArray());
+	private void getListOfCompletionProposals(ContentAssistInvocationContext context, final IFeatureProject featureProject, final CharSequence prefix,
+			Collection<String> list) {
+
+		for (final String string : list) {
+			final int start = context.getInvocationOffset();
+			final CompletionProposal proposal = new CompletionProposal(string, start, prefix.length(), string.length());
 
 			if (string.startsWith(prefix.toString())) {
-				completionProposalList.add(proposal);
+				directivesCompletionProposalList.add(proposal);
 			}
 		}
-
-		final LinkedList<CompletionProposal> completionProposalsList = completionProposalList;
-		return completionProposalsList;
 	}
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor arg1) {
 
 		if ((context == null) || (file == null) || (featureProject == null)) {
-			return Collections.emptyList();
-		}
-		try {
-			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
-			final int offsetOfLine = context.getDocument().getLineOffset(line);
-			final int lineLength = context.getDocument().getLineLength(line);
-			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			final String lastKeyword = findLastKeyword(lineContent);
-
-			final boolean triggerAutocomplete = lineContent.trim() == "#";
-			final boolean hasDirective = lineContainsElements(lineContent, CPPEnum.getAllDirectives());
-			final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-			final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
-
-			if (triggerAutocomplete && !hasDirective) {
-				status = Status.ShowDirectives;
-			}
+			return directivesCompletionProposalList;
 		}
 
-		catch (final BadLocationException e1) {
-			e1.printStackTrace();
-		}
+		computeCurrentStatus(context);
 
 		if (status == Status.ShowNothing) {
-			return Collections.emptyList();
+			return directivesCompletionProposalList;
 		}
 
 		CharSequence prefix = "";
@@ -141,47 +116,40 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			e.printStackTrace();
 		}
 
-		final CharSequence prefix1 = prefix;
-		final LinkedList<CompletionProposal> completionProposalList1 = new LinkedList<CompletionProposal>();
-		for (final String string : CPPEnum.getAllDirectives()) {
-			CompletionProposal proposal1 = null;
-			proposal1 = CompletionProposal.create(CompletionProposal.LABEL_REF, prefix1.length());
-			proposal1.setName(string.toCharArray());
-			proposal1.setCompletion(string.toCharArray());
+		final Collection<String> featureNames = iterableToCollection(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 
-			if (string.startsWith(prefix1.toString())) {
-				completionProposalList1.add(proposal1);
-			}
-		}
-		final LinkedList<CompletionProposal> completionProposalList = completionProposalList1;
-		directivesCompletionProposalList = completionProposalList;
-
-		final ArrayList<ICompletionProposal> list = new ArrayList<ICompletionProposal>();
 		if (status == Status.ShowFeatures) {
-			for (final CompletionProposal proposal : getFeatureList(featureProject, prefix)) {
-
-				// final CompletionProposal completionProposal = new CompletionProposal(proposal, context);
-				// completionProposal.setReplacementString(new String(proposal.getCompletion()).replace(prefix, ""));
-				// completionProposal.setReplacementOffset(context.getInvocationOffset());
-				// final CompletionProposal feature = completionProposal;
-				// feature.setImage(FEATURE_ICON);
-
-				// list.add(feature);
-			}
+			getListOfCompletionProposals(context, featureProject, prefix, featureNames);
 		} else if (status == Status.ShowDirectives) {
+			getListOfCompletionProposals(context, featureProject, prefix, CPPEnum.getAllDirectives());
+		}
+		return directivesCompletionProposalList;
+	}
 
-			for (final CompletionProposal proposal : directivesCompletionProposalList) {
+	private void computeCurrentStatus(ContentAssistInvocationContext context) {
+		try {
+			final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
+			final int offsetOfLine = context.getDocument().getLineOffset(line);
+			final int lineLength = context.getDocument().getLineLength(line);
+			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
+			final String lastKeyword = findLastKeyword(lineContent);
 
-				// final CompletionProposal lazyJavaCompletionProposal = new CompletionProposal(proposal, context);
-				// lazyJavaCompletionProposal.setReplacementString(new String(proposal.getCompletion()).replace(prefix, ""));
-				// lazyJavaCompletionProposal.setReplacementOffset(context.getInvocationOffset());
-				// final CompletionProposal syntax = lazyJavaCompletionProposal;
+			final boolean triggerAutocomplete = lineContent.trim().equals("#");
+			final boolean hasDirective = lineContainsElements(lineContent, CPPEnum.getAllDirectives());
+			final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+			final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
 
-				// list.add(syntax);
-
+			if ((triggerAutocomplete && !hasDirective) || newDirectives) {
+				status = Status.ShowDirectives;
+			}
+			if (hasFeature) {
+				status = Status.ShowFeatures;
 			}
 		}
-		return list;
+
+		catch (final BadLocationException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	private boolean lineContainsElements(String lineContent, List<String> list) {
@@ -205,6 +173,17 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 
 	private enum Status {
 		ShowFeatures, ShowDirectives, ShowNothing
+	}
+
+	public <T> Collection<T> iterableToCollection(Iterable<T> iterable) {
+		final Collection<T> collection = new ArrayList<>();
+
+		final Iterator<T> iterator = iterable.iterator();
+		while (iterator.hasNext()) {
+			collection.add(iterator.next());
+		}
+
+		return collection;
 	}
 
 }
