@@ -327,4 +327,13 @@ point="org.eclipse.core.resources.markers">
             id="br.ufal.ic.colligens.RefactoringController">
       </contribution>
    </extension>
+   <extension point="org.eclipse.cdt.ui.completionProposalComputer"
+   id="CPP Proposals"
+   name="CPP Proposals">
+   <completionProposalComputer
+      class="br.ufal.ic.colligens.util.CPPCompletionProposalComputer"
+      categoryId="org.eclipse.ui.texteditor.textual_proposals">
+      <partition type="__c_singleline_comment"/>
+   </completionProposalComputer>
+ </extension>
 </plugin>
