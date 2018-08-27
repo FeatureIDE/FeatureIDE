@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import java.awt.geom.Rectangle2D.Double;
+import java.util.LinkedList;
 
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
@@ -29,7 +30,6 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * TODO check description manages Layout for Features
@@ -39,42 +39,29 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
-	/**
-	 * @param defaultConfiguration
-	 * @param fnep
-	 * @param dTree
-	 * @param manager
-	 */
 	public FTreeLayout2() {
 		super();
 	}
-
-	int yoffset;
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		// TODO Auto-generated method stub
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 
-		yoffset = 0;
-		yoffset += FMPropertyManager.getLayoutMarginY();
-
 		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
 		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
 		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(20.0, 5.0);
 
 		final TreeLayout<IGraphicalFeature> treeLayout = new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
-		for (final IGraphicalFeature feature : featureModel.getAllFeatures()) {
+
+		final LinkedList<IGraphicalFeature> list = new LinkedList<>();
+		list.add(root);
+		while (!list.isEmpty()) {
+			final IGraphicalFeature feature = list.removeFirst();
 			final Double bounds = treeLayout.getNodeBounds().get(feature);
 			setLocation(feature, new Point((int) (bounds.getX()), ((int) bounds.getY())));
+			list.addAll(getChildren(feature));
 		}
-
-		// missing: to show how many features are hidden in parent feature
-
-//		setLocation(root, new Point(100, 100));
-//		 setLocations(root); // check if nessecary
-//		  final org.eclipse.draw2d.geometry.Rectangle rootBounds = getBounds(root);
-//		layoutConstraints(yoffset, featureModel.getVisibleConstraints(), rootBounds);
 
 	}
 
