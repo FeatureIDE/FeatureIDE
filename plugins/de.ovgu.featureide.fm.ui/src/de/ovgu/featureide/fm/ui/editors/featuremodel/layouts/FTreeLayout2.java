@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.draw2d.geometry.Rectangle;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -56,7 +57,7 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
 		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
 		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
-		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(20.0, 5.0);
+		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
 
 		final TreeLayout<IGraphicalFeature> treeLayout = new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
 
@@ -68,6 +69,9 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 			list.addAll(getChildren(feature));
 			setLocation(feature, new Point((int) (bounds.getX() + xoffset), ((int) bounds.getY() + yoffset)));
 		}
+
+		final Rectangle rootBounds = getBounds(root);
+		layoutConstraints((int) treeLayout.getBounds().getMaxY() + 20, featureModel.getVisibleConstraints(), rootBounds);
 
 	}
 
