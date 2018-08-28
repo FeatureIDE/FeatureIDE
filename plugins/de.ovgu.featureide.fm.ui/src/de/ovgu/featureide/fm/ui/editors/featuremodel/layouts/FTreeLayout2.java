@@ -55,11 +55,7 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 		yoffset = FMPropertyManager.getLayoutMarginY();
 		xoffset = FMPropertyManager.getLayoutMarginX();
 
-		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
-		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
-		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
-
-		final TreeLayout<IGraphicalFeature> treeLayout = new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
+		final TreeLayout<IGraphicalFeature> treeLayout = layout(root);
 
 		final LinkedList<IGraphicalFeature> list = new LinkedList<>();
 		list.add(root);
@@ -73,6 +69,15 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 		final Rectangle rootBounds = getBounds(root);
 		layoutConstraints((int) treeLayout.getBounds().getMaxY() + 20, featureModel.getVisibleConstraints(), rootBounds);
 
+	}
+
+	private TreeLayout<IGraphicalFeature> layout(IGraphicalFeature root) {
+
+		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
+		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
+		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
+
+		return new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
 	}
 
 }
