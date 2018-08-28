@@ -105,4 +105,5 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
  de.fosd.typechef.parser.java15.lexer,
  de.fosd.typechef.typesystem,
  de.fosd.typechef.typesystem.linker,
- de.fosd.typechef.xtclexer
+ de.fosd.typechef.xtclexer,
+ scala.math
