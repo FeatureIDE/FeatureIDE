@@ -52,10 +52,11 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 
-		yoffset = FMPropertyManager.getLayoutMarginY();
-		xoffset = FMPropertyManager.getLayoutMarginX();
-
 		final TreeLayout<IGraphicalFeature> treeLayout = layout(root);
+
+		yoffset = FMPropertyManager.getLayoutMarginY();
+//		System.out.println("FeatureSpaceX: " + FMPropertyManager.);
+		xoffset = (controlWidth / 2) - ((int) (treeLayout.getBounds().getWidth() / 2));
 
 		final LinkedList<IGraphicalFeature> list = new LinkedList<>();
 		list.add(root);
