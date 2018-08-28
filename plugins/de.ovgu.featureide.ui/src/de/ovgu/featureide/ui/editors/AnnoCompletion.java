@@ -380,7 +380,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		if ((hasOpeningSyntax && !hasDirective)) {
 			status = Status.ShowDirectives;
 		}
-		if (hasDirective && !hasFeature) {
+		if (hasDirective) {
 			status = Status.ShowFeatures;
 		}
 	}
