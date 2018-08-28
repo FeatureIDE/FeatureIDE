@@ -40,7 +40,7 @@ public class NodeReaderErrorTypeTests {
 	String constraint = "";
 
 	@Test
-	public void ErrorTypeEqualsNoneTest() {
+	public void errorTypeEqualsNoneTest() {
 		final NodeReader reader = new NodeReader();
 		reader.stringToNode(constraint, featureList);
 
@@ -48,7 +48,7 @@ public class NodeReaderErrorTypeTests {
 	}
 
 	@Test
-	public void ErrorTypeEqualsDefaultTest() {
+	public void errorTypeEqualsDefaultTest() {
 		final NodeReader reader = new NodeReader();
 		constraint = "()";
 		reader.stringToNode(constraint, featureList);
@@ -57,7 +57,7 @@ public class NodeReaderErrorTypeTests {
 	}
 
 	@Test
-	public void ErrorTypeEqualsInvalidFeatureNameTest() {
+	public void errorTypeEqualsInvalidFeatureNameTest() {
 		final NodeReader reader = new NodeReader();
 		constraint = badFeatureName + " or A";
 		reader.stringToNode(constraint, featureList);
@@ -66,7 +66,7 @@ public class NodeReaderErrorTypeTests {
 	}
 
 	@Test
-	public void ErrorTypeEqualsInvalidExpressionLeftTest() {
+	public void errorTypeEqualsInvalidExpressionLeftTest() {
 		final NodeReader reader = new NodeReader();
 		constraint = "A or B implies implies";
 		reader.stringToNode(constraint, featureList);
@@ -74,7 +74,7 @@ public class NodeReaderErrorTypeTests {
 	}
 
 	@Test
-	public void ErrorTypeEqualsInvalidExpressionRightTest() {
+	public void errorTypeEqualsInvalidExpressionRightTest() {
 		final NodeReader reader = new NodeReader();
 		constraint = "A or B or ";
 		reader.stringToNode(constraint, featureList);

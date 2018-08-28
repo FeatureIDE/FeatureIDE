@@ -125,7 +125,9 @@ Export-Package:
  splar.plugins.reasoners.tests.sat.sat4j,
  splar.plugins.tests,
  splar.samples
-Import-Package: org.eclipse.jdt.core,
+Import-Package: 
+ de.ovgu.featureide.antenna,
+ org.eclipse.jdt.core,
  org.eclipse.jdt.core.compiler.batch,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
