@@ -227,7 +227,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			if (lineContent.contains("/*end[")) {
 				counter++;
 			}
-			if (lineContent.contains("/*if[")) {
+			if (lineContent.contains("/*if[") || lineContent.contains("/*if_not[")) {
 				if (counter > 1) {
 					counter--;
 					continue;
