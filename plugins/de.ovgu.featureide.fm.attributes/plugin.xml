@@ -57,7 +57,8 @@
          <adapt
                type="org.eclipse.core.resources.IResource">
             <test
-                  property="de.ovgu.featureide.fm.attributes.properties.extendedfeaturemodel">
+                  property="de.ovgu.featureide.fm.ui.properties.featuremodel"
+                  value="de.ovgu.featureide.fm.attributes.format.XmlExtendedFeatureModelFormat">
             </test>
          </adapt>
       </definition>
@@ -74,15 +75,5 @@
             </iterate>
          </with>
       </definition>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="de.ovgu.featureide.fm.attributes.properties.ExtendedFormatTester"
-            id="de.ovgu.featureide.fm.attributes.propertytester.format"
-            namespace="de.ovgu.featureide.fm.attributes.properties"
-            properties="extendedfeaturemodel"
-            type="java.lang.Object">
-      </propertyTester>
    </extension>
 </plugin>

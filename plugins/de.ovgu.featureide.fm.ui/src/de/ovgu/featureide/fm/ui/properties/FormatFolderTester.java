@@ -39,7 +39,7 @@ public class FormatFolderTester extends PropertyTester {
 					final FormatManager<?> formatManager = getFormatManager(property);
 					final FormatTester formatTester = new FormatTester();
 					for (final IFile file : files) {
-						if (formatTester.checkFormat(formatManager, file)) {
+						if (formatTester.checkFormat(formatManager, file, expectedValue)) {
 							return true;
 						}
 					}

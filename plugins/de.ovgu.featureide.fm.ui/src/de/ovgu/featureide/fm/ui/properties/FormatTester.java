@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IFile;
 import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
 public class FormatTester extends PropertyTester {
@@ -35,8 +36,15 @@ public class FormatTester extends PropertyTester {
 	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		final IFile res = SelectionWrapper.checkClass(receiver, IFile.class);
+		return checkFormat(getFormatManager(property), res, expectedValue);
+	}
+
+	protected boolean checkFormat(final FormatManager<?> formatManager, final IFile res, Object expectedValue) {
 		if (res != null) {
-			return checkFormat(getFormatManager(property), res);
+			if (formatManager != null) {
+				final IPersistentFormat<?> formatByContent = formatManager.getFormatByContent(Paths.get(res.getLocationURI()));
+				return (expectedValue == null) ? formatByContent != null : expectedValue.equals(formatByContent.getId());
+			}
 		}
 		return false;
 	}
@@ -50,13 +58,6 @@ public class FormatTester extends PropertyTester {
 		default:
 			return null;
 		}
-	}
-
-	protected boolean checkFormat(FormatManager<?> formatManager, final IFile res) {
-		if (formatManager != null) {
-			return formatManager.hasFormat(Paths.get(res.getLocationURI()));
-		}
-		return false;
 	}
 
 }
