@@ -59,8 +59,22 @@ public class FeatureDiagramLayoutHelper {
 			return "Top-Down (left-aligned)";
 		case 4:
 			return "Left To Right (ordered)";
+//		case 5:
+//			return "Left To Right (curved)";
+
 		case 5:
-			return "Left To Right (curved)";
+			return "Root Top (abego TreeLayout)";
+		case 6:
+			return "Root Left (abego TreeLayout)";
+		case 7:
+			return "Root Right (abego TreeLayout)";
+		case 8:
+			return "Root Bottom (abego TreeLayout)";
+		case 9:
+			return "";
+		case 10:
+			return "";
+
 		default:
 			return "Top-Down (ordered)";
 		}
@@ -180,10 +194,12 @@ public class FeatureDiagramLayoutHelper {
 		case 2:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("BreadthFirstLayout");
 			return new BreadthFirstLayout();
 		case 3:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("DepthFirstLayout");
 			return new DepthFirstLayout();
 		case 4:
 			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
@@ -193,6 +209,38 @@ public class FeatureDiagramLayoutHelper {
 //			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 //			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 //			return new VerticalLayout2();
+
+		case 5:
+			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+		case 6:
+			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+		case 7:
+			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+		case 8:
+			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+		case 9:
+			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+		case 10:
+			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			System.out.println("FTreeLayout2");
+			return new FTreeLayout2();
+
 		default:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
