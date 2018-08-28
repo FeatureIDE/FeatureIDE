@@ -27,6 +27,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHORT_NAMES;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.abego.treelayout.Configuration;
+import org.abego.treelayout.util.DefaultConfiguration;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -214,33 +216,36 @@ public class FeatureDiagramLayoutHelper {
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
+			return new FTreeLayout2(
+					new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0, Configuration.Location.Top, Configuration.AlignmentInLevel.TowardsRoot));
 		case 6:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
+			return new FTreeLayout2(
+					new DefaultConfiguration<IGraphicalFeature>(40, 10, Configuration.Location.Left, Configuration.AlignmentInLevel.TowardsRoot));
 		case 7:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
+			return new FTreeLayout2(
+					new DefaultConfiguration<IGraphicalFeature>(30, 15, Configuration.Location.Right, Configuration.AlignmentInLevel.TowardsRoot));
 		case 8:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
+			return new FTreeLayout2(
+					new DefaultConfiguration<IGraphicalFeature>(30, 5, Configuration.Location.Bottom, Configuration.AlignmentInLevel.AwayFromRoot));
 		case 9:
 			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
+			return new NewLayout();
 		case 10:
 			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			System.out.println("FTreeLayout2");
-			return new FTreeLayout2();
-
+			return new NewLayout();
 		default:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
 			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));

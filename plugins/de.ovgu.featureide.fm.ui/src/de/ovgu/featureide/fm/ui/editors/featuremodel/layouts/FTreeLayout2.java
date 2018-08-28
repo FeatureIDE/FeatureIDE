@@ -41,8 +41,20 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
+	private final DefaultConfiguration<IGraphicalFeature> defaultConfiguration;
+
 	public FTreeLayout2() {
 		super();
+		defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
+	}
+
+	/**
+	 * @param configuration
+	 */
+	public FTreeLayout2(DefaultConfiguration<IGraphicalFeature> configuration) {
+		// TODO Auto-generated constructor stub
+		defaultConfiguration = configuration;
+
 	}
 
 	int yoffset;
@@ -76,7 +88,7 @@ public class FTreeLayout2 extends FeatureDiagramLayoutManager {
 
 		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
 		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
-		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
+//		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
 
 		return new TreeLayout<IGraphicalFeature>(ftftl, igfNodeExtentProvider, defaultConfiguration);
 	}
