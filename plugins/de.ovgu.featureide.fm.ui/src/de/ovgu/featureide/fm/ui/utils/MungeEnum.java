@@ -48,4 +48,12 @@ public enum MungeEnum {
 		}
 		return list;
 	}
+
+	public static List<String> getEndundElseDirctivesWithFeatureName(String featureName) {
+		final List<String> list = new ArrayList<String>();
+
+		list.add(MungeEnum.ELSE.text + "[" + featureName + "]*/");
+		list.add(MungeEnum.END.text + "[" + featureName + "]*/");
+		return list;
+	}
 }

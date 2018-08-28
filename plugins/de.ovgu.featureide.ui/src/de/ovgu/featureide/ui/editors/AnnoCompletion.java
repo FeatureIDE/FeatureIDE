@@ -140,9 +140,13 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @param prefix
 	 */
 	private void buildListOfDirectives(final JavaContentAssistInvocationContext context) {
+		if (currentPreprocessor == JavaPreprocessor.Munge) {
+			directivesCompletionProposalList = getDirectivesWithSuggestedFeatureName(context, directivesCompletionProposalList);
+		}
+
 		for (final CompletionProposal proposal : directivesCompletionProposalList) {
 			final LazyJavaCompletionProposal syntax = createLazyJavaCompletionProposal(context, proposal);
-
+			final String s = getFeatureNameFromCondition(syntax.getDisplayString());
 			spawnCursorInbetweenSyntaxForMunge(syntax);
 			finalProposalsList.add(syntax);
 
@@ -154,10 +158,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	 * @param prefix
 	 */
 	private void buildListOfFeatures(final JavaContentAssistInvocationContext context) {
-		List<CompletionProposal> featureCompletionProposalList = getFeatureList(featureProject);
-		if (currentPreprocessor == JavaPreprocessor.Munge) {
-			featureCompletionProposalList = sortMungeProposalList(context, featureCompletionProposalList);
-		}
+		final List<CompletionProposal> featureCompletionProposalList = getFeatureList(featureProject);
 
 		for (final CompletionProposal proposal : featureCompletionProposalList) {
 
@@ -206,9 +207,27 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	private String getFeatureNameFromCondition(String conditionLine) {
-		final String featurename = conditionLine.trim().substring(conditionLine.indexOf('[') - 1, conditionLine.indexOf(']') - 2);
+		final String featurename = conditionLine.trim().substring(conditionLine.trim().indexOf('[') + 1, conditionLine.trim().indexOf(']'));
 
 		return featurename;
+	}
+
+	private List<CompletionProposal> getDirectivesWithSuggestedFeatureName(JavaContentAssistInvocationContext context,
+			List<CompletionProposal> directivesCompletionProposalList) {
+		final List<CompletionProposal> newdirectivesCompletionProposalList = directivesCompletionProposalList;
+		String suggestedFeatureName = null;
+		try {
+			suggestedFeatureName = getSuggestedFeatureName(context);
+		} catch (final BadLocationException e) {
+			suggestedFeatureName = null;
+		}
+		if (suggestedFeatureName != null) {
+			final LinkedList<CompletionProposal> completionProposalList =
+				createListOfCompletionProposals(MungeEnum.getEndundElseDirctivesWithFeatureName(suggestedFeatureName));
+			newdirectivesCompletionProposalList.addAll(completionProposalList);
+
+		}
+		return newdirectivesCompletionProposalList;
 	}
 
 	private String getSuggestedFeatureName(JavaContentAssistInvocationContext context) throws BadLocationException {
@@ -220,15 +239,11 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			final int offsetOfLine = context.getDocument().getLineOffset(i);
 			final int lineLength = context.getDocument().getLineLength(i);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			if ((i == lineIndex) && !lineContent.contains("/*end[")) {
-				return null;
-
-			}
-			if (lineContent.contains("/*end[")) {
+			if (findLastKeyword(lineContent).contains("/*end[")) {
 				counter++;
 			}
-			if (lineContent.contains("/*if[") || lineContent.contains("/*if_not[")) {
-				if (counter > 1) {
+			if (findLastKeyword(lineContent).contains("/*if[") || findLastKeyword(lineContent).contains("/*if_not[")) {
+				if (counter >= 1) {
 					counter--;
 					continue;
 				}
@@ -258,35 +273,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		} catch (final BadLocationException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private List<CompletionProposal> sortMungeProposalList(final JavaContentAssistInvocationContext context,
-			List<CompletionProposal> featureCompletionProposalList) {
-		String suggestedFeatureName = null;
-		final List<CompletionProposal> newfeatureCompletionProposalList = featureCompletionProposalList;
-
-		try {
-			suggestedFeatureName = getSuggestedFeatureName(context);
-		} catch (final BadLocationException e) {
-			suggestedFeatureName = null;
-		}
-
-		if (suggestedFeatureName != null) {
-			for (final CompletionProposal proposal : featureCompletionProposalList) {
-				if (Arrays.equals(proposal.getName(), suggestedFeatureName.toCharArray())) {
-					newfeatureCompletionProposalList.removeAll(newfeatureCompletionProposalList);
-					newfeatureCompletionProposalList.add(proposal);
-					Collections.swap(featureCompletionProposalList, 0, featureCompletionProposalList.indexOf(proposal));
-
-					break;
-				}
-
-			}
-
-		}
-
-		return newfeatureCompletionProposalList;
-
 	}
 
 	private void setCursorPostionForMunge(final CompletionProposal proposal, final LazyJavaCompletionProposal feature) {
