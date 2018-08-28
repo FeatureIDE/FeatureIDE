@@ -230,6 +230,13 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return newdirectivesCompletionProposalList;
 	}
 
+	private List<String> getAllWordsInLine(String lineContent) {
+		final String[] words = lineContent.split("\\s+");
+		final List<String> list = Arrays.asList(words);
+		Collections.reverse(list);
+		return list;
+	}
+
 	private String getSuggestedFeatureName(JavaContentAssistInvocationContext context) throws BadLocationException {
 
 		int counter = 0;
@@ -239,16 +246,19 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			final int offsetOfLine = context.getDocument().getLineOffset(i);
 			final int lineLength = context.getDocument().getLineLength(i);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			if (findLastKeyword(lineContent).contains("/*end[")) {
-				counter++;
-			}
-			if (findLastKeyword(lineContent).contains("/*if[") || findLastKeyword(lineContent).contains("/*if_not[")) {
-				if (counter >= 1) {
-					counter--;
-					continue;
+			for (final String keyWord : getAllWordsInLine(lineContent)) {
+				if (keyWord.contains("/*end[")) {
+					counter++;
 				}
-				return getFeatureNameFromCondition(lineContent);
+				if (keyWord.contains("/*if[") || keyWord.contains("/*if_not[")) {
+					if (counter >= 1) {
+						counter--;
+						continue;
+					}
+					return getFeatureNameFromCondition(keyWord);
+				}
 			}
+
 		}
 		return null;
 
