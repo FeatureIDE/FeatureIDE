@@ -50,9 +50,6 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class CPPCompletionProposalComputer implements ICompletionProposalComputer {
 
-	/**
-	 *
-	 */
 	private static final List<String> ALL_DIRECTIVES = CPPEnum.getAllDirectives();
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
@@ -65,6 +62,7 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 	private boolean hasDirective;
 	private boolean hasFeature;
 	private boolean newDirectives;
+	private boolean concatenationPossible;
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
@@ -148,9 +146,10 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			final int offsetOfLine = context.getDocument().getLineOffset(line);
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			final String lastKeyword = findLastKeyword(lineContent);
+			final String lastKeywordOfLine = findLastKeyword(lineContent);
+			final String firstKeywordOfLine = findFirstKeywordOfLine(lineContent);
 
-			setSyntaxEnvironmentStatus(lineContent, lastKeyword);
+			setSyntaxEnvironmentStatus(lineContent, firstKeywordOfLine, lastKeywordOfLine);
 			setCurrentStatus();
 		}
 
@@ -163,16 +162,17 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		if (triggerAutocomplete && !hasDirective) {
 			status = Status.ShowDirectives;
 		}
-		if ((hasDirective && !hasFeature) || newDirectives) {
+		if ((hasDirective && !hasFeature) || (concatenationPossible && newDirectives)) {
 			status = Status.ShowFeatures;
 		}
 	}
 
-	private void setSyntaxEnvironmentStatus(final String lineContent, final String lastKeyword) {
+	private void setSyntaxEnvironmentStatus(final String lineContent, final String firstKeyword, final String lastKeyword) {
 		triggerAutocomplete = lineContent.trim().equals("#");
 		hasDirective = lineContainsElements(lineContent, ALL_DIRECTIVES);
 		hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+		concatenationPossible = firstKeyword.equals("#" + CPPEnum.IF.getText());
 	}
 
 	private boolean lineContainsElements(String lineContent, List<String> list) {
@@ -192,6 +192,11 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			return text;
 		}
 		return text.substring(indexofKeyword).trim();
+	}
+
+	private String findFirstKeywordOfLine(String lineContent) {
+		final String string[] = lineContent.split(" ", 2);
+		return string[0];
 	}
 
 	private enum Status {
