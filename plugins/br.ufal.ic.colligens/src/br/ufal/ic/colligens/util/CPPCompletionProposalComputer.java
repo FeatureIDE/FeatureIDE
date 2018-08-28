@@ -51,23 +51,20 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class CPPCompletionProposalComputer implements ICompletionProposalComputer {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final List<String> ALL_DIRECTIVES = CPPEnum.getAllDirectives();
-	private Status status;
 	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
 
 	ArrayList<ICompletionProposal> directivesCompletionProposalList;
 
 	private IFile file;
+	private Status status;
 	private IFeatureProject featureProject;
-
-	private void init() {
-		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
-		featureProject = CorePlugin.getFeatureProject(file);
-		status = Status.ShowNothing;
-		directivesCompletionProposalList = new ArrayList<ICompletionProposal>();
-	}
+	private boolean triggerAutocomplete;
+	private boolean hasDirective;
+	private boolean hasFeature;
+	private boolean newDirectives;
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext arg0, IProgressMonitor arg1) {
@@ -89,20 +86,6 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		init();
 	}
 
-	private void getListOfCompletionProposals(ContentAssistInvocationContext context, final IFeatureProject featureProject, final CharSequence prefix,
-			Collection<String> list, String stringPrefix) {
-
-		for (final String string : list) {
-			final int start = context.getInvocationOffset();
-			final CompletionProposal proposal =
-				new CompletionProposal(string, start, prefix.length(), string.length(), FEATURE_ICON, stringPrefix + string, null, null);
-
-			if (string.startsWith(prefix.toString())) {
-				directivesCompletionProposalList.add(proposal);
-			}
-		}
-	}
-
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor arg1) {
 
@@ -116,21 +99,47 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			return directivesCompletionProposalList;
 		}
 
+		final CharSequence prefix = computePrefix(context);
+
+		final ArrayList<String> featureNames = new ArrayList<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+
+		if (status == Status.ShowFeatures) {
+			createListOfCompletionProposals(context, featureProject, prefix, featureNames, "");
+		} else if (status == Status.ShowDirectives) {
+			createListOfCompletionProposals(context, featureProject, prefix, ALL_DIRECTIVES, "#");
+		}
+		return directivesCompletionProposalList;
+	}
+
+	private void init() {
+		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
+		featureProject = CorePlugin.getFeatureProject(file);
+		status = Status.ShowNothing;
+		directivesCompletionProposalList = new ArrayList<ICompletionProposal>();
+	}
+
+	private void createListOfCompletionProposals(ContentAssistInvocationContext context, final IFeatureProject featureProject, final CharSequence prefix,
+			Collection<String> list, String stringPrefix) {
+
+		for (final String string : list) {
+			final int start = context.getInvocationOffset();
+			final CompletionProposal proposal =
+				new CompletionProposal(string, start, prefix.length(), string.length(), FEATURE_ICON, stringPrefix + string, null, null);
+
+			if (string.startsWith(prefix.toString())) {
+				directivesCompletionProposalList.add(proposal);
+			}
+		}
+	}
+
+	private CharSequence computePrefix(ContentAssistInvocationContext context) {
 		CharSequence prefix = "";
 		try {
 			prefix = context.computeIdentifierPrefix();
 		} catch (final BadLocationException e) {
 			e.printStackTrace();
 		}
-
-		final ArrayList<String> featureNames = new ArrayList<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-
-		if (status == Status.ShowFeatures) {
-			getListOfCompletionProposals(context, featureProject, prefix, featureNames, "");
-		} else if (status == Status.ShowDirectives) {
-			getListOfCompletionProposals(context, featureProject, prefix, ALL_DIRECTIVES, "#");
-		}
-		return directivesCompletionProposalList;
+		return prefix;
 	}
 
 	private void computeCurrentStatus(ContentAssistInvocationContext context) {
@@ -141,22 +150,29 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
 			final String lastKeyword = findLastKeyword(lineContent);
 
-			final boolean triggerAutocomplete = lineContent.trim().equals("#");
-			final boolean hasDirective = lineContainsElements(lineContent, ALL_DIRECTIVES);
-			final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-			final boolean newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
-
-			if (triggerAutocomplete && !hasDirective) {
-				status = Status.ShowDirectives;
-			}
-			if ((hasDirective && !hasFeature) || newDirectives) {
-				status = Status.ShowFeatures;
-			}
+			setSyntaxEnvironmentStatus(lineContent, lastKeyword);
+			setCurrentStatus();
 		}
 
 		catch (final BadLocationException e1) {
 			e1.printStackTrace();
 		}
+	}
+
+	private void setCurrentStatus() {
+		if (triggerAutocomplete && !hasDirective) {
+			status = Status.ShowDirectives;
+		}
+		if ((hasDirective && !hasFeature) || newDirectives) {
+			status = Status.ShowFeatures;
+		}
+	}
+
+	private void setSyntaxEnvironmentStatus(final String lineContent, final String lastKeyword) {
+		triggerAutocomplete = lineContent.trim().equals("#");
+		hasDirective = lineContainsElements(lineContent, ALL_DIRECTIVES);
+		hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
+		newDirectives = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
 	}
 
 	private boolean lineContainsElements(String lineContent, List<String> list) {
