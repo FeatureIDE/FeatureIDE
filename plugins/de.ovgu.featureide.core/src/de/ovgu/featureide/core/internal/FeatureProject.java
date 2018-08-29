@@ -158,6 +158,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					checkFeatureCoverage();
 					checkConfigurations(getAllConfigurations());
 					createAndDeleteFeatureFolders();
+					composerExtension.postModelChanged();
 				} catch (final CoreException e) {
 					CorePlugin.getDefault().logError(e);
 				}
