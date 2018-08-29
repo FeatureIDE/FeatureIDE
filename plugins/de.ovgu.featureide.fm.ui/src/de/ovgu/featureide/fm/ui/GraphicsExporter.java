@@ -133,11 +133,11 @@ public class GraphicsExporter {
 
 			// output Head
 			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
-			FileHandler.save(outputDir.resolve("head.tex"), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatHead);
+			FileHandler.save(outputDir.resolve("head.tex"), null, formatHead);
 
 			// output body
 			final IPersistentFormat<IGraphicalFeatureModel> formatBody = new TikzFormat.TikZBody(file.getName());
-			FileHandler.save(outputDir.resolve("body.tex"), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatBody);
+			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
 
 			// output main
 			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat.TikZMain();
