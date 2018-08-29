@@ -360,21 +360,12 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final Path filePath = arguments.modelFile.getFileName();
 		final Path root = arguments.modelFile.getRoot();
 		if ((filePath != null) && (root != null)) {
-			String fileName = filePath.toString();
-			final int extIndex = fileName.lastIndexOf('.');
-			if (arguments.newModelName.isEmpty()) {
-				fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
-					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
-			} else {
-				fileName = arguments.newModelName;
-			}
+			final IPersistentFormat<IFeatureModel> format =
+				arguments.newModelFormat != null ? arguments.newModelFormat : FMFormatManager.getInstance().getFormatByContent(filePath);
+			final String fileName = !arguments.newModelName.isEmpty() ? arguments.newModelName
+				: SimpleFileHandler.getFileName(filePath) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
 			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
-
-			if (arguments.newModelFormat != null) {
-				SimpleFileHandler.save(outputPath, newInterfaceModel, arguments.newModelFormat);
-			} else {
-				SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
-			}
+			SimpleFileHandler.save(outputPath, newInterfaceModel, format);
 		}
 	}
 
@@ -465,25 +456,41 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		if (arguments.omitAbstractFeatures) {
 			for (final IFeature feature : slicedModel.getFeatures()) {
 				if (feature.getName().startsWith("_Abstract_")) {
-					// At first set parent group to the group of the abstract feature
-					if (feature.getStructure().getParent() != null) {
-						if (feature.getStructure().isOr()) {
-							feature.getStructure().getParent().changeToOr();
-						} else if (feature.getStructure().isAlternative()) {
-							feature.getStructure().getParent().changeToAlternative();
-						} else {
-							feature.getStructure().getParent().changeToAnd();
-						}
-					}
-
 					// Now move the children of the abstract feature to the parent
 					for (final IFeatureStructure featureStruc : feature.getStructure().getChildren()) {
 						feature.getStructure().getParent().addChild(featureStruc);
 					}
 
+					// At first set parent group to the group of the abstract feature
+					if (feature.getStructure().getParent() != null) {
+						if (feature.getStructure().isOr()) {
+							feature.getStructure().getParent().changeToOr();
+							feature.getStructure().getParent().setOr();
+						} else if (feature.getStructure().isAlternative()) {
+							feature.getStructure().getParent().changeToAlternative();
+							feature.getStructure().getParent().setAlternative();
+						} else {
+							feature.getStructure().getParent().changeToAnd();
+							feature.getStructure().getParent().setAnd();
+						}
+					}
+
 					// Now remove abstract feature
 					feature.getStructure().getParent().removeChild(feature.getStructure());
 				}
+			}
+		}
+		// Remove '__root__' if it only has one child
+		if (arguments.omitRootIfPossible) {
+			if (slicedModel.getStructure().getRoot().getChildrenCount() == 1) {
+				// Save old root feature
+				final IFeature oldRoot = slicedModel.getStructure().getRoot().getFeature();
+
+				// Set new root
+				slicedModel.getStructure().setRoot(slicedModel.getStructure().getRoot().getChildren().get(0));
+
+				// Remove old root from model
+				slicedModel.deleteFeature(oldRoot);
 			}
 		}
 		return slicedModel;

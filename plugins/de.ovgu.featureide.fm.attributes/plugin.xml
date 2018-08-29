@@ -73,4 +73,23 @@
          </with>
       </definition>
    </extension>
+   <extension
+         point="de.ovgu.featureide.fm.core.FMComposer">
+      <fmComposer
+            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModeling"
+            composer="de.ovgu.featureide.core.ExtendedFeatureModeling"
+            id="de.ovgu.featureide.core.ExtendedFeatureModelingFMExtension"
+            name="Extended FeatureModeling FMExtension">
+      </fmComposer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.fm.attributes.composer.ExtendedFeatureModeling"
+            description="Creation of Extended Feature Models and Configurations."
+            id="de.ovgu.featureide.core.ExtendedFeatureModeling"
+            name="Extended Feature Modeling"
+            nature="FeatureIDE_Core.FeatureModelingNature">
+      </composer>
+   </extension>
 </plugin>
