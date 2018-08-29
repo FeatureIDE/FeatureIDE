@@ -29,8 +29,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.And;
+import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
@@ -70,6 +72,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		private final IPersistentFormat<IFeatureModel> newModelFormat;
 		private final boolean omitAbstractFeatures;
 		private final boolean omitRootIfPossible;
+		private final boolean simplifyImplications;
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
@@ -81,10 +84,14 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			newModelFormat = null;
 			omitAbstractFeatures = false;
 			omitRootIfPossible = false;
+			simplifyImplications = false;
 		}
 
+		/**
+		 * Do not delete. This constructor is used externally.
+		 */
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints, String newModelName,
-				IPersistentFormat<IFeatureModel> newModelFormat, boolean omitAbstractFeatures, boolean omitRootIfPossible) {
+				IPersistentFormat<IFeatureModel> newModelFormat, boolean omitAbstractFeatures, boolean omitRootIfPossible, boolean simplifyImplications) {
 			super(Arguments.class);
 			this.modelFile = modelFile;
 			this.featuremodel = featuremodel;
@@ -94,6 +101,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			this.newModelFormat = newModelFormat;
 			this.omitAbstractFeatures = omitAbstractFeatures;
 			this.omitRootIfPossible = omitRootIfPossible;
+			this.simplifyImplications = simplifyImplications;
 		}
 
 	}
@@ -491,6 +499,30 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 
 				// Remove old root from model
 				slicedModel.deleteFeature(oldRoot);
+			}
+		}
+
+		// Simplify 'NodeA or not NodeB' to 'NodeA implies NodeB'
+		if (arguments.simplifyImplications) {
+			for (final IConstraint con : slicedModel.getConstraints()) {
+				final Node constraintNode = con.getNode();
+				constraintNode.getChildren();
+				if (constraintNode instanceof Or) {
+					final Or orNode = (Or) constraintNode;
+					if (orNode.getChildren().length == 2) {
+						if (orNode.getChildren()[1] instanceof Not) {
+							final Node newNode = new Implies(orNode.getChildren()[0], orNode.getChildren()[1].getChildren()[0]);
+							con.setNode(newNode);
+						} else if (orNode.getChildren()[1] instanceof Literal) {
+							final Literal literal = (Literal) orNode.getChildren()[1];
+							if (!literal.positive) {
+								literal.positive = true;
+								final Node newNode = new Implies(orNode.getChildren()[0], literal);
+								con.setNode(newNode);
+							}
+						}
+					}
+				}
 			}
 		}
 		return slicedModel;
