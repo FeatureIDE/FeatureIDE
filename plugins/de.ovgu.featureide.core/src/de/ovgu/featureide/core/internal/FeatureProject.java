@@ -102,6 +102,7 @@ import de.ovgu.featureide.fm.core.base.impl.ConfigFormatManager;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -455,12 +456,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final IFile orderFile = project.getFile(".order");
 		final IFeatureModel featureModel = featureModelManager.getObject();
 		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
-
 			SimpleFileHandler.load(Paths.get(orderFile.getLocationURI()), featureModel, new FeatureOrderFormat());
 			// write feature order to model
 			// XmlFeatureModelWriter modelWriter = new
 			// XmlFeatureModelWriter(featureModel);
-			FeatureModelManager.save(featureModel, Paths.get(modelFile.getModelFile().getLocationURI()));
+			final java.nio.file.Path path = Paths.get(modelFile.getModelFile().getLocationURI());
+			FeatureModelManager.save(featureModel, path, FMFormatManager.getInstance().getFormatByContent(path));
 		}
 		/*
 		 * TODO delete .order file in 2013 delete de.ovgu.featureide.fm.ui.editors .FeatureOrderEditor#writeToOrderFile() and corresponding call see TODOs
@@ -476,7 +477,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void guidslToXML() {
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
-			FeatureModelManager.convert(Paths.get(project.getFile("model.m").getLocationURI()), Paths.get(project.getFile("model.xml").getLocationURI()));
+			FeatureModelManager.convert(Paths.get(project.getFile("model.m").getLocationURI()), Paths.get(project.getFile("model.xml").getLocationURI()),
+					new XmlFeatureModelFormat());
 			// TODO GUIDSL Annotations, should be handled in guidsl format #write
 			// if (!guidslReader.getAnnLine().isEmpty()) {
 			// ModelMarkerHandler<IFile> modelFile = new ModelMarkerHandler<>(project.getFile("model.m"));
@@ -1056,7 +1058,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		try {
 			for (final IResource res : configFolder.members()) {
-				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(res.getName())) {
+				if ((res instanceof IFile) && ConfigFormatManager.getInstance().hasFormat(Paths.get(res.getLocationURI()))) {
 					configs.add((IFile) res);
 				}
 			}

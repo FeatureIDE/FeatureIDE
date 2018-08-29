@@ -85,6 +85,13 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 	};
 
+	private static final IFilter<SelectableFeature> invalidFeatureFilter = new IFilter<SelectableFeature>() {
+		@Override
+		public boolean isValid(SelectableFeature feature) {
+			return feature.getFeature() != null;
+		}
+	};
+
 	private static final IFilter<SelectableFeature> concreteFilter = new IFilter<SelectableFeature>() {
 		@Override
 		public boolean isValid(SelectableFeature feature) {
@@ -751,8 +758,8 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	@SafeVarargs
 	private final Iterable<SelectableFeature> getFeatures(IFilter<SelectableFeature>... filter) {
-		final Iterable<SelectableFeature> source =
-			configuration.ignoreAbstractFeatures ? configuration.features : Functional.filter(configuration.features, concreteFilter);
+		final Iterable<SelectableFeature> source = configuration.ignoreAbstractFeatures ? Functional.filter(configuration.features, invalidFeatureFilter)
+			: Functional.filter(configuration.features, invalidFeatureFilter, concreteFilter);
 		return filter.length > 0 ? Functional.filter(source, filter) : source;
 	}
 

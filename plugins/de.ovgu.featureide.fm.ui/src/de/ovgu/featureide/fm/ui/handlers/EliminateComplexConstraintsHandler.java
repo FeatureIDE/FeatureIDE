@@ -41,12 +41,13 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFormatManager;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter.Option;
 import de.ovgu.featureide.fm.core.conversion.IConverterStrategy;
 import de.ovgu.featureide.fm.core.conversion.NNFConverter;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 import de.ovgu.featureide.fm.ui.wizards.EliminateConstraintsWizard;
@@ -60,11 +61,11 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(IFile file) {
-		final IFeatureModel featureModel = FeatureModelManager.load(Paths.get(file.getLocationURI())).getObject();
+		final FileHandler<IFeatureModel> fileHandler = FeatureModelManager.load(Paths.get(file.getLocationURI()));
+		final IFeatureModel featureModel = fileHandler.getObject();
 
 		IConverterStrategy strategy = new NNFConverter();
 		final ComplexConstraintConverter converter = new ComplexConstraintConverter();
-		String path = "";
 
 		final boolean trivial = ComplexConstraintConverter.trivialRefactoring(featureModel);
 
@@ -91,15 +92,19 @@ public class EliminateComplexConstraintsHandler extends AFileHandler {
 			if (wizard.removeRedundancy()) {
 				options.add(Option.REMOVE_RDUNDANCY);
 			}
-			path = wizard.getPath();
+			String path = wizard.getPath();
 			if ((new File(path)).exists() && !MessageDialog.openQuestion(new Shell(), "Warning!", "Selected file already exists. File will be overwritten.")) {
 				return;
 			}
+
+			final IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
+
+			final IPersistentFormat<IFeatureModel> format = fileHandler.getFormat();
+			if (!path.endsWith("." + format.getSuffix())) {
+				path += "." + format.getSuffix();
+			}
+			SimpleFileHandler.save(Paths.get(path), result, format);
 		}
-
-		final IFeatureModel result = converter.convert(featureModel, strategy, options.toArray(new Option[options.size()]));
-
-		SimpleFileHandler.save(Paths.get(path), result, FMFormatManager.getInstance().getFormatByFileName(path));
 	}
 
 	@SuppressWarnings("unused")

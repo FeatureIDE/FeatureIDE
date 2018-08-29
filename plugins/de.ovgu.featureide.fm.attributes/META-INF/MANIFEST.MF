@@ -11,11 +11,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
- org.eclipse.core.expressions
+ de.ovgu.featureide.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Eclipse-AutoStart: true
-Import-Package: de.ovgu.featureide.fm.ui.editors,
- de.ovgu.featureide.fm.ui.editors.configuration
 Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.base,
  de.ovgu.featureide.fm.attributes.base.exceptions,
