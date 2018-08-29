@@ -78,23 +78,18 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	}
 
-	private LinkedList<IFeature> getVisibleFeatures() {
+	private void getVisibleFeatures() {
 		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		final Iterable<IFeature> iFeatureList = featureModel.getFeatures();
-		// final List<IGraphicalFeature> visibleFeatures = graphicalFeatureModel.getVisibleFeatures();
-		final LinkedList<IFeature> result = new LinkedList<IFeature>();
+		final Iterable<IFeature> featureList = featureModel.getFeatures();
 
-		collapseLayer(iFeatureList);
+		collapseLayer(featureList);
 
-		for (final IFeature feature : iFeatureList) {
+		for (final IFeature feature : featureList) {
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			if (!featureDiagramEditor.getViewer().isNodeOutOfSight(graphicalFeature)) {
-				result.add(feature);
 				graphicalFeature.setCollapsed(false);
 			}
 		}
-
-		return result;
 	}
 
 	/**
