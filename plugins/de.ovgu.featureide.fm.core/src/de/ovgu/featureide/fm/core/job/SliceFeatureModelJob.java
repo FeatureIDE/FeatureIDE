@@ -68,6 +68,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		private final Path modelFile;
 		private final String newModelName;
 		private final IPersistentFormat<IFeatureModel> newModelFormat;
+		private final boolean omitAbstractFeatures;
+		private final boolean omitRootIfPossible;
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints) {
 			super(Arguments.class);
@@ -77,10 +79,12 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			this.considerConstraints = considerConstraints;
 			newModelName = "";
 			newModelFormat = null;
+			omitAbstractFeatures = false;
+			omitRootIfPossible = false;
 		}
 
 		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames, boolean considerConstraints, String newModelName,
-				IPersistentFormat<IFeatureModel> newModelFormat) {
+				IPersistentFormat<IFeatureModel> newModelFormat, boolean omitAbstractFeatures, boolean omitRootIfPossible) {
 			super(Arguments.class);
 			this.modelFile = modelFile;
 			this.featuremodel = featuremodel;
@@ -88,6 +92,8 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 			this.considerConstraints = considerConstraints;
 			this.newModelName = newModelName;
 			this.newModelFormat = newModelFormat;
+			this.omitAbstractFeatures = omitAbstractFeatures;
+			this.omitRootIfPossible = omitRootIfPossible;
 		}
 
 	}
@@ -224,6 +230,7 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 	@Override
 	public IFeatureModel execute(IMonitor monitor) throws Exception {
 		newInterfaceModel = sliceModel(arguments.featuremodel, arguments.featureNames, monitor);
+		newInterfaceModel = postProcessModel(newInterfaceModel);
 		saveModel();
 		return newInterfaceModel;
 	}
@@ -353,14 +360,21 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		final Path filePath = arguments.modelFile.getFileName();
 		final Path root = arguments.modelFile.getRoot();
 		if ((filePath != null) && (root != null)) {
-			final IPersistentFormat<IFeatureModel> format =
-				arguments.newModelFormat != null ? arguments.newModelFormat : FMFormatManager.getInstance().getFormatByContent(filePath);
-			final String fileName = !arguments.newModelName.isEmpty() ? arguments.newModelName
-				: SimpleFileHandler.getFileName(filePath) + "_sliced_" + System.currentTimeMillis() + "." + format.getSuffix();
-
+			String fileName = filePath.toString();
+			final int extIndex = fileName.lastIndexOf('.');
+			if (arguments.newModelName.isEmpty()) {
+				fileName = (extIndex > 0) ? fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml"
+					: fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
+			} else {
+				fileName = arguments.newModelName;
+			}
 			final Path outputPath = root.resolve(arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1)).resolve(fileName);
 
-			SimpleFileHandler.save(outputPath, newInterfaceModel, format);
+			if (arguments.newModelFormat != null) {
+				SimpleFileHandler.save(outputPath, newInterfaceModel, arguments.newModelFormat);
+			} else {
+				SimpleFileHandler.save(outputPath, newInterfaceModel, FMFormatManager.getInstance().getFormatByFileName(fileName));
+			}
 		}
 	}
 
@@ -444,6 +458,35 @@ public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Argum
 		monitor.step();
 
 		return m;
+	}
+
+	private IFeatureModel postProcessModel(IFeatureModel slicedModel) {
+		// Postprocess remove all '_Abstract*' features
+		if (arguments.omitAbstractFeatures) {
+			for (final IFeature feature : slicedModel.getFeatures()) {
+				if (feature.getName().startsWith("_Abstract_")) {
+					// At first set parent group to the group of the abstract feature
+					if (feature.getStructure().getParent() != null) {
+						if (feature.getStructure().isOr()) {
+							feature.getStructure().getParent().changeToOr();
+						} else if (feature.getStructure().isAlternative()) {
+							feature.getStructure().getParent().changeToAlternative();
+						} else {
+							feature.getStructure().getParent().changeToAnd();
+						}
+					}
+
+					// Now move the children of the abstract feature to the parent
+					for (final IFeatureStructure featureStruc : feature.getStructure().getChildren()) {
+						feature.getStructure().getParent().addChild(featureStruc);
+					}
+
+					// Now remove abstract feature
+					feature.getStructure().getParent().removeChild(feature.getStructure());
+				}
+			}
+		}
+		return slicedModel;
 	}
 
 }
