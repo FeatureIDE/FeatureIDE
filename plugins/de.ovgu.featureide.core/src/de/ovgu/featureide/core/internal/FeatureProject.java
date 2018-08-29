@@ -79,6 +79,9 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
+import org.prop4j.solver.BasicSolver;
+import org.prop4j.solver.ISatSolver.SatResult;
+import org.prop4j.solver.SatInstance;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -1082,45 +1085,53 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			@Override
 			public Boolean execute(IMonitor workMonitor) throws Exception {
-				workMonitor.setRemainingWork(2);
-				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
-				try {
-					IMonitor subTask = workMonitor.subTask(1);
-					subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
-					subTask.setRemainingWork(files.size());
-					for (final IFile file : files) {
-						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
-						subTask.step();
-					}
-					subTask.done();
-					subTask = workMonitor.subTask(1);
-					subTask.setRemainingWork(files.size());
-					// check validity
-					for (final IFile file : files) {
-						subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
-						final ProblemList lastProblems = SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
-						if (!config.isValid()) {
-							String name = file.getName();
-							final int extIndex = name.lastIndexOf('.');
-							if (extIndex > 0) {
-								name = name.substring(0, extIndex);
-							}
-							final String message = CONFIGURATION_ + name + IS_INVALID;
-							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
+				final SatInstance instance = new SatInstance(featureModelManager.getObject().getAnalyser().getCnf());
+				final BasicSolver solver = new BasicSolver(instance);
+				solver.isSatisfiable();
 
+				if (solver.isSatisfiable() == SatResult.TRUE) {
+					workMonitor.setRemainingWork(2);
+					final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
+					try {
+						IMonitor subTask = workMonitor.subTask(1);
+						subTask.setTaskName(DELETE_CONFIGURATION_MARKERS);
+						subTask.setRemainingWork(files.size());
+						for (final IFile file : files) {
+							deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+							subTask.step();
 						}
-						// create warnings (e.g., for features that are not available anymore)
-						for (final Problem warning : lastProblems) {
-							createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
+						subTask.done();
+						subTask = workMonitor.subTask(1);
+						subTask.setRemainingWork(files.size());
+						// check validity
+						for (final IFile file : files) {
+							subTask.setTaskName(CHECK_VALIDITY_OF + " - " + file.getName());
+							final ProblemList lastProblems =
+								SimpleFileHandler.load(Paths.get(file.getLocationURI()), config, ConfigFormatManager.getInstance());
+							if (!config.isValid()) {
+								String name = file.getName();
+								final int extIndex = name.lastIndexOf('.');
+								if (extIndex > 0) {
+									name = name.substring(0, extIndex);
+								}
+								final String message = CONFIGURATION_ + name + IS_INVALID;
+								createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
+
+							}
+							// create warnings (e.g., for features that are not available anymore)
+							for (final Problem warning : lastProblems) {
+								createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
+							}
+							subTask.step();
 						}
-						subTask.step();
+						subTask.done();
+					} catch (final OutOfMemoryError e) {
+						LOGGER.logError(e);
+						return false;
+					} finally {
+						workMonitor.done();
 					}
-					subTask.done();
-				} catch (final OutOfMemoryError e) {
-					LOGGER.logError(e);
-					return false;
-				} finally {
-					workMonitor.done();
+					return true;
 				}
 				return true;
 			}
