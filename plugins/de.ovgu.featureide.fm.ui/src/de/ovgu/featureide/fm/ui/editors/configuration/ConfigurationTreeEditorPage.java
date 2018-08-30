@@ -485,7 +485,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		item.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ConfigurationExporter.exportAs();
+				ConfigurationExporter.exportAs(configurationEditor.getConfiguration());
 			}
 		});
 

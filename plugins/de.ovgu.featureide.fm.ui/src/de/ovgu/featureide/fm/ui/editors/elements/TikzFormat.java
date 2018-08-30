@@ -170,7 +170,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
-	private static StringBuilder postProcessing(StringBuilder str) {
+	public static StringBuilder postProcessing(StringBuilder str) {
 		final int strLength = str.length();
 		StringBuilder newString = new StringBuilder();
 		newString = newString.append(str);

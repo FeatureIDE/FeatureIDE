@@ -23,12 +23,16 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -36,11 +40,12 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 /**
  * TODO description
  *
- * @author liuya
+ * @author Simon Wenk
+ * @author Yang Liu
  */
 public class ConfigurationExporter {
 
-	public static boolean exportAs() {
+	public static boolean exportAs(Configuration configuration) {
 		final FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		final String[] extensions = { "*.tex" };
 		fileDialog.setFilterExtensions(extensions);
@@ -54,12 +59,38 @@ public class ConfigurationExporter {
 
 		final File file = new File(filePath);
 		// TODO: EXPORT
-		final IPersistentFormat<Configuration> format = new LatexFormat();
-		FileHandler.save(file.toPath(), null, format);
-		final boolean succ = true;
-		// final boolean succ = ConfigurationExporter.exportAs(diagramEditor, file);
-		ConfigurationExporter.printExportMessage(file, succ);
-		return succ;
+
+		if (file.getAbsolutePath().endsWith(".tex")) {
+			// create new folder
+			final StringBuilder myFileName = new StringBuilder();
+			myFileName.append(file.getName().toString());
+			myFileName.delete(myFileName.length() - 4, myFileName.length());
+			Path outputDir;
+			try {
+				outputDir = Paths.get(file.getParent()).resolve(myFileName.toString());
+				FileSystem.mkDir(outputDir);
+			} catch (final IOException e) {
+				FMUIPlugin.getDefault().logError(e);
+				return false;
+			}
+
+			// print Head
+			final IPersistentFormat<Configuration> formatHead = new LatexFormat.LaTeXHead();
+			FileHandler.save(outputDir.resolve("head.tex"), null, formatHead);
+
+			// print Main
+			final IPersistentFormat<Configuration> formatMain = new LatexFormat.LaTeXMain();
+			FileHandler.save(outputDir.resolve(file.getName()), configuration, formatMain);
+
+			// print Body
+			final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(myFileName.toString());
+			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
+
+			ConfigurationExporter.printExportMessage(file, true);
+			return true;
+		}
+
+		return false;
 	}
 
 	public static void printExportMessage(File file, boolean successful) {
@@ -67,9 +98,5 @@ public class ConfigurationExporter {
 		final String infoMessage =
 			done ? "Configuration export has been saved to\n" + file.getAbsolutePath() : NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___;
 		FMUIPlugin.getDefault().logInfo(infoMessage);
-	}
-
-	public static void run() {
-		System.out.println("Dies ist ein Test.");
 	}
 }
