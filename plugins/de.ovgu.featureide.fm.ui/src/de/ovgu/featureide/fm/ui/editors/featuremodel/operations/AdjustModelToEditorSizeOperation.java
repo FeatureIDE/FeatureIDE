@@ -90,7 +90,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	private void checkChildren(IGraphicalFeature root) {
 
-		final ArrayList<IGraphicalFeature> childern = new ArrayList<IGraphicalFeature>(root.getGraphicalChildren(false));
+		final ArrayList<IGraphicalFeature> childern = new ArrayList<IGraphicalFeature>(root.getAllGraphicalChildren());
 		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
 		if (childern.size() > 0) {
 			collapseLayer(childern, true);

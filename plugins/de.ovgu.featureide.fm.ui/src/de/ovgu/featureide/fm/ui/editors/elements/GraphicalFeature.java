@@ -262,10 +262,25 @@ public class GraphicalFeature implements IGraphicalFeature {
 		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
 		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
-			features.add(gf);
-
+			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
+				features.add(gf);
+			}
 		}
 		return Collections.unmodifiableList(features);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#getAllChildren()
+	 */
+	@Override
+	public List<IGraphicalFeature> getAllGraphicalChildren() {
+		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
+		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
+			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
+			features.add(gf);
+		}
+		return features;
 	}
 
 }
