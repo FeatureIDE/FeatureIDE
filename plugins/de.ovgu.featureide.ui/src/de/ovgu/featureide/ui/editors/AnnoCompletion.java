@@ -379,7 +379,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	}
 
 	private Status getStatusForMunge(String lineContent, String lastKeyword) {
-		final boolean hasOpeningSyntax = lineContent.trim().contains("/*");
+		final boolean hasOpeningSyntax = lastKeyword.trim().equals("/*");
 		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		final boolean hasDirective = lineContainsElements(lineContent, allMungeDirectives);
 		setStatusForMunge(hasOpeningSyntax, hasFeature, hasDirective);
