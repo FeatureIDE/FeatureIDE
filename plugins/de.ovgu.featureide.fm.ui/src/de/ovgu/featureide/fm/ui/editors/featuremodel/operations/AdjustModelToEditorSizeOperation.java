@@ -89,7 +89,8 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 			final IGraphicalFeature left = graphicalFeatureModel.getGraphicalFeature(layer.get(0));
 			final IGraphicalFeature right = graphicalFeatureModel.getGraphicalFeature(layer.getLast());
 
-			if (getEditor().getViewer().isNodeOutOfSight(left) || getEditor().getViewer().isNodeOutOfSight(right)) {
+			boolean isLayerSomewhereOutOfSight = getEditor().getViewer().isNodeOutOfSight(left) || getEditor().getViewer().isNodeOutOfSight(right);
+			if (isLayerSomewhereOutOfSight) {
 				break;
 			}
 			if (left.getAllGraphicalChildren().size() > 0) {
@@ -104,7 +105,6 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 					break;
 				} else {
 					gf.setCollapsed(false);
-					getEditor().getViewer().internRefresh(true);
 					getEditor().propertyChange(new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED));
 					final boolean leftestChildIsOutOfSight = getEditor().getViewer().isNodeOutOfSight(leftestChild);
 					final int lastChildIndex = gf.getAllGraphicalChildren().size() - 1;
@@ -113,10 +113,10 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 						rightestChildIsOutOfSight = false;
 					} else {
 						rightestChildIsOutOfSight = getEditor().getViewer().isNodeOutOfSight(gf.getAllGraphicalChildren().get(lastChildIndex));
+						isLayerSomewhereOutOfSight = getEditor().getViewer().isNodeOutOfSight(left) || getEditor().getViewer().isNodeOutOfSight(right);
 					}
-					if (leftestChildIsOutOfSight || rightestChildIsOutOfSight) {
+					if (leftestChildIsOutOfSight || rightestChildIsOutOfSight || isLayerSomewhereOutOfSight) {
 						gf.setCollapsed(true);
-						break;
 					}
 				}
 			}
