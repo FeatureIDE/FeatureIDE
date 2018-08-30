@@ -40,6 +40,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
 			final StringBuilder str = new StringBuilder();
@@ -49,28 +52,43 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getId() {
 			return ID;
@@ -85,6 +103,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			this.FileName = FileName;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
 			final StringBuilder str = new StringBuilder();
@@ -94,28 +115,43 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getId() {
 			return ID;
@@ -125,6 +161,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	public static class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
 			StringBuilder str = new StringBuilder();
@@ -139,28 +178,43 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public String getId() {
 			return ID;
@@ -168,6 +222,9 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
+	/**
+	 *
+	 */
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
 	private static StringBuilder postProcessing(StringBuilder str) {
@@ -366,6 +423,16 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		}
 	}
 
+	/**
+	 * Write the <code>object</code> feature models from graphics to string to show feature models in laTex. Here, a complete runnable laTex file is divided
+	 * into three files which are TikZHead, TikZBody and TikZMain. These three files are also stored in tex-format and also require the conversion from the
+	 * graphics to string. Only three files together can build the feature models in latex, because they defines the different parts of the feature models
+	 * separately. TikZHead defines the required packages, variables and the style of the feature models which is static and already written using LaTex in
+	 * advance{@link #printHead(StringBuilder)}}.
+	 *
+	 * @param object the object graphics feature models to be written
+	 * @return the string of the graphics feature models
+	 */
 	@Override
 	public String write(IGraphicalFeatureModel object) {
 		final StringBuilder str = new StringBuilder();
@@ -384,28 +451,47 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return str.toString();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean supportsRead() {
 		return false;
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean supportsWrite() {
 		return true;
 
 	}
 
+	/**
+	 * Return the suffix of the extension.
+	 *
+	 * @return the suffix of the extension
+	 */
 	@Override
 	public String getSuffix() {
 		return ".tex";
 	}
 
+	/**
+	 * Returns the name of the extension as a string.
+	 *
+	 * @return the name of the extension
+	 */
 	@Override
 	public String getName() {
 		return "LaTeX-Document with TikZ";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getId() {
 		return ID;
