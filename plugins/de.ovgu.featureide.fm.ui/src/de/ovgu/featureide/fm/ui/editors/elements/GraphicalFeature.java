@@ -262,9 +262,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();
 		for (final IFeatureStructure f : getObject().getStructure().getChildren()) {
 			final IGraphicalFeature gf = getGraphicalModel().getGraphicalFeature(f.getFeature());
-			if (!gf.hasCollapsedParent() && (showHidden || !gf.getObject().getStructure().hasHiddenParent())) {
-				features.add(gf);
-			}
+			features.add(gf);
+
 		}
 		return Collections.unmodifiableList(features);
 	}

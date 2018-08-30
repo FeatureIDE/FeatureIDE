@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADJUST_MODEL_TO_EDITOR;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -78,18 +79,39 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 
 	}
 
-	private void getVisibleFeatures() {
-		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
-		final Iterable<IFeature> featureList = featureModel.getFeatures();
-
-		collapseLayer(featureList);
-
-		for (final IFeature feature : featureList) {
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-			if (!featureDiagramEditor.getViewer().isNodeOutOfSight(graphicalFeature)) {
-				graphicalFeature.setCollapsed(false);
+	private IGraphicalFeature findRoot(ArrayList<IGraphicalFeature> tree) {
+		for (final IGraphicalFeature feature : tree) {
+			if (feature.getSourceConnection().getTarget() == null) {
+				return feature;
 			}
 		}
+		return null;
+	}
+
+	private void checkChildren(IGraphicalFeature root) {
+
+		final ArrayList<IGraphicalFeature> childern = new ArrayList<IGraphicalFeature>(root.getGraphicalChildren(false));
+		final FeatureDiagramEditor featureDiagramEditor = (FeatureDiagramEditor) editor;
+		if (childern.size() > 0) {
+			collapseLayer(childern, true);
+			root.setCollapsed(false);
+
+		}
+		featureDiagramEditor.getViewer().internRefresh(true);
+		for (int j = 0; j < childern.size(); j++) {
+			if (featureDiagramEditor.getViewer().isNodeOutOfSight(childern.get(j))) {
+				root.setCollapsed(true);
+				break;
+			} else {
+				checkChildren(childern.get(j));
+			}
+		}
+
+	}
+
+	private void getVisibleFeatures() {
+		final IGraphicalFeature root = graphicalFeatureModel.getGraphicalFeature(featureModel.getStructure().getRoot().getFeature());
+		checkChildren(root);
 	}
 
 	/**
@@ -97,10 +119,10 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 	 *
 	 * @param level list of features
 	 */
-	private void collapseLayer(Iterable<IFeature> level) {
-		for (final IFeature feature : level) {
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
-			graphicalFeature.setCollapsed(true);
+	private void collapseLayer(ArrayList<IGraphicalFeature> level, boolean collapsed) {
+		for (final IGraphicalFeature graphicalFeature : level) {
+
+			graphicalFeature.setCollapsed(collapsed);
 		}
 	}
 
