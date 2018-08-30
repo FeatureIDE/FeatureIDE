@@ -184,20 +184,31 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	public boolean isNodeOutOfSight(IGraphicalFeature feature) {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
-		final double editorWidth = getFigureCanvas().getViewport().getSize().width / getZoomManager().getZoom();
-		final double editorHeight = getFigureCanvas().getViewport().getSize().height / getZoomManager().getZoom();
+		final double editorWidth = (getFigureCanvas().getViewport().getSize().width / getZoomManager().getZoom());
+		final double editorHeight = (getFigureCanvas().getViewport().getSize().height / getZoomManager().getZoom());
 
 		final double rootMidX = root.getLocation().x + (root.getSize().width / 2);
-		final double rootMidY = root.getLocation().y - 10;
+		final double rootMidY = root.getLocation().y - (root.getSize().height / 2);
 
 		final double borderLeft = rootMidX - (editorWidth / 2);
-		final double borderRight = rootMidX + (editorWidth / 2);
+		double borderRight = rootMidX + (editorWidth / 2);
+		if (borderLeft < -rootMidY) {
+			borderRight = editorWidth - rootMidX;
 
-		if (((feature.getLocation().x + feature.getSize().width) > borderRight) || (feature.getLocation().x < borderLeft)) {
+		}
+		double height = editorHeight;
+
+		if (((int) editorHeight / 4) == (int) rootMidY) {
+			height = editorHeight + rootMidY;
+		}
+
+		final int Xright = feature.getLocation().x + (feature.getSize().width / 2);
+		if ((Xright > borderRight) || (feature.getLocation().x < borderLeft)) {
 			getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
 			return true;
 		}
-		if (((feature.getLocation().y + feature.getSize().height) > editorHeight) || (feature.getLocation().y < 0)) {
+		final int YTop = feature.getLocation().y + (feature.getSize().height / 2);
+		if ((YTop > height) || (feature.getLocation().y < 0)) {
 			getFigureCanvas().getViewport().setViewLocation(new org.eclipse.draw2d.geometry.Point((int) borderLeft, (int) rootMidY));
 			return true;
 		}
