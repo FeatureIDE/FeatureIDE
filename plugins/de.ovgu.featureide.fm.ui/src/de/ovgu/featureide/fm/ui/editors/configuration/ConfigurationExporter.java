@@ -83,7 +83,7 @@ public class ConfigurationExporter {
 			FileHandler.save(outputDir.resolve(file.getName()), configuration, formatMain);
 
 			// print Body
-			final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(myFileName.toString());
+			final IPersistentFormat<Configuration> formatBody = new LatexFormat.LaTeXBody(file.getName());
 			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
 
 			ConfigurationExporter.printExportMessage(file, true);

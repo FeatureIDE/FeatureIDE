@@ -43,6 +43,8 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	public static final String LATEX_DOCUMENT = ".tex";
 	public static final String LATEX_DOCUMENT_DESCRIPTION = "LaTeX Document";
 
+	private static final String lnSep = System.lineSeparator();
+
 	public static class LaTeXHead extends APersistentFormat<Configuration> {
 
 		@Override
@@ -160,36 +162,39 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printHead(StringBuilder str) {
-		str.append("\\documentclass[varwidth,convert,border=5pt]{standalone}\n" + "\\usepackage{amsmath}\n" + "\\usepackage{tikz}\n" + "\\usepackage{color}\n"
-			+ "\\definecolor{boxColor}{RGB}{192 192 192}\n" + "\\definecolor{plusColor}{RGB}{48 191 48}\n" + "\\definecolor{minusColor}{HTML}{be0105}\n"
-			+ "\\newcommand\\tab[1][1em]{\\hspace*{#1}}\n" + "\n"
-			+ "\\newcommand{\\myPlus}{\\ \\fcolorbox{black}{boxColor}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }\n"
-			+ "\\newcommand{\\myPlusblank}{\\ \\fcolorbox{black}{white}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }\n"
-			+ "\\newcommand{\\myMinus}{\\ \\fcolorbox{black}{boxColor}{\\color{minusColor}$\\boldsymbol{\\pmb{-}}$}\\ }\n"
-			+ "\\newcommand{\\myMinusblank}{\\ \\fcolorbox{black}{white}{\\color{minusColor}$\\boldsymbol{\\pmb{-}}$}\\ }\n"
-			+ "\\newcommand{\\myBox}{\\ \\fcolorbox{black}{white}{\\color{white}$\\boldsymbol{\\pmb{+}}$}\\ }\n" + "\n"
-			+ "\\newcommand{\\optional}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]\n" + "\\draw (0,0) circle[radius=1em];\n"
-			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);\n" + "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);\n" + "\\end{tikzpicture}}$}\n"
-			+ "\\newcommand{\\mandatory}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]\n" + "\\draw[fill=black] (0,0) circle[radius=1em];\n"
-			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);\n" + "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);\n" + "\\end{tikzpicture}}$}\n" + "\n"
-			+ "\\newcommand{\\fold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]\n" + "\\fill (-1em,1em) -- (1em,0em) -- (-1em,-1em) -- cycle;\n"
-			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);\n" + "\\end{tikzpicture}}$}\n"
-			+ "\\newcommand{\\unfold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]\n" + "\\fill (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;\n"
-			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);\n" + "\\end{tikzpicture}}$}\n"
-			+ "\\newcommand{\\nofold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]\n" + "\\fill[opacity = 0] (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;\n"
-			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);\n" + "\\end{tikzpicture}}$}\n" + "\n"
-			+ "\\newcommand{\\myOr}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=2.2]\n"
-			+ "        \\filldraw (0.1em,0em) - +(0.025em,-0.15em) - +(0.175em,-0.15em)- +(0.1em,0em);\n"
-			+ "        \\draw (0.1em,0em) -- +(-0.15em, -0.3em);\n" + "        \\draw (0.1em,0em) -- +(0.15em,-0.3em);\n"
-			+ "        \\filldraw (0.025em,-0.15em) arc (240:300:0.15em);\n" + "    \\end{tikzpicture}}$}\n"
-			+ "\\newcommand{\\Alternative}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=2.2]\n" + "        \\draw (0.1em,0em) -- +(-0.15em, -0.3em);\n"
-			+ "        \\draw (0.1em,0em) -- +(0.15em,-0.3em);\n" + "        \\draw (0.025em,-0.15em) arc (240:300:0.15em);\n" + "    \\end{tikzpicture}}$}\n"
-			+ "    \n" + "\\newcommand{\\blank}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]\n"
-			+ "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);\n" + "\\end{tikzpicture}}$}");
+		str.append("\\documentclass[varwidth,convert,border=5pt]{standalone}" + lnSep + "\\usepackage{amsmath}" + lnSep + "\\usepackage{tikz}" + lnSep
+			+ "\\usepackage{color}" + lnSep + "\\definecolor{boxColor}{RGB}{192 192 192}" + lnSep + "\\definecolor{plusColor}{RGB}{48 191 48}" + lnSep
+			+ "\\definecolor{minusColor}{HTML}{be0105}" + lnSep + "\\newcommand\\tab[1][1em]{\\hspace*{#1}}" + lnSep + lnSep
+			+ "\\newcommand{\\myPlus}{\\ \\fcolorbox{black}{boxColor}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }" + lnSep
+			+ "\\newcommand{\\myPlusblank}{\\ \\fcolorbox{black}{white}{\\color{plusColor}$\\boldsymbol{\\pmb{+}}$}\\ }" + lnSep
+			+ "\\newcommand{\\myMinus}{\\ \\fcolorbox{black}{boxColor}{\\color{minusColor}$\\boldsymbol{\\pmb{-}}$}\\ }" + lnSep
+			+ "\\newcommand{\\myMinusblank}{\\ \\fcolorbox{black}{white}{\\color{minusColor}$\\boldsymbol{\\pmb{-}}$}\\ }" + lnSep
+			+ "\\newcommand{\\myBox}{\\ \\fcolorbox{black}{white}{\\color{white}$\\boldsymbol{\\pmb{+}}$}\\ }" + lnSep + lnSep
+			+ "\\newcommand{\\optional}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]" + lnSep + "\\draw (0,0) circle[radius=1em];" + lnSep
+			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);" + lnSep + "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);" + lnSep + "\\end{tikzpicture}}$}"
+			+ lnSep + "\\newcommand{\\mandatory}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]" + lnSep
+			+ "\\draw[fill=black] (0,0) circle[radius=1em];" + lnSep + "\\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);" + lnSep
+			+ "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);" + lnSep + "\\end{tikzpicture}}$}" + lnSep + lnSep
+			+ "\\newcommand{\\fold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]" + lnSep + "\\fill (-1em,1em) -- (1em,0em) -- (-1em,-1em) -- cycle;" + lnSep
+			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);" + lnSep + "\\end{tikzpicture}}$}" + lnSep
+			+ "\\newcommand{\\unfold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]" + lnSep + "\\fill (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;" + lnSep
+			+ "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);" + lnSep + "\\end{tikzpicture}}$}" + lnSep
+			+ "\\newcommand{\\nofold}{$\\mathord{\\begin{tikzpicture}[scale=0.15]" + lnSep
+			+ "\\fill[opacity = 0] (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;" + lnSep + "\\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);" + lnSep
+			+ "\\end{tikzpicture}}$}" + lnSep + lnSep + "\\newcommand{\\myOr}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=2.2]" + lnSep
+			+ "        \\filldraw (0.1em,0em) - +(0.025em,-0.15em) - +(0.175em,-0.15em)- +(0.1em,0em);" + lnSep
+			+ "        \\draw (0.1em,0em) -- +(-0.15em, -0.3em);" + lnSep + "        \\draw (0.1em,0em) -- +(0.15em,-0.3em);" + lnSep
+			+ "        \\filldraw (0.025em,-0.15em) arc (240:300:0.15em);" + lnSep + "    \\end{tikzpicture}}$}" + lnSep
+			+ "\\newcommand{\\Alternative}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=2.2]" + lnSep
+			+ "        \\draw (0.1em,0em) -- +(-0.15em, -0.3em);" + lnSep + "        \\draw (0.1em,0em) -- +(0.15em,-0.3em);" + lnSep
+			+ "        \\draw (0.025em,-0.15em) arc (240:300:0.15em);" + lnSep + "    \\end{tikzpicture}}$}" + lnSep + "    " + lnSep
+			+ "\\newcommand{\\blank}{$\\mspace{5mu}\\mathord{\\begin{tikzpicture}[scale=0.17]" + lnSep + "\\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);"
+			+ lnSep + "\\end{tikzpicture}}$}");
 	}
 
 	private static void printBody(StringBuilder str, String fileName) {
-		str.append("\\input{head.tex}\n" + "\\begin{document}\n" + "	\\sffamily\n" + "   \\input{" + fileName + "}\n" + "\\end{document}");
+		str.append(
+				"\\input{head.tex}" + lnSep + "\\begin{document}" + lnSep + "	\\sffamily" + lnSep + "	\\input{" + fileName + "}" + lnSep + "\\end{document}");
 	}
 
 	private static void printTabs(StringBuilder str, int depth) {
@@ -200,7 +205,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 	private static void printRoot(Configuration config, IFeature node, StringBuilder tree, int depth) {
 		// TODO: Implementation
-		tree.append("\\fboxsep0.1mm\n\\noindent\n");
+		tree.append("\\fboxsep0.1mm" + lnSep + "\\noindent" + lnSep);
 		printStructure(node, tree);
 		printAttributs(node, tree);
 		printConfiguration(config, node, tree);
@@ -277,9 +282,9 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 	private static void _printNodeName(SelectableFeature node, StringBuilder tree) {
 		if (node.getOpenClauses().size() > 0) {
-			tree.append("\\textbf{\\color{plusColor}" + node.getName() + "}\\\\\n");
+			tree.append("\\textbf{\\color{plusColor}" + node.getName() + "}\\\\" + lnSep);
 		} else {
-			tree.append(" " + node.getName() + "\\\\\n");
+			tree.append(" " + node.getName() + "\\\\" + lnSep);
 		}
 	}
 
@@ -287,12 +292,14 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	public String write(Configuration config) {
 		StringBuilder str = new StringBuilder();
 		printHead(str);
-		str.append("\n");
-		str.append("\\begin{document}\n");
+		str.append(lnSep);
+		str.append("\\begin{document}");
+		str.append(lnSep);
 		str.append("\\sffamily");
 		printRoot(config, config.getRoot().getFeature(), str, 0);
 		str = TikzFormat.postProcessing(str);
-		str.append("\n\\end{document}");
+		str.append(lnSep);
+		str.append("\\end{document}");
 
 		return str.toString();
 	}

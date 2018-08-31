@@ -38,6 +38,8 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	static boolean[] legend = { false, false, false, false, false, false, false };
 
+	private static final String lnSep = System.lineSeparator();
+
 	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
@@ -168,12 +170,12 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		public String write(IGraphicalFeatureModel object) {
 			StringBuilder str = new StringBuilder();
 
-			str.append("\\begin{forest}\n	featureDiagram\n	");
+			str.append("\\begin{forest}" + lnSep + "	featureDiagram" + lnSep + "	");
 			printTree(getRoot(object), object, str);
 			str = postProcessing(str);
-			str.append("	\n");
+			str.append("	" + lnSep);
 			printLegend(str);
-			str.append("\n\\end{forest}");
+			str.append(lnSep + "\\end{forest}");
 
 			return str.toString();
 		}
@@ -323,34 +325,37 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	private static void printHead(StringBuilder str) {
-		str.append("\\documentclass[border=5pt]{standalone}\n" + "%---required packages & variable definitions------------------------------------\n"
-			+ "\\usepackage{forest}\n" + "\\usepackage{xcolor}\n" + "\\usetikzlibrary{angles}\n" + "\\definecolor{drawColor}{RGB}{128 128 128}\n"
-			+ "\\newcommand{\\circleSize}{0.25em}\n" + "\\newcommand{\\angleSize}{0.8em}\n"
-			+ "%-------------------------------------------------------------------------------\n"
-			+ "%---Define the style of the tree------------------------------------------------\n" + "\\forestset{\n" + "	/tikz/mandatory/.style={\n"
-			+ "		circle,fill=drawColor,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n" + "	/tikz/optional/.style={\n"
-			+ "		circle,\n" + "		fill=white,\n" + "		draw=drawColor,\n" + "		inner sep=\\circleSize\n" + "	},\n"
-			+ "	featureDiagram/.style={\n" + "		for tree={\n" + "			parent anchor = south,\n" + "			child anchor = north,\n"
-			+ "			draw = drawColor,\n" + "			edge = {draw=drawColor},\n" + "		}\n" + "	},\n" + "	/tikz/abstract/.style={\n"
-			+ "		fill = blue!85!cyan!5,\n" + "		draw = drawColor\n" + "	},\n" + "	/tikz/concrete/.style={\n" + "		fill = blue!85!cyan!20,\n"
-			+ "		draw = drawColor\n" + "	},\n" + "	mandatory/.style={\n" + "		edge label={node [mandatory] {} }\n" + "	},\n"
-			+ "	optional/.style={\n" + "		edge label={node [optional] {} }\n" + "	},\n" + "	or/.style={\n" + "		tikz+={\n"
-			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	},\n" + "	/tikz/or/.style={\n" + "	},\n" + "	alternative/.style={\n" + "		tikz+={\n"
-			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};\n"
-			+ "		}	\n" + "	},\n" + "	/tikz/alternative/.style={\n" + "	},\n" + "	/tikz/placeholder/.style={\n" + "	},\n"
-			+ "	collapsed/.style={\n" + "		rounded corners,\n" + "		no edge,\n" + "		for tree={\n" + "			fill opacity=0,\n"
-			+ "			draw opacity=0,\n" + "			l = 0em,\n" + "		}\n" + "	},\n" + "	/tikz/hiddenNodes/.style={\n" + "		midway,\n"
-			+ "		rounded corners,\n" + "		draw=drawColor,\n" + "		fill=white,\n" + "		minimum size = 1.2em,\n"
-			+ "		minimum width = 0.8em,\n" + "		scale=0.9\n" + "	},\n" + "}\n"
-			+ "%-------------------------------------------------------------------------------\n");
+		str.append("\\documentclass[border=5pt]{standalone}" + lnSep + "%---required packages & variable definitions------------------------------------"
+			+ lnSep + "\\usepackage{forest}" + lnSep + "\\usepackage{xcolor}" + lnSep + "\\usetikzlibrary{angles}" + lnSep
+			+ "\\definecolor{drawColor}{RGB}{128 128 128}" + lnSep + "\\newcommand{\\circleSize}{0.25em}" + lnSep + "\\newcommand{\\angleSize}{0.8em}" + lnSep
+			+ "%-------------------------------------------------------------------------------" + lnSep
+			+ "%---Define the style of the tree------------------------------------------------" + lnSep + "\\forestset{" + lnSep
+			+ "	/tikz/mandatory/.style={" + lnSep + "		circle,fill=drawColor," + lnSep + "		draw=drawColor," + lnSep + "		inner sep=\\circleSize"
+			+ lnSep + "	}," + lnSep + "	/tikz/optional/.style={" + lnSep + "		circle," + lnSep + "		fill=white," + lnSep + "		draw=drawColor,"
+			+ lnSep + "		inner sep=\\circleSize" + lnSep + "	}," + lnSep + "	featureDiagram/.style={" + lnSep + "		for tree={" + lnSep
+			+ "			parent anchor = south," + lnSep + "			child anchor = north," + lnSep + "			draw = drawColor," + lnSep
+			+ "			edge = {draw=drawColor}," + lnSep + "		}" + lnSep + "	}," + lnSep + "	/tikz/abstract/.style={" + lnSep
+			+ "		fill = blue!85!cyan!5," + lnSep + "		draw = drawColor" + lnSep + "	}," + lnSep + "	/tikz/concrete/.style={" + lnSep
+			+ "		fill = blue!85!cyan!20," + lnSep + "		draw = drawColor" + lnSep + "	}," + lnSep + "	mandatory/.style={" + lnSep
+			+ "		edge label={node [mandatory] {} }" + lnSep + "	}," + lnSep + "	optional/.style={" + lnSep + "		edge label={node [optional] {} }"
+			+ lnSep + "	}," + lnSep + "	or/.style={" + lnSep + "		tikz+={" + lnSep
+			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\\angleSize]{angle};"
+			+ lnSep + "		}	" + lnSep + "	}," + lnSep + "	/tikz/or/.style={" + lnSep + "	}," + lnSep + "	alternative/.style={" + lnSep + "		tikz+={"
+			+ lnSep
+			+ "			\\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\\angleSize]{angle};"
+			+ lnSep + "		}	" + lnSep + "	}," + lnSep + "	/tikz/alternative/.style={" + lnSep + "	}," + lnSep + "	/tikz/placeholder/.style={" + lnSep
+			+ "	}," + lnSep + "	collapsed/.style={" + lnSep + "		rounded corners," + lnSep + "		no edge," + lnSep + "		for tree={" + lnSep
+			+ "			fill opacity=0," + lnSep + "			draw opacity=0," + lnSep + "			l = 0em," + lnSep + "		}" + lnSep + "	}," + lnSep
+			+ "	/tikz/hiddenNodes/.style={" + lnSep + "		midway," + lnSep + "		rounded corners," + lnSep + "		draw=drawColor," + lnSep
+			+ "		fill=white," + lnSep + "		minimum size = 1.2em," + lnSep + "		minimum width = 0.8em," + lnSep + "		scale=0.9" + lnSep + "	},"
+			+ lnSep + "}" + lnSep + "%-------------------------------------------------------------------------------" + lnSep);
 	}
 
 	private static void printBody(StringBuilder str, String FileName) {
-		str.append("\\input{head.tex}\n"); // Include head
-		str.append("\\begin{document}\n	");
-		str.append("\\sffamily\n");
-		str.append("	\\input{" + FileName + "}\n"); // Include main
+		str.append("\\input{head.tex}" + lnSep); // Include head
+		str.append("\\begin{document}" + lnSep + "	");
+		str.append("\\sffamily" + lnSep);
+		str.append("	\\input{" + FileName + "}" + lnSep); // Include main
 		str.append("\\end{document}");
 	}
 
@@ -373,50 +378,50 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		final StringBuilder myString = new StringBuilder();
 		if (legend[0]) {
 			check = true;
-			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\\n");
+			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
 			legend[0] = false;
 		}
 		if (legend[1]) {
 			check = true;
-			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\\n");
+			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
 			legend[1] = false;
 		}
 		if (legend[2]) {
 			check = true;
-			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\\n");
+			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\" + lnSep);
 			legend[2] = false;
 		}
 		if (legend[3]) {
 			check = true;
-			myString.append("		\\node [optional,label=right:Optional] {}; \\\\\n");
+			myString.append("		\\node [optional,label=right:Optional] {}; \\\\" + lnSep);
 			legend[3] = false;
 		}
 		if (legend[4]) {
 			check = true;
-			// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; \n"
-			// + " \\node [or,label=right:Or] {}; \\\\\n");
-			myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);\n"
-				+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);\n" + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);\n"
-				+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);\n" + "		\\node [or,label=right:Or] {}; \\\\");
+			// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; " + lnSep
+			// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
+			myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
+				+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+				+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
 			legend[4] = false;
 		}
 		if (legend[5]) {
 			check = true;
-			// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; \n"
-			// + " \\node [alternative,label=right:Alternative] {}; \\\\\n");
-			myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);\n" + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);\n"
-				+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);\n" + "		\\node [alternative,label=right:Alternative] {}; \\\\");
+			// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
+			// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
+			myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+				+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
 			legend[5] = false;
 		}
 		if (legend[6]) {
 			check = true;
-			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\\n");
+			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
 			legend[6] = false;
 		}
 		if (check) {
-			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {\n" + "		\\node [placeholder] {}; \\\\\n" + "	};\n"
-				+ "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {\n"
-				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\\n");
+			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
+				+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
+				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\" + lnSep);
 			str.append(myString);
 			str.append("	};");
 			check = false;
@@ -437,17 +442,17 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	public String write(IGraphicalFeatureModel object) {
 		final StringBuilder str = new StringBuilder();
 		printHead(str);
-		str.append("\\begin{document}\n" + "	%---The Feature Diagram-----------------------------------------------------\n" + "	\\begin{forest}\n"
-			+ "		featureDiagram\n");
+		str.append("\\begin{document}" + lnSep + "	%---The Feature Diagram-----------------------------------------------------" + lnSep + "	\\begin{forest}"
+			+ lnSep + "		featureDiagram" + lnSep);
 
 		StringBuilder myTree = new StringBuilder();
 		str.append("		");
 		printTree(getRoot(object), object, myTree);
 		myTree = postProcessing(myTree);
 		str.append(myTree);
-		str.append("\n");
+		str.append(lnSep);
 		printLegend(str);
-		str.append("	\\end{forest}\n" + "	%---------------------------------------------------------------------------\n" + "\\end{document}");
+		str.append("	\\end{forest}" + lnSep + "	%---------------------------------------------------------------------------" + lnSep + "\\end{document}");
 		return str.toString();
 	}
 
