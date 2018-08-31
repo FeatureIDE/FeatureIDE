@@ -1,0 +1,80 @@
+\documentclass[border=5pt]{standalone}
+%---required packages & variable definitions------------------------------------
+\usepackage{forest}
+\usepackage{xcolor}
+\usetikzlibrary{angles}
+\definecolor{drawColor}{RGB}{128 128 128}
+\newcommand{\circleSize}{0.25em}
+\newcommand{\angleSize}{0.8em}
+%-------------------------------------------------------------------------------
+%---Define the style of the tree------------------------------------------------
+\forestset{
+	/tikz/mandatory/.style={
+		circle,fill=drawColor,
+		draw=drawColor,
+		inner sep=\circleSize
+	},
+	/tikz/optional/.style={
+		circle,
+		fill=white,
+		draw=drawColor,
+		inner sep=\circleSize
+	},
+	featureDiagram/.style={
+		for tree={
+			parent anchor = south,
+			child anchor = north,
+			draw = drawColor,
+			edge = {draw=drawColor},
+		}
+	},
+	/tikz/abstract/.style={
+		fill = blue!85!cyan!5,
+		draw = drawColor
+	},
+	/tikz/concrete/.style={
+		fill = blue!85!cyan!20,
+		draw = drawColor
+	},
+	mandatory/.style={
+		edge label={node [mandatory] {} }
+	},
+	optional/.style={
+		edge label={node [optional] {} }
+	},
+	or/.style={
+		tikz+={
+			\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[fill=drawColor, angle radius=\angleSize]{angle};
+		}	
+	},
+	/tikz/or/.style={
+	},
+	alternative/.style={
+		tikz+={
+			\path (.parent) coordinate (A) -- (!u.children) coordinate (B) -- (!ul.parent) coordinate (C) pic[draw=drawColor, angle radius=\angleSize]{angle};
+		}	
+	},
+	/tikz/alternative/.style={
+	},
+	/tikz/placeholder/.style={
+	},
+	collapsed/.style={
+		rounded corners,
+		no edge,
+		for tree={
+			fill opacity=0,
+			draw opacity=0,
+			l = 0em,
+		}
+	},
+	/tikz/hiddenNodes/.style={
+		midway,
+		rounded corners,
+		draw=drawColor,
+		fill=white,
+		minimum size = 1.2em,
+		minimum width = 0.8em,
+		scale=0.9
+	},
+}
+%-------------------------------------------------------------------------------
