@@ -20,7 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -280,9 +284,33 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		_printNodeName(config.getSelectablefeature(node.getName()), tree);
 	}
 
+	/*
+	 * Calculates in which color the node name has to be print and does this. Only by open clauses the color of the name is blue (to much selected) or green
+	 * (not enough selected). In all other cases it is the normal color.
+	 */
 	private static void _printNodeName(SelectableFeature node, StringBuilder tree) {
 		if (node.getOpenClauses().size() > 0) {
-			tree.append("\\textbf{\\color{plusColor}" + node.getName() + "}\\\\" + lnSep);
+			final Collection<Node> myOpenClauses = node.getOpenClauses();
+			final StringBuilder myOpenFeatures = new StringBuilder();
+			final List<String> myOpenFeaturesList = new ArrayList<String>();
+			for (final Node myClause : myOpenClauses) {
+				myOpenFeatures.append(myClause.toString() + " |");
+			}
+
+			for (int i = 0, begin = 0, end = 0; i < myOpenFeatures.length(); ++i) {
+				if (myOpenFeatures.charAt(i) == '|') {
+					end = i - 1;
+					myOpenFeaturesList.add(myOpenFeatures.substring(begin, end));
+					begin = i + 2;
+				}
+			}
+			for (final String myFeature : myOpenFeaturesList) {
+				if (node.getName().equals(myFeature)) {
+					tree.append("\\textbf{\\color{plusColor}" + node.getName() + "}\\\\" + lnSep);
+				} else if (("-" + node.getName()).equals(myFeature)) {
+					tree.append("\\textbf{\\color{blue}" + node.getName() + "}\\\\" + lnSep);
+				}
+			}
 		} else {
 			tree.append(" " + node.getName() + "\\\\" + lnSep);
 		}
