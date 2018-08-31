@@ -294,7 +294,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	private LazyJavaCompletionProposal createLazyJavaCompletionProposal(final JavaContentAssistInvocationContext context, final CompletionProposal proposal) {
 		final LazyJavaCompletionProposal lazyJavaCompletionProposal = new LazyJavaCompletionProposal(proposal, context);
 
-		lazyJavaCompletionProposal.setReplacementString(new String(proposal.getCompletion()).replace(prefix, ""));
+		lazyJavaCompletionProposal.setReplacementString(new String(proposal.getCompletion()).replaceFirst(prefix.toString(), ""));
 		lazyJavaCompletionProposal.setReplacementOffset(context.getInvocationOffset());
 
 		return lazyJavaCompletionProposal;
