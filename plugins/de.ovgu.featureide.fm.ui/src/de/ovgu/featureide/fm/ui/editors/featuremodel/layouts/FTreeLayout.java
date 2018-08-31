@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
+import java.util.LinkedList;
 
-import org.abego.treelayout.TreeForTreeLayout;
 import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.eclipse.draw2d.geometry.Point;
@@ -31,73 +31,63 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
- * TODO check description manages Layout for Features
+ * Uses abego Tree Layout libary to create a graphical Feature Tree Layout
  *
- * @author Martha
- * @author lukas
+ * @author Martha Nyerembe
+ * @author Lukas Vogt
  */
 public class FTreeLayout extends FeatureDiagramLayoutManager {
 
-	private TreeLayout<IGraphicalFeature> treeLayout = null;
-
-	private TreeForTreeLayout<IGraphicalFeature> getTree() {
-		return treeLayout.getTree();
-	}
-
-	private Iterable<IGraphicalFeature> getTreeLayoutChildren(IGraphicalFeature parent) {
-		return getTree().getChildren(parent);
-	}
-
-	private Rectangle2D.Double getBoundsOfNode(IGraphicalFeature node) {
-		return treeLayout.getNodeBounds().get(node);
-	}
-
-	public FTreeLayout(TreeLayout<IGraphicalFeature> treeLayout) {
-		this.treeLayout = treeLayout;
-	}
+	private final DefaultConfiguration<IGraphicalFeature> defaultConfiguration;
 
 	public FTreeLayout() {
 		super();
+		defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
 	}
 
-	private Point recToPoint(Rectangle2D.Double rec) {
-		final double x = rec.getX();
-		final double y = rec.getY();
-		final Point point = new Point((int) x, (int) y);
-		return point;
-	}
-
-	private void setLocations(IGraphicalFeature root) {
-		final Rectangle2D.Double rec = getBoundsOfNode(root);
-		setLocation(root, recToPoint(rec));
-		for (final IGraphicalFeature child : getTreeLayoutChildren(root)) {
-			setLocations(child);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager#layoutFeatureModel(de.ovgu.featureide.fm.ui.editors.
-	 * IGraphicalFeatureModel)
+	/**
+	 * @param configuration
 	 */
+	public FTreeLayout(DefaultConfiguration<IGraphicalFeature> configuration) {
+		defaultConfiguration = configuration;
+
+	}
+
+	int yoffset;
+	int xoffset;
+
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		// TODO Auto-generated method stub
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
-		final IGFTreeForTreeLayout ftftl = new IGFTreeForTreeLayout(root);
-		final IGFNodeExtentProvider igfNodeExtentProvider = new IGFNodeExtentProvider();
-		final DefaultConfiguration<IGraphicalFeature> defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(20.0, 5.0);			// check and try
-																																				// others later
-		treeLayout = new TreeLayout<>(ftftl, igfNodeExtentProvider, defaultConfiguration);
 
-		setLocations(ftftl.getRoot());
+		final TreeLayout<IGraphicalFeature> treeLayout = layout(root);
 
-		// check if nessecary
+		yoffset = FMPropertyManager.getLayoutMarginY();
+		xoffset = (controlWidth / 2) - ((int) (treeLayout.getBounds().getWidth() / 2));
+
+		final LinkedList<IGraphicalFeature> list = new LinkedList<>();
+		list.add(root);
+		while (!list.isEmpty()) {
+			final IGraphicalFeature feature = list.removeFirst();
+			final Double bounds = treeLayout.getNodeBounds().get(feature);
+			list.addAll(getChildren(feature));
+			setLocation(feature, new Point((int) (bounds.getX() + xoffset), ((int) bounds.getY() + yoffset)));
+		}
+
 		final Rectangle rootBounds = getBounds(root);
-		layoutConstraints(0/* yoffset */, featureModel.getVisibleConstraints(), rootBounds);
+		layoutConstraints((int) treeLayout.getBounds().getMaxY() + 20, featureModel.getVisibleConstraints(), rootBounds);
 
+	}
+
+	private TreeLayout<IGraphicalFeature> layout(IGraphicalFeature root) {
+
+		final GFTreeForTreeLayout ftftl = new GFTreeForTreeLayout(root);
+		final GFNodeExtentProvider nodeExtentProvider = new GFNodeExtentProvider();
+
+		return new TreeLayout<IGraphicalFeature>(ftftl, nodeExtentProvider, defaultConfiguration);
 	}
 
 }

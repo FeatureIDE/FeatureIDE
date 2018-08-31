@@ -46,6 +46,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * stored persistently.
  *
  * @author Christian Kaestner
+ * @author Martha Nyerembe
+ * @author Lukas Vogt
  */
 public class FeatureUIHelper {
 
@@ -132,25 +134,23 @@ public class FeatureUIHelper {
 	private static ZoomManager zoomManager = null;
 
 	private static Point getSourceLocation(Rectangle bounds, IGraphicalFeatureModel featureModel) {
+		// gets source location of feature models for abego Tree Layout
 		final FeatureModelLayout layout = featureModel.getLayout();
 		if (layout.isUsesAbegoTreeLayout()) {
 			switch (layout.getAbegoRootposition()) {
 			case Top:
 				return bounds.getTop();
-//				return new Point(0, 0);
 			case Left:
 				return bounds.getLeft();
-			// return new Point(0, 0);
 			case Right:
-//				return new Point(0, 0);
 				return bounds.getRight();
 			case Bottom:
-//				return new Point(0, 0);
 				return bounds.getBottom();
 			default:
 				return new Point(0, 0);
 			}
 		}
+		// without abego library
 		if (featureModel.getLayout().verticalLayout()) {
 			return bounds.getLeft();
 		} else {
@@ -259,8 +259,8 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
-		System.out.println("now");
 		final Rectangle bounds = getBounds(feature);
+//		for abego Tree Layout
 		final FeatureModelLayout layout = feature.getGraphicalModel().getLayout();
 		if (layout.isUsesAbegoTreeLayout()) {
 			switch (layout.getAbegoRootposition()) {
@@ -269,30 +269,19 @@ public class FeatureUIHelper {
 			case Left:
 				return bounds.getRight();
 			case Right:
-//				return new Point(0, 0);
 				return bounds.getLeft();
 			case Bottom:
-//				return new Point(0, 0);
 				return bounds.getTop();
 			default:
 				return new Point(0, 0);
 			}
 		}
-
+//		without abego library
 		if (layout.verticalLayout()) {
 			return bounds.getRight();
 		}
-//		else if (feature.getGraphicalModel().getLayout().bottomUpLayout()) {	// ---------------------
-//			return bounds.getTop();
-//		}
 		return bounds.getBottom();
 	}
-
-//	// provisorisch: ! (unschön)
-//	public static void setBottonUp_____(boolean isBottomUp, IGraphicalFeatureModel featureModel) {
-//		featureModel.getLayout().verticalLayout(isBottomUp);
-//	}
-//	// -------------------------
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {
 		featureModel.getLayout().verticalLayout(isVerticalLayout);
