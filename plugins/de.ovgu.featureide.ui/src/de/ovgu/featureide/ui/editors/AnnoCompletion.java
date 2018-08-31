@@ -146,7 +146,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 		for (final CompletionProposal proposal : directivesCompletionProposalList) {
 			final LazyJavaCompletionProposal syntax = createLazyJavaCompletionProposal(context, proposal);
-			final String s = getFeatureNameFromCondition(syntax.getDisplayString());
+
 			spawnCursorInbetweenSyntaxForMunge(syntax);
 			finalProposalsList.add(syntax);
 
@@ -166,7 +166,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 			feature.setImage(FEATURE_ICON);
 
-			setCursorPostionForMunge(proposal, feature);
+			// setCursorPostionForMunge(proposal, feature);
 			finalProposalsList.add(feature);
 
 		}
@@ -222,9 +222,15 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			suggestedFeatureName = null;
 		}
 		if (suggestedFeatureName != null) {
-			final LinkedList<CompletionProposal> completionProposalList =
-				createListOfCompletionProposals(MungeEnum.getEndundElseDirctivesWithFeatureName(suggestedFeatureName));
-			newdirectivesCompletionProposalList.addAll(completionProposalList);
+			if (showJustEnd) {
+				final LinkedList<CompletionProposal> completionProposalList =
+					createListOfCompletionProposals(MungeEnum.getEndDirctivesWithFeatureName(suggestedFeatureName));
+				newdirectivesCompletionProposalList.addAll(completionProposalList);
+			} else {
+				final LinkedList<CompletionProposal> completionProposalList =
+					createListOfCompletionProposals(MungeEnum.getEndundElseDirctivesWithFeatureName(suggestedFeatureName));
+				newdirectivesCompletionProposalList.addAll(completionProposalList);
+			}
 
 		}
 		return newdirectivesCompletionProposalList;
@@ -237,9 +243,12 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return list;
 	}
 
+	boolean showJustEnd = false;
+
 	private String getSuggestedFeatureName(JavaContentAssistInvocationContext context) throws BadLocationException {
 
 		int counter = 0;
+		showJustEnd = false;
 		final int line = context.getDocument().getLineOfOffset(context.getInvocationOffset());
 		final int lineIndex = line;
 		for (int i = lineIndex; i >= 0; i--) {
@@ -250,6 +259,9 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 				if (keyWord.contains("/*end[")) {
 					counter++;
 				}
+				if (keyWord.contains("/*else[") && (counter < 1)) {
+					showJustEnd = true;
+				}
 				if (keyWord.contains("/*if[") || keyWord.contains("/*if_not[")) {
 					if (counter >= 1) {
 						counter--;
@@ -257,6 +269,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 					}
 					return getFeatureNameFromCondition(keyWord);
 				}
+
 			}
 
 		}
@@ -285,12 +298,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 	}
 
-	private void setCursorPostionForMunge(final CompletionProposal proposal, final LazyJavaCompletionProposal feature) {
-		if (currentPreprocessor == JavaPreprocessor.Munge) {
-			feature.setCursorPosition(proposal.getName().length + 3);
-		}
-	}
-
 	private LazyJavaCompletionProposal createLazyJavaCompletionProposal(final JavaContentAssistInvocationContext context, final CompletionProposal proposal) {
 		final LazyJavaCompletionProposal lazyJavaCompletionProposal = new LazyJavaCompletionProposal(proposal, context);
 
@@ -302,7 +309,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private void spawnCursorInbetweenSyntaxForMunge(final LazyJavaCompletionProposal syntax) {
 		if (currentPreprocessor == JavaPreprocessor.Munge) {
-			syntax.setCursorPosition(syntax.toString().length() - 3);
+			syntax.setCursorPosition((syntax.toString().length() - prefix.length()) - 3);
 		}
 	}
 
@@ -331,9 +338,9 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 			final int offsetOfLine = context.getDocument().getLineOffset(line);
 			final int lineLength = context.getDocument().getLineLength(line);
 			final String lineContent = context.getDocument().get(offsetOfLine, lineLength);
-			final String lastKeyword = findLastKeyword(lineContent);
+			final String lastKeyword = findLastKeyword(context.getDocument().get().substring(offsetOfLine, context.getInvocationOffset()));
 
-			getStatusAccordingToPreprocessor(lineContent, lastKeyword);
+			getStatusAccordingToPreprocessor(lineContent, lastKeyword, context);
 		}
 
 		catch (final BadLocationException e1) {
@@ -342,32 +349,26 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		return status;
 	}
 
-	private void getStatusAccordingToPreprocessor(final String lineContent, final String lastKeyword) {
+	private void getStatusAccordingToPreprocessor(String lineContent, String lastKeyword, final JavaContentAssistInvocationContext context) {
 		switch (currentPreprocessor) {
 		case Antenna:
-			status = getStatusForAntenna(lineContent, lastKeyword);
+			status = getStatusForAntenna(lineContent, lastKeyword, context);
 			break;
 		case Munge:
-			status = getStatusForMunge(lineContent, lastKeyword);
+			status = getStatusForMunge(lineContent, lastKeyword, context);
 			break;
 		default:
 			break;
 		}
 	}
 
-	private Status getStatusForAntenna(final String lineContent, final String lastKeyword) {
+	private Status getStatusForAntenna(String lineContent, String lastKeyword, final JavaContentAssistInvocationContext context) {
 		final boolean triggerAutocomplete = lineContent.trim().substring(2).trim().contains("#");
 		final boolean hasDirective = lineContainsElements(lineContent, allAntennaDirectives);
 		final boolean directiveHasCondition = lineContainsElements(lineContent, Arrays.asList("#if", "#elif", "#condition"));
 		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-		final boolean acceptsNewDirective = (lastKeyword.contains("&&") || lastKeyword.contains("||"));
+		final boolean acceptsNewDirective = (lineContent.contains("&&") || lastKeyword.contains("||"));
 
-		setStatusForAntenna(triggerAutocomplete, hasDirective, directiveHasCondition, hasFeature, acceptsNewDirective);
-		return status;
-	}
-
-	private void setStatusForAntenna(final boolean triggerAutocomplete, final boolean hasDirective, final boolean directiveHasCondition,
-			final boolean hasFeature, final boolean acceptsNewDirective) {
 		if (triggerAutocomplete && !hasDirective) {
 			status = Status.ShowDirectives;
 		} else {
@@ -376,23 +377,21 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		if ((directiveHasCondition && !hasFeature) || (hasFeature && hasDirective && acceptsNewDirective)) {
 			status = Status.ShowFeatures;
 		}
-	}
-
-	private Status getStatusForMunge(String lineContent, String lastKeyword) {
-		final boolean hasOpeningSyntax = lastKeyword.trim().equals("/*");
-		final boolean hasFeature = lineContainsElements(lineContent, (List<String>) FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
-		final boolean hasDirective = lineContainsElements(lineContent, allMungeDirectives);
-		setStatusForMunge(hasOpeningSyntax, hasFeature, hasDirective);
 		return status;
 	}
 
-	private void setStatusForMunge(final boolean hasOpeningSyntax, final boolean hasFeature, final boolean hasDirective) {
+	private Status getStatusForMunge(String lineContent, String lastKeyword, final JavaContentAssistInvocationContext context) {
+
+		final boolean hasOpeningSyntax = lastKeyword.trim().contains("/*") && !lastKeyword.trim().contains("[");
+		final boolean hasDirective = lineContainsElements(lastKeyword, MungeEnum.getAllDirectivesNames());
+		final boolean showFeatures = lastKeyword.toCharArray()[lastKeyword.length() - 1] == '[';
 		if ((hasOpeningSyntax && !hasDirective)) {
 			status = Status.ShowDirectives;
 		}
-		if (hasDirective) {
+		if ((hasDirective && showFeatures)) {
 			status = Status.ShowFeatures;
 		}
+		return status;
 	}
 
 	private List<CompletionProposal> getAntennaCompletionProposals() {

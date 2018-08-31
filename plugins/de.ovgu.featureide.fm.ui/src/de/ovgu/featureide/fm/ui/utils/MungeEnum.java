@@ -49,10 +49,25 @@ public enum MungeEnum {
 		return list;
 	}
 
+	public static List<String> getAllDirectivesNames() {
+		final List<String> list = new ArrayList<String>();
+		for (final MungeEnum d : MungeEnum.values()) {
+			list.add(d.text);
+		}
+		return list;
+	}
+
 	public static List<String> getEndundElseDirctivesWithFeatureName(String featureName) {
 		final List<String> list = new ArrayList<String>();
 
 		list.add(MungeEnum.ELSE.text + "[" + featureName + "]*/");
+		list.add(MungeEnum.END.text + "[" + featureName + "]*/");
+		return list;
+	}
+
+	public static List<String> getEndDirctivesWithFeatureName(String featureName) {
+		final List<String> list = new ArrayList<String>();
+
 		list.add(MungeEnum.END.text + "[" + featureName + "]*/");
 		return list;
 	}
