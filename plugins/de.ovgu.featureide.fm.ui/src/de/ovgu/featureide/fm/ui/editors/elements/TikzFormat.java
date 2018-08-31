@@ -174,8 +174,8 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			printTree(getRoot(object), object, str);
 			str = postProcessing(str);
 			str.append("	" + lnSep);
-			printLegend(str);
-			str.append(lnSep + "\\end{forest}");
+			printLegend(str, object.isLegendHidden());
+			str.append("\\end{forest}");
 
 			return str.toString();
 		}
@@ -373,58 +373,65 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return myRoot;
 	}
 
-	private static void printLegend(StringBuilder str) {
-		boolean check = false;
-		final StringBuilder myString = new StringBuilder();
-		if (legend[0]) {
-			check = true;
-			myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
-			legend[0] = false;
-		}
-		if (legend[1]) {
-			check = true;
-			myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
-			legend[1] = false;
-		}
-		if (legend[2]) {
-			check = true;
-			myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\" + lnSep);
-			legend[2] = false;
-		}
-		if (legend[3]) {
-			check = true;
-			myString.append("		\\node [optional,label=right:Optional] {}; \\\\" + lnSep);
-			legend[3] = false;
-		}
-		if (legend[4]) {
-			check = true;
-			// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; " + lnSep
-			// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
-			myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
-				+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
-				+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
-			legend[4] = false;
-		}
-		if (legend[5]) {
-			check = true;
-			// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
-			// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
-			myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
-				+ "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
-			legend[5] = false;
-		}
-		if (legend[6]) {
-			check = true;
-			myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
-			legend[6] = false;
-		}
-		if (check) {
-			str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
-				+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
-				+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\" + lnSep);
-			str.append(myString);
-			str.append("	};");
-			check = false;
+	private static void printLegend(StringBuilder str, boolean legendHidden) {
+		if (!legendHidden) {
+			boolean check = false;
+			final StringBuilder myString = new StringBuilder();
+			if (legend[0]) {
+				check = true;
+				myString.append("		\\node [abstract,label=right:Abstract] {}; \\\\" + lnSep);
+				legend[0] = false;
+			}
+			if (legend[1]) {
+				check = true;
+				myString.append("		\\node [concrete,label=right:Concrete] {}; \\\\" + lnSep);
+				legend[1] = false;
+			}
+			if (legend[2]) {
+				check = true;
+				myString.append("		\\node [mandatory,label=right:Mandatory] {}; \\\\" + lnSep);
+				legend[2] = false;
+			}
+			if (legend[3]) {
+				check = true;
+				myString.append("		\\node [optional,label=right:Optional] {}; \\\\" + lnSep);
+				legend[3] = false;
+			}
+			if (legend[4]) {
+				check = true;
+				// myString.append(" \\filldraw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2]; " + lnSep
+				// + " \\node [or,label=right:Or] {}; \\\\" + lnSep);
+				myString.append("			\\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);" + lnSep
+					+ "			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);" + lnSep
+					+ "			\\fill[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [or,label=right:Or] {}; \\\\");
+				legend[4] = false;
+			}
+			if (legend[5]) {
+				check = true;
+				// myString.append(" \\draw[drawColor] (0.45,0.15) ++ (225:0.3) arc[start angle=315,end angle=225,radius=0.2] -- cycle; " + lnSep
+				// + " \\node [alternative,label=right:Alternative] {}; \\\\" + lnSep);
+				myString.append("			\\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);" + lnSep + "			\\draw[drawColor] (0.1,0) -- +(0.2,-0.4);"
+					+ lnSep + "			\\draw[drawColor] (0,-0.2) arc (240:300:0.2);" + lnSep + "		\\node [alternative,label=right:Alternative] {}; \\\\");
+				legend[5] = false;
+			}
+			if (legend[6]) {
+				check = true;
+				myString.append("		\\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\\\" + lnSep);
+				legend[6] = false;
+			}
+			if (check) {
+				str.append("	\\matrix [anchor=north west] at (current bounding box.north east) {" + lnSep + "		\\node [placeholder] {}; \\\\" + lnSep
+					+ "	};" + lnSep + "	\\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {" + lnSep
+					+ "		\\node [label=center:\\underline{Legend:}] {}; \\\\" + lnSep);
+				str.append(myString);
+				str.append("	};" + lnSep);
+				check = false;
+			} else {
+				for (int i = 0; i < legend.length; ++i) {
+					legend[i] = false;
+				}
+				check = false;
+			}
 		}
 	}
 
@@ -451,7 +458,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		myTree = postProcessing(myTree);
 		str.append(myTree);
 		str.append(lnSep);
-		printLegend(str);
+		printLegend(str, object.isLegendHidden());
 		str.append("	\\end{forest}" + lnSep + "	%---------------------------------------------------------------------------" + lnSep + "\\end{document}");
 		return str.toString();
 	}
