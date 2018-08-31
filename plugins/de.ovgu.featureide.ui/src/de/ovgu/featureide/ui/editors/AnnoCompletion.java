@@ -67,7 +67,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 
 	private IFile file;
 	private IFeatureProject featureProject;
-	private ArrayList<ICompletionProposal> finalProposalsList;
+	private ArrayList<ICompletionProposal> finalProposalsList = new ArrayList<ICompletionProposal>();
 	private CharSequence prefix;
 
 	private final List<String> allAntennaDirectives = AntennaEnum.getAllDirectives();
@@ -82,7 +82,6 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		featureProject = CorePlugin.getFeatureProject(file);
 		status = Status.ShowNothing;
-		finalProposalsList = new ArrayList<ICompletionProposal>();
 		prefix = "";
 	}
 
@@ -124,6 +123,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		}
 
 		setDirectivesAccordingToPreprocessor();
+		finalProposalsList = new ArrayList<ICompletionProposal>();
 
 		if (status == Status.ShowFeatures) {
 			buildListOfFeatures(context);
