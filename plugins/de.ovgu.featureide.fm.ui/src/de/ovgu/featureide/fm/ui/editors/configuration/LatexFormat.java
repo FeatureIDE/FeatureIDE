@@ -36,7 +36,8 @@ import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.elements.TikzFormat;
 
 /**
- * TODO description
+ * Converts the configuration (advanced configuration) in a LaTeX format. This class implements a LaTeX converter for the advanced configuration of a Feature
+ * Diagram. <br> The main class uses one String for the latex code; the subclasses divides the code into three different Strings (each subclass for one String).
  *
  * @author Simon Wenk
  * @author Yang Liu
@@ -49,8 +50,18 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 	private static final String lnSep = System.lineSeparator();
 
+	/**
+	 * Creates the styles and packages that are required for the converted configuration. <br> <br> <b>Note:</b> For exporting purposes the file name must be
+	 * <i> head.tex </i> and exported in the same folder as the main file.
+	 */
 	public static class LaTeXHead extends APersistentFormat<Configuration> {
 
+		/**
+		 * Writes the required styles and packages in a String.
+		 *
+		 * @param config The configuration of a Feature Model
+		 * @return LaTeX Code as a String
+		 */
 		@Override
 		public String write(Configuration config) {
 			final StringBuilder str = new StringBuilder();
@@ -70,7 +81,6 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 		@Override
 		public String getSuffix() {
-			// TODO
 			return LATEX_DOCUMENT;
 		}
 
@@ -86,8 +96,21 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 	}
 
+	/**
+	 * Creates the main file. This contains the converted configuration. <br> </br>
+	 *
+	 * <b> Note: </b> The class <i> LaTeXHead </i> creates the styles and packages that are required to execute the resulting LaTeX Code correctly.
+	 *
+	 * @see {LaTeXHead}
+	 */
 	public static class LaTeXMain extends APersistentFormat<Configuration> {
 
+		/**
+		 * Writes the structure of the configuration in tex-format.
+		 *
+		 * @param config The configuration of a Feature Model
+		 * @return LaTeX Code as a String
+		 */
 		@Override
 		public String write(Configuration config) {
 			StringBuilder str = new StringBuilder();
@@ -123,14 +146,27 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 
 	}
 
+	/**
+	 * Creates the body for the LaTeX export. <br> <br> <b>Note:</b> For exporting purposes the file name must be <i> body.tex </i> and exported in the same
+	 * folder as the main file. This file runs only with the head file and the main file.
+	 */
 	public static class LaTeXBody extends APersistentFormat<Configuration> {
 
 		String fileName = new String();
 
+		/**
+		 * @param FileName The file name of the main file
+		 */
 		public LaTeXBody(String fileName) {
 			this.fileName = fileName;
 		}
 
+		/**
+		 * Constructs the body of the LaTeX file, includes the head file and the main file and writes it in a String.
+		 *
+		 * @param config The configuration of a Feature Model
+		 * @return LaTeX Code as a String
+		 */
 		@Override
 		public String write(Configuration config) {
 			final StringBuilder str = new StringBuilder();
@@ -208,7 +244,6 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printRoot(Configuration config, IFeature node, StringBuilder tree, int depth) {
-		// TODO: Implementation
 		tree.append("\\fboxsep0.1mm" + lnSep + "\\noindent" + lnSep);
 		printStructure(node, tree);
 		printAttributs(node, tree);
@@ -218,7 +253,6 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	}
 
 	private static void printNode(Configuration config, IFeature node, StringBuilder tree, int depth) {
-		// TODO: Implementation
 		printTabs(tree, depth);
 		printStructure(node, tree);
 		printAttributs(node, tree);
@@ -284,9 +318,12 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		_printNodeName(config.getSelectablefeature(node.getName()), tree);
 	}
 
-	/*
+	/**
 	 * Calculates in which color the node name has to be print and does this. Only by open clauses the color of the name is blue (to much selected) or green
 	 * (not enough selected). In all other cases it is the normal color.
+	 *
+	 * @param node The Feature to be processed
+	 * @param tree The StringBuilder that uses LaTeXMain to build the main code
 	 */
 	private static void _printNodeName(SelectableFeature node, StringBuilder tree) {
 		if (node.getOpenClauses().size() > 0) {
@@ -316,6 +353,12 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		}
 	}
 
+	/**
+	 * Writes the converted advanced configuration with all required packages and styles (for the tex format) in a String.
+	 *
+	 * @param config The configuration of a Feature Model
+	 * @return LaTeX Code as a String
+	 */
 	@Override
 	public String write(Configuration config) {
 		StringBuilder str = new StringBuilder();
@@ -342,11 +385,21 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 		return true;
 	}
 
+	/**
+	 * Return the suffix of the extension.
+	 *
+	 * @return the suffix of the extension
+	 */
 	@Override
 	public String getSuffix() {
 		return LATEX_DOCUMENT;
 	}
 
+	/**
+	 * Returns the name/description of the extension as a string.
+	 *
+	 * @return the name/description of the extension
+	 */
 	@Override
 	public String getName() {
 		return LATEX_DOCUMENT_DESCRIPTION;

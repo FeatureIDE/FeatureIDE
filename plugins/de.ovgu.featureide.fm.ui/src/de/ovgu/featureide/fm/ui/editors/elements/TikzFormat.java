@@ -29,7 +29,8 @@ import de.ovgu.featureide.fm.core.io.APersistentFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Converts the Feature Model Diagram in a tex-format using tikz.
+ * This class implements a LaTeX converter for the feature diagram (using TikZ). <br> The main class uses one String for the latex code; the subclasses divides
+ * the code into three different Strings (each subclass for one String).
  *
  * @author Simon Wenk
  * @author Yang Liu
@@ -40,10 +41,17 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	private static final String lnSep = System.lineSeparator();
 
+	/**
+	 * Creates the styles and packages that are required for the converted Feature Model Diagram. <br> <br> <b>Note:</b> For exporting purposes the file name
+	 * must be <i> head.tex </i> and exported in the same folder as the main file.
+	 */
 	public static class TikZHead extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
-		 * {@inheritDoc}
+		 * Writes the required styles and packages in a String.
+		 *
+		 * @param object The graphic feature model
+		 * @return LaTeX Code as a String
 		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
@@ -54,59 +62,54 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getId() {
 			return ID;
 		}
 	}
 
+	/**
+	 * Creates the body for the LaTeX export. <br> <br> <b>Note:</b> For exporting purposes the file name must be <i> body.tex </i> and exported in the same
+	 * folder as the main file. This file runs only with the head file and the main file.
+	 */
 	public static class TikZBody extends APersistentFormat<IGraphicalFeatureModel> {
 
 		private final String FileName;
 
+		/**
+		 * @param FileName The file name of the main file
+		 */
 		public TikZBody(String FileName) {
 			this.FileName = FileName;
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * Constructs the body of the LaTeX file, includes the head file and the main file and writes it in a String.
+		 *
+		 * @param object The graphic feature model
+		 * @return LaTeX Code as a String
 		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
@@ -117,43 +120,28 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getId() {
 			return ID;
@@ -161,10 +149,20 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
+	/**
+	 * Creates the main file. This contains the converted Feature Diagram. <br> </br>
+	 *
+	 * <b> Note: </b> The class <i> TikZHead </i> creates the styles and packages that are required to execute the resulting LaTeX Code correctly.
+	 *
+	 * @see {TikzHead}
+	 */
 	public static class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
-		 * {@inheritDoc}
+		 * Writes the tree of the Feature Diagram in tex-format.
+		 *
+		 * @param object The graphic feature model
+		 * @return LaTeX Code as a String
 		 */
 		@Override
 		public String write(IGraphicalFeatureModel object) {
@@ -180,43 +178,28 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 			return str.toString();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsRead() {
 			return false;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public boolean supportsWrite() {
 			return true;
 
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getSuffix() {
 			return ".tex";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getName() {
 			return "LaTeX-Document with TikZ";
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		public String getId() {
 			return ID;
@@ -224,11 +207,14 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	/**
-	 *
-	 */
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + TikzFormat.class.getSimpleName();
 
+	/**
+	 * Processes a String to make special symbols LaTeX compatible.
+	 *
+	 * @param str a StringBuilder which content should be LaTeX code
+	 * @return a StringBuilder which contend has compatible LaTeX code
+	 */
 	public static StringBuilder postProcessing(StringBuilder str) {
 		final int strLength = str.length();
 		StringBuilder newString = new StringBuilder();
@@ -436,14 +422,10 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	/**
-	 * Write the <code>object</code> feature models from graphics to string to show feature models in laTex. Here, a complete runnable laTex file is divided
-	 * into three files which are TikZHead, TikZBody and TikZMain. These three files are also stored in tex-format and also require the conversion from the
-	 * graphics to string. Only three files together can build the feature models in latex, because they defines the different parts of the feature models
-	 * separately. TikZHead defines the required packages, variables and the style of the feature models which is static and already written using LaTex in
-	 * advance{@link #printHead(StringBuilder)}}.
+	 * Writes the converted feature diagram with all required packages and styles (for the tex format) in a String.
 	 *
-	 * @param object the object graphics feature models to be written
-	 * @return the string of the graphics feature models
+	 * @param object The graphic feature model
+	 * @return LaTeX Code as String
 	 */
 	@Override
 	public String write(IGraphicalFeatureModel object) {
@@ -463,18 +445,12 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return str.toString();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean supportsRead() {
 		return false;
 
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean supportsWrite() {
 		return true;
@@ -492,18 +468,15 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	}
 
 	/**
-	 * Returns the name of the extension as a string.
+	 * Returns the name/description of the extension as a string.
 	 *
-	 * @return the name of the extension
+	 * @return the name/description of the extension
 	 */
 	@Override
 	public String getName() {
 		return "LaTeX-Document with TikZ";
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String getId() {
 		return ID;

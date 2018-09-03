@@ -89,9 +89,9 @@ public class LatexFormatTest {
 		FileHandler.load(Paths.get(Commons.getRemoteOrLocalFolder(TEST_XML_FILE_NAME).toURI()), configExample, ConfigFormatManager.getInstance());
 
 		// execute LaTeXExporter
-		head = formatHead.write(configExample);
-		main = formatMain.write(configExample);
-		body = formatBody.write(configExample);
+		head = formatHead.write(configExample).replace(System.lineSeparator(), "\n");
+		main = formatMain.write(configExample).replace(System.lineSeparator(), "\n");
+		body = formatBody.write(configExample).replace(System.lineSeparator(), "\n");
 
 		// test the Tikz-Exporter
 		assertEquals(testHead, head);

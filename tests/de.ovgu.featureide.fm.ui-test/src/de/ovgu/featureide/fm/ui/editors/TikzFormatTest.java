@@ -93,9 +93,9 @@ public class TikzFormatTest {
 		}
 
 		// execute Tikz-Exporter
-		head = formatHead.write(gFM);
-		main = formatMain.write(gFM);
-		body = formatbody.write(gFM);
+		head = formatHead.write(gFM).replace(System.lineSeparator(), "\n");
+		main = formatMain.write(gFM).replace(System.lineSeparator(), "\n");
+		body = formatbody.write(gFM).replace(System.lineSeparator(), "\n");
 
 		// test the Tikz-Exporter
 		assertEquals(testHead, head);

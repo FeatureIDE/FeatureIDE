@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * TODO description
+ * This class is responsible for exporting the configuration of Feature Models.
  *
  * @author Simon Wenk
  * @author Yang Liu
@@ -58,7 +58,6 @@ public class ConfigurationExporter {
 		}
 
 		final File file = new File(filePath);
-		// TODO: EXPORT
 
 		if (file.getAbsolutePath().endsWith(".tex")) {
 			// create new folder
