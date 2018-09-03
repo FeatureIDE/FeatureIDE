@@ -17,7 +17,7 @@ Require-Bundle:
  org.eclipse.core.expressions,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors;
@@ -63,3 +63,5 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.views.outline.custom.providers,
  de.ovgu.featureide.fm.ui.views.outline.standard,
  de.ovgu.featureide.fm.ui.wizards
+Bundle-ClassPath: .,
+ lib/org.abego.treelayout.core-1.0.3.jar

@@ -336,8 +336,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 		// Layout actions
 		autoLayoutConstraintAction = addAction(new AutoLayoutConstraintAction(viewer, graphicalFeatureModel));
-		setLayoutActions = new ArrayList<>(5);
-		for (int i = 0; i < 5; i++) {
+		setLayoutActions = new ArrayList<>(9);
+		for (int i = 0; i < 9; i++) {
 			setLayoutActions.add(addAction(new LayoutSelectionAction(graphicalFeatureModel, i)));
 		}
 
