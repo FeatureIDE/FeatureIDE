@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -49,6 +50,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -80,6 +82,8 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
+
+	private final List<Problem> localProblems = new ArrayList<Problem>();
 
 	@Override
 	public boolean supportsRead() {
@@ -115,6 +119,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 		}
 
 		importCustomProperties(customProperties, object);
+		warnings.addAll(localProblems);
 	}
 
 	@Override
@@ -553,10 +558,13 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			// TODO Consider feature name validity in all readers
-			// if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-			// throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			// }
+
+			if (!FMComposerManager
+					.getFMComposerExtension(ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(object.getSourceFile().toUri())[0].getProject())
+					.isValidFeatureName(name)) {
+				addToProblemsList(name + " is not a valid feature name", e);
+			}
+
 			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
@@ -604,6 +612,11 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
+	}
+
+	private void addToProblemsList(String message, org.w3c.dom.Node node) {
+		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
 	}
 
 	// TODO implement warnings
