@@ -1,0 +1,22 @@
+\begin{forest}
+	featureDiagram
+	[Root,abstract[Optional,concrete,optional[Or1,concrete,or][Or2,concrete]][Mandatory,concrete,mandatory[Alternative1,concrete,alternative][Alternative2,concrete[,collapsed,edge label={node[hiddenNodes]{2}}]]]]	
+	\matrix [anchor=north west] at (current bounding box.north east) {
+		\node [placeholder] {}; \\
+	};
+	\matrix [draw=drawColor,anchor=north west] at (current bounding box.north east) {
+		\node [label=center:\underline{Legend:}] {}; \\
+		\node [abstract,label=right:Abstract] {}; \\
+		\node [concrete,label=right:Concrete] {}; \\
+		\node [mandatory,label=right:Mandatory] {}; \\
+		\node [optional,label=right:Optional] {}; \\
+			\filldraw[drawColor] (0.1,0) - +(-0,-0.2) - +(0.2,-0.2)- +(0.1,0);
+			\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);
+			\draw[drawColor] (0.1,0) -- +(0.2,-0.4);
+			\fill[drawColor] (0,-0.2) arc (240:300:0.2);
+		\node [or,label=right:Or] {}; \\			\draw[drawColor] (0.1,0) -- +(-0.2, -0.4);
+			\draw[drawColor] (0.1,0) -- +(0.2,-0.4);
+			\draw[drawColor] (0,-0.2) arc (240:300:0.2);
+		\node [alternative,label=right:Alternative] {}; \\		\node [hiddenNodes,label=center:1,label=right:Collapsed Nodes] {}; \\
+	};
+\end{forest}

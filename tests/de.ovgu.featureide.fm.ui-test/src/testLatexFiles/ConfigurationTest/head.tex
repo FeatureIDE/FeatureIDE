@@ -1,0 +1,54 @@
+\documentclass[varwidth,convert,border=5pt]{standalone}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{color}
+\definecolor{boxColor}{RGB}{192 192 192}
+\definecolor{plusColor}{RGB}{48 191 48}
+\definecolor{minusColor}{HTML}{be0105}
+\newcommand\tab[1][1em]{\hspace*{#1}}
+
+\newcommand{\myPlus}{\ \fcolorbox{black}{boxColor}{\color{plusColor}$\boldsymbol{\pmb{+}}$}\ }
+\newcommand{\myPlusblank}{\ \fcolorbox{black}{white}{\color{plusColor}$\boldsymbol{\pmb{+}}$}\ }
+\newcommand{\myMinus}{\ \fcolorbox{black}{boxColor}{\color{minusColor}$\boldsymbol{\pmb{-}}$}\ }
+\newcommand{\myMinusblank}{\ \fcolorbox{black}{white}{\color{minusColor}$\boldsymbol{\pmb{-}}$}\ }
+\newcommand{\myBox}{\ \fcolorbox{black}{white}{\color{white}$\boldsymbol{\pmb{+}}$}\ }
+
+\newcommand{\optional}{$\mspace{5mu}\mathord{\begin{tikzpicture}[scale=0.17]
+\draw (0,0) circle[radius=1em];
+\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);
+\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);
+\end{tikzpicture}}$}
+\newcommand{\mandatory}{$\mspace{5mu}\mathord{\begin{tikzpicture}[scale=0.17]
+\draw[fill=black] (0,0) circle[radius=1em];
+\draw[opacity = 0] (0em,0em) -- (0em,-1.9em);
+\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);
+\end{tikzpicture}}$}
+
+\newcommand{\fold}{$\mathord{\begin{tikzpicture}[scale=0.15]
+\fill (-1em,1em) -- (1em,0em) -- (-1em,-1em) -- cycle;
+\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);
+\end{tikzpicture}}$}
+\newcommand{\unfold}{$\mathord{\begin{tikzpicture}[scale=0.15]
+\fill (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;
+\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);
+\end{tikzpicture}}$}
+\newcommand{\nofold}{$\mathord{\begin{tikzpicture}[scale=0.15]
+\fill[opacity = 0] (0em,-1em) -- (-1em,1em) -- (1em,1em) -- cycle;
+\draw[opacity = 0] (0em,0em) -- (0em,-2.2em);
+\end{tikzpicture}}$}
+
+\newcommand{\myOr}{$\mspace{5mu}\mathord{\begin{tikzpicture}[scale=2.2]
+        \filldraw (0.1em,0em) - +(0.025em,-0.15em) - +(0.175em,-0.15em)- +(0.1em,0em);
+        \draw (0.1em,0em) -- +(-0.15em, -0.3em);
+        \draw (0.1em,0em) -- +(0.15em,-0.3em);
+        \filldraw (0.025em,-0.15em) arc (240:300:0.15em);
+    \end{tikzpicture}}$}
+\newcommand{\Alternative}{$\mspace{5mu}\mathord{\begin{tikzpicture}[scale=2.2]
+        \draw (0.1em,0em) -- +(-0.15em, -0.3em);
+        \draw (0.1em,0em) -- +(0.15em,-0.3em);
+        \draw (0.025em,-0.15em) arc (240:300:0.15em);
+    \end{tikzpicture}}$}
+    
+\newcommand{\blank}{$\mspace{5mu}\mathord{\begin{tikzpicture}[scale=0.17]
+\draw[opacity = 0] (-1.94em,0em) -- (1.94em,0em);
+\end{tikzpicture}}$}

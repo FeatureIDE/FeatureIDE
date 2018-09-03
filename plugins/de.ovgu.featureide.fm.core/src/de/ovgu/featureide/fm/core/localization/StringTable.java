@@ -546,6 +546,7 @@ public class StringTable {
 		"Eclipse plugin for exporting diagram in SVG format is not existing.";
 	public static final String SVG_EXPORT_FAILED = "SVG export failed";
 	public static final String NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___ = "Nothing has been saved for diagram export...";
+	public static final String NOTHING_HAS_BEEN_SAVED_FOR_CONFIGURATION_EXPORT___ = "Nothing has been saved for configuration export...";
 	public static final String FILE = "File ";
 	public static final String XML = "XML";
 	public static final String EXPORT_TO_CNF = "Export to CNF";
