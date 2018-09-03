@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -51,7 +50,7 @@ public class FactoryWorkspace {
 		map = new HashMap<>();
 	}
 
-	public String getID(IPersistentFormat<IFeatureModel> format) {
+	public String getID(IPersistentFormat<?> format) {
 		return getID(format.getId());
 	}
 

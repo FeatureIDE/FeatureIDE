@@ -172,4 +172,5 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		usesAbegoTreeLayout = true;
 		this.abegoRootposition = abegoRootposition;
 	}
+
 }

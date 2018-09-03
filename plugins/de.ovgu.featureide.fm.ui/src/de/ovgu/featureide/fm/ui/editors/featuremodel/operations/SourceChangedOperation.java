@@ -49,13 +49,13 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModelEditor.readModel(newText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		featureModelEditor.readModel(oldText);
-		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_CHANGED, null, null);
+		return new FeatureIDEEvent(featureModel, EventType.MODEL_DATA_OVERRIDDEN, null, null);
 	}
 
 }

@@ -25,15 +25,17 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.CoreExtensionLoader;
 import de.ovgu.featureide.fm.core.ExtensionManager;
 import de.ovgu.featureide.fm.core.Logger;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.LazyReader;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
 
 /**
  * Manages additional formats for a certain object (e.g., a feature model or configuration).
@@ -49,62 +51,28 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 
 	protected FormatManager() {}
 
-	/**
-	 * Extracts the file extension from a file name.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
-	 * but ".file.txt" would return "txt".
-	 *
-	 * @param fileName the name of a file
-	 * @return the extension or an empty string if there is none.
-	 */
-	@Nonnull
-	public static String getFileExtension(String fileName) {
-		final int extIndex = fileName.lastIndexOf('.');
-		return extIndex > 0 ? fileName.substring(extIndex + 1) : "";
-	}
-
 	public T getFormatById(String id) throws NoSuchExtensionException {
 		return getExtension(id);
 	}
 
-	public boolean hasFormat(String fileName) {
-		return getFormatByFileName(fileName) != null;
+	public boolean hasFormat(Path file) {
+		return getFormatByContent(file) != null;
 	}
 
 	/**
 	 * Returns the format that fits the given parameter.
 	 *
-	 * @param fileName the file name (it is also possible to just specify the file extension (e.g., "xml"))
+	 * @param content the file's content
+	 * @param fileName the file name
 	 * @return A {@link IPersistentFormat format} that uses the given extension or {@code null} if there is none.<br/> In case there are multiple formats that
 	 *         fit the given extension, only the first one of the list is returned. In order to avoid this, please use the methods
 	 *         {@link #getFormatByContent(CharSequence, String)} or {@link #getFormatByPath(CharSequence)}, which also take into account the content that should
 	 *         be parsed.
 	 */
 	@CheckForNull
-	public T getFormatByFileName(String fileName) {
-		if (fileName != null) {
-			final String extension = getFileExtension(fileName);
-			for (final T format : getExtensions()) {
-				if (extension.equals(format.getSuffix())) {
-					return format;
-				}
-			}
-		}
-		return null;
-	}
-
-	@CheckForNull
-	public T getFormatByContent(CharSequence content) {
-		for (final T format : getExtensions()) {
-			if (format.supportsContent(content)) {
-				return format;
-			}
-		}
-		return null;
-	}
-
 	public T getFormatByContent(CharSequence content, String fileName) {
 		if (fileName != null) {
-			final String extension = getFileExtension(fileName);
+			final String extension = SimpleFileHandler.getFileExtension(fileName);
 			for (final T format : getExtensions()) {
 				if (extension.equals(format.getSuffix()) && format.supportsContent(content)) {
 					return format;
@@ -116,17 +84,25 @@ public class FormatManager<T extends IPersistentFormat<?>> extends ExtensionMana
 
 	public T getFormatByContent(Path path) {
 		if (path != null) {
-			try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.SYNC, StandardOpenOption.READ)) {
-				final LazyReader lazyReader = new LazyReader(inputStream);
-				final String extension = getFileExtension(path.getFileName().toString());
-				for (final T format : getExtensions()) {
-					if (extension.equals(format.getSuffix()) && format.supportsContent(lazyReader)) {
-						return format;
-					}
+			final String extension = SimpleFileHandler.getFileExtension(path);
+			final List<T> formatList = new LinkedList<>();
+			for (final T format : getExtensions()) {
+				if (extension.equals(format.getSuffix())) {
+					formatList.add(format);
 				}
-			} catch (final IOException e) {
-				Logger.logError(e);
-				return getFormatByFileName(path.getFileName().toString());
+			}
+			if (!formatList.isEmpty()) {
+				try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.SYNC, StandardOpenOption.READ)) {
+					final LazyReader lazyReader = new LazyReader(inputStream);
+					for (final T format : formatList) {
+						if (extension.equals(format.getSuffix()) && format.supportsContent(lazyReader)) {
+							return format;
+						}
+					}
+				} catch (final IOException e) {
+					Logger.logError(e);
+					return formatList.get(0);
+				}
 			}
 		}
 		return null;

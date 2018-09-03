@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 public class GuidslFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + GuidslFormat.class.getSimpleName();
+	public static final String FILE_EXTENSION = "m";
 
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
@@ -57,7 +58,7 @@ public class GuidslFormat extends APersistentFormat<IFeatureModel> implements IF
 
 	@Override
 	public String getSuffix() {
-		return "m";
+		return FILE_EXTENSION;
 	}
 
 	@Override

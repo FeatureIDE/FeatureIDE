@@ -52,6 +52,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
 			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
+			parseLegend(e, e.getElementsByTagName(LEGEND));
 		}
 	}
 
@@ -84,11 +85,51 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		} else if (showShort.equals(FALSE)) {
 			object.getLayout().setShowShortNames(false);
 		}
-		final String hideLegend = eElement.getAttribute(HIDE_LEGEND);
-		if (hideLegend.equals(TRUE)) {
-			object.setLegendHidden(true);
-		} else if (hideLegend.equals(FALSE)) {
-			object.setLegendHidden(false);
+	}
+
+	private void parseLegend(Element layoutNode, NodeList legendNode) {
+		if (getElements(legendNode).size() > 0) {
+
+			final Element legend = getElements(legendNode).get(0);
+
+			if (legend.hasAttribute(LEGEND_HIDDEN)) {
+				final String hideLegend = legend.getAttribute(LEGEND_HIDDEN);
+				if (hideLegend.equals(TRUE)) {
+					object.setLegendHidden(true);
+				} else {
+					object.setLegendHidden(false);
+				}
+			} else {
+				object.setLegendHidden(false);
+			}
+
+			if (legend.hasAttribute(LEGEND_AUTO_LAYOUT)) {
+				final String autoLegend = legend.getAttribute(LEGEND_AUTO_LAYOUT);
+				if (autoLegend.equals(TRUE)) {
+					object.getLayout().setLegendAutoLayout(true);
+				} else {
+					if (legend.hasAttribute("X") && legend.hasAttribute("Y")) {
+						object.getLayout().setLegendAutoLayout(false);
+						final String xLegend = legend.getAttribute("X");
+						final String yLegend = legend.getAttribute("Y");
+
+						object.getLayout().setLegendPos(Integer.parseInt(xLegend), Integer.parseInt(yLegend));
+					} else {
+						object.getLayout().setLegendAutoLayout(true);
+					}
+				}
+			} else {
+				object.getLayout().setLegendAutoLayout(true);
+			}
+
+		} else {
+			// Compatibility Case
+			final String hideLegend = layoutNode.getAttribute("hideLegend");
+			if (hideLegend.equals(TRUE)) {
+				object.setLegendHidden(true);
+			} else if (hideLegend.equals(FALSE)) {
+				object.setLegendHidden(false);
+			}
 		}
 	}
 
@@ -193,6 +234,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	@Override
 	protected void writeDocument(Document doc) {
 		final Element root = doc.createElement("layout");
+		final Element legend = doc.createElement(LEGEND);
 		final Element struct = doc.createElement(STRUCT);
 		final Element constraints = doc.createElement(CONSTRAINTS);
 		root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, Integer.toString(object.getLayout().getLayoutAlgorithm()));
@@ -211,14 +253,22 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 		if (!object.getLayout().showCollapsedConstraints()) {
 			root.setAttribute(SHOW_COLLAPSED_CONSTRAINTS, FALSE);
 		}
+
 		if (object.isLegendHidden()) {
-			root.setAttribute(HIDE_LEGEND, TRUE);
+			legend.setAttribute(LEGEND_HIDDEN, TRUE);
+		}
+		if (!object.getLayout().hasLegendAutoLayout()) {
+			legend.setAttribute(LEGEND_AUTO_LAYOUT, FALSE);
+			final Point legendPos = object.getLayout().getLegendPos();
+			legend.setAttribute("X", Integer.toString(legendPos.x));
+			legend.setAttribute("Y", Integer.toString(legendPos.y));
 		}
 
 		doc.appendChild(root);
 
 		root.appendChild(struct);
 		root.appendChild(constraints);
+		root.appendChild(legend);
 
 		if (!object.getLayout().hasFeaturesAutoLayout()) {
 			for (final IGraphicalFeature feat : object.getAllFeatures()) {
@@ -249,6 +299,9 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 				final Point location = constr.getLocation();
 				rule.setAttribute("X", Integer.toString(location.x));
 				rule.setAttribute("Y", Integer.toString(location.y));
+				if (constr.isCollapsed()) {
+					rule.setAttribute("collapsed", TRUE);
+				}
 				constraints.appendChild(rule);
 			}
 		}

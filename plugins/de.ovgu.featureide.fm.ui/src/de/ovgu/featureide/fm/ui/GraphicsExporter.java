@@ -54,8 +54,12 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.guidsl.GuidslFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.elements.TikzFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
@@ -82,9 +86,15 @@ public class GraphicsExporter {
 			return false;
 		}
 
-		if (filePath.endsWith(".m") || filePath.endsWith(".xml") || filePath.endsWith(".velvet")) {
-			return FeatureModelManager.save(featureModel, Paths.get(filePath));
-		} else {
+		final String fileExtension = SimpleFileHandler.getFileExtension(Paths.get(filePath));
+		switch (fileExtension) {
+		case GuidslFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new GuidslFormat());
+		case XmlFeatureModelFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new XmlFeatureModelFormat());
+		case VelvetFeatureModelFormat.FILE_EXTENSION:
+			return FeatureModelManager.save(featureModel, Paths.get(filePath), new VelvetFeatureModelFormat());
+		default:
 			final File file = new File(filePath);
 			final boolean succ = GraphicsExporter.exportAs(diagramEditor, file);
 			GraphicsExporter.printExportMessage(file, succ);

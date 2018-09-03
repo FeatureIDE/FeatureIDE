@@ -69,6 +69,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	public GraphicalFeature(GraphicalFeature graphicalFeature) {
+		collapsed = graphicalFeature.collapsed;
 		constraintSelected = graphicalFeature.constraintSelected;
 		location = graphicalFeature.location;
 		dimension = graphicalFeature.dimension;

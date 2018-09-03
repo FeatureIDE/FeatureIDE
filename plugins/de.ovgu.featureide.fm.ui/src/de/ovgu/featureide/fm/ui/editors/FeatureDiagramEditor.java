@@ -32,7 +32,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,9 +93,6 @@ import de.ovgu.featureide.fm.core.explanations.Explanation;
 import de.ovgu.featureide.fm.core.explanations.Reason;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelExplanation;
 import de.ovgu.featureide.fm.core.explanations.fm.FeatureModelReason;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.manager.AFileManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
@@ -105,8 +101,6 @@ import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelFormat;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AdjustModelToEditorSizeAction;
@@ -170,10 +164,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	private static final String PAGE_TEXT = FEATURE_DIAGRAM;
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
-	private static final IPersistentFormat<IGraphicalFeatureModel> format = new GraphicalFeatureModelFormat();
-
-	private final Path extraPath;
-	private final IGraphicalFeatureModel graphicalFeatureModel;
 
 	private final FeatureDiagramViewer viewer;
 
@@ -239,6 +229,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	/** The currently active explanation. */
 	private Explanation<?> activeExplanation;
 
+	private final IGraphicalFeatureModel graphicalFeatureModel;
+
 	/**
 	 * Constructor. Handles editable and read-only feature models.
 	 *
@@ -247,31 +239,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 * @param fm The feature model
 	 * @param isEditable True, if feature model is editable. False, if feature model is read-only
 	 */
-	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, boolean isEditable) {
-		super(fmManager);
+	public FeatureDiagramEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager, boolean isEditable) {
+		super(fmManager, gfmManager);
 
-		graphicalFeatureModel = getGrapicalFeatureModel(getFeatureModel());
-
-		// 1. Check if the fmManager exists and is not a VirtualFileManager instance (path returns null)
-		// 2. read-only feature model is currently only a view on the editable feature model and not persistent
-		if ((fmManager != null) && (fmManager.getPath() != null)) {
-			extraPath = AFileManager.constructExtraPath(fmManager.getPath(), format);
-			FileHandler.load(extraPath, graphicalFeatureModel, format);
-			fmManager.addListener(this);
-		} else {
-			extraPath = null;
-		}
-
+		graphicalFeatureModel = gfmManager.editObject();
 		viewer = new FeatureDiagramViewer(graphicalFeatureModel, this);
+		fmManager.addListener(this);
 		createActions();
 
 		FeatureColorManager.addListener(this);
-	}
-
-	public static GraphicalFeatureModel getGrapicalFeatureModel(IFeatureModel featureModel) {
-		final GraphicalFeatureModel graphicalFeatureModel = new GraphicalFeatureModel(featureModel);
-		graphicalFeatureModel.init();
-		return graphicalFeatureModel;
 	}
 
 	private void createActions() {
@@ -629,13 +605,13 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					viewer.refreshChildAll(newCompound);
 				}
 			}
-			viewer.internRefresh(false);
-			setDirty(true);
+			viewer.internRefresh(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case FEATURE_ADD:
 			((AbstractGraphicalEditPart) viewer.getEditPartRegistry().get(graphicalFeatureModel)).refresh();
-			setDirty(true);
+			setDirty();
 			final IFeature newFeature = (IFeature) event.getNewValue();
 			final IFeature parent = (IFeature) event.getOldValue();
 			final IFeatureModel fm = (IFeatureModel) event.getSource();
@@ -692,7 +668,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			viewer.reload();
-			setDirty(true);
+			setDirty();
 			break;
 		case ALL_FEATURES_CHANGED_NAME_TYPE:
 			for (final IGraphicalFeature f : graphicalFeatureModel.getFeatures()) {
@@ -700,43 +676,40 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			viewer.internRefresh(true);
 			viewer.reload();
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			break;
 		case MANDATORY_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
 
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case GROUP_TYPE_CHANGED:
 			for (final IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature) event.getSource(), graphicalFeatureModel)) {
 				f.update(event);
 			}
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case ATTRIBUTE_CHANGED:
 			FeatureUIHelper.getGraphicalFeature((IFeature) event.getSource(), graphicalFeatureModel).update(event);
-			setDirty(true);
+			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
 		case LOCATION_CHANGED:
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			break;
 		case CONSTRAINT_MOVE:
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			break;
 		case CONSTRAINT_MODIFY:
 			final IConstraint c = (IConstraint) event.getSource();
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
@@ -750,48 +723,32 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			for (final IGraphicalFeature gFeature : graphicalFeatureModel.getFeatures()) {
 				gFeature.getObject().fireEvent(new FeatureIDEEvent(null, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, true));
 				gFeature.update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
 			}
 			break;
 		case MODEL_DATA_OVERRIDDEN:
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			Display.getDefault().syncExec(new Runnable() {
 
 				@Override
 				public void run() {
 					viewer.deregisterEditParts();
+					graphicalFeatureModel.getLayout().setLayout(1);
 					graphicalFeatureModel.init();
-					if (extraPath != null) {
-						FileHandler.load(extraPath, graphicalFeatureModel, format);
-					}
 
 					viewer.setContents(graphicalFeatureModel);
-					viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-					viewer.reload();
 				}
 			});
-			setDirty(false);
+//			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_CHANGED:
 			// clear registry
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			viewer.deregisterEditParts();
-			graphicalFeatureModel.init();
-			if (extraPath != null) {
-				FileHandler.load(extraPath, graphicalFeatureModel, format);
-			}
 			viewer.setContents(graphicalFeatureModel);
-			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
-			viewer.reload();
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case FEATURE_DELETE:
@@ -816,19 +773,15 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				viewer.refreshChildAll(root.getObject());
 			}
 			viewer.internRefresh(true);
-			setDirty(true);
+			setDirty();
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			break;
 		case MODEL_LAYOUT_CHANGED:
+			viewer.setLayout();
 			viewer.reload();
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
+			setDirty();
 			break;
 		case REDRAW_DIAGRAM:
 			viewer.getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
@@ -839,13 +792,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
-			// legendAction.refresh();
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:
-			if ((event.getSource() instanceof Boolean) && ((Boolean) event.getSource())) {
-				setDirty(true);
-			}
+			setDirty();
 			legendLayoutAction.refresh();
 			viewer.internRefresh(false);
 			break;
@@ -859,7 +809,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			// leads to errors.
 			viewer.refreshChildAll((IFeature) event.getSource());
 			legendLayoutAction.refresh();
-			setDirty(true);
+			setDirty();
 			viewer.internRefresh(true);
 			analyzeFeatureModel();
 			break;
@@ -872,7 +822,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			viewer.internRefresh(false);
 			analyzeFeatureModel();
-			setDirty(true);
+			setDirty();
 			// Center collapsed feature after operation
 			if (event.getSource() instanceof IFeature) {
 				viewer.centerPointOnScreen((IFeature) event.getSource());
@@ -886,7 +836,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			viewer.refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
 			viewer.internRefresh(false);
 			analyzeFeatureModel();
-			setDirty(true);
+			setDirty();
 
 			// Center root feature after operation
 			viewer.centerPointOnScreen(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
@@ -929,7 +879,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			refreshGraphics(null);
 			break;
 		case DEPENDENCY_CALCULATED:
-			setDirty(false);
+			setDirty();
 			break;
 		case ACTIVE_EXPLANATION_CHANGED:
 			// Deactivate the old active explanation.
@@ -988,7 +938,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			}
 			break;
 		case FEATURE_ATTRIBUTE_CHANGED:
-			setDirty(true);
+			setDirty();
 			break;
 		case DEFAULT:
 			break;
@@ -1198,6 +1148,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
+			menuManager.add(focusOnExplanationAction);
 			menuManager.add(editConstraintAction);
 			menuManager.add(deleteAction);
 		} else if (isConnectionMenu(selection)) {
@@ -1268,15 +1219,12 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
-		return new FeatureDiagramEditor(fmManager, true);
+		return new FeatureDiagramEditor(fmManager, gfmManager, true);
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (isDirty()) {
-			if (extraPath != null) {
-				FileHandler.save(extraPath, graphicalFeatureModel, format);
-			}
 			super.doSave(monitor);
 		}
 	}
@@ -1295,6 +1243,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		FeatureColorManager.removeListener(this);
 		fmManager.removeListener(this);
 		graphicalFeatureModel.getFeatureModel().removeListener(editorKeyHandler);
+		gfmManager.dispose();
 		super.dispose();
 	}
 
