@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -35,6 +36,7 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -60,6 +62,8 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_FEATURE_MODEL + "[\\s>]");
 
 	private IFeatureModelFactory factory;
+
+	private final List<Problem> localProblems = new ArrayList<Problem>();
 
 	private AbstractFeatureAttributeFactory attributeFactory;
 
@@ -88,7 +92,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		}
 
 		importCustomProperties(customProperties, object);
-
+		warnings.addAll(localProblems);
 	}
 
 	@Override
@@ -606,10 +610,13 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			// TODO Consider feature name validity in all readers
-			// if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-			// throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			// }
+
+			if (!FMComposerManager
+					.getFMComposerExtension(ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(object.getSourceFile().toUri())[0].getProject())
+					.isValidFeatureName(name)) {
+				addToProblemsList(name + " is not a valid feature name", e);
+			}
+
 			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
@@ -665,6 +672,11 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	 */
 	private void throwError(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
+	}
+
+	private void addToProblemsList(String message, org.w3c.dom.Node node) {
+		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
 	}
 
 	// TODO implement warnings
