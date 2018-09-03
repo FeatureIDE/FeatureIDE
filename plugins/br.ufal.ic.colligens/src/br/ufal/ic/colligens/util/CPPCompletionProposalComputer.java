@@ -100,7 +100,7 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		final CharSequence prefix = computePrefix(context);
 
 		final ArrayList<String> featureNames = new ArrayList<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-
+		directivesCompletionProposalList = new ArrayList<ICompletionProposal>();
 		if (status == Status.ShowFeatures) {
 			createListOfCompletionProposals(context, featureProject, prefix, featureNames, "");
 		} else if (status == Status.ShowDirectives) {
@@ -113,7 +113,6 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 		file = ((IFileEditorInput) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput()).getFile();
 		featureProject = CorePlugin.getFeatureProject(file);
 		status = Status.ShowNothing;
-		directivesCompletionProposalList = new ArrayList<ICompletionProposal>();
 	}
 
 	private void createListOfCompletionProposals(ContentAssistInvocationContext context, final IFeatureProject featureProject, final CharSequence prefix,
