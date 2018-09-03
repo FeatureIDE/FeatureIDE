@@ -65,7 +65,7 @@ public class NodeReader {
 	private Collection<String> featureNames;
 
 	private String[] symbols = textualSymbols;
-	private boolean noValidFeatureName;
+
 	public ErrorType errorType = new ErrorType(ErrorEnum.None);
 	private ParseException errorMessage = null;
 
@@ -99,7 +99,6 @@ public class NodeReader {
 		try {
 			return parseNode(constraint);
 		} catch (final ParseException e) {
-
 			errorMessage = e;
 			return null;
 		}
@@ -133,10 +132,6 @@ public class NodeReader {
 	 */
 	public ParseException getErrorMessage() {
 		return errorMessage;
-	}
-
-	public boolean getnoValidFeatureName() {
-		return noValidFeatureName;
 	}
 
 	public boolean ignoresMissingFeatures() {
@@ -184,19 +179,15 @@ public class NodeReader {
 				final Node node1, node2;
 				if (i == 4) {
 					node1 = null;
-
 					if (rightSide.isEmpty()) {
 						errorType.setError(ErrorEnum.Default);
 						node2 = handleInvalidExpression("Missing feature name or expression", constraint);
-
 					} else {
 						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
 					}
-
 				} else {
 					if (leftSide.isEmpty()) {
 						errorType = new ErrorType(ErrorEnum.InvalidExpressionLeft, matcher.start(), matcher.end());
-
 						node1 = handleInvalidExpression("Missing feature name or expression on left side", constraint);
 					} else {
 						node1 = checkExpression(leftSide, quotedFeatureNames, subExpressions);
@@ -207,7 +198,6 @@ public class NodeReader {
 					} else {
 						node2 = checkExpression(rightSide, quotedFeatureNames, subExpressions);
 					}
-
 				}
 
 				switch (i) {
@@ -266,7 +256,6 @@ public class NodeReader {
 	}
 
 	private Node handleInvalidFeatureName(String featureName) throws ParseException {
-
 		return getInvalidLiteral("'" + featureName + "' is no valid feature name", featureName, ignoreMissingFeatures);
 	}
 

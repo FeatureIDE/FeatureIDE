@@ -269,10 +269,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 		return Collections.unmodifiableList(features);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#getAllChildren()
-	 */
 	@Override
 	public List<IGraphicalFeature> getAllGraphicalChildren() {
 		final List<IGraphicalFeature> features = new ArrayList<IGraphicalFeature>();

@@ -183,7 +183,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @author Marcus Pinnecke
 		 */
 		public enum HeaderDescriptionImage {
-		ERROR, WARNING, INFO, NONE
+			ERROR, WARNING, INFO, NONE
 		}
 
 		private static final String STRING_HEADER_LABEL_DEFAULT = CREATE_NEW_CONSTRAINT;
@@ -519,10 +519,6 @@ public class ConstraintDialog implements GUIDefaults {
 		if (constraint != null) {
 			validate();
 		}
-	}
-
-	public List<String> GetFeatureListFromConstraintDialog() {
-		return FeatureUtils.getExplicitFeatureList(featureModel);
 	}
 
 	/**
@@ -953,7 +949,7 @@ public class ConstraintDialog implements GUIDefaults {
 				autoActivationCharacters[c] = c;
 			}
 
-			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(this),
+			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(),
 					new ConstraintContentProposalProvider(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))), keyStroke,
 					autoActivationCharacters);
 
@@ -963,7 +959,7 @@ public class ConstraintDialog implements GUIDefaults {
 			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
 
 		} catch (final ParseException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -977,8 +973,7 @@ public class ConstraintDialog implements GUIDefaults {
 		} else {
 			final NodeReader nodeReader = new NodeReader();
 			final Node constraintNode = nodeReader.stringToNode(text, featureNamesList);
-			final boolean properConstraint = constraintNode != null;
-			if (!properConstraint) {
+			if (constraintNode == null) {
 				update(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, nodeReader.getErrorMessage().getMessage()),
 						HeaderPanel.HeaderDescriptionImage.ERROR, DialogState.SAVE_CHANGES_DISABLED);
 			} else {

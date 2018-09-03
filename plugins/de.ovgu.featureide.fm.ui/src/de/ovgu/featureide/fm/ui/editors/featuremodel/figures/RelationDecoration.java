@@ -72,9 +72,8 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 			super.setLocation(p.translate((-getBounds().width >> 1) + 1, 0));
 		} else {
 			setSize(TARGET_ANCHOR_DIAMETER, TARGET_ANCHOR_DIAMETER);
-			FeatureModelLayout layout;
 			if (featureModel != null) {
-				layout = featureModel.getLayout();
+				final FeatureModelLayout layout = featureModel.getLayout();
 				if (layout.isUsesAbegoTreeLayout()) {
 					switch (layout.getAbegoRootposition()) {
 					case Bottom:
@@ -98,9 +97,7 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 					super.setLocation(p.translate((-getBounds().width >> 1), 0));
 				}
 			}
-
 		}
-
 	}
 
 	@Override
@@ -117,7 +114,6 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	}
 
 	private void drawShape(final Graphics graphics) {
-
 		if (getActiveReason() != null) {
 			final Color reasonColor = FMPropertyManager.getReasonColor(getActiveReason());
 			graphics.setForegroundColor(reasonColor);
@@ -139,9 +135,8 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 		}
 		Point center = verticalLayout ? getBounds().getLeft() : getBounds().getTop();
 		boolean abegoRight = false;
-		FeatureModelLayout layout;
 		if (featureModel != null) {
-			layout = featureModel.getLayout();
+			final FeatureModelLayout layout = featureModel.getLayout();
 			if (layout.isUsesAbegoTreeLayout()) {
 				switch (layout.getAbegoRootposition()) {
 				case Bottom:
@@ -208,8 +203,6 @@ public class RelationDecoration extends ConnectionDecoration implements GUIDefau
 	private double calculateAngle(final Point point, final Point referencePoint) {
 		final int dx = referencePoint.x - point.x;
 		final int dy = referencePoint.y - point.y;
-		final long l = 360 - Math.round((Math.atan2(dy, dx) / Math.PI) * 180);
-
-		return l;
+		return 360 - Math.round((Math.atan2(dy, dx) / Math.PI) * 180);
 	}
 }

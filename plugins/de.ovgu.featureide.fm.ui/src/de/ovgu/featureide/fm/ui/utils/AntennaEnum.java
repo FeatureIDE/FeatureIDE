@@ -28,14 +28,13 @@ import java.util.List;
  *
  * @author Iris-Maria Banciu
  */
-
 public enum AntennaEnum {
 	IF("if"), ENDIF("endif"), IFDEF("ifdef"), IFNDEF("ifndef"), ELIF("elif"), ELIFDEF("elifdef"), ELIFNDEF("elifndef"), ELSE("else"), CONDITION(
 			"condition"), DEFINE("define"), UNDEFINE("undefine");
 
-	private String text;
+	private final String text;
 
-	AntennaEnum(String text) {
+	private AntennaEnum(String text) {
 		this.text = text;
 	}
 
@@ -44,7 +43,7 @@ public enum AntennaEnum {
 	}
 
 	public static List<String> getAllDirectives() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		for (final AntennaEnum d : AntennaEnum.values()) {
 			list.add(d.text);
 		}

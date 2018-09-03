@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -45,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperation {
 
-	boolean collapse;
+	private boolean collapse;
 	private final IFeatureModel featureModel;
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
@@ -128,7 +129,7 @@ public class AdjustModelToEditorSizeOperation extends AbstractFeatureModelOperat
 		try {
 			op.execute(null, null);
 		} catch (final ExecutionException e) {
-			e.printStackTrace();
+			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 

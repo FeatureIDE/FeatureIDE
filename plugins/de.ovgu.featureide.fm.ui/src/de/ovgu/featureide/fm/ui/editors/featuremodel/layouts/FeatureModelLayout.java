@@ -112,18 +112,6 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 		hasVerticalLayout = b;
 	}
 
-//	// provisorisch: ! (unschön)
-//	public void bottomUpLayout(boolean b) {
-//		hasBottomUpLayout = b;
-//	}
-//
-//	public boolean bottomUpLayout() {
-//		return hasBottomUpLayout;
-//	}
-//
-//	private boolean hasBottomUpLayout;
-//	// -------------------------
-
 	@Override
 	public Point getLegendPos() {
 		return legendPos;

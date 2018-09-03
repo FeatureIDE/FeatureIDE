@@ -26,6 +26,11 @@ package org.prop4j;
  * @author Mohammed Khaled
  */
 public class ErrorType {
+
+	public static enum ErrorEnum {
+		None, InvalidFeatureName, InvalidExpressionLeft, InvalidExpressionRight, Default
+	}
+
 	private ErrorEnum error;
 	private int startErrorIndex;
 	private int endErrorIndex;
@@ -102,7 +107,4 @@ public class ErrorType {
 		this.keyword = keyword;
 	}
 
-	public enum ErrorEnum {
-		None, InvalidFeatureName, InvalidExpressionLeft, InvalidExpressionRight, Default
-	}
 }

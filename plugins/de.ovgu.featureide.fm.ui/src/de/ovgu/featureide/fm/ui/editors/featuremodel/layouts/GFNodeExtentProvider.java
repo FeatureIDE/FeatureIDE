@@ -10,7 +10,6 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
  * @author Lukas Vogt
  * @author Martha Nyerembe
  */
-
 public class GFNodeExtentProvider implements NodeExtentProvider<IGraphicalFeature> {
 
 	@Override

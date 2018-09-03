@@ -55,7 +55,7 @@ public class TikzFormatTest {
 	public void testLatexExporter() throws FileNotFoundException, UnsupportedModelException {
 		final IFeatureModel tikzExample = Commons.loadTestFeatureModelFromFile(TEST_XML_FILE_NAME);
 		final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
-		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat.TikZMain();
+		final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat().new TikZMain();
 		final IPersistentFormat<IGraphicalFeatureModel> formatbody = new TikzFormat.TikZBody(TEST_TEX_MAIN_FILE_NAME);
 		String head = new String();
 		String main = new String();
@@ -101,6 +101,6 @@ public class TikzFormatTest {
 		assertEquals(testHead, head);
 		assertEquals(testMain, main);
 		assertEquals(testBody, body);
-
 	}
+
 }

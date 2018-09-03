@@ -29,11 +29,11 @@ import java.util.regex.Pattern;
  */
 public class Operator {
 
-	private static final StringBuilder sb = new StringBuilder();
-
 	public static final String[] NAMES = { "Not", "And", "Or", "Implies", "Iff", "(", ")" };
 
+	public static final String REGEX;
 	static {
+		final StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		for (final String keyword : NAMES) {
 			if ((keyword == "(") || (keyword == ")")) {
@@ -44,9 +44,8 @@ public class Operator {
 			sb.append("|");
 		}
 		sb.setCharAt(sb.length() - 1, ')');
+		REGEX = sb.toString();
 	}
-
-	public static final String REGEX = sb.toString();
 
 	/**
 	 * @param name

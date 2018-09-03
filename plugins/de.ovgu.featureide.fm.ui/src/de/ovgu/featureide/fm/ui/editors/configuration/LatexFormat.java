@@ -101,7 +101,7 @@ public class LatexFormat extends APersistentFormat<Configuration> {
 	 *
 	 * <b> Note: </b> The class <i> LaTeXHead </i> creates the styles and packages that are required to execute the resulting LaTeX Code correctly.
 	 *
-	 * @see {LaTeXHead}
+	 * @see LaTeXHead
 	 */
 	public static class LaTeXMain extends APersistentFormat<Configuration> {
 

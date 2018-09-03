@@ -24,14 +24,11 @@ import java.util.List;
 
 import org.abego.treelayout.util.AbstractTreeForTreeLayout;
 
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Provides the getParent and getChildrem methods of the graphical representation of a Feature to abego library
- *
- *
  *
  * @author Martha Nyerembe
  * @author Lukas Vogt
@@ -49,11 +46,7 @@ public class GFTreeForTreeLayout extends AbstractTreeForTreeLayout<IGraphicalFea
 
 	@Override
 	public IGraphicalFeature getParent(IGraphicalFeature child) {
-		final IFeatureStructure structure = child.getObject().getStructure();
-		final IFeatureStructure parent = structure.getParent();
-		final IGraphicalFeatureModel graphicalModel = child.getGraphicalModel();
-		final IGraphicalFeature graphicalFeature = graphicalModel.getGraphicalFeature(parent.getFeature());
-		return graphicalFeature;
+		return child.getGraphicalModel().getGraphicalFeature(FeatureUtils.getParent(child.getObject()));
 	}
 
 }

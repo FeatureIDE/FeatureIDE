@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
-	static boolean[] legend = { false, false, false, false, false, false, false };
-
 	private static final String lnSep = System.lineSeparator();
+
+	private final boolean[] legend = new boolean[7];
 
 	/**
 	 * Creates the styles and packages that are required for the converted Feature Model Diagram. <br> <br> <b>Note:</b> For exporting purposes the file name
@@ -156,7 +156,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	 *
 	 * @see {TikzHead}
 	 */
-	public static class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
+	public class TikZMain extends APersistentFormat<IGraphicalFeatureModel> {
 
 		/**
 		 * Writes the tree of the Feature Diagram in tex-format.
@@ -229,7 +229,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 
 	}
 
-	private static void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
+	private void insertNodeHead(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		str.append("[" + node);
 		if (object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().isAbstract() == true) {
 			str.append(",abstract");
@@ -271,7 +271,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		str.append("]");
 	}
 
-	private static void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
+	private void printTree(String node, IGraphicalFeatureModel object, StringBuilder str) {
 		// PRE-OREDER TRAVERSEL
 		final int numberOfChildren = object.getGraphicalFeature(object.getFeatureModel().getFeature(node)).getObject().getStructure().getChildrenCount();
 		if ((numberOfChildren == 0)) {
@@ -359,7 +359,7 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 		return myRoot;
 	}
 
-	private static void printLegend(StringBuilder str, boolean legendHidden) {
+	private void printLegend(StringBuilder str, boolean legendHidden) {
 		if (!legendHidden) {
 			boolean check = false;
 			final StringBuilder myString = new StringBuilder();
@@ -455,6 +455,11 @@ public class TikzFormat extends APersistentFormat<IGraphicalFeatureModel> {
 	public boolean supportsWrite() {
 		return true;
 
+	}
+
+	@Override
+	public APersistentFormat<IGraphicalFeatureModel> getInstance() {
+		return new TikzFormat();
 	}
 
 	/**

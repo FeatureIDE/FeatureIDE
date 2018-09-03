@@ -37,11 +37,4 @@
 		<nature>net.sourceforge.metrics.nature</nature>
 		<nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/org/prop4j/ErrorType.java</name>
-			<type>1</type>
-			<locationURI>PARENT_LOC/ErrorType.java</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

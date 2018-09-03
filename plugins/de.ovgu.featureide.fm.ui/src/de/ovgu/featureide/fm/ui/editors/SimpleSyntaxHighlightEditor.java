@@ -65,7 +65,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-
 				updateHighlight(new ErrorType(ErrorEnum.None));
 			}
 		});

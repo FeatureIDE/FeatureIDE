@@ -126,11 +126,6 @@ public class GraphicsExporter {
 				return false;
 			}
 
-			// ---old: one Latex Document---------------------------------------------
-			// final IPersistentFormat<IGraphicalFeatureModel> format = new TikzFormat();
-			// FileHandler.save(file.toPath(), (IGraphicalFeatureModel) viewer.getContents().getModel(), format);
-			// -----------------------------------------------------------------------
-
 			// output Head
 			final IPersistentFormat<IGraphicalFeatureModel> formatHead = new TikzFormat.TikZHead();
 			FileHandler.save(outputDir.resolve("head.tex"), null, formatHead);
@@ -140,7 +135,7 @@ public class GraphicsExporter {
 			FileHandler.save(outputDir.resolve("body.tex"), null, formatBody);
 
 			// output main
-			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat.TikZMain();
+			final IPersistentFormat<IGraphicalFeatureModel> formatMain = new TikzFormat().new TikZMain();
 			FileHandler.save(outputDir.resolve(file.getName()), (IGraphicalFeatureModel) viewer.getContents().getModel(), formatMain);
 
 			succ = true;

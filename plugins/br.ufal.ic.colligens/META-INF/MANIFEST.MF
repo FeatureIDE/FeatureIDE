@@ -11,8 +11,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.core.filebuffers,
  de.ovgu.featureide.fm.core,
- de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.ui,
  org.eclipse.ui.console,
  org.eclipse.cdt.core,
  org.eclipse.ltk.core.refactoring,
@@ -20,12 +21,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: de.ovgu.featureide.ui,
- org.eclipse.cdt.core.model,
+Import-Package: org.eclipse.cdt.core.model,
  org.eclipse.cdt.internal.core.model,
- org.eclipse.cdt.ui.text.contentassist,
- org.eclipse.jdt.core,
- org.eclipse.jdt.internal.ui.text.java
+ org.eclipse.cdt.ui.text.contentassist
 Bundle-ClassPath: .,
  lib/TypeChef-0.3.6.jar,
  lib/jdom-2.0.4.jar,
@@ -105,5 +103,4 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
  de.fosd.typechef.parser.java15.lexer,
  de.fosd.typechef.typesystem,
  de.fosd.typechef.typesystem.linker,
- de.fosd.typechef.xtclexer,
- scala.math
+ de.fosd.typechef.xtclexer

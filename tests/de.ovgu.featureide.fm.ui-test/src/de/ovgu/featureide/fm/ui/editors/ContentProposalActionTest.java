@@ -37,7 +37,7 @@ public final class ContentProposalActionTest {
 
 	private String applyProposal(String text, Point selection, String proposal) {
 		return insertPipe(SimpleSyntaxHighlighterConstraintContentAdapter.performInsertion(removePipe(text), selection, proposal, false));
-	} // TODO
+	}
 
 	private Point getSelection(String inputText) {
 		final String text = inputText;

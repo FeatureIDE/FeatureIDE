@@ -86,13 +86,11 @@ public class CPPCompletionProposalComputer implements ICompletionProposalCompute
 
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor arg1) {
-
 		if ((context == null) || (file == null) || (featureProject == null)) {
 			return directivesCompletionProposalList;
 		}
 
 		computeCurrentStatus(context);
-
 		if (status == Status.ShowNothing) {
 			return directivesCompletionProposalList;
 		}

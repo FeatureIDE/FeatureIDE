@@ -31,9 +31,9 @@ import java.util.List;
 public enum MungeEnum {
 	IF("if"), IF_NOT("if_not"), ELSE("else"), END("end");
 
-	private String text;
+	private final String text;
 
-	MungeEnum(String text) {
+	private MungeEnum(String text) {
 		this.text = text;
 	}
 
@@ -42,7 +42,7 @@ public enum MungeEnum {
 	}
 
 	public static List<String> getAllDirectives() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		for (final MungeEnum d : MungeEnum.values()) {
 			list.add(d.text + "[]*/");
 		}
@@ -58,7 +58,7 @@ public enum MungeEnum {
 	}
 
 	public static List<String> getEndundElseDirctivesWithFeatureName(String featureName) {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 
 		list.add(MungeEnum.ELSE.text + "[" + featureName + "]*/");
 		list.add(MungeEnum.END.text + "[" + featureName + "]*/");
@@ -66,7 +66,7 @@ public enum MungeEnum {
 	}
 
 	public static List<String> getEndDirctivesWithFeatureName(String featureName) {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 
 		list.add(MungeEnum.END.text + "[" + featureName + "]*/");
 		return list;

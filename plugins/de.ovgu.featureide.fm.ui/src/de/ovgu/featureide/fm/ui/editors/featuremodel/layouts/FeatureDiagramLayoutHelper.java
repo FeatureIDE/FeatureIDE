@@ -49,6 +49,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class FeatureDiagramLayoutHelper {
 
+	public static final int NUMBER_OF_LAYOUT_ALGORITHMS = 9;
+
 	/**
 	 * returns label texts (e.g. for the context menu)
 	 */

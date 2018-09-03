@@ -49,7 +49,6 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
@@ -348,15 +347,6 @@ public final class FeatureUtils {
 		requireNonNull(features);
 
 		return Functional.map(features, GET_FEATURE_NAME);
-	}
-
-	public static final List<String> getExplicitFeatureList(IFeatureModel featureModel) {
-		final List<String> featureList = getFeatureNamesList(featureModel);
-		final ArrayList<String> result = new ArrayList<String>();
-		for (final String s : featureList) {
-			result.add(s + " " + Features.FEATURE_SUFFIX);
-		}
-		return result;
 	}
 
 	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {

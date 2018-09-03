@@ -32,9 +32,9 @@ import java.util.List;
 public enum CPPEnum {
 	IFDEF("ifdef"), IFNOTDEF("ifndef"), ELSE("else"), END("endif"), DEFINE("define"), UNDEFINE("undefine"), IF("if");
 
-	private String text;
+	private final String text;
 
-	CPPEnum(String text) {
+	private CPPEnum(String text) {
 		this.text = text;
 	}
 
@@ -43,7 +43,7 @@ public enum CPPEnum {
 	}
 
 	public static List<String> getAllDirectives() {
-		final List<String> list = new ArrayList<String>();
+		final List<String> list = new ArrayList<>();
 		for (final CPPEnum d : CPPEnum.values()) {
 			list.add(d.text + " ");
 		}

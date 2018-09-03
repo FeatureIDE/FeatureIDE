@@ -45,19 +45,12 @@ public class FTreeLayout extends FeatureDiagramLayoutManager {
 
 	public FTreeLayout() {
 		super();
-		defaultConfiguration = new DefaultConfiguration<IGraphicalFeature>(30.0, 5.0);
+		defaultConfiguration = new DefaultConfiguration<>(30.0, 5.0);
 	}
 
-	/**
-	 * @param configuration
-	 */
 	public FTreeLayout(DefaultConfiguration<IGraphicalFeature> configuration) {
 		defaultConfiguration = configuration;
-
 	}
-
-	int yoffset;
-	int xoffset;
 
 	@Override
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
@@ -65,8 +58,8 @@ public class FTreeLayout extends FeatureDiagramLayoutManager {
 
 		final TreeLayout<IGraphicalFeature> treeLayout = layout(root);
 
-		yoffset = FMPropertyManager.getLayoutMarginY();
-		xoffset = (controlWidth / 2) - ((int) (treeLayout.getBounds().getWidth() / 2));
+		final int yoffset = FMPropertyManager.getLayoutMarginY();
+		final int xoffset = (controlWidth / 2) - ((int) (treeLayout.getBounds().getWidth() / 2));
 
 		final LinkedList<IGraphicalFeature> list = new LinkedList<>();
 		list.add(root);
@@ -83,11 +76,10 @@ public class FTreeLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private TreeLayout<IGraphicalFeature> layout(IGraphicalFeature root) {
-
 		final GFTreeForTreeLayout ftftl = new GFTreeForTreeLayout(root);
 		final GFNodeExtentProvider nodeExtentProvider = new GFNodeExtentProvider();
 
-		return new TreeLayout<IGraphicalFeature>(ftftl, nodeExtentProvider, defaultConfiguration);
+		return new TreeLayout<>(ftftl, nodeExtentProvider, defaultConfiguration);
 	}
 
 }
