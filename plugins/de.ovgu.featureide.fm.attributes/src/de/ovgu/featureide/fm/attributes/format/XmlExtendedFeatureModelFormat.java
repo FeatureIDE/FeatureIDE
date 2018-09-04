@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -36,7 +35,6 @@ import de.ovgu.featureide.fm.attributes.base.IFeatureAttributeParsedData;
 import de.ovgu.featureide.fm.attributes.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeFactory;
 import de.ovgu.featureide.fm.attributes.base.impl.FeatureAttributeParsedData;
-import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -46,6 +44,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -62,8 +61,16 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_FEATURE_MODEL + "[\\s>]");
 
 	private IFeatureModelFactory factory;
+	private IFeatureNameValidator validator;
 
-	private final List<Problem> localProblems = new ArrayList<Problem>();
+	private final List<Problem> localProblems = new ArrayList<>();
+
+	public XmlExtendedFeatureModelFormat() {}
+
+	protected XmlExtendedFeatureModelFormat(XmlExtendedFeatureModelFormat oldFormat) {
+		factory = oldFormat.factory;
+		validator = oldFormat.validator;
+	}
 
 	private AbstractFeatureAttributeFactory attributeFactory;
 
@@ -611,9 +618,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 				throwError("Duplicate entry for feature: " + name, e);
 			}
 
-			if (!FMComposerManager
-					.getFMComposerExtension(ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(object.getSourceFile().toUri())[0].getProject())
-					.isValidFeatureName(name)) {
+			if (validator != null && !validator.isValidFeatureName(name)) {
 				addToProblemsList(name + " is not a valid feature name", e);
 			}
 
@@ -705,7 +710,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 
 	@Override
 	public XmlExtendedFeatureModelFormat getInstance() {
-		return new XmlExtendedFeatureModelFormat();
+		return new XmlExtendedFeatureModelFormat(this);
 	}
 
 	@Override
@@ -726,6 +731,16 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	@Override
 	public String getName() {
 		return "FeatureIDE (Extended Feature Model)";
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
 	}
 
 }

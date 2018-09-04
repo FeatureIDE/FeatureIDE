@@ -79,12 +79,14 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.EclipseFileSystem;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.AFileManager;
@@ -119,7 +121,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private ModelMarkerHandler<IFile> markerHandler;
 	boolean isPageModified = false;
-	IFileManager<IFeatureModel> fmManager;
+	FeatureModelManager fmManager;
 	IFileManager<IGraphicalFeatureModel> gfmManager;
 
 	private boolean closeEditor;
@@ -130,16 +132,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	private FmOutlinePage outlinePage;
 
 	private final List<Action> actions = new ArrayList<>(4);
-
-	public FeatureModelEditor() {
-		super();
-	}
-
-	public FeatureModelEditor(IFileManager<IFeatureModel> fmManager, IFileManager<IGraphicalFeatureModel> gfmManager) {
-		super();
-		this.fmManager = fmManager;
-		this.gfmManager = gfmManager;
-	}
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -545,6 +537,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 		final Path path = markerHandler.getModelFile().getLocation().toFile().toPath();
 		fmManager = FeatureModelManager.getInstance(path);
+		fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
 		createModelFileMarkers(fmManager.getLastProblems());
 
 		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());

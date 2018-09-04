@@ -65,8 +65,7 @@ import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -78,15 +77,24 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Matthias Strauss
  * @author Reimar Schroeter
  */
-public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class SimpleVelvetFeatureModelFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + SimpleVelvetFeatureModelFormat.class.getSimpleName();
 
 	protected Path featureModelFile;
+	protected ProblemList problemList;
 
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
 	private final StringBuilder sb = new StringBuilder();
+
+	public SimpleVelvetFeatureModelFormat() {
+		super();
+	}
+
+	public SimpleVelvetFeatureModelFormat(AFeatureModelFormat oldFormat) {
+		super(oldFormat);
+	}
 
 	@Override
 	public boolean supportsRead() {
@@ -218,7 +226,8 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 
 	@Override
 	public ProblemList read(IFeatureModel object, CharSequence source) {
-		final ProblemList problemList = new ProblemList();
+		problemList = new ProblemList();
+		factory = ExtendedFeatureModelFactory.getInstance();
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile();
@@ -243,8 +252,6 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 			this.rawNode = rawNode;
 		}
 	}
-
-	private static final ExtendedFeatureModelFactory factory = ExtendedFeatureModelFactory.getInstance();
 
 	private static final int[] binaryOperators =
 		{ VelvetParser.OP_OR, VelvetParser.OP_AND, VelvetParser.OP_XOR, VelvetParser.OP_IMPLIES, VelvetParser.OP_EQUIVALENT };
@@ -308,7 +315,7 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 
 	private ExtendedFeature addFeature(final IFeature parent, final String featureName, final boolean isMandatory, final boolean isAbstract,
 			final boolean isHidden) {
-		final ExtendedFeature newFeature = factory.createFeature(extFeatureModel, featureName);
+		final ExtendedFeature newFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, featureName);
 		newFeature.getStructure().setMandatory(isMandatory);
 		newFeature.getStructure().setAbstract(isAbstract);
 		newFeature.getStructure().setHidden(isHidden);
@@ -464,7 +471,7 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 			case VelvetParser.ID:
 				extFeatureModelName = checkTree(curNode).getText();
 
-				final ExtendedFeature rootFeature = factory.createFeature(extFeatureModel, extFeatureModelName);
+				final ExtendedFeature rootFeature = (ExtendedFeature) factory.createFeature(extFeatureModel, extFeatureModelName);
 				rootFeature.getStructure().setAbstract(true);
 				rootFeature.getStructure().setMandatory(true);
 
@@ -686,6 +693,10 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 			}
 		}
 
+		if ((validator != null) && !validator.isValidFeatureName(featureName)) {
+			problemList.add(new Problem(featureName + " is not a valid feature name", root.getLine(), de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+		}
+
 		final ExtendedFeature newFeature = addFeature(parent, featureName, isMandatory, isAbstract, false);
 		if (moreDefinitions) {
 			parentStack.push(newFeature);
@@ -772,7 +783,7 @@ public class SimpleVelvetFeatureModelFormat extends APersistentFormat<IFeatureMo
 
 	@Override
 	public SimpleVelvetFeatureModelFormat getInstance() {
-		return new SimpleVelvetFeatureModelFormat();
+		return new SimpleVelvetFeatureModelFormat(this);
 	}
 
 	@Override
