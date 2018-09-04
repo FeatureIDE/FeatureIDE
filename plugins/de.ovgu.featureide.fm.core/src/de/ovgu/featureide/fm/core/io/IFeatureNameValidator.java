@@ -20,21 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-
 /**
- * Format for {@link IFeatureModel feature models}.
+ * Checks whether a given feature name is valid.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
+public interface IFeatureNameValidator {
 
-	public static String extensionPointID = "FMFormat";
-
-	public static String extensionID = "fmFormat";
-
-	void setFeatureNameValidator(IFeatureNameValidator validator);
-
-	IFeatureNameValidator getFeatureNameValidator();
+	/**
+	 * Checks whether a given feature name is valid.
+	 *
+	 * @param featureName the feature name to check
+	 * @return {@code true} if the given feature name is valid, {@code false} otherwise
+	 */
+	boolean isValidFeatureName(String featureName);
 
 }

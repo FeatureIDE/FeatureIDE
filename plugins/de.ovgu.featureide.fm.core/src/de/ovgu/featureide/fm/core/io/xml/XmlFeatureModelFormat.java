@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.prop4j.And;
 import org.prop4j.AtMost;
 import org.prop4j.Equals;
@@ -50,7 +49,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -61,6 +59,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -82,8 +81,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<featureModel[\\s>]");
 
 	private IFeatureModelFactory factory;
+	private IFeatureNameValidator validator;
 
-	private final List<Problem> localProblems = new ArrayList<Problem>();
+	private final List<Problem> localProblems = new ArrayList<>();
+
+	public XmlFeatureModelFormat() {}
+
+	protected XmlFeatureModelFormat(XmlFeatureModelFormat oldFormat) {
+		factory = oldFormat.factory;
+		validator = oldFormat.validator;
+	}
 
 	@Override
 	public boolean supportsRead() {
@@ -559,9 +566,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 				throwError("Duplicate entry for feature: " + name, e);
 			}
 
-			if (!FMComposerManager
-					.getFMComposerExtension(ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(object.getSourceFile().toUri())[0].getProject())
-					.isValidFeatureName(name)) {
+			if ((validator != null) && !validator.isValidFeatureName(name)) {
 				addToProblemsList(name + " is not a valid feature name", e);
 			}
 
@@ -646,7 +651,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 
 	@Override
 	public XmlFeatureModelFormat getInstance() {
-		return new XmlFeatureModelFormat();
+		return new XmlFeatureModelFormat(this);
 	}
 
 	@Override
@@ -667,6 +672,16 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> implements 
 	@Override
 	public String getName() {
 		return "FeatureIDE";
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
 	}
 
 }

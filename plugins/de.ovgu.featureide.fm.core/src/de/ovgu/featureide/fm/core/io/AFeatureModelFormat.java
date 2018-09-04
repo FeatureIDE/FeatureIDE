@@ -21,20 +21,38 @@
 package de.ovgu.featureide.fm.core.io;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * Format for {@link IFeatureModel feature models}.
+ * Abstract class for foramts that handle feature models.
  *
  * @author Sebastian Krieter
  */
-public interface IFeatureModelFormat extends IPersistentFormat<IFeatureModel> {
+public abstract class AFeatureModelFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
 
-	public static String extensionPointID = "FMFormat";
+	protected IFeatureModelFactory factory;
+	protected IFeatureNameValidator validator;
 
-	public static String extensionID = "fmFormat";
+	public AFeatureModelFormat() {}
 
-	void setFeatureNameValidator(IFeatureNameValidator validator);
+	protected AFeatureModelFormat(AFeatureModelFormat oldFormat) {
+		factory = oldFormat.factory;
+		validator = oldFormat.validator;
+	}
 
-	IFeatureNameValidator getFeatureNameValidator();
+	protected void setFactory(final IFeatureModel featureModel) {
+		factory = FMFactoryManager.getFactory(featureModel);
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
+	}
 
 }
