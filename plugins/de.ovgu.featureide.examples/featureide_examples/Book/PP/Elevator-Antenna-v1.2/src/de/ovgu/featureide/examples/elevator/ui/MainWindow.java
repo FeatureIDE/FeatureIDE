@@ -25,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -94,7 +95,7 @@ public class MainWindow implements ITickListener
 		frmElevatorSample.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//#if FloorPermission
-		FloorChooseDialog permissionDialog = new FloorChooseDialog(maxFloors, new ArrayList<Integer>(), "Choose disabled floors");
+		FloorChooseDialog permissionDialog = new FloorChooseDialog(maxFloors, Arrays.asList(0), "Choose disabled floors");
 		List<Integer> disabledFloors = permissionDialog.getSelectedFloors();
 		sim.setDisabledFloors(disabledFloors);
 		permissionDialog.dispose();
