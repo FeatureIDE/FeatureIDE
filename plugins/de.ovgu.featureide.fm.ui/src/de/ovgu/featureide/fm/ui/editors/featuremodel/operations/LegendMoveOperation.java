@@ -68,7 +68,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
+		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
 		graphicalFeatureModel.handleLegendLayoutChanged();
-		return new FeatureIDEEvent(featureModel, EventType.LEGEND_LAYOUT_CHANGED);
+		return new FeatureIDEEvent(true, EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 }

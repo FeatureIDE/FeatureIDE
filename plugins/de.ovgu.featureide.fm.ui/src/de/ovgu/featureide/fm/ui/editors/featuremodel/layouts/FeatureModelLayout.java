@@ -135,4 +135,5 @@ public class FeatureModelLayout implements IExtendedFeatureModelLayout {
 	public FeatureModelLayout clone() {
 		return new FeatureModelLayout(this);
 	}
+
 }

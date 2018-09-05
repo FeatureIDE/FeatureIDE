@@ -214,9 +214,10 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 			final Point size = getControl().getSize();
 			layoutManager.setControlSize(size.x, size.y);
 		}
+
 		layoutManager.layout(graphicalFeatureModel, this);
 
-		if (!graphicalFeatureModel.isLegendHidden()) {
+		if (!graphicalFeatureModel.isLegendHidden() && graphicalFeatureModel.getLayout().hasLegendAutoLayout()) {
 			for (final Object obj : getEditPartRegistry().values()) {
 				if (obj instanceof LegendEditPart) {
 					final LegendFigure fig = ((LegendEditPart) obj).getFigure();
