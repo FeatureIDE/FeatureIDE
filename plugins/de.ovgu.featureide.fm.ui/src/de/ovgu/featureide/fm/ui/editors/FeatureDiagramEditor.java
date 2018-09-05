@@ -101,7 +101,6 @@ import de.ovgu.featureide.fm.core.io.manager.IFileManager;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.JobStartingStrategy;
 import de.ovgu.featureide.fm.core.job.JobToken;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -525,9 +524,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 				return true;
 			}
 		}, ANALYZE_FEATURE_MODEL);
-		if (analyzeJob instanceof LongRunningJob<?>) {
-			((LongRunningJob<?>) analyzeJob).setPriority(Job.LONG);
-		}
+		analyzeJob.setPriority(Job.LONG);
 		LongRunningWrapper.startJob(analysisToken, analyzeJob);
 	}
 
@@ -1200,6 +1197,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		} else if (isConstraintMenu(selection)) {
 			menuManager.add(createConstraintAction);
 			menuManager.add(expandConstraintAction);
+			menuManager.add(focusOnExplanationAction);
 			menuManager.add(editConstraintAction);
 			menuManager.add(deleteAction);
 		} else if (isConnectionMenu(selection)) {

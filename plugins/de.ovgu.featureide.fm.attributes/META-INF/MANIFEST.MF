@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extended Feature Model Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.attributes;singleton:=true
-Bundle-Version: 3.5.1.qualifier
+Bundle-Version: 3.5.2.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.attributes.FMAttributesPlugin
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.eclipse.ui,
@@ -10,11 +10,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.ui.ide,
  de.ovgu.featureide.fm.core,
- de.ovgu.featureide.fm.ui
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Eclipse-AutoStart: true
-Import-Package: de.ovgu.featureide.fm.ui.editors,
- de.ovgu.featureide.fm.ui.editors.configuration
 Export-Package: de.ovgu.featureide.fm.attributes,
  de.ovgu.featureide.fm.attributes.base,
  de.ovgu.featureide.fm.attributes.base.exceptions,

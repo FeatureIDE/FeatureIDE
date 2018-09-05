@@ -4,7 +4,7 @@
 
   <groupId>de.ovgu.featureide</groupId>
   <artifactId>de.ovgu.featureide.lib.fm</artifactId>
-  <version>3.5.1-SNAPSHOT</version>
+  <version>3.5.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>FeatureIDE library for feature model core</name>

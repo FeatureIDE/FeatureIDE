@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import de.ovgu.featureide.fm.core.base.impl.FormatManager;
 import de.ovgu.featureide.fm.core.io.FileSystem;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -64,10 +66,40 @@ public class SimpleFileHandler<T> {
 	 * @param path the given path
 	 * @return the file name
 	 */
+	@Nonnull
 	public static String getFileName(Path path) {
 		final String fileName = path.getFileName().toString();
 		final int extensionIndex = fileName.lastIndexOf('.');
 		return (extensionIndex > 0) ? fileName.substring(0, extensionIndex) : fileName;
+	}
+
+	/**
+	 * Retrieves the file extension of a {@link Path}.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no
+	 * extension, but ".file.txt" would return "txt".
+	 *
+	 * @param path the given path
+	 * @return the file extension
+	 *
+	 * @see #getFileExtension(String)
+	 */
+	@Nonnull
+	public static String getFileExtension(Path path) {
+		return getFileExtension(path.getFileName().toString());
+	}
+
+	/**
+	 * Retrieves the file extension from a file name.<br/> <b>Note:</b> A dot at the first position of the file name is ignored. E.g., ".file" has no extension,
+	 * but ".file.txt" would return "txt".
+	 *
+	 * @param fileName the given file name
+	 * @return the file extension
+	 *
+	 * @see #getFileExtension(Path)
+	 */
+	@Nonnull
+	public static String getFileExtension(String fileName) {
+		final int extensionIndex = fileName.lastIndexOf('.');
+		return (extensionIndex > 0) ? fileName.substring(extensionIndex + 1) : "";
 	}
 
 	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {

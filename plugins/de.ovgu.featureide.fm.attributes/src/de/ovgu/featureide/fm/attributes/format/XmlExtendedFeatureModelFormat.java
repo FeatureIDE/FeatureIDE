@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.IFeatureNameValidator;
 import de.ovgu.featureide.fm.core.io.LazyReader;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -60,6 +61,16 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	private static final Pattern CONTENT_REGEX = Pattern.compile("\\A\\s*(<[?]xml\\s.*[?]>\\s*)?<" + EXTENDED_FEATURE_MODEL + "[\\s>]");
 
 	private IFeatureModelFactory factory;
+	private IFeatureNameValidator validator;
+
+	private final List<Problem> localProblems = new ArrayList<>();
+
+	public XmlExtendedFeatureModelFormat() {}
+
+	protected XmlExtendedFeatureModelFormat(XmlExtendedFeatureModelFormat oldFormat) {
+		factory = oldFormat.factory;
+		validator = oldFormat.validator;
+	}
 
 	private AbstractFeatureAttributeFactory attributeFactory;
 
@@ -88,7 +99,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		}
 
 		importCustomProperties(customProperties, object);
-
+		warnings.addAll(localProblems);
 	}
 
 	@Override
@@ -606,10 +617,11 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 			if (object.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}
-			// TODO Consider feature name validity in all readers
-			// if (!object.getFMComposerExtension().isValidFeatureName(name)) {
-			// throwError(name + IS_NO_VALID_FEATURE_NAME, e);
-			// }
+
+			if (validator != null && !validator.isValidFeatureName(name)) {
+				addToProblemsList(name + " is not a valid feature name", e);
+			}
+
 			final IFeature f = factory.createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
@@ -667,6 +679,11 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()));
 	}
 
+	private void addToProblemsList(String message, org.w3c.dom.Node node) {
+		localProblems.add(new Problem(message, Integer.parseInt(node.getUserData(PositionalXMLHandler.LINE_NUMBER_KEY_NAME).toString()),
+				de.ovgu.featureide.fm.core.io.Problem.Severity.ERROR));
+	}
+
 	// TODO implement warnings
 	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
@@ -693,7 +710,7 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 
 	@Override
 	public XmlExtendedFeatureModelFormat getInstance() {
-		return new XmlExtendedFeatureModelFormat();
+		return new XmlExtendedFeatureModelFormat(this);
 	}
 
 	@Override
@@ -714,6 +731,16 @@ public class XmlExtendedFeatureModelFormat extends AXMLFormat<IFeatureModel> imp
 	@Override
 	public String getName() {
 		return "FeatureIDE (Extended Feature Model)";
+	}
+
+	@Override
+	public void setFeatureNameValidator(IFeatureNameValidator validator) {
+		this.validator = validator;
+	}
+
+	@Override
+	public IFeatureNameValidator getFeatureNameValidator() {
+		return validator;
 	}
 
 }

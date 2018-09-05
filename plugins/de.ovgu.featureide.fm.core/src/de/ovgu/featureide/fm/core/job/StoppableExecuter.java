@@ -31,6 +31,8 @@ import de.ovgu.featureide.fm.core.job.monitor.IMonitor.MethodCancelException;
  */
 class StoppableExecuter<T> extends Executer<T> {
 
+	static final int DEFAULT_TIMEOUT = 300;
+
 	private class InnerThread extends Thread {
 
 		private T result = null;
@@ -56,7 +58,7 @@ class StoppableExecuter<T> extends Executer<T> {
 
 	public StoppableExecuter(LongRunningMethod<T> method, int cancelingTimeout) {
 		super(method);
-		this.cancelingTimeout = (cancelingTimeout < 0) ? 300 : cancelingTimeout;
+		this.cancelingTimeout = (cancelingTimeout < 0) ? DEFAULT_TIMEOUT : cancelingTimeout;
 	}
 
 	public StoppableExecuter(LongRunningMethod<T> method) {

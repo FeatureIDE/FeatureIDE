@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IResourceDelta;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 
 /**
  * @brief Base interface of all composition tool classes.
@@ -198,4 +199,9 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 * @return The generation {@link Mechanism} of the generation tool, or null.
 	 */
 	Mechanism getGenerationMechanism();
+
+	/**
+	 * @return The format that should be used to create the feature model
+	 */
+	IFeatureModelFormat getFeatureModelFormat();
 }

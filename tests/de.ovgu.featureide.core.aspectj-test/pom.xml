@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>de.ovgu.featureide</groupId>
 		<artifactId>de.ovgu.featureide.root</artifactId>
-		<version>3.5.1-SNAPSHOT</version>
+		<version>3.5.2-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>de.ovgu.featureide.core.aspectj-test</artifactId>
-	<version>3.5.1-SNAPSHOT</version>
+	<version>3.5.2-SNAPSHOT</version>
 	<packaging>eclipse-test-plugin</packaging>
 </project>

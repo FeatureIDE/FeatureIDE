@@ -39,7 +39,6 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.job.IRunner;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.monitor.IMonitor;
@@ -76,9 +75,7 @@ public class AllConfigrationsGenerator extends AConfigurationGenerator {
 				return true;
 			}
 		}, IConfigurationBuilderBasics.JOB_TITLE_COUNT_CONFIGURATIONS);
-		if (number instanceof LongRunningJob<?>) {
-			((LongRunningJob<?>) number).setPriority(Job.LONG);
-		}
+		number.setPriority(Job.LONG);
 		number.schedule();
 	}
 

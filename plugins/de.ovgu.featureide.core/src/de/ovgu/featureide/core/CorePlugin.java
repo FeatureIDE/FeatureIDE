@@ -103,8 +103,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.XMLConfFormat;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.manager.SimpleFileHandler;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IRunner;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -447,7 +447,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		final IComposerExtensionClass composer = getComposer(compositionToolID);
 		createProjectStructure(project, sourcePath, configPath, buildPath, composer, shouldCreateSourceFolder, shouldCreateBuildFolder);
 
-		final IFeatureModel featureModel = createFeatureModelFile(project);
+		final IFeatureModel featureModel = createFeatureModelFile(project, composer);
 		createConfigFile(project, configPath, featureModel, "default.");
 
 		if ((composer != null) && addCompiler) {
@@ -587,11 +587,11 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, configPath);
 	}
 
-	private static IFeatureModel createFeatureModelFile(IProject project) {
+	private static IFeatureModel createFeatureModelFile(IProject project, IComposerExtensionClass composerClass) {
 		final Path modelPath = Paths.get(project.getFile("model.xml").getLocationURI());
 
 		if (!modelPath.toFile().exists()) {
-			final XmlFeatureModelFormat format = new XmlFeatureModelFormat();
+			final IFeatureModelFormat format = composerClass.getFeatureModelFormat();
 			IFeatureModelFactory factory;
 			try {
 				factory = FMFactoryManager.getFactory(modelPath.toString(), format);
