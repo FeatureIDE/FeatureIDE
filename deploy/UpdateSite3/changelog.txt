@@ -7,6 +7,15 @@ https://github.com/FeatureIDE/FeatureIDE/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 3.5.2 (September 2018)
+* Hotfix containing only stability improvements over v3.5.1
+* Improved loading and saving of feature models (#759, #761, #771, #773, #776, #799)
+* Better performance for feature models with large contraints (#780)
+* Configuration only marked as invalid if the feature model is not void (#797)
+* FeatureIDE library improved (#807)
+* Mac users find a README in the prepackaged Eclipse when having trouble running unsigned code (#801)
+* Numerous further issues fixed: https://github.com/FeatureIDE/FeatureIDE/milestone/26?closed=1
+
 Release 3.5.1 (June 2018)
 * Hotfix containing only stability improvements over v3.5.0
 * Better performance for analyses in constraint dialog (#736)

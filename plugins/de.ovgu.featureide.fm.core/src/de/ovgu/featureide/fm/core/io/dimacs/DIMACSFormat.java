@@ -32,12 +32,9 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.PluginID;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.ProblemList;
 
@@ -47,7 +44,7 @@ import de.ovgu.featureide.fm.core.io.ProblemList;
  * @author Sebastian Krieter
  * @author Timo G&uuml;nther
  */
-public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class DIMACSFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + DIMACSFormat.class.getSimpleName();
 
@@ -64,6 +61,7 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 	@Override
 	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
 		final ProblemList problemList = new ProblemList();
+		setFactory(featureModel);
 
 		// Transform the input into a propositional node.
 		final DimacsReader r = new DimacsReader();
@@ -88,7 +86,6 @@ public class DIMACSFormat extends APersistentFormat<IFeatureModel> implements IF
 	 */
 	private void addNodeToFeatureModel(IFeatureModel featureModel, Node node) {
 		// Add a dummy feature as root.
-		final IFeatureModelFactory factory = FMFactoryManager.getFactory(featureModel);
 		final IFeature rootFeature = factory.createFeature(featureModel, "__Root__");
 		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);

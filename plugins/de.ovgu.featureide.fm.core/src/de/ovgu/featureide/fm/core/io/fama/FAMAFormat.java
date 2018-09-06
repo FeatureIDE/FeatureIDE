@@ -30,8 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.conversion.ComplexConstraintConverter;
-import de.ovgu.featureide.fm.core.io.APersistentFormat;
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
+import de.ovgu.featureide.fm.core.io.AFeatureModelFormat;
 
 /**
  * Prints feature models in the FaMa format.
@@ -39,7 +38,7 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
  * @author Alexander Knueppel
  * @author Sebastian Krieter
  */
-public class FAMAFormat extends APersistentFormat<IFeatureModel> implements IFeatureModelFormat {
+public class FAMAFormat extends AFeatureModelFormat {
 
 	public static final String ID = PluginID.PLUGIN_ID + ".format.fm." + FAMAFormat.class.getSimpleName();
 
