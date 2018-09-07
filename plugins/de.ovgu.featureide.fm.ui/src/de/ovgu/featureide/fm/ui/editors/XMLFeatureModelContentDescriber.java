@@ -17,7 +17,7 @@ public class XMLFeatureModelContentDescriber implements IContentDescriber {
 	public int describe(InputStream contents, IContentDescription description) throws IOException {
 		final LazyReader lazyReader = new LazyReader(contents);
 		for (final IFeatureModelFormat format : FMFormatManager.getInstance().getExtensions()) {
-			if (format.supportsContent(lazyReader)) {
+			if ("xml".equals(format.getSuffix()) && format.supportsContent(lazyReader)) {
 				return IContentDescriber.VALID;
 			}
 		}
