@@ -168,7 +168,7 @@ import de.ovgu.featureide.fm.ui.utils.SearchField;
 public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUIDefaults, IEventListener {
 
 	private static final String PAGE_TEXT = FEATURE_DIAGRAM;
-	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
 	private static final IPersistentFormat<IGraphicalFeatureModel> format = new GraphicalFeatureModelFormat();
 
 	private final Path extraPath;
