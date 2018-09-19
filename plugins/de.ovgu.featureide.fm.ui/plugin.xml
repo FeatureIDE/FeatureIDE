@@ -180,6 +180,14 @@
 				name="FeatureIDE Outline"
 				restorable="true">
 		</view>
+  <view
+        category="FeatureIDE"
+        class="de.ovgu.featureide.fm.ui.views.constraintview.ConstraintView"
+        icon="icons/FeatureIconSmall.ico"
+        id="de.ovgu.featureide.fm.ui.views.constraintView"
+        name="Feature Model Constraint View"
+        restorable="true">
+  </view>
 	</extension>
 	<extension
 			point="org.eclipse.ui.propertyPages">
