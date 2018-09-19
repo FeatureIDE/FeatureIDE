@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -33,6 +35,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -50,7 +53,6 @@ public class ConstraintView extends ViewPart implements IEventListener {
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TableViewer viewer;
-
 	private Table table;
 
 	/*
@@ -68,15 +70,27 @@ public class ConstraintView extends ViewPart implements IEventListener {
 
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+
 		// define layout for the viewer
 		addTableLayout(viewer);
 		viewer.refresh();
 	}
 
+	private void initializeContent() {
+
+	}
+
+	private void refreshConstraints(List<IConstraint> constraints) {
+		for (final IConstraint constraint : constraints) {
+			viewer.add(constraint); // adds constraint to table
+		}
+		viewer.refresh();
+	}
+
 	private void addTableLayout(TableViewer viewer) {
 		final TableLayout layout = new TableLayout();
-		layout.addColumnData(new ColumnWeightData(20, true));
-		layout.addColumnData(new ColumnWeightData(80, 800, true));
+		layout.addColumnData(new ColumnWeightData(60, true));
+		layout.addColumnData(new ColumnWeightData(40, 800, true));
 		viewer.getTable().setLayout(layout);
 	}
 
@@ -84,19 +98,28 @@ public class ConstraintView extends ViewPart implements IEventListener {
 		final TableViewerColumn constraintViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn constraintColumn = constraintViewerColumn.getColumn();
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		addColumnProvider(constraintViewerColumn, 0);
+		addConstraintColumnProvider(constraintViewerColumn);
 
 		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
 		descriptionColumn.setText(DESCRIPTION_HEADER);
-		addColumnProvider(descriptionViewerColumn, 1);
+		addDescriptionColumnProvider(descriptionViewerColumn);
 	}
 
-	private void addColumnProvider(TableViewerColumn viewerColumn, final int columNumber) {
+	private void addConstraintColumnProvider(TableViewerColumn viewerColumn) {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return super.getText(((String[]) element)[columNumber]);
+				return super.getText(((IConstraint) element).getDisplayName());
+			}
+		});
+	}
+
+	private void addDescriptionColumnProvider(TableViewerColumn viewerColumn) {
+		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return super.getText(((IConstraint) element).getDescription());
 			}
 		});
 	}
@@ -115,9 +138,20 @@ public class ConstraintView extends ViewPart implements IEventListener {
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
 	 */
+
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		// TODO Auto-generated method stub
+		System.out.println(event.getEventType());
+		switch (event.getEventType()) {
+		case MODEL_DATA_LOADED:
+		case MODEL_DATA_SAVED:
+			System.out.println("model data loaded event triggered");
+			// refreshConstraints();
+			break;
+
+		default:
+			break;
+		}
 
 	}
 
