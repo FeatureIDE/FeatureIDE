@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -58,30 +60,35 @@ public class ConstraintView extends ViewPart implements IEventListener {
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-
 		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table = viewer.getTable();
+		// add headings
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setInput(new String[][] { { "1", "2" }, { "1", "2" }, { "1", "2" } });
 
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		// define layout for the viewer
+		addTableLayout(viewer);
+		viewer.refresh();
+	}
 
+	private void addTableLayout(TableViewer viewer) {
+		final TableLayout layout = new TableLayout();
+		layout.addColumnData(new ColumnWeightData(20, true));
+		layout.addColumnData(new ColumnWeightData(80, 800, true));
+		viewer.getTable().setLayout(layout);
 	}
 
 	private void addColumns(TableViewer viewer) {
 		final TableViewerColumn constraintViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn constraintColumn = constraintViewerColumn.getColumn();
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		constraintColumn.setWidth(100);
 		addColumnProvider(constraintViewerColumn, 0);
 
 		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
 		descriptionColumn.setText(DESCRIPTION_HEADER);
-		constraintColumn.setWidth(100);
 		addColumnProvider(descriptionViewerColumn, 1);
 	}
 
