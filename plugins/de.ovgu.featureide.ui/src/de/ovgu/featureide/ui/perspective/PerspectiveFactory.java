@@ -67,11 +67,11 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		final IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
 		final IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 
-		down.addView(CollaborationView.ID);
-		down.addView(ConfigurationMap.ID);
-		down.addView(FeatureModelEditView.ID);
-		down.addView(FeatureStatisticsView.ID);
 		down.addView(ConstraintView.ID);
+		down.addView(FeatureModelEditView.ID);
+		down.addView(ConfigurationMap.ID);
+		down.addView(CollaborationView.ID);
+		down.addView(FeatureStatisticsView.ID);
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
