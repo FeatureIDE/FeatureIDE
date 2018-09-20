@@ -27,8 +27,10 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -56,6 +58,15 @@ public class ConstraintView {
 		viewer.add(element);
 	}
 
+	public void colorTable() {
+		for (int i = 0; i < table.getItemCount(); i++) {
+			if ((i % 2) == 1) {
+				viewer.getTable().getItem(i).setBackground(new Color(table.getParent().getDisplay(), 235, 235, 235));
+			}
+		}
+
+	}
+
 	public void removeItem(IConstraint element) {
 		viewer.remove(element);
 	}
@@ -72,12 +83,14 @@ public class ConstraintView {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table = viewer.getTable();
-
+		table.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
+		table.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		addTableLayout(viewer);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+
 	}
 
 	private void addTableLayout(TableViewer viewer) {
@@ -94,6 +107,7 @@ public class ConstraintView {
 		addConstraintColumnProvider(constraintViewerColumn);
 
 		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
+
 		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 		addDescriptionColumnProvider(descriptionViewerColumn);

@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
@@ -32,7 +31,9 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
@@ -45,11 +46,15 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author "Thomas Graave"
  */
 public class ConstraintViewController extends ViewPart implements IEventListener {
-	public ConstraintViewController() {}
+	public ConstraintViewController() {
+
+	}
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
 
 	private ConstraintView viewer;
+	private FeatureModelManager fmManager;
+	private IFeatureModel currentModel;
 
 	/*
 	 * (non-Javadoc)
@@ -61,7 +66,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		viewer = new ConstraintView(parent);
 		getSite().getPage().addPartListener(constraintListener);
 
-		final IFeatureModel currentModel = FeatureModelUtil.getFeatureModel();
+		currentModel = FeatureModelUtil.getFeatureModel();
 
 		refreshView(currentModel);
 	}
@@ -72,12 +77,16 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * @param FeatureModel that contains the constraints
 	 */
 	public void refreshView(IFeatureModel currentModel) {
+		fmManager = FeatureModelManager.getInstance(currentModel.getSourceFile());
+		this.currentModel = currentModel;
+		addEventListener(this);
 		viewer.getViewer().refresh();
 		if (currentModel != null) {
 			for (final IConstraint constraint : currentModel.getConstraints()) {
 				viewer.addItem(constraint);
 			}
 		}
+		viewer.colorTable();
 	}
 
 	private final IPartListener constraintListener = new IPartListener() {
@@ -92,24 +101,26 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 			// React to ModelView
-			if (part == viewer) {
-				System.out.println("View ist nicht offen, yeeeah");
-			}
+
 			// Show/Hide Constraint List
 		}
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			// React to ModelView
-
+			if (part instanceof FeatureModelEditor) {
+				if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
+					viewer.getViewer().refresh();
+				}
+			}
 			// Show/Hide Constraint List
 		}
 
 		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 			// React to ModelView
-			if (part instanceof IEditorPart) {
-				System.out.println("Brought to top");
+			if (part instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part).getFeatureModel());
 			}
 			// Show/Hide Constraint List
 		}
@@ -117,8 +128,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partActivated(IWorkbenchPart part) {
 			// React to ModelView
-			if (part instanceof IEditorPart) {
-				System.out.println("View ist offen, yeeeah");
+			if (part instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part).getFeatureModel());
 			}
 			// Show/Hide Constraint List
 		}
@@ -139,21 +150,24 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
 	 */
+	public void addEventListener(IEventListener listener) {
+		if (fmManager == null) {
+			return;
+		}
+		fmManager.addListener(listener);
+	}
+
+	public void removeEventListener(IEventListener listener) {
+		if (fmManager == null) {
+			return;
+		}
+		fmManager.removeListener(listener);
+	}
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		System.out.println(event.getEventType());
-		switch (event.getEventType()) {
-		case MODEL_DATA_LOADED:
-		case MODEL_DATA_SAVED:
-			System.out.println("model data loaded event triggered");
-			// refreshConstraints();
-			break;
-
-		default:
-			break;
-		}
-
+		// TODO: make refreshView in switch case
+		refreshView(currentModel);
 	}
 
 }
