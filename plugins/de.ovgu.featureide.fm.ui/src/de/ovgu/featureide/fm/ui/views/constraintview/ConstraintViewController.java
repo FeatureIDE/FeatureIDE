@@ -56,10 +56,19 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		viewer = new ConstraintView(parent);
 		final IFeatureModel currentModel = FeatureModelUtil.getFeatureModel();
 
+		refreshView(currentModel);
+	}
+
+	/**
+	 * this method first clears the table and then adds all current existing constraints.
+	 *
+	 * @param FeatureModel that contains the constraints
+	 */
+	public void refreshView(IFeatureModel currentModel) {
+		viewer.getViewer().refresh();
 		if (currentModel != null) {
 			for (final IConstraint constraint : currentModel.getConstraints()) {
 				viewer.addItem(constraint);
-
 			}
 		}
 	}
