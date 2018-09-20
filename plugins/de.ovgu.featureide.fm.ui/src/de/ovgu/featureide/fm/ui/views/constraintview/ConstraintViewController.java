@@ -23,6 +23,9 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -38,6 +41,8 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
+ * @author "Rahel Arens"
+ * @author "Thomas Graave"
  */
 public class ConstraintViewController extends ViewPart implements IEventListener {
 	public ConstraintViewController() {}
@@ -54,6 +59,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
+		getSite().getPage().addPartListener(constraintListener);
+
 		final IFeatureModel currentModel = FeatureModelUtil.getFeatureModel();
 
 		if (currentModel != null) {
@@ -63,6 +70,51 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			}
 		}
 	}
+
+	private final IPartListener constraintListener = new IPartListener() {
+
+		@Override
+		public void partOpened(IWorkbenchPart part) {
+			// React to ModelView
+
+			// Show/Hide Constraint List
+		}
+
+		@Override
+		public void partDeactivated(IWorkbenchPart part) {
+			// React to ModelView
+			if (part == viewer) {
+				System.out.println("View ist nicht offen, yeeeah");
+			}
+			// Show/Hide Constraint List
+		}
+
+		@Override
+		public void partClosed(IWorkbenchPart part) {
+			// React to ModelView
+
+			// Show/Hide Constraint List
+		}
+
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part) {
+			// React to ModelView
+			if (part instanceof IEditorPart) {
+				System.out.println("Brought to top");
+			}
+			// Show/Hide Constraint List
+		}
+
+		@Override
+		public void partActivated(IWorkbenchPart part) {
+			// React to ModelView
+			if (part instanceof IEditorPart) {
+				System.out.println("View ist offen, yeeeah");
+			}
+			// Show/Hide Constraint List
+		}
+
+	};
 
 	/*
 	 * (non-Javadoc)
