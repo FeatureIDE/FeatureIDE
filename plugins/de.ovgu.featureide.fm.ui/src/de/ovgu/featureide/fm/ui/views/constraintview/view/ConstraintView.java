@@ -18,9 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.constraintview;
-
-import java.util.List;
+package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -33,58 +31,54 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * TODO description
  *
  * @author "Rosiak Kamil"
  */
-public class ConstraintView extends ViewPart implements IEventListener {
-	public ConstraintView() {}
-
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
+public class ConstraintView {
 
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TableViewer viewer;
 	private Table table;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
+	public ConstraintView(Composite parent) {
+		init(parent);
+	}
+
+	public void addItem(Object element) {
+		viewer.add(element);
+		viewer.refresh();
+	}
+
+	public void removeItem(Object element) {
+		viewer.remove(element);
+		viewer.refresh();
+	}
+
+	public TableViewer getViewer() {
+		return viewer;
+	}
+
+	public void removeAll() {
+		viewer.getTable().removeAll();
+		viewer.refresh();
+	}
+
+	private void init(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table = viewer.getTable();
-		// add headings
+
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-
+		addTableLayout(viewer);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-
-		// define layout for the viewer
-		addTableLayout(viewer);
-		viewer.refresh();
-	}
-
-	private void initializeContent() {
-
-	}
-
-	private void refreshConstraints(List<IConstraint> constraints) {
-		for (final IConstraint constraint : constraints) {
-			viewer.add(constraint); // adds constraint to table
-		}
-		viewer.refresh();
 	}
 
 	private void addTableLayout(TableViewer viewer) {
@@ -122,37 +116,6 @@ public class ConstraintView extends ViewPart implements IEventListener {
 				return super.getText(((IConstraint) element).getDescription());
 			}
 		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
-
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		System.out.println(event.getEventType());
-		switch (event.getEventType()) {
-		case MODEL_DATA_LOADED:
-		case MODEL_DATA_SAVED:
-			System.out.println("model data loaded event triggered");
-			// refreshConstraints();
-			break;
-
-		default:
-			break;
-		}
-
 	}
 
 }

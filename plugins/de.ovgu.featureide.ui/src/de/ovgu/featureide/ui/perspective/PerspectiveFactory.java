@@ -29,7 +29,7 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
 import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
-import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintView;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.outline.custom.Outline;
 import de.ovgu.featureide.fm.ui.wizards.NewFeatureModelWizard;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -71,7 +71,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		down.addView(ConfigurationMap.ID);
 		down.addView(FeatureModelEditView.ID);
 		down.addView(FeatureStatisticsView.ID);
-		down.addView(ConstraintView.ID);
+		down.addView(ConstraintViewController.ID);
 
 		down.addView(IPageLayout.ID_PROBLEM_VIEW);
 		down.addView("org.eclipse.ui.console.ConsoleView");
