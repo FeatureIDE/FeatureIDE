@@ -50,12 +50,12 @@ public class ConstraintView {
 		init(parent);
 	}
 
-	public void addItem(Object element) {
+	public void addItem(IConstraint element) {
 		viewer.add(element);
 		viewer.refresh();
 	}
 
-	public void removeItem(Object element) {
+	public void removeItem(IConstraint element) {
 		viewer.remove(element);
 		viewer.refresh();
 	}
