@@ -18,10 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.views.constraintview;
+package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -29,89 +31,97 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.part.ViewPart;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
  * TODO description
  *
  * @author "Rosiak Kamil"
+ * @author "Domenik Eichhorn"
  */
-public class ConstraintView extends ViewPart implements IEventListener {
-	public ConstraintView() {}
-
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
+public class ConstraintView {
 
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TableViewer viewer;
-
 	private Table table;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
-		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
+	public ConstraintView(Composite parent) {
+		init(parent);
+	}
 
+	public void addItem(IConstraint element) {
+		// add to table:
+		viewer.add(element);
+	}
+
+	public void removeItem(IConstraint element) {
+		viewer.remove(element);
+	}
+
+	public TableViewer getViewer() {
+		return viewer;
+	}
+
+	public void removeAll() {
+		viewer.getTable().removeAll();
+	}
+
+	private void init(Composite parent) {
+		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table = viewer.getTable();
+
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setInput(new String[][] { { "1", "2" }, { "1", "2" }, { "1", "2" } });
-
+		addTableLayout(viewer);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		// define layout for the viewer
+	}
 
+	private void addTableLayout(TableViewer viewer) {
+		final TableLayout layout = new TableLayout();
+		layout.addColumnData(new ColumnWeightData(60, true));
+		layout.addColumnData(new ColumnWeightData(40, 800, true));
+		viewer.getTable().setLayout(layout);
 	}
 
 	private void addColumns(TableViewer viewer) {
 		final TableViewerColumn constraintViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn constraintColumn = constraintViewerColumn.getColumn();
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		constraintColumn.setWidth(100);
-		addColumnProvider(constraintViewerColumn, 0);
+		addConstraintColumnProvider(constraintViewerColumn);
 
 		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
 		descriptionColumn.setText(DESCRIPTION_HEADER);
-		constraintColumn.setWidth(100);
-		addColumnProvider(descriptionViewerColumn, 1);
+		addDescriptionColumnProvider(descriptionViewerColumn);
 	}
 
-	private void addColumnProvider(TableViewerColumn viewerColumn, final int columNumber) {
+	private void addConstraintColumnProvider(TableViewerColumn viewerColumn) {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return super.getText(((String[]) element)[columNumber]);
+				// reformats the DisplayName with logical element from unicode
+				String displayName = ((IConstraint) element).getDisplayName();
+				displayName = displayName.replace("|", "\u2228");
+				displayName = displayName.replace("<=>", "\u21D4");
+				displayName = displayName.replace("=>", "\u21D2");
+				displayName = displayName.replace("&", "\u2227");
+				displayName = displayName.replace("-", "\u00AC");
+				return super.getText(displayName);
 			}
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		// TODO Auto-generated method stub
-
+	private void addDescriptionColumnProvider(TableViewerColumn viewerColumn) {
+		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return super.getText(((IConstraint) element).getDescription());
+			}
+		});
 	}
 
 }
