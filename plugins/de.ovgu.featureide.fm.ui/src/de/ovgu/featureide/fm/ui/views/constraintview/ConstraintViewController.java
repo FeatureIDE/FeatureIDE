@@ -25,15 +25,19 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
  * TODO description
  *
  * @author "Rosiak Kamil"
+ * @author "Domenik Eichhorn"
  */
 public class ConstraintViewController extends ViewPart implements IEventListener {
 	public ConstraintViewController() {}
@@ -50,7 +54,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
+		final IFeatureModel currentModel = FeatureModelUtil.getFeatureModel();
 
+		if (currentModel != null) {
+			for (final IConstraint constraint : currentModel.getConstraints()) {
+				viewer.addItem(constraint);
+
+			}
+		}
 	}
 
 	/*

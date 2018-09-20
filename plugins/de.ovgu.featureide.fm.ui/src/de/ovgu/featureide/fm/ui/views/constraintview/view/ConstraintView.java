@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * TODO description
  *
  * @author "Rosiak Kamil"
+ * @author "Domenik Eichhorn"
  */
 public class ConstraintView {
 
@@ -51,13 +52,12 @@ public class ConstraintView {
 	}
 
 	public void addItem(IConstraint element) {
+		// add to table:
 		viewer.add(element);
-		viewer.refresh();
 	}
 
 	public void removeItem(IConstraint element) {
 		viewer.remove(element);
-		viewer.refresh();
 	}
 
 	public TableViewer getViewer() {
@@ -66,7 +66,6 @@ public class ConstraintView {
 
 	public void removeAll() {
 		viewer.getTable().removeAll();
-		viewer.refresh();
 	}
 
 	private void init(Composite parent) {
@@ -104,7 +103,14 @@ public class ConstraintView {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return super.getText(((IConstraint) element).getDisplayName());
+				// reformats the DisplayName with logical element from unicode
+				String displayName = ((IConstraint) element).getDisplayName();
+				displayName = displayName.replace("|", "\u2228");
+				displayName = displayName.replace("<=>", "\u21D4");
+				displayName = displayName.replace("=>", "\u21D2");
+				displayName = displayName.replace("&", "\u2227");
+				displayName = displayName.replace("-", "\u00AC");
+				return super.getText(displayName);
 			}
 		});
 	}
