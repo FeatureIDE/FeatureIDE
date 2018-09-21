@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class ConstraintView extends ViewPart implements IEventListener {
 	public ConstraintView() {}
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.ConstraintView";
 
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
@@ -51,10 +51,6 @@ public class ConstraintView extends ViewPart implements IEventListener {
 
 	private Table table;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -63,7 +59,6 @@ public class ConstraintView extends ViewPart implements IEventListener {
 		table = viewer.getTable();
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setInput(new String[][] { { "1", "2" }, { "1", "2" }, { "1", "2" } });
 
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -94,23 +89,13 @@ public class ConstraintView extends ViewPart implements IEventListener {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		// TODO Auto-generated method stub
 
 	}
 
