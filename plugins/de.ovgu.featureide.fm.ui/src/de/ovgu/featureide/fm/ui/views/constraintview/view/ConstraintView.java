@@ -23,9 +23,11 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -46,6 +48,7 @@ public class ConstraintView implements GUIDefaults {
 	private final String DESCRIPTION_HEADER = "Description";
 	private TreeViewer treeViewer;
 	private Tree tree;
+	private Text searchBox;
 
 	private TreeColumn constraintColumn, descriptionColumn;
 
@@ -108,9 +111,22 @@ public class ConstraintView implements GUIDefaults {
 	 * This method initializes the view
 	 */
 	private void init(Composite parent) {
-		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
+		parent.setLayout(new GridLayout(1, false));
+
+		final GridData boxData = new GridData();
+		boxData.grabExcessHorizontalSpace = true;
+		boxData.horizontalAlignment = SWT.FILL;
+		searchBox = new Text(parent, SWT.SEARCH);
+		searchBox.setLayoutData(boxData);
+
 		treeViewer = new TreeViewer(parent, SWT.BORDER);
+		final GridData treeData = new GridData();
+		treeData.grabExcessHorizontalSpace = true;
+		treeData.horizontalAlignment = SWT.FILL;
+		treeData.grabExcessVerticalSpace = true;
+		treeData.verticalAlignment = SWT.FILL;
 		tree = treeViewer.getTree();
+		tree.setLayoutData(treeData);
 		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
 		tree.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
 
@@ -135,6 +151,14 @@ public class ConstraintView implements GUIDefaults {
 		descriptionColumn.setWidth(200);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 
+	}
+
+	/**
+	 *
+	 * @return Text searchBox
+	 */
+	public Text getSearchBox() {
+		return searchBox;
 	}
 
 }
