@@ -55,8 +55,6 @@ public class ConstraintView implements GUIDefaults {
 
 	/**
 	 * This method adds a constraint to the view
-	 *
-	 * @param element
 	 */
 	public void addItem(IConstraint element) {
 		final TreeItem item = new TreeItem(tree, SWT.None);
@@ -74,6 +72,9 @@ public class ConstraintView implements GUIDefaults {
 		tree.setHeaderVisible(true);
 	}
 
+	/**
+	 * This method adds a item to represent that no feature model editor is activated or no feature model is loaded.
+	 */
 	public void addNoFeatureModelItem() {
 		removeAll();
 		final TreeItem item = new TreeItem(tree, SWT.ICON);
@@ -84,16 +85,13 @@ public class ConstraintView implements GUIDefaults {
 
 	/**
 	 * This method removes a constraint from the view
-	 *
-	 * @param element
 	 */
 	public void removeItem(IConstraint element) {
 		treeViewer.remove(element);
 	}
 
 	/**
-	 * This method returns the table viewer
-	 *
+	 * This method returns the tree viewer
 	 */
 	public TreeViewer getViewer() {
 		return treeViewer;
@@ -107,7 +105,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * This method initialises the view
+	 * This method initializes the view
 	 */
 	private void init(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -122,9 +120,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * Adding the columns with topics to the table viewer
-	 *
-	 * @param viewer
+	 * Adding the columns with topics to the tree viewer
 	 */
 	private void addColumns(TreeViewer viewer) {
 		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);

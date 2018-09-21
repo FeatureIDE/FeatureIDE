@@ -48,10 +48,12 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
-
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 
+	/**
+	 * Standard SWT initialize called after construction.
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -79,13 +81,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
+	/**
+	 * listening on events that fired from parts
+	 */
 	private final IPartListener constraintListener = new IPartListener() {
 
 		@Override
 		public void partOpened(IWorkbenchPart part) {
-			// React to ModelView
 
-			// Show/Hide Constraint List
 		}
 
 		@Override
@@ -123,6 +126,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			// React to ModelView
 			if (part instanceof FeatureModelEditor) {
 				refreshView(((FeatureModelEditor) part).getFeatureModel());
+			} else if ((part instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
+				refreshView(FeatureModelUtil.getFeatureModel());
 			}
 			// Show/Hide Constraint List
 		}
@@ -133,10 +138,12 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 	}
 
+	/**
+	 * Reacts on observer of the current feature model
+	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		// TODO: make refreshView in switch case
 		refreshView(currentModel);
-	}
 
+	}
 }
