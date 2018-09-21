@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of a feature model.
  *
  * @author Sebastian Krieter
+ * @author Thomas Graave
+ * @author Rahel Arens
  */
 public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
@@ -50,6 +52,10 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	void setLegend(Legend legend);
 
 	Legend getLegend();
+
+	void setConstraintsHidden(boolean hideConstraints);
+
+	boolean getConstraintsHidden();
 
 	void handleLegendLayoutChanged();
 

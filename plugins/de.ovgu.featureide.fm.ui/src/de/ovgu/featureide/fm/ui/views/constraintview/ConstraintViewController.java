@@ -25,6 +25,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
@@ -35,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
@@ -57,6 +59,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private final ConstraintViewController viewController = this;
 
 	private IFeatureModel featuremodel;
+	private IGraphicalFeatureModel graph_model;
 
 	/*
 	 * (non-Javadoc)
@@ -106,9 +109,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			// React to ModelView
 
 			// Show/Hide Constraint List
-			if (part == viewController) {
-
-			}
 		}
 
 		@Override
@@ -120,6 +120,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				}
 			}
 			// Show/Hide Constraint List
+			if (part == viewController) {
+				setConstraintsHidden(false);
+			}
 		}
 
 		@Override
@@ -129,6 +132,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				refreshView(((FeatureModelEditor) part).getFeatureModel());
 			}
 			// Show/Hide Constraint List
+			if (part == viewController) {
+				setConstraintsHidden(true);
+			}
 		}
 
 		@Override
@@ -139,11 +145,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			}
 			// Show/Hide Constraint List
 			if (part == viewController) {
-				featuremodel = FeatureModelUtil.getFeatureModel();
-				featuremodel.getConstraints();
-				for (final IConstraint c : featuremodel.getConstraints()) {}
-				// featuremodel.System.out.println("View ist offen, yeeeah");
+				setConstraintsHidden(true);
+			} else if (part instanceof IViewPart) {
+				setConstraintsHidden(false);
 			}
+
 		}
 
 	};
@@ -156,6 +162,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	public void setFocus() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void setConstraintsHidden(boolean hideConstraints) {
+		FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
+		FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().redrawDiagram();
 	}
 
 	/*
