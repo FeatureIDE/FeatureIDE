@@ -28,6 +28,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
 /**
  * TODO description
@@ -46,8 +47,11 @@ public class FeatureModelBounds {
 
 		for (final IGraphicalElement element : elements) {
 			int labelWidth = 0;
-			if (((IGraphicalFeature) element).getCollapsedDecoration() != null) {
-				labelWidth = ((IGraphicalFeature) element).getCollapsedDecoration().getDimension().width;
+			int labelHeight = 0;
+			final CollapsedDecoration collapsedDecoration = (CollapsedDecoration) ((IGraphicalFeature) element).getCollapsedDecoration();
+			if (collapsedDecoration != null) {
+				labelWidth = collapsedDecoration.getDimension().width;
+				labelHeight = collapsedDecoration.getDimension().height;
 			}
 
 			final Rectangle position = FeatureUIHelper.getBounds(element);
@@ -61,7 +65,7 @@ public class FeatureModelBounds {
 				max.x = position.right() + labelWidth;
 			}
 			if ((position.y + position.height) > max.y) {
-				max.y = position.bottom();
+				max.y = position.bottom() + labelHeight;
 			}
 		}
 
