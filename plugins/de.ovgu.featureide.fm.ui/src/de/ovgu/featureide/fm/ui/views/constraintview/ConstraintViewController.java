@@ -52,7 +52,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 
-	boolean constraintsHidden = true;
+	boolean constraintsHidden = false;
 
 	/**
 	 * Standard SWT initialize called after construction.
