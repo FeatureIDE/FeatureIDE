@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
- * TODO description
+ * TODO This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
@@ -46,9 +46,6 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author "Thomas Graave"
  */
 public class ConstraintViewController extends ViewPart implements IEventListener {
-	public ConstraintViewController() {
-
-	}
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
 
