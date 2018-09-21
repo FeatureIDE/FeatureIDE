@@ -59,7 +59,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
 		getSite().getPage().addPartListener(constraintListener);
-
 		currentModel = FeatureModelUtil.getFeatureModel();
 
 		refreshView(currentModel);
@@ -81,8 +80,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
-	/**
-	 * listening on events that fired from parts
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	private final IPartListener constraintListener = new IPartListener() {
 
