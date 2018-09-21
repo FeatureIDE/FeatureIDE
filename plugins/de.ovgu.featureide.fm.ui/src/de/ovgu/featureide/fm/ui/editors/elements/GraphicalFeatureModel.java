@@ -60,7 +60,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected Map<IConstraint, IGraphicalConstraint> constraints = new HashMap<IConstraint, IGraphicalConstraint>();
 
 	protected boolean hiddenLegend = false;
-	protected boolean hiddenConstraints = true;
+	protected boolean hiddenConstraints = false;
 	protected Legend legend;
 
 	/**
