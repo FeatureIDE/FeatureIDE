@@ -20,9 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -33,9 +42,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
@@ -47,12 +59,11 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author "Thomas Graave"
  */
 public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
-
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 
-	boolean constraintsHidden = true;
+	boolean constraintsHidden = false;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -61,11 +72,13 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
+		addListener();
 		getSite().getPage().addPartListener(constraintListener);
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			currentModel = FeatureModelUtil.getFeatureModel();
 			refreshView(currentModel);
 		}
+		createContextMenu(viewer.getViewer());
 
 	}
 
@@ -146,6 +159,57 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		public void partInputChanged(IWorkbenchPartReference partRef) {}
 
 	};
+
+	/**
+	 * adding Listener to the tree viewer
+	 */
+	private void addListener() {
+		// doubleclicklistener
+		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+
+				if (event.getSource() instanceof TreeViewer) {
+					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+					if (treeSelection.getFirstElement() instanceof IConstraint) {
+						final IConstraint constrait = (IConstraint) treeSelection.getFirstElement();
+						final ConstraintDialog constraintDialog = new ConstraintDialog(currentModel, constrait);
+					}
+
+				}
+
+			}
+		});
+	}
+
+	/**
+	 * Creates the context menu
+	 *
+	 * @param viewer
+	 */
+	protected void createContextMenu(Viewer viewer) {
+		final MenuManager contextMenu = new MenuManager("#ViewerMenu"); //$NON-NLS-1$
+		contextMenu.setRemoveAllWhenShown(true);
+		contextMenu.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager mgr) {
+				fillContextMenu(mgr);
+			}
+		});
+
+		final Menu menu = contextMenu.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
+	}
+
+	/**
+	 * Fill dynamic context menu
+	 *
+	 * @param contextMenu
+	 */
+	protected void fillContextMenu(IMenuManager contextMenu) {
+		contextMenu.add(new CreateConstraintAction(viewer.getViewer(), currentModel));
+		contextMenu.add(new EditConstraintAction(viewer.getViewer(), currentModel));
+	}
 
 	@Override
 	public void setFocus() {}
