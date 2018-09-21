@@ -27,15 +27,17 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * TODO description
+ * TODO This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
@@ -51,35 +53,72 @@ public class ConstraintView {
 		init(parent);
 	}
 
+	/**
+	 * This method adds a constraint to the view
+	 *
+	 * @param element
+	 */
 	public void addItem(IConstraint element) {
 		// add to table:
 		viewer.add(element);
 	}
 
+	/**
+	 * This method alternates the background color of the table viewer to get a better look and feel.
+	 */
+	public void colorTable() {
+		for (int i = 0; i < table.getItemCount(); i++) {
+			if ((i % 2) == 1) {
+				viewer.getTable().getItem(i).setBackground(new Color(table.getParent().getDisplay(), 235, 235, 235));
+			}
+		}
+
+	}
+
+	/**
+	 * This method removes a constraint from the view
+	 *
+	 * @param element
+	 */
 	public void removeItem(IConstraint element) {
 		viewer.remove(element);
 	}
 
+	/**
+	 * This method returns the table viewer
+	 *
+	 */
 	public TableViewer getViewer() {
 		return viewer;
 	}
 
+	/**
+	 * This method removes all constraints from the view
+	 */
 	public void removeAll() {
 		viewer.getTable().removeAll();
 	}
 
+	/**
+	 * This method initialises the view
+	 */
 	private void init(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table = viewer.getTable();
-
+		table.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
+		table.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
 		addColumns(viewer);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		addTableLayout(viewer);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+
 	}
 
+	/**
+	 * Layouting of the table viewer
+	 */
 	private void addTableLayout(TableViewer viewer) {
 		final TableLayout layout = new TableLayout();
 		layout.addColumnData(new ColumnWeightData(60, true));
@@ -87,6 +126,11 @@ public class ConstraintView {
 		viewer.getTable().setLayout(layout);
 	}
 
+	/**
+	 * Adding the columns with topics to the table viewer
+	 *
+	 * @param viewer
+	 */
 	private void addColumns(TableViewer viewer) {
 		final TableViewerColumn constraintViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
 		final TableColumn constraintColumn = constraintViewerColumn.getColumn();
@@ -94,11 +138,17 @@ public class ConstraintView {
 		addConstraintColumnProvider(constraintViewerColumn);
 
 		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
+
 		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 		addDescriptionColumnProvider(descriptionViewerColumn);
 	}
 
+	/**
+	 * Labelprovider for the constraint name column
+	 *
+	 * @param viewerColumn
+	 */
 	private void addConstraintColumnProvider(TableViewerColumn viewerColumn) {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -115,6 +165,11 @@ public class ConstraintView {
 		});
 	}
 
+	/**
+	 * Labelprovider for the description column
+	 *
+	 * @param viewerColumn
+	 */
 	private void addDescriptionColumnProvider(TableViewerColumn viewerColumn) {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
