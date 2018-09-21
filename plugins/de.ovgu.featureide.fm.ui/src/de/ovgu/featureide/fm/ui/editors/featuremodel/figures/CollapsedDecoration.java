@@ -39,6 +39,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Enis Belli
  * @author Christopher Sontag
  * @author Maximilian Kühl
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 public class CollapsedDecoration extends ConnectionDecoration implements GUIDefaults {
 

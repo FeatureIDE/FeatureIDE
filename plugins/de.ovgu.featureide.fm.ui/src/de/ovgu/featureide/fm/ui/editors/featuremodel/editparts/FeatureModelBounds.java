@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration
  * TODO description
  *
  * @author Insansa Michel
+ * @author Malek Badeer
  */
 public class FeatureModelBounds {
 

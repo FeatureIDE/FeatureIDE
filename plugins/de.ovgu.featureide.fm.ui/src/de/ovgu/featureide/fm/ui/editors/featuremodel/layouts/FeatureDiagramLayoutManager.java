@@ -54,6 +54,8 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Edgard Schmidt
  * @author Stefanie Schober
  * @author Jann-Ole Henningson
+ * @author Insansa Michel
+ * @author Malek Badeer
  */
 abstract public class FeatureDiagramLayoutManager {
 
