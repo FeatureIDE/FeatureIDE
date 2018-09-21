@@ -51,6 +51,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 	private ConstraintView viewer;
 
+	private final ConstraintViewController viewController = this;
+
+	private IFeatureModel featuremodel;
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -87,15 +91,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			// React to ModelView
 
 			// Show/Hide Constraint List
+			if (part instanceof IEditorPart) {}
 		}
 
 		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 			// React to ModelView
-			if (part == viewer) {
-				System.out.println("View ist nicht offen, yeeeah");
-			}
+
 			// Show/Hide Constraint List
+			if (part == viewController) {
+
+			}
 		}
 
 		@Override
@@ -117,10 +123,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partActivated(IWorkbenchPart part) {
 			// React to ModelView
-			if (part instanceof IEditorPart) {
-				System.out.println("View ist offen, yeeeah");
-			}
+
 			// Show/Hide Constraint List
+			if (part == viewController) {
+				featuremodel = FeatureModelUtil.getFeatureModel();
+				featuremodel.getConstraints();
+				for (final IConstraint c : featuremodel.getConstraints()) {}
+				// featuremodel.System.out.println("View ist offen, yeeeah");
+			}
 		}
 
 	};
