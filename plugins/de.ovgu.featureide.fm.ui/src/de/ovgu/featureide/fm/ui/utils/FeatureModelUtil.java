@@ -58,5 +58,4 @@ public class FeatureModelUtil {
 		final FeatureModelEditor fmEditor = getActiveFMEditor();
 		return fmEditor.getOriginalFeatureModel();
 	}
-
 }

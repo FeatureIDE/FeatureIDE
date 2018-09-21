@@ -23,8 +23,9 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -51,6 +52,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 
+	boolean constraintsHidden = true;
+
 	/**
 	 * Standard SWT initialize called after construction.
 	 */
@@ -59,15 +62,15 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
 		getSite().getPage().addPartListener(constraintListener);
-		currentModel = FeatureModelUtil.getFeatureModel();
+		if (FeatureModelUtil.getActiveFMEditor() != null) {
+			currentModel = FeatureModelUtil.getFeatureModel();
+			refreshView(currentModel);
+		}
 
-		refreshView(currentModel);
 	}
 
 	/**
 	 * this method first clears the table and then adds all current existing constraints.
-	 *
-	 * @param FeatureModel that contains the constraints
 	 */
 	public void refreshView(IFeatureModel currentModel) {
 		if (currentModel != null) {
@@ -80,62 +83,82 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	/**
+	 * Listenes to Changes to adapt the View and the Constraint List under the feature diagram
 	 */
-	private final IPartListener constraintListener = new IPartListener() {
+	private final IPartListener2 constraintListener = new IPartListener2() {
 
 		@Override
-		public void partOpened(IWorkbenchPart part) {
-
+		public void partOpened(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(true);
+			}
 		}
 
 		@Override
-		public void partDeactivated(IWorkbenchPart part) {
-			// React to ModelView
-
-			// Show/Hide Constraint List
-		}
+		public void partDeactivated(IWorkbenchPartReference part) {}
 
 		@Override
-		public void partClosed(IWorkbenchPart part) {
-			// React to ModelView
+		public void partClosed(IWorkbenchPartReference part) {
 			if (part instanceof FeatureModelEditor) {
 				if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
 					viewer.getViewer().refresh();
 				}
 			}
-			// Show/Hide Constraint List
 		}
 
 		@Override
-		public void partBroughtToTop(IWorkbenchPart part) {
-			// React to ModelView
-			if (part instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part).getFeatureModel());
+		public void partBroughtToTop(IWorkbenchPartReference part) {
+			if (part.getPart(false) instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
 			} else {
 				viewer.addNoFeatureModelItem();
-
 			}
-			// Show/Hide Constraint List
 		}
 
 		@Override
-		public void partActivated(IWorkbenchPart part) {
-			// React to ModelView
-			if (part instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part).getFeatureModel());
-			} else if ((part instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
+		public void partActivated(IWorkbenchPartReference part) {
+			if (part.getPart(false) instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
+			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
 				refreshView(FeatureModelUtil.getFeatureModel());
 			}
-			// Show/Hide Constraint List
+			if (part.getPart(false) instanceof IEditorPart) {
+				setConstraintsHidden(constraintsHidden);
+			}
 		}
+
+		@Override
+		public void partHidden(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(false);
+			}
+		}
+
+		@Override
+		public void partVisible(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(true);
+			}
+		}
+
+		@Override
+		public void partInputChanged(IWorkbenchPartReference partRef) {}
+
 	};
 
 	@Override
-	public void setFocus() {
+	public void setFocus() {}
 
+	/**
+	 * Changes if the Constraints are shown under the feature model
+	 */
+	public void setConstraintsHidden(boolean hideConstraints) {
+		if ((FeatureModelUtil.getActiveFMEditor() != null) && (constraintsHidden != hideConstraints)) {
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().redrawDiagram();
+			constraintsHidden = hideConstraints;
+		}
 	}
 
 	/**
@@ -144,6 +167,5 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
 		refreshView(currentModel);
-
 	}
 }
