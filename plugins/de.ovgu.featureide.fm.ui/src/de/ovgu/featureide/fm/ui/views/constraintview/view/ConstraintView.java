@@ -20,21 +20,19 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.TableLayout;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.localization.StringTable;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * TODO This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
@@ -42,12 +40,14 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
  */
-public class ConstraintView {
-
+public class ConstraintView implements GUIDefaults {
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_MODEL_;
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
-	private TableViewer viewer;
-	private Table table;
+	private TreeViewer treeViewer;
+	private Tree tree;
+
+	private TreeColumn constraintColumn, descriptionColumn;
 
 	public ConstraintView(Composite parent) {
 		init(parent);
@@ -59,20 +59,27 @@ public class ConstraintView {
 	 * @param element
 	 */
 	public void addItem(IConstraint element) {
-		// add to table:
-		viewer.add(element);
+		final TreeItem item = new TreeItem(tree, SWT.None);
+		item.setData(element);
+		String displayName = ((IConstraint) element).getDisplayName();
+		displayName = displayName.replace("|", "\u2228");
+		displayName = displayName.replace("<=>", "\u21D4");
+		displayName = displayName.replace("=>", "\u21D2");
+		displayName = displayName.replace("&", "\u2227");
+		displayName = displayName.replace("-", "\u00AC");
+		item.setText(new String[] { displayName, element.getDescription() });
+		if ((tree.getItemCount() % 2) == 1) {
+			item.setBackground(new Color(Display.getDefault(), 240, 240, 240));
+		}
+		tree.setHeaderVisible(true);
 	}
 
-	/**
-	 * This method alternates the background color of the table viewer to get a better look and feel.
-	 */
-	public void colorTable() {
-		for (int i = 0; i < table.getItemCount(); i++) {
-			if ((i % 2) == 1) {
-				viewer.getTable().getItem(i).setBackground(new Color(table.getParent().getDisplay(), 235, 235, 235));
-			}
-		}
-
+	public void addNoFeatureModelItem() {
+		removeAll();
+		final TreeItem item = new TreeItem(tree, SWT.ICON);
+		item.setText(DEFAULT_MESSAGE);
+		item.setImage(DEFAULT_IMAGE);
+		tree.setHeaderVisible(false);
 	}
 
 	/**
@@ -81,22 +88,22 @@ public class ConstraintView {
 	 * @param element
 	 */
 	public void removeItem(IConstraint element) {
-		viewer.remove(element);
+		treeViewer.remove(element);
 	}
 
 	/**
 	 * This method returns the table viewer
 	 *
 	 */
-	public TableViewer getViewer() {
-		return viewer;
+	public TreeViewer getViewer() {
+		return treeViewer;
 	}
 
 	/**
 	 * This method removes all constraints from the view
 	 */
 	public void removeAll() {
-		viewer.getTable().removeAll();
+		treeViewer.getTree().removeAll();
 	}
 
 	/**
@@ -104,26 +111,14 @@ public class ConstraintView {
 	 */
 	private void init(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		viewer = new TableViewer(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		table = viewer.getTable();
-		table.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
-		table.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
-		addColumns(viewer);
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		addTableLayout(viewer);
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		treeViewer = new TreeViewer(parent, SWT.BORDER);
+		tree = treeViewer.getTree();
+		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
+		tree.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
 
-	}
-
-	/**
-	 * Layouting of the table viewer
-	 */
-	private void addTableLayout(TableViewer viewer) {
-		final TableLayout layout = new TableLayout();
-		layout.addColumnData(new ColumnWeightData(60, true));
-		layout.addColumnData(new ColumnWeightData(40, 800, true));
-		viewer.getTable().setLayout(layout);
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);
+		addColumns(treeViewer);
 	}
 
 	/**
@@ -131,52 +126,19 @@ public class ConstraintView {
 	 *
 	 * @param viewer
 	 */
-	private void addColumns(TableViewer viewer) {
-		final TableViewerColumn constraintViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-		final TableColumn constraintColumn = constraintViewerColumn.getColumn();
+	private void addColumns(TreeViewer viewer) {
+		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
+		constraintColumn.setResizable(true);
+		constraintColumn.setMoveable(true);
+		constraintColumn.setWidth(800);
 		constraintColumn.setText(CONSTRAINT_HEADER);
-		addConstraintColumnProvider(constraintViewerColumn);
 
-		final TableViewerColumn descriptionViewerColumn = new TableViewerColumn(viewer, SWT.NONE);
-
-		final TableColumn descriptionColumn = descriptionViewerColumn.getColumn();
+		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
+		descriptionColumn.setResizable(true);
+		descriptionColumn.setMoveable(true);
+		descriptionColumn.setWidth(200);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
-		addDescriptionColumnProvider(descriptionViewerColumn);
-	}
 
-	/**
-	 * Labelprovider for the constraint name column
-	 *
-	 * @param viewerColumn
-	 */
-	private void addConstraintColumnProvider(TableViewerColumn viewerColumn) {
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				// reformats the DisplayName with logical element from unicode
-				String displayName = ((IConstraint) element).getDisplayName();
-				displayName = displayName.replace("|", "\u2228");
-				displayName = displayName.replace("<=>", "\u21D4");
-				displayName = displayName.replace("=>", "\u21D2");
-				displayName = displayName.replace("&", "\u2227");
-				displayName = displayName.replace("-", "\u00AC");
-				return super.getText(displayName);
-			}
-		});
-	}
-
-	/**
-	 * Labelprovider for the description column
-	 *
-	 * @param viewerColumn
-	 */
-	private void addDescriptionColumnProvider(TableViewerColumn viewerColumn) {
-		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				return super.getText(((IConstraint) element).getDescription());
-			}
-		});
 	}
 
 }

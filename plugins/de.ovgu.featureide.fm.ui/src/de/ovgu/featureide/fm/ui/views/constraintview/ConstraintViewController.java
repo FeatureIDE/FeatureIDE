@@ -31,9 +31,9 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
@@ -45,18 +45,13 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  * @author "Rahel Arens"
  * @author "Thomas Graave"
  */
-public class ConstraintViewController extends ViewPart implements IEventListener {
+public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
 
 	private ConstraintView viewer;
-	private FeatureModelManager fmManager;
 	private IFeatureModel currentModel;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -74,16 +69,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * @param FeatureModel that contains the constraints
 	 */
 	public void refreshView(IFeatureModel currentModel) {
-		fmManager = FeatureModelManager.getInstance(currentModel.getSourceFile());
-		this.currentModel = currentModel;
-		addEventListener(this);
-		viewer.getViewer().refresh();
 		if (currentModel != null) {
+			this.currentModel = currentModel;
+			this.currentModel.addListener(this);
+			viewer.removeAll();
 			for (final IConstraint constraint : currentModel.getConstraints()) {
 				viewer.addItem(constraint);
 			}
 		}
-		viewer.colorTable();
 	}
 
 	private final IPartListener constraintListener = new IPartListener() {
@@ -118,6 +111,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			// React to ModelView
 			if (part instanceof FeatureModelEditor) {
 				refreshView(((FeatureModelEditor) part).getFeatureModel());
+			} else {
+				viewer.addNoFeatureModelItem();
+
 			}
 			// Show/Hide Constraint List
 		}
@@ -130,35 +126,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			}
 			// Show/Hide Constraint List
 		}
-
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
-	public void addEventListener(IEventListener listener) {
-		if (fmManager == null) {
-			return;
-		}
-		fmManager.addListener(listener);
-	}
-
-	public void removeEventListener(IEventListener listener) {
-		if (fmManager == null) {
-			return;
-		}
-		fmManager.removeListener(listener);
 	}
 
 	@Override

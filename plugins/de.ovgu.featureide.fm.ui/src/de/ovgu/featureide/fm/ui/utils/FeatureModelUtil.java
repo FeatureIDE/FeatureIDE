@@ -37,10 +37,10 @@ public class FeatureModelUtil {
 	 *
 	 * @return
 	 */
-	public static IEditorPart getActiveFMEditor() {
+	public static FeatureModelEditor getActiveFMEditor() {
 		final IEditorPart viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		if (viewReferences instanceof FeatureModelEditor) {
-			return viewReferences;
+			return (FeatureModelEditor) viewReferences;
 		}
 		return null;
 	}
@@ -51,12 +51,13 @@ public class FeatureModelUtil {
 	 * @return
 	 */
 	public static IFeatureModel getFeatureModel() {
-		final IEditorPart fmEditor = getActiveFMEditor();
-		if (fmEditor instanceof FeatureModelEditor) {
-			return ((FeatureModelEditor) fmEditor).getFeatureModel();
-		}
+		final FeatureModelEditor fmEditor = getActiveFMEditor();
+		return fmEditor.getFeatureModel();
+	}
 
-		return null;
+	public static IFeatureModel getOriginalFeatureModel() {
+		final FeatureModelEditor fmEditor = getActiveFMEditor();
+		return fmEditor.getOriginalFeatureModel();
 	}
 
 }
