@@ -56,7 +56,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	protected boolean collapsed;
 
-	protected Point location = new Point(-1, -1);
+	protected Point location = new Point(0, 0);
 
 	protected Dimension dimension = new Dimension(10, 10);
 
