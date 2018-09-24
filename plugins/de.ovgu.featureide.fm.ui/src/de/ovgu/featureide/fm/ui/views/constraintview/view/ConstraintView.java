@@ -111,7 +111,6 @@ public class ConstraintView implements GUIDefaults {
 	 * This method initializes the view
 	 */
 	private void init(Composite parent) {
-<<<<<<< HEAD
 		parent.setLayout(new GridLayout(1, false));
 
 		final GridData boxData = new GridData();
@@ -120,16 +119,12 @@ public class ConstraintView implements GUIDefaults {
 		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
 		searchBox.setLayoutData(boxData);
 
-		treeViewer = new TreeViewer(parent, SWT.BORDER);
+		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI);
 		final GridData treeData = new GridData();
 		treeData.grabExcessHorizontalSpace = true;
 		treeData.horizontalAlignment = SWT.FILL;
 		treeData.grabExcessVerticalSpace = true;
 		treeData.verticalAlignment = SWT.FILL;
-=======
-		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI);
->>>>>>> refs/remotes/origin/Del_and_sel_constraints
 		tree = treeViewer.getTree();
 		tree.setLayoutData(treeData);
 		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
