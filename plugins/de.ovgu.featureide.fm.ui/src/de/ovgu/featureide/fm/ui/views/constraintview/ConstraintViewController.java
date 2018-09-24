@@ -87,7 +87,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	};
 
 	/**
-	 * this method first clears the table and then adds all constrains that contain searchInput in their DisplayName or Description
+	 * this method first clears the table and then adds all constrains that contain searchInput in their DisplayName or Description also it checks for RegEx
+	 * matching in searchInput
 	 */
 	public void refreshView(IFeatureModel currentModel, String searchInput) {
 		if (currentModel != null) {
@@ -96,9 +97,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			viewer.removeAll();
 			for (final IConstraint constraint : currentModel.getConstraints()) {
 				final String lazyConstraint = constraint.getDisplayName().toLowerCase();
-				final String lazyDescription = constraint.getDescription().toLowerCase();
+				final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
 				searchInput = searchInput.toLowerCase();
-				if (lazyConstraint.contains(searchInput) || lazyDescription.contains(searchInput)) {
+				if (lazyConstraint.matches(searchInput) || lazyConstraint.contains(searchInput) || lazyDescription.matches(searchInput)
+					|| lazyDescription.contains(searchInput)) {
 					viewer.addItem(constraint);
 				}
 			}

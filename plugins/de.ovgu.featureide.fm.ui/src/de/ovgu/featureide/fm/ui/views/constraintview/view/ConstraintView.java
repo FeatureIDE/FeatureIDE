@@ -68,7 +68,7 @@ public class ConstraintView implements GUIDefaults {
 		displayName = displayName.replace("=>", "\u21D2");
 		displayName = displayName.replace("&", "\u2227");
 		displayName = displayName.replace("-", "\u00AC");
-		item.setText(new String[] { displayName, element.getDescription() });
+		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
 		if ((tree.getItemCount() % 2) == 1) {
 			item.setBackground(new Color(Display.getDefault(), 240, 240, 240));
 		}
@@ -116,7 +116,7 @@ public class ConstraintView implements GUIDefaults {
 		final GridData boxData = new GridData();
 		boxData.grabExcessHorizontalSpace = true;
 		boxData.horizontalAlignment = SWT.FILL;
-		searchBox = new Text(parent, SWT.SEARCH);
+		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
 		searchBox.setLayoutData(boxData);
 
 		treeViewer = new TreeViewer(parent, SWT.BORDER);
