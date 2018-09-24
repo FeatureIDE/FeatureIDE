@@ -46,10 +46,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 	private ConstraintView viewer;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -64,20 +60,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.event.IEventListener#propertyChange(de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent)
-	 */
+	public void setFocus() {}
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
@@ -86,7 +70,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		case MODEL_DATA_LOADED:
 		case MODEL_DATA_SAVED:
 			System.out.println("model data loaded event triggered");
-			// refreshConstraints();
 			break;
 
 		default:
