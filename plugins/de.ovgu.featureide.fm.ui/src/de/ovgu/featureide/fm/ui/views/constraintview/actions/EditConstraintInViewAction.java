@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -34,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
  *
  * @author "Rosiak Kamil"
  */
-public class EditConstraintAction extends AbstractConstraintEditorAction {
+public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	public static final String ID = "de.ovgu.featureide.editconstraint";
 	private IConstraint constraint;
 
@@ -44,9 +45,12 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	 * @param menuname
 	 * @param id
 	 */
-	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
+	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
+		if (viewer instanceof TreeViewer) {
+			constraint = (IConstraint) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+		}
 	}
 
 	@Override
