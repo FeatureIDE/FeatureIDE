@@ -48,8 +48,12 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
+
 		if (viewer instanceof TreeViewer) {
-			constraint = (IConstraint) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			final TreeViewer treeView = (TreeViewer) viewer;
+			final IStructuredSelection selection = treeView.getStructuredSelection();
+			setEnabled(isValidSelection(selection));
+			constraint = (IConstraint) selection.getFirstElement();
 		}
 	}
 
@@ -65,7 +69,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.getFirstElement() instanceof IConstraint) {
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
 			constraint = (IConstraint) selection.getFirstElement();
 			return true;
 		}

@@ -109,7 +109,7 @@ public class ConstraintView implements GUIDefaults {
 	 */
 	private void init(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		treeViewer = new TreeViewer(parent, SWT.BORDER);
+		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI);
 		tree = treeViewer.getTree();
 		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
 		tree.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
