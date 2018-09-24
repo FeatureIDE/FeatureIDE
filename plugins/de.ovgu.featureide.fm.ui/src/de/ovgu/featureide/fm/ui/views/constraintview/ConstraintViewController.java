@@ -55,6 +55,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private IFeatureModel currentModel;
 
 	boolean constraintsHidden = false;
+
 	private String searchText = "";
 
 	/**
