@@ -99,7 +99,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
-			refreshView(currentModel, searchText);
+			checkForRefresh();
 		}
 
 	};
@@ -154,8 +154,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partBroughtToTop(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-				checkForRefresh(editor);
+				checkForRefresh();
 			} else {
 				viewer.addNoFeatureModelItem();
 			}
@@ -164,10 +163,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partActivated(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-				checkForRefresh(editor);
+				checkForRefresh();
 			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
-				refreshView(FeatureModelUtil.getFeatureModel(), searchText);
+				checkForRefresh();
 			}
 			if (part.getPart(false) instanceof IEditorPart) {
 				setConstraintsHidden(constraintsHidden);
@@ -199,13 +197,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * check if the page is the FeatureDiagramEditor.
 	 *
 	 */
-	private void checkForRefresh(FeatureModelEditor fme) {
-		if (fme.getActivePage() == 0) {
-			addPageChangeListener(fme);
-			refreshView(fme.getFeatureModel(), searchText);
-		} else {
-			viewer.addNoFeatureModelItem();
+	private void checkForRefresh() {
+		if (FeatureModelUtil.getActiveFMEditor() != null) {
+			final FeatureModelEditor fme = FeatureModelUtil.getActiveFMEditor();
+			if (fme.getActivePage() == 0) {
+				addPageChangeListener(fme);
+				refreshView(fme.getFeatureModel(), searchText);
+			} else {
+				viewer.addNoFeatureModelItem();
+			}
 		}
+
 	}
 
 	/**
@@ -286,6 +288,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().redrawDiagram();
 			constraintsHidden = hideConstraints;
+
 		}
 	}
 
@@ -294,6 +297,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		refreshView(currentModel, searchText);
+		if (FeatureModelUtil.getActiveFMEditor() != null) {
+			checkForRefresh();
+		}
 	}
 }
