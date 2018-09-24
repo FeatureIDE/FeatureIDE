@@ -42,13 +42,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
-import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
@@ -256,8 +254,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		actions.clear();
 
 		// FM structure modify actions
-		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
-		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
+		createLayerAction = addAction(new CreateLayerAction(viewer, graphicalFeatureModel));
+		createCompoundAction = addAction(new CreateCompoundAction(viewer, graphicalFeatureModel));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
@@ -605,9 +603,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 					// new Feature is root so update all childs from root
 					viewer.refreshChildAll(newCompound);
 				}
-				if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
-					setNewPositionAddAbove(graphicalFeatureModel.getGraphicalFeature(newCompound), graphicalFeatureModel.getGraphicalFeature(oldParent));
-				}
 			}
 			viewer.internRefresh(true);
 			setDirty();
@@ -649,10 +644,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
-
-			if (graphicalFeatureModel.getLayout().getLayoutAlgorithm() == 0) {
-				setNewPositionFeatureBelow(newGraphicalFeature, newEditPart);
-			}
 
 			if (newEditPart != null) {// TODO move to FeatureEditPart
 				newEditPart.activate();
@@ -959,104 +950,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 //		for (final IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 //			page.propertyChange(event);
 //		}
-	}
-
-	/**
-	 * @param graphicalFeature
-	 */
-	private void setNewPositionAddAbove(IGraphicalFeature graphicalFeature, IGraphicalFeature oldParent) {
-		final List<IGraphicalFeature> children = graphicalFeature.getGraphicalChildren(true);
-		int minX = children.get(0).getLocation().x;
-		int minY = children.get(0).getLocation().y;
-		int yLocation = children.get(0).getLocation().y;
-		int xLocation = children.get(0).getLocation().x;
-
-		// looks for the leftest x coordinate and the topmost y coordinate of a child
-		for (final IGraphicalFeature child : children) {
-			if (child.getLocation().x < minX) {
-				minX = child.getLocation().x;
-				yLocation = child.getLocation().y;
-			}
-			if (child.getLocation().y < minY) {
-				minY = child.getLocation().y;
-				xLocation = child.getLocation().x;
-			}
-		}
-
-		// decides if the anchor points are at the side or on the top of the rectangle
-		final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(children.get(0));
-		int distance;
-		boolean topDown;
-		final Request request = new Request();
-		if (newEditPart.getSourceConnectionAnchor(request).getLocation(children.get(0).getLocation()).y == children.get(0).getLocation().y) {
-			graphicalFeature.setLocation(new Point(minX, yLocation));
-			topDown = true;
-			if (oldParent.getObject() != null) {
-				distance = yLocation - oldParent.getLocation().y;
-			} else {
-				distance = 30;
-			}
-		} else {
-			graphicalFeature.setLocation(new Point(xLocation, minY));
-			topDown = false;
-			if (oldParent.getObject() != null) {
-				distance = (xLocation - oldParent.getLocation().x) + 30;
-			} else {
-				distance = 120;
-			}
-		}
-		shiftChildren(graphicalFeature, distance, topDown);
-	}
-
-	/**
-	 * @param graphicalFeature
-	 */
-	private void shiftChildren(IGraphicalFeature graphicalFeature, int distance, boolean topDown) {
-		final List<IGraphicalFeature> children = graphicalFeature.getGraphicalChildren(true);
-		for (int i = 0; i < children.size(); i++) {
-			shiftChildren(children.get(i), distance, topDown);
-			if (topDown) {
-				children.get(i).setLocation(new Point(children.get(i).getLocation().x, children.get(i).getLocation().y + distance));
-			} else {
-				children.get(i).setLocation(new Point(children.get(i).getLocation().x + distance, children.get(i).getLocation().y));
-			}
-		}
-
-	}
-
-	/**
-	 * @param newGraphicalFeature
-	 */
-	private void setNewPositionFeatureBelow(IGraphicalFeature newGraphicalFeature, FeatureEditPart featureEditPart) {
-		final IGraphicalFeature localParent = newGraphicalFeature.getSourceConnection().getTarget();
-		int maxX = localParent.getLocation().x - 8;
-		int maxY = localParent.getLocation().y - 8;
-		int yLocation = localParent.getLocation().y() + 31 + localParent.getSize().height;
-		int xLocation = localParent.getLocation().x + 20 + localParent.getSize().width;
-		final List<IGraphicalFeature> olderSiblings = localParent.getGraphicalChildren(true);
-
-		if (olderSiblings.size() != 1) {
-			// looks for the rightest x coordinate and the lowermost y coordinate of a child
-			for (int i = 0; i < olderSiblings.size(); i++) {
-				final int rightFeatureBorder = (olderSiblings.get(i).getLocation().x + olderSiblings.get(i).getSize().width);
-				final int downFeatureBorder = (olderSiblings.get(i).getLocation().y + olderSiblings.get(i).getSize().height);
-				if (rightFeatureBorder >= maxX) {
-					maxX = rightFeatureBorder;
-					yLocation = olderSiblings.get(i).getLocation().y;
-				}
-				if (downFeatureBorder >= maxY) {
-					maxY = downFeatureBorder;
-					xLocation = olderSiblings.get(i).getLocation().x;
-				}
-			}
-		}
-		// decides if the anchor points are at the side or on the top of the rectangle
-		final Request request = new Request();
-		if (featureEditPart.getSourceConnectionAnchor(request).getLocation(newGraphicalFeature.getLocation()).y == newGraphicalFeature.getLocation().y) {
-			newGraphicalFeature.setLocation(new Point(maxX + 8, yLocation));
-		} else {
-			newGraphicalFeature.setLocation(new Point(xLocation, maxY + 8));
-		}
 	}
 
 	@Override

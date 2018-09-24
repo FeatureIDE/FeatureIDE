@@ -23,12 +23,17 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
+import java.util.List;
+
+import org.eclipse.draw2d.geometry.Point;
+
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Operation with functionality to create a layer feature. Enables undo/redo functionality.
@@ -40,10 +45,13 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
 	private IFeature newFeature;
+	private final IGraphicalFeature graphicalFeature;
+	private IGraphicalFeature newGraphicalFeature;
 
-	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
+	public CreateFeatureBelowOperation(IGraphicalFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
-		this.feature = feature;
+		this.feature = feature.getObject();
+		graphicalFeature = feature;
 	}
 
 	@Override
@@ -59,7 +67,46 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
+		newGraphicalFeature = graphicalFeature.getGraphicalModel().getGraphicalFeature(newFeature);
+
+		if (graphicalFeature.getGraphicalModel().getLayout().getLayoutAlgorithm() == 0) {
+			setNewPositionFeatureBelow();
+		}
+
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, feature, newFeature);
+	}
+
+	/**
+	 * adjust position of the new feature in manual layout
+	 */
+	private void setNewPositionFeatureBelow() {
+		int maxX = graphicalFeature.getLocation().x - 5;
+		int maxY = graphicalFeature.getLocation().y - 8;
+		int yLocation = graphicalFeature.getLocation().y() + 31 + graphicalFeature.getSize().height;
+		int xLocation = graphicalFeature.getLocation().x + 20 + graphicalFeature.getSize().width;
+		final List<IGraphicalFeature> olderSiblings = graphicalFeature.getGraphicalChildren(true);
+
+		if (olderSiblings.size() != 1) {
+			// looks for the rightest x coordinate and the lowermost y coordinate of a child
+			for (int i = 0; i < olderSiblings.size(); i++) {
+				final int rightFeatureBorder = (olderSiblings.get(i).getLocation().x + olderSiblings.get(i).getSize().width);
+				final int downFeatureBorder = (olderSiblings.get(i).getLocation().y + olderSiblings.get(i).getSize().height);
+				if (rightFeatureBorder >= maxX) {
+					maxX = rightFeatureBorder;
+					yLocation = olderSiblings.get(i).getLocation().y;
+				}
+				if (downFeatureBorder >= maxY) {
+					maxY = downFeatureBorder;
+					xLocation = olderSiblings.get(i).getLocation().x;
+				}
+			}
+		}
+		// decides if the anchor points are at the side or on the top of the rectangle
+		if (!newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout()) {
+			newGraphicalFeature.setLocation(new Point(maxX + 5, yLocation));
+		} else {
+			newGraphicalFeature.setLocation(new Point(xLocation, maxY + 8));
+		}
 	}
 
 	@Override

@@ -28,8 +28,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
 
 /**
@@ -43,9 +43,9 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
+	public CreateLayerAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(CREATE_FEATURE_BELOW + " (Ins)", viewer, ID);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
@@ -53,7 +53,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		final CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(feature, featureModel);
+		final CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(featureModel.getGraphicalFeature(feature), featureModel.getFeatureModel());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
