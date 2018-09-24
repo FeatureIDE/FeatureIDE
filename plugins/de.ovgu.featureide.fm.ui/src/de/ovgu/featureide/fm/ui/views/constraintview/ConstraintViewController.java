@@ -171,8 +171,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				if (event.getSource() instanceof TreeViewer) {
 					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 					if (treeSelection.getFirstElement() instanceof IConstraint) {
-						final IConstraint constrait = (IConstraint) treeSelection.getFirstElement();
-						new CreateConstraintAction(constrait, currentModel);
+						new EditConstraintAction(viewer.getViewer(), currentModel).run();
 					}
 				}
 			}
