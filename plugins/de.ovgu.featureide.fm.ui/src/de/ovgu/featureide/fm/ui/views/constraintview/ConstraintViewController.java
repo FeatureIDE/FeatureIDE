@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
+import java.util.List;
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -45,6 +47,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
@@ -109,13 +112,31 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			this.currentModel = currentModel;
 			this.currentModel.addListener(this);
 			viewer.removeAll();
-			for (final IConstraint constraint : currentModel.getConstraints()) {
-				final String lazyConstraint = constraint.getDisplayName().toLowerCase();
-				final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
-				searchInput = searchInput.toLowerCase();
-				if (lazyConstraint.matches(searchInput) || lazyConstraint.contains(searchInput) || lazyDescription.matches(searchInput)
-					|| lazyDescription.contains(searchInput)) {
-					viewer.addItem(constraint);
+			// if empty search show only constrains from non collapsed features
+			if (searchInput.equals("")) {
+				// System.out.println(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
+				final List<IGraphicalConstraint> constraints =
+					FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
+				for (final IGraphicalConstraint constraint : constraints) {
+					/*
+					 * final FeatureDiagramViewer fdv = FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer(); for (final Object part_it :
+					 * fdv.getSelectedEditParts()) { final FeatureEditPart fe_part = (FeatureEditPart) part_it;
+					 * System.out.println(fe_part.getModel().getObject().getName()); } if (fdv.getSelectedEditParts().contains(constraints) ||
+					 * FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+					 * viewer.addItem(constraint.getObject()); }
+					 */
+					viewer.addItem(constraint.getObject());
+				}
+			} else {
+				for (final IConstraint constraint : currentModel.getConstraints()) {
+					final String lazyConstraint = constraint.getDisplayName().toLowerCase();
+					final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
+					searchInput = searchInput.toLowerCase();
+					if (lazyConstraint.matches(searchInput) || lazyConstraint.contains(searchInput) || lazyDescription.matches(searchInput)
+						|| lazyDescription.contains(searchInput)) {
+						viewer.addItem(constraint);
+
+					}
 				}
 			}
 		}
