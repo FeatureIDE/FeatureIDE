@@ -95,9 +95,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			this.currentModel.addListener(this);
 			viewer.removeAll();
 			for (final IConstraint constraint : currentModel.getConstraints()) {
-				final String lazySearch = constraint.getDisplayName().toLowerCase();
+				final String lazyConstraint = constraint.getDisplayName().toLowerCase();
+				final String lazyDescription = constraint.getDescription().toLowerCase();
 				searchInput = searchInput.toLowerCase();
-				if (lazySearch.contains(searchInput) || lazySearch.contains(searchInput)) {
+				if (lazyConstraint.contains(searchInput) || lazyDescription.contains(searchInput)) {
 					viewer.addItem(constraint);
 				}
 			}
