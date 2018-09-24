@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TreeSelection;
@@ -44,6 +46,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
@@ -81,6 +84,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		getSite().getPage().addPartListener(constraintListener);
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			currentModel = FeatureModelUtil.getFeatureModel();
+			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(currentModel, searchText);
 		}
 		createContextMenu(viewer.getViewer());
@@ -140,6 +144,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		public void partClosed(IWorkbenchPartReference part) {
 			if (part instanceof FeatureModelEditor) {
 				if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
+					final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
+					addPageChangeListener(editor);
 					viewer.getViewer().refresh();
 				}
 			}
@@ -148,7 +154,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partBroughtToTop(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel(), searchText);
+				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
+				checkForRefresh(editor);
 			} else {
 				viewer.addNoFeatureModelItem();
 			}
@@ -157,7 +164,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partActivated(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel(), searchText);
+				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
+				checkForRefresh(editor);
 			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
 				refreshView(FeatureModelUtil.getFeatureModel(), searchText);
 			}
@@ -181,9 +189,42 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 
 		@Override
-		public void partInputChanged(IWorkbenchPartReference partRef) {}
+		public void partInputChanged(IWorkbenchPartReference partRef) {
+
+		}
 
 	};
+
+	/**
+	 * check if the page is the FeatureDiagramEditor.
+	 *
+	 */
+	private void checkForRefresh(FeatureModelEditor fme) {
+		if (fme.getActivePage() == 0) {
+			addPageChangeListener(fme);
+			refreshView(fme.getFeatureModel(), searchText);
+		} else {
+			viewer.addNoFeatureModelItem();
+		}
+	}
+
+	/**
+	 * add a listener to the Feature model editor to get the page change events
+	 *
+	 */
+	private void addPageChangeListener(FeatureModelEditor fme) {
+		fme.addPageChangedListener(new IPageChangedListener() {
+			@Override
+			public void pageChanged(PageChangedEvent event) {
+				if (event.getSelectedPage() instanceof FeatureDiagramEditor) {
+					refreshView(FeatureModelUtil.getFeatureModel(), searchText);
+				} else {
+					viewer.addNoFeatureModelItem();
+				}
+
+			}
+		});
+	}
 
 	/**
 	 * adding Listener to the tree viewer
