@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
@@ -205,7 +205,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu) {
 		contextMenu.add(new CreateConstraintAction(viewer.getViewer(), currentModel));
-		contextMenu.add(new EditConstraintInViewAction(viewer.getViewer(), currentModel));
+		contextMenu.add(new EditConstraintAction(viewer.getViewer(), currentModel));
 	}
 
 	@Override

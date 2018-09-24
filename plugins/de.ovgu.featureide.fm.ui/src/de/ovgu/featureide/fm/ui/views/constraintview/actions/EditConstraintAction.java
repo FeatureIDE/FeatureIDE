@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
  *
  * @author "Rosiak Kamil"
  */
-public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
+public class EditConstraintAction extends AbstractConstraintEditorAction {
 	public static final String ID = "de.ovgu.featureide.editconstraint";
 	private IConstraint constraint;
 
@@ -45,7 +45,7 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	 * @param menuname
 	 * @param id
 	 */
-	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
+	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 		if (viewer instanceof TreeViewer) {
