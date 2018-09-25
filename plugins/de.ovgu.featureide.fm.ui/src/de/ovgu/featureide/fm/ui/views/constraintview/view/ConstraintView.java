@@ -36,13 +36,14 @@ import org.eclipse.swt.widgets.TableColumn;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
 /**
- * TODO description
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
  */
 public class ConstraintView {
 
+	private final ColumnWeightData cwd1 = new ColumnWeightData(60, true);
+	private final ColumnWeightData cwd2 = new ColumnWeightData(40, 800, true);
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TableViewer viewer;
@@ -83,8 +84,8 @@ public class ConstraintView {
 
 	private void addTableLayout(TableViewer viewer) {
 		final TableLayout layout = new TableLayout();
-		layout.addColumnData(new ColumnWeightData(60, true));
-		layout.addColumnData(new ColumnWeightData(40, 800, true));
+		layout.addColumnData(cwd1);
+		layout.addColumnData(cwd2);
 		viewer.getTable().setLayout(layout);
 	}
 

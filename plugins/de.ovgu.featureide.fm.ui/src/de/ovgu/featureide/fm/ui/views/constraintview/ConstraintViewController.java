@@ -34,7 +34,6 @@ import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
- * TODO description
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
