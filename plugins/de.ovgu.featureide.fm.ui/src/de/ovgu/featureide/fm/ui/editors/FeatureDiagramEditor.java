@@ -254,8 +254,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		actions.clear();
 
 		// FM structure modify actions
-		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
-		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
+		createLayerAction = addAction(new CreateLayerAction(viewer, graphicalFeatureModel));
+		createCompoundAction = addAction(new CreateCompoundAction(viewer, graphicalFeatureModel));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
@@ -644,6 +644,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) viewer.getEditPartRegistry().get(newGraphicalFeature);
+
 			if (newEditPart != null) {// TODO move to FeatureEditPart
 				newEditPart.activate();
 				viewer.select(newEditPart);

@@ -146,7 +146,7 @@ public class FmOutlinePage extends ContentOutlinePage implements IEventListener 
 		}
 
 		viewer.expandToLevel(2);
-		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fInput);
+		final FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fTextEditor.diagramEditor.getGraphicalFeatureModel());
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 
