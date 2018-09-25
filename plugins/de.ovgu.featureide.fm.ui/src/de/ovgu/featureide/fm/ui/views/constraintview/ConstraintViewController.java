@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
@@ -127,8 +128,24 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private void hideCollapsedConstraints(IFeatureModel currentModel) {
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
+		// goes through all constraints that are not collapsed
 		for (final IGraphicalConstraint constraint : constraints) {
-			if (constraint.isFeatureSelected() || FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+				// when at least one feature is selected:
+				// goes through all features that are selected
+				for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
+					if (part instanceof FeatureEditPart) {
+						// compares with String compare if constraints connect to a selected feature
+						String partName = part.toString().replace("FeatureEditPart( ", "");
+						partName = partName.replace(" )", "");
+						if (constraint.getObject().getDisplayName().contains(partName)) {
+							viewer.addItem(constraint.getObject());
+							break;
+						}
+					}
+				}
+			} else {
+				// when no feature is selected, adds all constraints to the viewer
 				viewer.addItem(constraint.getObject());
 			}
 		}
