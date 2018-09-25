@@ -47,15 +47,8 @@ public class FeatureModelBounds {
 		 */
 
 		for (final IGraphicalElement element : elements) {
-			int labelWidth = 0;
-			int labelHeight = 0;
-			final CollapsedDecoration collapsedDecoration = (CollapsedDecoration) ((IGraphicalFeature) element).getCollapsedDecoration();
-			if (collapsedDecoration != null) {
-				labelWidth = collapsedDecoration.getDimension().width;
-				labelHeight = collapsedDecoration.getDimension().height;
-			}
 
-			final Rectangle position = FeatureUIHelper.getBounds(element);
+			Rectangle position = FeatureUIHelper.getBounds(element);
 			if (position.x < min.x) {
 				min.x = position.x;
 			}
@@ -63,14 +56,35 @@ public class FeatureModelBounds {
 				min.y = position.y;
 			}
 			if ((position.x + position.width) > max.x) {
-				max.x = position.right() + labelWidth;
+				max.x = position.right();
 			}
 			if ((position.y + position.height) > max.y) {
-				max.y = position.bottom() + labelHeight;
+				max.y = position.bottom();
+			}
+
+			if (((IGraphicalFeature) element).isCollapsed() == true) {
+				final CollapsedDecoration collapsedDecoration = ((IGraphicalFeature) element).getCollapsedDecoration();
+				position = getBounds(collapsedDecoration);
+				if (position.x < min.x) {
+					min.x = position.x;
+				}
+				if (position.y < min.y) {
+					min.y = position.y;
+				}
+				if ((position.x + position.width) > max.x) {
+					max.x = position.right();
+				}
+				if ((position.y + position.height) > max.y) {
+					max.y = position.bottom();
+				}
+
 			}
 		}
-
 		return new Rectangle(min, max);
+	}
+
+	public Rectangle getBounds(CollapsedDecoration element) {
+		return new Rectangle(element.getLocation(), element.getSize());
 	}
 
 }

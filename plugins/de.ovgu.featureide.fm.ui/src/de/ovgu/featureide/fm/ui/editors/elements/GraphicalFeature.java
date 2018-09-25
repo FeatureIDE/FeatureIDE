@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
@@ -38,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration;
 
 /**
  * Graphical representation of an {@link IFeature} instance.
@@ -63,7 +63,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	private IEventListener uiObject;
 
-	private Shape deco;
+	private CollapsedDecoration deco;
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
@@ -278,7 +278,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#setCollapsedDecoration(de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CollapsedDecoration)
 	 */
 	@Override
-	public void setCollapsedDecoration(Shape decoration) {
+	public void setCollapsedDecoration(CollapsedDecoration decoration) {
 		deco = decoration;
 
 	}
@@ -288,7 +288,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	 * @see de.ovgu.featureide.fm.ui.editors.IGraphicalFeature#getCollapsedDecoration()
 	 */
 	@Override
-	public Shape getCollapsedDecoration() {
+	public CollapsedDecoration getCollapsedDecoration() {
 
 		return deco;
 	}
