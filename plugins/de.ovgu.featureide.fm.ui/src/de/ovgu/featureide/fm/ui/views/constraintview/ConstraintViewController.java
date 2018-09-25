@@ -128,7 +128,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		for (final IGraphicalConstraint constraint : constraints) {
-			if (constraint.isFeatureSelected()) {
+			if (constraint.isFeatureSelected() || FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				viewer.addItem(constraint.getObject());
 			}
 		}
