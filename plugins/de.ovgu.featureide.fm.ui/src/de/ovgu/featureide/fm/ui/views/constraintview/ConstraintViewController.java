@@ -113,10 +113,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			this.currentModel = currentModel;
 			this.currentModel.addListener(this);
 			viewer.removeAll();
-			// if empty search show only constrains from non collapsed features
+			// no search text is entered:
 			if (searchText.equals("")) {
-				hideCollapsedConstraints(currentModel);
+				addConstraints(currentModel);
 			} else {
+				// when searchText is entered, search through all constraints
 				findConstraints(currentModel);
 			}
 		}
@@ -125,7 +126,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	/**
 	 * only shows constraints from features that are not collapsed
 	 */
-	private void hideCollapsedConstraints(IFeatureModel currentModel) {
+	private void addConstraints(IFeatureModel currentModel) {
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
@@ -143,6 +144,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 							break;
 						}
 					}
+
 				}
 			} else {
 				// when no feature is selected, adds all constraints to the viewer
@@ -299,6 +301,45 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		refreshView(currentModel);
+		switch (event.getEventType()) {
+		case CONSTRAINT_MOVE:
+		case CONSTRAINT_MODIFY:
+		case CONSTRAINT_DELETE:
+		case CONSTRAINT_ADD:
+		case CONSTRAINT_SELECTED:
+		case FEATURE_MODIFY:
+		case FEATURE_DELETE:
+		case FEATURE_ADD_ABOVE:
+		case FEATURE_ADD:
+		case FEATURE_NAME_CHANGED:
+		case ALL_FEATURES_CHANGED_NAME_TYPE:
+		case COLOR_CHANGED:
+		case HIDDEN_CHANGED:
+		case COLLAPSED_CHANGED:
+		case COLLAPSED_ALL_CHANGED:
+		case LOCATION_CHANGED:
+		case ATTRIBUTE_CHANGED:
+		case GROUP_TYPE_CHANGED:
+		case PARENT_CHANGED:
+		case MANDATORY_CHANGED:
+		case STRUCTURE_CHANGED:
+		case LEGEND_LAYOUT_CHANGED:
+		case MODEL_LAYOUT_CHANGED:
+		case MODEL_DATA_CHANGED:
+		case MODEL_DATA_SAVED:
+		case MODEL_DATA_LOADED:
+		case MODEL_DATA_OVERRIDDEN:
+		case REDRAW_DIAGRAM:
+		case REFRESH_ACTIONS:
+		case CHILDREN_CHANGED:
+		case DEPENDENCY_CALCULATED:
+		case ACTIVE_EXPLANATION_CHANGED:
+		case FEATURE_ATTRIBUTE_CHANGED:
+		case ACTIVE_REASON_CHANGED:
+			refreshView(currentModel);
+			break;
+		default:
+			break;
+		}
 	}
 }
