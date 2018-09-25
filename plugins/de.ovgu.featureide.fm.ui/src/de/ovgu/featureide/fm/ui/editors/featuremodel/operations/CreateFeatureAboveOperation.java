@@ -57,6 +57,9 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	boolean parentOr = false;
 	boolean parentAlternative = false;
 
+	private final int topDownDefaultDistance = 50;
+	private final int leftRightDefaultDistance = 120;
+
 	public CreateFeatureAboveOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel.getFeatureModel(), CREATE_COMPOUND);
 		this.selectedFeatures = selectedFeatures;
@@ -137,23 +140,14 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 		// decides if the anchor points are at the side or on the top of the rectangle
 		int distance;
 		boolean topDown;
-		final IGraphicalFeature oldParent = newGraphicalFeature.getSourceConnection().getTarget();
 		if (!newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout()) {
 			newGraphicalFeature.setLocation(new Point(minX, yLocation));
 			topDown = true;
-			if (oldParent != null) {
-				distance = yLocation - oldParent.getLocation().y;
-			} else {
-				distance = 30;
-			}
+			distance = topDownDefaultDistance;
 		} else {
 			newGraphicalFeature.setLocation(new Point(xLocation, minY));
 			topDown = false;
-			if (oldParent != null) {
-				distance = (xLocation - oldParent.getLocation().x) + 10;
-			} else {
-				distance = 120;
-			}
+			distance = leftRightDefaultDistance;
 		}
 		this.distance = distance;
 		shiftChildren(graphicalChildren, distance, topDown);

@@ -47,6 +47,10 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	private IFeature newFeature;
 	private final IGraphicalFeature graphicalFeature;
 	private IGraphicalFeature newGraphicalFeature;
+	private final int xDistanceTopDown = 5;
+	private final int yDistanceTopDown = 31;
+	private final int xDistanceLeftRight = 20;
+	private final int yDistanceLeftRight = 8;
 
 	public CreateFeatureBelowOperation(IGraphicalFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
@@ -80,10 +84,10 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	 * adjust position of the new feature in manual layout
 	 */
 	private void setNewPositionFeatureBelow() {
-		int maxX = graphicalFeature.getLocation().x - 5;
-		int maxY = graphicalFeature.getLocation().y - 8;
-		int yLocation = graphicalFeature.getLocation().y() + 31 + graphicalFeature.getSize().height;
-		int xLocation = graphicalFeature.getLocation().x + 20 + graphicalFeature.getSize().width;
+		int maxX = graphicalFeature.getLocation().x - xDistanceTopDown;
+		int maxY = graphicalFeature.getLocation().y - yDistanceLeftRight;
+		int yLocation = graphicalFeature.getLocation().y() + yDistanceTopDown + graphicalFeature.getSize().height;
+		int xLocation = graphicalFeature.getLocation().x + xDistanceLeftRight + graphicalFeature.getSize().width;
 		final List<IGraphicalFeature> olderSiblings = graphicalFeature.getGraphicalChildren(true);
 
 		if (olderSiblings.size() != 1) {
@@ -103,9 +107,9 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		}
 		// decides if the anchor points are at the side or on the top of the rectangle
 		if (!newGraphicalFeature.getGraphicalModel().getLayout().verticalLayout()) {
-			newGraphicalFeature.setLocation(new Point(maxX + 5, yLocation));
+			newGraphicalFeature.setLocation(new Point(maxX + xDistanceTopDown, yLocation));
 		} else {
-			newGraphicalFeature.setLocation(new Point(xLocation, maxY + 8));
+			newGraphicalFeature.setLocation(new Point(xLocation, maxY + yDistanceLeftRight));
 		}
 	}
 
