@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintActio
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
- * 
+ *
  * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
  *
  * @author "Rosiak Kamil"
@@ -134,6 +134,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		public void partActivated(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
 				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
+				setConstraintsHidden(constraintsHidden);
 			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
 				refreshView(FeatureModelUtil.getFeatureModel());
 			}
@@ -216,7 +217,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * Changes if the Constraints are shown under the feature model
 	 */
 	public void setConstraintsHidden(boolean hideConstraints) {
-		if ((FeatureModelUtil.getActiveFMEditor() != null) && (constraintsHidden != hideConstraints)) {
+		if ((FeatureModelUtil.getActiveFMEditor() != null)) {
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().redrawDiagram();
 			constraintsHidden = hideConstraints;
