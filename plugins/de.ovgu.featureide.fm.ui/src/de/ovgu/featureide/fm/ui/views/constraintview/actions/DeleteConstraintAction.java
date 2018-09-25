@@ -31,7 +31,9 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AbstractFeatureModelOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * action to delete one or multiply Constraints selected in the ConstraintView
@@ -47,26 +49,35 @@ public class DeleteConstraintAction extends Action {
 
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
+	private TreeViewer viewer;
+
 	public DeleteConstraintAction(Object viewer, IFeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			this.featureModel = featureModel;
 			setEnabled(isValidSelection(selection));
+			this.viewer = (TreeViewer) viewer;
 		}
 	}
 
 	@Override
 	public void run() {
-		for (final Object sel : selection.toList()) {
-			final DeleteConstraintOperation cdo = new DeleteConstraintOperation((IConstraint) sel, featureModel);
-
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(cdo, null, null);
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+		AbstractFeatureModelOperation abstractFeatureModelOperation = null;
+		if (selection.toList().size() == 1) {
+			abstractFeatureModelOperation = new DeleteConstraintOperation((IConstraint) selection.getFirstElement(), featureModel);
+		} else if (selection.toList().size() > 1) {
+			abstractFeatureModelOperation = new ElementDeleteOperation(viewer, featureModel);
 		}
+		// for (final Object sel : selection.toList()) {
+		// final DeleteConstraintOperation cdo = new DeleteConstraintOperation((IConstraint) sel, featureModel);
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(abstractFeatureModelOperation, null, null);
+		} catch (final ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+		// }
 	}
 
 	/**

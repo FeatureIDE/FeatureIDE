@@ -81,7 +81,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(currentModel, searchText);
 		}
-		new ConstraintViewContextMenu(viewer.getViewer(), currentModel);
+		new ConstraintViewContextMenu(this);
 	}
 
 	/**
@@ -262,5 +262,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			checkForRefresh();
 		}
+	}
+
+	/**
+	 * returns the current model
+	 */
+	public IFeatureModel getCurrentModel() {
+		// TODO Auto-generated method stub
+		return currentModel;
+	}
+
+	public TreeViewer getViewer() {
+		return viewer.getViewer();
 	}
 }

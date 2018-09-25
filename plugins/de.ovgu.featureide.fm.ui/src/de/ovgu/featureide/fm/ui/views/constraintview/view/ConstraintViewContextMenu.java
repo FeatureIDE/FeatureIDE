@@ -26,8 +26,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Menu;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
 
@@ -37,11 +37,11 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintActio
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewContextMenu {
-	IFeatureModel currentModel;
+	ConstraintViewController controller;
 
-	public ConstraintViewContextMenu(Viewer viewer, IFeatureModel currentModel) {
-		this.currentModel = currentModel;
-		createContextMenu(viewer);
+	public ConstraintViewContextMenu(ConstraintViewController controller) {
+		this.controller = controller;
+		createContextMenu(controller.getViewer());
 	}
 
 	/**
@@ -69,8 +69,8 @@ public class ConstraintViewContextMenu {
 	 * @param contextMenu
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
-		contextMenu.add(new CreateConstraintAction(viewer, currentModel));
-		contextMenu.add(new EditConstraintAction(viewer, currentModel));
-		contextMenu.add(new DeleteConstraintAction(viewer, currentModel));
+		contextMenu.add(new CreateConstraintAction(viewer, controller.getCurrentModel()));
+		contextMenu.add(new EditConstraintAction(viewer, controller.getCurrentModel()));
+		contextMenu.add(new DeleteConstraintAction(viewer, controller.getCurrentModel()));
 	}
 }
