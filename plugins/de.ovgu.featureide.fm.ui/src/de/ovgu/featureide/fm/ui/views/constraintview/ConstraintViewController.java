@@ -125,18 +125,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * only shows constraints from features that are not collapsed
 	 */
 	private void hideCollapsedConstraints(IFeatureModel currentModel) {
-		// System.out.println(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		for (final IGraphicalConstraint constraint : constraints) {
-			/*
-			 * final FeatureDiagramViewer fdv = FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer(); for (final Object part_it :
-			 * fdv.getSelectedEditParts()) { final FeatureEditPart fe_part = (FeatureEditPart) part_it;
-			 * System.out.println(fe_part.getModel().getObject().getName()); } if (fdv.getSelectedEditParts().contains(constraints) ||
-			 * FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) { viewer.addItem(constraint.getObject()); }
-			 */
-			viewer.addItem(constraint.getObject());
+			if (constraint.isFeatureSelected()) {
+				viewer.addItem(constraint.getObject());
+			}
 		}
+
 	}
 
 	/**
