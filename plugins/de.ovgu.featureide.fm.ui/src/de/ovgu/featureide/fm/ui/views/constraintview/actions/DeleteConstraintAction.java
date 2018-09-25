@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteConstraint
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
- * action to delete one or multiply Constraints selected in the ConstraintView
+ * This class represents the Action to delete one or multiply Constraints selected in the ConstraintView.
  *
  * @author "Rosiak Kamil"
  * @author "Rahel Arens"
@@ -69,15 +69,12 @@ public class DeleteConstraintAction extends Action {
 		} else if (selection.toList().size() > 1) {
 			abstractFeatureModelOperation = new ElementDeleteOperation(viewer, featureModel);
 		}
-		// for (final Object sel : selection.toList()) {
-		// final DeleteConstraintOperation cdo = new DeleteConstraintOperation((IConstraint) sel, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(abstractFeatureModelOperation, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		// }
 	}
 
 	/**

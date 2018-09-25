@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
 
 /**
- * TODO This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
+ * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"

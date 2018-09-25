@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAct
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
 
 /**
- * TODO description
+ * This class represents the context menu of the ConstraintView.
  *
  * @author "Rosiak Kamil"
  */
@@ -46,8 +46,6 @@ public class ConstraintViewContextMenu {
 
 	/**
 	 * Creates the context menu
-	 *
-	 * @param viewer
 	 */
 	protected void createContextMenu(final Viewer viewer) {
 		final MenuManager contextMenu = new MenuManager("#ViewerMenu"); //$NON-NLS-1$
@@ -65,8 +63,6 @@ public class ConstraintViewContextMenu {
 
 	/**
 	 * Fill dynamic context menu
-	 *
-	 * @param contextMenu
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
 		contextMenu.add(new CreateConstraintAction(viewer, controller.getCurrentModel()));
