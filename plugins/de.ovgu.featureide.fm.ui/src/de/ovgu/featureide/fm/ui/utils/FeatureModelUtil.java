@@ -27,18 +27,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * This is a util class thats provides some helper methods to get feature model context.
+ * This is a utility class thats provides some helper methods to get feature model context.
  *
  * @author "Rosiak Kamil"
  */
 public class FeatureModelUtil {
 	/**
-<<<<<<< HEAD
-	 * This method returns the active feature model editor if available.
-	 *
-=======
 	 * This method returns the active feature model editor if available else it returns null.
->>>>>>> refs/remotes/origin/DevelopmentBranch
 	 */
 	public static FeatureModelEditor getActiveFMEditor() {
 		final IEditorPart viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
@@ -50,10 +45,6 @@ public class FeatureModelUtil {
 
 	/**
 	 * This method returns the feature model of the active editor.
-<<<<<<< HEAD
-	 *
-=======
->>>>>>> refs/remotes/origin/DevelopmentBranch
 	 */
 	public static IFeatureModel getFeatureModel() {
 		final FeatureModelEditor fmEditor = getActiveFMEditor();
