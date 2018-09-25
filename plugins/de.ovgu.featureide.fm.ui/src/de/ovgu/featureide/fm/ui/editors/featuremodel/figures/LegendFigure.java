@@ -251,11 +251,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAlternative());
 		}
-		if (_abstract) {
+		if (_abstract && !concrete) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (concrete && !_abstract) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (_abstract && concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAbstract());
-		}
-		if (concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getConcrete());
 		}
