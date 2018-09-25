@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
@@ -60,6 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
@@ -94,6 +96,7 @@ public class FmOutlinePageContextMenu {
 	private DeleteAllAction dAAction;
 	private CreateCompoundAction cAction;
 	private CreateLayerAction clAction;
+	private CreateSiblingAction csAction;
 	private CreateConstraintAction ccAction;
 	private EditConstraintAction ecAction;
 	private OrAction oAction;
@@ -189,6 +192,7 @@ public class FmOutlinePageContextMenu {
 		ecAction = new EditConstraintAction(viewer, fInput);
 		cAction = new CreateCompoundAction(viewer, fInput);
 		clAction = new CreateLayerAction(viewer, fInput);
+		csAction = new CreateSiblingAction(viewer, fTextEditor.diagramEditor.getGraphicalFeatureModel());
 		oAction = new OrAction(viewer, fInput);
 		// TODO _interfaces Removed Code
 		// roAction = new ReverseOrderAction(viewer, fInput);
@@ -301,6 +305,9 @@ public class FmOutlinePageContextMenu {
 		if (sel instanceof IFeature) {
 
 			manager.add(cAction);
+
+			csAction.setText(CREATE_SIBLING);
+			manager.add(csAction);
 
 			clAction.setText(CREATE_FEATURE_BELOW);
 			manager.add(clAction);

@@ -22,18 +22,27 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateSiblingOperation;
 
 /**
  * TODO description
@@ -47,6 +56,8 @@ public class CreateSiblingAction extends Action {
 
 	private final IGraphicalFeatureModel featureModel;
 
+	private IFeature parent = null;
+
 	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
@@ -56,13 +67,70 @@ public class CreateSiblingAction extends Action {
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(true);
+			setEnabled(isValidSelection(selection));
 		}
 	};
 
 	public CreateSiblingAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(CREATE_SIBLING, createImage);
 		this.featureModel = featureModel;
+		setEnabled(false);
+		setId(ID);
+		if (viewer instanceof GraphicalViewerImpl) {
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		} else {
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		}
+	}
+
+	@Override
+	public void run() {
+		final CreateSiblingOperation op = new CreateSiblingOperation(featureModel, selectedFeatures);
+
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+		} catch (final ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+	}
+
+	private boolean isValidSelection(IStructuredSelection selection) {
+		// check empty selection (i.e. ModelEditPart is selected)
+		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
+			return false;
+		}
+
+		// check that selected features have the same parent
+		selectedFeatures.clear();
+		final Iterator<?> iter = selection.iterator();
+		while (iter.hasNext()) {
+			final Object editPart = iter.next();
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
+				continue;
+			}
+			IFeature feature;
+
+			if (editPart instanceof FeatureEditPart) {
+				feature = ((FeatureEditPart) editPart).getModel().getObject();
+			} else {
+				feature = (IFeature) editPart;
+			}
+
+			final IFeatureStructure structureParent = feature.getStructure().getParent();
+			if (structureParent != null) {
+				final IFeature featureParent = structureParent.getFeature();
+				if (selectedFeatures.isEmpty()) {
+					parent = featureParent;
+				} else if (parent != featureParent) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+
+			selectedFeatures.add(feature);
+		}
+		return !selectedFeatures.isEmpty();
 	}
 
 }

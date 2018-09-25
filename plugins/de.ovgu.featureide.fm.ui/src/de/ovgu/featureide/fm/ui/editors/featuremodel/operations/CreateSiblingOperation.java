@@ -48,11 +48,13 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
 		this.selectedFeatures = selectedFeatures;
+		this.featureModel = featureModel;
 		int number = 0;
 		while (FeatureUtils.getFeatureNames(featureModel.getFeatureModel()).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
 
 		newCompound =
 			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
+		System.out.println("Das hier passiert, wenn man auf CreateSibling drückt: " + newCompound.getName());
 	}
 
 	@Override
@@ -60,14 +62,18 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 		final IFeatureStructure parent = selectedFeatures.get(0).getStructure().getParent();
 		if (parent != null) {
 			parent.addChild(newCompound.getStructure());
+			featureModel.getFeatureModel().addFeature(newCompound);
 		} else {
 			return null;
 		}
+
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent.getFeature() : null, newCompound);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		return null;
+		newCompound = featureModel.getFeatureModel().getFeature(newCompound.getName());
+		featureModel.getFeatureModel().deleteFeature(newCompound);
+		return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, newCompound);
 	}
 }
