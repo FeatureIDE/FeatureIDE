@@ -612,7 +612,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			analyzeFeatureModel();
 			break;
 		case FEATURE_ADD_SIBLING:
-			final IFeature newCompund = null;
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
 				newCompound = (IFeature) event.getNewValue();
 				final IFeature parent = (IFeature) event.getOldValue();

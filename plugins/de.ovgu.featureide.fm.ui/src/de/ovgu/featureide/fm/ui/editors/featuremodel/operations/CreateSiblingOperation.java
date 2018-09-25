@@ -24,6 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -31,19 +34,22 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * TODO description
+ * Operation with functionality to create a sibling feature. Enables undo/redo functionality.
  *
  * @author Sabrina Hugo
  * @author Christian Orsinger
  */
 public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
-	IGraphicalFeatureModel featureModel;
-	LinkedList<IFeature> selectedFeatures;
-	IFeature newCompound;
+	private final IGraphicalFeatureModel featureModel;
+	private final LinkedList<IFeature> selectedFeatures;
+	private IFeature newCompound;
+	private final int xDistanceTopDown = 5;
+	private final int yDistanceLeftRight = 8;
 
 	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
@@ -54,20 +60,52 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 		newCompound =
 			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
-		System.out.println("Das hier passiert, wenn man auf CreateSibling drückt: " + newCompound.getName());
 	}
 
+	// finds the parent of the selected features and adds a new child of the parent
 	@Override
 	protected FeatureIDEEvent operation() {
 		final IFeatureStructure parent = selectedFeatures.get(0).getStructure().getParent();
-		if (parent != null) {
-			parent.addChild(newCompound.getStructure());
-			featureModel.getFeatureModel().addFeature(newCompound);
-		} else {
-			return null;
+
+		parent.addChild(newCompound.getStructure());
+		featureModel.getFeatureModel().addFeature(newCompound);
+		// checks if manual layout is chosen
+		if (featureModel.getLayout().getLayoutAlgorithm() == 0) {
+			setPositionNewSibling();
 		}
 
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent.getFeature() : null, newCompound);
+	}
+
+	/**
+	 * looks for the rightest and lowermost location and places the new feature there, depending on the previous layout
+	 */
+	private void setPositionNewSibling() {
+		final IGraphicalFeature parent = featureModel.getGraphicalFeature(newCompound.getStructure().getParent().getFeature());
+		final List<IGraphicalFeature> children = parent.getGraphicalChildren(true);
+		int maxX = children.get(0).getLocation().x + children.get(0).getSize().width;
+		int yLocation = children.get(0).getLocation().y;
+		int maxY = children.get(0).getLocation().y + children.get(0).getSize().height;
+		int xLocation = children.get(0).getLocation().x;
+		for (int i = 0; i < children.size(); i++) {
+			final int rightFeatureBorder = (children.get(i).getLocation().x + children.get(i).getSize().width);
+			final int downFeatureBorder = (children.get(i).getLocation().y + children.get(i).getSize().height);
+			if (rightFeatureBorder > maxX) {
+				maxX = rightFeatureBorder;
+				yLocation = children.get(i).getLocation().y;
+			}
+			if (downFeatureBorder > maxY) {
+				maxY = downFeatureBorder;
+				xLocation = children.get(i).getLocation().x;
+			}
+		}
+
+		if (featureModel.getLayout().verticalLayout()) {
+			// left to right
+			featureModel.getGraphicalFeature(newCompound).setLocation(new Point(xLocation, maxY + yDistanceLeftRight));
+		} else {
+			featureModel.getGraphicalFeature(newCompound).setLocation(new Point(maxX + xDistanceTopDown, yLocation));
+		}
 	}
 
 	@Override

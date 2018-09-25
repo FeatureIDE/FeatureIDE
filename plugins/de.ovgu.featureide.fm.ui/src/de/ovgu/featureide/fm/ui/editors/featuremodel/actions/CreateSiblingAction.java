@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateSiblingOperation;
 
 /**
- * TODO description
+ * Creates a new feature with the currently selected features as siblings
  *
  * @author Sabrina Hugo
  * @author Christian Orsinger
@@ -94,6 +94,10 @@ public class CreateSiblingAction extends Action {
 		}
 	}
 
+	/**
+	 * @param selection selected elements
+	 * @return true, if selected elements are sibling features, false otherwise
+	 */
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
@@ -116,6 +120,7 @@ public class CreateSiblingAction extends Action {
 				feature = (IFeature) editPart;
 			}
 
+			// checks if selected feature is root
 			final IFeatureStructure structureParent = feature.getStructure().getParent();
 			if (structureParent != null) {
 				final IFeature featureParent = structureParent.getFeature();
