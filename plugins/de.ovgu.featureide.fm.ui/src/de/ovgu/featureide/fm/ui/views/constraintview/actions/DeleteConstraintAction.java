@@ -69,6 +69,9 @@ public class DeleteConstraintAction extends Action {
 		}
 	}
 
+	/**
+	 * this method is a selection verifier, returns true if this command can process the selected items.
+	 */
 	public boolean isValidSelection(IStructuredSelection selection) {
 		if ((selection.size() == 1) && (selection.getFirstElement() instanceof IConstraint)) {
 			return true;

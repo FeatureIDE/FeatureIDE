@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
- * TODO This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
+ * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the content of the view.
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
@@ -80,7 +80,7 @@ public class ConstraintView implements GUIDefaults {
 	 */
 	public void addNoFeatureModelItem() {
 		removeAll();
-		final TreeItem item = new TreeItem(tree, SWT.ICON);
+		final TreeItem item = new TreeItem(tree, SWT.None);
 		item.setText(DEFAULT_MESSAGE);
 		item.setImage(DEFAULT_IMAGE);
 		tree.setHeaderVisible(false);

@@ -39,12 +39,6 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	public static final String ID = "de.ovgu.featureide.editconstraint";
 	private IConstraint constraint;
 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 * @param menuname
-	 * @param id
-	 */
 	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
