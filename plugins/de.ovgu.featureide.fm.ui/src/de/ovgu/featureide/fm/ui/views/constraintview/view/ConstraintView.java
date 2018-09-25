@@ -43,7 +43,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author "Domenik Eichhorn"
  */
 public class ConstraintView implements GUIDefaults {
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_MODEL_;
+	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
+	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
+	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+
+	private final int CONSTRAINT_NAME_WIDTH = 800;
+	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
+
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM_EDITOR;
+
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TreeViewer treeViewer;
@@ -70,7 +78,7 @@ public class ConstraintView implements GUIDefaults {
 		displayName = displayName.replace("-", "\u00AC");
 		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
 		if ((tree.getItemCount() % 2) == 1) {
-			item.setBackground(new Color(Display.getDefault(), 240, 240, 240));
+			item.setBackground(ROW_ALTER_COLOR);
 		}
 		tree.setHeaderVisible(true);
 	}
@@ -127,8 +135,8 @@ public class ConstraintView implements GUIDefaults {
 		treeData.verticalAlignment = SWT.FILL;
 		tree = treeViewer.getTree();
 		tree.setLayoutData(treeData);
-		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
-		tree.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
+		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
+		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
 
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
@@ -142,13 +150,13 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		constraintColumn.setResizable(true);
 		constraintColumn.setMoveable(true);
-		constraintColumn.setWidth(800);
+		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
 
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);
-		descriptionColumn.setWidth(200);
+		descriptionColumn.setWidth(CONSTRAINT_DESCRIPTION_WIDTH);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 
 	}

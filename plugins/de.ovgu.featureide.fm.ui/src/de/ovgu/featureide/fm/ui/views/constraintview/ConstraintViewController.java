@@ -20,22 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -49,11 +44,10 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
+import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
 
 /**
  * TODO This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
@@ -87,8 +81,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(currentModel, searchText);
 		}
-		createContextMenu(viewer.getViewer());
-
+		new ConstraintViewContextMenu(viewer.getViewer(), currentModel);
 	}
 
 	/**
@@ -232,7 +225,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * adding Listener to the tree viewer
 	 */
 	private void addListener() {
-		// doubleclicklistener
 		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
@@ -245,36 +237,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				}
 			}
 		});
-	}
-
-	/**
-	 * Creates the context menu
-	 *
-	 * @param viewer
-	 */
-	protected void createContextMenu(Viewer viewer) {
-		final MenuManager contextMenu = new MenuManager("#ViewerMenu"); //$NON-NLS-1$
-		contextMenu.setRemoveAllWhenShown(true);
-		contextMenu.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(IMenuManager mgr) {
-				fillContextMenu(mgr);
-			}
-		});
-
-		final Menu menu = contextMenu.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-	}
-
-	/**
-	 * Fill dynamic context menu
-	 *
-	 * @param contextMenu
-	 */
-	protected void fillContextMenu(IMenuManager contextMenu) {
-		contextMenu.add(new CreateConstraintAction(viewer.getViewer(), currentModel));
-		contextMenu.add(new EditConstraintAction(viewer.getViewer(), currentModel));
-		contextMenu.add(new DeleteConstraintAction(viewer.getViewer(), currentModel));
 	}
 
 	@Override
