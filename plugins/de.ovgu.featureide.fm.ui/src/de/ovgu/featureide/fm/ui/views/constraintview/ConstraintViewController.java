@@ -84,7 +84,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		getSite().getPage().addPartListener(constraintListener);
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			currentModel = FeatureModelUtil.getFeatureModel();
-			refreshView(currentModel, searchText);
+			refreshView(currentModel);
 		}
 		createContextMenu(viewer.getViewer());
 
@@ -98,7 +98,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
-			refreshView(currentModel, searchText);
+			refreshView(currentModel);
 		}
 
 	};
@@ -107,37 +107,49 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * this method first clears the table and then adds all constrains that contain searchInput in their DisplayName or Description also it checks for RegEx
 	 * matching in searchInput
 	 */
-	public void refreshView(IFeatureModel currentModel, String searchInput) {
+	public void refreshView(IFeatureModel currentModel) {
 		if (currentModel != null) {
 			this.currentModel = currentModel;
 			this.currentModel.addListener(this);
 			viewer.removeAll();
 			// if empty search show only constrains from non collapsed features
-			if (searchInput.equals("")) {
-				// System.out.println(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
-				final List<IGraphicalConstraint> constraints =
-					FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
-				for (final IGraphicalConstraint constraint : constraints) {
-					/*
-					 * final FeatureDiagramViewer fdv = FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer(); for (final Object part_it :
-					 * fdv.getSelectedEditParts()) { final FeatureEditPart fe_part = (FeatureEditPart) part_it;
-					 * System.out.println(fe_part.getModel().getObject().getName()); } if (fdv.getSelectedEditParts().contains(constraints) ||
-					 * FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
-					 * viewer.addItem(constraint.getObject()); }
-					 */
-					viewer.addItem(constraint.getObject());
-				}
+			if (searchText.equals("")) {
+				hideCollapsedConstraints(currentModel);
 			} else {
-				for (final IConstraint constraint : currentModel.getConstraints()) {
-					final String lazyConstraint = constraint.getDisplayName().toLowerCase();
-					final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
-					searchInput = searchInput.toLowerCase();
-					if (lazyConstraint.matches(searchInput) || lazyConstraint.contains(searchInput) || lazyDescription.matches(searchInput)
-						|| lazyDescription.contains(searchInput)) {
-						viewer.addItem(constraint);
+				findConstraints(currentModel);
+			}
+		}
+	}
 
-					}
-				}
+	/**
+	 * only shows constraints from features that are not collapsed
+	 */
+	private void hideCollapsedConstraints(IFeatureModel currentModel) {
+		// System.out.println(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
+		final List<IGraphicalConstraint> constraints =
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
+		for (final IGraphicalConstraint constraint : constraints) {
+			/*
+			 * final FeatureDiagramViewer fdv = FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer(); for (final Object part_it :
+			 * fdv.getSelectedEditParts()) { final FeatureEditPart fe_part = (FeatureEditPart) part_it;
+			 * System.out.println(fe_part.getModel().getObject().getName()); } if (fdv.getSelectedEditParts().contains(constraints) ||
+			 * FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) { viewer.addItem(constraint.getObject()); }
+			 */
+			viewer.addItem(constraint.getObject());
+		}
+	}
+
+	/**
+	 * searches constraints that match the searchInput (Description and Displayname) and adds them to the TreeViewer
+	 */
+	private void findConstraints(IFeatureModel currentModel) {
+		for (final IConstraint constraint : currentModel.getConstraints()) {
+			final String lazyConstraint = constraint.getDisplayName().toLowerCase();
+			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
+			searchText = searchText.toLowerCase();
+			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
+				viewer.addItem(constraint);
+
 			}
 		}
 	}
@@ -169,7 +181,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partBroughtToTop(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel(), searchText);
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
 			} else {
 				viewer.addNoFeatureModelItem();
 			}
@@ -178,9 +190,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		@Override
 		public void partActivated(IWorkbenchPartReference part) {
 			if (part.getPart(false) instanceof FeatureModelEditor) {
-				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel(), searchText);
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
 			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
-				refreshView(FeatureModelUtil.getFeatureModel(), searchText);
+				refreshView(FeatureModelUtil.getFeatureModel());
 			}
 			if (part.getPart(false) instanceof IEditorPart) {
 				setConstraintsHidden(constraintsHidden);
@@ -274,6 +286,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 */
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		refreshView(currentModel, searchText);
+		refreshView(currentModel);
 	}
 }
