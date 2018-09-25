@@ -33,28 +33,38 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  */
 public class FeatureModelUtil {
 	/**
+<<<<<<< HEAD
 	 * This method returns the active feature model editor if available.
 	 *
+=======
+	 * This method returns the active feature model editor if available else it returns null.
+>>>>>>> refs/remotes/origin/DevelopmentBranch
 	 */
-	public static IEditorPart getActiveFMEditor() {
+	public static FeatureModelEditor getActiveFMEditor() {
 		final IEditorPart viewReferences = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		if (viewReferences instanceof FeatureModelEditor) {
-			return viewReferences;
+			return (FeatureModelEditor) viewReferences;
 		}
 		return null;
 	}
 
 	/**
 	 * This method returns the feature model of the active editor.
+<<<<<<< HEAD
 	 *
+=======
+>>>>>>> refs/remotes/origin/DevelopmentBranch
 	 */
 	public static IFeatureModel getFeatureModel() {
-		final IEditorPart fmEditor = getActiveFMEditor();
-		if (fmEditor instanceof FeatureModelEditor) {
-			return ((FeatureModelEditor) fmEditor).getFeatureModel();
-		}
-
-		return null;
+		final FeatureModelEditor fmEditor = getActiveFMEditor();
+		return fmEditor.getFeatureModel();
 	}
 
+	/**
+	 * This method returns the original feature model of the active editor.
+	 */
+	public static IFeatureModel getOriginalFeatureModel() {
+		final FeatureModelEditor fmEditor = getActiveFMEditor();
+		return fmEditor.getOriginalFeatureModel();
+	}
 }
