@@ -112,10 +112,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescri
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CollapseSiblingsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
@@ -170,8 +170,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private Label infoLabel;
 
 	private CalculateDependencyAction calculateDependencyAction;
-	private CreateLayerAction createLayerAction;
-	private CreateCompoundAction createCompoundAction;
+	private CreateFeatureBelowAction createLayerAction;
+	private CreateFeatureAboveAction createCompoundAction;
 	private CreateSiblingAction createSiblingAction;
 	private DeleteAction deleteAction;
 	private DeleteAllAction deleteAllAction;
@@ -256,8 +256,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		actions.clear();
 
 		// FM structure modify actions
-		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
-		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
+		createLayerAction = addAction(new CreateFeatureBelowAction(viewer, featureModel));
+		createCompoundAction = addAction(new CreateFeatureAboveAction(viewer, featureModel));
 		createSiblingAction = addAction(new CreateSiblingAction(viewer, graphicalFeatureModel));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
@@ -1273,10 +1273,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {
-		if (CreateLayerAction.ID.equals(workbenchActionID)) {
+		if (CreateFeatureBelowAction.ID.equals(workbenchActionID)) {
 			return createLayerAction;
 		}
-		if (CreateCompoundAction.ID.equals(workbenchActionID)) {
+		if (CreateFeatureAboveAction.ID.equals(workbenchActionID)) {
 			return createCompoundAction;
 		}
 		if (CreateSiblingAction.ID.equals(workbenchActionID)) {

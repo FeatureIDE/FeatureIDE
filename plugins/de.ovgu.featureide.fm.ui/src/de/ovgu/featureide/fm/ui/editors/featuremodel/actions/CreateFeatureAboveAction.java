@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateCompoundAction extends Action {
+public class CreateFeatureAboveAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.createcompound";
 
@@ -71,7 +71,7 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
+	public CreateFeatureAboveAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
 		this.featureModel = featureModel;
 		setEnabled(false);

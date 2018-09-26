@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBel
  *
  * @author Thomas Thuem
  */
-public class CreateLayerAction extends SingleSelectionAction {
+public class CreateFeatureBelowAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.createlayer";
 
@@ -45,7 +45,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	private final IFeatureModel featureModel;
 
-	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
+	public CreateFeatureBelowAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_BELOW + " (Ins)", viewer, ID);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
