@@ -318,7 +318,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 
 	@Override
 	public boolean matches(IGraphicalFeature element, String searchString) {
-		return element.getObject().getName().toLowerCase().contains(searchString.toLowerCase());
+		return element.getObject().getName().toLowerCase().matches(".*" + searchString.toLowerCase() + ".*");
 	}
 
 	@Override

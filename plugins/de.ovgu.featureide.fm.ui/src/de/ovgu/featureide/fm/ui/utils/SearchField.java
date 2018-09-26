@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.utils;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -31,6 +32,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
@@ -104,16 +107,36 @@ public class SearchField<T> {
 		for (; it.hasNext(); i++) {
 			final T next = it.next();
 			if (searchable.matches(next, searchString)) {
-				if (((IGraphicalFeature) next).isCollapsed()) {
-					if (i >= curIndex) {
-						curIndex = i;
-						searchable.found(next);
-						return;
-					} else if (temp == null) {
-						temp = next;
-						tempIndex = i;
+				if (((IGraphicalFeature) next).hasCollapsedParent()) {
+					/*
+					 * final IGraphicalFeatureModel graphicalFeatureModel = null; final Object viewer = null; final CollapseAction collapseAction = new
+					 * CollapseAction(viewer, graphicalFeatureModel); collapseAction.run();
+					 */
+					System.out.println("next: " + next);
+					final IFeatureStructure parent = ((IGraphicalFeature) next).getObject().getStructure().getParent();
+					System.out.println("parent: " + parent);
+					final List<IFeatureStructure> kids = parent.getChildren();
+					System.out.println("kids: " + kids);
+					for (int j = 0; j < kids.size(); j++) {
+						final IFeatureStructure kid = kids.get(j);
+						System.out.println("kid: " + kid);
+
+						final IFeature featurekid = kid.getFeature();
+						System.out.println("feature kid: " + featurekid);
+						// ((IGraphicalFeature) kids.get(j)).setCollapsed(true);
+
+						// featurekid.
 					}
 				}
+				if (i >= curIndex) {
+					curIndex = i;
+					searchable.found(next);
+					return;
+				} else if (temp == null) {
+					temp = next;
+					tempIndex = i;
+				}
+
 			}
 		}
 		if (temp != null) {
