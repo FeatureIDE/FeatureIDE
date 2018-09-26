@@ -230,30 +230,24 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			// marks features by changing their border when a related feature is selected
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				// sets all features to not selected
-				if (!(graphfeature == null)) {
-					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-						graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-						graphfeature.setConstraintSelected(false);
-						new FeatureFigure(graphfeature, graphmodel).setProperties();
-					}
-				}
-				// after that sets features that are related to the constraint to selected
 				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
-				if (treeSelection.getFirstElement() instanceof IConstraint) {
-					final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
-					for (final IFeature feature : constraint.getContainedFeatures()) {
-						graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-						graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
+				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+					if (constraint.getContainedFeatures().contains(feature)) {
 						graphfeature.setConstraintSelected(true);
-						System.out.println(graphfeature);
-						new FeatureFigure(graphfeature, graphmodel).setProperties();
+					} else {
+						graphfeature.setConstraintSelected(false);
 					}
+					new FeatureFigure(graphfeature, graphmodel).setProperties();
 				}
 			}
 
 		});
+
 		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				// setInheritedFeatureBorderColor
@@ -264,6 +258,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 					}
 				}
 			}
+
 		});
 	}
 
