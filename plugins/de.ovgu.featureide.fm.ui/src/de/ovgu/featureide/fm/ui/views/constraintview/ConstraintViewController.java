@@ -1,23 +1,23 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- *
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
+* Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
+*
+* This file is part of FeatureIDE.
+*
+* FeatureIDE is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* FeatureIDE is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+*
+* See http://featureide.cs.ovgu.de/ for further information.
+*/
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
 import java.util.List;
@@ -26,6 +26,8 @@ import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -36,6 +38,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -43,8 +46,11 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
@@ -64,6 +70,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
+	private IGraphicalFeature graphfeature = null;
+	private IGraphicalFeatureModel graphmodel = null;
 
 	boolean constraintsHidden = false;
 
@@ -85,7 +93,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			refreshView(currentModel);
 		}
 		new ConstraintViewContextMenu(this);
-
 	}
 
 	/**
@@ -217,10 +224,39 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * adding Listener to the tree viewer
 	 */
 	private void addListener() {
+		// event fired when clicking on an constraint (one click)
+		viewer.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+
+			// marks features by changing their border when a related feature is selected
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				// sets all features to not selected
+				if (!(graphfeature == null)) {
+					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+						graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+						graphfeature.setConstraintSelected(false);
+						new FeatureFigure(graphfeature, graphmodel).setProperties();
+					}
+				}
+				// after that sets features that are related to the constraint to selected
+				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+				if (treeSelection.getFirstElement() instanceof IConstraint) {
+					final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
+					for (final IFeature feature : constraint.getContainedFeatures()) {
+						graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+						graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+						graphfeature.setConstraintSelected(true);
+						System.out.println(graphfeature);
+						new FeatureFigure(graphfeature, graphmodel).setProperties();
+					}
+				}
+			}
+
+		});
 		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
-
+				// setInheritedFeatureBorderColor
 				if (event.getSource() instanceof TreeViewer) {
 					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 					if (treeSelection.getFirstElement() instanceof IConstraint) {
