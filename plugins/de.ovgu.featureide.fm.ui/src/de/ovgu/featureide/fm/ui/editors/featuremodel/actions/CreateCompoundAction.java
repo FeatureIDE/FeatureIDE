@@ -37,7 +37,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -54,8 +53,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
 public class CreateCompoundAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.createcompound";
-
-	private final IFeatureModel featureModel;
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 
@@ -76,7 +73,6 @@ public class CreateCompoundAction extends Action {
 
 	public CreateCompoundAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
-		this.featureModel = featureModel.getFeatureModel();
 		graphicalFeatureModel = featureModel;
 		setEnabled(false);
 		setId(ID);

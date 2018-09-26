@@ -163,6 +163,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	private void shiftChildren(List<IGraphicalFeature> graphicalChildren, int distance, boolean topDown) {
 		for (int i = 0; i < graphicalChildren.size(); i++) {
 			shiftChildren(graphicalChildren.get(i).getGraphicalChildren(true), distance, topDown);
+			// if there are more layouts to come, there has to be more cases added here
 			if (topDown) {
 				graphicalChildren.get(i).setLocation(new Point(graphicalChildren.get(i).getLocation().x, graphicalChildren.get(i).getLocation().y + distance));
 			} else {
