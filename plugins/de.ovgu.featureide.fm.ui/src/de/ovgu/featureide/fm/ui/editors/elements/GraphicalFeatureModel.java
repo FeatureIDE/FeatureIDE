@@ -235,6 +235,25 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return Collections.unmodifiableList(constraints);
 	}
 
+	/**
+	 * Helpermethod for Constraint view
+	 *
+	 * @return constraints of non collapsed features
+	 */
+	@Override
+	public List<IGraphicalConstraint> getNonCollapsedConstraints() {
+		if (getLayout().showCollapsedConstraints()) {
+			return getConstraints();
+		}
+		final List<IGraphicalConstraint> constraints = new ArrayList<IGraphicalConstraint>();
+		for (final IGraphicalConstraint c : getConstraints()) {
+			if (!c.isCollapsed()) {
+				constraints.add(c);
+			}
+		}
+		return Collections.unmodifiableList(constraints);
+	}
+
 	@Override
 	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
 		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);

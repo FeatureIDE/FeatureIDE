@@ -41,6 +41,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
+ * @author "Thomas Graave"
+ * @author "Rahel Arens"
  */
 public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
