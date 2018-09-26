@@ -41,7 +41,7 @@ public class ConstraintViewContextMenu {
 
 	public ConstraintViewContextMenu(ConstraintViewController controller) {
 		this.controller = controller;
-		createContextMenu(controller.getViewer());
+		createContextMenu(controller.getTreeViewer());
 	}
 
 	/**

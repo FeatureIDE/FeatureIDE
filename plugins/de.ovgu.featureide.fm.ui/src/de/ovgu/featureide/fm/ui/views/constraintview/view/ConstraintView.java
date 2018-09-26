@@ -73,16 +73,24 @@ public class ConstraintView implements GUIDefaults {
 		final TreeItem item = new TreeItem(tree, SWT.None);
 		item.setData(element);
 		String displayName = ((IConstraint) element).getDisplayName();
-		displayName = displayName.replace("|", "\u2228");
-		displayName = displayName.replace("<=>", "\u21D4");
-		displayName = displayName.replace("=>", "\u21D2");
-		displayName = displayName.replace("&", "\u2227");
-		displayName = displayName.replace("-", "\u00AC");
+		displayName = stringStyling(displayName);
 		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
 		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
 		}
 		tree.setHeaderVisible(true);
+	}
+
+	/**
+	 * replaces logical connectives with unicode signs
+	 */
+	private String stringStyling(String string) {
+		string = string.replace("|", "\u2228");
+		string = string.replace("<=>", "\u21D4");
+		string = string.replace("=>", "\u21D2");
+		string = string.replace("&", "\u2227");
+		string = string.replace("-", "\u00AC");
+		return string;
 	}
 
 	/**

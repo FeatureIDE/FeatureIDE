@@ -33,9 +33,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -50,6 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
 
@@ -80,13 +78,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		viewer = new ConstraintView(parent);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		getSite().getPage().addPartListener(constraintListener);
+		getSite().getPage().addPartListener(new ConstraintViewPartListener(this));
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			currentModel = FeatureModelUtil.getFeatureModel();
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(currentModel);
 		}
 		new ConstraintViewContextMenu(this);
+
 	}
 
 	/**
@@ -180,76 +179,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	}
 
 	/**
-	 * Listenes to Changes to adapt the View and the Constraint List under the feature diagram
-	 */
-	private final IPartListener2 constraintListener = new IPartListener2() {
-
-		@Override
-		public void partOpened(IWorkbenchPartReference part) {
-			if (part.getId().equals(ID)) {
-				setConstraintsHidden(true);
-			}
-		}
-
-		@Override
-		public void partDeactivated(IWorkbenchPartReference part) {}
-
-		@Override
-		public void partClosed(IWorkbenchPartReference part) {
-			if (part instanceof FeatureModelEditor) {
-				if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
-					final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-					addPageChangeListener(editor);
-					viewer.getViewer().refresh();
-				}
-			}
-		}
-
-		@Override
-		public void partBroughtToTop(IWorkbenchPartReference part) {
-			if (part.getPart(false) instanceof FeatureModelEditor) {
-				checkForRefresh();
-			} else {
-				viewer.addNoFeatureModelItem();
-			}
-		}
-
-		@Override
-		public void partActivated(IWorkbenchPartReference part) {
-			if (part.getPart(false) instanceof FeatureModelEditor) {
-				checkForRefresh();
-			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
-				checkForRefresh();
-			}
-			if (part.getPart(false) instanceof IEditorPart) {
-				setConstraintsHidden(constraintsHidden);
-			}
-		}
-
-		@Override
-		public void partHidden(IWorkbenchPartReference part) {
-			if (part.getId().equals(ID)) {
-				setConstraintsHidden(false);
-			}
-		}
-
-		@Override
-		public void partVisible(IWorkbenchPartReference part) {
-			if (part.getId().equals(ID)) {
-				setConstraintsHidden(true);
-			}
-		}
-
-		@Override
-		public void partInputChanged(IWorkbenchPartReference partRef) {}
-
-	};
-
-	/**
 	 * check if the page is the FeatureDiagramEditor.
 	 *
 	 */
-	private void checkForRefresh() {
+	public void checkForRefresh() {
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			final FeatureModelEditor fme = FeatureModelUtil.getActiveFMEditor();
 			if (fme.getActivePage() == 0) {
@@ -266,7 +199,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * add a listener to the Feature model editor to get the page change events
 	 *
 	 */
-	private void addPageChangeListener(FeatureModelEditor fme) {
+	public void addPageChangeListener(FeatureModelEditor fme) {
 		fme.addPageChangedListener(new IPageChangedListener() {
 			@Override
 			public void pageChanged(PageChangedEvent event) {
@@ -322,6 +255,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
+	public boolean isConstraintsHidden() {
+		return constraintsHidden;
+	}
+
 	/**
 	 * returns the current model
 	 */
@@ -329,7 +266,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		return currentModel;
 	}
 
-	public TreeViewer getViewer() {
+	public TreeViewer getTreeViewer() {
 		return viewer.getViewer();
+	}
+
+	public ConstraintView getView() {
+		return viewer;
 	}
 }
