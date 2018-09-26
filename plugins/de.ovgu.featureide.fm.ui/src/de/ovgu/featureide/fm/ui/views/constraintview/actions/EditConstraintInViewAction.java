@@ -31,21 +31,15 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
- * TODO description
+ * this action deletes constraints in the view
  *
  * @author "Rosiak Kamil"
  */
-public class EditConstraintAction extends AbstractConstraintEditorAction {
+public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	public static final String ID = "de.ovgu.featureide.editconstraint";
 	private IConstraint constraint;
 
-	/**
-	 * @param viewer
-	 * @param featuremodel
-	 * @param menuname
-	 * @param id
-	 */
-	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
+	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
 		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
 		if (viewer instanceof TreeViewer) {
