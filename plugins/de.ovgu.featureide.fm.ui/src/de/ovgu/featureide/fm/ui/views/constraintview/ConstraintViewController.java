@@ -135,11 +135,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
 		for (final IGraphicalConstraint constraint : constraints) {
-			final List<ConstraintColorPair<IConstraint, Color>> explanationSet = getExplanationConstraints();
+			final List<ConstraintColorPair<IConstraint, Color>> explanationList = getExplanationConstraints();
 			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				// when at least one feature is selected:
 				// goes through all features that are selected
-				if (explanationSet == null) {
+				if (explanationList == null) {
 					for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
 						if (part instanceof FeatureEditPart) {
 							if (matchesConstraint(part, constraint)) {
@@ -149,7 +149,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 						}
 					}
 				} else {
-					for (final ConstraintColorPair<IConstraint, Color> pair : explanationSet) {
+					for (final ConstraintColorPair<IConstraint, Color> pair : explanationList) {
 						viewer.addDecoratedItem(pair.getFirst(), pair.getSecond());
 					}
 				}
@@ -226,7 +226,13 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 					for (final IGraphicalConstraint constraint : fme.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
 						if (constraint.getObject().equals(fmr.getSubject().getElement())) {
 							constraintList.add(new ConstraintColorPair<IConstraint, Color>(constraint.getObject(), FMPropertyManager.getReasonColor(fmr)));
+							continue;
 						}
+						// Add redundant constraints of reason
+						if (constraint.getObject().toString().equals(fmr.getSubject().getElement().toString())) {
+							constraintList.add(new ConstraintColorPair<IConstraint, Color>(constraint.getObject(), null));
+						}
+
 					}
 				}
 				return constraintList;

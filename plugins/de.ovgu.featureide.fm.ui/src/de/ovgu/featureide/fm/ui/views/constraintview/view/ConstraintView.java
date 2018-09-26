@@ -54,6 +54,7 @@ public class ConstraintView implements GUIDefaults {
 	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
+	private final int ALPHA_VALUE = 175;
 
 	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM_EDITOR;
 
@@ -95,24 +96,19 @@ public class ConstraintView implements GUIDefaults {
 
 	public void addDecoratedItem(IConstraint element, Color color) {
 		final TreeItem item = addItem(element);
-		final Image emptyImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
-		final GC gc = new GC(emptyImg);
-
-		gc.setBackground(color);
-		// MAGIC NUMBERS
-		gc.setAntialias(SWT.ON);
-		gc.setAlpha(175);
-		gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, emptyImg.getBounds().height - BORDER_OFFSET, emptyImg.getBounds().width - BORDER_OFFSET);
-		item.setImage(emptyImg);
-		switch (element.getConstraintAttribute()) {
-		case FALSE_OPTIONAL:
-			// item.setImage(FM_WARNING);
-			// item.setBackground();
-			break;
-		default:
-			break;
+		Image elementImg;
+		if (color == null) {
+			elementImg = FM_INFO;
+		} else {
+			elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
+			final GC gc = new GC(elementImg);
+			gc.setBackground(color);
+			// MAGIC NUMBERS
+			gc.setAntialias(SWT.ON);
+			gc.setAlpha(ALPHA_VALUE);
+			gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
 		}
-
+		item.setImage(elementImg);
 	}
 
 	/**
