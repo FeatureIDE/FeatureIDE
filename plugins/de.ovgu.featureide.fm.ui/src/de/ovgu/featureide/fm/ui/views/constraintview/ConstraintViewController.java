@@ -66,6 +66,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
  */
 public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.constraintView";
+	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 
@@ -124,7 +125,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	}
 
 	/**
-	 * only shows constraints from features that are not collapsed
+	 * only shows constraints from features that are not collapsed. If there are selected features we only show constraint containing at least one of the
+	 * selected features
 	 */
 	private void addConstraints(IFeatureModel currentModel) {
 		final List<IGraphicalConstraint> constraints =
@@ -136,22 +138,33 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				// goes through all features that are selected
 				for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
 					if (part instanceof FeatureEditPart) {
-						// compares with String compare if constraints connect to a selected feature
-						String partName = part.toString().replace("FeatureEditPart( ", "");
-						partName = partName.replace(" )", "");
-						if (constraint.getObject().getDisplayName().contains(partName)) {
+						if (matchesConstraint(part, constraint)) {
 							viewer.addItem(constraint.getObject());
 							break;
 						}
 					}
-
 				}
 			} else {
 				// when no feature is selected, adds all constraints to the viewer
 				viewer.addItem(constraint.getObject());
 			}
 		}
+	}
 
+	/**
+	 * Compares whether a FeatureEditPart occurs in a constraint and returns true if yes
+	 */
+	private boolean matchesConstraint(Object part, IGraphicalConstraint constraint) {
+		if (part instanceof FeatureEditPart) {
+			// Cutting the String because FeatureEditPart.toString == "FeatureEditPart( >Name< )";
+			final String partName = part.toString().substring(FEATURE_EDIT_PART_OFFSET, part.toString().length() - 2);
+			// Adding blanks to allow every case to be covered by just one RegEx
+			final String constraintName = " " + constraint.getObject().getDisplayName() + " ";
+			if (constraintName.matches(".* " + partName + " .*")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -162,6 +175,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			final String lazyConstraint = constraint.getDisplayName().toLowerCase();
 			final String lazyDescription = constraint.getDescription().toLowerCase().replaceAll("\n", " ");
 			searchText = searchText.toLowerCase();
+			// RegEx search with part string: .* at the start and at the end enables part search automatically
 			if (lazyConstraint.matches(".*" + searchText + ".*") || lazyDescription.matches(".*" + searchText + ".*")) {
 				viewer.addItem(constraint);
 

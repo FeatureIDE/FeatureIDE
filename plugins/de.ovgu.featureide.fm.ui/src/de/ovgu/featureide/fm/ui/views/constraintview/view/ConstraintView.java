@@ -41,6 +41,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
+ * @author "Thomas Graave"
+ * @author "Rahel Arens"
  */
 public class ConstraintView implements GUIDefaults {
 	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_MODEL_;
