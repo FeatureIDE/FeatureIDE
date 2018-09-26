@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -47,7 +46,6 @@ public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
-	private final Color ROW_EXPLANATION_COLOR = new Color(Display.getDefault(), 255, 0, 0);
 
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
@@ -79,16 +77,9 @@ public class ConstraintView implements GUIDefaults {
 		displayName = displayName.replace("&", "\u2227");
 		displayName = displayName.replace("-", "\u00AC");
 		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
-		if (((tree.getItemCount() % 2) == 1) && ((element.getConstraintAttribute() == ConstraintAttribute.NORMAL))) {
+		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
-		} else if (element.getConstraintAttribute() == ConstraintAttribute.FALSE_OPTIONAL) {
-			item.setBackground(DEAD_BACKGROUND);
-			item.setImage(FM_WARNING);
-		} else if (element.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
-			item.setBackground(WARNING_BACKGROUND);
-			item.setImage(FM_INFO);
 		}
-
 		tree.setHeaderVisible(true);
 	}
 
@@ -170,8 +161,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 *
-	 * @return Text searchBox
+	 * Text searchBox
 	 */
 	public Text getSearchBox() {
 		return searchBox;
