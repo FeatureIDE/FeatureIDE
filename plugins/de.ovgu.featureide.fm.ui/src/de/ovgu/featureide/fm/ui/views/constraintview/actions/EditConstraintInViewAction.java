@@ -52,10 +52,8 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 		openEditor(constraint);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction#isValidSelection(org.eclipse.jface.viewers.IStructuredSelection)
+	/**
+	 * input validation
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
