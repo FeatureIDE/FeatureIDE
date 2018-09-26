@@ -235,7 +235,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if (constraint.getContainedFeatures().contains(feature)) {
+					if (constraint != null && constraint.getContainedFeatures().contains(feature)) {
 						graphfeature.setConstraintSelected(true);
 					} else {
 						graphfeature.setConstraintSelected(false);
