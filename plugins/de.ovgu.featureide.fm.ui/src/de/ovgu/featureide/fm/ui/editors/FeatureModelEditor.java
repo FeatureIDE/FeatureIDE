@@ -108,6 +108,7 @@ import de.ovgu.featureide.fm.ui.views.outline.standard.FmOutlinePage;
  *
  * @author Thomas Thuem
  * @author Christian Becker
+ * 
  */
 public class FeatureModelEditor extends MultiPageEditorPart implements IEventListener, IResourceChangeListener {
 

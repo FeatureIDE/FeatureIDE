@@ -20,9 +20,21 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -30,51 +42,194 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 
 /**
  *
+ * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
+ *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
+ * @author "Rahel Arens"
+ * @author "Thomas Graave"
  */
-public class ConstraintViewController extends ViewPart implements IEventListener {
-	public ConstraintViewController() {}
+public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.ConstraintView";
-
 	private ConstraintView viewer;
+	private IFeatureModel currentModel;
 
+	boolean constraintsHidden = false;
+
+	/**
+	 * Standard SWT initialize called after construction.
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
 		viewer = new ConstraintView(parent);
-		final IFeatureModel currentModel = FeatureModelUtil.getFeatureModel();
+		addListener();
+		getSite().getPage().addPartListener(constraintListener);
+		if (FeatureModelUtil.getActiveFMEditor() != null) {
+			currentModel = FeatureModelUtil.getFeatureModel();
+			refreshView(currentModel);
+		}
+		createContextMenu(viewer.getViewer());
 
+	}
+
+	/**
+	 * this method first clears the table and then adds all current existing constraints.
+	 */
+	public void refreshView(IFeatureModel currentModel) {
 		if (currentModel != null) {
+			this.currentModel = currentModel;
+			this.currentModel.addListener(this);
+			viewer.removeAll();
 			for (final IConstraint constraint : currentModel.getConstraints()) {
 				viewer.addItem(constraint);
-
 			}
 		}
+	}
+
+	/**
+	 * Listenes to Changes to adapt the View and the Constraint List under the feature diagram
+	 */
+	private final IPartListener2 constraintListener = new IPartListener2() {
+
+		@Override
+		public void partOpened(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(true);
+			}
+		}
+
+		@Override
+		public void partDeactivated(IWorkbenchPartReference part) {}
+
+		@Override
+		public void partClosed(IWorkbenchPartReference part) {
+			if (part instanceof FeatureModelEditor) {
+				if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
+					viewer.getViewer().refresh();
+				}
+			}
+		}
+
+		@Override
+		public void partBroughtToTop(IWorkbenchPartReference part) {
+			if (part.getPart(false) instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
+			} else {
+				viewer.addNoFeatureModelItem();
+			}
+		}
+
+		@Override
+		public void partActivated(IWorkbenchPartReference part) {
+			if (part.getPart(false) instanceof FeatureModelEditor) {
+				refreshView(((FeatureModelEditor) part.getPart(false)).getFeatureModel());
+				setConstraintsHidden(constraintsHidden);
+			} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
+				refreshView(FeatureModelUtil.getFeatureModel());
+			}
+			if (part.getPart(false) instanceof IEditorPart) {
+				setConstraintsHidden(constraintsHidden);
+			}
+		}
+
+		@Override
+		public void partHidden(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(false);
+			}
+		}
+
+		@Override
+		public void partVisible(IWorkbenchPartReference part) {
+			if (part.getId().equals(ID)) {
+				setConstraintsHidden(true);
+			}
+		}
+
+		@Override
+		public void partInputChanged(IWorkbenchPartReference partRef) {}
+
+	};
+
+	/**
+	 * adding Listener to the tree viewer
+	 */
+	private void addListener() {
+		// doubleclicklistener
+		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+
+				if (event.getSource() instanceof TreeViewer) {
+					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+					if (treeSelection.getFirstElement() instanceof IConstraint) {
+						new EditConstraintAction(viewer.getViewer(), currentModel).run();
+					}
+				}
+			}
+		});
+	}
+
+	/**
+	 * Creates the context menu
+	 *
+	 * @param viewer
+	 */
+	protected void createContextMenu(Viewer viewer) {
+		final MenuManager contextMenu = new MenuManager("#ViewerMenu"); //$NON-NLS-1$
+		contextMenu.setRemoveAllWhenShown(true);
+		contextMenu.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager mgr) {
+				fillContextMenu(mgr);
+			}
+		});
+
+		final Menu menu = contextMenu.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
+	}
+
+	/**
+	 * Fill dynamic context menu
+	 *
+	 * @param contextMenu
+	 */
+	protected void fillContextMenu(IMenuManager contextMenu) {
+		contextMenu.add(new CreateConstraintAction(viewer.getViewer(), currentModel));
+		contextMenu.add(new EditConstraintInViewAction(viewer.getViewer(), currentModel));
 	}
 
 	@Override
 	public void setFocus() {}
 
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		System.out.println(event.getEventType());
-		switch (event.getEventType()) {
-		case MODEL_DATA_LOADED:
-		case MODEL_DATA_SAVED:
-			System.out.println("model data loaded event triggered");
-			break;
-
-		default:
-			break;
+	/**
+	 * Changes if the Constraints are shown under the feature model
+	 */
+	public void setConstraintsHidden(boolean hideConstraints) {
+		if ((FeatureModelUtil.getActiveFMEditor() != null)) {
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().setConstraintsHidden(hideConstraints);
+			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().redrawDiagram();
+			constraintsHidden = hideConstraints;
 		}
-
 	}
 
+	/**
+	 * Reacts on observer of the current feature model
+	 */
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
+		refreshView(currentModel);
+	}
 }
