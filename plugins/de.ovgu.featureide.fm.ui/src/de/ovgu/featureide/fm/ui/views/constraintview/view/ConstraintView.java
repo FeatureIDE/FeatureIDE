@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -32,6 +34,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -48,7 +51,7 @@ public class ConstraintView implements GUIDefaults {
 	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
 	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
 	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
-
+	private final int BORDER_OFFSET = 4;
 	private final int CONSTRAINT_NAME_WIDTH = 800;
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
 
@@ -69,16 +72,47 @@ public class ConstraintView implements GUIDefaults {
 	/**
 	 * This method adds a constraint to the view
 	 */
-	public void addItem(IConstraint element) {
-		final TreeItem item = new TreeItem(tree, SWT.None);
-		item.setData(element);
+	public TreeItem addItem(IConstraint element) {
+		final TreeItem item = createTreeItem(element);
 		String displayName = ((IConstraint) element).getDisplayName();
 		displayName = stringStyling(displayName);
 		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
 		if (((tree.getItemCount() % 2) == 1)) {
 			item.setBackground(ROW_ALTER_COLOR);
 		}
+		if (element.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+			item.setImage(FM_INFO);
+		}
 		tree.setHeaderVisible(true);
+		return item;
+	}
+
+	public TreeItem createTreeItem(IConstraint constraint) {
+		final TreeItem item = new TreeItem(tree, SWT.None);
+		item.setData(constraint);
+		return item;
+	}
+
+	public void addDecoratedItem(IConstraint element, Color color) {
+		final TreeItem item = addItem(element);
+		final Image emptyImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
+		final GC gc = new GC(emptyImg);
+
+		gc.setBackground(color);
+		// MAGIC NUMBERS
+		gc.setAntialias(SWT.ON);
+		gc.setAlpha(175);
+		gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, emptyImg.getBounds().height - BORDER_OFFSET, emptyImg.getBounds().width - BORDER_OFFSET);
+		item.setImage(emptyImg);
+		switch (element.getConstraintAttribute()) {
+		case FALSE_OPTIONAL:
+			// item.setImage(FM_WARNING);
+			// item.setBackground();
+			break;
+		default:
+			break;
+		}
+
 	}
 
 	/**
