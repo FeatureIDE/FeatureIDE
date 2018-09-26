@@ -267,13 +267,15 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// add actions:
+				System.out.println(e.keyCode);
+				if (e.keyCode == 127) { // 127 is the delete button
+
+				}
+
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e) {
-
-			}
+			public void keyReleased(KeyEvent e) {}
 
 		});
 	}
