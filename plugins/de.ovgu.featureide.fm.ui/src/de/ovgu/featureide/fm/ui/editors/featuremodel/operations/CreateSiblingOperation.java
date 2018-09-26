@@ -50,6 +50,7 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 	private IFeature newCompound;
 	private final int xDistanceTopDown = 5;
 	private final int yDistanceLeftRight = 8;
+	final IFeatureStructure parent;
 
 	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
@@ -60,12 +61,12 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 		newCompound =
 			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
+		parent = selectedFeatures.get(0).getStructure().getParent();
 	}
 
 	// finds the parent of the selected features and adds a new child of the parent
 	@Override
 	protected FeatureIDEEvent operation() {
-		final IFeatureStructure parent = selectedFeatures.get(0).getStructure().getParent();
 
 		parent.addChild(newCompound.getStructure());
 		featureModel.getFeatureModel().addFeature(newCompound);
