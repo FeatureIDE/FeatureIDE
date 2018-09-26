@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
- * 
  * This class represents the view (MVC) of the constraint view. It creates all UI elements and provides methods to get the conten of the view.
  *
  * @author "Rosiak Kamil"
@@ -162,6 +161,7 @@ public class ConstraintView implements GUIDefaults {
 		descriptionColumn.setWidth(CONSTRAINT_DESCRIPTION_WIDTH);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
 	}
+
 	/**
 	 * Text searchBox
 	 */
