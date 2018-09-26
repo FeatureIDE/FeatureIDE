@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Menu;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 
 /**
  * This class represents the context menu of the ConstraintView.
@@ -66,7 +66,7 @@ public class ConstraintViewContextMenu {
 	 */
 	protected void fillContextMenu(IMenuManager contextMenu, Viewer viewer) {
 		contextMenu.add(new CreateConstraintAction(viewer, controller.getCurrentModel()));
-		contextMenu.add(new EditConstraintAction(viewer, controller.getCurrentModel()));
+		contextMenu.add(new EditConstraintInViewAction(viewer, controller.getCurrentModel()));
 		contextMenu.add(new DeleteConstraintAction(viewer, controller.getCurrentModel()));
 	}
 }

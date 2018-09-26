@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
 
@@ -291,7 +291,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				if (event.getSource() instanceof TreeViewer) {
 					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 					if (treeSelection.getFirstElement() instanceof IConstraint) {
-						new EditConstraintAction(viewer.getViewer(), currentModel).run();
+						new EditConstraintInViewAction(viewer.getViewer(), currentModel).run();
 					}
 				}
 			}
