@@ -45,7 +45,7 @@ public class ExpandConstraintOperation extends AbstractFeatureModelOperation {
 	private final LinkedList<IGraphicalFeature> affectedFeatureList = new LinkedList<IGraphicalFeature>();
 
 	/**
-	 * @param featureModel
+	 * @param currentModel
 	 * @param label
 	 */
 	public ExpandConstraintOperation(IGraphicalFeatureModel graphicalFeatureModel, IConstraint iConstraint) {
