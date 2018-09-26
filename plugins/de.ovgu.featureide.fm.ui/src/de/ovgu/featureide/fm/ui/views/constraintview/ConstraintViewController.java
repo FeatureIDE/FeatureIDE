@@ -268,7 +268,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * returns the current model
 	 */
 	public IFeatureModel getCurrentModel() {
-		// TODO Auto-generated method stub
 		return currentModel;
 	}
 

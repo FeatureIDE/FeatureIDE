@@ -31,7 +31,6 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintEditorAction;
 
 /**
- * TODO description
  *
  * @author "Rosiak Kamil"
  */
