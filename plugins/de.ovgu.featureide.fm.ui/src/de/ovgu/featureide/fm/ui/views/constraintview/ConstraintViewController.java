@@ -31,6 +31,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -235,7 +237,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if (constraint != null && constraint.getContainedFeatures().contains(feature)) {
+					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
 						graphfeature.setConstraintSelected(true);
 					} else {
 						graphfeature.setConstraintSelected(false);
@@ -257,6 +259,20 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 						new EditConstraintInViewAction(viewer.getViewer(), currentModel).run();
 					}
 				}
+			}
+
+		});
+
+		viewer.getViewer().getTree().addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// add actions:
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
 			}
 
 		});
