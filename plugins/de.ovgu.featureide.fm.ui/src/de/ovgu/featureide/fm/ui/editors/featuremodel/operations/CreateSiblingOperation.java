@@ -46,7 +46,6 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 	private final IGraphicalFeatureModel featureModel;
-	private final LinkedList<IFeature> selectedFeatures;
 	private IFeature newCompound;
 	private final int xDistanceTopDown = 5;
 	private final int yDistanceLeftRight = 8;
@@ -54,7 +53,6 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
-		this.selectedFeatures = selectedFeatures;
 		this.featureModel = featureModel;
 		int number = 0;
 		while (FeatureUtils.getFeatureNames(featureModel.getFeatureModel()).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
