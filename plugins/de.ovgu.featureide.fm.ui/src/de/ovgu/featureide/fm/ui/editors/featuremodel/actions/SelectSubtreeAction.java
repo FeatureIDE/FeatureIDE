@@ -22,13 +22,15 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_SUBTREE;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.PlatformUI;
+import java.util.ArrayList;
+import java.util.List;
 
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SelectSubtreeOperation;
 
 /**
  * Selects the whole subtree of a selected feature
@@ -40,6 +42,7 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.selectSubtree";
 	private final IGraphicalFeatureModel graphicalFeatureModel;
+	private IStructuredSelection selection;
 
 	/**
 	 * @param text
@@ -53,17 +56,19 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		final SelectSubtreeOperation op = new SelectSubtreeOperation(feature, graphicalFeatureModel);
-
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (final ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
+		if (viewer instanceof TreeViewer) {
+			final List<IFeature> children = new ArrayList();
+			children.add(feature);
+			for (final IFeatureStructure struct : feature.getStructure().getChildren()) {
+				children.add(struct.getFeature());
+			}
 		}
+
 	}
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
+		this.selection = selection;
 		return super.isValidSelection(selection);
 	}
 

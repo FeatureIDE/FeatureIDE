@@ -133,6 +133,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAc
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectSubtreeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.SelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowHiddenFeaturesAction;
@@ -171,6 +172,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private CalculateDependencyAction calculateDependencyAction;
 	private CreateLayerAction createLayerAction;
 	private CreateCompoundAction createCompoundAction;
+	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
 	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
@@ -256,6 +258,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// FM structure modify actions
 		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
 		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
+		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer, featureModel));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
@@ -1121,6 +1124,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		if (isFeatureMenu(selection)) {
 			menuManager.add(createCompoundAction);
 			menuManager.add(createLayerAction);
+			menuManager.add(selectSubtreeAction);
 			menuManager.add(createConstraintWithAction);
 			menuManager.add(renameAction);
 			menuManager.add(changeFeatureDescriptionAction);
@@ -1260,6 +1264,9 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		}
 		if (CreateCompoundAction.ID.equals(workbenchActionID)) {
 			return createCompoundAction;
+		}
+		if (SelectSubtreeAction.ID.equals(workbenchActionID)) {
+			return selectSubtreeAction;
 		}
 		if (DeleteAction.ID.equals(workbenchActionID)) {
 			return deleteAction;
