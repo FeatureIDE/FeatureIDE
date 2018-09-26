@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
@@ -50,8 +49,9 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 	private final int xDistanceTopDown = 5;
 	private final int yDistanceLeftRight = 8;
 	final IFeatureStructure parent;
+	private final int index;
 
-	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
+	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
 		this.featureModel = featureModel;
 		int number = 0;
@@ -59,14 +59,15 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 		newCompound =
 			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
-		parent = selectedFeatures.get(0).getStructure().getParent();
+		parent = selectedFeature.getStructure().getParent();
+		index = parent.getChildIndex(selectedFeature.getStructure()) + 1;
 	}
 
 	// finds the parent of the selected features and adds a new child of the parent
 	@Override
 	protected FeatureIDEEvent operation() {
 
-		parent.addChild(newCompound.getStructure());
+		parent.addChildAtPosition(index, newCompound.getStructure());
 		featureModel.getFeatureModel().addFeature(newCompound);
 		// checks if manual layout is chosen
 		if (featureModel.getLayout().getLayoutAlgorithm() == 0) {

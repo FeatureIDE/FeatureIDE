@@ -22,26 +22,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateSiblingOperation;
 
 /**
@@ -50,42 +40,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateSiblingOpe
  * @author Sabrina Hugo
  * @author Christian Orsinger
  */
-public class CreateSiblingAction extends Action {
+public class CreateSiblingAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.createsibling";
 
 	private final IGraphicalFeatureModel featureModel;
 
-	private IFeature parent = null;
-
-	private final LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
-
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final ISelectionChangedListener listener = new ISelectionChangedListener() {
-
-		@Override
-		public void selectionChanged(SelectionChangedEvent event) {
-			final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			setEnabled(isValidSelection(selection));
-		}
-	};
-
 	public CreateSiblingAction(Object viewer, IGraphicalFeatureModel featureModel) {
-		super(CREATE_SIBLING, createImage);
+		super(CREATE_SIBLING, viewer, ID);
+		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
-		setEnabled(false);
-		setId(ID);
-		if (viewer instanceof GraphicalViewerImpl) {
-			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
-		} else {
-			((TreeViewer) viewer).addSelectionChangedListener(listener);
-		}
 	}
 
 	@Override
 	public void run() {
-		final CreateSiblingOperation op = new CreateSiblingOperation(featureModel, selectedFeatures);
+		final CreateSiblingOperation op = new CreateSiblingOperation(featureModel, feature);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -96,46 +67,30 @@ public class CreateSiblingAction extends Action {
 
 	/**
 	 * @param selection selected elements
-	 * @return true, if selected elements are sibling features, false otherwise
+	 * @return true, if only one element of FeatureEditPart or IFeature is selected and this is not the root
 	 */
-	private boolean isValidSelection(IStructuredSelection selection) {
-		// check empty selection (i.e. ModelEditPart is selected)
-		if ((selection.size() == 1) && (selection.getFirstElement() instanceof ModelEditPart)) {
+	@Override
+	protected boolean isValidSelection(IStructuredSelection selection) {
+		if (!super.isValidSelection(selection)) {
 			return false;
 		}
-
-		// check that selected features have the same parent
-		selectedFeatures.clear();
-		final Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			final Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature)) {
-				continue;
-			}
-			IFeature feature;
-
-			if (editPart instanceof FeatureEditPart) {
-				feature = ((FeatureEditPart) editPart).getModel().getObject();
+		final Object selectedObject = selection.getFirstElement();
+		IFeature selectedFeature;
+		if ((selectedObject instanceof FeatureEditPart) || (selectedObject instanceof IFeature)) {
+			if (selectedObject instanceof FeatureEditPart) {
+				selectedFeature = ((FeatureEditPart) selectedObject).getModel().getObject();
 			} else {
-				feature = (IFeature) editPart;
+				selectedFeature = (IFeature) selectedObject;
 			}
-
-			// checks if selected feature is root
-			final IFeatureStructure structureParent = feature.getStructure().getParent();
-			if (structureParent != null) {
-				final IFeature featureParent = structureParent.getFeature();
-				if (selectedFeatures.isEmpty()) {
-					parent = featureParent;
-				} else if (parent != featureParent) {
-					return false;
-				}
-			} else {
-				return false;
-			}
-
-			selectedFeatures.add(feature);
+		} else {
+			return false;
 		}
-		return !selectedFeatures.isEmpty();
+		return selectedFeature.getStructure().getParent() != null;
+	}
+
+	@Override
+	protected void updateProperties() {
+		setEnabled(true);
 	}
 
 }
