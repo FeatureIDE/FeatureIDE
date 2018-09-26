@@ -1,4 +1,3 @@
-
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2017  FeatureIDE team, University of Magdeburg, Germany
  *
@@ -24,9 +23,11 @@ package de.ovgu.featureide.fm.ui.views.constraintview.view;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -41,13 +42,24 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  *
  * @author "Rosiak Kamil"
  * @author "Domenik Eichhorn"
+ * @author "Thomas Graave"
+ * @author "Rahel Arens"
  */
 public class ConstraintView implements GUIDefaults {
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_MODEL_;
+	private final Color HEADER_BACKGROUND_COLOR = new Color(Display.getDefault(), 207, 207, 207);
+	private final Color HEADER_FORGROUND_COLOR = new Color(Display.getDefault(), 0, 0, 0);
+	private final Color ROW_ALTER_COLOR = new Color(Display.getDefault(), 240, 240, 240);
+
+	private final int CONSTRAINT_NAME_WIDTH = 800;
+	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
+
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM_EDITOR;
+
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";
 	private TreeViewer treeViewer;
 	private Tree tree;
+	private Text searchBox;
 
 	private TreeColumn constraintColumn, descriptionColumn;
 
@@ -67,9 +79,9 @@ public class ConstraintView implements GUIDefaults {
 		displayName = displayName.replace("=>", "\u21D2");
 		displayName = displayName.replace("&", "\u2227");
 		displayName = displayName.replace("-", "\u00AC");
-		item.setText(new String[] { displayName, element.getDescription() });
-		if ((tree.getItemCount() % 2) == 1) {
-			item.setBackground(new Color(Display.getDefault(), 240, 240, 240));
+		item.setText(new String[] { displayName, element.getDescription().replaceAll("\n", " ") }); // removes line break
+		if (((tree.getItemCount() % 2) == 1)) {
+			item.setBackground(ROW_ALTER_COLOR);
 		}
 		tree.setHeaderVisible(true);
 	}
@@ -79,7 +91,7 @@ public class ConstraintView implements GUIDefaults {
 	 */
 	public void addNoFeatureModelItem() {
 		removeAll();
-		final TreeItem item = new TreeItem(tree, SWT.ICON);
+		final TreeItem item = new TreeItem(tree, SWT.None);
 		item.setText(DEFAULT_MESSAGE);
 		item.setImage(DEFAULT_IMAGE);
 		tree.setHeaderVisible(false);
@@ -110,11 +122,24 @@ public class ConstraintView implements GUIDefaults {
 	 * This method initializes the view
 	 */
 	private void init(Composite parent) {
-		parent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		treeViewer = new TreeViewer(parent, SWT.BORDER);
+		parent.setLayout(new GridLayout(1, false));
+
+		final GridData boxData = new GridData();
+		boxData.grabExcessHorizontalSpace = true;
+		boxData.horizontalAlignment = SWT.FILL;
+		searchBox = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
+		searchBox.setLayoutData(boxData);
+
+		treeViewer = new TreeViewer(parent, SWT.BORDER | SWT.MULTI);
+		final GridData treeData = new GridData();
+		treeData.grabExcessHorizontalSpace = true;
+		treeData.horizontalAlignment = SWT.FILL;
+		treeData.grabExcessVerticalSpace = true;
+		treeData.verticalAlignment = SWT.FILL;
 		tree = treeViewer.getTree();
-		tree.setHeaderBackground(new Color(Display.getDefault(), 207, 207, 207));
-		tree.setHeaderForeground(new Color(Display.getDefault(), 0, 0, 0));
+		tree.setLayoutData(treeData);
+		tree.setHeaderBackground(HEADER_BACKGROUND_COLOR);
+		tree.setHeaderForeground(HEADER_FORGROUND_COLOR);
 
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
@@ -128,13 +153,20 @@ public class ConstraintView implements GUIDefaults {
 		constraintColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		constraintColumn.setResizable(true);
 		constraintColumn.setMoveable(true);
-		constraintColumn.setWidth(800);
+		constraintColumn.setWidth(CONSTRAINT_NAME_WIDTH);
 		constraintColumn.setText(CONSTRAINT_HEADER);
 
 		descriptionColumn = new TreeColumn(viewer.getTree(), SWT.LEFT);
 		descriptionColumn.setResizable(true);
 		descriptionColumn.setMoveable(true);
-		descriptionColumn.setWidth(200);
+		descriptionColumn.setWidth(CONSTRAINT_DESCRIPTION_WIDTH);
 		descriptionColumn.setText(DESCRIPTION_HEADER);
+	}
+	/**
+	 * Text searchBox
+	 */
+	public Text getSearchBox() {
+		return searchBox;
+
 	}
 }
