@@ -31,6 +31,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+
 /**
  * An UI text field with search functionality.
  *
@@ -102,13 +104,15 @@ public class SearchField<T> {
 		for (; it.hasNext(); i++) {
 			final T next = it.next();
 			if (searchable.matches(next, searchString)) {
-				if (i >= curIndex) {
-					curIndex = i;
-					searchable.found(next);
-					return;
-				} else if (temp == null) {
-					temp = next;
-					tempIndex = i;
+				if (((IGraphicalFeature) next).isCollapsed()) {
+					if (i >= curIndex) {
+						curIndex = i;
+						searchable.found(next);
+						return;
+					} else if (temp == null) {
+						temp = next;
+						tempIndex = i;
+					}
 				}
 			}
 		}
