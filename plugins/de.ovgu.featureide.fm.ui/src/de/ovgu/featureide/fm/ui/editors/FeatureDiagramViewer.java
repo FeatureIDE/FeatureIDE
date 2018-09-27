@@ -275,7 +275,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		}
 	}
 
-	void refreshChildAll(IFeature parent) {
+	public void refreshChildAll(IFeature parent) {
 		for (final IFeatureStructure f : parent.getStructure().getChildren()) {
 			// Refresh children
 			refreshChildAll(f.getFeature());

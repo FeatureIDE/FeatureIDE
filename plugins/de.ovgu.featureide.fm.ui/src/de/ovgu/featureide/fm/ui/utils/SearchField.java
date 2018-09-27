@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.utils;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -32,9 +31,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * An UI text field with search functionality.
@@ -53,6 +53,9 @@ public class SearchField<T> {
 			if (e.character == 13) {
 				curIndex++;
 				search();
+				if (featureDiagramEditor != null) {
+					refresh();
+				}
 			}
 		}
 	}
@@ -63,6 +66,9 @@ public class SearchField<T> {
 		public void modifyText(ModifyEvent e) {
 			curIndex = 0;
 			search();
+			if (featureDiagramEditor != null) {
+				refresh();
+			}
 		}
 	}
 
@@ -73,6 +79,33 @@ public class SearchField<T> {
 	private final ISearchable<T> searchable;
 
 	private int curIndex;
+
+	private IGraphicalFeatureModel graphicalFeatureModel = null;
+
+	private FeatureDiagramEditor featureDiagramEditor = null;
+
+	private final IGraphicalFeature previousparent = null;
+
+	public SearchField(Composite parent, final ISearchable<T> searchable, FeatureDiagramEditor featureDiagramEditor) {
+		this.featureDiagramEditor = featureDiagramEditor;
+		graphicalFeatureModel = this.featureDiagramEditor.getGraphicalFeatureModel();
+		if ((searchable == null) || (parent == null)) {
+			throw new NullPointerException();
+		}
+		this.searchable = searchable;
+		this.searchField = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL | SWT.BORDER);
+
+		final GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.widthHint = 300;
+		gridData.minimumWidth = 150;
+
+		searchField.setLayoutData(gridData);
+		searchField.addModifyListener(searchModifyListener);
+		searchField.addKeyListener(searchNextListener);
+	}
 
 	public SearchField(Composite parent, final ISearchable<T> searchable) {
 		if ((searchable == null) || (parent == null)) {
@@ -104,29 +137,18 @@ public class SearchField<T> {
 		T temp = null;
 		int tempIndex = -1;
 
+		IGraphicalFeature parent = null;
+
 		for (; it.hasNext(); i++) {
 			final T next = it.next();
+
 			if (searchable.matches(next, searchString)) {
-				if (((IGraphicalFeature) next).hasCollapsedParent()) {
-					/*
-					 * final IGraphicalFeatureModel graphicalFeatureModel = null; final Object viewer = null; final CollapseAction collapseAction = new
-					 * CollapseAction(viewer, graphicalFeatureModel); collapseAction.run();
-					 */
-					System.out.println("next: " + next);
-					final IFeatureStructure parent = ((IGraphicalFeature) next).getObject().getStructure().getParent();
-					System.out.println("parent: " + parent);
-					final List<IFeatureStructure> kids = parent.getChildren();
-					System.out.println("kids: " + kids);
-					for (int j = 0; j < kids.size(); j++) {
-						final IFeatureStructure kid = kids.get(j);
-						System.out.println("kid: " + kid);
-
-						final IFeature featurekid = kid.getFeature();
-						System.out.println("feature kid: " + featurekid);
-						// ((IGraphicalFeature) kids.get(j)).setCollapsed(true);
-
-						// featurekid.
-					}
+				parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
+				if (parent.isCollapsed()) {
+					parent.setCollapsed(false);
+				}
+				if ((parent != previousparent) && (previousparent != null)) {
+					previousparent.setCollapsed(true);
 				}
 				if (i >= curIndex) {
 					curIndex = i;
@@ -139,12 +161,22 @@ public class SearchField<T> {
 
 			}
 		}
-		if (temp != null) {
+		if (temp != null)
+
+		{
 			curIndex = tempIndex;
 			searchable.found(temp);
 		} else {
 			curIndex = 0;
 		}
+	}
+
+	private void refresh() {
+		featureDiagramEditor.getViewer().getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
+		featureDiagramEditor.getViewer().reload();
+		featureDiagramEditor.refreshGraphics(null);
+		featureDiagramEditor.getViewer().refreshChildAll(graphicalFeatureModel.getFeatureModel().getStructure().getRoot().getFeature());
+		featureDiagramEditor.analyzeFeatureModel();
 	}
 
 }
