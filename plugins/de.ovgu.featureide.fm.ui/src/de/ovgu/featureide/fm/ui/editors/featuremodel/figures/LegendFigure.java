@@ -135,6 +135,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int EXPLANATION = 12;
 	private static final int REDUNDANT = 13;
 	private static final int VOID_MODEL = 14;
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
 	private static final int FEATURECON = 15;
 	private static final int FEATUREABS = 16;
 
@@ -351,12 +352,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (alternative) {
 			createRowAlternative(row++);
 		}
+		// necessary creating a legend with only abstract or concrete features which then are only named feature
 		if (_abstract && !concrete) {
 			createRowFeatureAbstract(row++);
 		}
 		if (concrete && !_abstract) {
 			createRowFeatureConcrete(row++);
 		}
+		// necessary for creating a legend where abstract and concrete features are present at the same time
 		if (_abstract && concrete) {
 			createRowAbstract(row++);
 			createRowConcrete(row++);
@@ -481,6 +484,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelMandatory);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowAbstract(int row) {
 		createSymbol(row, ABSTRACT, true, ABSTRACT_TOOLTIP);
 		final Label labelAbstract = createLabel(row, language.getAbstract(), FMPropertyManager.getFeatureForgroundColor(), ABSTRACT_TOOLTIP);
@@ -505,18 +509,21 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelInterfaced);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowConcrete(int row) {
 		createSymbol(row, CONCRETE, true, CONCRETE_TOOLTIP);
 		final Label labelConcrete = createLabel(row, language.getConcrete(), FMPropertyManager.getFeatureForgroundColor(), CONCRETE_TOOLTIP);
 		add(labelConcrete);
 	}
 
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
 	private void createRowFeatureConcrete(int row) {
 		createSymbol(row, FEATURECON, true, FEATURE_TOOLTIP);
 		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
 		add(labelFeature);
 	}
 
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
 	private void createRowFeatureAbstract(int row) {
 		createSymbol(row, FEATUREABS, true, FEATURE_TOOLTIP);
 		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
