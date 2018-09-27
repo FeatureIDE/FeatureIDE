@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_SIBLING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
 
@@ -58,9 +59,10 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AndAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureAboveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateFeatureBelowAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateSiblingAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.EditConstraintAction;
@@ -94,8 +96,9 @@ public class FmOutlinePageContextMenu {
 	private AbstractAction aAction;
 	private DeleteAction dAction;
 	private DeleteAllAction dAAction;
-	private CreateCompoundAction cAction;
-	private CreateLayerAction clAction;
+	private CreateFeatureAboveAction cAction;
+	private CreateFeatureBelowAction clAction;
+	private CreateSiblingAction csAction;
 	private CreateConstraintAction ccAction;
 	private EditConstraintAction ecAction;
 	private OrAction oAction;
@@ -154,6 +157,7 @@ public class FmOutlinePageContextMenu {
 		this.fInput = fInput;
 		this.syncCollapsedFeatures = syncCollapsedFeatures;
 		this.registerContextMenu = registerContextMenu;
+		graphicalFeatureModel = fTextEditor.diagramEditor.getGraphicalFeatureModel();
 		initContextMenu();
 	}
 
@@ -194,9 +198,9 @@ public class FmOutlinePageContextMenu {
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
-		cAction = new CreateCompoundAction(viewer, graphicalFeatureModel);
-		clAction = new CreateLayerAction(viewer, graphicalFeatureModel);
-
+		cAction = new CreateFeatureAboveAction(viewer, graphicalFeatureModel);
+		clAction = new CreateFeatureBelowAction(viewer, graphicalFeatureModel);
+		csAction = new CreateSiblingAction(viewer, graphicalFeatureModel);
 		oAction = new OrAction(viewer, fInput);
 		// TODO _interfaces Removed Code
 		// roAction = new ReverseOrderAction(viewer, fInput);
@@ -309,6 +313,9 @@ public class FmOutlinePageContextMenu {
 		if (sel instanceof IFeature) {
 
 			manager.add(cAction);
+
+			csAction.setText(CREATE_SIBLING);
+			manager.add(csAction);
 
 			clAction.setText(CREATE_FEATURE_BELOW);
 			manager.add(clAction);

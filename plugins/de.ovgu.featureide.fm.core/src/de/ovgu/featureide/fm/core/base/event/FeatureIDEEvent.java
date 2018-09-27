@@ -74,6 +74,10 @@ public class FeatureIDEEvent {
 		 */
 		FEATURE_ADD,
 		/**
+		 * A sibling was added.
+		 */
+		FEATURE_ADD_SIBLING,
+		/**
 		 * A feature's name was changed.
 		 */
 		FEATURE_NAME_CHANGED,
