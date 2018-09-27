@@ -27,6 +27,8 @@ import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -38,6 +40,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -47,6 +50,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -56,6 +61,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPart
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 
 /**
  * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
@@ -70,6 +76,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
+	private IGraphicalFeature graphfeature = null;
+	private IGraphicalFeatureModel graphmodel = null;
 
 	boolean constraintsHidden = false;
 
@@ -91,7 +99,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			refreshView(currentModel);
 		}
 		new ConstraintViewContextMenu(this);
-
 	}
 
 	/**
@@ -264,6 +271,28 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * adding Listener to the tree viewer
 	 */
 	private void addListener() {
+		// event fired when clicking on an constraint (one click)
+		viewer.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+
+			// marks features by changing their border when a related feature is selected
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
+				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+					if (constraint != null && constraint.getContainedFeatures().contains(feature)) {
+						graphfeature.setConstraintSelected(true);
+					} else {
+						graphfeature.setConstraintSelected(false);
+					}
+					new FeatureFigure(graphfeature, graphmodel).setProperties();
+				}
+			}
+
+		});
+
 		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(DoubleClickEvent event) {
