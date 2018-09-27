@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_GROUP_TAG_TO_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,21 +36,29 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
  *
  * @author "Rosiak Kamil"
  */
-public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
+public class EditConstraintOrDescriptionInViewAction extends AbstractConstraintEditorAction {
 	public static final String ID = "de.ovgu.featureide.editconstraintinview";
 	private IConstraint constraint;
+	private IStructuredSelection selection;
 
-	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
+	public EditConstraintOrDescriptionInViewAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT, ID);
-		setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
+
 		if (viewer instanceof TreeViewer) {
-			constraint = (IConstraint) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			selection = ((IStructuredSelection) ((TreeViewer) viewer).getSelection());
+			setEnabled(isValidSelection(selection));
+			constraint = (IConstraint) selection.getFirstElement();
 		}
 	}
 
 	@Override
 	public void run() {
-		openEditor(constraint);
+		if (selection.size() == 1) {
+			openEditor(constraint);
+		} else if (selection.size() > 1) {
+
+		}
+
 	}
 
 	/**
@@ -57,11 +66,18 @@ public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.getFirstElement() instanceof IConstraint) {
-			constraint = (IConstraint) selection.getFirstElement();
+		if (selection.size() == 1) {
+			if (selection.getFirstElement() instanceof IConstraint) {
+				constraint = (IConstraint) selection.getFirstElement();
+				setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/write_obj.gif"));
+				return true;
+			}
+			setText(EDIT_CONSTRAINT);
+		} else if (selection.size() > 1) {
+			setImageDescriptor(FMUIPlugin.getDefault().getImageDescriptor("icons/wordassist_co.gif"));
+			setText(ADD_GROUP_TAG_TO_DESCRIPTION);
 			return true;
 		}
 		return false;
 	}
-
 }

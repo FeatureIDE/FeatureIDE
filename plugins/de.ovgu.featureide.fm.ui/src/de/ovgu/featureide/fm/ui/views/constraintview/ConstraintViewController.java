@@ -39,6 +39,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -57,7 +58,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintOrDescriptionInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
@@ -77,7 +78,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
 	private IGraphicalFeature graphfeature = null;
-	private IGraphicalFeatureModel graphmodel = null;
+	private final IGraphicalFeatureModel graphmodel = null;
 
 	boolean constraintsHidden = false;
 	private final ConstraintViewPartListener partListener = new ConstraintViewPartListener(this);
@@ -271,26 +272,40 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * adding Listener to the tree viewer
 	 */
 	private void addListener() {
+
 		// event fired when clicking on an constraint (one click)
 		viewer.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
 
 			// marks features by changing their border when a related feature is selected
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
-				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
-				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
-						graphfeature.setConstraintSelected(true);
-					} else {
-						graphfeature.setConstraintSelected(false);
+				if ((event.getSelection() instanceof TreeSelection) && (FeatureModelUtil.getFeatureModel() != null)) {
+					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+					if ((treeSelection.getFirstElement() instanceof IConstraint)) {
+						final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
+						if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+							viewer.removeAll();
+							viewer.addItem(constraint);
+							final Explanation explanation = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
+							for (final Object reason : explanation.getReasons()) {
+								if (reason instanceof FeatureModelReason) {
+									final FeatureModelReason fmReason = (FeatureModelReason) reason;
+									viewer.addDecoratedItem((IConstraint) fmReason.getSubject().getElement(), FMPropertyManager.getReasonColor(fmReason));
+								}
+							}
+						}
+						for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+							graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+							if (constraint.getContainedFeatures().contains(feature)) {
+								graphfeature.setConstraintSelected(true);
+							} else {
+								graphfeature.setConstraintSelected(false);
+							}
+							new FeatureFigure(graphfeature, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()).setProperties();
+						}
 					}
-					new FeatureFigure(graphfeature, graphmodel).setProperties();
 				}
 			}
-
 		});
 
 		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
@@ -300,7 +315,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				if (event.getSource() instanceof TreeViewer) {
 					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 					if (treeSelection.getFirstElement() instanceof IConstraint) {
-						new EditConstraintInViewAction(viewer.getViewer(), currentModel).run();
+						new EditConstraintOrDescriptionInViewAction(viewer.getViewer(), currentModel).run();
 					}
 				}
 			}
