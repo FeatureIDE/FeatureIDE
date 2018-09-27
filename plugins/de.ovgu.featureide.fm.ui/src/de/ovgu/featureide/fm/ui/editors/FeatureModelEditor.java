@@ -124,6 +124,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	FeatureModelManager fmManager;
 	IFileManager<IGraphicalFeatureModel> gfmManager;
 
+	private boolean existLayoutInformation;
 	private boolean closeEditor;
 
 	private int currentPageIndex;
@@ -419,6 +420,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
+						if (!hasLayoutInformation()) {
+							diagramEditor.setAdjustModelToEditorSize();
+						}
 						pageChange(getDiagramEditorIndex());
 						diagramEditor.getViewer().internRefresh(false);
 						diagramEditor.analyzeFeatureModel();
@@ -545,10 +549,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (fmManager != null) {
 			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
 			createModelFileMarkers(fmManager.getLastProblems());
-
+			setLayoutInformation(true);
 			final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
 			if ((extraPath != null) && !extraPath.toFile().exists()) {
 				FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
+				setLayoutInformation(false);
 			}
 
 			gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
@@ -690,6 +695,20 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 			return;
 		}
 		fmManager.removeListener(listener);
+	}
+
+	/**
+	 * @return the layoutInformation
+	 */
+	public boolean hasLayoutInformation() {
+		return existLayoutInformation;
+	}
+
+	/**
+	 * @param layoutInformation the layoutInformation to set
+	 */
+	public void setLayoutInformation(boolean layoutInformation) {
+		existLayoutInformation = layoutInformation;
 	}
 
 }
