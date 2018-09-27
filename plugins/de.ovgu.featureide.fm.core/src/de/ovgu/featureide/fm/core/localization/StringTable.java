@@ -1094,4 +1094,6 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String CONSTRAINT_VIEW_QUESTION_DIALOG = "Open Constraint View Question";
+	public static final String CONSTRAINT_VIEW_QUESTION_TITLE = "Would you like to open the new ConstraintView ?";
 }

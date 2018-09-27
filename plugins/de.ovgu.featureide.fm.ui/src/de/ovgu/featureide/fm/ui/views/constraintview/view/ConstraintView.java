@@ -66,6 +66,10 @@ public class ConstraintView implements GUIDefaults {
 
 	private TreeColumn constraintColumn, descriptionColumn;
 
+	public void dispose() {
+		treeViewer.getTree().dispose();
+	}
+
 	public ConstraintView(Composite parent) {
 		init(parent);
 	}
@@ -152,7 +156,9 @@ public class ConstraintView implements GUIDefaults {
 	 * This method removes all constraints from the view
 	 */
 	public void removeAll() {
-		treeViewer.getTree().removeAll();
+		if (treeViewer.getTree() != null) {
+			treeViewer.getTree().removeAll();
+		}
 	}
 
 	/**

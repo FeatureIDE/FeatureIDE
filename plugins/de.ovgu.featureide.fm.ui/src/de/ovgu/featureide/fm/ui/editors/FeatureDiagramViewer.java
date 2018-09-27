@@ -30,14 +30,20 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -50,6 +56,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
 import de.ovgu.featureide.fm.ui.editors.mousehandler.FeatureDiagramEditorMouseHandler;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
  * An editor based on the Graphical Editing Framework to view and edit feature diagrams and cross-tree constraints.
@@ -143,10 +150,32 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
 		}
+
+		// ask the user to open the constraint view
+		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
+			if (questionMessage()) {
+				try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
+				} catch (final PartInitException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}
 	}
 
 	public FeatureDiagramViewer(IGraphicalFeatureModel graphicalFeatureModel) {
 		this(graphicalFeatureModel, null);
+	}
+
+	/**
+	 * asking the user to open the constraint view.
+	 */
+	public static boolean questionMessage() {
+		return MessageDialog.openQuestion(Display.getDefault().getActiveShell(), StringTable.CONSTRAINT_VIEW_QUESTION_DIALOG,
+				StringTable.CONSTRAINT_VIEW_QUESTION_TITLE);
 	}
 
 	/**

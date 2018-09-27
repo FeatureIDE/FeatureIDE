@@ -55,13 +55,13 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partClosed(IWorkbenchPartReference part) {
-		if (part instanceof FeatureModelEditor) {
+		if (part.getPart(false) instanceof FeatureModelEditor) {
 			if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
-				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-				controller.addPageChangeListener(editor);
 				controller.getTreeViewer().refresh();
+				controller.getView().addNoFeatureModelItem();
 			}
 		}
+
 	}
 
 	@Override

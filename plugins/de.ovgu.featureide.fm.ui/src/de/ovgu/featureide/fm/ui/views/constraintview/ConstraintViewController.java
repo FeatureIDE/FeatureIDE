@@ -80,7 +80,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private IGraphicalFeatureModel graphmodel = null;
 
 	boolean constraintsHidden = false;
-
+	private final ConstraintViewPartListener partListener = new ConstraintViewPartListener(this);
 	private String searchText = "";
 
 	/**
@@ -92,7 +92,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		viewer = new ConstraintView(parent);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		getSite().getPage().addPartListener(new ConstraintViewPartListener(this));
+		getSite().getPage().addPartListener(partListener);
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			currentModel = FeatureModelUtil.getFeatureModel();
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
@@ -119,7 +119,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * matching in searchInput
 	 */
 	public void refreshView(IFeatureModel currentModel) {
-		if (currentModel != null) {
+		if ((currentModel != null)) {
 			this.currentModel = currentModel;
 			this.currentModel.addListener(this);
 			viewer.removeAll();
@@ -203,8 +203,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 *
 	 */
 	public void checkForRefresh() {
-		if (FeatureModelUtil.getActiveFMEditor() != null) {
+		if ((FeatureModelUtil.getActiveFMEditor() != null) && (viewer != null)) {
 			final FeatureModelEditor fme = FeatureModelUtil.getActiveFMEditor();
+
 			if (fme.getActivePage() == 0) {
 				addPageChangeListener(fme);
 				refreshView(fme.getFeatureModel());
@@ -308,6 +309,16 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 	@Override
 	public void setFocus() {}
+
+	@Override
+	public void dispose() {
+		if (currentModel != null) {
+			currentModel.removeListener(this);
+		}
+		getSite().getPage().removePartListener(partListener);
+		viewer.dispose();
+		super.dispose();
+	}
 
 	/**
 	 * Changes if the Constraints are shown under the feature model
