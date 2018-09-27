@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -37,6 +39,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -82,8 +85,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 	// integer values that are returned when pressing a special button (from keyListener)
 	private final int DELETE_BUTTON_PRESSED = 127;
+	private final int SHIFT_BUTTON_PRESSED = 131072;
 	private final int CTRL_BUTTON_PRESSED = 262144;
 	private final int F_BUTTON_PRESSED = 102;
+	private final int Z_BUTTON_PRESSED = 122;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -279,6 +284,16 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == F_BUTTON_PRESSED))) {
 					// pressing CTRL + F will get you in the search box
 					viewer.getSearchBox().setFocus();
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+					// pressing CTRL + Z will undo operations
+					try {
+						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) currentModel.getUndoContext(), null, null);
+					} catch (final ExecutionException e1) {}
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED + SHIFT_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+					// pressing CTRL + SHIFT + Z will re do undo's
+					try {
+						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) currentModel.getUndoContext(), null, null);
+					} catch (final ExecutionException e1) {}
 				}
 			}
 
