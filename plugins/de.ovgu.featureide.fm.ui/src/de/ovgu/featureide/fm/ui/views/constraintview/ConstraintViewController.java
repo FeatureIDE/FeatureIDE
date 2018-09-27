@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
@@ -61,7 +62,6 @@ import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPart
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 
 /**
  * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
@@ -212,7 +212,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				viewer.addNoFeatureModelItem();
 			}
 		}
-
 	}
 
 	/**
@@ -282,7 +281,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if (constraint != null && constraint.getContainedFeatures().contains(feature)) {
+					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
 						graphfeature.setConstraintSelected(true);
 					} else {
 						graphfeature.setConstraintSelected(false);
