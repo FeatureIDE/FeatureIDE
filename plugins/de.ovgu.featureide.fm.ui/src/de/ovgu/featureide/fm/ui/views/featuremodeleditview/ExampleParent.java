@@ -78,8 +78,6 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 		try {
 			if (example == null) {
 				example = c.calculateExample(added);
-			}
-			if (example == null) {
 				addChild(NONE);
 			} else {
 				final SelectableFeature root = example.getRoot();
