@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
@@ -78,6 +79,11 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	boolean constraintsHidden = false;
 
 	private String searchText = "";
+
+	// integer values that are returned when pressing a special button (from keyListener)
+	private final int DELETE_BUTTON_PRESSED = 127;
+	private final int CTRL_BUTTON_PRESSED = 262144;
+	private final int F_BUTTON_PRESSED = 102;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -267,11 +273,13 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				System.out.println(e.keyCode);
-				if (e.keyCode == 127) { // 127 is the delete button
-
+				if (e.keyCode == DELETE_BUTTON_PRESSED) {
+					// pressing the del button while having a constraint selected will delete it
+					new DeleteConstraintAction(viewer.getViewer(), currentModel).run();
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == F_BUTTON_PRESSED))) {
+					// pressing CTRL + F will get you in the search box
+					viewer.getSearchBox().setFocus();
 				}
-
 			}
 
 			@Override
