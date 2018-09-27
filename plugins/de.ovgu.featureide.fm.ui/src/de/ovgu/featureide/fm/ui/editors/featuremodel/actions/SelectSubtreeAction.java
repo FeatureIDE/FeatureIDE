@@ -22,15 +22,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_SUBTREE;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.gef.EditPart;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Selects the whole subtree of a selected feature
@@ -56,14 +57,21 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		if (viewer instanceof TreeViewer) {
-			final List<IFeature> children = new ArrayList();
-			children.add(feature);
-			for (final IFeatureStructure struct : feature.getStructure().getChildren()) {
-				children.add(struct.getFeature());
-			}
+		if (viewer instanceof FeatureDiagramViewer) {
+			final FeatureDiagramViewer featureDiagramViewer = (FeatureDiagramViewer) viewer;
+			final FeatureEditPart part = (FeatureEditPart) featureDiagramViewer.getFocusEditPart();
+			final Map<?, ?> editPartRegistry = featureDiagramViewer.getEditPartRegistry();
+			final List<IGraphicalFeature> children = part.getModel().getGraphicalChildren(true);
+			selectChildren(editPartRegistry, children, featureDiagramViewer);
 		}
+	}
 
+	private void selectChildren(Map<?, ?> editPartRegistry, List<IGraphicalFeature> children, FeatureDiagramViewer viewer) {
+		for (final IGraphicalFeature child : children) {
+			final EditPart childPart = (EditPart) editPartRegistry.get(child);
+			viewer.appendSelection(childPart);
+			selectChildren(editPartRegistry, child.getGraphicalChildren(true), viewer);
+		}
 	}
 
 	@Override

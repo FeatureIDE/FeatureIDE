@@ -258,7 +258,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		// FM structure modify actions
 		createLayerAction = addAction(new CreateLayerAction(viewer, featureModel));
 		createCompoundAction = addAction(new CreateCompoundAction(viewer, featureModel));
-		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer, featureModel));
+		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer, graphicalFeatureModel));
 		deleteAction = addAction(new DeleteAction(viewer, featureModel));
 		deleteAllAction = addAction(new DeleteAllAction(viewer, featureModel));
 		moveStopAction = addAction(new MoveAction(viewer, graphicalFeatureModel, null, MoveAction.STOP));
