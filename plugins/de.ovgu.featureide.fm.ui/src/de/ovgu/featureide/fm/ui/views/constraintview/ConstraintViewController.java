@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -32,10 +34,13 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -56,6 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
@@ -82,6 +88,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	boolean constraintsHidden = false;
 
 	private String searchText = "";
+
+	// integer values that are returned when pressing a special button (from keyListener)
+	private final int DELETE_BUTTON_PRESSED = 127;
+	private final int SHIFT_BUTTON_PRESSED = 131072;
+	private final int CTRL_BUTTON_PRESSED = 262144;
+	private final int F_BUTTON_PRESSED = 102;
+	private final int Z_BUTTON_PRESSED = 122;
+	private final int ESC_BUTTON_PRESSED = 27;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -331,6 +345,37 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			currentModel.removeListener(eventListener);
 		}
 		getSite().getPage().removePartListener(partListener);
+
+		viewer.getViewer().getTree().addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.keyCode == DELETE_BUTTON_PRESSED) {
+					// pressing the del button while having a constraint selected will delete it
+					new DeleteConstraintAction(viewer.getViewer(), currentModel).run();
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == F_BUTTON_PRESSED))) {
+					// pressing CTRL + F will get you in the search box
+					viewer.getSearchBox().setFocus();
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+					// pressing CTRL + Z will undo operations
+					try {
+						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) currentModel.getUndoContext(), null, null);
+					} catch (final ExecutionException e1) {}
+				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED + SHIFT_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+					// pressing CTRL + SHIFT + Z will re do undo's
+					try {
+						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) currentModel.getUndoContext(), null, null);
+					} catch (final ExecutionException e1) {}
+				} else if (e.keyCode == ESC_BUTTON_PRESSED) {
+					// pressing the escape button will remove the focus or current selection
+					viewer.getViewer().setSelection(null);
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {}
+
+		});
 	}
 
 	@Override
