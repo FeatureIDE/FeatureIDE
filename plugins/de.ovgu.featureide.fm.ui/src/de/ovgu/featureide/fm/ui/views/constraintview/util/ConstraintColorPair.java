@@ -20,33 +20,50 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.util;
 
+import org.eclipse.swt.graphics.Color;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
+
 /**
- * TODO description
+ * This class maps a IConstraint to an Color.
  *
  * @author "Rosiak Kamil"
  */
-public class ConstraintColorPair<S, T> {
-	S first;
-	T second;
+public class ConstraintColorPair {
+	private IConstraint constraint;
+	private Color color;
 
-	public ConstraintColorPair(S first, T second) {
-		setFirst(first);
-		setSecond(second);
+	public ConstraintColorPair(IConstraint constraint, Color color) {
+		setConstraint(constraint);
+		setColor(color);
 	}
 
-	public S getFirst() {
-		return first;
+	/**
+	 * @return the constraint
+	 */
+	public IConstraint getConstraint() {
+		return constraint;
 	}
 
-	public void setFirst(S first) {
-		this.first = first;
+	/**
+	 * @param constraint the constraint to set
+	 */
+	public void setConstraint(IConstraint constraint) {
+		this.constraint = constraint;
 	}
 
-	public T getSecond() {
-		return second;
+	/**
+	 * @return the color
+	 */
+	public Color getColor() {
+		return color;
 	}
 
-	public void setSecond(T second) {
-		this.second = second;
+	/**
+	 * @param color the color to set
+	 */
+	public void setColor(Color color) {
+		this.color = color;
 	}
+
 }

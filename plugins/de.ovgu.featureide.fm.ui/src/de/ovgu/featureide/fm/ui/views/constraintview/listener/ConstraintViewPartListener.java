@@ -29,16 +29,13 @@ import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * TODO description
+ * This class is the implementation of the IPartListener2 for the ConstraintView.
  *
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewPartListener implements IPartListener2 {
 	ConstraintViewController controller;
 
-	/**
-	 *
-	 */
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
 		controller = cvc;
 	}
