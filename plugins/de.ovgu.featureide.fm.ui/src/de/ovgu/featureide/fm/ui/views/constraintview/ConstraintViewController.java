@@ -96,6 +96,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(FeatureModelUtil.getFeatureModel());
+		} else {
+			viewer.addNoFeatureModelItem();
 		}
 
 		new ConstraintViewContextMenu(this);
@@ -289,15 +291,17 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			public void selectionChanged(SelectionChangedEvent event) {
 				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
-				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-					graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-					graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
-						graphFeature.setConstraintSelected(true);
-					} else {
-						graphFeature.setConstraintSelected(false);
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+						graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+						graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+						if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
+							graphFeature.setConstraintSelected(true);
+						} else {
+							graphFeature.setConstraintSelected(false);
+						}
+						new FeatureFigure(graphFeature, graphModel).setProperties();
 					}
-					new FeatureFigure(graphFeature, graphModel).setProperties();
 				}
 			}
 
