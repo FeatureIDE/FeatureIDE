@@ -147,7 +147,6 @@ public class German implements ILanguage {
 	@Override
 	public String getFeature() {
 		return FEATURE;
-
 	}
 
 	@Override
