@@ -240,18 +240,21 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				viewer.removeAll();
 				final List<ConstraintColorPair> constraintList = new ArrayList<ConstraintColorPair>();
 				for (final Object reasonObj : explanation.getReasons()) {
+					if (reasonObj == null) {
+						continue;
+					}
 					final FeatureModelReason fmReason = (FeatureModelReason) reasonObj;
+					if ((fmReason.getSubject() != null) && (fmReason.getSubject().getElement() != null)) {
+						for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
+							if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
+								constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
+								continue;
+							}
 
-					for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
-						if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
-							constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
-							continue;
+							if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
+								constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
+							}
 						}
-						// Add redundant constraints of reason
-						if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
-							constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
-						}
-
 					}
 				}
 				return constraintList;
@@ -259,6 +262,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 		}
 		return null;
+
 	}
 
 	/**
