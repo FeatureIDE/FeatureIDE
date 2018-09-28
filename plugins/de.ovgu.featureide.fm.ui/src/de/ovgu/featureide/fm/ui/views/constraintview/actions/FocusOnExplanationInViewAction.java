@@ -69,29 +69,29 @@ public class FocusOnExplanationInViewAction extends Action {
 
 	@Override
 	public void run() {
-		if (constraint.getFeatureModel().getAnalyser().getExplanation(constraint) != null) {
-			final FeatureModelExplanation explanation = (FeatureModelExplanation) constraint.getFeatureModel().getAnalyser().getExplanation(constraint);
-			final FocusOnExplanationOperation op = new FocusOnExplanationOperation(graphicalFeatureModel, explanation);
-			try {
-				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-			} catch (final ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
-		} else {
-			for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-				if (feature.getFeatureModel().getAnalyser().getExplanation(feature) != null) {
-					for (final Object reason : feature.getFeatureModel().getAnalyser().getExplanation(feature).getReasons()) {
-						if (reason instanceof FeatureModelReason) {
-							final FeatureModelReason fmReason = (FeatureModelReason) reason;
-							if (fmReason.getSubject().getElement() instanceof IConstraint) {
-								if (fmReason.getSubject().getElement().equals(constraint)) {
-									final FeatureModelExplanation fme =
-										(FeatureModelExplanation) feature.getFeatureModel().getAnalyser().getExplanation(feature);
-									final FocusOnExplanationOperation op = new FocusOnExplanationOperation(graphicalFeatureModel, fme);
-									try {
-										PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-									} catch (final ExecutionException e) {
-										FMUIPlugin.getDefault().logError(e);
+		FocusOnExplanationOperation focusOnExplanationOperation = null;
+		// If model is void always show voidModelExplanation
+		if (!FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
+			focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, FeatureModelUtil.getFeatureModel().getAnalyser().getVoidFeatureModelExplanation());
+		}
+		if (constraint != null) {
+			// Handler if constraint has an explanation
+			if (constraint.getFeatureModel().getAnalyser().getExplanation(constraint) != null) {
+				final FeatureModelExplanation<?> explanation =
+					(FeatureModelExplanation<?>) constraint.getFeatureModel().getAnalyser().getExplanation(constraint);
+				focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, explanation);
+				// Check if any feature has this constraint as a reason in its explanation
+			} else {
+				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+					if (feature.getFeatureModel().getAnalyser().getExplanation(feature) != null) {
+						for (final Object reason : feature.getFeatureModel().getAnalyser().getExplanation(feature).getReasons()) {
+							if (reason instanceof FeatureModelReason) {
+								final FeatureModelReason fmReason = (FeatureModelReason) reason;
+								if (fmReason.getSubject().getElement() instanceof IConstraint) {
+									if (fmReason.getSubject().getElement().equals(constraint)) {
+										final FeatureModelExplanation<?> fme =
+											(FeatureModelExplanation<?>) feature.getFeatureModel().getAnalyser().getExplanation(feature);
+										focusOnExplanationOperation = new FocusOnExplanationOperation(graphicalFeatureModel, fme);
 									}
 								}
 							}
@@ -100,10 +100,23 @@ public class FocusOnExplanationInViewAction extends Action {
 				}
 			}
 		}
-
+		// apply explanation collapse
+		if (focusOnExplanationOperation != null) {
+			try {
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(focusOnExplanationOperation, null, null);
+			} catch (final ExecutionException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	public boolean hasExplanation(IStructuredSelection sel) {
+		if (!FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
+			return true;
+		}
+		if (constraint == null) {
+			return false;
+		}
 		if ((constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) || (constraint.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE)
 			|| (constraint.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL) || (constraint.getConstraintAttribute() == ConstraintAttribute.DEAD)
 			|| ((constraint.getConstraintAttribute() == ConstraintAttribute.IMPLICIT)
