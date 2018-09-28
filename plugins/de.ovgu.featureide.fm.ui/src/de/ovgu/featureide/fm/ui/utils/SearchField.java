@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * An UI text field with search functionality.
  *
  * @author Sebastian Krieter
+ * @author "Insansa Michel, Malek Badeer"
  */
 public class SearchField<T> {
 
@@ -53,26 +54,20 @@ public class SearchField<T> {
 			if (e.character == 13) {
 				curIndex++;
 				search();
-				if (featureDiagramEditor != null) {
-					refresh();
-				}
+
 			}
 		}
 	}
 
 	private final class SearchModifyListener implements ModifyListener {
-
 		@Override
 		public void modifyText(ModifyEvent e) {
 			curIndex = 0;
-			search();
-			if (featureDiagramEditor != null) {
-				refresh();
-			}
 		}
 	}
 
 	private final SearchModifyListener searchModifyListener = new SearchModifyListener();
+
 	private final SearchNextListener searchNextListener = new SearchNextListener();
 
 	private final Text searchField;
@@ -83,8 +78,6 @@ public class SearchField<T> {
 	private IGraphicalFeatureModel graphicalFeatureModel = null;
 
 	private FeatureDiagramEditor featureDiagramEditor = null;
-
-	private final IGraphicalFeature previousparent = null;
 
 	public SearchField(Composite parent, final ISearchable<T> searchable, FeatureDiagramEditor featureDiagramEditor) {
 		this.featureDiagramEditor = featureDiagramEditor;
@@ -136,21 +129,11 @@ public class SearchField<T> {
 		int i = 0;
 		T temp = null;
 		int tempIndex = -1;
-
-		IGraphicalFeature parent = null;
-
 		for (; it.hasNext(); i++) {
 			final T next = it.next();
-
 			if (searchable.matches(next, searchString)) {
-				parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
-				if (parent.isCollapsed()) {
-					parent.setCollapsed(false);
-				}
-				if ((parent != previousparent) && (previousparent != null)) {
-					previousparent.setCollapsed(true);
-				}
 				if (i >= curIndex) {
+					expand(next);
 					curIndex = i;
 					searchable.found(next);
 					return;
@@ -158,16 +141,34 @@ public class SearchField<T> {
 					temp = next;
 					tempIndex = i;
 				}
-
 			}
 		}
 		if (temp != null)
 
 		{
 			curIndex = tempIndex;
+			expand(temp);
 			searchable.found(temp);
+
 		} else {
 			curIndex = 0;
+
+		}
+	}
+
+	private void expand(T next) {
+		if (((IGraphicalFeature) next).getSourceConnection().getTarget() != null) {
+			final IGraphicalFeature parent = ((IGraphicalFeature) next).getSourceConnection().getTarget();
+			if (parent.getSourceConnection().getTarget() != null) {
+				expand((T) parent);
+			}
+			if (parent.isCollapsed()) {
+				parent.setCollapsed(false);
+				if (featureDiagramEditor != null) {
+					refresh();
+				}
+			}
+
 		}
 	}
 
