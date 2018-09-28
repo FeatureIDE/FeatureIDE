@@ -52,7 +52,6 @@ import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
@@ -77,8 +76,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
-	private IGraphicalFeature graphfeature = null;
-	private final IGraphicalFeatureModel graphmodel = null;
+	private IGraphicalFeature graphFeature;
 
 	boolean constraintsHidden = false;
 	private final ConstraintViewPartListener partListener = new ConstraintViewPartListener(this);
@@ -106,7 +104,6 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * reacts when searchBox noticed input and modifies the Constraint table according to the input
 	 */
 	private final ModifyListener searchListener = new ModifyListener() {
-
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
@@ -120,9 +117,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * matching in searchInput
 	 */
 	public void refreshView(IFeatureModel currentModel) {
+		// when switching models we remove the IEventListener on the old model and add it to the current model
 		if ((currentModel != null)) {
+			final IFeatureModel oldModel = this.currentModel;
 			this.currentModel = currentModel;
 			this.currentModel.addListener(this);
+			if (oldModel != null) {
+				oldModel.removeListener(this);
+			}
 			viewer.removeAll();
 			// no search text is entered:
 			if (searchText.equals("")) {
@@ -295,13 +297,13 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 							}
 						}
 						for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-							graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+							graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 							if (constraint.getContainedFeatures().contains(feature)) {
-								graphfeature.setConstraintSelected(true);
+								graphFeature.setConstraintSelected(true);
 							} else {
-								graphfeature.setConstraintSelected(false);
+								graphFeature.setConstraintSelected(false);
 							}
-							new FeatureFigure(graphfeature, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()).setProperties();
+							new FeatureFigure(graphFeature, FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel()).setProperties();
 						}
 					}
 				}

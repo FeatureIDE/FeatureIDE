@@ -45,7 +45,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partOpened(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID)) {
+		if (part.getId().equals(ConstraintViewController.ID) || part.getId().equals(FeatureModelEditor.ID)) {
 			controller.setConstraintsHidden(true);
 		}
 	}
