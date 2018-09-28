@@ -89,6 +89,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	private final int CTRL_BUTTON_PRESSED = 262144;
 	private final int F_BUTTON_PRESSED = 102;
 	private final int Z_BUTTON_PRESSED = 122;
+	private final int ESC_BUTTON_PRESSED = 27;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -294,6 +295,9 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 					try {
 						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) currentModel.getUndoContext(), null, null);
 					} catch (final ExecutionException e1) {}
+				} else if (e.keyCode == ESC_BUTTON_PRESSED) {
+					// pressing the escape button will remove the focus or current selection
+					viewer.getViewer().setSelection(null);
 				}
 			}
 
