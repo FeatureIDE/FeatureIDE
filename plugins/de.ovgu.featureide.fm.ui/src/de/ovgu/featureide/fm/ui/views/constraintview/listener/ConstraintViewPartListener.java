@@ -29,23 +29,20 @@ import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * TODO description
+ * This class is the implementation of the IPartListener2 for the ConstraintView.
  *
  * @author "Rosiak Kamil"
  */
 public class ConstraintViewPartListener implements IPartListener2 {
 	ConstraintViewController controller;
 
-	/**
-	 *
-	 */
 	public ConstraintViewPartListener(ConstraintViewController cvc) {
 		controller = cvc;
 	}
 
 	@Override
 	public void partOpened(IWorkbenchPartReference part) {
-		if (part.getId().equals(ConstraintViewController.ID)) {
+		if (part.getId().equals(ConstraintViewController.ID) || part.getId().equals(FeatureModelEditor.ID)) {
 			controller.setConstraintsHidden(true);
 		}
 	}
@@ -55,12 +52,9 @@ public class ConstraintViewPartListener implements IPartListener2 {
 
 	@Override
 	public void partClosed(IWorkbenchPartReference part) {
-		if (part instanceof FeatureModelEditor) {
-			if ((FeatureModelUtil.getActiveFMEditor() == part) || (FeatureModelUtil.getActiveFMEditor() == null)) {
-				final FeatureModelEditor editor = (FeatureModelEditor) part.getPart(false);
-				controller.addPageChangeListener(editor);
-				controller.getTreeViewer().refresh();
-			}
+		if (part.getPart(false) instanceof FeatureModelEditor) {
+			controller.getView().removeAll();
+			controller.getView().addNoFeatureModelItem();
 		}
 	}
 

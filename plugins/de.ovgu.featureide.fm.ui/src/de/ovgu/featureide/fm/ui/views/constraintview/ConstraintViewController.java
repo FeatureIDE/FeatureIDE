@@ -34,7 +34,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
@@ -71,13 +70,14 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextM
  * @author "Rahel Arens"
  * @author "Thomas Graave"
  */
-public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
+public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.ConstraintView";
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
-	private IGraphicalFeature graphfeature = null;
-	private IGraphicalFeatureModel graphmodel = null;
+	private IGraphicalFeature graphFeature;
+	private IGraphicalFeatureModel graphModel;
+	private ConstraintViewPartListener partListener;
 
 	boolean constraintsHidden = false;
 
@@ -92,13 +92,20 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		viewer = new ConstraintView(parent);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		getSite().getPage().addPartListener(new ConstraintViewPartListener(this));
+		createListener();
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			currentModel = FeatureModelUtil.getFeatureModel();
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
-			refreshView(currentModel);
+			refreshView(FeatureModelUtil.getFeatureModel());
+		} else {
+			viewer.addNoFeatureModelItem();
 		}
+
 		new ConstraintViewContextMenu(this);
+	}
+
+	public void createListener() {
+		partListener = new ConstraintViewPartListener(this);
+		getSite().getPage().addPartListener(partListener);
 	}
 
 	/**
@@ -119,17 +126,24 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * matching in searchInput
 	 */
 	public void refreshView(IFeatureModel currentModel) {
-		if (currentModel != null) {
-			this.currentModel = currentModel;
-			this.currentModel.addListener(this);
-			viewer.removeAll();
-			// no search text is entered:
-			if (searchText.equals("")) {
-				addConstraints(currentModel);
-			} else {
-				// when searchText is entered, search through all constraints
-				findConstraints(currentModel);
+		if (this.currentModel != currentModel) {
+			if (this.currentModel != null) {
+				this.currentModel.removeListener(eventListener);
+				this.currentModel = null;
 			}
+			if (currentModel != null) {
+				this.currentModel = currentModel;
+				this.currentModel.addListener(eventListener);
+			}
+		}
+
+		viewer.removeAll();
+		// no search text is entered:
+		if (searchText.equals("")) {
+			addConstraints(currentModel);
+		} else {
+			// when searchText is entered, search through all constraints
+			findConstraints(currentModel);
 		}
 	}
 
@@ -142,7 +156,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
 		for (final IGraphicalConstraint constraint : constraints) {
-			final List<ConstraintColorPair<IConstraint, Color>> explanationList = getExplanationConstraints();
+			final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				// when at least one feature is selected:
 				// goes through all features that are selected
@@ -156,8 +170,8 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 						}
 					}
 				} else {
-					for (final ConstraintColorPair<IConstraint, Color> pair : explanationList) {
-						viewer.addDecoratedItem(pair.getFirst(), pair.getSecond());
+					for (final ConstraintColorPair pair : explanationList) {
+						viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
 					}
 				}
 			} else {
@@ -215,30 +229,32 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	}
 
 	/**
-	 * returns a set of constraints if a explanation is available else null
+	 * returns a set of constraints if an explanation is available else null
 	 *
 	 */
-	@SuppressWarnings("rawtypes")
-	public List<ConstraintColorPair<IConstraint, Color>> getExplanationConstraints() {
+	public List<ConstraintColorPair> getExplanationConstraints() {
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			final FeatureModelEditor fme = FeatureModelUtil.getActiveFMEditor();
-			if (fme.diagramEditor.getActiveExplanation() != null) {
-				final Explanation explanation = (Explanation) fme.diagramEditor.getActiveExplanation();
+			final FeatureModelEditor fmEditor = FeatureModelUtil.getActiveFMEditor();
+			if (fmEditor.diagramEditor.getActiveExplanation() != null) {
+				final Explanation<?> explanation = (Explanation<?>) fmEditor.diagramEditor.getActiveExplanation();
 				viewer.removeAll();
-				final List<ConstraintColorPair<IConstraint, Color>> constraintList = new ArrayList<ConstraintColorPair<IConstraint, Color>>();
-				for (final Object rea : explanation.getReasons()) {
-					final FeatureModelReason fmr = (FeatureModelReason) rea;
+				final List<ConstraintColorPair> constraintList = new ArrayList<ConstraintColorPair>();
+				for (final Object reasonObj : explanation.getReasons()) {
+					if (reasonObj == null) {
+						continue;
+					}
+					final FeatureModelReason fmReason = (FeatureModelReason) reasonObj;
+					if ((fmReason.getSubject() != null) && (fmReason.getSubject().getElement() != null)) {
+						for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
+							if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
+								constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
+								continue;
+							}
 
-					for (final IGraphicalConstraint constraint : fme.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
-						if (constraint.getObject().equals(fmr.getSubject().getElement())) {
-							constraintList.add(new ConstraintColorPair<IConstraint, Color>(constraint.getObject(), FMPropertyManager.getReasonColor(fmr)));
-							continue;
+							if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
+								constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
+							}
 						}
-						// Add redundant constraints of reason
-						if (constraint.getObject().toString().equals(fmr.getSubject().getElement().toString())) {
-							constraintList.add(new ConstraintColorPair<IConstraint, Color>(constraint.getObject(), null));
-						}
-
 					}
 				}
 				return constraintList;
@@ -246,6 +262,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 
 		}
 		return null;
+
 	}
 
 	/**
@@ -278,15 +295,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 			public void selectionChanged(SelectionChangedEvent event) {
 				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
-				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-					graphfeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
-						graphfeature.setConstraintSelected(true);
-					} else {
-						graphfeature.setConstraintSelected(false);
+				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
+						graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
+						graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+						if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
+							graphFeature.setConstraintSelected(true);
+						} else {
+							graphFeature.setConstraintSelected(false);
+						}
+						new FeatureFigure(graphFeature, graphModel).setProperties();
 					}
-					new FeatureFigure(graphfeature, graphmodel).setProperties();
 				}
 			}
 
@@ -307,6 +326,14 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	}
 
 	@Override
+	public void dispose() {
+		if (currentModel != null) {
+			currentModel.removeListener(eventListener);
+		}
+		getSite().getPage().removePartListener(partListener);
+	}
+
+	@Override
 	public void setFocus() {}
 
 	/**
@@ -320,15 +347,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
-	/**
-	 * Reacts on observer of the current feature model
-	 */
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			checkForRefresh();
+	private final IEventListener eventListener = new IEventListener() {
+		/**
+		 * Reacts on observer of the current feature model
+		 */
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			if (FeatureModelUtil.getActiveFMEditor() != null) {
+				checkForRefresh();
+			}
 		}
-	}
+	};
 
 	public boolean isConstraintsHidden() {
 		return constraintsHidden;

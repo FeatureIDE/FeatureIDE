@@ -88,14 +88,23 @@ public class ConstraintView implements GUIDefaults {
 		return item;
 	}
 
+	/**
+	 * This method creates a TreeItem and adds data to it.
+	 */
 	public TreeItem createTreeItem(IConstraint constraint) {
 		final TreeItem item = new TreeItem(tree, SWT.None);
 		item.setData(constraint);
 		return item;
 	}
 
-	public void addDecoratedItem(IConstraint element, Color color) {
-		final TreeItem item = addItem(element);
+	/**
+	 * This method decorates the icon of the TreeItem with the evidence color of the explanation.
+	 *
+	 * @param constraint the constraint that would be shown in the view
+	 * @param color the evidence color of the explanation
+	 */
+	public void addDecoratedItem(IConstraint constraint, Color color) {
+		final TreeItem item = addItem(constraint);
 		Image elementImg;
 		if (color == null) {
 			elementImg = FM_INFO;
@@ -103,7 +112,6 @@ public class ConstraintView implements GUIDefaults {
 			elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
 			final GC gc = new GC(elementImg);
 			gc.setBackground(color);
-			// MAGIC NUMBERS
 			gc.setAntialias(SWT.ON);
 			gc.setAlpha(ALPHA_VALUE);
 			gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET, elementImg.getBounds().width - BORDER_OFFSET);
@@ -207,4 +215,5 @@ public class ConstraintView implements GUIDefaults {
 		return searchBox;
 
 	}
+
 }
