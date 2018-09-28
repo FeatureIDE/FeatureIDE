@@ -89,7 +89,7 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
-	 * This method creates a TreeItem and adds a IConstraint as data.
+	 * This method creates a TreeItem and adds data to it.
 	 */
 	public TreeItem createTreeItem(IConstraint constraint) {
 		final TreeItem item = new TreeItem(tree, SWT.None);
