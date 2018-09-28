@@ -70,13 +70,13 @@ import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextM
  * @author "Rahel Arens"
  * @author "Thomas Graave"
  */
-public class ConstraintViewController extends ViewPart implements IEventListener, GUIDefaults {
+public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.ConstraintView";
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
-	private IGraphicalFeature graphFeature = null;
-	private IGraphicalFeatureModel graphmodel = null;
+	private IGraphicalFeature graphFeature;
+	private IGraphicalFeatureModel graphModel;
 
 	boolean constraintsHidden = false;
 
@@ -93,10 +93,10 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		addListener();
 		getSite().getPage().addPartListener(new ConstraintViewPartListener(this));
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			currentModel = FeatureModelUtil.getFeatureModel();
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
-			refreshView(currentModel);
+			refreshView(FeatureModelUtil.getFeatureModel());
 		}
+
 		new ConstraintViewContextMenu(this);
 	}
 
@@ -118,17 +118,24 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	 * matching in searchInput
 	 */
 	public void refreshView(IFeatureModel currentModel) {
-		if (currentModel != null) {
-			this.currentModel = currentModel;
-			this.currentModel.addListener(this);
-			viewer.removeAll();
-			// no search text is entered:
-			if (searchText.equals("")) {
-				addConstraints(currentModel);
-			} else {
-				// when searchText is entered, search through all constraints
-				findConstraints(currentModel);
+		if (this.currentModel != currentModel) {
+			if (this.currentModel != null) {
+				this.currentModel.removeListener(eventListener);
+				this.currentModel = null;
 			}
+			if (currentModel != null) {
+				this.currentModel = currentModel;
+				this.currentModel.addListener(eventListener);
+			}
+		}
+
+		viewer.removeAll();
+		// no search text is entered:
+		if (searchText.equals("")) {
+			addConstraints(currentModel);
+		} else {
+			// when searchText is entered, search through all constraints
+			findConstraints(currentModel);
 		}
 	}
 
@@ -278,13 +285,13 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
 				for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 					graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-					graphmodel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+					graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 					if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
 						graphFeature.setConstraintSelected(true);
 					} else {
 						graphFeature.setConstraintSelected(false);
 					}
-					new FeatureFigure(graphFeature, graphmodel).setProperties();
+					new FeatureFigure(graphFeature, graphModel).setProperties();
 				}
 			}
 
@@ -305,6 +312,12 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 	}
 
 	@Override
+	public void dispose() {
+		currentModel.removeListener(eventListener);
+		super.dispose();
+	}
+
+	@Override
 	public void setFocus() {}
 
 	/**
@@ -318,15 +331,17 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 		}
 	}
 
-	/**
-	 * Reacts on observer of the current feature model
-	 */
-	@Override
-	public void propertyChange(FeatureIDEEvent event) {
-		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			checkForRefresh();
+	private final IEventListener eventListener = new IEventListener() {
+		/**
+		 * Reacts on observer of the current feature model
+		 */
+		@Override
+		public void propertyChange(FeatureIDEEvent event) {
+			if (FeatureModelUtil.getActiveFMEditor() != null) {
+				checkForRefresh();
+			}
 		}
-	}
+	};
 
 	public boolean isConstraintsHidden() {
 		return constraintsHidden;
