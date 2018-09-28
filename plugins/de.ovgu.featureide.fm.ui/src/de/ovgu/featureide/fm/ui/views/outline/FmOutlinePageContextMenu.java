@@ -198,9 +198,11 @@ public class FmOutlinePageContextMenu {
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
-		cAction = new CreateFeatureAboveAction(viewer, graphicalFeatureModel);
-		clAction = new CreateFeatureBelowAction(viewer, graphicalFeatureModel);
-		csAction = new CreateSiblingAction(viewer, graphicalFeatureModel);
+		if (graphicalFeatureModel != null) {
+			cAction = new CreateFeatureAboveAction(viewer, graphicalFeatureModel);
+			clAction = new CreateFeatureBelowAction(viewer, graphicalFeatureModel);
+			csAction = new CreateSiblingAction(viewer, graphicalFeatureModel);
+		}
 		oAction = new OrAction(viewer, fInput);
 		// TODO _interfaces Removed Code
 		// roAction = new ReverseOrderAction(viewer, fInput);

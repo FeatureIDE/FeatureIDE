@@ -71,17 +71,16 @@ public class CreateSiblingAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (!super.isValidSelection(selection)) {
+		if ((selection == null) || selection.isEmpty() || !super.isValidSelection(selection)) {
 			return false;
 		}
 		final Object selectedObject = selection.getFirstElement();
 		IFeature selectedFeature;
-		if ((selectedObject instanceof FeatureEditPart) || (selectedObject instanceof IFeature)) {
-			if (selectedObject instanceof FeatureEditPart) {
-				selectedFeature = ((FeatureEditPart) selectedObject).getModel().getObject();
-			} else {
-				selectedFeature = (IFeature) selectedObject;
-			}
+
+		if (selectedObject instanceof FeatureEditPart) {
+			selectedFeature = ((FeatureEditPart) selectedObject).getModel().getObject();
+		} else if (selectedObject instanceof IFeature) {
+			selectedFeature = (IFeature) selectedObject;
 		} else {
 			return false;
 		}
