@@ -77,6 +77,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private IFeatureModel currentModel;
 	private IGraphicalFeature graphFeature;
 	private IGraphicalFeatureModel graphModel;
+	private ConstraintViewPartListener partListener;
 
 	boolean constraintsHidden = false;
 
@@ -91,13 +92,18 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		viewer = new ConstraintView(parent);
 		viewer.getSearchBox().addModifyListener(searchListener);
 		addListener();
-		getSite().getPage().addPartListener(new ConstraintViewPartListener(this));
+		createListener();
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			addPageChangeListener(FeatureModelUtil.getActiveFMEditor());
 			refreshView(FeatureModelUtil.getFeatureModel());
 		}
 
 		new ConstraintViewContextMenu(this);
+	}
+
+	public void createListener() {
+		partListener = new ConstraintViewPartListener(this);
+		getSite().getPage().addPartListener(partListener);
 	}
 
 	/**
@@ -313,8 +319,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	@Override
 	public void dispose() {
-		currentModel.removeListener(eventListener);
-		super.dispose();
+		if (currentModel != null) {
+			currentModel.removeListener(eventListener);
+		}
+		getSite().getPage().removePartListener(partListener);
 	}
 
 	@Override

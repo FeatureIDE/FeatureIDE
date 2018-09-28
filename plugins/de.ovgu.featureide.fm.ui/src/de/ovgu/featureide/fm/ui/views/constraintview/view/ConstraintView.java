@@ -215,4 +215,5 @@ public class ConstraintView implements GUIDefaults {
 		return searchBox;
 
 	}
+
 }
