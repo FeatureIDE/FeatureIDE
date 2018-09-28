@@ -1094,4 +1094,5 @@ public class StringTable {
 	public static final String ADD_LONG_ATTRIBUTE = "Add Long Attribute";
 	public static final String ADD_DOUBLE_ATTRIBUTE = "Add Double Attribute";
 	public static final String REMOVE_SELECTED_ATTRIBUTE = "Remove Selected Attribute";
+	public static final String SELECT_SUBTREE = "Select Subtree";
 }
