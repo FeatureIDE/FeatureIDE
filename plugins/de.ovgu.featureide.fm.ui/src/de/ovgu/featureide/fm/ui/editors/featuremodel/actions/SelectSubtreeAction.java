@@ -22,15 +22,17 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_SUBTREE;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.gef.EditPart;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramViewer;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -42,17 +44,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class SelectSubtreeAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.selectSubtree";
-	private final IGraphicalFeatureModel graphicalFeatureModel;
-	private IStructuredSelection selection;
+	private static ImageDescriptor createImage;
 
-	/**
-	 * @param text
-	 * @param viewer
-	 * @param id
-	 */
-	public SelectSubtreeAction(Object viewer, IGraphicalFeatureModel graphicalFeatureModel) {
+	public SelectSubtreeAction(Object viewer) {
 		super(SELECT_SUBTREE, viewer, ID);
-		this.graphicalFeatureModel = graphicalFeatureModel;
+		URL url = null;
+		try {
+			url = new URL("platform:/plugin/org.eclipse.wst.xsdeditor.doc.user/images/XSDChoice.gif");
+		} catch (final MalformedURLException e) {}
+		createImage = ImageDescriptor.createFromURL(url);
+		setImageDescriptor(createImage);
 	}
 
 	@Override
@@ -76,7 +77,6 @@ public class SelectSubtreeAction extends SingleSelectionAction {
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		this.selection = selection;
 		return super.isValidSelection(selection);
 	}
 
