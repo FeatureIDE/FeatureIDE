@@ -1272,11 +1272,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final Object data = element.getData();
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) data;
-			// if (searchString.startsWith("*")) {
-			// return feature.getName().toLowerCase().contains(searchString.substring(1).toLowerCase());
-			// } else {
-			// return feature.getName().toLowerCase().startsWith(searchString.toLowerCase());
-			// }
 			return feature.getName().toLowerCase().matches(".*" + searchString.toLowerCase() + ".*");
 		}
 		return false;
