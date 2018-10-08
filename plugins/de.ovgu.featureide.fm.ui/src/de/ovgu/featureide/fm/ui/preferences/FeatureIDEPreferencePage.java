@@ -21,6 +21,9 @@
 package de.ovgu.featureide.fm.ui.preferences;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_COLORING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_DIALOGS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TEXT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TRIES_TO_FIND_FEATURES_WHICH_LEAD_TO_A_VALID_CONFIGURATION_BY_SOLVING_A_SATISFIABILITY_PROBLEM_;
@@ -40,6 +43,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintViewDialog;
 
 public class FeatureIDEPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -72,6 +76,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		final Composite container = new Composite(parent, SWT.NULL);
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 
+		// completion group
 		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
 		completionGroup.setText(CONFIGURATION_COLORING);
 		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
@@ -107,6 +112,20 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		noneButton.addSelectionListener(completionSelectionListener);
 		openClauseButton.addSelectionListener(completionSelectionListener);
 		contradictionButton.addSelectionListener(completionSelectionListener);
+
+		// Dialog Configuration
+
+		final String constraintViewPref = Preferences.getPrefereces().get(ConstraintViewDialog.CONSTRAINT_DIALOG_PREFERENCE, "default");
+		final boolean isConstraintView = Boolean.parseBoolean(constraintViewPref);
+
+		final Group dialogGroup = new Group(container, SWT.SHADOW_IN);
+		dialogGroup.setText(CONFIGURATION_DIALOGS);
+		final Button constraintViewButton = new Button(dialogGroup, SWT.CHECK);
+
+		constraintViewButton.setText(CONFIGURATION_DIALOGS_CONSTRAINT_TEXT);
+		constraintViewButton.setToolTipText(CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP);
+
+		constraintViewButton.setSelection(isConstraintView);
 
 		return container;
 	}

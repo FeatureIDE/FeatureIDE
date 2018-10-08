@@ -49,6 +49,10 @@ public abstract class Preferences {
 		return defaultCompletion;
 	}
 
+	public static IEclipsePreferences getPrefereces() {
+		return preferences;
+	}
+
 	public static void setDefaultCompletion(int defaultCompletion) {
 		Preferences.defaultCompletion = defaultCompletion;
 		store("configCompletion", defaultCompletion);
