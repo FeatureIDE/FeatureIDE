@@ -165,27 +165,26 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
+		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
+		if (explanationList != null) {
+			for (final ConstraintColorPair pair : explanationList) {
+				viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
+			}
+		}
 		for (final IGraphicalConstraint constraint : constraints) {
-			final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				// when at least one feature is selected:
 				// goes through all features that are selected
-				if (explanationList == null) {
-					for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
-						if (part instanceof FeatureEditPart) {
-							if (matchesConstraint(part, constraint)) {
-								viewer.addItem(constraint.getObject());
-								break;
-							}
+				for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
+					if (part instanceof FeatureEditPart) {
+						if (matchesConstraint(part, constraint)) {
+							viewer.addItem(constraint.getObject());
+							break;
 						}
-					}
-				} else {
-					for (final ConstraintColorPair pair : explanationList) {
-						viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
 					}
 				}
 			} else {
-				// when no feature is selected, adds all constraints to the viewer
+				// when no feature is selected and no explanation, adds all constraints to the viewer
 				viewer.addItem(constraint.getObject());
 			}
 		}
@@ -247,7 +246,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			final FeatureModelEditor fmEditor = FeatureModelUtil.getActiveFMEditor();
 			if (fmEditor.diagramEditor.getActiveExplanation() != null) {
 				final Explanation<?> explanation = (Explanation<?>) fmEditor.diagramEditor.getActiveExplanation();
-				viewer.removeAll();
+				// viewer.removeAll();
 				final List<ConstraintColorPair> constraintList = new ArrayList<ConstraintColorPair>();
 				for (final Object reasonObj : explanation.getReasons()) {
 					if (reasonObj == null) {
@@ -255,8 +254,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 					}
 					final FeatureModelReason fmReason = (FeatureModelReason) reasonObj;
 					if ((fmReason.getSubject() != null) && (fmReason.getSubject().getElement() != null)) {
+						System.out.println(fmReason.getSubject().getElement());
 						for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
 							if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
+								System.out.println("added reason");
 								constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
 								continue;
 							}
@@ -306,6 +307,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
 				if (FeatureModelUtil.getActiveFMEditor() != null) {
+					System.out.println(constraint.getFeatureModel().getAnalyser().getExplanation(constraint));
+					FeatureModelUtil.getActiveFMEditor().diagramEditor
+							.setActiveExplanation(constraint.getFeatureModel().getAnalyser().getExplanation(constraint));
 					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 						graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 						graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
