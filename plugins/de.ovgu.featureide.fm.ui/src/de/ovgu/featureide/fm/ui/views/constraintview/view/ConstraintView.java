@@ -56,7 +56,7 @@ public class ConstraintView implements GUIDefaults {
 	private final int CONSTRAINT_DESCRIPTION_WIDTH = 200;
 	private final int ALPHA_VALUE = 175;
 
-	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM_EDITOR;
+	private final String DEFAULT_MESSAGE = StringTable.OPEN_A_FEATURE_DIAGRAM;
 
 	private final String CONSTRAINT_HEADER = "Constraint";
 	private final String DESCRIPTION_HEADER = "Description";

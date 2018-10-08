@@ -103,6 +103,13 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	 */
 	List<IGraphicalConstraint> getNonCollapsedConstraints();
 
+	/**
+	 * Returns getNonCollapsedConstraints only if the Constraints are not supposed to be hidden.
+	 *
+	 * @see #getNonCollapsedConstraints()
+	 *
+	 * @return All not collapsed constraints stored in this feature model that shall be shown in the feature model editor.
+	 */
 	List<IGraphicalConstraint> getVisibleConstraints();
 
 	/**

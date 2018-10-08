@@ -617,7 +617,7 @@ public class StringTable {
 	public static final String BUILD_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + BUILD_PATH + "\".";
 	public static final String CONFIG_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + CONFIG_PATH + "\".";
 	public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
-	public static final String OPEN_A_FEATURE_DIAGRAM_EDITOR = "Open a feature diagram editor.";
+	public static final String OPEN_A_FEATURE_DIAGRAM = "Open a feature diagram.";
 	public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ =
 		"Start manual calculation or activate automatic calculation to show statistics.";
 	public static final String CALCULATING___ = "Calculating...";
