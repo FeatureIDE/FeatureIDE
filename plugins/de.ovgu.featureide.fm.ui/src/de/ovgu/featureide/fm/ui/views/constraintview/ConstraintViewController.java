@@ -337,14 +337,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				}
 			}
 		});
-	}
-
-	@Override
-	public void dispose() {
-		if (currentModel != null) {
-			currentModel.removeListener(eventListener);
-		}
-		getSite().getPage().removePartListener(partListener);
 
 		viewer.getViewer().getTree().addKeyListener(new KeyListener() {
 
@@ -376,6 +368,15 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			public void keyReleased(KeyEvent e) {}
 
 		});
+	}
+
+	@Override
+	public void dispose() {
+		if (currentModel != null) {
+			currentModel.removeListener(eventListener);
+		}
+		getSite().getPage().removePartListener(partListener);
+
 	}
 
 	@Override
