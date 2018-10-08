@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPart
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
+import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewSettingsMenu;
 
 /**
  * This class represents the controller (MVC) of the constraint view it creates all GUI elements and holds the logic that operates on the view.
@@ -84,6 +85,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private IGraphicalFeature graphFeature;
 	private IGraphicalFeatureModel graphModel;
 	private ConstraintViewPartListener partListener;
+	private ConstraintViewSettingsMenu settingsMenu;
 
 	boolean constraintsHidden = false;
 
@@ -109,7 +111,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		} else {
 			viewer.addNoFeatureModelItem();
 		}
-
+		settingsMenu = new ConstraintViewSettingsMenu(this);
 		new ConstraintViewContextMenu(this);
 	}
 
@@ -146,7 +148,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				this.currentModel.addListener(eventListener);
 			}
 		}
-
+		// settingsMenu.update(this);
 		viewer.removeAll();
 		// no search text is entered:
 		if (searchText.equals("")) {

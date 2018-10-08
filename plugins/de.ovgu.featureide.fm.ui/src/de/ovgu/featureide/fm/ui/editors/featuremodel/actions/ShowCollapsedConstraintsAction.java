@@ -42,7 +42,7 @@ public class ShowCollapsedConstraintsAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.collapseconstraints";
 
-	private final IGraphicalFeatureModel featureModel;
+	private IGraphicalFeatureModel featureModel;
 
 	public ShowCollapsedConstraintsAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_COLLAPSED_CONSTRAINTS);
@@ -62,6 +62,10 @@ public class ShowCollapsedConstraintsAction extends Action {
 			FMUIPlugin.getDefault().logError(e);
 
 		}
+	}
+
+	public void update(IGraphicalFeatureModel featureModel) {
+		this.featureModel = featureModel;
 	}
 
 }
