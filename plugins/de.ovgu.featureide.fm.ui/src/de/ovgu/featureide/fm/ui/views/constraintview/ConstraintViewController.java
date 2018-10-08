@@ -90,12 +90,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private String searchText = "";
 
 	// integer values that are returned when pressing a special button (from keyListener)
-	private final int DELETE_BUTTON_PRESSED = 127;
-	private final int SHIFT_BUTTON_PRESSED = 131072;
-	private final int CTRL_BUTTON_PRESSED = 262144;
 	private final int F_BUTTON_PRESSED = 102;
 	private final int Z_BUTTON_PRESSED = 122;
-	private final int ESC_BUTTON_PRESSED = 27;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -342,23 +338,23 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == DELETE_BUTTON_PRESSED) {
+				if (e.keyCode == SWT.DEL) {
 					// pressing the del button while having a constraint selected will delete it
 					new DeleteConstraintAction(viewer.getViewer(), currentModel).run();
-				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == F_BUTTON_PRESSED))) {
+				} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
 					// pressing CTRL + F will get you in the search box
 					viewer.getSearchBox().setFocus();
-				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+				} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == Z_BUTTON_PRESSED))) {
 					// pressing CTRL + Z will undo operations
 					try {
 						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) currentModel.getUndoContext(), null, null);
 					} catch (final ExecutionException e1) {}
-				} else if (((e.stateMask == (CTRL_BUTTON_PRESSED + SHIFT_BUTTON_PRESSED)) && (e.keyCode == Z_BUTTON_PRESSED))) {
+				} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
 					// pressing CTRL + SHIFT + Z will re do undo's
 					try {
 						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) currentModel.getUndoContext(), null, null);
 					} catch (final ExecutionException e1) {}
-				} else if (e.keyCode == ESC_BUTTON_PRESSED) {
+				} else if (e.keyCode == SWT.ESC) {
 					// pressing the escape button will remove the focus or current selection
 					viewer.getViewer().setSelection(null);
 				}
