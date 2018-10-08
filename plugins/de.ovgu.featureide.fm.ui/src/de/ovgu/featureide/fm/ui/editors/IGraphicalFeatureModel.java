@@ -115,4 +115,10 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	 */
 	int getConstraintIndex(Constraint constraint);
 
+	/**
+	 * @param ao
+	 * @return
+	 */
+	List<IGraphicalFeature> getVisibleRelations();
+
 }
