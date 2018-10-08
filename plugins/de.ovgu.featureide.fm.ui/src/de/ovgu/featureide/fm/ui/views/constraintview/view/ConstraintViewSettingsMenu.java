@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
-import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
@@ -33,26 +34,26 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
  * @author Domenik Eichhorn
  */
 
-// TODO add Pfeil nach unten
 // TODO add more funktionen
 // TODO add schöne Checkboxen
 
 public class ConstraintViewSettingsMenu {
 	ConstraintViewController controller;
-	private final IToolBarManager manager;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 	private final ShowCollapsedConstraintsAction collapseAction;
 
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
-		this.controller = controller;
-		manager = controller.getViewSite().getActionBars().getToolBarManager();
-
+		// create actions:
 		collapseAction = new ShowCollapsedConstraintsAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
-
+		collapseAction.setChecked(false);
+		// create layout:
 		update(controller);
 		createToolBarLayout();
 	}
 
+	/**
+	 * updates the current controller and graphicalfeaturemodel when the active diagram changed
+	 */
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
@@ -65,7 +66,11 @@ public class ConstraintViewSettingsMenu {
 	 * creates the Layout from the toolbar
 	 */
 	private void createToolBarLayout() {
-		manager.add(collapseAction);
+		final IActionBars actionBars = controller.getViewSite().getActionBars();
+		final IMenuManager dropDownMenu = actionBars.getMenuManager();
+		dropDownMenu.add(collapseAction);
 
+		// final IToolBarManager toolBarManager = actionBars.getToolBarManager();
+		// toolBarManager.add(collapseAction);
 	}
 }
