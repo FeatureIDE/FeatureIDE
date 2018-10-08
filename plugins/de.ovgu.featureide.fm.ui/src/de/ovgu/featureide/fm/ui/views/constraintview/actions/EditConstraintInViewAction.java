@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractConstraintE
  * @author "Rosiak Kamil"
  */
 public class EditConstraintInViewAction extends AbstractConstraintEditorAction {
-	public static final String ID = "de.ovgu.featureide.editconstraint";
+	public static final String ID = "de.ovgu.featureide.editconstraintinview";
 	private IConstraint constraint;
 
 	public EditConstraintInViewAction(Object viewer, IFeatureModel featuremodel) {
