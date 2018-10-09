@@ -30,10 +30,9 @@ import org.osgi.service.prefs.BackingStoreException;
  * @author Sebastian Krieter
  */
 public abstract class Preferences {
-
 	public static final int COMPLETION_NONE = 0, COMPLETION_ONE_CLICK = 1, COMPLETION_OPEN_CLAUSES = 2, SCHEME_LONG = 0, SCHEME_SHORT = 1;
 
-	private static final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+	public static final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
 
 	public static int defaultCompletion;
 
@@ -49,13 +48,24 @@ public abstract class Preferences {
 		return defaultCompletion;
 	}
 
-	public static IEclipsePreferences getPrefereces() {
-		return preferences;
-	}
-
 	public static void setDefaultCompletion(int defaultCompletion) {
 		Preferences.defaultCompletion = defaultCompletion;
 		store("configCompletion", defaultCompletion);
+	}
+
+	/**
+	 * this method adds a value by his key to the preferences
+	 */
+	public static void putPref(String key, String value) {
+		preferences.put(key, value);
+		flush();
+	}
+
+	/**
+	 * get the value of an given key
+	 */
+	public static String getPref(String key) {
+		return preferences.get(key, "default");
 	}
 
 	private static int castToInt(String pref, int defaultValue) {

@@ -288,7 +288,7 @@ public class ConstraintViewController extends ViewPart implements IEventListener
 						if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
 							viewer.removeAll();
 							viewer.addItem(constraint);
-							final Explanation explanation = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
+							final Explanation<?> explanation = constraint.getFeatureModel().getAnalyser().getRedundantConstraintExplanation(constraint);
 							for (final Object reason : explanation.getReasons()) {
 								if (reason instanceof FeatureModelReason) {
 									final FeatureModelReason fmReason = (FeatureModelReason) reason;

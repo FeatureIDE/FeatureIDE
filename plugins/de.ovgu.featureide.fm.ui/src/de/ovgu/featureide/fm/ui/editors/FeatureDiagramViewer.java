@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditPart;
@@ -152,11 +154,34 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if (editorPart != null) {
 			setEditDomain(new DefaultEditDomain(editorPart));
 		}
+		openConstraintDecision();
+	}
 
+	/**
+	 * Opens a dialog and asks the user if he wants to show the constraint view.
+	 */
+	public void openConstraintDecision() {
 		// ask the user to open the constraint view
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
-			if (questionMessage()) {
+		boolean constraintDecision = false;
+		final String prefValue = Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY);
+		try {
+			constraintDecision = Boolean.parseBoolean(prefValue);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+		// if the constraint view is not opened and the global setting is false
+		if ((bench.getActivePage().findView(ConstraintViewController.ID) == null) && !constraintDecision) {
+			final ConstraintViewDialog dialog = new ConstraintViewDialog(Display.getDefault().getActiveShell());
+			if (dialog.open() == Window.OK) {
+				final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+				preferences.put(ConstraintViewDialog.CONSTRAINT_VIEW_KEY, String.valueOf(dialog.isChecked()));
+				try {
+					preferences.flush();
+				} catch (final BackingStoreException e1) {
+					e1.printStackTrace();
+				}
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
 				} catch (final PartInitException e) {
@@ -164,24 +189,6 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 				}
 
 			}
-		}
-	}
-
-	/**
-	 * asking the user to open the constraint view.
-	 */
-	public static boolean questionMessage() {
-		final ConstraintViewDialog dialog = new ConstraintViewDialog(Display.getDefault().getActiveShell());
-		if (dialog.open() == Window.OK) {
-			Preferences.getPrefereces().put(ConstraintViewDialog.CONSTRAINT_DIALOG_PREFERENCE, String.valueOf(dialog.isChecked()));
-			try {
-				Preferences.getPrefereces().flush();
-			} catch (final BackingStoreException e) {
-				e.printStackTrace();
-			}
-			return true;
-		} else {
-			return false;
 		}
 	}
 
