@@ -169,7 +169,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private void changeConstraints(IFeatureModel currentModel) {
 		final List<IGraphicalConstraint> constraints =
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
-		// goes through all constraints that are not collapsed
+		// Void Model
 		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 		m: for (final IGraphicalConstraint constraint : constraints) {
 			if (explanationList != null) {
@@ -192,7 +192,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
 		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
-
 		m: for (final IGraphicalConstraint constraint : constraints) {
 			if (explanationList != null) {
 				for (final ConstraintColorPair pair : explanationList) {
@@ -201,8 +200,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 						continue m;
 					}
 				}
-			}
-			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+			} else if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				// when at least one feature is selected:
 				// goes through all features that are selected
 				for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
@@ -217,6 +215,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				// when no feature is selected and no explanation, adds all constraints to the viewer
 				viewer.addItem(constraint.getObject());
 			}
+
 		}
 	}
 
@@ -274,34 +273,35 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public List<ConstraintColorPair> getExplanationConstraints() {
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			final FeatureModelEditor fmEditor = FeatureModelUtil.getActiveFMEditor();
-			if (fmEditor.diagramEditor.getActiveExplanation() != null) {
+			if (!fmEditor.getFeatureModel().getAnalyser().valid()) {
+				explanation = (Explanation<?>) fmEditor.getFeatureModel().getAnalyser().getVoidFeatureModelExplanation();
+			} else if (fmEditor.diagramEditor.getActiveExplanation() != null) {
 				explanation = (Explanation<?>) fmEditor.diagramEditor.getActiveExplanation();
-				// viewer.removeAll();
-				final List<ConstraintColorPair> constraintList = new ArrayList<ConstraintColorPair>();
-				for (final Object reasonObj : explanation.getReasons()) {
-					if (reasonObj == null) {
-						continue;
-					}
-					final FeatureModelReason fmReason = (FeatureModelReason) reasonObj;
-					if ((fmReason.getSubject() != null) && (fmReason.getSubject().getElement() != null)) {
-						for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
-							if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
-								constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
-								continue;
-							}
+			} else {
+				return null;
+			}
+			final List<ConstraintColorPair> constraintList = new ArrayList<ConstraintColorPair>();
+			for (final Object reasonObj : explanation.getReasons()) {
+				if (reasonObj == null) {
+					continue;
+				}
+				final FeatureModelReason fmReason = (FeatureModelReason) reasonObj;
+				if ((fmReason.getSubject() != null) && (fmReason.getSubject().getElement() != null)) {
+					for (final IGraphicalConstraint constraint : fmEditor.diagramEditor.getGraphicalFeatureModel().getConstraints()) {
+						if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
+							constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
+							continue;
+						}
 
-							if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
-								constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
-							}
+						if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
+							constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
 						}
 					}
 				}
-				return constraintList;
 			}
-
+			return constraintList;
 		}
 		return null;
-
 	}
 
 	/**
