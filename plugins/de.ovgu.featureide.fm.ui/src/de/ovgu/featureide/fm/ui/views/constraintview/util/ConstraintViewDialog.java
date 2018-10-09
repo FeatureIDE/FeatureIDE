@@ -41,7 +41,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class ConstraintViewDialog extends Dialog implements GUIDefaults {
 	public static final String CONSTRAINT_VIEW_KEY = "constraint_view_option";
 	private Button checkBox;
-	private boolean isSelected;
 
 	public ConstraintViewDialog(Shell parent) {
 		super(parent);
@@ -59,22 +58,14 @@ public class ConstraintViewDialog extends Dialog implements GUIDefaults {
 
 		checkBox = new Button(container, SWT.CHECK);
 		checkBox.setText(StringTable.CONSTRAINT_VIEW_SAVE_DECISION);
-		parent.redraw();
+		checkBox.setSelection(Boolean.parseBoolean(Preferences.getPref(CONSTRAINT_VIEW_KEY)));
+
 		return container;
-	}
-
-	public boolean isChecked() {
-		return isSelected;
-	}
-
-	public void setSelected(boolean selection) {
-		isSelected = selection;
 	}
 
 	@Override
 	protected void okPressed() {
-		isSelected = checkBox.getSelection();
-		Preferences.preferences.put(CONSTRAINT_VIEW_KEY, String.valueOf(checkBox.getSelection()));
+		Preferences.store(CONSTRAINT_VIEW_KEY, String.valueOf(checkBox.getSelection()));
 		super.okPressed();
 	}
 

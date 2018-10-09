@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditPart;
@@ -42,7 +40,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.osgi.service.prefs.BackingStoreException;
 
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -175,19 +172,11 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 		if ((bench.getActivePage().findView(ConstraintViewController.ID) == null) && !constraintDecision) {
 			final ConstraintViewDialog dialog = new ConstraintViewDialog(Display.getDefault().getActiveShell());
 			if (dialog.open() == Window.OK) {
-				final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-				preferences.put(ConstraintViewDialog.CONSTRAINT_VIEW_KEY, String.valueOf(dialog.isChecked()));
-				try {
-					preferences.flush();
-				} catch (final BackingStoreException e1) {
-					e1.printStackTrace();
-				}
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
 				} catch (final PartInitException e) {
 					e.printStackTrace();
 				}
-
 			}
 		}
 	}

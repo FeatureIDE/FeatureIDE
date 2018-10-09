@@ -118,10 +118,20 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		dialogGroup.setText(CONFIGURATION_DIALOGS);
 		final Button constraintViewButton = new Button(dialogGroup, SWT.CHECK);
 
+		// loading preferences
+		try {
+			Boolean isSelected = false;
+			final String pref = Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY);
+			isSelected = Boolean.valueOf(pref);
+			constraintViewButton.setSelection(isSelected);
+		} catch (final Exception e) {
+			e.getStackTrace();
+		}
+
 		constraintViewButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Preferences.putPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY, String.valueOf(constraintViewButton.getSelection()));
+				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_KEY, String.valueOf(constraintViewButton.getSelection()));
 			}
 
 			@Override
@@ -130,15 +140,6 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 
 		constraintViewButton.setText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TEXT);
 		constraintViewButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP);
-		// loading preferences
-		Boolean isSelected = false;
-		try {
-			final String pref = Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY);
-			isSelected = Boolean.valueOf(pref);
-		} catch (final Exception e) {
-			e.getStackTrace();
-		}
-		constraintViewButton.setSelection(isSelected);
 
 		return container;
 	}
