@@ -25,7 +25,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
@@ -70,8 +69,6 @@ public class ConstraintViewPartListener implements IPartListener2 {
 	@Override
 	public void partActivated(IWorkbenchPartReference part) {
 		if (part.getPart(false) instanceof FeatureModelEditor) {
-			controller.checkForRefresh();
-		} else if ((part.getPart(false) instanceof ConstraintViewController) && (FeatureModelUtil.getActiveFMEditor() != null)) {
 			controller.checkForRefresh();
 		}
 		if (part.getPart(false) instanceof IEditorPart) {

@@ -21,12 +21,14 @@
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
 
 /**
  * this class contains a menu where settings can be set for the ConstraintView
@@ -38,27 +40,30 @@ import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 // TODO add schöne Checkboxen
 
 public class ConstraintViewSettingsMenu {
-	ConstraintViewController controller;
+	private ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
 	private final ShowCollapsedConstraintsAction collapseAction;
+	private final RefreshViewAction refreshAction;
 
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
 		// create actions:
 		collapseAction = new ShowCollapsedConstraintsAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
 		collapseAction.setChecked(false);
+		refreshAction = new RefreshViewAction(controller); // Action that lets the user refresh the view manually
 		// create layout:
 		update(controller);
 		createToolBarLayout();
 	}
 
 	/**
-	 * updates the current controller and graphicalfeaturemodel when the active diagram changed
+	 * updates the current controller, graphicalfeaturemodel and actions (e.g. when the active diagram changed)
 	 */
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 			collapseAction.update(graphicalModel);
+			refreshAction.update(controller);
 		}
 	}
 
@@ -70,7 +75,7 @@ public class ConstraintViewSettingsMenu {
 		final IMenuManager dropDownMenu = actionBars.getMenuManager();
 		dropDownMenu.add(collapseAction);
 
-		// final IToolBarManager toolBarManager = actionBars.getToolBarManager();
-		// toolBarManager.add(collapseAction);
+		final IToolBarManager toolBarManager = actionBars.getToolBarManager();
+		toolBarManager.add(refreshAction);
 	}
 }
