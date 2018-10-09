@@ -151,7 +151,11 @@ public class ConstraintView implements GUIDefaults {
 		for (final TreeItem item : tree.getItems()) {
 			if (item.getData() instanceof IConstraint) {
 				if (item.getData().equals(constraint)) {
-					item.setImage(IMAGE_EMPTY);
+					if (constraint.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
+						item.setImage(FM_INFO);
+					} else {
+						item.setImage(IMAGE_EMPTY);
+					}
 				}
 			}
 		}

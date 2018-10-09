@@ -158,6 +158,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				findConstraints(currentModel);
 			}
 		} else {
+			for (final IConstraint constraint : currentModel.getConstraints()) {
+				viewer.undecorateItem(constraint);
+			}
 			changeConstraints(currentModel);
 		}
 
@@ -168,12 +171,12 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 		// goes through all constraints that are not collapsed
 		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
-		for (final IGraphicalConstraint constraint : constraints) {
+		m: for (final IGraphicalConstraint constraint : constraints) {
 			if (explanationList != null) {
 				for (final ConstraintColorPair pair : explanationList) {
-					viewer.removeItem(pair.getConstraint());
 					if (pair.getConstraint().equals(constraint.getObject())) {
 						viewer.changeToDecoratedItem(pair.getConstraint(), pair.getColor());
+						continue m;
 					}
 				}
 			}
@@ -194,11 +197,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			if (explanationList != null) {
 				for (final ConstraintColorPair pair : explanationList) {
 					if (pair.getConstraint().equals(constraint.getObject())) {
-						viewer.changeToDecoratedItem(pair.getConstraint(), pair.getColor());
+						viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
 						continue m;
 					}
 				}
-				viewer.undecorateItem(constraint.getObject());
 			}
 			if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 				// when at least one feature is selected:
