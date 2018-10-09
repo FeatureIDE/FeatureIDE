@@ -62,22 +62,25 @@ public class FeatureModelBounds {
 				max.y = position.bottom();
 			}
 
-			if (((IGraphicalFeature) element).isCollapsed() == true) {
-				final CollapsedDecoration collapsedDecoration = ((IGraphicalFeature) element).getCollapsedDecoration();
-				position = getBounds(collapsedDecoration);
-				if (position.x < min.x) {
-					min.x = position.x;
+			if (element instanceof IGraphicalFeature) {
+				if (((IGraphicalFeature) element).isCollapsed() == true) {
+					if (((IGraphicalFeature) element).getCollapsedDecoration() != null) {
+						final CollapsedDecoration collapsedDecoration = ((IGraphicalFeature) element).getCollapsedDecoration();
+						position = getBounds(collapsedDecoration);
+						if (position.x < min.x) {
+							min.x = position.x;
+						}
+						if (position.y < min.y) {
+							min.y = position.y;
+						}
+						if ((position.x + position.width) > max.x) {
+							max.x = position.right();
+						}
+						if ((position.y + position.height) > max.y) {
+							max.y = position.bottom();
+						}
+					}
 				}
-				if (position.y < min.y) {
-					min.y = position.y;
-				}
-				if ((position.x + position.width) > max.x) {
-					max.x = position.right();
-				}
-				if ((position.y + position.height) > max.y) {
-					max.y = position.bottom();
-				}
-
 			}
 		}
 		return new Rectangle(min, max);

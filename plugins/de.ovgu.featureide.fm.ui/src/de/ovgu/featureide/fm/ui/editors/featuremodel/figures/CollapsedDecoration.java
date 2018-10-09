@@ -60,7 +60,7 @@ public class CollapsedDecoration extends ConnectionDecoration implements GUIDefa
 		setLayoutManager(layout);
 		setBackgroundColor(FMPropertyManager.getDiagramBackgroundColor());
 		setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
-		parent.setCollapsedDecoration(this);
+		graphicalFeature.setCollapsedDecoration(this);
 
 		childrenCount.setFont(DEFAULT_FONT);
 		setOpaque(true);

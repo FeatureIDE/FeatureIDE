@@ -225,6 +225,7 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 				}
 			}
 		}
+
 	}
 
 	public void layoutLegendOnIntersect() {
