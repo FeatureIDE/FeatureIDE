@@ -31,7 +31,9 @@ import org.eclipse.swt.events.KeyEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -52,8 +54,14 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if ((event.keyCode != SWT.ARROW_DOWN) && (event.keyCode != SWT.ARROW_LEFT) && (event.keyCode != SWT.ARROW_RIGHT) && (event.keyCode != SWT.ARROW_UP)) {
+			return super.keyPressed(event);
+		}
+
 		final EditPart part = getViewer().getFocusEditPart();
 		final Map<?, ?> editPartRegistry = getViewer().getEditPartRegistry();
+
+		// true if a feature is selected
 		if (part instanceof FeatureEditPart) {
 			final FeatureEditPart featurepart = (FeatureEditPart) part;
 			final IGraphicalFeature feature = featurepart.getModel();
@@ -103,13 +111,34 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 					return true;
 				}
 			}
-
+			// true if a constraint is selected
+		} else if (part instanceof ConstraintEditPart) {
+			final ConstraintEditPart constraint = (ConstraintEditPart) part;
+			final List<IGraphicalConstraint> graphList = constraint.getModel().getGraphicalModel().getConstraints();
+			final int dex = graphList.indexOf(constraint.getModel());
+			if (event.keyCode == SWT.ARROW_UP) {
+				if (dex > 0) {
+					final Object o = editPartRegistry.get(graphList.get(dex - 1));
+					navigateTo((EditPart) o, event);
+				}
+				return true;
+			}
+			if (event.keyCode == SWT.ARROW_DOWN) {
+				if (dex < (graphList.size() - 1)) {
+					final Object o = editPartRegistry.get(graphList.get(dex + 1));
+					navigateTo((EditPart) o, event);
+				}
+				return true;
+			}
+			if ((event.keyCode == SWT.ARROW_LEFT) || (event.keyCode == SWT.ARROW_RIGHT)) {
+				return true;
+			}
 		}
-		return super.keyPressed(event);
+		return true;
 	}
 
 	/**
-	 * navigates to next feature on the right, which is on the same layer as
+	 * navigates to next feature, which is on the same layer
 	 *
 	 * @param parent
 	 * @param dex
@@ -120,15 +149,19 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 		final List<IFeatureStructure> siblings = parent.getObject().getStructure().getChildren();
 		final Map<?, ?> editPartRegistry = getViewer().getEditPartRegistry();
 		final boolean oneMore = checkForOneMore(siblings, dex, direct);
-		final int newDirections = (direct == direction.right) ? 1 : (direct == direction.left) ? -1 : 0;
+		final int newDirection = (direct == direction.right) ? 1 : (direct == direction.left) ? -1 : 0;
+		// checks if there is an adjacent feature which has the same parent
 		if (oneMore && (layer == 1)) {
-			final IFeature nextSibling = siblings.get(dex + newDirections).getFeature();
+			final IFeature nextSibling = siblings.get(dex + newDirection).getFeature();
 			final IGraphicalFeature nextGraphicalSibling = parent.getGraphicalModel().getGraphicalFeature(nextSibling);
 			final FeatureEditPart editPart = (FeatureEditPart) editPartRegistry.get(nextGraphicalSibling);
 			return editPart;
+			// looks if there is an adjacent feature on the current layer
 		} else if (oneMore && (layer != 1)) {
-			for (int i = dex + newDirections; (i < siblings.size()) && (i >= 0); i = i + newDirections) {
+			// moves through the sibling-list of the current feature in the given direction
+			for (int i = dex + newDirection; (i < siblings.size()) && (i >= 0); i = i + newDirection) {
 				IFeatureStructure nextSibling = siblings.get(i);
+				// moves through the layer until it reached the original layer
 				for (int l = 1; l < layer; l++) {
 					final List<IFeatureStructure> descendants = nextSibling.getChildren();
 					if ((descendants != null) && !descendants.isEmpty()) {
@@ -144,9 +177,13 @@ public class MovingKeyHandler extends GraphicalViewerKeyHandler {
 					}
 				}
 			}
+			if (parent.getObject().getStructure().isRoot()) {
+				return null;
+			}
 			final IGraphicalFeature grandParent = parent.getSourceConnection().getTarget();
 			final int newDex = grandParent.getObject().getStructure().getChildIndex(parent.getObject().getStructure());
 			return findNextFeature(parent, newDex, layer + 1, direct);
+			// case if current parent has no features in the given direction
 		} else {
 			if (parent.getObject().getStructure().isRoot()) {
 				return null;
