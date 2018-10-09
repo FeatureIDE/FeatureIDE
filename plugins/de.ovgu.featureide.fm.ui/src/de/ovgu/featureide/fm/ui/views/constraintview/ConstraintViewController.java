@@ -140,7 +140,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public void refreshView(IFeatureModel currentModel) {
 		if (this.currentModel != currentModel) {
 			if (this.currentModel != null) {
-				settingsMenu.update(this);
 				this.currentModel.removeListener(eventListener);
 				this.currentModel = null;
 			}
@@ -149,6 +148,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				this.currentModel.addListener(eventListener);
 			}
 		}
+		if (settingsMenu != null) {
+			settingsMenu.update(this);
+		}
+
 		viewer.removeAll();
 		// no search text is entered:
 		if (searchText.equals("")) {

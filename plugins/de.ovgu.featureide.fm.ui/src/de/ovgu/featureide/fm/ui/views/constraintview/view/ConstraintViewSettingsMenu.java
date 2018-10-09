@@ -48,7 +48,6 @@ public class ConstraintViewSettingsMenu {
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
 		// create actions:
 		collapseAction = new ShowCollapsedConstraintsAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
-		collapseAction.setChecked(false);
 		refreshAction = new RefreshViewAction(controller); // Action that lets the user refresh the view manually
 		// create layout:
 		update(controller);
@@ -63,6 +62,7 @@ public class ConstraintViewSettingsMenu {
 		if (FeatureModelUtil.getActiveFMEditor() != null) {
 			graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 			collapseAction.update(graphicalModel);
+			collapseAction.setChecked(graphicalModel.getLayout().showCollapsedConstraints());
 			refreshAction.update(controller);
 		}
 	}
