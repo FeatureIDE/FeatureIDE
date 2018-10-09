@@ -120,6 +120,45 @@ public class ConstraintView implements GUIDefaults {
 	}
 
 	/**
+	 * Changes the existing item to a decorated item
+	 */
+	public void changeToDecoratedItem(IConstraint constraint, Color color) {
+		for (final TreeItem item : tree.getItems()) {
+			if (item.getData() instanceof IConstraint) {
+				if (item.getData().equals(constraint)) {
+					Image elementImg;
+					if (color == null) {
+						elementImg = FM_INFO;
+					} else {
+						elementImg = new Image(Display.getDefault(), IMAGE_EMPTY.getImageData());
+						final GC gc = new GC(elementImg);
+						gc.setBackground(color);
+						gc.setAntialias(SWT.ON);
+						gc.setAlpha(ALPHA_VALUE);
+						gc.fillOval(BORDER_OFFSET / 2, BORDER_OFFSET / 2, elementImg.getBounds().height - BORDER_OFFSET,
+								elementImg.getBounds().width - BORDER_OFFSET);
+					}
+					item.setImage(elementImg);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Removes decoration from item
+	 */
+	public void undecorateItem(IConstraint constraint) {
+		for (final TreeItem item : tree.getItems()) {
+			if (item.getData() instanceof IConstraint) {
+				if (item.getData().equals(constraint)) {
+					item.setImage(IMAGE_EMPTY);
+				}
+			}
+		}
+
+	}
+
+	/**
 	 * replaces logical connectives with unicode signs
 	 */
 	private String stringStyling(String string) {
