@@ -118,6 +118,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String MODEL_CONST_TOOLTIP = StringTable.FEATURE_MODELIS_VOID;
 	private static final String IMPLICIT_TOOLTIP = "Implicit constraint:\n\n This constraint is an implicit dependency of the feature model.";
 	private static final String EXPLANATION_TOOLTIP = "Placeholder";
+	private static final String FEATURE_TOOLTIP = "Feature";
 
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
@@ -134,6 +135,9 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int EXPLANATION = 12;
 	private static final int REDUNDANT = 13;
 	private static final int VOID_MODEL = 14;
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private static final int FEATURECON = 15;
+	private static final int FEATUREABS = 16;
 
 	private static final XYLayout layout = new XYLayout();
 
@@ -251,11 +255,17 @@ public class LegendFigure extends Figure implements GUIDefaults {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAlternative());
 		}
-		if (_abstract) {
+		if (_abstract && !concrete) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (concrete && !_abstract) {
+			height = height + ROW_HEIGHT;
+			setWidth(language.getFeature());
+		}
+		if (_abstract && concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getAbstract());
-		}
-		if (concrete) {
 			height = height + ROW_HEIGHT;
 			setWidth(language.getConcrete());
 		}
@@ -342,10 +352,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		if (alternative) {
 			createRowAlternative(row++);
 		}
-		if (_abstract) {
-			createRowAbstract(row++);
+		// necessary creating a legend with only abstract or concrete features which then are only named feature
+		if (_abstract && !concrete) {
+			createRowFeatureAbstract(row++);
 		}
-		if (concrete) {
+		if (concrete && !_abstract) {
+			createRowFeatureConcrete(row++);
+		}
+		// necessary for creating a legend where abstract and concrete features are present at the same time
+		if (_abstract && concrete) {
+			createRowAbstract(row++);
 			createRowConcrete(row++);
 		}
 		if (imported) {
@@ -468,6 +484,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelMandatory);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowAbstract(int row) {
 		createSymbol(row, ABSTRACT, true, ABSTRACT_TOOLTIP);
 		final Label labelAbstract = createLabel(row, language.getAbstract(), FMPropertyManager.getFeatureForgroundColor(), ABSTRACT_TOOLTIP);
@@ -492,10 +509,25 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		add(labelInterfaced);
 	}
 
+	// necessary for creating a legend where abstract and concrete features are present at the same time
 	private void createRowConcrete(int row) {
 		createSymbol(row, CONCRETE, true, CONCRETE_TOOLTIP);
 		final Label labelConcrete = createLabel(row, language.getConcrete(), FMPropertyManager.getFeatureForgroundColor(), CONCRETE_TOOLTIP);
 		add(labelConcrete);
+	}
+
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private void createRowFeatureConcrete(int row) {
+		createSymbol(row, FEATURECON, true, FEATURE_TOOLTIP);
+		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
+		add(labelFeature);
+	}
+
+	// necessary creating a legend with only abstract or concrete features which then are only named feature
+	private void createRowFeatureAbstract(int row) {
+		createSymbol(row, FEATUREABS, true, FEATURE_TOOLTIP);
+		final Label labelFeature = createLabel(row, language.getFeature(), FMPropertyManager.getFeatureForgroundColor(), FEATURE_TOOLTIP);
+		add(labelFeature);
 	}
 
 	private void createRowHidden(int row) {
@@ -651,6 +683,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		case (CONCRETE):
 			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
 			rect.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+			break;
+		case (FEATURECON):
+			rect.setBorder(FMPropertyManager.getConcreteFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
+			break;
+		case (FEATUREABS):
+			rect.setBorder(FMPropertyManager.getAbsteactFeatureBorder(false));
+			rect.setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
 			break;
 		case (HIDDEN):
 			rect.setBorder(FMPropertyManager.getHiddenLegendBorder());

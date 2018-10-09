@@ -1317,4 +1317,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		viewer.removeSelectionChangedListener(listener);
 	}
 
+	public void setAdjustModelToEditorSize() {
+		adjustModelToEditorSizeAction.run();
+	}
+
 }

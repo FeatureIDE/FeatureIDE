@@ -54,6 +54,7 @@ public class German implements ILanguage {
 	private static final String INHERITED = GEERBT;
 	private static final String INTERFACED = VON_INTERFACE;
 	private static final String CONCRETE = KONKRET;
+	private static final String FEATURE = "Feature";
 	private static final String HIDDEN = VERSTECKT;
 	private static final String COLLAPSED = EINGEKLAPPT;
 	private static final String DEAD = "Unwählbar";
@@ -141,6 +142,11 @@ public class German implements ILanguage {
 	@Override
 	public String getConcrete() {
 		return CONCRETE;
+	}
+
+	@Override
+	public String getFeature() {
+		return FEATURE;
 	}
 
 	@Override
