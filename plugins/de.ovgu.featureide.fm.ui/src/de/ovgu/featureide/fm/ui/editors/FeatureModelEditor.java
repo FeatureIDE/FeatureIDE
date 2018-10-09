@@ -688,7 +688,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		fmManager.removeListener(listener);
 	}
 
-	public void createLayoutInformation() {
+	private void createLayoutInformation() {
 		createdLayoutInformation = false;
 		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
 		if ((extraPath != null) && !extraPath.toFile().exists()) {
