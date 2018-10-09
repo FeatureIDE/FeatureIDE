@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 	private final IGraphicalFeatureModel featureModel;
-	private IFeature newCompound;
+	private IFeature newFeature;
 	private final int xDistanceTopDown = 5;
 	private final int yDistanceLeftRight = 8;
 	final IFeatureStructure parent;
@@ -54,11 +54,11 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 	public CreateSiblingOperation(IGraphicalFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel.getFeatureModel(), CREATE_SIBLING);
 		this.featureModel = featureModel;
-		int number = 0;
-		while (FeatureUtils.getFeatureNames(featureModel.getFeatureModel()).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number)) {}
+		int newFeatureNumber = 0;
+		while (FeatureUtils.getFeatureNames(featureModel.getFeatureModel()).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++newFeatureNumber)) {}
 
-		newCompound =
-			FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(), DEFAULT_FEATURE_LAYER_CAPTION + number);
+		newFeature = FMFactoryManager.getFactory(featureModel.getFeatureModel()).createFeature(featureModel.getFeatureModel(),
+				DEFAULT_FEATURE_LAYER_CAPTION + newFeatureNumber);
 		parent = selectedFeature.getStructure().getParent();
 		index = parent.getChildIndex(selectedFeature.getStructure()) + 1;
 	}
@@ -67,21 +67,21 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 
-		parent.addChildAtPosition(index, newCompound.getStructure());
-		featureModel.getFeatureModel().addFeature(newCompound);
+		parent.addChildAtPosition(index, newFeature.getStructure());
+		featureModel.getFeatureModel().addFeature(newFeature);
 		// checks if manual layout is chosen
 		if (featureModel.getLayout().getLayoutAlgorithm() == 0) {
 			setPositionNewSibling();
 		}
 
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent.getFeature() : null, newCompound);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_SIBLING, parent != null ? parent.getFeature() : null, newFeature);
 	}
 
 	/**
 	 * looks for the rightest and lowermost location and places the new feature there, depending on the previous layout
 	 */
 	private void setPositionNewSibling() {
-		final IGraphicalFeature parent = featureModel.getGraphicalFeature(newCompound.getStructure().getParent().getFeature());
+		final IGraphicalFeature parent = featureModel.getGraphicalFeature(newFeature.getStructure().getParent().getFeature());
 		final List<IGraphicalFeature> children = parent.getGraphicalChildren(true);
 		int maxX = children.get(0).getLocation().x + children.get(0).getSize().width;
 		int yLocation = children.get(0).getLocation().y;
@@ -102,16 +102,16 @@ public class CreateSiblingOperation extends AbstractFeatureModelOperation {
 
 		if (featureModel.getLayout().verticalLayout()) {
 			// left to right
-			featureModel.getGraphicalFeature(newCompound).setLocation(new Point(xLocation, maxY + yDistanceLeftRight));
+			featureModel.getGraphicalFeature(newFeature).setLocation(new Point(xLocation, maxY + yDistanceLeftRight));
 		} else {
-			featureModel.getGraphicalFeature(newCompound).setLocation(new Point(maxX + xDistanceTopDown, yLocation));
+			featureModel.getGraphicalFeature(newFeature).setLocation(new Point(maxX + xDistanceTopDown, yLocation));
 		}
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
-		newCompound = featureModel.getFeatureModel().getFeature(newCompound.getName());
-		featureModel.getFeatureModel().deleteFeature(newCompound);
-		return new FeatureIDEEvent(newCompound, EventType.FEATURE_DELETE, null, newCompound);
+		newFeature = featureModel.getFeatureModel().getFeature(newFeature.getName());
+		featureModel.getFeatureModel().deleteFeature(newFeature);
+		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, null, newFeature);
 	}
 }

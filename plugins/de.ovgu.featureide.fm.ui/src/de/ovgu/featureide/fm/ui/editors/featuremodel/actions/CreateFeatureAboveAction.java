@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAbo
  */
 public class CreateFeatureAboveAction extends Action {
 
-	public static final String ID = "de.ovgu.featureide.createcompound";
+	public static final String ID = "de.ovgu.featureide.createfeatureabove";
 
 	private final IGraphicalFeatureModel graphicalFeatureModel;
 

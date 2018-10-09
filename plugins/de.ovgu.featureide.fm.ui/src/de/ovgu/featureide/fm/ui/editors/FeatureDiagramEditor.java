@@ -171,8 +171,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private Label infoLabel;
 
 	private CalculateDependencyAction calculateDependencyAction;
-	private CreateFeatureBelowAction createLayerAction;
-	private CreateFeatureAboveAction createCompoundAction;
+	private CreateFeatureBelowAction createFeatureBelowAction;
+	private CreateFeatureAboveAction createFeatureAboveAction;
 	private CreateSiblingAction createSiblingAction;
 	private SelectSubtreeAction selectSubtreeAction;
 	private DeleteAction deleteAction;
@@ -256,8 +256,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	private void createActions() {
 		final IFeatureModel featureModel = getFeatureModel();
 		actions.clear();
-		createLayerAction = addAction(new CreateFeatureBelowAction(viewer, graphicalFeatureModel));
-		createCompoundAction = addAction(new CreateFeatureAboveAction(viewer, graphicalFeatureModel));
+		createFeatureBelowAction = addAction(new CreateFeatureBelowAction(viewer, graphicalFeatureModel));
+		createFeatureAboveAction = addAction(new CreateFeatureAboveAction(viewer, graphicalFeatureModel));
 		createSiblingAction = addAction(new CreateSiblingAction(viewer, graphicalFeatureModel));
 		// FM structure modify actions
 		selectSubtreeAction = addAction(new SelectSubtreeAction(viewer));
@@ -615,7 +615,6 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			break;
 		case FEATURE_ADD_SIBLING:
 			if ((event.getNewValue() != null) && (event.getNewValue() instanceof IFeature)) {
-				newCompound = (IFeature) event.getNewValue();
 				final IFeature parent = (IFeature) event.getOldValue();
 				if (parent != null) {
 					final IGraphicalFeature graphicalParent = graphicalFeatureModel.getGraphicalFeature(parent);
@@ -1012,7 +1011,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		final KeyHandler handler = viewer.getKeyHandler();
 
 		handler.put(KeyStroke.getPressed(SWT.F2, 0), renameAction);
-		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createLayerAction);
+		handler.put(KeyStroke.getPressed(SWT.INSERT, 0), createFeatureBelowAction);
 		handler.put(KeyStroke.getPressed((char) (('d' - 'a') + 1), 'd', SWT.CTRL), deleteAllAction);
 		handler.put(KeyStroke.getPressed((char) (('c' - 'a') + 1), 'c', SWT.CTRL), collapseAction);
 
@@ -1139,8 +1138,8 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 			menuManager.add(createNameTypeMenuManager());
 		}
 		if (isFeatureMenu(selection)) {
-			menuManager.add(createCompoundAction);
-			menuManager.add(createLayerAction);
+			menuManager.add(createFeatureAboveAction);
+			menuManager.add(createFeatureBelowAction);
 			menuManager.add(createSiblingAction);
 			menuManager.add(createConstraintWithAction);
 			menuManager.add(selectSubtreeAction);
@@ -1278,10 +1277,10 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 
 	public IAction getDiagramAction(String workbenchActionID) {
 		if (CreateFeatureBelowAction.ID.equals(workbenchActionID)) {
-			return createLayerAction;
+			return createFeatureBelowAction;
 		}
 		if (CreateFeatureAboveAction.ID.equals(workbenchActionID)) {
-			return createCompoundAction;
+			return createFeatureAboveAction;
 		}
 		if (CreateSiblingAction.ID.equals(workbenchActionID)) {
 			return createSiblingAction;
