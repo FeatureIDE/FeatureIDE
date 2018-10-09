@@ -274,15 +274,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				}
 				return constraintList;
 			}
-
 		}
 		return null;
-
 	}
 
 	/**
 	 * add a listener to the Feature model editor to get the page change events
 	 *
+	 * TODO: remove listener when view is closed
 	 */
 	public void addPageChangeListener(FeatureModelEditor fme) {
 		fme.addPageChangedListener(new IPageChangedListener() {
@@ -293,7 +292,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				} else {
 					viewer.addNoFeatureModelItem();
 				}
-
 			}
 		});
 	}

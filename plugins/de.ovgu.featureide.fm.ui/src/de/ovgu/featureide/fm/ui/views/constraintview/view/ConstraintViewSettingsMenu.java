@@ -36,9 +36,6 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
  * @author Domenik Eichhorn
  */
 
-// TODO add more funktionen
-// TODO add schöne Checkboxen
-
 public class ConstraintViewSettingsMenu {
 	private ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
