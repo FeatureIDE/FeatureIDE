@@ -176,7 +176,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 				// If one or more Feature were selected
 				if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
-					addFeatureConstraints(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
+					addFeatureConstraints();
 				} else {
 					addVisibleConstraints();
 				}
@@ -199,7 +199,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			}
 		}
 	}
-	
+
 	/**
 	 * Add decoration to explanation Constraints without hiding the others (called when the subject is a constraint from the view)
 	 */
@@ -235,14 +235,14 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	/**
 	 * Show constraints containing the selected feature
 	 */
-	public void addFeatureConstraints(List<Object> selectedEditParts) {
+	public void addFeatureConstraints() {
 		if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 			// when at least one feature is selected:
 			// goes through all features that are selected
 			final List<IGraphicalConstraint> constraints =
 				FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
 			for (final IGraphicalConstraint constraint : constraints) {
-				for (final Object part : selectedEditParts) {
+				for (final Object part : FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts()) {
 					if (part instanceof FeatureEditPart) {
 						if (matchesConstraint(part, constraint)) {
 							viewer.addItem(constraint.getObject());
@@ -285,7 +285,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			final String partName = part.toString().substring(FEATURE_EDIT_PART_OFFSET, part.toString().length() - 2);
 			// Adding blanks to allow every case to be covered by just one RegEx
 			final String constraintName = " " + constraint.getObject().getDisplayName() + " ";
-			if (constraintName.matches(".* -*" + partName + " .*")) {	
+			if (constraintName.matches(".* -*" + partName + " .*")) {
 				return true;
 			}
 		}
