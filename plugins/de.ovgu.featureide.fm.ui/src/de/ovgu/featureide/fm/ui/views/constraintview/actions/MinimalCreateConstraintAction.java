@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
 /**
+ * a modified CreateConstraintAction for the ConstraintView
+ *
  * @author Domenik Eichhorn
  */
 public class MinimalCreateConstraintAction extends Action {

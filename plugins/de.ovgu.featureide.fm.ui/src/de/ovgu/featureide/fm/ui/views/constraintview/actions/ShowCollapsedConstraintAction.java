@@ -35,32 +35,28 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedConstraintsOperation;
 
 /**
+ * a modified ShowCollapsedConstraintsAction for the ConstraintView
  *
  * @author Domenik Eichhorn
  */
 public class ShowCollapsedConstraintAction extends Action {
 
-	public static final String ID = "de.ovgu.featureide.collapseconstraints";
-
-	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
+	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("collapse.gif");
 	private IGraphicalFeatureModel featureModel;
 
 	public ShowCollapsedConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_COLLAPSED_CONSTRAINTS, ImageDescriptor.createFromImage(SHOW_HIDE_IMAGE));
 		this.featureModel = featureModel;
-		setId(ID);
 	}
 
 	@Override
 	public void run() {
 		final ShowCollapsedConstraintsOperation op = new ShowCollapsedConstraintsOperation(featureModel);
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
-
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (final ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
 	}
 

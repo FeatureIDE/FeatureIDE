@@ -21,8 +21,10 @@
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
@@ -61,19 +63,21 @@ public class ConstraintViewSettingsMenu {
 		this.controller = controller;
 		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
 			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				createAction.setEnabled(true);
-				refreshAction.setEnabled(true);
-				collapseAction.setEnabled(true);
-
+				enableActions();
 				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 				createAction.update(controller.getCurrentModel());
-				collapseAction.update(graphicalModel);
 				refreshAction.update(controller);
+				collapseAction.update(graphicalModel);
+				if (graphicalModel.getLayout().showCollapsedConstraints()) {
+					collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("collapse.gif")));
+					collapseAction.setToolTipText("Hide Collapsed Constraints");
+				} else {
+					collapseAction.setImageDescriptor(ImageDescriptor.createFromImage(FMUIPlugin.getImage("expand.gif")));
+					collapseAction.setToolTipText("Show Collapsed Constraints");
+				}
 			}
 		} else {
-			createAction.setEnabled(false);
-			refreshAction.setEnabled(false);
-			collapseAction.setEnabled(false);
+			disableActions();
 		}
 	}
 
@@ -86,5 +90,23 @@ public class ConstraintViewSettingsMenu {
 		toolBarManager.add(createAction);
 		toolBarManager.add(refreshAction);
 		toolBarManager.add(collapseAction);
+	}
+
+	/**
+	 * disables all actions (run method is not called when activated)
+	 */
+	public void enableActions() {
+		createAction.setEnabled(true);
+		refreshAction.setEnabled(true);
+		collapseAction.setEnabled(true);
+	}
+
+	/**
+	 * enables all actions (when activated the run method will be called)
+	 */
+	public void disableActions() {
+		createAction.setEnabled(false);
+		refreshAction.setEnabled(false);
+		collapseAction.setEnabled(false);
 	}
 }

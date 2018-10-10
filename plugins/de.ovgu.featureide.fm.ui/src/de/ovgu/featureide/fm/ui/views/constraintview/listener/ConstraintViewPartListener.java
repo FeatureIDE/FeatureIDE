@@ -54,7 +54,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 		if (part.getPart(false) instanceof FeatureModelEditor) {
 			controller.getView().removeAll();
 			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().update(controller);
+			controller.getSettingsMenu().disableActions();
 		}
 	}
 
@@ -64,7 +64,7 @@ public class ConstraintViewPartListener implements IPartListener2 {
 			controller.checkForRefresh();
 		} else {
 			controller.getView().addNoFeatureModelItem();
-			controller.getSettingsMenu().update(controller);
+			controller.getSettingsMenu().disableActions();
 		}
 	}
 
