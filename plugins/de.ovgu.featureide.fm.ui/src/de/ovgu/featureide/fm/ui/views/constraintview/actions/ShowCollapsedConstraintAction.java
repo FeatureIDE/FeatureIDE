@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
+package de.ovgu.featureide.fm.ui.views.constraintview.actions;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_COLLAPSED_CONSTRAINTS;
 
@@ -26,6 +26,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -33,19 +35,18 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowCollapsedConstraintsOperation;
 
 /**
- * Action to show/hide collapsed constraints
  *
- * @author Christopher Sontag
- * @author Maximilian Kühl
+ * @author Domenik Eichhorn
  */
-public class ShowCollapsedConstraintsAction extends Action {
+public class ShowCollapsedConstraintAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.collapseconstraints";
 
-	private final IGraphicalFeatureModel featureModel;
+	private static final Image SHOW_HIDE_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
+	private IGraphicalFeatureModel featureModel;
 
-	public ShowCollapsedConstraintsAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
-		super(SHOW_COLLAPSED_CONSTRAINTS);
+	public ShowCollapsedConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
+		super(SHOW_COLLAPSED_CONSTRAINTS, ImageDescriptor.createFromImage(SHOW_HIDE_IMAGE));
 		this.featureModel = featureModel;
 		setId(ID);
 	}
@@ -53,7 +54,6 @@ public class ShowCollapsedConstraintsAction extends Action {
 	@Override
 	public void run() {
 		final ShowCollapsedConstraintsOperation op = new ShowCollapsedConstraintsOperation(featureModel);
-		// TODO _interfaces Removed Code
 		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
@@ -63,4 +63,9 @@ public class ShowCollapsedConstraintsAction extends Action {
 
 		}
 	}
+
+	public void update(IGraphicalFeatureModel featureModel) {
+		this.featureModel = featureModel;
+	}
+
 }

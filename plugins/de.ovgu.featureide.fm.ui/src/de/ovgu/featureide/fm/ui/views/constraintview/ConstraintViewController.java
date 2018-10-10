@@ -422,4 +422,8 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	public ConstraintView getView() {
 		return viewer;
 	}
+
+	public ConstraintViewSettingsMenu getSettingsMenu() {
+		return settingsMenu;
+	}
 }

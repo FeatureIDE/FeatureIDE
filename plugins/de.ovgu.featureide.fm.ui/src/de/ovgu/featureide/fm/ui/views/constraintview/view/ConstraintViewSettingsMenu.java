@@ -20,15 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.view;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.ui.IActionBars;
 
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ShowCollapsedConstraintsAction;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
 import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.MinimalCreateConstraintAction;
 import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.actions.ShowCollapsedConstraintAction;
 
 /**
  * this class contains a menu where settings can be set for the ConstraintView
@@ -39,13 +39,16 @@ import de.ovgu.featureide.fm.ui.views.constraintview.actions.RefreshViewAction;
 public class ConstraintViewSettingsMenu {
 	private ConstraintViewController controller;
 	private IGraphicalFeatureModel graphicalModel; // active graphical FeatureModel
-	private final ShowCollapsedConstraintsAction collapseAction;
+
+	private final ShowCollapsedConstraintAction collapseAction;
 	private final RefreshViewAction refreshAction;
+	private final MinimalCreateConstraintAction createAction;
 
 	public ConstraintViewSettingsMenu(ConstraintViewController controller) {
 		// create actions:
-		collapseAction = new ShowCollapsedConstraintsAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
+		collapseAction = new ShowCollapsedConstraintAction(null, graphicalModel); // Action that Shows/Hides Collapsed Constraints
 		refreshAction = new RefreshViewAction(controller); // Action that lets the user refresh the view manually
+		createAction = new MinimalCreateConstraintAction(controller.getCurrentModel()); // Action that lets user create a new constraint
 		// create layout:
 		update(controller);
 		createToolBarLayout();
@@ -56,11 +59,21 @@ public class ConstraintViewSettingsMenu {
 	 */
 	public void update(ConstraintViewController controller) {
 		this.controller = controller;
-		if (FeatureModelUtil.getActiveFMEditor() != null) {
-			graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-			collapseAction.update(graphicalModel);
-			collapseAction.setChecked(graphicalModel.getLayout().showCollapsedConstraints());
-			refreshAction.update(controller);
+		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
+			if (FeatureModelUtil.getActiveFMEditor() != null) {
+				createAction.setEnabled(true);
+				refreshAction.setEnabled(true);
+				collapseAction.setEnabled(true);
+
+				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
+				createAction.update(controller.getCurrentModel());
+				collapseAction.update(graphicalModel);
+				refreshAction.update(controller);
+			}
+		} else {
+			createAction.setEnabled(false);
+			refreshAction.setEnabled(false);
+			collapseAction.setEnabled(false);
 		}
 	}
 
@@ -69,10 +82,9 @@ public class ConstraintViewSettingsMenu {
 	 */
 	private void createToolBarLayout() {
 		final IActionBars actionBars = controller.getViewSite().getActionBars();
-		final IMenuManager dropDownMenu = actionBars.getMenuManager();
-		dropDownMenu.add(collapseAction);
-
 		final IToolBarManager toolBarManager = actionBars.getToolBarManager();
+		toolBarManager.add(createAction);
 		toolBarManager.add(refreshAction);
+		toolBarManager.add(collapseAction);
 	}
 }
