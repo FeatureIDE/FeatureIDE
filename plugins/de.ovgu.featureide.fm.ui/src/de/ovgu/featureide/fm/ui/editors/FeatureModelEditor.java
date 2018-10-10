@@ -124,7 +124,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	FeatureModelManager fmManager;
 	IFileManager<IGraphicalFeatureModel> gfmManager;
 
-	private boolean existLayoutInformation;
+	// indicates if layout information had to be created
+	private boolean createdLayoutInformation;
 	private boolean closeEditor;
 
 	private int currentPageIndex;
@@ -420,7 +421,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 					@Override
 					public void run() {
-						if (!hasLayoutInformation()) {
+						if (createdLayoutInformation) {
 							diagramEditor.setAdjustModelToEditorSize();
 						}
 						pageChange(getDiagramEditorIndex());
@@ -549,17 +550,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		if (fmManager != null) {
 			fmManager.getFormat().setFeatureNameValidator(FMComposerManager.getFMComposerExtension(EclipseFileSystem.getResource(path).getProject()));
 			createModelFileMarkers(fmManager.getLastProblems());
-			setLayoutInformation(true);
-			final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
-			if ((extraPath != null) && !extraPath.toFile().exists()) {
-				FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
-				setLayoutInformation(false);
-			}
-
-			gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
-			FMPropertyManager.registerEditor(this);
-
-			setPartName(getModelFile().getProject().getName() + MODEL);
+			createLayoutInformation();
 		} else {
 			setPartName(input.getName());
 		}
@@ -697,18 +688,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		fmManager.removeListener(listener);
 	}
 
-	/**
-	 * @return the layoutInformation
-	 */
-	public boolean hasLayoutInformation() {
-		return existLayoutInformation;
-	}
+	private void createLayoutInformation() {
+		createdLayoutInformation = false;
+		final Path extraPath = AFileManager.constructExtraPath(fmManager.getPath(), new GraphicalFeatureModelFormat());
+		if ((extraPath != null) && !extraPath.toFile().exists()) {
+			FileHandler.save(extraPath, new GraphicalFeatureModel(fmManager.editObject()), new GraphicalFeatureModelFormat());
+			createdLayoutInformation = true;
+		}
+		gfmManager = GraphicalFeatureModelManager.getInstance(extraPath, new GraphicalFeatureModel(fmManager.editObject()));
+		FMPropertyManager.registerEditor(this);
 
-	/**
-	 * @param layoutInformation the layoutInformation to set
-	 */
-	public void setLayoutInformation(boolean layoutInformation) {
-		existLayoutInformation = layoutInformation;
+		setPartName(getModelFile().getProject().getName() + MODEL);
 	}
-
 }
