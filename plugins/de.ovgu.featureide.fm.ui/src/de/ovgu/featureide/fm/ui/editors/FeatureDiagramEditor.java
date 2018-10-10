@@ -378,7 +378,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 		infoLabel.setText("");
 		infoLabel.setLayoutData(gridData);
 
-		new SearchField<>(compositeTop, viewer);
+		new SearchField<>(compositeTop, viewer, this);
 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
@@ -509,7 +509,7 @@ public class FeatureDiagramEditor extends FeatureModelEditorPage implements GUID
 	 *
 	 * @param changedAttributes Result of analysis to only refresh special features, or null if all features should be refreshed.
 	 */
-	private void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
+	public void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
 		final UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
 
 			@Override
