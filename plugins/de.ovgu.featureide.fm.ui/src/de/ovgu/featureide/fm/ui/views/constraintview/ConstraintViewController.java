@@ -89,6 +89,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	boolean refreshWithDelete = true;
 	boolean constraintsHidden = false;
+	boolean isDirty = false;
 
 	private String searchText = "";
 
@@ -176,26 +177,28 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				}
 				// Selection has explanation or Model is void
 				if ((explanationList != null) || !FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
-					changeConstraints(currentModel);
+					changeIntoDecoratedConstraints(currentModel);
 				}
 			} else {
 				// when searchText is entered, search through all constraints
 				findConstraints(currentModel);
-				// INCLUDE VOID
 			}
 			// Only update explanations
 		} else {
-			for (final IConstraint constraint : currentModel.getConstraints()) {
-				viewer.undecorateItem(constraint);
+
+			for (final TreeItem constraint : viewer.getViewer().getTree().getItems()) {
+				viewer.undecorateItem((IConstraint) constraint.getData());
 			}
-			changeConstraints(currentModel);
+			if (searchText.isEmpty()) {
+				changeIntoDecoratedConstraints(currentModel);
+			}
 		}
 	}
 
 	/**
 	 * Add decoration to explanation Constraints without hiding the others (called when the subject is a constraint from the view)
 	 */
-	private void changeConstraints(IFeatureModel currentModel) {
+	private void changeIntoDecoratedConstraints(IFeatureModel currentModel) {
 		final TreeItem constraints[] = viewer.getViewer().getTree().getItems();
 		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 		if (explanationList != null) {
@@ -209,8 +212,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 						continue m;
 					}
 				}
-				// No match found: Create new decorated item
-				viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
 			}
 		}
 	}
@@ -383,8 +384,10 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
 				if (FeatureModelUtil.getActiveFMEditor() != null) {
 					refreshWithDelete = false;
-					FeatureModelUtil.getActiveFMEditor().diagramEditor
-							.setActiveExplanation(constraint.getFeatureModel().getAnalyser().getExplanation(constraint));
+					if (constraint != null) {
+						FeatureModelUtil.getActiveFMEditor().diagramEditor
+								.setActiveExplanation(constraint.getFeatureModel().getAnalyser().getExplanation(constraint));
+					}
 					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
 						graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
 						graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
