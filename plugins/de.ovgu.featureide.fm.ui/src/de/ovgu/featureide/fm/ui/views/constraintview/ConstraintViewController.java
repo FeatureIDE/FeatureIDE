@@ -40,6 +40,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
@@ -128,7 +129,12 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		@Override
 		public void modifyText(ModifyEvent e) {
 			searchText = viewer.getSearchBox().getText();
-			checkForRefresh();
+			if (searchText.isEmpty()) {
+				viewer.removeAll();
+				addVisibleConstraints();
+			} else {
+				checkForRefresh();
+			}
 		}
 
 	};
@@ -148,54 +154,64 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 				this.currentModel.addListener(eventListener);
 			}
 		}
-		if (refreshWithDelete) {
-			viewer.removeAll();
-			// no search text is entered:
-			if (searchText.equals("")) {
-				addConstraints(currentModel);
-			} else {
-				// when searchText is entered, search through all constraints
-				findConstraints(currentModel);
-			}
-		} else {
-			for (final IConstraint constraint : currentModel.getConstraints()) {
-				viewer.undecorateItem(constraint);
-			}
-			changeConstraints(currentModel);
-		}
-
-	}
-
-	private void changeConstraints(IFeatureModel currentModel) {
-		final List<IGraphicalConstraint> constraints =
-			FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getNonCollapsedConstraints();
-		// Void Model
-		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
-		m: for (final IGraphicalConstraint constraint : constraints) {
-			if (explanationList != null) {
-				for (final ConstraintColorPair pair : explanationList) {
-					if (pair.getConstraint().equals(constraint.getObject())) {
-						viewer.changeToDecoratedItem(pair.getConstraint(), pair.getColor());
-						continue m;
-					}
-				}
-			}
-		}
+		refreshConstraints(currentModel);
 	}
 
 	/**
 	 * only shows constraints from features that are not collapsed. If there are selected features we only show constraint containing at least one of the
 	 * selected features
 	 */
-	private void addConstraints(IFeatureModel currentModel) {
-		// goes through all constraints that are not collapsed
+	private void refreshConstraints(IFeatureModel currentModel) {
+		// Refresh entire List
+		if (refreshWithDelete) {
+			viewer.removeAll();
+			// no search text is entered:
+			if (searchText.isEmpty()) {
+				final List<ConstraintColorPair> explanationList = getExplanationConstraints();
+				// If one or more Feature were selected
+				if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
+					addFeatureConstraints(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
+				} else {
+					addVisibleConstraints();
+				}
+				// Selection has explanation or Model is void
+				if ((explanationList != null) || !FeatureModelUtil.getFeatureModel().getAnalyser().valid()) {
+					changeConstraints(currentModel);
+				}
+			} else {
+				// when searchText is entered, search through all constraints
+				findConstraints(currentModel);
+				// INCLUDE VOID
+			}
+			// Only update explanations
+		} else {
+			for (final IConstraint constraint : currentModel.getConstraints()) {
+				viewer.undecorateItem(constraint);
+			}
+			changeConstraints(currentModel);
+		}
+	}
+
+	/**
+	 * Add decoration to explanation Constraints without hiding the others (called when the subject is a constraint from the view)
+	 */
+	private void changeConstraints(IFeatureModel currentModel) {
+		final TreeItem constraints[] = viewer.getViewer().getTree().getItems();
 		final List<ConstraintColorPair> explanationList = getExplanationConstraints();
 		if (explanationList != null) {
-			addDecoratedConstraints(explanationList);
-		} else if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
-			addFeatureConstraints(FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts());
-		} else {
-			addVisibleConstraints();
+			// Iterate reasons
+			m: for (final ConstraintColorPair pair : explanationList) {
+				// Iterate items in View
+				for (final TreeItem constraint : constraints) {
+					// If a match was found: Decorate that item
+					if (pair.getConstraint().equals(constraint.getData())) {
+						viewer.changeToDecoratedItem(pair.getConstraint(), pair.getColor());
+						continue m;
+					}
+				}
+				// No match found: Create new decorated item
+				viewer.addDecoratedItem(pair.getConstraint(), pair.getColor());
+			}
 		}
 	}
 
@@ -214,7 +230,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	 * Show constraints containing the selected feature
 	 */
 	public void addFeatureConstraints(List<Object> selectedEditParts) {
-		viewer.removeAll();
 		if (!FeatureModelUtil.getActiveFMEditor().diagramEditor.getViewer().getSelectedEditParts().isEmpty()) {
 			// when at least one feature is selected:
 			// goes through all features that are selected
@@ -264,7 +279,7 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 			final String partName = part.toString().substring(FEATURE_EDIT_PART_OFFSET, part.toString().length() - 2);
 			// Adding blanks to allow every case to be covered by just one RegEx
 			final String constraintName = " " + constraint.getObject().getDisplayName() + " ";
-			if (constraintName.matches(".* " + partName + " .*")) {
+			if (constraintName.matches(".* -*" + partName + " .*")) {
 				return true;
 			}
 		}
@@ -327,10 +342,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 						if (constraint.getObject().equals(fmReason.getSubject().getElement())) {
 							constraintList.add(new ConstraintColorPair(constraint.getObject(), FMPropertyManager.getReasonColor(fmReason)));
 							continue;
-						}
-
-						if (constraint.getObject().toString().equals(fmReason.getSubject().getElement().toString())) {
-							constraintList.add(new ConstraintColorPair(constraint.getObject(), null));
 						}
 					}
 				}
