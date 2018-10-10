@@ -23,29 +23,18 @@ package de.ovgu.featureide.fm.ui.views.constraintview;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -55,16 +44,14 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.utils.FeatureModelUtil;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.DeleteConstraintAction;
-import de.ovgu.featureide.fm.ui.views.constraintview.actions.EditConstraintInViewAction;
+import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewDoubleClickListener;
+import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewKeyListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewPartListener;
+import de.ovgu.featureide.fm.ui.views.constraintview.listener.ConstraintViewSelectionChangedListener;
 import de.ovgu.featureide.fm.ui.views.constraintview.util.ConstraintColorPair;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintView;
 import de.ovgu.featureide.fm.ui.views.constraintview.view.ConstraintViewContextMenu;
@@ -83,8 +70,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	private static final Integer FEATURE_EDIT_PART_OFFSET = 17;
 	private ConstraintView viewer;
 	private IFeatureModel currentModel;
-	private IGraphicalFeature graphFeature;
-	private IGraphicalFeatureModel graphModel;
 	private ConstraintViewPartListener partListener;
 	private ConstraintViewSettingsMenu settingsMenu;
 	private Explanation<?> explanation;
@@ -93,10 +78,6 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	boolean constraintsHidden = false;
 
 	private String searchText = "";
-
-	// integer values that are returned when pressing a special button (from keyListener)
-	private final int F_BUTTON_PRESSED = 102;
-	private final int Z_BUTTON_PRESSED = 122;
 
 	/**
 	 * Standard SWT initialize called after construction.
@@ -379,78 +360,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 	 * adding Listener to the tree viewer
 	 */
 	private void addListener() {
-		// event fired when clicking on an constraint (one click)
-		viewer.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-
-			// marks features by changing their border when a related feature is selected
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				final TreeSelection treeSelection = (TreeSelection) event.getSelection();
-				final IConstraint constraint = (IConstraint) treeSelection.getFirstElement();
-				if (FeatureModelUtil.getActiveFMEditor() != null) {
-					refreshWithDelete = false;
-					if (constraint != null) {
-						FeatureModelUtil.getActiveFMEditor().diagramEditor
-								.setActiveExplanation(constraint.getFeatureModel().getAnalyser().getExplanation(constraint));
-					}
-					for (final IFeature feature : FeatureModelUtil.getFeatureModel().getFeatures()) {
-						graphFeature = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel().getGraphicalFeature(feature);
-						graphModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
-						if ((constraint != null) && constraint.getContainedFeatures().contains(feature)) {
-							graphFeature.setConstraintSelected(true);
-						} else {
-							graphFeature.setConstraintSelected(false);
-						}
-						new FeatureFigure(graphFeature, graphModel).setProperties();
-					}
-				}
-			}
-
-		});
-
-		viewer.getViewer().addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-
-				if (event.getSource() instanceof TreeViewer) {
-					final TreeSelection treeSelection = (TreeSelection) event.getSelection();
-					if (treeSelection.getFirstElement() instanceof IConstraint) {
-						new EditConstraintInViewAction(viewer.getViewer(), currentModel).run();
-					}
-				}
-			}
-		});
-
-		viewer.getViewer().getTree().addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.keyCode == SWT.DEL) {
-					// pressing the del button while having a constraint selected will delete it
-					new DeleteConstraintAction(viewer.getViewer(), currentModel).run();
-				} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == F_BUTTON_PRESSED))) {
-					// pressing CTRL + F will get you in the search box
-					viewer.getSearchBox().setFocus();
-				} else if (((e.stateMask == (SWT.CTRL)) && (e.keyCode == Z_BUTTON_PRESSED))) {
-					// pressing CTRL + Z will undo operations
-					try {
-						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().undo((IUndoContext) currentModel.getUndoContext(), null, null);
-					} catch (final ExecutionException e1) {}
-				} else if (((e.stateMask == (SWT.CTRL + SWT.SHIFT)) && (e.keyCode == Z_BUTTON_PRESSED))) {
-					// pressing CTRL + SHIFT + Z will re do undo's
-					try {
-						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().redo((IUndoContext) currentModel.getUndoContext(), null, null);
-					} catch (final ExecutionException e1) {}
-				} else if (e.keyCode == SWT.ESC) {
-					// pressing the escape button will remove the focus or current selection
-					viewer.getViewer().setSelection(null);
-				}
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {}
-
-		});
+		viewer.getViewer().addSelectionChangedListener(new ConstraintViewSelectionChangedListener(this));
+		viewer.getViewer().addDoubleClickListener(new ConstraintViewDoubleClickListener(this));
+		viewer.getViewer().getTree().addKeyListener(new ConstraintViewKeyListener(this));
 	}
 
 	@Override
@@ -483,9 +395,9 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
 			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				if (refreshWithDelete == false) {
+				if (!isRefreshWithDelete()) {
 					checkForRefresh();
-					refreshWithDelete = true;
+					setRefreshWithDelete(true);
 				} else {
 					checkForRefresh();
 				}
@@ -514,5 +426,13 @@ public class ConstraintViewController extends ViewPart implements GUIDefaults {
 
 	public ConstraintViewSettingsMenu getSettingsMenu() {
 		return settingsMenu;
+	}
+
+	public boolean isRefreshWithDelete() {
+		return refreshWithDelete;
+	}
+
+	public void setRefreshWithDelete(Boolean refreshWithDelete) {
+		this.refreshWithDelete = refreshWithDelete;
 	}
 }

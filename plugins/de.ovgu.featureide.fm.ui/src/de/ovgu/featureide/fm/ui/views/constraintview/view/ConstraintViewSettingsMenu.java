@@ -63,7 +63,7 @@ public class ConstraintViewSettingsMenu {
 		this.controller = controller;
 		if (controller.getView().getViewer().getTree().getHeaderVisible()) {
 			if (FeatureModelUtil.getActiveFMEditor() != null) {
-				enableActions();
+				setStatOfActions(true);
 				graphicalModel = FeatureModelUtil.getActiveFMEditor().diagramEditor.getGraphicalFeatureModel();
 				createAction.update(controller.getCurrentModel());
 				refreshAction.update(controller);
@@ -77,7 +77,7 @@ public class ConstraintViewSettingsMenu {
 				}
 			}
 		} else {
-			disableActions();
+			setStatOfActions(false);
 		}
 	}
 
@@ -95,18 +95,10 @@ public class ConstraintViewSettingsMenu {
 	/**
 	 * disables all actions (run method is not called when activated)
 	 */
-	public void enableActions() {
-		createAction.setEnabled(true);
-		refreshAction.setEnabled(true);
-		collapseAction.setEnabled(true);
+	public void setStatOfActions(Boolean isEnabdled) {
+		createAction.setEnabled(isEnabdled);
+		refreshAction.setEnabled(isEnabdled);
+		collapseAction.setEnabled(isEnabdled);
 	}
 
-	/**
-	 * enables all actions (when activated the run method will be called)
-	 */
-	public void disableActions() {
-		createAction.setEnabled(false);
-		refreshAction.setEnabled(false);
-		collapseAction.setEnabled(false);
-	}
 }
