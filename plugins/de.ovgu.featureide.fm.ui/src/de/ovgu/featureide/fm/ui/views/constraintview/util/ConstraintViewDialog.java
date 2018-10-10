@@ -20,53 +20,163 @@
  */
 package de.ovgu.featureide.fm.ui.views.constraintview.util;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.localization.StringTable;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
+import de.ovgu.featureide.fm.ui.views.constraintview.ConstraintViewController;
 
 /**
- * Dialog that asks the user if he wants to open the constraint view if not opened.
+ * A dialog that asks a user to open the constraint view. Its saves the decision in the workspace wide preferences.
  *
  * @author "Rosiak Kamil"
  */
-public class ConstraintViewDialog extends Dialog implements GUIDefaults {
-	public static final String CONSTRAINT_VIEW_KEY = "constraint_view_option";
-	private Button checkBox;
+public class ConstraintViewDialog extends Dialog {
+	public static final String CONSTRAINT_VIEW_REMEMBER = "de.ovgu.featureide.fm.ui.views.constraintview_remember";
+	public static final String CONSTRAINT_VIEW_DECISION = "de.ovgu.featureide.fm.ui.views.constraintview_decision";
 
+	private final int ROW_WIDTH = 120;
+	private Shell shell;
+	private static boolean remember;
+	private static boolean decision;
+	private int exitCode = SWT.CANCEL;
+
+	// default constructor
 	public ConstraintViewDialog(Shell parent) {
-		super(parent);
+		this(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.Resize);
+		shell = parent;
+		remember = Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "false"));
+		decision = Boolean.parseBoolean(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_DECISION, "false"));
 	}
 
-	@Override
-	protected Control createDialogArea(Composite parent) {
-		final Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE);
-		container.setLayout(new FillLayout(SWT.VERTICAL));
+	public ConstraintViewDialog(Shell parent, int style) {
+		super(parent, style);
+		shell = parent;
+	}
 
-		final CLabel label = new CLabel(container, SWT.NONE);
-		label.setImage(HELP_IMAGE);
+	public boolean getDecision() {
+		return decision;
+	}
+
+	public boolean isRemember() {
+		return remember;
+	}
+
+	/**
+	 * Opens the dialog.
+	 *
+	 * @return exit code SWT.OK | SWT.NO | SWT.CANCEL
+	 */
+	public int open() {
+		shell.setText(StringTable.CONSTRAINT_VIEW_QUESTION_TITLE);
+		shell.setLocation(Display.getCurrent().getCursorLocation());
+		createContents(shell);
+		shell.pack();
+		shell.open();
+
+		final Display display = getParent().getDisplay();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch()) {
+				display.sleep();
+			}
+		}
+		return exitCode;
+	}
+
+	/**
+	 * Creates the dialog's contents
+	 *
+	 * @param shell the dialog window
+	 */
+	private void createContents(final Shell shell) {
+		shell.setLayout(new RowLayout(SWT.VERTICAL));
+
+		// Question text
+		final CLabel label = new CLabel(shell, SWT.NONE);
 		label.setText(StringTable.CONSTRAINT_VIEW_QUESTION_DIALOG);
+		label.setImage(shell.getDisplay().getSystemImage(SWT.ICON_QUESTION));
 
-		checkBox = new Button(container, SWT.CHECK);
-		checkBox.setText(StringTable.CONSTRAINT_VIEW_SAVE_DECISION);
-		checkBox.setSelection(Boolean.parseBoolean(Preferences.getPref(CONSTRAINT_VIEW_KEY)));
+		// Buttons and Layouting
+		final Button rememberDecButton = new Button(shell, SWT.CHECK);
+		rememberDecButton.setText(StringTable.CONSTRAINT_VIEW_REMEMBER_DECISION);
+		rememberDecButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				remember = rememberDecButton.getSelection();
+			}
+		});
 
-		return container;
+		final Composite buttons = new Composite(shell, SWT.None);
+		buttons.setLayout(new RowLayout(SWT.HORIZONTAL));
+		final RowData rowData = new RowData();
+		rowData.width = ROW_WIDTH;
+
+		final Button cancelButton = new Button(buttons, SWT.PUSH);
+		cancelButton.setText(StringTable.CANCEL);
+		cancelButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				setExitCode(SWT.CANCEL);
+				shell.dispose();
+			}
+		});
+
+		final Button noButton = new Button(buttons, SWT.PUSH);
+		noButton.setText(StringTable.NO);
+
+		noButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (remember) {
+					Preferences.store(CONSTRAINT_VIEW_REMEMBER, "true");
+					Preferences.store(CONSTRAINT_VIEW_DECISION, "false");
+					decision = false;
+				}
+				setExitCode(SWT.NO);
+				shell.dispose();
+			}
+		});
+
+		final Button yesButton = new Button(buttons, SWT.PUSH);
+		yesButton.setText(StringTable.YES);
+
+		yesButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (remember) {
+					Preferences.store(CONSTRAINT_VIEW_REMEMBER, "true");
+					Preferences.store(CONSTRAINT_VIEW_DECISION, "true");
+					decision = true;
+				}
+				setExitCode(SWT.YES);
+				try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
+				} catch (final PartInitException e) {
+					e.printStackTrace();
+				}
+				shell.dispose();
+			}
+		});
+		cancelButton.setLayoutData(rowData);
+		yesButton.setLayoutData(rowData);
+		noButton.setLayoutData(rowData);
+		shell.setDefaultButton(cancelButton);
 	}
 
-	@Override
-	protected void okPressed() {
-		Preferences.store(CONSTRAINT_VIEW_KEY, String.valueOf(checkBox.getSelection()));
-		super.okPressed();
+	private void setExitCode(int exitCode) {
+		this.exitCode = exitCode;
 	}
 
 }

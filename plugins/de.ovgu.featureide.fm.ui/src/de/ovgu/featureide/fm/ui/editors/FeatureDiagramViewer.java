@@ -30,18 +30,16 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.ChillScrollFreeformRootEditPart;
@@ -158,24 +156,20 @@ public class FeatureDiagramViewer extends ScrollingGraphicalViewer implements IS
 	 * Opens a dialog and asks the user if he wants to show the constraint view.
 	 */
 	public void openConstraintDecision() {
-		// ask the user to open the constraint view
 		final IWorkbenchWindow bench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		boolean constraintDecision = false;
-		final String prefValue = Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY);
-		try {
-			constraintDecision = Boolean.parseBoolean(prefValue);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
 
-		// if the constraint view is not opened and the global setting is false
-		if ((bench.getActivePage().findView(ConstraintViewController.ID) == null) && !constraintDecision) {
-			final ConstraintViewDialog dialog = new ConstraintViewDialog(Display.getDefault().getActiveShell());
-			if (dialog.open() == Window.OK) {
-				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
-				} catch (final PartInitException e) {
-					e.printStackTrace();
+		if (bench.getActivePage().findView(ConstraintViewController.ID) == null) {
+			final ConstraintViewDialog dialog = new ConstraintViewDialog(new Shell(SWT.MIN | SWT.MAX));
+			System.out.println(dialog.isRemember());
+			if (!dialog.isRemember()) {
+				dialog.open();
+			} else {
+				if (dialog.getDecision()) {
+					try {
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(ConstraintViewController.ID);
+					} catch (final PartInitException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}

@@ -29,6 +29,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TRIES_TO_FIND_
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
@@ -118,28 +119,15 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		dialogGroup.setText(CONFIGURATION_DIALOGS);
 		final Button constraintViewButton = new Button(dialogGroup, SWT.CHECK);
 
-		// loading preferences
-		try {
-			Boolean isSelected = false;
-			final String pref = Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_KEY);
-			isSelected = Boolean.valueOf(pref);
-			constraintViewButton.setSelection(isSelected);
-		} catch (final Exception e) {
-			e.getStackTrace();
-		}
-
-		constraintViewButton.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_KEY, String.valueOf(constraintViewButton.getSelection()));
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
-		});
-
 		constraintViewButton.setText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TEXT);
 		constraintViewButton.setToolTipText(StringTable.CONFIGURATION_DIALOGS_CONSTRAINT_TOOLTIP);
+		constraintViewButton.setSelection(Boolean.valueOf(Preferences.getPref(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, "default")));
+		constraintViewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				Preferences.store(ConstraintViewDialog.CONSTRAINT_VIEW_REMEMBER, String.valueOf(constraintViewButton.getSelection()));
+			}
+		});
 
 		return container;
 	}
